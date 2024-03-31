@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "DasForUE",
+	"Description": "Daslang plugin for Unreal Engine 5",
+	"Category": "Other",
+	"CreatedBy": "spiiin",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "DasForUE",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
