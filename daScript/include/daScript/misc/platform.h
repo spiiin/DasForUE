@@ -211,7 +211,8 @@ __forceinline uint32_t rotr_c(uint32_t a, uint32_t b) {
 void os_debug_break();
 
 #ifndef DAS_FATAL_LOG
-#define DAS_FATAL_LOG(...)   do { printf(__VA_ARGS__); fflush(stdout); } while(0)
+void DAS_FATAL_LOG(const char* format, ...);
+//#define DAS_FATAL_LOG(...)   do { printf(__VA_ARGS__); fflush(stdout); } while(0)
 #endif
 
 #ifndef DAS_FATAL_ERROR
