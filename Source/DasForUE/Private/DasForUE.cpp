@@ -15,9 +15,9 @@
 THIRD_PARTY_INCLUDES_START
 #include "daScript/daScript.h"
 THIRD_PARTY_INCLUDES_END
-
 #include "das_compile.h"
-#include "das_unreal.h"
+
+#include "codegen/dasUnreal.h"
 #include "using_das.inc"
 
 void FDasForUEModule::StartupModule()
@@ -28,7 +28,7 @@ void FDasForUEModule::StartupModule()
     das::setDasRoot(ConvertToUtf8.Get());
     //
     NEED_ALL_DEFAULT_MODULES;
-    NEED_MODULE(Module_Unreal);
+    NEED_MODULE(Module_dasUnreal);
     Module::Initialize();
 }
 
