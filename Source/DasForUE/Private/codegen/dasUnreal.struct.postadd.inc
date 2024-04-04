@@ -3,4 +3,6 @@
 
 initRecAnnotation(ann_FString,lib);
 initRecAnnotation(ann_FTextRange,lib);
+initRecAnnotation(ann_FVTableHelper,lib);
+initRecAnnotation(ann_FRestoreForUObjectOverwrite,lib);
 initRecAnnotation(ann_UObjectBase,lib);

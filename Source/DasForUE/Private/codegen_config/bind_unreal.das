@@ -70,6 +70,13 @@ class UnrealGen : CppGenBind
              "RegisterCompiledInInfo" => true; //FClassRegisterCompiledInInfo
              "UObjectBaseInit" => true; //some inner stuff?
              "UObjectBaseShutdown" => true;
+
+             //UObject/UObjectMarks.h
+             "GetObjectsWithAllMarks" => true;
+             "GetObjectsWithAnyMarks" => true;
+
+             //UObject/UObjectBaseUtility.h
+             "UObjectBaseUtility::GetVersePath" => true;
         }}
 
         //TODO:
@@ -101,6 +108,11 @@ class UnrealGen : CppGenBind
             "FEnumRegisterCompiledInInfo" => true;
             "FPackageReloadVersionInfo" => true;
             "FStat_STAT_UObjectsStatGroupTester" => true; //unrelated
+
+            //UObject/ObjectMacros.h
+            "FReferencerInformationList" => true;
+            "FReferencerInformation" => true;
+            "FUObjectCppClassStaticFunctions" => true;
         }}
 
         canMoveIfCopyConstructable <- {{
@@ -118,7 +130,10 @@ class UnrealGen : CppGenBind
         //print("fname = {fname}\n")
         if (
             fname |> find("UnrealString.h") != -1 ||
-            fname |> find("UObjectBase.h") != -1
+            fname |> find("UObject/UObjectBase.h") != -1 ||
+            fname |> find("UObject/UObjectMarks.h") != -1 ||
+            fname |> find("UObject/ObjectMacros.h") != -1
+            //fname |> find("UObject/UObjectBaseUtility.h") != -1
         )
             return false
         return true
@@ -176,6 +191,12 @@ class UnrealGen : CppGenBind
 
     def override skip_struct(name: string)
         return unreal_skip_struct |> key_exists(name)
+
+    def override skip_enum ( ns_en, en : string )
+        //print("enum {ns_en} {en}\n")
+        if en |> find("unnamed enum at") != -1
+            return true
+        return false
 
     def override writeFuncPrefix
         fwrite(func_file, "#include \"{bind_module}.h\"\n")

@@ -101,4 +101,8 @@
 #define __EDG__ 1
 
 #include "UnrealString.h"
+
 #include "UObject/UObjectBase.h"
+#include "UObject/UObjectMarks.h"
+#include "UObject/ObjectMacros.h"
+//#include "UObject/UObjectBaseUtility.h"

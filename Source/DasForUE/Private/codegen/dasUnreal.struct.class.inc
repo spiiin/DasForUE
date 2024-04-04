@@ -22,6 +22,22 @@ struct FTextRange_GeneratedAnnotation : ManagedStructureAnnotation<FTextRange> {
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/ObjectMacros.h:167:7
+struct FVTableHelper_GeneratedAnnotation : ManagedStructureAnnotation<FVTableHelper> {
+	FVTableHelper_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FVTableHelper", ml, "FVTableHelper") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/ObjectMacros.h:2178:7
+struct FRestoreForUObjectOverwrite_GeneratedAnnotation : ManagedStructureAnnotation<FRestoreForUObjectOverwrite> {
+	FRestoreForUObjectOverwrite_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FRestoreForUObjectOverwrite", ml, "FRestoreForUObjectOverwrite") {
+	}
+	void init () {
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBase.h:33:7
 struct UObjectBase_GeneratedAnnotation : ManagedStructureAnnotation<UObjectBase> {
 	UObjectBase_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UObjectBase", ml, "UObjectBase") {
