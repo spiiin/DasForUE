@@ -12,3 +12,9 @@ bool _dasUnreal_static_7_ToHexBlob(const FString &,const FString & Source,unsign
 FString _dasUnreal_static_8_SanitizeFloat(const FString &,double InFloat,const int InMinFractionalDigits);
 FName _dasUnreal_virtual_9_GetFNameForStatID(const UObjectBase & self);
 FString _dasUnreal_static_10_RemoveClassPrefix(const UObjectBase &,const wchar_t * ClassName);
+bool _dasUnreal_static_11_IsPendingKillEnabled(const UObjectBaseUtility &);
+EInternalObjectFlags _dasUnreal_static_12_FixGarbageOrPendingKillInternalObjectFlags(const UObjectBaseUtility &,const EInternalObjectFlags InFlags);
+bool _dasUnreal_virtual_13_CanBeClusterRoot(const UObjectBaseUtility & self);
+bool _dasUnreal_virtual_14_CanBeInCluster(const UObjectBaseUtility & self);
+void _dasUnreal_virtual_15_CreateCluster(UObjectBaseUtility & self);
+void _dasUnreal_virtual_16_OnClusterMarkedAsPendingKill(UObjectBaseUtility & self);

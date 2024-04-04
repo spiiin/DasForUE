@@ -464,3 +464,15 @@ public:
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBaseUtility.h:43:12
+class Enumeration_EObjectFullNameFlags : public das::Enumeration {
+public:
+	Enumeration_EObjectFullNameFlags() : das::Enumeration("EObjectFullNameFlags") {
+		external = true;
+		cppName = "EObjectFullNameFlags";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(EObjectFullNameFlags::None), das::LineInfo());
+		addIEx("IncludeClassPackage", "IncludeClassPackage", int64_t(EObjectFullNameFlags::IncludeClassPackage), das::LineInfo());
+	}
+};
+

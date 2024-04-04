@@ -35,3 +35,5 @@ DAS_BASE_BIND_ENUM_GEN(UE::ELoadConfigPropagationFlags,ELoadConfigPropagationFla
 
 DAS_BASE_BIND_ENUM_GEN(EObjectMark,EObjectMark);
 
+DAS_BASE_BIND_ENUM_GEN(EObjectFullNameFlags,EObjectFullNameFlags);
+

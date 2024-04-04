@@ -11,3 +11,6 @@ auto ann_FRestoreForUObjectOverwrite = make_smart<FRestoreForUObjectOverwrite_Ge
 addAnnotation(ann_FRestoreForUObjectOverwrite);
 auto ann_UObjectBase = make_smart<UObjectBase_GeneratedAnnotation>(lib);
 addAnnotation(ann_UObjectBase);
+auto ann_UObjectBaseUtility = make_smart<UObjectBaseUtility_GeneratedAnnotation>(lib);
+addAnnotation(ann_UObjectBaseUtility);
+setParents(this,"UObjectBaseUtility",  {"UObjectBase"});

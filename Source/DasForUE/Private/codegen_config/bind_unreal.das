@@ -77,6 +77,12 @@ class UnrealGen : CppGenBind
 
              //UObject/UObjectBaseUtility.h
              "UObjectBaseUtility::GetVersePath" => true;
+             "UObjectBaseUtility::GetStatID" => true; //TStatId
+             "UObjectBaseUtility::GetLinkerCustomVersion" => true; //FGuid
+             "UObjectBaseUtility::GetLinkerUEVersion" => true; //FPackageFileVersion
+             "UObjectBaseUtility::GetLinker" => true; //FLinkerLoad
+             "UObjectBaseUtility::GetFullName" => true; //TStringBuilderBase<wchar_t>
+             "UObjectBaseUtility::GetPathName" => true; //TStringBuilderBase<wchar_t>
         }}
 
         //TODO:
@@ -113,6 +119,9 @@ class UnrealGen : CppGenBind
             "FReferencerInformationList" => true;
             "FReferencerInformation" => true;
             "FUObjectCppClassStaticFunctions" => true;
+
+            //UObject/UObjectBaseUtility.h
+            "FScopeCycleCounterUObject" => true; //TStatId
         }}
 
         canMoveIfCopyConstructable <- {{
@@ -132,8 +141,8 @@ class UnrealGen : CppGenBind
             fname |> find("UnrealString.h") != -1 ||
             fname |> find("UObject/UObjectBase.h") != -1 ||
             fname |> find("UObject/UObjectMarks.h") != -1 ||
-            fname |> find("UObject/ObjectMacros.h") != -1
-            //fname |> find("UObject/UObjectBaseUtility.h") != -1
+            fname |> find("UObject/ObjectMacros.h") != -1 ||
+            fname |> find("UObject/UObjectBaseUtility.h") != -1
         )
             return false
         return true

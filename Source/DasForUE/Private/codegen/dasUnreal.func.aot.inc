@@ -45,3 +45,27 @@ FString _dasUnreal_static_10_RemoveClassPrefix(const UObjectBase &,const wchar_t
 	return UObjectBase::RemoveClassPrefix(ClassName);
 }
 
+bool _dasUnreal_static_11_IsPendingKillEnabled(const UObjectBaseUtility &) {
+	return UObjectBaseUtility::IsPendingKillEnabled();
+}
+
+EInternalObjectFlags _dasUnreal_static_12_FixGarbageOrPendingKillInternalObjectFlags(const UObjectBaseUtility &,const EInternalObjectFlags InFlags) {
+	return UObjectBaseUtility::FixGarbageOrPendingKillInternalObjectFlags(InFlags);
+}
+
+bool _dasUnreal_virtual_13_CanBeClusterRoot(const UObjectBaseUtility & self) {
+	return self.CanBeClusterRoot();
+}
+
+bool _dasUnreal_virtual_14_CanBeInCluster(const UObjectBaseUtility & self) {
+	return self.CanBeInCluster();
+}
+
+void _dasUnreal_virtual_15_CreateCluster(UObjectBaseUtility & self) {
+	self.CreateCluster();
+}
+
+void _dasUnreal_virtual_16_OnClusterMarkedAsPendingKill(UObjectBaseUtility & self) {
+	self.OnClusterMarkedAsPendingKill();
+}
+

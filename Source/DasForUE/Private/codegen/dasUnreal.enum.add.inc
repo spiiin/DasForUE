@@ -18,3 +18,4 @@ addEnumeration(make_smart<Enumeration_EInternalObjectFlags>());
 addEnumeration(make_smart<Enumeration_EEnumFlags>());
 addEnumeration(make_smart<Enumeration_UE_ELoadConfigPropagationFlags>());
 addEnumeration(make_smart<Enumeration_EObjectMark>());
+addEnumeration(make_smart<Enumeration_EObjectFullNameFlags>());

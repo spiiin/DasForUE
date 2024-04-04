@@ -19,3 +19,4 @@ DAS_BIND_ENUM_CAST(EInternalObjectFlags);
 DAS_BIND_ENUM_CAST(EEnumFlags);
 DAS_BIND_ENUM_CAST(UE::ELoadConfigPropagationFlags);
 DAS_BIND_ENUM_CAST(EObjectMark);
+DAS_BIND_ENUM_CAST(EObjectFullNameFlags);

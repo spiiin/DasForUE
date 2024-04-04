@@ -31,3 +31,9 @@ template <> struct cast_arg<UObjectBase> {
 		return * cast<UObjectBase *>::to(res);
 	}
 };
+template <> struct cast_arg<UObjectBaseUtility> {
+	static __forceinline const UObjectBaseUtility & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UObjectBaseUtility *>::to(res);
+	}
+};

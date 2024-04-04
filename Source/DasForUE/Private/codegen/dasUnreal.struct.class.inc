@@ -46,3 +46,11 @@ struct UObjectBase_GeneratedAnnotation : ManagedStructureAnnotation<UObjectBase>
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBaseUtility.h:57:7
+struct UObjectBaseUtility_GeneratedAnnotation : ManagedStructureAnnotation<UObjectBaseUtility> {
+	UObjectBaseUtility_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UObjectBaseUtility", ml, "UObjectBaseUtility") {
+	}
+	void init () {
+	}
+};
+
