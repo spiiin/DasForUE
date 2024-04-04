@@ -37,3 +37,11 @@ FString _dasUnreal_static_8_SanitizeFloat(const FString &,double InFloat,const i
 	return FString::SanitizeFloat(InFloat,InMinFractionalDigits);
 }
 
+FName _dasUnreal_virtual_9_GetFNameForStatID(const UObjectBase & self) {
+	return self.GetFNameForStatID();
+}
+
+FString _dasUnreal_static_10_RemoveClassPrefix(const UObjectBase &,const wchar_t * ClassName) {
+	return UObjectBase::RemoveClassPrefix(ClassName);
+}
+

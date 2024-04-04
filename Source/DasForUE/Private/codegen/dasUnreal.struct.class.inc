@@ -1,7 +1,7 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers\UnrealString.h:55:7
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:55:7
 struct FString_GeneratedAnnotation : ManagedStructureAnnotation<FString> {
 	virtual bool canCopy() const override { return std::is_copy_constructible<FString>::value; }
 	virtual bool canClone() const override { return std::is_copy_constructible<FString>::value; }
@@ -12,13 +12,21 @@ struct FString_GeneratedAnnotation : ManagedStructureAnnotation<FString> {
 	}
 };
 
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers\UnrealString.h:2534:8
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2534:8
 struct FTextRange_GeneratedAnnotation : ManagedStructureAnnotation<FTextRange> {
 	FTextRange_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FTextRange", ml, "FTextRange") {
 	}
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(BeginIndex)>("BeginIndex","BeginIndex");
 		addField<DAS_BIND_MANAGED_FIELD(EndIndex)>("EndIndex","EndIndex");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBase.h:33:7
+struct UObjectBase_GeneratedAnnotation : ManagedStructureAnnotation<UObjectBase> {
+	UObjectBase_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UObjectBase", ml, "UObjectBase") {
+	}
+	void init () {
 	}
 };
 

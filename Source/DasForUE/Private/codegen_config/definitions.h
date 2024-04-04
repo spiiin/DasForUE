@@ -95,4 +95,10 @@
 #define TRACELOG_API DLLIMPORT
 #define BUILDSETTINGS_API DLLEXPORT
 
+#define COREUOBJECT_API DLLIMPORT
+
+#undef __clang__
+#define __EDG__ 1
+
 #include "UnrealString.h"
+#include "UObject/UObjectBase.h"

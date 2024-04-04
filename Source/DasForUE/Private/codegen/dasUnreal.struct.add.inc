@@ -5,3 +5,5 @@ auto ann_FString = make_smart<FString_GeneratedAnnotation>(lib);
 addAnnotation(ann_FString);
 auto ann_FTextRange = make_smart<FTextRange_GeneratedAnnotation>(lib);
 addAnnotation(ann_FTextRange);
+auto ann_UObjectBase = make_smart<UObjectBase_GeneratedAnnotation>(lib);
+addAnnotation(ann_UObjectBase);

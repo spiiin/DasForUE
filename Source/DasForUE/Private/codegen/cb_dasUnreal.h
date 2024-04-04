@@ -29,6 +29,19 @@ namespace das {
             return v;
         }
     };
+    
+    template <> struct cast_arg<EObjectFlags> {
+        static __forceinline EObjectFlags to(Context& ctx, SimNode* node) {
+            vec4f res = node->eval(ctx);
+            EObjectFlags v; memcpy(&v, &res, sizeof(EObjectFlags));
+            return v;
+        }
+    };
+    template <> struct cast_res<EObjectFlags> {
+        static __forceinline vec4f from(EObjectFlags flags, Context*) {
+            return cast<int32_t>::from(int32_t(flags));
+        };
+    };
 
     //------------------------------------------------------------------------
     //Manual add, replace after re-generate

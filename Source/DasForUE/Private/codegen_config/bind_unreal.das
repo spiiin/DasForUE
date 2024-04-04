@@ -27,12 +27,14 @@ class UnrealGen : CppGenBind
         let engineIncludes = [[string
             "{UNREAL_PATH}/Engine/Source/Runtime/Core/Public";
             "{UNREAL_PATH}/Engine/Source/Runtime/Core/Public/Containers/";
-            "{UNREAL_PATH}/Engine/Source/Runtime/TraceLog/Public/"
+            "{UNREAL_PATH}/Engine/Source/Runtime/TraceLog/Public/";
+
+            "{UNREAL_PATH}/Engine/Source/Runtime/CoreUObject/Public/";
         ]]
 
         var args <- [{string
             "-xc++-header";
-            "-std=c++1z"
+            "-std=c++1z";
         }]
         for engineInclude in engineIncludes
             args |> push <| "-I{engineInclude}"
@@ -54,26 +56,51 @@ class UnrealGen : CppGenBind
             "FString::end" => true;
             "FString::rbegin" => true;
             "FString::rend" => true;
-            "FString::SerializeAsANSICharArray" => true; //FArray
-            "FString::CountBytes" => true;
+            "FString::SerializeAsANSICharArray" => true; //FArchive
+            "FString::CountBytes" => true; //FArchive
+
+             //UObject/UObjectBase.h
+             "FStat_STAT_UObjectsStatGroupTester::GetStatName" => true; //related to inner stat
+             "FStat_STAT_UObjectsStatGroupTester::GetDescription" => true;
+             "FStat_STAT_UObjectsStatGroupTester::GetStatType" => true;
+             "FStat_STAT_UObjectsStatGroupTester::IsClearEveryFrame" => true;
+             "FStat_STAT_UObjectsStatGroupTester::IsCycleStat" => true;
+             "FStat_STAT_UObjectsStatGroupTester::GetFlags" => true;
+             "FStat_STAT_UObjectsStatGroupTester::GetMemoryRegion" => true;
+             "RegisterCompiledInInfo" => true; //FClassRegisterCompiledInInfo
+             "UObjectBaseInit" => true; //some inner stuff?
+             "UObjectBaseShutdown" => true;
         }}
 
         //TODO:
         // - find substring is slow
         // - apply macro expansion? (`clang -E` + unexpand includes back)
         unreal_arg_part_names <- [{string
-            "TArray";           //TODO: temp, due to name das/unreal name conflict
+            "TArray";           //TODO: temp, due to name das/unreal name conflict (namespace das -> dasext?)
 
             "const WIDECHAR *";  //mostly (for UnrealString, at least), it related to overloads char/wchar/unsigned short/UTF8CHAR
             "const UCS2CHAR *";  //check what can be done with them
             "const UTF8CHAR *";  //
-            "const TCHAR *";     //
+
         }]
         
         unreal_skip_struct <- {{
             //UnrealString.h
             "FStringOutputDevice" => true;
             "FStringOutputDeviceCountLines" => true;
+
+            //UObject/UObjectBase.h
+            "UObject" => true;
+            "UClass" => true;
+            "FRegisterCompiledInInfo" => true;
+            "FClassReloadVersionInfo" => true;
+            "FClassRegisterCompiledInInfo" => true;
+            "FStructReloadVersionInfo" => true;
+            "FStructRegisterCompiledInInfo" => true;
+            "FEnumReloadVersionInfo" => true;
+            "FEnumRegisterCompiledInInfo" => true;
+            "FPackageReloadVersionInfo" => true;
+            "FStat_STAT_UObjectsStatGroupTester" => true; //unrelated
         }}
 
         canMoveIfCopyConstructable <- {{
@@ -88,8 +115,11 @@ class UnrealGen : CppGenBind
         return true
 
     def override skip_file(fname:string) : bool
-        // print("fname = {fname}\n")
-        if fname |> find("UnrealString.h") != -1
+        //print("fname = {fname}\n")
+        if (
+            fname |> find("UnrealString.h") != -1 ||
+            fname |> find("UObjectBase.h") != -1
+        )
             return false
         return true
 

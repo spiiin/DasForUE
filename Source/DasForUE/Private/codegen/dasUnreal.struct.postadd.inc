@@ -3,3 +3,4 @@
 
 initRecAnnotation(ann_FString,lib);
 initRecAnnotation(ann_FTextRange,lib);
+initRecAnnotation(ann_UObjectBase,lib);

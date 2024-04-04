@@ -13,3 +13,9 @@ template <> struct cast_arg<FTextRange> {
 		return * cast<FTextRange *>::to(res);
 	}
 };
+template <> struct cast_arg<UObjectBase> {
+	static __forceinline const UObjectBase & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UObjectBase *>::to(res);
+	}
+};

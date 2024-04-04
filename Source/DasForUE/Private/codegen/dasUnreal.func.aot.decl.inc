@@ -10,3 +10,5 @@ bool _dasUnreal_static_5_ToBlob(const FString &,const FString & Source,unsigned 
 FString _dasUnreal_static_6_FromHexBlob(const FString &,const unsigned char * SrcBuffer,const unsigned int SrcSize);
 bool _dasUnreal_static_7_ToHexBlob(const FString &,const FString & Source,unsigned char * DestBuffer,const unsigned int DestSize);
 FString _dasUnreal_static_8_SanitizeFloat(const FString &,double InFloat,const int InMinFractionalDigits);
+FName _dasUnreal_virtual_9_GetFNameForStatID(const UObjectBase & self);
+FString _dasUnreal_static_10_RemoveClassPrefix(const UObjectBase &,const wchar_t * ClassName);
