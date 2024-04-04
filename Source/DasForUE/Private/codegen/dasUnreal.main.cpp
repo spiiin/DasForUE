@@ -8,7 +8,6 @@
 DAS_BASE_BIND_ENUM_GEN(ESearchDir::Type, ESearchDir_Type);
 DAS_BASE_BIND_ENUM_GEN(ESearchCase::Type, ESearchCase_Type);
 
-IMPLEMENT_EXTERNAL_TYPE_FACTORY(UObject, UObject);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(UClass, UClass);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FStaticConstructObjectParameters, FStaticConstructObjectParameters);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FText, FText);
@@ -16,17 +15,6 @@ IMPLEMENT_EXTERNAL_TYPE_FACTORY(FName, FName);
 
 
 namespace das {
-
-    struct UObjectAnnotation final : ManagedStructureAnnotation<UObject, false, false> {
-        UObjectAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("UObject", ml) {
-        }
-        void init() {
-        }
-        bool hasNonTrivialCtor() const override { return true; }
-        bool canClone() const override { return false; }
-        bool canNew() const override { return false; }
-    };
-
     struct UClassAnnotation final : ManagedStructureAnnotation<UClass, false, false> {
         UClassAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("UClass", ml) {
         }
@@ -85,18 +73,17 @@ namespace das {
 
     //------------------------------------------------------------------------
 
-    void Module_dasUnreal::initAdditional () {
-
+    void Module_dasUnreal::initAdditionalAnnotations () {
         addAnnotation(make_smart<FTextAnnotation>(lib));
         addAnnotation(make_smart<FNameAnnotation>(lib));
-
-        addAnnotation(make_smart<UObjectAnnotation>(lib));
         addAnnotation(make_smart<UClassAnnotation>(lib));
         addAnnotation(make_smart<FStaticConstructObjectParametersAnnotation>(lib));
 
         addEnumeration(make_smart<ESearchDir_Annotation>());
         addEnumeration(make_smart<ESearchCase_Annotation>());
+    }
 
+    void Module_dasUnreal::initAdditionalFunctions() {
         addExtern<DAS_BIND_FUN(UFunctionCaller::callUFunctionOn)>(*this, lib, "call_ufunction_on", SideEffects::worstDefault);
         addExtern<DAS_BIND_FUN(getClassByName)>(*this, lib, "get_class_by_name", SideEffects::worstDefault);
         addExtern<UObject* (*)(UObject*, UClass*, FName), newObjectFromClass>(*this, lib, "new_object_from_class", SideEffects::worstDefault);

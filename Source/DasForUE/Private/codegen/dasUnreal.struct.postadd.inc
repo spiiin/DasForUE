@@ -7,3 +7,6 @@ initRecAnnotation(ann_FVTableHelper,lib);
 initRecAnnotation(ann_FRestoreForUObjectOverwrite,lib);
 initRecAnnotation(ann_UObjectBase,lib);
 initRecAnnotation(ann_UObjectBaseUtility,lib);
+initRecAnnotation(ann_FAssetRegistryTagMetadata,lib);
+initRecAnnotation(ann_UObject,lib);
+initRecAnnotation(ann_FObjectNetPushIdHelper,lib);

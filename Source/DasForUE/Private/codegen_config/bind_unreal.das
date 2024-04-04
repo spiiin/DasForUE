@@ -15,6 +15,7 @@ class UnrealGen : CppGenBind
     unreal_arg_part_names : array<string>
 
     canMoveIfCopyConstructable : table<string;bool>
+    disableNewDelete : table<string;bool>
 
     declaredFunctionsHashes : table<uint64;bool>
 
@@ -83,6 +84,50 @@ class UnrealGen : CppGenBind
              "UObjectBaseUtility::GetLinker" => true; //FLinkerLoad
              "UObjectBaseUtility::GetFullName" => true; //TStringBuilderBase<wchar_t>
              "UObjectBaseUtility::GetPathName" => true; //TStringBuilderBase<wchar_t>
+
+            //UObject/Object.h
+            "UObject::PreSave" => true; //FObjectPreSaveContext
+            "UObject::UObject" => true; //For internal use only; use StaticConstructObject() to create new objects ?
+            "UObject::PostEditUndo" => true; //TSharedPtr<ITransactionObjectAnnotation, ESPMode::ThreadSafe>
+            "UObject::GetNativePropertyValues" => true; //TMap<FString, FString>
+            "UObject::GetAssetRegistryTagMetadata" => true; //TMap<FName, UObject::FAssetRegistryTagMetadata>
+            "UObject::BuildSubobjectMapping" => true; //TMap<UObject *, UObject *>
+            "UObject::BeginCacheForCookedPlatformData" => true;
+            "UObject::IsCachedCookedPlatformDataLoaded" => true;
+            "UObject::ClearCachedCookedPlatformData" => true;
+            "UObject::CookAdditionalFiles" => true;
+            "UObject::IsDataValid" => true;
+            "UObject::PostDuplicate" => true;
+            "UObject::GetResourceSizeBytes" => true;
+            "UObject::GetPrimaryAssetId" => true;
+            "UObject::FindOrCreateTransactionAnnotation" => true;
+            "UObject::CreateAndRestoreTransactionAnnotation" => true;
+            "UObject::__DefaultConstructor" => true;
+            "UObject::__VTableCtorCaller" => true;
+            "UObject::PostCDOCompiled" => true;
+            "UObject::DeclareCustomVersions" => true;
+            "UObject::Serialize" => true;
+            "UObject::AppendToClassSchema" => true;
+            "UObject::PreEditChange" => true;
+            "UObject::CanEditChange" => true;
+            "UObject::PostEditChangeProperty" => true;
+            "UObject::PostEditChangeChainProperty" => true;
+            "UObject::PostTransacted" => true;
+            "UObject::PreDuplicate" => true;
+            "UObject::NeedsLoadForTargetPlatform" =>true;
+            "UObject::ExportCustomProperties" => true;
+            "UObject::GetResourceSizeEx" => true;
+            "UObject::AddReferencedObjects" => true;
+            "UObject::GetReplicatedCustomConditionState" => true;
+            "UObject::ProcessConsoleExec" => true;
+            "UObject::CallAddReferencedObjects" => true;
+            "UObject::GetMetaDataTagsForAssetRegistry" => true;
+            "UObject::RegisterReplicationFragments" => true;
+            "UObject::SerializeScriptProperties" => true;
+            "UObject::UpdateSinglePropertyInConfigFile" => true;
+            "UObject::CallFunctionByNameWithArguments" => true;
+            "UObject::StaticPackage" => true;
+            "UObject::StaticClassCastFlags" => true;
         }}
 
         //TODO:
@@ -95,6 +140,7 @@ class UnrealGen : CppGenBind
             "const UCS2CHAR *";  //check what can be done with them
             "const UTF8CHAR *";  //
 
+            "FFrame &" //temp
         }]
         
         unreal_skip_struct <- {{
@@ -103,7 +149,6 @@ class UnrealGen : CppGenBind
             "FStringOutputDeviceCountLines" => true;
 
             //UObject/UObjectBase.h
-            "UObject" => true;
             "UClass" => true;
             "FRegisterCompiledInInfo" => true;
             "FClassReloadVersionInfo" => true;
@@ -122,15 +167,61 @@ class UnrealGen : CppGenBind
 
             //UObject/UObjectBaseUtility.h
             "FScopeCycleCounterUObject" => true; //TStatId
+
+            //UObject/Object.h
+            "FDataValidationContext" => true;
+            "FLifetimeProperty" => true;
+            "FOutParmRec" => true;
+            "FRepRecord" => true;
+            "Object_eventExecuteUbergraph_Parms" => true;
+            "UScriptStruct" => true;
+            "FProperty" => true;
+            "FEditPropertyChain" => true;
+            "FArchive" => true;
+            "FAppendToClassSchemaContext" => true;
+            "FStructuredArchiveRecord" => true;
+            "FPropertyChangedEvent" => true;
+            "FPropertyChangedChainEvent" => true;
+            "FObjectPreSaveRootContext" => true;
+            "FObjectPostSaveContext" => true;
+            "FObjectPreSaveContext" => true;
+            "FObjectPostSaveRootContext" => true;
+            "FObjectInstancingGraph" => true;
+            "FTransactionObjectEvent" => true;
+            "FObjectDuplicationParameters" => true;
+            "FOutputDevice" => true;
+            "FFeedbackContext" => true;
+            "FResourceSizeEx" => true;
+            "FReferenceCollector" => true;
+            "FCustomPropertyConditionState" => true;
+            "FFragmentRegistrationContext" => true;
+            "ITargetPlatform" => true;
+            "UFunction" => true;
+            "FFrame" => true;
+            "FInternalUObjectBaseUtilityIsValidFlagsChecker" => true;
+            "EDataValidationResult" => true;
+            "FStructuredArchiveSlot" => true;
+            "FConfigCacheIni" => true;
+            "FLinkerLoad" => true;
+            "UWorld" => true;
+            "FAssetRegistryTag" => true;
+            "FLogCategoryLogObj" => true;
         }}
 
         canMoveIfCopyConstructable <- {{
             "FString" => true;
         }}
 
+        disableNewDelete <- {{
+            "UObject" => true;
+        }}
+
     //TODO: check if this may be moved to cbind_boost
-    def isMoveType(name, cppname:string)
+    def isMoveType(name, cppname: string)
         return canMoveIfCopyConstructable[name]
+
+    def isDisableNewDelete(name, cppname: string)
+        return disableNewDelete[name]
 
     def override isArgByValue(name:string)
         return true
@@ -142,7 +233,8 @@ class UnrealGen : CppGenBind
             fname |> find("UObject/UObjectBase.h") != -1 ||
             fname |> find("UObject/UObjectMarks.h") != -1 ||
             fname |> find("UObject/ObjectMacros.h") != -1 ||
-            fname |> find("UObject/UObjectBaseUtility.h") != -1
+            fname |> find("UObject/UObjectBaseUtility.h") != -1 ||
+            fname |> find("UObject/Object.h") != -1
         )
             return false
         return true
@@ -207,6 +299,15 @@ class UnrealGen : CppGenBind
             return true
         return false
 
+    def override dasEnumName(enum_name,cpp_enum_name:string) : string
+        var das_enum_name = enum_name
+        if das_enum_name |> ends_with("_")
+            das_enum_name = das_enum_name |> slice(0,-1)
+        //TODO: check if need to rename all enums to "Namespace/OuterType_ENUMNAME"
+        if das_enum_name == "Type"
+            das_enum_name = "ECastCheckedType_Type" //avoid conflicts with ofter using std rtti::Type.
+        return das_enum_name
+
     def override writeFuncPrefix
         fwrite(func_file, "#include \"{bind_module}.h\"\n")
         fwrite(func_file, "#include \"need_{bind_module}.h\"\n")
@@ -249,7 +350,8 @@ class UnrealGen : CppGenBind
         module_h_file |> fwrite("\tModule_{bind_module}();\n")
         module_h_file |> fwrite("protected:\n")
         module_h_file |> fwrite("\tvirtual bool initDependencies() override;\n")
-        module_h_file |> fwrite("\tvoid initAdditional();\n")
+        module_h_file |> fwrite("\tvoid initAdditionalAnnotations();\n")
+        module_h_file |> fwrite("\tvoid initAdditionalFunctions();\n")
         module_h_file |> fwrite("\tvoid initMain ();\n")
         if length(aot_alias)!=0
             module_h_file |> fwrite("\tvoid initAotAlias ();\n")
@@ -287,12 +389,13 @@ class UnrealGen : CppGenBind
             module_cpp_file |> fwrite("\tinitAotAlias();\n")
         if generate_constant_decl
             module_cpp_file |> fwrite("\t#include \"{bind_module}.const.inc\"\n")
+        module_cpp_file |> fwrite("\tinitAdditionalAnnotations();\n")
         module_cpp_file |> fwrite("\t#include \"{bind_module}.enum.add.inc\"\n")
         module_cpp_file |> fwrite("\t#include \"{bind_module}.dummy.add.inc\"\n")
         module_cpp_file |> fwrite("\t#include \"{bind_module}.struct.add.inc\"\n")
         module_cpp_file |> fwrite("\t#include \"{bind_module}.struct.postadd.inc\"\n")
         module_cpp_file |> fwrite("\t#include \"{bind_module}.alias.add.inc\"\n")
-        module_cpp_file |> fwrite("\tinitAdditional();\n")
+        module_cpp_file |> fwrite("\tinitAdditionalFunctions();\n")
         module_cpp_file |> fwrite("\t#include \"{bind_module}.func.reg.inc\"\n")
         module_cpp_file |> fwrite("\treturn true;\n")
         module_cpp_file |> fwrite("\}\n")
@@ -329,8 +432,12 @@ class UnrealGen : CppGenBind
         let st = build_string() <| $ ( var writer:StringBuilderWriter )
             swrite |> push(unsafe(addr(writer)))
             writer |> write("// from {clang_getCursorLocationDescription(c)}\n")
-            writer |> write("struct {dashing_name}_GeneratedAnnotation : ManagedStructureAnnotation<{struct_namespace_name}> \{\n")
-            if isMoveType(struct_name,struct_namespace_name)
+            if isDisableNewDelete(struct_name, struct_namespace_name)
+                writer |> write("struct {dashing_name}_GeneratedAnnotation : ManagedStructureAnnotation<{struct_namespace_name}, false, false> \{\n")
+            else
+                writer |> write("struct {dashing_name}_GeneratedAnnotation : ManagedStructureAnnotation<{struct_namespace_name}> \{\n")
+
+            if isMoveType(struct_name, struct_namespace_name)
                 //TODO:
                 // - split tp copy/move/clone?
                 // - check if it safe to move this logic in some daScript base Annotation type, remove copy-paste of compile-time checks
@@ -338,7 +445,7 @@ class UnrealGen : CppGenBind
                 writer |> write("\tvirtual bool canCopy() const override \{ return std::is_copy_constructible<{struct_name}>::value; \}\n")
                 writer |> write("\tvirtual bool canClone() const override \{ return std::is_copy_constructible<{struct_name}>::value; \}\n")
                 writer |> write("\tvirtual bool canMove() const override \{ return std::is_copy_constructible<{struct_name}>::value; \}\n")
-            if isLocalType(struct_name,struct_namespace_name)
+            if isLocalType(struct_name, struct_namespace_name)
                 writer |> write("\tvirtual bool isLocal() const override \{ return true; \}\n")
                 writer |> write("\tvirtual bool canBePlacedInContainer() const override \{ return true; \}\n")
             writer |> write("\t{dashing_name}_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation (\"{struct_name}\", ml, \"{struct_namespace_name}\") \{\n")

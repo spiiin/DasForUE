@@ -20,3 +20,7 @@ DAS_BIND_ENUM_CAST(EEnumFlags);
 DAS_BIND_ENUM_CAST(UE::ELoadConfigPropagationFlags);
 DAS_BIND_ENUM_CAST(EObjectMark);
 DAS_BIND_ENUM_CAST(EObjectFullNameFlags);
+DAS_BIND_ENUM_CAST(UE::Net::EFragmentRegistrationFlags);
+DAS_BIND_ENUM_CAST(ECastCheckedType::Type);
+DAS_BIND_ENUM_CAST(EEditChangePropagationFlags);
+DAS_BIND_ENUM_CAST(UObject::ENetFields_Private);

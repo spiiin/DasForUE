@@ -37,3 +37,21 @@ template <> struct cast_arg<UObjectBaseUtility> {
 		return * cast<UObjectBaseUtility *>::to(res);
 	}
 };
+template <> struct cast_arg<UObject::FAssetRegistryTagMetadata> {
+	static __forceinline const UObject::FAssetRegistryTagMetadata & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UObject::FAssetRegistryTagMetadata *>::to(res);
+	}
+};
+template <> struct cast_arg<UObject> {
+	static __forceinline const UObject & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UObject *>::to(res);
+	}
+};
+template <> struct cast_arg<FObjectNetPushIdHelper> {
+	static __forceinline const FObjectNetPushIdHelper & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FObjectNetPushIdHelper *>::to(res);
+	}
+};

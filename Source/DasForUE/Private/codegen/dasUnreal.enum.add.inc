@@ -19,3 +19,7 @@ addEnumeration(make_smart<Enumeration_EEnumFlags>());
 addEnumeration(make_smart<Enumeration_UE_ELoadConfigPropagationFlags>());
 addEnumeration(make_smart<Enumeration_EObjectMark>());
 addEnumeration(make_smart<Enumeration_EObjectFullNameFlags>());
+addEnumeration(make_smart<Enumeration_UE_Net_EFragmentRegistrationFlags>());
+addEnumeration(make_smart<Enumeration_ECastCheckedType_Type>());
+addEnumeration(make_smart<Enumeration_EEditChangePropagationFlags>());
+addEnumeration(make_smart<Enumeration_UObject_ENetFields_Private>());

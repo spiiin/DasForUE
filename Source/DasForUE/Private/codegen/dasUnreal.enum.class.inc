@@ -476,3 +476,49 @@ public:
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:38:13
+class Enumeration_UE_Net_EFragmentRegistrationFlags : public das::Enumeration {
+public:
+	Enumeration_UE_Net_EFragmentRegistrationFlags() : das::Enumeration("EFragmentRegistrationFlags") {
+		external = true;
+		cppName = "UE::Net::EFragmentRegistrationFlags";
+		baseType = (das::Type) das::ToBasicType<uint32>::type;
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:51:7
+class Enumeration_ECastCheckedType_Type : public das::Enumeration {
+public:
+	Enumeration_ECastCheckedType_Type() : das::Enumeration("ECastCheckedType_Type") {
+		external = true;
+		cppName = "ECastCheckedType::Type";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("NullAllowed", "NullAllowed", int64_t(ECastCheckedType::Type::NullAllowed), das::LineInfo());
+		addIEx("NullChecked", "NullChecked", int64_t(ECastCheckedType::Type::NullChecked), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:62:12
+class Enumeration_EEditChangePropagationFlags : public das::Enumeration {
+public:
+	Enumeration_EEditChangePropagationFlags() : das::Enumeration("EEditChangePropagationFlags") {
+		external = true;
+		cppName = "EEditChangePropagationFlags";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("None", "None", int64_t(EEditChangePropagationFlags::None), das::LineInfo());
+		addIEx("OnlyMarkRealignedInstancesAsDirty", "OnlyMarkRealignedInstancesAsDirty", int64_t(EEditChangePropagationFlags::OnlyMarkRealignedInstancesAsDirty), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:1696:13
+class Enumeration_UObject_ENetFields_Private : public das::Enumeration {
+public:
+	Enumeration_UObject_ENetFields_Private() : das::Enumeration("ENetFields_Private") {
+		external = true;
+		cppName = "UObject::ENetFields_Private";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("NETFIELD_REP_START", "NETFIELD_REP_START", int64_t(UObject::ENetFields_Private::NETFIELD_REP_START), das::LineInfo());
+		addIEx("NETFIELD_REP_END", "NETFIELD_REP_END", int64_t(UObject::ENetFields_Private::NETFIELD_REP_END), das::LineInfo());
+	}
+};
+

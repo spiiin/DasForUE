@@ -37,3 +37,11 @@ DAS_BASE_BIND_ENUM_GEN(EObjectMark,EObjectMark);
 
 DAS_BASE_BIND_ENUM_GEN(EObjectFullNameFlags,EObjectFullNameFlags);
 
+DAS_BASE_BIND_ENUM_GEN(UE::Net::EFragmentRegistrationFlags,EFragmentRegistrationFlags);
+
+DAS_BASE_BIND_ENUM_GEN(ECastCheckedType::Type,ECastCheckedType_Type);
+
+DAS_BASE_BIND_ENUM_GEN(EEditChangePropagationFlags,EEditChangePropagationFlags);
+
+DAS_BASE_BIND_ENUM_GEN(UObject::ENetFields_Private,ENetFields_Private);
+

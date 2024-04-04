@@ -20,7 +20,8 @@ public:
 	Module_dasUnreal();
 protected:
 	virtual bool initDependencies() override;
-	void initAdditional();
+	void initAdditionalAnnotations();
+	void initAdditionalFunctions();
 	void initMain ();
 	virtual ModuleAotType aotRequire ( TextWriter & tw ) const override;
 	#include "dasUnreal.func.decl.inc"

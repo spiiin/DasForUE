@@ -15,12 +15,13 @@ bool Module_dasUnreal::initDependencies() {
 	initialized = true;
 	lib.addModule(this);
 	lib.addBuiltInModule();
+	initAdditionalAnnotations();
 	#include "dasUnreal.enum.add.inc"
 	#include "dasUnreal.dummy.add.inc"
 	#include "dasUnreal.struct.add.inc"
 	#include "dasUnreal.struct.postadd.inc"
 	#include "dasUnreal.alias.add.inc"
-	initAdditional();
+	initAdditionalFunctions();
 	#include "dasUnreal.func.reg.inc"
 	return true;
 }

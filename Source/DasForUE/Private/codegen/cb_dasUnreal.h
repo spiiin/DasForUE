@@ -55,7 +55,6 @@ namespace das {
     };
 }
 
-MAKE_EXTERNAL_TYPE_FACTORY(UObject, UObject);
 MAKE_EXTERNAL_TYPE_FACTORY(UClass, UClass);
 MAKE_EXTERNAL_TYPE_FACTORY(FStaticConstructObjectParameters, FStaticConstructObjectParameters);
 MAKE_EXTERNAL_TYPE_FACTORY(FText, FText);

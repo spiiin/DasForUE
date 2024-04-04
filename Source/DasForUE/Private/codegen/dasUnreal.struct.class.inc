@@ -54,3 +54,31 @@ struct UObjectBaseUtility_GeneratedAnnotation : ManagedStructureAnnotation<UObje
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:906:9
+struct UObject_FAssetRegistryTagMetadata_GeneratedAnnotation : ManagedStructureAnnotation<UObject::FAssetRegistryTagMetadata> {
+	UObject_FAssetRegistryTagMetadata_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FAssetRegistryTagMetadata", ml, "UObject::FAssetRegistryTagMetadata") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(DisplayName)>("DisplayName","DisplayName");
+		addField<DAS_BIND_MANAGED_FIELD(TooltipText)>("TooltipText","TooltipText");
+		addField<DAS_BIND_MANAGED_FIELD(Suffix)>("Suffix","Suffix");
+		addField<DAS_BIND_MANAGED_FIELD(ImportantValue)>("ImportantValue","ImportantValue");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:85:7
+struct UObject_GeneratedAnnotation : ManagedStructureAnnotation<UObject, false, false> {
+	UObject_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UObject", ml, "UObject") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:1723:8
+struct FObjectNetPushIdHelper_GeneratedAnnotation : ManagedStructureAnnotation<FObjectNetPushIdHelper> {
+	FObjectNetPushIdHelper_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FObjectNetPushIdHelper", ml, "FObjectNetPushIdHelper") {
+	}
+	void init () {
+	}
+};
+
