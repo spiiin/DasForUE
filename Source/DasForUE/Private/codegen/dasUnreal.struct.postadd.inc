@@ -22,3 +22,5 @@ initRecAnnotation(ann_FNativeFunctionLookup,lib);
 initRecAnnotation(ann_FClassFunctionLinkInfo,lib);
 initRecAnnotation(ann_UClass,lib);
 initRecAnnotation(ann_FTestUninitializedScriptStructMembersTest,lib);
+initRecAnnotation(ann_FSavePackageResultStruct,lib);
+initRecAnnotation(ann_UPackage,lib);

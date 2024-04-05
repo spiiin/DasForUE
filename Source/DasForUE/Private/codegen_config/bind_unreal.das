@@ -37,6 +37,8 @@ class UnrealGen : CppGenBind
         var args <- [{string
             "-xc++-header";
             "-std=c++1z";
+            "-Wno-inconsistent-missing-override";
+            "-Wno-microsoft-unqualified-friend";
         }]
         for engineInclude in engineIncludes
             args |> push <| "-I{engineInclude}"
@@ -50,6 +52,7 @@ class UnrealGen : CppGenBind
     def init_skip()
         canMoveIfCopyConstructable <- {{
             "FString";
+            "FSavePackageResultStruct";
         }}
 
         unrealReflectionTypes <- {{
@@ -58,6 +61,7 @@ class UnrealGen : CppGenBind
             "UStruct";
             "UClass";
             "UEnum";
+            "UPackage";
         }}
 
         unreal_skip_func <- {{
@@ -176,6 +180,17 @@ class UnrealGen : CppGenBind
             "UClass::HasAnyClassFlags";
             "UClass::HasAnyCastFlag";
             "UClass::HasAllCastFlags";
+
+            //UObject/Package.h
+            "UPackage::GetWorldTileInfo";
+            "UPackage::GetLinkerPackageVersion";
+            "UPackage::AddReferencedObjects";
+            "UPackage::GetLoadedPath";
+            "UPackage::SetLoadedPath";
+            "UPackage::AccessThumbnailMap";
+            "UPackage::GetThumbnailMap";
+            "UPackage::Save";
+            "UPackage::SavePackage";
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -195,6 +210,14 @@ class UnrealGen : CppGenBind
             "FSchemaOwner";
             "FUnversionedStructSchema";
             "FFrame &"; //temp
+            "TUniquePtr";
+
+            "TPimplPtr";
+            "TFuture";
+            "FCustomVersionContainer";
+            "FPackageFileVersion";
+            "FGuid"; //Guid has not been used by the engine for a long time and GetGuid will be removed
+            "FPackageId";
 
             "const WIDECHAR *";  //mostly (for UnrealString, at least), it related to overloads char/wchar/unsigned short/UTF8CHAR
             "const UCS2CHAR *";  //check what can be done with them
@@ -270,6 +293,9 @@ class UnrealGen : CppGenBind
             "UDynamicClass";
             "FStructUtils";
             //"FCppClassTypeInfo";
+
+            //UObject/Package.h
+            "Error";
         }}
 
     //TODO: check if this may be moved to cbind_boost
@@ -291,7 +317,8 @@ class UnrealGen : CppGenBind
             fname |> find("UObject/ObjectMacros.h") != -1 ||
             fname |> find("UObject/UObjectBaseUtility.h") != -1 ||
             fname |> find("UObject/Object.h") != -1 ||
-            fname |> find("UObject/Class.h") != -1
+            fname |> find("UObject/Class.h") != -1 ||
+            fname |> find("UObject/Package.h") != -1
         )
             return false
         return true
@@ -670,6 +697,23 @@ class UnrealGen : CppGenBind
                 return CXChildVisitResult Recurse
         fprint(enum_class_file, "\t\}\n\};\n\n")
         fprint(enum_add_file, "addEnumeration(make_smart<Enumeration_{dashing_name}>());\n");
+
+     //TODO: send fix to cbind_boost
+    def override generateStructLsp
+        var lspClone := lsp //create clone, because iterator lock table
+        for k,v in keys(lsp),values(lsp)
+            fprint(struct_add_file,"setParents(this,\"{k}\",  \{")
+            var pp : array<string>
+            pp |> push(v)
+            var qv = v
+            while lspClone |> key_exists(qv)
+                qv = lspClone[qv]
+                pp |> push(qv)
+            for p,i in pp,count()
+                if i!=0
+                    fprint(struct_add_file,",")
+                fprint(struct_add_file,"\"{p}\"")
+            fprint(struct_add_file,"\});\n")
 
 [export]
 def main

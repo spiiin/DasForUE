@@ -629,3 +629,25 @@ public:
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:54:12
+class Enumeration_ESavePackageResult : public das::Enumeration {
+public:
+	Enumeration_ESavePackageResult() : das::Enumeration("ESavePackageResult") {
+		external = true;
+		cppName = "ESavePackageResult";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Success", "Success", int64_t(ESavePackageResult::Success), das::LineInfo());
+		addIEx("Error", "Error", int64_t(ESavePackageResult::Error), das::LineInfo());
+		addIEx("Canceled", "Canceled", int64_t(ESavePackageResult::Canceled), das::LineInfo());
+		addIEx("ContainsEditorOnlyData", "ContainsEditorOnlyData", int64_t(ESavePackageResult::ContainsEditorOnlyData), das::LineInfo());
+		addIEx("ReferencedOnlyByEditorOnlyData", "ReferencedOnlyByEditorOnlyData", int64_t(ESavePackageResult::ReferencedOnlyByEditorOnlyData), das::LineInfo());
+		addIEx("ReplaceCompletely", "ReplaceCompletely", int64_t(ESavePackageResult::ReplaceCompletely), das::LineInfo());
+		addIEx("GenerateStub", "GenerateStub", int64_t(ESavePackageResult::GenerateStub), das::LineInfo());
+		addIEx("MissingFile", "MissingFile", int64_t(ESavePackageResult::MissingFile), das::LineInfo());
+		addIEx("ValidatorError", "ValidatorError", int64_t(ESavePackageResult::ValidatorError), das::LineInfo());
+		addIEx("ValidatorSuppress", "ValidatorSuppress", int64_t(ESavePackageResult::ValidatorSuppress), das::LineInfo());
+		addIEx("EmptyRealm", "EmptyRealm", int64_t(ESavePackageResult::EmptyRealm), das::LineInfo());
+		addIEx("Timeout", "Timeout", int64_t(ESavePackageResult::Timeout), das::LineInfo());
+	}
+};
+

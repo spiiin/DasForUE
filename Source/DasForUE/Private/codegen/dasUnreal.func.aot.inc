@@ -573,3 +573,63 @@ bool _dasUnreal_static_142_IsSafeToSerializeToStructuredArchives(const UClass &,
 	return UClass::IsSafeToSerializeToStructuredArchives(InClass);
 }
 
+UClass * _dasUnreal_static_143_StaticClass(const UPackage &) {
+	return UPackage::StaticClass();
+}
+
+const wchar_t * _dasUnreal_static_144_StaticPackage(const UPackage &) {
+	return UPackage::StaticPackage();
+}
+
+void _dasUnreal_static_145_StaticRegisterNativesUPackage(const UPackage &) {
+	UPackage::StaticRegisterNativesUPackage();
+}
+
+bool _dasUnreal_virtual_146_IsNameStableForNetworking(const UPackage & self) {
+	return self.IsNameStableForNetworking();
+}
+
+bool _dasUnreal_virtual_147_NeedsLoadForClient(const UPackage & self) {
+	return self.NeedsLoadForClient();
+}
+
+bool _dasUnreal_virtual_148_NeedsLoadForServer(const UPackage & self) {
+	return self.NeedsLoadForServer();
+}
+
+bool _dasUnreal_virtual_149_IsPostLoadThreadSafe(const UPackage & self) {
+	return self.IsPostLoadThreadSafe();
+}
+
+bool _dasUnreal_virtual_150_IsDestructionThreadSafe(const UPackage & self) {
+	return self.IsDestructionThreadSafe();
+}
+
+void _dasUnreal_virtual_151_PostInitProperties(UPackage & self) {
+	self.PostInitProperties();
+}
+
+void _dasUnreal_virtual_152_FinishDestroy(UPackage & self) {
+	self.FinishDestroy();
+}
+
+bool _dasUnreal_virtual_153_IsAsset(const UPackage & self) {
+	return self.IsAsset();
+}
+
+void _dasUnreal_virtual_154_TagSubobjects(UPackage & self,EObjectFlags NewFlags) {
+	self.TagSubobjects(NewFlags);
+}
+
+void _dasUnreal_static_155_WaitForAsyncFileWrites(const UPackage &) {
+	UPackage::WaitForAsyncFileWrites();
+}
+
+bool _dasUnreal_static_156_HasAsyncFileWrites(const UPackage &) {
+	return UPackage::HasAsyncFileWrites();
+}
+
+bool _dasUnreal_static_157_IsEmptyPackage(const UPackage &,UPackage * Package,const UObject * LastReferencer) {
+	return UPackage::IsEmptyPackage(Package,LastReferencer);
+}
+

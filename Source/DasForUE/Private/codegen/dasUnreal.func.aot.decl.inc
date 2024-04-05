@@ -144,3 +144,18 @@ bool _dasUnreal_virtual_139_IsFunctionImplementedInScript(const UClass & self,FN
 UObject * _dasUnreal_virtual_140_FindArchetype(const UClass & self,const UClass * ArchetypeClass,const FName ArchetypeName);
 UObject * _dasUnreal_virtual_141_GetArchetypeForCDO(const UClass & self);
 bool _dasUnreal_static_142_IsSafeToSerializeToStructuredArchives(const UClass &,UClass * InClass);
+UClass * _dasUnreal_static_143_StaticClass(const UPackage &);
+const wchar_t * _dasUnreal_static_144_StaticPackage(const UPackage &);
+void _dasUnreal_static_145_StaticRegisterNativesUPackage(const UPackage &);
+bool _dasUnreal_virtual_146_IsNameStableForNetworking(const UPackage & self);
+bool _dasUnreal_virtual_147_NeedsLoadForClient(const UPackage & self);
+bool _dasUnreal_virtual_148_NeedsLoadForServer(const UPackage & self);
+bool _dasUnreal_virtual_149_IsPostLoadThreadSafe(const UPackage & self);
+bool _dasUnreal_virtual_150_IsDestructionThreadSafe(const UPackage & self);
+void _dasUnreal_virtual_151_PostInitProperties(UPackage & self);
+void _dasUnreal_virtual_152_FinishDestroy(UPackage & self);
+bool _dasUnreal_virtual_153_IsAsset(const UPackage & self);
+void _dasUnreal_virtual_154_TagSubobjects(UPackage & self,EObjectFlags NewFlags);
+void _dasUnreal_static_155_WaitForAsyncFileWrites(const UPackage &);
+bool _dasUnreal_static_156_HasAsyncFileWrites(const UPackage &);
+bool _dasUnreal_static_157_IsEmptyPackage(const UPackage &,UPackage * Package,const UObject * LastReferencer);

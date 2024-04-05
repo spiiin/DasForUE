@@ -108,3 +108,4 @@
 #include "UObject/UObjectBaseUtility.h"
 #include "UObject/Object.h"
 #include "UObject/Class.h"
+#include "UObject/Package.h"

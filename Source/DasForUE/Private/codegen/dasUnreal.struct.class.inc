@@ -198,3 +198,30 @@ struct FTestUninitializedScriptStructMembersTest_GeneratedAnnotation : ManagedSt
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:86:8
+struct FSavePackageResultStruct_GeneratedAnnotation : ManagedStructureAnnotation<FSavePackageResultStruct> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FSavePackageResultStruct>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FSavePackageResultStruct>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FSavePackageResultStruct>::value; }
+	FSavePackageResultStruct_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FSavePackageResultStruct", ml, "FSavePackageResultStruct") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Result)>("Result","Result");
+		addField<DAS_BIND_MANAGED_FIELD(TotalFileSize)>("TotalFileSize","TotalFileSize");
+		addField<DAS_BIND_MANAGED_FIELD(SerializedPackageFlags)>("SerializedPackageFlags","SerializedPackageFlags");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:142:23
+struct UPackage_GeneratedAnnotation : ManagedStructureAnnotation<UPackage, false, false> {
+	UPackage_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UPackage", ml, "UPackage") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(LinkerLicenseeVersion)>("LinkerLicenseeVersion","LinkerLicenseeVersion");
+		addField<DAS_BIND_MANAGED_FIELD(FileSize)>("FileSize","FileSize");
+		addField<DAS_BIND_MANAGED_FIELD(MetaData)>("MetaData","MetaData");
+		addField<DAS_BIND_MANAGED_FIELD(PIEInstanceID)>("PIEInstanceID","PIEInstanceID");
+		addField<DAS_BIND_MANAGED_FIELD(FileName)>("FileName","FileName");
+	}
+};
+

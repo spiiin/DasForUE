@@ -31,3 +31,4 @@ DAS_BIND_ENUM_CAST(EIncludeSuperFlag::Type);
 DAS_BIND_ENUM_CAST(EGetSparseClassDataMethod);
 DAS_BIND_ENUM_CAST(EInstancePropertyValueFlags);
 DAS_BIND_ENUM_CAST(EObjectInstancingGraphOptions);
+DAS_BIND_ENUM_CAST(ESavePackageResult);

@@ -127,3 +127,15 @@ template <> struct cast_arg<FTestUninitializedScriptStructMembersTest> {
 		return * cast<FTestUninitializedScriptStructMembersTest *>::to(res);
 	}
 };
+template <> struct cast_arg<FSavePackageResultStruct> {
+	static __forceinline const FSavePackageResultStruct & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FSavePackageResultStruct *>::to(res);
+	}
+};
+template <> struct cast_arg<UPackage> {
+	static __forceinline const UPackage & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UPackage *>::to(res);
+	}
+};

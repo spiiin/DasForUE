@@ -30,3 +30,4 @@ addEnumeration(make_smart<Enumeration_EIncludeSuperFlag_Type>());
 addEnumeration(make_smart<Enumeration_EGetSparseClassDataMethod>());
 addEnumeration(make_smart<Enumeration_EInstancePropertyValueFlags>());
 addEnumeration(make_smart<Enumeration_EObjectInstancingGraphOptions>());
+addEnumeration(make_smart<Enumeration_ESavePackageResult>());

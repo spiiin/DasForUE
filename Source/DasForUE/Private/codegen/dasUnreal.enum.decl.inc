@@ -59,3 +59,5 @@ DAS_BASE_BIND_ENUM_GEN(EInstancePropertyValueFlags,EInstancePropertyValueFlags);
 
 DAS_BASE_BIND_ENUM_GEN(EObjectInstancingGraphOptions,EObjectInstancingGraphOptions);
 
+DAS_BASE_BIND_ENUM_GEN(ESavePackageResult,ESavePackageResult);
+
