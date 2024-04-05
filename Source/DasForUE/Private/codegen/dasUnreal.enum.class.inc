@@ -49,9 +49,6 @@ public:
 		addIEx("SAVE_CutdownPackage", "SAVE_CutdownPackage", int64_t(ESaveFlags::SAVE_CutdownPackage), das::LineInfo());
 		addIEx("SAVE_KeepEditorOnlyCookedPackages", "SAVE_KeepEditorOnlyCookedPackages", int64_t(ESaveFlags::SAVE_KeepEditorOnlyCookedPackages), das::LineInfo());
 		addIEx("SAVE_Concurrent", "SAVE_Concurrent", int64_t(ESaveFlags::SAVE_Concurrent), das::LineInfo());
-		addIEx("SAVE_DiffOnly", "SAVE_DiffOnly", int64_t(ESaveFlags::SAVE_DiffOnly), das::LineInfo());
-		addIEx("SAVE_DiffCallstack", "SAVE_DiffCallstack", int64_t(ESaveFlags::SAVE_DiffCallstack), das::LineInfo());
-		addIEx("SAVE_ComputeHash", "SAVE_ComputeHash", int64_t(ESaveFlags::SAVE_ComputeHash), das::LineInfo());
 		addIEx("SAVE_CompareLinker", "SAVE_CompareLinker", int64_t(ESaveFlags::SAVE_CompareLinker), das::LineInfo());
 		addIEx("SAVE_BulkDataByReference", "SAVE_BulkDataByReference", int64_t(ESaveFlags::SAVE_BulkDataByReference), das::LineInfo());
 		addIEx("SAVE_Unversioned_Properties", "SAVE_Unversioned_Properties", int64_t(ESaveFlags::SAVE_Unversioned_Properties), das::LineInfo());
@@ -148,14 +145,12 @@ public:
 		addIEx("CLASS_MatchedSerializers", "CLASS_MatchedSerializers", int64_t(EClassFlags::CLASS_MatchedSerializers), das::LineInfo());
 		addIEx("CLASS_ProjectUserConfig", "CLASS_ProjectUserConfig", int64_t(EClassFlags::CLASS_ProjectUserConfig), das::LineInfo());
 		addIEx("CLASS_Native", "CLASS_Native", int64_t(EClassFlags::CLASS_Native), das::LineInfo());
-		addIEx("CLASS_NoExport", "CLASS_NoExport", int64_t(EClassFlags::CLASS_NoExport), das::LineInfo());
 		addIEx("CLASS_NotPlaceable", "CLASS_NotPlaceable", int64_t(EClassFlags::CLASS_NotPlaceable), das::LineInfo());
 		addIEx("CLASS_PerObjectConfig", "CLASS_PerObjectConfig", int64_t(EClassFlags::CLASS_PerObjectConfig), das::LineInfo());
 		addIEx("CLASS_ReplicationDataIsSetUp", "CLASS_ReplicationDataIsSetUp", int64_t(EClassFlags::CLASS_ReplicationDataIsSetUp), das::LineInfo());
 		addIEx("CLASS_EditInlineNew", "CLASS_EditInlineNew", int64_t(EClassFlags::CLASS_EditInlineNew), das::LineInfo());
 		addIEx("CLASS_CollapseCategories", "CLASS_CollapseCategories", int64_t(EClassFlags::CLASS_CollapseCategories), das::LineInfo());
 		addIEx("CLASS_Interface", "CLASS_Interface", int64_t(EClassFlags::CLASS_Interface), das::LineInfo());
-		addIEx("CLASS_CustomConstructor", "CLASS_CustomConstructor", int64_t(EClassFlags::CLASS_CustomConstructor), das::LineInfo());
 		addIEx("CLASS_Const", "CLASS_Const", int64_t(EClassFlags::CLASS_Const), das::LineInfo());
 		addIEx("CLASS_NeedsDeferredDependencyLoading", "CLASS_NeedsDeferredDependencyLoading", int64_t(EClassFlags::CLASS_NeedsDeferredDependencyLoading), das::LineInfo());
 		addIEx("CLASS_CompiledFromBlueprint", "CLASS_CompiledFromBlueprint", int64_t(EClassFlags::CLASS_CompiledFromBlueprint), das::LineInfo());
@@ -380,11 +375,8 @@ public:
 		addIEx("RF_DuplicateTransient", "RF_DuplicateTransient", int64_t(EObjectFlags::RF_DuplicateTransient), das::LineInfo());
 		addIEx("RF_StrongRefOnFrame", "RF_StrongRefOnFrame", int64_t(EObjectFlags::RF_StrongRefOnFrame), das::LineInfo());
 		addIEx("RF_NonPIEDuplicateTransient", "RF_NonPIEDuplicateTransient", int64_t(EObjectFlags::RF_NonPIEDuplicateTransient), das::LineInfo());
-		addIEx("RF_Dynamic", "RF_Dynamic", int64_t(EObjectFlags::RF_Dynamic), das::LineInfo());
 		addIEx("RF_WillBeLoaded", "RF_WillBeLoaded", int64_t(EObjectFlags::RF_WillBeLoaded), das::LineInfo());
 		addIEx("RF_HasExternalPackage", "RF_HasExternalPackage", int64_t(EObjectFlags::RF_HasExternalPackage), das::LineInfo());
-		addIEx("RF_PendingKill", "RF_PendingKill", int64_t(EObjectFlags::RF_PendingKill), das::LineInfo());
-		addIEx("RF_Garbage", "RF_Garbage", int64_t(EObjectFlags::RF_Garbage), das::LineInfo());
 		addIEx("RF_AllocatedInSharedPage", "RF_AllocatedInSharedPage", int64_t(EObjectFlags::RF_AllocatedInSharedPage), das::LineInfo());
 	}
 };
@@ -405,7 +397,6 @@ public:
 		addIEx("Async", "Async", int64_t(EInternalObjectFlags::Async), das::LineInfo());
 		addIEx("AsyncLoading", "AsyncLoading", int64_t(EInternalObjectFlags::AsyncLoading), das::LineInfo());
 		addIEx("Unreachable", "Unreachable", int64_t(EInternalObjectFlags::Unreachable), das::LineInfo());
-		addIEx("PendingKill", "PendingKill", int64_t(EInternalObjectFlags::PendingKill), das::LineInfo());
 		addIEx("RootSet", "RootSet", int64_t(EInternalObjectFlags::RootSet), das::LineInfo());
 		addIEx("PendingConstruction", "PendingConstruction", int64_t(EInternalObjectFlags::PendingConstruction), das::LineInfo());
 		addIEx("GarbageCollectionKeepFlags", "GarbageCollectionKeepFlags", int64_t(EInternalObjectFlags::GarbageCollectionKeepFlags), das::LineInfo());

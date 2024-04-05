@@ -622,6 +622,17 @@ class UnrealGen : CppGenBind
             *wr |> write("\t\taddField<{substType},offsetof(ManagedType,{field_name})>(\"{getBindFldName(field_name)}\",\"{field_name}\")\n")
             *wr |> write("\t\t\t.adjustAot(\"das_reinterpret<{substType}>::pass(\",\")\");\n")
 
+    def check_deprecated_attribute(var cursor : CXCursor)
+        //check [[deprecated]] attribute, Unreal mark enum values with it
+        var hasDeprecationAttribute = false
+        clang_visitChildren(cursor) <| $ (var cc, cc_parent)
+            if cc.kind == CXCursorKind FirstAttr
+                //TODO: check attribute name
+                hasDeprecationAttribute = true
+                return CXChildVisitResult Break
+            return CXChildVisitResult Recurse
+        return hasDeprecationAttribute
+
     def override parse_Enum(var cursor : CXCursor; enum_name : string)
         let ns_en = namespace_name(enum_name)
         let das_enum_name = dasEnumName(enum_name,ns_en)
@@ -645,11 +656,15 @@ class UnrealGen : CppGenBind
         fprint(enum_class_file, "\t\tcppName = \"{ns_en}\";\n")
         let itype = string(clang_getTypeSpelling(clang_getEnumDeclIntegerType(cursor)))
         fprint(enum_class_file, "\t\tbaseType = (das::Type) das::ToBasicType<{itype}>::type;\n")
-        clang_visitChildren(cursor) <| $ ( var c,parent )
+        clang_visitChildren(cursor) <| $ (var c, parent)
             if c.kind==CXCursorKind EnumConstantDecl
                 let een = string(clang_getCursorDisplayName(c))
                 let deen = enum_entry_name(enum_name, een)
-                fprint(enum_class_file, "\t\taddIEx(\"{deen}\", \"{een}\", int64_t({ns_en}::{een}), das::LineInfo());\n")
+                
+                if !check_deprecated_attribute(c)
+                    fprint(enum_class_file, "\t\taddIEx(\"{deen}\", \"{een}\", int64_t({ns_en}::{een}), das::LineInfo());\n")
+                else
+                    to_log(LOG_INFO, "Enum value {een} mark as deprecated, skipped\n")
                 return CXChildVisitResult Continue
             else
                 return CXChildVisitResult Recurse
