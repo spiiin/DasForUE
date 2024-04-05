@@ -33,13 +33,6 @@ namespace das {
     //------------------------------------------------------------------------
     //Manual add, replace after re-generate
 
-    template <> struct cast_arg<FText> {
-        static __forceinline const FText& to(Context& ctx, SimNode* node) {
-            vec4f res = node->eval(ctx);
-            return *cast<FText*>::to(res);
-        }
-    };
-
     template <> struct cast_arg<FName> {
         static __forceinline const FName& to(Context& ctx, SimNode* node) {
             vec4f res = node->eval(ctx);
@@ -55,7 +48,6 @@ namespace das {
     };
 }
 
-MAKE_EXTERNAL_TYPE_FACTORY(UClass, UClass);
 MAKE_EXTERNAL_TYPE_FACTORY(FStaticConstructObjectParameters, FStaticConstructObjectParameters);
 MAKE_EXTERNAL_TYPE_FACTORY(FText, FText);
 MAKE_EXTERNAL_TYPE_FACTORY(FName, FName);

@@ -18,6 +18,7 @@ class UnrealGen : CppGenBind
     disableNewDelete : table<string;bool>
 
     declaredFunctionsHashes : table<uint64;bool>
+    declearedEnumsHashes : table<uint64;bool>
 
     def UnrealGen()
         bind_root = BIND_ROOT
@@ -128,6 +129,64 @@ class UnrealGen : CppGenBind
             "UObject::CallFunctionByNameWithArguments" => true;
             "UObject::StaticPackage" => true;
             "UObject::StaticClassCastFlags" => true;
+
+            //UObject/Class.h
+            "UClass::UClass" => true;
+            "UStruct::UStruct" => true;
+            "UField::UField" => true;
+            "UEnum::UEnum" => true;
+
+            "FCppClassTypeInfo::FCppClassTypeInfo" => true;
+            "UStruct::SetUnresolvedScriptProperties" => true; //TArray<TTuple<TFieldPath<FField>
+            "UStruct::SerializeExpr" => true;
+            "UStruct::GetStructPathName" => true;
+            "UStruct::Serialize" => true;
+            "UStruct::Link" => true;
+            "UStruct::SerializeBin" => true;
+            "UStruct::SerializeTaggedProperties" => true;
+            "UStruct::AddReferencedObjects" => true;
+            "UStruct::PreloadChildren" => true;
+            "UStruct::__DefaultConstructor" => true;
+            "UStruct::StaticClassCastFlags" => true;
+
+            "UEnum::ResolveEnumerator" => true;
+            "UEnum::LookupEnumName" => true;
+            "UEnum::LookupEnumNameSlow" => true;
+            "UEnum::Serialize" => true;
+            "UEnum::__DefaultConstructor" => true;
+            "UEnum::StaticClassCastFlags" => true;
+
+            "UClass::TryFixShortClassNameExportPath" => true;
+            "UClass::TryConvertShortTypeNameToPathName" => true;
+            "UClass::ConvertPathNameToShortTypeName" => true;
+            "UClass::ConvertFullNameToShortTypeFullName" => true;
+            "UClass::IsShortTypeName" => true;
+            "UClass::TryFindTypeSlow" => true;
+            "UClass::TryFindTypeSlowSafe" => true;
+            "UClass::GetClassPathName" => true;
+            "UClass::Serialize" => true;
+            "UClass::Link" => true;
+            "UClass::AddReferencedObjects" => true;
+            "UClass::CallAddReferencedObjects" => true;
+            "UClass::CallDeclareCustomVersions" => true;
+            "UClass::SerializeDefaultObject" => true;
+            "UClass::CallAppendToClassSchema" => true;
+            "UClass::GetSparseClassData" => true;
+            "UClass::CreateLinkAndAddChildFunctionsToMap" => true;
+            "UClass::GetDefaultPropertiesFeedbackContext" => true;
+            "UClass::SetupObjectInitializer" => true;
+            "UClass::__DefaultConstructor" => true;
+            "UClass::StaticClassCastFlags" => true;
+            "UClass::GetClassFlags" => true;
+            "UClass::HasAllClassFlags" => true;
+            "UClass::HasAnyClassFlags" => true;
+            "UClass::HasAnyCastFlag" => true;
+            "UClass::HasAllCastFlags" => true;
+
+            "UField::Serialize" => true;
+            "UField::__DefaultConstructor" => true;
+            "UField::StaticClassCastFlags" => true;
+            //__VTableCtorCaller
         }}
 
         //TODO:
@@ -135,12 +194,15 @@ class UnrealGen : CppGenBind
         // - apply macro expansion? (`clang -E` + unexpand includes back)
         unreal_arg_part_names <- [{string
             "TArray";           //TODO: temp, due to name das/unreal name conflict (namespace das -> dasext?)
+            "TObjectPtr";
+            "FField";
+            "FSchemaOwner";
+            "FUnversionedStructSchema";
+            "FFrame &"; //temp
 
             "const WIDECHAR *";  //mostly (for UnrealString, at least), it related to overloads char/wchar/unsigned short/UTF8CHAR
             "const UCS2CHAR *";  //check what can be done with them
             "const UTF8CHAR *";  //
-
-            "FFrame &" //temp
         }]
         
         unreal_skip_struct <- {{
@@ -149,7 +211,6 @@ class UnrealGen : CppGenBind
             "FStringOutputDeviceCountLines" => true;
 
             //UObject/UObjectBase.h
-            "UClass" => true;
             "FRegisterCompiledInInfo" => true;
             "FClassReloadVersionInfo" => true;
             "FClassRegisterCompiledInInfo" => true;
@@ -205,7 +266,14 @@ class UnrealGen : CppGenBind
             "FLinkerLoad" => true;
             "UWorld" => true;
             "FAssetRegistryTag" => true;
-            "FLogCategoryLogObj" => true;
+
+            //UObject/Class.h
+            "FUnversionedStructSchema" => true;
+            "UDelegateFunction" => true;
+            "USparseDelegateFunction" => true;
+            "UDynamicClass" => true;
+            "FStructUtils" => true;
+            //"FCppClassTypeInfo" => true;
         }}
 
         canMoveIfCopyConstructable <- {{
@@ -214,6 +282,10 @@ class UnrealGen : CppGenBind
 
         disableNewDelete <- {{
             "UObject" => true;
+            "UField" => true;
+            "UStruct" => true;
+            "UClass" => true;
+            "UEnum" => true;
         }}
 
     //TODO: check if this may be moved to cbind_boost
@@ -234,7 +306,8 @@ class UnrealGen : CppGenBind
             fname |> find("UObject/UObjectMarks.h") != -1 ||
             fname |> find("UObject/ObjectMacros.h") != -1 ||
             fname |> find("UObject/UObjectBaseUtility.h") != -1 ||
-            fname |> find("UObject/Object.h") != -1
+            fname |> find("UObject/Object.h") != -1 ||
+            fname |> find("UObject/Class.h") != -1
         )
             return false
         return true
@@ -291,6 +364,8 @@ class UnrealGen : CppGenBind
         return false
 
     def override skip_struct(name: string)
+        if name |> starts_with("FLogCategory") //DECLARE_LOG_CATEGORY_EXTERN macro
+            return true
         return unreal_skip_struct |> key_exists(name)
 
     def override skip_enum ( ns_en, en : string )
@@ -300,12 +375,9 @@ class UnrealGen : CppGenBind
         return false
 
     def override dasEnumName(enum_name,cpp_enum_name:string) : string
-        var das_enum_name = enum_name
+        var das_enum_name = cpp_enum_name |> replace("::", "_")
         if das_enum_name |> ends_with("_")
             das_enum_name = das_enum_name |> slice(0,-1)
-        //TODO: check if need to rename all enums to "Namespace/OuterType_ENUMNAME"
-        if das_enum_name == "Type"
-            das_enum_name = "ECastCheckedType_Type" //avoid conflicts with ofter using std rtti::Type.
         return das_enum_name
 
     def override writeFuncPrefix
@@ -518,7 +590,6 @@ class UnrealGen : CppGenBind
         if skipAlreadyDeclared
             to_log(LOG_INFO, "Function declaration {bind_enchantation} {extra_enchantation} already generated, skipped (possible declared in header twice)\n")
             return
-
         declaredFunctionsHashes[funcNameHash] = true
 
         fprint(func_file, "// from {clang_getCursorLocationDescription(c)}\n")
@@ -549,6 +620,57 @@ class UnrealGen : CppGenBind
             fprint(func_file,"\n\t\t->res_type(makeType<{rp}>(lib))")
 		fprint(func_file, "\n\t\t->addToModule(*this, SideEffects::worstDefault)")
         fprint(func_file,";\n")
+
+    def override parse_Field(var c : CXCursor)
+        let field_name = string(clang_getCursorSpelling(c))
+        var field_type = clang_getCanonicalType(clang_getCursorType(c))
+        let field_type_name = string(clang_getTypeSpelling(field_type))
+
+        for skipName in unreal_arg_part_names
+            if field_type_name |> find(skipName) != -1
+                return
+
+        var wr = swrite |> back
+        let substType = substFieldType(c)
+        if substType |> empty()
+            *wr |> write("\t\taddField<DAS_BIND_MANAGED_FIELD({field_name})>(\"{getBindFldName(field_name)}\",\"{field_name}\");\n")
+        else
+            *wr |> write("\t\taddField<{substType},offsetof(ManagedType,{field_name})>(\"{getBindFldName(field_name)}\",\"{field_name}\")\n")
+            *wr |> write("\t\t\t.adjustAot(\"das_reinterpret<{substType}>::pass(\",\")\");\n")
+
+    def override parse_Enum(var cursor : CXCursor; enum_name : string)
+        let ns_en = namespace_name(enum_name)
+        let das_enum_name = dasEnumName(enum_name,ns_en)
+        if skip_enum(ns_en,enum_name)
+            return
+
+        let enumNameHash = hash("{ns_en},{enum_name}")
+        var skipAlreadyDeclared = declearedEnumsHashes |> key_exists(enumNameHash)
+        if skipAlreadyDeclared
+            to_log(LOG_INFO, "Enum declaration {ns_en} {enum_name} already generated, skipped (possible declared twice)\n")
+            return
+        declearedEnumsHashes[enumNameHash] = true
+
+        enumDecl |> push([[auto ns_en,enum_name]])
+        let dashing_name = namespace_name(enum_name,"_")
+        fprint(enum_class_file, "// from {clang_getCursorLocationDescription(cursor)}\n")
+        fprint(enum_class_file, "class Enumeration_{dashing_name} : public das::Enumeration \{\n")
+        fprint(enum_class_file, "public:\n")
+        fprint(enum_class_file, "\tEnumeration_{dashing_name}() : das::Enumeration(\"{das_enum_name}\") \{\n")
+        fprint(enum_class_file, "\t\texternal = true;\n")
+        fprint(enum_class_file, "\t\tcppName = \"{ns_en}\";\n")
+        let itype = string(clang_getTypeSpelling(clang_getEnumDeclIntegerType(cursor)))
+        fprint(enum_class_file, "\t\tbaseType = (das::Type) das::ToBasicType<{itype}>::type;\n")
+        clang_visitChildren(cursor) <| $ ( var c,parent )
+            if c.kind==CXCursorKind EnumConstantDecl
+                let een = string(clang_getCursorDisplayName(c))
+                let deen = enum_entry_name(enum_name, een)
+                fprint(enum_class_file, "\t\taddIEx(\"{deen}\", \"{een}\", int64_t({ns_en}::{een}), das::LineInfo());\n")
+                return CXChildVisitResult Continue
+            else
+                return CXChildVisitResult Recurse
+        fprint(enum_class_file, "\t\}\n\};\n\n")
+        fprint(enum_add_file, "addEnumeration(make_smart<Enumeration_{dashing_name}>());\n");
 
 [export]
 def main

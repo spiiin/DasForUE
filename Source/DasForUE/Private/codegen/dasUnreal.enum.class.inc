@@ -430,7 +430,7 @@ public:
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/ObjectMacros.h:2129:7
 class Enumeration_UE_ELoadConfigPropagationFlags : public das::Enumeration {
 public:
-	Enumeration_UE_ELoadConfigPropagationFlags() : das::Enumeration("ELoadConfigPropagationFlags") {
+	Enumeration_UE_ELoadConfigPropagationFlags() : das::Enumeration("UE_ELoadConfigPropagationFlags") {
 		external = true;
 		cppName = "UE::ELoadConfigPropagationFlags";
 		baseType = (das::Type) das::ToBasicType<int>::type;
@@ -479,7 +479,7 @@ public:
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:38:13
 class Enumeration_UE_Net_EFragmentRegistrationFlags : public das::Enumeration {
 public:
-	Enumeration_UE_Net_EFragmentRegistrationFlags() : das::Enumeration("EFragmentRegistrationFlags") {
+	Enumeration_UE_Net_EFragmentRegistrationFlags() : das::Enumeration("UE_Net_EFragmentRegistrationFlags") {
 		external = true;
 		cppName = "UE::Net::EFragmentRegistrationFlags";
 		baseType = (das::Type) das::ToBasicType<uint32>::type;
@@ -513,12 +513,128 @@ public:
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:1696:13
 class Enumeration_UObject_ENetFields_Private : public das::Enumeration {
 public:
-	Enumeration_UObject_ENetFields_Private() : das::Enumeration("ENetFields_Private") {
+	Enumeration_UObject_ENetFields_Private() : das::Enumeration("UObject_ENetFields_Private") {
 		external = true;
 		cppName = "UObject::ENetFields_Private";
 		baseType = (das::Type) das::ToBasicType<int>::type;
 		addIEx("NETFIELD_REP_START", "NETFIELD_REP_START", int64_t(UObject::ENetFields_Private::NETFIELD_REP_START), das::LineInfo());
 		addIEx("NETFIELD_REP_END", "NETFIELD_REP_END", int64_t(UObject::ENetFields_Private::NETFIELD_REP_END), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:756:6
+class Enumeration_EStructFlags : public das::Enumeration {
+public:
+	Enumeration_EStructFlags() : das::Enumeration("EStructFlags") {
+		external = true;
+		cppName = "EStructFlags";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("STRUCT_NoFlags", "STRUCT_NoFlags", int64_t(EStructFlags::STRUCT_NoFlags), das::LineInfo());
+		addIEx("STRUCT_Native", "STRUCT_Native", int64_t(EStructFlags::STRUCT_Native), das::LineInfo());
+		addIEx("STRUCT_IdenticalNative", "STRUCT_IdenticalNative", int64_t(EStructFlags::STRUCT_IdenticalNative), das::LineInfo());
+		addIEx("STRUCT_HasInstancedReference", "STRUCT_HasInstancedReference", int64_t(EStructFlags::STRUCT_HasInstancedReference), das::LineInfo());
+		addIEx("STRUCT_NoExport", "STRUCT_NoExport", int64_t(EStructFlags::STRUCT_NoExport), das::LineInfo());
+		addIEx("STRUCT_Atomic", "STRUCT_Atomic", int64_t(EStructFlags::STRUCT_Atomic), das::LineInfo());
+		addIEx("STRUCT_Immutable", "STRUCT_Immutable", int64_t(EStructFlags::STRUCT_Immutable), das::LineInfo());
+		addIEx("STRUCT_AddStructReferencedObjects", "STRUCT_AddStructReferencedObjects", int64_t(EStructFlags::STRUCT_AddStructReferencedObjects), das::LineInfo());
+		addIEx("STRUCT_RequiredAPI", "STRUCT_RequiredAPI", int64_t(EStructFlags::STRUCT_RequiredAPI), das::LineInfo());
+		addIEx("STRUCT_NetSerializeNative", "STRUCT_NetSerializeNative", int64_t(EStructFlags::STRUCT_NetSerializeNative), das::LineInfo());
+		addIEx("STRUCT_SerializeNative", "STRUCT_SerializeNative", int64_t(EStructFlags::STRUCT_SerializeNative), das::LineInfo());
+		addIEx("STRUCT_CopyNative", "STRUCT_CopyNative", int64_t(EStructFlags::STRUCT_CopyNative), das::LineInfo());
+		addIEx("STRUCT_IsPlainOldData", "STRUCT_IsPlainOldData", int64_t(EStructFlags::STRUCT_IsPlainOldData), das::LineInfo());
+		addIEx("STRUCT_NoDestructor", "STRUCT_NoDestructor", int64_t(EStructFlags::STRUCT_NoDestructor), das::LineInfo());
+		addIEx("STRUCT_ZeroConstructor", "STRUCT_ZeroConstructor", int64_t(EStructFlags::STRUCT_ZeroConstructor), das::LineInfo());
+		addIEx("STRUCT_ExportTextItemNative", "STRUCT_ExportTextItemNative", int64_t(EStructFlags::STRUCT_ExportTextItemNative), das::LineInfo());
+		addIEx("STRUCT_ImportTextItemNative", "STRUCT_ImportTextItemNative", int64_t(EStructFlags::STRUCT_ImportTextItemNative), das::LineInfo());
+		addIEx("STRUCT_PostSerializeNative", "STRUCT_PostSerializeNative", int64_t(EStructFlags::STRUCT_PostSerializeNative), das::LineInfo());
+		addIEx("STRUCT_SerializeFromMismatchedTag", "STRUCT_SerializeFromMismatchedTag", int64_t(EStructFlags::STRUCT_SerializeFromMismatchedTag), das::LineInfo());
+		addIEx("STRUCT_NetDeltaSerializeNative", "STRUCT_NetDeltaSerializeNative", int64_t(EStructFlags::STRUCT_NetDeltaSerializeNative), das::LineInfo());
+		addIEx("STRUCT_PostScriptConstruct", "STRUCT_PostScriptConstruct", int64_t(EStructFlags::STRUCT_PostScriptConstruct), das::LineInfo());
+		addIEx("STRUCT_NetSharedSerialization", "STRUCT_NetSharedSerialization", int64_t(EStructFlags::STRUCT_NetSharedSerialization), das::LineInfo());
+		addIEx("STRUCT_Trashed", "STRUCT_Trashed", int64_t(EStructFlags::STRUCT_Trashed), das::LineInfo());
+		addIEx("STRUCT_NewerVersionExists", "STRUCT_NewerVersionExists", int64_t(EStructFlags::STRUCT_NewerVersionExists), das::LineInfo());
+		addIEx("STRUCT_CanEditChange", "STRUCT_CanEditChange", int64_t(EStructFlags::STRUCT_CanEditChange), das::LineInfo());
+		addIEx("STRUCT_Inherit", "STRUCT_Inherit", int64_t(EStructFlags::STRUCT_Inherit), das::LineInfo());
+		addIEx("STRUCT_ComputedFlags", "STRUCT_ComputedFlags", int64_t(EStructFlags::STRUCT_ComputedFlags), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1980:12
+class Enumeration_EGetByNameFlags : public das::Enumeration {
+public:
+	Enumeration_EGetByNameFlags() : das::Enumeration("EGetByNameFlags") {
+		external = true;
+		cppName = "EGetByNameFlags";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(EGetByNameFlags::None), das::LineInfo());
+		addIEx("ErrorIfNotFound", "ErrorIfNotFound", int64_t(EGetByNameFlags::ErrorIfNotFound), das::LineInfo());
+		addIEx("CaseSensitive", "CaseSensitive", int64_t(EGetByNameFlags::CaseSensitive), das::LineInfo());
+		addIEx("CheckAuthoredName", "CheckAuthoredName", int64_t(EGetByNameFlags::CheckAuthoredName), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2006:13
+class Enumeration_UEnum_ECppForm : public das::Enumeration {
+public:
+	Enumeration_UEnum_ECppForm() : das::Enumeration("UEnum_ECppForm") {
+		external = true;
+		cppName = "UEnum::ECppForm";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Regular", "Regular", int64_t(UEnum::ECppForm::Regular), das::LineInfo());
+		addIEx("Namespaced", "Namespaced", int64_t(UEnum::ECppForm::Namespaced), das::LineInfo());
+		addIEx("EnumClass", "EnumClass", int64_t(UEnum::ECppForm::EnumClass), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2698:7
+class Enumeration_EIncludeSuperFlag_Type : public das::Enumeration {
+public:
+	Enumeration_EIncludeSuperFlag_Type() : das::Enumeration("EIncludeSuperFlag_Type") {
+		external = true;
+		cppName = "EIncludeSuperFlag::Type";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("ExcludeSuper", "ExcludeSuper", int64_t(EIncludeSuperFlag::Type::ExcludeSuper), das::LineInfo());
+		addIEx("IncludeSuper", "IncludeSuper", int64_t(EIncludeSuperFlag::Type::IncludeSuper), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2712:12
+class Enumeration_EGetSparseClassDataMethod : public das::Enumeration {
+public:
+	Enumeration_EGetSparseClassDataMethod() : das::Enumeration("EGetSparseClassDataMethod") {
+		external = true;
+		cppName = "EGetSparseClassDataMethod";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("CreateIfNull", "CreateIfNull", int64_t(EGetSparseClassDataMethod::CreateIfNull), das::LineInfo());
+		addIEx("ArchetypeIfNull", "ArchetypeIfNull", int64_t(EGetSparseClassDataMethod::ArchetypeIfNull), das::LineInfo());
+		addIEx("ReturnIfNull", "ReturnIfNull", int64_t(EGetSparseClassDataMethod::ReturnIfNull), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:3656:12
+class Enumeration_EInstancePropertyValueFlags : public das::Enumeration {
+public:
+	Enumeration_EInstancePropertyValueFlags() : das::Enumeration("EInstancePropertyValueFlags") {
+		external = true;
+		cppName = "EInstancePropertyValueFlags";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(EInstancePropertyValueFlags::None), das::LineInfo());
+		addIEx("CausesInstancing", "CausesInstancing", int64_t(EInstancePropertyValueFlags::CausesInstancing), das::LineInfo());
+		addIEx("AllowSelfReference", "AllowSelfReference", int64_t(EInstancePropertyValueFlags::AllowSelfReference), das::LineInfo());
+		addIEx("DoNotCreateNewInstance", "DoNotCreateNewInstance", int64_t(EInstancePropertyValueFlags::DoNotCreateNewInstance), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:3672:12
+class Enumeration_EObjectInstancingGraphOptions : public das::Enumeration {
+public:
+	Enumeration_EObjectInstancingGraphOptions() : das::Enumeration("EObjectInstancingGraphOptions") {
+		external = true;
+		cppName = "EObjectInstancingGraphOptions";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(EObjectInstancingGraphOptions::None), das::LineInfo());
+		addIEx("DisableInstancing", "DisableInstancing", int64_t(EObjectInstancingGraphOptions::DisableInstancing), das::LineInfo());
+		addIEx("InstanceTemplatesOnly", "InstanceTemplatesOnly", int64_t(EObjectInstancingGraphOptions::InstanceTemplatesOnly), das::LineInfo());
 	}
 };
 

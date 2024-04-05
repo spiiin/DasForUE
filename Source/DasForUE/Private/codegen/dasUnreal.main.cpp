@@ -8,23 +8,12 @@
 DAS_BASE_BIND_ENUM_GEN(ESearchDir::Type, ESearchDir_Type);
 DAS_BASE_BIND_ENUM_GEN(ESearchCase::Type, ESearchCase_Type);
 
-IMPLEMENT_EXTERNAL_TYPE_FACTORY(UClass, UClass);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FStaticConstructObjectParameters, FStaticConstructObjectParameters);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FText, FText);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FName, FName);
 
 
 namespace das {
-    struct UClassAnnotation final : ManagedStructureAnnotation<UClass, false, false> {
-        UClassAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("UClass", ml) {
-        }
-        void init() {
-        }
-        bool hasNonTrivialCtor() const override { return true; }
-        bool canClone() const override { return false; }
-        bool canNew() const override { return false; }
-    };
-
     struct FStaticConstructObjectParametersAnnotation final : ManagedStructureAnnotation<FStaticConstructObjectParameters> {
         FStaticConstructObjectParametersAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("FStaticConstructObjectParameters", ml) {
         }
@@ -37,7 +26,9 @@ namespace das {
         }
         void init() {
         }
-        bool hasNonTrivialCtor() const override { return true; }
+        virtual bool canCopy() const override { return std::is_copy_constructible<FString>::value; }
+        virtual bool canClone() const override { return std::is_copy_constructible<FString>::value; }
+        virtual bool canMove() const override { return std::is_copy_constructible<FString>::value; }
     };
 
 
@@ -76,7 +67,6 @@ namespace das {
     void Module_dasUnreal::initAdditionalAnnotations () {
         addAnnotation(make_smart<FTextAnnotation>(lib));
         addAnnotation(make_smart<FNameAnnotation>(lib));
-        addAnnotation(make_smart<UClassAnnotation>(lib));
         addAnnotation(make_smart<FStaticConstructObjectParametersAnnotation>(lib));
 
         addEnumeration(make_smart<ESearchDir_Annotation>());
