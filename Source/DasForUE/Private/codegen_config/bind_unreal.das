@@ -10,15 +10,15 @@ class UnrealGen : CppGenBind
     override generate_lsp = true
     override func_to_stdout = false
     override generate_constant_decl = false
-    unreal_skip_func : table<string;bool>
-    unreal_skip_struct : table<string;bool>
+    unreal_skip_func : table<string>
+    unreal_skip_struct : table<string>
     unreal_arg_part_names : array<string>
 
-    canMoveIfCopyConstructable : table<string;bool>
-    disableNewDelete : table<string;bool>
+    canMoveIfCopyConstructable : table<string>
+    unrealReflectionTypes : table<string>
 
-    declaredFunctionsHashes : table<uint64;bool>
-    declearedEnumsHashes : table<uint64;bool>
+    declaredFunctionsHashes : table<uint64>
+    declearedEnumsHashes : table<uint64>
 
     def UnrealGen()
         bind_root = BIND_ROOT
@@ -48,146 +48,142 @@ class UnrealGen : CppGenBind
         openAllFiles()
 
     def init_skip()
+        canMoveIfCopyConstructable <- {{
+            "FString";
+        }}
+
+        unrealReflectionTypes <- {{
+            "UObject";
+            "UField";
+            "UStruct";
+            "UClass";
+            "UEnum";
+        }}
+
         unreal_skip_func <- {{
             //UnrealString.h
-            "FString::Format" => true;
-            "FString::CreateIterator" => true;
-            "FString::CreateConstIterator" => true;
-            "FString::GetCharArray" => true;
-            "FString::begin" => true;
-            "FString::end" => true;
-            "FString::rbegin" => true;
-            "FString::rend" => true;
-            "FString::SerializeAsANSICharArray" => true; //FArchive
-            "FString::CountBytes" => true; //FArchive
+            "FString::Format";
+            "FString::CreateIterator";
+            "FString::CreateConstIterator";
+            "FString::GetCharArray";
+            "FString::begin";
+            "FString::end";
+            "FString::rbegin";
+            "FString::rend";
+            "FString::SerializeAsANSICharArray"; //FArchive
+            "FString::CountBytes"; //FArchive
 
              //UObject/UObjectBase.h
-             "FStat_STAT_UObjectsStatGroupTester::GetStatName" => true; //related to inner stat
-             "FStat_STAT_UObjectsStatGroupTester::GetDescription" => true;
-             "FStat_STAT_UObjectsStatGroupTester::GetStatType" => true;
-             "FStat_STAT_UObjectsStatGroupTester::IsClearEveryFrame" => true;
-             "FStat_STAT_UObjectsStatGroupTester::IsCycleStat" => true;
-             "FStat_STAT_UObjectsStatGroupTester::GetFlags" => true;
-             "FStat_STAT_UObjectsStatGroupTester::GetMemoryRegion" => true;
-             "RegisterCompiledInInfo" => true; //FClassRegisterCompiledInInfo
-             "UObjectBaseInit" => true; //some inner stuff?
-             "UObjectBaseShutdown" => true;
+             "FStat_STAT_UObjectsStatGroupTester::GetStatName"; //related to inner stat
+             "FStat_STAT_UObjectsStatGroupTester::GetDescription";
+             "FStat_STAT_UObjectsStatGroupTester::GetStatType";
+             "FStat_STAT_UObjectsStatGroupTester::IsClearEveryFrame";
+             "FStat_STAT_UObjectsStatGroupTester::IsCycleStat";
+             "FStat_STAT_UObjectsStatGroupTester::GetFlags";
+             "FStat_STAT_UObjectsStatGroupTester::GetMemoryRegion";
+             "RegisterCompiledInInfo"; //FClassRegisterCompiledInInfo
+             "UObjectBaseInit"; //some inner stuff?
+             "UObjectBaseShutdown";
 
              //UObject/UObjectMarks.h
-             "GetObjectsWithAllMarks" => true;
-             "GetObjectsWithAnyMarks" => true;
+             "GetObjectsWithAllMarks";
+             "GetObjectsWithAnyMarks";
 
              //UObject/UObjectBaseUtility.h
-             "UObjectBaseUtility::GetVersePath" => true;
-             "UObjectBaseUtility::GetStatID" => true; //TStatId
-             "UObjectBaseUtility::GetLinkerCustomVersion" => true; //FGuid
-             "UObjectBaseUtility::GetLinkerUEVersion" => true; //FPackageFileVersion
-             "UObjectBaseUtility::GetLinker" => true; //FLinkerLoad
-             "UObjectBaseUtility::GetFullName" => true; //TStringBuilderBase<wchar_t>
-             "UObjectBaseUtility::GetPathName" => true; //TStringBuilderBase<wchar_t>
+             "UObjectBaseUtility::GetVersePath";
+             "UObjectBaseUtility::GetStatID"; //TStatId
+             "UObjectBaseUtility::GetLinkerCustomVersion"; //FGuid
+             "UObjectBaseUtility::GetLinkerUEVersion"; //FPackageFileVersion
+             "UObjectBaseUtility::GetLinker"; //FLinkerLoad
+             "UObjectBaseUtility::GetFullName"; //TStringBuilderBase<wchar_t>
+             "UObjectBaseUtility::GetPathName"; //TStringBuilderBase<wchar_t>
 
             //UObject/Object.h
-            "UObject::PreSave" => true; //FObjectPreSaveContext
-            "UObject::UObject" => true; //For internal use only; use StaticConstructObject() to create new objects ?
-            "UObject::PostEditUndo" => true; //TSharedPtr<ITransactionObjectAnnotation, ESPMode::ThreadSafe>
-            "UObject::GetNativePropertyValues" => true; //TMap<FString, FString>
-            "UObject::GetAssetRegistryTagMetadata" => true; //TMap<FName, UObject::FAssetRegistryTagMetadata>
-            "UObject::BuildSubobjectMapping" => true; //TMap<UObject *, UObject *>
-            "UObject::BeginCacheForCookedPlatformData" => true;
-            "UObject::IsCachedCookedPlatformDataLoaded" => true;
-            "UObject::ClearCachedCookedPlatformData" => true;
-            "UObject::CookAdditionalFiles" => true;
-            "UObject::IsDataValid" => true;
-            "UObject::PostDuplicate" => true;
-            "UObject::GetResourceSizeBytes" => true;
-            "UObject::GetPrimaryAssetId" => true;
-            "UObject::FindOrCreateTransactionAnnotation" => true;
-            "UObject::CreateAndRestoreTransactionAnnotation" => true;
-            "UObject::__DefaultConstructor" => true;
-            "UObject::__VTableCtorCaller" => true;
-            "UObject::PostCDOCompiled" => true;
-            "UObject::DeclareCustomVersions" => true;
-            "UObject::Serialize" => true;
-            "UObject::AppendToClassSchema" => true;
-            "UObject::PreEditChange" => true;
-            "UObject::CanEditChange" => true;
-            "UObject::PostEditChangeProperty" => true;
-            "UObject::PostEditChangeChainProperty" => true;
-            "UObject::PostTransacted" => true;
-            "UObject::PreDuplicate" => true;
-            "UObject::NeedsLoadForTargetPlatform" =>true;
-            "UObject::ExportCustomProperties" => true;
-            "UObject::GetResourceSizeEx" => true;
-            "UObject::AddReferencedObjects" => true;
-            "UObject::GetReplicatedCustomConditionState" => true;
-            "UObject::ProcessConsoleExec" => true;
-            "UObject::CallAddReferencedObjects" => true;
-            "UObject::GetMetaDataTagsForAssetRegistry" => true;
-            "UObject::RegisterReplicationFragments" => true;
-            "UObject::SerializeScriptProperties" => true;
-            "UObject::UpdateSinglePropertyInConfigFile" => true;
-            "UObject::CallFunctionByNameWithArguments" => true;
-            "UObject::StaticPackage" => true;
-            "UObject::StaticClassCastFlags" => true;
+            "UObject::PreSave"; //FObjectPreSaveContext
+            "UObject::PostEditUndo"; //TSharedPtr<ITransactionObjectAnnotation, ESPMode::ThreadSafe>
+            "UObject::GetNativePropertyValues"; //TMap<FString, FString>
+            "UObject::GetAssetRegistryTagMetadata"; //TMap<FName, UObject::FAssetRegistryTagMetadata>
+            "UObject::BuildSubobjectMapping"; //TMap<UObject *, UObject *>
+            "UObject::BeginCacheForCookedPlatformData";
+            "UObject::IsCachedCookedPlatformDataLoaded";
+            "UObject::ClearCachedCookedPlatformData";
+            "UObject::CookAdditionalFiles";
+            "UObject::IsDataValid";
+            "UObject::PostDuplicate";
+            "UObject::GetResourceSizeBytes";
+            "UObject::GetPrimaryAssetId";
+            "UObject::FindOrCreateTransactionAnnotation";
+            "UObject::CreateAndRestoreTransactionAnnotation";
+            "UObject::PostCDOCompiled";
+            "UObject::DeclareCustomVersions";
+            "UObject::AppendToClassSchema";
+            "UObject::PreEditChange";
+            "UObject::CanEditChange";
+            "UObject::PostEditChangeProperty";
+            "UObject::PostEditChangeChainProperty";
+            "UObject::PostTransacted";
+            "UObject::PreDuplicate";
+            "UObject::NeedsLoadForTargetPlatform";
+            "UObject::ExportCustomProperties";
+            "UObject::GetResourceSizeEx";
+            "UObject::AddReferencedObjects";
+            "UObject::GetReplicatedCustomConditionState";
+            "UObject::ProcessConsoleExec";
+            "UObject::CallAddReferencedObjects";
+            "UObject::GetMetaDataTagsForAssetRegistry";
+            "UObject::RegisterReplicationFragments";
+            "UObject::SerializeScriptProperties";
+            "UObject::UpdateSinglePropertyInConfigFile";
+            "UObject::CallFunctionByNameWithArguments";
+            "UObject::StaticPackage";
 
             //UObject/Class.h
-            "UClass::UClass" => true;
-            "UStruct::UStruct" => true;
-            "UField::UField" => true;
-            "UEnum::UEnum" => true;
+            "FCppClassTypeInfo::FCppClassTypeInfo";
+            "UStruct::SetUnresolvedScriptProperties"; //TArray<TTuple<TFieldPath<FField>
+            "UStruct::SerializeExpr";
+            "UStruct::GetStructPathName";
+            "UStruct::Serialize";
+            "UStruct::Link";
+            "UStruct::SerializeBin";
+            "UStruct::SerializeTaggedProperties";
+            "UStruct::AddReferencedObjects";
+            "UStruct::PreloadChildren";
 
-            "FCppClassTypeInfo::FCppClassTypeInfo" => true;
-            "UStruct::SetUnresolvedScriptProperties" => true; //TArray<TTuple<TFieldPath<FField>
-            "UStruct::SerializeExpr" => true;
-            "UStruct::GetStructPathName" => true;
-            "UStruct::Serialize" => true;
-            "UStruct::Link" => true;
-            "UStruct::SerializeBin" => true;
-            "UStruct::SerializeTaggedProperties" => true;
-            "UStruct::AddReferencedObjects" => true;
-            "UStruct::PreloadChildren" => true;
-            "UStruct::__DefaultConstructor" => true;
-            "UStruct::StaticClassCastFlags" => true;
+            "UEnum::ResolveEnumerator";
+            "UEnum::LookupEnumName";
+            "UEnum::LookupEnumNameSlow";
 
-            "UEnum::ResolveEnumerator" => true;
-            "UEnum::LookupEnumName" => true;
-            "UEnum::LookupEnumNameSlow" => true;
-            "UEnum::Serialize" => true;
-            "UEnum::__DefaultConstructor" => true;
-            "UEnum::StaticClassCastFlags" => true;
-
-            "UClass::TryFixShortClassNameExportPath" => true;
-            "UClass::TryConvertShortTypeNameToPathName" => true;
-            "UClass::ConvertPathNameToShortTypeName" => true;
-            "UClass::ConvertFullNameToShortTypeFullName" => true;
-            "UClass::IsShortTypeName" => true;
-            "UClass::TryFindTypeSlow" => true;
-            "UClass::TryFindTypeSlowSafe" => true;
-            "UClass::GetClassPathName" => true;
-            "UClass::Serialize" => true;
-            "UClass::Link" => true;
-            "UClass::AddReferencedObjects" => true;
-            "UClass::CallAddReferencedObjects" => true;
-            "UClass::CallDeclareCustomVersions" => true;
-            "UClass::SerializeDefaultObject" => true;
-            "UClass::CallAppendToClassSchema" => true;
-            "UClass::GetSparseClassData" => true;
-            "UClass::CreateLinkAndAddChildFunctionsToMap" => true;
-            "UClass::GetDefaultPropertiesFeedbackContext" => true;
-            "UClass::SetupObjectInitializer" => true;
-            "UClass::__DefaultConstructor" => true;
-            "UClass::StaticClassCastFlags" => true;
-            "UClass::GetClassFlags" => true;
-            "UClass::HasAllClassFlags" => true;
-            "UClass::HasAnyClassFlags" => true;
-            "UClass::HasAnyCastFlag" => true;
-            "UClass::HasAllCastFlags" => true;
-
-            "UField::Serialize" => true;
-            "UField::__DefaultConstructor" => true;
-            "UField::StaticClassCastFlags" => true;
-            //__VTableCtorCaller
+            "UClass::TryFixShortClassNameExportPath";
+            "UClass::TryConvertShortTypeNameToPathName";
+            "UClass::ConvertPathNameToShortTypeName";
+            "UClass::ConvertFullNameToShortTypeFullName";
+            "UClass::IsShortTypeName";
+            "UClass::TryFindTypeSlow";
+            "UClass::TryFindTypeSlowSafe";
+            "UClass::GetClassPathName";
+            "UClass::Link";
+            "UClass::AddReferencedObjects";
+            "UClass::CallAddReferencedObjects";
+            "UClass::CallDeclareCustomVersions";
+            "UClass::SerializeDefaultObject";
+            "UClass::CallAppendToClassSchema";
+            "UClass::GetSparseClassData";
+            "UClass::CreateLinkAndAddChildFunctionsToMap";
+            "UClass::GetDefaultPropertiesFeedbackContext";
+            "UClass::SetupObjectInitializer";
+            "UClass::GetClassFlags";
+            "UClass::HasAllClassFlags";
+            "UClass::HasAnyClassFlags";
+            "UClass::HasAnyCastFlag";
+            "UClass::HasAllCastFlags";
         }}
+
+        for unrealReflType in keys(unrealReflectionTypes)
+            unreal_skip_func |> insert <| "{unrealReflType}::{unrealReflType}" //disable ctors, because type must be construct with StaticConstructObject()
+            unreal_skip_func |> insert <| "{unrealReflType}::__DefaultConstructor" //meta-function
+            unreal_skip_func |> insert <| "{unrealReflType}::__VTableCtorCaller"   //meta-function
+            unreal_skip_func |> insert <| "{unrealReflType}::StaticClassCastFlags" //idk why it crashes
+            unreal_skip_func |> insert <| "{unrealReflType}::Serialize"            //temp disabled until FArchive is generated
 
         //TODO:
         // - find substring is slow
@@ -207,93 +203,81 @@ class UnrealGen : CppGenBind
         
         unreal_skip_struct <- {{
             //UnrealString.h
-            "FStringOutputDevice" => true;
-            "FStringOutputDeviceCountLines" => true;
+            "FStringOutputDevice";
+            "FStringOutputDeviceCountLines";
 
             //UObject/UObjectBase.h
-            "FRegisterCompiledInInfo" => true;
-            "FClassReloadVersionInfo" => true;
-            "FClassRegisterCompiledInInfo" => true;
-            "FStructReloadVersionInfo" => true;
-            "FStructRegisterCompiledInInfo" => true;
-            "FEnumReloadVersionInfo" => true;
-            "FEnumRegisterCompiledInInfo" => true;
-            "FPackageReloadVersionInfo" => true;
-            "FStat_STAT_UObjectsStatGroupTester" => true; //unrelated
+            "FRegisterCompiledInInfo";
+            "FClassReloadVersionInfo";
+            "FClassRegisterCompiledInInfo";
+            "FStructReloadVersionInfo";
+            "FStructRegisterCompiledInInfo";
+            "FEnumReloadVersionInfo";
+            "FEnumRegisterCompiledInInfo";
+            "FPackageReloadVersionInfo";
+            "FStat_STAT_UObjectsStatGroupTester"; //unrelated
 
             //UObject/ObjectMacros.h
-            "FReferencerInformationList" => true;
-            "FReferencerInformation" => true;
-            "FUObjectCppClassStaticFunctions" => true;
+            "FReferencerInformationList";
+            "FReferencerInformation";
+            "FUObjectCppClassStaticFunctions";
 
             //UObject/UObjectBaseUtility.h
-            "FScopeCycleCounterUObject" => true; //TStatId
+            "FScopeCycleCounterUObject"; //TStatId
 
             //UObject/Object.h
-            "FDataValidationContext" => true;
-            "FLifetimeProperty" => true;
-            "FOutParmRec" => true;
-            "FRepRecord" => true;
-            "Object_eventExecuteUbergraph_Parms" => true;
-            "UScriptStruct" => true;
-            "FProperty" => true;
-            "FEditPropertyChain" => true;
-            "FArchive" => true;
-            "FAppendToClassSchemaContext" => true;
-            "FStructuredArchiveRecord" => true;
-            "FPropertyChangedEvent" => true;
-            "FPropertyChangedChainEvent" => true;
-            "FObjectPreSaveRootContext" => true;
-            "FObjectPostSaveContext" => true;
-            "FObjectPreSaveContext" => true;
-            "FObjectPostSaveRootContext" => true;
-            "FObjectInstancingGraph" => true;
-            "FTransactionObjectEvent" => true;
-            "FObjectDuplicationParameters" => true;
-            "FOutputDevice" => true;
-            "FFeedbackContext" => true;
-            "FResourceSizeEx" => true;
-            "FReferenceCollector" => true;
-            "FCustomPropertyConditionState" => true;
-            "FFragmentRegistrationContext" => true;
-            "ITargetPlatform" => true;
-            "UFunction" => true;
-            "FFrame" => true;
-            "FInternalUObjectBaseUtilityIsValidFlagsChecker" => true;
-            "EDataValidationResult" => true;
-            "FStructuredArchiveSlot" => true;
-            "FConfigCacheIni" => true;
-            "FLinkerLoad" => true;
-            "UWorld" => true;
-            "FAssetRegistryTag" => true;
+            "FDataValidationContext";
+            "FLifetimeProperty";
+            "FOutParmRec";
+            "FRepRecord";
+            "Object_eventExecuteUbergraph_Parms";
+            "UScriptStruct";
+            "FProperty";
+            "FEditPropertyChain";
+            "FArchive";
+            "FAppendToClassSchemaContext";
+            "FStructuredArchiveRecord";
+            "FPropertyChangedEvent";
+            "FPropertyChangedChainEvent";
+            "FObjectPreSaveRootContext";
+            "FObjectPostSaveContext";
+            "FObjectPreSaveContext";
+            "FObjectPostSaveRootContext";
+            "FObjectInstancingGraph";
+            "FTransactionObjectEvent";
+            "FObjectDuplicationParameters";
+            "FOutputDevice";
+            "FFeedbackContext";
+            "FResourceSizeEx";
+            "FReferenceCollector";
+            "FCustomPropertyConditionState";
+            "FFragmentRegistrationContext";
+            "ITargetPlatform";
+            "UFunction";
+            "FFrame";
+            "FInternalUObjectBaseUtilityIsValidFlagsChecker";
+            "EDataValidationResult";
+            "FStructuredArchiveSlot";
+            "FConfigCacheIni";
+            "FLinkerLoad";
+            "UWorld";
+            "FAssetRegistryTag";
 
             //UObject/Class.h
-            "FUnversionedStructSchema" => true;
-            "UDelegateFunction" => true;
-            "USparseDelegateFunction" => true;
-            "UDynamicClass" => true;
-            "FStructUtils" => true;
-            //"FCppClassTypeInfo" => true;
-        }}
-
-        canMoveIfCopyConstructable <- {{
-            "FString" => true;
-        }}
-
-        disableNewDelete <- {{
-            "UObject" => true;
-            "UField" => true;
-            "UStruct" => true;
-            "UClass" => true;
-            "UEnum" => true;
+            "FUnversionedStructSchema";
+            "UDelegateFunction";
+            "USparseDelegateFunction";
+            "UDynamicClass";
+            "FStructUtils";
+            //"FCppClassTypeInfo";
         }}
 
     //TODO: check if this may be moved to cbind_boost
     def isMoveType(name, cppname: string)
-        return canMoveIfCopyConstructable[name]
+        return canMoveIfCopyConstructable |> key_exists <| name
 
     def isDisableNewDelete(name, cppname: string)
-        return disableNewDelete[name]
+        return unrealReflectionTypes|> key_exists <| name
 
     def override isArgByValue(name:string)
         return true
@@ -590,7 +574,7 @@ class UnrealGen : CppGenBind
         if skipAlreadyDeclared
             to_log(LOG_INFO, "Function declaration {bind_enchantation} {extra_enchantation} already generated, skipped (possible declared in header twice)\n")
             return
-        declaredFunctionsHashes[funcNameHash] = true
+        declaredFunctionsHashes |> insert <| funcNameHash
 
         fprint(func_file, "// from {clang_getCursorLocationDescription(c)}\n")
         fprint(func_file, "\tmakeExtern<{bind_enchantation}{extra_enchantation}{get_module_temp_fn()}>(lib,\"{das_function_name}\",\"{cpp_enchantation}\")")
@@ -649,7 +633,7 @@ class UnrealGen : CppGenBind
         if skipAlreadyDeclared
             to_log(LOG_INFO, "Enum declaration {ns_en} {enum_name} already generated, skipped (possible declared twice)\n")
             return
-        declearedEnumsHashes[enumNameHash] = true
+        declearedEnumsHashes |> insert <| enumNameHash
 
         enumDecl |> push([[auto ns_en,enum_name]])
         let dashing_name = namespace_name(enum_name,"_")
