@@ -25,6 +25,240 @@ template <> struct cast_arg<FRestoreForUObjectOverwrite> {
 		return * cast<FRestoreForUObjectOverwrite *>::to(res);
 	}
 };
+template <> struct cast_arg<FObjectInitializer> {
+	static __forceinline const FObjectInitializer & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FObjectInitializer *>::to(res);
+	}
+};
+template <> struct cast_arg<FStaticConstructObjectParameters> {
+	static __forceinline const FStaticConstructObjectParameters & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FStaticConstructObjectParameters *>::to(res);
+	}
+};
+template <> struct cast_arg<FScriptIntegrationObjectHelper> {
+	static __forceinline const FScriptIntegrationObjectHelper & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FScriptIntegrationObjectHelper *>::to(res);
+	}
+};
+template <> struct cast_arg<FVerySlowReferenceCollectorArchiveScope> {
+	static __forceinline const FVerySlowReferenceCollectorArchiveScope & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FVerySlowReferenceCollectorArchiveScope *>::to(res);
+	}
+};
+template <> struct cast_arg<FReferenceCollector::AROPrivate> {
+	static __forceinline const FReferenceCollector::AROPrivate & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FReferenceCollector::AROPrivate *>::to(res);
+	}
+};
+template <> struct cast_arg<FReferenceCollector> {
+	static __forceinline const FReferenceCollector & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FReferenceCollector *>::to(res);
+	}
+};
+template <> struct cast_arg<FReferenceFinder> {
+	static __forceinline const FReferenceFinder & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FReferenceFinder *>::to(res);
+	}
+};
+template <> struct cast_arg<FEndLoadPackageContext> {
+	static __forceinline const FEndLoadPackageContext & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FEndLoadPackageContext *>::to(res);
+	}
+};
+template <> struct cast_arg<FCoreUObjectDelegates> {
+	static __forceinline const FCoreUObjectDelegates & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FCoreUObjectDelegates *>::to(res);
+	}
+};
+template <> struct cast_arg<FDynamicClassStaticData> {
+	static __forceinline const FDynamicClassStaticData & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FDynamicClassStaticData *>::to(res);
+	}
+};
+template <> struct cast_arg<UE::FAssetLog> {
+	static __forceinline const UE::FAssetLog & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UE::FAssetLog *>::to(res);
+	}
+};
+template <> struct cast_arg<FAssetMsg> {
+	static __forceinline const FAssetMsg & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FAssetMsg *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FMetaDataPairParam> {
+	static __forceinline const UECodeGen_Private::FMetaDataPairParam & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FMetaDataPairParam *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FEnumeratorParam> {
+	static __forceinline const UECodeGen_Private::FEnumeratorParam & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FEnumeratorParam *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FPropertyParamsBase> {
+	static __forceinline const UECodeGen_Private::FPropertyParamsBase & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FPropertyParamsBase *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FPropertyParamsBaseWithoutOffset> {
+	static __forceinline const UECodeGen_Private::FPropertyParamsBaseWithoutOffset & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FPropertyParamsBaseWithoutOffset *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FPropertyParamsBaseWithOffset> {
+	static __forceinline const UECodeGen_Private::FPropertyParamsBaseWithOffset & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FPropertyParamsBaseWithOffset *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FGenericPropertyParams> {
+	static __forceinline const UECodeGen_Private::FGenericPropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FGenericPropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FBytePropertyParams> {
+	static __forceinline const UECodeGen_Private::FBytePropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FBytePropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FBoolPropertyParams> {
+	static __forceinline const UECodeGen_Private::FBoolPropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FBoolPropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FObjectPropertyParamsWithoutClass> {
+	static __forceinline const UECodeGen_Private::FObjectPropertyParamsWithoutClass & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FObjectPropertyParamsWithoutClass *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FObjectPropertyParamsWithClass> {
+	static __forceinline const UECodeGen_Private::FObjectPropertyParamsWithClass & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FObjectPropertyParamsWithClass *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FObjectPropertyParams> {
+	static __forceinline const UECodeGen_Private::FObjectPropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FObjectPropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FClassPropertyParams> {
+	static __forceinline const UECodeGen_Private::FClassPropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FClassPropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FSoftClassPropertyParams> {
+	static __forceinline const UECodeGen_Private::FSoftClassPropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FSoftClassPropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FInterfacePropertyParams> {
+	static __forceinline const UECodeGen_Private::FInterfacePropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FInterfacePropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FStructPropertyParams> {
+	static __forceinline const UECodeGen_Private::FStructPropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FStructPropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FDelegatePropertyParams> {
+	static __forceinline const UECodeGen_Private::FDelegatePropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FDelegatePropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FMulticastDelegatePropertyParams> {
+	static __forceinline const UECodeGen_Private::FMulticastDelegatePropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FMulticastDelegatePropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FEnumPropertyParams> {
+	static __forceinline const UECodeGen_Private::FEnumPropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FEnumPropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FFieldPathPropertyParams> {
+	static __forceinline const UECodeGen_Private::FFieldPathPropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FFieldPathPropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FArrayPropertyParams> {
+	static __forceinline const UECodeGen_Private::FArrayPropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FArrayPropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FMapPropertyParams> {
+	static __forceinline const UECodeGen_Private::FMapPropertyParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FMapPropertyParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FFunctionParams> {
+	static __forceinline const UECodeGen_Private::FFunctionParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FFunctionParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FEnumParams> {
+	static __forceinline const UECodeGen_Private::FEnumParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FEnumParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FStructParams> {
+	static __forceinline const UECodeGen_Private::FStructParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FStructParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FPackageParams> {
+	static __forceinline const UECodeGen_Private::FPackageParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FPackageParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FImplementedInterfaceParams> {
+	static __forceinline const UECodeGen_Private::FImplementedInterfaceParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FImplementedInterfaceParams *>::to(res);
+	}
+};
+template <> struct cast_arg<UECodeGen_Private::FClassParams> {
+	static __forceinline const UECodeGen_Private::FClassParams & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UECodeGen_Private::FClassParams *>::to(res);
+	}
+};
 template <> struct cast_arg<UObjectBase> {
 	static __forceinline const UObjectBase & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
@@ -65,6 +299,24 @@ template <> struct cast_arg<UStruct> {
 	static __forceinline const UStruct & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<UStruct *>::to(res);
+	}
+};
+template <> struct cast_arg<UScriptStruct::ICppStructOps::FCapabilities> {
+	static __forceinline const UScriptStruct::ICppStructOps::FCapabilities & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UScriptStruct::ICppStructOps::FCapabilities *>::to(res);
+	}
+};
+template <> struct cast_arg<UScriptStruct::ICppStructOps> {
+	static __forceinline const UScriptStruct::ICppStructOps & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UScriptStruct::ICppStructOps *>::to(res);
+	}
+};
+template <> struct cast_arg<UScriptStruct> {
+	static __forceinline const UScriptStruct & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UScriptStruct *>::to(res);
 	}
 };
 template <> struct cast_arg<UEnum> {

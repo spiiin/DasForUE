@@ -1,6 +1,7 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+addEnumeration(make_smart<Enumeration_ELogVerbosity_Type>());
 addEnumeration(make_smart<Enumeration_ELoadFlags>());
 addEnumeration(make_smart<Enumeration_ESaveFlags>());
 addEnumeration(make_smart<Enumeration_EPackageFlags>());
@@ -17,6 +18,19 @@ addEnumeration(make_smart<Enumeration_EObjectFlags>());
 addEnumeration(make_smart<Enumeration_EInternalObjectFlags>());
 addEnumeration(make_smart<Enumeration_EEnumFlags>());
 addEnumeration(make_smart<Enumeration_UE_ELoadConfigPropagationFlags>());
+addEnumeration(make_smart<Enumeration_EDuplicateMode_Type>());
+addEnumeration(make_smart<Enumeration_EFindFirstObjectOptions>());
+addEnumeration(make_smart<Enumeration_EParseObjectLoadingPolicy>());
+addEnumeration(make_smart<Enumeration_EAsyncLoadingResult_Type>());
+addEnumeration(make_smart<Enumeration_EUniqueObjectNameOptions>());
+addEnumeration(make_smart<Enumeration_EAsyncPackageState_Type>());
+addEnumeration(make_smart<Enumeration_EObjectInitializerOptions>());
+addEnumeration(make_smart<Enumeration_EPackageReloadPhase>());
+addEnumeration(make_smart<Enumeration_EHotReloadedClassFlags>());
+addEnumeration(make_smart<Enumeration_EReloadCompleteReason>());
+addEnumeration(make_smart<Enumeration_EConstructDynamicType>());
+addEnumeration(make_smart<Enumeration_UECodeGen_Private_EPropertyGenFlags>());
+addEnumeration(make_smart<Enumeration_EDataValidationResult>());
 addEnumeration(make_smart<Enumeration_EObjectMark>());
 addEnumeration(make_smart<Enumeration_EObjectFullNameFlags>());
 addEnumeration(make_smart<Enumeration_UE_Net_EFragmentRegistrationFlags>());

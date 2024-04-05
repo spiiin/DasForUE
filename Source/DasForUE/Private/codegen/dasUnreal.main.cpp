@@ -8,18 +8,11 @@
 DAS_BASE_BIND_ENUM_GEN(ESearchDir::Type, ESearchDir_Type);
 DAS_BASE_BIND_ENUM_GEN(ESearchCase::Type, ESearchCase_Type);
 
-IMPLEMENT_EXTERNAL_TYPE_FACTORY(FStaticConstructObjectParameters, FStaticConstructObjectParameters);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FText, FText);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FName, FName);
 
 
 namespace das {
-    struct FStaticConstructObjectParametersAnnotation final : ManagedStructureAnnotation<FStaticConstructObjectParameters> {
-        FStaticConstructObjectParametersAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("FStaticConstructObjectParameters", ml) {
-        }
-        void init() {
-        }
-    };
 
     struct FTextAnnotation final : ManagedStructureAnnotation<FText> {
         FTextAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("FText", ml) {
@@ -67,7 +60,6 @@ namespace das {
     void Module_dasUnreal::initAdditionalAnnotations () {
         addAnnotation(make_smart<FTextAnnotation>(lib));
         addAnnotation(make_smart<FNameAnnotation>(lib));
-        addAnnotation(make_smart<FStaticConstructObjectParametersAnnotation>(lib));
 
         addEnumeration(make_smart<ESearchDir_Annotation>());
         addEnumeration(make_smart<ESearchCase_Annotation>());
@@ -82,9 +74,6 @@ namespace das {
         addCtorAndUsing<FName>(*this, lib, "FName", "FName");
         addCtorAndUsing<FName, const char*>(*this, lib, "FName", "FName")
             ->args({ "Str" });
-
-        addCtorAndUsing<FStaticConstructObjectParameters, UClass*>(*this, lib, "FStaticConstructObjectParameters", "FStaticConstructObjectParameters")
-            ->args({ "Class" });
     }
 
 	void Module_dasUnreal::initMain () {

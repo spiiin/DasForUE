@@ -39,15 +39,7 @@ namespace das {
             return *cast<FName*>::to(res);
         }
     };
-
-    template <> struct cast_arg<FStaticConstructObjectParameters> {
-        static __forceinline const FStaticConstructObjectParameters& to(Context& ctx, SimNode* node) {
-            vec4f res = node->eval(ctx);
-            return *cast<FStaticConstructObjectParameters*>::to(res);
-        }
-    };
 }
 
-MAKE_EXTERNAL_TYPE_FACTORY(FStaticConstructObjectParameters, FStaticConstructObjectParameters);
 MAKE_EXTERNAL_TYPE_FACTORY(FText, FText);
 MAKE_EXTERNAL_TYPE_FACTORY(FName, FName);

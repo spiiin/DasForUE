@@ -1,6 +1,29 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Logging/LogVerbosity.h:16:7
+class Enumeration_ELogVerbosity_Type : public das::Enumeration {
+public:
+	Enumeration_ELogVerbosity_Type() : das::Enumeration("ELogVerbosity_Type") {
+		external = true;
+		cppName = "ELogVerbosity::Type";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("NoLogging", "NoLogging", int64_t(ELogVerbosity::Type::NoLogging), das::LineInfo());
+		addIEx("Fatal", "Fatal", int64_t(ELogVerbosity::Type::Fatal), das::LineInfo());
+		addIEx("Error", "Error", int64_t(ELogVerbosity::Type::Error), das::LineInfo());
+		addIEx("Warning", "Warning", int64_t(ELogVerbosity::Type::Warning), das::LineInfo());
+		addIEx("Display", "Display", int64_t(ELogVerbosity::Type::Display), das::LineInfo());
+		addIEx("Log", "Log", int64_t(ELogVerbosity::Type::Log), das::LineInfo());
+		addIEx("Verbose", "Verbose", int64_t(ELogVerbosity::Type::Verbose), das::LineInfo());
+		addIEx("VeryVerbose", "VeryVerbose", int64_t(ELogVerbosity::Type::VeryVerbose), das::LineInfo());
+		addIEx("All", "All", int64_t(ELogVerbosity::Type::All), das::LineInfo());
+		addIEx("NumVerbosity", "NumVerbosity", int64_t(ELogVerbosity::Type::NumVerbosity), das::LineInfo());
+		addIEx("VerbosityMask", "VerbosityMask", int64_t(ELogVerbosity::Type::VerbosityMask), das::LineInfo());
+		addIEx("SetColor", "SetColor", int64_t(ELogVerbosity::Type::SetColor), das::LineInfo());
+		addIEx("BreakOnLog", "BreakOnLog", int64_t(ELogVerbosity::Type::BreakOnLog), das::LineInfo());
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/ObjectMacros.h:56:6
 class Enumeration_ELoadFlags : public das::Enumeration {
 public:
@@ -431,6 +454,200 @@ public:
 		addIEx("LCPF_PropagateToInstances", "LCPF_PropagateToInstances", int64_t(UE::ELoadConfigPropagationFlags::LCPF_PropagateToInstances), das::LineInfo());
 		addIEx("LCPF_ReloadingConfigData", "LCPF_ReloadingConfigData", int64_t(UE::ELoadConfigPropagationFlags::LCPF_ReloadingConfigData), das::LineInfo());
 		addIEx("LCPF_PersistentFlags", "LCPF_PersistentFlags", int64_t(UE::ELoadConfigPropagationFlags::LCPF_PersistentFlags), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:115:7
+class Enumeration_EDuplicateMode_Type : public das::Enumeration {
+public:
+	Enumeration_EDuplicateMode_Type() : das::Enumeration("EDuplicateMode_Type") {
+		external = true;
+		cppName = "EDuplicateMode::Type";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Normal", "Normal", int64_t(EDuplicateMode::Type::Normal), das::LineInfo());
+		addIEx("World", "World", int64_t(EDuplicateMode::Type::World), das::LineInfo());
+		addIEx("PIE", "PIE", int64_t(EDuplicateMode::Type::PIE), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:461:12
+class Enumeration_EFindFirstObjectOptions : public das::Enumeration {
+public:
+	Enumeration_EFindFirstObjectOptions() : das::Enumeration("EFindFirstObjectOptions") {
+		external = true;
+		cppName = "EFindFirstObjectOptions";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(EFindFirstObjectOptions::None), das::LineInfo());
+		addIEx("ExactClass", "ExactClass", int64_t(EFindFirstObjectOptions::ExactClass), das::LineInfo());
+		addIEx("NativeFirst", "NativeFirst", int64_t(EFindFirstObjectOptions::NativeFirst), das::LineInfo());
+		addIEx("EnsureIfAmbiguous", "EnsureIfAmbiguous", int64_t(EFindFirstObjectOptions::EnsureIfAmbiguous), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:502:12
+class Enumeration_EParseObjectLoadingPolicy : public das::Enumeration {
+public:
+	Enumeration_EParseObjectLoadingPolicy() : das::Enumeration("EParseObjectLoadingPolicy") {
+		external = true;
+		cppName = "EParseObjectLoadingPolicy";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("Find", "Find", int64_t(EParseObjectLoadingPolicy::Find), das::LineInfo());
+		addIEx("FindOrLoad", "FindOrLoad", int64_t(EParseObjectLoadingPolicy::FindOrLoad), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:647:7
+class Enumeration_EAsyncLoadingResult_Type : public das::Enumeration {
+public:
+	Enumeration_EAsyncLoadingResult_Type() : das::Enumeration("EAsyncLoadingResult_Type") {
+		external = true;
+		cppName = "EAsyncLoadingResult::Type";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Failed", "Failed", int64_t(EAsyncLoadingResult::Type::Failed), das::LineInfo());
+		addIEx("Succeeded", "Succeeded", int64_t(EAsyncLoadingResult::Type::Succeeded), das::LineInfo());
+		addIEx("Canceled", "Canceled", int64_t(EAsyncLoadingResult::Type::Canceled), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:799:12
+class Enumeration_EUniqueObjectNameOptions : public das::Enumeration {
+public:
+	Enumeration_EUniqueObjectNameOptions() : das::Enumeration("EUniqueObjectNameOptions") {
+		external = true;
+		cppName = "EUniqueObjectNameOptions";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(EUniqueObjectNameOptions::None), das::LineInfo());
+		addIEx("GloballyUnique", "GloballyUnique", int64_t(EUniqueObjectNameOptions::GloballyUnique), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:885:7
+class Enumeration_EAsyncPackageState_Type : public das::Enumeration {
+public:
+	Enumeration_EAsyncPackageState_Type() : das::Enumeration("EAsyncPackageState_Type") {
+		external = true;
+		cppName = "EAsyncPackageState::Type";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("TimeOut", "TimeOut", int64_t(EAsyncPackageState::Type::TimeOut), das::LineInfo());
+		addIEx("PendingImports", "PendingImports", int64_t(EAsyncPackageState::Type::PendingImports), das::LineInfo());
+		addIEx("Complete", "Complete", int64_t(EAsyncPackageState::Type::Complete), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:1021:12
+class Enumeration_EObjectInitializerOptions : public das::Enumeration {
+public:
+	Enumeration_EObjectInitializerOptions() : das::Enumeration("EObjectInitializerOptions") {
+		external = true;
+		cppName = "EObjectInitializerOptions";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(EObjectInitializerOptions::None), das::LineInfo());
+		addIEx("CopyTransientsFromClassDefaults", "CopyTransientsFromClassDefaults", int64_t(EObjectInitializerOptions::CopyTransientsFromClassDefaults), das::LineInfo());
+		addIEx("InitializeProperties", "InitializeProperties", int64_t(EObjectInitializerOptions::InitializeProperties), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:2829:12
+class Enumeration_EPackageReloadPhase : public das::Enumeration {
+public:
+	Enumeration_EPackageReloadPhase() : das::Enumeration("EPackageReloadPhase") {
+		external = true;
+		cppName = "EPackageReloadPhase";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:2833:12
+class Enumeration_EHotReloadedClassFlags : public das::Enumeration {
+public:
+	Enumeration_EHotReloadedClassFlags() : das::Enumeration("EHotReloadedClassFlags") {
+		external = true;
+		cppName = "EHotReloadedClassFlags";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(EHotReloadedClassFlags::None), das::LineInfo());
+		addIEx("Changed", "Changed", int64_t(EHotReloadedClassFlags::Changed), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:2843:12
+class Enumeration_EReloadCompleteReason : public das::Enumeration {
+public:
+	Enumeration_EReloadCompleteReason() : das::Enumeration("EReloadCompleteReason") {
+		external = true;
+		cppName = "EReloadCompleteReason";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(EReloadCompleteReason::None), das::LineInfo());
+		addIEx("HotReloadAutomatic", "HotReloadAutomatic", int64_t(EReloadCompleteReason::HotReloadAutomatic), das::LineInfo());
+		addIEx("HotReloadManual", "HotReloadManual", int64_t(EReloadCompleteReason::HotReloadManual), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3064:85
+class Enumeration_EConstructDynamicType : public das::Enumeration {
+public:
+	Enumeration_EConstructDynamicType() : das::Enumeration("EConstructDynamicType") {
+		external = true;
+		cppName = "EConstructDynamicType";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("OnlyAllocateClassObject", "OnlyAllocateClassObject", int64_t(EConstructDynamicType::OnlyAllocateClassObject), das::LineInfo());
+		addIEx("CallZConstructor", "CallZConstructor", int64_t(EConstructDynamicType::CallZConstructor), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3226:13
+class Enumeration_UECodeGen_Private_EPropertyGenFlags : public das::Enumeration {
+public:
+	Enumeration_UECodeGen_Private_EPropertyGenFlags() : das::Enumeration("UECodeGen_Private_EPropertyGenFlags") {
+		external = true;
+		cppName = "UECodeGen_Private::EPropertyGenFlags";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("None", "None", int64_t(UECodeGen_Private::EPropertyGenFlags::None), das::LineInfo());
+		addIEx("Byte", "Byte", int64_t(UECodeGen_Private::EPropertyGenFlags::Byte), das::LineInfo());
+		addIEx("Int8", "Int8", int64_t(UECodeGen_Private::EPropertyGenFlags::Int8), das::LineInfo());
+		addIEx("Int16", "Int16", int64_t(UECodeGen_Private::EPropertyGenFlags::Int16), das::LineInfo());
+		addIEx("Int", "Int", int64_t(UECodeGen_Private::EPropertyGenFlags::Int), das::LineInfo());
+		addIEx("Int64", "Int64", int64_t(UECodeGen_Private::EPropertyGenFlags::Int64), das::LineInfo());
+		addIEx("UInt16", "UInt16", int64_t(UECodeGen_Private::EPropertyGenFlags::UInt16), das::LineInfo());
+		addIEx("UInt32", "UInt32", int64_t(UECodeGen_Private::EPropertyGenFlags::UInt32), das::LineInfo());
+		addIEx("UInt64", "UInt64", int64_t(UECodeGen_Private::EPropertyGenFlags::UInt64), das::LineInfo());
+		addIEx("Float", "Float", int64_t(UECodeGen_Private::EPropertyGenFlags::Float), das::LineInfo());
+		addIEx("Double", "Double", int64_t(UECodeGen_Private::EPropertyGenFlags::Double), das::LineInfo());
+		addIEx("Bool", "Bool", int64_t(UECodeGen_Private::EPropertyGenFlags::Bool), das::LineInfo());
+		addIEx("SoftClass", "SoftClass", int64_t(UECodeGen_Private::EPropertyGenFlags::SoftClass), das::LineInfo());
+		addIEx("WeakObject", "WeakObject", int64_t(UECodeGen_Private::EPropertyGenFlags::WeakObject), das::LineInfo());
+		addIEx("LazyObject", "LazyObject", int64_t(UECodeGen_Private::EPropertyGenFlags::LazyObject), das::LineInfo());
+		addIEx("SoftObject", "SoftObject", int64_t(UECodeGen_Private::EPropertyGenFlags::SoftObject), das::LineInfo());
+		addIEx("Class", "Class", int64_t(UECodeGen_Private::EPropertyGenFlags::Class), das::LineInfo());
+		addIEx("Object", "Object", int64_t(UECodeGen_Private::EPropertyGenFlags::Object), das::LineInfo());
+		addIEx("Interface", "Interface", int64_t(UECodeGen_Private::EPropertyGenFlags::Interface), das::LineInfo());
+		addIEx("Name", "Name", int64_t(UECodeGen_Private::EPropertyGenFlags::Name), das::LineInfo());
+		addIEx("Str", "Str", int64_t(UECodeGen_Private::EPropertyGenFlags::Str), das::LineInfo());
+		addIEx("Array", "Array", int64_t(UECodeGen_Private::EPropertyGenFlags::Array), das::LineInfo());
+		addIEx("Map", "Map", int64_t(UECodeGen_Private::EPropertyGenFlags::Map), das::LineInfo());
+		addIEx("Set", "Set", int64_t(UECodeGen_Private::EPropertyGenFlags::Set), das::LineInfo());
+		addIEx("Struct", "Struct", int64_t(UECodeGen_Private::EPropertyGenFlags::Struct), das::LineInfo());
+		addIEx("Delegate", "Delegate", int64_t(UECodeGen_Private::EPropertyGenFlags::Delegate), das::LineInfo());
+		addIEx("InlineMulticastDelegate", "InlineMulticastDelegate", int64_t(UECodeGen_Private::EPropertyGenFlags::InlineMulticastDelegate), das::LineInfo());
+		addIEx("SparseMulticastDelegate", "SparseMulticastDelegate", int64_t(UECodeGen_Private::EPropertyGenFlags::SparseMulticastDelegate), das::LineInfo());
+		addIEx("Text", "Text", int64_t(UECodeGen_Private::EPropertyGenFlags::Text), das::LineInfo());
+		addIEx("Enum", "Enum", int64_t(UECodeGen_Private::EPropertyGenFlags::Enum), das::LineInfo());
+		addIEx("FieldPath", "FieldPath", int64_t(UECodeGen_Private::EPropertyGenFlags::FieldPath), das::LineInfo());
+		addIEx("LargeWorldCoordinatesReal", "LargeWorldCoordinatesReal", int64_t(UECodeGen_Private::EPropertyGenFlags::LargeWorldCoordinatesReal), das::LineInfo());
+		addIEx("NativeBool", "NativeBool", int64_t(UECodeGen_Private::EPropertyGenFlags::NativeBool), das::LineInfo());
+		addIEx("ObjectPtr", "ObjectPtr", int64_t(UECodeGen_Private::EPropertyGenFlags::ObjectPtr), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3769:12
+class Enumeration_EDataValidationResult : public das::Enumeration {
+public:
+	Enumeration_EDataValidationResult() : das::Enumeration("EDataValidationResult") {
+		external = true;
+		cppName = "EDataValidationResult";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("Invalid", "Invalid", int64_t(EDataValidationResult::Invalid), das::LineInfo());
+		addIEx("Valid", "Valid", int64_t(EDataValidationResult::Valid), das::LineInfo());
+		addIEx("NotValidated", "NotValidated", int64_t(EDataValidationResult::NotValidated), das::LineInfo());
 	}
 };
 

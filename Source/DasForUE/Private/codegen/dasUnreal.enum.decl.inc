@@ -1,6 +1,8 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+DAS_BASE_BIND_ENUM_GEN(ELogVerbosity::Type,ELogVerbosity_Type);
+
 DAS_BASE_BIND_ENUM_GEN(ELoadFlags,ELoadFlags);
 
 DAS_BASE_BIND_ENUM_GEN(ESaveFlags,ESaveFlags);
@@ -32,6 +34,32 @@ DAS_BASE_BIND_ENUM_GEN(EInternalObjectFlags,EInternalObjectFlags);
 DAS_BASE_BIND_ENUM_GEN(EEnumFlags,EEnumFlags);
 
 DAS_BASE_BIND_ENUM_GEN(UE::ELoadConfigPropagationFlags,UE_ELoadConfigPropagationFlags);
+
+DAS_BASE_BIND_ENUM_GEN(EDuplicateMode::Type,EDuplicateMode_Type);
+
+DAS_BASE_BIND_ENUM_GEN(EFindFirstObjectOptions,EFindFirstObjectOptions);
+
+DAS_BASE_BIND_ENUM_GEN(EParseObjectLoadingPolicy,EParseObjectLoadingPolicy);
+
+DAS_BASE_BIND_ENUM_GEN(EAsyncLoadingResult::Type,EAsyncLoadingResult_Type);
+
+DAS_BASE_BIND_ENUM_GEN(EUniqueObjectNameOptions,EUniqueObjectNameOptions);
+
+DAS_BASE_BIND_ENUM_GEN(EAsyncPackageState::Type,EAsyncPackageState_Type);
+
+DAS_BASE_BIND_ENUM_GEN(EObjectInitializerOptions,EObjectInitializerOptions);
+
+DAS_BASE_BIND_ENUM_GEN(EPackageReloadPhase,EPackageReloadPhase);
+
+DAS_BASE_BIND_ENUM_GEN(EHotReloadedClassFlags,EHotReloadedClassFlags);
+
+DAS_BASE_BIND_ENUM_GEN(EReloadCompleteReason,EReloadCompleteReason);
+
+DAS_BASE_BIND_ENUM_GEN(EConstructDynamicType,EConstructDynamicType);
+
+DAS_BASE_BIND_ENUM_GEN(UECodeGen_Private::EPropertyGenFlags,UECodeGen_Private_EPropertyGenFlags);
+
+DAS_BASE_BIND_ENUM_GEN(EDataValidationResult,EDataValidationResult);
 
 DAS_BASE_BIND_ENUM_GEN(EObjectMark,EObjectMark);
 

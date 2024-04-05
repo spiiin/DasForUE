@@ -6,6 +6,14 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_1() {
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Logging/LogVerbosity.h:72:23
+	makeExtern< const wchar_t * (*)(ELogVerbosity::Type) , ToString , SimNode_ExtFuncCall >(lib,"ToString","ToString")
+		->args({"Verbosity"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Logging/LogVerbosity.h:79:37
+	makeExtern< ELogVerbosity::Type (*)(const FString &) , ParseLogVerbosityFromString , SimNode_ExtFuncCall >(lib,"ParseLogVerbosityFromString","ParseLogVerbosityFromString")
+		->args({"VerbosityString"})
+		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:41:14
 	makeExtern< wchar_t * (*)(FString &) , GetData , SimNode_ExtFuncCall >(lib,"GetData","GetData")
 		->args({""})
@@ -484,14 +492,6 @@ void Module_dasUnreal::initFunctions_1() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2215:16
 	makeExtern< int (*)(const FString &,unsigned char *) , HexToBytes , SimNode_ExtFuncCall >(lib,"HexToBytes","HexToBytes")
 		->args({"HexString","OutBytes"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2236:13
-	makeExtern< void (*)(signed char &,const wchar_t *) , LexFromString , SimNode_ExtFuncCall >(lib,"LexFromString","LexFromString")
-		->args({"OutValue","Buffer"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2237:13
-	makeExtern< void (*)(short &,const wchar_t *) , LexFromString , SimNode_ExtFuncCall >(lib,"LexFromString","LexFromString")
-		->args({"OutValue","Buffer"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

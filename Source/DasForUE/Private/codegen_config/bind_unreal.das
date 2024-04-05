@@ -59,6 +59,7 @@ class UnrealGen : CppGenBind
             "UObject";
             "UField";
             "UStruct";
+            "UScriptStruct";
             "UClass";
             "UEnum";
             "UPackage";
@@ -181,6 +182,13 @@ class UnrealGen : CppGenBind
             "UClass::HasAnyCastFlag";
             "UClass::HasAllCastFlags";
 
+            "UScriptStruct::UseBinarySerialization";
+            "UScriptStruct::SerializeItem";
+            "UScriptStruct::ShouldSerializeAtomically";
+            "UScriptStruct::Link";
+            "UScriptStruct::FindInnerPropertyInstance";
+            "UScriptStruct::ICppStructOps::GetComputedPropertyFlags";
+
             //UObject/Package.h
             "UPackage::GetWorldTileInfo";
             "UPackage::GetLinkerPackageVersion";
@@ -191,6 +199,31 @@ class UnrealGen : CppGenBind
             "UPackage::GetThumbnailMap";
             "UPackage::Save";
             "UPackage::SavePackage";
+
+            //UObject/UObjectGlobals.h
+            "SetMountPointDefaultPackageFlags";
+            "RemoveMountPointDefaultPackageFlags";
+            "GetConvertedDynamicPackageNameToTypeName";
+            "GetDynamicClassMap";
+            "LoadPackageAsync";
+            "FlushAsyncLoading";
+            "FCoreUObjectDelegates::GetPreGarbageCollectDelegate";
+            "FCoreUObjectDelegates::GetPostGarbageCollect";
+            "FCoreUObjectDelegates::GetPostPurgeGarbageDelegate";
+            "FCoreUObjectDelegates::GetGarbageCollectReportGarbageReferencers";
+            "FObjectInitializer::SetNestedDefaultSubobjectClass";
+            "FObjectInitializer::DoNotCreateNestedDefaultSubobject";
+            "StaticDuplicateObjectEx";
+            "FReferenceFinder::HandleObjectReference";
+            "UECodeGen_Private::ConstructUFunction";
+            "FScopedAllowAbstractClassAllocation::IsDisallowedAbstractClass";
+            "StaticAllocateObjectErrorTests";
+            "FVerySlowReferenceCollectorArchiveScope::GetArchive";
+            "FReferenceCollector::AROPrivate::AddReferencedObjects";
+            "FReferenceCollector::GetVerySlowReferenceCollectorArchive";
+            "FReferenceCollector::AddStableReferenceSet";
+            "FReferenceCollector::AddStableReferenceArray";
+            "FReferenceCollector::AddReferencedObjects";
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -212,12 +245,24 @@ class UnrealGen : CppGenBind
             "FFrame &"; //temp
             "TUniquePtr";
 
+            //UPackage
             "TPimplPtr";
             "TFuture";
             "FCustomVersionContainer";
             "FPackageFileVersion";
             "FGuid"; //Guid has not been used by the engine for a long time and GetGuid will be removed
             "FPackageId";
+
+            //UObjectGlobals
+            "TFunction";
+            "EFunctionFlags";
+            "TMap";
+            "FTopLevelAssetPath";
+            "TDelegate";
+            "TArrayView";
+            "FPackagePath";
+            "UE::Core::FVersePath";
+            "FWeakObjectPtr";
 
             "const WIDECHAR *";  //mostly (for UnrealString, at least), it related to overloads char/wchar/unsigned short/UTF8CHAR
             "const UCS2CHAR *";  //check what can be done with them
@@ -254,7 +299,6 @@ class UnrealGen : CppGenBind
             "FOutParmRec";
             "FRepRecord";
             "Object_eventExecuteUbergraph_Parms";
-            "UScriptStruct";
             "FProperty";
             "FEditPropertyChain";
             "FArchive";
@@ -272,7 +316,6 @@ class UnrealGen : CppGenBind
             "FOutputDevice";
             "FFeedbackContext";
             "FResourceSizeEx";
-            "FReferenceCollector";
             "FCustomPropertyConditionState";
             "FFragmentRegistrationContext";
             "ITargetPlatform";
@@ -296,6 +339,11 @@ class UnrealGen : CppGenBind
 
             //UObject/Package.h
             "Error";
+
+            //UObject/UObjectGlobals.h
+            "FScopedObjectFlagMarker";
+            "FScopedAllowAbstractClassAllocation";
+            "FReferenceCollectorArchive";
         }}
 
     //TODO: check if this may be moved to cbind_boost
@@ -312,13 +360,15 @@ class UnrealGen : CppGenBind
         //print("fname = {fname}\n")
         if (
             fname |> find("UnrealString.h") != -1 ||
+            fname |> find("Logging/LogVerbosity.h") != -1 ||
             fname |> find("UObject/UObjectBase.h") != -1 ||
             fname |> find("UObject/UObjectMarks.h") != -1 ||
             fname |> find("UObject/ObjectMacros.h") != -1 ||
             fname |> find("UObject/UObjectBaseUtility.h") != -1 ||
             fname |> find("UObject/Object.h") != -1 ||
             fname |> find("UObject/Class.h") != -1 ||
-            fname |> find("UObject/Package.h") != -1
+            fname |> find("UObject/Package.h") != -1 ||
+            fname |> find("UObject/UObjectGlobals.h") != -1
         )
             return false
         return true
@@ -376,6 +426,8 @@ class UnrealGen : CppGenBind
 
     def override skip_struct(name: string)
         if name |> starts_with("FLogCategory") //DECLARE_LOG_CATEGORY_EXTERN macro
+            return true
+        if name |> starts_with("FStat_") //DECLARE_CYCLE_STAT_EXTERN macro
             return true
         return unreal_skip_struct |> key_exists(name)
 

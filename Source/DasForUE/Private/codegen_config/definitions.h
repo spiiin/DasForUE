@@ -101,6 +101,7 @@
 #define __EDG__ 1
 
 #include "UnrealString.h"
+#include "Logging/LogVerbosity.h"
 
 #include "UObject/UObjectBase.h"
 #include "UObject/UObjectMarks.h"

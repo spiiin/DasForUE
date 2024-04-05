@@ -7,3 +7,5 @@ initFunctions_3();
 initFunctions_4();
 initFunctions_5();
 initFunctions_6();
+initFunctions_7();
+initFunctions_8();
