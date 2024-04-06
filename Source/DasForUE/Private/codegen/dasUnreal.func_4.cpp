@@ -172,16 +172,19 @@ void Module_dasUnreal::initFunctions_4() {
 		->args({"Object"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:88:2
-	makeExtern< UClass * (*)(const UObject &) , _dasUnreal_static_39_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_39_StaticClass")
+	makeExtern< UClass * (*)(const UObject *) , _dasUnreal_static_39_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_39_StaticClass")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UObject*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:95:22
-	makeExtern< const wchar_t * (*)(const UObject &) , _dasUnreal_static_40_StaticConfigName , SimNode_ExtFuncCall >(lib,"StaticConfigName","_dasUnreal_static_40_StaticConfigName")
+	makeExtern< const wchar_t * (*)(const UObject *) , _dasUnreal_static_40_StaticConfigName , SimNode_ExtFuncCall >(lib,"StaticConfigName","_dasUnreal_static_40_StaticConfigName")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UObject*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:99:14
-	makeExtern< void (*)(const UObject &) , _dasUnreal_static_41_StaticRegisterNativesUObject , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUObject","_dasUnreal_static_41_StaticRegisterNativesUObject")
+	makeExtern< void (*)(const UObject *) , _dasUnreal_static_41_StaticRegisterNativesUObject , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUObject","_dasUnreal_static_41_StaticRegisterNativesUObject")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UObject*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	using _method_197 = das::das_call_member< UObject * (UObject::*)(FName,UClass *,UClass *,bool,bool),&UObject::CreateDefaultSubobject >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:120:27
@@ -310,8 +313,9 @@ void Module_dasUnreal::initFunctions_4() {
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:637:30
-	makeExtern< bool (*)(const UObject &,UObject *) , _dasUnreal_static_67_CanCreateInCurrentContext , SimNode_ExtFuncCall >(lib,"CanCreateInCurrentContext","_dasUnreal_static_67_CanCreateInCurrentContext")
+	makeExtern< bool (*)(const UObject *,UObject *) , _dasUnreal_static_67_CanCreateInCurrentContext , SimNode_ExtFuncCall >(lib,"CanCreateInCurrentContext","_dasUnreal_static_67_CanCreateInCurrentContext")
 		->args({"self","Template"})
+		->arg_type(0,makeType<TExplicit<const UObject*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:666:15
 	makeExtern< void (*)(UObject &) , _dasUnreal_virtual_68_PostEditImport , SimNode_ExtFuncCall >(lib,"PostEditImport","_dasUnreal_virtual_68_PostEditImport")
@@ -363,12 +367,14 @@ void Module_dasUnreal::initFunctions_4() {
 		->args({"self","Out"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:884:38
-	makeExtern< const FName & (*)(const UObject &) , _dasUnreal_static_77_SourceFileTagName , SimNode_ExtFuncCallRef >(lib,"SourceFileTagName","_dasUnreal_static_77_SourceFileTagName")
+	makeExtern< const FName & (*)(const UObject *) , _dasUnreal_static_77_SourceFileTagName , SimNode_ExtFuncCallRef >(lib,"SourceFileTagName","_dasUnreal_static_77_SourceFileTagName")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UObject*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:888:38
-	makeExtern< const FName & (*)(const UObject &) , _dasUnreal_static_78_AssetVersePathTagName , SimNode_ExtFuncCallRef >(lib,"AssetVersePathTagName","_dasUnreal_static_78_AssetVersePathTagName")
+	makeExtern< const FName & (*)(const UObject *) , _dasUnreal_static_78_AssetVersePathTagName , SimNode_ExtFuncCallRef >(lib,"AssetVersePathTagName","_dasUnreal_static_78_AssetVersePathTagName")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UObject*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	using _method_241 = das::das_call_member< UObject::FAssetRegistryTagMetadata & (UObject::FAssetRegistryTagMetadata::*)(const FText &),&UObject::FAssetRegistryTagMetadata::SetDisplayName >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:914:30

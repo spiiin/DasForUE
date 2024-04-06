@@ -1,6 +1,6 @@
 //options log=true
-require unreal
-require unreal_boost_internal
+require unreal_boost
+//require unreal_boost_internal
 
 //--------------------------------------------------------------
 //1. creating unreal function-wrapper - def SaySomething(var obj: UObject?; msg : FString)
@@ -26,10 +26,19 @@ def SaySomething(obj: UObject?; var msg: FString)
         obj |> call_ufunction_on(FString("SaySomething")) <| addr(params)
 
 //--------------------------------------------------------------
+
 [export]
 def main
-    let clazz = get_class_by_name(FString("TestClass"))
-    var obj = new_object_from_class(FStaticConstructObjectParameters(clazz))
+    let className = "TestClass"
+    var clazz = get_class_by_name(className)
+    if clazz == null
+        print("Class {className} not found!")
+        return
+    print("Class name: {string(*clazz |> GetName)}\n")
+    var obj = new_object_from_class(clazz)
+    print("Object name: {string(*obj |> GetName)}\n")
+
+    //print("{cls}\n") //TODO: fix crash
 
     //1
     //obj |> SaySomething(FString("SaySomething"))
@@ -40,4 +49,4 @@ def main
     //3 call without macro
     obj |> SaySomething(FString("SaySomething"))
 
-    print("das_root: {get_das_root()}\n")
+    //print("{clazz}\n")

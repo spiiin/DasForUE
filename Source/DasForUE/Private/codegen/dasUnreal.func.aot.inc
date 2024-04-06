@@ -1,63 +1,63 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
-FString _dasUnreal_static_0_Chr(const FString &,wchar_t Ch) {
+FString _dasUnreal_static_0_Chr(const FString *,wchar_t Ch) {
 	return FString::Chr(Ch);
 }
 
-FString _dasUnreal_static_1_ChrN(const FString &,int NumCharacters,wchar_t Char) {
+FString _dasUnreal_static_1_ChrN(const FString *,int NumCharacters,wchar_t Char) {
 	return FString::ChrN(NumCharacters,Char);
 }
 
-FString _dasUnreal_static_2_FormatAsNumber(const FString &,int InNumber) {
+FString _dasUnreal_static_2_FormatAsNumber(const FString *,int InNumber) {
 	return FString::FormatAsNumber(InNumber);
 }
 
-FString _dasUnreal_static_3_FromInt(const FString &,int Num) {
+FString _dasUnreal_static_3_FromInt(const FString *,int Num) {
 	return FString::FromInt(Num);
 }
 
-FString _dasUnreal_static_4_FromBlob(const FString &,const unsigned char * SrcBuffer,const unsigned int SrcSize) {
+FString _dasUnreal_static_4_FromBlob(const FString *,const unsigned char * SrcBuffer,const unsigned int SrcSize) {
 	return FString::FromBlob(SrcBuffer,SrcSize);
 }
 
-bool _dasUnreal_static_5_ToBlob(const FString &,const FString & Source,unsigned char * DestBuffer,const unsigned int DestSize) {
+bool _dasUnreal_static_5_ToBlob(const FString *,const FString & Source,unsigned char * DestBuffer,const unsigned int DestSize) {
 	return FString::ToBlob(Source,DestBuffer,DestSize);
 }
 
-FString _dasUnreal_static_6_FromHexBlob(const FString &,const unsigned char * SrcBuffer,const unsigned int SrcSize) {
+FString _dasUnreal_static_6_FromHexBlob(const FString *,const unsigned char * SrcBuffer,const unsigned int SrcSize) {
 	return FString::FromHexBlob(SrcBuffer,SrcSize);
 }
 
-bool _dasUnreal_static_7_ToHexBlob(const FString &,const FString & Source,unsigned char * DestBuffer,const unsigned int DestSize) {
+bool _dasUnreal_static_7_ToHexBlob(const FString *,const FString & Source,unsigned char * DestBuffer,const unsigned int DestSize) {
 	return FString::ToHexBlob(Source,DestBuffer,DestSize);
 }
 
-FString _dasUnreal_static_8_SanitizeFloat(const FString &,double InFloat,const int InMinFractionalDigits) {
+FString _dasUnreal_static_8_SanitizeFloat(const FString *,double InFloat,const int InMinFractionalDigits) {
 	return FString::SanitizeFloat(InFloat,InMinFractionalDigits);
 }
 
-void _dasUnreal_static_9_AssertIfInConstructor(const FObjectInitializer &,UObject * Outer,const wchar_t * ErrorMessage) {
+void _dasUnreal_static_9_AssertIfInConstructor(const FObjectInitializer *,UObject * Outer,const wchar_t * ErrorMessage) {
 	FObjectInitializer::AssertIfInConstructor(Outer,ErrorMessage);
 }
 
-FObjectInitializer & _dasUnreal_static_10_Get(const FObjectInitializer &) {
+FObjectInitializer & _dasUnreal_static_10_Get(const FObjectInitializer *) {
 	return FObjectInitializer::Get();
 }
 
-void _dasUnreal_static_11_InitProperties(const FScriptIntegrationObjectHelper &,const FObjectInitializer & ObjectInitializer,UObject * Obj,UClass * DefaultsClass,UObject * DefaultData) {
+void _dasUnreal_static_11_InitProperties(const FScriptIntegrationObjectHelper *,const FObjectInitializer & ObjectInitializer,UObject * Obj,UClass * DefaultsClass,UObject * DefaultData) {
 	FScriptIntegrationObjectHelper::InitProperties(ObjectInitializer,Obj,DefaultsClass,DefaultData);
 }
 
-bool _dasUnreal_static_12_InitSubobjectProperties(const FScriptIntegrationObjectHelper &,const FObjectInitializer & ObjectInitializer) {
+bool _dasUnreal_static_12_InitSubobjectProperties(const FScriptIntegrationObjectHelper *,const FObjectInitializer & ObjectInitializer) {
 	return FScriptIntegrationObjectHelper::InitSubobjectProperties(ObjectInitializer);
 }
 
-void _dasUnreal_static_13_InstanceSubobjects(const FScriptIntegrationObjectHelper &,const FObjectInitializer & ObjectInitializer,UClass * Class,bool bNeedInstancing,bool bNeedSubobjectInstancing) {
+void _dasUnreal_static_13_InstanceSubobjects(const FScriptIntegrationObjectHelper *,const FObjectInitializer & ObjectInitializer,UClass * Class,bool bNeedInstancing,bool bNeedSubobjectInstancing) {
 	FScriptIntegrationObjectHelper::InstanceSubobjects(ObjectInitializer,Class,bNeedInstancing,bNeedSubobjectInstancing);
 }
 
-void _dasUnreal_static_14_PostConstructInitObject(const FScriptIntegrationObjectHelper &,FObjectInitializer & ObjectInitializer) {
+void _dasUnreal_static_14_PostConstructInitObject(const FScriptIntegrationObjectHelper *,FObjectInitializer & ObjectInitializer) {
 	FScriptIntegrationObjectHelper::PostConstructInitObject(ObjectInitializer);
 }
 
@@ -97,23 +97,23 @@ bool _dasUnreal_virtual_23_IsIgnoringTransient(const FReferenceFinder & self) {
 	return self.IsIgnoringTransient();
 }
 
-void _dasUnreal_static_24_BroadcastOnObjectModified(const FCoreUObjectDelegates &,UObject * Object) {
+void _dasUnreal_static_24_BroadcastOnObjectModified(const FCoreUObjectDelegates *,UObject * Object) {
 	FCoreUObjectDelegates::BroadcastOnObjectModified(Object);
 }
 
-FString _dasUnreal_static_25_FormatPathForAssetLog(const FAssetMsg &,const wchar_t * Path) {
+FString _dasUnreal_static_25_FormatPathForAssetLog(const FAssetMsg *,const wchar_t * Path) {
 	return FAssetMsg::FormatPathForAssetLog(Path);
 }
 
-FString _dasUnreal_static_26_FormatPathForAssetLog(const FAssetMsg &,const UObject * Object) {
+FString _dasUnreal_static_26_FormatPathForAssetLog(const FAssetMsg *,const UObject * Object) {
 	return FAssetMsg::FormatPathForAssetLog(Object);
 }
 
-FString _dasUnreal_static_27_GetAssetLogString(const FAssetMsg &,const wchar_t * Path,const FString & Message) {
+FString _dasUnreal_static_27_GetAssetLogString(const FAssetMsg *,const wchar_t * Path,const FString & Message) {
 	return FAssetMsg::GetAssetLogString(Path,Message);
 }
 
-FString _dasUnreal_static_28_GetAssetLogString(const FAssetMsg &,const UObject * Object,const FString & Message) {
+FString _dasUnreal_static_28_GetAssetLogString(const FAssetMsg *,const UObject * Object,const FString & Message) {
 	return FAssetMsg::GetAssetLogString(Object,Message);
 }
 
@@ -121,23 +121,23 @@ FName _dasUnreal_virtual_29_GetFNameForStatID(const UObjectBase & self) {
 	return self.GetFNameForStatID();
 }
 
-FString _dasUnreal_static_30_RemoveClassPrefix(const UObjectBase &,const wchar_t * ClassName) {
+FString _dasUnreal_static_30_RemoveClassPrefix(const UObjectBase *,const wchar_t * ClassName) {
 	return UObjectBase::RemoveClassPrefix(ClassName);
 }
 
-void _dasUnreal_static_31_PrefetchClass(const UObjectBase &,UObject * Object) {
+void _dasUnreal_static_31_PrefetchClass(const UObjectBase *,UObject * Object) {
 	UObjectBase::PrefetchClass(Object);
 }
 
-void _dasUnreal_static_32_PrefetchOuter(const UObjectBase &,UObject * Object) {
+void _dasUnreal_static_32_PrefetchOuter(const UObjectBase *,UObject * Object) {
 	UObjectBase::PrefetchOuter(Object);
 }
 
-bool _dasUnreal_static_33_IsPendingKillEnabled(const UObjectBaseUtility &) {
+bool _dasUnreal_static_33_IsPendingKillEnabled(const UObjectBaseUtility *) {
 	return UObjectBaseUtility::IsPendingKillEnabled();
 }
 
-EInternalObjectFlags _dasUnreal_static_34_FixGarbageOrPendingKillInternalObjectFlags(const UObjectBaseUtility &,const EInternalObjectFlags InFlags) {
+EInternalObjectFlags _dasUnreal_static_34_FixGarbageOrPendingKillInternalObjectFlags(const UObjectBaseUtility *,const EInternalObjectFlags InFlags) {
 	return UObjectBaseUtility::FixGarbageOrPendingKillInternalObjectFlags(InFlags);
 }
 
@@ -157,15 +157,15 @@ void _dasUnreal_virtual_38_OnClusterMarkedAsPendingKill(UObjectBaseUtility & sel
 	self.OnClusterMarkedAsPendingKill();
 }
 
-UClass * _dasUnreal_static_39_StaticClass(const UObject &) {
+UClass * _dasUnreal_static_39_StaticClass(const UObject *) {
 	return UObject::StaticClass();
 }
 
-const wchar_t * _dasUnreal_static_40_StaticConfigName(const UObject &) {
+const wchar_t * _dasUnreal_static_40_StaticConfigName(const UObject *) {
 	return UObject::StaticConfigName();
 }
 
-void _dasUnreal_static_41_StaticRegisterNativesUObject(const UObject &) {
+void _dasUnreal_static_41_StaticRegisterNativesUObject(const UObject *) {
 	UObject::StaticRegisterNativesUObject();
 }
 
@@ -269,7 +269,7 @@ bool _dasUnreal_virtual_66_IsDestructionThreadSafe(const UObject & self) {
 	return self.IsDestructionThreadSafe();
 }
 
-bool _dasUnreal_static_67_CanCreateInCurrentContext(const UObject &,UObject * Template) {
+bool _dasUnreal_static_67_CanCreateInCurrentContext(const UObject *,UObject * Template) {
 	return UObject::CanCreateInCurrentContext(Template);
 }
 
@@ -309,11 +309,11 @@ bool _dasUnreal_virtual_76_AreNativePropertiesIdenticalTo(const UObject & self,U
 	return self.AreNativePropertiesIdenticalTo(Other);
 }
 
-const FName & _dasUnreal_static_77_SourceFileTagName(const UObject &) {
+const FName & _dasUnreal_static_77_SourceFileTagName(const UObject *) {
 	return UObject::SourceFileTagName();
 }
 
-const FName & _dasUnreal_static_78_AssetVersePathTagName(const UObject &) {
+const FName & _dasUnreal_static_78_AssetVersePathTagName(const UObject *) {
 	return UObject::AssetVersePathTagName();
 }
 
@@ -381,7 +381,7 @@ void _dasUnreal_virtual_94_OverridePerObjectConfigSection(UObject & self,FString
 	self.OverridePerObjectConfigSection(SectionName);
 }
 
-UObject * _dasUnreal_static_95_GetArchetypeFromRequiredInfo(const UObject &,const UClass * Class,const UObject * Outer,FName Name,EObjectFlags ObjectFlags) {
+UObject * _dasUnreal_static_95_GetArchetypeFromRequiredInfo(const UObject *,const UClass * Class,const UObject * Outer,FName Name,EObjectFlags ObjectFlags) {
 	return UObject::GetArchetypeFromRequiredInfo(Class,Outer,Name,ObjectFlags);
 }
 
@@ -397,15 +397,15 @@ uint64 _dasUnreal_virtual_98_GetNetPushIdDynamic(const UObject & self) {
 	return self.GetNetPushIdDynamic();
 }
 
-UClass * _dasUnreal_static_99_StaticClass(const UField &) {
+UClass * _dasUnreal_static_99_StaticClass(const UField *) {
 	return UField::StaticClass();
 }
 
-const wchar_t * _dasUnreal_static_100_StaticPackage(const UField &) {
+const wchar_t * _dasUnreal_static_100_StaticPackage(const UField *) {
 	return UField::StaticPackage();
 }
 
-void _dasUnreal_static_101_StaticRegisterNativesUField(const UField &) {
+void _dasUnreal_static_101_StaticRegisterNativesUField(const UField *) {
 	UField::StaticRegisterNativesUField();
 }
 
@@ -425,19 +425,19 @@ void _dasUnreal_virtual_105_Bind(UField & self) {
 	self.Bind();
 }
 
-void _dasUnreal_static_106_FormatNativeToolTip(const UField &,FString & ToolTipString,bool bRemoveExtraSections) {
+void _dasUnreal_static_106_FormatNativeToolTip(const UField *,FString & ToolTipString,bool bRemoveExtraSections) {
 	UField::FormatNativeToolTip(ToolTipString,bRemoveExtraSections);
 }
 
-UClass * _dasUnreal_static_107_StaticClass(const UStruct &) {
+UClass * _dasUnreal_static_107_StaticClass(const UStruct *) {
 	return UStruct::StaticClass();
 }
 
-const wchar_t * _dasUnreal_static_108_StaticPackage(const UStruct &) {
+const wchar_t * _dasUnreal_static_108_StaticPackage(const UStruct *) {
 	return UStruct::StaticPackage();
 }
 
-void _dasUnreal_static_109_StaticRegisterNativesUStruct(const UStruct &) {
+void _dasUnreal_static_109_StaticRegisterNativesUStruct(const UStruct *) {
 	UStruct::StaticRegisterNativesUStruct();
 }
 
@@ -485,15 +485,15 @@ bool _dasUnreal_virtual_120_IsStructTrashed(const UStruct & self) {
 	return self.IsStructTrashed();
 }
 
-UClass * _dasUnreal_static_121_StaticClass(const UScriptStruct &) {
+UClass * _dasUnreal_static_121_StaticClass(const UScriptStruct *) {
 	return UScriptStruct::StaticClass();
 }
 
-const wchar_t * _dasUnreal_static_122_StaticPackage(const UScriptStruct &) {
+const wchar_t * _dasUnreal_static_122_StaticPackage(const UScriptStruct *) {
 	return UScriptStruct::StaticPackage();
 }
 
-void _dasUnreal_static_123_StaticRegisterNativesUScriptStruct(const UScriptStruct &) {
+void _dasUnreal_static_123_StaticRegisterNativesUScriptStruct(const UScriptStruct *) {
 	UScriptStruct::StaticRegisterNativesUScriptStruct();
 }
 
@@ -529,15 +529,15 @@ void _dasUnreal_virtual_131_InitializeDefaultValue(const UScriptStruct & self,un
 	self.InitializeDefaultValue(InStructData);
 }
 
-UClass * _dasUnreal_static_132_StaticClass(const UEnum &) {
+UClass * _dasUnreal_static_132_StaticClass(const UEnum *) {
 	return UEnum::StaticClass();
 }
 
-const wchar_t * _dasUnreal_static_133_StaticPackage(const UEnum &) {
+const wchar_t * _dasUnreal_static_133_StaticPackage(const UEnum *) {
 	return UEnum::StaticPackage();
 }
 
-void _dasUnreal_static_134_StaticRegisterNativesUEnum(const UEnum &) {
+void _dasUnreal_static_134_StaticRegisterNativesUEnum(const UEnum *) {
 	UEnum::StaticRegisterNativesUEnum();
 }
 
@@ -549,7 +549,7 @@ FString _dasUnreal_virtual_136_GetAuthoredNameStringByIndex(const UEnum & self,i
 	return self.GetAuthoredNameStringByIndex(InIndex);
 }
 
-bool _dasUnreal_static_137_IsFullEnumName(const UEnum &,const wchar_t * InEnumName) {
+bool _dasUnreal_static_137_IsFullEnumName(const UEnum *,const wchar_t * InEnumName) {
 	return UEnum::IsFullEnumName(InEnumName);
 }
 
@@ -557,7 +557,7 @@ FString _dasUnreal_virtual_138_GenerateFullEnumName(const UEnum & self,const wch
 	return self.GenerateFullEnumName(InEnumName);
 }
 
-int64 _dasUnreal_static_139_ParseEnum(const UEnum &,const wchar_t *& Str) {
+int64 _dasUnreal_static_139_ParseEnum(const UEnum *,const wchar_t *& Str) {
 	return UEnum::ParseEnum(Str);
 }
 
@@ -569,15 +569,15 @@ bool _dasUnreal_virtual_141_IsAbstract(const FCppClassTypeInfo & self) {
 	return self.IsAbstract();
 }
 
-UClass * _dasUnreal_static_142_StaticClass(const UClass &) {
+UClass * _dasUnreal_static_142_StaticClass(const UClass *) {
 	return UClass::StaticClass();
 }
 
-const wchar_t * _dasUnreal_static_143_StaticPackage(const UClass &) {
+const wchar_t * _dasUnreal_static_143_StaticPackage(const UClass *) {
 	return UClass::StaticPackage();
 }
 
-void _dasUnreal_static_144_StaticRegisterNativesUClass(const UClass &) {
+void _dasUnreal_static_144_StaticRegisterNativesUClass(const UClass *) {
 	UClass::StaticRegisterNativesUClass();
 }
 
@@ -589,7 +589,7 @@ void _dasUnreal_virtual_146_FlushCompilationQueueForLevel(UClass & self) {
 	self.FlushCompilationQueueForLevel();
 }
 
-void _dasUnreal_static_147_AssembleReferenceTokenStreams(const UClass &) {
+void _dasUnreal_static_147_AssembleReferenceTokenStreams(const UClass *) {
 	UClass::AssembleReferenceTokenStreams();
 }
 
@@ -681,7 +681,7 @@ void _dasUnreal_virtual_169_PurgeClass(UClass & self,bool bRecompilingOnLoad) {
 	self.PurgeClass(bRecompilingOnLoad);
 }
 
-UClass * _dasUnreal_static_170_FindCommonBase(const UClass &,UClass * InClassA,UClass * InClassB) {
+UClass * _dasUnreal_static_170_FindCommonBase(const UClass *,UClass * InClassA,UClass * InClassB) {
 	return UClass::FindCommonBase(InClassA,InClassB);
 }
 
@@ -697,19 +697,19 @@ UObject * _dasUnreal_virtual_173_GetArchetypeForCDO(const UClass & self) {
 	return self.GetArchetypeForCDO();
 }
 
-bool _dasUnreal_static_174_IsSafeToSerializeToStructuredArchives(const UClass &,UClass * InClass) {
+bool _dasUnreal_static_174_IsSafeToSerializeToStructuredArchives(const UClass *,UClass * InClass) {
 	return UClass::IsSafeToSerializeToStructuredArchives(InClass);
 }
 
-UClass * _dasUnreal_static_175_StaticClass(const UPackage &) {
+UClass * _dasUnreal_static_175_StaticClass(const UPackage *) {
 	return UPackage::StaticClass();
 }
 
-const wchar_t * _dasUnreal_static_176_StaticPackage(const UPackage &) {
+const wchar_t * _dasUnreal_static_176_StaticPackage(const UPackage *) {
 	return UPackage::StaticPackage();
 }
 
-void _dasUnreal_static_177_StaticRegisterNativesUPackage(const UPackage &) {
+void _dasUnreal_static_177_StaticRegisterNativesUPackage(const UPackage *) {
 	UPackage::StaticRegisterNativesUPackage();
 }
 
@@ -749,15 +749,15 @@ void _dasUnreal_virtual_186_TagSubobjects(UPackage & self,EObjectFlags NewFlags)
 	self.TagSubobjects(NewFlags);
 }
 
-void _dasUnreal_static_187_WaitForAsyncFileWrites(const UPackage &) {
+void _dasUnreal_static_187_WaitForAsyncFileWrites(const UPackage *) {
 	UPackage::WaitForAsyncFileWrites();
 }
 
-bool _dasUnreal_static_188_HasAsyncFileWrites(const UPackage &) {
+bool _dasUnreal_static_188_HasAsyncFileWrites(const UPackage *) {
 	return UPackage::HasAsyncFileWrites();
 }
 
-bool _dasUnreal_static_189_IsEmptyPackage(const UPackage &,UPackage * Package,const UObject * LastReferencer) {
+bool _dasUnreal_static_189_IsEmptyPackage(const UPackage *,UPackage * Package,const UObject * LastReferencer) {
 	return UPackage::IsEmptyPackage(Package,LastReferencer);
 }
 

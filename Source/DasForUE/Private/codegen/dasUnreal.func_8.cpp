@@ -17,16 +17,19 @@ void Module_dasUnreal::initFunctions_8() {
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:950:14
-	makeExtern< void (*)(const UPackage &) , _dasUnreal_static_187_WaitForAsyncFileWrites , SimNode_ExtFuncCall >(lib,"WaitForAsyncFileWrites","_dasUnreal_static_187_WaitForAsyncFileWrites")
+	makeExtern< void (*)(const UPackage *) , _dasUnreal_static_187_WaitForAsyncFileWrites , SimNode_ExtFuncCall >(lib,"WaitForAsyncFileWrites","_dasUnreal_static_187_WaitForAsyncFileWrites")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UPackage*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:953:14
-	makeExtern< bool (*)(const UPackage &) , _dasUnreal_static_188_HasAsyncFileWrites , SimNode_ExtFuncCall >(lib,"HasAsyncFileWrites","_dasUnreal_static_188_HasAsyncFileWrites")
+	makeExtern< bool (*)(const UPackage *) , _dasUnreal_static_188_HasAsyncFileWrites , SimNode_ExtFuncCall >(lib,"HasAsyncFileWrites","_dasUnreal_static_188_HasAsyncFileWrites")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UPackage*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:962:14
-	makeExtern< bool (*)(const UPackage &,UPackage *,const UObject *) , _dasUnreal_static_189_IsEmptyPackage , SimNode_ExtFuncCall >(lib,"IsEmptyPackage","_dasUnreal_static_189_IsEmptyPackage")
+	makeExtern< bool (*)(const UPackage *,UPackage *,const UObject *) , _dasUnreal_static_189_IsEmptyPackage , SimNode_ExtFuncCall >(lib,"IsEmptyPackage","_dasUnreal_static_189_IsEmptyPackage")
 		->args({"self","Package","LastReferencer"})
+		->arg_type(0,makeType<TExplicit<const UPackage*> >(lib))
 		->arg_init(2,make_smart<ExprConstPtr>())
 		->addToModule(*this, SideEffects::worstDefault);
 }

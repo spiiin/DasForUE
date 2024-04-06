@@ -84,8 +84,9 @@ void Module_dasUnreal::initFunctions_5() {
 		->args({"self","Parms"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:1358:34
-	makeExtern< UObject * (*)(const UObject &,const UClass *,const UObject *,FName,EObjectFlags) , _dasUnreal_static_95_GetArchetypeFromRequiredInfo , SimNode_ExtFuncCall >(lib,"GetArchetypeFromRequiredInfo","_dasUnreal_static_95_GetArchetypeFromRequiredInfo")
+	makeExtern< UObject * (*)(const UObject *,const UClass *,const UObject *,FName,EObjectFlags) , _dasUnreal_static_95_GetArchetypeFromRequiredInfo , SimNode_ExtFuncCall >(lib,"GetArchetypeFromRequiredInfo","_dasUnreal_static_95_GetArchetypeFromRequiredInfo")
 		->args({"self","Class","Outer","Name","ObjectFlags"})
+		->arg_type(0,makeType<TExplicit<const UObject*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	using _method_277 = das::das_call_member< UObject * (UObject::*)() const,&UObject::GetArchetype >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:1365:27
@@ -133,16 +134,19 @@ void Module_dasUnreal::initFunctions_5() {
 		->args({"Test"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:157:2
-	makeExtern< UClass * (*)(const UField &) , _dasUnreal_static_99_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_99_StaticClass")
+	makeExtern< UClass * (*)(const UField *) , _dasUnreal_static_99_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_99_StaticClass")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UField*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:157:2
-	makeExtern< const wchar_t * (*)(const UField &) , _dasUnreal_static_100_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_100_StaticPackage")
+	makeExtern< const wchar_t * (*)(const UField *) , _dasUnreal_static_100_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_100_StaticPackage")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UField*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:157:2
-	makeExtern< void (*)(const UField &) , _dasUnreal_static_101_StaticRegisterNativesUField , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUField","_dasUnreal_static_101_StaticRegisterNativesUField")
+	makeExtern< void (*)(const UField *) , _dasUnreal_static_101_StaticRegisterNativesUField , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUField","_dasUnreal_static_101_StaticRegisterNativesUField")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UField*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:170:31
 	makeExtern< void (*)(UField &) , _dasUnreal_virtual_102_PostLoad , SimNode_ExtFuncCall >(lib,"PostLoad","_dasUnreal_virtual_102_PostLoad")
@@ -187,8 +191,9 @@ void Module_dasUnreal::initFunctions_5() {
 		->arg_init(1,make_smart<ExprConstBool>(false))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:214:30
-	makeExtern< void (*)(const UField &,FString &,bool) , _dasUnreal_static_106_FormatNativeToolTip , SimNode_ExtFuncCall >(lib,"FormatNativeToolTip","_dasUnreal_static_106_FormatNativeToolTip")
+	makeExtern< void (*)(const UField *,FString &,bool) , _dasUnreal_static_106_FormatNativeToolTip , SimNode_ExtFuncCall >(lib,"FormatNativeToolTip","_dasUnreal_static_106_FormatNativeToolTip")
 		->args({"self","ToolTipString","bRemoveExtraSections"})
+		->arg_type(0,makeType<TExplicit<const UField*> >(lib))
 		->arg_init(2,make_smart<ExprConstBool>(true))
 		->addToModule(*this, SideEffects::worstDefault);
 	using _method_298 = das::das_call_member< bool (UField::*)(const wchar_t *) const,&UField::HasMetaData >;
@@ -302,16 +307,19 @@ void Module_dasUnreal::initFunctions_5() {
 		->args({"self","InCastFlags"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:388:2
-	makeExtern< UClass * (*)(const UStruct &) , _dasUnreal_static_107_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_107_StaticClass")
+	makeExtern< UClass * (*)(const UStruct *) , _dasUnreal_static_107_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_107_StaticClass")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UStruct*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:388:2
-	makeExtern< const wchar_t * (*)(const UStruct &) , _dasUnreal_static_108_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_108_StaticPackage")
+	makeExtern< const wchar_t * (*)(const UStruct *) , _dasUnreal_static_108_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_108_StaticPackage")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UStruct*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:388:2
-	makeExtern< void (*)(const UStruct &) , _dasUnreal_static_109_StaticRegisterNativesUStruct , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUStruct","_dasUnreal_static_109_StaticRegisterNativesUStruct")
+	makeExtern< void (*)(const UStruct *) , _dasUnreal_static_109_StaticRegisterNativesUStruct , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUStruct","_dasUnreal_static_109_StaticRegisterNativesUStruct")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UStruct*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	using _method_323 = das::das_call_member< const FBlake3Hash & (UStruct::*)(bool) const,&UStruct::GetSchemaHash >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:441:37

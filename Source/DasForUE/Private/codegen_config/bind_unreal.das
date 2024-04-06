@@ -605,7 +605,7 @@ class UnrealGen : CppGenBind
         fprint(struct_postadd_file,"initRecAnnotation(ann_{struct_name},lib);\n")
 
     //TODO: check if really need overload, or base class expanded needed
-    def override parse_anyFunctionDecl ( var c : CXCursor; isMethod : bool )
+    def override parse_anyFunctionDecl (var c: CXCursor; isMethod: bool)
         step_Function()
         let isStatic = clang_Cursor_getStorageClass(c)==CX_StorageClass Static
         let function_name = string(clang_getCursorSpelling(c))
@@ -669,6 +669,13 @@ class UnrealGen : CppGenBind
                 let arg_name = string(clang_getCursorSpelling(carg))
                 fprint(func_file,"\"{arg_name}\"")
             fprint(func_file,"\})")
+
+            //Unreal only logic?, maybe better to declare explicit functions explicitly via config
+            let isExplicitFirstArgument = isMethod && isStatic
+            if isExplicitFirstArgument
+                let self_type = namespace_struct_name()
+                fprint(func_file,"\n\t\t->arg_type({0},makeType<TExplicit<const {self_type}*> >(lib))")
+
             for ai in urange(narg)
                 let aii = int(isMethod ? ai+1u : ai)
                 var carg = clang_Cursor_getArgument(c, ai)
@@ -683,6 +690,44 @@ class UnrealGen : CppGenBind
             fprint(func_file,"\n\t\t->res_type(makeType<{rp}>(lib))")
 		fprint(func_file, "\n\t\t->addToModule(*this, SideEffects::worstDefault)")
         fprint(func_file,";\n")
+
+    def override functionHeaderSpelling(var c : CXCursor; isMethod,needMethodQualifier,needArgumentNames:bool; function_name, self_type:string)
+        var fun_type = clang_getCursorType(c)
+        var res_type = clang_getResultType(fun_type)
+        let function_result_type = typeSpelling(res_type)
+        let isStatic = clang_Cursor_getStorageClass(c)==CX_StorageClass Static
+        return build_string() <| $ ( str )
+            str |> write("{function_result_type} {function_name}(")
+            if !empty(self_type)
+                if isMethod && (clang_CXXMethod_isConst(c)!=0u || isStatic)
+                    str |> write("const ")
+                
+                if isStatic
+                    //for static method, convert argument to pointer, so it is possible to call it with nullptr, other it need to create unneeded temp object
+                    //but param type still useful for resolve overloads
+                    str |> write("{self_type} *") 
+                else
+                    //for virtual methods -- some object still needed, so it is ok to have const reference argument
+                    str |> write("{self_type} &")
+                    
+                if needArgumentNames && !isStatic
+                    str |> write(" self")
+            let narg = clang_Cursor_getNumArguments(c)
+            for ai in urange(narg)
+                if ai != 0u || !empty(self_type)
+                    str |> write(",")
+                var carg = clang_Cursor_getArgument(c, ai)
+                var arg_type = clang_getCursorType(carg)
+                let argument_type = typeSpelling(arg_type)
+                str |> write("{argument_type}")
+                if needArgumentNames
+                    var arg_name = string(clang_getCursorSpelling(carg))
+                    if empty(arg_name)
+                        arg_name = "_arg_{int(ai)}"
+                    str |> write(" {arg_name}")
+            str |> write(")")
+            if isMethod && needMethodQualifier && clang_CXXMethod_isConst(c)!=0u
+                str |> write(" const")
 
     def override parse_Field(var c : CXCursor)
         let field_name = string(clang_getCursorSpelling(c))

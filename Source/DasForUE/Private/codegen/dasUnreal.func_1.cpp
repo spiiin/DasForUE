@@ -291,12 +291,14 @@ void Module_dasUnreal::initFunctions_1() {
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1424:39
-	makeExtern< FString (*)(const FString &,wchar_t) , _dasUnreal_static_0_Chr , SimNode_ExtFuncCallAndCopyOrMove >(lib,"Chr","_dasUnreal_static_0_Chr")
+	makeExtern< FString (*)(const FString *,wchar_t) , _dasUnreal_static_0_Chr , SimNode_ExtFuncCallAndCopyOrMove >(lib,"Chr","_dasUnreal_static_0_Chr")
 		->args({"self","Ch"})
+		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1434:39
-	makeExtern< FString (*)(const FString &,int,wchar_t) , _dasUnreal_static_1_ChrN , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ChrN","_dasUnreal_static_1_ChrN")
+	makeExtern< FString (*)(const FString *,int,wchar_t) , _dasUnreal_static_1_ChrN , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ChrN","_dasUnreal_static_1_ChrN")
 		->args({"self","NumCharacters","Char"})
+		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	using _method_47 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const,&FString::StartsWith >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1466:20
@@ -406,8 +408,9 @@ void Module_dasUnreal::initFunctions_1() {
 		->args({"self","InSpacesPerTab"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1910:39
-	makeExtern< FString (*)(const FString &,int) , _dasUnreal_static_2_FormatAsNumber , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FormatAsNumber","_dasUnreal_static_2_FormatAsNumber")
+	makeExtern< FString (*)(const FString *,int) , _dasUnreal_static_2_FormatAsNumber , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FormatAsNumber","_dasUnreal_static_2_FormatAsNumber")
 		->args({"self","InNumber"})
+		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	using _method_67 = das::das_call_member< void (FString::*)(int),&FString::Reserve >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1913:16
@@ -415,8 +418,9 @@ void Module_dasUnreal::initFunctions_1() {
 		->args({"self","CharacterCount"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1926:42
-	makeExtern< FString (*)(const FString &,int) , _dasUnreal_static_3_FromInt , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromInt","_dasUnreal_static_3_FromInt")
+	makeExtern< FString (*)(const FString *,int) , _dasUnreal_static_3_FromInt , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromInt","_dasUnreal_static_3_FromInt")
 		->args({"self","Num"})
+		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	using _method_69 = das::das_call_member< void (FString::*)(int),&FString::AppendInt >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1934:16
@@ -429,24 +433,29 @@ void Module_dasUnreal::initFunctions_1() {
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1953:39
-	makeExtern< FString (*)(const FString &,const unsigned char *,const unsigned int) , _dasUnreal_static_4_FromBlob , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromBlob","_dasUnreal_static_4_FromBlob")
+	makeExtern< FString (*)(const FString *,const unsigned char *,const unsigned int) , _dasUnreal_static_4_FromBlob , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromBlob","_dasUnreal_static_4_FromBlob")
 		->args({"self","SrcBuffer","SrcSize"})
+		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1963:23
-	makeExtern< bool (*)(const FString &,const FString &,unsigned char *,const unsigned int) , _dasUnreal_static_5_ToBlob , SimNode_ExtFuncCall >(lib,"ToBlob","_dasUnreal_static_5_ToBlob")
+	makeExtern< bool (*)(const FString *,const FString &,unsigned char *,const unsigned int) , _dasUnreal_static_5_ToBlob , SimNode_ExtFuncCall >(lib,"ToBlob","_dasUnreal_static_5_ToBlob")
 		->args({"self","Source","DestBuffer","DestSize"})
+		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1973:39
-	makeExtern< FString (*)(const FString &,const unsigned char *,const unsigned int) , _dasUnreal_static_6_FromHexBlob , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromHexBlob","_dasUnreal_static_6_FromHexBlob")
+	makeExtern< FString (*)(const FString *,const unsigned char *,const unsigned int) , _dasUnreal_static_6_FromHexBlob , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromHexBlob","_dasUnreal_static_6_FromHexBlob")
 		->args({"self","SrcBuffer","SrcSize"})
+		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1983:23
-	makeExtern< bool (*)(const FString &,const FString &,unsigned char *,const unsigned int) , _dasUnreal_static_7_ToHexBlob , SimNode_ExtFuncCall >(lib,"ToHexBlob","_dasUnreal_static_7_ToHexBlob")
+	makeExtern< bool (*)(const FString *,const FString &,unsigned char *,const unsigned int) , _dasUnreal_static_7_ToHexBlob , SimNode_ExtFuncCall >(lib,"ToHexBlob","_dasUnreal_static_7_ToHexBlob")
 		->args({"self","Source","DestBuffer","DestSize"})
+		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1994:39
-	makeExtern< FString (*)(const FString &,double,const int) , _dasUnreal_static_8_SanitizeFloat , SimNode_ExtFuncCallAndCopyOrMove >(lib,"SanitizeFloat","_dasUnreal_static_8_SanitizeFloat")
+	makeExtern< FString (*)(const FString *,double,const int) , _dasUnreal_static_8_SanitizeFloat , SimNode_ExtFuncCallAndCopyOrMove >(lib,"SanitizeFloat","_dasUnreal_static_8_SanitizeFloat")
 		->args({"self","InFloat","InMinFractionalDigits"})
+		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->arg_init(2,make_smart<ExprConstInt>(1))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2094:29

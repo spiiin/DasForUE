@@ -67,8 +67,9 @@ void Module_dasUnreal::initFunctions_3() {
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:2879:14
-	makeExtern< void (*)(const FCoreUObjectDelegates &,UObject *) , _dasUnreal_static_24_BroadcastOnObjectModified , SimNode_ExtFuncCall >(lib,"BroadcastOnObjectModified","_dasUnreal_static_24_BroadcastOnObjectModified")
+	makeExtern< void (*)(const FCoreUObjectDelegates *,UObject *) , _dasUnreal_static_24_BroadcastOnObjectModified , SimNode_ExtFuncCall >(lib,"BroadcastOnObjectModified","_dasUnreal_static_24_BroadcastOnObjectModified")
 		->args({"self","Object"})
+		->arg_type(0,makeType<TExplicit<const FCoreUObjectDelegates*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3062:32
 	makeExtern< UScriptStruct * (*)() , GetFallbackStruct , SimNode_ExtFuncCall >(lib,"GetFallbackStruct","GetFallbackStruct")
@@ -97,20 +98,24 @@ void Module_dasUnreal::initFunctions_3() {
 		->args({"CategoryName","Verbosity","AssetLog","Message","File","Line"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3151:33
-	makeExtern< FString (*)(const FAssetMsg &,const wchar_t *) , _dasUnreal_static_25_FormatPathForAssetLog , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FormatPathForAssetLog","_dasUnreal_static_25_FormatPathForAssetLog")
+	makeExtern< FString (*)(const FAssetMsg *,const wchar_t *) , _dasUnreal_static_25_FormatPathForAssetLog , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FormatPathForAssetLog","_dasUnreal_static_25_FormatPathForAssetLog")
 		->args({"self","Path"})
+		->arg_type(0,makeType<TExplicit<const FAssetMsg*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3157:33
-	makeExtern< FString (*)(const FAssetMsg &,const UObject *) , _dasUnreal_static_26_FormatPathForAssetLog , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FormatPathForAssetLog","_dasUnreal_static_26_FormatPathForAssetLog")
+	makeExtern< FString (*)(const FAssetMsg *,const UObject *) , _dasUnreal_static_26_FormatPathForAssetLog , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FormatPathForAssetLog","_dasUnreal_static_26_FormatPathForAssetLog")
 		->args({"self","Object"})
+		->arg_type(0,makeType<TExplicit<const FAssetMsg*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3159:33
-	makeExtern< FString (*)(const FAssetMsg &,const wchar_t *,const FString &) , _dasUnreal_static_27_GetAssetLogString , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetAssetLogString","_dasUnreal_static_27_GetAssetLogString")
+	makeExtern< FString (*)(const FAssetMsg *,const wchar_t *,const FString &) , _dasUnreal_static_27_GetAssetLogString , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetAssetLogString","_dasUnreal_static_27_GetAssetLogString")
 		->args({"self","Path","Message"})
+		->arg_type(0,makeType<TExplicit<const FAssetMsg*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3161:33
-	makeExtern< FString (*)(const FAssetMsg &,const UObject *,const FString &) , _dasUnreal_static_28_GetAssetLogString , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetAssetLogString","_dasUnreal_static_28_GetAssetLogString")
+	makeExtern< FString (*)(const FAssetMsg *,const UObject *,const FString &) , _dasUnreal_static_28_GetAssetLogString , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetAssetLogString","_dasUnreal_static_28_GetAssetLogString")
 		->args({"self","Object","Message"})
+		->arg_type(0,makeType<TExplicit<const FAssetMsg*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3210:22
 	makeExtern< bool (*)(const UObject *,bool) , IsEditorOnlyObject , SimNode_ExtFuncCall >(lib,"IsEditorOnlyObject","IsEditorOnlyObject")
@@ -181,8 +186,9 @@ void Module_dasUnreal::initFunctions_3() {
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBase.h:164:33
-	makeExtern< FString (*)(const UObjectBase &,const wchar_t *) , _dasUnreal_static_30_RemoveClassPrefix , SimNode_ExtFuncCallAndCopyOrMove >(lib,"RemoveClassPrefix","_dasUnreal_static_30_RemoveClassPrefix")
+	makeExtern< FString (*)(const UObjectBase *,const wchar_t *) , _dasUnreal_static_30_RemoveClassPrefix , SimNode_ExtFuncCallAndCopyOrMove >(lib,"RemoveClassPrefix","_dasUnreal_static_30_RemoveClassPrefix")
 		->args({"self","ClassName"})
+		->arg_type(0,makeType<TExplicit<const UObjectBase*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	using _method_122 = das::das_call_member< UPackage * (UObjectBase::*)() const,&UObjectBase::GetExternalPackage >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBase.h:167:28
@@ -215,12 +221,14 @@ void Module_dasUnreal::initFunctions_3() {
 		->args({"self","FlagsToClear"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBase.h:234:14
-	makeExtern< void (*)(const UObjectBase &,UObject *) , _dasUnreal_static_31_PrefetchClass , SimNode_ExtFuncCall >(lib,"PrefetchClass","_dasUnreal_static_31_PrefetchClass")
+	makeExtern< void (*)(const UObjectBase *,UObject *) , _dasUnreal_static_31_PrefetchClass , SimNode_ExtFuncCall >(lib,"PrefetchClass","_dasUnreal_static_31_PrefetchClass")
 		->args({"self","Object"})
+		->arg_type(0,makeType<TExplicit<const UObjectBase*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBase.h:235:14
-	makeExtern< void (*)(const UObjectBase &,UObject *) , _dasUnreal_static_32_PrefetchOuter , SimNode_ExtFuncCall >(lib,"PrefetchOuter","_dasUnreal_static_32_PrefetchOuter")
+	makeExtern< void (*)(const UObjectBase *,UObject *) , _dasUnreal_static_32_PrefetchOuter , SimNode_ExtFuncCall >(lib,"PrefetchOuter","_dasUnreal_static_32_PrefetchOuter")
 		->args({"self","Object"})
+		->arg_type(0,makeType<TExplicit<const UObjectBase*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBase.h:276:22
 	makeExtern< bool (*)() , UObjectInitialized , SimNode_ExtFuncCall >(lib,"UObjectInitialized","UObjectInitialized")
@@ -412,12 +420,14 @@ void Module_dasUnreal::initFunctions_3() {
 		->args({"self","FlagsToClear"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBaseUtility.h:467:21
-	makeExtern< bool (*)(const UObjectBaseUtility &) , _dasUnreal_static_33_IsPendingKillEnabled , SimNode_ExtFuncCall >(lib,"IsPendingKillEnabled","_dasUnreal_static_33_IsPendingKillEnabled")
+	makeExtern< bool (*)(const UObjectBaseUtility *) , _dasUnreal_static_33_IsPendingKillEnabled , SimNode_ExtFuncCall >(lib,"IsPendingKillEnabled","_dasUnreal_static_33_IsPendingKillEnabled")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UObjectBaseUtility*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBaseUtility.h:473:42
-	makeExtern< EInternalObjectFlags (*)(const UObjectBaseUtility &,const EInternalObjectFlags) , _dasUnreal_static_34_FixGarbageOrPendingKillInternalObjectFlags , SimNode_ExtFuncCall >(lib,"FixGarbageOrPendingKillInternalObjectFlags","_dasUnreal_static_34_FixGarbageOrPendingKillInternalObjectFlags")
+	makeExtern< EInternalObjectFlags (*)(const UObjectBaseUtility *,const EInternalObjectFlags) , _dasUnreal_static_34_FixGarbageOrPendingKillInternalObjectFlags , SimNode_ExtFuncCall >(lib,"FixGarbageOrPendingKillInternalObjectFlags","_dasUnreal_static_34_FixGarbageOrPendingKillInternalObjectFlags")
 		->args({"self","InFlags"})
+		->arg_type(0,makeType<TExplicit<const UObjectBaseUtility*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBaseUtility.h:496:15
 	makeExtern< bool (*)(const UObjectBaseUtility &) , _dasUnreal_virtual_35_CanBeClusterRoot , SimNode_ExtFuncCall >(lib,"CanBeClusterRoot","_dasUnreal_virtual_35_CanBeClusterRoot")

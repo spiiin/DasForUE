@@ -67,9 +67,9 @@ namespace das {
 
     void Module_dasUnreal::initAdditionalFunctions() {
         addExtern<DAS_BIND_FUN(UFunctionCaller::callUFunctionOn)>(*this, lib, "call_ufunction_on", SideEffects::worstDefault);
-        addExtern<DAS_BIND_FUN(getClassByName)>(*this, lib, "get_class_by_name", SideEffects::worstDefault);
-        addExtern<UObject* (*)(UObject*, UClass*, FName), newObjectFromClass>(*this, lib, "new_object_from_class", SideEffects::worstDefault);
-        addExtern<UObject* (*)(FStaticConstructObjectParameters), newObjectFromClass>(*this, lib, "new_object_from_class", SideEffects::worstDefault);
+
+        addExtern<UPackage* (*)(), AnyPackage>(*this, lib, "AnyPackage", SideEffects::worstDefault);
+        addExtern<DAS_BIND_FUN(FStringToCStr)>(*this, lib, "string", SideEffects::worstDefault);
 
         addCtorAndUsing<FName>(*this, lib, "FName", "FName");
         addCtorAndUsing<FName, const char*>(*this, lib, "FName", "FName")

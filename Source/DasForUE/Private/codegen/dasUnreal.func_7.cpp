@@ -174,8 +174,9 @@ void Module_dasUnreal::initFunctions_7() {
 		->args({"self","bRecompilingOnLoad"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:3426:33
-	makeExtern< UClass * (*)(const UClass &,UClass *,UClass *) , _dasUnreal_static_170_FindCommonBase , SimNode_ExtFuncCall >(lib,"FindCommonBase","_dasUnreal_static_170_FindCommonBase")
+	makeExtern< UClass * (*)(const UClass *,UClass *,UClass *) , _dasUnreal_static_170_FindCommonBase , SimNode_ExtFuncCall >(lib,"FindCommonBase","_dasUnreal_static_170_FindCommonBase")
 		->args({"self","InClassA","InClassB"})
+		->arg_type(0,makeType<TExplicit<const UClass*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:3442:31
 	makeExtern< bool (*)(const UClass &,FName) , _dasUnreal_virtual_171_IsFunctionImplementedInScript , SimNode_ExtFuncCall >(lib,"IsFunctionImplementedInScript","_dasUnreal_virtual_171_IsFunctionImplementedInScript")
@@ -210,8 +211,9 @@ void Module_dasUnreal::initFunctions_7() {
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:3486:30
-	makeExtern< bool (*)(const UClass &,UClass *) , _dasUnreal_static_174_IsSafeToSerializeToStructuredArchives , SimNode_ExtFuncCall >(lib,"IsSafeToSerializeToStructuredArchives","_dasUnreal_static_174_IsSafeToSerializeToStructuredArchives")
+	makeExtern< bool (*)(const UClass *,UClass *) , _dasUnreal_static_174_IsSafeToSerializeToStructuredArchives , SimNode_ExtFuncCall >(lib,"IsSafeToSerializeToStructuredArchives","_dasUnreal_static_174_IsSafeToSerializeToStructuredArchives")
 		->args({"self","InClass"})
+		->arg_type(0,makeType<TExplicit<const UClass*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:3610:22
 	makeExtern< void (*)(UClass *,UClass *,UClass *,const wchar_t *,const wchar_t *) , InitializePrivateStaticClass , SimNode_ExtFuncCall >(lib,"InitializePrivateStaticClass","InitializePrivateStaticClass")
@@ -228,16 +230,19 @@ void Module_dasUnreal::initFunctions_7() {
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:144:2
-	makeExtern< UClass * (*)(const UPackage &) , _dasUnreal_static_175_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_175_StaticClass")
+	makeExtern< UClass * (*)(const UPackage *) , _dasUnreal_static_175_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_175_StaticClass")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UPackage*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:144:2
-	makeExtern< const wchar_t * (*)(const UPackage &) , _dasUnreal_static_176_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_176_StaticPackage")
+	makeExtern< const wchar_t * (*)(const UPackage *) , _dasUnreal_static_176_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_176_StaticPackage")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UPackage*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:144:2
-	makeExtern< void (*)(const UPackage &) , _dasUnreal_static_177_StaticRegisterNativesUPackage , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUPackage","_dasUnreal_static_177_StaticRegisterNativesUPackage")
+	makeExtern< void (*)(const UPackage *) , _dasUnreal_static_177_StaticRegisterNativesUPackage , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUPackage","_dasUnreal_static_177_StaticRegisterNativesUPackage")
 		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UPackage*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	using _method_505 = das::das_call_member< bool (UPackage::*)() const,&UPackage::GetHasBeenEndLoaded >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:231:7
