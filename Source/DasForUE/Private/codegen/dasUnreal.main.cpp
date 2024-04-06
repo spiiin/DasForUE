@@ -3,7 +3,6 @@
 //#include "aot_dasUnreal.h"
 
 #include "../ReflectionHelpers.h"
-#include "../UFunctionCaller.h"
 
 DAS_BASE_BIND_ENUM_GEN(ESearchDir::Type, ESearchDir_Type);
 DAS_BASE_BIND_ENUM_GEN(ESearchCase::Type, ESearchCase_Type);
@@ -66,8 +65,6 @@ namespace das {
     }
 
     void Module_dasUnreal::initAdditionalFunctions() {
-        addExtern<DAS_BIND_FUN(UFunctionCaller::callUFunctionOn)>(*this, lib, "call_ufunction_on", SideEffects::worstDefault);
-
         addExtern<UPackage* (*)(), AnyPackage>(*this, lib, "AnyPackage", SideEffects::worstDefault);
         addExtern<DAS_BIND_FUN(FStringToCStr)>(*this, lib, "string", SideEffects::worstDefault);
 

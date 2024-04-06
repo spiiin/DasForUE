@@ -19,11 +19,11 @@ def SaySomethingElse(obj: UObject?; var msg: FString)
 struct SaySomethingParams
     msg : FString
 
-def SaySomething(obj: UObject?; var msg: FString)
+def SaySomething(var obj: UObject?; var msg: FString)
     unsafe
         var params: SaySomethingParams //no inited, unsafe
         params.msg <- msg
-        obj |> call_ufunction_on(FString("SaySomething")) <| addr(params)
+        obj |> call_ufunction_on("SaySomething") <| addr(params)
 
 //--------------------------------------------------------------
 
