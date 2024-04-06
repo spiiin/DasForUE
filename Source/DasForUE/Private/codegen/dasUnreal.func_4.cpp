@@ -6,6 +6,11 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_4() {
+	using _method_165 = das::das_call_member< FString (UObjectBaseUtility::*)() const,&UObjectBaseUtility::GetName >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBaseUtility.h:543:22
+	makeExtern<DAS_CALL_METHOD(_method_165), SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetName","das_call_member< FString (UObjectBaseUtility::*)() const , &UObjectBaseUtility::GetName >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
 	using _method_166 = das::das_call_member< void (UObjectBaseUtility::*)(FString &) const,&UObjectBaseUtility::GetName >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBaseUtility.h:549:19
 	makeExtern<DAS_CALL_METHOD(_method_166), SimNode_ExtFuncCall >(lib,"GetName","das_call_member< void (UObjectBaseUtility::*)(FString &) const , &UObjectBaseUtility::GetName >::invoke")
@@ -453,11 +458,6 @@ void Module_dasUnreal::initFunctions_4() {
 	using _method_258 = das::das_call_member< bool (UObject::*)(),&UObject::ConditionalBeginDestroy >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:1106:23
 	makeExtern<DAS_CALL_METHOD(_method_258), SimNode_ExtFuncCall >(lib,"ConditionalBeginDestroy","das_call_member< bool (UObject::*)() , &UObject::ConditionalBeginDestroy >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_259 = das::das_call_member< bool (UObject::*)(),&UObject::ConditionalFinishDestroy >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:1109:23
-	makeExtern<DAS_CALL_METHOD(_method_259), SimNode_ExtFuncCall >(lib,"ConditionalFinishDestroy","das_call_member< bool (UObject::*)() , &UObject::ConditionalFinishDestroy >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 }

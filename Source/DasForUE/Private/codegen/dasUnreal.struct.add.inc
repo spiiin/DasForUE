@@ -107,6 +107,8 @@ auto ann_ICppStructOps = make_smart<UScriptStruct_ICppStructOps_GeneratedAnnotat
 addAnnotation(ann_ICppStructOps);
 auto ann_UScriptStruct = make_smart<UScriptStruct_GeneratedAnnotation>(lib);
 addAnnotation(ann_UScriptStruct);
+auto ann_UFunction = make_smart<UFunction_GeneratedAnnotation>(lib);
+addAnnotation(ann_UFunction);
 auto ann_UEnum = make_smart<UEnum_GeneratedAnnotation>(lib);
 addAnnotation(ann_UEnum);
 auto ann_FCppClassTypeTraitsBase = make_smart<FCppClassTypeTraitsBase_GeneratedAnnotation>(lib);
@@ -133,6 +135,7 @@ auto ann_UPackage = make_smart<UPackage_GeneratedAnnotation>(lib);
 addAnnotation(ann_UPackage);
 setParents(this,"UClass",  {"UStruct","UField","UObject","UObjectBaseUtility","UObjectBase"});
 setParents(this,"UObject",  {"UObjectBaseUtility","UObjectBase"});
+setParents(this,"UFunction",  {"UStruct","UField","UObject","UObjectBaseUtility","UObjectBase"});
 setParents(this,"UPackage",  {"UObject","UObjectBaseUtility","UObjectBase"});
 setParents(this,"FCppClassTypeInfo",  {"ICppClassTypeInfo"});
 setParents(this,"FReferenceFinder",  {"FReferenceCollector"});

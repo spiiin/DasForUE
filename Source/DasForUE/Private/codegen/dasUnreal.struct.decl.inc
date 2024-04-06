@@ -70,6 +70,7 @@ MAKE_EXTERNAL_TYPE_FACTORY(UStruct,UStruct);
 MAKE_EXTERNAL_TYPE_FACTORY(UScriptStruct,UScriptStruct);
 MAKE_EXTERNAL_TYPE_FACTORY(ICppStructOps,UScriptStruct::ICppStructOps);
 MAKE_EXTERNAL_TYPE_FACTORY(FCapabilities,UScriptStruct::ICppStructOps::FCapabilities);
+MAKE_EXTERNAL_TYPE_FACTORY(UFunction,UFunction);
 MAKE_EXTERNAL_TYPE_FACTORY(UEnum,UEnum);
 MAKE_EXTERNAL_TYPE_FACTORY(FCppClassTypeTraitsBase,FCppClassTypeTraitsBase);
 MAKE_EXTERNAL_TYPE_FACTORY(ICppClassTypeInfo,ICppClassTypeInfo);

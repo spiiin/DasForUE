@@ -59,6 +59,7 @@ class UnrealGen : CppGenBind
             "UObject";
             "UField";
             "UStruct";
+            "UFunction";
             "UScriptStruct";
             "UClass";
             "UEnum";
@@ -188,6 +189,8 @@ class UnrealGen : CppGenBind
             "UScriptStruct::Link";
             "UScriptStruct::FindInnerPropertyInstance";
             "UScriptStruct::ICppStructOps::GetComputedPropertyFlags";
+
+            "UFunction::Link";
 
             //UObject/Package.h
             "UPackage::GetWorldTileInfo";
@@ -319,7 +322,6 @@ class UnrealGen : CppGenBind
             "FCustomPropertyConditionState";
             "FFragmentRegistrationContext";
             "ITargetPlatform";
-            "UFunction";
             "FFrame";
             "FInternalUObjectBaseUtilityIsValidFlagsChecker";
             "EDataValidationResult";

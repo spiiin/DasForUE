@@ -668,6 +668,22 @@ struct UScriptStruct_GeneratedAnnotation : ManagedStructureAnnotation<UScriptStr
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1780:7
+struct UFunction_GeneratedAnnotation : ManagedStructureAnnotation<UFunction, false, false> {
+	UFunction_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UFunction", ml, "UFunction") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(NumParms)>("NumParms","NumParms");
+		addField<DAS_BIND_MANAGED_FIELD(ParmsSize)>("ParmsSize","ParmsSize");
+		addField<DAS_BIND_MANAGED_FIELD(ReturnValueOffset)>("ReturnValueOffset","ReturnValueOffset");
+		addField<DAS_BIND_MANAGED_FIELD(RPCId)>("RPCId","RPCId");
+		addField<DAS_BIND_MANAGED_FIELD(RPCResponseId)>("RPCResponseId","RPCResponseId");
+		addField<DAS_BIND_MANAGED_FIELD(EventGraphFunction)>("EventGraphFunction","EventGraphFunction");
+		addField<DAS_BIND_MANAGED_FIELD(EventGraphCallOffset)>("EventGraphCallOffset","EventGraphCallOffset");
+		addField<DAS_BIND_MANAGED_FIELD(SingletonPtr)>("SingletonPtr","SingletonPtr");
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1999:7
 struct UEnum_GeneratedAnnotation : ManagedStructureAnnotation<UEnum, false, false> {
 	UEnum_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UEnum", ml, "UEnum") {

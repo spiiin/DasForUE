@@ -54,6 +54,7 @@ initRecAnnotation(ann_UStruct,lib);
 initRecAnnotation(ann_FCapabilities,lib);
 initRecAnnotation(ann_ICppStructOps,lib);
 initRecAnnotation(ann_UScriptStruct,lib);
+initRecAnnotation(ann_UFunction,lib);
 initRecAnnotation(ann_UEnum,lib);
 initRecAnnotation(ann_FCppClassTypeTraitsBase,lib);
 initRecAnnotation(ann_ICppClassTypeInfo,lib);

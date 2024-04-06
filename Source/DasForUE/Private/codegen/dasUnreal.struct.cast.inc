@@ -319,6 +319,12 @@ template <> struct cast_arg<UScriptStruct> {
 		return * cast<UScriptStruct *>::to(res);
 	}
 };
+template <> struct cast_arg<UFunction> {
+	static __forceinline const UFunction & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UFunction *>::to(res);
+	}
+};
 template <> struct cast_arg<UEnum> {
 	static __forceinline const UEnum & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
