@@ -30,13 +30,16 @@ def SaySomething(var obj: UObject?; var msg: FString)
 [export]
 def main
     let className = "TestClass"
-    var clazz = get_class_by_name(className)
+    var clazz = get_class_by_name(FString(className))
     if clazz == null
         print("Class {className} not found!")
         return
     print("Class name: {string(*clazz |> GetName)}\n")
-    var obj = new_object_from_class(clazz)
+    var obj = new_uobject_of_class(clazz)
     print("Object name: {string(*obj |> GetName)}\n")
+
+    var uclassObject = new_uobject(type<UClass>)
+    print("uclassObject: {string(*uclassObject |> GetName)}\n")
 
     //print("{cls}\n") //TODO: fix crash
 
