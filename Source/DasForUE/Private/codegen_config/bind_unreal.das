@@ -64,6 +64,7 @@ class UnrealGen : CppGenBind
             "UClass";
             "UEnum";
             "UPackage";
+            "UPropertyWrapper";
         }}
 
         unreal_skip_func <- {{
@@ -227,6 +228,30 @@ class UnrealGen : CppGenBind
             "FReferenceCollector::AddStableReferenceSet";
             "FReferenceCollector::AddStableReferenceArray";
             "FReferenceCollector::AddReferencedObjects";
+
+            //UObject/UnrealType.h
+            "FByteProperty::Serialize";
+            "FBoolProperty::Serialize";
+            "FBoolProperty::LinkInternal";
+            "FObjectPropertyBase::Serialize";
+            "FClassProperty::Serialize";
+            "FInterfaceProperty::Serialize";
+            "FInterfaceProperty::LinkInternal";
+            "FStructProperty::Serialize";
+            "FStructProperty::LinkInternal";
+            "FDelegateProperty::Serialize";
+            "FPropertyHelpers::ReadToken";
+            "FProperty::Serialize";
+            "FObjectProperty::PostSerializeObjectItem";
+            "FStructProperty::UseBinaryOrNativeSerialization";
+            "FProperty::LinkWithoutChangingOffset";
+            "FProperty::Link";
+            "FProperty::ShouldSerializeValue";
+            "FProperty::ExportCppDeclaration";
+            "GlobalSetProperty";
+            "UEProperty_Private::FProperty_DoNotUse::Unsafe_AlterOffset";
+            "UPropertyWrapper::GetProperty";
+
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -267,6 +292,8 @@ class UnrealGen : CppGenBind
             "UE::Core::FVersePath";
             "FWeakObjectPtr";
 
+            //UObjectTypes
+
             "const WIDECHAR *";  //mostly (for UnrealString, at least), it related to overloads char/wchar/unsigned short/UTF8CHAR
             "const UCS2CHAR *";  //check what can be done with them
             "const UTF8CHAR *";  //
@@ -302,7 +329,6 @@ class UnrealGen : CppGenBind
             "FOutParmRec";
             "FRepRecord";
             "Object_eventExecuteUbergraph_Parms";
-            "FProperty";
             "FEditPropertyChain";
             "FArchive";
             "FAppendToClassSchemaContext";
@@ -346,6 +372,60 @@ class UnrealGen : CppGenBind
             "FScopedObjectFlagMarker";
             "FScopedAllowAbstractClassAllocation";
             "FReferenceCollectorArchive";
+
+            //UObject/UnrealType.h
+            "FScriptMapHelper";
+            "FScriptSetHelper";
+            "FMapProperty";
+            "FSetProperty";
+            "FMulticastInlineDelegateProperty";
+            "FMulticastSparseDelegateProperty";
+            "UMulticastDelegatePropertyWrapper";
+            "FWeakObjectProperty";
+            "FLazyObjectProperty";
+            "FSoftObjectProperty";
+            "FSoftClassProperty";
+            "FArrayProperty";
+            "FScriptArrayHelper";
+            "FMulticastDelegateProperty";
+            "UEProperty_Private_FProperty_DoNotUse";
+            "FPropertyValueIterator";
+            "UMulticastInlineDelegatePropertyWrapper";
+            "FScriptArrayHelper_InContainer";
+            "FScriptMapHelper_InContainer";
+            "FMapPropertyParams";
+            "FArrayPropertyParams";
+            "FScriptSetHelper_InContainer";
+            "FVerySlowReferenceCollectorArchiveScope";
+            "FObjectPtrProperty";
+
+            "FInterfaceProperty";
+            "FByteProperty";
+            "FDoubleProperty";
+            //"FObjectPropertyBase";
+            "FInt8Property";
+            "FNameProperty";
+            "FObjectProperty";
+            "FUInt32Property";
+            "FInt16Property";
+            "FStrProperty";
+            "FDelegateProperty";
+            "FClassPtrProperty";
+            "FUInt16Property";
+            "FClassProperty";
+            "FIntProperty";
+            "FFloatProperty";
+            "FInt64Property";
+            "FUInt64Property";
+            "FLargeWorldCoordinatesRealProperty";
+
+            "FProperty"; //FField
+            "FBoolProperty";
+            "FObjectPropertyBase";
+            "FNumericProperty";
+            "FStructProperty";
+
+            "FDefaultConstructedPropertyElement";
         }}
 
     //TODO: check if this may be moved to cbind_boost
@@ -370,7 +450,8 @@ class UnrealGen : CppGenBind
             fname |> find("UObject/Object.h") != -1 ||
             fname |> find("UObject/Class.h") != -1 ||
             fname |> find("UObject/Package.h") != -1 ||
-            fname |> find("UObject/UObjectGlobals.h") != -1
+            fname |> find("UObject/UObjectGlobals.h") != -1 ||
+            fname |> find("UObject/UnrealType.h") != -1
         )
             return false
         return true

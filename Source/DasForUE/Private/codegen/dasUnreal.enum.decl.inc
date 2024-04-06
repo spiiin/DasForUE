@@ -89,3 +89,27 @@ DAS_BASE_BIND_ENUM_GEN(EObjectInstancingGraphOptions,EObjectInstancingGraphOptio
 
 DAS_BASE_BIND_ENUM_GEN(ESavePackageResult,ESavePackageResult);
 
+DAS_BASE_BIND_ENUM_GEN(ELifetimeCondition,ELifetimeCondition);
+
+DAS_BASE_BIND_ENUM_GEN(EPropertyExportCPPFlags,EPropertyExportCPPFlags);
+
+DAS_BASE_BIND_ENUM_GEN(EExportedDeclaration::Type,EExportedDeclaration_Type);
+
+DAS_BASE_BIND_ENUM_GEN(EConvertFromTypeResult,EConvertFromTypeResult);
+
+DAS_BASE_BIND_ENUM_GEN(EPropertyMemoryAccess,EPropertyMemoryAccess);
+
+DAS_BASE_BIND_ENUM_GEN(EPropertyPointerType,EPropertyPointerType);
+
+DAS_BASE_BIND_ENUM_GEN(EObjectPropertyOptions,EObjectPropertyOptions);
+
+DAS_BASE_BIND_ENUM_GEN(EFieldIterationFlags,EFieldIterationFlags);
+
+DAS_BASE_BIND_ENUM_GEN(EFieldIteratorFlags::SuperClassFlags,EFieldIteratorFlags_SuperClassFlags);
+
+DAS_BASE_BIND_ENUM_GEN(EFieldIteratorFlags::DeprecatedPropertyFlags,EFieldIteratorFlags_DeprecatedPropertyFlags);
+
+DAS_BASE_BIND_ENUM_GEN(EFieldIteratorFlags::InterfaceClassFlags,EFieldIteratorFlags_InterfaceClassFlags);
+
+DAS_BASE_BIND_ENUM_GEN(EPropertyValueIteratorFlags,EPropertyValueIteratorFlags);
+

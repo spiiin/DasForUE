@@ -71,14 +71,6 @@ struct FScriptIntegrationObjectHelper_GeneratedAnnotation : ManagedStructureAnno
 	}
 };
 
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:2132:7
-struct FVerySlowReferenceCollectorArchiveScope_GeneratedAnnotation : ManagedStructureAnnotation<FVerySlowReferenceCollectorArchiveScope> {
-	FVerySlowReferenceCollectorArchiveScope_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FVerySlowReferenceCollectorArchiveScope", ml, "FVerySlowReferenceCollectorArchiveScope") {
-	}
-	void init () {
-	}
-};
-
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:2602:9
 struct FReferenceCollector_AROPrivate_GeneratedAnnotation : ManagedStructureAnnotation<FReferenceCollector::AROPrivate> {
 	FReferenceCollector_AROPrivate_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("AROPrivate", ml, "FReferenceCollector::AROPrivate") {
@@ -447,42 +439,6 @@ struct UECodeGen_Private_FFieldPathPropertyParams_GeneratedAnnotation : ManagedS
 	}
 };
 
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3584:9
-struct UECodeGen_Private_FArrayPropertyParams_GeneratedAnnotation : ManagedStructureAnnotation<UECodeGen_Private::FArrayPropertyParams> {
-	UECodeGen_Private_FArrayPropertyParams_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FArrayPropertyParams", ml, "UECodeGen_Private::FArrayPropertyParams") {
-	}
-	void init () {
-		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
-		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
-		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
-		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
-		addField<DAS_BIND_MANAGED_FIELD(Offset)>("Offset","Offset");
-		addField<DAS_BIND_MANAGED_FIELD(ArrayFlags)>("ArrayFlags","ArrayFlags");
-		addField<DAS_BIND_MANAGED_FIELD(NumMetaData)>("NumMetaData","NumMetaData");
-		addField<DAS_BIND_MANAGED_FIELD(MetaDataArray)>("MetaDataArray","MetaDataArray");
-	}
-};
-
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3602:9
-struct UECodeGen_Private_FMapPropertyParams_GeneratedAnnotation : ManagedStructureAnnotation<UECodeGen_Private::FMapPropertyParams> {
-	UECodeGen_Private_FMapPropertyParams_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FMapPropertyParams", ml, "UECodeGen_Private::FMapPropertyParams") {
-	}
-	void init () {
-		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
-		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
-		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
-		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
-		addField<DAS_BIND_MANAGED_FIELD(Offset)>("Offset","Offset");
-		addField<DAS_BIND_MANAGED_FIELD(MapFlags)>("MapFlags","MapFlags");
-		addField<DAS_BIND_MANAGED_FIELD(NumMetaData)>("NumMetaData","NumMetaData");
-		addField<DAS_BIND_MANAGED_FIELD(MetaDataArray)>("MetaDataArray","MetaDataArray");
-	}
-};
-
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3641:9
 struct UECodeGen_Private_FFunctionParams_GeneratedAnnotation : ManagedStructureAnnotation<UECodeGen_Private::FFunctionParams> {
 	UECodeGen_Private_FFunctionParams_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FFunctionParams", ml, "UECodeGen_Private::FFunctionParams") {
@@ -804,6 +760,50 @@ struct UPackage_GeneratedAnnotation : ManagedStructureAnnotation<UPackage, false
 		addField<DAS_BIND_MANAGED_FIELD(MetaData)>("MetaData","MetaData");
 		addField<DAS_BIND_MANAGED_FIELD(PIEInstanceID)>("PIEInstanceID","PIEInstanceID");
 		addField<DAS_BIND_MANAGED_FIELD(FileName)>("FileName","FileName");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1139:7
+struct FPropertyHelpers_GeneratedAnnotation : ManagedStructureAnnotation<FPropertyHelpers> {
+	FPropertyHelpers_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FPropertyHelpers", ml, "FPropertyHelpers") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1151:8
+struct UEProperty_Private_FProperty_DoNotUse_GeneratedAnnotation : ManagedStructureAnnotation<UEProperty_Private::FProperty_DoNotUse> {
+	UEProperty_Private_FProperty_DoNotUse_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FProperty_DoNotUse", ml, "UEProperty_Private::FProperty_DoNotUse") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1170:8
+struct FDefinedProperty_GeneratedAnnotation : ManagedStructureAnnotation<FDefinedProperty> {
+	FDefinedProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FDefinedProperty", ml, "FDefinedProperty") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Index)>("Index","Index");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:6181:24
+struct FCustomPropertyListNode_GeneratedAnnotation : ManagedStructureAnnotation<FCustomPropertyListNode> {
+	FCustomPropertyListNode_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FCustomPropertyListNode", ml, "FCustomPropertyListNode") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(ArrayIndex)>("ArrayIndex","ArrayIndex");
+		addField<DAS_BIND_MANAGED_FIELD(SubPropertyList)>("SubPropertyList","SubPropertyList");
+		addField<DAS_BIND_MANAGED_FIELD(PropertyListNext)>("PropertyListNext","PropertyListNext");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:7164:23
+struct UPropertyWrapper_GeneratedAnnotation : ManagedStructureAnnotation<UPropertyWrapper, false, false> {
+	UPropertyWrapper_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UPropertyWrapper", ml, "UPropertyWrapper") {
+	}
+	void init () {
 	}
 };
 

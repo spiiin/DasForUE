@@ -868,3 +868,159 @@ public:
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:73:6
+class Enumeration_ELifetimeCondition : public das::Enumeration {
+public:
+	Enumeration_ELifetimeCondition() : das::Enumeration("ELifetimeCondition") {
+		external = true;
+		cppName = "ELifetimeCondition";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:89:6
+class Enumeration_EPropertyExportCPPFlags : public das::Enumeration {
+public:
+	Enumeration_EPropertyExportCPPFlags() : das::Enumeration("EPropertyExportCPPFlags") {
+		external = true;
+		cppName = "EPropertyExportCPPFlags";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("CPPF_None", "CPPF_None", int64_t(EPropertyExportCPPFlags::CPPF_None), das::LineInfo());
+		addIEx("CPPF_OptionalValue", "CPPF_OptionalValue", int64_t(EPropertyExportCPPFlags::CPPF_OptionalValue), das::LineInfo());
+		addIEx("CPPF_ArgumentOrReturnValue", "CPPF_ArgumentOrReturnValue", int64_t(EPropertyExportCPPFlags::CPPF_ArgumentOrReturnValue), das::LineInfo());
+		addIEx("CPPF_Implementation", "CPPF_Implementation", int64_t(EPropertyExportCPPFlags::CPPF_Implementation), das::LineInfo());
+		addIEx("CPPF_CustomTypeName", "CPPF_CustomTypeName", int64_t(EPropertyExportCPPFlags::CPPF_CustomTypeName), das::LineInfo());
+		addIEx("CPPF_NoConst", "CPPF_NoConst", int64_t(EPropertyExportCPPFlags::CPPF_NoConst), das::LineInfo());
+		addIEx("CPPF_NoRef", "CPPF_NoRef", int64_t(EPropertyExportCPPFlags::CPPF_NoRef), das::LineInfo());
+		addIEx("CPPF_NoStaticArray", "CPPF_NoStaticArray", int64_t(EPropertyExportCPPFlags::CPPF_NoStaticArray), das::LineInfo());
+		addIEx("CPPF_BlueprintCppBackend", "CPPF_BlueprintCppBackend", int64_t(EPropertyExportCPPFlags::CPPF_BlueprintCppBackend), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:113:7
+class Enumeration_EExportedDeclaration_Type : public das::Enumeration {
+public:
+	Enumeration_EExportedDeclaration_Type() : das::Enumeration("EExportedDeclaration_Type") {
+		external = true;
+		cppName = "EExportedDeclaration::Type";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Local", "Local", int64_t(EExportedDeclaration::Type::Local), das::LineInfo());
+		addIEx("Member", "Member", int64_t(EExportedDeclaration::Type::Member), das::LineInfo());
+		addIEx("Parameter", "Parameter", int64_t(EExportedDeclaration::Type::Parameter), das::LineInfo());
+		addIEx("MacroParameter", "MacroParameter", int64_t(EExportedDeclaration::Type::MacroParameter), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:123:12
+class Enumeration_EConvertFromTypeResult : public das::Enumeration {
+public:
+	Enumeration_EConvertFromTypeResult() : das::Enumeration("EConvertFromTypeResult") {
+		external = true;
+		cppName = "EConvertFromTypeResult";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("UseSerializeItem", "UseSerializeItem", int64_t(EConvertFromTypeResult::UseSerializeItem), das::LineInfo());
+		addIEx("CannotConvert", "CannotConvert", int64_t(EConvertFromTypeResult::CannotConvert), das::LineInfo());
+		addIEx("Converted", "Converted", int64_t(EConvertFromTypeResult::Converted), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:130:12
+class Enumeration_EPropertyMemoryAccess : public das::Enumeration {
+public:
+	Enumeration_EPropertyMemoryAccess() : das::Enumeration("EPropertyMemoryAccess") {
+		external = true;
+		cppName = "EPropertyMemoryAccess";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("Direct", "Direct", int64_t(EPropertyMemoryAccess::Direct), das::LineInfo());
+		addIEx("InContainer", "InContainer", int64_t(EPropertyMemoryAccess::InContainer), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:144:12
+class Enumeration_EPropertyPointerType : public das::Enumeration {
+public:
+	Enumeration_EPropertyPointerType() : das::Enumeration("EPropertyPointerType") {
+		external = true;
+		cppName = "EPropertyPointerType";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Direct", "Direct", int64_t(EPropertyPointerType::Direct), das::LineInfo());
+		addIEx("Container", "Container", int64_t(EPropertyPointerType::Container), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2827:12
+class Enumeration_EObjectPropertyOptions : public das::Enumeration {
+public:
+	Enumeration_EObjectPropertyOptions() : das::Enumeration("EObjectPropertyOptions") {
+		external = true;
+		cppName = "EObjectPropertyOptions";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(EObjectPropertyOptions::None), das::LineInfo());
+		addIEx("AllowNullValuesOnNonNullableProperty", "AllowNullValuesOnNonNullableProperty", int64_t(EObjectPropertyOptions::AllowNullValuesOnNonNullableProperty), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:6486:12
+class Enumeration_EFieldIterationFlags : public das::Enumeration {
+public:
+	Enumeration_EFieldIterationFlags() : das::Enumeration("EFieldIterationFlags") {
+		external = true;
+		cppName = "EFieldIterationFlags";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("None", "None", int64_t(EFieldIterationFlags::None), das::LineInfo());
+		addIEx("IncludeSuper", "IncludeSuper", int64_t(EFieldIterationFlags::IncludeSuper), das::LineInfo());
+		addIEx("IncludeDeprecated", "IncludeDeprecated", int64_t(EFieldIterationFlags::IncludeDeprecated), das::LineInfo());
+		addIEx("IncludeInterfaces", "IncludeInterfaces", int64_t(EFieldIterationFlags::IncludeInterfaces), das::LineInfo());
+		addIEx("IncludeAll", "IncludeAll", int64_t(EFieldIterationFlags::IncludeAll), das::LineInfo());
+		addIEx("Default", "Default", int64_t(EFieldIterationFlags::Default), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:6502:7
+class Enumeration_EFieldIteratorFlags_SuperClassFlags : public das::Enumeration {
+public:
+	Enumeration_EFieldIteratorFlags_SuperClassFlags() : das::Enumeration("EFieldIteratorFlags_SuperClassFlags") {
+		external = true;
+		cppName = "EFieldIteratorFlags::SuperClassFlags";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("ExcludeSuper", "ExcludeSuper", int64_t(EFieldIteratorFlags::SuperClassFlags::ExcludeSuper), das::LineInfo());
+		addIEx("IncludeSuper", "IncludeSuper", int64_t(EFieldIteratorFlags::SuperClassFlags::IncludeSuper), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:6508:7
+class Enumeration_EFieldIteratorFlags_DeprecatedPropertyFlags : public das::Enumeration {
+public:
+	Enumeration_EFieldIteratorFlags_DeprecatedPropertyFlags() : das::Enumeration("EFieldIteratorFlags_DeprecatedPropertyFlags") {
+		external = true;
+		cppName = "EFieldIteratorFlags::DeprecatedPropertyFlags";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("ExcludeDeprecated", "ExcludeDeprecated", int64_t(EFieldIteratorFlags::DeprecatedPropertyFlags::ExcludeDeprecated), das::LineInfo());
+		addIEx("IncludeDeprecated", "IncludeDeprecated", int64_t(EFieldIteratorFlags::DeprecatedPropertyFlags::IncludeDeprecated), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:6514:7
+class Enumeration_EFieldIteratorFlags_InterfaceClassFlags : public das::Enumeration {
+public:
+	Enumeration_EFieldIteratorFlags_InterfaceClassFlags() : das::Enumeration("EFieldIteratorFlags_InterfaceClassFlags") {
+		external = true;
+		cppName = "EFieldIteratorFlags::InterfaceClassFlags";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("ExcludeInterfaces", "ExcludeInterfaces", int64_t(EFieldIteratorFlags::InterfaceClassFlags::ExcludeInterfaces), das::LineInfo());
+		addIEx("IncludeInterfaces", "IncludeInterfaces", int64_t(EFieldIteratorFlags::InterfaceClassFlags::IncludeInterfaces), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:6854:12
+class Enumeration_EPropertyValueIteratorFlags : public das::Enumeration {
+public:
+	Enumeration_EPropertyValueIteratorFlags() : das::Enumeration("EPropertyValueIteratorFlags") {
+		external = true;
+		cppName = "EPropertyValueIteratorFlags";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("NoRecursion", "NoRecursion", int64_t(EPropertyValueIteratorFlags::NoRecursion), das::LineInfo());
+		addIEx("FullRecursion", "FullRecursion", int64_t(EPropertyValueIteratorFlags::FullRecursion), das::LineInfo());
+	}
+};
+

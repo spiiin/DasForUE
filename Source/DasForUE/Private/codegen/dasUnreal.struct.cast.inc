@@ -43,12 +43,6 @@ template <> struct cast_arg<FScriptIntegrationObjectHelper> {
 		return * cast<FScriptIntegrationObjectHelper *>::to(res);
 	}
 };
-template <> struct cast_arg<FVerySlowReferenceCollectorArchiveScope> {
-	static __forceinline const FVerySlowReferenceCollectorArchiveScope & to ( Context & ctx, SimNode * node ) {
-		vec4f res = node->eval(ctx);
-		return * cast<FVerySlowReferenceCollectorArchiveScope *>::to(res);
-	}
-};
 template <> struct cast_arg<FReferenceCollector::AROPrivate> {
 	static __forceinline const FReferenceCollector::AROPrivate & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
@@ -209,18 +203,6 @@ template <> struct cast_arg<UECodeGen_Private::FFieldPathPropertyParams> {
 	static __forceinline const UECodeGen_Private::FFieldPathPropertyParams & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<UECodeGen_Private::FFieldPathPropertyParams *>::to(res);
-	}
-};
-template <> struct cast_arg<UECodeGen_Private::FArrayPropertyParams> {
-	static __forceinline const UECodeGen_Private::FArrayPropertyParams & to ( Context & ctx, SimNode * node ) {
-		vec4f res = node->eval(ctx);
-		return * cast<UECodeGen_Private::FArrayPropertyParams *>::to(res);
-	}
-};
-template <> struct cast_arg<UECodeGen_Private::FMapPropertyParams> {
-	static __forceinline const UECodeGen_Private::FMapPropertyParams & to ( Context & ctx, SimNode * node ) {
-		vec4f res = node->eval(ctx);
-		return * cast<UECodeGen_Private::FMapPropertyParams *>::to(res);
 	}
 };
 template <> struct cast_arg<UECodeGen_Private::FFunctionParams> {
@@ -395,5 +377,35 @@ template <> struct cast_arg<UPackage> {
 	static __forceinline const UPackage & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<UPackage *>::to(res);
+	}
+};
+template <> struct cast_arg<FPropertyHelpers> {
+	static __forceinline const FPropertyHelpers & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FPropertyHelpers *>::to(res);
+	}
+};
+template <> struct cast_arg<UEProperty_Private::FProperty_DoNotUse> {
+	static __forceinline const UEProperty_Private::FProperty_DoNotUse & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UEProperty_Private::FProperty_DoNotUse *>::to(res);
+	}
+};
+template <> struct cast_arg<FDefinedProperty> {
+	static __forceinline const FDefinedProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FDefinedProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FCustomPropertyListNode> {
+	static __forceinline const FCustomPropertyListNode & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FCustomPropertyListNode *>::to(res);
+	}
+};
+template <> struct cast_arg<UPropertyWrapper> {
+	static __forceinline const UPropertyWrapper & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UPropertyWrapper *>::to(res);
 	}
 };

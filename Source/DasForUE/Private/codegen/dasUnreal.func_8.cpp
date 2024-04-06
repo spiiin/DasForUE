@@ -137,6 +137,25 @@ void Module_dasUnreal::initFunctions_8() {
 		->arg_type(0,makeType<TExplicit<const UPackage*> >(lib))
 		->arg_init(2,make_smart<ExprConstPtr>())
 		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:6529:16
+	makeExtern< UField * (*)(const UStruct *) , GetChildFieldsFromStruct , SimNode_ExtFuncCall >(lib,"GetChildFieldsFromStruct","GetChildFieldsFromStruct")
+		->args({"Owner"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:7166:2
+	makeExtern< UClass * (*)(const UPropertyWrapper *) , _dasUnreal_static_199_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_199_StaticClass")
+		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UPropertyWrapper*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:7166:2
+	makeExtern< const wchar_t * (*)(const UPropertyWrapper *) , _dasUnreal_static_200_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_200_StaticPackage")
+		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UPropertyWrapper*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:7166:2
+	makeExtern< void (*)(const UPropertyWrapper *) , _dasUnreal_static_201_StaticRegisterNativesUPropertyWrapper , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUPropertyWrapper","_dasUnreal_static_201_StaticRegisterNativesUPropertyWrapper")
+		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UPropertyWrapper*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
 }
 }
 

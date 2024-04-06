@@ -797,3 +797,15 @@ bool _dasUnreal_static_198_IsEmptyPackage(const UPackage *,UPackage * Package,co
 	return UPackage::IsEmptyPackage(Package,LastReferencer);
 }
 
+UClass * _dasUnreal_static_199_StaticClass(const UPropertyWrapper *) {
+	return UPropertyWrapper::StaticClass();
+}
+
+const wchar_t * _dasUnreal_static_200_StaticPackage(const UPropertyWrapper *) {
+	return UPropertyWrapper::StaticPackage();
+}
+
+void _dasUnreal_static_201_StaticRegisterNativesUPropertyWrapper(const UPropertyWrapper *) {
+	UPropertyWrapper::StaticRegisterNativesUPropertyWrapper();
+}
+
