@@ -1,16 +1,6 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
-MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_float,TProperty_Numeric<float>);
-MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint32,TProperty_Numeric<uint32>);
-MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int8,TProperty_Numeric<int8>);
-MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint16,TProperty_Numeric<uint16>);
-MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint8,TProperty_Numeric<uint8>);
-MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int16,TProperty_Numeric<int16>);
-MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_double,TProperty_Numeric<double>);
-MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int64,TProperty_Numeric<int64>);
-MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint64,TProperty_Numeric<uint64>);
-MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int32,TProperty_Numeric<int32>);
 MAKE_EXTERNAL_TYPE_FACTORY(FEngineVersionBase,FEngineVersionBase);
 MAKE_EXTERNAL_TYPE_FACTORY(FLinker,FLinker);
 MAKE_EXTERNAL_TYPE_FACTORY(FEditorBulkData,UE::Serialization::FEditorBulkData);
@@ -131,6 +121,7 @@ MAKE_EXTERNAL_TYPE_FACTORY(FFloatProperty,FFloatProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FDoubleProperty,FDoubleProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FBoolProperty,FBoolProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FObjectPropertyBase,FObjectPropertyBase);
+MAKE_EXTERNAL_TYPE_FACTORY(FStrProperty,FStrProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FStructProperty,FStructProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FCustomPropertyListNode,FCustomPropertyListNode);
 MAKE_EXTERNAL_TYPE_FACTORY(UPropertyWrapper,UPropertyWrapper);

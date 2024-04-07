@@ -64,17 +64,28 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
 
     //create new function
     var fn = new_uobject(cls, name, type<UFunction>)
-    var field = Construct(
+
+    //create function arguments
+    var field1 = Construct(
         [[FIntProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
         FFieldVariant(fn),
         FName("Parameter1"),
         propertyFlags 
     )
+    var propPtr1 = unsafe(reinterpret<FProperty?> field1) //TODO: find a way to construct field with something return FProperty?
+    *fn |> AddCppProperty(propPtr1)
 
-    //create function arguments
-    var propPtr = unsafe(reinterpret<FProperty?> field) //TODO: find a way to construct field with something return FProperty?
-    *fn |> AddCppProperty(propPtr)
-    //fn.functionFlags
+    var field2 = Construct(
+        [[FStrProperty?]],
+        FFieldVariant(fn),
+        FName("Parameter2"),
+        propertyFlags 
+    )
+    var propPtr2 = unsafe(reinterpret<FProperty?> field2) //TODO: find a way to construct field with something return FProperty?
+    *fn |> AddCppProperty(propPtr2)
+
+    //set functio flags
+    //  fn.functionFlags
 
     //fill class 
     *cls |> AddFunctionToFunctionMap(fn, name)

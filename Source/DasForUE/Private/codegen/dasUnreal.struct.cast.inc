@@ -547,6 +547,12 @@ template <> struct cast_arg<FObjectPropertyBase> {
 		return * cast<FObjectPropertyBase *>::to(res);
 	}
 };
+template <> struct cast_arg<FStrProperty> {
+	static __forceinline const FStrProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FStrProperty *>::to(res);
+	}
+};
 template <> struct cast_arg<FStructProperty> {
 	static __forceinline const FStructProperty & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);

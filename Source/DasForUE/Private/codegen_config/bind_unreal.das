@@ -401,7 +401,6 @@ class UnrealGen : CppGenBind
             "FNameProperty";
             "FObjectProperty";
            
-            "FStrProperty";
             "FDelegateProperty";
             "FClassPtrProperty";
             "FClassProperty";
@@ -893,13 +892,17 @@ class UnrealGen : CppGenBind
         fprint(enum_class_file, "\t\}\n\};\n\n")
         fprint(enum_add_file, "addEnumeration(make_smart<Enumeration_{dashing_name}>());\n");
 
+    def isTemplateType(typeName: string): bool
+        return true if typeName == "FStrProperty_Super" //unreal macro hardcode
+        return typeName |> find("<") != -1
+
      //TODO: send fix to cbind_boost (lspClone)
     def override generateStructLsp
         var lspClone := lsp //create clone, because iterator lock table
         for k,v in keys(lsp), values(lsp)
-        
-            //quick check if first parent is template for skip all setParent line
-            if v |> find("<") != -1
+
+            //quick check if first parent is template for skip whole setParent line
+            if isTemplateType(v)
                 continue
             
             fprint(struct_add_file,"setParents(this,\"{k}\",  \{")
@@ -912,7 +915,7 @@ class UnrealGen : CppGenBind
             for p,i in pp,count()
                 if i!=0
                     fprint(struct_add_file,",")
-                if p |> find("<") != -1
+                if isTemplateType(p)
                     if dummyTemplateInstanceAnnotations |> key_exists(p)
                         fprint(struct_add_file,"\"{transformTemplateName(p)}\"")
                     else

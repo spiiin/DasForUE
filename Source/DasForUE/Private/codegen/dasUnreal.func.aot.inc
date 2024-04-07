@@ -1785,99 +1785,123 @@ void _dasUnreal_virtual_445_SetObjectPropertyValue_InContainer(const FObjectProp
 	self.SetObjectPropertyValue_InContainer(ContainerAddress,Value,ArrayIndex);
 }
 
-FFieldClass * _dasUnreal_static_446_StaticClass(const FStructProperty *) {
-	return FStructProperty::StaticClass();
+FFieldClass * _dasUnreal_static_446_StaticClass(const FStrProperty *) {
+	return FStrProperty::StaticClass();
 }
 
-FField * _dasUnreal_static_447_Construct(const FStructProperty *,const FFieldVariant & InOwner,const FName & InName,EObjectFlags InObjectFlags) {
-	return FStructProperty::Construct(InOwner,InName,InObjectFlags);
+FField * _dasUnreal_static_447_Construct(const FStrProperty *,const FFieldVariant & InOwner,const FName & InName,EObjectFlags InObjectFlags) {
+	return FStrProperty::Construct(InOwner,InName,InObjectFlags);
 }
 
-uint64 _dasUnreal_static_448_StaticClassCastFlagsPrivate(const FStructProperty *) {
-	return FStructProperty::StaticClassCastFlagsPrivate();
+uint64 _dasUnreal_static_448_StaticClassCastFlagsPrivate(const FStrProperty *) {
+	return FStrProperty::StaticClassCastFlagsPrivate();
 }
 
-uint64 _dasUnreal_static_449_StaticClassCastFlags(const FStructProperty *) {
-	return FStructProperty::StaticClassCastFlags();
+uint64 _dasUnreal_static_449_StaticClassCastFlags(const FStrProperty *) {
+	return FStrProperty::StaticClassCastFlags();
 }
 
-void _dasUnreal_virtual_450_Serialize(FStructProperty & self,FArchive & Ar) {
-	self.Serialize(Ar);
-}
-
-void _dasUnreal_virtual_451_AddReferencedObjects(FStructProperty & self,FReferenceCollector & Collector) {
-	self.AddReferencedObjects(Collector);
-}
-
-void _dasUnreal_virtual_452_PostDuplicate(FStructProperty & self,const FField & InField) {
-	self.PostDuplicate(InField);
-}
-
-FString _dasUnreal_virtual_453_GetCPPMacroType(const FStructProperty & self,FString & ExtendedTypeText) {
-	return self.GetCPPMacroType(ExtendedTypeText);
-}
-
-FString _dasUnreal_virtual_454_GetCPPType(const FStructProperty & self,FString * ExtendedTypeText,unsigned int CPPExportFlags) {
-	return self.GetCPPType(ExtendedTypeText,CPPExportFlags);
-}
-
-FString _dasUnreal_virtual_455_GetCPPTypeForwardDeclaration(const FStructProperty & self) {
+FString _dasUnreal_virtual_450_GetCPPTypeForwardDeclaration(const FStrProperty & self) {
 	return self.GetCPPTypeForwardDeclaration();
 }
 
-void _dasUnreal_virtual_456_LinkInternal(FStructProperty & self,FArchive & Ar) {
+unsigned int _dasUnreal_virtual_451_GetValueTypeHashInternal(const FStrProperty & self,const void * Src) {
+	return self.GetValueTypeHashInternal(Src);
+}
+
+FFieldClass * _dasUnreal_static_452_StaticClass(const FStructProperty *) {
+	return FStructProperty::StaticClass();
+}
+
+FField * _dasUnreal_static_453_Construct(const FStructProperty *,const FFieldVariant & InOwner,const FName & InName,EObjectFlags InObjectFlags) {
+	return FStructProperty::Construct(InOwner,InName,InObjectFlags);
+}
+
+uint64 _dasUnreal_static_454_StaticClassCastFlagsPrivate(const FStructProperty *) {
+	return FStructProperty::StaticClassCastFlagsPrivate();
+}
+
+uint64 _dasUnreal_static_455_StaticClassCastFlags(const FStructProperty *) {
+	return FStructProperty::StaticClassCastFlags();
+}
+
+void _dasUnreal_virtual_456_Serialize(FStructProperty & self,FArchive & Ar) {
+	self.Serialize(Ar);
+}
+
+void _dasUnreal_virtual_457_AddReferencedObjects(FStructProperty & self,FReferenceCollector & Collector) {
+	self.AddReferencedObjects(Collector);
+}
+
+void _dasUnreal_virtual_458_PostDuplicate(FStructProperty & self,const FField & InField) {
+	self.PostDuplicate(InField);
+}
+
+FString _dasUnreal_virtual_459_GetCPPMacroType(const FStructProperty & self,FString & ExtendedTypeText) {
+	return self.GetCPPMacroType(ExtendedTypeText);
+}
+
+FString _dasUnreal_virtual_460_GetCPPType(const FStructProperty & self,FString * ExtendedTypeText,unsigned int CPPExportFlags) {
+	return self.GetCPPType(ExtendedTypeText,CPPExportFlags);
+}
+
+FString _dasUnreal_virtual_461_GetCPPTypeForwardDeclaration(const FStructProperty & self) {
+	return self.GetCPPTypeForwardDeclaration();
+}
+
+void _dasUnreal_virtual_462_LinkInternal(FStructProperty & self,FArchive & Ar) {
 	self.LinkInternal(Ar);
 }
 
-bool _dasUnreal_virtual_457_Identical(const FStructProperty & self,const void * A,const void * B,unsigned int PortFlags) {
+bool _dasUnreal_virtual_463_Identical(const FStructProperty & self,const void * A,const void * B,unsigned int PortFlags) {
 	return self.Identical(A,B,PortFlags);
 }
 
-bool _dasUnreal_virtual_458_SupportsNetSharedSerialization(const FStructProperty & self) {
+bool _dasUnreal_virtual_464_SupportsNetSharedSerialization(const FStructProperty & self) {
 	return self.SupportsNetSharedSerialization();
 }
 
-void _dasUnreal_virtual_459_CopyValuesInternal(const FStructProperty & self,void * Dest,const void * Src,int Count) {
+void _dasUnreal_virtual_465_CopyValuesInternal(const FStructProperty & self,void * Dest,const void * Src,int Count) {
 	self.CopyValuesInternal(Dest,Src,Count);
 }
 
-void _dasUnreal_virtual_460_ClearValueInternal(const FStructProperty & self,void * Data) {
+void _dasUnreal_virtual_466_ClearValueInternal(const FStructProperty & self,void * Data) {
 	self.ClearValueInternal(Data);
 }
 
-void _dasUnreal_virtual_461_DestroyValueInternal(const FStructProperty & self,void * Dest) {
+void _dasUnreal_virtual_467_DestroyValueInternal(const FStructProperty & self,void * Dest) {
 	self.DestroyValueInternal(Dest);
 }
 
-void _dasUnreal_virtual_462_InitializeValueInternal(const FStructProperty & self,void * Dest) {
+void _dasUnreal_virtual_468_InitializeValueInternal(const FStructProperty & self,void * Dest) {
 	self.InitializeValueInternal(Dest);
 }
 
-int _dasUnreal_virtual_463_GetMinAlignment(const FStructProperty & self) {
+int _dasUnreal_virtual_469_GetMinAlignment(const FStructProperty & self) {
 	return self.GetMinAlignment();
 }
 
-bool _dasUnreal_virtual_464_SameType(const FStructProperty & self,const FProperty * Other) {
+bool _dasUnreal_virtual_470_SameType(const FStructProperty & self,const FProperty * Other) {
 	return self.SameType(Other);
 }
 
-void _dasUnreal_virtual_465_AppendSchemaHash(const FStructProperty & self,FBlake3 & Builder,bool bSkipEditorOnly) {
+void _dasUnreal_virtual_471_AppendSchemaHash(const FStructProperty & self,FBlake3 & Builder,bool bSkipEditorOnly) {
 	self.AppendSchemaHash(Builder,bSkipEditorOnly);
 }
 
-FProperty * _dasUnreal_static_466_GetNextPropertyAndAdvance(const FCustomPropertyListNode *,const FCustomPropertyListNode *& Node) {
+FProperty * _dasUnreal_static_472_GetNextPropertyAndAdvance(const FCustomPropertyListNode *,const FCustomPropertyListNode *& Node) {
 	return FCustomPropertyListNode::GetNextPropertyAndAdvance(Node);
 }
 
-UClass * _dasUnreal_static_467_StaticClass(const UPropertyWrapper *) {
+UClass * _dasUnreal_static_473_StaticClass(const UPropertyWrapper *) {
 	return UPropertyWrapper::StaticClass();
 }
 
-const wchar_t * _dasUnreal_static_468_StaticPackage(const UPropertyWrapper *) {
+const wchar_t * _dasUnreal_static_474_StaticPackage(const UPropertyWrapper *) {
 	return UPropertyWrapper::StaticPackage();
 }
 
-void _dasUnreal_static_469_StaticRegisterNativesUPropertyWrapper(const UPropertyWrapper *) {
+void _dasUnreal_static_475_StaticRegisterNativesUPropertyWrapper(const UPropertyWrapper *) {
 	UPropertyWrapper::StaticRegisterNativesUPropertyWrapper();
 }
 

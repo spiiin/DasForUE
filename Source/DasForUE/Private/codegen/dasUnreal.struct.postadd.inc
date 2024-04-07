@@ -1,16 +1,6 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
-initRecAnnotation(ann_TProperty_Numeric_float,lib);
-initRecAnnotation(ann_TProperty_Numeric_uint32,lib);
-initRecAnnotation(ann_TProperty_Numeric_int8,lib);
-initRecAnnotation(ann_TProperty_Numeric_uint16,lib);
-initRecAnnotation(ann_TProperty_Numeric_uint8,lib);
-initRecAnnotation(ann_TProperty_Numeric_int16,lib);
-initRecAnnotation(ann_TProperty_Numeric_double,lib);
-initRecAnnotation(ann_TProperty_Numeric_int64,lib);
-initRecAnnotation(ann_TProperty_Numeric_uint64,lib);
-initRecAnnotation(ann_TProperty_Numeric_int32,lib);
 initRecAnnotation(ann_FEngineVersionBase,lib);
 initRecAnnotation(ann_FFastPathLoadBuffer,lib);
 initRecAnnotation(ann_FArchiveState,lib);
@@ -102,6 +92,7 @@ initRecAnnotation(ann_FFloatProperty,lib);
 initRecAnnotation(ann_FDoubleProperty,lib);
 initRecAnnotation(ann_FBoolProperty,lib);
 initRecAnnotation(ann_FObjectPropertyBase,lib);
+initRecAnnotation(ann_FStrProperty,lib);
 initRecAnnotation(ann_FStructProperty,lib);
 initRecAnnotation(ann_FCustomPropertyListNode,lib);
 initRecAnnotation(ann_UPropertyWrapper,lib);

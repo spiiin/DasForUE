@@ -1,76 +1,6 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
-
-struct TProperty_Numeric_float_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<float>> {
-	TProperty_Numeric_float_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_float", ml) {
-	}
-	void init() {
-	}
-};
-
-struct TProperty_Numeric_uint32_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<uint32>> {
-	TProperty_Numeric_uint32_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_uint32", ml) {
-	}
-	void init() {
-	}
-};
-
-struct TProperty_Numeric_int8_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<int8>> {
-	TProperty_Numeric_int8_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_int8", ml) {
-	}
-	void init() {
-	}
-};
-
-struct TProperty_Numeric_uint16_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<uint16>> {
-	TProperty_Numeric_uint16_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_uint16", ml) {
-	}
-	void init() {
-	}
-};
-
-struct TProperty_Numeric_uint8_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<uint8>> {
-	TProperty_Numeric_uint8_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_uint8", ml) {
-	}
-	void init() {
-	}
-};
-
-struct TProperty_Numeric_int16_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<int16>> {
-	TProperty_Numeric_int16_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_int16", ml) {
-	}
-	void init() {
-	}
-};
-
-struct TProperty_Numeric_double_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<double>> {
-	TProperty_Numeric_double_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_double", ml) {
-	}
-	void init() {
-	}
-};
-
-struct TProperty_Numeric_int64_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<int64>> {
-	TProperty_Numeric_int64_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_int64", ml) {
-	}
-	void init() {
-	}
-};
-
-struct TProperty_Numeric_uint64_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<uint64>> {
-	TProperty_Numeric_uint64_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_uint64", ml) {
-	}
-	void init() {
-	}
-};
-
-struct TProperty_Numeric_int32_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<int32>> {
-	TProperty_Numeric_int32_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_int32", ml) {
-	}
-	void init() {
-	}
-};
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Misc/EngineVersionBase.h:28:7
 struct FEngineVersionBase_GeneratedAnnotation : ManagedStructureAnnotation<FEngineVersionBase> {
 	FEngineVersionBase_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FEngineVersionBase", ml, "FEngineVersionBase") {
@@ -1095,6 +1025,14 @@ struct FBoolProperty_GeneratedAnnotation : ManagedStructureAnnotation<FBoolPrope
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2491:23
 struct FObjectPropertyBase_GeneratedAnnotation : ManagedStructureAnnotation<FObjectPropertyBase> {
 	FObjectPropertyBase_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FObjectPropertyBase", ml, "FObjectPropertyBase") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:3564:23
+struct FStrProperty_GeneratedAnnotation : ManagedStructureAnnotation<FStrProperty> {
+	FStrProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FStrProperty", ml, "FStrProperty") {
 	}
 	void init () {
 	}

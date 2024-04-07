@@ -28,11 +28,13 @@ def SaySomething(var obj: UObject?; var msg: FString)
 //--------------------------------------------------------------
 struct SaySomethingGeneratedParams
     a : int
+    msg : FString
 
-def SaySomethingGenerated(var obj: UObject?)
+def SaySomethingGenerated(var obj: UObject?; a : int; var msg: FString)
     unsafe
         var params: SaySomethingGeneratedParams //no inited, unsafe
-        params.a = 42
+        params.a = a
+        params.msg <- msg
         obj |> call_ufunction_on("SaySomethingGenerated") <| addr(params)
 
 //--------------------------------------------------------------
@@ -71,7 +73,9 @@ def main
     print("Generated function name: {string(*fn |> GetName)}\n")
 
     //check if generated function really has int parameter
-    let param = fn |> GetChildFieldsFromStruct_FField
-    print("Generated function parameter name: {string(*param |> GetName)}\n")
+    let param2 = fn |> GetChildFieldsFromStruct_FField
+    print("Generated function parameter2 name: {string(*param2 |> GetName)}\n")
+    let param1 = param2.Next //stack
+    print("Generated function parameter1 name: {string(*param1 |> GetName)}\n")
 
-    obj |> SaySomethingGenerated
+    obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"))
