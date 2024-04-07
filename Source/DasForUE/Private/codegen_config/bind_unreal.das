@@ -20,6 +20,7 @@ class UnrealGen : CppGenBind
     dummyTemplateInstanceAnnotations: table<string>
 
     declaredFunctionsHashes : table<uint64>
+    declaredFunctionsHashesWithoutResults : table<uint64>
     declearedEnumsHashes : table<uint64>
 
     def UnrealGen()
@@ -264,9 +265,6 @@ class UnrealGen : CppGenBind
             "FField::GetPathName";
             "FField::GetConvertCustomUFieldToFFieldDelegate";
             "FProperty::FProperty";
-
-            "GetChildFieldsFromStruct"; //UField* GetChildFieldsFromStruct(const UStruct* Owner)
-                                        //FField* GetChildFieldsFromStruct(const UStruct* Owner)
 
             "FProperty::Construct"; //"asbstract macro" -- has no implementation, ancestor implement it
             "FProperty::GetPropertyFlags";
@@ -746,12 +744,22 @@ class UnrealGen : CppGenBind
             bind_enchantation = " {function_cpp_type} , {function_cpp_name} "
             cpp_enchantation = function_cpp_name
 
+        //skip same declarations
         let funcNameHash = hash("{bind_enchantation}{extra_enchantation}")
-        var skipAlreadyDeclared = declaredFunctionsHashes |> key_exists(funcNameHash)
+        let skipAlreadyDeclared = declaredFunctionsHashes |> key_exists(funcNameHash)
         if skipAlreadyDeclared
             to_log(LOG_INFO, "Function declaration {bind_enchantation} {extra_enchantation} already generated, skipped (possible declared in header twice)\n")
-            return
+            return 
         declaredFunctionsHashes |> insert <| funcNameHash
+
+        //rename overloads different in result type only
+        let funcNameHashWithoutResultHash = hash(functionHeaderSpellingSkipResult(c, true, false, false, das_function_name, namespace_struct_name(), true))
+        let needRenameInDas = declaredFunctionsHashesWithoutResults |> key_exists(funcNameHashWithoutResultHash)
+        if needRenameInDas
+            let res = string(clang_getTypeSpelling(clang_getCanonicalType(res_type)))
+            das_function_name = "{das_function_name}_{res}"
+        else
+            declaredFunctionsHashesWithoutResults |> insert <| funcNameHashWithoutResultHash
 
         fprint(func_file, "// from {clang_getCursorLocationDescription(c)}\n")
         fprint(func_file, "\tmakeExtern<{bind_enchantation}{extra_enchantation}{get_module_temp_fn()}>(lib,\"{das_function_name}\",\"{cpp_enchantation}\")")
@@ -789,10 +797,13 @@ class UnrealGen : CppGenBind
 		fprint(func_file, "\n\t\t->addToModule(*this, SideEffects::worstDefault)")
         fprint(func_file,";\n")
 
-    def override functionHeaderSpelling(var c : CXCursor; isMethod,needMethodQualifier,needArgumentNames:bool; function_name, self_type:string)
+    def override functionHeaderSpelling(var c : CXCursor; isMethod, needMethodQualifier, needArgumentNames: bool; function_name, self_type: string) : string
+        return functionHeaderSpellingSkipResult(c, isMethod, needMethodQualifier, needArgumentNames, function_name, self_type, false)
+
+    def functionHeaderSpellingSkipResult(var c: CXCursor; isMethod, needMethodQualifier, needArgumentNames:bool; function_name, self_type:string; skip_result: bool): string
         var fun_type = clang_getCursorType(c)
         var res_type = clang_getResultType(fun_type)
-        let function_result_type = typeSpelling(res_type)
+        let function_result_type = skip_result ? "" : typeSpelling(res_type)
         let isStatic = clang_Cursor_getStorageClass(c)==CX_StorageClass Static
         return build_string() <| $ ( str )
             str |> write("{function_result_type} {function_name}(")
