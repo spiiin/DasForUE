@@ -1,6 +1,42 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+template <> struct cast_arg<FEngineVersionBase> {
+	static __forceinline const FEngineVersionBase & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FEngineVersionBase *>::to(res);
+	}
+};
+template <> struct cast_arg<FArchiveState::FFastPathLoadBuffer> {
+	static __forceinline const FArchiveState::FFastPathLoadBuffer & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FArchiveState::FFastPathLoadBuffer *>::to(res);
+	}
+};
+template <> struct cast_arg<FArchiveState> {
+	static __forceinline const FArchiveState & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FArchiveState *>::to(res);
+	}
+};
+template <> struct cast_arg<FArchive::FScopeSetDebugSerializationFlags> {
+	static __forceinline const FArchive::FScopeSetDebugSerializationFlags & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FArchive::FScopeSetDebugSerializationFlags *>::to(res);
+	}
+};
+template <> struct cast_arg<FArchive::FScopeAddDebugData> {
+	static __forceinline const FArchive::FScopeAddDebugData & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FArchive::FScopeAddDebugData *>::to(res);
+	}
+};
+template <> struct cast_arg<FArchive> {
+	static __forceinline const FArchive & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FArchive *>::to(res);
+	}
+};
 template <> struct cast_arg<FString> {
 	static __forceinline const FString & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);

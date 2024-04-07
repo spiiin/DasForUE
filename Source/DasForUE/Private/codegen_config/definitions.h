@@ -100,6 +100,9 @@
 #undef __clang__
 #define __EDG__ 1
 
+#include "Misc/EngineVersionBase.h"
+#include "Misc/CompressionFlags.h"
+#include "Serialization/Archive.h"
 #include "UnrealString.h"
 #include "Logging/LogVerbosity.h"
 

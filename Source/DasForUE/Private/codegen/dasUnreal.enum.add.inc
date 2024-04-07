@@ -1,7 +1,11 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+addEnumeration(make_smart<Enumeration_EVersionComponent>());
+addEnumeration(make_smart<Enumeration_EVersionComparison>());
+addEnumeration(make_smart<Enumeration_ECompressionFlags>());
 addEnumeration(make_smart<Enumeration_ELogVerbosity_Type>());
+addEnumeration(make_smart<Enumeration_EFileRegionType>());
 addEnumeration(make_smart<Enumeration_ELoadFlags>());
 addEnumeration(make_smart<Enumeration_ESaveFlags>());
 addEnumeration(make_smart<Enumeration_EPackageFlags>());

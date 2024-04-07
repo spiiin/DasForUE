@@ -1,6 +1,57 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Misc/EngineVersionBase.h:8:12
+class Enumeration_EVersionComponent : public das::Enumeration {
+public:
+	Enumeration_EVersionComponent() : das::Enumeration("EVersionComponent") {
+		external = true;
+		cppName = "EVersionComponent";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Major", "Major", int64_t(EVersionComponent::Major), das::LineInfo());
+		addIEx("Minor", "Minor", int64_t(EVersionComponent::Minor), das::LineInfo());
+		addIEx("Patch", "Patch", int64_t(EVersionComponent::Patch), das::LineInfo());
+		addIEx("Changelist", "Changelist", int64_t(EVersionComponent::Changelist), das::LineInfo());
+		addIEx("Branch", "Branch", int64_t(EVersionComponent::Branch), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Misc/EngineVersionBase.h:19:12
+class Enumeration_EVersionComparison : public das::Enumeration {
+public:
+	Enumeration_EVersionComparison() : das::Enumeration("EVersionComparison") {
+		external = true;
+		cppName = "EVersionComparison";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Neither", "Neither", int64_t(EVersionComparison::Neither), das::LineInfo());
+		addIEx("First", "First", int64_t(EVersionComparison::First), das::LineInfo());
+		addIEx("Second", "Second", int64_t(EVersionComparison::Second), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Misc/CompressionFlags.h:12:6
+class Enumeration_ECompressionFlags : public das::Enumeration {
+public:
+	Enumeration_ECompressionFlags() : das::Enumeration("ECompressionFlags") {
+		external = true;
+		cppName = "ECompressionFlags";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("COMPRESS_None", "COMPRESS_None", int64_t(ECompressionFlags::COMPRESS_None), das::LineInfo());
+		addIEx("COMPRESS_ZLIB", "COMPRESS_ZLIB", int64_t(ECompressionFlags::COMPRESS_ZLIB), das::LineInfo());
+		addIEx("COMPRESS_GZIP", "COMPRESS_GZIP", int64_t(ECompressionFlags::COMPRESS_GZIP), das::LineInfo());
+		addIEx("COMPRESS_Custom", "COMPRESS_Custom", int64_t(ECompressionFlags::COMPRESS_Custom), das::LineInfo());
+		addIEx("COMPRESS_DeprecatedFormatFlagsMask", "COMPRESS_DeprecatedFormatFlagsMask", int64_t(ECompressionFlags::COMPRESS_DeprecatedFormatFlagsMask), das::LineInfo());
+		addIEx("COMPRESS_NoFlags", "COMPRESS_NoFlags", int64_t(ECompressionFlags::COMPRESS_NoFlags), das::LineInfo());
+		addIEx("COMPRESS_BiasMemory", "COMPRESS_BiasMemory", int64_t(ECompressionFlags::COMPRESS_BiasMemory), das::LineInfo());
+		addIEx("COMPRESS_BiasSize", "COMPRESS_BiasSize", int64_t(ECompressionFlags::COMPRESS_BiasSize), das::LineInfo());
+		addIEx("COMPRESS_BiasSpeed", "COMPRESS_BiasSpeed", int64_t(ECompressionFlags::COMPRESS_BiasSpeed), das::LineInfo());
+		addIEx("COMPRESS_SourceIsPadded", "COMPRESS_SourceIsPadded", int64_t(ECompressionFlags::COMPRESS_SourceIsPadded), das::LineInfo());
+		addIEx("COMPRESS_OptionsFlagsMask", "COMPRESS_OptionsFlagsMask", int64_t(ECompressionFlags::COMPRESS_OptionsFlagsMask), das::LineInfo());
+		addIEx("COMPRESS_ForPackaging", "COMPRESS_ForPackaging", int64_t(ECompressionFlags::COMPRESS_ForPackaging), das::LineInfo());
+		addIEx("COMPRESS_ForPurposeMask", "COMPRESS_ForPurposeMask", int64_t(ECompressionFlags::COMPRESS_ForPurposeMask), das::LineInfo());
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Logging/LogVerbosity.h:16:7
 class Enumeration_ELogVerbosity_Type : public das::Enumeration {
 public:
@@ -21,6 +72,16 @@ public:
 		addIEx("VerbosityMask", "VerbosityMask", int64_t(ELogVerbosity::Type::VerbosityMask), das::LineInfo());
 		addIEx("SetColor", "SetColor", int64_t(ELogVerbosity::Type::SetColor), das::LineInfo());
 		addIEx("BreakOnLog", "BreakOnLog", int64_t(ELogVerbosity::Type::BreakOnLog), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:46:12
+class Enumeration_EFileRegionType : public das::Enumeration {
+public:
+	Enumeration_EFileRegionType() : das::Enumeration("EFileRegionType") {
+		external = true;
+		cppName = "EFileRegionType";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
 	}
 };
 

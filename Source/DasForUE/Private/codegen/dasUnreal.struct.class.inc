@@ -71,6 +71,62 @@ struct TProperty_Numeric_int32_GeneratedAnnotation final : ManagedStructureAnnot
 	void init() {
 	}
 };
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Misc/EngineVersionBase.h:28:7
+struct FEngineVersionBase_GeneratedAnnotation : ManagedStructureAnnotation<FEngineVersionBase> {
+	FEngineVersionBase_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FEngineVersionBase", ml, "FEngineVersionBase") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:737:9
+struct FArchiveState_FFastPathLoadBuffer_GeneratedAnnotation : ManagedStructureAnnotation<FArchiveState::FFastPathLoadBuffer> {
+	FArchiveState_FFastPathLoadBuffer_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FFastPathLoadBuffer", ml, "FArchiveState::FFastPathLoadBuffer") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(StartFastPathLoadBuffer)>("StartFastPathLoadBuffer","StartFastPathLoadBuffer");
+		addField<DAS_BIND_MANAGED_FIELD(EndFastPathLoadBuffer)>("EndFastPathLoadBuffer","EndFastPathLoadBuffer");
+		addField<DAS_BIND_MANAGED_FIELD(OriginalFastPathLoadBuffer)>("OriginalFastPathLoadBuffer","OriginalFastPathLoadBuffer");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:65:8
+struct FArchiveState_GeneratedAnnotation : ManagedStructureAnnotation<FArchiveState> {
+	FArchiveState_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FArchiveState", ml, "FArchiveState") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(ArSerializingDefaults)>("ArSerializingDefaults","ArSerializingDefaults");
+		addField<DAS_BIND_MANAGED_FIELD(ArPortFlags)>("ArPortFlags","ArPortFlags");
+		addField<DAS_BIND_MANAGED_FIELD(ArMaxSerializeSize)>("ArMaxSerializeSize","ArMaxSerializeSize");
+		addField<DAS_BIND_MANAGED_FIELD(ArCustomPropertyList)>("ArCustomPropertyList","ArCustomPropertyList");
+		addField<DAS_BIND_MANAGED_FIELD(ArDebugSerializationFlags)>("ArDebugSerializationFlags","ArDebugSerializationFlags");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:2113:8
+struct FArchive_FScopeSetDebugSerializationFlags_GeneratedAnnotation : ManagedStructureAnnotation<FArchive::FScopeSetDebugSerializationFlags> {
+	FArchive_FScopeSetDebugSerializationFlags_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FScopeSetDebugSerializationFlags", ml, "FArchive::FScopeSetDebugSerializationFlags") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:2164:8
+struct FArchive_FScopeAddDebugData_GeneratedAnnotation : ManagedStructureAnnotation<FArchive::FScopeAddDebugData> {
+	FArchive_FScopeAddDebugData_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FScopeAddDebugData", ml, "FArchive::FScopeAddDebugData") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1134:7
+struct FArchive_GeneratedAnnotation : ManagedStructureAnnotation<FArchive> {
+	FArchive_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FArchive", ml, "FArchive") {
+	}
+	void init () {
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:55:7
 struct FString_GeneratedAnnotation : ManagedStructureAnnotation<FString> {
 	virtual bool canCopy() const override { return std::is_copy_constructible<FString>::value; }

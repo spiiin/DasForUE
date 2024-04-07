@@ -1,7 +1,15 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+DAS_BASE_BIND_ENUM_GEN(EVersionComponent,EVersionComponent);
+
+DAS_BASE_BIND_ENUM_GEN(EVersionComparison,EVersionComparison);
+
+DAS_BASE_BIND_ENUM_GEN(ECompressionFlags,ECompressionFlags);
+
 DAS_BASE_BIND_ENUM_GEN(ELogVerbosity::Type,ELogVerbosity_Type);
+
+DAS_BASE_BIND_ENUM_GEN(EFileRegionType,EFileRegionType);
 
 DAS_BASE_BIND_ENUM_GEN(ELoadFlags,ELoadFlags);
 

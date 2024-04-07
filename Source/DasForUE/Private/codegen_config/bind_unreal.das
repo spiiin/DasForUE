@@ -32,9 +32,11 @@ class UnrealGen : CppGenBind
         let engineIncludes = [[string
             "{UNREAL_PATH}/Engine/Source/Runtime/Core/Public";
             "{UNREAL_PATH}/Engine/Source/Runtime/Core/Public/Containers/";
-            "{UNREAL_PATH}/Engine/Source/Runtime/TraceLog/Public/";
+            "{UNREAL_PATH}/Engine/Source/Runtime/Core/Public/Serialization";
 
             "{UNREAL_PATH}/Engine/Source/Runtime/CoreUObject/Public/";
+
+            "{UNREAL_PATH}/Engine/Source/Runtime/TraceLog/Public/";
         ]]
 
         var args <- [{string
@@ -288,6 +290,12 @@ class UnrealGen : CppGenBind
 
             "FProperty::Construct"; //"abstract macro" -- has no implementation, ancestor implement it
             "FProperty::GetPropertyFlags";
+
+            //FArchive.h
+            "FArchive::SerializeBulkData";
+            "FArchive::AttachExternalReadDependency";
+            "FArchiveState::SetCookingTarget";
+            "FArchiveState::CookingTarget";
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -369,7 +377,6 @@ class UnrealGen : CppGenBind
             "FRepRecord";
             "Object_eventExecuteUbergraph_Parms";
             "FEditPropertyChain";
-            "FArchive";
             "FAppendToClassSchemaContext";
             "FStructuredArchiveRecord";
             "FPropertyChangedEvent";
@@ -386,7 +393,6 @@ class UnrealGen : CppGenBind
             "FResourceSizeEx";
             "FCustomPropertyConditionState";
             "FFragmentRegistrationContext";
-            "ITargetPlatform";
             "FFrame";
             "FInternalUObjectBaseUtilityIsValidFlagsChecker";
             "EDataValidationResult";
@@ -450,7 +456,13 @@ class UnrealGen : CppGenBind
 
             "FDefaultConstructedPropertyElement";
 
-            //UObject/Field.h
+            //FArchive.h
+            "FCompressedChunk";
+            "FBulkData";
+            "FBulkDataSerializationParams";
+            "FScopeSeekTo";
+            "FArchiveCookData";
+            "ITargetPlatform";
         }}
 
         enums_with_flags <- {{
@@ -470,6 +482,9 @@ class UnrealGen : CppGenBind
     def override skip_file(fname:string) : bool
         //print("fname = {fname}\n")
         if (
+            fname |> find("Misc/EngineVersionBase.h") != -1 ||
+            fname |> find("Misc/CompressionFlags.h") != -1 ||
+            fname |> find("Serialization/Archive.h") != -1 ||
             fname |> find("UnrealString.h") != -1 ||
             fname |> find("Logging/LogVerbosity.h") != -1 ||
             fname |> find("UObject/UObjectBase.h") != -1 ||

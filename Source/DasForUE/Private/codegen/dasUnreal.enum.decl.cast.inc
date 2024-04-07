@@ -2,7 +2,11 @@
 // all user modifications will be lost after this file is re-generated
 
 #pragma once
+DAS_BIND_ENUM_CAST(EVersionComponent);
+DAS_BIND_ENUM_CAST(EVersionComparison);
+DAS_BIND_ENUM_CAST(ECompressionFlags);
 DAS_BIND_ENUM_CAST(ELogVerbosity::Type);
+DAS_BIND_ENUM_CAST(EFileRegionType);
 DAS_BIND_ENUM_CAST(ELoadFlags);
 DAS_BIND_ENUM_CAST(ESaveFlags);
 DAS_BIND_ENUM_CAST(EPackageFlags);
