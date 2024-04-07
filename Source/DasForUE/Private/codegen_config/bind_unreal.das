@@ -105,8 +105,6 @@ class UnrealGen : CppGenBind
             "FString::end";
             "FString::rbegin";
             "FString::rend";
-            "FString::SerializeAsANSICharArray"; //FArchive
-            "FString::CountBytes"; //FArchive
 
              //UObject/UObjectBase.h
              "FStat_STAT_UObjectsStatGroupTester::GetStatName"; //related to inner stat
@@ -260,36 +258,19 @@ class UnrealGen : CppGenBind
             "FReferenceCollector::AddReferencedObjects";
 
             //UObject/UnrealType.h
-            "FByteProperty::Serialize";
-            "FBoolProperty::Serialize";
-            "FBoolProperty::LinkInternal";
-            "FObjectPropertyBase::Serialize";
-            "FClassProperty::Serialize";
-            "FInterfaceProperty::Serialize";
-            "FInterfaceProperty::LinkInternal";
-            "FStructProperty::Serialize";
-            "FStructProperty::LinkInternal";
-            "FStructProperty::UseBinaryOrNativeSerialization";
-            "FDelegateProperty::Serialize";
-            "FObjectProperty::PostSerializeObjectItem";
-            "FPropertyHelpers::ReadToken";
-            "FProperty::Serialize";
-            "FProperty::LinkWithoutChangingOffset";
-            "FProperty::Link";
-            "FProperty::ShouldSerializeValue";
             "FProperty::ExportCppDeclaration";
             "GlobalSetProperty";
             "UEProperty_Private::FProperty_DoNotUse::Unsafe_AlterOffset";
             "UPropertyWrapper::GetProperty";
 
             //UObject/Field.h
-            "FField::Serialize";
             "FField::GetPathName";
             "FField::GetConvertCustomUFieldToFFieldDelegate";
             "FProperty::FProperty";
 
             "FProperty::Construct"; //"abstract macro" -- has no implementation, ancestor implement it
             "FProperty::GetPropertyFlags";
+            "FPropertyHelpers::ReadToken";
 
             //FArchive.h
             "FArchive::SerializeBulkData";
@@ -306,8 +287,7 @@ class UnrealGen : CppGenBind
             unreal_skip_func |> insert <| "{unrealReflType}::Serialize"            //temp disabled until FArchive is generated
 
         //TODO:
-        // - find substring is slow
-        // - apply macro expansion? (`clang -E` + unexpand includes back)
+        // - radical way, find substring is slow
         unreal_arg_part_names <- [{string
             "TArray";           //TODO: temp, due to name das/unreal name conflict (namespace das -> dasext?)
             "TObjectPtr";
@@ -315,6 +295,7 @@ class UnrealGen : CppGenBind
             "FUnversionedStructSchema";
             "FFrame &"; //temp
             "TUniquePtr";
+            "TStringBuilderBase";
 
             //UPackage
             "TPimplPtr";

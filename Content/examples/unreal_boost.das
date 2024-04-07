@@ -65,7 +65,7 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
     //create new function
     var fn = new_uobject(cls, name, type<UFunction>)
     var field = Construct(
-        [[FIntProperty?]],
+        [[FIntProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
         FFieldVariant(fn),
         FName("Parameter1"),
         propertyFlags 

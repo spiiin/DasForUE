@@ -6,25 +6,53 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_12() {
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1592:16
+	makeExtern< int64 (*)(const FNumericProperty &,const void *) , _dasUnreal_virtual_332_GetSignedIntPropertyValue , SimNode_ExtFuncCall >(lib,"GetSignedIntPropertyValue","_dasUnreal_virtual_332_GetSignedIntPropertyValue")
+		->args({"self","Data"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1593:16
+	makeExtern< int64 (*)(const FNumericProperty &,const void *) , _dasUnreal_virtual_333_GetSignedIntPropertyValue_InContainer , SimNode_ExtFuncCall >(lib,"GetSignedIntPropertyValue_InContainer","_dasUnreal_virtual_333_GetSignedIntPropertyValue_InContainer")
+		->args({"self","Container"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1600:17
+	makeExtern< uint64 (*)(const FNumericProperty &,const void *) , _dasUnreal_virtual_334_GetUnsignedIntPropertyValue , SimNode_ExtFuncCall >(lib,"GetUnsignedIntPropertyValue","_dasUnreal_virtual_334_GetUnsignedIntPropertyValue")
+		->args({"self","Data"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1601:17
+	makeExtern< uint64 (*)(const FNumericProperty &,const void *) , _dasUnreal_virtual_335_GetUnsignedIntPropertyValue_InContainer , SimNode_ExtFuncCall >(lib,"GetUnsignedIntPropertyValue_InContainer","_dasUnreal_virtual_335_GetUnsignedIntPropertyValue_InContainer")
+		->args({"self","Container"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1608:17
+	makeExtern< double (*)(const FNumericProperty &,const void *) , _dasUnreal_virtual_336_GetFloatingPointPropertyValue , SimNode_ExtFuncCall >(lib,"GetFloatingPointPropertyValue","_dasUnreal_virtual_336_GetFloatingPointPropertyValue")
+		->args({"self","Data"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1616:18
+	makeExtern< FString (*)(const FNumericProperty &,const void *) , _dasUnreal_virtual_337_GetNumericPropertyValueToString , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetNumericPropertyValueToString","_dasUnreal_virtual_337_GetNumericPropertyValueToString")
+		->args({"self","Data"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1617:18
+	makeExtern< FString (*)(const FNumericProperty &,const void *) , _dasUnreal_virtual_338_GetNumericPropertyValueToString_InContainer , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetNumericPropertyValueToString_InContainer","_dasUnreal_virtual_338_GetNumericPropertyValueToString_InContainer")
+		->args({"self","Container"})
+		->addToModule(*this, SideEffects::worstDefault);
 	addCtorAndUsing<FByteProperty,EInternal,FFieldClass *>(*this,lib,"FByteProperty","FByteProperty")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1902:2
-	makeExtern< FFieldClass * (*)(const FByteProperty *) , _dasUnreal_static_337_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_337_StaticClass")
+	makeExtern< FFieldClass * (*)(const FByteProperty *) , _dasUnreal_static_339_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_339_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FByteProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1902:2
-	makeExtern< FField * (*)(const FByteProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_338_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_338_Construct")
+	makeExtern< FField * (*)(const FByteProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_340_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_340_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FByteProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1902:2
-	makeExtern< uint64 (*)(const FByteProperty *) , _dasUnreal_static_339_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_339_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FByteProperty *) , _dasUnreal_static_341_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_341_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FByteProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1902:2
-	makeExtern< uint64 (*)(const FByteProperty *) , _dasUnreal_static_340_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_340_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FByteProperty *) , _dasUnreal_static_342_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_342_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FByteProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -34,52 +62,56 @@ void Module_dasUnreal::initFunctions_12() {
 		->args({"InOwner","Prop"});
 	addCtorAndUsing<FByteProperty,UField *>(*this,lib,"FByteProperty","FByteProperty")
 		->args({"InField"});
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1934:15
+	makeExtern< void (*)(FByteProperty &,FArchive &) , _dasUnreal_virtual_343_Serialize , SimNode_ExtFuncCall >(lib,"Serialize","_dasUnreal_virtual_343_Serialize")
+		->args({"self","Ar"})
+		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1935:15
-	makeExtern< void (*)(FByteProperty &,FReferenceCollector &) , _dasUnreal_virtual_341_AddReferencedObjects , SimNode_ExtFuncCall >(lib,"AddReferencedObjects","_dasUnreal_virtual_341_AddReferencedObjects")
+	makeExtern< void (*)(FByteProperty &,FReferenceCollector &) , _dasUnreal_virtual_344_AddReferencedObjects , SimNode_ExtFuncCall >(lib,"AddReferencedObjects","_dasUnreal_virtual_344_AddReferencedObjects")
 		->args({"self","Collector"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1940:15
-	makeExtern< void (*)(FByteProperty &,const FField &) , _dasUnreal_virtual_342_PostDuplicate , SimNode_ExtFuncCall >(lib,"PostDuplicate","_dasUnreal_virtual_342_PostDuplicate")
+	makeExtern< void (*)(FByteProperty &,const FField &) , _dasUnreal_virtual_345_PostDuplicate , SimNode_ExtFuncCall >(lib,"PostDuplicate","_dasUnreal_virtual_345_PostDuplicate")
 		->args({"self","InField"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1943:18
-	makeExtern< FString (*)(const FByteProperty &,FString *,unsigned int) , _dasUnreal_virtual_343_GetCPPType , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetCPPType","_dasUnreal_virtual_343_GetCPPType")
+	makeExtern< FString (*)(const FByteProperty &,FString *,unsigned int) , _dasUnreal_virtual_346_GetCPPType , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetCPPType","_dasUnreal_virtual_346_GetCPPType")
 		->args({"self","ExtendedTypeText","CPPExportFlags"})
 		->arg_init(1,make_smart<ExprConstPtr>())
 		->arg_init(2,make_smart<ExprConstUInt>(0x0))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1955:15
-	makeExtern< void (*)(const FByteProperty &,FBlake3 &,bool) , _dasUnreal_virtual_344_AppendSchemaHash , SimNode_ExtFuncCall >(lib,"AppendSchemaHash","_dasUnreal_virtual_344_AppendSchemaHash")
+	makeExtern< void (*)(const FByteProperty &,FBlake3 &,bool) , _dasUnreal_virtual_347_AppendSchemaHash , SimNode_ExtFuncCall >(lib,"AppendSchemaHash","_dasUnreal_virtual_347_AppendSchemaHash")
 		->args({"self","Builder","bSkipEditorOnly"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1960:17
-	makeExtern< UEnum * (*)(const FByteProperty &) , _dasUnreal_virtual_345_GetIntPropertyEnum , SimNode_ExtFuncCall >(lib,"GetIntPropertyEnum","_dasUnreal_virtual_345_GetIntPropertyEnum")
+	makeExtern< UEnum * (*)(const FByteProperty &) , _dasUnreal_virtual_348_GetIntPropertyEnum , SimNode_ExtFuncCall >(lib,"GetIntPropertyEnum","_dasUnreal_virtual_348_GetIntPropertyEnum")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_940 = das::das_call_member< uint64 (FByteProperty::*)() const,&FByteProperty::GetMaxNetSerializeBits >;
+	using _method_948 = das::das_call_member< uint64 (FByteProperty::*)() const,&FByteProperty::GetMaxNetSerializeBits >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1964:9
-	makeExtern<DAS_CALL_METHOD(_method_940), SimNode_ExtFuncCall >(lib,"GetMaxNetSerializeBits","das_call_member< uint64 (FByteProperty::*)() const , &FByteProperty::GetMaxNetSerializeBits >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_948), SimNode_ExtFuncCall >(lib,"GetMaxNetSerializeBits","das_call_member< uint64 (FByteProperty::*)() const , &FByteProperty::GetMaxNetSerializeBits >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 	addCtorAndUsing<FInt8Property,EInternal,FFieldClass *>(*this,lib,"FInt8Property","FInt8Property")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1976:2
-	makeExtern< FFieldClass * (*)(const FInt8Property *) , _dasUnreal_static_346_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_346_StaticClass")
+	makeExtern< FFieldClass * (*)(const FInt8Property *) , _dasUnreal_static_349_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_349_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FInt8Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1976:2
-	makeExtern< FField * (*)(const FInt8Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_347_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_347_Construct")
+	makeExtern< FField * (*)(const FInt8Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_350_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_350_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FInt8Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1976:2
-	makeExtern< uint64 (*)(const FInt8Property *) , _dasUnreal_static_348_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_348_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FInt8Property *) , _dasUnreal_static_351_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_351_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FInt8Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1976:2
-	makeExtern< uint64 (*)(const FInt8Property *) , _dasUnreal_static_349_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_349_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FInt8Property *) , _dasUnreal_static_352_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_352_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FInt8Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -92,22 +124,22 @@ void Module_dasUnreal::initFunctions_12() {
 	addCtorAndUsing<FInt16Property,EInternal,FFieldClass *>(*this,lib,"FInt16Property","FInt16Property")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2015:2
-	makeExtern< FFieldClass * (*)(const FInt16Property *) , _dasUnreal_static_350_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_350_StaticClass")
+	makeExtern< FFieldClass * (*)(const FInt16Property *) , _dasUnreal_static_353_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_353_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FInt16Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2015:2
-	makeExtern< FField * (*)(const FInt16Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_351_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_351_Construct")
+	makeExtern< FField * (*)(const FInt16Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_354_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_354_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FInt16Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2015:2
-	makeExtern< uint64 (*)(const FInt16Property *) , _dasUnreal_static_352_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_352_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FInt16Property *) , _dasUnreal_static_355_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_355_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FInt16Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2015:2
-	makeExtern< uint64 (*)(const FInt16Property *) , _dasUnreal_static_353_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_353_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FInt16Property *) , _dasUnreal_static_356_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_356_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FInt16Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -120,22 +152,22 @@ void Module_dasUnreal::initFunctions_12() {
 	addCtorAndUsing<FIntProperty,EInternal,FFieldClass *>(*this,lib,"FIntProperty","FIntProperty")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2055:2
-	makeExtern< FFieldClass * (*)(const FIntProperty *) , _dasUnreal_static_354_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_354_StaticClass")
+	makeExtern< FFieldClass * (*)(const FIntProperty *) , _dasUnreal_static_357_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_357_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FIntProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2055:2
-	makeExtern< FField * (*)(const FIntProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_355_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_355_Construct")
+	makeExtern< FField * (*)(const FIntProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_358_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_358_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FIntProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2055:2
-	makeExtern< uint64 (*)(const FIntProperty *) , _dasUnreal_static_356_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_356_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FIntProperty *) , _dasUnreal_static_359_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_359_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FIntProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2055:2
-	makeExtern< uint64 (*)(const FIntProperty *) , _dasUnreal_static_357_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_357_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FIntProperty *) , _dasUnreal_static_360_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_360_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FIntProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -148,22 +180,22 @@ void Module_dasUnreal::initFunctions_12() {
 	addCtorAndUsing<FInt64Property,EInternal,FFieldClass *>(*this,lib,"FInt64Property","FInt64Property")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2094:2
-	makeExtern< FFieldClass * (*)(const FInt64Property *) , _dasUnreal_static_358_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_358_StaticClass")
+	makeExtern< FFieldClass * (*)(const FInt64Property *) , _dasUnreal_static_361_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_361_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FInt64Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2094:2
-	makeExtern< FField * (*)(const FInt64Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_359_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_359_Construct")
+	makeExtern< FField * (*)(const FInt64Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_362_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_362_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FInt64Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2094:2
-	makeExtern< uint64 (*)(const FInt64Property *) , _dasUnreal_static_360_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_360_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FInt64Property *) , _dasUnreal_static_363_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_363_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FInt64Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2094:2
-	makeExtern< uint64 (*)(const FInt64Property *) , _dasUnreal_static_361_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_361_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FInt64Property *) , _dasUnreal_static_364_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_364_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FInt64Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -176,22 +208,22 @@ void Module_dasUnreal::initFunctions_12() {
 	addCtorAndUsing<FUInt16Property,EInternal,FFieldClass *>(*this,lib,"FUInt16Property","FUInt16Property")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2133:2
-	makeExtern< FFieldClass * (*)(const FUInt16Property *) , _dasUnreal_static_362_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_362_StaticClass")
+	makeExtern< FFieldClass * (*)(const FUInt16Property *) , _dasUnreal_static_365_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_365_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FUInt16Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2133:2
-	makeExtern< FField * (*)(const FUInt16Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_363_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_363_Construct")
+	makeExtern< FField * (*)(const FUInt16Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_366_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_366_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FUInt16Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2133:2
-	makeExtern< uint64 (*)(const FUInt16Property *) , _dasUnreal_static_364_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_364_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FUInt16Property *) , _dasUnreal_static_367_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_367_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FUInt16Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2133:2
-	makeExtern< uint64 (*)(const FUInt16Property *) , _dasUnreal_static_365_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_365_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FUInt16Property *) , _dasUnreal_static_368_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_368_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FUInt16Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -204,22 +236,22 @@ void Module_dasUnreal::initFunctions_12() {
 	addCtorAndUsing<FUInt32Property,EInternal,FFieldClass *>(*this,lib,"FUInt32Property","FUInt32Property")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2172:2
-	makeExtern< FFieldClass * (*)(const FUInt32Property *) , _dasUnreal_static_366_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_366_StaticClass")
+	makeExtern< FFieldClass * (*)(const FUInt32Property *) , _dasUnreal_static_369_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_369_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FUInt32Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2172:2
-	makeExtern< FField * (*)(const FUInt32Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_367_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_367_Construct")
+	makeExtern< FField * (*)(const FUInt32Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_370_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_370_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FUInt32Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2172:2
-	makeExtern< uint64 (*)(const FUInt32Property *) , _dasUnreal_static_368_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_368_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FUInt32Property *) , _dasUnreal_static_371_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_371_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FUInt32Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2172:2
-	makeExtern< uint64 (*)(const FUInt32Property *) , _dasUnreal_static_369_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_369_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FUInt32Property *) , _dasUnreal_static_372_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_372_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FUInt32Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -232,22 +264,22 @@ void Module_dasUnreal::initFunctions_12() {
 	addCtorAndUsing<FUInt64Property,EInternal,FFieldClass *>(*this,lib,"FUInt64Property","FUInt64Property")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2211:2
-	makeExtern< FFieldClass * (*)(const FUInt64Property *) , _dasUnreal_static_370_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_370_StaticClass")
+	makeExtern< FFieldClass * (*)(const FUInt64Property *) , _dasUnreal_static_373_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_373_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FUInt64Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2211:2
-	makeExtern< FField * (*)(const FUInt64Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_371_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_371_Construct")
+	makeExtern< FField * (*)(const FUInt64Property *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_374_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_374_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FUInt64Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2211:2
-	makeExtern< uint64 (*)(const FUInt64Property *) , _dasUnreal_static_372_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_372_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FUInt64Property *) , _dasUnreal_static_375_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_375_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FUInt64Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2211:2
-	makeExtern< uint64 (*)(const FUInt64Property *) , _dasUnreal_static_373_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_373_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FUInt64Property *) , _dasUnreal_static_376_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_376_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FUInt64Property*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -260,22 +292,22 @@ void Module_dasUnreal::initFunctions_12() {
 	addCtorAndUsing<FFloatProperty,EInternal,FFieldClass *>(*this,lib,"FFloatProperty","FFloatProperty")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2251:2
-	makeExtern< FFieldClass * (*)(const FFloatProperty *) , _dasUnreal_static_374_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_374_StaticClass")
+	makeExtern< FFieldClass * (*)(const FFloatProperty *) , _dasUnreal_static_377_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_377_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FFloatProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2251:2
-	makeExtern< FField * (*)(const FFloatProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_375_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_375_Construct")
+	makeExtern< FField * (*)(const FFloatProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_378_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_378_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FFloatProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2251:2
-	makeExtern< uint64 (*)(const FFloatProperty *) , _dasUnreal_static_376_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_376_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FFloatProperty *) , _dasUnreal_static_379_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_379_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FFloatProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2251:2
-	makeExtern< uint64 (*)(const FFloatProperty *) , _dasUnreal_static_377_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_377_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FFloatProperty *) , _dasUnreal_static_380_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_380_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FFloatProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -288,22 +320,22 @@ void Module_dasUnreal::initFunctions_12() {
 	addCtorAndUsing<FDoubleProperty,EInternal,FFieldClass *>(*this,lib,"FDoubleProperty","FDoubleProperty")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2290:2
-	makeExtern< FFieldClass * (*)(const FDoubleProperty *) , _dasUnreal_static_378_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_378_StaticClass")
+	makeExtern< FFieldClass * (*)(const FDoubleProperty *) , _dasUnreal_static_381_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_381_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FDoubleProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2290:2
-	makeExtern< FField * (*)(const FDoubleProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_379_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_379_Construct")
+	makeExtern< FField * (*)(const FDoubleProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_382_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_382_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FDoubleProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2290:2
-	makeExtern< uint64 (*)(const FDoubleProperty *) , _dasUnreal_static_380_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_380_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FDoubleProperty *) , _dasUnreal_static_383_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_383_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FDoubleProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2290:2
-	makeExtern< uint64 (*)(const FDoubleProperty *) , _dasUnreal_static_381_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_381_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FDoubleProperty *) , _dasUnreal_static_384_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_384_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FDoubleProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -316,55 +348,27 @@ void Module_dasUnreal::initFunctions_12() {
 	addCtorAndUsing<FBoolProperty,EInternal,FFieldClass *>(*this,lib,"FBoolProperty","FBoolProperty")
 		->args({"InInernal","InClass"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2340:2
-	makeExtern< FFieldClass * (*)(const FBoolProperty *) , _dasUnreal_static_382_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_382_StaticClass")
+	makeExtern< FFieldClass * (*)(const FBoolProperty *) , _dasUnreal_static_385_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_385_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FBoolProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2340:2
-	makeExtern< FField * (*)(const FBoolProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_383_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_383_Construct")
+	makeExtern< FField * (*)(const FBoolProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_386_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_386_Construct")
 		->args({"self","InOwner","InName","InObjectFlags"})
 		->arg_type(0,makeType<TExplicit<const FBoolProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2340:2
-	makeExtern< uint64 (*)(const FBoolProperty *) , _dasUnreal_static_384_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_384_StaticClassCastFlagsPrivate")
+	makeExtern< uint64 (*)(const FBoolProperty *) , _dasUnreal_static_387_StaticClassCastFlagsPrivate , SimNode_ExtFuncCall >(lib,"StaticClassCastFlagsPrivate","_dasUnreal_static_387_StaticClassCastFlagsPrivate")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FBoolProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2340:2
-	makeExtern< uint64 (*)(const FBoolProperty *) , _dasUnreal_static_385_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_385_StaticClassCastFlags")
+	makeExtern< uint64 (*)(const FBoolProperty *) , _dasUnreal_static_388_StaticClassCastFlags , SimNode_ExtFuncCall >(lib,"StaticClassCastFlags","_dasUnreal_static_388_StaticClassCastFlags")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FBoolProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	addCtorAndUsing<FBoolProperty,FFieldVariant,const FName &,EObjectFlags>(*this,lib,"FBoolProperty","FBoolProperty")
 		->args({"InOwner","InName","InObjectFlags"});
-	addCtorAndUsing<FBoolProperty,FFieldVariant,const UECodeGen_Private::FBoolPropertyParams &>(*this,lib,"FBoolProperty","FBoolProperty")
-		->args({"InOwner","Prop"});
-	addCtorAndUsing<FBoolProperty,UField *>(*this,lib,"FBoolProperty","FBoolProperty")
-		->args({"InField"});
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2388:15
-	makeExtern< void (*)(FBoolProperty &,const FField &) , _dasUnreal_virtual_386_PostDuplicate , SimNode_ExtFuncCall >(lib,"PostDuplicate","_dasUnreal_virtual_386_PostDuplicate")
-		->args({"self","InField"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2391:18
-	makeExtern< FString (*)(const FBoolProperty &,FString *,unsigned int) , _dasUnreal_virtual_387_GetCPPType , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetCPPType","_dasUnreal_virtual_387_GetCPPType")
-		->args({"self","ExtendedTypeText","CPPExportFlags"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2392:18
-	makeExtern< FString (*)(const FBoolProperty &,FString &) , _dasUnreal_virtual_388_GetCPPMacroType , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetCPPMacroType","_dasUnreal_virtual_388_GetCPPMacroType")
-		->args({"self","ExtendedTypeText"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2393:18
-	makeExtern< FString (*)(const FBoolProperty &) , _dasUnreal_virtual_389_GetCPPTypeForwardDeclaration , SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetCPPTypeForwardDeclaration","_dasUnreal_virtual_389_GetCPPTypeForwardDeclaration")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2398:15
-	makeExtern< bool (*)(const FBoolProperty &,const void *,const void *,unsigned int) , _dasUnreal_virtual_390_Identical , SimNode_ExtFuncCall >(lib,"Identical","_dasUnreal_virtual_390_Identical")
-		->args({"self","A","B","PortFlags"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2405:15
-	makeExtern< void (*)(const FBoolProperty &,void *,const void *,int) , _dasUnreal_virtual_391_CopyValuesInternal , SimNode_ExtFuncCall >(lib,"CopyValuesInternal","_dasUnreal_virtual_391_CopyValuesInternal")
-		->args({"self","Dest","Src","Count"})
-		->addToModule(*this, SideEffects::worstDefault);
 }
 }
 
