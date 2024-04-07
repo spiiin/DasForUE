@@ -107,13 +107,6 @@ class UnrealGen : CppGenBind
             "FString::rend";
 
              //UObject/UObjectBase.h
-             "FStat_STAT_UObjectsStatGroupTester::GetStatName"; //related to inner stat
-             "FStat_STAT_UObjectsStatGroupTester::GetDescription";
-             "FStat_STAT_UObjectsStatGroupTester::GetStatType";
-             "FStat_STAT_UObjectsStatGroupTester::IsClearEveryFrame";
-             "FStat_STAT_UObjectsStatGroupTester::IsCycleStat";
-             "FStat_STAT_UObjectsStatGroupTester::GetFlags";
-             "FStat_STAT_UObjectsStatGroupTester::GetMemoryRegion";
              "RegisterCompiledInInfo"; //FClassRegisterCompiledInInfo
              "UObjectBaseInit"; //some inner stuff?
              "UObjectBaseShutdown";
@@ -127,7 +120,6 @@ class UnrealGen : CppGenBind
              "UObjectBaseUtility::GetStatID"; //TStatId
              "UObjectBaseUtility::GetLinkerCustomVersion"; //FGuid
              "UObjectBaseUtility::GetLinkerUEVersion"; //FPackageFileVersion
-             "UObjectBaseUtility::GetLinker"; //FLinkerLoad
              "UObjectBaseUtility::GetFullName"; //TStringBuilderBase<wchar_t>
              "UObjectBaseUtility::GetPathName"; //TStringBuilderBase<wchar_t>
 
@@ -137,14 +129,10 @@ class UnrealGen : CppGenBind
             "UObject::GetNativePropertyValues"; //TMap<FString, FString>
             "UObject::GetAssetRegistryTagMetadata"; //TMap<FName, UObject::FAssetRegistryTagMetadata>
             "UObject::BuildSubobjectMapping"; //TMap<UObject *, UObject *>
-            "UObject::BeginCacheForCookedPlatformData";
-            "UObject::IsCachedCookedPlatformDataLoaded";
-            "UObject::ClearCachedCookedPlatformData";
-            "UObject::CookAdditionalFiles";
+            "UObject::BeginCacheForCookedPlatformData"; //ITargetPlatform
+            "UObject::IsCachedCookedPlatformDataLoaded"; //ITargetPlatform
+            "UObject::ClearCachedCookedPlatformData"; //ITargetPlatform
             "UObject::IsDataValid";
-            "UObject::PostDuplicate";
-            "UObject::GetResourceSizeBytes";
-            "UObject::GetPrimaryAssetId";
             "UObject::FindOrCreateTransactionAnnotation";
             "UObject::CreateAndRestoreTransactionAnnotation";
             "UObject::PostCDOCompiled";
@@ -277,6 +265,12 @@ class UnrealGen : CppGenBind
             "FArchive::AttachExternalReadDependency";
             "FArchiveState::SetCookingTarget";
             "FArchiveState::CookingTarget";
+            
+            //PrimaryAssetId.h
+            "FPrimaryAssetId::AppendString"; //TStringBuilderBase
+            "FPrimaryAssetType::AppendString"; //TStringBuilderBase
+            "FPrimaryAssetId::ExportTextItem"; //linker error
+            "FPrimaryAssetType::ExportTextItem"; //linker error
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -463,11 +457,14 @@ class UnrealGen : CppGenBind
     def override skip_file(fname:string) : bool
         //print("fname = {fname}\n")
         if (
+            fname |> find("ProfilingDebugging/ResourceSize.h") != -1 ||
             fname |> find("Misc/EngineVersionBase.h") != -1 ||
             fname |> find("Misc/CompressionFlags.h") != -1 ||
             fname |> find("Serialization/Archive.h") != -1 ||
             fname |> find("UnrealString.h") != -1 ||
             fname |> find("Logging/LogVerbosity.h") != -1 ||
+            fname |> find("UObject/UnrealNames.h") != -1 ||
+            fname |> find("UObject/PrimaryAssetId.h") != -1 ||
             fname |> find("UObject/UObjectBase.h") != -1 ||
             fname |> find("UObject/UObjectMarks.h") != -1 ||
             fname |> find("UObject/ObjectMacros.h") != -1 ||

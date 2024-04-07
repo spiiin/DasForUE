@@ -101,11 +101,14 @@
 #define __EDG__ 1
 
 #include "Misc/EngineVersionBase.h"
+#include "ProfilingDebugging/ResourceSize.h"
 #include "Misc/CompressionFlags.h"
 #include "Serialization/Archive.h"
 #include "UnrealString.h"
 #include "Logging/LogVerbosity.h"
 
+#include "UObject/UnrealNames.h"
+#include "UObject/PrimaryAssetId.h"
 #include "UObject/UObjectBase.h"
 #include "UObject/UObjectMarks.h"
 #include "UObject/ObjectMacros.h"
