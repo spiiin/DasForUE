@@ -6,6 +6,8 @@ addEnumeration(make_smart<Enumeration_EVersionComparison>());
 addEnumeration(make_smart<Enumeration_ECompressionFlags>());
 addEnumeration(make_smart<Enumeration_ELogVerbosity_Type>());
 addEnumeration(make_smart<Enumeration_EFileRegionType>());
+addEnumeration(make_smart<Enumeration_EName>());
+addEnumeration(make_smart<Enumeration_EResourceSizeMode_Type>());
 addEnumeration(make_smart<Enumeration_ELoadFlags>());
 addEnumeration(make_smart<Enumeration_ESaveFlags>());
 addEnumeration(make_smart<Enumeration_EPackageFlags>());

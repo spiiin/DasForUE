@@ -147,10 +147,8 @@ class UnrealGen : CppGenBind
             "UObject::NeedsLoadForTargetPlatform";
             "UObject::ExportCustomProperties";
             "UObject::GetResourceSizeEx";
-            "UObject::AddReferencedObjects";
             "UObject::GetReplicatedCustomConditionState";
             "UObject::ProcessConsoleExec";
-            "UObject::CallAddReferencedObjects";
             "UObject::GetMetaDataTagsForAssetRegistry";
             "UObject::RegisterReplicationFragments";
             "UObject::SerializeScriptProperties";
@@ -163,11 +161,7 @@ class UnrealGen : CppGenBind
             "UStruct::SetUnresolvedScriptProperties"; //TArray<TTuple<TFieldPath<FField>
             "UStruct::SerializeExpr";
             "UStruct::GetStructPathName";
-            "UStruct::Serialize";
-            "UStruct::Link";
-            "UStruct::SerializeBin";
             "UStruct::SerializeTaggedProperties";
-            "UStruct::AddReferencedObjects";
             "UStruct::PreloadChildren";
 
             "UEnum::ResolveEnumerator";
@@ -182,9 +176,6 @@ class UnrealGen : CppGenBind
             "UClass::TryFindTypeSlow";
             "UClass::TryFindTypeSlowSafe";
             "UClass::GetClassPathName";
-            "UClass::Link";
-            "UClass::AddReferencedObjects";
-            "UClass::CallAddReferencedObjects";
             "UClass::CallDeclareCustomVersions";
             "UClass::SerializeDefaultObject";
             "UClass::CallAppendToClassSchema";
@@ -201,18 +192,14 @@ class UnrealGen : CppGenBind
             "UScriptStruct::UseBinarySerialization";
             "UScriptStruct::SerializeItem";
             "UScriptStruct::ShouldSerializeAtomically";
-            "UScriptStruct::Link";
             "UScriptStruct::FindInnerPropertyInstance";
             "UScriptStruct::ICppStructOps::GetComputedPropertyFlags";
-
-            "UFunction::Link";
 
             "UField::AddCppProperty"; //just runtime hook to fail
 
             //UObject/Package.h
             "UPackage::GetWorldTileInfo";
             "UPackage::GetLinkerPackageVersion";
-            "UPackage::AddReferencedObjects";
             "UPackage::GetLoadedPath";
             "UPackage::SetLoadedPath";
             "UPackage::AccessThumbnailMap";
@@ -278,7 +265,6 @@ class UnrealGen : CppGenBind
             unreal_skip_func |> insert <| "{unrealReflType}::__DefaultConstructor" //meta-function
             unreal_skip_func |> insert <| "{unrealReflType}::__VTableCtorCaller"   //meta-function
             unreal_skip_func |> insert <| "{unrealReflType}::StaticClassCastFlags" //idk why it crashes
-            unreal_skip_func |> insert <| "{unrealReflType}::Serialize"            //temp disabled until FArchive is generated
 
         //TODO:
         // - radical way, find substring is slow

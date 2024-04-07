@@ -19,6 +19,8 @@ initRecAnnotation(ann_FScopeAddDebugData,lib);
 initRecAnnotation(ann_FArchive,lib);
 initRecAnnotation(ann_FString,lib);
 initRecAnnotation(ann_FTextRange,lib);
+initRecAnnotation(ann_FPrimaryAssetType,lib);
+initRecAnnotation(ann_FPrimaryAssetId,lib);
 initRecAnnotation(ann_FVTableHelper,lib);
 initRecAnnotation(ann_FRestoreForUObjectOverwrite,lib);
 initRecAnnotation(ann_FObjectInitializer,lib);

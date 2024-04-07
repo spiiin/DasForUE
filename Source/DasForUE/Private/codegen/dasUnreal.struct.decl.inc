@@ -24,6 +24,8 @@ MAKE_EXTERNAL_TYPE_FACTORY(FScopeSetDebugSerializationFlags,FArchive::FScopeSetD
 MAKE_EXTERNAL_TYPE_FACTORY(FScopeAddDebugData,FArchive::FScopeAddDebugData);
 MAKE_EXTERNAL_TYPE_FACTORY(FString,FString);
 MAKE_EXTERNAL_TYPE_FACTORY(FTextRange,FTextRange);
+MAKE_EXTERNAL_TYPE_FACTORY(FPrimaryAssetType,FPrimaryAssetType);
+MAKE_EXTERNAL_TYPE_FACTORY(FPrimaryAssetId,FPrimaryAssetId);
 MAKE_EXTERNAL_TYPE_FACTORY(FVTableHelper,FVTableHelper);
 MAKE_EXTERNAL_TYPE_FACTORY(FRestoreForUObjectOverwrite,FRestoreForUObjectOverwrite);
 MAKE_EXTERNAL_TYPE_FACTORY(FCbWriter,FCbWriter);

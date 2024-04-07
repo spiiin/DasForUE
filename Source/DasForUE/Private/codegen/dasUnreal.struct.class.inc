@@ -148,6 +148,24 @@ struct FTextRange_GeneratedAnnotation : ManagedStructureAnnotation<FTextRange> {
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:22:8
+struct FPrimaryAssetType_GeneratedAnnotation : ManagedStructureAnnotation<FPrimaryAssetType> {
+	FPrimaryAssetType_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FPrimaryAssetType", ml, "FPrimaryAssetType") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:104:8
+struct FPrimaryAssetId_GeneratedAnnotation : ManagedStructureAnnotation<FPrimaryAssetId> {
+	FPrimaryAssetId_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FPrimaryAssetId", ml, "FPrimaryAssetId") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(PrimaryAssetType)>("PrimaryAssetType","PrimaryAssetType");
+		addField<DAS_BIND_MANAGED_FIELD(PrimaryAssetName)>("PrimaryAssetName","PrimaryAssetName");
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/ObjectMacros.h:167:7
 struct FVTableHelper_GeneratedAnnotation : ManagedStructureAnnotation<FVTableHelper> {
 	FVTableHelper_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FVTableHelper", ml, "FVTableHelper") {

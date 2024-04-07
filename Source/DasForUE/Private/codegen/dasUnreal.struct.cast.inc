@@ -49,6 +49,18 @@ template <> struct cast_arg<FTextRange> {
 		return * cast<FTextRange *>::to(res);
 	}
 };
+template <> struct cast_arg<FPrimaryAssetType> {
+	static __forceinline const FPrimaryAssetType & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FPrimaryAssetType *>::to(res);
+	}
+};
+template <> struct cast_arg<FPrimaryAssetId> {
+	static __forceinline const FPrimaryAssetId & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FPrimaryAssetId *>::to(res);
+	}
+};
 template <> struct cast_arg<FVTableHelper> {
 	static __forceinline const FVTableHelper & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);

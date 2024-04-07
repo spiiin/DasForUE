@@ -11,6 +11,10 @@ DAS_BASE_BIND_ENUM_GEN(ELogVerbosity::Type,ELogVerbosity_Type);
 
 DAS_BASE_BIND_ENUM_GEN(EFileRegionType,EFileRegionType);
 
+DAS_BASE_BIND_ENUM_GEN(EName,EName);
+
+DAS_BASE_BIND_ENUM_GEN(EResourceSizeMode::Type,EResourceSizeMode_Type);
+
 DAS_BASE_BIND_ENUM_GEN(ELoadFlags,ELoadFlags);
 
 DAS_BASE_BIND_ENUM_GEN(ESaveFlags,ESaveFlags);

@@ -7,6 +7,8 @@ DAS_BIND_ENUM_CAST(EVersionComparison);
 DAS_BIND_ENUM_CAST(ECompressionFlags);
 DAS_BIND_ENUM_CAST(ELogVerbosity::Type);
 DAS_BIND_ENUM_CAST(EFileRegionType);
+DAS_BIND_ENUM_CAST(EName);
+DAS_BIND_ENUM_CAST(EResourceSizeMode::Type);
 DAS_BIND_ENUM_CAST(ELoadFlags);
 DAS_BIND_ENUM_CAST(ESaveFlags);
 DAS_BIND_ENUM_CAST(EPackageFlags);
