@@ -1,6 +1,15 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_float,TProperty_Numeric<float>);
+MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint32,TProperty_Numeric<uint32>);
+MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int8,TProperty_Numeric<int8>);
+MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint16,TProperty_Numeric<uint16>);
+MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint8,TProperty_Numeric<uint8>);
+MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int16,TProperty_Numeric<int16>);
+MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_double,TProperty_Numeric<double>);
+MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int64,TProperty_Numeric<int64>);
+MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint64,TProperty_Numeric<uint64>);
 MAKE_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int32,TProperty_Numeric<int32>);
 MAKE_EXTERNAL_TYPE_FACTORY(FString,FString);
 MAKE_EXTERNAL_TYPE_FACTORY(FTextRange,FTextRange);
@@ -98,7 +107,16 @@ MAKE_EXTERNAL_TYPE_FACTORY(FPropertyHelpers,FPropertyHelpers);
 MAKE_EXTERNAL_TYPE_FACTORY(FProperty_DoNotUse,UEProperty_Private::FProperty_DoNotUse);
 MAKE_EXTERNAL_TYPE_FACTORY(FDefinedProperty,FDefinedProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FNumericProperty,FNumericProperty);
+MAKE_EXTERNAL_TYPE_FACTORY(FByteProperty,FByteProperty);
+MAKE_EXTERNAL_TYPE_FACTORY(FInt8Property,FInt8Property);
+MAKE_EXTERNAL_TYPE_FACTORY(FInt16Property,FInt16Property);
 MAKE_EXTERNAL_TYPE_FACTORY(FIntProperty,FIntProperty);
+MAKE_EXTERNAL_TYPE_FACTORY(FInt64Property,FInt64Property);
+MAKE_EXTERNAL_TYPE_FACTORY(FUInt16Property,FUInt16Property);
+MAKE_EXTERNAL_TYPE_FACTORY(FUInt32Property,FUInt32Property);
+MAKE_EXTERNAL_TYPE_FACTORY(FUInt64Property,FUInt64Property);
+MAKE_EXTERNAL_TYPE_FACTORY(FFloatProperty,FFloatProperty);
+MAKE_EXTERNAL_TYPE_FACTORY(FDoubleProperty,FDoubleProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FBoolProperty,FBoolProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FObjectPropertyBase,FObjectPropertyBase);
 MAKE_EXTERNAL_TYPE_FACTORY(FStructProperty,FStructProperty);

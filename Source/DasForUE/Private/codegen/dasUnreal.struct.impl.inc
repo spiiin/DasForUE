@@ -1,6 +1,15 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_float,TProperty_Numeric<float>);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint32,TProperty_Numeric<uint32>);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int8,TProperty_Numeric<int8>);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint16,TProperty_Numeric<uint16>);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint8,TProperty_Numeric<uint8>);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int16,TProperty_Numeric<int16>);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_double,TProperty_Numeric<double>);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int64,TProperty_Numeric<int64>);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_uint64,TProperty_Numeric<uint64>);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int32,TProperty_Numeric<int32>);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FString,FString);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FTextRange,FTextRange);
@@ -98,7 +107,16 @@ IMPLEMENT_EXTERNAL_TYPE_FACTORY(FPropertyHelpers,FPropertyHelpers);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FProperty_DoNotUse,UEProperty_Private::FProperty_DoNotUse);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FDefinedProperty,FDefinedProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FNumericProperty,FNumericProperty);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FByteProperty,FByteProperty);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FInt8Property,FInt8Property);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FInt16Property,FInt16Property);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FIntProperty,FIntProperty);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FInt64Property,FInt64Property);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FUInt16Property,FUInt16Property);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FUInt32Property,FUInt32Property);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FUInt64Property,FUInt64Property);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FFloatProperty,FFloatProperty);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FDoubleProperty,FDoubleProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FBoolProperty,FBoolProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FObjectPropertyBase,FObjectPropertyBase);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FStructProperty,FStructProperty);

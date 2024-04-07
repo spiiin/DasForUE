@@ -427,10 +427,64 @@ template <> struct cast_arg<FNumericProperty> {
 		return * cast<FNumericProperty *>::to(res);
 	}
 };
+template <> struct cast_arg<FByteProperty> {
+	static __forceinline const FByteProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FByteProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FInt8Property> {
+	static __forceinline const FInt8Property & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FInt8Property *>::to(res);
+	}
+};
+template <> struct cast_arg<FInt16Property> {
+	static __forceinline const FInt16Property & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FInt16Property *>::to(res);
+	}
+};
 template <> struct cast_arg<FIntProperty> {
 	static __forceinline const FIntProperty & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<FIntProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FInt64Property> {
+	static __forceinline const FInt64Property & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FInt64Property *>::to(res);
+	}
+};
+template <> struct cast_arg<FUInt16Property> {
+	static __forceinline const FUInt16Property & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FUInt16Property *>::to(res);
+	}
+};
+template <> struct cast_arg<FUInt32Property> {
+	static __forceinline const FUInt32Property & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FUInt32Property *>::to(res);
+	}
+};
+template <> struct cast_arg<FUInt64Property> {
+	static __forceinline const FUInt64Property & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FUInt64Property *>::to(res);
+	}
+};
+template <> struct cast_arg<FFloatProperty> {
+	static __forceinline const FFloatProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FFloatProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FDoubleProperty> {
+	static __forceinline const FDoubleProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FDoubleProperty *>::to(res);
 	}
 };
 template <> struct cast_arg<FBoolProperty> {

@@ -57,6 +57,15 @@ class UnrealGen : CppGenBind
             "FString";
             "FSavePackageResultStruct";
             "FIntProperty";
+            "FFloatProperty";
+            "FUInt16Property";
+            "FInt64Property";
+            "FUInt64Property";
+             "FByteProperty";
+            "FDoubleProperty";
+            "FInt8Property";
+            "FUInt32Property";
+            "FInt16Property";
         }}
 
         unrealReflectionTypes <- {{
@@ -72,7 +81,16 @@ class UnrealGen : CppGenBind
         }}
 
         dummyTemplateInstanceAnnotations <- {{
-            "TProperty_Numeric<int32>";
+            "TProperty_Numeric<int32>"; //TODO: support inheritance hierarchy
+            "TProperty_Numeric<float>";
+            "TProperty_Numeric<uint16>";
+            "TProperty_Numeric<int64>";
+            "TProperty_Numeric<uint64>";
+            "TProperty_Numeric<uint8>";
+            "TProperty_Numeric<double>";
+            "TProperty_Numeric<int8>";
+            "TProperty_Numeric<uint32>";
+            "TProperty_Numeric<int16>";
         }}
 
         unreal_skip_func <- {{
@@ -247,11 +265,11 @@ class UnrealGen : CppGenBind
             "FInterfaceProperty::LinkInternal";
             "FStructProperty::Serialize";
             "FStructProperty::LinkInternal";
+            "FStructProperty::UseBinaryOrNativeSerialization";
             "FDelegateProperty::Serialize";
+            "FObjectProperty::PostSerializeObjectItem";
             "FPropertyHelpers::ReadToken";
             "FProperty::Serialize";
-            "FObjectProperty::PostSerializeObjectItem";
-            "FStructProperty::UseBinaryOrNativeSerialization";
             "FProperty::LinkWithoutChangingOffset";
             "FProperty::Link";
             "FProperty::ShouldSerializeValue";
@@ -419,22 +437,13 @@ class UnrealGen : CppGenBind
             "FObjectPtrProperty";
 
             "FInterfaceProperty";
-            "FByteProperty";
-            "FDoubleProperty";
-            "FInt8Property";
             "FNameProperty";
             "FObjectProperty";
-            "FUInt32Property";
-            "FInt16Property";
+           
             "FStrProperty";
             "FDelegateProperty";
             "FClassPtrProperty";
-            "FUInt16Property";
             "FClassProperty";
-            //"FIntProperty";
-            "FFloatProperty";
-            "FInt64Property";
-            "FUInt64Property";
             "FLargeWorldCoordinatesRealProperty";
 
             "FDefaultConstructedPropertyElement";

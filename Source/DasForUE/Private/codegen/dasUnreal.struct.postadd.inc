@@ -1,6 +1,15 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+initRecAnnotation(ann_TProperty_Numeric_float,lib);
+initRecAnnotation(ann_TProperty_Numeric_uint32,lib);
+initRecAnnotation(ann_TProperty_Numeric_int8,lib);
+initRecAnnotation(ann_TProperty_Numeric_uint16,lib);
+initRecAnnotation(ann_TProperty_Numeric_uint8,lib);
+initRecAnnotation(ann_TProperty_Numeric_int16,lib);
+initRecAnnotation(ann_TProperty_Numeric_double,lib);
+initRecAnnotation(ann_TProperty_Numeric_int64,lib);
+initRecAnnotation(ann_TProperty_Numeric_uint64,lib);
 initRecAnnotation(ann_TProperty_Numeric_int32,lib);
 initRecAnnotation(ann_FString,lib);
 initRecAnnotation(ann_FTextRange,lib);
@@ -73,7 +82,16 @@ initRecAnnotation(ann_FPropertyHelpers,lib);
 initRecAnnotation(ann_FProperty_DoNotUse,lib);
 initRecAnnotation(ann_FDefinedProperty,lib);
 initRecAnnotation(ann_FNumericProperty,lib);
+initRecAnnotation(ann_FByteProperty,lib);
+initRecAnnotation(ann_FInt8Property,lib);
+initRecAnnotation(ann_FInt16Property,lib);
 initRecAnnotation(ann_FIntProperty,lib);
+initRecAnnotation(ann_FInt64Property,lib);
+initRecAnnotation(ann_FUInt16Property,lib);
+initRecAnnotation(ann_FUInt32Property,lib);
+initRecAnnotation(ann_FUInt64Property,lib);
+initRecAnnotation(ann_FFloatProperty,lib);
+initRecAnnotation(ann_FDoubleProperty,lib);
 initRecAnnotation(ann_FBoolProperty,lib);
 initRecAnnotation(ann_FObjectPropertyBase,lib);
 initRecAnnotation(ann_FStructProperty,lib);

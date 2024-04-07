@@ -2,6 +2,69 @@
 // all user modifications will be lost after this file is re-generated
 
 
+struct TProperty_Numeric_float_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<float>> {
+	TProperty_Numeric_float_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_float", ml) {
+	}
+	void init() {
+	}
+};
+
+struct TProperty_Numeric_uint32_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<uint32>> {
+	TProperty_Numeric_uint32_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_uint32", ml) {
+	}
+	void init() {
+	}
+};
+
+struct TProperty_Numeric_int8_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<int8>> {
+	TProperty_Numeric_int8_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_int8", ml) {
+	}
+	void init() {
+	}
+};
+
+struct TProperty_Numeric_uint16_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<uint16>> {
+	TProperty_Numeric_uint16_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_uint16", ml) {
+	}
+	void init() {
+	}
+};
+
+struct TProperty_Numeric_uint8_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<uint8>> {
+	TProperty_Numeric_uint8_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_uint8", ml) {
+	}
+	void init() {
+	}
+};
+
+struct TProperty_Numeric_int16_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<int16>> {
+	TProperty_Numeric_int16_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_int16", ml) {
+	}
+	void init() {
+	}
+};
+
+struct TProperty_Numeric_double_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<double>> {
+	TProperty_Numeric_double_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_double", ml) {
+	}
+	void init() {
+	}
+};
+
+struct TProperty_Numeric_int64_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<int64>> {
+	TProperty_Numeric_int64_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_int64", ml) {
+	}
+	void init() {
+	}
+};
+
+struct TProperty_Numeric_uint64_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<uint64>> {
+	TProperty_Numeric_uint64_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_uint64", ml) {
+	}
+	void init() {
+	}
+};
+
 struct TProperty_Numeric_int32_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<int32>> {
 	TProperty_Numeric_int32_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_int32", ml) {
 	}
@@ -837,12 +900,111 @@ struct FNumericProperty_GeneratedAnnotation : ManagedStructureAnnotation<FNumeri
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1900:23
+struct FByteProperty_GeneratedAnnotation : ManagedStructureAnnotation<FByteProperty> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FByteProperty>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FByteProperty>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FByteProperty>::value; }
+	FByteProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FByteProperty", ml, "FByteProperty") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1974:23
+struct FInt8Property_GeneratedAnnotation : ManagedStructureAnnotation<FInt8Property> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FInt8Property>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FInt8Property>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FInt8Property>::value; }
+	FInt8Property_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FInt8Property", ml, "FInt8Property") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2013:23
+struct FInt16Property_GeneratedAnnotation : ManagedStructureAnnotation<FInt16Property> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FInt16Property>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FInt16Property>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FInt16Property>::value; }
+	FInt16Property_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FInt16Property", ml, "FInt16Property") {
+	}
+	void init () {
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2053:23
 struct FIntProperty_GeneratedAnnotation : ManagedStructureAnnotation<FIntProperty> {
 	virtual bool canCopy() const override { return std::is_copy_constructible<FIntProperty>::value; }
 	virtual bool canClone() const override { return std::is_copy_constructible<FIntProperty>::value; }
 	virtual bool canMove() const override { return std::is_copy_constructible<FIntProperty>::value; }
 	FIntProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FIntProperty", ml, "FIntProperty") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2092:23
+struct FInt64Property_GeneratedAnnotation : ManagedStructureAnnotation<FInt64Property> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FInt64Property>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FInt64Property>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FInt64Property>::value; }
+	FInt64Property_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FInt64Property", ml, "FInt64Property") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2131:23
+struct FUInt16Property_GeneratedAnnotation : ManagedStructureAnnotation<FUInt16Property> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FUInt16Property>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FUInt16Property>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FUInt16Property>::value; }
+	FUInt16Property_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FUInt16Property", ml, "FUInt16Property") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2170:23
+struct FUInt32Property_GeneratedAnnotation : ManagedStructureAnnotation<FUInt32Property> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FUInt32Property>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FUInt32Property>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FUInt32Property>::value; }
+	FUInt32Property_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FUInt32Property", ml, "FUInt32Property") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2209:23
+struct FUInt64Property_GeneratedAnnotation : ManagedStructureAnnotation<FUInt64Property> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FUInt64Property>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FUInt64Property>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FUInt64Property>::value; }
+	FUInt64Property_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FUInt64Property", ml, "FUInt64Property") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2249:23
+struct FFloatProperty_GeneratedAnnotation : ManagedStructureAnnotation<FFloatProperty> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FFloatProperty>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FFloatProperty>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FFloatProperty>::value; }
+	FFloatProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FFloatProperty", ml, "FFloatProperty") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2288:23
+struct FDoubleProperty_GeneratedAnnotation : ManagedStructureAnnotation<FDoubleProperty> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FDoubleProperty>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FDoubleProperty>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FDoubleProperty>::value; }
+	FDoubleProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FDoubleProperty", ml, "FDoubleProperty") {
 	}
 	void init () {
 	}
