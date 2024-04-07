@@ -41,7 +41,7 @@ def call_ufunction_on(var executor: UObject?; functionName: string; var inParams
 
 //UObjects constructors
 
-def new_uobject(owner: UObject?; name: FName; objType: auto(TT)) : TT?
+def new_uobject(owner: UObject?; name: FName; objType: auto(TT)-const) : TT?
     let className = typeinfo(stripped_typename objType)
     static_assert(className |> starts_with("unreal::"))
     let cls = get_class_by_name(FString(className |> slice(9))) //remove unreal::A/U/F unreal type prefix
@@ -49,24 +49,41 @@ def new_uobject(owner: UObject?; name: FName; objType: auto(TT)) : TT?
     unsafe { return reinterpret<TT?> new_uobject_of_class(owner, cls, name); }
 
 
-def new_uobject(objType: auto(TT)) : TT?
+def new_uobject(objType: auto(TT)-const) : TT?
     let className = typeinfo(stripped_typename objType) 
     static_assert(className |> starts_with("unreal::"))
     let cls = get_class_by_name(FString(className |> slice(9))) //remove unreal::A/U/F unreal type prefix
     return null if cls == null
     unsafe { return reinterpret<TT?> new_uobject_of_class(cls); }
 
+let private propertyFlags = EObjectFlags RF_Public | EObjectFlags RF_Transient | EObjectFlags RF_MarkAsNative
 
-def emit_ufunction(cls: UClass?; name: FName)
-    //RF_Public | RF_Transient | RF_MarkAsRootSet | RF_MarkAsNative
+def test_emit_ufunction(var cls: UClass?; var name: FName)
+    //check if function with name already exist in this class or it's superclasses
+    //  TODO:
+
+    //create new function
     var fn = new_uobject(cls, name, type<UFunction>)
+    var field = Construct(
+        [[FIntProperty?]],
+        FFieldVariant(fn),
+        FName("Parameter1"),
+        propertyFlags 
+    )
+
+    //create function arguments
+    var propPtr = unsafe(reinterpret<FProperty?> field) //TODO: find a way to construct field with something return FProperty?
+    var fnAsStruct = unsafe(reinterpret<UStruct?> fn) //TODO: check why safe cast<UStruct?> doesn't work. Need to cast to struct for correct overload selection
+    *fnAsStruct |> AddCppProperty(propPtr)
     //fn.functionFlags
-    //TODO: logic for super
-    //fn.Next = cls.Children
-    //cls.Children = fn
-    //foreach ARG
-        //fn |> emit_fproperty(ARG)
-    //cls |> AddFunctionToFunctionMap(fn, name)
-    //fn |> SetNativeFunc
-    //fn |> StaticLink(true)
+
+    //fill class 
+    *cls |> AddFunctionToFunctionMap(fn, name)
+    //TODO: create new field in class
+    //  fn.Next = cls.Children
+    //  cls.Children = fn
+
+    //create function body
+    //  fn |> SetNativeFunc(ptr)
+    //  fn |> StaticLink(true)
     return fn

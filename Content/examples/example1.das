@@ -26,20 +26,28 @@ def SaySomething(var obj: UObject?; var msg: FString)
         obj |> call_ufunction_on("SaySomething") <| addr(params)
 
 //--------------------------------------------------------------
+struct SaySomethingGeneratedParams
+    a : int
+
+def SaySomethingGenerated(var obj: UObject?)
+    unsafe
+        var params: SaySomethingGeneratedParams //no inited, unsafe
+        params.a = 42
+        obj |> call_ufunction_on("SaySomethingGenerated") <| addr(params)
+
+//--------------------------------------------------------------
+
 
 [export]
 def main
     let className = "TestClass"
-    var clazz = get_class_by_name(FString(className))
-    if clazz == null
+    var cls = get_class_by_name(FString(className))
+    if cls == null
         print("Class {className} not found!")
         return
-    print("Class name: {string(*clazz |> GetName)}\n")
-    var obj = new_uobject_of_class(clazz)
+    print("Class name: {string(*cls |> GetName)}\n")
+    var obj = new_uobject_of_class(cls)
     print("Object name: {string(*obj |> GetName)}\n")
-
-    var uclassObject = new_uobject(type<UClass>)
-    print("uclassObject: {string(*uclassObject |> GetName)}\n")
 
     //print("{cls}\n") //TODO: fix crash
 
@@ -52,4 +60,18 @@ def main
     //3 call without macro
     obj |> SaySomething(FString("SaySomething"))
 
-    //print("{clazz}\n")
+    //---
+    //new_uobject by type
+    var uclassObject = new_uobject(type<UClass>)
+    print("uclassObject: {string(*uclassObject |> GetName)}\n")
+
+    //----
+    //create function
+    let fn = cls |> test_emit_ufunction() <| FName("SaySomethingGenerated")
+    print("Generated function name: {string(*fn |> GetName)}\n")
+
+    //check if generated function really has int parameter
+    let param = fn |> GetChildFieldsFromStruct_FField
+    print("Generated function parameter name: {string(*param |> GetName)}\n")
+
+    obj |> SaySomethingGenerated
