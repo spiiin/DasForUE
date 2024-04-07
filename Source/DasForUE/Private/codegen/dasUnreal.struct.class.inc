@@ -577,6 +577,34 @@ struct FObjectNetPushIdHelper_GeneratedAnnotation : ManagedStructureAnnotation<F
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:62:7
+struct FFieldClass_GeneratedAnnotation : ManagedStructureAnnotation<FFieldClass> {
+	FFieldClass_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FFieldClass", ml, "FFieldClass") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:264:7
+struct FFieldVariant_GeneratedAnnotation : ManagedStructureAnnotation<FFieldVariant> {
+	FFieldVariant_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FFieldVariant", ml, "FFieldVariant") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:412:7
+struct FField_GeneratedAnnotation : ManagedStructureAnnotation<FField> {
+	FField_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FField", ml, "FField") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Owner)>("Owner","Owner");
+		addField<DAS_BIND_MANAGED_FIELD(Next)>("Next","Next");
+		addField<DAS_BIND_MANAGED_FIELD(NamePrivate)>("NamePrivate","NamePrivate");
+		addField<DAS_BIND_MANAGED_FIELD(FlagsPrivate)>("FlagsPrivate","FlagsPrivate");
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:155:7
 struct UField_GeneratedAnnotation : ManagedStructureAnnotation<UField, false, false> {
 	UField_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UField", ml, "UField") {
@@ -591,6 +619,7 @@ struct UStruct_GeneratedAnnotation : ManagedStructureAnnotation<UStruct, false, 
 	UStruct_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UStruct", ml, "UStruct") {
 	}
 	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(ChildProperties)>("ChildProperties","ChildProperties");
 		addField<DAS_BIND_MANAGED_FIELD(PropertiesSize)>("PropertiesSize","PropertiesSize");
 		addField<DAS_BIND_MANAGED_FIELD(MinAlignment)>("MinAlignment","MinAlignment");
 		addField<DAS_BIND_MANAGED_FIELD(FieldPathSerialNumber)>("FieldPathSerialNumber","FieldPathSerialNumber");
@@ -721,6 +750,7 @@ struct UClass_GeneratedAnnotation : ManagedStructureAnnotation<UClass, false, fa
 		addField<DAS_BIND_MANAGED_FIELD(bLayoutChanging)>("bLayoutChanging","bLayoutChanging");
 		addField<DAS_BIND_MANAGED_FIELD(ClassFlags)>("ClassFlags","ClassFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ClassCastFlags)>("ClassCastFlags","ClassCastFlags");
+		addField<DAS_BIND_MANAGED_FIELD(PropertiesPendingDestruction)>("PropertiesPendingDestruction","PropertiesPendingDestruction");
 		addField<DAS_BIND_MANAGED_FIELD(ClassConfigName)>("ClassConfigName","ClassConfigName");
 	}
 };

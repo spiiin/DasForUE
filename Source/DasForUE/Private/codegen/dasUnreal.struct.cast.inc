@@ -271,6 +271,24 @@ template <> struct cast_arg<FObjectNetPushIdHelper> {
 		return * cast<FObjectNetPushIdHelper *>::to(res);
 	}
 };
+template <> struct cast_arg<FFieldClass> {
+	static __forceinline const FFieldClass & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FFieldClass *>::to(res);
+	}
+};
+template <> struct cast_arg<FFieldVariant> {
+	static __forceinline const FFieldVariant & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FFieldVariant *>::to(res);
+	}
+};
+template <> struct cast_arg<FField> {
+	static __forceinline const FField & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FField *>::to(res);
+	}
+};
 template <> struct cast_arg<UField> {
 	static __forceinline const UField & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);

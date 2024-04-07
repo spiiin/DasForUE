@@ -252,6 +252,14 @@ class UnrealGen : CppGenBind
             "UEProperty_Private::FProperty_DoNotUse::Unsafe_AlterOffset";
             "UPropertyWrapper::GetProperty";
 
+            //UObject/Field.h
+            "FFieldVariant::FFieldVariant";
+            "FField::Serialize";
+            "FField::GetPathName";
+            "FField::GetConvertCustomUFieldToFFieldDelegate";
+
+            "GetChildFieldsFromStruct"; //UField* GetChildFieldsFromStruct(const UStruct* Owner)
+                                        //FField* GetChildFieldsFromStruct(const UStruct* Owner)
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -267,7 +275,6 @@ class UnrealGen : CppGenBind
         unreal_arg_part_names <- [{string
             "TArray";           //TODO: temp, due to name das/unreal name conflict (namespace das -> dasext?)
             "TObjectPtr";
-            "FField";
             "FSchemaOwner";
             "FUnversionedStructSchema";
             "FFrame &"; //temp
@@ -426,6 +433,8 @@ class UnrealGen : CppGenBind
             "FStructProperty";
 
             "FDefaultConstructedPropertyElement";
+
+            //UObject/Field.h
         }}
 
     //TODO: check if this may be moved to cbind_boost
@@ -451,7 +460,8 @@ class UnrealGen : CppGenBind
             fname |> find("UObject/Class.h") != -1 ||
             fname |> find("UObject/Package.h") != -1 ||
             fname |> find("UObject/UObjectGlobals.h") != -1 ||
-            fname |> find("UObject/UnrealType.h") != -1
+            fname |> find("UObject/UnrealType.h") != -1 ||
+            fname |> find("UObject/Field.h") != -1
         )
             return false
         return true

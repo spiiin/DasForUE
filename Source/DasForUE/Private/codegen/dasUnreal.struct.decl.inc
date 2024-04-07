@@ -57,6 +57,9 @@ MAKE_EXTERNAL_TYPE_FACTORY(FNetHandleLegacyPushModelHelper,UE::Net::Private::FNe
 MAKE_EXTERNAL_TYPE_FACTORY(UObject,UObject);
 MAKE_EXTERNAL_TYPE_FACTORY(FAssetRegistryTagMetadata,UObject::FAssetRegistryTagMetadata);
 MAKE_EXTERNAL_TYPE_FACTORY(FObjectNetPushIdHelper,FObjectNetPushIdHelper);
+MAKE_EXTERNAL_TYPE_FACTORY(FFieldClass,FFieldClass);
+MAKE_EXTERNAL_TYPE_FACTORY(FFieldVariant,FFieldVariant);
+MAKE_EXTERNAL_TYPE_FACTORY(FField,FField);
 MAKE_EXTERNAL_TYPE_FACTORY(FBlake3Hash,FBlake3Hash);
 MAKE_EXTERNAL_TYPE_FACTORY(FNetDeltaSerializeInfo,FNetDeltaSerializeInfo);
 MAKE_EXTERNAL_TYPE_FACTORY(UField,UField);
