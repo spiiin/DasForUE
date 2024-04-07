@@ -57,3 +57,4 @@ addEnumeration(make_smart<Enumeration_EFieldIteratorFlags_SuperClassFlags>());
 addEnumeration(make_smart<Enumeration_EFieldIteratorFlags_DeprecatedPropertyFlags>());
 addEnumeration(make_smart<Enumeration_EFieldIteratorFlags_InterfaceClassFlags>());
 addEnumeration(make_smart<Enumeration_EPropertyValueIteratorFlags>());
+addEnumFlagOps<EObjectFlags>(*this,lib,"EObjectFlags");

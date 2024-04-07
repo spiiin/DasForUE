@@ -272,6 +272,9 @@ void Module_dasUnreal::initFunctions_5() {
 	makeExtern<DAS_CALL_METHOD(_method_310), SimNode_ExtFuncCall >(lib,"GetNextUniqueNameIndex","das_call_member< int (FFieldClass::*)() , &FFieldClass::GetNextUniqueNameIndex >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
+	addCtorAndUsing<FFieldVariant>(*this,lib,"FFieldVariant","FFieldVariant");
+	addCtorAndUsing<FFieldVariant,const FField *>(*this,lib,"FFieldVariant","FFieldVariant")
+		->args({"InField"});
 	using _method_311 = das::das_call_member< bool (FFieldVariant::*)() const,&FFieldVariant::IsUObject >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:302:14
 	makeExtern<DAS_CALL_METHOD(_method_311), SimNode_ExtFuncCall >(lib,"IsUObject","das_call_member< bool (FFieldVariant::*)() const , &FFieldVariant::IsUObject >::invoke")
@@ -476,16 +479,6 @@ void Module_dasUnreal::initFunctions_5() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:531:7
 	makeExtern<DAS_CALL_METHOD(_method_351), SimNode_ExtFuncCall >(lib,"HasAllFlags","das_call_member< bool (FField::*)(EObjectFlags) const , &FField::HasAllFlags >::invoke")
 		->args({"self","FlagsToCheck"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_352 = das::das_call_member< FFieldClass * (FField::*)() const,&FField::GetClass >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:537:22
-	makeExtern<DAS_CALL_METHOD(_method_352), SimNode_ExtFuncCall >(lib,"GetClass","das_call_member< FFieldClass * (FField::*)() const , &FField::GetClass >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_353 = das::das_call_member< uint64 (FField::*)() const,&FField::GetCastFlags >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:541:16
-	makeExtern<DAS_CALL_METHOD(_method_353), SimNode_ExtFuncCall >(lib,"GetCastFlags","das_call_member< uint64 (FField::*)() const , &FField::GetCastFlags >::invoke")
-		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

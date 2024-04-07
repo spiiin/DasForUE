@@ -839,6 +839,9 @@ struct FNumericProperty_GeneratedAnnotation : ManagedStructureAnnotation<FNumeri
 
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2053:23
 struct FIntProperty_GeneratedAnnotation : ManagedStructureAnnotation<FIntProperty> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FIntProperty>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FIntProperty>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FIntProperty>::value; }
 	FIntProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FIntProperty", ml, "FIntProperty") {
 	}
 	void init () {

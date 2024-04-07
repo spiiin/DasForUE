@@ -6,6 +6,9 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_9() {
+	addCtorAndUsing<FSavePackageResultStruct>(*this,lib,"FSavePackageResultStruct","FSavePackageResultStruct");
+	addCtorAndUsing<FSavePackageResultStruct,ESavePackageResult>(*this,lib,"FSavePackageResultStruct","FSavePackageResultStruct")
+		->args({"InResult"});
 	addCtorAndUsing<FSavePackageResultStruct,ESavePackageResult,long long>(*this,lib,"FSavePackageResultStruct","FSavePackageResultStruct")
 		->args({"InResult","InTotalFileSize"});
 	using _method_645 = das::das_call_member< bool (FSavePackageResultStruct::*)() const,&FSavePackageResultStruct::IsSuccessful >;
@@ -481,16 +484,6 @@ void Module_dasUnreal::initFunctions_9() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:770:25
 	makeExtern<DAS_CALL_METHOD(_method_741), SimNode_ExtFuncCall >(lib,"GetValueTypeHash","das_call_member< unsigned int (FProperty::*)(const void *) const , &FProperty::GetValueTypeHash >::invoke")
 		->args({"self","Src"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_742 = das::das_call_member< void (FProperty::*)(void *,const void *) const,&FProperty::CopyCompleteValue >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:786:19
-	makeExtern<DAS_CALL_METHOD(_method_742), SimNode_ExtFuncCall >(lib,"CopyCompleteValue","das_call_member< void (FProperty::*)(void *,const void *) const , &FProperty::CopyCompleteValue >::invoke")
-		->args({"self","Dest","Src"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_743 = das::das_call_member< void (FProperty::*)(void *,const void *) const,&FProperty::CopyCompleteValue_InContainer >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:800:19
-	makeExtern<DAS_CALL_METHOD(_method_743), SimNode_ExtFuncCall >(lib,"CopyCompleteValue_InContainer","das_call_member< void (FProperty::*)(void *,const void *) const , &FProperty::CopyCompleteValue_InContainer >::invoke")
-		->args({"self","Dest","Src"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

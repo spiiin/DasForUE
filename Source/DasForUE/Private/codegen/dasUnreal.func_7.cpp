@@ -6,6 +6,14 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_7() {
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:463:31
+	makeExtern< void (*)(UStruct &,EObjectFlags) , _dasUnreal_virtual_140_TagSubobjects , SimNode_ExtFuncCall >(lib,"TagSubobjects","_dasUnreal_virtual_140_TagSubobjects")
+		->args({"self","NewFlags"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:466:31
+	makeExtern< void (*)(UStruct &,FProperty *) , _dasUnreal_virtual_141_AddCppProperty , SimNode_ExtFuncCall >(lib,"AddCppProperty","_dasUnreal_virtual_141_AddCppProperty")
+		->args({"self","Property"})
+		->addToModule(*this, SideEffects::worstDefault);
 	using _method_450 = das::das_call_member< FProperty * (UStruct::*)(FName) const,&UStruct::FindPropertyByName >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:474:29
 	makeExtern<DAS_CALL_METHOD(_method_450), SimNode_ExtFuncCall >(lib,"FindPropertyByName","das_call_member< FProperty * (UStruct::*)(FName) const , &UStruct::FindPropertyByName >::invoke")
@@ -488,16 +496,6 @@ void Module_dasUnreal::initFunctions_7() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2060:26
 	makeExtern<DAS_CALL_METHOD(_method_547), SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetNameStringByValue","das_call_member< FString (UEnum::*)(int64) const , &UEnum::GetNameStringByValue >::invoke")
 		->args({"self","InValue"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_548 = das::das_call_member< FString (UEnum::*)(int64) const,&UEnum::GetValueOrBitfieldAsString >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2063:26
-	makeExtern<DAS_CALL_METHOD(_method_548), SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetValueOrBitfieldAsString","das_call_member< FString (UEnum::*)(int64) const , &UEnum::GetValueOrBitfieldAsString >::invoke")
-		->args({"self","InValue"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_549 = das::das_call_member< bool (UEnum::*)(FString &,int64) const,&UEnum::FindNameStringByValue >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2066:23
-	makeExtern<DAS_CALL_METHOD(_method_549), SimNode_ExtFuncCall >(lib,"FindNameStringByValue","das_call_member< bool (UEnum::*)(FString &,int64) const , &UEnum::FindNameStringByValue >::invoke")
-		->args({"self","Out","InValue"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

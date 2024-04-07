@@ -6,6 +6,16 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_6() {
+	using _method_352 = das::das_call_member< FFieldClass * (FField::*)() const,&FField::GetClass >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:537:22
+	makeExtern<DAS_CALL_METHOD(_method_352), SimNode_ExtFuncCall >(lib,"GetClass","das_call_member< FFieldClass * (FField::*)() const , &FField::GetClass >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_353 = das::das_call_member< uint64 (FField::*)() const,&FField::GetCastFlags >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:541:16
+	makeExtern<DAS_CALL_METHOD(_method_353), SimNode_ExtFuncCall >(lib,"GetCastFlags","das_call_member< uint64 (FField::*)() const , &FField::GetCastFlags >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
 	using _method_354 = das::das_call_member< bool (FField::*)(const FFieldClass *) const,&FField::IsA >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:546:14
 	makeExtern<DAS_CALL_METHOD(_method_354), SimNode_ExtFuncCall >(lib,"IsA","das_call_member< bool (FField::*)(const FFieldClass *) const , &FField::IsA >::invoke")
@@ -485,14 +495,6 @@ void Module_dasUnreal::initFunctions_6() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:460:31
 	makeExtern< void (*)(UStruct &) , _dasUnreal_virtual_139_RegisterDependencies , SimNode_ExtFuncCall >(lib,"RegisterDependencies","_dasUnreal_virtual_139_RegisterDependencies")
 		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:463:31
-	makeExtern< void (*)(UStruct &,EObjectFlags) , _dasUnreal_virtual_140_TagSubobjects , SimNode_ExtFuncCall >(lib,"TagSubobjects","_dasUnreal_virtual_140_TagSubobjects")
-		->args({"self","NewFlags"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:466:31
-	makeExtern< void (*)(UStruct &,FProperty *) , _dasUnreal_virtual_141_AddCppProperty , SimNode_ExtFuncCall >(lib,"AddCppProperty","_dasUnreal_virtual_141_AddCppProperty")
-		->args({"self","Property"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

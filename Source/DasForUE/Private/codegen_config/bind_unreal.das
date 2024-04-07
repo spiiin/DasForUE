@@ -56,6 +56,7 @@ class UnrealGen : CppGenBind
         canMoveIfCopyConstructable <- {{
             "FString";
             "FSavePackageResultStruct";
+            "FIntProperty";
         }}
 
         unrealReflectionTypes <- {{
@@ -260,13 +261,12 @@ class UnrealGen : CppGenBind
             "UPropertyWrapper::GetProperty";
 
             //UObject/Field.h
-            "FFieldVariant::FFieldVariant";
             "FField::Serialize";
             "FField::GetPathName";
             "FField::GetConvertCustomUFieldToFFieldDelegate";
             "FProperty::FProperty";
 
-            "FProperty::Construct"; //"asbstract macro" -- has no implementation, ancestor implement it
+            "FProperty::Construct"; //"abstract macro" -- has no implementation, ancestor implement it
             "FProperty::GetPropertyFlags";
         }}
 
@@ -314,6 +314,8 @@ class UnrealGen : CppGenBind
             "const WIDECHAR *";  //mostly (for UnrealString, at least), it related to overloads char/wchar/unsigned short/UTF8CHAR
             "const UCS2CHAR *";  //check what can be done with them
             "const UTF8CHAR *";  //
+            
+            "TYPE_OF_NULLPTR";  //macro for std::nullptr_t
         }]
         
         unreal_skip_struct <- {{
@@ -438,6 +440,10 @@ class UnrealGen : CppGenBind
             "FDefaultConstructedPropertyElement";
 
             //UObject/Field.h
+        }}
+
+        enums_with_flags <- {{
+            "EObjectFlags" => true;
         }}
 
     //TODO: check if this may be moved to cbind_boost
@@ -756,7 +762,8 @@ class UnrealGen : CppGenBind
         let funcNameHashWithoutResultHash = hash(functionHeaderSpellingSkipResult(c, true, false, false, das_function_name, namespace_struct_name(), true))
         let needRenameInDas = declaredFunctionsHashesWithoutResults |> key_exists(funcNameHashWithoutResultHash)
         if needRenameInDas
-            let res = string(clang_getTypeSpelling(clang_getCanonicalType(res_type)))
+            var res = string(clang_getTypeSpelling(clang_getCanonicalType(res_type)))
+            res = replace(replace(res, "*", ""), "&", "") |> strip() //hardcode, remove pointers and references from result type name
             das_function_name = "{das_function_name}_{res}"
         else
             declaredFunctionsHashesWithoutResults |> insert <| funcNameHashWithoutResultHash

@@ -6,6 +6,16 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_10() {
+	using _method_742 = das::das_call_member< void (FProperty::*)(void *,const void *) const,&FProperty::CopyCompleteValue >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:786:19
+	makeExtern<DAS_CALL_METHOD(_method_742), SimNode_ExtFuncCall >(lib,"CopyCompleteValue","das_call_member< void (FProperty::*)(void *,const void *) const , &FProperty::CopyCompleteValue >::invoke")
+		->args({"self","Dest","Src"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_743 = das::das_call_member< void (FProperty::*)(void *,const void *) const,&FProperty::CopyCompleteValue_InContainer >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:800:19
+	makeExtern<DAS_CALL_METHOD(_method_743), SimNode_ExtFuncCall >(lib,"CopyCompleteValue_InContainer","das_call_member< void (FProperty::*)(void *,const void *) const , &FProperty::CopyCompleteValue_InContainer >::invoke")
+		->args({"self","Dest","Src"})
+		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:815:31
 	makeExtern< void (*)(const FProperty &,void *,const void *) , _dasUnreal_virtual_248_CopySingleValueToScriptVM , SimNode_ExtFuncCall >(lib,"CopySingleValueToScriptVM","_dasUnreal_virtual_248_CopySingleValueToScriptVM")
 		->args({"self","Dest","Src"})
@@ -423,14 +433,6 @@ void Module_dasUnreal::initFunctions_10() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2527:15
 	makeExtern< void (*)(FObjectPropertyBase &,FReferenceCollector &) , _dasUnreal_virtual_301_AddReferencedObjects , SimNode_ExtFuncCall >(lib,"AddReferencedObjects","_dasUnreal_virtual_301_AddReferencedObjects")
 		->args({"self","Collector"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2528:15
-	makeExtern< void (*)(FObjectPropertyBase &) , _dasUnreal_virtual_302_BeginDestroy , SimNode_ExtFuncCall >(lib,"BeginDestroy","_dasUnreal_virtual_302_BeginDestroy")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2532:15
-	makeExtern< void (*)(FObjectPropertyBase &,const FField &) , _dasUnreal_virtual_303_PostDuplicate , SimNode_ExtFuncCall >(lib,"PostDuplicate","_dasUnreal_virtual_303_PostDuplicate")
-		->args({"self","InField"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

@@ -70,6 +70,10 @@ namespace das {
         addCtorAndUsing<FName>(*this, lib, "FName", "FName");
         addCtorAndUsing<FName, const char*>(*this, lib, "FName", "FName")
             ->args({ "Str" });
+
+        //FFieldVariant has only template move ctor(T&&), so it needs to be instantiated for UObject explicitly
+        addCtorAndUsing<FFieldVariant, const UObject*>(*this, lib, "FFieldVariant", "FFieldVariant")
+            ->args({ "Object" });
     }
 
 	void Module_dasUnreal::initMain () {

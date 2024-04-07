@@ -6,6 +6,14 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_11() {
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2528:15
+	makeExtern< void (*)(FObjectPropertyBase &) , _dasUnreal_virtual_302_BeginDestroy , SimNode_ExtFuncCall >(lib,"BeginDestroy","_dasUnreal_virtual_302_BeginDestroy")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2532:15
+	makeExtern< void (*)(FObjectPropertyBase &,const FField &) , _dasUnreal_virtual_303_PostDuplicate , SimNode_ExtFuncCall >(lib,"PostDuplicate","_dasUnreal_virtual_303_PostDuplicate")
+		->args({"self","InField"})
+		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2535:15
 	makeExtern< bool (*)(const FObjectPropertyBase &,const void *,const void *,unsigned int) , _dasUnreal_virtual_304_Identical , SimNode_ExtFuncCall >(lib,"Identical","_dasUnreal_virtual_304_Identical")
 		->args({"self","A","B","PortFlags"})
@@ -167,7 +175,7 @@ void Module_dasUnreal::initFunctions_11() {
 		->args({"Owner"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:6535:16
-	makeExtern< FField * (*)(const UStruct *) , GetChildFieldsFromStruct , SimNode_ExtFuncCall >(lib,"GetChildFieldsFromStruct_FField *","GetChildFieldsFromStruct")
+	makeExtern< FField * (*)(const UStruct *) , GetChildFieldsFromStruct , SimNode_ExtFuncCall >(lib,"GetChildFieldsFromStruct_FField","GetChildFieldsFromStruct")
 		->args({"Owner"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:6777:22
