@@ -164,7 +164,6 @@ struct UECodeGen_Private_FPropertyParamsBase_GeneratedAnnotation : ManagedStruct
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -178,7 +177,6 @@ struct UECodeGen_Private_FPropertyParamsBaseWithoutOffset_GeneratedAnnotation : 
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -192,7 +190,6 @@ struct UECodeGen_Private_FPropertyParamsBaseWithOffset_GeneratedAnnotation : Man
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -207,7 +204,6 @@ struct UECodeGen_Private_FGenericPropertyParams_GeneratedAnnotation : ManagedStr
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -224,7 +220,6 @@ struct UECodeGen_Private_FBytePropertyParams_GeneratedAnnotation : ManagedStruct
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -241,7 +236,6 @@ struct UECodeGen_Private_FBoolPropertyParams_GeneratedAnnotation : ManagedStruct
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -259,7 +253,6 @@ struct UECodeGen_Private_FObjectPropertyParamsWithoutClass_GeneratedAnnotation :
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -276,7 +269,6 @@ struct UECodeGen_Private_FObjectPropertyParamsWithClass_GeneratedAnnotation : Ma
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -293,7 +285,6 @@ struct UECodeGen_Private_FObjectPropertyParams_GeneratedAnnotation : ManagedStru
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -310,7 +301,6 @@ struct UECodeGen_Private_FClassPropertyParams_GeneratedAnnotation : ManagedStruc
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -327,7 +317,6 @@ struct UECodeGen_Private_FSoftClassPropertyParams_GeneratedAnnotation : ManagedS
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -344,7 +333,6 @@ struct UECodeGen_Private_FInterfacePropertyParams_GeneratedAnnotation : ManagedS
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -361,7 +349,6 @@ struct UECodeGen_Private_FStructPropertyParams_GeneratedAnnotation : ManagedStru
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -378,7 +365,6 @@ struct UECodeGen_Private_FDelegatePropertyParams_GeneratedAnnotation : ManagedSt
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -395,7 +381,6 @@ struct UECodeGen_Private_FMulticastDelegatePropertyParams_GeneratedAnnotation : 
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -412,7 +397,6 @@ struct UECodeGen_Private_FEnumPropertyParams_GeneratedAnnotation : ManagedStruct
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -429,7 +413,6 @@ struct UECodeGen_Private_FFieldPathPropertyParams_GeneratedAnnotation : ManagedS
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(NameUTF8)>("NameUTF8","NameUTF8");
 		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFuncUTF8)>("RepNotifyFuncUTF8","RepNotifyFuncUTF8");
-		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Flags)>("Flags","Flags");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
@@ -622,6 +605,10 @@ struct UStruct_GeneratedAnnotation : ManagedStructureAnnotation<UStruct, false, 
 		addField<DAS_BIND_MANAGED_FIELD(ChildProperties)>("ChildProperties","ChildProperties");
 		addField<DAS_BIND_MANAGED_FIELD(PropertiesSize)>("PropertiesSize","PropertiesSize");
 		addField<DAS_BIND_MANAGED_FIELD(MinAlignment)>("MinAlignment","MinAlignment");
+		addField<DAS_BIND_MANAGED_FIELD(PropertyLink)>("PropertyLink","PropertyLink");
+		addField<DAS_BIND_MANAGED_FIELD(RefLink)>("RefLink","RefLink");
+		addField<DAS_BIND_MANAGED_FIELD(DestructorLink)>("DestructorLink","DestructorLink");
+		addField<DAS_BIND_MANAGED_FIELD(PostConstructLink)>("PostConstructLink","PostConstructLink");
 		addField<DAS_BIND_MANAGED_FIELD(FieldPathSerialNumber)>("FieldPathSerialNumber","FieldPathSerialNumber");
 	}
 };
@@ -631,7 +618,6 @@ struct UScriptStruct_ICppStructOps_FCapabilities_GeneratedAnnotation : ManagedSt
 	UScriptStruct_ICppStructOps_FCapabilities_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FCapabilities", ml, "UScriptStruct::ICppStructOps::FCapabilities") {
 	}
 	void init () {
-		addField<DAS_BIND_MANAGED_FIELD(ComputedPropertyFlags)>("ComputedPropertyFlags","ComputedPropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(HasSerializerObjectReferences)>("HasSerializerObjectReferences","HasSerializerObjectReferences");
 	}
 };
@@ -663,6 +649,7 @@ struct UFunction_GeneratedAnnotation : ManagedStructureAnnotation<UFunction, fal
 		addField<DAS_BIND_MANAGED_FIELD(ReturnValueOffset)>("ReturnValueOffset","ReturnValueOffset");
 		addField<DAS_BIND_MANAGED_FIELD(RPCId)>("RPCId","RPCId");
 		addField<DAS_BIND_MANAGED_FIELD(RPCResponseId)>("RPCResponseId","RPCResponseId");
+		addField<DAS_BIND_MANAGED_FIELD(FirstPropertyToInit)>("FirstPropertyToInit","FirstPropertyToInit");
 		addField<DAS_BIND_MANAGED_FIELD(EventGraphFunction)>("EventGraphFunction","EventGraphFunction");
 		addField<DAS_BIND_MANAGED_FIELD(EventGraphCallOffset)>("EventGraphCallOffset","EventGraphCallOffset");
 		addField<DAS_BIND_MANAGED_FIELD(SingletonPtr)>("SingletonPtr","SingletonPtr");
@@ -793,6 +780,22 @@ struct UPackage_GeneratedAnnotation : ManagedStructureAnnotation<UPackage, false
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:153:7
+struct FProperty_GeneratedAnnotation : ManagedStructureAnnotation<FProperty> {
+	FProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FProperty", ml, "FProperty") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
+		addField<DAS_BIND_MANAGED_FIELD(ElementSize)>("ElementSize","ElementSize");
+		addField<DAS_BIND_MANAGED_FIELD(RepIndex)>("RepIndex","RepIndex");
+		addField<DAS_BIND_MANAGED_FIELD(PropertyLinkNext)>("PropertyLinkNext","PropertyLinkNext");
+		addField<DAS_BIND_MANAGED_FIELD(NextRef)>("NextRef","NextRef");
+		addField<DAS_BIND_MANAGED_FIELD(DestructorLinkNext)>("DestructorLinkNext","DestructorLinkNext");
+		addField<DAS_BIND_MANAGED_FIELD(PostConstructLinkNext)>("PostConstructLinkNext","PostConstructLinkNext");
+		addField<DAS_BIND_MANAGED_FIELD(RepNotifyFunc)>("RepNotifyFunc","RepNotifyFunc");
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1139:7
 struct FPropertyHelpers_GeneratedAnnotation : ManagedStructureAnnotation<FPropertyHelpers> {
 	FPropertyHelpers_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FPropertyHelpers", ml, "FPropertyHelpers") {
@@ -814,7 +817,40 @@ struct FDefinedProperty_GeneratedAnnotation : ManagedStructureAnnotation<FDefine
 	FDefinedProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FDefinedProperty", ml, "FDefinedProperty") {
 	}
 	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Property)>("Property","Property");
 		addField<DAS_BIND_MANAGED_FIELD(Index)>("Index","Index");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1486:23
+struct FNumericProperty_GeneratedAnnotation : ManagedStructureAnnotation<FNumericProperty> {
+	FNumericProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FNumericProperty", ml, "FNumericProperty") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2338:23
+struct FBoolProperty_GeneratedAnnotation : ManagedStructureAnnotation<FBoolProperty> {
+	FBoolProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FBoolProperty", ml, "FBoolProperty") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2491:23
+struct FObjectPropertyBase_GeneratedAnnotation : ManagedStructureAnnotation<FObjectPropertyBase> {
+	FObjectPropertyBase_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FObjectPropertyBase", ml, "FObjectPropertyBase") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:5788:23
+struct FStructProperty_GeneratedAnnotation : ManagedStructureAnnotation<FStructProperty> {
+	FStructProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FStructProperty", ml, "FStructProperty") {
+	}
+	void init () {
 	}
 };
 
@@ -823,6 +859,7 @@ struct FCustomPropertyListNode_GeneratedAnnotation : ManagedStructureAnnotation<
 	FCustomPropertyListNode_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FCustomPropertyListNode", ml, "FCustomPropertyListNode") {
 	}
 	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Property)>("Property","Property");
 		addField<DAS_BIND_MANAGED_FIELD(ArrayIndex)>("ArrayIndex","ArrayIndex");
 		addField<DAS_BIND_MANAGED_FIELD(SubPropertyList)>("SubPropertyList","SubPropertyList");
 		addField<DAS_BIND_MANAGED_FIELD(PropertyListNext)>("PropertyListNext","PropertyListNext");

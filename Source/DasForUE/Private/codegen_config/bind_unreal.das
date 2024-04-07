@@ -257,9 +257,13 @@ class UnrealGen : CppGenBind
             "FField::Serialize";
             "FField::GetPathName";
             "FField::GetConvertCustomUFieldToFFieldDelegate";
+            "FProperty::FProperty";
 
             "GetChildFieldsFromStruct"; //UField* GetChildFieldsFromStruct(const UStruct* Owner)
                                         //FField* GetChildFieldsFromStruct(const UStruct* Owner)
+
+            "FProperty::Construct"; //"asbstract macro" -- has no implementation, ancestor implement it
+            "FProperty::GetPropertyFlags";
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -300,6 +304,8 @@ class UnrealGen : CppGenBind
             "FWeakObjectPtr";
 
             //UObjectTypes
+            
+            "EPropertyFlags";
 
             "const WIDECHAR *";  //mostly (for UnrealString, at least), it related to overloads char/wchar/unsigned short/UTF8CHAR
             "const UCS2CHAR *";  //check what can be done with them
@@ -409,7 +415,6 @@ class UnrealGen : CppGenBind
             "FInterfaceProperty";
             "FByteProperty";
             "FDoubleProperty";
-            //"FObjectPropertyBase";
             "FInt8Property";
             "FNameProperty";
             "FObjectProperty";
@@ -425,12 +430,6 @@ class UnrealGen : CppGenBind
             "FInt64Property";
             "FUInt64Property";
             "FLargeWorldCoordinatesRealProperty";
-
-            "FProperty"; //FField
-            "FBoolProperty";
-            "FObjectPropertyBase";
-            "FNumericProperty";
-            "FStructProperty";
 
             "FDefaultConstructedPropertyElement";
 

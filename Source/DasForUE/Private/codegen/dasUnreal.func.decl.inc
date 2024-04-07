@@ -10,3 +10,5 @@ void initFunctions_6();
 void initFunctions_7();
 void initFunctions_8();
 void initFunctions_9();
+void initFunctions_10();
+void initFunctions_11();

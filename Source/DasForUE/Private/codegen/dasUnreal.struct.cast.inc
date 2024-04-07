@@ -397,6 +397,12 @@ template <> struct cast_arg<UPackage> {
 		return * cast<UPackage *>::to(res);
 	}
 };
+template <> struct cast_arg<FProperty> {
+	static __forceinline const FProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FProperty *>::to(res);
+	}
+};
 template <> struct cast_arg<FPropertyHelpers> {
 	static __forceinline const FPropertyHelpers & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
@@ -413,6 +419,30 @@ template <> struct cast_arg<FDefinedProperty> {
 	static __forceinline const FDefinedProperty & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<FDefinedProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FNumericProperty> {
+	static __forceinline const FNumericProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FNumericProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FBoolProperty> {
+	static __forceinline const FBoolProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FBoolProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FObjectPropertyBase> {
+	static __forceinline const FObjectPropertyBase & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FObjectPropertyBase *>::to(res);
+	}
+};
+template <> struct cast_arg<FStructProperty> {
+	static __forceinline const FStructProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FStructProperty *>::to(res);
 	}
 };
 template <> struct cast_arg<FCustomPropertyListNode> {
