@@ -82,18 +82,10 @@ class UnrealGen : CppGenBind
             "UPropertyWrapper";
         }}
 
-        dummyTemplateInstanceAnnotations <- {{
-            "TProperty_Numeric<int32>"; //TODO: support inheritance hierarchy
-            "TProperty_Numeric<float>";
-            "TProperty_Numeric<uint16>";
-            "TProperty_Numeric<int64>";
-            "TProperty_Numeric<uint64>";
-            "TProperty_Numeric<uint8>";
-            "TProperty_Numeric<double>";
-            "TProperty_Numeric<int8>";
-            "TProperty_Numeric<uint32>";
-            "TProperty_Numeric<int16>";
-        }}
+        /*dummyTemplateInstanceAnnotations <- {{
+            "TProperty_Numeric<int32>";
+            "TProperty_WithEqualityAndSerializer<int32,FNumericProperty>";
+        }}*/
 
         unreal_skip_func <- {{
             //UnrealString.h
@@ -901,10 +893,15 @@ class UnrealGen : CppGenBind
         fprint(enum_class_file, "\t\}\n\};\n\n")
         fprint(enum_add_file, "addEnumeration(make_smart<Enumeration_{dashing_name}>());\n");
 
-     //TODO: send fix to cbind_boost
+     //TODO: send fix to cbind_boost (lspClone)
     def override generateStructLsp
         var lspClone := lsp //create clone, because iterator lock table
-        for k,v in keys(lsp),values(lsp)
+        for k,v in keys(lsp), values(lsp)
+        
+            //quick check if first parent is template for skip all setParent line
+            if v |> find("<") != -1
+                continue
+            
             fprint(struct_add_file,"setParents(this,\"{k}\",  \{")
             var pp : array<string>
             pp |> push(v)
@@ -919,20 +916,22 @@ class UnrealGen : CppGenBind
                     if dummyTemplateInstanceAnnotations |> key_exists(p)
                         fprint(struct_add_file,"\"{transformTemplateName(p)}\"")
                     else
-                        to_log(LOG_ERROR, "\nTemplate it parents:{p} for type:{k}\n")
-                        fprint(struct_add_file,"\"{p}\"")
+                        to_log(LOG_WARNING, "\nTemplate in parents: {p} for type:{k}, skipped\n")
                 else
                     fprint(struct_add_file,"\"{p}\"")
             fprint(struct_add_file,"\});\n")
 
     def transformTemplateName(s: string)
-        return replace(replace(s, "<", "_"), ">", "")
+        return replace(replace(replace(s, "<", "_"), ">", ""),",","_")
 
     def generateDummpyTemplateInstaceAnnotations
-        for templName in keys(dummyTemplateInstanceAnnotations)
+        for templName, i in keys(dummyTemplateInstanceAnnotations), count()
             let templDashedName = transformTemplateName(templName)
-            fprint(struct_decl_file, "MAKE_EXTERNAL_TYPE_FACTORY({templDashedName},{templName});\n")
-            fprint(struct_impl_file, "IMPLEMENT_EXTERNAL_TYPE_FACTORY({templDashedName},{templName});\n")
+            let templateUsingAlias = "templateType{i}"
+            let using_line = "using {templateUsingAlias} = {templName};\n" //comma in template parameters can't be used in macro
+            fprint(struct_decl_file, using_line)
+            fprint(struct_decl_file, "MAKE_EXTERNAL_TYPE_FACTORY({templDashedName},{templateUsingAlias});\n")
+            fprint(struct_impl_file, "IMPLEMENT_EXTERNAL_TYPE_FACTORY({templDashedName},{templateUsingAlias});\n")
             fprint(struct_add_file,"auto ann_{templDashedName} = make_smart<{templDashedName}_GeneratedAnnotation>(lib);\n")
             fprint(struct_add_file,"addAnnotation(ann_{templDashedName});\n")
             fprint(struct_postadd_file,"initRecAnnotation(ann_{templDashedName},lib);\n")
