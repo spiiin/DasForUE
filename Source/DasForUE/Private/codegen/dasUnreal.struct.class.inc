@@ -1,6 +1,13 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+
+struct TProperty_Numeric_int32_GeneratedAnnotation final : ManagedStructureAnnotation<TProperty_Numeric<int32>> {
+	TProperty_Numeric_int32_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TProperty_Numeric_int32", ml) {
+	}
+	void init() {
+	}
+};
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:55:7
 struct FString_GeneratedAnnotation : ManagedStructureAnnotation<FString> {
 	virtual bool canCopy() const override { return std::is_copy_constructible<FString>::value; }
@@ -825,6 +832,14 @@ struct FDefinedProperty_GeneratedAnnotation : ManagedStructureAnnotation<FDefine
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1486:23
 struct FNumericProperty_GeneratedAnnotation : ManagedStructureAnnotation<FNumericProperty> {
 	FNumericProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FNumericProperty", ml, "FNumericProperty") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2053:23
+struct FIntProperty_GeneratedAnnotation : ManagedStructureAnnotation<FIntProperty> {
+	FIntProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FIntProperty", ml, "FIntProperty") {
 	}
 	void init () {
 	}

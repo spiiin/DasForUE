@@ -1,6 +1,8 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+auto ann_TProperty_Numeric_int32 = make_smart<TProperty_Numeric_int32_GeneratedAnnotation>(lib);
+addAnnotation(ann_TProperty_Numeric_int32);
 auto ann_FString = make_smart<FString_GeneratedAnnotation>(lib);
 addAnnotation(ann_FString);
 auto ann_FTextRange = make_smart<FTextRange_GeneratedAnnotation>(lib);
@@ -143,6 +145,8 @@ auto ann_FDefinedProperty = make_smart<FDefinedProperty_GeneratedAnnotation>(lib
 addAnnotation(ann_FDefinedProperty);
 auto ann_FNumericProperty = make_smart<FNumericProperty_GeneratedAnnotation>(lib);
 addAnnotation(ann_FNumericProperty);
+auto ann_FIntProperty = make_smart<FIntProperty_GeneratedAnnotation>(lib);
+addAnnotation(ann_FIntProperty);
 auto ann_FBoolProperty = make_smart<FBoolProperty_GeneratedAnnotation>(lib);
 addAnnotation(ann_FBoolProperty);
 auto ann_FObjectPropertyBase = make_smart<FObjectPropertyBase_GeneratedAnnotation>(lib);
@@ -156,6 +160,7 @@ addAnnotation(ann_UPropertyWrapper);
 setParents(this,"FObjectPropertyBase",  {"FProperty","FField"});
 setParents(this,"UObjectBaseUtility",  {"UObjectBase"});
 setParents(this,"FNumericProperty",  {"FProperty","FField"});
+setParents(this,"FIntProperty",  {"TProperty_Numeric_int32"});
 setParents(this,"UClass",  {"UStruct","UField","UObject","UObjectBaseUtility","UObjectBase"});
 setParents(this,"UObject",  {"UObjectBaseUtility","UObjectBase"});
 setParents(this,"UFunction",  {"UStruct","UField","UObject","UObjectBaseUtility","UObjectBase"});

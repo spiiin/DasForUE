@@ -427,6 +427,12 @@ template <> struct cast_arg<FNumericProperty> {
 		return * cast<FNumericProperty *>::to(res);
 	}
 };
+template <> struct cast_arg<FIntProperty> {
+	static __forceinline const FIntProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FIntProperty *>::to(res);
+	}
+};
 template <> struct cast_arg<FBoolProperty> {
 	static __forceinline const FBoolProperty & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);

@@ -17,6 +17,8 @@ class UnrealGen : CppGenBind
     canMoveIfCopyConstructable : table<string>
     unrealReflectionTypes : table<string>
 
+    dummyTemplateInstanceAnnotations: table<string>
+
     declaredFunctionsHashes : table<uint64>
     declearedEnumsHashes : table<uint64>
 
@@ -65,6 +67,10 @@ class UnrealGen : CppGenBind
             "UEnum";
             "UPackage";
             "UPropertyWrapper";
+        }}
+
+        dummyTemplateInstanceAnnotations <- {{
+            "TProperty_Numeric<int32>";
         }}
 
         unreal_skip_func <- {{
@@ -425,7 +431,7 @@ class UnrealGen : CppGenBind
             "FClassPtrProperty";
             "FUInt16Property";
             "FClassProperty";
-            "FIntProperty";
+            //"FIntProperty";
             "FFloatProperty";
             "FInt64Property";
             "FUInt64Property";
@@ -630,7 +636,7 @@ class UnrealGen : CppGenBind
         module_cpp_file |> fwrite("REGISTER_MODULE_IN_NAMESPACE(Module_{bind_module},das);\n\n")
 
     //TODO: check if really need overload, or base class expanded needed
-    def override parse_Struct ( var c : CXCursor; struct_name : string )
+    def override parse_Struct(var c :CXCursor; struct_name :string)
         return if struct_name |> starts_with <| "(" // do nothing for anonymous unions/structs
         let struct_namespace_name = namespace_name(struct_name)
         nsst2st[struct_namespace_name] = struct_name
@@ -901,8 +907,53 @@ class UnrealGen : CppGenBind
             for p,i in pp,count()
                 if i!=0
                     fprint(struct_add_file,",")
-                fprint(struct_add_file,"\"{p}\"")
+                if p |> find("<") != -1
+                    if dummyTemplateInstanceAnnotations |> key_exists(p)
+                        fprint(struct_add_file,"\"{transformTemplateName(p)}\"")
+                    else
+                        to_log(LOG_ERROR, "\nTemplate it parents:{p} for type:{k}\n")
+                        fprint(struct_add_file,"\"{p}\"")
+                else
+                    fprint(struct_add_file,"\"{p}\"")
             fprint(struct_add_file,"\});\n")
+
+    def transformTemplateName(s: string)
+        return replace(replace(s, "<", "_"), ">", "")
+
+    def generateDummpyTemplateInstaceAnnotations
+        for templName in keys(dummyTemplateInstanceAnnotations)
+            let templDashedName = transformTemplateName(templName)
+            fprint(struct_decl_file, "MAKE_EXTERNAL_TYPE_FACTORY({templDashedName},{templName});\n")
+            fprint(struct_impl_file, "IMPLEMENT_EXTERNAL_TYPE_FACTORY({templDashedName},{templName});\n")
+            fprint(struct_add_file,"auto ann_{templDashedName} = make_smart<{templDashedName}_GeneratedAnnotation>(lib);\n")
+            fprint(struct_add_file,"addAnnotation(ann_{templDashedName});\n")
+            fprint(struct_postadd_file,"initRecAnnotation(ann_{templDashedName},lib);\n")
+
+            fprint(struct_class_file, "\n")
+            fprint(struct_class_file, "struct {templDashedName}_GeneratedAnnotation final : ManagedStructureAnnotation<{templName}> \{\n")
+            fprint(struct_class_file, "\t{templDashedName}_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation(\"{templDashedName}\", ml) \{\n")
+            fprint(struct_class_file, "\t\}\n")
+            fprint(struct_class_file, "\tvoid init() \{\n")
+            fprint(struct_class_file, "\t\}\n")
+            fprint(struct_class_file, "\};\n")
+
+    def override generate
+        generateDummpyTemplateInstaceAnnotations()
+        AnyGenBind`generate(self)
+        generateEnumDecl()
+        generateDummy()
+        if generate_lsp
+            generateStructLsp()
+            generateStructInterfaces()
+        generateModuleH()
+        generateModuleNeedH()
+        generateModuleCpp()
+        if generate_constant_decl
+            if empty(CONST_FILE_NAMES)
+                generateConstants(open_file_name())
+            else
+                generateConstantsFrom(CONST_FILE_NAMES)
+        closeAllFiles()
 
 [export]
 def main

@@ -1,6 +1,7 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+initRecAnnotation(ann_TProperty_Numeric_int32,lib);
 initRecAnnotation(ann_FString,lib);
 initRecAnnotation(ann_FTextRange,lib);
 initRecAnnotation(ann_FVTableHelper,lib);
@@ -72,6 +73,7 @@ initRecAnnotation(ann_FPropertyHelpers,lib);
 initRecAnnotation(ann_FProperty_DoNotUse,lib);
 initRecAnnotation(ann_FDefinedProperty,lib);
 initRecAnnotation(ann_FNumericProperty,lib);
+initRecAnnotation(ann_FIntProperty,lib);
 initRecAnnotation(ann_FBoolProperty,lib);
 initRecAnnotation(ann_FObjectPropertyBase,lib);
 initRecAnnotation(ann_FStructProperty,lib);

@@ -1,6 +1,7 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TProperty_Numeric_int32,TProperty_Numeric<int32>);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FString,FString);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FTextRange,FTextRange);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FVTableHelper,FVTableHelper);
@@ -97,6 +98,7 @@ IMPLEMENT_EXTERNAL_TYPE_FACTORY(FPropertyHelpers,FPropertyHelpers);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FProperty_DoNotUse,UEProperty_Private::FProperty_DoNotUse);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FDefinedProperty,FDefinedProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FNumericProperty,FNumericProperty);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FIntProperty,FIntProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FBoolProperty,FBoolProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FObjectPropertyBase,FObjectPropertyBase);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FStructProperty,FStructProperty);

@@ -10,7 +10,6 @@ DAS_BASE_BIND_ENUM_GEN(ESearchCase::Type, ESearchCase_Type);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FText, FText);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FName, FName);
 
-
 namespace das {
 
     struct FTextAnnotation final : ManagedStructureAnnotation<FText> {
