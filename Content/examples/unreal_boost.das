@@ -73,8 +73,7 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
 
     //create function arguments
     var propPtr = unsafe(reinterpret<FProperty?> field) //TODO: find a way to construct field with something return FProperty?
-    var fnAsStruct = unsafe(reinterpret<UStruct?> fn) //TODO: check why safe cast<UStruct?> doesn't work. Need to cast to struct for correct overload selection
-    *fnAsStruct |> AddCppProperty(propPtr)
+    *fn |> AddCppProperty(propPtr)
     //fn.functionFlags
 
     //fill class 

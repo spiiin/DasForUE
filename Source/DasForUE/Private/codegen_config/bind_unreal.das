@@ -219,6 +219,8 @@ class UnrealGen : CppGenBind
 
             "UFunction::Link";
 
+            "UField::AddCppProperty"; //just runtime hook to fail
+
             //UObject/Package.h
             "UPackage::GetWorldTileInfo";
             "UPackage::GetLinkerPackageVersion";
