@@ -6,26 +6,6 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_10() {
-	using _method_718 = das::das_call_member< bool (UScriptStruct::ICppStructOps::*)() const,&UScriptStruct::ICppStructOps::IsAbstract >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1164:8
-	makeExtern<DAS_CALL_METHOD(_method_718), SimNode_ExtFuncCall >(lib,"IsAbstract","das_call_member< bool (UScriptStruct::ICppStructOps::*)() const , &UScriptStruct::ICppStructOps::IsAbstract >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_719 = das::das_call_member< bool (UScriptStruct::ICppStructOps::*)() const,&UScriptStruct::ICppStructOps::HasCanEditChange >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1171:8
-	makeExtern<DAS_CALL_METHOD(_method_719), SimNode_ExtFuncCall >(lib,"HasCanEditChange","das_call_member< bool (UScriptStruct::ICppStructOps::*)() const , &UScriptStruct::ICppStructOps::HasCanEditChange >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1541:2
-	makeExtern< UClass * (*)(const UScriptStruct *) , _dasUnreal_static_248_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_248_StaticClass")
-		->args({"self"})
-		->arg_type(0,makeType<TExplicit<const UScriptStruct*> >(lib))
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1541:2
-	makeExtern< const wchar_t * (*)(const UScriptStruct *) , _dasUnreal_static_249_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_249_StaticPackage")
-		->args({"self"})
-		->arg_type(0,makeType<TExplicit<const UScriptStruct*> >(lib))
-		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1541:2
 	makeExtern< void (*)(const UScriptStruct *) , _dasUnreal_static_250_StaticRegisterNativesUScriptStruct , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUScriptStruct","_dasUnreal_static_250_StaticRegisterNativesUScriptStruct")
 		->args({"self"})
@@ -491,6 +471,26 @@ void Module_dasUnreal::initFunctions_10() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2802:23
 	makeExtern<DAS_CALL_METHOD(_method_815), SimNode_ExtFuncCall >(lib,"IsAutoCollapseCategory","das_call_member< bool (UClass::*)(const wchar_t *) const , &UClass::IsAutoCollapseCategory >::invoke")
 		->args({"self","InCategory"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_816 = das::das_call_member< bool (UClass::*)(const wchar_t *) const,&UClass::IsClassGroupName >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2804:23
+	makeExtern<DAS_CALL_METHOD(_method_816), SimNode_ExtFuncCall >(lib,"IsClassGroupName","das_call_member< bool (UClass::*)(const wchar_t *) const , &UClass::IsClassGroupName >::invoke")
+		->args({"self","InGroupName"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_817 = das::das_call_member< void (UClass::*)(UObject *,FReferenceCollector &) const,&UClass::CallAddReferencedObjects >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2812:19
+	makeExtern<DAS_CALL_METHOD(_method_817), SimNode_ExtFuncCall >(lib,"CallAddReferencedObjects","das_call_member< void (UClass::*)(UObject *,FReferenceCollector &) const , &UClass::CallAddReferencedObjects >::invoke")
+		->args({"self","This","Collector"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_818 = das::das_call_member< void * (UClass::*)(),&UClass::GetOrCreateSparseClassData >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2864:8
+	makeExtern<DAS_CALL_METHOD(_method_818), SimNode_ExtFuncCall >(lib,"GetOrCreateSparseClassData","das_call_member< void * (UClass::*)() , &UClass::GetOrCreateSparseClassData >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_819 = das::das_call_member< UScriptStruct * (UClass::*)() const,&UClass::GetSparseClassDataStruct >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2869:33
+	makeExtern<DAS_CALL_METHOD(_method_819), SimNode_ExtFuncCall >(lib,"GetSparseClassDataStruct","das_call_member< UScriptStruct * (UClass::*)() const , &UClass::GetSparseClassDataStruct >::invoke")
+		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

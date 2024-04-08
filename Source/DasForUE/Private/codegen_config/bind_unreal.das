@@ -215,7 +215,6 @@ class UnrealGen : CppGenBind
             "FObjectInitializer::DoNotCreateNestedDefaultSubobject";
             "StaticDuplicateObjectEx";
             "FReferenceFinder::HandleObjectReference";
-            "UECodeGen_Private::ConstructUFunction";
             "FScopedAllowAbstractClassAllocation::IsDisallowedAbstractClass";
             "StaticAllocateObjectErrorTests";
             "FVerySlowReferenceCollectorArchiveScope::GetArchive";
@@ -224,6 +223,12 @@ class UnrealGen : CppGenBind
             "FReferenceCollector::AddStableReferenceSet";
             "FReferenceCollector::AddStableReferenceArray";
             "FReferenceCollector::AddReferencedObjects";
+
+            "UECodeGen_Private::ConstructUFunction";
+            "UECodeGen_Private::ConstructUEnum";
+            "UECodeGen_Private::ConstructUScriptStruct";
+            "UECodeGen_Private::ConstructUPackage";
+            "UECodeGen_Private::ConstructUClass";
 
             //UObject/UnrealType.h
             "FProperty::ExportCppDeclaration";
@@ -308,6 +313,7 @@ class UnrealGen : CppGenBind
             "const UTF8CHAR *";  //
             
             "TYPE_OF_NULLPTR";  //macro for std::nullptr_t
+            "UECodeGen_Private::"; //recheck, must be skipped dy skip_struct
         }]
         
         unreal_skip_struct <- {{
@@ -530,6 +536,9 @@ class UnrealGen : CppGenBind
         if name |> starts_with("FLogCategory") //DECLARE_LOG_CATEGORY_EXTERN macro
             return true
         if name |> starts_with("FStat_") //DECLARE_CYCLE_STAT_EXTERN macro
+            return true
+        let struct_namespace_name = namespace_name(name)
+        if struct_namespace_name |> starts_with("UECodeGen_Private::")
             return true
         return unreal_skip_struct |> key_exists(name)
 

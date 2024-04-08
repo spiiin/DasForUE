@@ -6,26 +6,6 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_8() {
-	using _method_525 = das::das_call_member< bool (FFieldVariant::*)() const,&FFieldVariant::IsValid >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:306:14
-	makeExtern<DAS_CALL_METHOD(_method_525), SimNode_ExtFuncCall >(lib,"IsValid","das_call_member< bool (FFieldVariant::*)() const , &FFieldVariant::IsValid >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_526 = das::das_call_member< bool (FFieldVariant::*)() const,&FFieldVariant::IsValidLowLevel >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:310:23
-	makeExtern<DAS_CALL_METHOD(_method_526), SimNode_ExtFuncCall >(lib,"IsValidLowLevel","das_call_member< bool (FFieldVariant::*)() const , &FFieldVariant::IsValidLowLevel >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_527 = das::das_call_member< bool (FFieldVariant::*)(const UClass *) const,&FFieldVariant::IsA >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:315:23
-	makeExtern<DAS_CALL_METHOD(_method_527), SimNode_ExtFuncCall >(lib,"IsA","das_call_member< bool (FFieldVariant::*)(const UClass *) const , &FFieldVariant::IsA >::invoke")
-		->args({"self","InClass"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_528 = das::das_call_member< bool (FFieldVariant::*)(const FFieldClass *) const,&FFieldVariant::IsA >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:316:23
-	makeExtern<DAS_CALL_METHOD(_method_528), SimNode_ExtFuncCall >(lib,"IsA","das_call_member< bool (FFieldVariant::*)(const FFieldClass *) const , &FFieldVariant::IsA >::invoke")
-		->args({"self","InClass"})
-		->addToModule(*this, SideEffects::worstDefault);
 	using _method_529 = das::das_call_member< UObject * (FFieldVariant::*)() const,&FFieldVariant::ToUObject >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:342:11
 	makeExtern<DAS_CALL_METHOD(_method_529), SimNode_ExtFuncCall >(lib,"ToUObject","das_call_member< UObject * (FFieldVariant::*)() const , &FFieldVariant::ToUObject >::invoke")
@@ -487,6 +467,24 @@ void Module_dasUnreal::initFunctions_8() {
 	makeExtern< UClass * (*)(const UField *) , _dasUnreal_static_216_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_216_StaticClass")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const UField*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:157:2
+	makeExtern< const wchar_t * (*)(const UField *) , _dasUnreal_static_217_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_217_StaticPackage")
+		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UField*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:157:2
+	makeExtern< void (*)(const UField *) , _dasUnreal_static_218_StaticRegisterNativesUField , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUField","_dasUnreal_static_218_StaticRegisterNativesUField")
+		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UField*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:169:31
+	makeExtern< void (*)(UField &,FArchive &) , _dasUnreal_virtual_219_Serialize , SimNode_ExtFuncCall >(lib,"Serialize","_dasUnreal_virtual_219_Serialize")
+		->args({"self","Ar"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:170:31
+	makeExtern< void (*)(UField &) , _dasUnreal_virtual_220_PostLoad , SimNode_ExtFuncCall >(lib,"PostLoad","_dasUnreal_virtual_220_PostLoad")
+		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

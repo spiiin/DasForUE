@@ -6,24 +6,6 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_9() {
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:157:2
-	makeExtern< const wchar_t * (*)(const UField *) , _dasUnreal_static_217_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_217_StaticPackage")
-		->args({"self"})
-		->arg_type(0,makeType<TExplicit<const UField*> >(lib))
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:157:2
-	makeExtern< void (*)(const UField *) , _dasUnreal_static_218_StaticRegisterNativesUField , SimNode_ExtFuncCall >(lib,"StaticRegisterNativesUField","_dasUnreal_static_218_StaticRegisterNativesUField")
-		->args({"self"})
-		->arg_type(0,makeType<TExplicit<const UField*> >(lib))
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:169:31
-	makeExtern< void (*)(UField &,FArchive &) , _dasUnreal_virtual_219_Serialize , SimNode_ExtFuncCall >(lib,"Serialize","_dasUnreal_virtual_219_Serialize")
-		->args({"self","Ar"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:170:31
-	makeExtern< void (*)(UField &) , _dasUnreal_virtual_220_PostLoad , SimNode_ExtFuncCall >(lib,"PostLoad","_dasUnreal_virtual_220_PostLoad")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:171:31
 	makeExtern< bool (*)(const UField &) , _dasUnreal_virtual_221_NeedsLoadForClient , SimNode_ExtFuncCall >(lib,"NeedsLoadForClient","_dasUnreal_virtual_221_NeedsLoadForClient")
 		->args({"self"})
@@ -487,6 +469,26 @@ void Module_dasUnreal::initFunctions_9() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1149:8
 	makeExtern<DAS_CALL_METHOD(_method_717), SimNode_ExtFuncCall >(lib,"HasGetTypeHash","das_call_member< bool (UScriptStruct::ICppStructOps::*)() const , &UScriptStruct::ICppStructOps::HasGetTypeHash >::invoke")
 		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_718 = das::das_call_member< bool (UScriptStruct::ICppStructOps::*)() const,&UScriptStruct::ICppStructOps::IsAbstract >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1164:8
+	makeExtern<DAS_CALL_METHOD(_method_718), SimNode_ExtFuncCall >(lib,"IsAbstract","das_call_member< bool (UScriptStruct::ICppStructOps::*)() const , &UScriptStruct::ICppStructOps::IsAbstract >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_719 = das::das_call_member< bool (UScriptStruct::ICppStructOps::*)() const,&UScriptStruct::ICppStructOps::HasCanEditChange >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1171:8
+	makeExtern<DAS_CALL_METHOD(_method_719), SimNode_ExtFuncCall >(lib,"HasCanEditChange","das_call_member< bool (UScriptStruct::ICppStructOps::*)() const , &UScriptStruct::ICppStructOps::HasCanEditChange >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1541:2
+	makeExtern< UClass * (*)(const UScriptStruct *) , _dasUnreal_static_248_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_248_StaticClass")
+		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UScriptStruct*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:1541:2
+	makeExtern< const wchar_t * (*)(const UScriptStruct *) , _dasUnreal_static_249_StaticPackage , SimNode_ExtFuncCall >(lib,"StaticPackage","_dasUnreal_static_249_StaticPackage")
+		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const UScriptStruct*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

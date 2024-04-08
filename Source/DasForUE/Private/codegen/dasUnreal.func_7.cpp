@@ -6,22 +6,6 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_7() {
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:513:15
-	makeExtern< void (*)(UObject &,UObject *,const FName) , _dasUnreal_virtual_152_PostRename , SimNode_ExtFuncCall >(lib,"PostRename","_dasUnreal_virtual_152_PostRename")
-		->args({"self","OldOuter","OldName"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:528:15
-	makeExtern< void (*)(UObject &,bool) , _dasUnreal_virtual_153_PostDuplicate , SimNode_ExtFuncCall >(lib,"PostDuplicate","_dasUnreal_virtual_153_PostDuplicate")
-		->args({"self","bDuplicateForPIE"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:529:15
-	makeExtern< void (*)(UObject &,EDuplicateMode::Type) , _dasUnreal_virtual_154_PostDuplicate , SimNode_ExtFuncCall >(lib,"PostDuplicate","_dasUnreal_virtual_154_PostDuplicate")
-		->args({"self","DuplicateMode"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:540:31
-	makeExtern< bool (*)(const UObject &) , _dasUnreal_virtual_155_NeedsLoadForClient , SimNode_ExtFuncCall >(lib,"NeedsLoadForClient","_dasUnreal_virtual_155_NeedsLoadForClient")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:548:31
 	makeExtern< bool (*)(const UObject &) , _dasUnreal_virtual_156_NeedsLoadForServer , SimNode_ExtFuncCall >(lib,"NeedsLoadForServer","_dasUnreal_virtual_156_NeedsLoadForServer")
 		->args({"self"})
@@ -468,6 +452,26 @@ void Module_dasUnreal::initFunctions_7() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:302:14
 	makeExtern<DAS_CALL_METHOD(_method_524), SimNode_ExtFuncCall >(lib,"IsUObject","das_call_member< bool (FFieldVariant::*)() const , &FFieldVariant::IsUObject >::invoke")
 		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_525 = das::das_call_member< bool (FFieldVariant::*)() const,&FFieldVariant::IsValid >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:306:14
+	makeExtern<DAS_CALL_METHOD(_method_525), SimNode_ExtFuncCall >(lib,"IsValid","das_call_member< bool (FFieldVariant::*)() const , &FFieldVariant::IsValid >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_526 = das::das_call_member< bool (FFieldVariant::*)() const,&FFieldVariant::IsValidLowLevel >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:310:23
+	makeExtern<DAS_CALL_METHOD(_method_526), SimNode_ExtFuncCall >(lib,"IsValidLowLevel","das_call_member< bool (FFieldVariant::*)() const , &FFieldVariant::IsValidLowLevel >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_527 = das::das_call_member< bool (FFieldVariant::*)(const UClass *) const,&FFieldVariant::IsA >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:315:23
+	makeExtern<DAS_CALL_METHOD(_method_527), SimNode_ExtFuncCall >(lib,"IsA","das_call_member< bool (FFieldVariant::*)(const UClass *) const , &FFieldVariant::IsA >::invoke")
+		->args({"self","InClass"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_528 = das::das_call_member< bool (FFieldVariant::*)(const FFieldClass *) const,&FFieldVariant::IsA >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Field.h:316:23
+	makeExtern<DAS_CALL_METHOD(_method_528), SimNode_ExtFuncCall >(lib,"IsA","das_call_member< bool (FFieldVariant::*)(const FFieldClass *) const , &FFieldVariant::IsA >::invoke")
+		->args({"self","InClass"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

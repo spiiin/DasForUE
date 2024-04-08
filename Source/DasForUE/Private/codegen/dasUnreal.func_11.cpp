@@ -6,26 +6,6 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_11() {
-	using _method_816 = das::das_call_member< bool (UClass::*)(const wchar_t *) const,&UClass::IsClassGroupName >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2804:23
-	makeExtern<DAS_CALL_METHOD(_method_816), SimNode_ExtFuncCall >(lib,"IsClassGroupName","das_call_member< bool (UClass::*)(const wchar_t *) const , &UClass::IsClassGroupName >::invoke")
-		->args({"self","InGroupName"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_817 = das::das_call_member< void (UClass::*)(UObject *,FReferenceCollector &) const,&UClass::CallAddReferencedObjects >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2812:19
-	makeExtern<DAS_CALL_METHOD(_method_817), SimNode_ExtFuncCall >(lib,"CallAddReferencedObjects","das_call_member< void (UClass::*)(UObject *,FReferenceCollector &) const , &UClass::CallAddReferencedObjects >::invoke")
-		->args({"self","This","Collector"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_818 = das::das_call_member< void * (UClass::*)(),&UClass::GetOrCreateSparseClassData >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2864:8
-	makeExtern<DAS_CALL_METHOD(_method_818), SimNode_ExtFuncCall >(lib,"GetOrCreateSparseClassData","das_call_member< void * (UClass::*)() , &UClass::GetOrCreateSparseClassData >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_819 = das::das_call_member< UScriptStruct * (UClass::*)() const,&UClass::GetSparseClassDataStruct >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2869:33
-	makeExtern<DAS_CALL_METHOD(_method_819), SimNode_ExtFuncCall >(lib,"GetSparseClassDataStruct","das_call_member< UScriptStruct * (UClass::*)() const , &UClass::GetSparseClassDataStruct >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
 	using _method_820 = das::das_call_member< void (UClass::*)(UScriptStruct *),&UClass::SetSparseClassDataStruct >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:2871:23
 	makeExtern<DAS_CALL_METHOD(_method_820), SimNode_ExtFuncCall >(lib,"SetSparseClassDataStruct","das_call_member< void (UClass::*)(UScriptStruct *) , &UClass::SetSparseClassDataStruct >::invoke")
@@ -467,6 +447,25 @@ void Module_dasUnreal::initFunctions_11() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:580:7
 	makeExtern<DAS_CALL_METHOD(_method_911), SimNode_ExtFuncCall >(lib,"SetCanBeImportedFlag","das_call_member< void (UPackage::*)(bool) , &UPackage::SetCanBeImportedFlag >::invoke")
 		->args({"self","bInCanBeImported"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_912 = das::das_call_member< bool (UPackage::*)() const,&UPackage::CanBeImported >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:590:7
+	makeExtern<DAS_CALL_METHOD(_method_912), SimNode_ExtFuncCall >(lib,"CanBeImported","das_call_member< bool (UPackage::*)() const , &UPackage::CanBeImported >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:597:15
+	makeExtern< void (*)(UPackage &,EObjectFlags) , _dasUnreal_virtual_332_TagSubobjects , SimNode_ExtFuncCall >(lib,"TagSubobjects","_dasUnreal_virtual_332_TagSubobjects")
+		->args({"self","NewFlags"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_914 = das::das_call_member< void (UPackage::*)(),&UPackage::ThisContainsMap >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:602:7
+	makeExtern<DAS_CALL_METHOD(_method_914), SimNode_ExtFuncCall >(lib,"ThisContainsMap","das_call_member< void (UPackage::*)() , &UPackage::ThisContainsMap >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_915 = das::das_call_member< bool (UPackage::*)() const,&UPackage::ContainsMap >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:612:7
+	makeExtern<DAS_CALL_METHOD(_method_915), SimNode_ExtFuncCall >(lib,"ContainsMap","das_call_member< bool (UPackage::*)() const , &UPackage::ContainsMap >::invoke")
+		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

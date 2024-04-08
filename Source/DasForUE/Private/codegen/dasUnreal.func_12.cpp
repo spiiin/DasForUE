@@ -6,25 +6,6 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_12() {
-	using _method_912 = das::das_call_member< bool (UPackage::*)() const,&UPackage::CanBeImported >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:590:7
-	makeExtern<DAS_CALL_METHOD(_method_912), SimNode_ExtFuncCall >(lib,"CanBeImported","das_call_member< bool (UPackage::*)() const , &UPackage::CanBeImported >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:597:15
-	makeExtern< void (*)(UPackage &,EObjectFlags) , _dasUnreal_virtual_332_TagSubobjects , SimNode_ExtFuncCall >(lib,"TagSubobjects","_dasUnreal_virtual_332_TagSubobjects")
-		->args({"self","NewFlags"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_914 = das::das_call_member< void (UPackage::*)(),&UPackage::ThisContainsMap >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:602:7
-	makeExtern<DAS_CALL_METHOD(_method_914), SimNode_ExtFuncCall >(lib,"ThisContainsMap","das_call_member< void (UPackage::*)() , &UPackage::ThisContainsMap >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_915 = das::das_call_member< bool (UPackage::*)() const,&UPackage::ContainsMap >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:612:7
-	makeExtern<DAS_CALL_METHOD(_method_915), SimNode_ExtFuncCall >(lib,"ContainsMap","das_call_member< bool (UPackage::*)() const , &UPackage::ContainsMap >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
 	using _method_916 = das::das_call_member< void (UPackage::*)(bool),&UPackage::ThisRequiresLocalizationGather >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Package.h:620:7
 	makeExtern<DAS_CALL_METHOD(_method_916), SimNode_ExtFuncCall >(lib,"ThisRequiresLocalizationGather","das_call_member< void (UPackage::*)(bool) , &UPackage::ThisRequiresLocalizationGather >::invoke")
@@ -494,6 +475,23 @@ void Module_dasUnreal::initFunctions_12() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1134:21
 	makeExtern<DAS_CALL_METHOD(_method_1011), SimNode_ExtFuncCall >(lib,"GetBlueprintReplicationCondition","das_call_member< ELifetimeCondition (FProperty::*)() const , &FProperty::GetBlueprintReplicationCondition >::invoke")
 		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_1012 = das::das_call_member< void (FProperty::*)(ELifetimeCondition),&FProperty::SetBlueprintReplicationCondition >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1135:7
+	makeExtern<DAS_CALL_METHOD(_method_1012), SimNode_ExtFuncCall >(lib,"SetBlueprintReplicationCondition","das_call_member< void (FProperty::*)(ELifetimeCondition) , &FProperty::SetBlueprintReplicationCondition >::invoke")
+		->args({"self","InBlueprintReplicationCondition"})
+		->addToModule(*this, SideEffects::worstDefault);
+	addCtorAndUsing<FNumericProperty,EInternal,FFieldClass *>(*this,lib,"FNumericProperty","FNumericProperty")
+		->args({"InInernal","InClass"});
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1488:2
+	makeExtern< FFieldClass * (*)(const FNumericProperty *) , _dasUnreal_static_365_StaticClass , SimNode_ExtFuncCall >(lib,"StaticClass","_dasUnreal_static_365_StaticClass")
+		->args({"self"})
+		->arg_type(0,makeType<TExplicit<const FNumericProperty*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:1488:2
+	makeExtern< FField * (*)(const FNumericProperty *,const FFieldVariant &,const FName &,EObjectFlags) , _dasUnreal_static_366_Construct , SimNode_ExtFuncCall >(lib,"Construct","_dasUnreal_static_366_Construct")
+		->args({"self","InOwner","InName","InObjectFlags"})
+		->arg_type(0,makeType<TExplicit<const FNumericProperty*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

@@ -6,18 +6,6 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_6() {
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectMarks.h:117:29
-	makeExtern< EObjectMark (*)(const UObjectBase *) , ObjectGetAllMarks , SimNode_ExtFuncCall >(lib,"ObjectGetAllMarks","ObjectGetAllMarks")
-		->args({"Object"})
-		->addToModule(*this, SideEffects::worstDefault);
-	addCtorAndUsing<UObjectBaseUtility>(*this,lib,"UObjectBaseUtility","UObjectBaseUtility");
-	addCtorAndUsing<UObjectBaseUtility,EObjectFlags>(*this,lib,"UObjectBaseUtility","UObjectBaseUtility")
-		->args({"InFlags"});
-	using _method_338 = das::das_call_member< void (UObjectBaseUtility::*)(EObjectFlags),&UObjectBaseUtility::SetFlags >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBaseUtility.h:100:19
-	makeExtern<DAS_CALL_METHOD(_method_338), SimNode_ExtFuncCall >(lib,"SetFlags","das_call_member< void (UObjectBaseUtility::*)(EObjectFlags) , &UObjectBaseUtility::SetFlags >::invoke")
-		->args({"self","NewFlags"})
-		->addToModule(*this, SideEffects::worstDefault);
 	using _method_339 = das::das_call_member< void (UObjectBaseUtility::*)(EObjectFlags),&UObjectBaseUtility::ClearFlags >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectBaseUtility.h:108:19
 	makeExtern<DAS_CALL_METHOD(_method_339), SimNode_ExtFuncCall >(lib,"ClearFlags","das_call_member< void (UObjectBaseUtility::*)(EObjectFlags) , &UObjectBaseUtility::ClearFlags >::invoke")
@@ -471,6 +459,22 @@ void Module_dasUnreal::initFunctions_6() {
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:475:31
 	makeExtern< void (*)(UObject &) , _dasUnreal_virtual_151_PreEditUndo , SimNode_ExtFuncCall >(lib,"PreEditUndo","_dasUnreal_virtual_151_PreEditUndo")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:513:15
+	makeExtern< void (*)(UObject &,UObject *,const FName) , _dasUnreal_virtual_152_PostRename , SimNode_ExtFuncCall >(lib,"PostRename","_dasUnreal_virtual_152_PostRename")
+		->args({"self","OldOuter","OldName"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:528:15
+	makeExtern< void (*)(UObject &,bool) , _dasUnreal_virtual_153_PostDuplicate , SimNode_ExtFuncCall >(lib,"PostDuplicate","_dasUnreal_virtual_153_PostDuplicate")
+		->args({"self","bDuplicateForPIE"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:529:15
+	makeExtern< void (*)(UObject &,EDuplicateMode::Type) , _dasUnreal_virtual_154_PostDuplicate , SimNode_ExtFuncCall >(lib,"PostDuplicate","_dasUnreal_virtual_154_PostDuplicate")
+		->args({"self","DuplicateMode"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Object.h:540:31
+	makeExtern< bool (*)(const UObject &) , _dasUnreal_virtual_155_NeedsLoadForClient , SimNode_ExtFuncCall >(lib,"NeedsLoadForClient","_dasUnreal_virtual_155_NeedsLoadForClient")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
