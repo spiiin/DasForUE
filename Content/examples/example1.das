@@ -72,10 +72,4 @@ def main
     let fn = cls |> test_emit_ufunction() <| FName("SaySomethingGenerated")
     print("Generated function name: {string(*fn |> GetName)}\n")
 
-    //check if generated function really has int parameter
-    let param2 = fn |> GetChildFieldsFromStruct_FField
-    print("Generated function parameter2 name: {string(*param2 |> GetName)}\n")
-    let param1 = param2.Next //stack
-    print("Generated function parameter1 name: {string(*param1 |> GetName)}\n")
-
     obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"))
