@@ -3,6 +3,8 @@
 
 auto ann_FEngineVersionBase = make_smart<FEngineVersionBase_GeneratedAnnotation>(lib);
 addAnnotation(ann_FEngineVersionBase);
+auto ann_FOutputDevice = make_smart<FOutputDevice_GeneratedAnnotation>(lib);
+addAnnotation(ann_FOutputDevice);
 auto ann_FFastPathLoadBuffer = make_smart<FArchiveState_FFastPathLoadBuffer_GeneratedAnnotation>(lib);
 addAnnotation(ann_FFastPathLoadBuffer);
 auto ann_FArchiveState = make_smart<FArchiveState_GeneratedAnnotation>(lib);
@@ -191,7 +193,10 @@ auto ann_FCustomPropertyListNode = make_smart<FCustomPropertyListNode_GeneratedA
 addAnnotation(ann_FCustomPropertyListNode);
 auto ann_UPropertyWrapper = make_smart<UPropertyWrapper_GeneratedAnnotation>(lib);
 addAnnotation(ann_UPropertyWrapper);
+auto ann_FFrame = make_smart<FFrame_GeneratedAnnotation>(lib);
+addAnnotation(ann_FFrame);
 setParents(this,"FObjectPropertyBase",  {"FProperty","FField"});
+setParents(this,"FFrame",  {"FOutputDevice"});
 setParents(this,"FArchive",  {"FArchiveState"});
 setParents(this,"UObjectBaseUtility",  {"UObjectBase"});
 setParents(this,"FNumericProperty",  {"FProperty","FField"});

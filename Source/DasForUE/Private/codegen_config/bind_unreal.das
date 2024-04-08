@@ -147,6 +147,7 @@ class UnrealGen : CppGenBind
             "UObject::UpdateSinglePropertyInConfigFile";
             "UObject::CallFunctionByNameWithArguments";
             "UObject::StaticPackage";
+            "UObject::ProcessInternal"; //linker error"
 
             //UObject/Class.h
             "FCppClassTypeInfo::FCppClassTypeInfo";
@@ -250,6 +251,14 @@ class UnrealGen : CppGenBind
             "FPrimaryAssetType::AppendString"; //TStringBuilderBase
             "FPrimaryAssetId::ExportTextItem"; //linker error
             "FPrimaryAssetType::ExportTextItem"; //linker error
+            "FPrimaryAssetType::ImportTextItem"; //linker error
+            "FPrimaryAssetId::ImportTextItem"; //linker error
+
+            //FStack.h
+            "FFrame::GetScriptCallstack"; //TStringBuilderBase
+            "FFrame::GetStackTrace"; //TStringBuilderBase
+            "FFrame::GetStackDescription"; //TStringBuilderBase
+            "FFrame::InitPrintScriptCallstack"; //linker error
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -265,7 +274,6 @@ class UnrealGen : CppGenBind
             "TObjectPtr";
             "FSchemaOwner";
             "FUnversionedStructSchema";
-            "FFrame &"; //temp
             "TUniquePtr";
             "TStringBuilderBase";
 
@@ -341,12 +349,10 @@ class UnrealGen : CppGenBind
             "FObjectInstancingGraph";
             "FTransactionObjectEvent";
             "FObjectDuplicationParameters";
-            "FOutputDevice";
             "FFeedbackContext";
             "FResourceSizeEx";
             "FCustomPropertyConditionState";
             "FFragmentRegistrationContext";
-            "FFrame";
             "FInternalUObjectBaseUtilityIsValidFlagsChecker";
             "EDataValidationResult";
             "FStructuredArchiveSlot";
@@ -415,6 +421,7 @@ class UnrealGen : CppGenBind
             "FScopeSeekTo";
             "FArchiveCookData";
             "ITargetPlatform";
+
         }}
 
         enums_with_flags <- {{
@@ -436,6 +443,7 @@ class UnrealGen : CppGenBind
         if (
             fname |> find("ProfilingDebugging/ResourceSize.h") != -1 ||
             fname |> find("Misc/EngineVersionBase.h") != -1 ||
+            fname |> find("Misc/OutputDevice.h") != -1 ||
             fname |> find("Misc/CompressionFlags.h") != -1 ||
             fname |> find("Serialization/Archive.h") != -1 ||
             fname |> find("UnrealString.h") != -1 ||
@@ -451,7 +459,8 @@ class UnrealGen : CppGenBind
             fname |> find("UObject/Package.h") != -1 ||
             fname |> find("UObject/UObjectGlobals.h") != -1 ||
             fname |> find("UObject/UnrealType.h") != -1 ||
-            fname |> find("UObject/Field.h") != -1
+            fname |> find("UObject/Field.h") != -1 ||
+            fname |> find("UObject/Stack.h") != -1
         )
             return false
         return true
@@ -500,6 +509,8 @@ class UnrealGen : CppGenBind
             return true
         let function_name = namespace_name(string(clang_getCursorSpelling(c)))
         if function_name |> find("operator") != -1 //TODO: check this
+            return true
+        if function_name |> starts_with("UObject::exec") //DECLARE_FUNCTION macro in UObject, internal function call processing
             return true
         if skip_arguments_and_result_types(c)
             return true

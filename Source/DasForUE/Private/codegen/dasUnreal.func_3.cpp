@@ -6,188 +6,310 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_3() {
-	using _method_183 = das::das_call_member< void (FString::*)(),&FString::RemoveSpacesInline >;
+	using _method_183 = das::das_call_member< void (FString::*)(int,bool),&FString::RightInline >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1035:19
+	makeExtern<DAS_CALL_METHOD(_method_183), SimNode_ExtFuncCall >(lib,"RightInline","das_call_member< void (FString::*)(int,bool) , &FString::RightInline >::invoke")
+		->args({"self","Count","bAllowShrinking"})
+		->arg_init(2,make_smart<ExprConstBool>(true))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_184 = das::das_call_member< void (FString::*)(int,bool),&FString::RightChopInline >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1051:19
+	makeExtern<DAS_CALL_METHOD(_method_184), SimNode_ExtFuncCall >(lib,"RightChopInline","das_call_member< void (FString::*)(int,bool) , &FString::RightChopInline >::invoke")
+		->args({"self","Count","bAllowShrinking"})
+		->arg_init(2,make_smart<ExprConstBool>(true))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_185 = das::das_call_member< void (FString::*)(int,int,bool),&FString::MidInline >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1065:19
+	makeExtern<DAS_CALL_METHOD(_method_185), SimNode_ExtFuncCall >(lib,"MidInline","das_call_member< void (FString::*)(int,int,bool) , &FString::MidInline >::invoke")
+		->args({"self","Start","Count","bAllowShrinking"})
+		->arg_init(2,make_smart<ExprConstInt>(2147483647))
+		->arg_init(3,make_smart<ExprConstBool>(true))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_186 = das::das_call_member< int (FString::*)(const wchar_t *,ESearchCase::Type,ESearchDir::Type,int) const,&FString::Find >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1107:21
+	makeExtern<DAS_CALL_METHOD(_method_186), SimNode_ExtFuncCall >(lib,"Find","das_call_member< int (FString::*)(const wchar_t *,ESearchCase::Type,ESearchDir::Type,int) const , &FString::Find >::invoke")
+		->args({"self","SubStr","SearchCase","SearchDir","StartPosition"})
+		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
+		->arg_init(3,make_smart<ExprConstEnumeration>(0,makeType<ESearchDir::Type>(lib)))
+		->arg_init(4,make_smart<ExprConstInt>(-1))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_187 = das::das_call_member< int (FString::*)(const FString &,ESearchCase::Type,ESearchDir::Type,int) const,&FString::Find >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1129:21
+	makeExtern<DAS_CALL_METHOD(_method_187), SimNode_ExtFuncCall >(lib,"Find","das_call_member< int (FString::*)(const FString &,ESearchCase::Type,ESearchDir::Type,int) const , &FString::Find >::invoke")
+		->args({"self","SubStr","SearchCase","SearchDir","StartPosition"})
+		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
+		->arg_init(3,make_smart<ExprConstEnumeration>(0,makeType<ESearchDir::Type>(lib)))
+		->arg_init(4,make_smart<ExprConstInt>(-1))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_188 = das::das_call_member< int (FString::*)(const wchar_t *,int,ESearchCase::Type,ESearchDir::Type,int) const,&FString::Find >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1152:30
+	makeExtern<DAS_CALL_METHOD(_method_188), SimNode_ExtFuncCall >(lib,"Find","das_call_member< int (FString::*)(const wchar_t *,int,ESearchCase::Type,ESearchDir::Type,int) const , &FString::Find >::invoke")
+		->args({"self","SubStr","InSubStrLen","SearchCase","SearchDir","StartPosition"})
+		->arg_init(3,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
+		->arg_init(4,make_smart<ExprConstEnumeration>(0,makeType<ESearchDir::Type>(lib)))
+		->arg_init(5,make_smart<ExprConstInt>(-1))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_189 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type,ESearchDir::Type) const,&FString::Contains >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1180:32
+	makeExtern<DAS_CALL_METHOD(_method_189), SimNode_ExtFuncCall >(lib,"Contains","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type,ESearchDir::Type) const , &FString::Contains >::invoke")
+		->args({"self","SubStr","SearchCase","SearchDir"})
+		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
+		->arg_init(3,make_smart<ExprConstEnumeration>(0,makeType<ESearchDir::Type>(lib)))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_190 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type,ESearchDir::Type) const,&FString::Contains >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1194:32
+	makeExtern<DAS_CALL_METHOD(_method_190), SimNode_ExtFuncCall >(lib,"Contains","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type,ESearchDir::Type) const , &FString::Contains >::invoke")
+		->args({"self","SubStr","SearchCase","SearchDir"})
+		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
+		->arg_init(3,make_smart<ExprConstEnumeration>(0,makeType<ESearchDir::Type>(lib)))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_191 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type,ESearchDir::Type) const,&FString::Contains >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1209:32
+	makeExtern<DAS_CALL_METHOD(_method_191), SimNode_ExtFuncCall >(lib,"Contains","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type,ESearchDir::Type) const , &FString::Contains >::invoke")
+		->args({"self","SubStr","SubStrLen","SearchCase","SearchDir"})
+		->arg_init(3,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
+		->arg_init(4,make_smart<ExprConstEnumeration>(0,makeType<ESearchDir::Type>(lib)))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_192 = das::das_call_member< bool (FString::*)(wchar_t,int &) const,&FString::FindChar >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1222:19
+	makeExtern<DAS_CALL_METHOD(_method_192), SimNode_ExtFuncCall >(lib,"FindChar","das_call_member< bool (FString::*)(wchar_t,int &) const , &FString::FindChar >::invoke")
+		->args({"self","InChar","Index"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_193 = das::das_call_member< bool (FString::*)(wchar_t,int &) const,&FString::FindLastChar >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1234:19
+	makeExtern<DAS_CALL_METHOD(_method_193), SimNode_ExtFuncCall >(lib,"FindLastChar","das_call_member< bool (FString::*)(wchar_t,int &) const , &FString::FindLastChar >::invoke")
+		->args({"self","InChar","Index"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_194 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const,&FString::Equals >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1275:32
+	makeExtern<DAS_CALL_METHOD(_method_194), SimNode_ExtFuncCall >(lib,"Equals","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const , &FString::Equals >::invoke")
+		->args({"self","Other","SearchCase"})
+		->arg_init(2,make_smart<ExprConstEnumeration>(0,makeType<ESearchCase::Type>(lib)))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_195 = das::das_call_member< int (FString::*)(const FString &,ESearchCase::Type) const,&FString::Compare >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1307:33
+	makeExtern<DAS_CALL_METHOD(_method_195), SimNode_ExtFuncCall >(lib,"Compare","das_call_member< int (FString::*)(const FString &,ESearchCase::Type) const , &FString::Compare >::invoke")
+		->args({"self","Other","SearchCase"})
+		->arg_init(2,make_smart<ExprConstEnumeration>(0,makeType<ESearchCase::Type>(lib)))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_196 = das::das_call_member< bool (FString::*)(const FString &,FString *,FString *,ESearchCase::Type,ESearchDir::Type) const,&FString::Split >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1329:16
+	makeExtern<DAS_CALL_METHOD(_method_196), SimNode_ExtFuncCall >(lib,"Split","das_call_member< bool (FString::*)(const FString &,FString *,FString *,ESearchCase::Type,ESearchDir::Type) const , &FString::Split >::invoke")
+		->args({"self","InS","LeftS","RightS","SearchCase","SearchDir"})
+		->arg_init(5,make_smart<ExprConstEnumeration>(0,makeType<ESearchDir::Type>(lib)))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_197 = das::das_call_member< bool (FString::*)(const FString &,FString *,FString *) const,&FString::Split >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1333:16
+	makeExtern<DAS_CALL_METHOD(_method_197), SimNode_ExtFuncCall >(lib,"Split","das_call_member< bool (FString::*)(const FString &,FString *,FString *) const , &FString::Split >::invoke")
+		->args({"self","InS","LeftS","RightS"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_198 = das::das_call_member< void (FString::*)(),&FString::ToUpperInline >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1345:16
+	makeExtern<DAS_CALL_METHOD(_method_198), SimNode_ExtFuncCall >(lib,"ToUpperInline","das_call_member< void (FString::*)() , &FString::ToUpperInline >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_199 = das::das_call_member< void (FString::*)(),&FString::ToLowerInline >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1357:16
+	makeExtern<DAS_CALL_METHOD(_method_199), SimNode_ExtFuncCall >(lib,"ToLowerInline","das_call_member< void (FString::*)() , &FString::ToLowerInline >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_200 = das::das_call_member< FString (FString::*)(int) const,&FString::LeftPad >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1360:32
+	makeExtern<DAS_CALL_METHOD(_method_200), SimNode_ExtFuncCallAndCopyOrMove >(lib,"LeftPad","das_call_member< FString (FString::*)(int) const , &FString::LeftPad >::invoke")
+		->args({"self","ChCount"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_201 = das::das_call_member< FString (FString::*)(int) const,&FString::RightPad >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1363:32
+	makeExtern<DAS_CALL_METHOD(_method_201), SimNode_ExtFuncCallAndCopyOrMove >(lib,"RightPad","das_call_member< FString (FString::*)(int) const , &FString::RightPad >::invoke")
+		->args({"self","ChCount"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_202 = das::das_call_member< bool (FString::*)() const,&FString::IsNumeric >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1366:29
+	makeExtern<DAS_CALL_METHOD(_method_202), SimNode_ExtFuncCall >(lib,"IsNumeric","das_call_member< bool (FString::*)() const , &FString::IsNumeric >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_203 = das::das_call_member< void (FString::*)(),&FString::RemoveSpacesInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1369:16
-	makeExtern<DAS_CALL_METHOD(_method_183), SimNode_ExtFuncCall >(lib,"RemoveSpacesInline","das_call_member< void (FString::*)() , &FString::RemoveSpacesInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_203), SimNode_ExtFuncCall >(lib,"RemoveSpacesInline","das_call_member< void (FString::*)() , &FString::RemoveSpacesInline >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1424:39
-	makeExtern< FString (*)(const FString *,wchar_t) , _dasUnreal_static_61_Chr , SimNode_ExtFuncCallAndCopyOrMove >(lib,"Chr","_dasUnreal_static_61_Chr")
+	makeExtern< FString (*)(const FString *,wchar_t) , _dasUnreal_static_70_Chr , SimNode_ExtFuncCallAndCopyOrMove >(lib,"Chr","_dasUnreal_static_70_Chr")
 		->args({"self","Ch"})
 		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1434:39
-	makeExtern< FString (*)(const FString *,int,wchar_t) , _dasUnreal_static_62_ChrN , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ChrN","_dasUnreal_static_62_ChrN")
+	makeExtern< FString (*)(const FString *,int,wchar_t) , _dasUnreal_static_71_ChrN , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ChrN","_dasUnreal_static_71_ChrN")
 		->args({"self","NumCharacters","Char"})
 		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_186 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const,&FString::StartsWith >;
+	using _method_206 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const,&FString::StartsWith >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1466:20
-	makeExtern<DAS_CALL_METHOD(_method_186), SimNode_ExtFuncCall >(lib,"StartsWith","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const , &FString::StartsWith >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_206), SimNode_ExtFuncCall >(lib,"StartsWith","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const , &FString::StartsWith >::invoke")
 		->args({"self","InPrefix","SearchCase"})
 		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_187 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const,&FString::StartsWith >;
+	using _method_207 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const,&FString::StartsWith >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1477:20
-	makeExtern<DAS_CALL_METHOD(_method_187), SimNode_ExtFuncCall >(lib,"StartsWith","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const , &FString::StartsWith >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_207), SimNode_ExtFuncCall >(lib,"StartsWith","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const , &FString::StartsWith >::invoke")
 		->args({"self","InPrefix","SearchCase"})
 		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_188 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const,&FString::StartsWith >;
+	using _method_208 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const,&FString::StartsWith >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1488:29
-	makeExtern<DAS_CALL_METHOD(_method_188), SimNode_ExtFuncCall >(lib,"StartsWith","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const , &FString::StartsWith >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_208), SimNode_ExtFuncCall >(lib,"StartsWith","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const , &FString::StartsWith >::invoke")
 		->args({"self","InPrefix","InPrefixLen","SearchCase"})
 		->arg_init(3,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_189 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const,&FString::EndsWith >;
+	using _method_209 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const,&FString::EndsWith >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1509:20
-	makeExtern<DAS_CALL_METHOD(_method_189), SimNode_ExtFuncCall >(lib,"EndsWith","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const , &FString::EndsWith >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_209), SimNode_ExtFuncCall >(lib,"EndsWith","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const , &FString::EndsWith >::invoke")
 		->args({"self","InSuffix","SearchCase"})
 		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_190 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const,&FString::EndsWith >;
+	using _method_210 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const,&FString::EndsWith >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1520:20
-	makeExtern<DAS_CALL_METHOD(_method_190), SimNode_ExtFuncCall >(lib,"EndsWith","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const , &FString::EndsWith >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_210), SimNode_ExtFuncCall >(lib,"EndsWith","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const , &FString::EndsWith >::invoke")
 		->args({"self","InSuffix","SearchCase"})
 		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_191 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const,&FString::EndsWith >;
+	using _method_211 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const,&FString::EndsWith >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1531:29
-	makeExtern<DAS_CALL_METHOD(_method_191), SimNode_ExtFuncCall >(lib,"EndsWith","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const , &FString::EndsWith >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_211), SimNode_ExtFuncCall >(lib,"EndsWith","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const , &FString::EndsWith >::invoke")
 		->args({"self","InSuffix","InSuffixLen","SearchCase"})
 		->arg_init(3,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_192 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const,&FString::MatchesWildcard >;
+	using _method_212 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const,&FString::MatchesWildcard >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1556:20
-	makeExtern<DAS_CALL_METHOD(_method_192), SimNode_ExtFuncCall >(lib,"MatchesWildcard","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const , &FString::MatchesWildcard >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_212), SimNode_ExtFuncCall >(lib,"MatchesWildcard","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) const , &FString::MatchesWildcard >::invoke")
 		->args({"self","Wildcard","SearchCase"})
 		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_193 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const,&FString::MatchesWildcard >;
+	using _method_213 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const,&FString::MatchesWildcard >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1569:20
-	makeExtern<DAS_CALL_METHOD(_method_193), SimNode_ExtFuncCall >(lib,"MatchesWildcard","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const , &FString::MatchesWildcard >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_213), SimNode_ExtFuncCall >(lib,"MatchesWildcard","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) const , &FString::MatchesWildcard >::invoke")
 		->args({"self","Wildcard","SearchCase"})
 		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_194 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const,&FString::MatchesWildcard >;
+	using _method_214 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const,&FString::MatchesWildcard >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1582:29
-	makeExtern<DAS_CALL_METHOD(_method_194), SimNode_ExtFuncCall >(lib,"MatchesWildcard","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const , &FString::MatchesWildcard >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_214), SimNode_ExtFuncCall >(lib,"MatchesWildcard","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) const , &FString::MatchesWildcard >::invoke")
 		->args({"self","Wildcard","WildcardLen","SearchCase"})
 		->arg_init(3,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_195 = das::das_call_member< void (FString::*)(),&FString::TrimStartAndEndInline >;
+	using _method_215 = das::das_call_member< void (FString::*)(),&FString::TrimStartAndEndInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1587:16
-	makeExtern<DAS_CALL_METHOD(_method_195), SimNode_ExtFuncCall >(lib,"TrimStartAndEndInline","das_call_member< void (FString::*)() , &FString::TrimStartAndEndInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_215), SimNode_ExtFuncCall >(lib,"TrimStartAndEndInline","das_call_member< void (FString::*)() , &FString::TrimStartAndEndInline >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_196 = das::das_call_member< void (FString::*)(),&FString::TrimStartInline >;
+	using _method_216 = das::das_call_member< void (FString::*)(),&FString::TrimStartInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1604:16
-	makeExtern<DAS_CALL_METHOD(_method_196), SimNode_ExtFuncCall >(lib,"TrimStartInline","das_call_member< void (FString::*)() , &FString::TrimStartInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_216), SimNode_ExtFuncCall >(lib,"TrimStartInline","das_call_member< void (FString::*)() , &FString::TrimStartInline >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_197 = das::das_call_member< void (FString::*)(),&FString::TrimEndInline >;
+	using _method_217 = das::das_call_member< void (FString::*)(),&FString::TrimEndInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1621:16
-	makeExtern<DAS_CALL_METHOD(_method_197), SimNode_ExtFuncCall >(lib,"TrimEndInline","das_call_member< void (FString::*)() , &FString::TrimEndInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_217), SimNode_ExtFuncCall >(lib,"TrimEndInline","das_call_member< void (FString::*)() , &FString::TrimEndInline >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_198 = das::das_call_member< void (FString::*)(),&FString::TrimToNullTerminator >;
+	using _method_218 = das::das_call_member< void (FString::*)(),&FString::TrimToNullTerminator >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1638:16
-	makeExtern<DAS_CALL_METHOD(_method_198), SimNode_ExtFuncCall >(lib,"TrimToNullTerminator","das_call_member< void (FString::*)() , &FString::TrimToNullTerminator >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_218), SimNode_ExtFuncCall >(lib,"TrimToNullTerminator","das_call_member< void (FString::*)() , &FString::TrimToNullTerminator >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_199 = das::das_call_member< void (FString::*)(bool *),&FString::TrimQuotesInline >;
+	using _method_219 = das::das_call_member< void (FString::*)(bool *),&FString::TrimQuotesInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1644:16
-	makeExtern<DAS_CALL_METHOD(_method_199), SimNode_ExtFuncCall >(lib,"TrimQuotesInline","das_call_member< void (FString::*)(bool *) , &FString::TrimQuotesInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_219), SimNode_ExtFuncCall >(lib,"TrimQuotesInline","das_call_member< void (FString::*)(bool *) , &FString::TrimQuotesInline >::invoke")
 		->args({"self","bQuotesRemoved"})
 		->arg_init(1,make_smart<ExprConstPtr>())
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_200 = das::das_call_member< void (FString::*)(const wchar_t,bool *),&FString::TrimCharInline >;
+	using _method_220 = das::das_call_member< void (FString::*)(const wchar_t,bool *),&FString::TrimCharInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1650:16
-	makeExtern<DAS_CALL_METHOD(_method_200), SimNode_ExtFuncCall >(lib,"TrimCharInline","das_call_member< void (FString::*)(const wchar_t,bool *) , &FString::TrimCharInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_220), SimNode_ExtFuncCall >(lib,"TrimCharInline","das_call_member< void (FString::*)(const wchar_t,bool *) , &FString::TrimCharInline >::invoke")
 		->args({"self","CharacterToTrim","bCharRemoved"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_201 = das::das_call_member< void (FString::*)(),&FString::ReverseString >;
+	using _method_221 = das::das_call_member< void (FString::*)(),&FString::ReverseString >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1740:16
-	makeExtern<DAS_CALL_METHOD(_method_201), SimNode_ExtFuncCall >(lib,"ReverseString","das_call_member< void (FString::*)() , &FString::ReverseString >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_221), SimNode_ExtFuncCall >(lib,"ReverseString","das_call_member< void (FString::*)() , &FString::ReverseString >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_202 = das::das_call_member< int (FString::*)(const wchar_t *,const wchar_t *,ESearchCase::Type),&FString::ReplaceInline >;
+	using _method_222 = das::das_call_member< int (FString::*)(const wchar_t *,const wchar_t *,ESearchCase::Type),&FString::ReplaceInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1771:17
-	makeExtern<DAS_CALL_METHOD(_method_202), SimNode_ExtFuncCall >(lib,"ReplaceInline","das_call_member< int (FString::*)(const wchar_t *,const wchar_t *,ESearchCase::Type) , &FString::ReplaceInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_222), SimNode_ExtFuncCall >(lib,"ReplaceInline","das_call_member< int (FString::*)(const wchar_t *,const wchar_t *,ESearchCase::Type) , &FString::ReplaceInline >::invoke")
 		->args({"self","SearchText","ReplacementText","SearchCase"})
 		->arg_init(3,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_203 = das::das_call_member< void (FString::*)(const wchar_t,const wchar_t,ESearchCase::Type),&FString::ReplaceCharInline >;
+	using _method_223 = das::das_call_member< void (FString::*)(const wchar_t,const wchar_t,ESearchCase::Type),&FString::ReplaceCharInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1781:7
-	makeExtern<DAS_CALL_METHOD(_method_203), SimNode_ExtFuncCall >(lib,"ReplaceCharInline","das_call_member< void (FString::*)(const wchar_t,const wchar_t,ESearchCase::Type) , &FString::ReplaceCharInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_223), SimNode_ExtFuncCall >(lib,"ReplaceCharInline","das_call_member< void (FString::*)(const wchar_t,const wchar_t,ESearchCase::Type) , &FString::ReplaceCharInline >::invoke")
 		->args({"self","SearchChar","ReplacementChar","SearchCase"})
 		->arg_init(3,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_204 = das::das_call_member< void (FString::*)(const int),&FString::ConvertTabsToSpacesInline >;
+	using _method_224 = das::das_call_member< void (FString::*)(const int),&FString::ConvertTabsToSpacesInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1884:16
-	makeExtern<DAS_CALL_METHOD(_method_204), SimNode_ExtFuncCall >(lib,"ConvertTabsToSpacesInline","das_call_member< void (FString::*)(const int) , &FString::ConvertTabsToSpacesInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_224), SimNode_ExtFuncCall >(lib,"ConvertTabsToSpacesInline","das_call_member< void (FString::*)(const int) , &FString::ConvertTabsToSpacesInline >::invoke")
 		->args({"self","InSpacesPerTab"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1910:39
-	makeExtern< FString (*)(const FString *,int) , _dasUnreal_static_63_FormatAsNumber , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FormatAsNumber","_dasUnreal_static_63_FormatAsNumber")
+	makeExtern< FString (*)(const FString *,int) , _dasUnreal_static_72_FormatAsNumber , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FormatAsNumber","_dasUnreal_static_72_FormatAsNumber")
 		->args({"self","InNumber"})
 		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_206 = das::das_call_member< void (FString::*)(int),&FString::Reserve >;
+	using _method_226 = das::das_call_member< void (FString::*)(int),&FString::Reserve >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1913:16
-	makeExtern<DAS_CALL_METHOD(_method_206), SimNode_ExtFuncCall >(lib,"Reserve","das_call_member< void (FString::*)(int) , &FString::Reserve >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_226), SimNode_ExtFuncCall >(lib,"Reserve","das_call_member< void (FString::*)(int) , &FString::Reserve >::invoke")
 		->args({"self","CharacterCount"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_207 = das::das_call_member< void (FString::*)(FArchive &,int) const,&FString::SerializeAsANSICharArray >;
+	using _method_227 = das::das_call_member< void (FString::*)(FArchive &,int) const,&FString::SerializeAsANSICharArray >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1922:16
-	makeExtern<DAS_CALL_METHOD(_method_207), SimNode_ExtFuncCall >(lib,"SerializeAsANSICharArray","das_call_member< void (FString::*)(FArchive &,int) const , &FString::SerializeAsANSICharArray >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_227), SimNode_ExtFuncCall >(lib,"SerializeAsANSICharArray","das_call_member< void (FString::*)(FArchive &,int) const , &FString::SerializeAsANSICharArray >::invoke")
 		->args({"self","Ar","MinCharacters"})
 		->arg_init(2,make_smart<ExprConstInt>(0))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1926:42
-	makeExtern< FString (*)(const FString *,int) , _dasUnreal_static_64_FromInt , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromInt","_dasUnreal_static_64_FromInt")
+	makeExtern< FString (*)(const FString *,int) , _dasUnreal_static_73_FromInt , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromInt","_dasUnreal_static_73_FromInt")
 		->args({"self","Num"})
 		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_209 = das::das_call_member< void (FString::*)(int),&FString::AppendInt >;
+	using _method_229 = das::das_call_member< void (FString::*)(int),&FString::AppendInt >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1934:16
-	makeExtern<DAS_CALL_METHOD(_method_209), SimNode_ExtFuncCall >(lib,"AppendInt","das_call_member< void (FString::*)(int) , &FString::AppendInt >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_229), SimNode_ExtFuncCall >(lib,"AppendInt","das_call_member< void (FString::*)(int) , &FString::AppendInt >::invoke")
 		->args({"self","InNum"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_210 = das::das_call_member< bool (FString::*)() const,&FString::ToBool >;
+	using _method_230 = das::das_call_member< bool (FString::*)() const,&FString::ToBool >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1943:29
-	makeExtern<DAS_CALL_METHOD(_method_210), SimNode_ExtFuncCall >(lib,"ToBool","das_call_member< bool (FString::*)() const , &FString::ToBool >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_230), SimNode_ExtFuncCall >(lib,"ToBool","das_call_member< bool (FString::*)() const , &FString::ToBool >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1953:39
-	makeExtern< FString (*)(const FString *,const unsigned char *,const unsigned int) , _dasUnreal_static_65_FromBlob , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromBlob","_dasUnreal_static_65_FromBlob")
+	makeExtern< FString (*)(const FString *,const unsigned char *,const unsigned int) , _dasUnreal_static_74_FromBlob , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromBlob","_dasUnreal_static_74_FromBlob")
 		->args({"self","SrcBuffer","SrcSize"})
 		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1963:23
-	makeExtern< bool (*)(const FString *,const FString &,unsigned char *,const unsigned int) , _dasUnreal_static_66_ToBlob , SimNode_ExtFuncCall >(lib,"ToBlob","_dasUnreal_static_66_ToBlob")
+	makeExtern< bool (*)(const FString *,const FString &,unsigned char *,const unsigned int) , _dasUnreal_static_75_ToBlob , SimNode_ExtFuncCall >(lib,"ToBlob","_dasUnreal_static_75_ToBlob")
 		->args({"self","Source","DestBuffer","DestSize"})
 		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1973:39
-	makeExtern< FString (*)(const FString *,const unsigned char *,const unsigned int) , _dasUnreal_static_67_FromHexBlob , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromHexBlob","_dasUnreal_static_67_FromHexBlob")
+	makeExtern< FString (*)(const FString *,const unsigned char *,const unsigned int) , _dasUnreal_static_76_FromHexBlob , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromHexBlob","_dasUnreal_static_76_FromHexBlob")
 		->args({"self","SrcBuffer","SrcSize"})
 		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1983:23
-	makeExtern< bool (*)(const FString *,const FString &,unsigned char *,const unsigned int) , _dasUnreal_static_68_ToHexBlob , SimNode_ExtFuncCall >(lib,"ToHexBlob","_dasUnreal_static_68_ToHexBlob")
+	makeExtern< bool (*)(const FString *,const FString &,unsigned char *,const unsigned int) , _dasUnreal_static_77_ToHexBlob , SimNode_ExtFuncCall >(lib,"ToHexBlob","_dasUnreal_static_77_ToHexBlob")
 		->args({"self","Source","DestBuffer","DestSize"})
 		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1994:39
-	makeExtern< FString (*)(const FString *,double,const int) , _dasUnreal_static_69_SanitizeFloat , SimNode_ExtFuncCallAndCopyOrMove >(lib,"SanitizeFloat","_dasUnreal_static_69_SanitizeFloat")
+	makeExtern< FString (*)(const FString *,double,const int) , _dasUnreal_static_78_SanitizeFloat , SimNode_ExtFuncCallAndCopyOrMove >(lib,"SanitizeFloat","_dasUnreal_static_78_SanitizeFloat")
 		->args({"self","InFloat","InMinFractionalDigits"})
 		->arg_type(0,makeType<TExplicit<const FString*> >(lib))
 		->arg_init(2,make_smart<ExprConstInt>(1))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_216 = das::das_call_member< void (FString::*)(FArchive &) const,&FString::CountBytes >;
+	using _method_236 = das::das_call_member< void (FString::*)(FArchive &) const,&FString::CountBytes >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2057:19
-	makeExtern<DAS_CALL_METHOD(_method_216), SimNode_ExtFuncCall >(lib,"CountBytes","das_call_member< void (FString::*)(FArchive &) const , &FString::CountBytes >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_236), SimNode_ExtFuncCall >(lib,"CountBytes","das_call_member< void (FString::*)(FArchive &) const , &FString::CountBytes >::invoke")
 		->args({"self","Ar"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2094:29
@@ -322,34 +444,34 @@ void Module_dasUnreal::initFunctions_3() {
 	addCtorAndUsing<FTextRange>(*this,lib,"FTextRange","FTextRange");
 	addCtorAndUsing<FTextRange,int,int>(*this,lib,"FTextRange","FTextRange")
 		->args({"InBeginIndex","InEndIndex"});
-	using _method_217 = das::das_call_member< int (FTextRange::*)() const,&FTextRange::Len >;
+	using _method_237 = das::das_call_member< int (FTextRange::*)() const,&FTextRange::Len >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2569:8
-	makeExtern<DAS_CALL_METHOD(_method_217), SimNode_ExtFuncCall >(lib,"Len","das_call_member< int (FTextRange::*)() const , &FTextRange::Len >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_237), SimNode_ExtFuncCall >(lib,"Len","das_call_member< int (FTextRange::*)() const , &FTextRange::Len >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_218 = das::das_call_member< bool (FTextRange::*)() const,&FTextRange::IsEmpty >;
+	using _method_238 = das::das_call_member< bool (FTextRange::*)() const,&FTextRange::IsEmpty >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2570:7
-	makeExtern<DAS_CALL_METHOD(_method_218), SimNode_ExtFuncCall >(lib,"IsEmpty","das_call_member< bool (FTextRange::*)() const , &FTextRange::IsEmpty >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_238), SimNode_ExtFuncCall >(lib,"IsEmpty","das_call_member< bool (FTextRange::*)() const , &FTextRange::IsEmpty >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_219 = das::das_call_member< void (FTextRange::*)(int),&FTextRange::Offset >;
+	using _method_239 = das::das_call_member< void (FTextRange::*)(int),&FTextRange::Offset >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2571:7
-	makeExtern<DAS_CALL_METHOD(_method_219), SimNode_ExtFuncCall >(lib,"Offset","das_call_member< void (FTextRange::*)(int) , &FTextRange::Offset >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_239), SimNode_ExtFuncCall >(lib,"Offset","das_call_member< void (FTextRange::*)(int) , &FTextRange::Offset >::invoke")
 		->args({"self","Amount"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_220 = das::das_call_member< bool (FTextRange::*)(int) const,&FTextRange::Contains >;
+	using _method_240 = das::das_call_member< bool (FTextRange::*)(int) const,&FTextRange::Contains >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2572:7
-	makeExtern<DAS_CALL_METHOD(_method_220), SimNode_ExtFuncCall >(lib,"Contains","das_call_member< bool (FTextRange::*)(int) const , &FTextRange::Contains >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_240), SimNode_ExtFuncCall >(lib,"Contains","das_call_member< bool (FTextRange::*)(int) const , &FTextRange::Contains >::invoke")
 		->args({"self","Index"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_221 = das::das_call_member< bool (FTextRange::*)(int) const,&FTextRange::InclusiveContains >;
+	using _method_241 = das::das_call_member< bool (FTextRange::*)(int) const,&FTextRange::InclusiveContains >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2573:7
-	makeExtern<DAS_CALL_METHOD(_method_221), SimNode_ExtFuncCall >(lib,"InclusiveContains","das_call_member< bool (FTextRange::*)(int) const , &FTextRange::InclusiveContains >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_241), SimNode_ExtFuncCall >(lib,"InclusiveContains","das_call_member< bool (FTextRange::*)(int) const , &FTextRange::InclusiveContains >::invoke")
 		->args({"self","Index"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_222 = das::das_call_member< FTextRange (FTextRange::*)(const FTextRange &) const,&FTextRange::Intersect >;
+	using _method_242 = das::das_call_member< FTextRange (FTextRange::*)(const FTextRange &) const,&FTextRange::Intersect >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:2575:13
-	makeExtern<DAS_CALL_METHOD(_method_222), SimNode_ExtFuncCallAndCopyOrMove >(lib,"Intersect","das_call_member< FTextRange (FTextRange::*)(const FTextRange &) const , &FTextRange::Intersect >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_242), SimNode_ExtFuncCallAndCopyOrMove >(lib,"Intersect","das_call_member< FTextRange (FTextRange::*)(const FTextRange &) const , &FTextRange::Intersect >::invoke")
 		->args({"self","Other"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/UObject/UnrealNames.h:28:23
@@ -363,77 +485,6 @@ void Module_dasUnreal::initFunctions_3() {
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/UObject/UnrealNames.h:46:15
 	makeExtern< bool (*)(EName,const FName &) , ShouldReplicateAsInteger , SimNode_ExtFuncCall >(lib,"ShouldReplicateAsInteger","ShouldReplicateAsInteger")
 		->args({"Ename","Name"})
-		->addToModule(*this, SideEffects::worstDefault);
-	addCtorAndUsing<FPrimaryAssetType>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType");
-	addCtorAndUsing<FPrimaryAssetType,FName>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
-		->args({"InName"});
-	addCtorAndUsing<FPrimaryAssetType,EName>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
-		->args({"InName"});
-	addCtorAndUsing<FPrimaryAssetType,const char *>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
-		->args({"InName"});
-	addCtorAndUsing<FPrimaryAssetType,const FPrimaryAssetType &>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
-		->args({""});
-	using _method_223 = das::das_call_member< FName (FPrimaryAssetType::*)() const,&FPrimaryAssetType::GetName >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:41:8
-	makeExtern<DAS_CALL_METHOD(_method_223), SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetName","das_call_member< FName (FPrimaryAssetType::*)() const , &FPrimaryAssetType::GetName >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_224 = das::das_call_member< bool (FPrimaryAssetType::*)() const,&FPrimaryAssetType::IsValid >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:57:7
-	makeExtern<DAS_CALL_METHOD(_method_224), SimNode_ExtFuncCall >(lib,"IsValid","das_call_member< bool (FPrimaryAssetType::*)() const , &FPrimaryAssetType::IsValid >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_225 = das::das_call_member< FString (FPrimaryAssetType::*)() const,&FPrimaryAssetType::ToString >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:63:10
-	makeExtern<DAS_CALL_METHOD(_method_225), SimNode_ExtFuncCallAndCopyOrMove >(lib,"ToString","das_call_member< FString (FPrimaryAssetType::*)() const , &FPrimaryAssetType::ToString >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_226 = das::das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const,&FPrimaryAssetType::LexicalLess >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:84:7
-	makeExtern<DAS_CALL_METHOD(_method_226), SimNode_ExtFuncCall >(lib,"LexicalLess","das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const , &FPrimaryAssetType::LexicalLess >::invoke")
-		->args({"self","Other"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_227 = das::das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const,&FPrimaryAssetType::FastLess >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:89:7
-	makeExtern<DAS_CALL_METHOD(_method_227), SimNode_ExtFuncCall >(lib,"FastLess","das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const , &FPrimaryAssetType::FastLess >::invoke")
-		->args({"self","Other"})
-		->addToModule(*this, SideEffects::worstDefault);
-	addCtorAndUsing<FPrimaryAssetId>(*this,lib,"FPrimaryAssetId","FPrimaryAssetId");
-	addCtorAndUsing<FPrimaryAssetId,FPrimaryAssetType,FName>(*this,lib,"FPrimaryAssetId","FPrimaryAssetId")
-		->args({"InAssetType","InAssetName"});
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:122:41
-	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,const wchar_t *,unsigned int) , _dasUnreal_static_70_ParseTypeAndName , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ParseTypeAndName","_dasUnreal_static_70_ParseTypeAndName")
-		->args({"self","TypeAndName","Len"})
-		->arg_type(0,makeType<TExplicit<const FPrimaryAssetId*> >(lib))
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:123:41
-	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,FName) , _dasUnreal_static_71_ParseTypeAndName , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ParseTypeAndName","_dasUnreal_static_71_ParseTypeAndName")
-		->args({"self","TypeAndName"})
-		->arg_type(0,makeType<TExplicit<const FPrimaryAssetId*> >(lib))
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:124:25
-	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,const FString &) , _dasUnreal_static_72_ParseTypeAndName , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ParseTypeAndName","_dasUnreal_static_72_ParseTypeAndName")
-		->args({"self","TypeAndName"})
-		->arg_type(0,makeType<TExplicit<const FPrimaryAssetId*> >(lib))
-		->addToModule(*this, SideEffects::worstDefault);
-	addCtorAndUsing<FPrimaryAssetId,const FString &>(*this,lib,"FPrimaryAssetId","FPrimaryAssetId")
-		->args({"TypeAndName"});
-	addCtorAndUsing<FPrimaryAssetId,const FPrimaryAssetId &>(*this,lib,"FPrimaryAssetId","FPrimaryAssetId")
-		->args({""});
-	using _method_231 = das::das_call_member< bool (FPrimaryAssetId::*)() const,&FPrimaryAssetId::IsValid >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:139:7
-	makeExtern<DAS_CALL_METHOD(_method_231), SimNode_ExtFuncCall >(lib,"IsValid","das_call_member< bool (FPrimaryAssetId::*)() const , &FPrimaryAssetId::IsValid >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_232 = das::das_call_member< FString (FPrimaryAssetId::*)() const,&FPrimaryAssetId::ToString >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:145:10
-	makeExtern<DAS_CALL_METHOD(_method_232), SimNode_ExtFuncCallAndCopyOrMove >(lib,"ToString","das_call_member< FString (FPrimaryAssetId::*)() const , &FPrimaryAssetId::ToString >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:164:25
-	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,const FString &) , _dasUnreal_static_73_FromString , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromString","_dasUnreal_static_73_FromString")
-		->args({"self","String"})
-		->arg_type(0,makeType<TExplicit<const FPrimaryAssetId*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

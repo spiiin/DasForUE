@@ -2,6 +2,7 @@
 // all user modifications will be lost after this file is re-generated
 
 initRecAnnotation(ann_FEngineVersionBase,lib);
+initRecAnnotation(ann_FOutputDevice,lib);
 initRecAnnotation(ann_FFastPathLoadBuffer,lib);
 initRecAnnotation(ann_FArchiveState,lib);
 initRecAnnotation(ann_FScopeSetDebugSerializationFlags,lib);
@@ -96,3 +97,4 @@ initRecAnnotation(ann_FStrProperty,lib);
 initRecAnnotation(ann_FStructProperty,lib);
 initRecAnnotation(ann_FCustomPropertyListNode,lib);
 initRecAnnotation(ann_UPropertyWrapper,lib);
+initRecAnnotation(ann_FFrame,lib);

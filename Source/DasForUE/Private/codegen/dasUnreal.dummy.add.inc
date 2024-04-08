@@ -2,6 +2,7 @@
 // all user modifications will be lost after this file is re-generated
 
 addAnnotation(make_smart<DummyTypeAnnotation>("FNetHandleLegacyPushModelHelper", "UE::Net::Private::FNetHandleLegacyPushModelHelper", 1, 1));
+addAnnotation(make_smart<DummyTypeAnnotation>("FLogRecord", "UE::FLogRecord", 1, 1));
 addAnnotation(make_smart<DummyTypeAnnotation>("FArchiveSerializedPropertyChain", "FArchiveSerializedPropertyChain", 1, 1));
 addAnnotation(make_smart<DummyTypeAnnotation>("FPolyglotTextData", "FPolyglotTextData", 1, 1));
 addAnnotation(make_smart<DummyTypeAnnotation>("FCbWriter", "FCbWriter", 1, 1));

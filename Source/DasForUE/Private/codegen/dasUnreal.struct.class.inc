@@ -9,6 +9,14 @@ struct FEngineVersionBase_GeneratedAnnotation : ManagedStructureAnnotation<FEngi
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Misc/OutputDevice.h:129:7
+struct FOutputDevice_GeneratedAnnotation : ManagedStructureAnnotation<FOutputDevice> {
+	FOutputDevice_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FOutputDevice", ml, "FOutputDevice") {
+	}
+	void init () {
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:737:9
 struct FArchiveState_FFastPathLoadBuffer_GeneratedAnnotation : ManagedStructureAnnotation<FArchiveState::FFastPathLoadBuffer> {
 	FArchiveState_FFastPathLoadBuffer_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FFastPathLoadBuffer", ml, "FArchiveState::FFastPathLoadBuffer") {
@@ -1063,6 +1071,28 @@ struct UPropertyWrapper_GeneratedAnnotation : ManagedStructureAnnotation<UProper
 	UPropertyWrapper_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UPropertyWrapper", ml, "UPropertyWrapper") {
 	}
 	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Stack.h:136:8
+struct FFrame_GeneratedAnnotation : ManagedStructureAnnotation<FFrame> {
+	FFrame_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FFrame", ml, "FFrame") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Node)>("Node","Node");
+		addField<DAS_BIND_MANAGED_FIELD(Object)>("Object","Object");
+		addField<DAS_BIND_MANAGED_FIELD(Code)>("Code","Code");
+		addField<DAS_BIND_MANAGED_FIELD(Locals)>("Locals","Locals");
+		addField<DAS_BIND_MANAGED_FIELD(MostRecentProperty)>("MostRecentProperty","MostRecentProperty");
+		addField<DAS_BIND_MANAGED_FIELD(MostRecentPropertyAddress)>("MostRecentPropertyAddress","MostRecentPropertyAddress");
+		addField<DAS_BIND_MANAGED_FIELD(MostRecentPropertyContainer)>("MostRecentPropertyContainer","MostRecentPropertyContainer");
+		addField<DAS_BIND_MANAGED_FIELD(PreviousFrame)>("PreviousFrame","PreviousFrame");
+		addField<DAS_BIND_MANAGED_FIELD(PropertyChainForCompiledIn)>("PropertyChainForCompiledIn","PropertyChainForCompiledIn");
+		addField<DAS_BIND_MANAGED_FIELD(CurrentNativeFunction)>("CurrentNativeFunction","CurrentNativeFunction");
+		addField<DAS_BIND_MANAGED_FIELD(PreviousTrackingFrame)>("PreviousTrackingFrame","PreviousTrackingFrame");
+		addField<DAS_BIND_MANAGED_FIELD(bArrayContextFailed)>("bArrayContextFailed","bArrayContextFailed");
+		addField<DAS_BIND_MANAGED_FIELD(bAbortingExecution)>("bAbortingExecution","bAbortingExecution");
+		addField<DAS_BIND_MANAGED_FIELD(DepthCounter)>("DepthCounter","DepthCounter");
 	}
 };
 

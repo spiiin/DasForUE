@@ -75,6 +75,21 @@ public:
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Misc/OutputDevice.h:107:7
+class Enumeration_ELogTimes_Type : public das::Enumeration {
+public:
+	Enumeration_ELogTimes_Type() : das::Enumeration("ELogTimes_Type") {
+		external = true;
+		cppName = "ELogTimes::Type";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("None", "None", int64_t(ELogTimes::Type::None), das::LineInfo());
+		addIEx("UTC", "UTC", int64_t(ELogTimes::Type::UTC), das::LineInfo());
+		addIEx("SinceGStartTime", "SinceGStartTime", int64_t(ELogTimes::Type::SinceGStartTime), das::LineInfo());
+		addIEx("Local", "Local", int64_t(ELogTimes::Type::Local), das::LineInfo());
+		addIEx("Timecode", "Timecode", int64_t(ELogTimes::Type::Timecode), das::LineInfo());
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:46:12
 class Enumeration_EFileRegionType : public das::Enumeration {
 public:
@@ -1334,6 +1349,52 @@ public:
 		baseType = (das::Type) das::ToBasicType<uint8>::type;
 		addIEx("NoRecursion", "NoRecursion", int64_t(EPropertyValueIteratorFlags::NoRecursion), das::LineInfo());
 		addIEx("FullRecursion", "FullRecursion", int64_t(EPropertyValueIteratorFlags::FullRecursion), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Stack.h:73:6
+class Enumeration_EPropertyType : public das::Enumeration {
+public:
+	Enumeration_EPropertyType() : das::Enumeration("EPropertyType") {
+		external = true;
+		cppName = "EPropertyType";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("CPT_None", "CPT_None", int64_t(EPropertyType::CPT_None), das::LineInfo());
+		addIEx("CPT_Byte", "CPT_Byte", int64_t(EPropertyType::CPT_Byte), das::LineInfo());
+		addIEx("CPT_UInt16", "CPT_UInt16", int64_t(EPropertyType::CPT_UInt16), das::LineInfo());
+		addIEx("CPT_UInt32", "CPT_UInt32", int64_t(EPropertyType::CPT_UInt32), das::LineInfo());
+		addIEx("CPT_UInt64", "CPT_UInt64", int64_t(EPropertyType::CPT_UInt64), das::LineInfo());
+		addIEx("CPT_Int8", "CPT_Int8", int64_t(EPropertyType::CPT_Int8), das::LineInfo());
+		addIEx("CPT_Int16", "CPT_Int16", int64_t(EPropertyType::CPT_Int16), das::LineInfo());
+		addIEx("CPT_Int", "CPT_Int", int64_t(EPropertyType::CPT_Int), das::LineInfo());
+		addIEx("CPT_Int64", "CPT_Int64", int64_t(EPropertyType::CPT_Int64), das::LineInfo());
+		addIEx("CPT_Bool", "CPT_Bool", int64_t(EPropertyType::CPT_Bool), das::LineInfo());
+		addIEx("CPT_Bool8", "CPT_Bool8", int64_t(EPropertyType::CPT_Bool8), das::LineInfo());
+		addIEx("CPT_Bool16", "CPT_Bool16", int64_t(EPropertyType::CPT_Bool16), das::LineInfo());
+		addIEx("CPT_Bool32", "CPT_Bool32", int64_t(EPropertyType::CPT_Bool32), das::LineInfo());
+		addIEx("CPT_Bool64", "CPT_Bool64", int64_t(EPropertyType::CPT_Bool64), das::LineInfo());
+		addIEx("CPT_Float", "CPT_Float", int64_t(EPropertyType::CPT_Float), das::LineInfo());
+		addIEx("CPT_ObjectReference", "CPT_ObjectReference", int64_t(EPropertyType::CPT_ObjectReference), das::LineInfo());
+		addIEx("CPT_Name", "CPT_Name", int64_t(EPropertyType::CPT_Name), das::LineInfo());
+		addIEx("CPT_Delegate", "CPT_Delegate", int64_t(EPropertyType::CPT_Delegate), das::LineInfo());
+		addIEx("CPT_Interface", "CPT_Interface", int64_t(EPropertyType::CPT_Interface), das::LineInfo());
+		addIEx("CPT_Unused_Index_19", "CPT_Unused_Index_19", int64_t(EPropertyType::CPT_Unused_Index_19), das::LineInfo());
+		addIEx("CPT_Struct", "CPT_Struct", int64_t(EPropertyType::CPT_Struct), das::LineInfo());
+		addIEx("CPT_Unused_Index_21", "CPT_Unused_Index_21", int64_t(EPropertyType::CPT_Unused_Index_21), das::LineInfo());
+		addIEx("CPT_Unused_Index_22", "CPT_Unused_Index_22", int64_t(EPropertyType::CPT_Unused_Index_22), das::LineInfo());
+		addIEx("CPT_String", "CPT_String", int64_t(EPropertyType::CPT_String), das::LineInfo());
+		addIEx("CPT_Text", "CPT_Text", int64_t(EPropertyType::CPT_Text), das::LineInfo());
+		addIEx("CPT_MulticastDelegate", "CPT_MulticastDelegate", int64_t(EPropertyType::CPT_MulticastDelegate), das::LineInfo());
+		addIEx("CPT_WeakObjectReference", "CPT_WeakObjectReference", int64_t(EPropertyType::CPT_WeakObjectReference), das::LineInfo());
+		addIEx("CPT_LazyObjectReference", "CPT_LazyObjectReference", int64_t(EPropertyType::CPT_LazyObjectReference), das::LineInfo());
+		addIEx("CPT_ObjectPtrReference", "CPT_ObjectPtrReference", int64_t(EPropertyType::CPT_ObjectPtrReference), das::LineInfo());
+		addIEx("CPT_SoftObjectReference", "CPT_SoftObjectReference", int64_t(EPropertyType::CPT_SoftObjectReference), das::LineInfo());
+		addIEx("CPT_Double", "CPT_Double", int64_t(EPropertyType::CPT_Double), das::LineInfo());
+		addIEx("CPT_Map", "CPT_Map", int64_t(EPropertyType::CPT_Map), das::LineInfo());
+		addIEx("CPT_Set", "CPT_Set", int64_t(EPropertyType::CPT_Set), das::LineInfo());
+		addIEx("CPT_FieldPath", "CPT_FieldPath", int64_t(EPropertyType::CPT_FieldPath), das::LineInfo());
+		addIEx("CPT_FLargeWorldCoordinatesReal", "CPT_FLargeWorldCoordinatesReal", int64_t(EPropertyType::CPT_FLargeWorldCoordinatesReal), das::LineInfo());
+		addIEx("CPT_MAX", "CPT_MAX", int64_t(EPropertyType::CPT_MAX), das::LineInfo());
 	}
 };
 

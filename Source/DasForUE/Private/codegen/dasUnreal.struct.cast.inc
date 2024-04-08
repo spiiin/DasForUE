@@ -7,6 +7,12 @@ template <> struct cast_arg<FEngineVersionBase> {
 		return * cast<FEngineVersionBase *>::to(res);
 	}
 };
+template <> struct cast_arg<FOutputDevice> {
+	static __forceinline const FOutputDevice & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FOutputDevice *>::to(res);
+	}
+};
 template <> struct cast_arg<FArchiveState::FFastPathLoadBuffer> {
 	static __forceinline const FArchiveState::FFastPathLoadBuffer & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
@@ -569,5 +575,11 @@ template <> struct cast_arg<UPropertyWrapper> {
 	static __forceinline const UPropertyWrapper & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<UPropertyWrapper *>::to(res);
+	}
+};
+template <> struct cast_arg<FFrame> {
+	static __forceinline const FFrame & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FFrame *>::to(res);
 	}
 };

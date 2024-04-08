@@ -103,6 +103,7 @@
 #include "Misc/EngineVersionBase.h"
 #include "ProfilingDebugging/ResourceSize.h"
 #include "Misc/CompressionFlags.h"
+#include "Misc/OutputDevice.h"
 #include "Serialization/Archive.h"
 #include "UnrealString.h"
 #include "Logging/LogVerbosity.h"
@@ -118,3 +119,4 @@
 #include "UObject/Package.h"
 #include "UObject/UnrealType.h"
 #include "UObject/Field.h"
+#include "UObject/Stack.h"

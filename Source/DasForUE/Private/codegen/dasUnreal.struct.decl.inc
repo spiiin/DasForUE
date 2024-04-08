@@ -2,6 +2,8 @@
 // all user modifications will be lost after this file is re-generated
 
 MAKE_EXTERNAL_TYPE_FACTORY(FEngineVersionBase,FEngineVersionBase);
+MAKE_EXTERNAL_TYPE_FACTORY(FLogRecord,UE::FLogRecord);
+MAKE_EXTERNAL_TYPE_FACTORY(FOutputDevice,FOutputDevice);
 MAKE_EXTERNAL_TYPE_FACTORY(FLinker,FLinker);
 MAKE_EXTERNAL_TYPE_FACTORY(FEditorBulkData,UE::Serialization::FEditorBulkData);
 MAKE_EXTERNAL_TYPE_FACTORY(FArchiveSerializedPropertyChain,FArchiveSerializedPropertyChain);
@@ -125,3 +127,4 @@ MAKE_EXTERNAL_TYPE_FACTORY(FStrProperty,FStrProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FStructProperty,FStructProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FCustomPropertyListNode,FCustomPropertyListNode);
 MAKE_EXTERNAL_TYPE_FACTORY(UPropertyWrapper,UPropertyWrapper);
+MAKE_EXTERNAL_TYPE_FACTORY(FFrame,FFrame);

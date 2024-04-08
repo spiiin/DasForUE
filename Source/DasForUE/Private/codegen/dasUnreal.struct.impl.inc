@@ -2,6 +2,8 @@
 // all user modifications will be lost after this file is re-generated
 
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FEngineVersionBase,FEngineVersionBase);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FLogRecord,UE::FLogRecord);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FOutputDevice,FOutputDevice);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FLinker,FLinker);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FEditorBulkData,UE::Serialization::FEditorBulkData);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FArchiveSerializedPropertyChain,FArchiveSerializedPropertyChain);
@@ -125,3 +127,4 @@ IMPLEMENT_EXTERNAL_TYPE_FACTORY(FStrProperty,FStrProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FStructProperty,FStructProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FCustomPropertyListNode,FCustomPropertyListNode);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(UPropertyWrapper,UPropertyWrapper);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FFrame,FFrame);

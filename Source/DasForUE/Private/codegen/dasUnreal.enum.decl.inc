@@ -9,6 +9,8 @@ DAS_BASE_BIND_ENUM_GEN(ECompressionFlags,ECompressionFlags);
 
 DAS_BASE_BIND_ENUM_GEN(ELogVerbosity::Type,ELogVerbosity_Type);
 
+DAS_BASE_BIND_ENUM_GEN(ELogTimes::Type,ELogTimes_Type);
+
 DAS_BASE_BIND_ENUM_GEN(EFileRegionType,EFileRegionType);
 
 DAS_BASE_BIND_ENUM_GEN(EName,EName);
@@ -124,4 +126,6 @@ DAS_BASE_BIND_ENUM_GEN(EFieldIteratorFlags::DeprecatedPropertyFlags,EFieldIterat
 DAS_BASE_BIND_ENUM_GEN(EFieldIteratorFlags::InterfaceClassFlags,EFieldIteratorFlags_InterfaceClassFlags);
 
 DAS_BASE_BIND_ENUM_GEN(EPropertyValueIteratorFlags,EPropertyValueIteratorFlags);
+
+DAS_BASE_BIND_ENUM_GEN(EPropertyType,EPropertyType);
 
