@@ -39,6 +39,13 @@ namespace das {
             return *cast<FName*>::to(res);
         }
     };
+
+    template <> struct cast_arg<const FName> {
+        static __forceinline const FName& to(Context& ctx, SimNode* node) {
+            vec4f res = node->eval(ctx);
+            return *cast<FName*>::to(res);
+        }
+    };
 }
 
 MAKE_EXTERNAL_TYPE_FACTORY(FText, FText);

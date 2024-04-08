@@ -54,6 +54,34 @@ namespace das {
     };
 
     //------------------------------------------------------------------------
+    struct DasUeCallback {
+        Lambda      lambda;
+        Context* context = nullptr;
+    };
+
+    thread_local das_map<const UFunction*, DasUeCallback> g_Callbacks;
+
+    static void dasForUeNativeFunc(UObject* unrealContext, FFrame& theStack, void*const param) {
+        auto key = theStack.CurrentNativeFunction;
+        auto it = g_Callbacks.find(key);
+        if (it == g_Callbacks.end()) {
+            das_to_stderr("Error, native function doesn't exist for UFunction [%p]", key); //TODO: add function name
+            return;
+        }
+        auto& [dasFunction, dasContext] = it->second;
+        if (dasContext) {
+            das_invoke_lambda<void>::invoke<UObject*, FFrame&, void* const>(dasContext, nullptr, dasFunction,
+                unrealContext, theStack, param);
+        }
+    }
+
+
+    void setNativeFunc(UFunction* uFunction, das::TLambda<void, UObject*, FFrame&, void*const> dasFunction, Context* dasContext) {
+        g_Callbacks[uFunction] = { dasFunction, dasContext };
+        uFunction->SetNativeFunc(&dasForUeNativeFunc);
+    }
+
+    //------------------------------------------------------------------------
 
     void Module_dasUnreal::initAdditionalAnnotations () {
         addAnnotation(make_smart<FTextAnnotation>(lib));
@@ -74,6 +102,9 @@ namespace das {
         //FFieldVariant has only template move ctor(T&&), so it needs to be instantiated for UObject explicitly
         addCtorAndUsing<FFieldVariant, const UObject*>(*this, lib, "FFieldVariant", "FFieldVariant")
             ->args({ "Object" });
+
+        addExtern<DAS_BIND_FUN(setNativeFunc)>(*this, lib, "SetNativeFunc", SideEffects::worstDefault, "setNativeFunc");
+
     }
 
 	void Module_dasUnreal::initMain () {

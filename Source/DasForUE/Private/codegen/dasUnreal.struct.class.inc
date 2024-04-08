@@ -104,6 +104,54 @@ struct FPrimaryAssetId_GeneratedAnnotation : ManagedStructureAnnotation<FPrimary
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:24:1
+struct FStatGroup_STATGROUP_Script_GeneratedAnnotation : ManagedStructureAnnotation<FStatGroup_STATGROUP_Script> {
+	FStatGroup_STATGROUP_Script_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FStatGroup_STATGROUP_Script", ml, "FStatGroup_STATGROUP_Script") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:380:8
+struct FBlueprintExceptionInfo_GeneratedAnnotation : ManagedStructureAnnotation<FBlueprintExceptionInfo> {
+	FBlueprintExceptionInfo_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FBlueprintExceptionInfo", ml, "FBlueprintExceptionInfo") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:409:8
+struct FScriptInstrumentationSignal_GeneratedAnnotation : ManagedStructureAnnotation<FScriptInstrumentationSignal> {
+	FScriptInstrumentationSignal_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FScriptInstrumentationSignal", ml, "FScriptInstrumentationSignal") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:474:7
+struct FBlueprintCoreDelegates_GeneratedAnnotation : ManagedStructureAnnotation<FBlueprintCoreDelegates> {
+	FBlueprintCoreDelegates_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FBlueprintCoreDelegates", ml, "FBlueprintCoreDelegates") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:504:24
+struct FBlueprintContextTracker_GeneratedAnnotation : ManagedStructureAnnotation<FBlueprintContextTracker> {
+	FBlueprintContextTracker_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FBlueprintContextTracker", ml, "FBlueprintContextTracker") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:594:8
+struct FEditorScriptExecutionGuard_GeneratedAnnotation : ManagedStructureAnnotation<FEditorScriptExecutionGuard> {
+	FEditorScriptExecutionGuard_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FEditorScriptExecutionGuard", ml, "FEditorScriptExecutionGuard") {
+	}
+	void init () {
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/ObjectMacros.h:167:7
 struct FVTableHelper_GeneratedAnnotation : ManagedStructureAnnotation<FVTableHelper> {
 	FVTableHelper_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FVTableHelper", ml, "FVTableHelper") {
@@ -516,6 +564,7 @@ struct UECodeGen_Private_FFunctionParams_GeneratedAnnotation : ManagedStructureA
 		addField<DAS_BIND_MANAGED_FIELD(NumProperties)>("NumProperties","NumProperties");
 		addField<DAS_BIND_MANAGED_FIELD(StructureSize)>("StructureSize","StructureSize");
 		addField<DAS_BIND_MANAGED_FIELD(ObjectFlags)>("ObjectFlags","ObjectFlags");
+		addField<DAS_BIND_MANAGED_FIELD(FunctionFlags)>("FunctionFlags","FunctionFlags");
 		addField<DAS_BIND_MANAGED_FIELD(RPCId)>("RPCId","RPCId");
 		addField<DAS_BIND_MANAGED_FIELD(RPCResponseId)>("RPCResponseId","RPCResponseId");
 		addField<DAS_BIND_MANAGED_FIELD(NumMetaData)>("NumMetaData","NumMetaData");
@@ -726,6 +775,7 @@ struct UFunction_GeneratedAnnotation : ManagedStructureAnnotation<UFunction, fal
 	UFunction_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UFunction", ml, "UFunction") {
 	}
 	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(FunctionFlags)>("FunctionFlags","FunctionFlags");
 		addField<DAS_BIND_MANAGED_FIELD(NumParms)>("NumParms","NumParms");
 		addField<DAS_BIND_MANAGED_FIELD(ParmsSize)>("ParmsSize","ParmsSize");
 		addField<DAS_BIND_MANAGED_FIELD(ReturnValueOffset)>("ReturnValueOffset","ReturnValueOffset");

@@ -352,6 +352,261 @@ public:
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:92:7
+class Enumeration_FunctionCallspace_Type : public das::Enumeration {
+public:
+	Enumeration_FunctionCallspace_Type() : das::Enumeration("FunctionCallspace_Type") {
+		external = true;
+		cppName = "FunctionCallspace::Type";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Absorbed", "Absorbed", int64_t(FunctionCallspace::Type::Absorbed), das::LineInfo());
+		addIEx("Remote", "Remote", int64_t(FunctionCallspace::Type::Remote), das::LineInfo());
+		addIEx("Local", "Local", int64_t(FunctionCallspace::Type::Local), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:126:6
+class Enumeration_EFunctionFlags : public das::Enumeration {
+public:
+	Enumeration_EFunctionFlags() : das::Enumeration("EFunctionFlags") {
+		external = true;
+		cppName = "EFunctionFlags";
+		baseType = (das::Type) das::ToBasicType<uint32>::type;
+		addIEx("FUNC_None", "FUNC_None", int64_t(EFunctionFlags::FUNC_None), das::LineInfo());
+		addIEx("FUNC_Final", "FUNC_Final", int64_t(EFunctionFlags::FUNC_Final), das::LineInfo());
+		addIEx("FUNC_RequiredAPI", "FUNC_RequiredAPI", int64_t(EFunctionFlags::FUNC_RequiredAPI), das::LineInfo());
+		addIEx("FUNC_BlueprintAuthorityOnly", "FUNC_BlueprintAuthorityOnly", int64_t(EFunctionFlags::FUNC_BlueprintAuthorityOnly), das::LineInfo());
+		addIEx("FUNC_BlueprintCosmetic", "FUNC_BlueprintCosmetic", int64_t(EFunctionFlags::FUNC_BlueprintCosmetic), das::LineInfo());
+		addIEx("FUNC_Net", "FUNC_Net", int64_t(EFunctionFlags::FUNC_Net), das::LineInfo());
+		addIEx("FUNC_NetReliable", "FUNC_NetReliable", int64_t(EFunctionFlags::FUNC_NetReliable), das::LineInfo());
+		addIEx("FUNC_NetRequest", "FUNC_NetRequest", int64_t(EFunctionFlags::FUNC_NetRequest), das::LineInfo());
+		addIEx("FUNC_Exec", "FUNC_Exec", int64_t(EFunctionFlags::FUNC_Exec), das::LineInfo());
+		addIEx("FUNC_Native", "FUNC_Native", int64_t(EFunctionFlags::FUNC_Native), das::LineInfo());
+		addIEx("FUNC_Event", "FUNC_Event", int64_t(EFunctionFlags::FUNC_Event), das::LineInfo());
+		addIEx("FUNC_NetResponse", "FUNC_NetResponse", int64_t(EFunctionFlags::FUNC_NetResponse), das::LineInfo());
+		addIEx("FUNC_Static", "FUNC_Static", int64_t(EFunctionFlags::FUNC_Static), das::LineInfo());
+		addIEx("FUNC_NetMulticast", "FUNC_NetMulticast", int64_t(EFunctionFlags::FUNC_NetMulticast), das::LineInfo());
+		addIEx("FUNC_UbergraphFunction", "FUNC_UbergraphFunction", int64_t(EFunctionFlags::FUNC_UbergraphFunction), das::LineInfo());
+		addIEx("FUNC_MulticastDelegate", "FUNC_MulticastDelegate", int64_t(EFunctionFlags::FUNC_MulticastDelegate), das::LineInfo());
+		addIEx("FUNC_Public", "FUNC_Public", int64_t(EFunctionFlags::FUNC_Public), das::LineInfo());
+		addIEx("FUNC_Private", "FUNC_Private", int64_t(EFunctionFlags::FUNC_Private), das::LineInfo());
+		addIEx("FUNC_Protected", "FUNC_Protected", int64_t(EFunctionFlags::FUNC_Protected), das::LineInfo());
+		addIEx("FUNC_Delegate", "FUNC_Delegate", int64_t(EFunctionFlags::FUNC_Delegate), das::LineInfo());
+		addIEx("FUNC_NetServer", "FUNC_NetServer", int64_t(EFunctionFlags::FUNC_NetServer), das::LineInfo());
+		addIEx("FUNC_HasOutParms", "FUNC_HasOutParms", int64_t(EFunctionFlags::FUNC_HasOutParms), das::LineInfo());
+		addIEx("FUNC_HasDefaults", "FUNC_HasDefaults", int64_t(EFunctionFlags::FUNC_HasDefaults), das::LineInfo());
+		addIEx("FUNC_NetClient", "FUNC_NetClient", int64_t(EFunctionFlags::FUNC_NetClient), das::LineInfo());
+		addIEx("FUNC_DLLImport", "FUNC_DLLImport", int64_t(EFunctionFlags::FUNC_DLLImport), das::LineInfo());
+		addIEx("FUNC_BlueprintCallable", "FUNC_BlueprintCallable", int64_t(EFunctionFlags::FUNC_BlueprintCallable), das::LineInfo());
+		addIEx("FUNC_BlueprintEvent", "FUNC_BlueprintEvent", int64_t(EFunctionFlags::FUNC_BlueprintEvent), das::LineInfo());
+		addIEx("FUNC_BlueprintPure", "FUNC_BlueprintPure", int64_t(EFunctionFlags::FUNC_BlueprintPure), das::LineInfo());
+		addIEx("FUNC_EditorOnly", "FUNC_EditorOnly", int64_t(EFunctionFlags::FUNC_EditorOnly), das::LineInfo());
+		addIEx("FUNC_Const", "FUNC_Const", int64_t(EFunctionFlags::FUNC_Const), das::LineInfo());
+		addIEx("FUNC_NetValidate", "FUNC_NetValidate", int64_t(EFunctionFlags::FUNC_NetValidate), das::LineInfo());
+		addIEx("FUNC_AllFlags", "FUNC_AllFlags", int64_t(EFunctionFlags::FUNC_AllFlags), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:184:6
+class Enumeration_EExprToken : public das::Enumeration {
+public:
+	Enumeration_EExprToken() : das::Enumeration("EExprToken") {
+		external = true;
+		cppName = "EExprToken";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("EX_LocalVariable", "EX_LocalVariable", int64_t(EExprToken::EX_LocalVariable), das::LineInfo());
+		addIEx("EX_InstanceVariable", "EX_InstanceVariable", int64_t(EExprToken::EX_InstanceVariable), das::LineInfo());
+		addIEx("EX_DefaultVariable", "EX_DefaultVariable", int64_t(EExprToken::EX_DefaultVariable), das::LineInfo());
+		addIEx("EX_Return", "EX_Return", int64_t(EExprToken::EX_Return), das::LineInfo());
+		addIEx("EX_Jump", "EX_Jump", int64_t(EExprToken::EX_Jump), das::LineInfo());
+		addIEx("EX_JumpIfNot", "EX_JumpIfNot", int64_t(EExprToken::EX_JumpIfNot), das::LineInfo());
+		addIEx("EX_Assert", "EX_Assert", int64_t(EExprToken::EX_Assert), das::LineInfo());
+		addIEx("EX_Nothing", "EX_Nothing", int64_t(EExprToken::EX_Nothing), das::LineInfo());
+		addIEx("EX_NothingInt32", "EX_NothingInt32", int64_t(EExprToken::EX_NothingInt32), das::LineInfo());
+		addIEx("EX_Let", "EX_Let", int64_t(EExprToken::EX_Let), das::LineInfo());
+		addIEx("EX_BitFieldConst", "EX_BitFieldConst", int64_t(EExprToken::EX_BitFieldConst), das::LineInfo());
+		addIEx("EX_ClassContext", "EX_ClassContext", int64_t(EExprToken::EX_ClassContext), das::LineInfo());
+		addIEx("EX_MetaCast", "EX_MetaCast", int64_t(EExprToken::EX_MetaCast), das::LineInfo());
+		addIEx("EX_LetBool", "EX_LetBool", int64_t(EExprToken::EX_LetBool), das::LineInfo());
+		addIEx("EX_EndParmValue", "EX_EndParmValue", int64_t(EExprToken::EX_EndParmValue), das::LineInfo());
+		addIEx("EX_EndFunctionParms", "EX_EndFunctionParms", int64_t(EExprToken::EX_EndFunctionParms), das::LineInfo());
+		addIEx("EX_Self", "EX_Self", int64_t(EExprToken::EX_Self), das::LineInfo());
+		addIEx("EX_Skip", "EX_Skip", int64_t(EExprToken::EX_Skip), das::LineInfo());
+		addIEx("EX_Context", "EX_Context", int64_t(EExprToken::EX_Context), das::LineInfo());
+		addIEx("EX_Context_FailSilent", "EX_Context_FailSilent", int64_t(EExprToken::EX_Context_FailSilent), das::LineInfo());
+		addIEx("EX_VirtualFunction", "EX_VirtualFunction", int64_t(EExprToken::EX_VirtualFunction), das::LineInfo());
+		addIEx("EX_FinalFunction", "EX_FinalFunction", int64_t(EExprToken::EX_FinalFunction), das::LineInfo());
+		addIEx("EX_IntConst", "EX_IntConst", int64_t(EExprToken::EX_IntConst), das::LineInfo());
+		addIEx("EX_FloatConst", "EX_FloatConst", int64_t(EExprToken::EX_FloatConst), das::LineInfo());
+		addIEx("EX_StringConst", "EX_StringConst", int64_t(EExprToken::EX_StringConst), das::LineInfo());
+		addIEx("EX_ObjectConst", "EX_ObjectConst", int64_t(EExprToken::EX_ObjectConst), das::LineInfo());
+		addIEx("EX_NameConst", "EX_NameConst", int64_t(EExprToken::EX_NameConst), das::LineInfo());
+		addIEx("EX_RotationConst", "EX_RotationConst", int64_t(EExprToken::EX_RotationConst), das::LineInfo());
+		addIEx("EX_VectorConst", "EX_VectorConst", int64_t(EExprToken::EX_VectorConst), das::LineInfo());
+		addIEx("EX_ByteConst", "EX_ByteConst", int64_t(EExprToken::EX_ByteConst), das::LineInfo());
+		addIEx("EX_IntZero", "EX_IntZero", int64_t(EExprToken::EX_IntZero), das::LineInfo());
+		addIEx("EX_IntOne", "EX_IntOne", int64_t(EExprToken::EX_IntOne), das::LineInfo());
+		addIEx("EX_True", "EX_True", int64_t(EExprToken::EX_True), das::LineInfo());
+		addIEx("EX_False", "EX_False", int64_t(EExprToken::EX_False), das::LineInfo());
+		addIEx("EX_TextConst", "EX_TextConst", int64_t(EExprToken::EX_TextConst), das::LineInfo());
+		addIEx("EX_NoObject", "EX_NoObject", int64_t(EExprToken::EX_NoObject), das::LineInfo());
+		addIEx("EX_TransformConst", "EX_TransformConst", int64_t(EExprToken::EX_TransformConst), das::LineInfo());
+		addIEx("EX_IntConstByte", "EX_IntConstByte", int64_t(EExprToken::EX_IntConstByte), das::LineInfo());
+		addIEx("EX_NoInterface", "EX_NoInterface", int64_t(EExprToken::EX_NoInterface), das::LineInfo());
+		addIEx("EX_DynamicCast", "EX_DynamicCast", int64_t(EExprToken::EX_DynamicCast), das::LineInfo());
+		addIEx("EX_StructConst", "EX_StructConst", int64_t(EExprToken::EX_StructConst), das::LineInfo());
+		addIEx("EX_EndStructConst", "EX_EndStructConst", int64_t(EExprToken::EX_EndStructConst), das::LineInfo());
+		addIEx("EX_SetArray", "EX_SetArray", int64_t(EExprToken::EX_SetArray), das::LineInfo());
+		addIEx("EX_EndArray", "EX_EndArray", int64_t(EExprToken::EX_EndArray), das::LineInfo());
+		addIEx("EX_PropertyConst", "EX_PropertyConst", int64_t(EExprToken::EX_PropertyConst), das::LineInfo());
+		addIEx("EX_UnicodeStringConst", "EX_UnicodeStringConst", int64_t(EExprToken::EX_UnicodeStringConst), das::LineInfo());
+		addIEx("EX_Int64Const", "EX_Int64Const", int64_t(EExprToken::EX_Int64Const), das::LineInfo());
+		addIEx("EX_UInt64Const", "EX_UInt64Const", int64_t(EExprToken::EX_UInt64Const), das::LineInfo());
+		addIEx("EX_DoubleConst", "EX_DoubleConst", int64_t(EExprToken::EX_DoubleConst), das::LineInfo());
+		addIEx("EX_Cast", "EX_Cast", int64_t(EExprToken::EX_Cast), das::LineInfo());
+		addIEx("EX_SetSet", "EX_SetSet", int64_t(EExprToken::EX_SetSet), das::LineInfo());
+		addIEx("EX_EndSet", "EX_EndSet", int64_t(EExprToken::EX_EndSet), das::LineInfo());
+		addIEx("EX_SetMap", "EX_SetMap", int64_t(EExprToken::EX_SetMap), das::LineInfo());
+		addIEx("EX_EndMap", "EX_EndMap", int64_t(EExprToken::EX_EndMap), das::LineInfo());
+		addIEx("EX_SetConst", "EX_SetConst", int64_t(EExprToken::EX_SetConst), das::LineInfo());
+		addIEx("EX_EndSetConst", "EX_EndSetConst", int64_t(EExprToken::EX_EndSetConst), das::LineInfo());
+		addIEx("EX_MapConst", "EX_MapConst", int64_t(EExprToken::EX_MapConst), das::LineInfo());
+		addIEx("EX_EndMapConst", "EX_EndMapConst", int64_t(EExprToken::EX_EndMapConst), das::LineInfo());
+		addIEx("EX_Vector3fConst", "EX_Vector3fConst", int64_t(EExprToken::EX_Vector3fConst), das::LineInfo());
+		addIEx("EX_StructMemberContext", "EX_StructMemberContext", int64_t(EExprToken::EX_StructMemberContext), das::LineInfo());
+		addIEx("EX_LetMulticastDelegate", "EX_LetMulticastDelegate", int64_t(EExprToken::EX_LetMulticastDelegate), das::LineInfo());
+		addIEx("EX_LetDelegate", "EX_LetDelegate", int64_t(EExprToken::EX_LetDelegate), das::LineInfo());
+		addIEx("EX_LocalVirtualFunction", "EX_LocalVirtualFunction", int64_t(EExprToken::EX_LocalVirtualFunction), das::LineInfo());
+		addIEx("EX_LocalFinalFunction", "EX_LocalFinalFunction", int64_t(EExprToken::EX_LocalFinalFunction), das::LineInfo());
+		addIEx("EX_LocalOutVariable", "EX_LocalOutVariable", int64_t(EExprToken::EX_LocalOutVariable), das::LineInfo());
+		addIEx("EX_DeprecatedOp4A", "EX_DeprecatedOp4A", int64_t(EExprToken::EX_DeprecatedOp4A), das::LineInfo());
+		addIEx("EX_InstanceDelegate", "EX_InstanceDelegate", int64_t(EExprToken::EX_InstanceDelegate), das::LineInfo());
+		addIEx("EX_PushExecutionFlow", "EX_PushExecutionFlow", int64_t(EExprToken::EX_PushExecutionFlow), das::LineInfo());
+		addIEx("EX_PopExecutionFlow", "EX_PopExecutionFlow", int64_t(EExprToken::EX_PopExecutionFlow), das::LineInfo());
+		addIEx("EX_ComputedJump", "EX_ComputedJump", int64_t(EExprToken::EX_ComputedJump), das::LineInfo());
+		addIEx("EX_PopExecutionFlowIfNot", "EX_PopExecutionFlowIfNot", int64_t(EExprToken::EX_PopExecutionFlowIfNot), das::LineInfo());
+		addIEx("EX_Breakpoint", "EX_Breakpoint", int64_t(EExprToken::EX_Breakpoint), das::LineInfo());
+		addIEx("EX_InterfaceContext", "EX_InterfaceContext", int64_t(EExprToken::EX_InterfaceContext), das::LineInfo());
+		addIEx("EX_ObjToInterfaceCast", "EX_ObjToInterfaceCast", int64_t(EExprToken::EX_ObjToInterfaceCast), das::LineInfo());
+		addIEx("EX_EndOfScript", "EX_EndOfScript", int64_t(EExprToken::EX_EndOfScript), das::LineInfo());
+		addIEx("EX_CrossInterfaceCast", "EX_CrossInterfaceCast", int64_t(EExprToken::EX_CrossInterfaceCast), das::LineInfo());
+		addIEx("EX_InterfaceToObjCast", "EX_InterfaceToObjCast", int64_t(EExprToken::EX_InterfaceToObjCast), das::LineInfo());
+		addIEx("EX_WireTracepoint", "EX_WireTracepoint", int64_t(EExprToken::EX_WireTracepoint), das::LineInfo());
+		addIEx("EX_SkipOffsetConst", "EX_SkipOffsetConst", int64_t(EExprToken::EX_SkipOffsetConst), das::LineInfo());
+		addIEx("EX_AddMulticastDelegate", "EX_AddMulticastDelegate", int64_t(EExprToken::EX_AddMulticastDelegate), das::LineInfo());
+		addIEx("EX_ClearMulticastDelegate", "EX_ClearMulticastDelegate", int64_t(EExprToken::EX_ClearMulticastDelegate), das::LineInfo());
+		addIEx("EX_Tracepoint", "EX_Tracepoint", int64_t(EExprToken::EX_Tracepoint), das::LineInfo());
+		addIEx("EX_LetObj", "EX_LetObj", int64_t(EExprToken::EX_LetObj), das::LineInfo());
+		addIEx("EX_LetWeakObjPtr", "EX_LetWeakObjPtr", int64_t(EExprToken::EX_LetWeakObjPtr), das::LineInfo());
+		addIEx("EX_BindDelegate", "EX_BindDelegate", int64_t(EExprToken::EX_BindDelegate), das::LineInfo());
+		addIEx("EX_RemoveMulticastDelegate", "EX_RemoveMulticastDelegate", int64_t(EExprToken::EX_RemoveMulticastDelegate), das::LineInfo());
+		addIEx("EX_CallMulticastDelegate", "EX_CallMulticastDelegate", int64_t(EExprToken::EX_CallMulticastDelegate), das::LineInfo());
+		addIEx("EX_LetValueOnPersistentFrame", "EX_LetValueOnPersistentFrame", int64_t(EExprToken::EX_LetValueOnPersistentFrame), das::LineInfo());
+		addIEx("EX_ArrayConst", "EX_ArrayConst", int64_t(EExprToken::EX_ArrayConst), das::LineInfo());
+		addIEx("EX_EndArrayConst", "EX_EndArrayConst", int64_t(EExprToken::EX_EndArrayConst), das::LineInfo());
+		addIEx("EX_SoftObjectConst", "EX_SoftObjectConst", int64_t(EExprToken::EX_SoftObjectConst), das::LineInfo());
+		addIEx("EX_CallMath", "EX_CallMath", int64_t(EExprToken::EX_CallMath), das::LineInfo());
+		addIEx("EX_SwitchValue", "EX_SwitchValue", int64_t(EExprToken::EX_SwitchValue), das::LineInfo());
+		addIEx("EX_InstrumentationEvent", "EX_InstrumentationEvent", int64_t(EExprToken::EX_InstrumentationEvent), das::LineInfo());
+		addIEx("EX_ArrayGetByRef", "EX_ArrayGetByRef", int64_t(EExprToken::EX_ArrayGetByRef), das::LineInfo());
+		addIEx("EX_ClassSparseDataVariable", "EX_ClassSparseDataVariable", int64_t(EExprToken::EX_ClassSparseDataVariable), das::LineInfo());
+		addIEx("EX_FieldPathConst", "EX_FieldPathConst", int64_t(EExprToken::EX_FieldPathConst), das::LineInfo());
+		addIEx("EX_AutoRtfmTransact", "EX_AutoRtfmTransact", int64_t(EExprToken::EX_AutoRtfmTransact), das::LineInfo());
+		addIEx("EX_AutoRtfmStopTransact", "EX_AutoRtfmStopTransact", int64_t(EExprToken::EX_AutoRtfmStopTransact), das::LineInfo());
+		addIEx("EX_AutoRtfmAbortIfNot", "EX_AutoRtfmAbortIfNot", int64_t(EExprToken::EX_AutoRtfmAbortIfNot), das::LineInfo());
+		addIEx("EX_Max", "EX_Max", int64_t(EExprToken::EX_Max), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:305:6
+class Enumeration_EAutoRtfmStopTransactMode : public das::Enumeration {
+public:
+	Enumeration_EAutoRtfmStopTransactMode() : das::Enumeration("EAutoRtfmStopTransactMode") {
+		external = true;
+		cppName = "EAutoRtfmStopTransactMode";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("GracefulExit", "GracefulExit", int64_t(EAutoRtfmStopTransactMode::GracefulExit), das::LineInfo());
+		addIEx("AbortingExit", "AbortingExit", int64_t(EAutoRtfmStopTransactMode::AbortingExit), das::LineInfo());
+		addIEx("AbortingExitAndAbortParent", "AbortingExitAndAbortParent", int64_t(EAutoRtfmStopTransactMode::AbortingExitAndAbortParent), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:312:6
+class Enumeration_ECastToken : public das::Enumeration {
+public:
+	Enumeration_ECastToken() : das::Enumeration("ECastToken") {
+		external = true;
+		cppName = "ECastToken";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("CST_ObjectToInterface", "CST_ObjectToInterface", int64_t(ECastToken::CST_ObjectToInterface), das::LineInfo());
+		addIEx("CST_ObjectToBool", "CST_ObjectToBool", int64_t(ECastToken::CST_ObjectToBool), das::LineInfo());
+		addIEx("CST_InterfaceToBool", "CST_InterfaceToBool", int64_t(ECastToken::CST_InterfaceToBool), das::LineInfo());
+		addIEx("CST_DoubleToFloat", "CST_DoubleToFloat", int64_t(ECastToken::CST_DoubleToFloat), das::LineInfo());
+		addIEx("CST_FloatToDouble", "CST_FloatToDouble", int64_t(ECastToken::CST_FloatToDouble), das::LineInfo());
+		addIEx("CST_Max", "CST_Max", int64_t(ECastToken::CST_Max), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:324:12
+class Enumeration_EBlueprintTextLiteralType : public das::Enumeration {
+public:
+	Enumeration_EBlueprintTextLiteralType() : das::Enumeration("EBlueprintTextLiteralType") {
+		external = true;
+		cppName = "EBlueprintTextLiteralType";
+		baseType = (das::Type) das::ToBasicType<uint8>::type;
+		addIEx("Empty", "Empty", int64_t(EBlueprintTextLiteralType::Empty), das::LineInfo());
+		addIEx("LocalizedText", "LocalizedText", int64_t(EBlueprintTextLiteralType::LocalizedText), das::LineInfo());
+		addIEx("InvariantText", "InvariantText", int64_t(EBlueprintTextLiteralType::InvariantText), das::LineInfo());
+		addIEx("LiteralString", "LiteralString", int64_t(EBlueprintTextLiteralType::LiteralString), das::LineInfo());
+		addIEx("StringTableEntry", "StringTableEntry", int64_t(EBlueprintTextLiteralType::StringTableEntry), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:341:7
+class Enumeration_EBlueprintExceptionType_Type : public das::Enumeration {
+public:
+	Enumeration_EBlueprintExceptionType_Type() : das::Enumeration("EBlueprintExceptionType_Type") {
+		external = true;
+		cppName = "EBlueprintExceptionType::Type";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Breakpoint", "Breakpoint", int64_t(EBlueprintExceptionType::Type::Breakpoint), das::LineInfo());
+		addIEx("Tracepoint", "Tracepoint", int64_t(EBlueprintExceptionType::Type::Tracepoint), das::LineInfo());
+		addIEx("WireTracepoint", "WireTracepoint", int64_t(EBlueprintExceptionType::Type::WireTracepoint), das::LineInfo());
+		addIEx("AccessViolation", "AccessViolation", int64_t(EBlueprintExceptionType::Type::AccessViolation), das::LineInfo());
+		addIEx("InfiniteLoop", "InfiniteLoop", int64_t(EBlueprintExceptionType::Type::InfiniteLoop), das::LineInfo());
+		addIEx("NonFatalError", "NonFatalError", int64_t(EBlueprintExceptionType::Type::NonFatalError), das::LineInfo());
+		addIEx("FatalError", "FatalError", int64_t(EBlueprintExceptionType::Type::FatalError), das::LineInfo());
+		addIEx("AbortExecution", "AbortExecution", int64_t(EBlueprintExceptionType::Type::AbortExecution), das::LineInfo());
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:357:7
+class Enumeration_EScriptInstrumentation_Type : public das::Enumeration {
+public:
+	Enumeration_EScriptInstrumentation_Type() : das::Enumeration("EScriptInstrumentation_Type") {
+		external = true;
+		cppName = "EScriptInstrumentation::Type";
+		baseType = (das::Type) das::ToBasicType<int>::type;
+		addIEx("Class", "Class", int64_t(EScriptInstrumentation::Type::Class), das::LineInfo());
+		addIEx("ClassScope", "ClassScope", int64_t(EScriptInstrumentation::Type::ClassScope), das::LineInfo());
+		addIEx("Instance", "Instance", int64_t(EScriptInstrumentation::Type::Instance), das::LineInfo());
+		addIEx("Event", "Event", int64_t(EScriptInstrumentation::Type::Event), das::LineInfo());
+		addIEx("InlineEvent", "InlineEvent", int64_t(EScriptInstrumentation::Type::InlineEvent), das::LineInfo());
+		addIEx("ResumeEvent", "ResumeEvent", int64_t(EScriptInstrumentation::Type::ResumeEvent), das::LineInfo());
+		addIEx("PureNodeEntry", "PureNodeEntry", int64_t(EScriptInstrumentation::Type::PureNodeEntry), das::LineInfo());
+		addIEx("NodeDebugSite", "NodeDebugSite", int64_t(EScriptInstrumentation::Type::NodeDebugSite), das::LineInfo());
+		addIEx("NodeEntry", "NodeEntry", int64_t(EScriptInstrumentation::Type::NodeEntry), das::LineInfo());
+		addIEx("NodeExit", "NodeExit", int64_t(EScriptInstrumentation::Type::NodeExit), das::LineInfo());
+		addIEx("PushState", "PushState", int64_t(EScriptInstrumentation::Type::PushState), das::LineInfo());
+		addIEx("RestoreState", "RestoreState", int64_t(EScriptInstrumentation::Type::RestoreState), das::LineInfo());
+		addIEx("ResetState", "ResetState", int64_t(EScriptInstrumentation::Type::ResetState), das::LineInfo());
+		addIEx("SuspendState", "SuspendState", int64_t(EScriptInstrumentation::Type::SuspendState), das::LineInfo());
+		addIEx("PopState", "PopState", int64_t(EScriptInstrumentation::Type::PopState), das::LineInfo());
+		addIEx("TunnelEndOfThread", "TunnelEndOfThread", int64_t(EScriptInstrumentation::Type::TunnelEndOfThread), das::LineInfo());
+		addIEx("Stop", "Stop", int64_t(EScriptInstrumentation::Type::Stop), das::LineInfo());
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/ObjectMacros.h:56:6
 class Enumeration_ELoadFlags : public das::Enumeration {
 public:

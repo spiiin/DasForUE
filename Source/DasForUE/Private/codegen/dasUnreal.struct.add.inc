@@ -23,6 +23,18 @@ auto ann_FPrimaryAssetType = make_smart<FPrimaryAssetType_GeneratedAnnotation>(l
 addAnnotation(ann_FPrimaryAssetType);
 auto ann_FPrimaryAssetId = make_smart<FPrimaryAssetId_GeneratedAnnotation>(lib);
 addAnnotation(ann_FPrimaryAssetId);
+auto ann_FStatGroup_STATGROUP_Script = make_smart<FStatGroup_STATGROUP_Script_GeneratedAnnotation>(lib);
+addAnnotation(ann_FStatGroup_STATGROUP_Script);
+auto ann_FBlueprintExceptionInfo = make_smart<FBlueprintExceptionInfo_GeneratedAnnotation>(lib);
+addAnnotation(ann_FBlueprintExceptionInfo);
+auto ann_FScriptInstrumentationSignal = make_smart<FScriptInstrumentationSignal_GeneratedAnnotation>(lib);
+addAnnotation(ann_FScriptInstrumentationSignal);
+auto ann_FBlueprintCoreDelegates = make_smart<FBlueprintCoreDelegates_GeneratedAnnotation>(lib);
+addAnnotation(ann_FBlueprintCoreDelegates);
+auto ann_FBlueprintContextTracker = make_smart<FBlueprintContextTracker_GeneratedAnnotation>(lib);
+addAnnotation(ann_FBlueprintContextTracker);
+auto ann_FEditorScriptExecutionGuard = make_smart<FEditorScriptExecutionGuard_GeneratedAnnotation>(lib);
+addAnnotation(ann_FEditorScriptExecutionGuard);
 auto ann_FVTableHelper = make_smart<FVTableHelper_GeneratedAnnotation>(lib);
 addAnnotation(ann_FVTableHelper);
 auto ann_FRestoreForUObjectOverwrite = make_smart<FRestoreForUObjectOverwrite_GeneratedAnnotation>(lib);

@@ -17,6 +17,22 @@ DAS_BASE_BIND_ENUM_GEN(EName,EName);
 
 DAS_BASE_BIND_ENUM_GEN(EResourceSizeMode::Type,EResourceSizeMode_Type);
 
+DAS_BASE_BIND_ENUM_GEN(FunctionCallspace::Type,FunctionCallspace_Type);
+
+DAS_BASE_BIND_ENUM_GEN(EFunctionFlags,EFunctionFlags);
+
+DAS_BASE_BIND_ENUM_GEN(EExprToken,EExprToken);
+
+DAS_BASE_BIND_ENUM_GEN(EAutoRtfmStopTransactMode,EAutoRtfmStopTransactMode);
+
+DAS_BASE_BIND_ENUM_GEN(ECastToken,ECastToken);
+
+DAS_BASE_BIND_ENUM_GEN(EBlueprintTextLiteralType,EBlueprintTextLiteralType);
+
+DAS_BASE_BIND_ENUM_GEN(EBlueprintExceptionType::Type,EBlueprintExceptionType_Type);
+
+DAS_BASE_BIND_ENUM_GEN(EScriptInstrumentation::Type,EScriptInstrumentation_Type);
+
 DAS_BASE_BIND_ENUM_GEN(ELoadFlags,ELoadFlags);
 
 DAS_BASE_BIND_ENUM_GEN(ESaveFlags,ESaveFlags);

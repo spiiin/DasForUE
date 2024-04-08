@@ -259,6 +259,10 @@ class UnrealGen : CppGenBind
             "FFrame::GetStackTrace"; //TStringBuilderBase
             "FFrame::GetStackDescription"; //TStringBuilderBase
             "FFrame::InitPrintScriptCallstack"; //linker error
+
+            //Script.h
+            //"FBlueprintContext::FBlueprintContext"; //Linker error
+            //"FBlueprintContext::GetVirtualStackAllocator"; //FVirtualStackAllocator
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -287,7 +291,6 @@ class UnrealGen : CppGenBind
 
             //UObjectGlobals
             "TFunction";
-            "EFunctionFlags";
             "TMap";
             "FTopLevelAssetPath";
             "TDelegate";
@@ -298,7 +301,7 @@ class UnrealGen : CppGenBind
 
             //UObjectTypes
             
-            "EPropertyFlags";
+            "EPropertyFlags"; //TODO: crashes, check reason (64 bit type?)
 
             "const WIDECHAR *";  //mostly (for UnrealString, at least), it related to overloads char/wchar/unsigned short/UTF8CHAR
             "const UCS2CHAR *";  //check what can be done with them
@@ -422,10 +425,14 @@ class UnrealGen : CppGenBind
             "FArchiveCookData";
             "ITargetPlatform";
 
+            //Script.h
+            "FBlueprintContext";
         }}
 
         enums_with_flags <- {{
             "EObjectFlags" => true;
+            "EFunctionFlags" => true;
+            //"EPropertyFlags" => true;
         }}
 
     //TODO: check if this may be moved to cbind_boost
@@ -460,7 +467,8 @@ class UnrealGen : CppGenBind
             fname |> find("UObject/UObjectGlobals.h") != -1 ||
             fname |> find("UObject/UnrealType.h") != -1 ||
             fname |> find("UObject/Field.h") != -1 ||
-            fname |> find("UObject/Stack.h") != -1
+            fname |> find("UObject/Stack.h") != -1 ||
+            fname |> find("UObject/Script.h") != -1
         )
             return false
         return true

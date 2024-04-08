@@ -120,3 +120,4 @@
 #include "UObject/UnrealType.h"
 #include "UObject/Field.h"
 #include "UObject/Stack.h"
+#include "UObject/Script.h"

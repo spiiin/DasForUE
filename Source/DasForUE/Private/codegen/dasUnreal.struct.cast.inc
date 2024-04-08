@@ -67,6 +67,42 @@ template <> struct cast_arg<FPrimaryAssetId> {
 		return * cast<FPrimaryAssetId *>::to(res);
 	}
 };
+template <> struct cast_arg<FStatGroup_STATGROUP_Script> {
+	static __forceinline const FStatGroup_STATGROUP_Script & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FStatGroup_STATGROUP_Script *>::to(res);
+	}
+};
+template <> struct cast_arg<FBlueprintExceptionInfo> {
+	static __forceinline const FBlueprintExceptionInfo & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FBlueprintExceptionInfo *>::to(res);
+	}
+};
+template <> struct cast_arg<FScriptInstrumentationSignal> {
+	static __forceinline const FScriptInstrumentationSignal & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FScriptInstrumentationSignal *>::to(res);
+	}
+};
+template <> struct cast_arg<FBlueprintCoreDelegates> {
+	static __forceinline const FBlueprintCoreDelegates & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FBlueprintCoreDelegates *>::to(res);
+	}
+};
+template <> struct cast_arg<FBlueprintContextTracker> {
+	static __forceinline const FBlueprintContextTracker & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FBlueprintContextTracker *>::to(res);
+	}
+};
+template <> struct cast_arg<FEditorScriptExecutionGuard> {
+	static __forceinline const FEditorScriptExecutionGuard & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FEditorScriptExecutionGuard *>::to(res);
+	}
+};
 template <> struct cast_arg<FVTableHelper> {
 	static __forceinline const FVTableHelper & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
