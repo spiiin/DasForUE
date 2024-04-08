@@ -54,17 +54,17 @@ namespace das {
     };
 
     //------------------------------------------------------------------------
-    struct DasUeCallback {
-        Lambda      lambda;
-        Context* context = nullptr;
-    };
 
-    thread_local das_map<const UFunction*, DasUeCallback> g_Callbacks;
+    thread_local das_map<const UFunction*, UnrealNativeFunc> Module_dasUnreal::g_Callbacks;
 
-    static void dasForUeNativeFunc(UObject* unrealContext, FFrame& theStack, void*const param) {
+    Module_dasUnreal::~Module_dasUnreal() {
+        g_Callbacks.clear();
+    }
+
+    static void unrealNativeFunc(UObject* unrealContext, FFrame& theStack, void* const param) {
         auto key = theStack.CurrentNativeFunction;
-        auto it = g_Callbacks.find(key);
-        if (it == g_Callbacks.end()) {
+        auto it = Module_dasUnreal::g_Callbacks.find(key);
+        if (it == Module_dasUnreal::g_Callbacks.end()) {
             das_to_stderr("Error, native function doesn't exist for UFunction [%p]", key); //TODO: add function name
             return;
         }
@@ -75,10 +75,9 @@ namespace das {
         }
     }
 
-
-    void setNativeFunc(UFunction* uFunction, das::TLambda<void, UObject*, FFrame&, void*const> dasFunction, Context* dasContext) {
-        g_Callbacks[uFunction] = { dasFunction, dasContext };
-        uFunction->SetNativeFunc(&dasForUeNativeFunc);
+    static void setNativeFunc(UFunction* uFunction, das::TLambda<void, UObject*, FFrame&, void*const> dasFunction, Context* dasContext) {
+        Module_dasUnreal::g_Callbacks[uFunction] = { dasFunction, dasContext };
+        uFunction->SetNativeFunc(&unrealNativeFunc);
     }
 
     //------------------------------------------------------------------------

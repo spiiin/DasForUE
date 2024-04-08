@@ -28,6 +28,10 @@ protected:
 public:
 	ModuleLibrary lib;
 	bool initialized = false;
+	public:
+		virtual ~Module_dasUnreal();
+	public:
+		static thread_local das_map<const UFunction*, UnrealNativeFunc> g_Callbacks;
 };
 }
 

@@ -587,6 +587,12 @@ class UnrealGen : CppGenBind
         fwrite(module_h_file, "#include \"using_das.inc\"\n")
         fwrite(module_h_file, "#include \"cb_dasUnreal.h\"\n")
 
+    def override generateModuleHSuffix
+        module_h_file |> fwrite("\tpublic:\n")
+        module_h_file |> fwrite("\t\tvirtual ~Module_{bind_module}();\n")
+        module_h_file |> fwrite("\tpublic:\n")
+        module_h_file |> fwrite("\t\tstatic thread_local das_map<const UFunction*, UnrealNativeFunc> g_Callbacks;\n")
+
     def override generateModuleH
         module_h_file |> fwrite("#pragma once\n")
         generateModuleHPrefix()

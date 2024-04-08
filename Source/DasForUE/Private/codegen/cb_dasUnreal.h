@@ -30,9 +30,6 @@ namespace das {
         }
     };
 
-    //------------------------------------------------------------------------
-    //Manual add, replace after re-generate
-
     template <> struct cast_arg<FName> {
         static __forceinline const FName& to(Context& ctx, SimNode* node) {
             vec4f res = node->eval(ctx);
@@ -45,6 +42,11 @@ namespace das {
             vec4f res = node->eval(ctx);
             return *cast<FName*>::to(res);
         }
+    };
+
+    struct UnrealNativeFunc {
+        Lambda      lambda;
+        Context* context = nullptr;
     };
 }
 
