@@ -1,0 +1,3 @@
+[submodule "ThirdParty/daScript"]
+	path = ThirdParty/daScript
+	url = https://github.com/spiiin/daScript.git
