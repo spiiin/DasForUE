@@ -1,4 +1,5 @@
 //options log=true
+//options optimize=false
 require unreal_boost
 //require unreal_boost_internal
 
@@ -29,13 +30,18 @@ def SaySomething(var obj: UObject?; var msg: FString)
 struct SaySomethingGeneratedParams
     a : int
     msg : FString
+    f: float
+    g: float
 
-def SaySomethingGenerated(var obj: UObject?; a : int; var msg: FString)
+def SaySomethingGenerated(var obj: UObject?; a : int; var msg: FString; f, g: float)
     unsafe
         var params: SaySomethingGeneratedParams //no inited, unsafe
         params.a = a
         params.msg <- msg
+        params.f = f
+        params.g = g
         obj |> call_ufunction_on("SaySomethingGenerated") <| addr(params)
+        print("After call: params.a = {params.a}")
 
 //--------------------------------------------------------------
 
@@ -72,4 +78,4 @@ def main
     let fn = cls |> test_emit_ufunction() <| FName("SaySomethingGenerated")
     print("Generated function name: {string(*fn |> GetName)}\n")
 
-    obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"))
+    obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"), 3.14f, 2.71f)

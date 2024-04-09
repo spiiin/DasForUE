@@ -63,6 +63,12 @@ let private funcFlags = (
     EFunctionFlags FUNC_Public
 )
 
+struct SaySomethingGeneratedParams1
+    g:float
+    f: float
+    msg : FString
+    a : int
+
 def test_emit_ufunction(var cls: UClass?; var name: FName)
     //check if function with name already exist in this class or it's superclasses
     //  TODO:
@@ -78,8 +84,7 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
         FName("Parameter1"),
         propertyObjFlags 
     )
-    var propPtr1 = unsafe(reinterpret<FProperty?> field1) //TODO: find a way to construct field with something return FProperty?
-    *fn |> AddCppProperty(propPtr1)
+    *fn |> AddCppProperty(unsafe(reinterpret<FProperty?> field1))
 
     var field2 = Construct(
         [[FStrProperty?]],
@@ -87,8 +92,23 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
         FName("Parameter2"),
         propertyObjFlags 
     )
-    var propPtr2 = unsafe(reinterpret<FProperty?> field2) //TODO: find a way to construct field with something return FProperty?
-    *fn |> AddCppProperty(propPtr2)
+    *fn |> AddCppProperty(unsafe(reinterpret<FProperty?> field2))
+
+    var field3 = Construct(
+        [[FFloatProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
+        FFieldVariant(fn),
+        FName("Parameter3"),
+        propertyObjFlags 
+    )
+    *fn |> AddCppProperty(unsafe(reinterpret<FProperty?> field3))
+
+    var field4 = Construct(
+        [[FFloatProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
+        FFieldVariant(fn),
+        FName("Parameter4"),
+        propertyObjFlags 
+    )
+    *fn |> AddCppProperty(unsafe(reinterpret<FProperty?> field4))
 
     //fill class 
     *cls |> AddFunctionToFunctionMap(fn, name)
@@ -98,12 +118,72 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
 
     //create function body
     fn |> SetNativeFunc <| @(var context: UObject?; var stack: FFrame; param: void?)
-        print("In native func\n")
-        let fn = stack.Node
-        let param2 = fn |> GetChildFieldsFromStruct_FField
-        print("Generated function parameter2 name: {string(*param2 |> GetName)}\n")
-        let param1 = param2.Next //stack
-        print("Generated function parameter1 name: {string(*param1 |> GetName)}\n")
+        //init debug
+        print("In generated funcion\n")
+        let selfFunction = stack.Node
+
+        /*let param4f = selfFunction |> GetChildFieldsFromStruct_FField
+        print("  Generated function parameter4 name: {string(*param4f |> GetName)}\n")
+        let param3f = param4f.Next //stack
+        print("  Generated function parameter3 name: {string(*param3f |> GetName)}\n")
+        let param2f = param3f.Next //stack
+        print("  Generated function parameter2 name: {string(*param2f |> GetName)}\n")
+        let param1f = param2f.Next //stack
+        print("  Generated function parameter1 name: {string(*param1f |> GetName)}\n")*/
+
+        print("  Generated function ParmsSize = {fn.ParmsSize}\n")
+
+        print("ppp {stack.Node}\n")
+        print("ppp {stack.Object}\n")
+        print("ppp {stack.Code}\n")
+        print("ppp {stack.Locals}\n")
+        print("ppp {stack.PropertyChainForCompiledIn}\n")
+        print("ppp {stack.CurrentNativeFunction}\n")
+
+        unsafe
+            var f = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
+            print("PropertyChainForCompiledIn name: {string(*f |> GetName)}\n")
+
         //let obj = unsafe(reinterpret<UMyClassToTestPtr?> context)
+
+        //prolog
+        unsafe
+            print("  Parameters values:\n")
+            //is GetDefaultPropertyValue really need?
+
+            /*var param1 = 0 //GetDefaultPropertyValue([[FIntProperty?]])
+            stack |> StepCompiledIn(addr(param1), [[FIntProperty?]] |> StaticClass)
+            print("    {string(*param1f |> GetName)} : {param1}\n")*/
+
+            /*var param2 : FString //GetDefaultPropertyValue([[FStrProperty?]])
+            stack |> StepCompiledIn(addr(param2), [[FStrProperty?]] |> StaticClass)
+            print("    {string(*param2f |> GetName)} : {string(param2)}\n")*/
+
+            /*var param3 = 0.f //GetDefaultPropertyValue([[FFloatProperty?]])
+            stack |> StepCompiledIn(addr(param3), [[FFloatProperty?]] |> StaticClass)
+            print("    {string(*param3f |> GetName)} : {param3}\n")*/
+
+
+            var prop1Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
+            print("    PropertyChainForCompiledIn current name: {string(*prop1Ptr |> GetName)}\n")
+
+            var param4 = 33.f //GetDefaultPropertyValue([[FFloatProperty?]])
+            stack |> StepCompiledIn(addr(param4), [[FFloatProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {param4}\n")
+
+            var prop2Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
+            print("    PropertyChainForCompiledIn current name: {string(*prop2Ptr |> GetName)}\n")
+
+            let params = reinterpret<SaySomethingGeneratedParams1?>(stack.Locals)
+            print("    Stack locals: {params.a}\n")
+
+            if stack.Code != null //stack.Code += !!stack.Code
+                stack.Code++
+            
+            
+        //epilogue
+        //*((FVector*)(Z_Param__Result)) = Result;
+        
     *fn |> StaticLink(true)
+    print("  Generated function ParmsSize = {fn.ParmsSize}\n")
     return fn
