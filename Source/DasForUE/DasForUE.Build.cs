@@ -11,18 +11,18 @@ public class DasForUE : ModuleRules
 		//PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs; //use for check if some headers were forgotten
 		
 		string PluginDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../"));
-		PublicAdditionalLibraries.Add(Path.Combine(PluginDir, "daScript/cmake_temp/Release/libDaScript.lib"));
+		PublicAdditionalLibraries.Add(Path.Combine(PluginDir, "ThirdParty/daScript/cmake_temp/Release/libDaScript.lib"));
 		
+		PublicDefinitions.Add("DAS_EXTERN_LOGERROR");
 		PublicIncludePaths.AddRange(
 			new string[] {
-				// ... add public include paths required here ...
 			}
 		);
 
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				"../daScript/include"
+				"../ThirdParty/daScript/include"
 			}
 		);
 		
@@ -48,7 +48,6 @@ public class DasForUE : ModuleRules
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
-				// ... add any modules that your module loads dynamically here ...
 			}
 		);
 	}
