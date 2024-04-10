@@ -369,6 +369,7 @@ struct UScriptStruct_ICppStructOps_FCapabilities_GeneratedAnnotation : ManagedSt
 	UScriptStruct_ICppStructOps_FCapabilities_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FCapabilities", ml, "UScriptStruct::ICppStructOps::FCapabilities") {
 	}
 	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(ComputedPropertyFlags)>("ComputedPropertyFlags","ComputedPropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(HasSerializerObjectReferences)>("HasSerializerObjectReferences","HasSerializerObjectReferences");
 	}
 };
@@ -539,6 +540,7 @@ struct FProperty_GeneratedAnnotation : ManagedStructureAnnotation<FProperty> {
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(ArrayDim)>("ArrayDim","ArrayDim");
 		addField<DAS_BIND_MANAGED_FIELD(ElementSize)>("ElementSize","ElementSize");
+		addField<DAS_BIND_MANAGED_FIELD(PropertyFlags)>("PropertyFlags","PropertyFlags");
 		addField<DAS_BIND_MANAGED_FIELD(RepIndex)>("RepIndex","RepIndex");
 		addField<DAS_BIND_MANAGED_FIELD(PropertyLinkNext)>("PropertyLinkNext","PropertyLinkNext");
 		addField<DAS_BIND_MANAGED_FIELD(NextRef)>("NextRef","NextRef");

@@ -21,7 +21,7 @@ class UnrealGen : CppGenBind
 
     declaredFunctionsHashes : table<uint64>
     declaredFunctionsHashesWithoutResults : table<uint64>
-    declearedEnumsHashes : table<uint64>
+    declaredEnumsHashes : table<uint64>
 
     def UnrealGen()
         bind_root = BIND_ROOT
@@ -176,11 +176,6 @@ class UnrealGen : CppGenBind
             "UClass::CreateLinkAndAddChildFunctionsToMap";
             "UClass::GetDefaultPropertiesFeedbackContext";
             "UClass::SetupObjectInitializer";
-            "UClass::GetClassFlags";
-            "UClass::HasAllClassFlags";
-            "UClass::HasAnyClassFlags";
-            "UClass::HasAnyCastFlag";
-            "UClass::HasAllCastFlags";
 
             "UScriptStruct::UseBinarySerialization";
             "UScriptStruct::SerializeItem";
@@ -242,7 +237,6 @@ class UnrealGen : CppGenBind
             "FProperty::FProperty";
 
             "FProperty::Construct"; //"abstract macro" -- has no implementation, ancestor implement it
-            "FProperty::GetPropertyFlags";
             "FPropertyHelpers::ReadToken";
 
             //FArchive.h
@@ -305,8 +299,6 @@ class UnrealGen : CppGenBind
             "FWeakObjectPtr";
 
             //UObjectTypes
-            
-            "EPropertyFlags"; //TODO: crashes, check reason (64 bit type?)
 
             "const WIDECHAR *";  //mostly (for UnrealString, at least), it related to overloads char/wchar/unsigned short/UTF8CHAR
             "const UCS2CHAR *";  //check what can be done with them
@@ -438,7 +430,7 @@ class UnrealGen : CppGenBind
         enums_with_flags <- {{
             "EObjectFlags" => true;
             "EFunctionFlags" => true;
-            //"EPropertyFlags" => true;
+            "EPropertyFlags" => true;
         }}
 
     //TODO: check if this may be moved to cbind_boost
@@ -895,11 +887,11 @@ class UnrealGen : CppGenBind
             return
 
         let enumNameHash = hash("{ns_en},{enum_name}")
-        var skipAlreadyDeclared = declearedEnumsHashes |> key_exists(enumNameHash)
+        var skipAlreadyDeclared = declaredEnumsHashes |> key_exists(enumNameHash)
         if skipAlreadyDeclared
             to_log(LOG_INFO, "Enum declaration {ns_en} {enum_name} already generated, skipped (possible declared twice)\n")
             return
-        declearedEnumsHashes |> insert <| enumNameHash
+        declaredEnumsHashes |> insert <| enumNameHash
 
         enumDecl |> push([[auto ns_en,enum_name]])
         let dashing_name = namespace_name(enum_name,"_")
