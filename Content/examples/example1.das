@@ -31,9 +31,9 @@ struct SaySomethingGeneratedParams
     a : int
     msg : FString
     f: float
-    g: float
+    g: int
 
-def SaySomethingGenerated(var obj: UObject?; a : int; var msg: FString; f, g: float)
+def SaySomethingGenerated(var obj: UObject?; a : int; var msg: FString; f: float; g: int)
     unsafe
         var params: SaySomethingGeneratedParams //no inited, unsafe
         params.a = a
@@ -41,7 +41,6 @@ def SaySomethingGenerated(var obj: UObject?; a : int; var msg: FString; f, g: fl
         params.f = f
         params.g = g
         obj |> call_ufunction_on("SaySomethingGenerated") <| addr(params)
-        print("After call: params.a = {params.a}")
 
 //--------------------------------------------------------------
 
@@ -78,4 +77,4 @@ def main
     let fn = cls |> test_emit_ufunction() <| FName("SaySomethingGenerated")
     print("Generated function name: {string(*fn |> GetName)}\n")
 
-    obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"), 3.14f, 2.71f)
+    obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"), 3.14f, 33)

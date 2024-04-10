@@ -62,12 +62,13 @@ let private funcFlags = (
     EFunctionFlags FUNC_Native |
     EFunctionFlags FUNC_Public
 )
+let private propFlags = EPropertyFlags CPF_Parm
 
 struct SaySomethingGeneratedParams1
-    g:float
-    f: float
-    msg : FString
     a : int
+    msg : FString
+    f: float
+    g: int
 
 def test_emit_ufunction(var cls: UClass?; var name: FName)
     //check if function with name already exist in this class or it's superclasses
@@ -82,33 +83,55 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
         [[FIntProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
         FFieldVariant(fn),
         FName("Parameter1"),
-        propertyObjFlags 
+        propertyObjFlags
     )
-    *fn |> AddCppProperty(unsafe(reinterpret<FProperty?> field1))
+    var prop1 = unsafe(reinterpret<FProperty?> field1)
+    //let flagsTest = *prop1 |> GetPropertyFlags
+    //print("Flags: {flagsTest}\n") //crash
+    //prop1.PropertyFlags |= propFlags
+    *prop1 |> SetPropertyFlags(propFlags)
+    *fn |> AddCppProperty(prop1)
 
     var field2 = Construct(
         [[FStrProperty?]],
         FFieldVariant(fn),
         FName("Parameter2"),
-        propertyObjFlags 
+        propertyObjFlags
     )
-    *fn |> AddCppProperty(unsafe(reinterpret<FProperty?> field2))
+    var prop2 = unsafe(reinterpret<FProperty?> field2)
+    *prop2 |> SetPropertyFlags(propFlags)
+    *fn |> AddCppProperty(prop2)
+    
 
     var field3 = Construct(
         [[FFloatProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
         FFieldVariant(fn),
         FName("Parameter3"),
-        propertyObjFlags 
+        propertyObjFlags
     )
-    *fn |> AddCppProperty(unsafe(reinterpret<FProperty?> field3))
+    var prop3 = unsafe(reinterpret<FProperty?> field3)
+    *prop3 |> SetPropertyFlags(propFlags)
+    *fn |> AddCppProperty(prop3)
 
     var field4 = Construct(
-        [[FFloatProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
+        [[FIntProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
         FFieldVariant(fn),
         FName("Parameter4"),
-        propertyObjFlags 
+        propertyObjFlags
     )
-    *fn |> AddCppProperty(unsafe(reinterpret<FProperty?> field4))
+    var prop4 = unsafe(reinterpret<FProperty?> field4)
+    *prop4 |> SetPropertyFlags(propFlags)
+    *fn |> AddCppProperty(prop4)
+
+    /*var field5 = Construct(
+        [[FIntProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
+        FFieldVariant(fn),
+        FName("Parameter5"),
+        propertyObjFlags
+    )
+    var prop5 = unsafe(reinterpret<FProperty?> field5)
+    *prop5 |> SetPropertyFlags(propFlags)
+    *fn |> AddCppProperty(prop5)*/
 
     //fill class 
     *cls |> AddFunctionToFunctionMap(fn, name)
@@ -131,18 +154,14 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
         let param1f = param2f.Next //stack
         print("  Generated function parameter1 name: {string(*param1f |> GetName)}\n")*/
 
-        print("  Generated function ParmsSize = {fn.ParmsSize}\n")
+        print("  Generated function ParmsSize = {int(fn.ParmsSize)}\n")
 
-        print("ppp {stack.Node}\n")
-        print("ppp {stack.Object}\n")
-        print("ppp {stack.Code}\n")
-        print("ppp {stack.Locals}\n")
-        print("ppp {stack.PropertyChainForCompiledIn}\n")
-        print("ppp {stack.CurrentNativeFunction}\n")
-
-        unsafe
-            var f = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
-            print("PropertyChainForCompiledIn name: {string(*f |> GetName)}\n")
+        print("stack.Node: {stack.Node}\n")
+        print("stack.Object {stack.Object}\n")
+        print("stack.Code {stack.Code}\n")
+        print("stack.Locals {stack.Locals}\n")
+        print("stack.PropertyChainForCompiledIn {stack.PropertyChainForCompiledIn}\n")
+        print("stack.CurrentNativeFunction {stack.CurrentNativeFunction}\n")
 
         //let obj = unsafe(reinterpret<UMyClassToTestPtr?> context)
 
@@ -151,31 +170,23 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
             print("  Parameters values:\n")
             //is GetDefaultPropertyValue really need?
 
-            /*var param1 = 0 //GetDefaultPropertyValue([[FIntProperty?]])
-            stack |> StepCompiledIn(addr(param1), [[FIntProperty?]] |> StaticClass)
-            print("    {string(*param1f |> GetName)} : {param1}\n")*/
-
-            /*var param2 : FString //GetDefaultPropertyValue([[FStrProperty?]])
-            stack |> StepCompiledIn(addr(param2), [[FStrProperty?]] |> StaticClass)
-            print("    {string(*param2f |> GetName)} : {string(param2)}\n")*/
-
-            /*var param3 = 0.f //GetDefaultPropertyValue([[FFloatProperty?]])
-            stack |> StepCompiledIn(addr(param3), [[FFloatProperty?]] |> StaticClass)
-            print("    {string(*param3f |> GetName)} : {param3}\n")*/
-
-
-            var prop1Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
+            /*var prop1Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
             print("    PropertyChainForCompiledIn current name: {string(*prop1Ptr |> GetName)}\n")
 
             var param4 = 33.f //GetDefaultPropertyValue([[FFloatProperty?]])
             stack |> StepCompiledIn(addr(param4), [[FFloatProperty?]] |> StaticClass)
             print("        StepCompiledIn : {param4}\n")
 
+            var param3 = 33.f //GetDefaultPropertyValue([[FFloatProperty?]])
+            stack |> StepCompiledIn(addr(param3), [[FFloatProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {param3}\n")
+
             var prop2Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
-            print("    PropertyChainForCompiledIn current name: {string(*prop2Ptr |> GetName)}\n")
+            print("    PropertyChainForCompiledIn current name: {string(*prop2Ptr |> GetName)}\n")*/
 
             let params = reinterpret<SaySomethingGeneratedParams1?>(stack.Locals)
-            print("    Stack locals: {params.a}\n")
+            print("    Stack locals: {params}\n")
+            print("    Stack locals str: {string(params.msg)}\n")
 
             if stack.Code != null //stack.Code += !!stack.Code
                 stack.Code++
