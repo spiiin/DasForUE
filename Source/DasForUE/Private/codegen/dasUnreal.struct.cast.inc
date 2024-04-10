@@ -163,12 +163,6 @@ template <> struct cast_arg<FCoreUObjectDelegates> {
 		return * cast<FCoreUObjectDelegates *>::to(res);
 	}
 };
-template <> struct cast_arg<FDynamicClassStaticData> {
-	static __forceinline const FDynamicClassStaticData & to ( Context & ctx, SimNode * node ) {
-		vec4f res = node->eval(ctx);
-		return * cast<FDynamicClassStaticData *>::to(res);
-	}
-};
 template <> struct cast_arg<UE::FAssetLog> {
 	static __forceinline const UE::FAssetLog & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);

@@ -243,14 +243,6 @@ struct FCoreUObjectDelegates_GeneratedAnnotation : ManagedStructureAnnotation<FC
 	}
 };
 
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3096:97
-struct FDynamicClassStaticData_GeneratedAnnotation : ManagedStructureAnnotation<FDynamicClassStaticData> {
-	FDynamicClassStaticData_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FDynamicClassStaticData", ml, "FDynamicClassStaticData") {
-	}
-	void init () {
-	}
-};
-
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3116:7
 struct UE_FAssetLog_GeneratedAnnotation : ManagedStructureAnnotation<UE::FAssetLog> {
 	UE_FAssetLog_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FAssetLog", ml, "UE::FAssetLog") {
@@ -525,11 +517,6 @@ struct UPackage_GeneratedAnnotation : ManagedStructureAnnotation<UPackage, false
 	UPackage_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UPackage", ml, "UPackage") {
 	}
 	void init () {
-		addField<DAS_BIND_MANAGED_FIELD(LinkerLicenseeVersion)>("LinkerLicenseeVersion","LinkerLicenseeVersion");
-		addField<DAS_BIND_MANAGED_FIELD(FileSize)>("FileSize","FileSize");
-		addField<DAS_BIND_MANAGED_FIELD(MetaData)>("MetaData","MetaData");
-		addField<DAS_BIND_MANAGED_FIELD(PIEInstanceID)>("PIEInstanceID","PIEInstanceID");
-		addField<DAS_BIND_MANAGED_FIELD(FileName)>("FileName","FileName");
 	}
 };
 

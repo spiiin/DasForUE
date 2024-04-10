@@ -85,8 +85,6 @@ DAS_BASE_BIND_ENUM_GEN(EHotReloadedClassFlags,EHotReloadedClassFlags);
 
 DAS_BASE_BIND_ENUM_GEN(EReloadCompleteReason,EReloadCompleteReason);
 
-DAS_BASE_BIND_ENUM_GEN(EConstructDynamicType,EConstructDynamicType);
-
 DAS_BASE_BIND_ENUM_GEN(UECodeGen_Private::EPropertyGenFlags,UECodeGen_Private_EPropertyGenFlags);
 
 DAS_BASE_BIND_ENUM_GEN(EDataValidationResult,EDataValidationResult);

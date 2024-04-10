@@ -43,7 +43,6 @@ addEnumeration(make_smart<Enumeration_EObjectInitializerOptions>());
 addEnumeration(make_smart<Enumeration_EPackageReloadPhase>());
 addEnumeration(make_smart<Enumeration_EHotReloadedClassFlags>());
 addEnumeration(make_smart<Enumeration_EReloadCompleteReason>());
-addEnumeration(make_smart<Enumeration_EConstructDynamicType>());
 addEnumeration(make_smart<Enumeration_UECodeGen_Private_EPropertyGenFlags>());
 addEnumeration(make_smart<Enumeration_EDataValidationResult>());
 addEnumeration(make_smart<Enumeration_EObjectMark>());

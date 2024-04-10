@@ -518,6 +518,8 @@ class UnrealGen : CppGenBind
             return true
         if function_name |> starts_with("UObject::exec") //DECLARE_FUNCTION macro in UObject, internal function call processing
             return true
+        if check_deprecated_attribute(c)
+            return true
         if skip_arguments_and_result_types(c)
             return true
         if unreal_skip_func |> key_exists(function_name)
@@ -647,7 +649,8 @@ class UnrealGen : CppGenBind
         module_cpp_file |> fwrite("REGISTER_MODULE_IN_NAMESPACE(Module_{bind_module},das);\n\n")
 
     //TODO: check if really need overload, or base class expanded needed
-    def override parse_Struct(var c :CXCursor; struct_name :string)
+    def override parse_Struct(var c: CXCursor; struct_name: string)
+        return if check_deprecated_attribute(c)
         return if struct_name |> starts_with <| "(" // do nothing for anonymous unions/structs
         let struct_namespace_name = namespace_name(struct_name)
         nsst2st[struct_namespace_name] = struct_name
@@ -853,6 +856,8 @@ class UnrealGen : CppGenBind
                 str |> write(" const")
 
     def override parse_Field(var c : CXCursor)
+        return if check_deprecated_attribute(c)
+        
         let field_name = string(clang_getCursorSpelling(c))
         var field_type = clang_getCanonicalType(clang_getCursorType(c))
         let field_type_name = string(clang_getTypeSpelling(field_type))
@@ -870,21 +875,15 @@ class UnrealGen : CppGenBind
             *wr |> write("\t\t\t.adjustAot(\"das_reinterpret<{substType}>::pass(\",\")\");\n")
 
     def check_deprecated_attribute(var cursor : CXCursor)
-        //check [[deprecated]] attribute, Unreal mark enum values with it
-        var hasDeprecationAttribute = false
-        clang_visitChildren(cursor) <| $ (var cc, cc_parent)
-            if cc.kind == CXCursorKind FirstAttr
-                //TODO: check attribute name
-                hasDeprecationAttribute = true
-                return CXChildVisitResult Break
-            return CXChildVisitResult Recurse
-        return hasDeprecationAttribute
+        let av = clang_getCursorAvailability(cursor)
+        return av == CXAvailabilityKind Deprecated
 
-    def override parse_Enum(var cursor : CXCursor; enum_name : string)
+    def override parse_Enum(var cursor: CXCursor; enum_name: string)
+        return if check_deprecated_attribute(cursor)
+    
         let ns_en = namespace_name(enum_name)
         let das_enum_name = dasEnumName(enum_name,ns_en)
-        if skip_enum(ns_en,enum_name)
-            return
+        return if skip_enum(ns_en,enum_name)
 
         let enumNameHash = hash("{ns_en},{enum_name}")
         var skipAlreadyDeclared = declaredEnumsHashes |> key_exists(enumNameHash)
@@ -910,8 +909,6 @@ class UnrealGen : CppGenBind
                 
                 if !check_deprecated_attribute(c)
                     fprint(enum_class_file, "\t\taddIEx(\"{deen}\", \"{een}\", int64_t({ns_en}::{een}), das::LineInfo());\n")
-                else
-                    to_log(LOG_INFO, "Enum value {een} mark as deprecated, skipped\n")
                 return CXChildVisitResult Continue
             else
                 return CXChildVisitResult Recurse

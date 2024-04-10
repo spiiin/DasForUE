@@ -231,19 +231,9 @@ void Module_dasUnreal::initFunctions_1() {
 	makeExtern<DAS_CALL_METHOD(_method_46), SimNode_ExtFuncCall >(lib,"LicenseeUEVer","das_call_member< int (FArchiveState::*)() const , &FArchiveState::LicenseeUEVer >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_47 = das::das_call_member< int (FArchiveState::*)() const,&FArchiveState::UE4Ver >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:216:20
-	makeExtern<DAS_CALL_METHOD(_method_47), SimNode_ExtFuncCall >(lib,"UE4Ver","das_call_member< int (FArchiveState::*)() const , &FArchiveState::UE4Ver >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_48 = das::das_call_member< int (FArchiveState::*)() const,&FArchiveState::LicenseeUE4Ver >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:223:20
-	makeExtern<DAS_CALL_METHOD(_method_48), SimNode_ExtFuncCall >(lib,"LicenseeUE4Ver","das_call_member< int (FArchiveState::*)() const , &FArchiveState::LicenseeUE4Ver >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_49 = das::das_call_member< FEngineVersionBase (FArchiveState::*)() const,&FArchiveState::EngineVer >;
+	using _method_47 = das::das_call_member< FEngineVersionBase (FArchiveState::*)() const,&FArchiveState::EngineVer >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:229:33
-	makeExtern<DAS_CALL_METHOD(_method_49), SimNode_ExtFuncCallAndCopyOrMove >(lib,"EngineVer","das_call_member< FEngineVersionBase (FArchiveState::*)() const , &FArchiveState::EngineVer >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_47), SimNode_ExtFuncCallAndCopyOrMove >(lib,"EngineVer","das_call_member< FEngineVersionBase (FArchiveState::*)() const , &FArchiveState::EngineVer >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:235:26
@@ -254,227 +244,237 @@ void Module_dasUnreal::initFunctions_1() {
 	makeExtern< unsigned int (*)(const FArchiveState &) , _dasUnreal_virtual_20_GameNetVer , SimNode_ExtFuncCall >(lib,"GameNetVer","_dasUnreal_virtual_20_GameNetVer")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_52 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsLoading >;
+	using _method_50 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsLoading >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:249:19
-	makeExtern<DAS_CALL_METHOD(_method_52), SimNode_ExtFuncCall >(lib,"IsLoading","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsLoading >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_50), SimNode_ExtFuncCall >(lib,"IsLoading","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsLoading >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_53 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsLoadingFromCookedPackage >;
+	using _method_51 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsLoadingFromCookedPackage >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:255:20
-	makeExtern<DAS_CALL_METHOD(_method_53), SimNode_ExtFuncCall >(lib,"IsLoadingFromCookedPackage","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsLoadingFromCookedPackage >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_51), SimNode_ExtFuncCall >(lib,"IsLoadingFromCookedPackage","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsLoadingFromCookedPackage >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_54 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsSaving >;
+	using _method_52 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsSaving >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:261:19
-	makeExtern<DAS_CALL_METHOD(_method_54), SimNode_ExtFuncCall >(lib,"IsSaving","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsSaving >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_52), SimNode_ExtFuncCall >(lib,"IsSaving","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsSaving >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_55 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsTransacting >;
+	using _method_53 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsTransacting >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:267:19
-	makeExtern<DAS_CALL_METHOD(_method_55), SimNode_ExtFuncCall >(lib,"IsTransacting","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsTransacting >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_53), SimNode_ExtFuncCall >(lib,"IsTransacting","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsTransacting >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_56 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsTextFormat >;
+	using _method_54 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsTextFormat >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:283:19
-	makeExtern<DAS_CALL_METHOD(_method_56), SimNode_ExtFuncCall >(lib,"IsTextFormat","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsTextFormat >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_54), SimNode_ExtFuncCall >(lib,"IsTextFormat","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsTextFormat >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_57 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::WantBinaryPropertySerialization >;
+	using _method_55 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::WantBinaryPropertySerialization >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:289:19
-	makeExtern<DAS_CALL_METHOD(_method_57), SimNode_ExtFuncCall >(lib,"WantBinaryPropertySerialization","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::WantBinaryPropertySerialization >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_55), SimNode_ExtFuncCall >(lib,"WantBinaryPropertySerialization","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::WantBinaryPropertySerialization >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_58 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::UseUnversionedPropertySerialization >;
+	using _method_56 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::UseUnversionedPropertySerialization >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:298:19
-	makeExtern<DAS_CALL_METHOD(_method_58), SimNode_ExtFuncCall >(lib,"UseUnversionedPropertySerialization","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::UseUnversionedPropertySerialization >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_56), SimNode_ExtFuncCall >(lib,"UseUnversionedPropertySerialization","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::UseUnversionedPropertySerialization >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_59 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsForcingUnicode >;
+	using _method_57 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsForcingUnicode >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:304:19
-	makeExtern<DAS_CALL_METHOD(_method_59), SimNode_ExtFuncCall >(lib,"IsForcingUnicode","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsForcingUnicode >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_57), SimNode_ExtFuncCall >(lib,"IsForcingUnicode","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsForcingUnicode >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_60 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsPersistent >;
+	using _method_58 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsPersistent >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:313:19
-	makeExtern<DAS_CALL_METHOD(_method_60), SimNode_ExtFuncCall >(lib,"IsPersistent","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsPersistent >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_58), SimNode_ExtFuncCall >(lib,"IsPersistent","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsPersistent >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_61 = das::das_call_member< void (FArchiveState::*)(bool),&FArchiveState::SetShouldSkipCompilingAssets >;
+	using _method_59 = das::das_call_member< void (FArchiveState::*)(bool),&FArchiveState::SetShouldSkipCompilingAssets >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:323:7
-	makeExtern<DAS_CALL_METHOD(_method_61), SimNode_ExtFuncCall >(lib,"SetShouldSkipCompilingAssets","das_call_member< void (FArchiveState::*)(bool) , &FArchiveState::SetShouldSkipCompilingAssets >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_59), SimNode_ExtFuncCall >(lib,"SetShouldSkipCompilingAssets","das_call_member< void (FArchiveState::*)(bool) , &FArchiveState::SetShouldSkipCompilingAssets >::invoke")
 		->args({"self","Enabled"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_62 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ShouldSkipCompilingAssets >;
+	using _method_60 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ShouldSkipCompilingAssets >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:331:19
-	makeExtern<DAS_CALL_METHOD(_method_62), SimNode_ExtFuncCall >(lib,"ShouldSkipCompilingAssets","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ShouldSkipCompilingAssets >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_60), SimNode_ExtFuncCall >(lib,"ShouldSkipCompilingAssets","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ShouldSkipCompilingAssets >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_63 = das::das_call_member< void (FArchiveState::*)(bool),&FArchiveState::SetShouldSkipUpdateCustomVersion >;
+	using _method_61 = das::das_call_member< void (FArchiveState::*)(bool),&FArchiveState::SetShouldSkipUpdateCustomVersion >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:341:16
-	makeExtern<DAS_CALL_METHOD(_method_63), SimNode_ExtFuncCall >(lib,"SetShouldSkipUpdateCustomVersion","das_call_member< void (FArchiveState::*)(bool) , &FArchiveState::SetShouldSkipUpdateCustomVersion >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_61), SimNode_ExtFuncCall >(lib,"SetShouldSkipUpdateCustomVersion","das_call_member< void (FArchiveState::*)(bool) , &FArchiveState::SetShouldSkipUpdateCustomVersion >::invoke")
 		->args({"self","bShouldSkip"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_64 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ShouldSkipUpdateCustomVersion >;
+	using _method_62 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ShouldSkipUpdateCustomVersion >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:344:19
-	makeExtern<DAS_CALL_METHOD(_method_64), SimNode_ExtFuncCall >(lib,"ShouldSkipUpdateCustomVersion","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ShouldSkipUpdateCustomVersion >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_62), SimNode_ExtFuncCall >(lib,"ShouldSkipUpdateCustomVersion","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ShouldSkipUpdateCustomVersion >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_65 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsError >;
+	using _method_63 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsError >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:350:19
-	makeExtern<DAS_CALL_METHOD(_method_65), SimNode_ExtFuncCall >(lib,"IsError","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsError >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_63), SimNode_ExtFuncCall >(lib,"IsError","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsError >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_66 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::GetError >;
+	using _method_64 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::GetError >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:355:19
-	makeExtern<DAS_CALL_METHOD(_method_66), SimNode_ExtFuncCall >(lib,"GetError","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::GetError >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_64), SimNode_ExtFuncCall >(lib,"GetError","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::GetError >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_67 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsCriticalError >;
+	using _method_65 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsCriticalError >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:361:19
-	makeExtern<DAS_CALL_METHOD(_method_67), SimNode_ExtFuncCall >(lib,"IsCriticalError","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsCriticalError >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_65), SimNode_ExtFuncCall >(lib,"IsCriticalError","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsCriticalError >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_68 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ContainsCode >;
+	using _method_66 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ContainsCode >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:367:19
-	makeExtern<DAS_CALL_METHOD(_method_68), SimNode_ExtFuncCall >(lib,"ContainsCode","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ContainsCode >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_66), SimNode_ExtFuncCall >(lib,"ContainsCode","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ContainsCode >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_69 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ContainsMap >;
+	using _method_67 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ContainsMap >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:373:19
-	makeExtern<DAS_CALL_METHOD(_method_69), SimNode_ExtFuncCall >(lib,"ContainsMap","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ContainsMap >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_67), SimNode_ExtFuncCall >(lib,"ContainsMap","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ContainsMap >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_70 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::RequiresLocalizationGather >;
+	using _method_68 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::RequiresLocalizationGather >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:379:19
-	makeExtern<DAS_CALL_METHOD(_method_70), SimNode_ExtFuncCall >(lib,"RequiresLocalizationGather","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::RequiresLocalizationGather >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_68), SimNode_ExtFuncCall >(lib,"RequiresLocalizationGather","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::RequiresLocalizationGather >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_71 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ForceByteSwapping >;
+	using _method_69 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ForceByteSwapping >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:385:19
-	makeExtern<DAS_CALL_METHOD(_method_71), SimNode_ExtFuncCall >(lib,"ForceByteSwapping","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ForceByteSwapping >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_69), SimNode_ExtFuncCall >(lib,"ForceByteSwapping","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ForceByteSwapping >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_72 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsSerializingDefaults >;
+	using _method_70 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsSerializingDefaults >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:391:19
-	makeExtern<DAS_CALL_METHOD(_method_72), SimNode_ExtFuncCall >(lib,"IsSerializingDefaults","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsSerializingDefaults >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_70), SimNode_ExtFuncCall >(lib,"IsSerializingDefaults","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsSerializingDefaults >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_73 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsIgnoringArchetypeRef >;
+	using _method_71 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsIgnoringArchetypeRef >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:397:19
-	makeExtern<DAS_CALL_METHOD(_method_73), SimNode_ExtFuncCall >(lib,"IsIgnoringArchetypeRef","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsIgnoringArchetypeRef >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_71), SimNode_ExtFuncCall >(lib,"IsIgnoringArchetypeRef","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsIgnoringArchetypeRef >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_74 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::DoDelta >;
+	using _method_72 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::DoDelta >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:403:19
-	makeExtern<DAS_CALL_METHOD(_method_74), SimNode_ExtFuncCall >(lib,"DoDelta","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::DoDelta >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_72), SimNode_ExtFuncCall >(lib,"DoDelta","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::DoDelta >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_75 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::DoIntraPropertyDelta >;
+	using _method_73 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::DoIntraPropertyDelta >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:409:19
-	makeExtern<DAS_CALL_METHOD(_method_75), SimNode_ExtFuncCall >(lib,"DoIntraPropertyDelta","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::DoIntraPropertyDelta >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_73), SimNode_ExtFuncCall >(lib,"DoIntraPropertyDelta","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::DoIntraPropertyDelta >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_76 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsIgnoringOuterRef >;
+	using _method_74 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsIgnoringOuterRef >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:415:19
-	makeExtern<DAS_CALL_METHOD(_method_76), SimNode_ExtFuncCall >(lib,"IsIgnoringOuterRef","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsIgnoringOuterRef >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_74), SimNode_ExtFuncCall >(lib,"IsIgnoringOuterRef","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsIgnoringOuterRef >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_77 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsIgnoringClassGeneratedByRef >;
+	using _method_75 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsIgnoringClassGeneratedByRef >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:421:19
-	makeExtern<DAS_CALL_METHOD(_method_77), SimNode_ExtFuncCall >(lib,"IsIgnoringClassGeneratedByRef","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsIgnoringClassGeneratedByRef >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_75), SimNode_ExtFuncCall >(lib,"IsIgnoringClassGeneratedByRef","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsIgnoringClassGeneratedByRef >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_78 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsIgnoringClassRef >;
+	using _method_76 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsIgnoringClassRef >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:427:19
-	makeExtern<DAS_CALL_METHOD(_method_78), SimNode_ExtFuncCall >(lib,"IsIgnoringClassRef","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsIgnoringClassRef >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_76), SimNode_ExtFuncCall >(lib,"IsIgnoringClassRef","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsIgnoringClassRef >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_79 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsAllowingLazyLoading >;
+	using _method_77 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsAllowingLazyLoading >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:433:19
-	makeExtern<DAS_CALL_METHOD(_method_79), SimNode_ExtFuncCall >(lib,"IsAllowingLazyLoading","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsAllowingLazyLoading >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_77), SimNode_ExtFuncCall >(lib,"IsAllowingLazyLoading","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsAllowingLazyLoading >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_80 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsObjectReferenceCollector >;
+	using _method_78 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsObjectReferenceCollector >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:442:19
-	makeExtern<DAS_CALL_METHOD(_method_80), SimNode_ExtFuncCall >(lib,"IsObjectReferenceCollector","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsObjectReferenceCollector >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_78), SimNode_ExtFuncCall >(lib,"IsObjectReferenceCollector","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsObjectReferenceCollector >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_81 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsModifyingWeakAndStrongReferences >;
+	using _method_79 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsModifyingWeakAndStrongReferences >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:448:19
-	makeExtern<DAS_CALL_METHOD(_method_81), SimNode_ExtFuncCall >(lib,"IsModifyingWeakAndStrongReferences","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsModifyingWeakAndStrongReferences >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_79), SimNode_ExtFuncCall >(lib,"IsModifyingWeakAndStrongReferences","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsModifyingWeakAndStrongReferences >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_82 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsCountingMemory >;
+	using _method_80 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsCountingMemory >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:454:19
-	makeExtern<DAS_CALL_METHOD(_method_82), SimNode_ExtFuncCall >(lib,"IsCountingMemory","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsCountingMemory >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_80), SimNode_ExtFuncCall >(lib,"IsCountingMemory","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsCountingMemory >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_83 = das::das_call_member< unsigned int (FArchiveState::*)() const,&FArchiveState::GetPortFlags >;
+	using _method_81 = das::das_call_member< unsigned int (FArchiveState::*)() const,&FArchiveState::GetPortFlags >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:460:21
-	makeExtern<DAS_CALL_METHOD(_method_83), SimNode_ExtFuncCall >(lib,"GetPortFlags","das_call_member< unsigned int (FArchiveState::*)() const , &FArchiveState::GetPortFlags >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_81), SimNode_ExtFuncCall >(lib,"GetPortFlags","das_call_member< unsigned int (FArchiveState::*)() const , &FArchiveState::GetPortFlags >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_84 = das::das_call_member< bool (FArchiveState::*)(unsigned int) const,&FArchiveState::HasAnyPortFlags >;
+	using _method_82 = das::das_call_member< bool (FArchiveState::*)(unsigned int) const,&FArchiveState::HasAnyPortFlags >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:466:19
-	makeExtern<DAS_CALL_METHOD(_method_84), SimNode_ExtFuncCall >(lib,"HasAnyPortFlags","das_call_member< bool (FArchiveState::*)(unsigned int) const , &FArchiveState::HasAnyPortFlags >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_82), SimNode_ExtFuncCall >(lib,"HasAnyPortFlags","das_call_member< bool (FArchiveState::*)(unsigned int) const , &FArchiveState::HasAnyPortFlags >::invoke")
 		->args({"self","Flags"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_85 = das::das_call_member< bool (FArchiveState::*)(unsigned int) const,&FArchiveState::HasAllPortFlags >;
+	using _method_83 = das::das_call_member< bool (FArchiveState::*)(unsigned int) const,&FArchiveState::HasAllPortFlags >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:472:19
-	makeExtern<DAS_CALL_METHOD(_method_85), SimNode_ExtFuncCall >(lib,"HasAllPortFlags","das_call_member< bool (FArchiveState::*)(unsigned int) const , &FArchiveState::HasAllPortFlags >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_83), SimNode_ExtFuncCall >(lib,"HasAllPortFlags","das_call_member< bool (FArchiveState::*)(unsigned int) const , &FArchiveState::HasAllPortFlags >::invoke")
 		->args({"self","Flags"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_86 = das::das_call_member< unsigned int (FArchiveState::*)() const,&FArchiveState::GetDebugSerializationFlags >;
+	using _method_84 = das::das_call_member< unsigned int (FArchiveState::*)() const,&FArchiveState::GetDebugSerializationFlags >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:478:21
-	makeExtern<DAS_CALL_METHOD(_method_86), SimNode_ExtFuncCall >(lib,"GetDebugSerializationFlags","das_call_member< unsigned int (FArchiveState::*)() const , &FArchiveState::GetDebugSerializationFlags >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_84), SimNode_ExtFuncCall >(lib,"GetDebugSerializationFlags","das_call_member< unsigned int (FArchiveState::*)() const , &FArchiveState::GetDebugSerializationFlags >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_87 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ShouldSkipBulkData >;
+	using _method_85 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::ShouldSkipBulkData >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:488:19
-	makeExtern<DAS_CALL_METHOD(_method_87), SimNode_ExtFuncCall >(lib,"ShouldSkipBulkData","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ShouldSkipBulkData >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_85), SimNode_ExtFuncCall >(lib,"ShouldSkipBulkData","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::ShouldSkipBulkData >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_88 = das::das_call_member< int64 (FArchiveState::*)() const,&FArchiveState::GetMaxSerializeSize >;
+	using _method_86 = das::das_call_member< int64 (FArchiveState::*)() const,&FArchiveState::GetMaxSerializeSize >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:494:20
-	makeExtern<DAS_CALL_METHOD(_method_88), SimNode_ExtFuncCall >(lib,"GetMaxSerializeSize","das_call_member< int64 (FArchiveState::*)() const , &FArchiveState::GetMaxSerializeSize >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_86), SimNode_ExtFuncCall >(lib,"GetMaxSerializeSize","das_call_member< int64 (FArchiveState::*)() const , &FArchiveState::GetMaxSerializeSize >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:515:24
 	makeExtern< void (*)(FArchiveState &) , _dasUnreal_virtual_21_ResetCustomVersions , SimNode_ExtFuncCall >(lib,"ResetCustomVersions","_dasUnreal_virtual_21_ResetCustomVersions")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_90 = das::das_call_member< void (FArchiveState::*)(bool),&FArchiveState::SetByteSwapping >;
+	using _method_88 = das::das_call_member< void (FArchiveState::*)(bool),&FArchiveState::SetByteSwapping >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:532:7
-	makeExtern<DAS_CALL_METHOD(_method_90), SimNode_ExtFuncCall >(lib,"SetByteSwapping","das_call_member< void (FArchiveState::*)(bool) , &FArchiveState::SetByteSwapping >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_88), SimNode_ExtFuncCall >(lib,"SetByteSwapping","das_call_member< void (FArchiveState::*)(bool) , &FArchiveState::SetByteSwapping >::invoke")
 		->args({"self","Enabled"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_91 = das::das_call_member< void (FArchiveState::*)(unsigned int),&FArchiveState::SetPortFlags >;
+	using _method_89 = das::das_call_member< void (FArchiveState::*)(unsigned int),&FArchiveState::SetPortFlags >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:542:7
-	makeExtern<DAS_CALL_METHOD(_method_91), SimNode_ExtFuncCall >(lib,"SetPortFlags","das_call_member< void (FArchiveState::*)(unsigned int) , &FArchiveState::SetPortFlags >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_89), SimNode_ExtFuncCall >(lib,"SetPortFlags","das_call_member< void (FArchiveState::*)(unsigned int) , &FArchiveState::SetPortFlags >::invoke")
 		->args({"self","InPortFlags"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_92 = das::das_call_member< void (FArchiveState::*)(unsigned int),&FArchiveState::SetDebugSerializationFlags >;
+	using _method_90 = das::das_call_member< void (FArchiveState::*)(unsigned int),&FArchiveState::SetDebugSerializationFlags >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:552:7
-	makeExtern<DAS_CALL_METHOD(_method_92), SimNode_ExtFuncCall >(lib,"SetDebugSerializationFlags","das_call_member< void (FArchiveState::*)(unsigned int) , &FArchiveState::SetDebugSerializationFlags >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_90), SimNode_ExtFuncCall >(lib,"SetDebugSerializationFlags","das_call_member< void (FArchiveState::*)(unsigned int) , &FArchiveState::SetDebugSerializationFlags >::invoke")
 		->args({"self","InCustomFlags"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_93 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsFilterEditorOnly >;
+	using _method_91 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsFilterEditorOnly >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:564:7
-	makeExtern<DAS_CALL_METHOD(_method_93), SimNode_ExtFuncCall >(lib,"IsFilterEditorOnly","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsFilterEditorOnly >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_91), SimNode_ExtFuncCall >(lib,"IsFilterEditorOnly","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsFilterEditorOnly >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:574:15
 	makeExtern< void (*)(FArchiveState &,bool) , _dasUnreal_virtual_22_SetFilterEditorOnly , SimNode_ExtFuncCall >(lib,"SetFilterEditorOnly","_dasUnreal_virtual_22_SetFilterEditorOnly")
 		->args({"self","InFilterEditorOnly"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_95 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsSaveGame >;
+	using _method_93 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsSaveGame >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:585:7
-	makeExtern<DAS_CALL_METHOD(_method_95), SimNode_ExtFuncCall >(lib,"IsSaveGame","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsSaveGame >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_93), SimNode_ExtFuncCall >(lib,"IsSaveGame","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsSaveGame >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_96 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsNetArchive >;
+	using _method_94 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsNetArchive >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:593:19
-	makeExtern<DAS_CALL_METHOD(_method_96), SimNode_ExtFuncCall >(lib,"IsNetArchive","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsNetArchive >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_94), SimNode_ExtFuncCall >(lib,"IsNetArchive","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsNetArchive >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_95 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsCooking >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:603:19
+	makeExtern<DAS_CALL_METHOD(_method_95), SimNode_ExtFuncCall >(lib,"IsCooking","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsCooking >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_96 = das::das_call_member< FArchiveCookContext * (FArchiveState::*)(),&FArchiveState::GetCookContext >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:629:35
+	makeExtern<DAS_CALL_METHOD(_method_96), SimNode_ExtFuncCall >(lib,"GetCookContext","das_call_member< FArchiveCookContext * (FArchiveState::*)() , &FArchiveState::GetCookContext >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 }

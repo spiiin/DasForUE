@@ -1165,18 +1165,6 @@ public:
 	}
 };
 
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3064:85
-class Enumeration_EConstructDynamicType : public das::Enumeration {
-public:
-	Enumeration_EConstructDynamicType() : das::Enumeration("EConstructDynamicType") {
-		external = true;
-		cppName = "EConstructDynamicType";
-		baseType = (das::Type) das::ToBasicType<uint8>::type;
-		addIEx("OnlyAllocateClassObject", "OnlyAllocateClassObject", int64_t(EConstructDynamicType::OnlyAllocateClassObject), das::LineInfo());
-		addIEx("CallZConstructor", "CallZConstructor", int64_t(EConstructDynamicType::CallZConstructor), das::LineInfo());
-	}
-};
-
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:3226:13
 class Enumeration_UECodeGen_Private_EPropertyGenFlags : public das::Enumeration {
 public:

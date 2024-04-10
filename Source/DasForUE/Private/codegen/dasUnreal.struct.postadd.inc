@@ -28,7 +28,6 @@ initRecAnnotation(ann_FReferenceCollector,lib);
 initRecAnnotation(ann_FReferenceFinder,lib);
 initRecAnnotation(ann_FEndLoadPackageContext,lib);
 initRecAnnotation(ann_FCoreUObjectDelegates,lib);
-initRecAnnotation(ann_FDynamicClassStaticData,lib);
 initRecAnnotation(ann_FAssetLog,lib);
 initRecAnnotation(ann_FAssetMsg,lib);
 initRecAnnotation(ann_UObjectBase,lib);

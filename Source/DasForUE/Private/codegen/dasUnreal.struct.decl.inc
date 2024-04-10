@@ -41,7 +41,6 @@ MAKE_EXTERNAL_TYPE_FACTORY(FGarbageCollectionTracer,FGarbageCollectionTracer);
 MAKE_EXTERNAL_TYPE_FACTORY(FPackageReloadedEvent,FPackageReloadedEvent);
 MAKE_EXTERNAL_TYPE_FACTORY(FEndLoadPackageContext,FEndLoadPackageContext);
 MAKE_EXTERNAL_TYPE_FACTORY(FCoreUObjectDelegates,FCoreUObjectDelegates);
-MAKE_EXTERNAL_TYPE_FACTORY(FDynamicClassStaticData,FDynamicClassStaticData);
 MAKE_EXTERNAL_TYPE_FACTORY(FAssetLog,UE::FAssetLog);
 MAKE_EXTERNAL_TYPE_FACTORY(FAssetMsg,FAssetMsg);
 MAKE_EXTERNAL_TYPE_FACTORY(UObjectBase,UObjectBase);

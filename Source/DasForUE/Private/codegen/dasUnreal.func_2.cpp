@@ -6,16 +6,6 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_2() {
-	using _method_97 = das::das_call_member< bool (FArchiveState::*)() const,&FArchiveState::IsCooking >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:603:19
-	makeExtern<DAS_CALL_METHOD(_method_97), SimNode_ExtFuncCall >(lib,"IsCooking","das_call_member< bool (FArchiveState::*)() const , &FArchiveState::IsCooking >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_98 = das::das_call_member< FArchiveCookContext * (FArchiveState::*)(),&FArchiveState::GetCookContext >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:629:35
-	makeExtern<DAS_CALL_METHOD(_method_98), SimNode_ExtFuncCall >(lib,"GetCookContext","das_call_member< FArchiveCookContext * (FArchiveState::*)() , &FArchiveState::GetCookContext >::invoke")
-		->args({"self"})
-		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:653:15
 	makeExtern< bool (*)(const FArchiveState &) , _dasUnreal_virtual_23_UseToResolveEnumerators , SimNode_ExtFuncCall >(lib,"UseToResolveEnumerators","_dasUnreal_virtual_23_UseToResolveEnumerators")
 		->args({"self"})
@@ -28,14 +18,14 @@ void Module_dasUnreal::initFunctions_2() {
 	makeExtern< void (*)(FArchiveState &,FProperty *) , _dasUnreal_virtual_25_SetSerializedProperty , SimNode_ExtFuncCall >(lib,"SetSerializedProperty","_dasUnreal_virtual_25_SetSerializedProperty")
 		->args({"self","InProperty"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_102 = das::das_call_member< FProperty * (FArchiveState::*)() const,&FArchiveState::GetSerializedProperty >;
+	using _method_100 = das::das_call_member< FProperty * (FArchiveState::*)() const,&FArchiveState::GetSerializedProperty >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:682:31
-	makeExtern<DAS_CALL_METHOD(_method_102), SimNode_ExtFuncCall >(lib,"GetSerializedProperty","das_call_member< FProperty * (FArchiveState::*)() const , &FArchiveState::GetSerializedProperty >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_100), SimNode_ExtFuncCall >(lib,"GetSerializedProperty","das_call_member< FProperty * (FArchiveState::*)() const , &FArchiveState::GetSerializedProperty >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_103 = das::das_call_member< const FArchiveSerializedPropertyChain * (FArchiveState::*)() const,&FArchiveState::GetSerializedPropertyChain >;
+	using _method_101 = das::das_call_member< const FArchiveSerializedPropertyChain * (FArchiveState::*)() const,&FArchiveState::GetSerializedPropertyChain >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:697:53
-	makeExtern<DAS_CALL_METHOD(_method_103), SimNode_ExtFuncCall >(lib,"GetSerializedPropertyChain","das_call_member< const FArchiveSerializedPropertyChain * (FArchiveState::*)() const , &FArchiveState::GetSerializedPropertyChain >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_101), SimNode_ExtFuncCall >(lib,"GetSerializedPropertyChain","das_call_member< const FArchiveSerializedPropertyChain * (FArchiveState::*)() const , &FArchiveState::GetSerializedPropertyChain >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:705:24
@@ -68,9 +58,9 @@ void Module_dasUnreal::initFunctions_2() {
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 	addCtorAndUsing<FArchiveState::FFastPathLoadBuffer>(*this,lib,"FFastPathLoadBuffer","FArchiveState::FFastPathLoadBuffer");
-	using _method_111 = das::das_call_member< void (FArchiveState::FFastPathLoadBuffer::*)(),&FArchiveState::FFastPathLoadBuffer::Reset >;
+	using _method_109 = das::das_call_member< void (FArchiveState::FFastPathLoadBuffer::*)(),&FArchiveState::FFastPathLoadBuffer::Reset >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:746:20
-	makeExtern<DAS_CALL_METHOD(_method_111), SimNode_ExtFuncCall >(lib,"Reset","das_call_member< void (FArchiveState::FFastPathLoadBuffer::*)() , &FArchiveState::FFastPathLoadBuffer::Reset >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_109), SimNode_ExtFuncCall >(lib,"Reset","das_call_member< void (FArchiveState::FFastPathLoadBuffer::*)() , &FArchiveState::FFastPathLoadBuffer::Reset >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:878:24
@@ -109,18 +99,8 @@ void Module_dasUnreal::initFunctions_2() {
 	makeExtern< void (*)(FArchiveState &,bool) , _dasUnreal_virtual_41_SetIsPersistent , SimNode_ExtFuncCall >(lib,"SetIsPersistent","_dasUnreal_virtual_41_SetIsPersistent")
 		->args({"self","bInIsPersistent"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_121 = das::das_call_member< void (FArchiveState::*)(int),&FArchiveState::SetUE4Ver >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:941:19
-	makeExtern<DAS_CALL_METHOD(_method_121), SimNode_ExtFuncCall >(lib,"SetUE4Ver","das_call_member< void (FArchiveState::*)(int) , &FArchiveState::SetUE4Ver >::invoke")
-		->args({"self","InVer"})
-		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:953:24
 	makeExtern< void (*)(FArchiveState &,int) , _dasUnreal_virtual_42_SetLicenseeUEVer , SimNode_ExtFuncCall >(lib,"SetLicenseeUEVer","_dasUnreal_virtual_42_SetLicenseeUEVer")
-		->args({"self","InVer"})
-		->addToModule(*this, SideEffects::worstDefault);
-	using _method_123 = das::das_call_member< void (FArchiveState::*)(int),&FArchiveState::SetLicenseeUE4Ver >;
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:956:19
-	makeExtern<DAS_CALL_METHOD(_method_123), SimNode_ExtFuncCall >(lib,"SetLicenseeUE4Ver","das_call_member< void (FArchiveState::*)(int) , &FArchiveState::SetLicenseeUE4Ver >::invoke")
 		->args({"self","InVer"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:967:24
@@ -166,14 +146,14 @@ void Module_dasUnreal::initFunctions_2() {
 	makeExtern< void (*)(FArchive &,UObject *) , _dasUnreal_virtual_52_Preload , SimNode_ExtFuncCall >(lib,"Preload","_dasUnreal_virtual_52_Preload")
 		->args({"self","Object"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_134 = das::das_call_member< FArchiveState & (FArchive::*)(),&FArchive::GetArchiveState >;
+	using _method_130 = das::das_call_member< FArchiveState & (FArchive::*)(),&FArchive::GetArchiveState >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1613:17
-	makeExtern<DAS_CALL_METHOD(_method_134), SimNode_ExtFuncCallRef >(lib,"GetArchiveState","das_call_member< FArchiveState & (FArchive::*)() , &FArchive::GetArchiveState >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_130), SimNode_ExtFuncCallRef >(lib,"GetArchiveState","das_call_member< FArchiveState & (FArchive::*)() , &FArchive::GetArchiveState >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_135 = das::das_call_member< const FArchiveState & (FArchive::*)() const,&FArchive::GetArchiveState >;
+	using _method_131 = das::das_call_member< const FArchiveState & (FArchive::*)() const,&FArchive::GetArchiveState >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1618:23
-	makeExtern<DAS_CALL_METHOD(_method_135), SimNode_ExtFuncCallRef >(lib,"GetArchiveState","das_call_member< const FArchiveState & (FArchive::*)() const , &FArchive::GetArchiveState >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_131), SimNode_ExtFuncCallRef >(lib,"GetArchiveState","das_call_member< const FArchiveState & (FArchive::*)() const , &FArchive::GetArchiveState >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1636:15
@@ -208,44 +188,44 @@ void Module_dasUnreal::initFunctions_2() {
 	makeExtern< bool (*)(FArchive &) , _dasUnreal_virtual_60_Close , SimNode_ExtFuncCall >(lib,"Close","_dasUnreal_virtual_60_Close")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_144 = das::das_call_member< void (FArchive::*)(void *,int64,FName,ECompressionFlags,bool),&FArchive::SerializeCompressed >;
+	using _method_140 = das::das_call_member< void (FArchive::*)(void *,int64,FName,ECompressionFlags,bool),&FArchive::SerializeCompressed >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1747:16
-	makeExtern<DAS_CALL_METHOD(_method_144), SimNode_ExtFuncCall >(lib,"SerializeCompressed","das_call_member< void (FArchive::*)(void *,int64,FName,ECompressionFlags,bool) , &FArchive::SerializeCompressed >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_140), SimNode_ExtFuncCall >(lib,"SerializeCompressed","das_call_member< void (FArchive::*)(void *,int64,FName,ECompressionFlags,bool) , &FArchive::SerializeCompressed >::invoke")
 		->args({"self","V","Length","CompressionFormatCannotChange","Flags","bTreatBufferAsFileReader"})
 		->arg_init(4,make_smart<ExprConstEnumeration>(0,makeType<ECompressionFlags>(lib)))
 		->arg_init(5,make_smart<ExprConstBool>(false))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_145 = das::das_call_member< void (FArchive::*)(void *,int64,FName,FName,ECompressionFlags,bool,long long *),&FArchive::SerializeCompressedNew >;
+	using _method_141 = das::das_call_member< void (FArchive::*)(void *,int64,FName,FName,ECompressionFlags,bool,long long *),&FArchive::SerializeCompressedNew >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1767:16
-	makeExtern<DAS_CALL_METHOD(_method_145), SimNode_ExtFuncCall >(lib,"SerializeCompressedNew","das_call_member< void (FArchive::*)(void *,int64,FName,FName,ECompressionFlags,bool,long long *) , &FArchive::SerializeCompressedNew >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_141), SimNode_ExtFuncCall >(lib,"SerializeCompressedNew","das_call_member< void (FArchive::*)(void *,int64,FName,FName,ECompressionFlags,bool,long long *) , &FArchive::SerializeCompressedNew >::invoke")
 		->args({"self","V","Length","CompressionFormatToEncode","CompressionFormatToDecodeOldV1Files","Flags","bTreatBufferAsFileReader","OutPartialReadLength"})
 		->arg_init(5,make_smart<ExprConstEnumeration>(0,makeType<ECompressionFlags>(lib)))
 		->arg_init(6,make_smart<ExprConstBool>(false))
 		->arg_init(7,make_smart<ExprConstPtr>())
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_146 = das::das_call_member< void (FArchive::*)(void *,int64),&FArchive::SerializeCompressedNew >;
+	using _method_142 = das::das_call_member< void (FArchive::*)(void *,int64),&FArchive::SerializeCompressedNew >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1779:16
-	makeExtern<DAS_CALL_METHOD(_method_146), SimNode_ExtFuncCall >(lib,"SerializeCompressedNew","das_call_member< void (FArchive::*)(void *,int64) , &FArchive::SerializeCompressedNew >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_142), SimNode_ExtFuncCall >(lib,"SerializeCompressedNew","das_call_member< void (FArchive::*)(void *,int64) , &FArchive::SerializeCompressedNew >::invoke")
 		->args({"self","V","Length"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_147 = das::das_call_member< void (FArchive::*)(void *,int),&FArchive::ByteSwap >;
+	using _method_143 = das::das_call_member< void (FArchive::*)(void *,int),&FArchive::ByteSwap >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1785:16
-	makeExtern<DAS_CALL_METHOD(_method_147), SimNode_ExtFuncCall >(lib,"ByteSwap","das_call_member< void (FArchive::*)(void *,int) , &FArchive::ByteSwap >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_143), SimNode_ExtFuncCall >(lib,"ByteSwap","das_call_member< void (FArchive::*)(void *,int) , &FArchive::ByteSwap >::invoke")
 		->args({"self","V","Length"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_148 = das::das_call_member< FArchive & (FArchive::*)(void *,int),&FArchive::ByteOrderSerialize >;
+	using _method_144 = das::das_call_member< FArchive & (FArchive::*)(void *,int),&FArchive::ByteOrderSerialize >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1788:24
-	makeExtern<DAS_CALL_METHOD(_method_148), SimNode_ExtFuncCallRef >(lib,"ByteOrderSerialize","das_call_member< FArchive & (FArchive::*)(void *,int) , &FArchive::ByteOrderSerialize >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_144), SimNode_ExtFuncCallRef >(lib,"ByteOrderSerialize","das_call_member< FArchive & (FArchive::*)(void *,int) , &FArchive::ByteOrderSerialize >::invoke")
 		->args({"self","V","Length"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_149 = das::das_call_member< void (FArchive::*)(),&FArchive::StartSerializingDefaults >;
+	using _method_145 = das::das_call_member< void (FArchive::*)(),&FArchive::StartSerializingDefaults >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1803:7
-	makeExtern<DAS_CALL_METHOD(_method_149), SimNode_ExtFuncCall >(lib,"StartSerializingDefaults","das_call_member< void (FArchive::*)() , &FArchive::StartSerializingDefaults >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_145), SimNode_ExtFuncCall >(lib,"StartSerializingDefaults","das_call_member< void (FArchive::*)() , &FArchive::StartSerializingDefaults >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_150 = das::das_call_member< void (FArchive::*)(),&FArchive::StopSerializingDefaults >;
+	using _method_146 = das::das_call_member< void (FArchive::*)(),&FArchive::StopSerializingDefaults >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1809:7
-	makeExtern<DAS_CALL_METHOD(_method_150), SimNode_ExtFuncCall >(lib,"StopSerializingDefaults","das_call_member< void (FArchive::*)() , &FArchive::StopSerializingDefaults >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_146), SimNode_ExtFuncCall >(lib,"StopSerializingDefaults","das_call_member< void (FArchive::*)() , &FArchive::StopSerializingDefaults >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Serialization/Archive.h:1817:15
@@ -312,131 +292,158 @@ void Module_dasUnreal::initFunctions_2() {
 		->args({"Len","Str"});
 	addCtorAndUsing<FString,const char *,int>(*this,lib,"FString","FString")
 		->args({"Str","ExtraSlack"});
-	using _method_160 = das::das_call_member< SIZE_T (FString::*)() const,&FString::GetAllocatedSize >;
+	using _method_156 = das::das_call_member< SIZE_T (FString::*)() const,&FString::GetAllocatedSize >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:266:21
-	makeExtern<DAS_CALL_METHOD(_method_160), SimNode_ExtFuncCall >(lib,"GetAllocatedSize","das_call_member< SIZE_T (FString::*)() const , &FString::GetAllocatedSize >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_156), SimNode_ExtFuncCall >(lib,"GetAllocatedSize","das_call_member< SIZE_T (FString::*)() const , &FString::GetAllocatedSize >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_161 = das::das_call_member< void (FString::*)() const,&FString::CheckInvariants >;
+	using _method_157 = das::das_call_member< void (FString::*)() const,&FString::CheckInvariants >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:274:19
-	makeExtern<DAS_CALL_METHOD(_method_161), SimNode_ExtFuncCall >(lib,"CheckInvariants","das_call_member< void (FString::*)() const , &FString::CheckInvariants >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_157), SimNode_ExtFuncCall >(lib,"CheckInvariants","das_call_member< void (FString::*)() const , &FString::CheckInvariants >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_162 = das::das_call_member< void (FString::*)(),&FString::Empty >;
+	using _method_158 = das::das_call_member< void (FString::*)(),&FString::Empty >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:287:16
-	makeExtern<DAS_CALL_METHOD(_method_162), SimNode_ExtFuncCall >(lib,"Empty","das_call_member< void (FString::*)() , &FString::Empty >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_158), SimNode_ExtFuncCall >(lib,"Empty","das_call_member< void (FString::*)() , &FString::Empty >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_163 = das::das_call_member< void (FString::*)(int),&FString::Empty >;
+	using _method_159 = das::das_call_member< void (FString::*)(int),&FString::Empty >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:288:16
-	makeExtern<DAS_CALL_METHOD(_method_163), SimNode_ExtFuncCall >(lib,"Empty","das_call_member< void (FString::*)(int) , &FString::Empty >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_159), SimNode_ExtFuncCall >(lib,"Empty","das_call_member< void (FString::*)(int) , &FString::Empty >::invoke")
 		->args({"self","Slack"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_164 = das::das_call_member< bool (FString::*)() const,&FString::IsEmpty >;
+	using _method_160 = das::das_call_member< bool (FString::*)() const,&FString::IsEmpty >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:295:32
-	makeExtern<DAS_CALL_METHOD(_method_164), SimNode_ExtFuncCall >(lib,"IsEmpty","das_call_member< bool (FString::*)() const , &FString::IsEmpty >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_160), SimNode_ExtFuncCall >(lib,"IsEmpty","das_call_member< bool (FString::*)() const , &FString::IsEmpty >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_165 = das::das_call_member< void (FString::*)(int),&FString::Reset >;
+	using _method_161 = das::das_call_member< void (FString::*)(int),&FString::Reset >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:305:16
-	makeExtern<DAS_CALL_METHOD(_method_165), SimNode_ExtFuncCall >(lib,"Reset","das_call_member< void (FString::*)(int) , &FString::Reset >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_161), SimNode_ExtFuncCall >(lib,"Reset","das_call_member< void (FString::*)(int) , &FString::Reset >::invoke")
 		->args({"self","NewReservedSize"})
 		->arg_init(1,make_smart<ExprConstInt>(0))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_166 = das::das_call_member< void (FString::*)(),&FString::Shrink >;
+	using _method_162 = das::das_call_member< void (FString::*)(),&FString::Shrink >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:310:16
-	makeExtern<DAS_CALL_METHOD(_method_166), SimNode_ExtFuncCall >(lib,"Shrink","das_call_member< void (FString::*)() , &FString::Shrink >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_162), SimNode_ExtFuncCall >(lib,"Shrink","das_call_member< void (FString::*)() , &FString::Shrink >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_167 = das::das_call_member< bool (FString::*)(int) const,&FString::IsValidIndex >;
+	using _method_163 = das::das_call_member< bool (FString::*)(int) const,&FString::IsValidIndex >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:319:32
-	makeExtern<DAS_CALL_METHOD(_method_167), SimNode_ExtFuncCall >(lib,"IsValidIndex","das_call_member< bool (FString::*)(int) const , &FString::IsValidIndex >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_163), SimNode_ExtFuncCall >(lib,"IsValidIndex","das_call_member< bool (FString::*)(int) const , &FString::IsValidIndex >::invoke")
 		->args({"self","Index"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_168 = das::das_call_member< void (FString::*)(const char *,int),&FString::AppendChars >;
+	using _method_164 = das::das_call_member< void (FString::*)(const char *,int),&FString::AppendChars >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:361:16
-	makeExtern<DAS_CALL_METHOD(_method_168), SimNode_ExtFuncCall >(lib,"AppendChars","das_call_member< void (FString::*)(const char *,int) , &FString::AppendChars >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_164), SimNode_ExtFuncCall >(lib,"AppendChars","das_call_member< void (FString::*)(const char *,int) , &FString::AppendChars >::invoke")
 		->args({"self","Str","Count"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_169 = das::das_call_member< FString & (FString::*)(wchar_t),&FString::AppendChar >;
+	using _method_165 = das::das_call_member< FString & (FString::*)(wchar_t),&FString::AppendChar >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:398:20
-	makeExtern<DAS_CALL_METHOD(_method_169), SimNode_ExtFuncCallRef >(lib,"AppendChar","das_call_member< FString & (FString::*)(wchar_t) , &FString::AppendChar >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_165), SimNode_ExtFuncCallRef >(lib,"AppendChar","das_call_member< FString & (FString::*)(wchar_t) , &FString::AppendChar >::invoke")
 		->args({"self","InChar"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_170 = das::das_call_member< void (FString::*)(int,wchar_t),&FString::InsertAt >;
+	using _method_166 = das::das_call_member< void (FString::*)(int,wchar_t),&FString::InsertAt >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:425:16
-	makeExtern<DAS_CALL_METHOD(_method_170), SimNode_ExtFuncCall >(lib,"InsertAt","das_call_member< void (FString::*)(int,wchar_t) , &FString::InsertAt >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_166), SimNode_ExtFuncCall >(lib,"InsertAt","das_call_member< void (FString::*)(int,wchar_t) , &FString::InsertAt >::invoke")
 		->args({"self","Index","Character"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_171 = das::das_call_member< void (FString::*)(int,const FString &),&FString::InsertAt >;
+	using _method_167 = das::das_call_member< void (FString::*)(int,const FString &),&FString::InsertAt >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:426:16
-	makeExtern<DAS_CALL_METHOD(_method_171), SimNode_ExtFuncCall >(lib,"InsertAt","das_call_member< void (FString::*)(int,const FString &) , &FString::InsertAt >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_167), SimNode_ExtFuncCall >(lib,"InsertAt","das_call_member< void (FString::*)(int,const FString &) , &FString::InsertAt >::invoke")
 		->args({"self","Index","Characters"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_172 = das::das_call_member< void (FString::*)(int,int,bool),&FString::RemoveAt >;
+	using _method_168 = das::das_call_member< void (FString::*)(int,int,bool),&FString::RemoveAt >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:435:16
-	makeExtern<DAS_CALL_METHOD(_method_172), SimNode_ExtFuncCall >(lib,"RemoveAt","das_call_member< void (FString::*)(int,int,bool) , &FString::RemoveAt >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_168), SimNode_ExtFuncCall >(lib,"RemoveAt","das_call_member< void (FString::*)(int,int,bool) , &FString::RemoveAt >::invoke")
 		->args({"self","Index","Count","bAllowShrinking"})
 		->arg_init(2,make_smart<ExprConstInt>(1))
 		->arg_init(3,make_smart<ExprConstBool>(true))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_173 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type),&FString::RemoveFromStart >;
+	using _method_169 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type),&FString::RemoveFromStart >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:456:7
-	makeExtern<DAS_CALL_METHOD(_method_173), SimNode_ExtFuncCall >(lib,"RemoveFromStart","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) , &FString::RemoveFromStart >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_169), SimNode_ExtFuncCall >(lib,"RemoveFromStart","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) , &FString::RemoveFromStart >::invoke")
 		->args({"self","InPrefix","SearchCase"})
 		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_174 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type),&FString::RemoveFromStart >;
+	using _method_170 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type),&FString::RemoveFromStart >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:467:7
-	makeExtern<DAS_CALL_METHOD(_method_174), SimNode_ExtFuncCall >(lib,"RemoveFromStart","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) , &FString::RemoveFromStart >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_170), SimNode_ExtFuncCall >(lib,"RemoveFromStart","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) , &FString::RemoveFromStart >::invoke")
 		->args({"self","InPrefix","SearchCase"})
 		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_175 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type),&FString::RemoveFromStart >;
+	using _method_171 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type),&FString::RemoveFromStart >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:479:16
-	makeExtern<DAS_CALL_METHOD(_method_175), SimNode_ExtFuncCall >(lib,"RemoveFromStart","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) , &FString::RemoveFromStart >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_171), SimNode_ExtFuncCall >(lib,"RemoveFromStart","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) , &FString::RemoveFromStart >::invoke")
 		->args({"self","InPrefix","InPrefixLen","SearchCase"})
 		->arg_init(3,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_176 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type),&FString::RemoveFromEnd >;
+	using _method_172 = das::das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type),&FString::RemoveFromEnd >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:500:7
-	makeExtern<DAS_CALL_METHOD(_method_176), SimNode_ExtFuncCall >(lib,"RemoveFromEnd","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) , &FString::RemoveFromEnd >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_172), SimNode_ExtFuncCall >(lib,"RemoveFromEnd","das_call_member< bool (FString::*)(const wchar_t *,ESearchCase::Type) , &FString::RemoveFromEnd >::invoke")
 		->args({"self","InSuffix","SearchCase"})
 		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_177 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type),&FString::RemoveFromEnd >;
+	using _method_173 = das::das_call_member< bool (FString::*)(const FString &,ESearchCase::Type),&FString::RemoveFromEnd >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:511:7
-	makeExtern<DAS_CALL_METHOD(_method_177), SimNode_ExtFuncCall >(lib,"RemoveFromEnd","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) , &FString::RemoveFromEnd >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_173), SimNode_ExtFuncCall >(lib,"RemoveFromEnd","das_call_member< bool (FString::*)(const FString &,ESearchCase::Type) , &FString::RemoveFromEnd >::invoke")
 		->args({"self","InSuffix","SearchCase"})
 		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_178 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type),&FString::RemoveFromEnd >;
+	using _method_174 = das::das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type),&FString::RemoveFromEnd >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:523:16
-	makeExtern<DAS_CALL_METHOD(_method_178), SimNode_ExtFuncCall >(lib,"RemoveFromEnd","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) , &FString::RemoveFromEnd >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_174), SimNode_ExtFuncCall >(lib,"RemoveFromEnd","das_call_member< bool (FString::*)(const wchar_t *,int,ESearchCase::Type) , &FString::RemoveFromEnd >::invoke")
 		->args({"self","InSuffix","InSuffixLen","SearchCase"})
 		->arg_init(3,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_179 = das::das_call_member< void (FString::*)(const wchar_t *,int),&FString::PathAppend >;
+	using _method_175 = das::das_call_member< void (FString::*)(const wchar_t *,int),&FString::PathAppend >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:531:16
-	makeExtern<DAS_CALL_METHOD(_method_179), SimNode_ExtFuncCall >(lib,"PathAppend","das_call_member< void (FString::*)(const wchar_t *,int) , &FString::PathAppend >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_175), SimNode_ExtFuncCall >(lib,"PathAppend","das_call_member< void (FString::*)(const wchar_t *,int) , &FString::PathAppend >::invoke")
 		->args({"self","Str","StrLength"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_180 = das::das_call_member< int (FString::*)() const,&FString::Len >;
+	using _method_176 = das::das_call_member< int (FString::*)() const,&FString::Len >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:976:33
-	makeExtern<DAS_CALL_METHOD(_method_180), SimNode_ExtFuncCall >(lib,"Len","das_call_member< int (FString::*)() const , &FString::Len >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_176), SimNode_ExtFuncCall >(lib,"Len","das_call_member< int (FString::*)() const , &FString::Len >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_181 = das::das_call_member< void (FString::*)(int,bool),&FString::LeftInline >;
+	using _method_177 = das::das_call_member< void (FString::*)(int,bool),&FString::LeftInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:994:19
-	makeExtern<DAS_CALL_METHOD(_method_181), SimNode_ExtFuncCall >(lib,"LeftInline","das_call_member< void (FString::*)(int,bool) , &FString::LeftInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_177), SimNode_ExtFuncCall >(lib,"LeftInline","das_call_member< void (FString::*)(int,bool) , &FString::LeftInline >::invoke")
 		->args({"self","Count","bAllowShrinking"})
 		->arg_init(2,make_smart<ExprConstBool>(true))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_182 = das::das_call_member< void (FString::*)(int,bool),&FString::LeftChopInline >;
+	using _method_178 = das::das_call_member< void (FString::*)(int,bool),&FString::LeftChopInline >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1015:19
-	makeExtern<DAS_CALL_METHOD(_method_182), SimNode_ExtFuncCall >(lib,"LeftChopInline","das_call_member< void (FString::*)(int,bool) , &FString::LeftChopInline >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_178), SimNode_ExtFuncCall >(lib,"LeftChopInline","das_call_member< void (FString::*)(int,bool) , &FString::LeftChopInline >::invoke")
 		->args({"self","Count","bAllowShrinking"})
 		->arg_init(2,make_smart<ExprConstBool>(true))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_179 = das::das_call_member< void (FString::*)(int,bool),&FString::RightInline >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1035:19
+	makeExtern<DAS_CALL_METHOD(_method_179), SimNode_ExtFuncCall >(lib,"RightInline","das_call_member< void (FString::*)(int,bool) , &FString::RightInline >::invoke")
+		->args({"self","Count","bAllowShrinking"})
+		->arg_init(2,make_smart<ExprConstBool>(true))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_180 = das::das_call_member< void (FString::*)(int,bool),&FString::RightChopInline >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1051:19
+	makeExtern<DAS_CALL_METHOD(_method_180), SimNode_ExtFuncCall >(lib,"RightChopInline","das_call_member< void (FString::*)(int,bool) , &FString::RightChopInline >::invoke")
+		->args({"self","Count","bAllowShrinking"})
+		->arg_init(2,make_smart<ExprConstBool>(true))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_181 = das::das_call_member< void (FString::*)(int,int,bool),&FString::MidInline >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1065:19
+	makeExtern<DAS_CALL_METHOD(_method_181), SimNode_ExtFuncCall >(lib,"MidInline","das_call_member< void (FString::*)(int,int,bool) , &FString::MidInline >::invoke")
+		->args({"self","Start","Count","bAllowShrinking"})
+		->arg_init(2,make_smart<ExprConstInt>(2147483647))
+		->arg_init(3,make_smart<ExprConstBool>(true))
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_182 = das::das_call_member< int (FString::*)(const wchar_t *,ESearchCase::Type,ESearchDir::Type,int) const,&FString::Find >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/UnrealString.h:1107:21
+	makeExtern<DAS_CALL_METHOD(_method_182), SimNode_ExtFuncCall >(lib,"Find","das_call_member< int (FString::*)(const wchar_t *,ESearchCase::Type,ESearchDir::Type,int) const , &FString::Find >::invoke")
+		->args({"self","SubStr","SearchCase","SearchDir","StartPosition"})
+		->arg_init(2,make_smart<ExprConstEnumeration>(1,makeType<ESearchCase::Type>(lib)))
+		->arg_init(3,make_smart<ExprConstEnumeration>(0,makeType<ESearchDir::Type>(lib)))
+		->arg_init(4,make_smart<ExprConstInt>(-1))
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

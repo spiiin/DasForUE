@@ -55,8 +55,6 @@ auto ann_FEndLoadPackageContext = make_smart<FEndLoadPackageContext_GeneratedAnn
 addAnnotation(ann_FEndLoadPackageContext);
 auto ann_FCoreUObjectDelegates = make_smart<FCoreUObjectDelegates_GeneratedAnnotation>(lib);
 addAnnotation(ann_FCoreUObjectDelegates);
-auto ann_FDynamicClassStaticData = make_smart<FDynamicClassStaticData_GeneratedAnnotation>(lib);
-addAnnotation(ann_FDynamicClassStaticData);
 auto ann_FAssetLog = make_smart<UE_FAssetLog_GeneratedAnnotation>(lib);
 addAnnotation(ann_FAssetLog);
 auto ann_FAssetMsg = make_smart<FAssetMsg_GeneratedAnnotation>(lib);

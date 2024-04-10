@@ -44,7 +44,6 @@ DAS_BIND_ENUM_CAST(EObjectInitializerOptions);
 DAS_BIND_ENUM_CAST(EPackageReloadPhase);
 DAS_BIND_ENUM_CAST(EHotReloadedClassFlags);
 DAS_BIND_ENUM_CAST(EReloadCompleteReason);
-DAS_BIND_ENUM_CAST(EConstructDynamicType);
 DAS_BIND_ENUM_CAST(UECodeGen_Private::EPropertyGenFlags);
 DAS_BIND_ENUM_CAST(EDataValidationResult);
 DAS_BIND_ENUM_CAST(EObjectMark);
