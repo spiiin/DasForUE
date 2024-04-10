@@ -16,7 +16,7 @@ void UTestClass::SaySomethingElse(FString Msg) {
 	UE_LOG(LogTemp, Log, TEXT("%s"), *Msg);
 }
 
-void UTestClass::SaySomething4(int a, FString Msg, float b, int c)
-{
+FString UTestClass::SaySomething4(int a, FString Msg, float b, int c) {
 	UE_LOG(LogTemp, Log, TEXT("%d %s %f %d"), a, *Msg, b, c);
+	return Msg;
 }

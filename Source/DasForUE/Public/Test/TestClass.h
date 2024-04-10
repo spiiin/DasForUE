@@ -23,6 +23,5 @@ public:
 	void SaySomethingElse(FString Msg);
 
 	UFUNCTION(BlueprintCallable)
-	void SaySomething4(int a, FString Msg, float b, int c);
-
+	FString SaySomething4(int a, FString Msg, float b, int c);
 };

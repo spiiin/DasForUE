@@ -77,4 +77,5 @@ initRecAnnotation(ann_FStrProperty,lib);
 initRecAnnotation(ann_FStructProperty,lib);
 initRecAnnotation(ann_FCustomPropertyListNode,lib);
 initRecAnnotation(ann_UPropertyWrapper,lib);
+initRecAnnotation(ann_FOutParmRec,lib);
 initRecAnnotation(ann_FFrame,lib);

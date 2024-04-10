@@ -733,6 +733,17 @@ struct UPropertyWrapper_GeneratedAnnotation : ManagedStructureAnnotation<UProper
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Stack.h:125:8
+struct FOutParmRec_GeneratedAnnotation : ManagedStructureAnnotation<FOutParmRec> {
+	FOutParmRec_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FOutParmRec", ml, "FOutParmRec") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Property)>("Property","Property");
+		addField<DAS_BIND_MANAGED_FIELD(PropAddr)>("PropAddr","PropAddr");
+		addField<DAS_BIND_MANAGED_FIELD(NextOutParm)>("NextOutParm","NextOutParm");
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Stack.h:136:8
 struct FFrame_GeneratedAnnotation : ManagedStructureAnnotation<FFrame> {
 	FFrame_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FFrame", ml, "FFrame") {
@@ -746,6 +757,7 @@ struct FFrame_GeneratedAnnotation : ManagedStructureAnnotation<FFrame> {
 		addField<DAS_BIND_MANAGED_FIELD(MostRecentPropertyAddress)>("MostRecentPropertyAddress","MostRecentPropertyAddress");
 		addField<DAS_BIND_MANAGED_FIELD(MostRecentPropertyContainer)>("MostRecentPropertyContainer","MostRecentPropertyContainer");
 		addField<DAS_BIND_MANAGED_FIELD(PreviousFrame)>("PreviousFrame","PreviousFrame");
+		addField<DAS_BIND_MANAGED_FIELD(OutParms)>("OutParms","OutParms");
 		addField<DAS_BIND_MANAGED_FIELD(PropertyChainForCompiledIn)>("PropertyChainForCompiledIn","PropertyChainForCompiledIn");
 		addField<DAS_BIND_MANAGED_FIELD(CurrentNativeFunction)>("CurrentNativeFunction","CurrentNativeFunction");
 		addField<DAS_BIND_MANAGED_FIELD(PreviousTrackingFrame)>("PreviousTrackingFrame","PreviousTrackingFrame");

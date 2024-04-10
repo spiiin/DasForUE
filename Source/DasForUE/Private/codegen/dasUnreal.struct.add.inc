@@ -153,6 +153,8 @@ auto ann_FCustomPropertyListNode = make_smart<FCustomPropertyListNode_GeneratedA
 addAnnotation(ann_FCustomPropertyListNode);
 auto ann_UPropertyWrapper = make_smart<UPropertyWrapper_GeneratedAnnotation>(lib);
 addAnnotation(ann_UPropertyWrapper);
+auto ann_FOutParmRec = make_smart<FOutParmRec_GeneratedAnnotation>(lib);
+addAnnotation(ann_FOutParmRec);
 auto ann_FFrame = make_smart<FFrame_GeneratedAnnotation>(lib);
 addAnnotation(ann_FFrame);
 setParents(this,"FObjectPropertyBase",  {"FProperty","FField"});

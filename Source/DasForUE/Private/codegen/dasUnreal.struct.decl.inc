@@ -107,4 +107,5 @@ MAKE_EXTERNAL_TYPE_FACTORY(FStrProperty,FStrProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FStructProperty,FStructProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FCustomPropertyListNode,FCustomPropertyListNode);
 MAKE_EXTERNAL_TYPE_FACTORY(UPropertyWrapper,UPropertyWrapper);
+MAKE_EXTERNAL_TYPE_FACTORY(FOutParmRec,FOutParmRec);
 MAKE_EXTERNAL_TYPE_FACTORY(FFrame,FFrame);

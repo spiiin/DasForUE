@@ -27,7 +27,7 @@ def new_uobject_of_class(owner: UObject?; cls: UClass?; name: FName; flags: EObj
         result = StaticConstructObject_Internal(params)
     return result
 
-
+[sideeffects]
 def call_ufunction_on(var executor: UObject?; functionName: string; var inParams: void?)
     let clazz = *executor |> GetClass
     //find function, can be separated
@@ -82,15 +82,19 @@ let private funcObjFlags = EObjectFlags RF_Public | EObjectFlags RF_Transient | 
 let private funcFlags = (
     EFunctionFlags FUNC_Native |
     EFunctionFlags FUNC_Public |
-    EFunctionFlags FUNC_BlueprintCallable
+    EFunctionFlags FUNC_BlueprintCallable |
+    EFunctionFlags FUNC_HasOutParms //if function return something
 )
 let private propFlags = EPropertyFlags CPF_Parm //| EPropertyFlags CPF_NativeAccessSpecifierPublic
+let private propFlagsReturn = EPropertyFlags CPF_ReturnParm
+let private propFlagsOut = EPropertyFlags CPF_OutParm
 
 struct SaySomethingGeneratedParams1
-    a : int
-    msg : FString
+    a: int
+    msg: FString
     f: float
     g: int
+    res: FString
 
 def test_emit_ufunction(var cls: UClass?; var name: FName)
     //check if function with name already exist in this class or it's superclasses
@@ -141,6 +145,18 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
     var prop4 = unsafe(reinterpret<FProperty?> field4)
     *prop4 |> SetPropertyFlags(propFlags)
 
+    var field5 = Construct(
+        [[FStrProperty?]],
+        FFieldVariant(fn),
+        FName("Parameter5"),
+        propertyObjFlags
+    )
+    var prop5 = unsafe(reinterpret<FProperty?> field5)
+    *prop5 |> SetPropertyFlags(propFlags)
+    *prop5 |> SetPropertyFlags(propFlagsReturn)
+    *prop5 |> SetPropertyFlags(propFlagsOut)
+
+    *fn |> AddCppProperty(prop5)
     *fn |> AddCppProperty(prop4)
     *fn |> AddCppProperty(prop3)
     *fn |> AddCppProperty(prop2)
@@ -156,9 +172,10 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
     fn |> SetNativeFunc <| @(var context: UObject?; var stack: FFrame; param: void?)
         //init debug
         print("In generated function\n")
-        let selfFunction = stack.Node
 
-        /*let param4f = selfFunction |> GetChildFieldsFromStruct_FField
+        /*
+        let selfFunction = stack.Node
+        let param4f = selfFunction |> GetChildFieldsFromStruct_FField
         print("  Generated function parameter4 name: {string(*param4f |> GetName)}\n")
         let param3f = param4f.Next //stack
         print("  Generated function parameter3 name: {string(*param3f |> GetName)}\n")
@@ -168,8 +185,9 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
         print("  Generated function parameter1 name: {string(*param1f |> GetName)}\n")*/
 
         print("  Generated function ParmsSize = {int(fn.ParmsSize)}\n")
+        print("  Generated function ReturnValueOffset = {int(fn.ReturnValueOffset)}\n")
 
-        print("stack.Node: {stack.Node}\n")
+        print("stack.Node {stack.Node}\n")
         print("stack.Object {stack.Object}\n")
         print("stack.Code {stack.Code}\n")
         print("stack.Locals {stack.Locals}\n")
@@ -203,18 +221,24 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
             stack |> StepCompiledIn(addr(param4), [[FIntProperty?]] |> StaticClass)
             print("        StepCompiledIn : {param4}\n")
 
+            var param5 : FString
+            stack |> StepCompiledIn(addr(param5), [[FStrProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {string(param5)}\n")
+
             //other way - just reinterpret
-            let params = reinterpret<SaySomethingGeneratedParams1?>(stack.Locals)
+            //TODO: assert sizeof(SaySomethingGeneratedParams1) == sizeof(fn.ParmsSize)
+            var params = reinterpret<SaySomethingGeneratedParams1?>(stack.Locals)
+
+            //TODO: out logic
+            //var returnProperty = *fn |> GetReturnProperty
+            //var returnPropertyStr = reinterpret<FStrProperty?> returnProperty
+
             print("    Stack locals: {params}\n")
-            print("    Stack locals str: {string(params.msg)}\n")
+            print("    Stack locals str: {string(params.res)}\n")
 
             if stack.Code != null //stack.Code += !!stack.Code
                 stack.Code++
-            
-            
-        //epilogue
-        //*((FVector*)(Z_Param__Result)) = Result;
-        
+
     *fn |> StaticLink(true)
     print("  Generated function ParmsSize = {fn.ParmsSize}\n")
     return fn

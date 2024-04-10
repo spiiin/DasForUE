@@ -457,6 +457,12 @@ template <> struct cast_arg<UPropertyWrapper> {
 		return * cast<UPropertyWrapper *>::to(res);
 	}
 };
+template <> struct cast_arg<FOutParmRec> {
+	static __forceinline const FOutParmRec & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FOutParmRec *>::to(res);
+	}
+};
 template <> struct cast_arg<FFrame> {
 	static __forceinline const FFrame & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);

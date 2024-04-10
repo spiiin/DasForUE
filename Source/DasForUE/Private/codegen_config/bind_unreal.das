@@ -335,7 +335,6 @@ class UnrealGen : CppGenBind
             //UObject/Object.h
             "FDataValidationContext";
             "FLifetimeProperty";
-            "FOutParmRec";
             "FRepRecord";
             "Object_eventExecuteUbergraph_Parms";
             "FEditPropertyChain";

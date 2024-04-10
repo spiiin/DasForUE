@@ -1,5 +1,3 @@
-//options log=true
-//options optimize=false
 require unreal_boost
 //require unreal_boost_internal
 
@@ -33,6 +31,7 @@ struct SaySomethingParams4
     msg : FString
     f: float
     g: int
+    result : FString
 
 def SaySomething4(var obj: UObject?; a:int; var msg: FString; f: float; g: int)
     unsafe
@@ -42,6 +41,7 @@ def SaySomething4(var obj: UObject?; a:int; var msg: FString; f: float; g: int)
         params.f = f
         params.g = g
         obj |> call_ufunction_on("SaySomething4") <| addr(params)
+        print("Call result: {string(params.result)}\n")
 
 //--------------------------------------------------------------
 struct SaySomethingGeneratedParams
@@ -49,14 +49,16 @@ struct SaySomethingGeneratedParams
     msg : FString
     f: float
     g: int
+    res : FString
 
-def SaySomethingGenerated(var obj: UObject?; a : int; var msg: FString; f: float; g: int)
+def SaySomethingGenerated(var obj: UObject?; a: int; var msg: FString; f: float; g: int; var res: FString)
     unsafe
         var params: SaySomethingGeneratedParams //no inited, unsafe
         params.a = a
         params.msg <- msg
         params.f = f
         params.g = g
+        params.res <- res
         obj |> call_ufunction_on("SaySomethingGenerated") <| addr(params)
 
 //--------------------------------------------------------------
@@ -96,4 +98,4 @@ def main
     let fn = cls |> test_emit_ufunction() <| FName("SaySomethingGenerated")
     print("Generated function name: {string(*fn |> GetName)}\n")
 
-    obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"), 3.14f, 33)
+    obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"), 3.14f, 33, FString("---"))
