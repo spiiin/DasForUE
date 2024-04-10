@@ -26,6 +26,23 @@ def SaySomething(var obj: UObject?; var msg: FString)
         params.msg <- msg
         obj |> call_ufunction_on("SaySomething") <| addr(params)
 
+
+//--------------------------------------------------------------
+struct SaySomethingParams4
+    a : int
+    msg : FString
+    f: float
+    g: int
+
+def SaySomething4(var obj: UObject?; a:int; var msg: FString; f: float; g: int)
+    unsafe
+        var params: SaySomethingParams4 //no inited, unsafe
+        params.a = a
+        params.msg <- msg
+        params.f = f
+        params.g = g
+        obj |> call_ufunction_on("SaySomething4") <| addr(params)
+
 //--------------------------------------------------------------
 struct SaySomethingGeneratedParams
     a : int
@@ -66,6 +83,8 @@ def main
 
     //3 call without macro
     obj |> SaySomething(FString("SaySomething"))
+
+    obj |> SaySomething4(42, FString("SaySomething"), 3.14f, 33)
 
     //---
     //new_uobject by type

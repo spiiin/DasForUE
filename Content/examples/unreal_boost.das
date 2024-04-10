@@ -2,6 +2,8 @@ module unreal_boost //shared
 
 require unreal public
 require daslib/templates
+require daslib/contracts
+require daslib/apply
 require strings
 
 def get_class_by_name(className: FString) : UClass?
@@ -36,7 +38,26 @@ def call_ufunction_on(var executor: UObject?; functionName: string; var inParams
     //TODO:
     // - process result/out parameters
     // - support unreal types
+    print("Func.ParmsSize {int(func.ParmsSize)}\n")
     *executor |> ProcessEvent(func, inParams)
+
+//TODO: better to have macro parse all arguments
+[expect_any_tuple(arguments) || expect_any_struct(arguments)]
+def call_ufunction(var executor: UObject?; functionName: string; var arguments: auto(TT))
+    let clazz = *executor |> GetClass
+    //find function, can be separated
+    let func = *clazz |> FindFunctionByName(FName(functionName))
+    if func == null
+        print("Function {functionName} not found in class {string(*clazz |> GetName)}\n")
+        return
+    //TODO:
+    // - process result/out parameters
+    unsafe
+        var buf: array<uint8>
+        buf |> resize_no_init(int(func.ParmsSize))
+        apply(arguments) <| $(name:string; field)
+            print("{name} = {field} ")
+        //*executor |> ProcessEvent(func, buf)
 
 
 //UObjects constructors
@@ -57,12 +78,13 @@ def new_uobject(objType: auto(TT)-const) : TT?
     unsafe { return reinterpret<TT?> new_uobject_of_class(cls); }
 
 let private propertyObjFlags = EObjectFlags RF_Public | EObjectFlags RF_Transient | EObjectFlags RF_MarkAsNative
-let private funcObjFlags = EObjectFlags RF_Public | EObjectFlags RF_Transient | EObjectFlags RF_MarkAsRootSet | EObjectFlags RF_MarkAsNative
+let private funcObjFlags = EObjectFlags RF_Public | EObjectFlags RF_Transient | EObjectFlags RF_MarkAsNative
 let private funcFlags = (
     EFunctionFlags FUNC_Native |
-    EFunctionFlags FUNC_Public
+    EFunctionFlags FUNC_Public |
+    EFunctionFlags FUNC_BlueprintCallable
 )
-let private propFlags = EPropertyFlags CPF_Parm
+let private propFlags = EPropertyFlags CPF_Parm //| EPropertyFlags CPF_NativeAccessSpecifierPublic
 
 struct SaySomethingGeneratedParams1
     a : int
@@ -90,7 +112,6 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
     //print("Flags: {flagsTest}\n") //crash
     //prop1.PropertyFlags |= propFlags
     *prop1 |> SetPropertyFlags(propFlags)
-    *fn |> AddCppProperty(prop1)
 
     var field2 = Construct(
         [[FStrProperty?]],
@@ -100,38 +121,30 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
     )
     var prop2 = unsafe(reinterpret<FProperty?> field2)
     *prop2 |> SetPropertyFlags(propFlags)
-    *fn |> AddCppProperty(prop2)
     
 
     var field3 = Construct(
-        [[FFloatProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
+        [[FFloatProperty?]],
         FFieldVariant(fn),
         FName("Parameter3"),
         propertyObjFlags
     )
     var prop3 = unsafe(reinterpret<FProperty?> field3)
     *prop3 |> SetPropertyFlags(propFlags)
-    *fn |> AddCppProperty(prop3)
 
     var field4 = Construct(
-        [[FIntProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
+        [[FIntProperty?]],
         FFieldVariant(fn),
         FName("Parameter4"),
         propertyObjFlags
     )
     var prop4 = unsafe(reinterpret<FProperty?> field4)
     *prop4 |> SetPropertyFlags(propFlags)
-    *fn |> AddCppProperty(prop4)
 
-    /*var field5 = Construct(
-        [[FIntProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
-        FFieldVariant(fn),
-        FName("Parameter5"),
-        propertyObjFlags
-    )
-    var prop5 = unsafe(reinterpret<FProperty?> field5)
-    *prop5 |> SetPropertyFlags(propFlags)
-    *fn |> AddCppProperty(prop5)*/
+    *fn |> AddCppProperty(prop4)
+    *fn |> AddCppProperty(prop3)
+    *fn |> AddCppProperty(prop2)
+    *fn |> AddCppProperty(prop1)
 
     //fill class 
     *cls |> AddFunctionToFunctionMap(fn, name)
@@ -142,7 +155,7 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
     //create function body
     fn |> SetNativeFunc <| @(var context: UObject?; var stack: FFrame; param: void?)
         //init debug
-        print("In generated funcion\n")
+        print("In generated function\n")
         let selfFunction = stack.Node
 
         /*let param4f = selfFunction |> GetChildFieldsFromStruct_FField
@@ -170,20 +183,27 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
             print("  Parameters values:\n")
             //is GetDefaultPropertyValue really need?
 
-            /*var prop1Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
+            var prop1Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
             print("    PropertyChainForCompiledIn current name: {string(*prop1Ptr |> GetName)}\n")
 
-            var param4 = 33.f //GetDefaultPropertyValue([[FFloatProperty?]])
-            stack |> StepCompiledIn(addr(param4), [[FFloatProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {param4}\n")
+            //read parameters by one
+            var param1 = 999
+            stack |> StepCompiledIn(addr(param1), [[FIntProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {param1}\n")
 
-            var param3 = 33.f //GetDefaultPropertyValue([[FFloatProperty?]])
+            var param2 : FString
+            stack |> StepCompiledIn(addr(param2), [[FStrProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {string(param2)}\n")
+
+            var param3 = 999.f
             stack |> StepCompiledIn(addr(param3), [[FFloatProperty?]] |> StaticClass)
             print("        StepCompiledIn : {param3}\n")
 
-            var prop2Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
-            print("    PropertyChainForCompiledIn current name: {string(*prop2Ptr |> GetName)}\n")*/
+            var param4 = 999
+            stack |> StepCompiledIn(addr(param4), [[FIntProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {param4}\n")
 
+            //other way - just reinterpret
             let params = reinterpret<SaySomethingGeneratedParams1?>(stack.Locals)
             print("    Stack locals: {params}\n")
             print("    Stack locals str: {string(params.msg)}\n")
