@@ -87,13 +87,13 @@ namespace das {
 
     //UK2Node_MakeArray* MakeArray = CompilerContext.SpawnIntermediateNode<UK2Node_MakeArray>(this, SourceGraph);
     //TODO: ctor from das array
-    static TArray_int32 new_TArray_int32() {
+    static TArray_int32 make_TArray_int32() {
         return std::move(TArray_int32());
     }
-    static TArray_float new_TArray_float() {
+    static TArray_float make_TArray_float() {
         return std::move(TArray_float());
     }
-    static TArray_FString new_TArray_FString() {
+    static TArray_FString make_TArray_FString() {
         return std::move(TArray_FString());
     }
 
@@ -122,11 +122,11 @@ namespace das {
         addExtern<DAS_BIND_FUN(setNativeFunc)>(*this, lib, "SetNativeFunc", SideEffects::worstDefault, "setNativeFunc");
 
         //
-        makeExtern<TArray_int32(*)(), new_TArray_int32, SimNode_ExtFuncCallAndCopyOrMove>(lib, "new_TArray_int32", "new_TArray_int32")
+        makeExtern<TArray_int32(*)(), make_TArray_int32, SimNode_ExtFuncCallAndCopyOrMove>(lib, "make_TArray_int32", "make_TArray_int32")
             ->addToModule(*this, SideEffects::worstDefault);
-        makeExtern<TArray_float(*)(), new_TArray_float, SimNode_ExtFuncCallAndCopyOrMove>(lib, "new_TArray_float", "new_TArray_float")
+        makeExtern<TArray_float(*)(), make_TArray_float, SimNode_ExtFuncCallAndCopyOrMove>(lib, "make_TArray_float", "make_TArray_float")
             ->addToModule(*this, SideEffects::worstDefault);
-        makeExtern<TArray_FString(*)(), new_TArray_FString, SimNode_ExtFuncCallAndCopyOrMove>(lib, "new_TArray_FString", "new_TArray_FString")
+        makeExtern<TArray_FString(*)(), make_TArray_FString, SimNode_ExtFuncCallAndCopyOrMove>(lib, "make_TArray_FString", "make_TArray_FString")
             ->addToModule(*this, SideEffects::worstDefault);
     }
 
