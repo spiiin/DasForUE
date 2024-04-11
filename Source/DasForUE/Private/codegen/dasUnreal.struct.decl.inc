@@ -3,8 +3,8 @@
 
 using templateType0 = TArray<float>;
 MAKE_EXTERNAL_TYPE_FACTORY(TArray_float,templateType0);
-using templateType1 = TArray<int32>;
-MAKE_EXTERNAL_TYPE_FACTORY(TArray_int32,templateType1);
+using templateType1 = TArray<int>;
+MAKE_EXTERNAL_TYPE_FACTORY(TArray_int,templateType1);
 using templateType2 = TArray<FString>;
 MAKE_EXTERNAL_TYPE_FACTORY(TArray_FString,templateType2);
 MAKE_EXTERNAL_TYPE_FACTORY(FEngineVersionBase,FEngineVersionBase);
@@ -110,8 +110,12 @@ MAKE_EXTERNAL_TYPE_FACTORY(FDoubleProperty,FDoubleProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FBoolProperty,FBoolProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FObjectPropertyBase,FObjectPropertyBase);
 MAKE_EXTERNAL_TYPE_FACTORY(FStrProperty,FStrProperty);
+MAKE_EXTERNAL_TYPE_FACTORY(FArrayProperty,FArrayProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FStructProperty,FStructProperty);
 MAKE_EXTERNAL_TYPE_FACTORY(FCustomPropertyListNode,FCustomPropertyListNode);
 MAKE_EXTERNAL_TYPE_FACTORY(UPropertyWrapper,UPropertyWrapper);
 MAKE_EXTERNAL_TYPE_FACTORY(FOutParmRec,FOutParmRec);
 MAKE_EXTERNAL_TYPE_FACTORY(FFrame,FFrame);
+MAKE_EXTERNAL_TYPE_FACTORY(UBlueprintFunctionLibrary,UBlueprintFunctionLibrary);
+MAKE_EXTERNAL_TYPE_FACTORY(AActor,AActor);
+MAKE_EXTERNAL_TYPE_FACTORY(UKismetArrayLibrary,UKismetArrayLibrary);

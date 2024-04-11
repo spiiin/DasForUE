@@ -96,6 +96,8 @@
 #define BUILDSETTINGS_API DLLEXPORT
 
 #define COREUOBJECT_API DLLIMPORT
+#define ENGINE_API DLLIMPORT
+#define NETCORE_API DLLIMPORT
 
 #undef __clang__
 #define __EDG__ 1
@@ -121,3 +123,6 @@
 #include "UObject/Field.h"
 #include "UObject/Stack.h"
 #include "UObject/Script.h"
+
+#include "Kismet/BlueprintFunctionLibrary.h"
+#include "Kismet/KismetArrayLibrary.h"

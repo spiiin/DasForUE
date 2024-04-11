@@ -12,8 +12,8 @@ struct TArray_float_GeneratedAnnotation final : ManagedStructureAnnotation<TArra
 	}
 };
 
-struct TArray_int32_GeneratedAnnotation final : ManagedStructureAnnotation<TArray<int32>, false, false> {
-	TArray_int32_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_int32", ml) {
+struct TArray_int_GeneratedAnnotation final : ManagedStructureAnnotation<TArray<int>, false, false> {
+	TArray_int_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_int", ml) {
 	}
 	virtual bool canCopy() const override { return true; }
 	virtual bool canClone() const override { return true; }
@@ -735,6 +735,16 @@ struct FStrProperty_GeneratedAnnotation : ManagedStructureAnnotation<FStrPropert
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:3628:23
+struct FArrayProperty_GeneratedAnnotation : ManagedStructureAnnotation<FArrayProperty> {
+	FArrayProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FArrayProperty", ml, "FArrayProperty") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(ArrayFlags)>("ArrayFlags","ArrayFlags");
+		addField<DAS_BIND_MANAGED_FIELD(Inner)>("Inner","Inner");
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:5788:23
 struct FStructProperty_GeneratedAnnotation : ManagedStructureAnnotation<FStructProperty> {
 	FStructProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FStructProperty", ml, "FStructProperty") {
@@ -794,6 +804,22 @@ struct FFrame_GeneratedAnnotation : ManagedStructureAnnotation<FFrame> {
 		addField<DAS_BIND_MANAGED_FIELD(bArrayContextFailed)>("bArrayContextFailed","bArrayContextFailed");
 		addField<DAS_BIND_MANAGED_FIELD(bAbortingExecution)>("bAbortingExecution","bAbortingExecution");
 		addField<DAS_BIND_MANAGED_FIELD(DepthCounter)>("DepthCounter","DepthCounter");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Engine/Classes\Kismet/BlueprintFunctionLibrary.h:15:7
+struct UBlueprintFunctionLibrary_GeneratedAnnotation : ManagedStructureAnnotation<UBlueprintFunctionLibrary, false, false> {
+	UBlueprintFunctionLibrary_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UBlueprintFunctionLibrary", ml, "UBlueprintFunctionLibrary") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Engine/Classes\Kismet/KismetArrayLibrary.h:19:7
+struct UKismetArrayLibrary_GeneratedAnnotation : ManagedStructureAnnotation<UKismetArrayLibrary, false, false> {
+	UKismetArrayLibrary_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UKismetArrayLibrary", ml, "UKismetArrayLibrary") {
+	}
+	void init () {
 	}
 };
 

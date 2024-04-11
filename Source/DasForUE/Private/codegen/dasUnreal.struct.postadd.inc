@@ -2,7 +2,7 @@
 // all user modifications will be lost after this file is re-generated
 
 initRecAnnotation(ann_TArray_float,lib);
-initRecAnnotation(ann_TArray_int32,lib);
+initRecAnnotation(ann_TArray_int,lib);
 initRecAnnotation(ann_TArray_FString,lib);
 initRecAnnotation(ann_FEngineVersionBase,lib);
 initRecAnnotation(ann_FOutputDevice,lib);
@@ -77,8 +77,11 @@ initRecAnnotation(ann_FDoubleProperty,lib);
 initRecAnnotation(ann_FBoolProperty,lib);
 initRecAnnotation(ann_FObjectPropertyBase,lib);
 initRecAnnotation(ann_FStrProperty,lib);
+initRecAnnotation(ann_FArrayProperty,lib);
 initRecAnnotation(ann_FStructProperty,lib);
 initRecAnnotation(ann_FCustomPropertyListNode,lib);
 initRecAnnotation(ann_UPropertyWrapper,lib);
 initRecAnnotation(ann_FOutParmRec,lib);
 initRecAnnotation(ann_FFrame,lib);
+initRecAnnotation(ann_UBlueprintFunctionLibrary,lib);
+initRecAnnotation(ann_UKismetArrayLibrary,lib);

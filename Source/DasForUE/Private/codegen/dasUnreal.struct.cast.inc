@@ -439,6 +439,12 @@ template <> struct cast_arg<FStrProperty> {
 		return * cast<FStrProperty *>::to(res);
 	}
 };
+template <> struct cast_arg<FArrayProperty> {
+	static __forceinline const FArrayProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FArrayProperty *>::to(res);
+	}
+};
 template <> struct cast_arg<FStructProperty> {
 	static __forceinline const FStructProperty & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
@@ -467,5 +473,17 @@ template <> struct cast_arg<FFrame> {
 	static __forceinline const FFrame & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<FFrame *>::to(res);
+	}
+};
+template <> struct cast_arg<UBlueprintFunctionLibrary> {
+	static __forceinline const UBlueprintFunctionLibrary & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UBlueprintFunctionLibrary *>::to(res);
+	}
+};
+template <> struct cast_arg<UKismetArrayLibrary> {
+	static __forceinline const UKismetArrayLibrary & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<UKismetArrayLibrary *>::to(res);
 	}
 };

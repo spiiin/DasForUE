@@ -23,6 +23,8 @@ class UnrealGen : CppGenBind
     declaredFunctionsHashesWithoutResults : table<uint64>
     declaredEnumsHashes : table<uint64>
 
+    replaceTypeNames: table<string;string>
+
     def UnrealGen()
         bind_root = BIND_ROOT
         bind_module = "dasUnreal"
@@ -31,12 +33,18 @@ class UnrealGen : CppGenBind
         let pfn = "definitions.h"
         let engineIncludes = [[string
             "{UNREAL_PATH}/Engine/Source/Runtime/Core/Public";
-            "{UNREAL_PATH}/Engine/Source/Runtime/Core/Public/Containers/";
+            "{UNREAL_PATH}/Engine/Source/Runtime/Core/Public/Containers";
             "{UNREAL_PATH}/Engine/Source/Runtime/Core/Public/Serialization";
 
-            "{UNREAL_PATH}/Engine/Source/Runtime/CoreUObject/Public/";
+            "{UNREAL_PATH}/Engine/Source/Runtime/CoreUObject/Public";
 
-            "{UNREAL_PATH}/Engine/Source/Runtime/TraceLog/Public/";
+            "{UNREAL_PATH}/Engine/Source/Runtime/TraceLog/Public";
+            "{UNREAL_PATH}/Engine/Source/Runtime/Engine/Classes";
+            "{UNREAL_PATH}/Engine/Source/Runtime/Net/Core/Public";
+            
+             //path to UHT generated files. Not need to parse, but for correct includes for other files
+             //TODO: find other way to skip them
+            "{UNREAL_PATH}/Engine/Intermediate/Build/Win64/UnrealEditor/Inc/Engine/UHT";
         ]]
 
         var args <- [{string
@@ -80,10 +88,12 @@ class UnrealGen : CppGenBind
             "UEnum";
             "UPackage";
             "UPropertyWrapper";
+            "UBlueprintFunctionLibrary";
+            "UKismetArrayLibrary";
         }}
 
         dummyTemplateInstanceAnnotations <- {{
-            "TArray<int32>";
+            "TArray<int>";
             "TArray<float>";
             "TArray<FString>";
         }}
@@ -231,6 +241,7 @@ class UnrealGen : CppGenBind
             "GlobalSetProperty";
             "UEProperty_Private::FProperty_DoNotUse::Unsafe_AlterOffset";
             "UPropertyWrapper::GetProperty";
+            "FArrayProperty::ImportTextInnerItem"; //FScriptArrayHelper
 
             //UObject/Field.h
             "FField::GetPathName";
@@ -263,6 +274,70 @@ class UnrealGen : CppGenBind
             //Script.h
             //"FBlueprintContext::FBlueprintContext"; //Linker error
             //"FBlueprintContext::GetVirtualStackAllocator"; //FVirtualStackAllocator
+
+            //Manual disabled function if TArray enabled
+            /*"FArchiveState::GetSerializedPropertyChain"; //TArray<FProperty *>
+            "FArchive::SetCompressionMap"; //TArray<FCompressedChunk
+            "FString::ReplaceCharWithEscapedCharInline"; //TArray<wchar_t>
+            "FString::ReplaceEscapedCharWithCharInline"; //TArray<wchar_t>
+            "ParsePropertyFlags"; //TArray<const wchar_t *>
+            "FTextRange::CalculateLineRangesFromString"; //TArray<FTextRange>
+            "StaticFindAllObjectsFast"; //TArray<UObject *>
+            "StaticFindAllObjectsFastSafe";
+            "StaticFindAllObjects";
+            "StaticFindAllObjectsSafe";
+            "FReferenceFinder::FReferenceFinder"; //TArray<UObject *>
+            "UObject::GetDefaultSubobjects"; //TArray<UObject *>
+            "UObject::GetPreloadDependencies"; //TArray<UObject *>
+            "UObject::GetPrestreamPackages"; //TArray<UObject *>
+            "UObject::GetAssetRegistryTags"; //TArray<UObject::FAssetRegistryTag>
+            "UObject::GetExtendedAssetRegistryTagsForSave";
+            "UObject::PostLoadAssetRegistryTags";
+            "UObject::GetLifetimeReplicatedProps"; //TArray<FLifetimeProperty>
+            "UObject::GetSubobjectsWithStableNamesForNetworking"; //TArray<UObject *>
+            "UObject::PropagatePreEditChange"; //TArray<UObject *>
+            "UObject::PropagatePostEditChange"; //TArray<UObject *>
+            "UObject::CollectDefaultSubobject"; //TArray<UObject *>
+            "UObject::RetrieveReferencers"; //TArray<FReferencerInformation>
+            "UObject::GetArchetypeInstances"; //TArray<UObject *>
+            "UObject::ValidateGeneratedRepEnums"; //TArray<FRepRecord>
+            "UObject::CollectDefaultSubobjects";
+            "FFieldClass::GetAllFieldClasses"; //TArray<FFieldClass *>
+            "FField::GetPreloadDependencies"; //TArray<UObject *>
+            "FField::GetInnerFields"; //TArray<FField *>
+            "UStruct::GetPreloadDependencies";
+            "UStruct::CollectBytecodeReferencedObjects";
+            "UStruct::CollectPropertyReferencedObjects";
+            "UEnum::SetEnums"; //TArray<TTuple<FName, long long>>
+            "UClass::GenerateFunctionList"; //TArray<FName>
+            "UClass::GetAssetRegistryTags"; //TArray<UObject::FAssetRegistryTag>
+            "UClass::GetDefaultObjectSubobjects";
+            "UClass::FindCommonBase"; //TArray<UClass *>
+            "UClass::GetDefaultObjectPreloadDependencies"; //TArray<UObject *>
+            "UClass::PostLoadAssetRegistryTags"; //TArray<UObject::FAssetRegistryTag>
+            "UClass::GetPreloadDependencies";
+            "UPackage::GetReloadDelegates"; //TArray<UFunction *>
+            "UPackage::SetReloadDelegates";
+            "UPackage::GetExternalPackages"; //TArray<UPackage *>
+            "FProperty::ImportSingleProperty"; //TArray<FDefinedProperty>
+            "FProperty::NetSerializeItem"; //TArray<unsigned char>
+            "FProperty::ContainsObjectReference"; //TArray<const FStructProperty *>
+            "FProperty::EmitReferenceInfo"; //TArray<const FStructProperty *>
+            "FByteProperty::GetPreloadDependencies";
+            "FByteProperty::NetSerializeItem";
+            "FBoolProperty::NetSerializeItem";
+            "FObjectPropertyBase::NetSerializeItem";
+            "FStructProperty::NetSerializeItem";
+            "FStructProperty::GetPreloadDependencies";
+            "FStructProperty::ContainsObjectReference";
+            "FStructProperty::EmitReferenceInfo";*/
+
+            //KismetArrayLibrary.h
+            "UKismetArrayLibrary::Array_ShuffleFromStream"; //FRandomStream
+            "UKismetArrayLibrary::Array_RandomFromStream";
+            "UKismetArrayLibrary::GenericArray_ShuffleFromStream";
+            "UKismetArrayLibrary::GenericArray_RandomFromStream";
+            "UKismetArrayLibrary::GetLastIndex"; //FScriptArrayHelper
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -274,7 +349,7 @@ class UnrealGen : CppGenBind
         //TODO:
         // - radical way, find substring is slow
         unreal_arg_part_names <- [{string
-            "TArray";           //TODO: temp, due to name das/unreal name conflict (namespace das -> dasext?)
+            "TArray";
             "TObjectPtr";
             "FSchemaOwner";
             "FUnversionedStructSchema";
@@ -390,7 +465,6 @@ class UnrealGen : CppGenBind
             "FLazyObjectProperty";
             "FSoftObjectProperty";
             "FSoftClassProperty";
-            "FArrayProperty";
             "FScriptArrayHelper";
             "FMulticastDelegateProperty";
             "UEProperty_Private_FProperty_DoNotUse";
@@ -466,7 +540,9 @@ class UnrealGen : CppGenBind
             fname |> find("UObject/UnrealType.h") != -1 ||
             fname |> find("UObject/Field.h") != -1 ||
             fname |> find("UObject/Stack.h") != -1 ||
-            fname |> find("UObject/Script.h") != -1
+            fname |> find("UObject/Script.h") != -1 ||
+            fname |> find("Kismet/BlueprintFunctionLibrary.h") != -1 ||
+            fname |> find("Kismet/KismetArrayLibrary.h") != -1
         )
             return false
         return true
@@ -516,7 +592,7 @@ class UnrealGen : CppGenBind
         let function_name = namespace_name(string(clang_getCursorSpelling(c)))
         if function_name |> find("operator") != -1 //TODO: check this
             return true
-        if function_name |> starts_with("UObject::exec") //DECLARE_FUNCTION macro in UObject, internal function call processing
+        if function_name |> find("::exec") != -1 //DECLARE_FUNCTION macro, internal function call processing
             return true
         if check_deprecated_attribute(c)
             return true
@@ -559,6 +635,7 @@ class UnrealGen : CppGenBind
         module_need_h_file |> fwrite("#pragma once\n")
         generateModuleNeedHPrefix()
         module_need_h_file |> fwrite("#include \"CoreMinimal.h\"\n")
+        module_need_h_file |> fwrite("#include \"Kismet/KismetArrayLibrary.h\"\n")
 
         module_need_h_file |> fwrite("#include \"{bind_module}.enum.decl.inc\"\n")
         module_need_h_file |> fwrite("#include \"{bind_module}.enum.decl.cast.inc\"\n")
@@ -814,6 +891,27 @@ class UnrealGen : CppGenBind
 		fprint(func_file, "\n\t\t->addToModule(*this, SideEffects::worstDefault)")
         fprint(func_file,";\n")
 
+    def override typeSpelling(var c: CXType)
+        let nspl = string(clang_getTypeSpelling(c))
+        if nspl=="size_t" || nspl=="std::size_t" || nspl=="intptr_t" || nspl=="uintptr_t" || nspl=="size_t *"
+            return nspl
+        var t = clang_getCanonicalType(c)
+        var spl = string(clang_getTypeSpelling(t))
+        if c.kind == CXTypeKind Enum
+            return enum2enum?[spl] ?? spl
+        elif t.kind==CXTypeKind Long || t.kind==CXTypeKind LongLong || t.kind==CXTypeKind ULong || t.kind==CXTypeKind ULongLong
+            return nspl // if its a fancy type, which may be different on different platform
+
+        var canonicalType = t
+        while clang_getPointeeType(canonicalType).kind != CXTypeKind Invalid
+            canonicalType = clang_getPointeeType(canonicalType)
+        var canonicalTypeStr = string(clang_getTypeSpelling(canonicalType))
+        //clang_getUnqualifiedType(t) & clang_getNonReferenceType(canonicalType) doesn't work?
+        canonicalTypeStr = replace(replace(canonicalTypeStr, " &", ""), "const ", "") //hardcode
+        if replaceTypeNames |> key_exists(canonicalTypeStr)
+            spl = spl |> replace(canonicalTypeStr, replaceTypeNames[canonicalTypeStr])
+        return spl
+
     def override functionHeaderSpelling(var c : CXCursor; isMethod, needMethodQualifier, needArgumentNames: bool; function_name, self_type: string) : string
         return functionHeaderSpellingSkipResult(c, isMethod, needMethodQualifier, needArgumentNames, function_name, self_type, false)
 
@@ -916,7 +1014,8 @@ class UnrealGen : CppGenBind
         fprint(enum_add_file, "addEnumeration(make_smart<Enumeration_{dashing_name}>());\n");
 
     def isTemplateType(typeName: string): bool
-        return true if typeName == "FStrProperty_Super" //unreal macro hardcode
+        return true if typeName == "FStrProperty_Super"   //unreal typedef hardcode, need to find a way resolve it
+        return true if typeName == "FArrayProperty_Super"
         return typeName |> find("<") != -1
 
      //TODO: send fix to cbind_boost (lspClone)
@@ -974,6 +1073,8 @@ class UnrealGen : CppGenBind
             fprint(struct_class_file, "\tvoid init() \{\n")
             fprint(struct_class_file, "\t\}\n")
             fprint(struct_class_file, "\};\n")
+
+            replaceTypeNames[templName] = templDashedName
 
     def override generate
         generateDummpyTemplateInstaceAnnotations()

@@ -10,7 +10,7 @@ DAS_BASE_BIND_ENUM_GEN(ESearchCase::Type, ESearchCase_Type);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FText, FText);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FName, FName);
 
-using TArray_int32 = TArray<int32>;
+using TArray_int = TArray<int>;
 using TArray_float = TArray<float>;
 using TArray_FString = TArray<FString>;
 
@@ -87,7 +87,7 @@ namespace das {
 
     //UK2Node_MakeArray* MakeArray = CompilerContext.SpawnIntermediateNode<UK2Node_MakeArray>(this, SourceGraph);
     //TODO: ctor from das array
-    static TArray_int32 make_TArray_int32() {
+    static TArray_int32 make_TArray_int() {
         return std::move(TArray_int32());
     }
     static TArray_float make_TArray_float() {
@@ -122,7 +122,7 @@ namespace das {
         addExtern<DAS_BIND_FUN(setNativeFunc)>(*this, lib, "SetNativeFunc", SideEffects::worstDefault, "setNativeFunc");
 
         //
-        makeExtern<TArray_int32(*)(), make_TArray_int32, SimNode_ExtFuncCallAndCopyOrMove>(lib, "make_TArray_int32", "make_TArray_int32")
+        makeExtern<TArray_int32(*)(), make_TArray_int, SimNode_ExtFuncCallAndCopyOrMove>(lib, "make_TArray_int", "make_TArray_int")
             ->addToModule(*this, SideEffects::worstDefault);
         makeExtern<TArray_float(*)(), make_TArray_float, SimNode_ExtFuncCallAndCopyOrMove>(lib, "make_TArray_float", "make_TArray_float")
             ->addToModule(*this, SideEffects::worstDefault);

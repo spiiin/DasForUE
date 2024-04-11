@@ -2,7 +2,7 @@
 // all user modifications will be lost after this file is re-generated
 
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(TArray_float,templateType0);
-IMPLEMENT_EXTERNAL_TYPE_FACTORY(TArray_int32,templateType1);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TArray_int,templateType1);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(TArray_FString,templateType2);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FEngineVersionBase,FEngineVersionBase);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FLogRecord,UE::FLogRecord);
@@ -107,8 +107,12 @@ IMPLEMENT_EXTERNAL_TYPE_FACTORY(FDoubleProperty,FDoubleProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FBoolProperty,FBoolProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FObjectPropertyBase,FObjectPropertyBase);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FStrProperty,FStrProperty);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(FArrayProperty,FArrayProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FStructProperty,FStructProperty);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FCustomPropertyListNode,FCustomPropertyListNode);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(UPropertyWrapper,UPropertyWrapper);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FOutParmRec,FOutParmRec);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FFrame,FFrame);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(UBlueprintFunctionLibrary,UBlueprintFunctionLibrary);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(AActor,AActor);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(UKismetArrayLibrary,UKismetArrayLibrary);

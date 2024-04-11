@@ -21,7 +21,7 @@ FString UTestClass::SaySomething4(int a, FString Msg, float b, int c) {
 	return Msg;
 }
 
-void UTestClass::SayArray(const TArray<int>& IntArray) {
+void UTestClass::SayArray(TArray<int> IntArray) {
     if (IntArray.Num() == 0)
     {
         UE_LOG(LogTemp, Log, TEXT("SayArray: Array is empty!"));

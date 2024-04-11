@@ -1889,119 +1889,323 @@ unsigned int _dasUnreal_virtual_471_GetValueTypeHashInternal(const FStrProperty 
 	return self.GetValueTypeHashInternal(Src);
 }
 
-FFieldClass * _dasUnreal_static_472_StaticClass(const FStructProperty *) {
-	return FStructProperty::StaticClass();
+FFieldClass * _dasUnreal_static_472_StaticClass(const FArrayProperty *) {
+	return FArrayProperty::StaticClass();
 }
 
-FField * _dasUnreal_static_473_Construct(const FStructProperty *,const FFieldVariant & InOwner,const FName & InName,EObjectFlags InObjectFlags) {
-	return FStructProperty::Construct(InOwner,InName,InObjectFlags);
+FField * _dasUnreal_static_473_Construct(const FArrayProperty *,const FFieldVariant & InOwner,const FName & InName,EObjectFlags InObjectFlags) {
+	return FArrayProperty::Construct(InOwner,InName,InObjectFlags);
 }
 
-uint64 _dasUnreal_static_474_StaticClassCastFlagsPrivate(const FStructProperty *) {
-	return FStructProperty::StaticClassCastFlagsPrivate();
+uint64 _dasUnreal_static_474_StaticClassCastFlagsPrivate(const FArrayProperty *) {
+	return FArrayProperty::StaticClassCastFlagsPrivate();
 }
 
-uint64 _dasUnreal_static_475_StaticClassCastFlags(const FStructProperty *) {
-	return FStructProperty::StaticClassCastFlags();
+uint64 _dasUnreal_static_475_StaticClassCastFlags(const FArrayProperty *) {
+	return FArrayProperty::StaticClassCastFlags();
 }
 
-void _dasUnreal_virtual_476_Serialize(FStructProperty & self,FArchive & Ar) {
+void _dasUnreal_virtual_476_Serialize(FArrayProperty & self,FArchive & Ar) {
 	self.Serialize(Ar);
 }
 
-void _dasUnreal_virtual_477_AddReferencedObjects(FStructProperty & self,FReferenceCollector & Collector) {
+void _dasUnreal_virtual_477_AddReferencedObjects(FArrayProperty & self,FReferenceCollector & Collector) {
 	self.AddReferencedObjects(Collector);
 }
 
-void _dasUnreal_virtual_478_PostDuplicate(FStructProperty & self,const FField & InField) {
+void _dasUnreal_virtual_478_PostDuplicate(FArrayProperty & self,const FField & InField) {
 	self.PostDuplicate(InField);
 }
 
-FString _dasUnreal_virtual_479_GetCPPMacroType(const FStructProperty & self,FString & ExtendedTypeText) {
+void _dasUnreal_virtual_479_AddCppProperty(FArrayProperty & self,FProperty * Property) {
+	self.AddCppProperty(Property);
+}
+
+FField * _dasUnreal_virtual_480_GetInnerFieldByName(FArrayProperty & self,const FName & InName) {
+	return self.GetInnerFieldByName(InName);
+}
+
+FString _dasUnreal_virtual_481_GetCPPMacroType(const FArrayProperty & self,FString & ExtendedTypeText) {
 	return self.GetCPPMacroType(ExtendedTypeText);
 }
 
-FString _dasUnreal_virtual_480_GetCPPType(const FStructProperty & self,FString * ExtendedTypeText,unsigned int CPPExportFlags) {
+FString _dasUnreal_virtual_482_GetCPPType(const FArrayProperty & self,FString * ExtendedTypeText,unsigned int CPPExportFlags) {
 	return self.GetCPPType(ExtendedTypeText,CPPExportFlags);
 }
 
-FString _dasUnreal_virtual_481_GetCPPTypeForwardDeclaration(const FStructProperty & self) {
+FString _dasUnreal_virtual_483_GetCPPTypeForwardDeclaration(const FArrayProperty & self) {
 	return self.GetCPPTypeForwardDeclaration();
 }
 
-void _dasUnreal_virtual_482_LinkInternal(FStructProperty & self,FArchive & Ar) {
+void _dasUnreal_virtual_484_LinkInternal(FArrayProperty & self,FArchive & Ar) {
 	self.LinkInternal(Ar);
 }
 
-bool _dasUnreal_virtual_483_Identical(const FStructProperty & self,const void * A,const void * B,unsigned int PortFlags) {
+bool _dasUnreal_virtual_485_Identical(const FArrayProperty & self,const void * A,const void * B,unsigned int PortFlags) {
 	return self.Identical(A,B,PortFlags);
 }
 
-bool _dasUnreal_virtual_484_SupportsNetSharedSerialization(const FStructProperty & self) {
-	return self.SupportsNetSharedSerialization();
-}
-
-void _dasUnreal_virtual_485_CopyValuesInternal(const FStructProperty & self,void * Dest,const void * Src,int Count) {
-	self.CopyValuesInternal(Dest,Src,Count);
-}
-
-void _dasUnreal_virtual_486_ClearValueInternal(const FStructProperty & self,void * Data) {
-	self.ClearValueInternal(Data);
-}
-
-void _dasUnreal_virtual_487_DestroyValueInternal(const FStructProperty & self,void * Dest) {
-	self.DestroyValueInternal(Dest);
-}
-
-void _dasUnreal_virtual_488_InitializeValueInternal(const FStructProperty & self,void * Dest) {
+void _dasUnreal_virtual_486_InitializeValueInternal(const FArrayProperty & self,void * Dest) {
 	self.InitializeValueInternal(Dest);
 }
 
-int _dasUnreal_virtual_489_GetMinAlignment(const FStructProperty & self) {
-	return self.GetMinAlignment();
+void _dasUnreal_virtual_487_CopyValuesInternal(const FArrayProperty & self,void * Dest,const void * Src,int Count) {
+	self.CopyValuesInternal(Dest,Src,Count);
 }
 
-bool _dasUnreal_virtual_490_SameType(const FStructProperty & self,const FProperty * Other) {
+void _dasUnreal_virtual_488_ClearValueInternal(const FArrayProperty & self,void * Data) {
+	self.ClearValueInternal(Data);
+}
+
+void _dasUnreal_virtual_489_DestroyValueInternal(const FArrayProperty & self,void * Dest) {
+	self.DestroyValueInternal(Dest);
+}
+
+bool _dasUnreal_virtual_490_PassCPPArgsByRef(const FArrayProperty & self) {
+	return self.PassCPPArgsByRef();
+}
+
+bool _dasUnreal_virtual_491_SameType(const FArrayProperty & self,const FProperty * Other) {
 	return self.SameType(Other);
 }
 
-void _dasUnreal_virtual_491_AppendSchemaHash(const FStructProperty & self,FBlake3 & Builder,bool bSkipEditorOnly) {
+int _dasUnreal_virtual_492_GetMinAlignment(const FArrayProperty & self) {
+	return self.GetMinAlignment();
+}
+
+void * _dasUnreal_virtual_493_GetValueAddressAtIndex_Direct(const FArrayProperty & self,const FProperty * Inner,void * InValueAddress,int Index) {
+	return self.GetValueAddressAtIndex_Direct(Inner,InValueAddress,Index);
+}
+
+void _dasUnreal_static_494_ExportTextInnerItem(const FArrayProperty *,FString & ValueStr,const FProperty * Inner,const void * PropertyValue,int PropertySize,const void * DefaultValue,int DefaultSize,UObject * Parent,int PortFlags,UObject * ExportRootScope) {
+	FArrayProperty::ExportTextInnerItem(ValueStr,Inner,PropertyValue,PropertySize,DefaultValue,DefaultSize,Parent,PortFlags,ExportRootScope);
+}
+
+void _dasUnreal_virtual_495_AppendSchemaHash(const FArrayProperty & self,FBlake3 & Builder,bool bSkipEditorOnly) {
 	self.AppendSchemaHash(Builder,bSkipEditorOnly);
 }
 
-FProperty * _dasUnreal_static_492_GetNextPropertyAndAdvance(const FCustomPropertyListNode *,const FCustomPropertyListNode *& Node) {
+FFieldClass * _dasUnreal_static_496_StaticClass(const FStructProperty *) {
+	return FStructProperty::StaticClass();
+}
+
+FField * _dasUnreal_static_497_Construct(const FStructProperty *,const FFieldVariant & InOwner,const FName & InName,EObjectFlags InObjectFlags) {
+	return FStructProperty::Construct(InOwner,InName,InObjectFlags);
+}
+
+uint64 _dasUnreal_static_498_StaticClassCastFlagsPrivate(const FStructProperty *) {
+	return FStructProperty::StaticClassCastFlagsPrivate();
+}
+
+uint64 _dasUnreal_static_499_StaticClassCastFlags(const FStructProperty *) {
+	return FStructProperty::StaticClassCastFlags();
+}
+
+void _dasUnreal_virtual_500_Serialize(FStructProperty & self,FArchive & Ar) {
+	self.Serialize(Ar);
+}
+
+void _dasUnreal_virtual_501_AddReferencedObjects(FStructProperty & self,FReferenceCollector & Collector) {
+	self.AddReferencedObjects(Collector);
+}
+
+void _dasUnreal_virtual_502_PostDuplicate(FStructProperty & self,const FField & InField) {
+	self.PostDuplicate(InField);
+}
+
+FString _dasUnreal_virtual_503_GetCPPMacroType(const FStructProperty & self,FString & ExtendedTypeText) {
+	return self.GetCPPMacroType(ExtendedTypeText);
+}
+
+FString _dasUnreal_virtual_504_GetCPPType(const FStructProperty & self,FString * ExtendedTypeText,unsigned int CPPExportFlags) {
+	return self.GetCPPType(ExtendedTypeText,CPPExportFlags);
+}
+
+FString _dasUnreal_virtual_505_GetCPPTypeForwardDeclaration(const FStructProperty & self) {
+	return self.GetCPPTypeForwardDeclaration();
+}
+
+void _dasUnreal_virtual_506_LinkInternal(FStructProperty & self,FArchive & Ar) {
+	self.LinkInternal(Ar);
+}
+
+bool _dasUnreal_virtual_507_Identical(const FStructProperty & self,const void * A,const void * B,unsigned int PortFlags) {
+	return self.Identical(A,B,PortFlags);
+}
+
+bool _dasUnreal_virtual_508_SupportsNetSharedSerialization(const FStructProperty & self) {
+	return self.SupportsNetSharedSerialization();
+}
+
+void _dasUnreal_virtual_509_CopyValuesInternal(const FStructProperty & self,void * Dest,const void * Src,int Count) {
+	self.CopyValuesInternal(Dest,Src,Count);
+}
+
+void _dasUnreal_virtual_510_ClearValueInternal(const FStructProperty & self,void * Data) {
+	self.ClearValueInternal(Data);
+}
+
+void _dasUnreal_virtual_511_DestroyValueInternal(const FStructProperty & self,void * Dest) {
+	self.DestroyValueInternal(Dest);
+}
+
+void _dasUnreal_virtual_512_InitializeValueInternal(const FStructProperty & self,void * Dest) {
+	self.InitializeValueInternal(Dest);
+}
+
+int _dasUnreal_virtual_513_GetMinAlignment(const FStructProperty & self) {
+	return self.GetMinAlignment();
+}
+
+bool _dasUnreal_virtual_514_SameType(const FStructProperty & self,const FProperty * Other) {
+	return self.SameType(Other);
+}
+
+void _dasUnreal_virtual_515_AppendSchemaHash(const FStructProperty & self,FBlake3 & Builder,bool bSkipEditorOnly) {
+	self.AppendSchemaHash(Builder,bSkipEditorOnly);
+}
+
+FProperty * _dasUnreal_static_516_GetNextPropertyAndAdvance(const FCustomPropertyListNode *,const FCustomPropertyListNode *& Node) {
 	return FCustomPropertyListNode::GetNextPropertyAndAdvance(Node);
 }
 
-UClass * _dasUnreal_static_493_StaticClass(const UPropertyWrapper *) {
+UClass * _dasUnreal_static_517_StaticClass(const UPropertyWrapper *) {
 	return UPropertyWrapper::StaticClass();
 }
 
-const wchar_t * _dasUnreal_static_494_StaticPackage(const UPropertyWrapper *) {
+const wchar_t * _dasUnreal_static_518_StaticPackage(const UPropertyWrapper *) {
 	return UPropertyWrapper::StaticPackage();
 }
 
-void _dasUnreal_static_495_StaticRegisterNativesUPropertyWrapper(const UPropertyWrapper *) {
+void _dasUnreal_static_519_StaticRegisterNativesUPropertyWrapper(const UPropertyWrapper *) {
 	UPropertyWrapper::StaticRegisterNativesUPropertyWrapper();
 }
 
-void _dasUnreal_virtual_496_Serialize(FFrame & self,const wchar_t * V,ELogVerbosity::Type Verbosity,const FName & Category) {
+void _dasUnreal_virtual_520_Serialize(FFrame & self,const wchar_t * V,ELogVerbosity::Type Verbosity,const FName & Category) {
 	self.Serialize(V,Verbosity,Category);
 }
 
-void _dasUnreal_static_497_KismetExecutionMessage(const FFrame *,const wchar_t * Message,ELogVerbosity::Type Verbosity,FName WarningId) {
+void _dasUnreal_static_521_KismetExecutionMessage(const FFrame *,const wchar_t * Message,ELogVerbosity::Type Verbosity,FName WarningId) {
 	FFrame::KismetExecutionMessage(Message,Verbosity,WarningId);
 }
 
-FFrame * _dasUnreal_static_498_PushThreadLocalTopStackFrame(const FFrame *,FFrame * NewTopStackFrame) {
+FFrame * _dasUnreal_static_522_PushThreadLocalTopStackFrame(const FFrame *,FFrame * NewTopStackFrame) {
 	return FFrame::PushThreadLocalTopStackFrame(NewTopStackFrame);
 }
 
-void _dasUnreal_static_499_PopThreadLocalTopStackFrame(const FFrame *,FFrame * NewTopStackFrame) {
+void _dasUnreal_static_523_PopThreadLocalTopStackFrame(const FFrame *,FFrame * NewTopStackFrame) {
 	FFrame::PopThreadLocalTopStackFrame(NewTopStackFrame);
 }
 
-FFrame * _dasUnreal_static_500_GetThreadLocalTopStackFrame(const FFrame *) {
+FFrame * _dasUnreal_static_524_GetThreadLocalTopStackFrame(const FFrame *) {
 	return FFrame::GetThreadLocalTopStackFrame();
+}
+
+UClass * _dasUnreal_static_525_StaticClass(const UBlueprintFunctionLibrary *) {
+	return UBlueprintFunctionLibrary::StaticClass();
+}
+
+const wchar_t * _dasUnreal_static_526_StaticPackage(const UBlueprintFunctionLibrary *) {
+	return UBlueprintFunctionLibrary::StaticPackage();
+}
+
+int _dasUnreal_virtual_527_GetFunctionCallspace(UBlueprintFunctionLibrary & self,UFunction * Function,FFrame * Stack) {
+	return self.GetFunctionCallspace(Function,Stack);
+}
+
+UClass * _dasUnreal_static_528_StaticClass(const UKismetArrayLibrary *) {
+	return UKismetArrayLibrary::StaticClass();
+}
+
+const wchar_t * _dasUnreal_static_529_StaticPackage(const UKismetArrayLibrary *) {
+	return UKismetArrayLibrary::StaticPackage();
+}
+
+int _dasUnreal_static_530_GenericArray_Add(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp,const void * NewItem) {
+	return UKismetArrayLibrary::GenericArray_Add(TargetArray,ArrayProp,NewItem);
+}
+
+int _dasUnreal_static_531_GenericArray_AddUnique(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp,const void * NewItem) {
+	return UKismetArrayLibrary::GenericArray_AddUnique(TargetArray,ArrayProp,NewItem);
+}
+
+void _dasUnreal_static_532_GenericArray_Shuffle(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp) {
+	UKismetArrayLibrary::GenericArray_Shuffle(TargetArray,ArrayProp);
+}
+
+bool _dasUnreal_static_533_GenericArray_Identical(const UKismetArrayLibrary *,void * ArrayA,const FArrayProperty * ArrayAProp,void * ArrayB,const FArrayProperty * ArrayBProperty) {
+	return UKismetArrayLibrary::GenericArray_Identical(ArrayA,ArrayAProp,ArrayB,ArrayBProperty);
+}
+
+void _dasUnreal_static_534_GenericArray_Append(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * TargetArrayProp,void * SourceArray,const FArrayProperty * SourceArrayProperty) {
+	UKismetArrayLibrary::GenericArray_Append(TargetArray,TargetArrayProp,SourceArray,SourceArrayProperty);
+}
+
+void _dasUnreal_static_535_GenericArray_Insert(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp,const void * NewItem,int Index) {
+	UKismetArrayLibrary::GenericArray_Insert(TargetArray,ArrayProp,NewItem,Index);
+}
+
+void _dasUnreal_static_536_GenericArray_Remove(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp,int IndexToRemove) {
+	UKismetArrayLibrary::GenericArray_Remove(TargetArray,ArrayProp,IndexToRemove);
+}
+
+bool _dasUnreal_static_537_GenericArray_RemoveItem(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp,const void * Item) {
+	return UKismetArrayLibrary::GenericArray_RemoveItem(TargetArray,ArrayProp,Item);
+}
+
+void _dasUnreal_static_538_GenericArray_Clear(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp) {
+	UKismetArrayLibrary::GenericArray_Clear(TargetArray,ArrayProp);
+}
+
+void _dasUnreal_static_539_GenericArray_Resize(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp,int Size) {
+	UKismetArrayLibrary::GenericArray_Resize(TargetArray,ArrayProp,Size);
+}
+
+void _dasUnreal_static_540_GenericArray_Reverse(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp) {
+	UKismetArrayLibrary::GenericArray_Reverse(TargetArray,ArrayProp);
+}
+
+int _dasUnreal_static_541_GenericArray_Length(const UKismetArrayLibrary *,const void * TargetArray,const FArrayProperty * ArrayProp) {
+	return UKismetArrayLibrary::GenericArray_Length(TargetArray,ArrayProp);
+}
+
+bool _dasUnreal_static_542_GenericArray_IsEmpty(const UKismetArrayLibrary *,const void * TargetArray,const FArrayProperty * ArrayProp) {
+	return UKismetArrayLibrary::GenericArray_IsEmpty(TargetArray,ArrayProp);
+}
+
+bool _dasUnreal_static_543_GenericArray_IsNotEmpty(const UKismetArrayLibrary *,const void * TargetArray,const FArrayProperty * ArrayProp) {
+	return UKismetArrayLibrary::GenericArray_IsNotEmpty(TargetArray,ArrayProp);
+}
+
+int _dasUnreal_static_544_GenericArray_LastIndex(const UKismetArrayLibrary *,const void * TargetArray,const FArrayProperty * ArrayProp) {
+	return UKismetArrayLibrary::GenericArray_LastIndex(TargetArray,ArrayProp);
+}
+
+void _dasUnreal_static_545_GenericArray_Get(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp,int Index,void * Item) {
+	UKismetArrayLibrary::GenericArray_Get(TargetArray,ArrayProp,Index,Item);
+}
+
+void _dasUnreal_static_546_GenericArray_Set(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp,int Index,const void * NewItem,bool bSizeToFit) {
+	UKismetArrayLibrary::GenericArray_Set(TargetArray,ArrayProp,Index,NewItem,bSizeToFit);
+}
+
+void _dasUnreal_static_547_GenericArray_Swap(const UKismetArrayLibrary *,const void * TargetArray,const FArrayProperty * ArrayProp,int First,int Second) {
+	UKismetArrayLibrary::GenericArray_Swap(TargetArray,ArrayProp,First,Second);
+}
+
+int _dasUnreal_static_548_GenericArray_Find(const UKismetArrayLibrary *,const void * TargetArray,const FArrayProperty * ArrayProperty,const void * ItemToFind) {
+	return UKismetArrayLibrary::GenericArray_Find(TargetArray,ArrayProperty,ItemToFind);
+}
+
+void _dasUnreal_static_549_GenericArray_SetArrayPropertyByName(const UKismetArrayLibrary *,UObject * OwnerObject,FName ArrayPropertyName,const void * SrcArrayAddr) {
+	UKismetArrayLibrary::GenericArray_SetArrayPropertyByName(OwnerObject,ArrayPropertyName,SrcArrayAddr);
+}
+
+void _dasUnreal_static_550_GenericArray_Random(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp,void * OutItem,int * OutIndex) {
+	UKismetArrayLibrary::GenericArray_Random(TargetArray,ArrayProp,OutItem,OutIndex);
+}
+
+bool _dasUnreal_static_551_GenericArray_IsValidIndex(const UKismetArrayLibrary *,const void * TargetArray,const FArrayProperty * ArrayProp,int IndexToTest) {
+	return UKismetArrayLibrary::GenericArray_IsValidIndex(TargetArray,ArrayProp,IndexToTest);
 }
 

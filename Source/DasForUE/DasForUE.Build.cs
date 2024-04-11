@@ -38,6 +38,7 @@ public class DasForUE : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
+				"Kismet",
 				"Slate",
 				"SlateCore",
 				

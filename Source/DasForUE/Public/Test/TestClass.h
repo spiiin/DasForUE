@@ -26,5 +26,5 @@ public:
 	FString SaySomething4(int a, FString Msg, float b, int c);
 
 	UFUNCTION(BlueprintCallable)
-	void SayArray(const TArray<int>& IntArray);
+	void SayArray(TArray<int> IntArray);
 };
