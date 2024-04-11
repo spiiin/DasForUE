@@ -60,6 +60,8 @@ def SaySomethingGenerated(var obj: UObject?; a: int; var msg: FString; f: float;
         params.g = g
         params.res <- res
         obj |> call_ufunction_on("SaySomethingGenerated") <| addr(params)
+        print("  Params after call SaySomethingGenerated: {params}\n")
+        print("  Params.res after call SaySomethingGenerated: {string(params.res)}\n")
 
 //--------------------------------------------------------------
 

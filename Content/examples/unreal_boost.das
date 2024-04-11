@@ -152,8 +152,8 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
         propertyObjFlags
     )
     var prop5 = unsafe(reinterpret<FProperty?> field5)
-    *prop5 |> SetPropertyFlags(propFlags)
-    *prop5 |> SetPropertyFlags(propFlagsReturn)
+    *prop5 |> SetPropertyFlags(propFlags) 
+    *prop5 |> SetPropertyFlags(propFlagsReturn) //|=, because |= for enum64 doesn't work yet
     *prop5 |> SetPropertyFlags(propFlagsOut)
 
     *fn |> AddCppProperty(prop5)
@@ -196,7 +196,6 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
 
         //let obj = unsafe(reinterpret<UMyClassToTestPtr?> context)
 
-        //prolog
         unsafe
             print("  Parameters values:\n")
             //is GetDefaultPropertyValue really need?
@@ -225,16 +224,20 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
             stack |> StepCompiledIn(addr(param5), [[FStrProperty?]] |> StaticClass)
             print("        StepCompiledIn : {string(param5)}\n")
 
-            //other way - just reinterpret
+            //other way - just reinterpret, locals is memcpy-ed copy of param (Object::ProcessEvents)
             //TODO: assert sizeof(SaySomethingGeneratedParams1) == sizeof(fn.ParmsSize)
-            var params = reinterpret<SaySomethingGeneratedParams1?>(stack.Locals)
+            var locals = reinterpret<SaySomethingGeneratedParams1?>(stack.Locals)
+            print("    Stack locals: {locals}\n")
+            print("    Stack locals str: {string(locals.res)}\n")
 
+            //param is addr of CPF_ReturnParm
+            var result = reinterpret<FString?>(param)
+            *result <- FString("ResultOfGeneratedFunction")
+            print("    Result str: {string(*result)}\n")
+            
             //TODO: out logic
             //var returnProperty = *fn |> GetReturnProperty
             //var returnPropertyStr = reinterpret<FStrProperty?> returnProperty
-
-            print("    Stack locals: {params}\n")
-            print("    Stack locals str: {string(params.res)}\n")
 
             if stack.Code != null //stack.Code += !!stack.Code
                 stack.Code++
