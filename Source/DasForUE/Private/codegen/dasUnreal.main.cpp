@@ -10,6 +10,11 @@ DAS_BASE_BIND_ENUM_GEN(ESearchCase::Type, ESearchCase_Type);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FText, FText);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FName, FName);
 
+using TArray_int32 = TArray<int32>;
+using TArray_float = TArray<float>;
+using TArray_FString = TArray<FString>;
+
+
 namespace das {
 
     struct FTextAnnotation final : ManagedStructureAnnotation<FText> {
@@ -80,6 +85,18 @@ namespace das {
         uFunction->SetNativeFunc(&unrealNativeFunc);
     }
 
+    //UK2Node_MakeArray* MakeArray = CompilerContext.SpawnIntermediateNode<UK2Node_MakeArray>(this, SourceGraph);
+    //TODO: ctor from das array
+    static TArray_int32 new_TArray_int32() {
+        return std::move(TArray_int32());
+    }
+    static TArray_float new_TArray_float() {
+        return std::move(TArray_float());
+    }
+    static TArray_FString new_TArray_FString() {
+        return std::move(TArray_FString());
+    }
+
     //------------------------------------------------------------------------
 
     void Module_dasUnreal::initAdditionalAnnotations () {
@@ -104,6 +121,13 @@ namespace das {
 
         addExtern<DAS_BIND_FUN(setNativeFunc)>(*this, lib, "SetNativeFunc", SideEffects::worstDefault, "setNativeFunc");
 
+        //
+        makeExtern<TArray_int32(*)(), new_TArray_int32, SimNode_ExtFuncCallAndCopyOrMove>(lib, "new_TArray_int32", "new_TArray_int32")
+            ->addToModule(*this, SideEffects::worstDefault);
+        makeExtern<TArray_float(*)(), new_TArray_float, SimNode_ExtFuncCallAndCopyOrMove>(lib, "new_TArray_float", "new_TArray_float")
+            ->addToModule(*this, SideEffects::worstDefault);
+        makeExtern<TArray_FString(*)(), new_TArray_FString, SimNode_ExtFuncCallAndCopyOrMove>(lib, "new_TArray_FString", "new_TArray_FString")
+            ->addToModule(*this, SideEffects::worstDefault);
     }
 
 	void Module_dasUnreal::initMain () {

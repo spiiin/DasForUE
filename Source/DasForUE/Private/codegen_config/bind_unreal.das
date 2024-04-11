@@ -82,10 +82,11 @@ class UnrealGen : CppGenBind
             "UPropertyWrapper";
         }}
 
-        /*dummyTemplateInstanceAnnotations <- {{
-            "TProperty_Numeric<int32>";
-            "TProperty_WithEqualityAndSerializer<int32,FNumericProperty>";
-        }}*/
+        dummyTemplateInstanceAnnotations <- {{
+            "TArray<int32>";
+            "TArray<float>";
+            "TArray<FString>";
+        }}
 
         unreal_skip_func <- {{
             //UnrealString.h
@@ -962,9 +963,14 @@ class UnrealGen : CppGenBind
             fprint(struct_postadd_file,"initRecAnnotation(ann_{templDashedName},lib);\n")
 
             fprint(struct_class_file, "\n")
-            fprint(struct_class_file, "struct {templDashedName}_GeneratedAnnotation final : ManagedStructureAnnotation<{templName}> \{\n")
+            //template can't new/delete by default
+            fprint(struct_class_file, "struct {templDashedName}_GeneratedAnnotation final : ManagedStructureAnnotation<{templName}, false, false> \{\n")
             fprint(struct_class_file, "\t{templDashedName}_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation(\"{templDashedName}\", ml) \{\n")
             fprint(struct_class_file, "\t\}\n")
+            //TODO: split copy-constructible/no constructible templates?
+            fprint(struct_class_file, "\tvirtual bool canCopy() const override \{ return true; \}\n")
+            fprint(struct_class_file, "\tvirtual bool canClone() const override \{ return true; \}\n")
+            fprint(struct_class_file, "\tvirtual bool canMove() const override \{ return true; \}\n")
             fprint(struct_class_file, "\tvoid init() \{\n")
             fprint(struct_class_file, "\t\}\n")
             fprint(struct_class_file, "\};\n")

@@ -44,6 +44,16 @@ def SaySomething4(var obj: UObject?; a:int; var msg: FString; f: float; g: int)
         print("Call result: {string(params.result)}\n")
 
 //--------------------------------------------------------------
+struct SayArrayParams
+    a: TArray_int32
+
+def SayArray(var obj: UObject?; var a: TArray_int32)
+    unsafe
+        var params: SayArrayParams //no inited, unsafe
+        params.a <- a
+        obj |> call_ufunction_on("SayArray") <| addr(params)
+
+//--------------------------------------------------------------
 struct SaySomethingGeneratedParams
     a : int
     msg : FString
@@ -89,6 +99,8 @@ def main
     obj |> SaySomething(FString("SaySomething"))
 
     obj |> SaySomething4(42, FString("SaySomething"), 3.14f, 33)
+
+    obj |> SayArray(make_TArray_int32())
 
     //---
     //new_uobject by type

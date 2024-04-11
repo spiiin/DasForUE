@@ -1,6 +1,12 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+auto ann_TArray_float = make_smart<TArray_float_GeneratedAnnotation>(lib);
+addAnnotation(ann_TArray_float);
+auto ann_TArray_int32 = make_smart<TArray_int32_GeneratedAnnotation>(lib);
+addAnnotation(ann_TArray_int32);
+auto ann_TArray_FString = make_smart<TArray_FString_GeneratedAnnotation>(lib);
+addAnnotation(ann_TArray_FString);
 auto ann_FEngineVersionBase = make_smart<FEngineVersionBase_GeneratedAnnotation>(lib);
 addAnnotation(ann_FEngineVersionBase);
 auto ann_FOutputDevice = make_smart<FOutputDevice_GeneratedAnnotation>(lib);

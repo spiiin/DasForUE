@@ -1,6 +1,9 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+initRecAnnotation(ann_TArray_float,lib);
+initRecAnnotation(ann_TArray_int32,lib);
+initRecAnnotation(ann_TArray_FString,lib);
 initRecAnnotation(ann_FEngineVersionBase,lib);
 initRecAnnotation(ann_FOutputDevice,lib);
 initRecAnnotation(ann_FFastPathLoadBuffer,lib);

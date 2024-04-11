@@ -20,3 +20,17 @@ FString UTestClass::SaySomething4(int a, FString Msg, float b, int c) {
 	UE_LOG(LogTemp, Log, TEXT("%d %s %f %d"), a, *Msg, b, c);
 	return Msg;
 }
+
+void UTestClass::SayArray(const TArray<int>& IntArray) {
+    if (IntArray.Num() == 0)
+    {
+        UE_LOG(LogTemp, Log, TEXT("SayArray: Array is empty!"));
+        return;
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("SayArray array elements:"));
+    for (int Element : IntArray)
+    {
+        UE_LOG(LogTemp, Log, TEXT("  %d"), Element);
+    }
+}

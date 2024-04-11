@@ -44,6 +44,29 @@ namespace das {
         }
     };
 
+    //--------------------------------------------------------------------------------
+    template <> struct cast_arg<TArray<int>> {
+        static __forceinline const TArray<int>& to(Context& ctx, SimNode* node) {
+            vec4f res = node->eval(ctx);
+            return *cast<TArray<int>*>::to(res);
+        }
+    };
+
+    template <> struct cast_arg<TArray<float>> {
+        static __forceinline const TArray<float>& to(Context& ctx, SimNode* node) {
+            vec4f res = node->eval(ctx);
+            return *cast<TArray<float>*>::to(res);
+        }
+    };
+
+    template <> struct cast_arg<TArray<FString>> {
+        static __forceinline const TArray<FString>& to(Context& ctx, SimNode* node) {
+            vec4f res = node->eval(ctx);
+            return *cast<TArray<FString>*>::to(res);
+        }
+    };
+    //--------------------------------------------------------------------------------
+
     struct UnrealNativeFunc {
         Lambda      lambda;
         Context* context = nullptr;

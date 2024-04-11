@@ -1,6 +1,36 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+
+struct TArray_float_GeneratedAnnotation final : ManagedStructureAnnotation<TArray<float>, false, false> {
+	TArray_float_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_float", ml) {
+	}
+	virtual bool canCopy() const override { return true; }
+	virtual bool canClone() const override { return true; }
+	virtual bool canMove() const override { return true; }
+	void init() {
+	}
+};
+
+struct TArray_int32_GeneratedAnnotation final : ManagedStructureAnnotation<TArray<int32>, false, false> {
+	TArray_int32_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_int32", ml) {
+	}
+	virtual bool canCopy() const override { return true; }
+	virtual bool canClone() const override { return true; }
+	virtual bool canMove() const override { return true; }
+	void init() {
+	}
+};
+
+struct TArray_FString_GeneratedAnnotation final : ManagedStructureAnnotation<TArray<FString>, false, false> {
+	TArray_FString_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_FString", ml) {
+	}
+	virtual bool canCopy() const override { return true; }
+	virtual bool canClone() const override { return true; }
+	virtual bool canMove() const override { return true; }
+	void init() {
+	}
+};
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Misc/EngineVersionBase.h:28:7
 struct FEngineVersionBase_GeneratedAnnotation : ManagedStructureAnnotation<FEngineVersionBase> {
 	FEngineVersionBase_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FEngineVersionBase", ml, "FEngineVersionBase") {

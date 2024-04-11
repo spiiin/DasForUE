@@ -1,6 +1,12 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+using templateType0 = TArray<float>;
+MAKE_EXTERNAL_TYPE_FACTORY(TArray_float,templateType0);
+using templateType1 = TArray<int32>;
+MAKE_EXTERNAL_TYPE_FACTORY(TArray_int32,templateType1);
+using templateType2 = TArray<FString>;
+MAKE_EXTERNAL_TYPE_FACTORY(TArray_FString,templateType2);
 MAKE_EXTERNAL_TYPE_FACTORY(FEngineVersionBase,FEngineVersionBase);
 MAKE_EXTERNAL_TYPE_FACTORY(FLogRecord,UE::FLogRecord);
 MAKE_EXTERNAL_TYPE_FACTORY(FOutputDevice,FOutputDevice);
