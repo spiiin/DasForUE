@@ -487,15 +487,8 @@ class UnrealGen : CppGenBind
             //UObject/UnrealType.h
             "FScriptMapHelper";
             "FScriptSetHelper";
-            "FMulticastInlineDelegateProperty";
-            "FMulticastSparseDelegateProperty";
             "UMulticastDelegatePropertyWrapper";
-            "FWeakObjectProperty";
-            "FLazyObjectProperty";
-            "FSoftObjectProperty";
-            "FSoftClassProperty";
             "FScriptArrayHelper";
-            "FMulticastDelegateProperty";
             "UEProperty_Private_FProperty_DoNotUse";
             "FPropertyValueIterator";
             "UMulticastInlineDelegatePropertyWrapper";
@@ -506,10 +499,12 @@ class UnrealGen : CppGenBind
             "FScriptSetHelper_InContainer";
             "FVerySlowReferenceCollectorArchiveScope";
 
+            "FDelegateProperty";
+            "FMulticastInlineDelegateProperty";
+            "FMulticastSparseDelegateProperty";
+            "FMulticastDelegateProperty";
             "FInterfaceProperty";
             "FNameProperty";
-           
-            "FDelegateProperty";
             "FLargeWorldCoordinatesRealProperty";
 
             "FDefaultConstructedPropertyElement";

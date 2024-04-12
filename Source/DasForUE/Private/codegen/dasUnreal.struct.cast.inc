@@ -577,6 +577,24 @@ template <> struct cast_arg<FObjectPtrProperty> {
 		return * cast<FObjectPtrProperty *>::to(res);
 	}
 };
+template <> struct cast_arg<FWeakObjectProperty> {
+	static __forceinline const FWeakObjectProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FWeakObjectProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FLazyObjectProperty> {
+	static __forceinline const FLazyObjectProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FLazyObjectProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FSoftObjectProperty> {
+	static __forceinline const FSoftObjectProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FSoftObjectProperty *>::to(res);
+	}
+};
 template <> struct cast_arg<FClassProperty> {
 	static __forceinline const FClassProperty & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
@@ -587,6 +605,12 @@ template <> struct cast_arg<FClassPtrProperty> {
 	static __forceinline const FClassPtrProperty & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<FClassPtrProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FSoftClassProperty> {
+	static __forceinline const FSoftClassProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FSoftClassProperty *>::to(res);
 	}
 };
 template <> struct cast_arg<FStrProperty> {

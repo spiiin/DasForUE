@@ -1188,6 +1188,39 @@ struct FObjectPtrProperty_GeneratedAnnotation : ManagedStructureAnnotation<FObje
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2977:23
+struct FWeakObjectProperty_GeneratedAnnotation : ManagedStructureAnnotation<FWeakObjectProperty> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FWeakObjectProperty>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FWeakObjectProperty>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FWeakObjectProperty>::value; }
+	FWeakObjectProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FWeakObjectProperty", ml, "FWeakObjectProperty") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:3042:23
+struct FLazyObjectProperty_GeneratedAnnotation : ManagedStructureAnnotation<FLazyObjectProperty> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FLazyObjectProperty>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FLazyObjectProperty>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FLazyObjectProperty>::value; }
+	FLazyObjectProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FLazyObjectProperty", ml, "FLazyObjectProperty") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:3109:23
+struct FSoftObjectProperty_GeneratedAnnotation : ManagedStructureAnnotation<FSoftObjectProperty> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FSoftObjectProperty>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FSoftObjectProperty>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FSoftObjectProperty>::value; }
+	FSoftObjectProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FSoftObjectProperty", ml, "FSoftObjectProperty") {
+	}
+	void init () {
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:3203:23
 struct FClassProperty_GeneratedAnnotation : ManagedStructureAnnotation<FClassProperty> {
 	virtual bool canCopy() const override { return std::is_copy_constructible<FClassProperty>::value; }
@@ -1208,6 +1241,18 @@ struct FClassPtrProperty_GeneratedAnnotation : ManagedStructureAnnotation<FClass
 	FClassPtrProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FClassPtrProperty", ml, "FClassPtrProperty") {
 	}
 	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:3330:23
+struct FSoftClassProperty_GeneratedAnnotation : ManagedStructureAnnotation<FSoftClassProperty> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FSoftClassProperty>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FSoftClassProperty>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FSoftClassProperty>::value; }
+	FSoftClassProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FSoftClassProperty", ml, "FSoftClassProperty") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(MetaClass)>("MetaClass","MetaClass");
 	}
 };
 
