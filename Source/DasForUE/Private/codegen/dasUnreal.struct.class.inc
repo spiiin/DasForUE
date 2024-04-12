@@ -16,12 +16,68 @@ struct TArray_float_GeneratedAnnotation final : ManagedStructureAnnotation<
 	}
 };
 
-struct TArray_int_GeneratedAnnotation final : ManagedStructureAnnotation<
-	TArray_int,
-	std::is_constructible<TArray_int>::value,
-	std::is_destructible<TArray_int>::value
+struct TObjectPtr_UStruct_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TObjectPtr_UStruct,
+	std::is_constructible<TObjectPtr_UStruct>::value,
+	std::is_destructible<TObjectPtr_UStruct>::value
 > {
-	TArray_int_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_int", ml) {
+	TObjectPtr_UStruct_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TObjectPtr_UStruct", ml) {
+	}
+	virtual bool canCopy() const override { return true; }
+	virtual bool canClone() const override { return true; }
+	virtual bool canMove() const override { return true; }
+	void init() {
+	}
+};
+
+struct TObjectPtr_UEnum_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TObjectPtr_UEnum,
+	std::is_constructible<TObjectPtr_UEnum>::value,
+	std::is_destructible<TObjectPtr_UEnum>::value
+> {
+	TObjectPtr_UEnum_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TObjectPtr_UEnum", ml) {
+	}
+	virtual bool canCopy() const override { return true; }
+	virtual bool canClone() const override { return true; }
+	virtual bool canMove() const override { return true; }
+	void init() {
+	}
+};
+
+struct TObjectPtr_UField_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TObjectPtr_UField,
+	std::is_constructible<TObjectPtr_UField>::value,
+	std::is_destructible<TObjectPtr_UField>::value
+> {
+	TObjectPtr_UField_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TObjectPtr_UField", ml) {
+	}
+	virtual bool canCopy() const override { return true; }
+	virtual bool canClone() const override { return true; }
+	virtual bool canMove() const override { return true; }
+	void init() {
+	}
+};
+
+struct TObjectPtr_UClass_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TObjectPtr_UClass,
+	std::is_constructible<TObjectPtr_UClass>::value,
+	std::is_destructible<TObjectPtr_UClass>::value
+> {
+	TObjectPtr_UClass_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TObjectPtr_UClass", ml) {
+	}
+	virtual bool canCopy() const override { return true; }
+	virtual bool canClone() const override { return true; }
+	virtual bool canMove() const override { return true; }
+	void init() {
+	}
+};
+
+struct TObjectPtr_UScriptStruct_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TObjectPtr_UScriptStruct,
+	std::is_constructible<TObjectPtr_UScriptStruct>::value,
+	std::is_destructible<TObjectPtr_UScriptStruct>::value
+> {
+	TObjectPtr_UScriptStruct_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TObjectPtr_UScriptStruct", ml) {
 	}
 	virtual bool canCopy() const override { return true; }
 	virtual bool canClone() const override { return true; }
@@ -36,6 +92,48 @@ struct TArray_FString_GeneratedAnnotation final : ManagedStructureAnnotation<
 	std::is_destructible<TArray_FString>::value
 > {
 	TArray_FString_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_FString", ml) {
+	}
+	virtual bool canCopy() const override { return true; }
+	virtual bool canClone() const override { return true; }
+	virtual bool canMove() const override { return true; }
+	void init() {
+	}
+};
+
+struct TObjectPtr_UFunction_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TObjectPtr_UFunction,
+	std::is_constructible<TObjectPtr_UFunction>::value,
+	std::is_destructible<TObjectPtr_UFunction>::value
+> {
+	TObjectPtr_UFunction_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TObjectPtr_UFunction", ml) {
+	}
+	virtual bool canCopy() const override { return true; }
+	virtual bool canClone() const override { return true; }
+	virtual bool canMove() const override { return true; }
+	void init() {
+	}
+};
+
+struct TArray_int_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TArray_int,
+	std::is_constructible<TArray_int>::value,
+	std::is_destructible<TArray_int>::value
+> {
+	TArray_int_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_int", ml) {
+	}
+	virtual bool canCopy() const override { return true; }
+	virtual bool canClone() const override { return true; }
+	virtual bool canMove() const override { return true; }
+	void init() {
+	}
+};
+
+struct TObjectPtr_UObject_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TObjectPtr_UObject,
+	std::is_constructible<TObjectPtr_UObject>::value,
+	std::is_destructible<TObjectPtr_UObject>::value
+> {
+	TObjectPtr_UObject_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TObjectPtr_UObject", ml) {
 	}
 	virtual bool canCopy() const override { return true; }
 	virtual bool canClone() const override { return true; }
@@ -463,6 +561,22 @@ struct FField_GeneratedAnnotation : ManagedStructureAnnotation<FField> {
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/ObjectPtr.h:55:8
+struct FObjectPtr_GeneratedAnnotation : ManagedStructureAnnotation<FObjectPtr> {
+	FObjectPtr_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FObjectPtr", ml, "FObjectPtr") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/ObjectPtr.h:614:9
+struct ObjectPtr_Private_Friend_GeneratedAnnotation : ManagedStructureAnnotation<ObjectPtr_Private::Friend> {
+	ObjectPtr_Private_Friend_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("Friend", ml, "ObjectPtr_Private::Friend") {
+	}
+	void init () {
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Class.h:155:7
 struct UField_GeneratedAnnotation : ManagedStructureAnnotation<UField, false, false> {
 	UField_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UField", ml, "UField") {
@@ -477,6 +591,7 @@ struct UStruct_GeneratedAnnotation : ManagedStructureAnnotation<UStruct, false, 
 	UStruct_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("UStruct", ml, "UStruct") {
 	}
 	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Children)>("Children","Children");
 		addField<DAS_BIND_MANAGED_FIELD(ChildProperties)>("ChildProperties","ChildProperties");
 		addField<DAS_BIND_MANAGED_FIELD(PropertiesSize)>("PropertiesSize","PropertiesSize");
 		addField<DAS_BIND_MANAGED_FIELD(MinAlignment)>("MinAlignment","MinAlignment");
@@ -580,6 +695,7 @@ struct FImplementedInterface_GeneratedAnnotation : ManagedStructureAnnotation<FI
 	FImplementedInterface_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FImplementedInterface", ml, "FImplementedInterface") {
 	}
 	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Class)>("Class","Class");
 		addField<DAS_BIND_MANAGED_FIELD(PointerOffset)>("PointerOffset","PointerOffset");
 		addField<DAS_BIND_MANAGED_FIELD(bImplementedByK2)>("bImplementedByK2","bImplementedByK2");
 	}
@@ -614,8 +730,11 @@ struct UClass_GeneratedAnnotation : ManagedStructureAnnotation<UClass, false, fa
 		addField<DAS_BIND_MANAGED_FIELD(bLayoutChanging)>("bLayoutChanging","bLayoutChanging");
 		addField<DAS_BIND_MANAGED_FIELD(ClassFlags)>("ClassFlags","ClassFlags");
 		addField<DAS_BIND_MANAGED_FIELD(ClassCastFlags)>("ClassCastFlags","ClassCastFlags");
+		addField<DAS_BIND_MANAGED_FIELD(ClassWithin)>("ClassWithin","ClassWithin");
+		addField<DAS_BIND_MANAGED_FIELD(ClassGeneratedBy)>("ClassGeneratedBy","ClassGeneratedBy");
 		addField<DAS_BIND_MANAGED_FIELD(PropertiesPendingDestruction)>("PropertiesPendingDestruction","PropertiesPendingDestruction");
 		addField<DAS_BIND_MANAGED_FIELD(ClassConfigName)>("ClassConfigName","ClassConfigName");
+		addField<DAS_BIND_MANAGED_FIELD(ClassDefaultObject)>("ClassDefaultObject","ClassDefaultObject");
 	}
 };
 
@@ -711,6 +830,7 @@ struct FByteProperty_GeneratedAnnotation : ManagedStructureAnnotation<FBytePrope
 	FByteProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FByteProperty", ml, "FByteProperty") {
 	}
 	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Enum)>("Enum","Enum");
 	}
 };
 
@@ -826,6 +946,40 @@ struct FObjectPropertyBase_GeneratedAnnotation : ManagedStructureAnnotation<FObj
 	FObjectPropertyBase_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FObjectPropertyBase", ml, "FObjectPropertyBase") {
 	}
 	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(PropertyClass)>("PropertyClass","PropertyClass");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2837:23
+struct FObjectProperty_GeneratedAnnotation : ManagedStructureAnnotation<FObjectProperty> {
+	FObjectProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FObjectProperty", ml, "FObjectProperty") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:2923:23
+struct FObjectPtrProperty_GeneratedAnnotation : ManagedStructureAnnotation<FObjectPtrProperty> {
+	FObjectPtrProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FObjectPtrProperty", ml, "FObjectPtrProperty") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:3203:23
+struct FClassProperty_GeneratedAnnotation : ManagedStructureAnnotation<FClassProperty> {
+	FClassProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FClassProperty", ml, "FClassProperty") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(MetaClass)>("MetaClass","MetaClass");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:3282:23
+struct FClassPtrProperty_GeneratedAnnotation : ManagedStructureAnnotation<FClassPtrProperty> {
+	FClassPtrProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FClassPtrProperty", ml, "FClassPtrProperty") {
+	}
+	void init () {
 	}
 };
 
@@ -874,6 +1028,7 @@ struct FStructProperty_GeneratedAnnotation : ManagedStructureAnnotation<FStructP
 	FStructProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FStructProperty", ml, "FStructProperty") {
 	}
 	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Struct)>("Struct","Struct");
 	}
 };
 

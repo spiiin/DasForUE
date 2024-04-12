@@ -7,16 +7,58 @@ template <> struct cast_arg<TArray_float> {
 		return * cast<TArray_float *>::to(res);
 	}
 };
-template <> struct cast_arg<TArray_int> {
-	static __forceinline const TArray_int & to ( Context & ctx, SimNode * node ) {
+template <> struct cast_arg<TObjectPtr_UStruct> {
+	static __forceinline const TObjectPtr_UStruct & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
-		return * cast<TArray_int *>::to(res);
+		return * cast<TObjectPtr_UStruct *>::to(res);
+	}
+};
+template <> struct cast_arg<TObjectPtr_UEnum> {
+	static __forceinline const TObjectPtr_UEnum & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TObjectPtr_UEnum *>::to(res);
+	}
+};
+template <> struct cast_arg<TObjectPtr_UField> {
+	static __forceinline const TObjectPtr_UField & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TObjectPtr_UField *>::to(res);
+	}
+};
+template <> struct cast_arg<TObjectPtr_UClass> {
+	static __forceinline const TObjectPtr_UClass & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TObjectPtr_UClass *>::to(res);
+	}
+};
+template <> struct cast_arg<TObjectPtr_UScriptStruct> {
+	static __forceinline const TObjectPtr_UScriptStruct & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TObjectPtr_UScriptStruct *>::to(res);
 	}
 };
 template <> struct cast_arg<TArray_FString> {
 	static __forceinline const TArray_FString & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<TArray_FString *>::to(res);
+	}
+};
+template <> struct cast_arg<TObjectPtr_UFunction> {
+	static __forceinline const TObjectPtr_UFunction & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TObjectPtr_UFunction *>::to(res);
+	}
+};
+template <> struct cast_arg<TArray_int> {
+	static __forceinline const TArray_int & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TArray_int *>::to(res);
+	}
+};
+template <> struct cast_arg<TObjectPtr_UObject> {
+	static __forceinline const TObjectPtr_UObject & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TObjectPtr_UObject *>::to(res);
 	}
 };
 template <> struct cast_arg<FEngineVersionBase> {
@@ -301,6 +343,18 @@ template <> struct cast_arg<FField> {
 		return * cast<FField *>::to(res);
 	}
 };
+template <> struct cast_arg<FObjectPtr> {
+	static __forceinline const FObjectPtr & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FObjectPtr *>::to(res);
+	}
+};
+template <> struct cast_arg<ObjectPtr_Private::Friend> {
+	static __forceinline const ObjectPtr_Private::Friend & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<ObjectPtr_Private::Friend *>::to(res);
+	}
+};
 template <> struct cast_arg<UField> {
 	static __forceinline const UField & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
@@ -509,6 +563,30 @@ template <> struct cast_arg<FObjectPropertyBase> {
 	static __forceinline const FObjectPropertyBase & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<FObjectPropertyBase *>::to(res);
+	}
+};
+template <> struct cast_arg<FObjectProperty> {
+	static __forceinline const FObjectProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FObjectProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FObjectPtrProperty> {
+	static __forceinline const FObjectPtrProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FObjectPtrProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FClassProperty> {
+	static __forceinline const FClassProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FClassProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FClassPtrProperty> {
+	static __forceinline const FClassPtrProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FClassPtrProperty *>::to(res);
 	}
 };
 template <> struct cast_arg<FStrProperty> {

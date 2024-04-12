@@ -106,6 +106,7 @@
 #include "ProfilingDebugging/ResourceSize.h"
 #include "Misc/CompressionFlags.h"
 #include "Misc/OutputDevice.h"
+#include "Misc/CoreMiscDefines.h"
 #include "Serialization/Archive.h"
 #include "UnrealString.h"
 #include "Logging/LogVerbosity.h"
@@ -123,6 +124,7 @@
 #include "UObject/Field.h"
 #include "UObject/Stack.h"
 #include "UObject/Script.h"
+#include "UObject/ObjectPtr.h"
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Kismet/KismetArrayLibrary.h"

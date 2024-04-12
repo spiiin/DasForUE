@@ -97,6 +97,14 @@ class UnrealGen : CppGenBind
             "TArray<int>";
             "TArray<float>";
             "TArray<FString>";
+
+            "TObjectPtr<UClass>";
+            "TObjectPtr<UObject>";
+            "TObjectPtr<UField>";
+            "TObjectPtr<UStruct>";
+            "TObjectPtr<UScriptStruct>";
+            "TObjectPtr<UFunction>";
+            "TObjectPtr<UEnum>";
         }}
 
         unreal_skip_func <- {{
@@ -255,6 +263,7 @@ class UnrealGen : CppGenBind
             //FArchive.h
             "FArchive::SerializeBulkData";
             "FArchive::AttachExternalReadDependency";
+            "FArchive::MarkSearchableName";
             "FArchiveState::SetCookingTarget";
             "FArchiveState::CookingTarget";
             
@@ -333,6 +342,8 @@ class UnrealGen : CppGenBind
             "FStructProperty::ContainsObjectReference";
             "FStructProperty::EmitReferenceInfo";*/
 
+            "FObjectPropertyBase::GetExportPath";
+
             //KismetArrayLibrary.h
             "UKismetArrayLibrary::Array_ShuffleFromStream"; //FRandomStream
             "UKismetArrayLibrary::Array_RandomFromStream";
@@ -351,7 +362,6 @@ class UnrealGen : CppGenBind
         // - radical way, find substring is slow
         unreal_arg_part_names <- [{string
             "TArray";
-            "TObjectPtr";
             "FSchemaOwner";
             "FUnversionedStructSchema";
             "TUniquePtr";
@@ -382,7 +392,9 @@ class UnrealGen : CppGenBind
             "const UTF8CHAR *";  //
             
             "TYPE_OF_NULLPTR";  //macro for std::nullptr_t
+            "ENoInit";
             "UECodeGen_Private::"; //recheck, must be skipped dy skip_struct
+            "FObjectHandle"; //UE::CoreUObject::Private::
         }]
         
         unreal_skip_struct <- {{
@@ -475,15 +487,11 @@ class UnrealGen : CppGenBind
             "FArrayPropertyParams";
             "FScriptSetHelper_InContainer";
             "FVerySlowReferenceCollectorArchiveScope";
-            "FObjectPtrProperty";
 
             "FInterfaceProperty";
             "FNameProperty";
-            "FObjectProperty";
            
             "FDelegateProperty";
-            "FClassPtrProperty";
-            "FClassProperty";
             "FLargeWorldCoordinatesRealProperty";
 
             "FDefaultConstructedPropertyElement";
@@ -498,6 +506,9 @@ class UnrealGen : CppGenBind
 
             //Script.h
             "FBlueprintContext";
+
+            //ObjectPtr.h
+            "FObjectHandle"; //UE::CoreUObject::Private::FObjectHandlePrivate;
         }}
 
         enums_with_flags <- {{
@@ -523,6 +534,7 @@ class UnrealGen : CppGenBind
             fname |> find("Misc/EngineVersionBase.h") != -1 ||
             fname |> find("Misc/OutputDevice.h") != -1 ||
             fname |> find("Misc/CompressionFlags.h") != -1 ||
+            fname |> find("Misc/MiscDefines.h") != -1 ||
             fname |> find("Serialization/Archive.h") != -1 ||
             fname |> find("UnrealString.h") != -1 ||
             fname |> find("Logging/LogVerbosity.h") != -1 ||
@@ -540,6 +552,7 @@ class UnrealGen : CppGenBind
             fname |> find("UObject/Field.h") != -1 ||
             fname |> find("UObject/Stack.h") != -1 ||
             fname |> find("UObject/Script.h") != -1 ||
+            fname |> find("UObject/ObjectPtr.h") != -1 ||
             fname |> find("Kismet/BlueprintFunctionLibrary.h") != -1 ||
             fname |> find("Kismet/KismetArrayLibrary.h") != -1 ||
             fname |> find("Containers/SparseArray.h") != -1 ||
@@ -779,10 +792,8 @@ class UnrealGen : CppGenBind
             writer |> write("\tvoid init () \{\n")
             let isAbstract = clang_CXXRecord_isAbstract(c)!=0u
             abstract_class |> push(isAbstract)
-            print("---push {length(abstract_class)} {struct_name}\n")
             AnyGenBind`parse_Struct(self, c, struct_name)
             abstract_class |> pop()
-            print("---pop {length(abstract_class)} {struct_name}\n")
             writer |> write("\t\}\n\};\n")
             if isArgByValue(struct_namespace_name)
                 fprint(struct_cast_file, "template <> struct cast_arg<{struct_namespace_name}> \{\n")

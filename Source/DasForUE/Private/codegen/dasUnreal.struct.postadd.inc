@@ -2,8 +2,15 @@
 // all user modifications will be lost after this file is re-generated
 
 initRecAnnotation(ann_TArray_float,lib);
-initRecAnnotation(ann_TArray_int,lib);
+initRecAnnotation(ann_TObjectPtr_UStruct,lib);
+initRecAnnotation(ann_TObjectPtr_UEnum,lib);
+initRecAnnotation(ann_TObjectPtr_UField,lib);
+initRecAnnotation(ann_TObjectPtr_UClass,lib);
+initRecAnnotation(ann_TObjectPtr_UScriptStruct,lib);
 initRecAnnotation(ann_TArray_FString,lib);
+initRecAnnotation(ann_TObjectPtr_UFunction,lib);
+initRecAnnotation(ann_TArray_int,lib);
+initRecAnnotation(ann_TObjectPtr_UObject,lib);
 initRecAnnotation(ann_FEngineVersionBase,lib);
 initRecAnnotation(ann_FOutputDevice,lib);
 initRecAnnotation(ann_FFastPathLoadBuffer,lib);
@@ -51,6 +58,8 @@ initRecAnnotation(ann_FObjectNetPushIdHelper,lib);
 initRecAnnotation(ann_FFieldClass,lib);
 initRecAnnotation(ann_FFieldVariant,lib);
 initRecAnnotation(ann_FField,lib);
+initRecAnnotation(ann_FObjectPtr,lib);
+initRecAnnotation(ann_Friend,lib);
 initRecAnnotation(ann_UField,lib);
 initRecAnnotation(ann_UStruct,lib);
 initRecAnnotation(ann_FCapabilities,lib);
@@ -86,6 +95,10 @@ initRecAnnotation(ann_FFloatProperty,lib);
 initRecAnnotation(ann_FDoubleProperty,lib);
 initRecAnnotation(ann_FBoolProperty,lib);
 initRecAnnotation(ann_FObjectPropertyBase,lib);
+initRecAnnotation(ann_FObjectProperty,lib);
+initRecAnnotation(ann_FObjectPtrProperty,lib);
+initRecAnnotation(ann_FClassProperty,lib);
+initRecAnnotation(ann_FClassPtrProperty,lib);
 initRecAnnotation(ann_FStrProperty,lib);
 initRecAnnotation(ann_FArrayProperty,lib);
 initRecAnnotation(ann_FMapProperty,lib);
