@@ -11,18 +11,20 @@ class UnrealGen : CppGenBind
     override generate_lsp = true
     override func_to_stdout = false
     override generate_constant_decl = false
-    unreal_skip_func : table<string>
-    unreal_skip_struct : table<string>
-    unreal_arg_part_names : array<string>
 
-    canMoveIfCopyConstructable : table<string>
-    unrealReflectionTypes : table<string>
+    unreal_allowed_fnames: table<string>
+    unreal_skip_func: table<string>
+    unreal_skip_struct: table<string>
+    unreal_arg_part_names: array<string>
+
+    canMoveIfCopyConstructable: table<string>
+    unrealReflectionTypes: table<string>
 
     dummyTemplateInstanceAnnotations: table<string>
 
-    declaredFunctionsHashes : table<uint64>
-    declaredFunctionsHashesWithoutResults : table<uint64>
-    declaredEnumsHashes : table<uint64>
+    declaredFunctionsHashes: table<uint64>
+    declaredFunctionsHashesWithoutResults: table<uint64>
+    declaredEnumsHashes: table<uint64>
 
     replaceTypeNames: table<string;string>
 
@@ -64,6 +66,38 @@ class UnrealGen : CppGenBind
         openAllFiles()
 
     def init_skip()
+
+        unreal_allowed_fnames <- {{
+            "ProfilingDebugging/ResourceSize.h";
+            "Misc/EngineVersionBase.h";
+            "Misc/OutputDevice.h";
+            "Misc/CompressionFlags.h";
+            "Misc/MiscDefines.h";
+            "Serialization/Archive.h";
+            "UnrealString.h";
+            "Logging/LogVerbosity.h";
+            "UObject/UnrealNames.h";
+            "UObject/PrimaryAssetId.h";
+            "UObject/UObjectBase.h";
+            "UObject/UObjectMarks.h";
+            "UObject/ObjectMacros.h";
+            "UObject/UObjectBaseUtility.h";
+            "UObject/Object.h";
+            "UObject/Class.h";
+            "UObject/Package.h";
+            "UObject/UObjectGlobals.h";
+            "UObject/UnrealType.h";
+            "UObject/Field.h";
+            "UObject/Stack.h";
+            "UObject/Script.h";
+            "UObject/ObjectPtr.h";
+            "Kismet/BlueprintFunctionLibrary.h";
+            "Kismet/KismetArrayLibrary.h";
+            "Containers/SparseArray.h";
+            "Containers/Set.h";
+            "Containers/Map.h";
+        }}
+
         canMoveIfCopyConstructable <- {{
             "FString";
             "FSavePackageResultStruct";
@@ -528,38 +562,10 @@ class UnrealGen : CppGenBind
         return true
 
     def override skip_file(fname:string) : bool
-        //print("fname = {fname}\n")
-        if (
-            fname |> find("ProfilingDebugging/ResourceSize.h") != -1 ||
-            fname |> find("Misc/EngineVersionBase.h") != -1 ||
-            fname |> find("Misc/OutputDevice.h") != -1 ||
-            fname |> find("Misc/CompressionFlags.h") != -1 ||
-            fname |> find("Misc/MiscDefines.h") != -1 ||
-            fname |> find("Serialization/Archive.h") != -1 ||
-            fname |> find("UnrealString.h") != -1 ||
-            fname |> find("Logging/LogVerbosity.h") != -1 ||
-            fname |> find("UObject/UnrealNames.h") != -1 ||
-            fname |> find("UObject/PrimaryAssetId.h") != -1 ||
-            fname |> find("UObject/UObjectBase.h") != -1 ||
-            fname |> find("UObject/UObjectMarks.h") != -1 ||
-            fname |> find("UObject/ObjectMacros.h") != -1 ||
-            fname |> find("UObject/UObjectBaseUtility.h") != -1 ||
-            fname |> find("UObject/Object.h") != -1 ||
-            fname |> find("UObject/Class.h") != -1 ||
-            fname |> find("UObject/Package.h") != -1 ||
-            fname |> find("UObject/UObjectGlobals.h") != -1 ||
-            fname |> find("UObject/UnrealType.h") != -1 ||
-            fname |> find("UObject/Field.h") != -1 ||
-            fname |> find("UObject/Stack.h") != -1 ||
-            fname |> find("UObject/Script.h") != -1 ||
-            fname |> find("UObject/ObjectPtr.h") != -1 ||
-            fname |> find("Kismet/BlueprintFunctionLibrary.h") != -1 ||
-            fname |> find("Kismet/KismetArrayLibrary.h") != -1 ||
-            fname |> find("Containers/SparseArray.h") != -1 ||
-            fname |> find("Containers/Set.h") != -1 ||
-            fname |> find("Containers/Map.h") != -1
-        )
-            return false
+        print("fname = {fname}\n")
+        for allowedFname in keys(unreal_allowed_fnames)
+            if fname |> ends_with(allowedFname)
+                return false
         return true
 
     def functionArgumentRules : TypeRules
@@ -978,7 +984,6 @@ class UnrealGen : CppGenBind
         for skipName in unreal_arg_part_names
             if field_type_name |> find(skipName) != -1
                 return
-        print("nnn\n")
         var wr = swrite |> back
         let substType = substFieldType(c)
         if substType |> empty()
