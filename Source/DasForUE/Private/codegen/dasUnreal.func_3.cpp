@@ -447,6 +447,26 @@ void Module_dasUnreal::initFunctions_3() {
 	makeExtern<DAS_CALL_METHOD(_method_238), SimNode_ExtFuncCallAndCopyOrMove >(lib,"Intersect","das_call_member< FTextRange (FTextRange::*)(const FTextRange &) const , &FTextRange::Intersect >::invoke")
 		->args({"self","Other"})
 		->addToModule(*this, SideEffects::worstDefault);
+	addCtorAndUsing<FSetElementId>(*this,lib,"FSetElementId","FSetElementId");
+	using _method_239 = das::das_call_member< bool (FSetElementId::*)() const,&FSetElementId::IsValidId >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Set.h:119:19
+	makeExtern<DAS_CALL_METHOD(_method_239), SimNode_ExtFuncCall >(lib,"IsValidId","das_call_member< bool (FSetElementId::*)() const , &FSetElementId::IsValidId >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+	using _method_240 = das::das_call_member< int (FSetElementId::*)() const,&FSetElementId::AsInteger >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Set.h:134:20
+	makeExtern<DAS_CALL_METHOD(_method_240), SimNode_ExtFuncCall >(lib,"AsInteger","das_call_member< int (FSetElementId::*)() const , &FSetElementId::AsInteger >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Set.h:139:35
+	makeExtern< FSetElementId (*)(const FSetElementId *,int) , _dasUnreal_static_79_FromInteger , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromInteger","_dasUnreal_static_79_FromInteger")
+		->args({"self","Integer"})
+		->arg_type(0,makeType<TExplicit<const FSetElementId*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Set.h:263:29
+	makeExtern< void (*)(unsigned long long) , UE::Core::Private::OnInvalidSetNum , SimNode_ExtFuncCall >(lib,"OnInvalidSetNum","UE::Core::Private::OnInvalidSetNum")
+		->args({"NewNum"})
+		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/UObject/UnrealNames.h:28:23
 	makeExtern< const wchar_t * (*)(EName) , LexToString , SimNode_ExtFuncCall >(lib,"LexToString","LexToString")
 		->args({"Ename"})
@@ -455,15 +475,6 @@ void Module_dasUnreal::initFunctions_3() {
 	makeExtern< bool (*)(EName,const FName &) , ShouldReplicateAsInteger , SimNode_ExtFuncCall >(lib,"ShouldReplicateAsInteger","ShouldReplicateAsInteger")
 		->args({"Ename","Name"})
 		->addToModule(*this, SideEffects::worstDefault);
-	addCtorAndUsing<FPrimaryAssetType>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType");
-	addCtorAndUsing<FPrimaryAssetType,FName>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
-		->args({"InName"});
-	addCtorAndUsing<FPrimaryAssetType,EName>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
-		->args({"InName"});
-	addCtorAndUsing<FPrimaryAssetType,const char *>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
-		->args({"InName"});
-	addCtorAndUsing<FPrimaryAssetType,const FPrimaryAssetType &>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
-		->args({""});
 }
 }
 

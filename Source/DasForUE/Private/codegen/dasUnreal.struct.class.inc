@@ -128,6 +128,96 @@ struct FTextRange_GeneratedAnnotation : ManagedStructureAnnotation<FTextRange> {
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/SparseArray.h:30:8
+struct FSparseArrayAllocationInfo_GeneratedAnnotation : ManagedStructureAnnotation<FSparseArrayAllocationInfo> {
+	FSparseArrayAllocationInfo_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FSparseArrayAllocationInfo", ml, "FSparseArrayAllocationInfo") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Index)>("Index","Index");
+		addField<DAS_BIND_MANAGED_FIELD(Pointer)>("Pointer","Pointer");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/SparseArray.h:1261:8
+struct FScriptSparseArrayLayout_GeneratedAnnotation : ManagedStructureAnnotation<FScriptSparseArrayLayout> {
+	FScriptSparseArrayLayout_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FScriptSparseArrayLayout", ml, "FScriptSparseArrayLayout") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(Alignment)>("Alignment","Alignment");
+		addField<DAS_BIND_MANAGED_FIELD(Size)>("Size","Size");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/SparseArray.h:1466:7
+struct FScriptSparseArray_GeneratedAnnotation : ManagedStructureAnnotation<FScriptSparseArray> {
+	FScriptSparseArray_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FScriptSparseArray", ml, "FScriptSparseArray") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Set.h:105:7
+struct FSetElementId_GeneratedAnnotation : ManagedStructureAnnotation<FSetElementId> {
+	FSetElementId_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FSetElementId", ml, "FSetElementId") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Set.h:1834:8
+struct FScriptSetLayout_GeneratedAnnotation : ManagedStructureAnnotation<FScriptSetLayout> {
+	FScriptSetLayout_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FScriptSetLayout", ml, "FScriptSetLayout") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(HashNextIdOffset)>("HashNextIdOffset","HashNextIdOffset");
+		addField<DAS_BIND_MANAGED_FIELD(HashIndexOffset)>("HashIndexOffset","HashIndexOffset");
+		addField<DAS_BIND_MANAGED_FIELD(Size)>("Size","Size");
+		addField<DAS_BIND_MANAGED_FIELD(SparseArrayLayout)>("SparseArrayLayout","SparseArrayLayout");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Set.h:2184:7
+struct FScriptSet_GeneratedAnnotation : ManagedStructureAnnotation<FScriptSet> {
+	FScriptSet_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FScriptSet", ml, "FScriptSet") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Set.h:2192:8
+struct TSetPrivateFriend_GeneratedAnnotation : ManagedStructureAnnotation<TSetPrivateFriend> {
+	TSetPrivateFriend_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("TSetPrivateFriend", ml, "TSetPrivateFriend") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Map.h:1665:8
+struct FScriptMapLayout_GeneratedAnnotation : ManagedStructureAnnotation<FScriptMapLayout> {
+	FScriptMapLayout_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FScriptMapLayout", ml, "FScriptMapLayout") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(ValueOffset)>("ValueOffset","ValueOffset");
+		addField<DAS_BIND_MANAGED_FIELD(SetLayout)>("SetLayout","SetLayout");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Map.h:1905:7
+struct FScriptMap_GeneratedAnnotation : ManagedStructureAnnotation<FScriptMap> {
+	FScriptMap_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FScriptMap", ml, "FScriptMap") {
+	}
+	void init () {
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/Core/Public/Containers/Map.h:1913:8
+struct TMapPrivateFriend_GeneratedAnnotation : ManagedStructureAnnotation<TMapPrivateFriend> {
+	TMapPrivateFriend_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("TMapPrivateFriend", ml, "TMapPrivateFriend") {
+	}
+	void init () {
+	}
+};
+
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:22:8
 struct FPrimaryAssetType_GeneratedAnnotation : ManagedStructureAnnotation<FPrimaryAssetType> {
 	FPrimaryAssetType_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FPrimaryAssetType", ml, "FPrimaryAssetType") {
@@ -754,6 +844,28 @@ struct FArrayProperty_GeneratedAnnotation : ManagedStructureAnnotation<FArrayPro
 	void init () {
 		addField<DAS_BIND_MANAGED_FIELD(ArrayFlags)>("ArrayFlags","ArrayFlags");
 		addField<DAS_BIND_MANAGED_FIELD(Inner)>("Inner","Inner");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:3772:23
+struct FMapProperty_GeneratedAnnotation : ManagedStructureAnnotation<FMapProperty> {
+	FMapProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FMapProperty", ml, "FMapProperty") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(KeyProp)>("KeyProp","KeyProp");
+		addField<DAS_BIND_MANAGED_FIELD(ValueProp)>("ValueProp","ValueProp");
+		addField<DAS_BIND_MANAGED_FIELD(MapLayout)>("MapLayout","MapLayout");
+		addField<DAS_BIND_MANAGED_FIELD(MapFlags)>("MapFlags","MapFlags");
+	}
+};
+
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UnrealType.h:3930:23
+struct FSetProperty_GeneratedAnnotation : ManagedStructureAnnotation<FSetProperty> {
+	FSetProperty_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FSetProperty", ml, "FSetProperty") {
+	}
+	void init () {
+		addField<DAS_BIND_MANAGED_FIELD(ElementProp)>("ElementProp","ElementProp");
+		addField<DAS_BIND_MANAGED_FIELD(SetLayout)>("SetLayout","SetLayout");
 	}
 };
 

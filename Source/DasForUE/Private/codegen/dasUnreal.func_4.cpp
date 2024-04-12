@@ -6,46 +6,55 @@
 namespace das {
 #include "dasUnreal.func.aot.decl.inc"
 void Module_dasUnreal::initFunctions_4() {
-	using _method_239 = das::das_call_member< FName (FPrimaryAssetType::*)() const,&FPrimaryAssetType::GetName >;
+	addCtorAndUsing<FPrimaryAssetType>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType");
+	addCtorAndUsing<FPrimaryAssetType,FName>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
+		->args({"InName"});
+	addCtorAndUsing<FPrimaryAssetType,EName>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
+		->args({"InName"});
+	addCtorAndUsing<FPrimaryAssetType,const char *>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
+		->args({"InName"});
+	addCtorAndUsing<FPrimaryAssetType,const FPrimaryAssetType &>(*this,lib,"FPrimaryAssetType","FPrimaryAssetType")
+		->args({""});
+	using _method_242 = das::das_call_member< FName (FPrimaryAssetType::*)() const,&FPrimaryAssetType::GetName >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:41:8
-	makeExtern<DAS_CALL_METHOD(_method_239), SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetName","das_call_member< FName (FPrimaryAssetType::*)() const , &FPrimaryAssetType::GetName >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_242), SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetName","das_call_member< FName (FPrimaryAssetType::*)() const , &FPrimaryAssetType::GetName >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_240 = das::das_call_member< bool (FPrimaryAssetType::*)() const,&FPrimaryAssetType::IsValid >;
+	using _method_243 = das::das_call_member< bool (FPrimaryAssetType::*)() const,&FPrimaryAssetType::IsValid >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:57:7
-	makeExtern<DAS_CALL_METHOD(_method_240), SimNode_ExtFuncCall >(lib,"IsValid","das_call_member< bool (FPrimaryAssetType::*)() const , &FPrimaryAssetType::IsValid >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_243), SimNode_ExtFuncCall >(lib,"IsValid","das_call_member< bool (FPrimaryAssetType::*)() const , &FPrimaryAssetType::IsValid >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_241 = das::das_call_member< FString (FPrimaryAssetType::*)() const,&FPrimaryAssetType::ToString >;
+	using _method_244 = das::das_call_member< FString (FPrimaryAssetType::*)() const,&FPrimaryAssetType::ToString >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:63:10
-	makeExtern<DAS_CALL_METHOD(_method_241), SimNode_ExtFuncCallAndCopyOrMove >(lib,"ToString","das_call_member< FString (FPrimaryAssetType::*)() const , &FPrimaryAssetType::ToString >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_244), SimNode_ExtFuncCallAndCopyOrMove >(lib,"ToString","das_call_member< FString (FPrimaryAssetType::*)() const , &FPrimaryAssetType::ToString >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_242 = das::das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const,&FPrimaryAssetType::LexicalLess >;
+	using _method_245 = das::das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const,&FPrimaryAssetType::LexicalLess >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:84:7
-	makeExtern<DAS_CALL_METHOD(_method_242), SimNode_ExtFuncCall >(lib,"LexicalLess","das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const , &FPrimaryAssetType::LexicalLess >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_245), SimNode_ExtFuncCall >(lib,"LexicalLess","das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const , &FPrimaryAssetType::LexicalLess >::invoke")
 		->args({"self","Other"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_243 = das::das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const,&FPrimaryAssetType::FastLess >;
+	using _method_246 = das::das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const,&FPrimaryAssetType::FastLess >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:89:7
-	makeExtern<DAS_CALL_METHOD(_method_243), SimNode_ExtFuncCall >(lib,"FastLess","das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const , &FPrimaryAssetType::FastLess >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_246), SimNode_ExtFuncCall >(lib,"FastLess","das_call_member< bool (FPrimaryAssetType::*)(const FPrimaryAssetType &) const , &FPrimaryAssetType::FastLess >::invoke")
 		->args({"self","Other"})
 		->addToModule(*this, SideEffects::worstDefault);
 	addCtorAndUsing<FPrimaryAssetId>(*this,lib,"FPrimaryAssetId","FPrimaryAssetId");
 	addCtorAndUsing<FPrimaryAssetId,FPrimaryAssetType,FName>(*this,lib,"FPrimaryAssetId","FPrimaryAssetId")
 		->args({"InAssetType","InAssetName"});
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:122:41
-	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,const wchar_t *,unsigned int) , _dasUnreal_static_79_ParseTypeAndName , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ParseTypeAndName","_dasUnreal_static_79_ParseTypeAndName")
+	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,const wchar_t *,unsigned int) , _dasUnreal_static_80_ParseTypeAndName , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ParseTypeAndName","_dasUnreal_static_80_ParseTypeAndName")
 		->args({"self","TypeAndName","Len"})
 		->arg_type(0,makeType<TExplicit<const FPrimaryAssetId*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:123:41
-	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,FName) , _dasUnreal_static_80_ParseTypeAndName , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ParseTypeAndName","_dasUnreal_static_80_ParseTypeAndName")
+	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,FName) , _dasUnreal_static_81_ParseTypeAndName , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ParseTypeAndName","_dasUnreal_static_81_ParseTypeAndName")
 		->args({"self","TypeAndName"})
 		->arg_type(0,makeType<TExplicit<const FPrimaryAssetId*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:124:25
-	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,const FString &) , _dasUnreal_static_81_ParseTypeAndName , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ParseTypeAndName","_dasUnreal_static_81_ParseTypeAndName")
+	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,const FString &) , _dasUnreal_static_82_ParseTypeAndName , SimNode_ExtFuncCallAndCopyOrMove >(lib,"ParseTypeAndName","_dasUnreal_static_82_ParseTypeAndName")
 		->args({"self","TypeAndName"})
 		->arg_type(0,makeType<TExplicit<const FPrimaryAssetId*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -53,48 +62,48 @@ void Module_dasUnreal::initFunctions_4() {
 		->args({"TypeAndName"});
 	addCtorAndUsing<FPrimaryAssetId,const FPrimaryAssetId &>(*this,lib,"FPrimaryAssetId","FPrimaryAssetId")
 		->args({""});
-	using _method_247 = das::das_call_member< bool (FPrimaryAssetId::*)() const,&FPrimaryAssetId::IsValid >;
+	using _method_250 = das::das_call_member< bool (FPrimaryAssetId::*)() const,&FPrimaryAssetId::IsValid >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:139:7
-	makeExtern<DAS_CALL_METHOD(_method_247), SimNode_ExtFuncCall >(lib,"IsValid","das_call_member< bool (FPrimaryAssetId::*)() const , &FPrimaryAssetId::IsValid >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_250), SimNode_ExtFuncCall >(lib,"IsValid","das_call_member< bool (FPrimaryAssetId::*)() const , &FPrimaryAssetId::IsValid >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_248 = das::das_call_member< FString (FPrimaryAssetId::*)() const,&FPrimaryAssetId::ToString >;
+	using _method_251 = das::das_call_member< FString (FPrimaryAssetId::*)() const,&FPrimaryAssetId::ToString >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:145:10
-	makeExtern<DAS_CALL_METHOD(_method_248), SimNode_ExtFuncCallAndCopyOrMove >(lib,"ToString","das_call_member< FString (FPrimaryAssetId::*)() const , &FPrimaryAssetId::ToString >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_251), SimNode_ExtFuncCallAndCopyOrMove >(lib,"ToString","das_call_member< FString (FPrimaryAssetId::*)() const , &FPrimaryAssetId::ToString >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/PrimaryAssetId.h:164:25
-	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,const FString &) , _dasUnreal_static_82_FromString , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromString","_dasUnreal_static_82_FromString")
+	makeExtern< FPrimaryAssetId (*)(const FPrimaryAssetId *,const FString &) , _dasUnreal_static_83_FromString , SimNode_ExtFuncCallAndCopyOrMove >(lib,"FromString","_dasUnreal_static_83_FromString")
 		->args({"self","String"})
 		->arg_type(0,makeType<TExplicit<const FPrimaryAssetId*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:24:1
-	makeExtern< const char * (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_83_GetGroupName , SimNode_ExtFuncCall >(lib,"GetGroupName","_dasUnreal_static_83_GetGroupName")
+	makeExtern< const char * (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_84_GetGroupName , SimNode_ExtFuncCall >(lib,"GetGroupName","_dasUnreal_static_84_GetGroupName")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FStatGroup_STATGROUP_Script*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:24:1
-	makeExtern< const char * (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_84_GetGroupCategory , SimNode_ExtFuncCall >(lib,"GetGroupCategory","_dasUnreal_static_84_GetGroupCategory")
+	makeExtern< const char * (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_85_GetGroupCategory , SimNode_ExtFuncCall >(lib,"GetGroupCategory","_dasUnreal_static_85_GetGroupCategory")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FStatGroup_STATGROUP_Script*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:24:1
-	makeExtern< const wchar_t * (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_85_GetDescription , SimNode_ExtFuncCall >(lib,"GetDescription","_dasUnreal_static_85_GetDescription")
+	makeExtern< const wchar_t * (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_86_GetDescription , SimNode_ExtFuncCall >(lib,"GetDescription","_dasUnreal_static_86_GetDescription")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FStatGroup_STATGROUP_Script*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:24:1
-	makeExtern< bool (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_86_IsDefaultEnabled , SimNode_ExtFuncCall >(lib,"IsDefaultEnabled","_dasUnreal_static_86_IsDefaultEnabled")
+	makeExtern< bool (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_87_IsDefaultEnabled , SimNode_ExtFuncCall >(lib,"IsDefaultEnabled","_dasUnreal_static_87_IsDefaultEnabled")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FStatGroup_STATGROUP_Script*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:24:1
-	makeExtern< bool (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_87_IsCompileTimeEnable , SimNode_ExtFuncCall >(lib,"IsCompileTimeEnable","_dasUnreal_static_87_IsCompileTimeEnable")
+	makeExtern< bool (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_88_IsCompileTimeEnable , SimNode_ExtFuncCall >(lib,"IsCompileTimeEnable","_dasUnreal_static_88_IsCompileTimeEnable")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FStatGroup_STATGROUP_Script*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:24:1
-	makeExtern< bool (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_88_GetSortByName , SimNode_ExtFuncCall >(lib,"GetSortByName","_dasUnreal_static_88_GetSortByName")
+	makeExtern< bool (*)(const FStatGroup_STATGROUP_Script *) , _dasUnreal_static_89_GetSortByName , SimNode_ExtFuncCall >(lib,"GetSortByName","_dasUnreal_static_89_GetSortByName")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FStatGroup_STATGROUP_Script*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
@@ -106,14 +115,14 @@ void Module_dasUnreal::initFunctions_4() {
 		->args({"InEventType"});
 	addCtorAndUsing<FBlueprintExceptionInfo,EBlueprintExceptionType::Type,const FText &>(*this,lib,"FBlueprintExceptionInfo","FBlueprintExceptionInfo")
 		->args({"InEventType","InDescription"});
-	using _method_256 = das::das_call_member< EBlueprintExceptionType::Type (FBlueprintExceptionInfo::*)() const,&FBlueprintExceptionInfo::GetType >;
+	using _method_259 = das::das_call_member< EBlueprintExceptionType::Type (FBlueprintExceptionInfo::*)() const,&FBlueprintExceptionInfo::GetType >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:394:32
-	makeExtern<DAS_CALL_METHOD(_method_256), SimNode_ExtFuncCall >(lib,"GetType","das_call_member< EBlueprintExceptionType::Type (FBlueprintExceptionInfo::*)() const , &FBlueprintExceptionInfo::GetType >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_259), SimNode_ExtFuncCall >(lib,"GetType","das_call_member< EBlueprintExceptionType::Type (FBlueprintExceptionInfo::*)() const , &FBlueprintExceptionInfo::GetType >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_257 = das::das_call_member< const FText & (FBlueprintExceptionInfo::*)() const,&FBlueprintExceptionInfo::GetDescription >;
+	using _method_260 = das::das_call_member< const FText & (FBlueprintExceptionInfo::*)() const,&FBlueprintExceptionInfo::GetDescription >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:399:15
-	makeExtern<DAS_CALL_METHOD(_method_257), SimNode_ExtFuncCallRef >(lib,"GetDescription","das_call_member< const FText & (FBlueprintExceptionInfo::*)() const , &FBlueprintExceptionInfo::GetDescription >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_260), SimNode_ExtFuncCallRef >(lib,"GetDescription","das_call_member< const FText & (FBlueprintExceptionInfo::*)() const , &FBlueprintExceptionInfo::GetDescription >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 	addCtorAndUsing<FScriptInstrumentationSignal,EScriptInstrumentation::Type,const UObject *,const FFrame &,const FName>(*this,lib,"FScriptInstrumentationSignal","FScriptInstrumentationSignal")
@@ -121,120 +130,120 @@ void Module_dasUnreal::initFunctions_4() {
 	addCtorAndUsing<FScriptInstrumentationSignal,EScriptInstrumentation::Type,const UObject *,UFunction *,const int>(*this,lib,"FScriptInstrumentationSignal","FScriptInstrumentationSignal")
 		->args({"InEventType","InContextObject","InFunction","LinkId"})
 		->arg_init(3,make_smart<ExprConstInt>(-1));
-	using _method_258 = das::das_call_member< EScriptInstrumentation::Type (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetType >;
+	using _method_261 = das::das_call_member< EScriptInstrumentation::Type (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetType >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:426:31
-	makeExtern<DAS_CALL_METHOD(_method_258), SimNode_ExtFuncCall >(lib,"GetType","das_call_member< EScriptInstrumentation::Type (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetType >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_261), SimNode_ExtFuncCall >(lib,"GetType","das_call_member< EScriptInstrumentation::Type (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetType >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_259 = das::das_call_member< void (FScriptInstrumentationSignal::*)(EScriptInstrumentation::Type),&FScriptInstrumentationSignal::SetType >;
+	using _method_262 = das::das_call_member< void (FScriptInstrumentationSignal::*)(EScriptInstrumentation::Type),&FScriptInstrumentationSignal::SetType >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:429:7
-	makeExtern<DAS_CALL_METHOD(_method_259), SimNode_ExtFuncCall >(lib,"SetType","das_call_member< void (FScriptInstrumentationSignal::*)(EScriptInstrumentation::Type) , &FScriptInstrumentationSignal::SetType >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_262), SimNode_ExtFuncCall >(lib,"SetType","das_call_member< void (FScriptInstrumentationSignal::*)(EScriptInstrumentation::Type) , &FScriptInstrumentationSignal::SetType >::invoke")
 		->args({"self","InType"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_260 = das::das_call_member< bool (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::IsContextObjectValid >;
+	using _method_263 = das::das_call_member< bool (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::IsContextObjectValid >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:432:7
-	makeExtern<DAS_CALL_METHOD(_method_260), SimNode_ExtFuncCall >(lib,"IsContextObjectValid","das_call_member< bool (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::IsContextObjectValid >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_263), SimNode_ExtFuncCall >(lib,"IsContextObjectValid","das_call_member< bool (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::IsContextObjectValid >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_261 = das::das_call_member< const UObject * (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetContextObject >;
+	using _method_264 = das::das_call_member< const UObject * (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetContextObject >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:435:17
-	makeExtern<DAS_CALL_METHOD(_method_261), SimNode_ExtFuncCall >(lib,"GetContextObject","das_call_member< const UObject * (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetContextObject >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_264), SimNode_ExtFuncCall >(lib,"GetContextObject","das_call_member< const UObject * (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetContextObject >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_262 = das::das_call_member< bool (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::IsStackFrameValid >;
+	using _method_265 = das::das_call_member< bool (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::IsStackFrameValid >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:438:7
-	makeExtern<DAS_CALL_METHOD(_method_262), SimNode_ExtFuncCall >(lib,"IsStackFrameValid","das_call_member< bool (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::IsStackFrameValid >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_265), SimNode_ExtFuncCall >(lib,"IsStackFrameValid","das_call_member< bool (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::IsStackFrameValid >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_263 = das::das_call_member< const FFrame & (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetStackFrame >;
+	using _method_266 = das::das_call_member< const FFrame & (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetStackFrame >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:441:16
-	makeExtern<DAS_CALL_METHOD(_method_263), SimNode_ExtFuncCallRef >(lib,"GetStackFrame","das_call_member< const FFrame & (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetStackFrame >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_266), SimNode_ExtFuncCallRef >(lib,"GetStackFrame","das_call_member< const FFrame & (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetStackFrame >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_264 = das::das_call_member< const UClass * (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetClass >;
+	using _method_267 = das::das_call_member< const UClass * (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetClass >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:444:32
-	makeExtern<DAS_CALL_METHOD(_method_264), SimNode_ExtFuncCall >(lib,"GetClass","das_call_member< const UClass * (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetClass >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_267), SimNode_ExtFuncCall >(lib,"GetClass","das_call_member< const UClass * (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetClass >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_265 = das::das_call_member< const UClass * (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetFunctionClassScope >;
+	using _method_268 = das::das_call_member< const UClass * (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetFunctionClassScope >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:447:32
-	makeExtern<DAS_CALL_METHOD(_method_265), SimNode_ExtFuncCall >(lib,"GetFunctionClassScope","das_call_member< const UClass * (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetFunctionClassScope >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_268), SimNode_ExtFuncCall >(lib,"GetFunctionClassScope","das_call_member< const UClass * (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetFunctionClassScope >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_266 = das::das_call_member< FName (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetFunctionName >;
+	using _method_269 = das::das_call_member< FName (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetFunctionName >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:450:24
-	makeExtern<DAS_CALL_METHOD(_method_266), SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetFunctionName","das_call_member< FName (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetFunctionName >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_269), SimNode_ExtFuncCallAndCopyOrMove >(lib,"GetFunctionName","das_call_member< FName (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetFunctionName >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_267 = das::das_call_member< int (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetScriptCodeOffset >;
+	using _method_270 = das::das_call_member< int (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetScriptCodeOffset >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:453:24
-	makeExtern<DAS_CALL_METHOD(_method_267), SimNode_ExtFuncCall >(lib,"GetScriptCodeOffset","das_call_member< int (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetScriptCodeOffset >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_270), SimNode_ExtFuncCall >(lib,"GetScriptCodeOffset","das_call_member< int (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetScriptCodeOffset >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_268 = das::das_call_member< int (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetLatentLinkId >;
+	using _method_271 = das::das_call_member< int (FScriptInstrumentationSignal::*)() const,&FScriptInstrumentationSignal::GetLatentLinkId >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:456:8
-	makeExtern<DAS_CALL_METHOD(_method_268), SimNode_ExtFuncCall >(lib,"GetLatentLinkId","das_call_member< int (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetLatentLinkId >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_271), SimNode_ExtFuncCall >(lib,"GetLatentLinkId","das_call_member< int (FScriptInstrumentationSignal::*)() const , &FScriptInstrumentationSignal::GetLatentLinkId >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:493:30
-	makeExtern< void (*)(const FBlueprintCoreDelegates *,const UObject *,FFrame &,const FBlueprintExceptionInfo &) , _dasUnreal_static_89_ThrowScriptException , SimNode_ExtFuncCall >(lib,"ThrowScriptException","_dasUnreal_static_89_ThrowScriptException")
+	makeExtern< void (*)(const FBlueprintCoreDelegates *,const UObject *,FFrame &,const FBlueprintExceptionInfo &) , _dasUnreal_static_90_ThrowScriptException , SimNode_ExtFuncCall >(lib,"ThrowScriptException","_dasUnreal_static_90_ThrowScriptException")
 		->args({"self","ActiveObject","StackFrame","Info"})
 		->arg_type(0,makeType<TExplicit<const FBlueprintCoreDelegates*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:494:30
-	makeExtern< void (*)(const FBlueprintCoreDelegates *,const FScriptInstrumentationSignal &) , _dasUnreal_static_90_InstrumentScriptEvent , SimNode_ExtFuncCall >(lib,"InstrumentScriptEvent","_dasUnreal_static_90_InstrumentScriptEvent")
+	makeExtern< void (*)(const FBlueprintCoreDelegates *,const FScriptInstrumentationSignal &) , _dasUnreal_static_91_InstrumentScriptEvent , SimNode_ExtFuncCall >(lib,"InstrumentScriptEvent","_dasUnreal_static_91_InstrumentScriptEvent")
 		->args({"self","Info"})
 		->arg_type(0,makeType<TExplicit<const FBlueprintCoreDelegates*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:495:30
-	makeExtern< void (*)(const FBlueprintCoreDelegates *,const int) , _dasUnreal_static_91_SetScriptMaximumLoopIterations , SimNode_ExtFuncCall >(lib,"SetScriptMaximumLoopIterations","_dasUnreal_static_91_SetScriptMaximumLoopIterations")
+	makeExtern< void (*)(const FBlueprintCoreDelegates *,const int) , _dasUnreal_static_92_SetScriptMaximumLoopIterations , SimNode_ExtFuncCall >(lib,"SetScriptMaximumLoopIterations","_dasUnreal_static_92_SetScriptMaximumLoopIterations")
 		->args({"self","MaximumLoopIterations"})
 		->arg_type(0,makeType<TExplicit<const FBlueprintCoreDelegates*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:496:30
-	makeExtern< bool (*)(const FBlueprintCoreDelegates *) , _dasUnreal_static_92_IsDebuggingEnabled , SimNode_ExtFuncCall >(lib,"IsDebuggingEnabled","_dasUnreal_static_92_IsDebuggingEnabled")
+	makeExtern< bool (*)(const FBlueprintCoreDelegates *) , _dasUnreal_static_93_IsDebuggingEnabled , SimNode_ExtFuncCall >(lib,"IsDebuggingEnabled","_dasUnreal_static_93_IsDebuggingEnabled")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FBlueprintCoreDelegates*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 	addCtorAndUsing<FBlueprintContextTracker>(*this,lib,"FBlueprintContextTracker","FBlueprintContextTracker");
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:514:35
-	makeExtern< FBlueprintContextTracker & (*)(const FBlueprintContextTracker *) , _dasUnreal_static_93_Get , SimNode_ExtFuncCallRef >(lib,"Get","_dasUnreal_static_93_Get")
+	makeExtern< FBlueprintContextTracker & (*)(const FBlueprintContextTracker *) , _dasUnreal_static_94_Get , SimNode_ExtFuncCallRef >(lib,"Get","_dasUnreal_static_94_Get")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FBlueprintContextTracker*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:517:41
-	makeExtern< const FBlueprintContextTracker * (*)(const FBlueprintContextTracker *) , _dasUnreal_static_94_TryGet , SimNode_ExtFuncCall >(lib,"TryGet","_dasUnreal_static_94_TryGet")
+	makeExtern< const FBlueprintContextTracker * (*)(const FBlueprintContextTracker *) , _dasUnreal_static_95_TryGet , SimNode_ExtFuncCall >(lib,"TryGet","_dasUnreal_static_95_TryGet")
 		->args({"self"})
 		->arg_type(0,makeType<TExplicit<const FBlueprintContextTracker*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_275 = das::das_call_member< void (FBlueprintContextTracker::*)(),&FBlueprintContextTracker::ResetRunaway >;
+	using _method_278 = das::das_call_member< void (FBlueprintContextTracker::*)(),&FBlueprintContextTracker::ResetRunaway >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:520:7
-	makeExtern<DAS_CALL_METHOD(_method_275), SimNode_ExtFuncCall >(lib,"ResetRunaway","das_call_member< void (FBlueprintContextTracker::*)() , &FBlueprintContextTracker::ResetRunaway >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_278), SimNode_ExtFuncCall >(lib,"ResetRunaway","das_call_member< void (FBlueprintContextTracker::*)() , &FBlueprintContextTracker::ResetRunaway >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_276 = das::das_call_member< void (FBlueprintContextTracker::*)(),&FBlueprintContextTracker::AddRunaway >;
+	using _method_279 = das::das_call_member< void (FBlueprintContextTracker::*)(),&FBlueprintContextTracker::AddRunaway >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:523:19
-	makeExtern<DAS_CALL_METHOD(_method_276), SimNode_ExtFuncCall >(lib,"AddRunaway","das_call_member< void (FBlueprintContextTracker::*)() , &FBlueprintContextTracker::AddRunaway >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_279), SimNode_ExtFuncCall >(lib,"AddRunaway","das_call_member< void (FBlueprintContextTracker::*)() , &FBlueprintContextTracker::AddRunaway >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_277 = das::das_call_member< void (FBlueprintContextTracker::*)(const UObject *,const UFunction *),&FBlueprintContextTracker::EnterScriptContext >;
+	using _method_280 = das::das_call_member< void (FBlueprintContextTracker::*)(const UObject *,const UFunction *),&FBlueprintContextTracker::EnterScriptContext >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:529:7
-	makeExtern<DAS_CALL_METHOD(_method_277), SimNode_ExtFuncCall >(lib,"EnterScriptContext","das_call_member< void (FBlueprintContextTracker::*)(const UObject *,const UFunction *) , &FBlueprintContextTracker::EnterScriptContext >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_280), SimNode_ExtFuncCall >(lib,"EnterScriptContext","das_call_member< void (FBlueprintContextTracker::*)(const UObject *,const UFunction *) , &FBlueprintContextTracker::EnterScriptContext >::invoke")
 		->args({"self","ContextObject","ContextFunction"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_278 = das::das_call_member< void (FBlueprintContextTracker::*)(),&FBlueprintContextTracker::ExitScriptContext >;
+	using _method_281 = das::das_call_member< void (FBlueprintContextTracker::*)(),&FBlueprintContextTracker::ExitScriptContext >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:532:7
-	makeExtern<DAS_CALL_METHOD(_method_278), SimNode_ExtFuncCall >(lib,"ExitScriptContext","das_call_member< void (FBlueprintContextTracker::*)() , &FBlueprintContextTracker::ExitScriptContext >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_281), SimNode_ExtFuncCall >(lib,"ExitScriptContext","das_call_member< void (FBlueprintContextTracker::*)() , &FBlueprintContextTracker::ExitScriptContext >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_279 = das::das_call_member< bool (FBlueprintContextTracker::*)(const UObject *),&FBlueprintContextTracker::RecordAccessViolation >;
+	using _method_282 = das::das_call_member< bool (FBlueprintContextTracker::*)(const UObject *),&FBlueprintContextTracker::RecordAccessViolation >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:535:7
-	makeExtern<DAS_CALL_METHOD(_method_279), SimNode_ExtFuncCall >(lib,"RecordAccessViolation","das_call_member< bool (FBlueprintContextTracker::*)(const UObject *) , &FBlueprintContextTracker::RecordAccessViolation >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_282), SimNode_ExtFuncCall >(lib,"RecordAccessViolation","das_call_member< bool (FBlueprintContextTracker::*)(const UObject *) , &FBlueprintContextTracker::RecordAccessViolation >::invoke")
 		->args({"self","Object"})
 		->addToModule(*this, SideEffects::worstDefault);
-	using _method_280 = das::das_call_member< int (FBlueprintContextTracker::*)() const,&FBlueprintContextTracker::GetScriptEntryTag >;
+	using _method_283 = das::das_call_member< int (FBlueprintContextTracker::*)() const,&FBlueprintContextTracker::GetScriptEntryTag >;
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/Script.h:538:20
-	makeExtern<DAS_CALL_METHOD(_method_280), SimNode_ExtFuncCall >(lib,"GetScriptEntryTag","das_call_member< int (FBlueprintContextTracker::*)() const , &FBlueprintContextTracker::GetScriptEntryTag >::invoke")
+	makeExtern<DAS_CALL_METHOD(_method_283), SimNode_ExtFuncCall >(lib,"GetScriptEntryTag","das_call_member< int (FBlueprintContextTracker::*)() const , &FBlueprintContextTracker::GetScriptEntryTag >::invoke")
 		->args({"self"})
 		->addToModule(*this, SideEffects::worstDefault);
 	addCtorAndUsing<FEditorScriptExecutionGuard>(*this,lib,"FEditorScriptExecutionGuard","FEditorScriptExecutionGuard");
@@ -437,27 +446,6 @@ void Module_dasUnreal::initFunctions_4() {
 		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:871:22
 	makeExtern< bool (*)() , IsLoading , SimNode_ExtFuncCall >(lib,"IsLoading","IsLoading")
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:878:22
-	makeExtern< void (*)(bool) , SetAsyncLoadingAllowed , SimNode_ExtFuncCall >(lib,"SetAsyncLoadingAllowed","SetAsyncLoadingAllowed")
-		->args({"bAllowAsyncLoading"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:905:42
-	makeExtern< EAsyncPackageState::Type (*)(bool,bool,double) , ProcessAsyncLoading , SimNode_ExtFuncCall >(lib,"ProcessAsyncLoading","ProcessAsyncLoading")
-		->args({"bUseTimeLimit","bUseFullTimeLimit","TimeLimit"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:917:22
-	makeExtern< void (*)(FUObjectSerializeContext *,const wchar_t *) , BeginLoad , SimNode_ExtFuncCall >(lib,"BeginLoad","BeginLoad")
-		->args({"LoadContext","DebugContext"})
-		->arg_init(1,make_smart<ExprConstPtr>())
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:918:22
-	makeExtern< void (*)(FUObjectSerializeContext *) , EndLoad , SimNode_ExtFuncCall >(lib,"EndLoad","EndLoad")
-		->args({"LoadContext"})
-		->addToModule(*this, SideEffects::worstDefault);
-// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/CoreUObject/Public\UObject/UObjectGlobals.h:927:27
-	makeExtern< UPackage * (*)(UObject *,const wchar_t *) , FindPackage , SimNode_ExtFuncCall >(lib,"FindPackage","FindPackage")
-		->args({"InOuter","PackageName"})
 		->addToModule(*this, SideEffects::worstDefault);
 }
 }

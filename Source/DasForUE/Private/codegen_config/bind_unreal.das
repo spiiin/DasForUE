@@ -2,6 +2,7 @@ require cbind/cbind_boost
 require fio
 require daslib/defer
 require daslib/strings_boost
+require daslib/safe_addr
 
 let UNREAL_PATH = "../../../../../../../UnrealEngine" //TODO: get from environment?
 let BIND_ROOT = "../codegen/"
@@ -456,8 +457,6 @@ class UnrealGen : CppGenBind
             //UObject/UnrealType.h
             "FScriptMapHelper";
             "FScriptSetHelper";
-            "FMapProperty";
-            "FSetProperty";
             "FMulticastInlineDelegateProperty";
             "FMulticastSparseDelegateProperty";
             "UMulticastDelegatePropertyWrapper";
@@ -542,7 +541,10 @@ class UnrealGen : CppGenBind
             fname |> find("UObject/Stack.h") != -1 ||
             fname |> find("UObject/Script.h") != -1 ||
             fname |> find("Kismet/BlueprintFunctionLibrary.h") != -1 ||
-            fname |> find("Kismet/KismetArrayLibrary.h") != -1
+            fname |> find("Kismet/KismetArrayLibrary.h") != -1 ||
+            fname |> find("Containers/SparseArray.h") != -1 ||
+            fname |> find("Containers/Set.h") != -1 ||
+            fname |> find("Containers/Map.h") != -1
         )
             return false
         return true
@@ -777,8 +779,10 @@ class UnrealGen : CppGenBind
             writer |> write("\tvoid init () \{\n")
             let isAbstract = clang_CXXRecord_isAbstract(c)!=0u
             abstract_class |> push(isAbstract)
+            print("---push {length(abstract_class)} {struct_name}\n")
             AnyGenBind`parse_Struct(self, c, struct_name)
             abstract_class |> pop()
+            print("---pop {length(abstract_class)} {struct_name}\n")
             writer |> write("\t\}\n\};\n")
             if isArgByValue(struct_namespace_name)
                 fprint(struct_cast_file, "template <> struct cast_arg<{struct_namespace_name}> \{\n")
@@ -963,7 +967,7 @@ class UnrealGen : CppGenBind
         for skipName in unreal_arg_part_names
             if field_type_name |> find(skipName) != -1
                 return
-
+        print("nnn\n")
         var wr = swrite |> back
         let substType = substFieldType(c)
         if substType |> empty()
@@ -1016,6 +1020,9 @@ class UnrealGen : CppGenBind
     def isTemplateType(typeName: string): bool
         return true if typeName == "FStrProperty_Super"   //unreal typedef hardcode, need to find a way resolve it
         return true if typeName == "FArrayProperty_Super"
+        return true if typeName == "FSetProperty_Super"
+        return true if typeName == "FMapProperty_Super"
+        
         return typeName |> find("<") != -1
 
      //TODO: send fix to cbind_boost (lspClone)
@@ -1086,6 +1093,214 @@ class UnrealGen : CppGenBind
                 fprint(struct_cast_file, "\};\n")
 
             replaceTypeNames[templName] = templDashedName
+
+    def isTemplateSpecialization(var cursor: CXCursor): bool
+        return clang_Cursor_isNull(clang_getSpecializedCursorTemplate(cursor)) == 0
+
+    def override parse(var cursor: CXCursor)
+        clang_visitChildren(cursor) <| $(var c, parent)
+            var file: CXFile
+            var line, column, offset : uint
+            clang_getSpellingLocation(clang_getCursorLocation(c), safe_addr(file), safe_addr(line), safe_addr(column), safe_addr(offset))
+            var fname = clang_getFileName(file)
+            peek(fname) <| $ ( fn )
+                if prevFileName != fn
+                    prevFileName := fn
+                    if skip_file(prevFileName) && verbose_file_skipping
+                        to_log(LOG_INFO, "skipping {prevFileName}\n")
+            if !skip_file(prevFileName)
+                //TODO: move to cbind_boost
+                if parent.kind == CXCursorKind ClassTemplate || isTemplateSpecialization(parent)    // skipping just about everything from template body
+                    return CXChildVisitResult Continue
+                let kind = clang_getCursorKind(c)
+                if kind == CXCursorKind TypedefDecl
+                    let tdn = string(clang_getCursorDisplayName(c))
+                    var tdt = clang_getCanonicalType(clang_getCursorType(c))
+                    if hasEmptyStruct
+                        if tdt.kind == CXTypeKind Record
+                            if !skip_struct(tdn)
+                                let acs = clang_getCXXAccessSpecifier(c)
+                                if acs != CX_CXXAccessSpecifier Public && acs != CX_CXXAccessSpecifier InvalidAccessSpecifier
+                                    to_log(LOG_INFO, "skipping nameless structure {tdn} due to access specifier {acs}\n")
+                                else
+                                    parse_Struct(emptyStruct, tdn)
+                            hasEmptyStruct = false
+                            return CXChildVisitResult Continue
+                        else
+                            to_log(LOG_ERROR, "typedef of type {tdt.kind} with nameless structure at {clang_getCursorLocationDescription(c)}\n")
+                            hasEmptyStruct = false
+                    elif hasEmptyEnum
+                        if tdt.kind == CXTypeKind Enum
+                            let acs = clang_getCXXAccessSpecifier(c)
+                            if acs != CX_CXXAccessSpecifier Public && acs != CX_CXXAccessSpecifier InvalidAccessSpecifier
+                                to_log(LOG_INFO, "skipping nameless enumeration {tdn} due to access specifier {acs}\n")
+                            else
+                                parse_Enum(emptyEnum, tdn)
+                            hasEmptyEnum = false
+                            return CXChildVisitResult Continue
+                        else
+                            to_log(LOG_ERROR, "typedef of type {tdt.kind} with nameless enumeration at {clang_getCursorLocationDescription(c)}\n")
+                            hasEmptyEnum = false
+                    elif tdt.kind == CXTypeKind Record
+                        let sn = string(clang_getTypeSpelling(tdt))
+                        if sn == tdn
+                            to_log(LOG_INFO, "skipping typedef struct {sn} {tdn};\n")
+                            return CXChildVisitResult Continue
+                        if skip_struct(sn) || skip_struct(tdn)
+                            to_log(LOG_INFO, "skipping typedef struct {sn} {tdn};\n")
+                            return CXChildVisitResult Continue
+                    elif tdt.kind == CXTypeKind Enum
+                        let sn = string(clang_getTypeSpelling(tdt))
+                        if sn == tdn
+                            to_log(LOG_INFO, "skipping typedef enum {sn} {tdn};\n")
+                            return CXChildVisitResult Continue
+                        else
+                            enum2enum[namespace_name(sn)] = tdn
+                            return CXChildVisitResult Continue
+                    if inClass == 0
+                        if !skip_alias(c)
+                            parse_Alias(c)
+                    return CXChildVisitResult Continue
+                elif kind == CXCursorKind FunctionDecl
+                    if !skip_function(c)
+                        parse_FunctionDecl(c)
+                    return CXChildVisitResult Continue
+                elif kind == CXCursorKind CXXMethod
+                    let acs = clang_getCXXAccessSpecifier(c)
+                    if acs != CX_CXXAccessSpecifier Public
+                        let method_name = string(clang_getCursorSpelling(c))
+                        to_log(LOG_INFO, "skipping {namespace_name(method_name)} due to access specifier {acs}\n")
+                    else
+                        if !skip_method(c)
+                            parse_Method(c)
+                    return CXChildVisitResult Continue
+                elif kind == CXCursorKind Constructor
+                    let acs = clang_getCXXAccessSpecifier(c)
+                    if acs != CX_CXXAccessSpecifier Public
+                        let ctor_name = string(clang_getCursorSpelling(c))
+                        to_log(LOG_INFO, "skipping {namespace_name(ctor_name)} constructor due to access specifier {acs}\n")
+                    else
+                        if !skip_constructor(c)
+                            parse_Constructor(c)
+                    return CXChildVisitResult Continue
+                /*
+                elif kind == CXCursorKind CXXConversionFunction
+                    // TODO: support autobind of cast?
+                    return CXChildVisitResult Continue
+                elif kind == CXCursorKind CXXDestructor
+                    return CXChildVisitResult Continue
+                */
+                elif kind == CXCursorKind StructDecl || kind == CXCursorKind ClassDecl || kind == CXCursorKind UnionDecl
+                    let struct_name = string(clang_getCursorSpelling(c))
+                    let nta = clang_Type_getNumTemplateArguments(clang_getCursorType(c))
+                    if nta != -1
+                        to_log(LOG_INFO, "skipping structure {struct_name} due to being template instance\n")
+                        return CXChildVisitResult Continue
+                    if empty(struct_name)
+                        if hasEmptyStruct
+                            to_log(LOG_ERROR, "already in empty struct mode from {clang_getCursorLocationDescription(emptyStruct)}, at {clang_getCursorLocationDescription(c)}\n")
+                        emptyStruct = c
+                        hasEmptyStruct = true
+                    else
+                        if !skip_struct(struct_name)
+                            let acs = clang_getCXXAccessSpecifier(c)
+                            if acs != CX_CXXAccessSpecifier Public && acs != CX_CXXAccessSpecifier InvalidAccessSpecifier
+                                var canonical = clang_getCanonicalType(clang_getCursorType(c))
+                                let sname = string(clang_getTypeSpelling(clang_getCursorType(c)))
+                                to_log(LOG_INFO, "skipping structure {struct_name} aka {sname} due to access specifier {acs}\n")
+                                skip_struct_by_access |> insert(sname)
+                                return CXChildVisitResult Continue
+                            else
+                                parse_Struct(c, struct_name)
+                    return CXChildVisitResult Continue
+                elif kind == CXCursorKind Namespace
+                    parse_Namespace(c)
+                    return CXChildVisitResult Continue
+                elif kind == CXCursorKind EnumDecl
+                    let enum_name = string(clang_getCursorSpelling(c))
+                    let acs = clang_getCXXAccessSpecifier(c)
+                    if acs != CX_CXXAccessSpecifier Public && acs != CX_CXXAccessSpecifier InvalidAccessSpecifier
+                        to_log(LOG_INFO, "skipping enumeration {enum_name} due to access specifier {acs}\n")
+                    elif empty(enum_name)
+                        if hasEmptyEnum
+                            to_log(LOG_ERROR, "already in empty enum mode from {clang_getCursorLocationDescription(emptyEnum)}, at {clang_getCursorLocationDescription(c)}\n")
+                        emptyEnum = c
+                        hasEmptyEnum = true
+                    else
+                        parse_Enum(c, enum_name)
+                    return CXChildVisitResult Continue
+                elif kind == CXCursorKind FieldDecl
+                    if skip_type(clang_getCursorType(c))
+                        let field_name = string(clang_getCursorSpelling(c))
+                        to_log(LOG_INFO, "skipping {namespace_name(field_name)} becuase its type is skipped\n")
+                        return CXChildVisitResult Continue
+                    if clang_Cursor_isBitField(c)!=0u
+                        let field_name = string(clang_getCursorSpelling(c))
+                        to_log(LOG_INFO, "skipping {namespace_name(field_name)} because its a bitfield\n")
+                        return CXChildVisitResult Continue
+                    let acs = clang_getCXXAccessSpecifier(c)
+                    if acs != CX_CXXAccessSpecifier Public
+                        let field_name = string(clang_getCursorSpelling(c))
+                        to_log(LOG_INFO, "skipping {namespace_name(field_name)} due to access specifier {acs}\n")
+                        return CXChildVisitResult Continue
+                    var field_type = clang_getCursorType(c)
+                    if skip_type(field_type)
+                        let field_name = string(clang_getCursorSpelling(c))
+                        let field_type_name = string(clang_getTypeSpelling(field_type))
+                        to_log(LOG_INFO, "skipping {namespace_name(field_name)} due to type {field_type_name}\n")
+                    else
+                        parse_Field(c)
+                    return CXChildVisitResult Continue
+                elif kind == CXCursorKind VarDecl
+                    /*
+                    let var_decl_name = string(clang_getCursorSpelling(c))
+                    var var_decl_type = clang_getCanonicalType(clang_getCursorType(c))
+                    let var_decl_type_name = string(clang_getTypeSpelling(var_decl_type))
+                    to_log(LOG_WARNING, "VarDecl {var_decl_name}:{var_decl_type_name} at {clang_getCursorLocationDescription(c)}\n")
+                    */
+                    return CXChildVisitResult Continue
+                elif kind == CXCursorKind CXXAccessSpecifier
+                    // nada?
+                    return CXChildVisitResult Recurse
+                elif kind == CXCursorKind UnexposedDecl
+                    // nada?
+                    return CXChildVisitResult Recurse
+                elif kind == CXCursorKind FunctionTemplate
+                    // nada?
+                    CXChildVisitResult Continue
+                /*
+                elif kind == CXCursorKind TemplateTypeParameter
+                    // nada?
+                    CXChildVisitResult Continue
+                elif kind == CXCursorKind TypeRef
+                    // nada?
+                    CXChildVisitResult Continue
+                */
+                elif kind == CXCursorKind CXXBaseSpecifier
+                    print("TTT\n")
+                    let class_name = back(nspaces)
+                    var tps = string(clang_getTypeSpelling(clang_getCursorType(c)))
+                    var tpq <- split(tps,"::")  // TODO: better inheritance?
+                    let base_name = back(tpq)
+                    delete tpq
+                    if !(lsp |> key_exists(class_name))
+                        lsp[class_name] = base_name
+                    else
+                        var acs = clang_getCXXAccessSpecifier(c)
+                        if acs == CX_CXXAccessSpecifier Public
+                            interfaces[class_name] |> push(base_name)
+                        else
+                            to_log(LOG_WARNING, "skipping interface {base_name} due to access specifier {acs} at {clang_getCursorLocationDescription(c)}\n")
+                    CXChildVisitResult Recurse
+                elif kind == CXCursorKind ClassTemplate
+                    let template_name = string(clang_getCursorSpelling(c))
+                    to_log(LOG_WARNING, "skipping template {template_name} at {clang_getCursorLocationDescription(c)}\n")
+                    CXChildVisitResult Continue
+                else
+                    to_log(LOG_WARNING, "unsupported {describe(c)} <- {describe(parent)} at {clang_getCursorLocationDescription(c)}\n")
+                return CXChildVisitResult Recurse
+            else
+                return CXChildVisitResult Recurse
 
     def override generate
         generateDummpyTemplateInstaceAnnotations()

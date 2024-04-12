@@ -126,3 +126,7 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Kismet/KismetArrayLibrary.h"
+
+#include "Containers/SparseArray.h"
+#include "Containers/Set.h"
+#include "Containers/Map.h"

@@ -73,6 +73,66 @@ template <> struct cast_arg<FTextRange> {
 		return * cast<FTextRange *>::to(res);
 	}
 };
+template <> struct cast_arg<FSparseArrayAllocationInfo> {
+	static __forceinline const FSparseArrayAllocationInfo & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FSparseArrayAllocationInfo *>::to(res);
+	}
+};
+template <> struct cast_arg<FScriptSparseArrayLayout> {
+	static __forceinline const FScriptSparseArrayLayout & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FScriptSparseArrayLayout *>::to(res);
+	}
+};
+template <> struct cast_arg<FScriptSparseArray> {
+	static __forceinline const FScriptSparseArray & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FScriptSparseArray *>::to(res);
+	}
+};
+template <> struct cast_arg<FSetElementId> {
+	static __forceinline const FSetElementId & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FSetElementId *>::to(res);
+	}
+};
+template <> struct cast_arg<FScriptSetLayout> {
+	static __forceinline const FScriptSetLayout & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FScriptSetLayout *>::to(res);
+	}
+};
+template <> struct cast_arg<FScriptSet> {
+	static __forceinline const FScriptSet & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FScriptSet *>::to(res);
+	}
+};
+template <> struct cast_arg<TSetPrivateFriend> {
+	static __forceinline const TSetPrivateFriend & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TSetPrivateFriend *>::to(res);
+	}
+};
+template <> struct cast_arg<FScriptMapLayout> {
+	static __forceinline const FScriptMapLayout & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FScriptMapLayout *>::to(res);
+	}
+};
+template <> struct cast_arg<FScriptMap> {
+	static __forceinline const FScriptMap & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FScriptMap *>::to(res);
+	}
+};
+template <> struct cast_arg<TMapPrivateFriend> {
+	static __forceinline const TMapPrivateFriend & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TMapPrivateFriend *>::to(res);
+	}
+};
 template <> struct cast_arg<FPrimaryAssetType> {
 	static __forceinline const FPrimaryAssetType & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
@@ -461,6 +521,18 @@ template <> struct cast_arg<FArrayProperty> {
 	static __forceinline const FArrayProperty & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);
 		return * cast<FArrayProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FMapProperty> {
+	static __forceinline const FMapProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FMapProperty *>::to(res);
+	}
+};
+template <> struct cast_arg<FSetProperty> {
+	static __forceinline const FSetProperty & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FSetProperty *>::to(res);
 	}
 };
 template <> struct cast_arg<FStructProperty> {
