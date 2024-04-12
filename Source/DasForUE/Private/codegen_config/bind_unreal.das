@@ -1052,18 +1052,21 @@ class UnrealGen : CppGenBind
     def generateDummpyTemplateInstaceAnnotations
         for templName, i in keys(dummyTemplateInstanceAnnotations), count()
             let templDashedName = transformTemplateName(templName)
-            let templateUsingAlias = "templateType{i}"
-            let using_line = "using {templateUsingAlias} = {templName};\n" //comma in template parameters can't be used in macro
+            let using_line = "using {templDashedName} = {templName};\n" //comma in template parameters can't be used in macro
             fprint(struct_decl_file, using_line)
-            fprint(struct_decl_file, "MAKE_EXTERNAL_TYPE_FACTORY({templDashedName},{templateUsingAlias});\n")
-            fprint(struct_impl_file, "IMPLEMENT_EXTERNAL_TYPE_FACTORY({templDashedName},{templateUsingAlias});\n")
+            fprint(struct_decl_file, "MAKE_EXTERNAL_TYPE_FACTORY({templDashedName},{templDashedName});\n")
+            fprint(struct_impl_file, "IMPLEMENT_EXTERNAL_TYPE_FACTORY({templDashedName},{templDashedName});\n")
             fprint(struct_add_file,"auto ann_{templDashedName} = make_smart<{templDashedName}_GeneratedAnnotation>(lib);\n")
             fprint(struct_add_file,"addAnnotation(ann_{templDashedName});\n")
             fprint(struct_postadd_file,"initRecAnnotation(ann_{templDashedName},lib);\n")
 
             fprint(struct_class_file, "\n")
             //template can't new/delete by default
-            fprint(struct_class_file, "struct {templDashedName}_GeneratedAnnotation final : ManagedStructureAnnotation<{templName}, false, false> \{\n")
+            fprint(struct_class_file, "struct {templDashedName}_GeneratedAnnotation final : ManagedStructureAnnotation<\n")
+            fprint(struct_class_file, "\t{templDashedName},\n")
+            fprint(struct_class_file, "\tstd::is_constructible<{templDashedName}>::value,\n")
+            fprint(struct_class_file, "\tstd::is_destructible<{templDashedName}>::value\n")
+            fprint(struct_class_file, "> \{\n")
             fprint(struct_class_file, "\t{templDashedName}_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation(\"{templDashedName}\", ml) \{\n")
             fprint(struct_class_file, "\t\}\n")
             //TODO: split copy-constructible/no constructible templates?
@@ -1073,6 +1076,14 @@ class UnrealGen : CppGenBind
             fprint(struct_class_file, "\tvoid init() \{\n")
             fprint(struct_class_file, "\t\}\n")
             fprint(struct_class_file, "\};\n")
+
+            if isArgByValue(templName)
+                fprint(struct_cast_file, "template <> struct cast_arg<{templDashedName}> \{\n")
+                fprint(struct_cast_file, "\tstatic __forceinline const {templDashedName} & to ( Context & ctx, SimNode * node ) \{\n")
+                fprint(struct_cast_file, "\t\tvec4f res = node->eval(ctx);\n")
+                fprint(struct_cast_file, "\t\treturn * cast<{templDashedName} *>::to(res);\n")
+                fprint(struct_cast_file, "\t\}\n")
+                fprint(struct_cast_file, "\};\n")
 
             replaceTypeNames[templName] = templDashedName
 

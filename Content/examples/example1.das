@@ -100,7 +100,7 @@ def main
 
     obj |> SaySomething4(42, FString("SaySomething"), 3.14f, 33)
 
-    obj |> SayArray(make_TArray_int())
+    obj |> SayArray(TArray_int())
 
     //---
     //new_uobject by type

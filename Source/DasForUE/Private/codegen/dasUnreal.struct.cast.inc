@@ -1,6 +1,24 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
+template <> struct cast_arg<TArray_float> {
+	static __forceinline const TArray_float & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TArray_float *>::to(res);
+	}
+};
+template <> struct cast_arg<TArray_int> {
+	static __forceinline const TArray_int & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TArray_int *>::to(res);
+	}
+};
+template <> struct cast_arg<TArray_FString> {
+	static __forceinline const TArray_FString & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<TArray_FString *>::to(res);
+	}
+};
 template <> struct cast_arg<FEngineVersionBase> {
 	static __forceinline const FEngineVersionBase & to ( Context & ctx, SimNode * node ) {
 		vec4f res = node->eval(ctx);

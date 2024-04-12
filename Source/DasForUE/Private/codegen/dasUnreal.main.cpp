@@ -10,11 +10,6 @@ DAS_BASE_BIND_ENUM_GEN(ESearchCase::Type, ESearchCase_Type);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FText, FText);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FName, FName);
 
-using TArray_int = TArray<int>;
-using TArray_float = TArray<float>;
-using TArray_FString = TArray<FString>;
-
-
 namespace das {
 
     struct FTextAnnotation final : ManagedStructureAnnotation<FText> {
@@ -85,18 +80,6 @@ namespace das {
         uFunction->SetNativeFunc(&unrealNativeFunc);
     }
 
-    //UK2Node_MakeArray* MakeArray = CompilerContext.SpawnIntermediateNode<UK2Node_MakeArray>(this, SourceGraph);
-    //TODO: ctor from das array
-    static TArray_int32 make_TArray_int() {
-        return std::move(TArray_int32());
-    }
-    static TArray_float make_TArray_float() {
-        return std::move(TArray_float());
-    }
-    static TArray_FString make_TArray_FString() {
-        return std::move(TArray_FString());
-    }
-
     //------------------------------------------------------------------------
 
     void Module_dasUnreal::initAdditionalAnnotations () {
@@ -115,19 +98,15 @@ namespace das {
         addCtorAndUsing<FName, const char*>(*this, lib, "FName", "FName")
             ->args({ "Str" });
 
-        //FFieldVariant has only template move ctor(T&&), so it needs to be instantiated for UObject explicitly
+        //FFieldVariant has only template move ctor(T&&) skipped by generator, so it needs to be instantiated for UObject explicitly
         addCtorAndUsing<FFieldVariant, const UObject*>(*this, lib, "FFieldVariant", "FFieldVariant")
             ->args({ "Object" });
 
-        addExtern<DAS_BIND_FUN(setNativeFunc)>(*this, lib, "SetNativeFunc", SideEffects::worstDefault, "setNativeFunc");
+        addCtorAndUsing<TArray_int>(*this, lib, "TArray_int", "TArray_int");
+        addCtorAndUsing<TArray_float>(*this, lib, "TArray_float", "TArray_float");
+        addCtorAndUsing<TArray_FString>(*this, lib, "TArray_FString", "TArray_FString");
 
-        //
-        makeExtern<TArray_int32(*)(), make_TArray_int, SimNode_ExtFuncCallAndCopyOrMove>(lib, "make_TArray_int", "make_TArray_int")
-            ->addToModule(*this, SideEffects::worstDefault);
-        makeExtern<TArray_float(*)(), make_TArray_float, SimNode_ExtFuncCallAndCopyOrMove>(lib, "make_TArray_float", "make_TArray_float")
-            ->addToModule(*this, SideEffects::worstDefault);
-        makeExtern<TArray_FString(*)(), make_TArray_FString, SimNode_ExtFuncCallAndCopyOrMove>(lib, "make_TArray_FString", "make_TArray_FString")
-            ->addToModule(*this, SideEffects::worstDefault);
+        addExtern<DAS_BIND_FUN(setNativeFunc)>(*this, lib, "SetNativeFunc", SideEffects::worstDefault, "setNativeFunc");
     }
 
 	void Module_dasUnreal::initMain () {

@@ -1,9 +1,9 @@
 // this file is generated via daScript automatic C++ binder
 // all user modifications will be lost after this file is re-generated
 
-IMPLEMENT_EXTERNAL_TYPE_FACTORY(TArray_float,templateType0);
-IMPLEMENT_EXTERNAL_TYPE_FACTORY(TArray_int,templateType1);
-IMPLEMENT_EXTERNAL_TYPE_FACTORY(TArray_FString,templateType2);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TArray_float,TArray_float);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TArray_int,TArray_int);
+IMPLEMENT_EXTERNAL_TYPE_FACTORY(TArray_FString,TArray_FString);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FEngineVersionBase,FEngineVersionBase);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FLogRecord,UE::FLogRecord);
 IMPLEMENT_EXTERNAL_TYPE_FACTORY(FOutputDevice,FOutputDevice);

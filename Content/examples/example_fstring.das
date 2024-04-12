@@ -2,4 +2,4 @@ require unreal
 
 [export]
 def main
-    print("{FString("Hello") |> ToCStr() }\n")
+    print("{string(FString("Hello"))}\n")

@@ -2,7 +2,11 @@
 // all user modifications will be lost after this file is re-generated
 
 
-struct TArray_float_GeneratedAnnotation final : ManagedStructureAnnotation<TArray<float>, false, false> {
+struct TArray_float_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TArray_float,
+	std::is_constructible<TArray_float>::value,
+	std::is_destructible<TArray_float>::value
+> {
 	TArray_float_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_float", ml) {
 	}
 	virtual bool canCopy() const override { return true; }
@@ -12,7 +16,11 @@ struct TArray_float_GeneratedAnnotation final : ManagedStructureAnnotation<TArra
 	}
 };
 
-struct TArray_int_GeneratedAnnotation final : ManagedStructureAnnotation<TArray<int>, false, false> {
+struct TArray_int_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TArray_int,
+	std::is_constructible<TArray_int>::value,
+	std::is_destructible<TArray_int>::value
+> {
 	TArray_int_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_int", ml) {
 	}
 	virtual bool canCopy() const override { return true; }
@@ -22,7 +30,11 @@ struct TArray_int_GeneratedAnnotation final : ManagedStructureAnnotation<TArray<
 	}
 };
 
-struct TArray_FString_GeneratedAnnotation final : ManagedStructureAnnotation<TArray<FString>, false, false> {
+struct TArray_FString_GeneratedAnnotation final : ManagedStructureAnnotation<
+	TArray_FString,
+	std::is_constructible<TArray_FString>::value,
+	std::is_destructible<TArray_FString>::value
+> {
 	TArray_FString_GeneratedAnnotation(ModuleLibrary& ml) : ManagedStructureAnnotation("TArray_FString", ml) {
 	}
 	virtual bool canCopy() const override { return true; }
