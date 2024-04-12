@@ -17,7 +17,6 @@ class UnrealGen : CppGenBind
     unreal_skip_struct: table<string>
     unreal_arg_part_names: array<string>
 
-    canMoveIfCopyConstructable: table<string>
     unrealReflectionTypes: table<string>
 
     dummyTemplateInstanceAnnotations: table<string>
@@ -96,21 +95,6 @@ class UnrealGen : CppGenBind
             "Containers/SparseArray.h";
             "Containers/Set.h";
             "Containers/Map.h";
-        }}
-
-        canMoveIfCopyConstructable <- {{
-            "FString";
-            "FSavePackageResultStruct";
-            "FIntProperty";
-            "FFloatProperty";
-            "FUInt16Property";
-            "FInt64Property";
-            "FUInt64Property";
-             "FByteProperty";
-            "FDoubleProperty";
-            "FInt8Property";
-            "FUInt32Property";
-            "FInt16Property";
         }}
 
         unrealReflectionTypes <- {{
@@ -553,7 +537,7 @@ class UnrealGen : CppGenBind
 
     //TODO: check if this may be moved to cbind_boost
     def isMoveType(name, cppname: string)
-        return canMoveIfCopyConstructable |> key_exists <| name
+        return true //check if copy constructible code moved based on type_traits
 
     def isDisableNewDelete(name, cppname: string)
         return unrealReflectionTypes|> key_exists <| name
@@ -562,7 +546,7 @@ class UnrealGen : CppGenBind
         return true
 
     def override skip_file(fname:string) : bool
-        print("fname = {fname}\n")
+        //print("fname = {fname}\n")
         for allowedFname in keys(unreal_allowed_fnames)
             if fname |> ends_with(allowedFname)
                 return false
@@ -787,9 +771,9 @@ class UnrealGen : CppGenBind
                 // - split tp copy/move/clone?
                 // - check if it safe to move this logic in some daScript base Annotation type, remove copy-paste of compile-time checks
                 // - is_copy_constructible type-trait for additional compiler check if it is ok
-                writer |> write("\tvirtual bool canCopy() const override \{ return std::is_copy_constructible<{struct_name}>::value; \}\n")
-                writer |> write("\tvirtual bool canClone() const override \{ return std::is_copy_constructible<{struct_name}>::value; \}\n")
-                writer |> write("\tvirtual bool canMove() const override \{ return std::is_copy_constructible<{struct_name}>::value; \}\n")
+                writer |> write("\tvirtual bool canCopy() const override \{ return std::is_copy_constructible<{struct_namespace_name}>::value; \}\n")
+                writer |> write("\tvirtual bool canClone() const override \{ return std::is_copy_constructible<{struct_namespace_name}>::value; \}\n")
+                writer |> write("\tvirtual bool canMove() const override \{ return std::is_copy_constructible<{struct_namespace_name}>::value; \}\n")
             if isLocalType(struct_name, struct_namespace_name)
                 writer |> write("\tvirtual bool isLocal() const override \{ return true; \}\n")
                 writer |> write("\tvirtual bool canBePlacedInContainer() const override \{ return true; \}\n")

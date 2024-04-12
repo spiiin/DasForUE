@@ -20,7 +20,7 @@ def new_uobject_of_class(cls: UClass?) : UObject?
 
 def new_uobject_of_class(owner: UObject?; cls: UClass?; name: FName; flags: EObjectFlags = EObjectFlags RF_NoFlags) : UObject?
     var result : UObject?
-    using(cls) <| $(var params: FStaticConstructObjectParameters explicit)
+    using(cls) <| $(var params: FStaticConstructObjectParameters#)
         params.Outer = owner //?? unsafe(reinterpret<UObject?> GetTransientPackage())
         params.Name = name
         params.SetFlags = flags
