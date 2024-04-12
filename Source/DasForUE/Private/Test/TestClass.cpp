@@ -28,7 +28,7 @@ void UTestClass::SayArray(TArray<int> IntArray) {
         return;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("SayArray array elements:"));
+    UE_LOG(LogTemp, Log, TEXT("SayArray array elements:"));
     for (int Element : IntArray)
     {
         UE_LOG(LogTemp, Log, TEXT("  %d"), Element);

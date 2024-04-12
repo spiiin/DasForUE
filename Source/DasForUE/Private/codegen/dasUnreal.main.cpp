@@ -80,6 +80,11 @@ namespace das {
         uFunction->SetNativeFunc(&unrealNativeFunc);
     }
 
+    template<typename T>
+    static inline ::TArray<T> fromDasArray(das::TArray<T>& tab) {
+        return ::TArray<T>((T*)(tab.data), int(tab.size));
+    }
+
     //------------------------------------------------------------------------
 
     void Module_dasUnreal::initAdditionalAnnotations () {
@@ -92,20 +97,32 @@ namespace das {
 
     void Module_dasUnreal::initAdditionalFunctions() {
         addExtern<UPackage* (*)(), AnyPackage>(*this, lib, "AnyPackage", SideEffects::worstDefault);
-        addExtern<DAS_BIND_FUN(FStringToCStr)>(*this, lib, "string", SideEffects::worstDefault);
 
+        //FFName
         addCtorAndUsing<FName>(*this, lib, "FName", "FName");
         addCtorAndUsing<FName, const char*>(*this, lib, "FName", "FName")
             ->args({ "Str" });
 
-        //FFieldVariant has only template move ctor(T&&) skipped by generator, so it needs to be instantiated for UObject explicitly
+        //FFieldVariant
+        //has only template move ctor(T&&) skipped by generator, so it needs to be instantiated for UObject explicitly
         addCtorAndUsing<FFieldVariant, const UObject*>(*this, lib, "FFieldVariant", "FFieldVariant")
             ->args({ "Object" });
 
+        //FString
+        addExtern<DAS_BIND_FUN(FStringToCStr)>(*this, lib, "string", SideEffects::worstDefault);
+
+        //TArray
         addCtorAndUsing<TArray_int>(*this, lib, "TArray_int", "TArray_int");
         addCtorAndUsing<TArray_float>(*this, lib, "TArray_float", "TArray_float");
         addCtorAndUsing<TArray_FString>(*this, lib, "TArray_FString", "TArray_FString");
+        makeExtern<TArray_int(*)(das::TArray<int>&), fromDasArray<int>, SimNode_ExtFuncCallAndCopyOrMove>(lib, "TArray_int")
+            ->addToModule(*this, SideEffects::worstDefault);
+        makeExtern<TArray_float(*)(das::TArray<float>&), fromDasArray<float>, SimNode_ExtFuncCallAndCopyOrMove>(lib, "TArray_float")
+            ->addToModule(*this, SideEffects::worstDefault);
+        makeExtern<TArray_FString(*)(das::TArray<FString>&), fromDasArray<FString>, SimNode_ExtFuncCallAndCopyOrMove>(lib, "TArray_FString")
+            ->addToModule(*this, SideEffects::worstDefault);
 
+        //UFunction
         addExtern<DAS_BIND_FUN(setNativeFunc)>(*this, lib, "SetNativeFunc", SideEffects::worstDefault, "setNativeFunc");
     }
 
