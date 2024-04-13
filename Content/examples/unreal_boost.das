@@ -90,14 +90,6 @@ let propFlagsParam = EPropertyFlags CPF_Parm | EPropertyFlags CPF_NativeAccessSp
 let propFlagsOut = propFlagsParam | EPropertyFlags CPF_OutParm
 let propFlagsReturn = propFlagsOut | EPropertyFlags CPF_ReturnParm
 
-struct SaySomethingGeneratedParams1
-    a: int
-    msg: FString
-    f: float
-    g: int
-    res: FString
-
-
 def newFIntProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) : FProperty?
     var field1 = Construct(
         [[FIntProperty?]],

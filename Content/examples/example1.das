@@ -61,17 +61,15 @@ struct SaySomethingGeneratedParams
     g: int
     res : FString
 
-def SaySomethingGenerated(var obj: UObject?; a: int; var msg: FString; f: float; g: int; var res: FString)
+def SaySomethingGenerated(var obj: UObject?; a: int; var msg: FString; f: float; g: int) : FString
     unsafe
         var params: SaySomethingGeneratedParams //no inited, unsafe
         params.a = a
         params.msg <- msg
         params.f = f
         params.g = g
-        params.res <- res
-        obj |> call_ufunction_on("SaySomethingGenerated") <| addr(params)
-        print("  Params after call SaySomethingGenerated: {params}\n")
-        print("  Params.res after call SaySomethingGenerated: {string(params.res)}\n")
+        obj |> call_ufunction_on("execSaySomethingGenerated") <| addr(params)
+        return params.res
 
 //--------------------------------------------------------------
 
@@ -87,19 +85,15 @@ def main
     var obj = new_uobject_of_class(cls)
     print("Object name: {string(*obj |> GetName)}\n")
 
-    print("Class {cls}\n")
-
     //1
     //obj |> SaySomething(FString("SaySomething"))
 
     //2
     //obj |> SaySomethingElse(FString("SaySomethingElse"))
 
-    //3 call without macro
+    //3 call existing functions, without macro
     obj |> SaySomething(FString("SaySomething"))
-
     obj |> SaySomething4(42, FString("SaySomething"), 3.14f, 33)
-
     obj |> SayArray(TArray_int([{int 1;2;3}]))
 
     //---
@@ -136,33 +130,19 @@ def main
             print("  Parameters values:\n")
             //is GetDefaultPropertyValue really need?
 
-            var prop1Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
-            print("    PropertyChainForCompiledIn current name: {string(*prop1Ptr |> GetName)}\n")
-
             //read parameters by one
-            var param1 = 999
-            stack |> StepCompiledIn(addr(param1), [[FIntProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {param1}\n")
-
-            var param2 : FString
-            stack |> StepCompiledIn(addr(param2), [[FStrProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {string(param2)}\n")
-
-            var param3 = 999.f
-            stack |> StepCompiledIn(addr(param3), [[FFloatProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {param3}\n")
-
-            var param4 = 999
-            stack |> StepCompiledIn(addr(param4), [[FIntProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {param4}\n")
-
-            var param5 : FString
-            stack |> StepCompiledIn(addr(param5), [[FStrProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {string(param5)}\n")
+            var params: SaySomethingGeneratedParams
+            stack |> StepCompiledIn(addr(params.a), [[FIntProperty?]] |> StaticClass)
+            stack |> StepCompiledIn(addr(params.msg), [[FStrProperty?]] |> StaticClass)
+            stack |> StepCompiledIn(addr(params.f), [[FFloatProperty?]] |> StaticClass)
+            stack |> StepCompiledIn(addr(params.g), [[FIntProperty?]] |> StaticClass)
+            stack |> StepCompiledIn(addr(params.res), [[FStrProperty?]] |> StaticClass)
+            print("    StepCompiledIn params: {params}\n")
+            print("    StepCompiledIn result: {string(params.res)}\n") //zero, because of out/result
 
             //other way - just reinterpret, locals is memcpy-ed copy of param (Object::ProcessEvents)
             //TODO: assert sizeof(SaySomethingGeneratedParams1) == sizeof(fn.ParmsSize)
-            var locals = reinterpret<SaySomethingGeneratedParams1?>(stack.Locals)
+            var locals = reinterpret<SaySomethingGeneratedParams?>(stack.Locals)
             print("    Stack locals: {locals}\n")
             print("    Stack locals str: {string(locals.res)}\n")
 
@@ -171,16 +151,13 @@ def main
             *result <- FString("ResultOfGeneratedFunction")
             print("    Result str: {string(*result)}\n")
             
-            //TODO: out logic
-            //var returnProperty = *fn |> GetReturnProperty
-            //var returnPropertyStr = reinterpret<FStrProperty?> returnProperty
+            //TODO: fill out parameters logic
 
-            if stack.Code != null //stack.Code += !!stack.Code
+            if stack.Code != null
                 stack.Code++
 
     //----
     //create function
-    let fn = cls |> test_emit_ufunction(FName("SaySomethingGenerated"), createPropertiesCb, nativeFuncPtr)
+    let fn = cls |> test_emit_ufunction(FName("execSaySomethingGenerated"), createPropertiesCb, nativeFuncPtr)
     print("Generated function name: {string(*fn |> GetName)}\n")
-
-    obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"), 3.14f, 33, FString("---"))
+    print("Generated function result: {string(obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"), 3.14f, 33))}\n")
