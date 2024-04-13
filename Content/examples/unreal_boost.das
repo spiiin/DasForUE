@@ -4,6 +4,7 @@ require unreal public
 require daslib/templates
 require daslib/contracts
 require daslib/apply
+require daslib/algorithm
 require strings
 
 def get_class_by_name(className: FString) : UClass?
@@ -85,9 +86,9 @@ let private funcFlags = (
     EFunctionFlags FUNC_BlueprintCallable |
     EFunctionFlags FUNC_HasOutParms //if function return something
 )
-let private propFlags = EPropertyFlags CPF_Parm //| EPropertyFlags CPF_NativeAccessSpecifierPublic
-let private propFlagsReturn = EPropertyFlags CPF_Parm | EPropertyFlags CPF_ReturnParm | EPropertyFlags CPF_OutParm
-let private propFlagsOut = EPropertyFlags CPF_Parm | EPropertyFlags CPF_OutParm
+let propFlagsParam = EPropertyFlags CPF_Parm | EPropertyFlags CPF_NativeAccessSpecifierPublic
+let propFlagsOut = propFlagsParam | EPropertyFlags CPF_OutParm
+let propFlagsReturn = propFlagsOut | EPropertyFlags CPF_ReturnParm
 
 struct SaySomethingGeneratedParams1
     a: int
@@ -96,7 +97,46 @@ struct SaySomethingGeneratedParams1
     g: int
     res: FString
 
-def test_emit_ufunction(var cls: UClass?; var name: FName)
+
+def newFIntProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) : FProperty?
+    var field1 = Construct(
+        [[FIntProperty?]],
+        FFieldVariant(owner),
+        FName(name),
+        propertyObjFlags
+    )
+    var prop = unsafe(reinterpret<FProperty?> field1)
+    *prop |> SetPropertyFlags(propFlags)
+    return prop
+
+def newFStringProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) : FProperty?
+    var field = Construct(
+        [[FStrProperty?]],
+        FFieldVariant(owner),
+        FName(name),
+        propertyObjFlags
+    )
+    var prop = unsafe(reinterpret<FProperty?> field)
+    *prop |> SetPropertyFlags(propFlags)
+    return prop
+
+def newFFloatProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) : FProperty?
+    var field = Construct(
+        [[FFloatProperty?]],
+        FFieldVariant(owner),
+        FName(name),
+        propertyObjFlags
+    )
+    var prop = unsafe(reinterpret<FProperty?> field)
+    *prop |> SetPropertyFlags(propFlags)
+    return prop
+
+def test_emit_ufunction(
+    var cls: UClass?;
+    var name: FName;
+    createPropertiesCb: lambda<(owner: UFunction?): array<FProperty?>>;
+    nativeFuncPtr: lambda<(var context: UObject?; var stack: FFrame; param: void?): void>
+)
     //check if function with name already exist in this class or it's superclasses
     //  TODO:
 
@@ -104,58 +144,10 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
     var fn = new_uobject(cls, name, funcObjFlags, type<UFunction>)
     fn.FunctionFlags = funcFlags
 
-    //create function arguments
-    var field1 = Construct(
-        [[FIntProperty?]], //c++ idiom - explicit typed nullptr just to select correct overload from functions, ugly in das
-        FFieldVariant(fn),
-        FName("Parameter1"),
-        propertyObjFlags
-    )
-    var prop1 = unsafe(reinterpret<FProperty?> field1)
-    *prop1 |> SetPropertyFlags(propFlags)
-
-    var field2 = Construct(
-        [[FStrProperty?]],
-        FFieldVariant(fn),
-        FName("Parameter2"),
-        propertyObjFlags
-    )
-    var prop2 = unsafe(reinterpret<FProperty?> field2)
-    *prop2 |> SetPropertyFlags(propFlags)
-    
-
-    var field3 = Construct(
-        [[FFloatProperty?]],
-        FFieldVariant(fn),
-        FName("Parameter3"),
-        propertyObjFlags
-    )
-    var prop3 = unsafe(reinterpret<FProperty?> field3)
-    *prop3 |> SetPropertyFlags(propFlags)
-
-    var field4 = Construct(
-        [[FIntProperty?]],
-        FFieldVariant(fn),
-        FName("Parameter4"),
-        propertyObjFlags
-    )
-    var prop4 = unsafe(reinterpret<FProperty?> field4)
-    *prop4 |> SetPropertyFlags(propFlags)
-
-    var field5 = Construct(
-        [[FStrProperty?]],
-        FFieldVariant(fn),
-        FName("Parameter5"),
-        propertyObjFlags
-    )
-    var prop5 = unsafe(reinterpret<FProperty?> field5)
-    *prop5 |> SetPropertyFlags(propFlagsReturn) 
-
-    *fn |> AddCppProperty(prop5)
-    *fn |> AddCppProperty(prop4)
-    *fn |> AddCppProperty(prop3)
-    *fn |> AddCppProperty(prop2)
-    *fn |> AddCppProperty(prop1)
+    var props <- invoke(createPropertiesCb, fn)
+    props |> reverse
+    for prop in props
+        *fn |> AddCppProperty(prop)
 
     //fill class 
     *cls |> AddFunctionToFunctionMap(fn, name)
@@ -164,78 +156,7 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
     //  cls.Children = fn
 
     //create function body
-    fn |> SetNativeFunc <| @(var context: UObject?; var stack: FFrame; param: void?)
-        //init debug
-        print("In generated function\n")
-
-        /*
-        let selfFunction = stack.Node
-        let param4f = selfFunction |> GetChildFieldsFromStruct_FField
-        print("  Generated function parameter4 name: {string(*param4f |> GetName)}\n")
-        let param3f = param4f.Next //stack
-        print("  Generated function parameter3 name: {string(*param3f |> GetName)}\n")
-        let param2f = param3f.Next //stack
-        print("  Generated function parameter2 name: {string(*param2f |> GetName)}\n")
-        let param1f = param2f.Next //stack
-        print("  Generated function parameter1 name: {string(*param1f |> GetName)}\n")*/
-
-        print("  Generated function ParmsSize = {int(fn.ParmsSize)}\n")
-        print("  Generated function ReturnValueOffset = {int(fn.ReturnValueOffset)}\n")
-
-        print("stack.Node {stack.Node}\n")
-        print("stack.Object {stack.Object}\n")
-        print("stack.Code {stack.Code}\n")
-        print("stack.Locals {stack.Locals}\n")
-        print("stack.PropertyChainForCompiledIn {stack.PropertyChainForCompiledIn}\n")
-        print("stack.CurrentNativeFunction {stack.CurrentNativeFunction}\n")
-
-        //let obj = unsafe(reinterpret<UMyClassToTestPtr?> context)
-
-        unsafe
-            print("  Parameters values:\n")
-            //is GetDefaultPropertyValue really need?
-
-            var prop1Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
-            print("    PropertyChainForCompiledIn current name: {string(*prop1Ptr |> GetName)}\n")
-
-            //read parameters by one
-            var param1 = 999
-            stack |> StepCompiledIn(addr(param1), [[FIntProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {param1}\n")
-
-            var param2 : FString
-            stack |> StepCompiledIn(addr(param2), [[FStrProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {string(param2)}\n")
-
-            var param3 = 999.f
-            stack |> StepCompiledIn(addr(param3), [[FFloatProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {param3}\n")
-
-            var param4 = 999
-            stack |> StepCompiledIn(addr(param4), [[FIntProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {param4}\n")
-
-            var param5 : FString
-            stack |> StepCompiledIn(addr(param5), [[FStrProperty?]] |> StaticClass)
-            print("        StepCompiledIn : {string(param5)}\n")
-
-            //other way - just reinterpret, locals is memcpy-ed copy of param (Object::ProcessEvents)
-            //TODO: assert sizeof(SaySomethingGeneratedParams1) == sizeof(fn.ParmsSize)
-            var locals = reinterpret<SaySomethingGeneratedParams1?>(stack.Locals)
-            print("    Stack locals: {locals}\n")
-            print("    Stack locals str: {string(locals.res)}\n")
-
-            //param is addr of CPF_ReturnParm
-            var result = reinterpret<FString?>(param)
-            *result <- FString("ResultOfGeneratedFunction")
-            print("    Result str: {string(*result)}\n")
-            
-            //TODO: out logic
-            //var returnProperty = *fn |> GetReturnProperty
-            //var returnPropertyStr = reinterpret<FStrProperty?> returnProperty
-
-            if stack.Code != null //stack.Code += !!stack.Code
-                stack.Code++
+    fn |> SetNativeFunc <| nativeFuncPtr
 
     *fn |> StaticLink(true)
     print("  Generated function ParmsSize = {fn.ParmsSize}\n")

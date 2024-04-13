@@ -107,9 +107,80 @@ def main
     var uclassObject = new_uobject(type<UClass>)
     print("uclassObject: {string(*uclassObject |> GetName)}\n")
 
+    let createPropertiesCb <- @ <|(owner:UFunction?): array<FProperty?>
+        var props: array<FProperty?>
+        props |> push <| newFIntProperty(owner, "Parameter1", propFlagsParam)
+        props |> push <| newFStringProperty(owner, "Parameter2", propFlagsParam)
+        props |> push <| newFFloatProperty(owner, "Parameter3", propFlagsParam)
+        props |> push <| newFIntProperty(owner, "Parameter4", propFlagsParam)
+        props |> push <| newFStringProperty(owner, "Parameter5", propFlagsReturn)
+        return <- props
+
+    var nativeFuncPtr <- @ <| (var context: UObject?; var stack: FFrame; param: void?)
+        print("In generated function\n")
+
+        /*print("stack.Node {stack.Node}\n")
+        print("stack.Object {stack.Object}\n")
+        print("stack.Code {stack.Code}\n")
+        print("stack.Locals {stack.Locals}\n")
+        print("stack.PropertyChainForCompiledIn {stack.PropertyChainForCompiledIn}\n")
+        print("stack.CurrentNativeFunction {stack.CurrentNativeFunction}\n")*/
+
+        var fn = stack.Node
+        print("  Generated function ParmsSize = {int(fn.ParmsSize)}\n")
+        print("  Generated function ReturnValueOffset = {int(fn.ReturnValueOffset)}\n")
+
+        //let obj = unsafe(reinterpret<UMyClassToTestPtr?> context)
+
+        unsafe
+            print("  Parameters values:\n")
+            //is GetDefaultPropertyValue really need?
+
+            var prop1Ptr = reinterpret<FProperty?> stack.PropertyChainForCompiledIn
+            print("    PropertyChainForCompiledIn current name: {string(*prop1Ptr |> GetName)}\n")
+
+            //read parameters by one
+            var param1 = 999
+            stack |> StepCompiledIn(addr(param1), [[FIntProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {param1}\n")
+
+            var param2 : FString
+            stack |> StepCompiledIn(addr(param2), [[FStrProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {string(param2)}\n")
+
+            var param3 = 999.f
+            stack |> StepCompiledIn(addr(param3), [[FFloatProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {param3}\n")
+
+            var param4 = 999
+            stack |> StepCompiledIn(addr(param4), [[FIntProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {param4}\n")
+
+            var param5 : FString
+            stack |> StepCompiledIn(addr(param5), [[FStrProperty?]] |> StaticClass)
+            print("        StepCompiledIn : {string(param5)}\n")
+
+            //other way - just reinterpret, locals is memcpy-ed copy of param (Object::ProcessEvents)
+            //TODO: assert sizeof(SaySomethingGeneratedParams1) == sizeof(fn.ParmsSize)
+            var locals = reinterpret<SaySomethingGeneratedParams1?>(stack.Locals)
+            print("    Stack locals: {locals}\n")
+            print("    Stack locals str: {string(locals.res)}\n")
+
+            //param is addr of CPF_ReturnParm
+            var result = reinterpret<FString?>(param)
+            *result <- FString("ResultOfGeneratedFunction")
+            print("    Result str: {string(*result)}\n")
+            
+            //TODO: out logic
+            //var returnProperty = *fn |> GetReturnProperty
+            //var returnPropertyStr = reinterpret<FStrProperty?> returnProperty
+
+            if stack.Code != null //stack.Code += !!stack.Code
+                stack.Code++
+
     //----
     //create function
-    let fn = cls |> test_emit_ufunction() <| FName("SaySomethingGenerated")
+    let fn = cls |> test_emit_ufunction(FName("SaySomethingGenerated"), createPropertiesCb, nativeFuncPtr)
     print("Generated function name: {string(*fn |> GetName)}\n")
 
     obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"), 3.14f, 33, FString("---"))
