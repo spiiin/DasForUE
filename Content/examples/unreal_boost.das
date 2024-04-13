@@ -86,8 +86,8 @@ let private funcFlags = (
     EFunctionFlags FUNC_HasOutParms //if function return something
 )
 let private propFlags = EPropertyFlags CPF_Parm //| EPropertyFlags CPF_NativeAccessSpecifierPublic
-let private propFlagsReturn = EPropertyFlags CPF_ReturnParm
-let private propFlagsOut = EPropertyFlags CPF_OutParm
+let private propFlagsReturn = EPropertyFlags CPF_Parm | EPropertyFlags CPF_ReturnParm | EPropertyFlags CPF_OutParm
+let private propFlagsOut = EPropertyFlags CPF_Parm | EPropertyFlags CPF_OutParm
 
 struct SaySomethingGeneratedParams1
     a: int
@@ -112,9 +112,6 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
         propertyObjFlags
     )
     var prop1 = unsafe(reinterpret<FProperty?> field1)
-    //let flagsTest = *prop1 |> GetPropertyFlags
-    //print("Flags: {flagsTest}\n") //crash
-    //prop1.PropertyFlags |= propFlags
     *prop1 |> SetPropertyFlags(propFlags)
 
     var field2 = Construct(
@@ -152,9 +149,7 @@ def test_emit_ufunction(var cls: UClass?; var name: FName)
         propertyObjFlags
     )
     var prop5 = unsafe(reinterpret<FProperty?> field5)
-    *prop5 |> SetPropertyFlags(propFlags) 
-    *prop5 |> SetPropertyFlags(propFlagsReturn) //|=, because |= for enum64 doesn't work yet
-    *prop5 |> SetPropertyFlags(propFlagsOut)
+    *prop5 |> SetPropertyFlags(propFlagsReturn) 
 
     *fn |> AddCppProperty(prop5)
     *fn |> AddCppProperty(prop4)

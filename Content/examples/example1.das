@@ -87,7 +87,7 @@ def main
     var obj = new_uobject_of_class(cls)
     print("Object name: {string(*obj |> GetName)}\n")
 
-    //print("{cls}\n") //TODO: fix crash
+    print("Class {cls}\n")
 
     //1
     //obj |> SaySomething(FString("SaySomething"))
