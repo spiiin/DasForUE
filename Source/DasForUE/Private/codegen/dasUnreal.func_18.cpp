@@ -86,6 +86,11 @@ void Module_dasUnreal::initFunctions_18() {
 		->args({"self","TargetArray","ArrayProp","IndexToTest"})
 		->arg_type(0,makeType<TExplicit<const UKismetArrayLibrary*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
+	using _method_1452 = das::das_call_member< bool (FAssetRegistryModule::*)() const,&FAssetRegistryModule::IsValid >;
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/AssetRegistry/Public\AssetRegistry/AssetRegistryModule.h:44:7
+	makeExtern<DAS_CALL_METHOD(_method_1452), SimNode_ExtFuncCall >(lib,"IsValid","das_call_member< bool (FAssetRegistryModule::*)() const , &FAssetRegistryModule::IsValid >::invoke")
+		->args({"self"})
+		->addToModule(*this, SideEffects::worstDefault);
 // from ../../../../../../../UnrealEngine/Engine/Source/Runtime/AssetRegistry/Public\AssetRegistry/AssetRegistryModule.h:60:14
 	makeExtern< void (*)(const FAssetRegistryModule *,float) , _dasUnreal_static_747_TickAssetRegistry , SimNode_ExtFuncCall >(lib,"TickAssetRegistry","_dasUnreal_static_747_TickAssetRegistry")
 		->args({"self","DeltaTime"})

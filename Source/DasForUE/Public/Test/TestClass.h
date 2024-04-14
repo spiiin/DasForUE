@@ -27,4 +27,13 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SayArray(TArray<int> IntArray);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int TestProperty1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString TestProperty2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TestProperty3;
 };

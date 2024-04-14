@@ -86,7 +86,12 @@ let private funcFlags = (
     EFunctionFlags FUNC_BlueprintCallable |
     EFunctionFlags FUNC_HasOutParms //if function return something
 )
-let propFlagsParam = EPropertyFlags CPF_Parm | EPropertyFlags CPF_NativeAccessSpecifierPublic
+
+let propFlagsPublic = EPropertyFlags CPF_NativeAccessSpecifierPublic
+
+let propFlagsField = propFlagsPublic | EPropertyFlags CPF_BlueprintVisible | EPropertyFlags CPF_Edit | EPropertyFlags CPF_ExposeOnSpawn
+
+let propFlagsParam = EPropertyFlags CPF_Parm | propFlagsPublic
 let propFlagsOut = propFlagsParam | EPropertyFlags CPF_OutParm
 let propFlagsReturn = propFlagsOut | EPropertyFlags CPF_ReturnParm
 
@@ -123,16 +128,36 @@ def newFFloatProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) 
     *prop |> SetPropertyFlags(propFlags)
     return prop
 
-def test_emit_ufunction(
+
+def emit_properties(
+    var cls: UStruct?;
+    createPropertiesCb: lambda<(owner: UObject?): array<FProperty?>>
+)
+    var clsPtr = unsafe(reinterpret<UClass?> cls)
+    if *clsPtr |> HasAnyClassFlags(EClassFlags CLASS_Intrinsic)
+        //class already created
+        return null
+    var props <- invoke(createPropertiesCb, cls)
+    props |> reverse
+    for prop in props
+        *cls |> AddCppProperty(prop)
+    //*cls |> StaticLink(true)
+
+    //
+    *cls |> StaticLink(true)
+    *clsPtr |> Bind
+    //*clsPtr |> AssembleReferenceTokenStream
+    return cls
+
+
+def emit_ufunction(
     var cls: UClass?;
     var name: FName;
-    createPropertiesCb: lambda<(owner: UFunction?): array<FProperty?>>;
+    createPropertiesCb: lambda<(owner: UObject?): array<FProperty?>>;
     nativeFuncPtr: lambda<(var context: UObject?; var stack: FFrame; param: void?): void>
 )
-    //check if function with name already exist in this class or it's superclasses
-    //  TODO:
+    //TODO: check if function with name already exist in this class or it's superclasses
 
-    //create new function
     var fn = new_uobject(cls, name, funcObjFlags, type<UFunction>)
     fn.FunctionFlags = funcFlags
 
@@ -141,15 +166,11 @@ def test_emit_ufunction(
     for prop in props
         *fn |> AddCppProperty(prop)
 
-    //fill class 
     *cls |> AddFunctionToFunctionMap(fn, name)
     //TODO: create new field in class
     //  fn.Next = cls.Children
     //  cls.Children = fn
 
-    //create function body
     fn |> SetNativeFunc <| nativeFuncPtr
-
     *fn |> StaticLink(true)
-    print("  Generated function ParmsSize = {fn.ParmsSize}\n")
     return fn

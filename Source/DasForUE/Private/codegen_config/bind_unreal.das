@@ -545,6 +545,7 @@ class UnrealGen : CppGenBind
             "EObjectFlags" => true;
             "EFunctionFlags" => true;
             "EPropertyFlags" => true;
+            "EClassFlags" => true;
         }}
 
     //TODO: check if this may be moved to cbind_boost

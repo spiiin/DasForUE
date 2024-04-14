@@ -72,6 +72,23 @@ def SaySomethingGenerated(var obj: UObject?; a: int; var msg: FString; f: float;
         return params.res
 
 //--------------------------------------------------------------
+[export]
+def on_after_compile()
+    //create new properties in class
+    let className = "TestClass_BP_C"
+    var cls = get_class_by_name(FString(className))
+    if cls == null
+        print("Class {className} not found!\n")
+        return
+    var updatedClass = emit_properties(cls) <| @(owner:UObject?): array<FProperty?>
+        return <- [{auto
+            newFIntProperty(owner, "Property1", propFlagsField);
+            //newFStringProperty(owner, "Property2", propFlagsField);
+            newFFloatProperty(owner, "Property3", propFlagsField)
+        }]
+    if updatedClass == null
+        print("Can't emit properties for class {className}\n")
+    [[FAssetRegistryModule?]] |> AssetCreated(updatedClass)
 
 
 [export]
@@ -101,7 +118,9 @@ def main
     var uclassObject = new_uobject(type<UClass>)
     print("uclassObject: {string(*uclassObject |> GetName)}\n")
 
-    let createPropertiesCb <- @ <|(owner:UFunction?): array<FProperty?>
+    //---
+    //generate new function and call it
+    let createPropertiesCb <- @ <|(owner:UObject?): array<FProperty?>
         var props: array<FProperty?>
         props |> push <| newFIntProperty(owner, "Parameter1", propFlagsParam)
         props |> push <| newFStringProperty(owner, "Parameter2", propFlagsParam)
@@ -158,6 +177,6 @@ def main
 
     //----
     //create function
-    let fn = cls |> test_emit_ufunction(FName("execSaySomethingGenerated"), createPropertiesCb, nativeFuncPtr)
+    let fn = cls |> emit_ufunction(FName("execSaySomethingGenerated"), createPropertiesCb, nativeFuncPtr)
     print("Generated function name: {string(*fn |> GetName)}\n")
     print("Generated function result: {string(obj |> SaySomethingGenerated(42, FString("SaySomethingGenerated"), 3.14f, 33))}\n")
