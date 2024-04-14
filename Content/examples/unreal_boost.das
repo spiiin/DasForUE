@@ -128,6 +128,19 @@ def newFFloatProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) 
     *prop |> SetPropertyFlags(propFlags)
     return prop
 
+//
+var private gPackage : UPackage?
+
+def init_script_package()
+    if gPackage == null
+        gPackage = wchar_ptr(FString("/Script/DasForUE")) |> CreatePackage()
+        *gPackage |> SetPackageFlags(uint(EPackageFlags PKG_CompiledIn | EPackageFlags PKG_Cooked))
+        *gPackage |> SetFlags(EObjectFlags RF_Standalone)
+        *gPackage |> AddToRoot
+
+def get_script_package()
+    return gPackage
+
 
 def emit_properties(
     var cls: UStruct?;
@@ -143,7 +156,6 @@ def emit_properties(
         *cls |> AddCppProperty(prop)
     //*cls |> StaticLink(true)
 
-    //
     *cls |> StaticLink(true)
     *clsPtr |> Bind
     //*clsPtr |> AssembleReferenceTokenStream

@@ -73,6 +73,7 @@ addEnumeration(make_smart<Enumeration_EFieldIteratorFlags_InterfaceClassFlags>()
 addEnumeration(make_smart<Enumeration_EPropertyValueIteratorFlags>());
 addEnumeration(make_smart<Enumeration_EPropertyType>());
 addEnumFlagOps<EFunctionFlags>(*this,lib,"EFunctionFlags");
+addEnumFlagOps<EPackageFlags>(*this,lib,"EPackageFlags");
 addEnumFlagOps<EClassFlags>(*this,lib,"EClassFlags");
 addEnumFlagOps<EPropertyFlags>(*this,lib,"EPropertyFlags");
 addEnumFlagOps<EObjectFlags>(*this,lib,"EObjectFlags");

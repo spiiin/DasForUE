@@ -74,6 +74,8 @@ def SaySomethingGenerated(var obj: UObject?; a: int; var msg: FString; f: float;
 //--------------------------------------------------------------
 [export]
 def on_after_compile()
+    init_script_package()
+
     //create new properties in class
     let className = "TestClass_BP_C"
     var cls = get_class_by_name(FString(className))

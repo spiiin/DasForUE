@@ -110,6 +110,7 @@ namespace das {
 
         //FString
         addExtern<DAS_BIND_FUN(FStringToCStr)>(*this, lib, "string", SideEffects::worstDefault);
+        addExtern<DAS_BIND_FUN(FStringToWChar)>(*this, lib, "wchar_ptr", SideEffects::worstDefault);
 
         //TArray
         addCtorAndUsing<TArray_int>(*this, lib, "TArray_int", "TArray_int");

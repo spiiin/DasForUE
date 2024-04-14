@@ -91,7 +91,8 @@ void run_script() {
 }
 
 void clean_scripts() {
-    //TODO: g_compiledScript
+    g_compiledScript.program = nullptr;
+    g_compiledScript.context = nullptr;
 }
 
 

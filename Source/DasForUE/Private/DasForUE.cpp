@@ -30,6 +30,7 @@ void FDasForUEModule::StartupModule()
 
 void FDasForUEModule::ShutdownModule()
 {
+    clean_scripts();
     Module::Shutdown();
 }
 
