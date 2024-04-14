@@ -114,3 +114,4 @@ initRecAnnotation(ann_FOutParmRec,lib);
 initRecAnnotation(ann_FFrame,lib);
 initRecAnnotation(ann_UBlueprintFunctionLibrary,lib);
 initRecAnnotation(ann_UKismetArrayLibrary,lib);
+initRecAnnotation(ann_FAssetRegistryModule,lib);

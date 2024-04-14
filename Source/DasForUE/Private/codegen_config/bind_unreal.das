@@ -43,6 +43,8 @@ class UnrealGen : CppGenBind
             "{UNREAL_PATH}/Engine/Source/Runtime/TraceLog/Public";
             "{UNREAL_PATH}/Engine/Source/Runtime/Engine/Classes";
             "{UNREAL_PATH}/Engine/Source/Runtime/Net/Core/Public";
+
+            "{UNREAL_PATH}/Engine/Source/Runtime/AssetRegistry/Public";
             
              //path to UHT generated files. Not need to parse, but for correct includes for other files
              //TODO: find other way to skip them
@@ -95,6 +97,7 @@ class UnrealGen : CppGenBind
             "Containers/SparseArray.h";
             "Containers/Set.h";
             "Containers/Map.h";
+            "AssetRegistry/AssetRegistryModule.h"
         }}
 
         unrealReflectionTypes <- {{
@@ -109,6 +112,8 @@ class UnrealGen : CppGenBind
             "UPropertyWrapper";
             "UBlueprintFunctionLibrary";
             "UKismetArrayLibrary";
+
+            "FAssetRegistryModule"; //modules can't be created directly
         }}
 
         dummyTemplateInstanceAnnotations <- {{
@@ -368,6 +373,15 @@ class UnrealGen : CppGenBind
             "UKismetArrayLibrary::GenericArray_ShuffleFromStream";
             "UKismetArrayLibrary::GenericArray_RandomFromStream";
             "UKismetArrayLibrary::GetLastIndex"; //FScriptArrayHelper
+
+            //FAssetRegistryModule
+            "FAssetRegistryModule::TryGetAssetByObjectPath"; //UE::AssetRegistry::EExists
+            "FAssetRegistryModule::TryGetAssetPackageData"; //UE::AssetRegistry::EExists
+            "FAssetRegistryModule::GetDependencies"; //UE::AssetRegistry::EDependencyCategory
+            "FAssetRegistryModule::Get"; //IAssetRegistry
+            "FAssetRegistryModule::GetRegistry"; //IAssetRegistry
+            "FAssetRegistryModule::TryGet";
+            "FAssetRegistryModule::StartupModule";
         }}
 
         for unrealReflType in keys(unrealReflectionTypes)
@@ -522,6 +536,9 @@ class UnrealGen : CppGenBind
 
             //ObjectPtr.h
             "FObjectHandle"; //UE::CoreUObject::Private::FObjectHandlePrivate;
+
+            //
+            
         }}
 
         enums_with_flags <- {{
@@ -635,6 +652,7 @@ class UnrealGen : CppGenBind
         module_need_h_file |> fwrite("#pragma once\n")
         generateModuleNeedHPrefix()
         module_need_h_file |> fwrite("#include \"CoreMinimal.h\"\n")
+        module_need_h_file |> fwrite("#include \"AssetRegistry/AssetRegistryModule.h\"\n")
         module_need_h_file |> fwrite("#include \"Kismet/KismetArrayLibrary.h\"\n")
 
         module_need_h_file |> fwrite("#include \"{bind_module}.enum.decl.inc\"\n")
@@ -1017,6 +1035,9 @@ class UnrealGen : CppGenBind
         return true if typeName == "FArrayProperty_Super"
         return true if typeName == "FSetProperty_Super"
         return true if typeName == "FMapProperty_Super"
+        //interfaces
+        return true if typeName == "IModuleInterface"
+        return true if typeName == "IAssetRegistryInterface"
         
         return typeName |> find("<") != -1
 
@@ -1272,18 +1293,19 @@ class UnrealGen : CppGenBind
                     CXChildVisitResult Continue
                 */
                 elif kind == CXCursorKind CXXBaseSpecifier
-                    print("TTT\n")
                     let class_name = back(nspaces)
                     var tps = string(clang_getTypeSpelling(clang_getCursorType(c)))
                     var tpq <- split(tps,"::")  // TODO: better inheritance?
                     let base_name = back(tpq)
                     delete tpq
                     if !(lsp |> key_exists(class_name))
-                        lsp[class_name] = base_name
+                        if !isTemplateType(base_name)
+                            lsp[class_name] = base_name
                     else
                         var acs = clang_getCXXAccessSpecifier(c)
                         if acs == CX_CXXAccessSpecifier Public
-                            interfaces[class_name] |> push(base_name)
+                            if !isTemplateType(base_name)
+                                interfaces[class_name] |> push(base_name)
                         else
                             to_log(LOG_WARNING, "skipping interface {base_name} due to access specifier {acs} at {clang_getCursorLocationDescription(c)}\n")
                     CXChildVisitResult Recurse

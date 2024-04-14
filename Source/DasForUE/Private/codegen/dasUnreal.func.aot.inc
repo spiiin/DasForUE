@@ -2989,3 +2989,23 @@ bool _dasUnreal_static_746_GenericArray_IsValidIndex(const UKismetArrayLibrary *
 	return UKismetArrayLibrary::GenericArray_IsValidIndex(TargetArray,ArrayProp,IndexToTest);
 }
 
+void _dasUnreal_static_747_TickAssetRegistry(const FAssetRegistryModule *,float DeltaTime) {
+	FAssetRegistryModule::TickAssetRegistry(DeltaTime);
+}
+
+void _dasUnreal_static_748_AssetCreated(const FAssetRegistryModule *,UObject * NewAsset) {
+	FAssetRegistryModule::AssetCreated(NewAsset);
+}
+
+void _dasUnreal_static_749_AssetDeleted(const FAssetRegistryModule *,UObject * DeletedAsset) {
+	FAssetRegistryModule::AssetDeleted(DeletedAsset);
+}
+
+void _dasUnreal_static_750_AssetRenamed(const FAssetRegistryModule *,const UObject * RenamedAsset,const FString & OldObjectPath) {
+	FAssetRegistryModule::AssetRenamed(RenamedAsset,OldObjectPath);
+}
+
+void _dasUnreal_static_751_PackageDeleted(const FAssetRegistryModule *,UPackage * DeletedPackage) {
+	FAssetRegistryModule::PackageDeleted(DeletedPackage);
+}
+

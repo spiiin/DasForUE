@@ -3,6 +3,7 @@
 
 #pragma once
 #include "CoreMinimal.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "Kismet/KismetArrayLibrary.h"
 #include "dasUnreal.enum.decl.inc"
 #include "dasUnreal.enum.decl.cast.inc"

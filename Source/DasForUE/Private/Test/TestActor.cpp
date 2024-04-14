@@ -6,7 +6,7 @@
 #include "Kismet/KismetStringLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-void compile_and_run_script(const char* fname);
+#include "das_compile.h"
 
 ATestActor::ATestActor() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -17,10 +17,8 @@ ATestActor::ATestActor() {
 
 void ATestActor::BeginPlay() {
 	Super::BeginPlay();
-
-	FTCHARToUTF8 Convert(*ScriptFilePath);
-	const char* Utf8String = (const char*)Convert.Get();
-	compile_and_run_script(Utf8String);
+	CompileScript();
+	run_script();
 }
 
 void ATestActor::Tick(float DeltaTime) {
@@ -43,4 +41,11 @@ void ATestActor::SetTestActorLocation(FVector NewLocation)
 {
 	this->SetActorLocation(NewLocation);
 	UE_LOG(LogTemp, Log, TEXT("Test Actor Location called. The name is %s and the new loc is %s"), *GetName(), *NewLocation.ToCompactString());
+}
+
+void ATestActor::CompileScript()
+{
+	FTCHARToUTF8 Convert(*ScriptFilePath);
+	const char* Utf8String = (const char*)Convert.Get();
+	compile_script(Utf8String);
 }

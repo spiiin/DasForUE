@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetTestActorLocation(FVector NewLocation);
 
+	UFUNCTION(CallInEditor)
+	void CompileScript();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Script")
 	FString ScriptFilePath; //set this path to compile and run script from file
 };

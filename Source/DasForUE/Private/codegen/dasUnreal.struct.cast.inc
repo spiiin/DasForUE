@@ -679,3 +679,9 @@ template <> struct cast_arg<UKismetArrayLibrary> {
 		return * cast<UKismetArrayLibrary *>::to(res);
 	}
 };
+template <> struct cast_arg<FAssetRegistryModule> {
+	static __forceinline const FAssetRegistryModule & to ( Context & ctx, SimNode * node ) {
+		vec4f res = node->eval(ctx);
+		return * cast<FAssetRegistryModule *>::to(res);
+	}
+};

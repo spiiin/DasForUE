@@ -155,3 +155,4 @@ MAKE_EXTERNAL_TYPE_FACTORY(FFrame,FFrame);
 MAKE_EXTERNAL_TYPE_FACTORY(UBlueprintFunctionLibrary,UBlueprintFunctionLibrary);
 MAKE_EXTERNAL_TYPE_FACTORY(AActor,AActor);
 MAKE_EXTERNAL_TYPE_FACTORY(UKismetArrayLibrary,UKismetArrayLibrary);
+MAKE_EXTERNAL_TYPE_FACTORY(FAssetRegistryModule,FAssetRegistryModule);

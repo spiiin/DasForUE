@@ -132,3 +132,5 @@
 #include "Containers/SparseArray.h"
 #include "Containers/Set.h"
 #include "Containers/Map.h"
+
+#include "AssetRegistry/AssetRegistryModule.h"

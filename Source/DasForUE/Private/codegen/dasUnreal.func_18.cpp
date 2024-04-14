@@ -86,6 +86,31 @@ void Module_dasUnreal::initFunctions_18() {
 		->args({"self","TargetArray","ArrayProp","IndexToTest"})
 		->arg_type(0,makeType<TExplicit<const UKismetArrayLibrary*> >(lib))
 		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/AssetRegistry/Public\AssetRegistry/AssetRegistryModule.h:60:14
+	makeExtern< void (*)(const FAssetRegistryModule *,float) , _dasUnreal_static_747_TickAssetRegistry , SimNode_ExtFuncCall >(lib,"TickAssetRegistry","_dasUnreal_static_747_TickAssetRegistry")
+		->args({"self","DeltaTime"})
+		->arg_type(0,makeType<TExplicit<const FAssetRegistryModule*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/AssetRegistry/Public\AssetRegistry/AssetRegistryModule.h:65:14
+	makeExtern< void (*)(const FAssetRegistryModule *,UObject *) , _dasUnreal_static_748_AssetCreated , SimNode_ExtFuncCall >(lib,"AssetCreated","_dasUnreal_static_748_AssetCreated")
+		->args({"self","NewAsset"})
+		->arg_type(0,makeType<TExplicit<const FAssetRegistryModule*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/AssetRegistry/Public\AssetRegistry/AssetRegistryModule.h:70:14
+	makeExtern< void (*)(const FAssetRegistryModule *,UObject *) , _dasUnreal_static_749_AssetDeleted , SimNode_ExtFuncCall >(lib,"AssetDeleted","_dasUnreal_static_749_AssetDeleted")
+		->args({"self","DeletedAsset"})
+		->arg_type(0,makeType<TExplicit<const FAssetRegistryModule*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/AssetRegistry/Public\AssetRegistry/AssetRegistryModule.h:75:14
+	makeExtern< void (*)(const FAssetRegistryModule *,const UObject *,const FString &) , _dasUnreal_static_750_AssetRenamed , SimNode_ExtFuncCall >(lib,"AssetRenamed","_dasUnreal_static_750_AssetRenamed")
+		->args({"self","RenamedAsset","OldObjectPath"})
+		->arg_type(0,makeType<TExplicit<const FAssetRegistryModule*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/AssetRegistry/Public\AssetRegistry/AssetRegistryModule.h:93:14
+	makeExtern< void (*)(const FAssetRegistryModule *,UPackage *) , _dasUnreal_static_751_PackageDeleted , SimNode_ExtFuncCall >(lib,"PackageDeleted","_dasUnreal_static_751_PackageDeleted")
+		->args({"self","DeletedPackage"})
+		->arg_type(0,makeType<TExplicit<const FAssetRegistryModule*> >(lib))
+		->addToModule(*this, SideEffects::worstDefault);
 }
 }
 

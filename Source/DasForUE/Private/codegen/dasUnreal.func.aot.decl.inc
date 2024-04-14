@@ -748,3 +748,8 @@ int _dasUnreal_static_743_GenericArray_Find(const UKismetArrayLibrary *,const vo
 void _dasUnreal_static_744_GenericArray_SetArrayPropertyByName(const UKismetArrayLibrary *,UObject * OwnerObject,FName ArrayPropertyName,const void * SrcArrayAddr);
 void _dasUnreal_static_745_GenericArray_Random(const UKismetArrayLibrary *,void * TargetArray,const FArrayProperty * ArrayProp,void * OutItem,int * OutIndex);
 bool _dasUnreal_static_746_GenericArray_IsValidIndex(const UKismetArrayLibrary *,const void * TargetArray,const FArrayProperty * ArrayProp,int IndexToTest);
+void _dasUnreal_static_747_TickAssetRegistry(const FAssetRegistryModule *,float DeltaTime);
+void _dasUnreal_static_748_AssetCreated(const FAssetRegistryModule *,UObject * NewAsset);
+void _dasUnreal_static_749_AssetDeleted(const FAssetRegistryModule *,UObject * DeletedAsset);
+void _dasUnreal_static_750_AssetRenamed(const FAssetRegistryModule *,const UObject * RenamedAsset,const FString & OldObjectPath);
+void _dasUnreal_static_751_PackageDeleted(const FAssetRegistryModule *,UPackage * DeletedPackage);

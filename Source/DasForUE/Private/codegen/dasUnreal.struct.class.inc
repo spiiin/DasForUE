@@ -1408,3 +1408,14 @@ struct UKismetArrayLibrary_GeneratedAnnotation : ManagedStructureAnnotation<UKis
 	}
 };
 
+// from ../../../../../../../UnrealEngine/Engine/Source/Runtime/AssetRegistry/Public\AssetRegistry/AssetRegistryModule.h:30:7
+struct FAssetRegistryModule_GeneratedAnnotation : ManagedStructureAnnotation<FAssetRegistryModule, false, false> {
+	virtual bool canCopy() const override { return std::is_copy_constructible<FAssetRegistryModule>::value; }
+	virtual bool canClone() const override { return std::is_copy_constructible<FAssetRegistryModule>::value; }
+	virtual bool canMove() const override { return std::is_copy_constructible<FAssetRegistryModule>::value; }
+	FAssetRegistryModule_GeneratedAnnotation(ModuleLibrary & ml) : ManagedStructureAnnotation ("FAssetRegistryModule", ml, "FAssetRegistryModule") {
+	}
+	void init () {
+	}
+};
+

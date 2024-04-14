@@ -1,55 +1,101 @@
 #include "das_compile.h"
+#include <memory>
 
-#include "das_config.h"
-THIRD_PARTY_INCLUDES_START
-#include "daScript/daScript.h"
-THIRD_PARTY_INCLUDES_END
+//TODO: normal infrastructure
+FCompiledScript g_compiledScript;
 
-#include "TextPrinterUE.h"
-
-#include "using_das.inc"
-
-void compile_and_run_script(const char* fname) {
+FCompiledScript compile_script(const char* fname) {
+    FCompiledScript result;
     TextPrinterUE tout;
     ModuleGroup dummyLibGroup;
     auto fAccess = make_smart<FsFileAccess>();
 
-    auto program = compileDaScript(fname, fAccess, tout, dummyLibGroup);
-    if (program->failed()) {
-        tout << "failed to compile\n";
-        for (auto& err : program->errors) {
+    result.program = compileDaScript(fname, fAccess, tout, dummyLibGroup);
+    if (result.program->failed()) {
+        tout << "[DasForUE] Failed to compile\n";
+        for (auto& err : result.program->errors) {
             tout << reportError(err.at, err.what, err.extra, err.fixme, err.cerr);
         }
-        return;
+        return result;
     }
 
-    Context ctx(program->getContextStackSize());
-    if (!program->simulate(ctx, tout))
+    result.context = std::make_shared<Context>(result.program->getContextStackSize());
+    if (!result.program->simulate(*result.context, tout))
     {
-        tout << "failed to simulate\n";
-        for (auto& err : program->errors) {
+        tout << "[DasForUE] Failed to simulate\n";
+        for (auto& err : result.program->errors) {
             tout << reportError(err.at, err.what, err.extra, err.fixme, err.cerr);
         }
+        return result;
+    }
+
+    result.fnMain = result.context->findFunction("main");
+    if (!result.fnMain)
+    {
+        tout << "[DasForUE] Function 'main' not found\n";
+        return result;
+    }
+
+    if (!verifyCall<void>(result.fnMain->debugInfo, dummyLibGroup))
+    {
+        tout << "[DasForUE] Function 'main', call arguments do not match. expecting def main : void\n";
+        return result;
+    }
+
+    result.fnAfterCompile = result.context->findFunction("on_after_compile");
+    if (!result.fnAfterCompile)
+    {
+        tout << "[DasForUE] Function 'on_after_compile' not found\n";
+        return result;
+    }
+
+    if (!verifyCall<void>(result.fnMain->debugInfo, dummyLibGroup))
+    {
+        tout << "[DasForUE] Function 'on_after_compile', call arguments do not match. expecting def on_after_compile : void\n";
+        return result;
+    }
+
+    result.context->evalWithCatch(result.fnAfterCompile, nullptr);
+    if (auto ex = result.context->getException())
+    {
+        tout << "[DasForUE] exception: " << ex << "\n";
+        return result;
+    }
+
+    tout << "[DasForUE] compile ok\n";
+
+    //TODO: no global
+    g_compiledScript = result;
+
+    return result;
+}
+
+
+void run_script() {
+    TextPrinterUE tout;
+    if (!g_compiledScript.program) {
+        tout << "[DasForUE] g_compiledScript.program == null\n";
+        return;
+    }
+    if (!g_compiledScript.fnMain) {
+        tout << "[DasForUE] g_compiledScript.fnMain == null\n";
         return;
     }
 
-    auto fnTest = ctx.findFunction("main");
-    if (!fnTest)
+    g_compiledScript.context->evalWithCatch(g_compiledScript.fnMain, nullptr);
+    if (auto ex = g_compiledScript.context->getException())
     {
-        tout << "function 'main' not found\n";
+        tout << "[DasForUE] exception: " << ex << "\n";
         return;
     }
+}
 
-    if (!verifyCall<void>(fnTest->debugInfo, dummyLibGroup))
-    {
-        tout << "function 'main', call arguments do not match. expecting def main : void\n";
-        return;
-    }
+void clean_scripts() {
+    //TODO: g_compiledScript
+}
 
-    ctx.evalWithCatch(fnTest, nullptr);
-    if (auto ex = ctx.getException())
-    {
-        tout << "exception: " << ex << "\n";
-        return;
-    }
+
+void compile_and_run_script(const char* fname) {
+    compile_script(fname);
+    run_script();
 }
