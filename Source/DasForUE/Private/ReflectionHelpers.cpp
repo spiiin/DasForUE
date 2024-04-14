@@ -11,3 +11,7 @@ const char* FStringToCStr(const FString& str) {
 const wchar_t* FStringToWChar(const FString& str) {
 	return *str;
 }
+
+void BroadcastAssets() {
+	FCoreUObjectDelegates::ReloadCompleteDelegate.Broadcast(EReloadCompleteReason::HotReloadManual);
+}

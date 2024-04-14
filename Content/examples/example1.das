@@ -77,7 +77,7 @@ def on_after_compile()
     init_script_package()
 
     //create new properties in class
-    let className = "TestClass_BP_C"
+    /*let className = "TestClass_BP_C"
     var cls = get_class_by_name(FString(className))
     if cls == null
         print("Class {className} not found!\n")
@@ -90,7 +90,12 @@ def on_after_compile()
         }]
     if updatedClass == null
         print("Can't emit properties for class {className}\n")
-    [[FAssetRegistryModule?]] |> AssetCreated(updatedClass)
+    [[FAssetRegistryModule?]] |> AssetCreated(updatedClass)*/
+
+    //---
+    var emittedClass = test_emit_class(get_script_package(), "DasActor", "Actor")
+    print("Emitted class: {string(*emittedClass |> GetName)}\n")
+    BroadcastAssets()
 
 
 [export]

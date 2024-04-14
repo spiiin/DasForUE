@@ -7,6 +7,26 @@ require daslib/apply
 require daslib/algorithm
 require strings
 
+let propertyObjFlags = EObjectFlags RF_Public | EObjectFlags RF_Transient | EObjectFlags RF_MarkAsNative
+let funcObjFlags = EObjectFlags RF_Public | EObjectFlags RF_Transient | EObjectFlags RF_MarkAsNative
+let classObjFlags = EObjectFlags RF_Public | EObjectFlags RF_Standalone | EObjectFlags RF_MarkAsRootSet
+
+let funcFlags = (
+    EFunctionFlags FUNC_Native |
+    EFunctionFlags FUNC_Public |
+    EFunctionFlags FUNC_BlueprintCallable |
+    EFunctionFlags FUNC_HasOutParms //if function return something
+)
+
+let propFlagsPublic = EPropertyFlags CPF_NativeAccessSpecifierPublic
+
+let propFlagsField = propFlagsPublic | EPropertyFlags CPF_BlueprintVisible | EPropertyFlags CPF_Edit | EPropertyFlags CPF_ExposeOnSpawn
+
+let propFlagsParam = EPropertyFlags CPF_Parm | propFlagsPublic
+let propFlagsOut = propFlagsParam | EPropertyFlags CPF_OutParm
+let propFlagsReturn = propFlagsOut | EPropertyFlags CPF_ReturnParm
+
+
 def get_class_by_name(className: FString) : UClass?
     var obj = StaticFindObject(
         StaticClass([[UObject?]]),
@@ -63,39 +83,29 @@ def call_ufunction(var executor: UObject?; functionName: string; var arguments: 
 
 //UObjects constructors
 
-def new_uobject(owner: UObject?; name: FName; flags: EObjectFlags; objType: auto(TT)-const) : TT?
+def strip_utype_name(name: string): string
+    if starts_with(name, "unreal::")
+        return name |> slice(9) //remove unreal::A/U/F unreal type prefix
+    else
+        return name |> slice(1) //remove unreal::A/U/F unreal type prefix
+
+def strip_short_utype_name(name: string): string
+    return name |> slice(1) //remove unreal::A/U/F unreal type prefix
+
+def new_uobject(owner: UObject?; name: FName; flags: EObjectFlags; objType: auto(TT)-const): TT?
     let className = typeinfo(stripped_typename objType)
-    static_assert(className |> starts_with("unreal::"))
-    let cls = get_class_by_name(FString(className |> slice(9))) //remove unreal::A/U/F unreal type prefix
+    let cls = get_class_by_name(FString(strip_utype_name(className)))
     return null if cls == null
     unsafe { return reinterpret<TT?> new_uobject_of_class(owner, cls, name, flags); }
 
 
-def new_uobject(objType: auto(TT)-const) : TT?
+def new_uobject(objType: auto(TT)-const): TT?
     let className = typeinfo(stripped_typename objType) 
-    static_assert(className |> starts_with("unreal::"))
-    let cls = get_class_by_name(FString(className |> slice(9))) //remove unreal::A/U/F unreal type prefix
+    let cls = get_class_by_name(FString(strip_utype_name(className)))
     return null if cls == null
     unsafe { return reinterpret<TT?> new_uobject_of_class(cls); }
 
-let private propertyObjFlags = EObjectFlags RF_Public | EObjectFlags RF_Transient | EObjectFlags RF_MarkAsNative
-let private funcObjFlags = EObjectFlags RF_Public | EObjectFlags RF_Transient | EObjectFlags RF_MarkAsNative
-let private funcFlags = (
-    EFunctionFlags FUNC_Native |
-    EFunctionFlags FUNC_Public |
-    EFunctionFlags FUNC_BlueprintCallable |
-    EFunctionFlags FUNC_HasOutParms //if function return something
-)
-
-let propFlagsPublic = EPropertyFlags CPF_NativeAccessSpecifierPublic
-
-let propFlagsField = propFlagsPublic | EPropertyFlags CPF_BlueprintVisible | EPropertyFlags CPF_Edit | EPropertyFlags CPF_ExposeOnSpawn
-
-let propFlagsParam = EPropertyFlags CPF_Parm | propFlagsPublic
-let propFlagsOut = propFlagsParam | EPropertyFlags CPF_OutParm
-let propFlagsReturn = propFlagsOut | EPropertyFlags CPF_ReturnParm
-
-def newFIntProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) : FProperty?
+def newFIntProperty(owner: UObject?; name: string; propFlags: EPropertyFlags): FProperty?
     var field1 = Construct(
         [[FIntProperty?]],
         FFieldVariant(owner),
@@ -106,7 +116,7 @@ def newFIntProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) : 
     *prop |> SetPropertyFlags(propFlags)
     return prop
 
-def newFStringProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) : FProperty?
+def newFStringProperty(owner: UObject?; name: string; propFlags: EPropertyFlags): FProperty?
     var field = Construct(
         [[FStrProperty?]],
         FFieldVariant(owner),
@@ -117,7 +127,7 @@ def newFStringProperty(owner: UObject?; name: string; propFlags: EPropertyFlags)
     *prop |> SetPropertyFlags(propFlags)
     return prop
 
-def newFFloatProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) : FProperty?
+def newFFloatProperty(owner: UObject?; name: string; propFlags: EPropertyFlags): FProperty?
     var field = Construct(
         [[FFloatProperty?]],
         FFieldVariant(owner),
@@ -129,7 +139,7 @@ def newFFloatProperty(owner: UObject?; name: string; propFlags: EPropertyFlags) 
     return prop
 
 //
-var private gPackage : UPackage?
+var private gPackage: UPackage?
 
 def init_script_package()
     if gPackage == null
@@ -186,3 +196,49 @@ def emit_ufunction(
     fn |> SetNativeFunc <| nativeFuncPtr
     *fn |> StaticLink(true)
     return fn
+
+
+def test_emit_class(
+    package: UPackage?;
+    name: string;
+    parentName: string
+    //classCtor: UClassConstructor;
+)
+    var newCls = package |> new_uobject(FName(name), classObjFlags, type<UClass>)
+    //*newCls |> SetClassConstructor(classCtor) //TODO
+    [[FAssetRegistryModule?]] |> AssetCreated(newCls)
+
+    var parent = get_class_by_name(FString(parentName))
+
+    var newClsStruct = unsafe(reinterpret<UStruct?> newCls) //TODO: check if `operator.field` can cast UClass? to UStruct?
+    var parentStruct = unsafe(reinterpret<UStruct?> parent)
+
+    newClsStruct.PropertyLink = parentStruct.PropertyLink
+    newCls.ClassWithin = parent.ClassWithin
+    newCls.ClassConfigName = parent.ClassConfigName
+    *newCls |> SetSuperStruct(parentStruct)
+
+    //newCls.ClassVTableHelperCtorCaller //TODO: callback
+    //newCls.CppClassStaticFunctions //TODO: vtable
+
+    newCls.ClassFlags &= parent.ClassFlags // re-check logic
+    newCls.ClassCastFlags = parent.ClassCastFlags
+    //TODO:
+    // - copy metadata from parent
+    // - fill self metadata
+    
+    //TODO:
+    // - emit properties
+    // - emit functions
+    // - emit/fill interfaces
+
+    *newCls |> StaticLink(true)
+    newCls.ClassFlags |= EClassFlags CLASS_Intrinsic
+
+    *newCls |> Bind
+    *newCls |> AssembleReferenceTokenStream
+
+    let cdo = *newCls |> GetDefaultObject //unused, force create CDO
+    return newCls
+
+

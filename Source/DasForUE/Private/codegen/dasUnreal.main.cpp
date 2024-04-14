@@ -125,6 +125,8 @@ namespace das {
 
         //UFunction
         addExtern<DAS_BIND_FUN(setNativeFunc)>(*this, lib, "SetNativeFunc", SideEffects::worstDefault, "setNativeFunc");
+
+        addExtern<DAS_BIND_FUN(BroadcastAssets)>(*this, lib, "BroadcastAssets", SideEffects::worstDefault, "BroadcastAssets");
     }
 
 	void Module_dasUnreal::initMain () {
