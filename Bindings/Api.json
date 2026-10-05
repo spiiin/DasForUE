@@ -1,0 +1,4608 @@
+{
+	"schema_version": 5,
+	"engine_version": "5.8.3-0+UE5",
+	"selection_policy_version": 1,
+	"policy":
+	{
+		"allow_deprecated": false,
+		"allow_internal": false
+	},
+	"functions": [
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "AddHealth",
+			"alias": "fixture_AddHealth",
+			"signature": "v1;AddHealth;Value:IntProperty:128;ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "value",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "value",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "MutateValues",
+			"alias": "fixture_MutateValues",
+			"signature": "v1;MutateValues;Count:IntProperty:134218112;Text:StrProperty:134218112;Accepted:BoolProperty:384;Description:StrProperty:384;ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "count",
+					"kind": "int",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "text",
+					"kind": "string",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "accepted",
+					"kind": "bool",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "description",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "count",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "text",
+					"metadata":
+					{
+					},
+					"kind": "string",
+					"type_path": "",
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "accepted",
+					"metadata":
+					{
+					},
+					"kind": "bool",
+					"type_path": "",
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "description",
+					"metadata":
+					{
+					},
+					"kind": "string",
+					"type_path": "",
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "ExchangeMode",
+			"alias": "fixture_ExchangeMode",
+			"signature": "v1;ExchangeMode;Input:EnumProperty:128:/Script/DasRuntime.EDasCallMode;Current:EnumProperty:134218112:/Script/DasRuntime.EDasCallMode;Previous:EnumProperty:384:/Script/DasRuntime.EDasCallMode;ReturnValue:EnumProperty:1408:/Script/DasRuntime.EDasCallMode;",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "input",
+					"kind": "enum",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "current",
+					"kind": "enum",
+					"input": true,
+					"output": true,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "previous",
+					"kind": "enum",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "returnvalue",
+					"kind": "enum",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				}
+			],
+			"parameters": [
+				{
+					"path": "input",
+					"metadata":
+					{
+					},
+					"kind": "enum",
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "current",
+					"metadata":
+					{
+					},
+					"kind": "enum",
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "previous",
+					"metadata":
+					{
+					},
+					"kind": "enum",
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "enum",
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "ExchangeName",
+			"alias": "fixture_ExchangeName",
+			"signature": "v1;ExchangeName;Input:NameProperty:128;Current:NameProperty:134218112;Previous:NameProperty:384;ReturnValue:NameProperty:1408;",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "input",
+					"kind": "name",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "current",
+					"kind": "name",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "previous",
+					"kind": "name",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "name",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "input",
+					"metadata":
+					{
+					},
+					"kind": "name",
+					"type_path": "",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "current",
+					"metadata":
+					{
+					},
+					"kind": "name",
+					"type_path": "",
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "previous",
+					"metadata":
+					{
+					},
+					"kind": "name",
+					"type_path": "",
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "name",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "ExchangeNamedMode",
+			"alias": "fixture_ExchangeNamedMode",
+			"signature": "v1;ExchangeNamedMode;Value:StructProperty:134218112:/Script/DasRuntime.DasNamedMode{Mode:EnumProperty:0:/Script/DasRuntime.EDasCallMode;Key:NameProperty:0;};Copy:StructProperty:384:/Script/DasRuntime.DasNamedMode{Mode:EnumProperty:0:/Script/DasRuntime.EDasCallMode;Key:NameProperty:0;};",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "value.mode",
+					"kind": "enum",
+					"input": true,
+					"output": true,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "value.key",
+					"kind": "name",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy.mode",
+					"kind": "enum",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "copy.key",
+					"kind": "name",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "value",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasNamedMode",
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "copy",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasNamedMode",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "TransformPayload",
+			"alias": "fixture_TransformPayload",
+			"signature": "v1;TransformPayload;Payload:StructProperty:134218114:/Script/DasRuntime.DasCallPayload{Metrics:StructProperty:0:/Script/DasRuntime.DasCallMetrics{Ratio:FloatProperty:0;};Count:IntProperty:0;Label:StrProperty:0;bEnabled:BoolProperty:0;Weight:DoubleProperty:0;};Delta:IntProperty:128;bUpper:BoolProperty:128;Suffix:StrProperty:128;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasCallPayload{Metrics:StructProperty:0:/Script/DasRuntime.DasCallMetrics{Ratio:FloatProperty:0;};Count:IntProperty:0;Label:StrProperty:0;bEnabled:BoolProperty:0;Weight:DoubleProperty:0;};",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "payload.metrics.ratio",
+					"kind": "float",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "payload.count",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "payload.label",
+					"kind": "string",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "payload.benabled",
+					"kind": "bool",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "payload.weight",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "delta",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "bupper",
+					"kind": "bool",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "suffix",
+					"kind": "string",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.metrics.ratio",
+					"kind": "float",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.count",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.label",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.benabled",
+					"kind": "bool",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.weight",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "payload",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasCallPayload",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "delta",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "bupper",
+					"metadata":
+					{
+					},
+					"kind": "bool",
+					"type_path": "",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "suffix",
+					"metadata":
+					{
+					},
+					"kind": "string",
+					"type_path": "",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasCallPayload",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "MutatePayload",
+			"alias": "fixture_MutatePayload",
+			"signature": "v1;MutatePayload;Payload:StructProperty:134218112:/Script/DasRuntime.DasCallPayload{Metrics:StructProperty:0:/Script/DasRuntime.DasCallMetrics{Ratio:FloatProperty:0;};Count:IntProperty:0;Label:StrProperty:0;bEnabled:BoolProperty:0;Weight:DoubleProperty:0;};Copy:StructProperty:384:/Script/DasRuntime.DasCallPayload{Metrics:StructProperty:0:/Script/DasRuntime.DasCallMetrics{Ratio:FloatProperty:0;};Count:IntProperty:0;Label:StrProperty:0;bEnabled:BoolProperty:0;Weight:DoubleProperty:0;};",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "payload.metrics.ratio",
+					"kind": "float",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "payload.count",
+					"kind": "int",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "payload.label",
+					"kind": "string",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "payload.benabled",
+					"kind": "bool",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "payload.weight",
+					"kind": "double",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy.metrics.ratio",
+					"kind": "float",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy.count",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy.label",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy.benabled",
+					"kind": "bool",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy.weight",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "payload",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasCallPayload",
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "copy",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasCallPayload",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "GetTargetObject",
+			"alias": "fixture_GetTargetObject",
+			"signature": "v1;GetTargetObject;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "returnvalue",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/CoreUObject.Object"
+				}
+			],
+			"parameters": [
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "object",
+					"type_path": "/Script/CoreUObject.Object",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "SetFixtureTarget",
+			"alias": "fixture_SetFixtureTarget",
+			"signature": "v1;SetFixtureTarget;Value:ObjectProperty:128:/Script/DasRuntime.DasObjectFixture;",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "value",
+					"kind": "object",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/DasRuntime.DasObjectFixture"
+				}
+			],
+			"parameters": [
+				{
+					"path": "value",
+					"metadata":
+					{
+					},
+					"kind": "object",
+					"type_path": "/Script/DasRuntime.DasObjectFixture",
+					"input": true,
+					"output": false
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "ExchangeObject",
+			"alias": "fixture_ExchangeObject",
+			"signature": "v1;ExchangeObject;Input:ObjectProperty:128:/Script/DasRuntime.DasObjectFixture;InOut:ObjectProperty:134218112:/Script/CoreUObject.Object;Output:ObjectProperty:384:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "input",
+					"kind": "object",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/DasRuntime.DasObjectFixture"
+				},
+				{
+					"path": "inout",
+					"kind": "object",
+					"input": true,
+					"output": true,
+					"type_path": "/Script/CoreUObject.Object"
+				},
+				{
+					"path": "output",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/CoreUObject.Object"
+				},
+				{
+					"path": "returnvalue",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/CoreUObject.Object"
+				}
+			],
+			"parameters": [
+				{
+					"path": "input",
+					"metadata":
+					{
+					},
+					"kind": "object",
+					"type_path": "/Script/DasRuntime.DasObjectFixture",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "inout",
+					"metadata":
+					{
+					},
+					"kind": "object",
+					"type_path": "/Script/CoreUObject.Object",
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "output",
+					"metadata":
+					{
+					},
+					"kind": "object",
+					"type_path": "/Script/CoreUObject.Object",
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "object",
+					"type_path": "/Script/CoreUObject.Object",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "NewFixture",
+			"alias": "fixture_NewFixture",
+			"signature": "v1;NewFixture;ReturnValue:ObjectProperty:1408:/Script/DasRuntime.DasObjectFixture;",
+			"metadata":
+			{
+				"Category": "Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "returnvalue",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.DasObjectFixture"
+				}
+			],
+			"parameters": [
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "object",
+					"type_path": "/Script/DasRuntime.DasObjectFixture",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "PolicyDefault",
+			"alias": "fixture_PolicyDefault",
+			"signature": "v1;PolicyDefault;Value:IntProperty:128;ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "Policy",
+				"DisplayName": "Policy default",
+				"ToolTip": "Metadata fixture"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": true,
+			"const": true,
+			"fields": [
+				{
+					"path": "value",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "value",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"default_text": "7",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "DefaultScalars",
+			"alias": "fixture_DefaultScalars",
+			"signature": "v1;DefaultScalars;Count:IntProperty:128;bEnabled:BoolProperty:128;Ratio:FloatProperty:128;Weight:DoubleProperty:128;Label:StrProperty:128;Key:NameProperty:128;Mode:EnumProperty:128:/Script/DasRuntime.EDasCallMode;Object:ObjectProperty:128:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;",
+			"metadata":
+			{
+				"Category": "Defaults"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "count",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "benabled",
+					"kind": "bool",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "ratio",
+					"kind": "float",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "weight",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "label",
+					"kind": "string",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "key",
+					"kind": "name",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "mode",
+					"kind": "enum",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "object",
+					"kind": "object",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/CoreUObject.Object"
+				},
+				{
+					"path": "returnvalue",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "count",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"default_text": "7",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "benabled",
+					"metadata":
+					{
+					},
+					"kind": "bool",
+					"type_path": "",
+					"default_text": "true",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "ratio",
+					"metadata":
+					{
+					},
+					"kind": "float",
+					"type_path": "",
+					"default_text": "1.500000",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "weight",
+					"metadata":
+					{
+					},
+					"kind": "double",
+					"type_path": "",
+					"default_text": "1.250000",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "label",
+					"metadata":
+					{
+					},
+					"kind": "string",
+					"type_path": "",
+					"default_text": "Hello {world}",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "key",
+					"metadata":
+					{
+					},
+					"kind": "name",
+					"type_path": "",
+					"default_text": "None",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "mode",
+					"metadata":
+					{
+					},
+					"kind": "enum",
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"default_text": "Active",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "object",
+					"metadata":
+					{
+					},
+					"kind": "object",
+					"type_path": "/Script/CoreUObject.Object",
+					"default_text": "None",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "string",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "DefaultWeight",
+			"alias": "fixture_DefaultWeight",
+			"signature": "v1;DefaultWeight;Value:DoubleProperty:128;ReturnValue:DoubleProperty:1408;",
+			"metadata":
+			{
+				"Category": "Defaults",
+				"ToolTip": "UHT's CPP_Default_Value rounds this source literal; scripts use reflected defaults."
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "value",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "value",
+					"metadata":
+					{
+					},
+					"kind": "double",
+					"type_path": "",
+					"default_text": "1.234568",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "double",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "TransformInts",
+			"alias": "fixture_TransformInts",
+			"signature": "v1;TransformInts;Values:ArrayProperty:134218114[Values:IntProperty:0;];ReturnValue:ArrayProperty:1408[ReturnValue:IntProperty:0;];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": false,
+					"type_path": "IntProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "IntProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "IntProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "IntProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "MutateStrings",
+			"alias": "fixture_MutateStrings",
+			"signature": "v1;MutateStrings;Values:ArrayProperty:134218112[Values:StrProperty:0;];Copy:ArrayProperty:384[Copy:StrProperty:0;];ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": true,
+					"type_path": "StrProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "string",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "StrProperty"
+				},
+				{
+					"path": "copy.*",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "StrProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "copy",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "StrProperty",
+					"element":
+					{
+						"path": "copy",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoNames",
+			"alias": "fixture_EchoNames",
+			"signature": "v1;EchoNames;Values:ArrayProperty:134218114[Values:NameProperty:0;];ReturnValue:ArrayProperty:1408[ReturnValue:NameProperty:0;];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": false,
+					"type_path": "NameProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "name",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "NameProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "name",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "NameProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "name",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "NameProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "name",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoFloats",
+			"alias": "fixture_EchoFloats",
+			"signature": "v1;EchoFloats;Values:ArrayProperty:134218114[Values:FloatProperty:0;];ReturnValue:ArrayProperty:1408[ReturnValue:FloatProperty:0;];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": false,
+					"type_path": "FloatProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "float",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "FloatProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "float",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "FloatProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "float",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "FloatProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "float",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoDoubles",
+			"alias": "fixture_EchoDoubles",
+			"signature": "v1;EchoDoubles;Values:ArrayProperty:134218114[Values:DoubleProperty:0;];ReturnValue:ArrayProperty:1408[ReturnValue:DoubleProperty:0;];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": false,
+					"type_path": "DoubleProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "DoubleProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "DoubleProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "double",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "DoubleProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "double",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoBools",
+			"alias": "fixture_EchoBools",
+			"signature": "v1;EchoBools;Values:ArrayProperty:134218114[Values:BoolProperty:0;];ReturnValue:ArrayProperty:1408[ReturnValue:BoolProperty:0;];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": false,
+					"type_path": "BoolProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "bool",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "BoolProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "bool",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "BoolProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "bool",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "BoolProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "bool",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "TransformPayloads",
+			"alias": "fixture_TransformPayloads",
+			"signature": "v1;TransformPayloads;Values:ArrayProperty:134218114[Values:StructProperty:0:/Script/DasRuntime.DasCallPayload{Metrics:StructProperty:0:/Script/DasRuntime.DasCallMetrics{Ratio:FloatProperty:0;};Count:IntProperty:0;Label:StrProperty:0;bEnabled:BoolProperty:0;Weight:DoubleProperty:0;};];ReturnValue:ArrayProperty:1408[ReturnValue:StructProperty:0:/Script/DasRuntime.DasCallPayload{Metrics:StructProperty:0:/Script/DasRuntime.DasCallMetrics{Ratio:FloatProperty:0;};Count:IntProperty:0;Label:StrProperty:0;bEnabled:BoolProperty:0;Weight:DoubleProperty:0;};];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": false,
+					"type_path": "StructProperty"
+				},
+				{
+					"path": "values.*.metrics.ratio",
+					"kind": "float",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.count",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.label",
+					"kind": "string",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.benabled",
+					"kind": "bool",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.weight",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "StructProperty"
+				},
+				{
+					"path": "returnvalue.*.metrics.ratio",
+					"kind": "float",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.count",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.label",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.benabled",
+					"kind": "bool",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.weight",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "StructProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "struct",
+						"type_path": "/Script/DasRuntime.DasCallPayload"
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "StructProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "struct",
+						"type_path": "/Script/DasRuntime.DasCallPayload"
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "MutateNamedModes",
+			"alias": "fixture_MutateNamedModes",
+			"signature": "v1;MutateNamedModes;Values:ArrayProperty:134218112[Values:StructProperty:0:/Script/DasRuntime.DasNamedMode{Mode:EnumProperty:0:/Script/DasRuntime.EDasCallMode;Key:NameProperty:0;};];Copy:ArrayProperty:384[Copy:StructProperty:0:/Script/DasRuntime.DasNamedMode{Mode:EnumProperty:0:/Script/DasRuntime.EDasCallMode;Key:NameProperty:0;};];ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": true,
+					"type_path": "StructProperty"
+				},
+				{
+					"path": "values.*.mode",
+					"kind": "enum",
+					"input": true,
+					"output": true,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "values.*.key",
+					"kind": "name",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "StructProperty"
+				},
+				{
+					"path": "copy.*.mode",
+					"kind": "enum",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "copy.*.key",
+					"kind": "name",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "StructProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "struct",
+						"type_path": "/Script/DasRuntime.DasNamedMode"
+					},
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "copy",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "StructProperty",
+					"element":
+					{
+						"path": "copy",
+						"metadata":
+						{
+						},
+						"kind": "struct",
+						"type_path": "/Script/DasRuntime.DasNamedMode"
+					},
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoModes",
+			"alias": "fixture_EchoModes",
+			"signature": "v1;EchoModes;Values:ArrayProperty:134218114[Values:EnumProperty:0:/Script/DasRuntime.EDasCallMode;];ReturnValue:ArrayProperty:1408[ReturnValue:EnumProperty:0:/Script/DasRuntime.EDasCallMode;];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": false,
+					"type_path": "EnumProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "enum",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "returnvalue",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "EnumProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "enum",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "EnumProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "enum",
+						"type_path": "/Script/DasRuntime.EDasCallMode"
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "EnumProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "enum",
+						"type_path": "/Script/DasRuntime.EDasCallMode"
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoFixtureObjects",
+			"alias": "fixture_EchoFixtureObjects",
+			"signature": "v1;EchoFixtureObjects;Values:ArrayProperty:134218114[Values:ObjectProperty:0:/Script/DasRuntime.DasObjectFixture;];ReturnValue:ArrayProperty:1408[ReturnValue:ObjectProperty:0:/Script/DasRuntime.DasObjectFixture;];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": false,
+					"type_path": "ObjectProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "object",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/DasRuntime.DasObjectFixture"
+				},
+				{
+					"path": "returnvalue",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "ObjectProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.DasObjectFixture"
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "ObjectProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "object",
+						"type_path": "/Script/DasRuntime.DasObjectFixture"
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "ObjectProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "object",
+						"type_path": "/Script/DasRuntime.DasObjectFixture"
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "SwapFixtureObjects",
+			"alias": "fixture_SwapFixtureObjects",
+			"signature": "v1;SwapFixtureObjects;Values:ArrayProperty:134218112[Values:ObjectProperty:0:/Script/DasRuntime.DasObjectFixture;];Copy:ArrayProperty:384[Copy:ObjectProperty:0:/Script/DasRuntime.DasObjectFixture;];ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": true,
+					"type_path": "ObjectProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "object",
+					"input": true,
+					"output": true,
+					"type_path": "/Script/DasRuntime.DasObjectFixture"
+				},
+				{
+					"path": "copy",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "ObjectProperty"
+				},
+				{
+					"path": "copy.*",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.DasObjectFixture"
+				},
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "ObjectProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "object",
+						"type_path": "/Script/DasRuntime.DasObjectFixture"
+					},
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "copy",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "ObjectProperty",
+					"element":
+					{
+						"path": "copy",
+						"metadata":
+						{
+						},
+						"kind": "object",
+						"type_path": "/Script/DasRuntime.DasObjectFixture"
+					},
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "MakeFixtureObjects",
+			"alias": "fixture_MakeFixtureObjects",
+			"signature": "v1;MakeFixtureObjects;Values:ArrayProperty:384[Values:ObjectProperty:0:/Script/DasRuntime.DasObjectFixture;];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "ObjectProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.DasObjectFixture"
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "ObjectProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "object",
+						"type_path": "/Script/DasRuntime.DasObjectFixture"
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "ReplaceFixtureObjects",
+			"alias": "fixture_ReplaceFixtureObjects",
+			"signature": "v1;ReplaceFixtureObjects;Values:ArrayProperty:134218112[Values:ObjectProperty:0:/Script/DasRuntime.DasObjectFixture;];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": true,
+					"type_path": "ObjectProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "object",
+					"input": true,
+					"output": true,
+					"type_path": "/Script/DasRuntime.DasObjectFixture"
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "ObjectProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "object",
+						"type_path": "/Script/DasRuntime.DasObjectFixture"
+					},
+					"input": true,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoActors",
+			"alias": "fixture_EchoActors",
+			"signature": "v1;EchoActors;Values:ArrayProperty:134218114[Values:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:ArrayProperty:1408[ReturnValue:ObjectProperty:0:/Script/Engine.Actor;];",
+			"metadata":
+			{
+				"Category": "Arrays"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": false,
+					"type_path": "ObjectProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "object",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/Engine.Actor"
+				},
+				{
+					"path": "returnvalue",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "ObjectProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/Engine.Actor"
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "ObjectProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "object",
+						"type_path": "/Script/Engine.Actor"
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "ObjectProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "object",
+						"type_path": "/Script/Engine.Actor"
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "TransformMap",
+			"alias": "fixture_TransformMap",
+			"signature": "v1;TransformMap;Values:MapProperty:134218114[Values_Key:IntProperty:0;Values:StrProperty:0;];ReturnValue:MapProperty:1408[ReturnValue_Key:IntProperty:0;ReturnValue:StrProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "map",
+					"input": true,
+					"output": false,
+					"type_path": "IntProperty;StrProperty"
+				},
+				{
+					"path": "values.*.key",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.value",
+					"kind": "string",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "map",
+					"input": false,
+					"output": true,
+					"type_path": "IntProperty;StrProperty"
+				},
+				{
+					"path": "returnvalue.*.key",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.value",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;StrProperty",
+					"key":
+					{
+						"path": "values_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;StrProperty",
+					"key":
+					{
+						"path": "returnvalue_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "MutateMap",
+			"alias": "fixture_MutateMap",
+			"signature": "v1;MutateMap;Values:MapProperty:134218112[Values_Key:IntProperty:0;Values:StrProperty:0;];Copy:MapProperty:384[Copy_Key:IntProperty:0;Copy:StrProperty:0;];ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "map",
+					"input": true,
+					"output": true,
+					"type_path": "IntProperty;StrProperty"
+				},
+				{
+					"path": "values.*.key",
+					"kind": "int",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.value",
+					"kind": "string",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy",
+					"kind": "map",
+					"input": false,
+					"output": true,
+					"type_path": "IntProperty;StrProperty"
+				},
+				{
+					"path": "copy.*.key",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy.*.value",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;StrProperty",
+					"key":
+					{
+						"path": "values_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "copy",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;StrProperty",
+					"key":
+					{
+						"path": "copy_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "copy",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoNameModeMap",
+			"alias": "fixture_EchoNameModeMap",
+			"signature": "v1;EchoNameModeMap;Values:MapProperty:134218114[Values_Key:NameProperty:0;Values:EnumProperty:0:/Script/DasRuntime.EDasCallMode;];ReturnValue:MapProperty:1408[ReturnValue_Key:NameProperty:0;ReturnValue:EnumProperty:0:/Script/DasRuntime.EDasCallMode;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "map",
+					"input": true,
+					"output": false,
+					"type_path": "NameProperty;EnumProperty"
+				},
+				{
+					"path": "values.*.key",
+					"kind": "name",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.value",
+					"kind": "enum",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "returnvalue",
+					"kind": "map",
+					"input": false,
+					"output": true,
+					"type_path": "NameProperty;EnumProperty"
+				},
+				{
+					"path": "returnvalue.*.key",
+					"kind": "name",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.value",
+					"kind": "enum",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "NameProperty;EnumProperty",
+					"key":
+					{
+						"path": "values_key",
+						"metadata":
+						{
+						},
+						"kind": "name",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "enum",
+						"type_path": "/Script/DasRuntime.EDasCallMode"
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "NameProperty;EnumProperty",
+					"key":
+					{
+						"path": "returnvalue_key",
+						"metadata":
+						{
+						},
+						"kind": "name",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "enum",
+						"type_path": "/Script/DasRuntime.EDasCallMode"
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoDoubleMap",
+			"alias": "fixture_EchoDoubleMap",
+			"signature": "v1;EchoDoubleMap;Values:MapProperty:134218114[Values_Key:StrProperty:0;Values:DoubleProperty:0;];ReturnValue:MapProperty:1408[ReturnValue_Key:StrProperty:0;ReturnValue:DoubleProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "map",
+					"input": true,
+					"output": false,
+					"type_path": "StrProperty;DoubleProperty"
+				},
+				{
+					"path": "values.*.key",
+					"kind": "string",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.value",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "map",
+					"input": false,
+					"output": true,
+					"type_path": "StrProperty;DoubleProperty"
+				},
+				{
+					"path": "returnvalue.*.key",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.value",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "StrProperty;DoubleProperty",
+					"key":
+					{
+						"path": "values_key",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "double",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "StrProperty;DoubleProperty",
+					"key":
+					{
+						"path": "returnvalue_key",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "double",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoFloatMap",
+			"alias": "fixture_EchoFloatMap",
+			"signature": "v1;EchoFloatMap;Values:MapProperty:134218114[Values_Key:IntProperty:0;Values:FloatProperty:0;];ReturnValue:MapProperty:1408[ReturnValue_Key:IntProperty:0;ReturnValue:FloatProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "map",
+					"input": true,
+					"output": false,
+					"type_path": "IntProperty;FloatProperty"
+				},
+				{
+					"path": "values.*.key",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.value",
+					"kind": "float",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "map",
+					"input": false,
+					"output": true,
+					"type_path": "IntProperty;FloatProperty"
+				},
+				{
+					"path": "returnvalue.*.key",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.value",
+					"kind": "float",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;FloatProperty",
+					"key":
+					{
+						"path": "values_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "float",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;FloatProperty",
+					"key":
+					{
+						"path": "returnvalue_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "float",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoBoolMap",
+			"alias": "fixture_EchoBoolMap",
+			"signature": "v1;EchoBoolMap;Values:MapProperty:134218114[Values_Key:IntProperty:0;Values:BoolProperty:0;];ReturnValue:MapProperty:1408[ReturnValue_Key:IntProperty:0;ReturnValue:BoolProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "map",
+					"input": true,
+					"output": false,
+					"type_path": "IntProperty;BoolProperty"
+				},
+				{
+					"path": "values.*.key",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.value",
+					"kind": "bool",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "map",
+					"input": false,
+					"output": true,
+					"type_path": "IntProperty;BoolProperty"
+				},
+				{
+					"path": "returnvalue.*.key",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.value",
+					"kind": "bool",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;BoolProperty",
+					"key":
+					{
+						"path": "values_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "bool",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;BoolProperty",
+					"key":
+					{
+						"path": "returnvalue_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "bool",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "TransformSet",
+			"alias": "fixture_TransformSet",
+			"signature": "v1;TransformSet;Values:SetProperty:134218114[Values:IntProperty:0;];ReturnValue:SetProperty:1408[ReturnValue:IntProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "set",
+					"input": true,
+					"output": false,
+					"type_path": "IntProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "set",
+					"input": false,
+					"output": true,
+					"type_path": "IntProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "IntProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "IntProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "MutateSet",
+			"alias": "fixture_MutateSet",
+			"signature": "v1;MutateSet;Values:SetProperty:134218112[Values:StrProperty:0;];Copy:SetProperty:384[Copy:StrProperty:0;];ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "set",
+					"input": true,
+					"output": true,
+					"type_path": "StrProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "string",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "copy",
+					"kind": "set",
+					"input": false,
+					"output": true,
+					"type_path": "StrProperty"
+				},
+				{
+					"path": "copy.*",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "StrProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "copy",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "StrProperty",
+					"element":
+					{
+						"path": "copy",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoNameSet",
+			"alias": "fixture_EchoNameSet",
+			"signature": "v1;EchoNameSet;Values:SetProperty:134218114[Values:NameProperty:0;];ReturnValue:SetProperty:1408[ReturnValue:NameProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "set",
+					"input": true,
+					"output": false,
+					"type_path": "NameProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "name",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "set",
+					"input": false,
+					"output": true,
+					"type_path": "NameProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "name",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "NameProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "name",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "NameProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "name",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoModeSet",
+			"alias": "fixture_EchoModeSet",
+			"signature": "v1;EchoModeSet;Values:SetProperty:134218114[Values:EnumProperty:0:/Script/DasRuntime.EDasCallMode;];ReturnValue:SetProperty:1408[ReturnValue:EnumProperty:0:/Script/DasRuntime.EDasCallMode;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "set",
+					"input": true,
+					"output": false,
+					"type_path": "EnumProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "enum",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				},
+				{
+					"path": "returnvalue",
+					"kind": "set",
+					"input": false,
+					"output": true,
+					"type_path": "EnumProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "enum",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/DasRuntime.EDasCallMode",
+					"members": [
+						{
+							"name": "Idle",
+							"value": "0"
+						},
+						{
+							"name": "Active",
+							"value": "7"
+						},
+						{
+							"name": "Paused",
+							"value": "42"
+						}
+					]
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "EnumProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "enum",
+						"type_path": "/Script/DasRuntime.EDasCallMode"
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "EnumProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "enum",
+						"type_path": "/Script/DasRuntime.EDasCallMode"
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "MakeMap",
+			"alias": "fixture_MakeMap",
+			"signature": "v1;MakeMap;Values:MapProperty:384[Values_Key:IntProperty:0;Values:StrProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "map",
+					"input": false,
+					"output": true,
+					"type_path": "IntProperty;StrProperty"
+				},
+				{
+					"path": "values.*.key",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.value",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;StrProperty",
+					"key":
+					{
+						"path": "values_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "MakeSet",
+			"alias": "fixture_MakeSet",
+			"signature": "v1;MakeSet;Values:SetProperty:384[Values:IntProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "set",
+					"input": false,
+					"output": true,
+					"type_path": "IntProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "IntProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoFloatSet",
+			"alias": "fixture_EchoFloatSet",
+			"signature": "v1;EchoFloatSet;Values:SetProperty:134218114[Values:FloatProperty:0;];ReturnValue:SetProperty:1408[ReturnValue:FloatProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "set",
+					"input": true,
+					"output": false,
+					"type_path": "FloatProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "float",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "set",
+					"input": false,
+					"output": true,
+					"type_path": "FloatProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "float",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "FloatProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "float",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "FloatProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "float",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoDoubleSet",
+			"alias": "fixture_EchoDoubleSet",
+			"signature": "v1;EchoDoubleSet;Values:SetProperty:134218114[Values:DoubleProperty:0;];ReturnValue:SetProperty:1408[ReturnValue:DoubleProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "set",
+					"input": true,
+					"output": false,
+					"type_path": "DoubleProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "set",
+					"input": false,
+					"output": true,
+					"type_path": "DoubleProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "DoubleProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "double",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "DoubleProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "double",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasObjectFixture",
+			"function": "EchoFloatKeyMap",
+			"alias": "fixture_EchoFloatKeyMap",
+			"signature": "v1;EchoFloatKeyMap;Values:MapProperty:134218114[Values_Key:FloatProperty:0;Values:BoolProperty:0;];ReturnValue:MapProperty:1408[ReturnValue_Key:FloatProperty:0;ReturnValue:BoolProperty:0;];",
+			"metadata":
+			{
+				"Category": "HashContainers"
+			},
+			"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "map",
+					"input": true,
+					"output": false,
+					"type_path": "FloatProperty;BoolProperty"
+				},
+				{
+					"path": "values.*.key",
+					"kind": "float",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.value",
+					"kind": "bool",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "map",
+					"input": false,
+					"output": true,
+					"type_path": "FloatProperty;BoolProperty"
+				},
+				{
+					"path": "returnvalue.*.key",
+					"kind": "float",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.value",
+					"kind": "bool",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "FloatProperty;BoolProperty",
+					"key":
+					{
+						"path": "values_key",
+						"metadata":
+						{
+						},
+						"kind": "float",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "bool",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "FloatProperty;BoolProperty",
+					"key":
+					{
+						"path": "returnvalue_key",
+						"metadata":
+						{
+						},
+						"kind": "float",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "bool",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/Engine.Actor",
+			"function": "ActorHasTag",
+			"alias": "actor_ActorHasTag",
+			"signature": "v1;ActorHasTag;Tag:NameProperty:128;ReturnValue:BoolProperty:1408;",
+			"metadata":
+			{
+				"Category": "Actor",
+				"ToolTip": "See if this actor's Tags array contains the supplied name tag"
+			},
+			"declaring_class": "/Script/Engine.Actor",
+			"pure": true,
+			"const": true,
+			"fields": [
+				{
+					"path": "tag",
+					"kind": "name",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "bool",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "tag",
+					"metadata":
+					{
+					},
+					"kind": "name",
+					"type_path": "",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "bool",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/Engine.Actor",
+			"function": "GetActorRelativeScale3D",
+			"alias": "actor_GetActorRelativeScale3D",
+			"signature": "v1;GetActorRelativeScale3D;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+			"metadata":
+			{
+				"Category": "Transformation",
+				"ToolTip": "Return the actor's relative scale 3d"
+			},
+			"declaring_class": "/Script/Engine.Actor",
+			"pure": true,
+			"const": true,
+			"fields": [
+				{
+					"path": "returnvalue.x",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.y",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.z",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/Engine.Actor",
+			"function": "GetAttachedActors",
+			"alias": "actor_GetAttachedActors",
+			"signature": "v1;GetAttachedActors;OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];bResetArray:BoolProperty:128;bRecursivelyIncludeAttachedActors:BoolProperty:128;",
+			"metadata":
+			{
+				"Category": "Actor",
+				"ToolTip": "Find all Actors which are attached directly to a component in this actor"
+			},
+			"declaring_class": "/Script/Engine.Actor",
+			"pure": true,
+			"const": true,
+			"fields": [
+				{
+					"path": "outactors",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "ObjectProperty"
+				},
+				{
+					"path": "outactors.*",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/Engine.Actor"
+				},
+				{
+					"path": "bresetarray",
+					"kind": "bool",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "brecursivelyincludeattachedactors",
+					"kind": "bool",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "outactors",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "ObjectProperty",
+					"element":
+					{
+						"path": "outactors",
+						"metadata":
+						{
+						},
+						"kind": "object",
+						"type_path": "/Script/Engine.Actor"
+					},
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "bresetarray",
+					"metadata":
+					{
+					},
+					"kind": "bool",
+					"type_path": "",
+					"default_text": "true",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "brecursivelyincludeattachedactors",
+					"metadata":
+					{
+					},
+					"kind": "bool",
+					"type_path": "",
+					"default_text": "false",
+					"input": true,
+					"output": false
+				}
+			]
+		},
+		{
+			"class": "/Script/Engine.Actor",
+			"function": "GetOwner",
+			"alias": "actor_GetOwner",
+			"signature": "v1;GetOwner;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;",
+			"metadata":
+			{
+				"Category": "Actor",
+				"ToolTip": "Get the owner of this Actor, used primarily for network replication."
+			},
+			"declaring_class": "/Script/Engine.Actor",
+			"pure": true,
+			"const": true,
+			"fields": [
+				{
+					"path": "returnvalue",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/Engine.Actor"
+				}
+			],
+			"parameters": [
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/Engine.Actor",
+			"function": "K2_GetActorLocation",
+			"alias": "actor_K2_GetActorLocation",
+			"signature": "v1;K2_GetActorLocation;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+			"metadata":
+			{
+				"Category": "Transformation",
+				"DisplayName": "Get Actor Location",
+				"ToolTip": "Returns the location of the RootComponent of this Actor"
+			},
+			"declaring_class": "/Script/Engine.Actor",
+			"pure": true,
+			"const": true,
+			"fields": [
+				{
+					"path": "returnvalue.x",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.y",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.z",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/Engine.Actor",
+			"function": "SetActorRelativeScale3D",
+			"alias": "actor_SetActorRelativeScale3D",
+			"signature": "v1;SetActorRelativeScale3D;NewRelativeScale:StructProperty:128:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+			"metadata":
+			{
+				"Category": "Transformation",
+				"ToolTip": "Set the actor's RootComponent to the specified relative scale 3d\n@param NewRelativeScale      New scale to set the actor's RootComponent to"
+			},
+			"declaring_class": "/Script/Engine.Actor",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "newrelativescale.x",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "newrelativescale.y",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "newrelativescale.z",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "newrelativescale",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"input": true,
+					"output": false
+				}
+			]
+		},
+		{
+			"class": "/Script/Engine.Actor",
+			"function": "SetOwner",
+			"alias": "actor_SetOwner",
+			"signature": "v1;SetOwner;NewOwner:ObjectProperty:128:/Script/Engine.Actor;",
+			"metadata":
+			{
+				"Category": "Actor",
+				"ToolTip": "Set the owner of this Actor, used primarily for network replication.\n@param NewOwner      The Actor who takes over ownership of this Actor"
+			},
+			"declaring_class": "/Script/Engine.Actor",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "newowner",
+					"kind": "object",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/Engine.Actor"
+				}
+			],
+			"parameters": [
+				{
+					"path": "newowner",
+					"metadata":
+					{
+					},
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"input": true,
+					"output": false
+				}
+			]
+		},
+		{
+			"class": "/Script/Engine.Actor",
+			"function": "SetTickGroup",
+			"alias": "actor_SetTickGroup",
+			"signature": "v1;SetTickGroup;NewTickGroup:ByteProperty:128:/Script/Engine.ETickingGroup;",
+			"metadata":
+			{
+				"Category": "Actor|Tick",
+				"ToolTip": "Sets the ticking group for this actor.\n@param NewTickGroup the new value to assign"
+			},
+			"declaring_class": "/Script/Engine.Actor",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "newtickgroup",
+					"kind": "enum",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/Engine.ETickingGroup",
+					"members": [
+						{
+							"name": "TG_PrePhysics",
+							"value": "0"
+						},
+						{
+							"name": "TG_StartPhysics",
+							"value": "1"
+						},
+						{
+							"name": "TG_DuringPhysics",
+							"value": "2"
+						},
+						{
+							"name": "TG_EndPhysics",
+							"value": "3"
+						},
+						{
+							"name": "TG_PostPhysics",
+							"value": "4"
+						},
+						{
+							"name": "TG_PostUpdateWork",
+							"value": "5"
+						},
+						{
+							"name": "TG_LastDemotable",
+							"value": "6"
+						},
+						{
+							"name": "TG_NewlySpawned",
+							"value": "7"
+						}
+					]
+				}
+			],
+			"parameters": [
+				{
+					"path": "newtickgroup",
+					"metadata":
+					{
+					},
+					"kind": "enum",
+					"type_path": "/Script/Engine.ETickingGroup",
+					"input": true,
+					"output": false
+				}
+			]
+		}
+	],
+	"diagnostics": [],
+	"structs": [
+		{
+			"type_path": "/Script/CoreUObject.Vector",
+			"cpp_type": "FVector",
+			"metadata":
+			{
+				"ToolTip": "A point or direction FVector in 3d space.\n@note The full C++ class is located here: Engine\\Source\\Runtime\\Core\\Public\\Math\\Vector.h"
+			},
+			"fields": [
+				{
+					"path": "x",
+					"metadata":
+					{
+						"Category": "Vector"
+					},
+					"kind": "double",
+					"type_path": ""
+				},
+				{
+					"path": "y",
+					"metadata":
+					{
+						"Category": "Vector"
+					},
+					"kind": "double",
+					"type_path": ""
+				},
+				{
+					"path": "z",
+					"metadata":
+					{
+						"Category": "Vector"
+					},
+					"kind": "double",
+					"type_path": ""
+				}
+			]
+		},
+		{
+			"type_path": "/Script/DasRuntime.DasCallMetrics",
+			"cpp_type": "FDasCallMetrics",
+			"metadata":
+			{
+			},
+			"fields": [
+				{
+					"path": "ratio",
+					"metadata":
+					{
+						"Category": "Probe"
+					},
+					"kind": "float",
+					"type_path": ""
+				}
+			]
+		},
+		{
+			"type_path": "/Script/DasRuntime.DasCallPayload",
+			"cpp_type": "FDasCallPayload",
+			"metadata":
+			{
+			},
+			"fields": [
+				{
+					"path": "metrics",
+					"metadata":
+					{
+						"Category": "Probe"
+					},
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasCallMetrics"
+				},
+				{
+					"path": "count",
+					"metadata":
+					{
+						"Category": "Probe"
+					},
+					"kind": "int",
+					"type_path": ""
+				},
+				{
+					"path": "label",
+					"metadata":
+					{
+						"Category": "Probe"
+					},
+					"kind": "string",
+					"type_path": ""
+				},
+				{
+					"path": "benabled",
+					"metadata":
+					{
+						"Category": "Probe"
+					},
+					"kind": "bool",
+					"type_path": ""
+				},
+				{
+					"path": "weight",
+					"metadata":
+					{
+						"Category": "Probe"
+					},
+					"kind": "double",
+					"type_path": ""
+				}
+			]
+		},
+		{
+			"type_path": "/Script/DasRuntime.DasNamedMode",
+			"cpp_type": "FDasNamedMode",
+			"metadata":
+			{
+			},
+			"fields": [
+				{
+					"path": "mode",
+					"metadata":
+					{
+						"Category": "Probe"
+					},
+					"kind": "enum",
+					"type_path": "/Script/DasRuntime.EDasCallMode"
+				},
+				{
+					"path": "key",
+					"metadata":
+					{
+						"Category": "Probe"
+					},
+					"kind": "name",
+					"type_path": ""
+				}
+			]
+		}
+	],
+	"classes": [
+		{
+			"type_path": "/Script/CoreUObject.Object",
+			"metadata":
+			{
+				"ToolTip": "The base class of all UE objects. The type of an object is defined by its UClass.\nThis provides support functions for creating and using objects, and virtual functions that should be overridden in child classes.\n\n@see https://docs.unrealengine.com/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/Objects"
+			},
+			"parent": ""
+		},
+		{
+			"type_path": "/Script/DasRuntime.DasObjectFixture",
+			"metadata":
+			{
+				"ToolTip": "Small reflected fixture shared by the editor and packaged interop tests."
+			},
+			"parent": "/Script/CoreUObject.Object"
+		},
+		{
+			"type_path": "/Script/Engine.Actor",
+			"metadata":
+			{
+				"ToolTip": "Actor is the base class for an Object that can be placed or spawned in a level.\nActors may contain a collection of ActorComponents, which can be used to control how actors move, how they are rendered, etc.\nThe other main function of an Actor is the replication of properties and function calls across the network during play.\n\n\nActor initialization has multiple steps, here's the order of important virtual functions that get called:\n- UObject::PostLoad: For actors statically placed in a level, the normal UObject PostLoad gets called both in the editor and during gameplay.\n                     This is not called for newly spawned actors.\n- UActorComponent::OnComponentCreated: When an actor is spawned in the editor or during gameplay, this gets called for any native components.\n                                       For blueprint-created components, this gets called during construction for that component.\n                                       This is not called for components loaded from a level.\n- AActor::PreRegisterAllComponents: For statically placed actors and spawned actors that have native root components, this gets called now.\n                                    For blueprint actors without a native root component, these registration functions get called later during construction.\n- UActorComponent::RegisterComponent: All components are registered in editor and at runtime, this creates their physical/visual representation.\n                                      These calls may be distributed over multiple frames, but are always after PreRegisterAllComponents.\n                                      This may also get called later on after an UnregisterComponent call removes it from the world.\n- AActor::PostRegisterAllComponents: Called for all actors both in the editor and in gameplay, this is the last function that is called in all cases.\n- AActor::PostActorCreated: When an actor is created in the editor or during gameplay, this gets called right before construction.\n                            This is not called for components loaded from a level.\n- AActor::UserConstructionScript: Called for blueprints that implement a construction script.\n- AActor::OnConstruction: Called at the end of ExecuteConstruction, which calls the blueprint construction script.\n                          This is called after all blueprint-created components are fully created and registered.\n                          This is only called during gameplay for spawned actors, and may get rerun in the editor when changing blueprints.\n- AActor::PreInitializeComponents: Called before InitializeComponent is called on the actor's components.\n                                   This is only called during gameplay and in certain editor preview windows.\n- UActorComponent::Activate: This will be called only if the component has bAutoActivate set.\n                             It will also got called later on if a component is manually activated.\n- UActorComponent::InitializeComponent: This will be called only if the component has bWantsInitializeComponentSet.\n                                        This only happens once per gameplay session.\n- AActor::PostInitializeComponents: Called after the actor's components have been initialized, only during gameplay and some editor previews.\n- AActor::BeginPlay: Called when the level starts ticking, only during actual gameplay.\n                     This normally happens right after PostInitializeComponents but can be delayed for networked or child actors.\n\n@see https://docs.unrealengine.com/Programming/UnrealArchitecture/Actors\n@see https://docs.unrealengine.com/Programming/UnrealArchitecture/Actors/ActorLifecycle\n@see UActorComponent"
+			},
+			"parent": "/Script/CoreUObject.Object"
+		}
+	]
+}

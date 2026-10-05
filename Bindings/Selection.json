@@ -1,0 +1,241 @@
+{
+  "functions": [
+    {
+      "function": "AddHealth",
+      "alias": "fixture_AddHealth",
+      "class": "/Script/DasRuntime.DasObjectFixture"
+    },
+    {
+      "function": "MutateValues",
+      "alias": "fixture_MutateValues",
+      "class": "/Script/DasRuntime.DasObjectFixture"
+    },
+    {
+      "function": "ExchangeMode",
+      "alias": "fixture_ExchangeMode",
+      "class": "/Script/DasRuntime.DasObjectFixture"
+    },
+    {
+      "function": "ExchangeName",
+      "alias": "fixture_ExchangeName",
+      "class": "/Script/DasRuntime.DasObjectFixture"
+    },
+    {
+      "function": "ExchangeNamedMode",
+      "alias": "fixture_ExchangeNamedMode",
+      "class": "/Script/DasRuntime.DasObjectFixture"
+    },
+    {
+      "function": "TransformPayload",
+      "alias": "fixture_TransformPayload",
+      "class": "/Script/DasRuntime.DasObjectFixture"
+    },
+    {
+      "function": "MutatePayload",
+      "alias": "fixture_MutatePayload",
+      "class": "/Script/DasRuntime.DasObjectFixture"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "GetTargetObject",
+      "alias": "fixture_GetTargetObject"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "SetFixtureTarget",
+      "alias": "fixture_SetFixtureTarget"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "ExchangeObject",
+      "alias": "fixture_ExchangeObject"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "NewFixture",
+      "alias": "fixture_NewFixture"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "PolicyDefault",
+      "alias": "fixture_PolicyDefault"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "DefaultScalars",
+      "alias": "fixture_DefaultScalars"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "DefaultWeight",
+      "alias": "fixture_DefaultWeight"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "TransformInts",
+      "alias": "fixture_TransformInts"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "MutateStrings",
+      "alias": "fixture_MutateStrings"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoNames",
+      "alias": "fixture_EchoNames"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoFloats",
+      "alias": "fixture_EchoFloats"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoDoubles",
+      "alias": "fixture_EchoDoubles"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoBools",
+      "alias": "fixture_EchoBools"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "TransformPayloads",
+      "alias": "fixture_TransformPayloads"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "MutateNamedModes",
+      "alias": "fixture_MutateNamedModes"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoModes",
+      "alias": "fixture_EchoModes"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoFixtureObjects",
+      "alias": "fixture_EchoFixtureObjects"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "SwapFixtureObjects",
+      "alias": "fixture_SwapFixtureObjects"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "MakeFixtureObjects",
+      "alias": "fixture_MakeFixtureObjects"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "ReplaceFixtureObjects",
+      "alias": "fixture_ReplaceFixtureObjects"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoActors",
+      "alias": "fixture_EchoActors"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "TransformMap",
+      "alias": "fixture_TransformMap"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "MutateMap",
+      "alias": "fixture_MutateMap"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoNameModeMap",
+      "alias": "fixture_EchoNameModeMap"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoDoubleMap",
+      "alias": "fixture_EchoDoubleMap"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoFloatMap",
+      "alias": "fixture_EchoFloatMap"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoBoolMap",
+      "alias": "fixture_EchoBoolMap"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "TransformSet",
+      "alias": "fixture_TransformSet"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "MutateSet",
+      "alias": "fixture_MutateSet"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoNameSet",
+      "alias": "fixture_EchoNameSet"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoModeSet",
+      "alias": "fixture_EchoModeSet"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "MakeMap",
+      "alias": "fixture_MakeMap"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "MakeSet",
+      "alias": "fixture_MakeSet"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoFloatSet",
+      "alias": "fixture_EchoFloatSet"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoDoubleSet",
+      "alias": "fixture_EchoDoubleSet"
+    },
+    {
+      "class": "/Script/DasRuntime.DasObjectFixture",
+      "function": "EchoFloatKeyMap",
+      "alias": "fixture_EchoFloatKeyMap"
+    }
+  ],
+  "policy": {
+    "allow_deprecated": false,
+    "allow_internal": false
+  },
+  "class_rules": [
+    {
+      "class": "/Script/Engine.Actor",
+      "prefix": "actor_",
+      "include": [
+        "ActorHasTag",
+        "SetTickGroup",
+        "GetOwner",
+        "SetOwner",
+        "K2_GetActorLocation",
+        "SetActorRelativeScale3D",
+        "GetActorRelativeScale3D",
+        "GetAttachedActors"
+      ],
+      "exclude": [],
+      "include_inherited": false
+    }
+  ]
+}

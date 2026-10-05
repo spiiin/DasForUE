@@ -5,10 +5,26 @@ $Project = Join-Path $Repo 'Tests\DasForUESmoke\DasForUESmoke.uproject'
 $Logs = Join-Path $Repo 'logs'
 $Archive = Join-Path $Repo 'Build\Packaged'
 New-Item -ItemType Directory -Path $Logs -Force | Out-Null
+# UE 5.8.3 BuildMode's synchronous fallback still loads Makefile.bin with -NoUBTMakefiles.
+# Rebuild only this disposable game-target cache so RuntimeDependencies globs include new scripts.
+$TargetMakefile = Join-Path $Repo 'Tests\DasForUESmoke\Intermediate\Build\Win64\x64\DasForUESmoke\Development\Makefile.bin'
+if (Test-Path -LiteralPath $TargetMakefile -PathType Leaf) {
+    Remove-Item -LiteralPath $TargetMakefile
+}
+# BuildConfiguration switches must be top-level UBT arguments, not nested UAT -Target arguments.
+& (Join-Path $Engine 'Engine\Build\BatchFiles\Build.bat') DasForUESmoke Win64 Development `
+    "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12 -NoUBTMakefiles "-Log=$Logs\build-packaged.log"
+if ($LASTEXITCODE) { throw 'Packaged target build failed' }
+$Receipt = Get-Content -LiteralPath (Join-Path $Repo 'Tests\DasForUESmoke\Binaries\Win64\DasForUESmoke.target') -Raw | ConvertFrom-Json
+$DeclaredFiles = @($Receipt.RuntimeDependencies | ForEach-Object { $_.Path })
+foreach ($Script in Get-ChildItem -LiteralPath (Join-Path $Repo 'Plugins\DasForUE\Content\Das\Scripts') -Filter '*.das' -File -Recurse) {
+    if ($DeclaredFiles -notcontains $Script.FullName) { throw "Script missing from build receipt: $($Script.FullName)" }
+}
+# The game is already built above; cook/stage/archive must consume that verified receipt.
 & (Join-Path $Engine 'Engine\Build\BatchFiles\RunUAT.bat') BuildCookRun "-project=$Project" `
-    -noP4 -platform=Win64 -clientconfig=Development -build -cook -stage -pak -archive `
+    -noP4 -platform=Win64 -clientconfig=Development -cook -stage -pak -archive `
     "-archivedirectory=$Archive" -map=/Engine/Maps/Entry -unattended -utf8output -nullrhi `
-    -nocompileeditor -skipbuildeditor -nodebuginfo '-UbtArgs=-NoXGE -MaxParallelActions=12'
+    -nocompileeditor -skipbuildeditor -nodebuginfo
 if ($LASTEXITCODE) { throw 'Packaging failed' }
 $Executable = Join-Path $Archive 'Windows\DasForUESmoke\Binaries\Win64\DasForUESmoke.exe'
 if (!(Test-Path -LiteralPath $Executable)) { throw "Packaged executable missing: $Executable" }

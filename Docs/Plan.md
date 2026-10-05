@@ -156,3 +156,246 @@ emitter. Добавления int/float поддержаны; удаления/�
 Self/UObject binding, полная функция/metadata IR, lifecycle callbacks, подписки,
 несколько клиентов и cook parity остаются следующими задачами. Подробности и
 воспроизводимые команды: Docs/ReloadProbe.md.
+
+## Следующий срез этапов 2–3 — 2026-10-05
+
+Выделены FDasClassSchema (типизированные scalar-поля/defaults и один int→int метод)
+и FDasBlueprintService. Runtime получил слабый self, проверяемый доступ к int32/float32
+свойствам и отказ для истёкшего объекта, неверного типа или read-only записи.
+Проверены GC, Actor::Destroy, reload/reopen и раздельное состояние editor/PIE.
+Foundation: 21 PASS в editor и packaged game; PIE: 1 success без ошибок/предупреждений.
+Полная модель типов/метаданных, persistent contexts, произвольные object handles,
+UFunction-вызовы и callbacks/подписки остаются в плане. Подробности: Docs/Interop.md.
+
+
+## Постоянные контексты и hot reload логики — 2026-10-05
+
+Реализованы отдельные сессии для owner/script, повторное использование Program/Context,
+проверка изменений исходника и импортов перед вызовом, подготовка и проверка кандидата,
+сохранение старой версии при ошибке, перенос именованного int32-state и очистка через
+Destroyed/EndPlay, world cleanup и GC. RunFile сохраняет прежнюю разовую семантику.
+Проверки: 44 PASS в editor и packaged Win64 Development; настоящий PIE с двумя
+счётчиками и fallback; structural reload/reopen. Подробности: Docs/PersistentContexts.md.
+
+Следующий функциональный срез: BeginPlay/Tick/EndPlay callbacks, затем delegates и
+подписки с очисткой при reload. Ещё нужны общий кеш Program, очередь обновлений,
+расширение схемы переносимого состояния и его перенос между reinstanced UObject.
+Полный пользовательский DSL остаётся отдельным этапом; его синтаксис не фиксируем.
+
+
+## Lifecycle callbacks — 2026-10-05
+
+ADasProbeActor подключает LifecycleScript и доставляет необязательные экспортированные
+begin_play(), tick(float), end_play(int). Сигнатуры проверяются до принятия новой версии,
+BeginPlay не повторяется при logic reload, EndPlay выполняется на рабочей версии до
+освобождения контекста. Доступ к self разрешён во время EndPlay уничтожаемого Actor.
+Неверные кандидаты оставляют предыдущие callbacks; LastDasError хранит диагностику.
+
+Проверки: 66 PASS в editor и packaged Win64 Development; отдельный настоящий PIE
+с двумя Actor, автоматическими Tick, reload, Destroy и EndPIE — 17 контрольных точек,
+1 success без предупреждений. Прежние structural reload/reopen/PIE тоже прошли.
+Подробности и примеры: Docs/Lifecycle.md. DSL-синтаксис не выбран и не фиксируется.
+
+Следующий функциональный срез: delegates/подписки с владением, снятием при reload
+и EndPlay и защитой от вызова старого контекста. Lifecycle при замене UObject через
+structural reinstancing, общий Program cache и очередь изменений остаются открытыми.
+
+
+## Управляемые delegate-подписки — 2026-10-05
+
+Первый срез: BlueprintAssignable dynamic multicast с одним int32, источники self/peer,
+экспортированный void(int) обработчик. bind_events() собирает и валидирует набор
+подписок до принятия кандидата; успешный reload отзывает старые IDs и заменяет
+привязки, неуспешный сохраняет их. UObject-прокси хранит ID вместо VM-указателей.
+Владение слабое; EndPlay/Destroy/GC/world cleanup/shutdown снимают только свои
+привязки. Вложенные события ставятся в ограниченную очередь; уничтожение owner
+во время VM-вызова откладывает освобождение контекста до безопасного выхода.
+
+Проверки: 85 PASS в editor и packaged Win64 Development, отдельный PIE delegates
+с 16 контрольными точками и без warnings; lifecycle/structural reload/reopen регрессии
+пройдены. Пример delegate_actor.das; подробности и ограничения: Docs/Delegates.md.
+
+Следующий срез: типизированные UObject handles и UFunction-вызовы для выбора
+произвольных источников, затем расширение сигнатур delegates. Остаются single-cast,
+worker-thread delivery, лямбды, runtime unsubscribe, structural rebind и безопасная
+отложенная доставка EndPlay при уничтожении Actor из вложенного события внутри VM.
+Синтаксис пользовательского DSL по-прежнему не фиксируется.
+
+
+## UObject handles и UFunction adapters — 2026-10-05
+
+Добавлен отдельный непрозрачный тип UObjectHandle в daScript, слабый реестр на
+контекст, null/valid/is-a/cast, чтение сильных объектных UPROPERTY и int32-свойств.
+Класс проверяется в runtime; сгенерированных daScript-типов для каждого UCLASS пока нет.
+Подписки могут получать произвольный доступный объектный источник через handle.
+
+ProcessEvent adapters поддерживают int32→int32, float32→float32, int32→void,
+()→object и object→void. Проверяются BlueprintCallable, signature, out/ref и класс
+аргумента; параметры используют FStructOnScope, вызов временно удерживает объекты.
+RPC/static и UFunction-вызовы из bind_events запрещены. После Destroy/GC старые
+handles отклоняются. При reload они заново получаются в новом контексте.
+
+Проверки: 103 PASS editor и packaged Win64; настоящий PIE с Blueprint Echo,
+native EmitDasSignal, engine SetOwner/GetOwner и Destroy/GC — 8 контрольных точек,
+1 success без warnings. Делегаты/lifecycle/structural reload/reopen регрессии прошли.
+Подробности: Docs/Objects.md. Пользовательский DSL-синтаксис по-прежнему не фиксируем.
+
+Следующий срез — типизированная function/signature IR и общий marshalling для
+нескольких аргументов, bool, строк и структур. AOT новых bindings, weak/soft/interface
+references, полноценная class-specific генерация и structural handle migration
+остаются отдельными задачами; текущие пять adapters не заменяют весь UE API.
+
+
+## Общий UFunction marshalling — 2026-10-05
+
+Выполнен первый общий срез: непрозрачный UCallHandle, IR скалярных путей/типов/
+направлений, несколько аргументов, int32/float/double/bool/FString, вложенные
+UScriptStruct, const-reference inputs и чтение struct return. Полная поддерживаемая
+сигнатура проверяется до подготовки вызова, заполненность inputs — до ProcessEvent.
+Параметры живут в FStructOnScope; строка результата копируется в daScript.
+Frames одноразовые, с ограничением количества и очисткой после callback/ошибки.
+Подробности, ограничения и результаты: Docs/Marshalling.md.
+
+Следующий срез: объединить object arguments с этим механизмом, добавить out/inout
+и enum/FName, затем контейнеры и генератор типизированных daScript-обёрток поверх
+IR. Необходимы полноценный IR с class/struct identity и метаданными, политика
+экспорта UE API и AOT. Текущий IR — внутреннее описание скалярных листьев конкретной
+UFunction, не окончательный формат схемы. DSL для авторских классов и его hot reload
+остаются в плане; выбор синтаксиса остаётся за пользователем.
+
+
+## Объектные параметры и out/inout — 2026-10-05
+
+Общий marshalling расширен до UObject input/return/out/inout и изменяемых
+скалярных/строковых/структурных ссылок. IR различает вход и выход независимо;
+все inout inputs обязательны, чистые out задавать нельзя. Frame удерживает
+объектные параметры/результаты, проверяет класс и истёкшие handles и освобождает
+pins явно либо при выходе из VM. Возвращаемые UObjectHandle остаются слабыми.
+Детали и верификация — Docs/InOut.md. Старые call adapters остаются совместимыми.
+
+Следующий срез: enum/FName, затем генерация типизированных daScript-обёрток по IR.
+Рекурсивное владение объектными полями структур, контейнеры, полный IR с метаданными
+и AOT остаются отдельными задачами. DSL авторских классов и его hot reload остаются
+в плане; выбор синтаксиса за пользователем.
+
+
+## Enum и FName — 2026-10-05
+
+Общий marshalling поддерживает FEnumProperty, enum-backed FByteProperty и FName,
+включая поля структур, return и out/inout. Enum задаётся путём UEnum и символом;
+IR хранит TypePath. Чужие типы, неизвестные элементы и зарезервированные _MAX
+отклоняются. Name использует правила UE для None, регистра и числовых суффиксов.
+Строки результатов принадлежат daScript, а ввод проверяется до создания FName.
+Подробности, границы и проверки — Docs/EnumsNames.md.
+
+Следующий срез: экспорт IR и генерация типизированных daScript-обёрток для явно
+выбранного UE API. Полная политика метаданных, enum declarations, контейнеры,
+GC-aware объектные поля структур и AOT ещё впереди. Синтаксис DSL классов не выбран.
+
+
+## Экспорт IR и типизированные обёртки — 2026-10-06
+
+Добавлен DasExport commandlet, JSON IR v1 и Python-генератор для 11 явно выбранных
+функций. Экспорт использует общую валидацию reflection с runtime. Обёртки получают
+типизированные параметры, отдельные enum/UEName и структуры нескольких результатов;
+они самостоятельно выполняют маршаллинг и проверку актуальности сигнатуры.
+GenerateBindings.ps1 -Check проверяет свежесть IR и кода. Подробности и результаты:
+Docs/GeneratedBindings.md. DSL авторских классов этим этапом не определяется.
+
+Следующий срез: именованные struct-типы вместо развёрнутых скалярных листьев,
+class-specific handles и политика экспорта метаданных. Затем расширение охвата API
+и AOT. Контейнеры, объектные поля структур и authoring DSL/hot reload остаются в плане.
+
+
+## Именованные структуры — 2026-10-06
+
+IR v2 сохраняет definitions структур и параметры верхнего уровня, а также листья
+для сверки с runtime. Генератор выпускает уникальные daScript struct-типы с
+вложенностью, enum/FName и строками. Входы/выходы передаются целиком; inout возвращает
+копию в result. FVector проверяется через реальные Set/GetActorRelativeScale3D.
+Список API расширен до 14 функций. Подробности и миграция: Docs/StructBindings.md.
+
+Следующий срез: class-specific UObject-типы, типизированные ссылки и их преобразования.
+Default values, policy метаданных, контейнеры, GC-aware объектные поля структур,
+AOT и DSL пользовательских классов с hot reload остаются отдельными этапами.
+
+
+## Типизированные ссылки UCLASS — 2026-10-06
+
+IR v3 хранит классы и их предков. Обёртки принимают конкретные nominal class-типы
+в receiver, input/return/out/inout; явные casts сохраняют проверку класса и слабое
+владение. Null допускается для параметров/результатов, истёкшие ссылки отклоняются.
+Выбор расширен до 18 функций; подробности: Docs/ClassBindings.md.
+
+Следующий срез: политика экспорта reflected API и метаданных, с явными правилами
+включения/исключения и диагностикой неподдерживаемых сигнатур. Затем defaults,
+контейнеры, GC-aware объектные поля структур и AOT. DSL пользовательских классов
+через синтаксические макросы и его hot reload остаются отдельными этапами;
+синтаксис выбирает пользователь.
+
+
+## Политика API и metadata — 2026-10-06
+
+Реализованы class_rules с include/exclude и явным include_inherited, обязательные
+и необязательные функции, фильтры deprecated/internal и диагностика пропусков.
+IR v3 дополнен declaring_class, pure/const, allowlist metadata и default_text.
+Экспорт требует Editor; metadata не меняет исполнение обёрток. Существующий выбор
+сохраняет 18 функций. Подробности: Docs/BindingPolicy.md.
+
+Следующий срез: типизированные значения по умолчанию. Затем расширение типов,
+контейнеры, объектные поля структур с GC, AOT и пользовательский DSL с hot reload.
+Синтаксис DSL по-прежнему не выбран и остаётся решением пользователя.
+
+
+## Типизированные defaults — 2026-10-06
+
+Генератор преобразует default_text в проверенные значения для int/float/double,
+bool, FString/FName, enum и null UObject. Поддержаны пропуск и переопределение
+аргументов; недопустимые представления и направления дают явную ошибку без
+перезаписи старого модуля. Источник defaults — metadata UHT с её точностью,
+а не исходный C++ литерал. Подробности и ограничения: Docs/Defaults.md.
+
+Следующий срез: TArray поддерживаемых значений и управление временем жизни
+элементов при маршаллинге. Затем дальнейшие контейнеры/объектные поля структур,
+AOT и DSL пользовательских классов с hot reload; синтаксис выбирает пользователь.
+
+
+## TArray скаляров — 2026-10-06
+
+Реализованы верхнеуровневые TArray<int32/float/double/bool/FString/FName>:
+input, return, out/inout, типизированные array<T> и move результатов в daScript.
+Добавлены проверки полноты, индексов, направлений, размеров и времени жизни frame.
+IR v3 дополнен element, runtime signature включает inner property. См. Docs/Arrays.md.
+
+Следующие шаги: массивы структур и UObject (GC), TMap/TSet; authoring DSL и
+синтаксические макросы; hot reload методов, затем структуры классов; AOT.
+Модель DSL может быть приоритетнее остальных контейнеров по выбору пользователя.
+
+
+## TArray структур и UObject — 2026-10-06
+
+IR v4 содержит wildcard-листья элементов, identity enum/struct/class и их
+зависимости. Добавлены рекурсивные value-структуры и enum в массивах, typed UObject
+input/return/out/inout с GC-pins на срок frame и слабыми возвращёнными handles.
+В PIE проверяется настоящий Actor.GetAttachedActors с прикреплённым ребёнком.
+Подробности: Docs/ComplexArrays.md. Object-поля внутри struct и nested containers
+этим этапом не добавлялись.
+
+Следующий этап: TMap/TSet. Далее authoring DSL (модель, синтаксические макросы),
+hot reload тел методов и структурных изменений классов, AOT. Синтаксис DSL
+выбирает пользователь; DSL может быть отдельным ближайшим приоритетом.
+
+
+## TMap/TSet скаляров — 2026-10-06
+
+IR v5 и nominal daScript wrappers поддерживают map key/value и set element
+скалярных типов. Входы заполняются в staging-values, затем проверяются полнота,
+UE hash/equality и уникальность. Native контейнеры строятся перед ProcessEvent;
+выходы читаются с учётом sparse/compact layout. Поддержаны return/out/inout,
+finite float keys и signed zero; failed post-call frames не раскрывают результаты.
+Подробности: Docs/HashContainers.md.
+
+Следующий основной этап: модель authoring DSL для классов/наследования/свойств/
+функций/metadata, затем синтаксические макросы; синтаксис выбирает пользователь.
+Далее hot reload методов, структурные изменения с переносом состояния, AOT.
+Map/Set структур и UObject и вложенные контейнеры остаются отдельным расширением.

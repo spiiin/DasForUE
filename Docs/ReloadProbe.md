@@ -102,3 +102,10 @@ editor service из commandlet. Затем расширить PIE-проверк
 Actor lifecycle callbacks, подписки и задачи при reload; отдельно — metadata-only changes,
 undo/redo и обновление открытых Blueprint-графов. Решение о production backend
 принять после этих проверок и проверки cook parity.
+
+## Обновление после выделения сервиса
+
+Генерация перенесена в FDasBlueprintService, схема представлена FDasClassSchema.
+Добавлен слабый self и scalar-доступ к свойствам. Теперь reload/reopen и PIE также
+проверяют запись из daScript; см. Docs/Interop.md. Указанные выше ограничения
+отсутствия self относятся к исходной версии эксперимента.

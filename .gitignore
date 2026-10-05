@@ -10,3 +10,6 @@
 .vs/
 /Tests/DasForUESmoke/Content/DasReloadProbe/
 /Tests/DasForUESmoke/Build/Windows/FileOpenOrder/
+__pycache__/
+*.pyc
+*.pyo
