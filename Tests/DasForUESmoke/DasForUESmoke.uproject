@@ -1,0 +1,21 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "{90C020A8-4348-BC21-07DF-8DBFB9DCD7A6}",
+  "AdditionalPluginDirectories": [
+    "../../Plugins"
+  ],
+  "Modules": [
+    {
+      "Name": "DasForUESmoke",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "DasForUE",
+      "Enabled": true
+    }
+  ],
+  "DisableEnginePluginsByDefault": true
+}

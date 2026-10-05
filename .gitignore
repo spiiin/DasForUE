@@ -1,0 +1,12 @@
+/Build/
+/ThirdParty/
+/logs/
+**/Binaries/
+**/Intermediate/
+**/Saved/
+**/DerivedDataCache/
+/Plugins/DasForUE/Content/Das/daslib/
+*.sln
+.vs/
+/Tests/DasForUESmoke/Content/DasReloadProbe/
+/Tests/DasForUESmoke/Build/Windows/FileOpenOrder/

@@ -1,0 +1,10 @@
+{
+  "unreal": "5.8.3",
+  "dascript": {
+    "url": "https://github.com/GaijinEntertainment/daScript.git",
+    "commit": "17c73938895497508439fcc62e9ea96adc92ffe0",
+    "version": "0.6.4"
+  },
+  "msvc": "14.44.35207",
+  "windowsSdk": "10.0.22621.0"
+}
