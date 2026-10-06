@@ -15,8 +15,9 @@
     {if(A.type!=das::Type::tString) DSLFail(TEXT("Metadata must be string: ")+DSLText(A.name));Out.Add(DSLText(A.name),DSLText(A.sValue));}
     const das::AnnotationDeclaration* DSLAnnotation(const das::AnnotationList& L,const char* N)
     {for(auto* A:L) if(A->annotation->name==N) return A;return nullptr;}
-    FString DSLTypeName(const das::TypeDeclPtr& T){if(!T)return {};switch(T->baseType){case das::Type::tInt:return TEXT("int");case das::Type::tFloat:return TEXT("float");case das::Type::tBool:return TEXT("bool");case das::Type::tDouble:return TEXT("double");case das::Type::tString:return TEXT("string");case das::Type::tVoid:return TEXT("void");case das::Type::tHandle:if(T->annotation && T->annotation->name=="UENameValue")return TEXT("name");default:break;}return {};}
-    bool DSLPropertyMatches(FProperty* P,const FString& K){return K==TEXT("int")?CastField<FIntProperty>(P)!=nullptr:K==TEXT("float")?CastField<FFloatProperty>(P)!=nullptr:K==TEXT("bool")?CastField<FBoolProperty>(P)!=nullptr:K==TEXT("double")?CastField<FDoubleProperty>(P)!=nullptr:K==TEXT("string")?CastField<FStrProperty>(P)!=nullptr:CastField<FNameProperty>(P)!=nullptr;}
+    FString DSLTypeName(const das::TypeDeclPtr& T){if(!T)return {};switch(T->baseType){case das::Type::tInt:return TEXT("int");case das::Type::tFloat:return TEXT("float");case das::Type::tBool:return TEXT("bool");case das::Type::tDouble:return TEXT("double");case das::Type::tString:return TEXT("string");case das::Type::tVoid:return TEXT("void");case das::Type::tHandle:if(T->annotation && T->annotation->name=="UENameValue")return TEXT("name");if(T->annotation && T->annotation->name=="UObjectHandle")return TEXT("object");if(T->annotation && (T->annotation->name=="UEVector" || T->annotation->name=="UERotator" || T->annotation->name=="UETransform" || T->annotation->name=="UEStructValue"))return TEXT("struct");default:break;}return {};}
+    FString DSLMathPath(const das::TypeDeclPtr& T){if(!T || !T->annotation)return {};return T->annotation->name=="UEVector"?TEXT("/Script/CoreUObject.Vector"):T->annotation->name=="UERotator"?TEXT("/Script/CoreUObject.Rotator"):TEXT("/Script/CoreUObject.Transform");}
+    bool DSLPropertyMatches(FProperty* P,const FString& K){return K==TEXT("int")?CastField<FIntProperty>(P)!=nullptr:K==TEXT("float")?CastField<FFloatProperty>(P)!=nullptr:K==TEXT("bool")?CastField<FBoolProperty>(P)!=nullptr:K==TEXT("double")?CastField<FDoubleProperty>(P)!=nullptr:K==TEXT("string")?CastField<FStrProperty>(P)!=nullptr:K==TEXT("struct")?CastField<FStructProperty>(P)!=nullptr:K==TEXT("name")?CastField<FNameProperty>(P)!=nullptr:CastField<FObjectProperty>(P)!=nullptr && !CastField<FClassProperty>(P);}
     struct FDSLBodyVisitor:das::Visitor
     {
         const FDasDeclaredClass& Decl;das::string Self;TSet<const das::Expression*> LeftFields;FString Error;
@@ -35,14 +36,14 @@
         das::ExpressionPtr Read(das::ExprField* F)
         {
             const auto* P=Property(F);if(!P) return F;
-            auto* C=new das::ExprCall(F->at,P->Type.Kind==TEXT("int")?"ue_get_self_int":P->Type.Kind==TEXT("float")?"ue_get_self_float":P->Type.Kind==TEXT("bool")?"ue_get_self_bool":P->Type.Kind==TEXT("double")?"ue_get_self_double":P->Type.Kind==TEXT("string")?"ue_get_self_string":"ue_get_self_name");
+            auto* C=new das::ExprCall(F->at,P->Type.Kind==TEXT("int")?"ue_get_self_int":P->Type.Kind==TEXT("float")?"ue_get_self_float":P->Type.Kind==TEXT("bool")?"ue_get_self_bool":P->Type.Kind==TEXT("double")?"ue_get_self_double":P->Type.Kind==TEXT("string")?"ue_get_self_string":P->Type.Kind==TEXT("struct")?"ue_get_self_struct":"ue_get_self_name");
             C->arguments.push_back(new das::ExprConstString(F->at,DSLUtf8(P->Name)));return C;
         }
         das::ExpressionPtr Write(das::ExprOp2* E,das::ExprField* F,bool Compound)
         {
             const auto* P=Property(F);if(!P) return E;
             if(P->bReadOnly){Error=TEXT("Cannot write BlueprintReadOnly self property: ")+P->Name;return E;}
-            auto* C=new das::ExprCall(E->at,P->Type.Kind==TEXT("int")?"ue_set_self_int":P->Type.Kind==TEXT("float")?"ue_set_self_float":P->Type.Kind==TEXT("bool")?"ue_set_self_bool":P->Type.Kind==TEXT("double")?"ue_set_self_double":P->Type.Kind==TEXT("string")?"ue_set_self_string":"ue_set_self_name");
+            auto* C=new das::ExprCall(E->at,P->Type.Kind==TEXT("int")?"ue_set_self_int":P->Type.Kind==TEXT("float")?"ue_set_self_float":P->Type.Kind==TEXT("bool")?"ue_set_self_bool":P->Type.Kind==TEXT("double")?"ue_set_self_double":P->Type.Kind==TEXT("string")?"ue_set_self_string":P->Type.Kind==TEXT("struct")?"ue_set_self_struct":"ue_set_self_name");
             C->arguments.push_back(new das::ExprConstString(E->at,DSLUtf8(P->Name)));
             C->arguments.push_back(Compound?new das::ExprOp2(E->at,E->op.substr(0,E->op.size()-1),Read(F),E->right):E->right);return C;
         }
@@ -106,8 +107,19 @@
                     if(ReadWrite && ReadOnly) DSLFail(TEXT("Conflicting BlueprintReadOnly/BlueprintReadWrite specifiers"));
                     if(!Marked) DSLFail(TEXT("Script-private fields unsupported; add @ue_property: ")+P.Name);
                     const FString FieldType=DSLTypeName(F.type);
-                    if(!F.type || F.type->ref || FieldType.IsEmpty() || FieldType==TEXT("void")) DSLFail(TEXT("Adapter supports int/float/bool/string/double/name properties: ")+P.Name);
+                    if(!F.type || F.type->ref || FieldType.IsEmpty() || (FieldType==TEXT("void") || FieldType==TEXT("object"))) DSLFail(TEXT("Adapter supports int/float/bool/string/double/name properties: ")+P.Name);
                     P.Type.Kind=FieldType;
+                    if(FieldType==TEXT("struct")){
+                        if(F.type->annotation->name!="UEStructValue" || !F.init || !F.init->rtti_isCall())DSLFail(TEXT("Struct property requires UEStructValue and literal ue_struct_value/default initializer"));
+                        auto* Call=static_cast<das::ExprCall*>(F.init);
+                        const bool Full=Call->name=="ue_struct_default";
+                        if((!Full && Call->name!="ue_struct_value") || Call->arguments.size()!=(Full?2:1))DSLFail(TEXT("Invalid struct property initializer"));
+                        for(auto* Arg:Call->arguments)if(Arg->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Struct initializer arguments must be literal strings"));
+                        P.Type.TypePath=DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text);
+                        P.Default.Kind=TEXT("string");P.Default.String=Full?DSLText(static_cast<das::ExprConstString*>(Call->arguments[1])->text):FString();
+                        FInstancedStruct Default;FString Issue;if(!ParseDasStructDefault(P.Type.TypePath,P.Default.String,Default,Issue))DSLFail(Issue);
+                        C.Properties.Add(MoveTemp(P));continue;
+                    }
                     if(F.init)
                     {
                         P.Default.Kind=TEXT("number");
@@ -126,18 +138,20 @@
                 for(const auto& F:Functions)
                 {
                     const auto* A=DSLAnnotation(F->annotations,"ue_function");FDasDeclaredMethod M;
-                    M.Name=DSLText(F->name.substr(F->name.find_last_of(das::string(1,char(96))+das::string(1,char(39)))+1));M.Id=C.Id+TEXT(".")+M.Name;M.ScriptFile=Script;M.EntryPoint=TEXT("ue_")+C.Name+TEXT("_")+M.Name;M.bCallable=false;
+                    M.Name=DSLText(F->name.substr(F->name.find_last_of(das::string(1,char(96))+das::string(1,char(39)))+1));M.Id=C.Id+TEXT(".")+M.Name;M.ScriptFile=Script;M.EntryPoint=TEXT("ue_")+C.Name+TEXT("_")+M.Name;M.bCallable=false;TMap<FString,FString> ObjectClasses;
                     for(const auto& V:A->arguments)
                     {
                         if(V.name=="id"){M.Id=DSLString(A->arguments,"id");continue;}
                         if(V.name=="BlueprintCallable") M.bCallable=DSLBool(V);
+                        else if(V.name=="return_class" || V.name=="return_struct" || (V.name.find("arg_")==0 && V.name.size()>10 && (V.name.substr(V.name.size()-6)=="_class" || V.name.substr(V.name.size()-7)=="_struct"))){ObjectClasses.Add(DSLText(V.name),DSLString(A->arguments,V.name.c_str()));}
                         else if(DSLIsMetadata(V.name)) DSLMetadata(V,M.Metadata);else DSLFail(TEXT("Unsupported ue_function specifier: ")+DSLText(V.name));
                     }
                     const FString ResultType=DSLTypeName(F->result);
                     if(!M.bCallable || F->isStaticClassMethod || !F->result || F->result->ref || ResultType.IsEmpty() || F->arguments.empty() || F->arguments.size()>17) DSLFail(TEXT("Adapter requires BlueprintCallable instance scalar/void method with up to 16 by-value inputs: ")+M.Name);
-                    M.ReturnType.Kind=ResultType;
+                    M.ReturnType.Kind=ResultType;if(ResultType==TEXT("struct")){if(F->result->annotation->name=="UEStructValue"){M.ReturnType.TypePath=ObjectClasses.FindRef(TEXT("return_struct"));ObjectClasses.Remove(TEXT("return_struct"));if(M.ReturnType.TypePath.IsEmpty())DSLFail(TEXT("UEStructValue result requires return_struct"));}else M.ReturnType.TypePath=DSLMathPath(F->result);}if(ResultType==TEXT("object")){M.ReturnType.TypePath=ObjectClasses.FindRef(TEXT("return_class"));if(M.ReturnType.TypePath.IsEmpty())M.ReturnType.TypePath=TEXT("/Script/CoreUObject.Object");ObjectClasses.Remove(TEXT("return_class"));}
                     const bool LegacySingle=F->arguments.size()==2 && (ResultType==TEXT("int") || ResultType==TEXT("float") || ResultType==TEXT("bool")) && DSLTypeName(F->arguments[1]->type)==ResultType;
-                    for(size_t I=1;I<F->arguments.size();++I){const auto& V=F->arguments[I];const FString K=DSLTypeName(V->type);if(!V->type || V->type->ref || K.IsEmpty() || K==TEXT("void") || V->init) DSLFail(TEXT("Unsupported parameter type/ref/default: ")+DSLText(V->name));FDasDeclaredParameter P;P.Name=LegacySingle?TEXT("Input"):DSLText(V->name);P.Id=M.Id+TEXT(".")+(LegacySingle?TEXT("input"):P.Name);P.Type.Kind=K;M.Parameters.Add(P);}
+                    for(size_t I=1;I<F->arguments.size();++I){const auto& V=F->arguments[I];const FString K=DSLTypeName(V->type);if(!V->type || V->type->ref || K.IsEmpty() || K==TEXT("void") || V->init) DSLFail(TEXT("Unsupported parameter type/ref/default: ")+DSLText(V->name));FDasDeclaredParameter P;P.Name=LegacySingle?TEXT("Input"):DSLText(V->name);P.Id=M.Id+TEXT(".")+(LegacySingle?TEXT("input"):P.Name);P.Type.Kind=K;if(K==TEXT("struct")){if(V->type->annotation->name=="UEStructValue"){const FString Key=TEXT("arg_")+DSLText(V->name)+TEXT("_struct");P.Type.TypePath=ObjectClasses.FindRef(Key);ObjectClasses.Remove(Key);if(P.Type.TypePath.IsEmpty())DSLFail(TEXT("UEStructValue parameter requires arg_name_struct"));}else P.Type.TypePath=DSLMathPath(V->type);}if(K==TEXT("object")){const FString Key=TEXT("arg_")+DSLText(V->name)+TEXT("_class");P.Type.TypePath=ObjectClasses.FindRef(Key);if(P.Type.TypePath.IsEmpty())P.Type.TypePath=TEXT("/Script/CoreUObject.Object");ObjectClasses.Remove(Key);}M.Parameters.Add(P);}
+                    if(!ObjectClasses.IsEmpty())DSLFail(TEXT("Unused object class annotation"));
                     auto Clone=F->clone();Clone->name=DSLUtf8(M.EntryPoint);Clone->classParent=nullptr;Clone->annotations.clear();Clone->exports=true;Clone->generated=true;Clone->privateFunction=false;Clone->isStaticClassMethod=false;Clone->isConstClassMethod=false;
                     FDSLBodyVisitor Rewrite(C,Clone->arguments[0]->name);Clone->body=Clone->body->visit(Rewrite);Clone->arguments.erase(Clone->arguments.begin());
                     if(!Rewrite.Error.IsEmpty()) DSLFail(Rewrite.Error);
@@ -170,9 +184,13 @@
                     FProperty* Actual=Self->GetClass()->FindPropertyByName(*P.Name);
                     if(!DSLPropertyMatches(Actual,P.Type.Kind) || P.bReadOnly!=Actual->HasAnyPropertyFlags(CPF_BlueprintReadOnly))
                     {Error=TEXT("DSL property differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}
+                    if(P.Type.Kind==TEXT("struct")){
+                        auto* Struct=CastField<FStructProperty>(Actual);FInstancedStruct Default;
+                        if(Struct->Struct->GetPathName()!=P.Type.TypePath || !ParseDasStructDefault(P.Type.TypePath,P.Default.String,Default,Error) || (ActorAdapter && !Struct->Struct->CompareScriptStruct(Struct->ContainerPtrToValuePtr<void>(Actual->GetOwnerClass()->GetDefaultObject()),Default.GetMemory(),0))){Error=TEXT("DSL struct type/default differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}continue;
+                    }
                     if(ActorAdapter)
                     {
-                        UObject* CDO=Self->GetClass()->GetDefaultObject();
+                        UObject* CDO=Actual->GetOwnerClass()->GetDefaultObject();
                         const bool DefaultMatches=P.Type.Kind==TEXT("int")
                             ? CastField<FIntProperty>(Actual)->GetPropertyValue_InContainer(CDO)==static_cast<int32>(P.Default.Number)
                             : P.Type.Kind==TEXT("float")?CastField<FFloatProperty>(Actual)->GetPropertyValue_InContainer(CDO)==static_cast<float>(P.Default.Number):P.Type.Kind==TEXT("bool")?CastField<FBoolProperty>(Actual)->GetPropertyValue_InContainer(CDO)==P.Default.Boolean:P.Type.Kind==TEXT("double")?CastField<FDoubleProperty>(Actual)->GetPropertyValue_InContainer(CDO)==P.Default.Number:P.Type.Kind==TEXT("string")?CastField<FStrProperty>(Actual)->GetPropertyValue_InContainer(CDO)==P.Default.String:CastField<FNameProperty>(Actual)->GetPropertyValue_InContainer(CDO)==FName(*P.Default.String);
@@ -185,8 +203,10 @@
                     auto Matches=[](FProperty* P,const FString& K){return DSLPropertyMatches(P,K);};
                     bool Fits=Method && Method->NumParms==M.Parameters.Num()+(M.ReturnType.Kind==TEXT("void")?0:1);
                     if(Fits){int32 Index=0;for(TFieldIterator<FProperty> It(Method);It;++It) if(It->HasAnyPropertyFlags(CPF_Parm) && !It->HasAnyPropertyFlags(CPF_ReturnParm)){Fits &= M.Parameters.IsValidIndex(Index) && It->GetFName()==FName(*M.Parameters[Index].Name);++Index;}Fits &= Index==M.Parameters.Num();}
-                    if(Fits) for(const auto& P:M.Parameters){auto* Actual=Method->FindPropertyByName(*P.Name);Fits &= Matches(Actual,P.Type.Kind) && !Actual->HasAnyPropertyFlags(CPF_OutParm|CPF_ReferenceParm);}
+                    if(Fits) for(const auto& P:M.Parameters){auto* Actual=Method->FindPropertyByName(*P.Name);Fits &= Matches(Actual,P.Type.Kind) && !Actual->HasAnyPropertyFlags(CPF_OutParm|CPF_ReferenceParm);if(Fits && P.Type.Kind==TEXT("struct"))Fits=CastField<FStructProperty>(Actual)->Struct->GetPathName()==P.Type.TypePath;if(Fits && P.Type.Kind==TEXT("object"))Fits=CastField<FObjectProperty>(Actual)->PropertyClass->GetPathName()==P.Type.TypePath;}
                     if(Fits) Fits=M.ReturnType.Kind==TEXT("void")?!Method->GetReturnProperty():Matches(Method->GetReturnProperty(),M.ReturnType.Kind);
+                    if(Fits && M.ReturnType.Kind==TEXT("struct"))Fits=CastField<FStructProperty>(Method->GetReturnProperty())->Struct->GetPathName()==M.ReturnType.TypePath;
+                    if(Fits && M.ReturnType.Kind==TEXT("object"))Fits=CastField<FObjectProperty>(Method->GetReturnProperty())->PropertyClass->GetPathName()==M.ReturnType.TypePath;
                     if(!Fits)
                     {Error=TEXT("DSL method differs from owner; apply/reimport Blueprint: ")+M.Name;OK=false;return;}
                 }

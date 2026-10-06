@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "DasSchema.h"
 
+enum class EDasDefaultMigrationPolicy : uint8 { Refuse, PreserveInstances };
 class UBlueprint;
 struct FDasAuthoringModule;
 
@@ -12,5 +13,5 @@ class DASEDITOR_API FDasBlueprintService
 public:
     static bool ReadSchema(const FString& ScriptFile, FDasClassSchema& Out, FString& Error);
     static bool ApplyAuthoring(UBlueprint* Blueprint, const FDasAuthoringModule& Module, const FString& ClassId, FString& Error);
-    static bool Apply(UBlueprint* Blueprint, const FDasClassSchema& Schema, FString& Error, bool bValidateOnly = false);
+    static bool Apply(UBlueprint* Blueprint, const FDasClassSchema& Schema, FString& Error, bool bValidateOnly = false, EDasDefaultMigrationPolicy DefaultPolicy = EDasDefaultMigrationPolicy::Refuse);
 };

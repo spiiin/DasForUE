@@ -1,4 +1,5 @@
 #include "DasAuthoring.h"
+#include "StructUtils/InstancedStruct.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
 #include "Policies/CondensedJsonPrintPolicy.h"
@@ -72,6 +73,7 @@ namespace
         }
         if (K == TEXT("bool") && D.Kind == TEXT("bool")) return true;
         if ((K == TEXT("string") || K == TEXT("name") || K == TEXT("enum")) && D.Kind == TEXT("string") && (K != TEXT("name") || D.String.Len() < NAME_SIZE) && (K != TEXT("enum") || Identifier(D.String))) return true;
+        if(K==TEXT("struct") && D.Kind==TEXT("string")){FInstancedStruct Value;return ParseDasStructDefault(P.Type.TypePath,D.String,Value,Error);}
         if (K == TEXT("object") && D.Kind == TEXT("null")) return true;
         return Fail(Error, TEXT("Invalid default for property ") + P.Name);
     }
@@ -291,10 +293,11 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         const FString K=M.ReturnType.Kind;
         const bool Action=K==TEXT("void") && M.Parameters.IsEmpty();
         const bool Scalar=(K==TEXT("int") || K==TEXT("float") || K==TEXT("bool")) && M.Parameters.Num()==1 && M.Parameters[0].Type.Kind==K && M.Parameters[0].Direction==TEXT("in") && M.Parameters[0].Name==TEXT("Input");
-        auto Kind=[](const FString& T){return T==TEXT("int")?EDasMethodSignature::Int:T==TEXT("float")?EDasMethodSignature::Float:T==TEXT("bool")?EDasMethodSignature::Bool:T==TEXT("void")?EDasMethodSignature::Void:T==TEXT("string")?EDasMethodSignature::String:T==TEXT("double")?EDasMethodSignature::Double:T==TEXT("name")?EDasMethodSignature::Name:EDasMethodSignature::Frame;};
-        if(Kind(K)==EDasMethodSignature::Frame || M.Parameters.Num()>16 || !M.bCallable || M.bPure || M.bStatic) return Fail(Error,TEXT("Actor adapter requires callable scalar/void methods with up to 16 by-value inputs, without pure/static: ")+M.Id);
-        FDasMethodSchema Method;Method.Name=*M.Name;Method.ScriptFile=M.ScriptFile;Method.EntryPoint=M.EntryPoint;Method.StableId=M.Id;Method.InputStableId=M.Parameters.Num()==1?M.Parameters[0].Id:FString();Method.Metadata=M.Metadata;Method.ReturnKind=Kind(K);
-        for(const auto& P:M.Parameters){if((Kind(P.Type.Kind)==EDasMethodSignature::Frame || Kind(P.Type.Kind)==EDasMethodSignature::Void) || P.Direction!=TEXT("in")) return Fail(Error,TEXT("Actor adapter parameter capability missing: ")+P.Id);Method.Parameters.Add({*P.Name,P.Id,Kind(P.Type.Kind)});}
+        auto Kind=[](const FString& T){return T==TEXT("int")?EDasMethodSignature::Int:T==TEXT("float")?EDasMethodSignature::Float:T==TEXT("bool")?EDasMethodSignature::Bool:T==TEXT("void")?EDasMethodSignature::Void:T==TEXT("string")?EDasMethodSignature::String:T==TEXT("double")?EDasMethodSignature::Double:T==TEXT("name")?EDasMethodSignature::Name:T==TEXT("object")?EDasMethodSignature::Object:EDasMethodSignature::Frame;};
+        auto ValueKind=[&](const FDasDeclaredType& T){if(T.Kind==TEXT("struct")){if(T.TypePath==TEXT("/Script/CoreUObject.Vector"))return EDasMethodSignature::Vector;if(T.TypePath==TEXT("/Script/CoreUObject.Rotator"))return EDasMethodSignature::Rotator;if(T.TypePath==TEXT("/Script/CoreUObject.Transform"))return EDasMethodSignature::Transform;return EDasMethodSignature::Struct;}return Kind(T.Kind);};
+        if(ValueKind(M.ReturnType)==EDasMethodSignature::Frame || M.Parameters.Num()>16 || !M.bCallable || M.bPure || M.bStatic) return Fail(Error,TEXT("Actor adapter requires callable scalar/void methods with up to 16 by-value inputs, without pure/static: ")+M.Id);
+        FDasMethodSchema Method;Method.Name=*M.Name;Method.ScriptFile=M.ScriptFile;Method.EntryPoint=M.EntryPoint;Method.StableId=M.Id;Method.InputStableId=M.Parameters.Num()==1?M.Parameters[0].Id:FString();Method.Metadata=M.Metadata;Method.ReturnKind=ValueKind(M.ReturnType);Method.ReturnClass=(K==TEXT("object") || (K==TEXT("struct") && Method.ReturnKind==EDasMethodSignature::Struct))?M.ReturnType.TypePath:FString();
+        for(const auto& P:M.Parameters){if((ValueKind(P.Type)==EDasMethodSignature::Frame || ValueKind(P.Type)==EDasMethodSignature::Void) || P.Direction!=TEXT("in")) return Fail(Error,TEXT("Actor adapter parameter capability missing: ")+P.Id);Method.Parameters.Add({*P.Name,P.Id,ValueKind(P.Type),(P.Type.Kind==TEXT("object") || (P.Type.Kind==TEXT("struct") && ValueKind(P.Type)==EDasMethodSignature::Struct))?P.Type.TypePath:FString()});}
         Method.Signature=Action?EDasMethodSignature::Void:Scalar?Kind(K):EDasMethodSignature::Frame;
         Result.Methods.Add(MoveTemp(Method));
     }
@@ -304,9 +307,9 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
     for (const auto* Ptr : Properties)
     {
         const auto& P=*Ptr;
-        if ((P.Type.Kind != TEXT("int") && P.Type.Kind != TEXT("float") && P.Type.Kind != TEXT("bool") && P.Type.Kind!=TEXT("string") && P.Type.Kind!=TEXT("double") && P.Type.Kind!=TEXT("name"))) return Fail(Error,TEXT("Actor adapter property capability missing: ")+P.Name);
-        FDasFieldSchema F; F.StableId = P.Id; F.Name = *P.Name; F.Kind = P.Type.Kind == TEXT("int")?EDasScalarKind::Int32:P.Type.Kind==TEXT("float")?EDasScalarKind::Float32:P.Type.Kind==TEXT("bool")?EDasScalarKind::Bool:P.Type.Kind==TEXT("string")?EDasScalarKind::String:P.Type.Kind==TEXT("double")?EDasScalarKind::Double:EDasScalarKind::Name; F.bInstanceEditable=P.bEditable;F.bReadOnly=P.bReadOnly;F.Metadata=P.Metadata;
-        F.IntDefault=P.Type.Kind==TEXT("int")?static_cast<int32>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.FloatDefault=P.Type.Kind==TEXT("float")?static_cast<float>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.BoolDefault=P.Default.Boolean;F.DoubleDefault=P.Default.Number;F.StringDefault=P.Default.String;F.NameDefault=P.Type.Kind==TEXT("name")?FName(*P.Default.String):NAME_None; Result.Fields.Add(F);
+        if ((P.Type.Kind != TEXT("int") && P.Type.Kind != TEXT("float") && P.Type.Kind != TEXT("bool") && P.Type.Kind!=TEXT("string") && P.Type.Kind!=TEXT("double") && P.Type.Kind!=TEXT("name") && P.Type.Kind!=TEXT("struct"))) return Fail(Error,TEXT("Actor adapter property capability missing: ")+P.Name);
+        FDasFieldSchema F; F.StableId = P.Id; F.Name = *P.Name; F.Kind = P.Type.Kind == TEXT("int")?EDasScalarKind::Int32:P.Type.Kind==TEXT("float")?EDasScalarKind::Float32:P.Type.Kind==TEXT("bool")?EDasScalarKind::Bool:P.Type.Kind==TEXT("string")?EDasScalarKind::String:P.Type.Kind==TEXT("double")?EDasScalarKind::Double:P.Type.Kind==TEXT("struct")?EDasScalarKind::Struct:EDasScalarKind::Name; F.bInstanceEditable=P.bEditable;F.bReadOnly=P.bReadOnly;F.Metadata=P.Metadata;
+        F.IntDefault=P.Type.Kind==TEXT("int")?static_cast<int32>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.FloatDefault=P.Type.Kind==TEXT("float")?static_cast<float>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.BoolDefault=P.Default.Boolean;F.DoubleDefault=P.Default.Number;F.StringDefault=P.Default.String;F.NameDefault=P.Type.Kind==TEXT("name")?FName(*P.Default.String):NAME_None; F.StructPath=P.Type.TypePath;F.StructDefault=P.Default.String; Result.Fields.Add(F);
     }
     if (!Result.Validate(Error)) return false; Out = MoveTemp(Result); return true;
 }

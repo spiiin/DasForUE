@@ -37,11 +37,11 @@ bool ADasProbeActor::ExecuteDasBool(const FString& File,const FString& Entry,boo
 void ADasProbeActor::ExecuteDasVoid(const FString& File,const FString& Entry)
 {auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));RecordLifecycleResult(R.RunNamedVoidPersistent(R.ScriptPath(File),Entry,this));}
 
-FDasScalarValue ADasProbeActor::ExecuteDasFrame(const FString& File,const FString& Entry,const TArray<FDasScalarValue>& Args,int32 Kind)
+FDasScalarValue ADasProbeActor::ExecuteDasFrame(const FString& File,const FString& Entry,const TArray<FDasScalarValue>& Args,int32 Kind,const FString& ResultClass)
 {
-    if(Kind<0 || Kind>7 || Kind==4){FDasExecutionResult Error;Error.Error=TEXT("Invalid scalar result kind");RecordLifecycleResult(Error);FDasScalarValue Failed;Failed.Kind=-1;return Failed;}
-    auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto V=R.RunNamedFramePersistent(R.ScriptPath(File),Entry,Args,static_cast<EDasMethodSignature>(Kind),this);RecordLifecycleResult(V);
-    FDasScalarValue Result;Result.Kind=V.bSucceeded?Kind:-1;Result.IntValue=V.Value;Result.FloatValue=V.FloatValue;Result.BoolValue=V.BoolValue;Result.StringValue=V.StringValue;Result.DoubleValue=V.DoubleValue;Result.NameValue=V.NameValue;return Result;
+    if(Kind<0 || Kind>12 || Kind==4){FDasExecutionResult Error;Error.Error=TEXT("Invalid scalar result kind");RecordLifecycleResult(Error);FDasScalarValue Failed;Failed.Kind=-1;return Failed;}
+    auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto V=R.RunNamedFramePersistent(R.ScriptPath(File),Entry,Args,static_cast<EDasMethodSignature>(Kind),this,ResultClass);RecordLifecycleResult(V);
+    FDasScalarValue Result;Result.Kind=V.bSucceeded?Kind:-1;Result.IntValue=V.Value;Result.FloatValue=V.FloatValue;Result.BoolValue=V.BoolValue;Result.StringValue=V.StringValue;Result.DoubleValue=V.DoubleValue;Result.NameValue=V.NameValue;Result.ObjectValue=V.ObjectValue.Get();Result.VectorValue=V.VectorValue;Result.RotatorValue=V.RotatorValue;Result.TransformValue=V.TransformValue;Result.StructValue=V.StructValue;return Result;
 }
 void ADasProbeActor::RecordLifecycleResult(const FDasExecutionResult& Result)
 {

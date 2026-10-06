@@ -23,7 +23,9 @@ struct FDasExecutionResult
     int32 Value = 0;
     float FloatValue = 0;
     bool BoolValue = false;
-    FString StringValue;double DoubleValue=0;FName NameValue;
+    FString StringValue;double DoubleValue=0;FName NameValue;TWeakObjectPtr<UObject> ObjectValue;
+    FInstancedStruct StructValue;
+    FVector VectorValue=FVector::ZeroVector;FRotator RotatorValue=FRotator::ZeroRotator;FTransform TransformValue=FTransform::Identity;
     FString Error;
     FString ReloadError; // Candidate rejected; a successful result may still use the previous version.
     uint32 Revision = 0;
@@ -35,13 +37,18 @@ enum class EDasCallback : uint8 { Main, BeginPlay, Tick, EndPlay };
 class DASRUNTIME_API FDasRuntimeModule final : public IModuleInterface
 {
 public:
+#if WITH_EDITOR
+    bool BeginPreserveMethodContextsForReinstance(UClass* RootClass);
+    void EndPreserveMethodContextsForReinstance(const FString& ApprovedDeclaration=FString());
+#endif
+
     virtual void StartupModule() override;
     virtual void ShutdownModule() override;
     virtual bool SupportsDynamicReloading() override { return false; }
     // Compile-only annotation collection; no global/body execution, Out unchanged on failure.
     bool ReadAuthoringScript(const FString& Path,FDasAuthoringModule& Out,FString& Error);
     bool ValidateFrameMethod(const FString& Path,FString& Error,const FString& EntryPoint,const FDasCallContract& Contract);
-    FDasExecutionResult RunNamedFramePersistent(const FString& Path,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,EDasMethodSignature ReturnKind,TWeakObjectPtr<UObject> Self);
+    FDasExecutionResult RunNamedFramePersistent(const FString& Path,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,EDasMethodSignature ReturnKind,TWeakObjectPtr<UObject> Self,const FString& ReturnClass = FString());
     bool ValidateScalarMethod(const FString& Path,FString& Error,const FString& EntryPoint,EDasMethodSignature Signature);
     bool ValidateIntMethod(const FString& Path, FString& Error, const FString& EntryPoint = TEXT("main"));
     FDasExecutionResult RunFile(const FString& Path, int32 Input, bool bUseAot = false, TWeakObjectPtr<UObject> Self = {});
@@ -55,13 +62,16 @@ public:
     void DispatchIntEvent(uint64 SubscriptionId, int32 Value);
     int32 SubscriptionCount(const UObject* Owner = nullptr) const;
     void ReleaseObject(UObject* Object);
+    int32 StructSnapshotCount(const UObject* Owner=nullptr) const;
+    uint64 StructSnapshotsReclaimed(const UObject* Owner=nullptr) const;
     int32 PersistentContextCount(const UWorld* World = nullptr) const;
     bool ExportBindings(const FString& SelectionPath, const FString& OutputPath, FString& Error);
     FString ScriptPath(const FString& Name) const;
 private:
-    FDasExecutionResult RunCallback(const FString& Path, EDasCallback Event, int32 Input, float DeltaSeconds, TWeakObjectPtr<UObject> Self, const FString& EntryPoint = TEXT("main"), EDasMethodSignature Signature = EDasMethodSignature::Int,const TArray<FDasScalarValue>* Frame = nullptr);
+    FDasExecutionResult RunCallback(const FString& Path, EDasCallback Event, int32 Input, float DeltaSeconds, TWeakObjectPtr<UObject> Self, const FString& EntryPoint = TEXT("main"), EDasMethodSignature Signature = EDasMethodSignature::Int,const TArray<FDasScalarValue>* Frame = nullptr,const FString& ReturnClass = FString());
     FDelegateHandle WorldCleanupHandle;
     FDelegateHandle PostGCHandle;
+    FDelegateHandle ObjectsReplacedHandle;
     FString Root;
     bool bInitialized = false;
 };

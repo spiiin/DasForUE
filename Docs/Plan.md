@@ -542,3 +542,125 @@ double не сужается до float. Literal defaults, CDO validation и edi
 расширены. Проверены ownership, real PIE, Save/Reopen, reload fallback.
 Подробности: Docs/DSLTextTypes.md. Следующий шаг — object/struct signatures,
 затем containers/out-ref и дополнительные authoring capabilities.
+
+
+## Object input/result frames — 2026-10-06
+
+Добавлены UObjectHandle inputs/results, native class constraints через
+arg_<name>_class/return_class и class-typed Blueprint pins. Runtime ABI использует
+temporary handle addresses/CMRES; inputs GC-pinned только на время eval, VM и
+host results слабые. Destroy/expired/wrong-class return отклоняются. Core
+replacement delegate перенаправляет existing weak handles при UE reinstance.
+Проверены real PIE и saved typed Actor graphs в новом процессе.
+Подробности: Docs/DSLObjectMethods.md. Object fields по-прежнему отдельно;
+следующий шаг — FVector/FRotator/FTransform value signatures.
+
+
+## FVector/FRotator/FTransform method values — 2026-10-06
+
+Добавлены UEVector/UERotator/UETransform handled values, native constructors/math
+helpers и exact UE struct Blueprint pins. Aligned input copies и CMRES outputs
+не сохраняют временных pointers. Проверяются finite values и quaternion validity.
+Проверены double precision, independent copies, real PIE и Save/Reopen.
+Подробности: Docs/DSLMathValues.md. Struct fields и arbitrary reflected structs
+ещё не реализованы; следующий этап — общий reflected struct adapter.
+
+
+## Generic reflected struct values — 2026-10-06
+
+Добавлен UEStructValue с arg_<name>_struct/return_struct constraints, recursive
+scalar/nested reflection capability validation и immutable native snapshots.
+Blueprint pack/unpack — два generic wildcard thunks, без per-type C++ adapters.
+Проверены DasCallPayload (binding IR type), deep copies/string/nested update,
+real PIE и Save/Reopen. Snapshot table bounded до 4096 distinct values; reclamation
+по VM roots пока не реализован, production long-lived loops требуют этого шага.
+Подробности: Docs/DSLReflectedStructs.md. Дальше — snapshot lifetime, enum leaves,
+затем struct fields/defaults/migration и дополнительные authoring capabilities.
+
+
+## Snapshot lifetime/reclamation — 2026-10-06
+
+Добавлен typed VM-root mark/sweep для UEStructValue snapshots. Persistent call
+boundaries очищают transient values; options gc + needCallerStackFrame/native
+line carriers позволяют pressure collection внутри long interpreter loops.
+Недостоверные frames не приводят к unsafe sweep. Проверены 20k + 10k updates,
+global array anchors, active locals/args, 5k коротких calls без gc option и release.
+Подробности: Docs/DSLStructLifetime.md. Дальше — enum leaves, struct fields/defaults
+и migration; production AOT/JIT root attribution отдельно.
+
+
+## Enum leaves reflected structs — 2026-10-06
+
+Добавлены FEnumProperty и enum-backed byte leaves, strict enum path + registered
+symbol helpers, immutable update и snapshot-wide enum value validation.
+Unknown/_MAX values не доходят до method body. Editor/cooked rules используют
+registered names, не display labels/editor-only Hidden metadata. Проверены
+DasNamedMode (IR type), native values 7/42, nested/legacy enum и real PIE/SaveReopen.
+Подробности: Docs/DSLStructEnums.md. Далее — struct fields/defaults/migration.
+
+
+## Reflected struct fields/defaults — 2026-10-06
+
+UEStructValue properties now create typed Blueprint variables with native CDO
+defaults and immutable self read/write. Literal ue_struct_value/default initializers
+provide native struct identity; strict Unreal export-text default validation rejects
+unknown/duplicate fields, parse errors, trailing text and invalid enum values.
+Existing defaults/types cannot change without migration policy. Tests cover actor
+override preservation through reinstance, persistence and real PIE.
+Details: Docs/DSLStructFields.md. Next: migration policy design/implementation,
+object properties and further authoring capabilities; native math field sugar and
+script-defined reflected structs remain explicit follow-up stages.
+
+
+## Explicit default migration — 2026-10-06
+
+Added opt-in defaults=preserve_instances to Das.DSL.Reimport. Only defaults may
+change in this step; the current Blueprint must match its stored model. Selected
+CDO and variable descriptors update without reinstance; all existing instance
+values are preserved, including old-default values. New spawns use new defaults.
+Scalar/struct defaults, saved asset reopen, later compile and PIE are validated.
+Details: Docs/DSLDefaultMigration.md. Next migration capability: explicit field
+rename mapping by stable identity, followed by constrained type conversion/removal
+policies; old-default propagation is a separate optional policy, not inferred.
+
+
+## Field rename by stable ID — 2026-10-07
+
+Added explicit fields=rename_by_id reimport for isolated Actor Blueprints. Only
+property names may change; retained ue_id determines the mapping. Vacant target
+names, unchanged type/default/flags/methods and matching stored model are required.
+Unreal variable GUID/local references persist; pre-reinstance native snapshots
+restore renamed CDO/instance values on replacement objects. Save/Reopen and real
+PIE validate source promotion and scalar/struct overrides. Dependent Blueprint or
+saved referencing asset migrations are refused pending a separate scope.
+Details: Docs/DSLFieldRename.md. Next: dependency-aware migration (children and
+saved maps/assets), then constrained type conversion/removal policies and rollback.
+
+
+## Dependency-aware field rename — 2026-10-07
+
+Added fields=rename_with_dependencies. Loaded dependencies and saved package
+referencers form a bounded scope; ordinary Blueprint and map assets load before
+snapshot capture. Root/derived CDOs and instances restore through parent-first
+recompile/reinstance; dependent graph references update via Unreal's rename API.
+Packages stay dirty for review/save. Separate-process Create/Migrate/Reopen tests
+cover child/grandchild overrides, external getter and initially unloaded saved map.
+Inherited DSL owner/default validation uses the declaring property's class CDO;
+child overrides work without bypassing unapplied parent-default checks.
+Details: Docs/DSLRenameDependencies.md. Next: explicit constrained type conversion
+and removal policies with data preservation/rollback. World Partition/streaming,
+external actor packages and other asset types remain separate scope extensions.
+
+
+## Exact numeric widening and bounded rollback — 2026-10-07
+
+Added explicit widening policies for int32/finite float32 -> double, isolated or
+ordinary Blueprint/map dependency scope. Defaults must be exact promotions; IDs,
+names and other declarations stay unchanged. Direct Blueprint property references,
+uncompiled scoped Blueprints and nonfinite/lossy conversions are refused.
+Original descriptors/values restore after a post-compile failure; metadata commits
+only on success. Method-only no-binding/no-cached-call VM contexts survive tested
+reinstance rollback; reflected host changes force retry of rejected source validation.
+Details: Docs/DSLNumericWiden.md. Next: explicit Blueprint pin/link adaptation and
+additional conversion policies, field removal with retained data, then lifecycle/
+delegate context preservation and general rollback beyond numeric migration.

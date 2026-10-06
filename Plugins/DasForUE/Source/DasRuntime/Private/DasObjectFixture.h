@@ -19,6 +19,13 @@ struct FDasNamedMode
 };
 
 USTRUCT(BlueprintType)
+struct FDasEnumBundle {
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite,Category="Probe") TEnumAsByte<EDasLegacyMode> Legacy = DasLegacyIdle;
+    UPROPERTY(BlueprintReadWrite,Category="Probe") FDasNamedMode Nested;
+};
+
+USTRUCT(BlueprintType)
 struct FDasCallMetrics
 {
     GENERATED_BODY()

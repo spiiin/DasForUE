@@ -328,3 +328,19 @@ Typed signatures: Docs/DSLScalarSignatures.md and dsl_scalar_methods.das.
 Mixed scalar methods (0–16 inputs): Docs/DSLMixedMethods.md, dsl_mixed_methods.das.
 
 String/FName/double authoring: Docs/DSLTextTypes.md and dsl_text_methods.das.
+
+Object input/result authoring: Docs/DSLObjectMethods.md and dsl_object_methods.das.
+
+Native math method values: Docs/DSLMathValues.md and dsl_math_methods.das.
+
+Generic reflected value structs: Docs/DSLReflectedStructs.md and dsl_reflected_methods.das.
+
+Reflected struct properties and defaults: Docs/DSLStructFields.md. Example: Plugins/DasForUE/Content/Das/Scripts/dsl_struct_fields.das. Validation: Docs/DSLStructFieldsValidation.md.
+
+Explicit default-only migration: Docs/DSLDefaultMigration.md (`defaults=preserve_instances`).
+
+Stable ID field rename migration: Docs/DSLFieldRename.md (`fields=rename_by_id`).
+
+Dependent Blueprint/map rename: Docs/DSLRenameDependencies.md (`fields=rename_with_dependencies`).
+
+Exact numeric field widening: Docs/DSLNumericWiden.md (`fields=widen_numeric_with_dependencies`).

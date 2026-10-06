@@ -993,3 +993,377 @@ bool FDasTextPIETest::RunTest(const FString& Parameters){
     FActorSpawnParameters Spawn;Spawn.Name=TEXT("TextActor");if(!TestNotNull(TEXT("Spawn text actor"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn)))return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasTextPIECommand>(BP,this));return true;
 }
+
+
+namespace {
+class FDasObjectFramePIECommand final : public IAutomationLatentCommand {
+    TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;FString Path,Original;double Start=0;bool Ending=false,Passed=true;
+    TStrongObjectPtr<UObject> Observer;
+public:
+    FDasObjectFramePIECommand(UBlueprint* B,FAutomationTestBase* T,FString P,FString Source):BP(B),Test(T),Path(P),Original(Source){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_OBJECT_FRAME_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));if(Observer.IsValid())R.ReleaseObject(Observer.Get());IFileManager::Get().Delete(*Path);UE_LOG(LogTemp,Display,TEXT("DAS_OBJECT_FRAME_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Receiver=Find(World,TEXT("ObjectReceiver"));auto* Target=Find(World,TEXT("ObjectTarget"));Check(Receiver && Target,TEXT("real_PIE_object_actors"));if(!Receiver || !Target){GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* F=Receiver->FindFunction(TEXT("ActorIdentity"));
+        auto InvokeActor=[&](UObject* Input){if(!F)return false;FStructOnScope Memory(F);auto* A=FindFProperty<FObjectProperty>(F,TEXT("actor"));auto* B=CastField<FObjectProperty>(F->GetReturnProperty());if(!A || !B || A->PropertyClass!=AActor::StaticClass() || B->PropertyClass!=AActor::StaticClass())return false;A->SetObjectPropertyValue_InContainer(Memory.GetStructMemory(),Input);FEditorScriptExecutionGuard Guard;Receiver->ProcessEvent(F,Memory.GetStructMemory());return B->GetObjectPropertyValue_InContainer(Memory.GetStructMemory())==Input;};
+        Check(InvokeActor(Target),TEXT("typed_Actor_input_result_ProcessEvent"));Check(InvokeActor(nullptr),TEXT("typed_Actor_null_ProcessEvent"));
+        Observer.Reset(NewObject<UDasLifecycleTestObserver>());FDasScalarValue O;O.Kind=8;O.ObjectValue=Target;
+        Check(R.RunNamedFramePersistent(Path,TEXT("ue_ObjectBridge_Remember"),{O},EDasMethodSignature::Void,Observer.Get()).bSucceeded,TEXT("observer_stores_weak_target"));
+        auto Before=R.RunNamedFramePersistent(Path,TEXT("ue_ObjectBridge_Recall"),{},EDasMethodSignature::Object,Observer.Get());Check(Before.bSucceeded && Before.ObjectValue.Get()==Target,TEXT("observer_object_return_before_reinstance"));
+        O.ObjectValue=nullptr;const FString Changed=Original.Replace(TEXT("class ObjectBridge {"),TEXT("class ObjectBridge {\n    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    Revision : int = 42\n"));
+        Check(FFileHelper::SaveStringToFile(Changed,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("write_object_structural_change"));FString Error;
+        Check(FDasDSLService::Reimport(BP.Get(),Error),TEXT("object_class_reinstance_in_PIE"));if(!Error.IsEmpty())Test->AddInfo(Error);
+        Receiver=Find(World,TEXT("ObjectReceiver"));Target=Find(World,TEXT("ObjectTarget"));Check(Receiver && Target && Int(Target,TEXT("Revision"))==42,TEXT("object_instances_updated"));
+        auto After=R.RunNamedFramePersistent(Path,TEXT("ue_ObjectBridge_Recall"),{},EDasMethodSignature::Object,Observer.Get());Check(After.bSucceeded && After.ObjectValue.Get()==Target,TEXT("weak_handle_follows_Unreal_replacement"));
+        if(Receiver){F=Receiver->FindFunction(TEXT("ActorIdentity"));Check(InvokeActor(Target),TEXT("Actor_result_after_reinstance"));}
+        Check(Target && Target->Destroy(),TEXT("destroy_target"));CollectGarbage(RF_NoFlags);
+        const auto Valid=R.RunNamedFramePersistent(Path,TEXT("ue_ObjectBridge_IsRememberedValid"),{},EDasMethodSignature::Bool,Observer.Get());Check(Valid.bSucceeded && !Valid.BoolValue,TEXT("destroyed_target_handle_invalid"));
+        const auto ExpiredResult=R.RunNamedFramePersistent(Path,TEXT("ue_ObjectBridge_Recall"),{},EDasMethodSignature::Object,Observer.Get());Check(!ExpiredResult.bSucceeded && ExpiredResult.Error.Contains(TEXT("expired")),TEXT("destroyed_object_return_rejected"));
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasObjectFramePIETest,"DasForUE.DSL.ObjectFramePIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasObjectFramePIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}
+    auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FString Source;FFileHelper::LoadFileToString(Source,*R.ScriptPath(TEXT("dsl_object_methods.das")));
+    const FString Guid=FGuid::NewGuid().ToString(EGuidFormats::Digits);const FString Script=TEXT("dsl_object_pie_")+Guid+TEXT(".das"),Path=R.ScriptPath(Script);if(!FFileHelper::SaveStringToFile(Source,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))return false;
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasObjectFrameProbe/Run_")+Guid+TEXT("/BP_Objects");
+    if(!TestTrue(TEXT("Create object DSL Blueprint"),FDasDSLService::Apply(Script,Package,TEXT("objects.ObjectBridge"),BP,Error))){AddInfo(Error);IFileManager::Get().Delete(*Path);return false;}
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("ObjectReceiver");auto* Receiver=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn);Spawn.Name=TEXT("ObjectTarget");auto* Target=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn);
+    if(!TestTrue(TEXT("Spawn object actors"),Receiver && Target)){IFileManager::Get().Delete(*Path);return false;}
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasObjectFramePIECommand>(BP,this,Path,Source));return true;
+}
+
+
+#include "UObject/NoExportTypes.h"
+namespace {
+class FDasMathPIECommand final : public IAutomationLatentCommand {
+    TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasMathPIECommand(UBlueprint* B,FAutomationTestBase* T):BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_MATH_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));UE_LOG(LogTemp,Display,TEXT("DAS_MATH_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("MathActor"));Check(Actor!=nullptr,TEXT("real_PIE_math_actor"));if(!Actor){GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto Invoke=[&](const TCHAR* Name,auto Input,auto Output){auto* F=Actor->FindFunction(Name);if(!F)return false;FStructOnScope Memory(F);if(!Input(F,Memory.GetStructMemory()))return false;FEditorScriptExecutionGuard Guard;Actor->ProcessEvent(F,Memory.GetStructMemory());return Output(F,Memory.GetStructMemory());};
+        Check(Invoke(TEXT("Shift"),[](UFunction* F,uint8* D){auto* V=FindFProperty<FStructProperty>(F,TEXT("value"));auto* A=FindFProperty<FDoubleProperty>(F,TEXT("delta"));if(!V || V->Struct!=TBaseStructure<FVector>::Get() || !A)return false;*V->ContainerPtrToValuePtr<FVector>(D)=FVector(1,2.25,3.5);A->SetPropertyValue_InContainer(D,4.0);return true;},[](UFunction* F,uint8* D){auto* V=CastField<FStructProperty>(F->GetReturnProperty());return V && V->Struct==TBaseStructure<FVector>::Get() && V->ContainerPtrToValuePtr<FVector>(D)->Equals(FVector(5,2.25,3.5),1e-12);}),TEXT("native_FVector_ProcessEvent"));
+        Check(Invoke(TEXT("Turn"),[](UFunction* F,uint8* D){auto* V=FindFProperty<FStructProperty>(F,TEXT("value"));auto* A=FindFProperty<FDoubleProperty>(F,TEXT("yaw"));if(!V || V->Struct!=TBaseStructure<FRotator>::Get() || !A)return false;*V->ContainerPtrToValuePtr<FRotator>(D)=FRotator(12.5,20.25,3.75);A->SetPropertyValue_InContainer(D,5.0);return true;},[](UFunction* F,uint8* D){auto* V=CastField<FStructProperty>(F->GetReturnProperty());return V && V->Struct==TBaseStructure<FRotator>::Get() && V->ContainerPtrToValuePtr<FRotator>(D)->Equals(FRotator(12.5,25.25,3.75),1e-12);}),TEXT("native_FRotator_ProcessEvent"));
+        const FTransform T(FRotator(0,90,0),FVector(10,20,30),FVector(2,3,4));
+        Check(Invoke(TEXT("PassTransform"),[&](UFunction* F,uint8* D){auto* V=FindFProperty<FStructProperty>(F,TEXT("value"));if(!V || V->Struct!=TBaseStructure<FTransform>::Get())return false;*V->ContainerPtrToValuePtr<FTransform>(D)=T;return true;},[&](UFunction* F,uint8* D){auto* V=CastField<FStructProperty>(F->GetReturnProperty());return V && V->Struct==TBaseStructure<FTransform>::Get() && V->ContainerPtrToValuePtr<FTransform>(D)->Equals(T,1e-12);}),TEXT("native_FTransform_ProcessEvent"));
+        Check(Invoke(TEXT("Apply"),[&](UFunction* F,uint8* D){auto* A=FindFProperty<FStructProperty>(F,TEXT("value"));auto* B=FindFProperty<FStructProperty>(F,TEXT("position"));if(!A || !B)return false;*A->ContainerPtrToValuePtr<FTransform>(D)=T;*B->ContainerPtrToValuePtr<FVector>(D)=FVector(1,2,3);return true;},[&](UFunction* F,uint8* D){auto* V=CastField<FStructProperty>(F->GetReturnProperty());return V && V->ContainerPtrToValuePtr<FVector>(D)->Equals(T.TransformPosition(FVector(1,2,3)),1e-12);}),TEXT("mixed_math_struct_semantics"));
+        FString Error;UClass* Before=BP->GeneratedClass;Check(FDasDSLService::Reimport(BP.Get(),Error) && BP->GeneratedClass==Before,TEXT("math_reimport_no_reinstance"));CollectGarbage(RF_NoFlags);Check(Find(World,TEXT("MathActor"))!=nullptr,TEXT("math_actor_survives_GC"));
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasMathPIETest,"DasForUE.DSL.MathPIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasMathPIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasMathProbe/Run_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT("/BP_Math");
+    if(!TestTrue(TEXT("Create math DSL Blueprint"),FDasDSLService::Apply(TEXT("dsl_math_methods.das"),Package,TEXT("math.MathBridge"),BP,Error))){AddInfo(Error);return false;}
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("MathActor");if(!TestNotNull(TEXT("Spawn math actor"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn)))return false;
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasMathPIECommand>(BP,this));return true;
+}
+
+
+namespace {
+class FDasReflectedPIECommand final : public IAutomationLatentCommand {
+    TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasReflectedPIECommand(UBlueprint* B,FAutomationTestBase* T):BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_REFLECTED_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));UE_LOG(LogTemp,Display,TEXT("DAS_REFLECTED_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("StructActor"));Check(Actor!=nullptr,TEXT("real_PIE_struct_actor"));if(!Actor){GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* F=Actor->FindFunction(TEXT("Edit"));bool OK=false;
+        if(F){FStructOnScope Frame(F);auto* A=FindFProperty<FStructProperty>(F,TEXT("value"));auto* Amount=FindFProperty<FIntProperty>(F,TEXT("amount"));auto* Result=CastField<FStructProperty>(F->GetReturnProperty());
+            if(A && Amount && Result && A->Struct==Result->Struct && A->Struct->GetPathName()==TEXT("/Script/DasRuntime.DasCallPayload")){
+                uint8* Input=A->ContainerPtrToValuePtr<uint8>(Frame.GetStructMemory());auto* Count=FindFProperty<FIntProperty>(A->Struct,TEXT("Count"));auto* Label=FindFProperty<FStrProperty>(A->Struct,TEXT("Label"));auto* Metrics=FindFProperty<FStructProperty>(A->Struct,TEXT("Metrics"));auto* Ratio=Metrics?FindFProperty<FFloatProperty>(Metrics->Struct,TEXT("Ratio")):nullptr;
+                if(Count && Label && Metrics && Ratio){Count->SetPropertyValue_InContainer(Input,7);Label->SetPropertyValue_InContainer(Input,TEXT("Привет 世界"));Ratio->SetPropertyValue_InContainer(Metrics->ContainerPtrToValuePtr<uint8>(Input),1.25f);Amount->SetPropertyValue_InContainer(Frame.GetStructMemory(),3);FEditorScriptExecutionGuard Guard;Actor->ProcessEvent(F,Frame.GetStructMemory());uint8* Output=Result->ContainerPtrToValuePtr<uint8>(Frame.GetStructMemory());OK=Count->GetPropertyValue_InContainer(Output)==10 && Label->GetPropertyValue_InContainer(Output)==TEXT("Привет 世界 !") && Ratio->GetPropertyValue_InContainer(Metrics->ContainerPtrToValuePtr<uint8>(Output))==1.75f && Count->GetPropertyValue_InContainer(Input)==7;}
+            }
+        }
+        Check(OK,TEXT("wildcard_reflected_struct_ProcessEvent_nested_fields"));FString Error;UClass* Before=BP->GeneratedClass;Check(FDasDSLService::Reimport(BP.Get(),Error) && BP->GeneratedClass==Before,TEXT("reflected_struct_reimport_no_reinstance"));CollectGarbage(RF_NoFlags);Check(Find(World,TEXT("StructActor"))!=nullptr,TEXT("reflected_actor_survives_GC"));
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasReflectedPIETest,"DasForUE.DSL.ReflectedPIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasReflectedPIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasReflectedProbe/Run_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT("/BP_Struct");
+    if(!TestTrue(TEXT("Create reflected DSL Blueprint"),FDasDSLService::Apply(TEXT("dsl_reflected_methods.das"),Package,TEXT("reflected.StructBridge"),BP,Error))){AddInfo(Error);return false;}
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("StructActor");if(!TestNotNull(TEXT("Spawn reflected actor"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn)))return false;
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasReflectedPIECommand>(BP,this));return true;
+}
+
+
+namespace {
+class FDasStructEnumPIECommand final : public IAutomationLatentCommand {
+    TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasStructEnumPIECommand(UBlueprint* B,FAutomationTestBase* T):BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_STRUCT_ENUM_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));UE_LOG(LogTemp,Display,TEXT("DAS_STRUCT_ENUM_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("EnumStructActor"));Check(Actor!=nullptr,TEXT("real_PIE_enum_struct_actor"));if(!Actor){GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* F=Actor->FindFunction(TEXT("SetMode"));bool OK=false;
+        if(F){FStructOnScope Memory(F);auto* Input=FindFProperty<FStructProperty>(F,TEXT("value"));auto* Symbol=FindFProperty<FStrProperty>(F,TEXT("symbol"));auto* Result=CastField<FStructProperty>(F->GetReturnProperty());
+            if(Input && Symbol && Result && Input->Struct==Result->Struct){auto* Mode=FindFProperty<FEnumProperty>(Input->Struct,TEXT("Mode"));auto* Key=FindFProperty<FNameProperty>(Input->Struct,TEXT("Key"));if(Mode && Key){uint8* Data=Input->ContainerPtrToValuePtr<uint8>(Memory.GetStructMemory());Mode->GetUnderlyingProperty()->SetIntPropertyValue(Mode->ContainerPtrToValuePtr<uint8>(Data),int64(0));Key->SetPropertyValue_InContainer(Data,FName(TEXT("Item_42")));Symbol->SetPropertyValue_InContainer(Memory.GetStructMemory(),TEXT("Paused"));FEditorScriptExecutionGuard Guard;Actor->ProcessEvent(F,Memory.GetStructMemory());uint8* Output=Result->ContainerPtrToValuePtr<uint8>(Memory.GetStructMemory());OK=Mode->GetUnderlyingProperty()->GetSignedIntPropertyValue(Mode->ContainerPtrToValuePtr<uint8>(Output))==42 && Key->GetPropertyValue_InContainer(Output)==FName(TEXT("Item_42")) && Mode->GetUnderlyingProperty()->GetSignedIntPropertyValue(Mode->ContainerPtrToValuePtr<uint8>(Data))==0;}}}
+        Check(OK,TEXT("enum_struct_wildcard_ProcessEvent_immutable_update"));FString Error;UClass* Before=BP->GeneratedClass;Check(FDasDSLService::Reimport(BP.Get(),Error) && BP->GeneratedClass==Before,TEXT("enum_struct_reimport_no_reinstance"));CollectGarbage(RF_NoFlags);Check(Find(World,TEXT("EnumStructActor"))!=nullptr,TEXT("enum_struct_actor_survives_GC"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasStructEnumPIETest,"DasForUE.DSL.StructEnumPIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasStructEnumPIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasStructEnumProbe/Run_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT("/BP_EnumStruct");
+    if(!TestTrue(TEXT("Create enum struct DSL Blueprint"),FDasDSLService::Apply(TEXT("dsl_struct_enum_methods.das"),Package,TEXT("enumvalues.EnumStructBridge"),BP,Error))){AddInfo(Error);return false;}
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("EnumStructActor");if(!TestNotNull(TEXT("Spawn enum struct actor"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn)))return false;ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasStructEnumPIECommand>(BP,this));return true;
+}
+
+namespace {
+class FDasStructFieldsPIECommand final : public IAutomationLatentCommand {
+    TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasStructFieldsPIECommand(UBlueprint* B,FAutomationTestBase* T):BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_STRUCT_FIELDS_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));UE_LOG(LogTemp,Display,TEXT("DAS_STRUCT_FIELDS_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("StructFieldsActor"));Check(Actor!=nullptr,TEXT("real_PIE_struct_fields_actor"));
+        if(Actor){
+            auto* P=FindFProperty<FStructProperty>(Actor->GetClass(),TEXT("Payload"));auto* Count=P?FindFProperty<FIntProperty>(P->Struct,TEXT("Count")):nullptr;
+            Check(Count && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Actor))==10,TEXT("PIE_struct_CDO_default"));
+            if(Count){
+                Count->SetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Actor),77);
+                auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FDasScalarValue Amount;Amount.Kind=0;Amount.IntValue=3;
+                const auto Result=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("dsl_struct_fields.das")),TEXT("ue_StructFields_Add"),{Amount},EDasMethodSignature::Int,Actor);
+                Check(Result.bSucceeded && Result.Value==80 && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Actor))==80,TEXT("PIE_struct_self_read_write"));if(!Result.bSucceeded)Test->AddInfo(Result.Error);
+                FString Error;UClass* Before=BP->GeneratedClass;Check(FDasDSLService::Reimport(BP.Get(),Error) && BP->GeneratedClass==Before,TEXT("struct_fields_body_reimport_keeps_class"));
+                FDasAuthoringModule Model;FDasClassSchema Schema;bool Prepared=Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_struct_fields.das")),Model,Error) && Model.ToActorSchema(TEXT("structfields.StructFields"),Schema,Error);
+                Check(Prepared,TEXT("struct_fields_reinstance_schema"));
+                if(Prepared){
+                    auto Changed=Schema;Changed.Fields.FindByPredicate([](const auto& F){return F.Name==TEXT("Payload");})->StructDefault=TEXT("(Count=11)");
+                    Check(!FDasBlueprintService::Apply(BP.Get(),Changed,Error) && BP->GeneratedClass==Before,TEXT("PIE_default_change_refused_without_mutation"));
+                    FDasFieldSchema Extra;Extra.Name=TEXT("AddedProbe");Extra.StableId=TEXT("structfields.StructFields.AddedProbe");Extra.IntDefault=5;Schema.Fields.Add(Extra);
+                    Check(FDasBlueprintService::Apply(BP.Get(),Schema,Error),TEXT("PIE_struct_reinstance"));Actor=Find(World,TEXT("StructFieldsActor"));
+                    P=FindFProperty<FStructProperty>(BP->GeneratedClass,TEXT("Payload"));Count=P?FindFProperty<FIntProperty>(P->Struct,TEXT("Count")):nullptr;
+                    Check(Actor && Count && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Actor))==80 && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(BP->GeneratedClass->GetDefaultObject()))==10,TEXT("PIE_struct_override_and_CDO_preserved"));
+                    CollectGarbage(RF_NoFlags);Check(Find(World,TEXT("StructFieldsActor"))!=nullptr,TEXT("PIE_struct_actor_survives_GC"));
+                }
+            }
+        }
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasStructFieldsPIETest,"DasForUE.DSL.StructFieldsPIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasStructFieldsPIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasFrameAssetProbe/Run_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT("/BP_Fields");
+    if(!TestTrue(TEXT("Create struct fields DSL Blueprint"),FDasDSLService::Apply(TEXT("dsl_struct_fields.das"),Package,TEXT("structfields.StructFields"),BP,Error))){AddInfo(Error);return false;}
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("StructFieldsActor");if(!TestNotNull(TEXT("Spawn struct fields actor"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn)))return false;
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasStructFieldsPIECommand>(BP,this));return true;
+}
+
+namespace {
+class FDasDefaultMigrationPIECommand final : public IAutomationLatentCommand {
+    FString Path,Source;TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasDefaultMigrationPIECommand(UBlueprint* B,FAutomationTestBase* T,FString P,FString S):Path(P),Source(S),BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_DEFAULT_MIGRATION_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));IFileManager::Get().Delete(*Path);UE_LOG(LogTemp,Display,TEXT("DAS_DEFAULT_MIGRATION_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("StructFieldsActor"));Check(Actor!=nullptr,TEXT("real_PIE_struct_fields_actor"));
+        if(Actor){
+            auto* P=FindFProperty<FStructProperty>(Actor->GetClass(),TEXT("Payload"));auto* Count=P?FindFProperty<FIntProperty>(P->Struct,TEXT("Count")):nullptr;
+            Check(Count && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Actor))==10,TEXT("PIE_struct_CDO_default"));
+            if(Count){
+                Count->SetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Actor),77);
+                auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FDasScalarValue Amount;Amount.Kind=0;Amount.IntValue=3;
+                const auto Result=Runtime.RunNamedFramePersistent(Path,TEXT("ue_StructFields_Add"),{Amount},EDasMethodSignature::Int,Actor);
+                Check(Result.bSucceeded && Result.Value==80 && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Actor))==80,TEXT("PIE_struct_self_read_write"));if(!Result.bSucceeded)Test->AddInfo(Result.Error);
+                FString Error;UClass* Before=BP->GeneratedClass;Check(FDasDSLService::Reimport(BP.Get(),Error) && BP->GeneratedClass==Before,TEXT("struct_fields_body_reimport_keeps_class"));
+                auto* Untouched=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity);const FName UntouchedName=Untouched->GetFName();
+                const FString MigratedSource=Source.Replace(TEXT("Count=10"),TEXT("Count=11"));
+                Check(FFileHelper::SaveStringToFile(MigratedSource,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_write_new_default"));
+                Check(!FDasDSLService::Reimport(BP.Get(),Error) && BP->GeneratedClass==Before,TEXT("PIE_default_change_without_policy_refused"));
+                Check(FDasDSLService::Reimport(BP.Get(),Error,EDasDefaultMigrationPolicy::PreserveInstances) && BP->GeneratedClass==Before,TEXT("PIE_explicit_default_migration_without_reinstance"));if(!Error.IsEmpty())Test->AddInfo(Error);
+                Check(Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Actor))==80 && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Untouched))==10 && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(BP->GeneratedClass->GetDefaultObject()))==11,TEXT("PIE_existing_values_preserved_new_CDO"));
+                auto* Fresh=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity);Check(Fresh && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Fresh))==11,TEXT("PIE_new_actor_uses_migrated_default"));
+                const auto AfterMigration=Runtime.RunNamedFramePersistent(Path,TEXT("ue_StructFields_Add"),{Amount},EDasMethodSignature::Int,Actor);
+                Check(AfterMigration.bSucceeded && AfterMigration.Value==83,TEXT("PIE_script_promotes_after_default_migration"));
+                FDasAuthoringModule Model;FDasClassSchema Schema;bool Prepared=Runtime.ReadAuthoringScript(Path,Model,Error) && Model.ToActorSchema(TEXT("structfields.StructFields"),Schema,Error);
+                Check(Prepared,TEXT("struct_fields_reinstance_schema"));
+                if(Prepared){
+                    auto Changed=Schema;Changed.Fields.FindByPredicate([](const auto& F){return F.Name==TEXT("Payload");})->StructDefault=TEXT("(Count=12)");
+                    Check(!FDasBlueprintService::Apply(BP.Get(),Changed,Error) && BP->GeneratedClass==Before,TEXT("PIE_default_change_refused_without_mutation"));
+                    FDasFieldSchema Extra;Extra.Name=TEXT("AddedProbe");Extra.StableId=TEXT("structfields.StructFields.AddedProbe");Extra.IntDefault=5;Schema.Fields.Add(Extra);
+                    Check(FDasBlueprintService::Apply(BP.Get(),Schema,Error),TEXT("PIE_struct_reinstance"));Actor=Find(World,TEXT("StructFieldsActor"));
+                    P=FindFProperty<FStructProperty>(BP->GeneratedClass,TEXT("Payload"));Count=P?FindFProperty<FIntProperty>(P->Struct,TEXT("Count")):nullptr;
+                    Check(Actor && Count && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Actor))==83 && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(BP->GeneratedClass->GetDefaultObject()))==11,TEXT("PIE_struct_override_and_CDO_preserved"));
+                    Untouched=nullptr;for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->GetFName()==UntouchedName)Untouched=*It;
+                    Check(Untouched && Count && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Untouched))==10,TEXT("PIE_unmodified_old_actor_retains_value_after_later_reinstance"));
+                    CollectGarbage(RF_NoFlags);Check(Find(World,TEXT("StructFieldsActor"))!=nullptr,TEXT("PIE_struct_actor_survives_GC"));
+                }
+            }
+        }
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasDefaultMigrationPIETest,"DasForUE.DSL.DefaultMigrationPIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasDefaultMigrationPIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}
+    auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FString Source;FFileHelper::LoadFileToString(Source,*Runtime.ScriptPath(TEXT("dsl_struct_fields.das")));
+    const FString Script=TEXT("dsl_migration_pie_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT(".das"),Path=Runtime.ScriptPath(Script);
+    if(!FFileHelper::SaveStringToFile(Source,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))return false;
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasFrameAssetProbe/Run_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT("/BP_Fields");
+    if(!TestTrue(TEXT("Create struct fields DSL Blueprint"),FDasDSLService::Apply(Script,Package,TEXT("structfields.StructFields"),BP,Error))){AddInfo(Error);return false;}
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("StructFieldsActor");if(!TestNotNull(TEXT("Spawn struct fields actor"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn)))return false;
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasDefaultMigrationPIECommand>(BP,this,Path,Source));return true;
+}
+
+namespace {
+class FDasFieldRenamePIECommand final : public IAutomationLatentCommand {
+    FString Path,Source;TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasFieldRenamePIECommand(UBlueprint* B,FAutomationTestBase* T,FString P,FString S):Path(P),Source(S),BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_FIELD_RENAME_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));IFileManager::Get().Delete(*Path);UE_LOG(LogTemp,Display,TEXT("DAS_FIELD_RENAME_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("RenameActor"));auto* Untouched=Find(World,TEXT("RenameUntouched"));Check(Actor && Untouched,TEXT("real_PIE_rename_actors"));
+        if(Actor && Untouched){
+            auto* Score=FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Score"));auto* Payload=FindFProperty<FStructProperty>(Actor->GetClass(),TEXT("Payload"));
+            if(Score && Payload){
+                Score->SetPropertyValue_InContainer(Actor,77);auto* Count=FindFProperty<FIntProperty>(Payload->Struct,TEXT("Count"));Count->SetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Actor),88);
+                auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto BeforeCall=Runtime.RunNamedPersistent(Path,TEXT("ue_RenameFields_Add"),0,Actor);Check(BeforeCall.bSucceeded && BeforeCall.Value==165,TEXT("PIE_persistent_context_before_rename"));
+                const FString Changed=Source.Replace(TEXT("Score :"),TEXT("Total :")).Replace(TEXT("self.Score"),TEXT("self.Total")).Replace(TEXT("Payload :"),TEXT("Data :")).Replace(TEXT("self.Payload"),TEXT("self.Data"));
+                FString Error;UClass* Before=BP->GeneratedClass;Check(FFileHelper::SaveStringToFile(Changed,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_write_rename"));
+                Check(!FDasDSLService::Reimport(BP.Get(),Error) && BP->GeneratedClass==Before,TEXT("PIE_no_policy_rename_refused"));
+                Check(FDasDSLService::ReimportRenamedFields(BP.Get(),Error),TEXT("PIE_rename_by_ID"));if(!Error.IsEmpty())Test->AddInfo(Error);
+                Actor=Find(World,TEXT("RenameActor"));Untouched=Find(World,TEXT("RenameUntouched"));Score=FindFProperty<FIntProperty>(BP->GeneratedClass,TEXT("Total"));Payload=FindFProperty<FStructProperty>(BP->GeneratedClass,TEXT("Data"));Count=Payload?FindFProperty<FIntProperty>(Payload->Struct,TEXT("Count")):nullptr;
+                Check(Actor && Untouched && Score && Count && Score->GetPropertyValue_InContainer(Actor)==77 && Count->GetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Actor))==88 && Score->GetPropertyValue_InContainer(Untouched)==5 && Count->GetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Untouched))==10,TEXT("PIE_rename_preserves_overrides_and_defaults"));
+                const auto AfterCall=Runtime.RunNamedPersistent(Path,TEXT("ue_RenameFields_Add"),3,Actor);Check(AfterCall.bSucceeded && AfterCall.Value==171,TEXT("PIE_updated_self_method_after_reinstance"));if(!AfterCall.bSucceeded)Test->AddInfo(AfterCall.Error);
+                auto* Fresh=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity);Check(Fresh && Score && Score->GetPropertyValue_InContainer(Fresh)==5 && Count && Count->GetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Fresh))==10,TEXT("PIE_new_actor_defaults_after_rename"));
+                Check(FDasDSLService::ReimportRenamedFields(BP.Get(),Error),TEXT("PIE_rename_idempotent"));CollectGarbage(RF_NoFlags);Check(Find(World,TEXT("RenameActor"))!=nullptr,TEXT("PIE_renamed_actor_survives_GC"));
+            }else Check(false,TEXT("PIE_fixture_fields"));
+        }
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasFieldRenamePIETest,"DasForUE.DSL.FieldRenamePIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasFieldRenamePIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}
+    auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FString Source;FFileHelper::LoadFileToString(Source,*Runtime.ScriptPath(TEXT("dsl_rename_fields.das")));
+    const FString Guid=FGuid::NewGuid().ToString(EGuidFormats::Digits),Script=TEXT("dsl_renamefields_pie_")+Guid+TEXT(".das"),Path=Runtime.ScriptPath(Script);if(!FFileHelper::SaveStringToFile(Source,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))return false;
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasFrameAssetProbe/Run_")+Guid+TEXT("/BP_Rename");
+    if(!TestTrue(TEXT("Create rename DSL Blueprint"),FDasDSLService::Apply(Script,Package,TEXT("rename.RenameFields"),BP,Error))){AddInfo(Error);IFileManager::Get().Delete(*Path);return false;}
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("RenameActor");auto* Actor=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn);Spawn.Name=TEXT("RenameUntouched");auto* Untouched=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn);
+    if(!TestTrue(TEXT("Spawn rename actors"),Actor && Untouched)){IFileManager::Get().Delete(*Path);return false;}
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasFieldRenamePIECommand>(BP,this,Path,Source));return true;
+}
+
+namespace {
+class FDasRenameScopePIECommand final : public IAutomationLatentCommand {
+    FString Path,Source;TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasRenameScopePIECommand(UBlueprint* B,FAutomationTestBase* T,FString P,FString S):Path(P),Source(S),BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_RENAME_SCOPE_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));IFileManager::Get().Delete(*Path);UE_LOG(LogTemp,Display,TEXT("DAS_RENAME_SCOPE_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("RenameActor"));auto* Untouched=Find(World,TEXT("RenameUntouched"));Check(Actor && Untouched,TEXT("real_PIE_rename_actors"));
+        if(Actor && Untouched){
+            auto* Score=FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Score"));auto* Payload=FindFProperty<FStructProperty>(Actor->GetClass(),TEXT("Payload"));
+            if(Score && Payload){
+                Score->SetPropertyValue_InContainer(Actor,77);auto* Count=FindFProperty<FIntProperty>(Payload->Struct,TEXT("Count"));Count->SetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Actor),88);
+                auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto BeforeCall=Runtime.RunNamedPersistent(Path,TEXT("ue_RenameFields_Add"),0,Actor);Check(BeforeCall.bSucceeded && BeforeCall.Value==165,TEXT("PIE_persistent_context_before_rename"));
+                const FString Changed=Source.Replace(TEXT("Score :"),TEXT("Total :")).Replace(TEXT("self.Score"),TEXT("self.Total")).Replace(TEXT("Payload :"),TEXT("Data :")).Replace(TEXT("self.Payload"),TEXT("self.Data"));
+                FString Error;UClass* Before=BP->GeneratedClass;Check(FFileHelper::SaveStringToFile(Changed,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_write_rename"));
+                Check(!FDasDSLService::Reimport(BP.Get(),Error) && BP->GeneratedClass==Before,TEXT("PIE_no_policy_rename_refused"));
+                Check(FDasDSLService::ReimportRenamedFields(BP.Get(),Error,true),TEXT("PIE_rename_by_ID"));if(!Error.IsEmpty())Test->AddInfo(Error);
+                Actor=Find(World,TEXT("RenameActor"));Untouched=Find(World,TEXT("RenameUntouched"));Score=FindFProperty<FIntProperty>(BP->GeneratedClass,TEXT("Total"));Payload=FindFProperty<FStructProperty>(BP->GeneratedClass,TEXT("Data"));Count=Payload?FindFProperty<FIntProperty>(Payload->Struct,TEXT("Count")):nullptr;
+                Check(Actor && Untouched && Score && Count && Score->GetPropertyValue_InContainer(Actor)==77 && Count->GetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Actor))==88 && Score->GetPropertyValue_InContainer(Untouched)==45 && Count->GetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Untouched))==56,TEXT("PIE_rename_preserves_overrides_and_defaults"));
+                const auto AfterCall=Runtime.RunNamedPersistent(Path,TEXT("ue_RenameFields_Add"),3,Actor);Check(AfterCall.bSucceeded && AfterCall.Value==171,TEXT("PIE_updated_self_method_after_reinstance"));if(!AfterCall.bSucceeded)Test->AddInfo(AfterCall.Error);
+                auto* Fresh=World->SpawnActor<ADasProbeActor>(Actor->GetClass(),FTransform::Identity);Check(Fresh && Score && Score->GetPropertyValue_InContainer(Fresh)==45 && Count && Count->GetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Fresh))==56,TEXT("PIE_new_actor_defaults_after_rename"));
+                Check(FFileHelper::SaveStringToFile(Changed.Replace(TEXT("Count=10"),TEXT("Count=11")),*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_write_unapplied_parent_default"));
+                const auto InvalidParentDefault=Runtime.RunNamedPersistent(Path,TEXT("ue_RenameFields_Add"),0,Fresh);Check(!InvalidParentDefault.bSucceeded && InvalidParentDefault.Error.Contains(TEXT("default")),TEXT("PIE_child_override_does_not_bypass_declaring_default_guard"));
+                Check(FFileHelper::SaveStringToFile(Changed,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_restore_parent_declaration"));
+                Check(FDasDSLService::ReimportRenamedFields(BP.Get(),Error,true),TEXT("PIE_rename_idempotent"));CollectGarbage(RF_NoFlags);Check(Find(World,TEXT("RenameActor"))!=nullptr,TEXT("PIE_renamed_actor_survives_GC"));
+            }else Check(false,TEXT("PIE_fixture_fields"));
+        }
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasRenameScopePIETest,"DasForUE.DSL.RenameScopePIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasRenameScopePIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}
+    auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FString Source;FFileHelper::LoadFileToString(Source,*Runtime.ScriptPath(TEXT("dsl_rename_fields.das")));
+    const FString Guid=FGuid::NewGuid().ToString(EGuidFormats::Digits),Script=TEXT("dsl_renamescope_pie_")+Guid+TEXT(".das"),Path=Runtime.ScriptPath(Script);if(!FFileHelper::SaveStringToFile(Source,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))return false;
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasFrameAssetProbe/Run_")+Guid+TEXT("/BP_Rename");
+    if(!TestTrue(TEXT("Create rename DSL Blueprint"),FDasDSLService::Apply(Script,Package,TEXT("rename.RenameFields"),BP,Error))){AddInfo(Error);IFileManager::Get().Delete(*Path);return false;}
+    auto* Child=FKismetEditorUtilities::CreateBlueprint(BP->GeneratedClass,CreatePackage(*(Package+TEXT("_Child"))),TEXT("BP_Child"),BPTYPE_Normal,UBlueprint::StaticClass(),UBlueprintGeneratedClass::StaticClass(),TEXT("DasRenameScopePIE"));
+    auto SetDefaults=[](UBlueprint* B,int32 ScoreValue,int32 CountValue){UObject* CDO=B->GeneratedClass->GetDefaultObject();FindFProperty<FIntProperty>(B->GeneratedClass,TEXT("Score"))->SetPropertyValue_InContainer(CDO,ScoreValue);auto* P=FindFProperty<FStructProperty>(B->GeneratedClass,TEXT("Payload"));FindFProperty<FIntProperty>(P->Struct,TEXT("Count"))->SetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(CDO),CountValue);};
+    SetDefaults(Child,23,34);auto* Grand=FKismetEditorUtilities::CreateBlueprint(Child->GeneratedClass,CreatePackage(*(Package+TEXT("_Grand"))),TEXT("BP_Grand"),BPTYPE_Normal,UBlueprint::StaticClass(),UBlueprintGeneratedClass::StaticClass(),TEXT("DasRenameScopePIE"));SetDefaults(Grand,45,56);
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("RenameActor");auto* Actor=World->SpawnActor<ADasProbeActor>(Grand->GeneratedClass,FTransform::Identity,Spawn);Spawn.Name=TEXT("RenameUntouched");auto* Untouched=World->SpawnActor<ADasProbeActor>(Grand->GeneratedClass,FTransform::Identity,Spawn);
+    if(!TestTrue(TEXT("Spawn rename actors"),Actor && Untouched)){IFileManager::Get().Delete(*Path);return false;}
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasRenameScopePIECommand>(BP,this,Path,Source));return true;
+}
+
+#if WITH_DEV_AUTOMATION_TESTS
+void DasFailWidenAfterCompileForTesting(bool Enabled);
+#endif
+namespace {
+class FDasNumericWidenPIECommand final : public IAutomationLatentCommand {
+    FString Path,Source;TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasNumericWidenPIECommand(UBlueprint* B,FAutomationTestBase* T,FString P,FString S):Path(P),Source(S),BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_NUMERIC_WIDEN_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));IFileManager::Get().Delete(*Path);UE_LOG(LogTemp,Display,TEXT("DAS_NUMERIC_WIDEN_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("WidenActor"));auto* Untouched=Find(World,TEXT("WidenUntouched"));Check(Actor && Untouched,TEXT("real_PIE_widen_actors"));
+        if(Actor && Untouched){
+            auto* Score=FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Score"));auto* Rate=FindFProperty<FFloatProperty>(Actor->GetClass(),TEXT("Rate"));Score->SetPropertyValue_InContainer(Actor,MAX_int32);Rate->SetPropertyValue_InContainer(Actor,0.1f);
+            auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto BeforeCall=Runtime.RunNamedFramePersistent(Path,TEXT("ue_WidenFields_ReadScore"),{},EDasMethodSignature::Double,Actor);Check(BeforeCall.bSucceeded && BeforeCall.DoubleValue==MAX_int32,TEXT("PIE_old_numeric_callback"));
+            const FString Changed=Source.Replace(TEXT("Score : int = 5"),TEXT("Score : double = 5.0lf")).Replace(TEXT("Rate : float = 1.5"),TEXT("Rate : double = 1.5lf"));FString Error;Check(FFileHelper::SaveStringToFile(Changed,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_write_double_fields"));
+#if WITH_DEV_AUTOMATION_TESTS
+            DasFailWidenAfterCompileForTesting(true);const bool RolledBack=!FDasDSLService::ReimportWidenedNumericFields(BP.Get(),Error,true);DasFailWidenAfterCompileForTesting(false);Actor=Find(World,TEXT("WidenActor"));
+            Check(RolledBack && Error.StartsWith(TEXT("Numeric migration rolled back:")) && Actor && FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Score")) && FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Score"))->GetPropertyValue_InContainer(Actor)==MAX_int32,TEXT("PIE_type_and_override_rollback"));
+            const auto LastGood=Runtime.RunNamedFramePersistent(Path,TEXT("ue_WidenFields_ReadScore"),{},EDasMethodSignature::Double,Actor);Check(LastGood.bSucceeded && LastGood.DoubleValue==MAX_int32,TEXT("PIE_last_good_callback_after_rollback"));Test->AddInfo(FString::Printf(TEXT("Rollback callback: success=%d value=%.17g error=%s"),LastGood.bSucceeded,LastGood.DoubleValue,*LastGood.Error));
+#endif
+            Check(FDasDSLService::ReimportWidenedNumericFields(BP.Get(),Error,true),TEXT("PIE_exact_numeric_widen"));if(!Error.IsEmpty())Test->AddInfo(Error);
+            Actor=Find(World,TEXT("WidenActor"));Untouched=Find(World,TEXT("WidenUntouched"));auto* D=Actor?FindFProperty<FDoubleProperty>(Actor->GetClass(),TEXT("Score")):nullptr;auto* R=Actor?FindFProperty<FDoubleProperty>(Actor->GetClass(),TEXT("Rate")):nullptr;
+            Check(Actor && Untouched && D && R && D->GetPropertyValue_InContainer(Actor)==MAX_int32 && R->GetPropertyValue_InContainer(Actor)==static_cast<double>(0.1f) && D->GetPropertyValue_InContainer(Untouched)==23 && R->GetPropertyValue_InContainer(Untouched)==2.25,TEXT("PIE_exact_override_and_child_default_values"));
+            const auto AfterCall=Runtime.RunNamedFramePersistent(Path,TEXT("ue_WidenFields_ReadRate"),{},EDasMethodSignature::Double,Actor);Check(AfterCall.bSucceeded && AfterCall.DoubleValue==static_cast<double>(0.1f),TEXT("PIE_callback_uses_new_double_field"));
+            auto* Fresh=World->SpawnActor<ADasProbeActor>(Actor->GetClass(),FTransform::Identity);Check(Fresh && D && R && D->GetPropertyValue_InContainer(Fresh)==23 && R->GetPropertyValue_InContainer(Fresh)==2.25,TEXT("PIE_fresh_child_uses_promoted_defaults"));
+            Check(FFileHelper::SaveStringToFile(TEXT("options gen2\nrequire ue_foundation\n[export]\ndef ue_WidenFields_ReadScore():double { return 12.0lf }\n[export]\ndef ue_WidenFields_ReadRate():double { return 13.0lf }\n"),*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_write_removed_DSL_declaration"));
+            const auto RemovedDSL=Runtime.RunNamedFramePersistent(Path,TEXT("ue_WidenFields_ReadScore"),{},EDasMethodSignature::Double,Actor);Check(RemovedDSL.bSucceeded && RemovedDSL.DoubleValue==MAX_int32 && RemovedDSL.ReloadError.Contains(TEXT("DSL declaration changed")),TEXT("PIE_missing_declaration_does_not_bypass_approval_guard"));
+            Check(FFileHelper::SaveStringToFile(Changed,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_restore_promoted_source"));
+            Check(FDasDSLService::ReimportWidenedNumericFields(BP.Get(),Error,true),TEXT("PIE_widen_idempotent"));CollectGarbage(RF_NoFlags);Check(Find(World,TEXT("WidenActor"))!=nullptr,TEXT("PIE_promoted_actor_survives_GC"));
+        }
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasNumericWidenPIETest,"DasForUE.DSL.NumericWidenPIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasNumericWidenPIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FString Source;FFileHelper::LoadFileToString(Source,*Runtime.ScriptPath(TEXT("dsl_widen_numeric.das")));
+    const FString Guid=FGuid::NewGuid().ToString(EGuidFormats::Digits),Script=TEXT("dsl_widen_pie_")+Guid+TEXT(".das"),Path=Runtime.ScriptPath(Script);if(!FFileHelper::SaveStringToFile(Source,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))return false;
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasFrameAssetProbe/WidenPIE_")+Guid+TEXT("/BP_Parent");if(!TestTrue(TEXT("Create widening Blueprint"),FDasDSLService::Apply(Script,Package,TEXT("widen.WidenFields"),BP,Error))){AddInfo(Error);IFileManager::Get().Delete(*Path);return false;}
+    auto* Child=FKismetEditorUtilities::CreateBlueprint(BP->GeneratedClass,CreatePackage(*(Package+TEXT("_Child"))),TEXT("BP_Child"),BPTYPE_Normal,UBlueprint::StaticClass(),UBlueprintGeneratedClass::StaticClass(),TEXT("DasWidenPIE"));UObject* CDO=Child->GeneratedClass->GetDefaultObject();FindFProperty<FIntProperty>(Child->GeneratedClass,TEXT("Score"))->SetPropertyValue_InContainer(CDO,23);FindFProperty<FFloatProperty>(Child->GeneratedClass,TEXT("Rate"))->SetPropertyValue_InContainer(CDO,2.25f);
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("WidenActor");auto* Actor=World->SpawnActor<ADasProbeActor>(Child->GeneratedClass,FTransform::Identity,Spawn);Spawn.Name=TEXT("WidenUntouched");auto* Untouched=World->SpawnActor<ADasProbeActor>(Child->GeneratedClass,FTransform::Identity,Spawn);if(!TestTrue(TEXT("Spawn widening actors"),Actor && Untouched)){IFileManager::Get().Delete(*Path);return false;}
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasNumericWidenPIECommand>(BP,this,Path,Source));return true;
+}

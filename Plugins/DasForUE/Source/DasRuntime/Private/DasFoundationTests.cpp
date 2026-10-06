@@ -992,6 +992,119 @@ bool RunDasFoundationTests(FString& Report)
         Runtime.ReleaseObject(TextObject.Get());
         Expect(OldText.StringValue==TEXT("Unicode 世界 !") && Rename.NameValue==FName(TEXT("Item_42")),TEXT("string_name_results_owned_after_context_release"));
     }
+    {
+        const FString ObjectPath=Runtime.ScriptPath(TEXT("dsl_object_methods.das"));FString ObjectError;FDasAuthoringModule ObjectModel;
+        Expect(Runtime.ReadAuthoringScript(ObjectPath,ObjectModel,ObjectError) && ObjectModel.Classes.Num()==1,TEXT("object_DSL_model_contracts"),ObjectError);
+        TStrongObjectPtr<UDasObjectFixture> ObjectOwner(NewObject<UDasObjectFixture>());TStrongObjectPtr<UDasObjectFixture> TargetObject(NewObject<UDasObjectFixture>());
+        FDasScalarValue O;O.Kind=8;O.ObjectValue=TargetObject.Get();
+        const auto ObjectEcho=Runtime.RunNamedFramePersistent(ObjectPath,TEXT("ue_ObjectBridge_Echo"),{O},EDasMethodSignature::Object,ObjectOwner.Get());
+        Expect(ObjectEcho.bSucceeded && ObjectEcho.ObjectValue.Get()==TargetObject.Get(),TEXT("object_frame_CMRES_roundtrip"),ObjectEcho.Error);
+        Expect(Runtime.RunNamedFramePersistent(ObjectPath,TEXT("ue_ObjectBridge_Remember"),{O},EDasMethodSignature::Void,ObjectOwner.Get()).bSucceeded,TEXT("object_handle_stored_in_VM"));
+        O.ObjectValue=nullptr;const auto NullObjectResult=Runtime.RunNamedFramePersistent(ObjectPath,TEXT("ue_ObjectBridge_Echo"),{O},EDasMethodSignature::Object,ObjectOwner.Get());
+        Expect(NullObjectResult.bSucceeded && !NullObjectResult.ObjectValue.IsValid(),TEXT("object_null_roundtrip"),NullObjectResult.Error);
+        TWeakObjectPtr<UObject> ObjectWeakTarget(TargetObject.Get());TargetObject.Reset();CollectGarbage(RF_NoFlags);
+        const auto WeakStateFrame=Runtime.RunNamedFramePersistent(ObjectPath,TEXT("ue_ObjectBridge_IsRememberedValid"),{},EDasMethodSignature::Bool,ObjectOwner.Get());
+        Expect(!ObjectWeakTarget.IsValid() && !ObjectEcho.ObjectValue.IsValid() && WeakStateFrame.bSucceeded && !WeakStateFrame.BoolValue,TEXT("object_results_and_VM_globals_do_not_pin_GC"),WeakStateFrame.Error);
+        const auto ObjectExpired=Runtime.RunNamedFramePersistent(ObjectPath,TEXT("ue_ObjectBridge_Recall"),{},EDasMethodSignature::Object,ObjectOwner.Get());
+        Expect(!ObjectExpired.bSucceeded && ObjectExpired.Error.Contains(TEXT("expired")),TEXT("expired_object_return_rejected"),ObjectExpired.Error);
+        UObject* Temporary=NewObject<UDasObjectFixture>();CastChecked<UDasObjectFixture>(Temporary)->health=73;TWeakObjectPtr<UObject> WeakTemporary(Temporary);O.ObjectValue=Temporary;
+        const auto AcrossGC=Runtime.RunNamedFramePersistent(ObjectPath,TEXT("ue_ObjectBridge_ReadAcrossGC"),{O},EDasMethodSignature::Int,ObjectOwner.Get());
+        Expect(AcrossGC.bSucceeded && AcrossGC.Value==73 && WeakTemporary.IsValid(),TEXT("object_inputs_pinned_only_during_eval"),AcrossGC.Error);
+        O.ObjectValue=nullptr;CollectGarbage(RF_NoFlags);Expect(!WeakTemporary.IsValid(),TEXT("object_input_pin_released_after_call"));
+        O.ObjectValue=ObjectOwner.Get();O.ObjectClass=TEXT("/Script/Engine.Actor");
+        Expect(!Runtime.RunNamedFramePersistent(ObjectPath,TEXT("ue_ObjectBridge_ActorIdentity"),{O},EDasMethodSignature::Object,ObjectOwner.Get(),TEXT("/Script/Engine.Actor")).bSucceeded,TEXT("object_argument_class_checked_before_eval"));
+        const auto WrongResult=Runtime.RunNamedFramePersistent(ObjectPath,TEXT("ue_ObjectBridge_WrongActorResult"),{},EDasMethodSignature::Object,ObjectOwner.Get(),TEXT("/Script/Engine.Actor"));
+        Expect(!WrongResult.bSucceeded && WrongResult.Error.Contains(TEXT("wrong class")),TEXT("object_result_class_checked"),WrongResult.Error);
+        Runtime.ReleaseObject(ObjectOwner.Get());
+    }
+    {
+        const FString MathPath=Runtime.ScriptPath(TEXT("dsl_math_methods.das"));FString MathError;FDasAuthoringModule MathModel;
+        Expect(Runtime.ReadAuthoringScript(MathPath,MathModel,MathError) && MathModel.Classes.Num()==1,TEXT("math_struct_DSL_model"),MathError);
+        TStrongObjectPtr<UDasObjectFixture> MathOwner(NewObject<UDasObjectFixture>());
+        FDasScalarValue VectorArg;VectorArg.Kind=9;VectorArg.VectorValue=FVector(9007199254740988.0,2.25,3.5);FDasScalarValue DeltaArg;DeltaArg.Kind=6;DeltaArg.DoubleValue=1.0;
+        const auto Shifted=Runtime.RunNamedFramePersistent(MathPath,TEXT("ue_MathBridge_Shift"),{VectorArg,DeltaArg},EDasMethodSignature::Vector,MathOwner.Get());
+        Expect(Shifted.bSucceeded && Shifted.VectorValue.X==9007199254740989.0 && Shifted.VectorValue.Y==2.25 && VectorArg.VectorValue.X==9007199254740988.0,TEXT("vector_double_precision_and_input_copy"),Shifted.Error);
+        FDasScalarValue RotationArg;RotationArg.Kind=10;RotationArg.RotatorValue=FRotator(12.5,20.25,3.75);DeltaArg.DoubleValue=5.0;
+        const auto Turned=Runtime.RunNamedFramePersistent(MathPath,TEXT("ue_MathBridge_Turn"),{RotationArg,DeltaArg},EDasMethodSignature::Rotator,MathOwner.Get());
+        Expect(Turned.bSucceeded && Turned.RotatorValue.Equals(FRotator(12.5,25.25,3.75),1e-12),TEXT("rotator_named_components_CMRES"),Turned.Error);
+        FDasScalarValue TransformArg;TransformArg.Kind=11;TransformArg.TransformValue=FTransform(FRotator(0,90,0),FVector(10,20,30),FVector(2,3,4));
+        const auto PassedTransform=Runtime.RunNamedFramePersistent(MathPath,TEXT("ue_MathBridge_PassTransform"),{TransformArg},EDasMethodSignature::Transform,MathOwner.Get());
+        Expect(PassedTransform.bSucceeded && PassedTransform.TransformValue.Equals(TransformArg.TransformValue,1e-12),TEXT("transform_full_value_CMRES"),PassedTransform.Error);
+        VectorArg.VectorValue=FVector(1,2,3);const auto Applied=Runtime.RunNamedFramePersistent(MathPath,TEXT("ue_MathBridge_Apply"),{TransformArg,VectorArg},EDasMethodSignature::Vector,MathOwner.Get());
+        Expect(Applied.bSucceeded && Applied.VectorValue.Equals(TransformArg.TransformValue.TransformPosition(VectorArg.VectorValue),1e-12),TEXT("transform_position_native_semantics"),Applied.Error);
+        Expect(Runtime.RunNamedFramePersistent(MathPath,TEXT("ue_MathBridge_Remember"),{TransformArg},EDasMethodSignature::Void,MathOwner.Get()).bSucceeded,TEXT("transform_global_value_copy"));
+        TransformArg.TransformValue=FTransform::Identity;const auto Recalled=Runtime.RunNamedFramePersistent(MathPath,TEXT("ue_MathBridge_Recall"),{},EDasMethodSignature::Transform,MathOwner.Get());
+        Expect(Recalled.bSucceeded && Recalled.TransformValue.Equals(PassedTransform.TransformValue,1e-12),TEXT("transform_stored_value_independent_of_host"),Recalled.Error);
+        Expect(!Runtime.RunNamedFramePersistent(MathPath,TEXT("ue_MathBridge_PassTransform"),{VectorArg},EDasMethodSignature::Transform,MathOwner.Get()).bSucceeded,TEXT("math_nominal_struct_types_distinct"));
+        VectorArg.VectorValue.X=std::numeric_limits<double>::infinity();
+        Expect(!Runtime.RunNamedFramePersistent(MathPath,TEXT("ue_MathBridge_Shift"),{VectorArg,DeltaArg},EDasMethodSignature::Vector,MathOwner.Get()).bSucceeded,TEXT("nonfinite_vector_input_rejected"));
+        TransformArg.TransformValue.SetRotation(FQuat(0,0,0,2));
+        Expect(!Runtime.RunNamedFramePersistent(MathPath,TEXT("ue_MathBridge_PassTransform"),{TransformArg},EDasMethodSignature::Transform,MathOwner.Get()).bSucceeded,TEXT("unnormalized_transform_input_rejected"));
+        Runtime.ReleaseObject(MathOwner.Get());Expect(PassedTransform.TransformValue.Equals(Recalled.TransformValue,1e-12),TEXT("math_results_owned_after_context_release"));
+    }
+    {
+        FString StructError;Expect(ValidateDasValueStruct(TEXT("/Script/DasRuntime.DasCallPayload"),StructError),TEXT("reflected_nested_scalar_struct_capability"),StructError);
+        Expect(!ValidateDasValueStruct(TEXT("/Script/Engine.HitResult"),StructError),TEXT("reflected_object_opaque_struct_rejected"),StructError);
+        const FString StructPath=Runtime.ScriptPath(TEXT("dsl_reflected_methods.das"));FDasAuthoringModule StructModel;
+        Expect(Runtime.ReadAuthoringScript(StructPath,StructModel,StructError),TEXT("reflected_struct_DSL_model"),StructError);
+        TStrongObjectPtr<UDasObjectFixture> StructOwner(NewObject<UDasObjectFixture>());
+        FDasCallPayload Payload;Payload.Count=7;Payload.Label=TEXT("Привет 世界");Payload.Metrics.Ratio=1.25f;Payload.bEnabled=true;Payload.Weight=1.23456789012345;
+        FDasScalarValue ValueArg;ValueArg.Kind=12;ValueArg.ObjectClass=TEXT("/Script/DasRuntime.DasCallPayload");ValueArg.StructValue.InitializeAs(FDasCallPayload::StaticStruct(),reinterpret_cast<const uint8*>(&Payload));FDasScalarValue AmountArg;AmountArg.IntValue=3;
+        const auto Edited=Runtime.RunNamedFramePersistent(StructPath,TEXT("ue_StructBridge_Edit"),{ValueArg,AmountArg},EDasMethodSignature::Struct,StructOwner.Get(),ValueArg.ObjectClass);
+        const auto* Result=Edited.StructValue.GetPtr<FDasCallPayload>();Expect(Edited.bSucceeded && Result && Result->Count==10 && Result->Label==TEXT("Привет 世界 !") && Result->Metrics.Ratio==1.75f && Result->bEnabled && Result->Weight==Payload.Weight,TEXT("reflected_struct_recursive_copy_update"),Edited.Error);
+        Expect(ValueArg.StructValue.Get<FDasCallPayload>().Count==7 && ValueArg.StructValue.Get<FDasCallPayload>().Label==Payload.Label,TEXT("reflected_struct_input_immutable"));
+        Expect(Runtime.RunNamedFramePersistent(StructPath,TEXT("ue_StructBridge_Remember"),{ValueArg},EDasMethodSignature::Void,StructOwner.Get()).bSucceeded,TEXT("reflected_struct_global_value"));
+        ValueArg.StructValue.GetMutable<FDasCallPayload>().Count=99;const auto Recall=Runtime.RunNamedFramePersistent(StructPath,TEXT("ue_StructBridge_Recall"),{},EDasMethodSignature::Struct,StructOwner.Get(),TEXT("/Script/DasRuntime.DasCallPayload"));
+        Expect(Recall.bSucceeded && Recall.StructValue.Get<FDasCallPayload>().Count==7,TEXT("reflected_struct_global_independent_of_host"),Recall.Error);
+        const auto Wrong=Runtime.RunNamedFramePersistent(StructPath,TEXT("ue_StructBridge_Wrong"),{ValueArg},EDasMethodSignature::Struct,StructOwner.Get(),TEXT("/Script/DasRuntime.DasCallMetrics"));
+        Expect(!Wrong.bSucceeded && Wrong.Error.Contains(TEXT("type mismatch")),TEXT("reflected_struct_wrong_result_identity"),Wrong.Error);
+        Runtime.ReleaseObject(StructOwner.Get());Expect(Edited.StructValue.GetPtr<FDasCallPayload>() && Edited.StructValue.GetPtr<FDasCallPayload>()->Count==10,TEXT("reflected_struct_owned_after_context_release"));
+    }
+    {
+        TStrongObjectPtr<UDasObjectFixture> SnapshotOwner(NewObject<UDasObjectFixture>());
+        const auto LongLoop=Runtime.RunPersistent(Runtime.ScriptPath(TEXT("struct_snapshot_gc.das")),20000,SnapshotOwner.Get());
+        Expect(LongLoop.bSucceeded && LongLoop.Value==19999,TEXT("struct_snapshot_gc_long_loop_active_locals"),LongLoop.Error);
+        Expect(Runtime.StructSnapshotCount(SnapshotOwner.Get())<=4 && Runtime.StructSnapshotsReclaimed(SnapshotOwner.Get())>10000,TEXT("struct_snapshot_gc_reclaims_churn_preserves_global_array"));
+        const auto AgainLoop=Runtime.RunPersistent(Runtime.ScriptPath(TEXT("struct_snapshot_gc.das")),10000,SnapshotOwner.Get());
+        Expect(AgainLoop.bSucceeded && AgainLoop.Value==9999 && Runtime.StructSnapshotCount(SnapshotOwner.Get())<=4,TEXT("struct_snapshot_gc_globals_survive_second_call"),AgainLoop.Error);
+        Runtime.ReleaseObject(SnapshotOwner.Get());
+        bool Boundaries=true;for(int32 I=0;I<5000;++I){const auto Value=Runtime.RunPersistent(Runtime.ScriptPath(TEXT("struct_snapshot_boundary.das")),I,SnapshotOwner.Get());if(!Value.bSucceeded || Value.Value!=I){Boundaries=false;break;}}
+        Expect(Boundaries && Runtime.StructSnapshotCount(SnapshotOwner.Get())==1,TEXT("struct_snapshot_call_boundary_without_gc_option"));
+        Runtime.ReleaseObject(SnapshotOwner.Get());Expect(Runtime.StructSnapshotCount(SnapshotOwner.Get())==0,TEXT("struct_snapshot_release_reclaims_all"));
+    }
+    {
+        FString StructDefaultError;FInstancedStruct ParsedDefault;
+        Expect(ParseDasStructDefault(TEXT("/Script/DasRuntime.DasCallPayload"),TEXT("(Metrics=(Ratio=1.5),Count=10,Label=\"Initial\",bEnabled=True,Weight=2.25)"),ParsedDefault,StructDefaultError) && ParsedDefault.GetPtr<FDasCallPayload>() && ParsedDefault.Get<FDasCallPayload>().Count==10 && ParsedDefault.Get<FDasCallPayload>().Metrics.Ratio==1.5f,TEXT("struct_default_recursive_import"),StructDefaultError);
+        Expect(!ParseDasStructDefault(TEXT("/Script/DasRuntime.DasCallPayload"),TEXT("(Unknown=10)"),ParsedDefault,StructDefaultError),TEXT("struct_default_unknown_field_rejected"));
+        Expect(!ParseDasStructDefault(TEXT("/Script/DasRuntime.DasCallPayload"),TEXT("(Count=10) trailing"),ParsedDefault,StructDefaultError),TEXT("struct_default_trailing_text_rejected"));
+        Expect(!ParseDasStructDefault(TEXT("/Script/DasRuntime.DasNamedMode"),TEXT("(Mode=Invalid)"),ParsedDefault,StructDefaultError),TEXT("struct_default_unknown_enum_rejected"));
+        FDasAuthoringModule StructFieldsModel;
+        Expect(Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_struct_fields.das")),StructFieldsModel,StructDefaultError),TEXT("struct_fields_native_DSL_model"),StructDefaultError);
+        FDasClassSchema StructFieldsSchema;Expect(StructFieldsModel.ToActorSchema(TEXT("structfields.StructFields"),StructFieldsSchema,StructDefaultError) && StructFieldsSchema.Fields.Num()==2 && StructFieldsSchema.Fields[0].Kind==EDasScalarKind::Struct,TEXT("struct_fields_schema_adapter"),StructDefaultError);
+        FString EnumStructError;Expect(ValidateDasValueStruct(TEXT("/Script/DasRuntime.DasNamedMode"),EnumStructError) && ValidateDasValueStruct(TEXT("/Script/DasRuntime.DasEnumBundle"),EnumStructError),TEXT("reflected_struct_enum_leaf_capabilities"),EnumStructError);
+        const FString EnumStructPath=Runtime.ScriptPath(TEXT("dsl_struct_enum_methods.das"));FDasAuthoringModule EnumStructModel;
+        Expect(Runtime.ReadAuthoringScript(EnumStructPath,EnumStructModel,EnumStructError),TEXT("enum_struct_DSL_model"),EnumStructError);
+        TStrongObjectPtr<UDasObjectFixture> EnumStructOwner(NewObject<UDasObjectFixture>());
+        FDasNamedMode Named;Named.Mode=EDasCallMode::Idle;Named.Key=FName(TEXT("Item_42"));FDasScalarValue NamedArg;NamedArg.Kind=12;NamedArg.ObjectClass=TEXT("/Script/DasRuntime.DasNamedMode");NamedArg.StructValue.InitializeAs(FDasNamedMode::StaticStruct(),reinterpret_cast<const uint8*>(&Named));FDasScalarValue SymbolArg;SymbolArg.Kind=5;SymbolArg.StringValue=TEXT("active");
+        const auto UpdatedEnum=Runtime.RunNamedFramePersistent(EnumStructPath,TEXT("ue_EnumStructBridge_SetMode"),{NamedArg,SymbolArg},EDasMethodSignature::Struct,EnumStructOwner.Get(),NamedArg.ObjectClass);
+        const auto* UpdatedNamed=UpdatedEnum.StructValue.GetPtr<FDasNamedMode>();Expect(UpdatedEnum.bSucceeded && UpdatedNamed && UpdatedNamed->Mode==EDasCallMode::Active && UpdatedNamed->Key==Named.Key && NamedArg.StructValue.Get<FDasNamedMode>().Mode==EDasCallMode::Idle,TEXT("enum_leaf_symbol_update_preserves_input_and_name"),UpdatedEnum.Error);
+        NamedArg.StructValue=UpdatedEnum.StructValue;const auto ReadEnum=Runtime.RunNamedFramePersistent(EnumStructPath,TEXT("ue_EnumStructBridge_ReadMode"),{NamedArg},EDasMethodSignature::String,EnumStructOwner.Get());
+        Expect(ReadEnum.bSucceeded && ReadEnum.StringValue==TEXT("Active"),TEXT("enum_leaf_canonical_symbol_read"),ReadEnum.Error);
+        SymbolArg.StringValue=TEXT("EDasCallMode::Paused");const auto QualifiedEnum=Runtime.RunNamedFramePersistent(EnumStructPath,TEXT("ue_EnumStructBridge_SetMode"),{NamedArg,SymbolArg},EDasMethodSignature::Struct,EnumStructOwner.Get(),NamedArg.ObjectClass);
+        Expect(QualifiedEnum.bSucceeded && QualifiedEnum.StructValue.GetPtr<FDasNamedMode>() && QualifiedEnum.StructValue.Get<FDasNamedMode>().Mode==EDasCallMode::Paused,TEXT("enum_leaf_qualified_symbol"),QualifiedEnum.Error);
+        SymbolArg.StringValue=TEXT("not-a-member");const auto BadSymbol=Runtime.RunNamedFramePersistent(EnumStructPath,TEXT("ue_EnumStructBridge_SetMode"),{NamedArg,SymbolArg},EDasMethodSignature::Struct,EnumStructOwner.Get(),NamedArg.ObjectClass);
+        Expect(!BadSymbol.bSucceeded && BadSymbol.Error.Contains(TEXT("unknown or reserved")),TEXT("enum_leaf_unknown_symbol_rejected"),BadSymbol.Error);
+        SymbolArg.StringValue=StaticEnum<EDasCallMode>()->GetNameStringByIndex(StaticEnum<EDasCallMode>()->NumEnums()-1);const auto MaxSymbol=Runtime.RunNamedFramePersistent(EnumStructPath,TEXT("ue_EnumStructBridge_SetMode"),{NamedArg,SymbolArg},EDasMethodSignature::Struct,EnumStructOwner.Get(),NamedArg.ObjectClass);
+        Expect(!MaxSymbol.bSucceeded && MaxSymbol.Error.Contains(TEXT("unknown or reserved")),TEXT("enum_leaf_MAX_symbol_rejected"),MaxSymbol.Error);
+        const auto WrongEnum=Runtime.RunNamedFramePersistent(EnumStructPath,TEXT("ue_EnumStructBridge_WrongEnumType"),{NamedArg},EDasMethodSignature::String,EnumStructOwner.Get());
+        Expect(!WrongEnum.bSucceeded && WrongEnum.Error.Contains(TEXT("type path mismatch")),TEXT("enum_leaf_identity_mismatch_rejected"),WrongEnum.Error);
+        NamedArg.StructValue.GetMutable<FDasNamedMode>().Mode=static_cast<EDasCallMode>(255);const auto InvalidStored=Runtime.RunNamedFramePersistent(EnumStructPath,TEXT("ue_EnumStructBridge_ReadMode"),{NamedArg},EDasMethodSignature::String,EnumStructOwner.Get());
+        Expect(!InvalidStored.bSucceeded && InvalidStored.Error.Contains(TEXT("Unknown or reserved enum value")),TEXT("enum_leaf_invalid_input_snapshot_rejected"),InvalidStored.Error);
+        FDasEnumBundle Bundle;Bundle.Nested.Key=Named.Key;FDasScalarValue BundleArg;BundleArg.Kind=12;BundleArg.ObjectClass=TEXT("/Script/DasRuntime.DasEnumBundle");BundleArg.StructValue.InitializeAs(FDasEnumBundle::StaticStruct(),reinterpret_cast<const uint8*>(&Bundle));
+        const auto BundleResult=Runtime.RunNamedFramePersistent(EnumStructPath,TEXT("ue_EnumStructBridge_UpdateBundle"),{BundleArg},EDasMethodSignature::Struct,EnumStructOwner.Get(),BundleArg.ObjectClass);
+        const auto* UpdatedBundle=BundleResult.StructValue.GetPtr<FDasEnumBundle>();Expect(BundleResult.bSucceeded && UpdatedBundle && UpdatedBundle->Legacy==DasLegacyActive && UpdatedBundle->Nested.Mode==EDasCallMode::Paused && UpdatedBundle->Nested.Key==Named.Key,TEXT("enum_byte_leaf_and_nested_enum_update"),BundleResult.Error);
+        Runtime.ReleaseObject(EnumStructOwner.Get());
+    }
     TWeakObjectPtr<UObject> DeadOwner(Second.Get());
     First.Reset(); Second.Reset(); CollectGarbage(RF_NoFlags);
     Expect(!DeadOwner.IsValid() && Runtime.PersistentContextCount() == 0 && Runtime.SubscriptionCount() == 0, TEXT("persistent_GC_reclaims_contexts_without_pinning"));
