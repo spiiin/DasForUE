@@ -760,3 +760,236 @@ bool FDasObjectsPIETest::RunTest(const FString& Parameters)
 }
 
 #endif
+
+
+#include "DasDSLService.h"
+#include "HAL/IConsoleManager.h"
+namespace {
+struct FDasDSLPIEState {
+    TStrongObjectPtr<UBlueprint> Blueprint;
+    FString ScriptName,ScriptPath,Source1,Source2;
+    bool Passed=true;
+};
+class FDasDSLPIECommand final : public IAutomationLatentCommand {
+    TSharedRef<FDasDSLPIEState> S;FAutomationTestBase* Test;double Start=0;bool Ending=false;
+public:
+    FDasDSLPIECommand(TSharedRef<FDasDSLPIEState> State,FAutomationTestBase* T):S(State),Test(T){}
+    virtual bool Update() override {
+        if(Start==0) Start=FPlatformTime::Seconds();
+        auto Check=[&](bool Value,const TCHAR* Name){S->Passed &= Test->TestTrue(Name,Value);UE_LOG(LogTemp,Display,TEXT("DAS_DSL_PIE %s %s"),Value?TEXT("PASS"):TEXT("FAIL"),Name);};
+        auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+        if(Ending){
+            if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30) return false;
+            Check(!GEditor->PlayWorld,TEXT("EndPIE"));
+            Check(Runtime.PersistentContextCount()==Runtime.PersistentContextCount(GEditor->GetEditorWorldContext().World()),TEXT("EndPIE_releases_play_contexts"));
+            IFileManager::Get().Delete(*S->ScriptPath);
+            UE_LOG(LogTemp,Display,TEXT("DAS_DSL_PIE_RESULT=%s"),S->Passed?TEXT("PASS"):TEXT("FAIL"));return true;
+        }
+        UWorld* World=GEditor->PlayWorld;
+        if(!World || !World->HasBegunPlay()){
+            if(FPlatformTime::Seconds()-Start<60) return false;
+            Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+        }
+        auto* Actor=Find(World,TEXT("DSLActor"));auto* Holder=Find(World,TEXT("DSLHolder"));
+        Check(Actor && Actor->HasActorBegunPlay() && Evaluate(Actor)==73,TEXT("native_DSL_method_in_real_PIE"));
+        if(!Actor){GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Score"))->SetPropertyValue_InContainer(Actor,77);
+        auto Write=[&](const FString& Text){return FFileHelper::SaveStringToFile(Text,*S->ScriptPath,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);};
+        auto Call=[&](){return Runtime.RunNamedPersistent(S->ScriptPath,TEXT("ue_Counter_Evaluate"),5,Actor);};
+        Check(Call().Value==82,TEXT("PIE_override_before_reload"));
+        const FString Body=S->Source1.Replace(TEXT("self.Score + input"),TEXT("self.Score + input + 100"));
+        Check(Write(Body),TEXT("write_body_change"));
+        const auto Reload=Call();Check(Reload.bSucceeded && Reload.Value==182 && Reload.ReloadError.IsEmpty(),TEXT("body_auto_reload_without_reinstance"));
+        UClass* BeforeClass=Actor->GetClass();UObject* BeforeActor=Actor;FString Error;
+        Check(FDasDSLService::Reimport(S->Blueprint.Get(),Error) && Find(World,TEXT("DSLActor"))==BeforeActor && Actor->GetClass()==BeforeClass,TEXT("body_only_reimport_preserves_actor_identity"));
+        Check(Write(TEXT("broken DSL")),TEXT("write_invalid_DSL"));
+        Check(!FDasDSLService::Reimport(S->Blueprint.Get(),Error) && Actor->GetClass()==BeforeClass,TEXT("invalid_reimport_no_Blueprint_mutation"));
+        auto Fallback=Call();Check(Fallback.bSucceeded && Fallback.Value==182 && !Fallback.ReloadError.IsEmpty(),TEXT("broken_DSL_keeps_last_good_body"));
+        Check(Write(Body) && Call().ReloadError.IsEmpty(),TEXT("body_reload_recovers"));
+        Check(Write(S->Source2),TEXT("write_structural_DSL_change"));
+        Fallback=Call();Check(Fallback.bSucceeded && Fallback.Value==182 && Fallback.ReloadError.Contains(TEXT("apply/reimport")),TEXT("structural_candidate_waits_for_Unreal_apply"));
+        bool Replaced=false;
+        auto Handle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([&](const FCoreUObjectDelegates::FReplacementObjectMap& Map){Replaced |= Map.Contains(BeforeActor);});
+        Check(FDasDSLService::Reimport(S->Blueprint.Get(),Error),TEXT("structural_reimport_during_PIE"));
+        FCoreUObjectDelegates::OnObjectsReplaced.Remove(Handle);
+        if(!Error.IsEmpty()) Test->AddInfo(Error);
+        Actor=Find(World,TEXT("DSLActor"));Holder=Find(World,TEXT("DSLHolder"));
+        auto* EditorActor=Find(GEditor->GetEditorWorldContext().World(),TEXT("DSLActor"));
+        Check(Replaced && Actor && Actor->HasActorBegunPlay() && Actor->GetClass()==S->Blueprint->GeneratedClass,TEXT("PIE_actor_reinstanced_with_BeginPlay_state"));
+        Check(Actor && Int(Actor,TEXT("Score"))==77 && Int(Actor,TEXT("Bonus"))==5 && Evaluate(Actor)==222,TEXT("new_field_and_body_preserve_override"));
+        Check(EditorActor && Int(EditorActor,TEXT("Score"))==33 && Int(EditorActor,TEXT("Bonus"))==5,TEXT("editor_world_override_isolated"));
+        Check(Actor && Holder && Holder->Peer==Actor && Actor->Peer==Holder,TEXT("references_preserved"));
+        Check(Actor && Call().Value==187,TEXT("new_declaration_runtime_accepted"));
+        BeforeClass=Actor?Actor->GetClass():nullptr;
+        Check(Write(S->Source2.Replace(TEXT("Score : int = 10"),TEXT("Score : int = 999"))),TEXT("write_unsupported_default_change"));
+        Check(!FDasDSLService::Reimport(S->Blueprint.Get(),Error) && Actor && Actor->GetClass()==BeforeClass,TEXT("unsupported_migration_rejected"));
+        Fallback=Call();Check(Fallback.bSucceeded && Fallback.Value==187 && Fallback.ReloadError.Contains(TEXT("apply/reimport")),TEXT("rejected_default_change_keeps_last_good_body"));
+        Check(Write(S->Source2) && Call().ReloadError.IsEmpty(),TEXT("restore_last_good_source"));
+        CollectGarbage(RF_NoFlags);Actor=Find(World,TEXT("DSLActor"));
+        Check(Actor && Int(Actor,TEXT("Score"))==77 && Evaluate(Actor)==222,TEXT("reimport_survives_GC"));
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasDSLPIETest,"DasForUE.DSL.PIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasDSLPIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))) {AddError(TEXT("DSL probe requires isolated smoke project"));return false;}
+    auto S=MakeShared<FDasDSLPIEState>();auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    const FString Guid=FGuid::NewGuid().ToString(EGuidFormats::Digits);
+    S->ScriptName=TEXT("dsl_pie_")+Guid+TEXT(".das");S->ScriptPath=Runtime.ScriptPath(S->ScriptName);
+    if(!FFileHelper::LoadFileToString(S->Source1,*Runtime.ScriptPath(TEXT("dsl_counter_v1.das"))) || !FFileHelper::LoadFileToString(S->Source2,*Runtime.ScriptPath(TEXT("dsl_counter_v2.das")))) return false;
+    if(!FFileHelper::SaveStringToFile(S->Source1,*S->ScriptPath,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM)) return false;
+    UWorld* World=FAutomationEditorCommonUtils::CreateNewMap();
+    const FString Package=TEXT("/Game/DasDSLProbe/Run_")+Guid+TEXT("/BP_Counter");
+    IConsoleManager::Get().ProcessUserConsoleInput(*(TEXT("Das.DSL.Apply ")+S->ScriptName+TEXT(" ")+Package+TEXT(" example.counter")),*GLog,World);
+    UBlueprint* BP=LoadObject<UBlueprint>(nullptr,*(Package+TEXT(".BP_Counter")));
+    if(!TestNotNull(TEXT("console command creates Blueprint"),BP)){IFileManager::Get().Delete(*S->ScriptPath);return false;}S->Blueprint.Reset(BP);
+    FString Error;UBlueprint* Ignored=nullptr;
+    TestTrue(TEXT("invalid package/source refused"),!FDasDSLService::Apply(TEXT("../bad.das"),Package,TEXT("example.counter"),Ignored,Error));
+    IConsoleManager::Get().ProcessUserConsoleInput(*(TEXT("Das.DSL.Reimport ")+Package),*GLog,World);
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("DSLActor");
+    auto* Actor=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn);
+    Spawn.Name=TEXT("DSLHolder");auto* Holder=World->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(),FTransform::Identity,Spawn);
+    if(!Actor || !Holder){IFileManager::Get().Delete(*S->ScriptPath);return false;}
+    FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Score"))->SetPropertyValue_InContainer(Actor,33);Holder->Peer=Actor;Actor->Peer=Holder;
+    // PIE duplicates the editor override; later writes exercise world isolation.
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
+    FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasDSLPIECommand>(S,this));return true;
+}
+
+
+#include "DasAuthoring.h"
+namespace {
+class FDasScalarPIECommand final : public IAutomationLatentCommand {
+    TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasScalarPIECommand(UBlueprint* B,FAutomationTestBase* T):BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0) Start=FPlatformTime::Seconds();
+        auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_SCALAR_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30) return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));UE_LOG(LogTemp,Display,TEXT("DAS_SCALAR_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;
+        if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60) return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("ScalarActor"));
+        Check(Actor && Int(Actor,TEXT("health"))==10 && Float(Actor,TEXT("speed"))==1.5f,TEXT("scalar_defaults"));
+        auto* InitialBool=Actor?FindFProperty<FBoolProperty>(Actor->GetClass(),TEXT("bScalar")):nullptr;
+        Check(InitialBool && InitialBool->GetPropertyValue_InContainer(Actor),TEXT("bool_true_Blueprint_default"));
+        if(!Actor){GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto Invoke=[&](const TCHAR* Name,auto SetInput,auto GetResult){
+            UFunction* Method=Actor->FindFunction(Name);if(!Method) return false;
+            FStructOnScope Frame(Method);if(!SetInput(Method,Frame.GetStructMemory())) return false;
+            FEditorScriptExecutionGuard Guard;Actor->ProcessEvent(Method,Frame.GetStructMemory());return GetResult(Method,Frame.GetStructMemory());
+        };
+        Check(Invoke(TEXT("Scale"),[](UFunction* F,uint8* Data){auto* P=FindFProperty<FFloatProperty>(F,TEXT("Input"));if(!P)return false;P->SetPropertyValue_InContainer(Data,2.25f);return true;},[](UFunction* F,uint8* Data){auto* P=CastField<FFloatProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(Data)==3.75f;}),TEXT("float_ProcessEvent_input_return"));
+        Check(Invoke(TEXT("Toggle"),[](UFunction* F,uint8* Data){auto* P=FindFProperty<FBoolProperty>(F,TEXT("Input"));if(!P)return false;P->SetPropertyValue_InContainer(Data,true);return true;},[](UFunction* F,uint8* Data){auto* P=CastField<FBoolProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(Data);}),TEXT("bool_ProcessEvent_input_return"));
+        auto* Flag=FindFProperty<FBoolProperty>(Actor->GetClass(),TEXT("bScalar"));
+        Check(Flag && Flag->GetPropertyValue_InContainer(Actor),TEXT("bool_reflected_field_write"));
+        Check(Invoke(TEXT("Check"),[](UFunction* F,uint8* Data){auto* P=FindFProperty<FIntProperty>(F,TEXT("Input"));if(!P)return false;P->SetPropertyValue_InContainer(Data,5);return true;},[](UFunction* F,uint8* Data){auto* P=CastField<FIntProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(Data)==15;}),TEXT("int_method_shares_context"));
+        Check(Invoke(TEXT("Reset"),[](UFunction* F,uint8*){return F->NumParms==0;},[](UFunction* F,uint8*){return !F->GetReturnProperty();}) && Int(Actor,TEXT("health"))==0 && Flag && !Flag->GetPropertyValue_InContainer(Actor) && Float(Actor,TEXT("speed"))==3.75f,TEXT("void_action_and_bool_reset"));
+        auto* EditorActor=Find(GEditor->GetEditorWorldContext().World(),TEXT("ScalarActor"));
+        Check(EditorActor && Int(EditorActor,TEXT("health"))==10 && Float(EditorActor,TEXT("speed"))==1.5f,TEXT("scalar_world_isolation"));
+        FString Error;UClass* Before=Actor->GetClass();
+        Check(FDasDSLService::Reimport(BP.Get(),Error) && Actor->GetClass()==Before,TEXT("typed_reimport_without_reinstance"));
+        auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FDasAuthoringModule Model;
+        if(Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_scalar_methods.das")),Model,Error)){
+            auto* M=Model.Classes[0].Methods.FindByPredicate([](const auto& X){return X.Name==TEXT("Scale");});
+            if(M){M->ReturnType.Kind=TEXT("int");M->Parameters[0].Type.Kind=TEXT("int");}
+            Check(M && !FDasBlueprintService::ApplyAuthoring(BP.Get(),Model,TEXT("typed.fixture"),Error) && BP->GeneratedClass==Before,TEXT("typed_signature_mismatch_no_mutation"));
+            if(M){M->ReturnType.Kind=TEXT("float");M->Parameters[0].Type.Kind=TEXT("float");}
+            auto* P=Model.Classes[0].Properties.FindByPredicate([](const auto& X){return X.Name==TEXT("bScalar");});if(P) P->Default.Boolean=false;
+            Check(P && !FDasBlueprintService::ApplyAuthoring(BP.Get(),Model,TEXT("typed.fixture"),Error) && BP->GeneratedClass==Before,TEXT("bool_default_migration_no_mutation"));
+        }else Check(false,TEXT("typed_model_read"));
+        CollectGarbage(RF_NoFlags);Actor=Find(World,TEXT("ScalarActor"));
+        Check(Actor && Float(Actor,TEXT("speed"))==3.75f && Int(Actor,TEXT("health"))==0,TEXT("typed_state_survives_GC"));
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasScalarPIETest,"DasForUE.DSL.ScalarsPIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasScalarPIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated smoke project required"));return false;}
+    UWorld* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;
+    const FString Package=TEXT("/Game/DasScalarProbe/Run_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT("/BP_Scalar");
+    if(!TestTrue(TEXT("Create typed DSL Blueprint"),FDasDSLService::Apply(TEXT("dsl_scalar_methods.das"),Package,TEXT("typed.fixture"),BP,Error))){AddInfo(Error);return false;}
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("ScalarActor");auto* Actor=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn);
+    if(!TestNotNull(TEXT("Spawn scalar actor"),Actor)) return false;
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasScalarPIECommand>(BP,this));return true;
+}
+
+
+namespace {
+class FDasFramePIECommand final : public IAutomationLatentCommand {
+    TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasFramePIECommand(UBlueprint* B,FAutomationTestBase* T):BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0) Start=FPlatformTime::Seconds();
+        auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_FRAME_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30) return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));UE_LOG(LogTemp,Display,TEXT("DAS_FRAME_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60) return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("FrameActor"));Check(Actor!=nullptr,TEXT("real_PIE_actor"));if(!Actor){GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto Invoke=[&](const TCHAR* Name,auto Input,auto Output){auto* F=Actor->FindFunction(Name);if(!F)return false;FStructOnScope Frame(F);if(!Input(F,Frame.GetStructMemory()))return false;FEditorScriptExecutionGuard Guard;Actor->ProcessEvent(F,Frame.GetStructMemory());return Output(F,Frame.GetStructMemory());};
+        auto SetInt=[](UFunction* F,uint8* Data,const TCHAR* Name,int32 V){auto* P=FindFProperty<FIntProperty>(F,Name);if(!P)return false;P->SetPropertyValue_InContainer(Data,V);return true;};
+        auto SetBool=[](UFunction* F,uint8* Data,const TCHAR* Name,bool V){auto* P=FindFProperty<FBoolProperty>(F,Name);if(!P)return false;P->SetPropertyValue_InContainer(Data,V);return true;};
+        Check(Invoke(TEXT("Compute"),[&](UFunction* F,uint8* D){auto* P=FindFProperty<FFloatProperty>(F,TEXT("factor"));if(!P)return false;P->SetPropertyValue_InContainer(D,0.5f);return SetInt(F,D,TEXT("count"),2) && SetBool(F,D,TEXT("apply"),true);},[](UFunction* F,uint8* D){auto* P=CastField<FFloatProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(D)==24.f;}),TEXT("mixed_three_named_inputs_float_result"));
+        Check(Invoke(TEXT("IsReady"),[&](UFunction* F,uint8* D){return SetInt(F,D,TEXT("minimum"),11) && SetBool(F,D,TEXT("enabled"),true);},[](UFunction* F,uint8* D){auto* P=CastField<FBoolProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(D);}),TEXT("mixed_bool_result"));
+        Check(Invoke(TEXT("ReadScore"),[](UFunction* F,uint8*){return F->NumParms==1;},[](UFunction* F,uint8* D){auto* P=CastField<FIntProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(D)==12;}),TEXT("zero_input_scalar_result"));
+        Check(Invoke(TEXT("BoolAsInt"),[&](UFunction* F,uint8* D){return SetBool(F,D,TEXT("value"),true);},[](UFunction* F,uint8* D){auto* P=CastField<FIntProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(D)==12;}),TEXT("single_input_different_result_type"));
+        Check(Invoke(TEXT("ResetWith"),[&](UFunction* F,uint8* D){return SetInt(F,D,TEXT("amount"),7) && SetBool(F,D,TEXT("resetGain"),true);},[](UFunction* F,uint8*){return F->NumParms==2 && !F->GetReturnProperty();}) && Int(Actor,TEXT("health"))==7 && Float(Actor,TEXT("speed"))==1.5f,TEXT("mixed_void_action"));
+        auto* EditorActor=Find(GEditor->GetEditorWorldContext().World(),TEXT("FrameActor"));Check(EditorActor && Int(EditorActor,TEXT("health"))==10,TEXT("frame_world_isolation"));
+        FString Error;UClass* Before=BP->GeneratedClass;Check(FDasDSLService::Reimport(BP.Get(),Error) && BP->GeneratedClass==Before,TEXT("frame_reimport_no_reinstance"));
+        auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FDasAuthoringModule Model;
+        if(R.ReadAuthoringScript(R.ScriptPath(TEXT("dsl_mixed_methods.das")),Model,Error)){
+            auto* M=Model.Classes[0].Methods.FindByPredicate([](const auto& X){return X.Name==TEXT("Compute");});if(M) M->Parameters.Swap(0,1);
+            Check(M && !FDasBlueprintService::ApplyAuthoring(BP.Get(),Model,TEXT("mixed.MixedCounter"),Error) && BP->GeneratedClass==Before,TEXT("frame_parameter_reorder_no_mutation"));
+            if(M){M->Parameters.Swap(0,1);M->Parameters[0].Id=TEXT("changed-parameter-id");}
+            Check(M && !FDasBlueprintService::ApplyAuthoring(BP.Get(),Model,TEXT("mixed.MixedCounter"),Error) && BP->GeneratedClass==Before,TEXT("frame_parameter_id_change_no_mutation"));
+        }else Check(false,TEXT("frame_model_read"));
+        CollectGarbage(RF_NoFlags);Actor=Find(World,TEXT("FrameActor"));Check(Actor && Int(Actor,TEXT("health"))==7,TEXT("frame_state_survives_GC"));
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasFramePIETest,"DasForUE.DSL.FramePIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasFramePIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasFrameProbe/Run_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT("/BP_Frame");
+    if(!TestTrue(TEXT("Create mixed DSL Blueprint"),FDasDSLService::Apply(TEXT("dsl_mixed_methods.das"),Package,TEXT("mixed.MixedCounter"),BP,Error))){AddInfo(Error);return false;}
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("FrameActor");if(!TestNotNull(TEXT("Spawn frame actor"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn)))return false;
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasFramePIECommand>(BP,this));return true;
+}
+
+
+namespace {
+class FDasTextPIECommand final : public IAutomationLatentCommand {
+    TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasTextPIECommand(UBlueprint* B,FAutomationTestBase* T):BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_TEXT_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));UE_LOG(LogTemp,Display,TEXT("DAS_TEXT_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("TextActor"));Check(Actor!=nullptr,TEXT("real_PIE_actor"));if(!Actor){GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Text=FindFProperty<FStrProperty>(Actor->GetClass(),TEXT("DSLText"));auto* Number=FindFProperty<FDoubleProperty>(Actor->GetClass(),TEXT("DSLPrecise"));auto* Key=FindFProperty<FNameProperty>(Actor->GetClass(),TEXT("DSLKey"));
+        Check(Text && Text->GetPropertyValue_InContainer(Actor)==TEXT("Привет") && Number && Number->GetPropertyValue_InContainer(Actor)==1.23456789012345 && Key && Key->GetPropertyValue_InContainer(Actor)==FName(TEXT("Initial_7")),TEXT("string_double_name_CDO_defaults"));
+        auto Invoke=[&](const TCHAR* Name,auto Input,auto Output){auto* F=Actor->FindFunction(Name);if(!F)return false;FStructOnScope Frame(F);if(!Input(F,Frame.GetStructMemory()))return false;FEditorScriptExecutionGuard Guard;Actor->ProcessEvent(F,Frame.GetStructMemory());return Output(F,Frame.GetStructMemory());};
+        Check(Invoke(TEXT("Echo"),[](UFunction* F,uint8* D){auto* A=FindFProperty<FStrProperty>(F,TEXT("value"));auto* B=FindFProperty<FStrProperty>(F,TEXT("suffix"));if(!A || !B)return false;A->SetPropertyValue_InContainer(D,TEXT("Строка 世界"));B->SetPropertyValue_InContainer(D,TEXT(" !"));return true;},[](UFunction* F,uint8* D){auto* P=CastField<FStrProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(D)==TEXT("Строка 世界 !");}),TEXT("unicode_string_ProcessEvent"));
+        Check(Invoke(TEXT("Recall"),[](UFunction*,uint8*){return true;},[](UFunction* F,uint8* D){auto* P=CastField<FStrProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(D)==TEXT("Строка 世界");}),TEXT("VM_owned_input_persists"));
+        Check(Invoke(TEXT("Precise"),[](UFunction* F,uint8* D){auto* A=FindFProperty<FDoubleProperty>(F,TEXT("value"));auto* B=FindFProperty<FDoubleProperty>(F,TEXT("delta"));if(!A || !B)return false;A->SetPropertyValue_InContainer(D,9007199254740990.0);B->SetPropertyValue_InContainer(D,1.0);return true;},[](UFunction* F,uint8* D){auto* P=CastField<FDoubleProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(D)==9007199254740991.0;}),TEXT("double_ProcessEvent_64bit"));
+        Check(Invoke(TEXT("Rename"),[](UFunction* F,uint8* D){auto* P=FindFProperty<FNameProperty>(F,TEXT("value"));if(!P)return false;P->SetPropertyValue_InContainer(D,FName(TEXT("Item_42")));return true;},[](UFunction* F,uint8* D){auto* P=CastField<FNameProperty>(F->GetReturnProperty());return P && P->GetPropertyValue_InContainer(D)==FName(TEXT("item_42"));}),TEXT("nominal_name_ProcessEvent"));
+        auto* EditorActor=Find(GEditor->GetEditorWorldContext().World(),TEXT("TextActor"));auto* EditorText=EditorActor?FindFProperty<FStrProperty>(EditorActor->GetClass(),TEXT("DSLText")):nullptr;
+        Check(EditorText && EditorText->GetPropertyValue_InContainer(EditorActor)==TEXT("Привет"),TEXT("text_world_isolation"));
+        FString Error;UClass* Before=BP->GeneratedClass;Check(FDasDSLService::Reimport(BP.Get(),Error) && BP->GeneratedClass==Before,TEXT("text_reimport_no_reinstance"));
+        CollectGarbage(RF_NoFlags);Actor=Find(World,TEXT("TextActor"));Check(Actor && Text && Text->GetPropertyValue_InContainer(Actor)==TEXT("Строка 世界 !"),TEXT("text_survives_UE_GC"));
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasTextPIETest,"DasForUE.DSL.TextPIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasTextPIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasTextProbe/Run_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT("/BP_Text");
+    if(!TestTrue(TEXT("Create text DSL Blueprint"),FDasDSLService::Apply(TEXT("dsl_text_methods.das"),Package,TEXT("text.TextCounter"),BP,Error))){AddInfo(Error);return false;}
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("TextActor");if(!TestNotNull(TEXT("Spawn text actor"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn)))return false;
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasTextPIECommand>(BP,this));return true;
+}

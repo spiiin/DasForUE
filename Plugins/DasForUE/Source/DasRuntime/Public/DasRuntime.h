@@ -1,9 +1,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DasSchema.h"
+#include "DasCallFrame.h"
 #include "Modules/ModuleInterface.h"
 #include "UObject/WeakObjectPtr.h"
 #include "UObject/WeakObjectPtrTemplates.h"
+
+struct FDasAuthoringModule;
 
 struct FDasTypeDeclaration
 {
@@ -17,6 +21,9 @@ struct FDasExecutionResult
     bool bSucceeded = false;
     bool bUsedAot = false;
     int32 Value = 0;
+    float FloatValue = 0;
+    bool BoolValue = false;
+    FString StringValue;double DoubleValue=0;FName NameValue;
     FString Error;
     FString ReloadError; // Candidate rejected; a successful result may still use the previous version.
     uint32 Revision = 0;
@@ -31,7 +38,17 @@ public:
     virtual void StartupModule() override;
     virtual void ShutdownModule() override;
     virtual bool SupportsDynamicReloading() override { return false; }
+    // Compile-only annotation collection; no global/body execution, Out unchanged on failure.
+    bool ReadAuthoringScript(const FString& Path,FDasAuthoringModule& Out,FString& Error);
+    bool ValidateFrameMethod(const FString& Path,FString& Error,const FString& EntryPoint,const FDasCallContract& Contract);
+    FDasExecutionResult RunNamedFramePersistent(const FString& Path,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,EDasMethodSignature ReturnKind,TWeakObjectPtr<UObject> Self);
+    bool ValidateScalarMethod(const FString& Path,FString& Error,const FString& EntryPoint,EDasMethodSignature Signature);
+    bool ValidateIntMethod(const FString& Path, FString& Error, const FString& EntryPoint = TEXT("main"));
     FDasExecutionResult RunFile(const FString& Path, int32 Input, bool bUseAot = false, TWeakObjectPtr<UObject> Self = {});
+    FDasExecutionResult RunNamedFloatPersistent(const FString& Path,const FString& EntryPoint,float Input,TWeakObjectPtr<UObject> Self);
+    FDasExecutionResult RunNamedBoolPersistent(const FString& Path,const FString& EntryPoint,bool Input,TWeakObjectPtr<UObject> Self);
+    FDasExecutionResult RunNamedVoidPersistent(const FString& Path,const FString& EntryPoint,TWeakObjectPtr<UObject> Self);
+    FDasExecutionResult RunNamedPersistent(const FString& Path, const FString& EntryPoint, int32 Input, TWeakObjectPtr<UObject> Self);
     FDasExecutionResult RunPersistent(const FString& Path, int32 Input, TWeakObjectPtr<UObject> Self);
     FDasExecutionResult RunLifecycle(const FString& Path, EDasCallback Event, TWeakObjectPtr<UObject> Self, float DeltaSeconds = 0.f, int32 EndReason = 0);
     // Internal reflected delegate bridge: IDs never contain a VM/function pointer.
@@ -42,7 +59,7 @@ public:
     bool ExportBindings(const FString& SelectionPath, const FString& OutputPath, FString& Error);
     FString ScriptPath(const FString& Name) const;
 private:
-    FDasExecutionResult RunCallback(const FString& Path, EDasCallback Event, int32 Input, float DeltaSeconds, TWeakObjectPtr<UObject> Self);
+    FDasExecutionResult RunCallback(const FString& Path, EDasCallback Event, int32 Input, float DeltaSeconds, TWeakObjectPtr<UObject> Self, const FString& EntryPoint = TEXT("main"), EDasMethodSignature Signature = EDasMethodSignature::Int,const TArray<FDasScalarValue>* Frame = nullptr);
     FDelegateHandle WorldCleanupHandle;
     FDelegateHandle PostGCHandle;
     FString Root;

@@ -399,3 +399,146 @@ finite float keys и signed zero; failed post-call frames не раскрыва�
 функций/metadata, затем синтаксические макросы; синтаксис выбирает пользователь.
 Далее hot reload методов, структурные изменения с переносом состояния, AOT.
 Map/Set структур и UObject и вложенные контейнеры остаются отдельным расширением.
+
+
+## Синтаксически независимая authoring model — 2026-10-06
+
+Добавлена модель module/class/property/method/parameter со стабильными IDs,
+типами, defaults, metadata, parent graph и implementation bindings. JSON authoring
+v1 является транспортом; reflection binding IR остаётся v5. Проверяются inheritance
+cycles/collisions, ID/name/type/default constraints и capabilities existing Actor backend.
+Diff различает structure/defaults/metadata/implementation; миграцию он не выполняет.
+Модель подключена к Blueprint-сервису с compile/signature preflight методов и
+персистентными IDs. Сквозной сценарий: class generation, instance reinstancing,
+override preservation, сохранение и reopen. Подробности: Docs/AuthoringModel.md.
+
+Следующий этап: macro frontend для модели; синтаксис выбирает пользователь.
+Далее расширение method/metadata emission, reload по diff и контролируемая
+структурная миграция, generated C++/UHT/AOT backend для cook/production.
+
+
+## Уточнение DSL после аудита макросов NimForUE — 2026-10-06
+
+Повторно проверены umacros/ueemit/uebindcore/vmmacros локального commit
+58140f4842a91a0187c17ce950e07181ba455862. Подробности и исходные ссылки:
+Docs/NimMacroAudit.md. Это аудит реализации, не runtime-валидация NimForUE.
+
+Перед фиксацией DSL syntax добавить в контракт фронтенда/модели:
+
+- annotation scopes для групп properties/functions и индивидуальные overrides;
+- отдельные typed specifiers class/property/method/parameter, edit/visibility/access
+  matrix, const/directions/parameter defaults и method/event/override kinds;
+- source spans + expansion trace, collector внешних/частичных method declarations;
+- reflected state отдельно от script-private state и их migration policies;
+- authoring declarations UStruct/UEnum/delegate/interface, explicit enum values;
+- literal defaults отдельно от runtime initializer hooks, явный порядок CDO/instance/
+  super/components/user constructor и запрет исполнения body/global init в preflight;
+- component graph со stable subobject IDs/names, root/attachment/socket/instancing;
+- network/RPC/RepNotify/conditions и FieldNotify/GAS как отдельные extensions;
+- независимые capabilities interpreted/AOT/native adapters, без произвольного
+  копирования Nim C++ layout/vtable обновлений в daScript.
+
+Metadata-only changes должны участвовать в diff, в отличие от проверенного
+UEType equality NimForUE. Синтаксис выбирает пользователь. Ближайший шаг остаётся
+macro frontend на нашей модели, но расширение emission/signatures должно идти
+с явными capability checks; ничего из аудита автоматически не считается готовым.
+
+
+## Authoring backend: несколько методов и metadata — 2026-10-06
+
+Добавлены named persistent entry points с общим owner/file context и reload
+fallback; проверка ранее использованных signatures действует на весь session.
+Actor schema поддерживает до 64 int→int методов, compile/signature preflight
+всех candidate bindings, metadata class/property/method и BlueprintReadOnly новых
+полей. Metadata сохраняется в Blueprint source для recompile/reopen.
+Подробности и ограничения: Docs/AuthoringMethods.md.
+
+Следующий этап: macro frontend и annotation scopes на существующей модели.
+Синтаксис DSL выбирает пользователь; pure/static/general signatures, initializer
+hooks, component graph, events/delegates и C++ adapters остаются дальнейшим расширением.
+
+
+## Проверка выбранной формы DSL — 2026-10-06
+
+Форма ue_class/ue_properties/ue_functions одобрена пользователем как направление.
+Проверка daScript 0.6.4 показала: bare ue_class не входит в grammar, но reader macro
+позволяет ту же форму с prefix `%ue_class~` и завершением по внешней скобке.
+Оба reader варианта проверены реальными compilation/execution capability probes.
+См. Docs/DSLSyntaxCheck.md. Полный frontend/tokenizer/emitter ещё не реализован;
+этот минимальный native prefix следует явно учесть в окончательном DSL.
+
+
+## DSL без reader macro — 2026-10-06
+
+Пользователь отказался от reader-macro формы. Новое направление: native
+`[ue_class(parent=...)] class`, field metadata `@ue_property=(flags)` и
+`[ue_function(flags)] def`. Grammar и извлечение flags из field AST проверены
+на daScript 0.6.4, exit 0. См. Docs/DSLNativeSyntax.md. Это syntax capability
+proof, не готовый Unreal frontend; reader вариант не используется как план.
+Ближайший шаг: collector annotations → validated model → существующий backend.
+
+
+## Уточнение annotations и optional blocks — 2026-10-06
+
+ue_function_group исключён по просьбе пользователя. Основной вариант —
+[ue_class(...)] class, @ue_property=(flags), [ue_function(...)] def.
+Точные class-body ue_properties/ue_functions blocks проверены и отклоняются
+grammar daScript 0.6.4 до macro expansion; дополнение не включается при заданном
+условии отсутствия reader/parser modifications. См. Docs/DSLNativeSyntax.md.
+
+
+## Native annotation frontend — 2026-10-06
+
+Реализованы native ue_class/ue_function annotations и @ue_property metadata,
+collector → validated authoring model → Actor Blueprint backend. Generated
+entry points читают/пишут self properties через runtime bridges. Это первая
+рабочая ограниченная версия DSL; reader/groups/blocks не используются.
+Примеры: dsl_counter_v1.das/dsl_counter_v2.das. Подробности: Docs/DSLFrontend.md.
+Следующий шаг — editor apply/reimport + проверка body/structural reload в PIE;
+далее general signatures/types, inheritance, constructors/components/events.
+
+
+## Editor DSL Apply/Reimport и PIE hot reload — 2026-10-06
+
+Добавлен FDasDSLService и console commands Das.DSL.Apply/Das.DSL.Reimport.
+Source/class ID/model сохраняются в metadata asset; reimport после reopen
+проверен. Body-only apply не запускает Blueprint recompile/reinstance.
+Runtime отказывает несовместимой/изменённой декларации до её применения к UE
+и продолжает last-good context. Проверены body/structural изменения в настоящем
+PIE, override/reference/world isolation, syntax/default-change fallback и recovery.
+Подробности: Docs/DSLReimport.md. Полный compiler rollback и automatic watcher/UI
+не входят в этот slice. Следующий этап: general signatures/types и capabilities.
+
+
+## Scalar signatures и bool properties — 2026-10-06
+
+Добавлены float→float, bool→bool и zero-argument void() methods; int→int
+совместим с прежним backend. Bool fields поддерживают literal defaults и self
+bridges. Typed native adapters и Blueprint graphs проходят compile-only preflight;
+existing signature/default migrations отклоняются до mutation. Общий owner/file
+context хранит типы ранее использованных entry points для reload validation.
+Подробности и текущие границы: Docs/DSLScalarSignatures.md. Следующий шаг —
+общий call frame для mixed/multiple parameters; затем дальнейшие field/method types.
+
+
+## Mixed scalar call frames — 2026-10-06
+
+Реализованы 0–16 ordered by-value int/float/bool parameters и scalar/void result.
+Новые graphs используют один ExecuteDasFrame и стандартные UE MakeStruct/
+MakeArray/BreakStruct nodes. Runtime проверяет AST contracts всех использованных
+entry points и сохраняет last-good context. Parameter names/order/IDs проверяются
+при reimport; IDs сохраняются в asset metadata. Пример без explicit IDs:
+dsl_mixed_methods.das. Проверены real PIE и Save/Reopen в новом процессе.
+Подробности: Docs/DSLMixedMethods.md. Следующий шаг — string/name/double,
+затем object/struct signatures с ownership и capability checks.
+
+
+## String/name/double authoring — 2026-10-06
+
+Добавлены FString/FName/double fields и frame inputs/results. UENameValue —
+nominal context-local value token с UE FName semantics; generated UEName wrapper
+не изменён. Strings копируются в VM heap на входе и в FString на выходе;
+double не сужается до float. Literal defaults, CDO validation и editor pins
+расширены. Проверены ownership, real PIE, Save/Reopen, reload fallback.
+Подробности: Docs/DSLTextTypes.md. Следующий шаг — object/struct signatures,
+затем containers/out-ref и дополнительные authoring capabilities.

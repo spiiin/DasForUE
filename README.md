@@ -288,3 +288,43 @@ outputs account for sparse holes and use move semantics. Float keys must be fini
 signed zero is normalized. See [Docs/HashContainers.md](Docs/HashContainers.md),
 generated_hash_containers.das and generated_hash_numbers.das. The selection contains
 51 functions. Map/Set structs/objects and nested containers remain future work.
+
+
+## Syntax-neutral authoring model
+
+DasAuthoring defines modules/classes/properties/methods with stable IDs, typed
+signatures/defaults, inheritance and metadata. Authoring JSON v1 is separate from
+binding IR v5. Validation and change classification run in editor and packaged
+runtime; the existing Actor Blueprint backend emits its supported scalar subset
+after method compile/signature preflight. TestAuthoring.ps1 covers live instance
+update, stable identity, refusal without mutation, save and reopen in a fresh process.
+See [Docs/AuthoringModel.md](Docs/AuthoringModel.md) and Authoring/Counter.v1.json.
+The chosen native annotation syntax is implemented in its first bounded slice; see Docs/DSLFrontend.md.
+
+
+## Authoring methods and metadata
+
+The Actor adapter emits up to 64 int-to-int methods with separate exported script
+entry points. Methods in one owner/file share a persistent context and reload
+fallback. Category/DisplayName/ToolTip are stored in Blueprint sources and reflection;
+new scalar fields may be BlueprintReadOnly. See Docs/AuthoringMethods.md,
+Authoring/Counter.v2.json and authoring_methods.das.
+
+
+## Native annotation DSL
+
+`require ue_dsl` enables `[ue_class]`, field `@ue_property` metadata and
+`[ue_function]`. Native AST macros collect validated declarations and generate
+UObject property bridges for method bodies. TestDSL.ps1 creates, updates, saves
+and reopens an Actor Blueprint directly from dsl_counter_v1/v2.das. The current
+slice supports int/float/bool fields, scalar same-type int/float/bool methods and void actions; manual editor Apply/Reimport and PIE reload are now available;
+general signatures and constructor/component hooks remain further work.
+See Docs/DSLFrontend.md for the supported syntax and limitations.
+
+See Docs/DSLReimport.md for `Das.DSL.Apply` / `Das.DSL.Reimport` commands.
+
+Typed signatures: Docs/DSLScalarSignatures.md and dsl_scalar_methods.das.
+
+Mixed scalar methods (0–16 inputs): Docs/DSLMixedMethods.md, dsl_mixed_methods.das.
+
+String/FName/double authoring: Docs/DSLTextTypes.md and dsl_text_methods.das.

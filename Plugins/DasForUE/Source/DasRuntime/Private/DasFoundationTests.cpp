@@ -1,5 +1,6 @@
 #include "DasRuntime.h"
 #include "DasSchema.h"
+#include "DasAuthoring.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "HAL/FileManager.h"
@@ -68,6 +69,86 @@ bool RunDasFoundationTests(FString& Report)
     Expect(!FDasClassSchema::FromDeclaration({TEXT("ActorType"), TEXT("Actor"), TEXT("speed:int;SPEED:float;")}, TEXT("smoke.das"), Typed, SchemaError)
         && Typed.Fields.Num() == 2 && Typed.Fields[0].Kind == EDasScalarKind::Float32,
         TEXT("invalid_schema_preserves_previous_IR"));
+
+    FString MethodPreflightError;
+    Expect(Runtime.ValidateIntMethod(Runtime.ScriptPath(TEXT("authoring_eval_v1.das")),MethodPreflightError),TEXT("authoring_method_compile_preflight_without_self"),MethodPreflightError);
+    Expect(Runtime.ValidateIntMethod(Runtime.ScriptPath(TEXT("panic.das")),MethodPreflightError),TEXT("authoring_method_preflight_does_not_execute_body"),MethodPreflightError);
+    Expect(!Runtime.ValidateIntMethod(Runtime.ScriptPath(TEXT("wrong_signature.das")),MethodPreflightError),TEXT("authoring_method_signature_preflight"),MethodPreflightError);
+    FDasAuthoringModule Model;
+    Model.Id=TEXT("authoring-tests");
+    FDasDeclaredClass Decl;
+    Decl.Id=TEXT("authoring-tests.actor"); Decl.Name=TEXT("AuthoredCounter"); Decl.NativeParent=TEXT("/Script/Engine.Actor");
+    FDasDeclaredProperty Score;
+    Score.Id=TEXT("authoring-tests.score"); Score.Name=TEXT("Score"); Score.Default.Kind=TEXT("number"); Score.Default.Number=10;
+    Decl.Properties.Add(Score);
+    FDasDeclaredMethod Evaluate;
+    Evaluate.Id=TEXT("authoring-tests.evaluate"); Evaluate.Name=TEXT("Evaluate"); Evaluate.ScriptFile=TEXT("authoring_eval_v1.das");
+    FDasDeclaredParameter Input;
+    Input.Id=TEXT("authoring-tests.input"); Input.Name=TEXT("Input"); Evaluate.Parameters.Add(Input); Decl.Methods.Add(Evaluate); Model.Classes.Add(Decl);
+    FString ModelJson, ModelError;
+    Expect(Model.Validate(ModelError) && Model.ToJson(ModelJson,ModelError), TEXT("authoring_valid_module_and_normalization"), ModelError);
+    FDasAuthoringModule ParsedModel;
+    FString Reencoded;
+    Expect(FDasAuthoringModule::FromJson(ModelJson,ParsedModel,ModelError) && ParsedModel.ToJson(Reencoded,ModelError) && Reencoded==ModelJson, TEXT("authoring_json_roundtrip"),ModelError);
+    FDasClassSchema ActorSchema;
+    Expect(Model.ToActorSchema(Decl.Id,ActorSchema,ModelError) && ActorSchema.StableId==Decl.Id && ActorSchema.Fields[0].StableId==Score.Id && ActorSchema.Method.StableId==Evaluate.Id && ActorSchema.Method.InputStableId==Input.Id, TEXT("authoring_actor_adapter_and_stable_ids"),ModelError);
+    {
+        auto Bad=Model; Bad.Classes[0].Properties[0].Id=Evaluate.Id;
+        Expect(!Bad.Validate(ModelError) && ModelError.Contains(TEXT("duplicate")),TEXT("authoring_duplicate_ids"),ModelError);
+        Bad=Model; auto Duplicate=Score; Duplicate.Id=TEXT("authoring-tests.other");Duplicate.Name=TEXT("SCORE");Bad.Classes[0].Properties.Add(Duplicate);
+        Expect(!Bad.Validate(ModelError),TEXT("authoring_case_insensitive_member_collision"),ModelError);
+        Bad=Model; Bad.Classes[0].Properties[0].Default.Number=2147483648.0;
+        Expect(!Bad.Validate(ModelError),TEXT("authoring_int_default_range"),ModelError);
+        Bad=Model; Bad.Classes[0].Properties[0].Default.Kind=TEXT("bool");
+        Expect(!Bad.Validate(ModelError),TEXT("authoring_default_type"),ModelError);
+        Bad=Model; Bad.Classes[0].Methods[0].ScriptFile=TEXT("../outside.das");
+        Expect(!Bad.Validate(ModelError),TEXT("authoring_script_path_boundary"),ModelError);
+        Bad=Model; Bad.Classes[0].Properties[0].Type.Kind=TEXT("void");
+        Expect(!Bad.Validate(ModelError),TEXT("authoring_void_property"),ModelError);
+        Bad=Model; Bad.Classes[0].Methods[0].Parameters[0].Direction=TEXT("wrong");
+        Expect(!Bad.Validate(ModelError),TEXT("authoring_parameter_direction"),ModelError);
+        Bad=Model; Bad.Classes[0].NativeParent.Reset(); Bad.Classes[0].ParentId=TEXT("missing");
+        Expect(!Bad.Validate(ModelError),TEXT("authoring_missing_parent"),ModelError);
+        Bad=Model; Bad.Classes[0].Metadata.Add(TEXT("Unexpected"),TEXT("x"));
+        Expect(!Bad.Validate(ModelError),TEXT("authoring_metadata_allowlist"),ModelError);
+    }
+    {
+        auto Inherited=Model; FDasDeclaredClass Child;Child.Id=TEXT("authoring-tests.child");Child.Name=TEXT("ChildCounter");Child.ParentId=Decl.Id;Inherited.Classes.Add(Child);
+        Expect(Inherited.Validate(ModelError),TEXT("authoring_class_inheritance_graph"),ModelError);
+        Inherited.Classes[0].NativeParent.Reset();Inherited.Classes[0].ParentId=Child.Id;
+        Expect(!Inherited.Validate(ModelError) && ModelError.Contains(TEXT("cycle")),TEXT("authoring_inheritance_cycle"),ModelError);
+        Inherited=Model;auto Conflict=Score;Conflict.Id=TEXT("authoring-tests.child.score");Child.Properties.Add(Conflict);Inherited.Classes.Add(Child);
+        Expect(!Inherited.Validate(ModelError) && ModelError.Contains(TEXT("Inherited")),TEXT("authoring_inherited_member_collision"),ModelError);
+    }
+    {
+        auto Next=Decl;Next.Properties[0].Metadata.Add(TEXT("Category"),TEXT("Gameplay"));
+        auto Delta=FDasAuthoringModule::Compare(Decl,Next);
+        Expect(Delta.bMetadata && !Delta.bStructural && !Delta.bDefaults && !Delta.bImplementation,TEXT("authoring_metadata_only_diff"));
+        Next=Decl;Next.Methods[0].ScriptFile=TEXT("authoring_eval_v2.das");Delta=FDasAuthoringModule::Compare(Decl,Next);
+        Expect(Delta.bImplementation && !Delta.bStructural,TEXT("authoring_implementation_diff"));
+        Next=Decl;Next.Properties[0].Default.Number=11;Delta=FDasAuthoringModule::Compare(Decl,Next);
+        Expect(Delta.bDefaults && !Delta.bStructural,TEXT("authoring_default_diff"));
+        Next=Decl;Next.Properties[0].Name=TEXT("RenamedScore");Delta=FDasAuthoringModule::Compare(Decl,Next);
+        Expect(Delta.bStructural && Delta.Added.IsEmpty() && Delta.Removed.IsEmpty(),TEXT("authoring_rename_preserves_member_identity"));
+        Next=Decl;Next.Properties[0].Id=TEXT("replacement-score");Delta=FDasAuthoringModule::Compare(Decl,Next);
+        Expect(Delta.bStructural && Delta.Added.Num()==1 && Delta.Removed.Num()==1,TEXT("authoring_identity_replacement_diff"));
+    }
+    {
+        auto Rich=Model;Rich.Classes[0].Methods[0].bStatic=true;
+        Expect(Rich.Validate(ModelError) && !Rich.ToActorSchema(Decl.Id,ActorSchema,ModelError) && ActorSchema.Fields.Num()==1 && ActorSchema.Method.ScriptFile==TEXT("authoring_eval_v1.das"),TEXT("authoring_backend_capabilities_preserve_candidate"),ModelError);
+        Rich=Model;Rich.Classes[0].Properties[0].Type.Kind=TEXT("string");Rich.Classes[0].Properties[0].Default.Kind=TEXT("string");Rich.Classes[0].Properties[0].Default.String=TEXT("text");
+        Expect(Rich.Validate(ModelError) && Rich.ToActorSchema(Decl.Id,ActorSchema,ModelError) && ActorSchema.Fields[0].Kind==EDasScalarKind::String,TEXT("authoring_string_backend_supported"),ModelError);
+        Rich=Model;auto& P=Rich.Classes[0].Properties[0];P.Type.Kind=TEXT("object");P.Type.TypePath=Decl.Id;P.Default.Kind=TEXT("null");
+        Expect(Rich.Validate(ModelError),TEXT("authoring_object_self_reference"),ModelError);
+    }
+    {
+        auto Previous=ParsedModel;
+        const FString Bad=ModelJson.Replace(TEXT("\"schema_version\": 1"),TEXT("\"schema_version\": 99"));
+        Expect(!FDasAuthoringModule::FromJson(Bad,ParsedModel,ModelError) && ParsedModel.Id==Previous.Id && ParsedModel.Classes[0].Id==Previous.Classes[0].Id,TEXT("authoring_invalid_json_preserves_previous_model"),ModelError);
+        Expect(!FDasAuthoringModule::FromJson(TEXT("{\"schema_version\":1,\"module_id\":\"x\",\"classes\":[],\"typo\":true}"),ParsedModel,ModelError),TEXT("authoring_unknown_json_key"),ModelError);
+        const FString BadBool=ModelJson.Replace(TEXT("\"editable\": true"),TEXT("\"editable\": \"yes\""));
+        Expect(!FDasAuthoringModule::FromJson(BadBool,ParsedModel,ModelError) && ModelError.Contains(TEXT("boolean")),TEXT("authoring_strict_json_bool"),ModelError);
+    }
 
     // Each run owns a unique scratch script; source plugin examples are never modified.
     const FString Scratch = FPaths::ProjectSavedDir() / TEXT("DasPersistent") / FGuid::NewGuid().ToString(EGuidFormats::Digits) / TEXT("counter.das");
@@ -742,6 +823,175 @@ bool RunDasFoundationTests(FString& Report)
       Expect(!H.bSucceeded && H.Error.Contains(TEXT("requires key or value")) && First->MarshalledCalls == BeforeHash, TEXT("hash_map_suffix_required"), H.Error); }
     { const auto H = Runtime.RunFile(Runtime.ScriptPath(TEXT("generated_hash_failed_result.das")), 0, false, First.Get());
       Expect(H.bSucceeded && H.Value == 1, TEXT("hash_failed_results_blocked_after_recover"), H.Error); }
+    {
+        const FString NamedPath=Runtime.ScriptPath(TEXT("named_entries.das"));
+        FString EntryError;
+        Expect(Runtime.ValidateIntMethod(NamedPath,EntryError,TEXT("alpha")) && !Runtime.ValidateIntMethod(NamedPath,EntryError,TEXT("wrong")),TEXT("named_entry_compile_signature_preflight"),EntryError);
+        Runtime.ReleaseObject(First.Get());
+        const auto Alpha=Runtime.RunNamedPersistent(NamedPath,TEXT("alpha"),0,First.Get());
+        const auto Beta=Runtime.RunNamedPersistent(NamedPath,TEXT("beta"),0,First.Get());
+        const auto AlphaAgain=Runtime.RunNamedPersistent(NamedPath,TEXT("alpha"),0,First.Get());
+        Expect(Alpha.bSucceeded && Alpha.Value==1 && Beta.bSucceeded && Beta.Value==12 && AlphaAgain.Value==3,TEXT("named_entries_share_globals_without_main"));
+        Expect(!Runtime.RunNamedPersistent(NamedPath,TEXT("wrong"),0,First.Get()).bSucceeded,TEXT("named_entry_wrong_signature_rejected"));
+        Expect(!Runtime.RunNamedPersistent(NamedPath,TEXT("missing"),0,First.Get()).bSucceeded,TEXT("named_entry_missing_rejected"));
+        Expect(Runtime.RunNamedPersistent(NamedPath,TEXT("alpha"),0,First.Get()).Value==4,TEXT("named_entry_error_keeps_working_context"));
+        Runtime.ReleaseObject(First.Get());
+    }
+    {
+        Runtime.ReleaseObject(First.Get());
+        const FString NamedSource=TEXT("options gen2\n[export]\ndef alpha(input:int):int { return input+7 }\n[export]\ndef beta(input:int):int { return input+9 }\n");
+        Write(NamedSource);
+        const auto NamedFirst=Runtime.RunNamedPersistent(Scratch,TEXT("alpha"),0,First.Get());
+        Write(TEXT("invalid replacement"));
+        const auto NamedFallback=Runtime.RunNamedPersistent(Scratch,TEXT("beta"),0,First.Get());
+        Expect(NamedFirst.bSucceeded && NamedFirst.Value==7 && NamedFallback.bSucceeded && NamedFallback.Value==9 && !NamedFallback.ReloadError.IsEmpty(),TEXT("named_entry_reload_keeps_previous_version"),NamedFallback.Error);
+        Write(NamedSource.Replace(TEXT("+7"),TEXT("+17")).Replace(TEXT("+9"),TEXT("+19")));
+        const auto NamedRepaired=Runtime.RunNamedPersistent(Scratch,TEXT("alpha"),0,First.Get());
+        Expect(NamedRepaired.bSucceeded && NamedRepaired.Value==17 && NamedRepaired.Revision==2 && NamedRepaired.ReloadError.IsEmpty(),TEXT("named_entry_reload_recovers"),NamedRepaired.Error);
+        Write(TEXT("options gen2\n[export]\ndef alpha(input:int):int { return input+100 }\n[export]\ndef beta(input:float):float { return input }\n"));
+        const auto CrossEntryFallback=Runtime.RunNamedPersistent(Scratch,TEXT("alpha"),0,First.Get());
+        Expect(CrossEntryFallback.bSucceeded && CrossEntryFallback.Value==17 && !CrossEntryFallback.ReloadError.IsEmpty(),TEXT("named_reload_checks_previously_used_other_entry"),CrossEntryFallback.Error);
+        const auto SignatureFallback=Runtime.RunNamedPersistent(Scratch,TEXT("beta"),0,First.Get());
+        Expect(SignatureFallback.bSucceeded && SignatureFallback.Value==19 && !SignatureFallback.ReloadError.IsEmpty(),TEXT("named_entry_wrong_signature_reload_fallback"),SignatureFallback.Error);
+        Runtime.ReleaseObject(First.Get());
+    }
+    {
+        FDasAuthoringModule DSL;FString DSLError;
+        const bool Read=Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_counter_v1.das")),DSL,DSLError);
+        Expect(Read && DSL.Id==TEXT("example") && DSL.Classes.Num()==1 && DSL.Classes[0].Properties.Num()==2 && DSL.Classes[0].Methods.Num()==1,TEXT("dsl_annotations_collect_model"),DSLError);
+        const auto* DSLScore=Read?DSL.Classes[0].Properties.FindByPredicate([](const auto& P){return P.Id==TEXT("example.counter.score");}):nullptr;
+        Expect(Read && DSL.Classes[0].Methods[0].EntryPoint==TEXT("ue_Counter_Evaluate") && DSLScore && DSLScore->Metadata.FindRef(TEXT("ToolTip"))==TEXT("Score tooltip"),TEXT("dsl_ids_metadata_and_generated_entry"));
+        TStrongObjectPtr<UDasObjectFixture> DSLObject(NewObject<UDasObjectFixture>());
+        const auto Updated=Runtime.RunNamedPersistent(Runtime.ScriptPath(TEXT("dsl_fixture.das")),TEXT("ue_ScalarFixture_Update"),5,DSLObject.Get());
+        Expect(Updated.bSucceeded && Updated.Value==10 && DSLObject->health==10 && DSLObject->speed==3.75f,TEXT("dsl_self_assignment_compound_and_float"),Updated.Error);
+        FString DSLSource;FFileHelper::LoadFileToString(DSLSource,*Runtime.ScriptPath(TEXT("dsl_fixture.das")));
+        DSLSource=DSLSource.Replace(TEXT("require ue_dsl"),TEXT("require ue_foundation"));
+        Write(DSLSource);const auto DSLInitial=Runtime.RunNamedPersistent(Scratch,TEXT("ue_ScalarFixture_Update"),5,DSLObject.Get());
+        const FString DSLBody=DSLSource.Replace(TEXT("return self.health"),TEXT("return self.health + 100"));
+        Write(DSLBody);const auto DSLReload=Runtime.RunNamedPersistent(Scratch,TEXT("ue_ScalarFixture_Update"),5,DSLObject.Get());
+        Expect(DSLInitial.bSucceeded && DSLInitial.Value==10 && DSLReload.bSucceeded && DSLReload.Value==110 && DSLReload.Revision==2,TEXT("dsl_runtime_body_reload"),DSLReload.Error);
+        Write(TEXT("broken DSL"));const auto DSLBroken=Runtime.RunNamedPersistent(Scratch,TEXT("ue_ScalarFixture_Update"),5,DSLObject.Get());
+        Expect(DSLBroken.bSucceeded && DSLBroken.Value==110 && !DSLBroken.ReloadError.IsEmpty(),TEXT("dsl_runtime_syntax_fallback"));
+        Write(DSLBody.Replace(TEXT("health : int = 10"),TEXT("health : int = 11")));const auto DSLDeclaration=Runtime.RunNamedPersistent(Scratch,TEXT("ue_ScalarFixture_Update"),5,DSLObject.Get());
+        Expect(DSLDeclaration.bSucceeded && DSLDeclaration.Value==110 && DSLDeclaration.ReloadError.Contains(TEXT("declaration changed")),TEXT("dsl_runtime_declaration_gate_fallback"));
+        Write(DSLBody.Replace(TEXT("health : int = 10"),TEXT("missingHealth : int = 10")).Replace(TEXT("self.health"),TEXT("self.missingHealth")));
+        const auto DSLOwnerMismatch=Runtime.RunNamedPersistent(Scratch,TEXT("ue_ScalarFixture_Update"),5,DSLObject.Get());
+        Expect(DSLOwnerMismatch.bSucceeded && DSLOwnerMismatch.Value==110 && DSLOwnerMismatch.ReloadError.Contains(TEXT("property differs")),TEXT("dsl_runtime_owner_mismatch_fallback"));
+        Write(DSLBody);const auto DSLRecovery=Runtime.RunNamedPersistent(Scratch,TEXT("ue_ScalarFixture_Update"),5,DSLObject.Get());
+        Expect(DSLRecovery.bSucceeded && DSLRecovery.Value==110 && DSLRecovery.ReloadError.IsEmpty(),TEXT("dsl_runtime_reload_recovery"));
+        Runtime.ReleaseObject(DSLObject.Get());
+
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_bad_unknown_flag.das")),DSL,DSLError) && DSLError.Contains(TEXT("Unknown ue_class")) && DSL.Id==TEXT("example") && DSL.Classes.Num()==1,TEXT("dsl_unknown_flag_reject_preserve_model"),DSLError);
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_bad_conflicting_flags.das")),DSL,DSLError) && DSLError.Contains(TEXT("Conflicting")) && DSL.Id==TEXT("example") && DSL.Classes.Num()==1,TEXT("dsl_conflicting_flags_reject_preserve_model"),DSLError);
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_bad_unsupported_type.das")),DSL,DSLError) && DSLError.Contains(TEXT("int/float")) && DSL.Id==TEXT("example") && DSL.Classes.Num()==1,TEXT("dsl_unsupported_type_reject_preserve_model"),DSLError);
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_bad_unsupported_signature.das")),DSL,DSLError) && DSLError.Contains(TEXT("Unsupported parameter")) && DSL.Id==TEXT("example") && DSL.Classes.Num()==1,TEXT("dsl_unsupported_signature_reject_preserve_model"),DSLError);
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_bad_readonly_write.das")),DSL,DSLError) && DSLError.Contains(TEXT("Cannot write")) && DSL.Id==TEXT("example") && DSL.Classes.Num()==1,TEXT("dsl_readonly_write_reject_preserve_model"),DSLError);
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_bad_reserved_argument.das")),DSL,DSLError) && DSLError.Contains(TEXT("Reserved internal")) && DSL.Id==TEXT("example") && DSL.Classes.Num()==1,TEXT("dsl_reserved_argument_reject_preserve_model"),DSLError);
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_bad_private_field.das")),DSL,DSLError) && DSLError.Contains(TEXT("Script-private")) && DSL.Id==TEXT("example") && DSL.Classes.Num()==1,TEXT("dsl_private_field_reject_preserve_model"),DSLError);
+
+    }
+    {
+        const FString Path=Runtime.ScriptPath(TEXT("dsl_scalar_methods.das"));FString Error;FDasAuthoringModule ScalarModel;
+        Expect(Runtime.ReadAuthoringScript(Path,ScalarModel,Error) && ScalarModel.Classes.Num()==1 && ScalarModel.Classes[0].Methods.Num()==4 && ScalarModel.Classes[0].Properties.Num()==3,TEXT("dsl_typed_model_collect"),Error);
+        const auto* ScalarBool=ScalarModel.Classes.Num()==1?ScalarModel.Classes[0].Properties.FindByPredicate([](const auto& P){return P.Name==TEXT("bScalar");}):nullptr;
+        Expect(ScalarBool && ScalarBool->Type.Kind==TEXT("bool") && ScalarBool->Default.Kind==TEXT("bool") && ScalarBool->Default.Boolean,TEXT("dsl_bool_literal_true_model"));
+        Expect(Runtime.ValidateScalarMethod(Path,Error,TEXT("ue_TypedFixture_Scale"),EDasMethodSignature::Float) && Runtime.ValidateScalarMethod(Path,Error,TEXT("ue_TypedFixture_Toggle"),EDasMethodSignature::Bool) && Runtime.ValidateScalarMethod(Path,Error,TEXT("ue_TypedFixture_Reset"),EDasMethodSignature::Void),TEXT("dsl_typed_compile_preflight"),Error);
+        TStrongObjectPtr<UDasObjectFixture> Object(NewObject<UDasObjectFixture>());Object->speed=1.5f;Object->health=10;
+        const auto Float=Runtime.RunNamedFloatPersistent(Path,TEXT("ue_TypedFixture_Scale"),2.25f,Object.Get());
+        const auto Bool=Runtime.RunNamedBoolPersistent(Path,TEXT("ue_TypedFixture_Toggle"),true,Object.Get());
+        const auto Int=Runtime.RunNamedPersistent(Path,TEXT("ue_TypedFixture_Check"),5,Object.Get());
+        Expect(Float.bSucceeded && Float.FloatValue==3.75f && Bool.bSucceeded && Bool.BoolValue && Object->bScalar && Int.bSucceeded && Int.Value==15,TEXT("dsl_typed_runtime_shared_owner"),Float.Error+Bool.Error+Int.Error);
+        const auto Wrong=Runtime.RunNamedPersistent(Path,TEXT("ue_TypedFixture_Scale"),0,Object.Get());
+        Expect(!Wrong.bSucceeded && Runtime.RunNamedBoolPersistent(Path,TEXT("ue_TypedFixture_Toggle"),false,Object.Get()).bSucceeded,TEXT("dsl_typed_wrong_signature_keeps_context"));
+        const auto Void=Runtime.RunNamedVoidPersistent(Path,TEXT("ue_TypedFixture_Reset"),Object.Get());
+        Expect(Void.bSucceeded && Object->health==0 && !Object->bScalar && Object->speed==3.75f,TEXT("dsl_void_action_and_bool_writes"),Void.Error);
+        Runtime.ReleaseObject(Object.Get());
+        FString Source;FFileHelper::LoadFileToString(Source,*Path);Source=Source.Replace(TEXT("require ue_dsl"),TEXT("require ue_foundation"));Write(Source);
+        Runtime.RunNamedFloatPersistent(Scratch,TEXT("ue_TypedFixture_Scale"),1.f,Object.Get());
+        Runtime.RunNamedBoolPersistent(Scratch,TEXT("ue_TypedFixture_Toggle"),true,Object.Get());
+        Write(Source.Replace(TEXT("def Toggle(input:bool):bool { self.bScalar = input; return self.bScalar }"),TEXT("def Toggle(input:int):int { return input }")));
+        const auto Kept=Runtime.RunNamedFloatPersistent(Scratch,TEXT("ue_TypedFixture_Scale"),1.f,Object.Get());
+        Expect(Kept.bSucceeded && !Kept.ReloadError.IsEmpty() && Runtime.RunNamedBoolPersistent(Scratch,TEXT("ue_TypedFixture_Toggle"),false,Object.Get()).bSucceeded,TEXT("dsl_reload_checks_other_scalar_signatures"));
+        Runtime.ReleaseObject(Object.Get());
+        const FString FreeTyped=TEXT("options gen2\nvar calls=0\n[export]\ndef alpha(input:float):float { calls+=1; return input+float(calls) }\n[export]\ndef beta(input:bool):bool { calls+=1; return input && calls==2 }\n");
+        Write(FreeTyped);const auto FreeFloat=Runtime.RunNamedFloatPersistent(Scratch,TEXT("alpha"),2.5f,Object.Get());
+        const auto FreeBool=Runtime.RunNamedBoolPersistent(Scratch,TEXT("beta"),true,Object.Get());
+        Expect(FreeFloat.bSucceeded && FreeFloat.FloatValue==3.5f && FreeBool.bSucceeded && FreeBool.BoolValue,TEXT("typed_entries_share_VM_globals"));
+        Write(FreeTyped.Replace(TEXT("def beta(input:bool):bool { calls+=1; return input && calls==2 }"),TEXT("def beta(input:int):int { return input }")));
+        const auto TypedFallback=Runtime.RunNamedFloatPersistent(Scratch,TEXT("alpha"),2.5f,Object.Get());
+        Expect(TypedFallback.bSucceeded && TypedFallback.FloatValue==5.5f && TypedFallback.ReloadError.Contains(TEXT("Previously used entry point signature changed: beta")),TEXT("typed_reload_preserves_other_entry_contract"));
+        Runtime.ReleaseObject(Object.Get());
+    }
+    {
+        const FString MixedPath=Runtime.ScriptPath(TEXT("dsl_mixed_methods.das"));FString MixedError;FDasAuthoringModule MixedModel;
+        const bool ReadMixed=Runtime.ReadAuthoringScript(MixedPath,MixedModel,MixedError);
+        FDasClassSchema MixedSchema;Expect(ReadMixed && MixedModel.ToActorSchema(TEXT("mixed.MixedCounter"),MixedSchema,MixedError) && MixedSchema.Methods.Num()==5,TEXT("mixed_DSL_auto_ids_model"),MixedError);
+        const auto* Compute=ReadMixed?MixedSchema.Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Compute");}):nullptr;
+        Expect(Compute && Compute->Parameters.Num()==3 && Compute->Parameters[0].Name==TEXT("count") && Compute->Parameters[0].StableId==TEXT("mixed.MixedCounter.Compute.count") && Runtime.ValidateFrameMethod(MixedPath,MixedError,Compute->EntryPoint,Compute->Contract()),TEXT("mixed_frame_preflight_and_parameter_identity"),MixedError);
+        TStrongObjectPtr<UDasObjectFixture> MixedObject(NewObject<UDasObjectFixture>());MixedObject->health=10;MixedObject->speed=1.5f;
+        FDasScalarValue A;A.IntValue=2;FDasScalarValue B;B.Kind=1;B.FloatValue=0.5f;FDasScalarValue C;C.Kind=2;C.BoolValue=true;
+        const auto MixedResult=Runtime.RunNamedFramePersistent(MixedPath,TEXT("ue_MixedCounter_Compute"),{A,B,C},EDasMethodSignature::Float,MixedObject.Get());
+        Expect(MixedResult.bSucceeded && MixedResult.FloatValue==24.f && MixedObject->health==12 && MixedObject->speed==2.f,TEXT("mixed_frame_runtime_order_and_types"),MixedResult.Error);
+        const auto Empty=Runtime.RunNamedFramePersistent(MixedPath,TEXT("ue_MixedCounter_ReadScore"),{},EDasMethodSignature::Int,MixedObject.Get());
+        const auto Changed=Runtime.RunNamedFramePersistent(MixedPath,TEXT("ue_MixedCounter_BoolAsInt"),{C},EDasMethodSignature::Int,MixedObject.Get());
+        Expect(Empty.bSucceeded && Empty.Value==12 && Changed.bSucceeded && Changed.Value==12,TEXT("frame_zero_args_and_mixed_return"));
+        const auto WrongOrder=Runtime.RunNamedFramePersistent(MixedPath,TEXT("ue_MixedCounter_Compute"),{B,A,C},EDasMethodSignature::Float,MixedObject.Get());
+        const auto MissingArgs=Runtime.RunNamedFramePersistent(MixedPath,TEXT("ue_MixedCounter_Compute"),{A,B},EDasMethodSignature::Float,MixedObject.Get());
+        Expect(!WrongOrder.bSucceeded && !MissingArgs.bSucceeded && MixedObject->health==12,TEXT("frame_bad_arity_and_order_no_execution"));
+        A.IntValue=7;const auto Action=Runtime.RunNamedFramePersistent(MixedPath,TEXT("ue_MixedCounter_ResetWith"),{A,C},EDasMethodSignature::Void,MixedObject.Get());
+        Expect(Action.bSucceeded && MixedObject->health==7 && MixedObject->speed==1.5f,TEXT("frame_void_with_inputs"),Action.Error);
+        Runtime.ReleaseObject(MixedObject.Get());
+        const auto BadCold=Runtime.RunNamedFramePersistent(MixedPath,TEXT("ue_MixedCounter_Compute"),{A},EDasMethodSignature::Float,MixedObject.Get());
+        A.IntValue=2;const auto RecoveredCold=Runtime.RunNamedFramePersistent(MixedPath,TEXT("ue_MixedCounter_Compute"),{A,B,C},EDasMethodSignature::Float,MixedObject.Get());
+        Expect(!BadCold.bSucceeded && RecoveredCold.bSucceeded,TEXT("frame_wrong_first_contract_recovers_without_source_edit"),RecoveredCold.Error);
+        FDasScalarValue Invalid;Invalid.Kind=99;
+        Expect(!Runtime.RunNamedFramePersistent(MixedPath,TEXT("ue_MixedCounter_Compute"),{Invalid,B,C},EDasMethodSignature::Float,MixedObject.Get()).bSucceeded,TEXT("frame_invalid_tag_rejected"));
+        TArray<FDasScalarValue> TooMany;TooMany.SetNum(17);
+        Expect(!Runtime.RunNamedFramePersistent(MixedPath,TEXT("ue_MixedCounter_Compute"),TooMany,EDasMethodSignature::Float,MixedObject.Get()).bSucceeded,TEXT("frame_arity_limit_rejected"));
+        Runtime.ReleaseObject(MixedObject.Get());
+        const FString FrameSource=TEXT("options gen2\nvar calls=0\n[export]\ndef calc(a:int;b:float;c:bool):float { calls+=1; if(c){return float(a)+b+float(calls)};return 0.0 }\n[export]\ndef gate(a:bool;b:int):bool { return a && b>0 }\n");
+        Write(FrameSource);Runtime.RunNamedFramePersistent(Scratch,TEXT("calc"),{A,B,C},EDasMethodSignature::Float,MixedObject.Get());
+        Runtime.RunNamedFramePersistent(Scratch,TEXT("gate"),{C,A},EDasMethodSignature::Bool,MixedObject.Get());
+        Write(FrameSource.Replace(TEXT("gate(a:bool;b:int):bool { return a && b>0 }"),TEXT("gate(a:int;b:bool):bool { return b && a>0 }")));
+        const auto FrameFallback=Runtime.RunNamedFramePersistent(Scratch,TEXT("calc"),{A,B,C},EDasMethodSignature::Float,MixedObject.Get());
+        Expect(FrameFallback.bSucceeded && FrameFallback.FloatValue==4.5f && FrameFallback.ReloadError.Contains(TEXT("Previously used entry point signature changed: gate")),TEXT("frame_reload_validates_other_mixed_contract_and_preserves_globals"),FrameFallback.Error);
+        Runtime.ReleaseObject(MixedObject.Get());
+    }
+    {
+        const FString TextPath=Runtime.ScriptPath(TEXT("dsl_text_methods.das"));FString TextError;FDasAuthoringModule TextModel;
+        Expect(Runtime.ReadAuthoringScript(TextPath,TextModel,TextError) && TextModel.Classes.Num()==1 && TextModel.Classes[0].Properties.Num()==3,TEXT("text_double_nominal_name_DSL_model"),TextError);
+        TStrongObjectPtr<UDasObjectFixture> TextObject(NewObject<UDasObjectFixture>());
+        FDasScalarValue S;S.Kind=5;S.StringValue=TEXT("Привет 世界");FDasScalarValue T;T.Kind=5;T.StringValue=TEXT(" !");
+        const auto Echo=Runtime.RunNamedFramePersistent(TextPath,TEXT("ue_TextCounter_Echo"),{S,T},EDasMethodSignature::String,TextObject.Get());
+        Expect(Echo.bSucceeded && Echo.StringValue==TEXT("Привет 世界 !") && TextObject->DSLText==Echo.StringValue,TEXT("frame_unicode_string_owned_result"),Echo.Error);
+        S.StringValue=TEXT("changed host buffer");const auto Recall=Runtime.RunNamedFramePersistent(TextPath,TEXT("ue_TextCounter_Recall"),{},EDasMethodSignature::String,TextObject.Get());
+        Expect(Recall.bSucceeded && Recall.StringValue==TEXT("Привет 世界") && Echo.StringValue==TEXT("Привет 世界 !"),TEXT("frame_string_input_survives_host_change_and_return"),Recall.Error);
+        FDasScalarValue D;D.Kind=6;D.DoubleValue=9007199254740990.0;FDasScalarValue Delta;Delta.Kind=6;Delta.DoubleValue=1.0;
+        const auto Precise=Runtime.RunNamedFramePersistent(TextPath,TEXT("ue_TextCounter_Precise"),{D,Delta},EDasMethodSignature::Double,TextObject.Get());
+        Expect(Precise.bSucceeded && Precise.DoubleValue==9007199254740991.0 && TextObject->DSLPrecise==Precise.DoubleValue,TEXT("frame_double_64bit_precision"),Precise.Error);
+        FDasScalarValue N;N.Kind=7;N.NameValue=FName(TEXT("Item_42"));FDasScalarValue Lower;Lower.Kind=7;Lower.NameValue=FName(TEXT("item_42"));
+        const auto Rename=Runtime.RunNamedFramePersistent(TextPath,TEXT("ue_TextCounter_Rename"),{N},EDasMethodSignature::Name,TextObject.Get());
+        const auto Equal=Runtime.RunNamedFramePersistent(TextPath,TEXT("ue_TextCounter_NamesEqual"),{N,Lower},EDasMethodSignature::Bool,TextObject.Get());
+        Expect(Rename.bSucceeded && Rename.NameValue==N.NameValue && TextObject->DSLKey==N.NameValue && Equal.bSucceeded && Equal.BoolValue,TEXT("frame_name_case_number_semantics"),Rename.Error+Equal.Error);
+        N.NameValue=NAME_None;const auto None=Runtime.RunNamedFramePersistent(TextPath,TEXT("ue_TextCounter_Rename"),{N},EDasMethodSignature::Name,TextObject.Get());
+        Expect(None.bSucceeded && None.NameValue.IsNone(),TEXT("frame_name_none_roundtrip"),None.Error);
+        Expect(!Runtime.RunNamedFramePersistent(TextPath,TEXT("ue_TextCounter_Rename"),{T},EDasMethodSignature::Name,TextObject.Get()).bSucceeded,TEXT("name_string_nominal_types_distinct"));
+        Runtime.ReleaseObject(TextObject.Get());
+        FString TextSource;FFileHelper::LoadFileToString(TextSource,*TextPath);TextSource=TextSource.Replace(TEXT("require ue_dsl"),TEXT("require ue_foundation"));Write(TextSource);
+        S.StringValue=TEXT("Unicode 世界");T.StringValue=TEXT(" !");
+        const auto OldText=Runtime.RunNamedFramePersistent(Scratch,TEXT("ue_TextCounter_Echo"),{S,T},EDasMethodSignature::String,TextObject.Get());
+        Write(TextSource.Replace(TEXT("return self.DSLText"),TEXT("return self.DSLText + \" v2\"")));
+        const auto NewText=Runtime.RunNamedFramePersistent(Scratch,TEXT("ue_TextCounter_Echo"),{S,T},EDasMethodSignature::String,TextObject.Get());
+        Expect(OldText.bSucceeded && NewText.bSucceeded && OldText.StringValue==TEXT("Unicode 世界 !") && NewText.StringValue==TEXT("Unicode 世界 ! v2"),TEXT("string_results_owned_across_valid_reload"),NewText.Error);
+        Write(TEXT("broken replacement"));const auto LastText=Runtime.RunNamedFramePersistent(Scratch,TEXT("ue_TextCounter_Echo"),{S,T},EDasMethodSignature::String,TextObject.Get());
+        Expect(LastText.bSucceeded && LastText.StringValue==NewText.StringValue && !LastText.ReloadError.IsEmpty(),TEXT("string_last_good_reload_fallback"));
+        Runtime.ReleaseObject(TextObject.Get());
+        FDasScalarValue Embedded;Embedded.Kind=5;Embedded.StringValue=TEXT("abc");Embedded.StringValue[1]=0;
+        const auto EmbeddedResult=Runtime.RunNamedFramePersistent(TextPath,TEXT("ue_TextCounter_Echo"),{Embedded,T},EDasMethodSignature::String,TextObject.Get());
+        Expect(!EmbeddedResult.bSucceeded && EmbeddedResult.Error.Contains(TEXT("embedded NUL")),TEXT("string_embedded_NUL_rejected_without_truncation"),EmbeddedResult.Error);
+        Runtime.ReleaseObject(TextObject.Get());
+        Expect(OldText.StringValue==TEXT("Unicode 世界 !") && Rename.NameValue==FName(TEXT("Item_42")),TEXT("string_name_results_owned_after_context_release"));
+    }
     TWeakObjectPtr<UObject> DeadOwner(Second.Get());
     First.Reset(); Second.Reset(); CollectGarbage(RF_NoFlags);
     Expect(!DeadOwner.IsValid() && Runtime.PersistentContextCount() == 0 && Runtime.SubscriptionCount() == 0, TEXT("persistent_GC_reclaims_contexts_without_pinning"));

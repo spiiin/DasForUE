@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "module_id": "example",
+  "classes": [
+    {
+      "id": "example.counter",
+      "name": "AuthoredCounter",
+      "native_parent": "/Script/Engine.Actor",
+      "metadata": {
+        "DisplayName": "Counter DSL",
+        "ToolTip": "Authored class metadata"
+      },
+      "properties": [
+        {
+          "id": "example.counter.score",
+          "name": "Score",
+          "type": {
+            "kind": "int"
+          },
+          "default": 10,
+          "editable": true,
+          "metadata": {
+            "Category": "Stats",
+            "ToolTip": "Score tooltip"
+          }
+        },
+        {
+          "id": "example.counter.gain",
+          "name": "Gain",
+          "type": {
+            "kind": "float"
+          },
+          "default": 1.5,
+          "editable": true
+        },
+        {
+          "id": "example.counter.bonus",
+          "name": "Bonus",
+          "type": {
+            "kind": "int"
+          },
+          "default": 5,
+          "editable": true
+        },
+        {
+          "id": "example.counter.locked",
+          "name": "Locked",
+          "type": {
+            "kind": "int"
+          },
+          "default": 12,
+          "editable": true,
+          "read_only": true,
+          "metadata": {
+            "Category": "Stats",
+            "DisplayName": "Locked score"
+          }
+        }
+      ],
+      "methods": [
+        {
+          "id": "example.counter.evaluate",
+          "name": "Evaluate",
+          "return_type": {
+            "kind": "int"
+          },
+          "parameters": [
+            {
+              "id": "example.counter.evaluate.input",
+              "name": "Input",
+              "type": {
+                "kind": "int"
+              },
+              "direction": "in"
+            }
+          ],
+          "implementation": {
+            "script_file": "authoring_eval_v2.das",
+            "entry_point": "main"
+          },
+          "callable": true,
+          "pure": false,
+          "static": false,
+          "metadata": {}
+        },
+        {
+          "id": "example.counter.inspect",
+          "name": "Inspect",
+          "return_type": {
+            "kind": "int"
+          },
+          "parameters": [
+            {
+              "id": "example.counter.inspect.input",
+              "name": "Input",
+              "type": {
+                "kind": "int"
+              },
+              "direction": "in"
+            }
+          ],
+          "implementation": {
+            "script_file": "authoring_methods.das",
+            "entry_point": "inspect"
+          },
+          "metadata": {
+            "Category": "State",
+            "DisplayName": "Inspect state",
+            "ToolTip": "Named entry point"
+          }
+        },
+        {
+          "id": "example.counter.inspect_again",
+          "name": "InspectAgain",
+          "return_type": {
+            "kind": "int"
+          },
+          "parameters": [
+            {
+              "id": "example.counter.inspect_again.input",
+              "name": "Input",
+              "type": {
+                "kind": "int"
+              },
+              "direction": "in"
+            }
+          ],
+          "implementation": {
+            "script_file": "authoring_methods.das",
+            "entry_point": "inspect_again"
+          },
+          "metadata": {
+            "Category": "State",
+            "DisplayName": "InspectAgain state",
+            "ToolTip": "Named entry point"
+          }
+        }
+      ]
+    }
+  ]
+}

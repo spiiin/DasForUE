@@ -13,3 +13,6 @@
 __pycache__/
 *.pyc
 *.pyo
+
+/Tests/DasForUESmoke/Content/DasAuthoringProbe/
+/Tests/DasForUESmoke/Content/DasFrameAssetProbe/

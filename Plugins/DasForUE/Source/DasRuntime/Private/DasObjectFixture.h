@@ -42,6 +42,10 @@ class UDasObjectFixture : public UObject
 {
     GENERATED_BODY()
 public:
+    UPROPERTY(BlueprintReadWrite, Category="Probe") FString DSLText;
+    UPROPERTY(BlueprintReadWrite, Category="Probe") double DSLPrecise=1.23456789012345;
+    UPROPERTY(BlueprintReadWrite, Category="Probe") FName DSLKey;
+    UPROPERTY(BlueprintReadWrite, Category="Probe") bool bScalar = false;
     UPROPERTY(BlueprintAssignable, Category="Probe") FDasIntSignal OnDasSignal;
     UPROPERTY(BlueprintAssignable, Category="Probe") FDasFloatTestSignal OnFloatSignal;
     UPROPERTY(BlueprintReadWrite, Category="Probe") TObjectPtr<UObject> Target;

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "module_id": "example",
+  "classes": [
+    {
+      "id": "example.counter",
+      "name": "AuthoredCounter",
+      "native_parent": "/Script/Engine.Actor",
+      "metadata": {},
+      "properties": [
+        {
+          "id": "example.counter.score",
+          "name": "Score",
+          "type": {
+            "kind": "int"
+          },
+          "default": 10,
+          "editable": true
+        },
+        {
+          "id": "example.counter.gain",
+          "name": "Gain",
+          "type": {
+            "kind": "float"
+          },
+          "default": 1.5,
+          "editable": true
+        }
+      ],
+      "methods": [
+        {
+          "id": "example.counter.evaluate",
+          "name": "Evaluate",
+          "return_type": {
+            "kind": "int"
+          },
+          "parameters": [
+            {
+              "id": "example.counter.evaluate.input",
+              "name": "Input",
+              "type": {
+                "kind": "int"
+              },
+              "direction": "in"
+            }
+          ],
+          "implementation": {
+            "script_file": "authoring_eval_v1.das",
+            "entry_point": "main"
+          },
+          "callable": true,
+          "pure": false,
+          "static": false,
+          "metadata": {}
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 #include "DasRuntime.h"
+#include "DasAuthoring.h"
 #include "Serialization/JsonSerializer.h"
 #include "Dom/JsonObject.h"
 #include "Misc/EngineVersion.h"
@@ -24,14 +25,23 @@
 #undef ensure
 #undef check
 THIRD_PARTY_INCLUDES_START
+// arraytype.h resets packing: load simulation prerequisites first, then match
+// the static daScript AST library's /Zp16 rather than Unreal's /Zp8.
+#include "daScript/simulate/simulate.h"
+#pragma pack(push, 16)
 #include "daScript/daScript.h"
 #include "daScript/ast/ast_handle.h"
+#include "daScript/ast/ast_visitor.h"
 THIRD_PARTY_INCLUDES_END
+#pragma pack(pop)
 #pragma pop_macro("check")
 #pragma pop_macro("ensure")
 #pragma pop_macro("verify")
 
 // No fields are exposed to scripts: this is a context-local capability, never a pointer.
+struct FDasNameValue { uint64 Token=0; };
+MAKE_TYPE_FACTORY(UENameValue,FDasNameValue);
+namespace das {template<> struct cast<FDasNameValue>{static vec4f from(FDasNameValue V){return cast<uint64_t>::from(V.Token);}static FDasNameValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
 struct FDasObjectHandle { uint64 Token = 0; };
 MAKE_TYPE_FACTORY(UObjectHandle, FDasObjectHandle);
 struct FDasCallHandle { uint64 Token = 0; };
@@ -143,6 +153,7 @@ namespace
     public:
         explicit FUnrealDasContext(uint32 StackSize) : das::Context(StackSize) {}
         TArray<FDasTypeDeclaration> Types;
+        TMap<uint64,FName> DSLNames;TMap<FName,uint64> DSLNameTokens;
         TMap<FString, int32> PersistentInts;
         bool bEnding = false;
         bool bCollectingSubscriptions = false;
@@ -219,6 +230,38 @@ namespace
         return Typed;
     }
 
+    bool GetSelfBool(const char* Name,das::Context* Context)
+    {return ResolveProperty<FBoolProperty>(ResolveSelf(Context),Name,false,Context)->GetPropertyValue_InContainer(ResolveSelf(Context));}
+    void SetSelfBool(const char* Name,bool Value,das::Context* Context)
+    {if(ActiveContext && ActiveContext->bCollectingSubscriptions) Context->throw_error("self writes are forbidden in bind_events");UObject* Self=ResolveSelf(Context);ResolveProperty<FBoolProperty>(Self,Name,true,Context)->SetPropertyValue_InContainer(Self,Value);}
+    FDasNameValue MakeDSLName(FName Name,das::Context* C)
+    {
+        if(C!=ActiveContext || !ActiveContext || !IsInGameThread()) C->throw_error("name requires active context");
+        if(Name.IsNone())return {};if(auto* T=ActiveContext->DSLNameTokens.Find(Name))return {*T};
+        if(ActiveContext->DSLNames.Num()>=65536)C->throw_error("name table limit exceeded");
+        static uint64 NextToken=1;const uint64 Token=NextToken++;ActiveContext->DSLNames.Add(Token,Name);ActiveContext->DSLNameTokens.Add(Name,Token);return {Token};
+    }
+    FName ResolveDSLName(FDasNameValue V,das::Context* C)
+    {if(C!=ActiveContext || !ActiveContext)C->throw_error("name requires active context");if(!V.Token)return NAME_None;auto* N=ActiveContext->DSLNames.Find(V.Token);if(!N)C->throw_error("name belongs to another context");return *N;}
+    FDasNameValue DSLNameFromString(const char* S,das::Context* C)
+    {const FString T=S?UTF8_TO_TCHAR(S):TEXT("");if(T.Len()>=NAME_SIZE)C->throw_error("FName value is too long");return MakeDSLName(FName(*T),C);}
+    char* CopyDSLString(const FString& S,das::Context* C){for(int32 I=0;I<S.Len();++I)if(S[I]==0)C->throw_error("embedded NUL is not supported in strings");const FTCHARToUTF8 U(*S);return C->allocateString(U.Get(),U.Length(),nullptr);}
+    char* DSLNameToString(FDasNameValue V,das::Context* C){return CopyDSLString(ResolveDSLName(V,C).ToString(),C);}
+    bool DSLNamesEqual(FDasNameValue A,FDasNameValue B,das::Context* C){return ResolveDSLName(A,C)==ResolveDSLName(B,C);}
+    double GetSelfDouble(const char* N,das::Context* C){auto* S=ResolveSelf(C);return ResolveProperty<FDoubleProperty>(S,N,false,C)->GetPropertyValue_InContainer(S);}
+    void SetSelfDouble(const char* N,double V,das::Context* C){auto* S=ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("self writes are forbidden in bind_events");ResolveProperty<FDoubleProperty>(S,N,true,C)->SetPropertyValue_InContainer(S,V);}
+    char* GetSelfString(const char* N,das::Context* C){auto* S=ResolveSelf(C);return CopyDSLString(ResolveProperty<FStrProperty>(S,N,false,C)->GetPropertyValue_InContainer(S),C);}
+    void SetSelfString(const char* N,const char* V,das::Context* C){auto* S=ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("self writes are forbidden in bind_events");ResolveProperty<FStrProperty>(S,N,true,C)->SetPropertyValue_InContainer(S,V?UTF8_TO_TCHAR(V):TEXT(""));}
+    FDasNameValue GetSelfName(const char* N,das::Context* C){auto* S=ResolveSelf(C);return MakeDSLName(ResolveProperty<FNameProperty>(S,N,false,C)->GetPropertyValue_InContainer(S),C);}
+    void SetSelfName(const char* N,FDasNameValue V,das::Context* C){auto* S=ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("self writes are forbidden in bind_events");ResolveProperty<FNameProperty>(S,N,true,C)->SetPropertyValue_InContainer(S,ResolveDSLName(V,C));}
+    bool VerifyContract(const das::ProgramPtr& Program,const FString& Entry,const FDasCallContract& C)
+    {
+        if(C.Inputs.Num()>16 || (static_cast<uint8>(C.ReturnKind)>7 || C.ReturnKind==EDasMethodSignature::Frame)) return false;
+        const FTCHARToUTF8 N(*Entry);auto* F=Program->getThisModule()->findUniqueFunction(N.Get());
+        auto Matches=[](const das::TypeDeclPtr& T,EDasMethodSignature K){if(!T || T->ref || (static_cast<uint8>(K)>7 || K==EDasMethodSignature::Frame))return false;if(K==EDasMethodSignature::Name)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UENameValue";const auto D=K==EDasMethodSignature::String?das::Type::tString:K==EDasMethodSignature::Double?das::Type::tDouble:K==EDasMethodSignature::Int?das::Type::tInt:K==EDasMethodSignature::Float?das::Type::tFloat:K==EDasMethodSignature::Bool?das::Type::tBool:das::Type::tVoid;return K==EDasMethodSignature::Void?T->baseType==D:T->isSimpleType(D);};
+        if(!F || !F->exports || F->arguments.size()!=static_cast<size_t>(C.Inputs.Num()) || !Matches(F->result,C.ReturnKind)) return false;
+        for(int32 I=0;I<C.Inputs.Num();++I) if(C.Inputs[I]==EDasMethodSignature::Void || !Matches(F->arguments[I]->type,C.Inputs[I])) return false;return true;
+    }
     int32 GetSelfInt(const char* Name, das::Context* Context)
     {
         UObject* Self = ResolveSelf(Context);
@@ -494,13 +537,24 @@ namespace
         virtual bool canBePlacedInContainer() const override { return true; }
     };
 
+    struct FDSLNameAnnotation:das::ManagedStructureAnnotation<FDasNameValue,false>{
+        FDSLNameAnnotation(das::ModuleLibrary& L):ManagedStructureAnnotation("UENameValue",L,"FDasNameValue"){}
+        virtual bool isRefType() const override{return false;}virtual bool isLocal() const override{return true;}
+        virtual bool canCopy() const override{return true;}virtual bool canMove() const override{return true;}
+        virtual bool hasNonTrivialCtor() const override{return false;}virtual bool isPod() const override{return true;}
+    };
+    #include "DasDSL.inl"
+
     class FUnrealFoundationModule final : public das::Module
     {
     public:
         FUnrealFoundationModule() : das::Module("ue_foundation")
         {
+            addAnnotation(new FUEClassAnnotation());
+            addAnnotation(new FUEFunctionAnnotation());
             das::ModuleLibrary Library(this);
             Library.addBuiltInModule();
+            addAnnotation(new FDSLNameAnnotation(Library));
             addAnnotation(new FObjectHandleAnnotation(Library));
             das::addExtern<DAS_BIND_FUN(ObjectCastNullable), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_cast_nullable_object", das::SideEffects::modifyExternal, "ObjectCastNullable");
             addAnnotation(new FCallHandleAnnotation(Library));
@@ -549,6 +603,17 @@ namespace
             das::addExtern<DAS_BIND_FUN(GetStateInt)>(*this, Library, "ue_state_get_int", das::SideEffects::modifyExternal, "GetStateInt");
             das::addExtern<DAS_BIND_FUN(SetStateInt)>(*this, Library, "ue_state_set_int", das::SideEffects::modifyExternal, "SetStateInt");
             das::addExtern<DAS_BIND_FUN(NativeAdd)>(*this, Library, "ue_add", das::SideEffects::none, "NativeAdd");
+            das::addExtern<DAS_BIND_FUN(DSLNameFromString)>(*this,Library,"ue_name_value",das::SideEffects::modifyExternal,"DSLNameFromString");
+            das::addExtern<DAS_BIND_FUN(DSLNameToString)>(*this,Library,"ue_name_text",das::SideEffects::modifyExternal,"DSLNameToString");
+            das::addExtern<DAS_BIND_FUN(DSLNamesEqual)>(*this,Library,"ue_names_equal",das::SideEffects::accessExternal,"DSLNamesEqual");
+            das::addExtern<DAS_BIND_FUN(GetSelfDouble)>(*this,Library,"ue_get_self_double",das::SideEffects::accessExternal,"GetSelfDouble");
+            das::addExtern<DAS_BIND_FUN(SetSelfDouble)>(*this,Library,"ue_set_self_double",das::SideEffects::modifyExternal,"SetSelfDouble");
+            das::addExtern<DAS_BIND_FUN(GetSelfString)>(*this,Library,"ue_get_self_string",das::SideEffects::modifyExternal,"GetSelfString");
+            das::addExtern<DAS_BIND_FUN(SetSelfString)>(*this,Library,"ue_set_self_string",das::SideEffects::modifyExternal,"SetSelfString");
+            das::addExtern<DAS_BIND_FUN(GetSelfName)>(*this,Library,"ue_get_self_name",das::SideEffects::modifyExternal,"GetSelfName");
+            das::addExtern<DAS_BIND_FUN(SetSelfName)>(*this,Library,"ue_set_self_name",das::SideEffects::modifyExternal,"SetSelfName");
+            das::addExtern<DAS_BIND_FUN(GetSelfBool)>(*this, Library, "ue_get_self_bool", das::SideEffects::accessExternal, "GetSelfBool");
+            das::addExtern<DAS_BIND_FUN(SetSelfBool)>(*this, Library, "ue_set_self_bool", das::SideEffects::modifyExternal, "SetSelfBool");
             das::addExtern<DAS_BIND_FUN(GetSelfInt)>(*this, Library, "ue_get_self_int", das::SideEffects::accessExternal, "GetSelfInt");
             das::addExtern<DAS_BIND_FUN(GetSelfFloat)>(*this, Library, "ue_get_self_float", das::SideEffects::accessExternal, "GetSelfFloat");
             das::addExtern<DAS_BIND_FUN(SetSelfInt)>(*this, Library, "ue_set_self_int", das::SideEffects::modifyExternal, "SetSelfInt");
@@ -569,6 +634,7 @@ namespace
     // Declaration order keeps compiler owners alive until the context is destroyed.
     struct FCompiledContext
     {
+        FString DSLDeclaration;
         das::ModuleGroup Modules;
         das::FileAccessPtr Access;
         das::ProgramPtr Program;
@@ -603,6 +669,8 @@ namespace
         TWeakObjectPtr<UWorld> World;
         FString Path;
         FSourceSet AttemptedSources;
+        TMap<FString,FDasCallContract> RequiredEntries;
+        FString AttemptedEntry;FDasCallContract AttemptedContract;
         TUniquePtr<FCompiledContext> Live;
         FString ReloadError;
         uint32 Revision = 0;
@@ -745,6 +813,50 @@ FString FDasRuntimeModule::ScriptPath(const FString& Name) const
     return Root / TEXT("Scripts") / Name;
 }
 
+bool FDasRuntimeModule::ReadAuthoringScript(const FString& Path,FDasAuthoringModule& Out,FString& Error)
+{
+    Error.Reset();if(!IsInGameThread() || !bInitialized){Error=TEXT("DSL compilation requires initialized runtime on game thread");return false;}
+    try
+    {
+        das::TextWriter Output;das::ModuleGroup Group;auto Access=das::make_smart<das::FsFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);
+        const FTCHARToUTF8 File(*Path);auto Program=das::compileDaScript(File.Get(),Access,Output,Group);
+        if(!Program || Program->failed()){Error=Errors(Program,Output);return false;}
+        FDasAuthoringModule Candidate;bool OK=true;
+        Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St)
+        {
+            const auto* A=DSLAnnotation(St->annotations,"ue_class");if(!A || !OK) return;
+            const auto* Wire=A->arguments.find(DSLModelKey,das::Type::tString);FDasAuthoringModule Part;
+            if(!Wire || !FDasAuthoringModule::FromJson(DSLText(Wire->sValue),Part,Error)){OK=false;return;}
+            if(!Candidate.Id.IsEmpty() && Candidate.Id!=Part.Id){Error=TEXT("Declarations in a file must share module ID");OK=false;return;}
+            Candidate.Id=Part.Id;Candidate.Classes.Append(Part.Classes);
+        });
+        if(!OK || !Candidate.Validate(Error)) return false;Out=MoveTemp(Candidate);return true;
+    }
+    catch(const std::exception& E){Error=UTF8_TO_TCHAR(E.what());return false;}
+}
+
+bool FDasRuntimeModule::ValidateIntMethod(const FString& Path,FString& Error,const FString& EntryPoint)
+{return ValidateScalarMethod(Path,Error,EntryPoint,EDasMethodSignature::Int);}
+bool FDasRuntimeModule::ValidateScalarMethod(const FString& Path,FString& Error,const FString& EntryPoint,EDasMethodSignature Signature)
+{return ValidateFrameMethod(Path,Error,EntryPoint,FDasCallContract::Scalar(Signature));}
+bool FDasRuntimeModule::ValidateFrameMethod(const FString& Path,FString& Error,const FString& EntryPoint,const FDasCallContract& Contract)
+{
+    Error.Reset();
+    if (!IsInGameThread() || !bInitialized) { Error=TEXT("Method preflight requires initialized runtime on game thread");return false; }
+    try
+    {
+        das::TextWriter Output;das::ModuleGroup Modules;
+        auto Access=das::make_smart<das::FsFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);
+        const FTCHARToUTF8 Utf8Path(*Path);das::CodeOfPolicies Policies;
+        auto Program=das::compileDaScript(Utf8Path.Get(),Access,Output,Modules,Policies);
+        if (!Program || Program->failed()) { Error=Errors(Program,Output);return false; }
+        if(!VerifyContract(Program,EntryPoint,Contract)){Error=TEXT("Expected exported scalar frame signature by value: ")+EntryPoint;return false;}
+        // No simulate/eval: runtime global initializers and the method body are not executed during preflight.
+        return true;
+    }
+    catch (const std::exception& Exception) { Error=UTF8_TO_TCHAR(Exception.what());return false; }
+}
+
 FDasExecutionResult FDasRuntimeModule::RunFile(const FString& Path, int32 Input, bool bUseAot, TWeakObjectPtr<UObject> Self)
 {
     FDasExecutionResult Result;
@@ -784,7 +896,7 @@ FDasExecutionResult FDasRuntimeModule::RunFile(const FString& Path, int32 Input,
             return Result;
         }
         vec4f Arguments[] = { das::cast<int32>::from(Input) };
-        const vec4f Value = Context.evalWithCatch(Function, Arguments);
+        const vec4f Value = Context.evalWithCatch(Function,Arguments);
         if (const char* Exception = Context.getException())
         {
             Result.Error = UTF8_TO_TCHAR(Exception);
@@ -836,6 +948,24 @@ int32 FDasRuntimeModule::PersistentContextCount(const UWorld* World) const
     return Count;
 }
 
+FDasExecutionResult FDasRuntimeModule::RunNamedFramePersistent(const FString& Path,const FString& Entry,const TArray<FDasScalarValue>& Args,EDasMethodSignature ResultKind,TWeakObjectPtr<UObject> Self)
+{return RunCallback(Path,EDasCallback::Main,0,0.f,Self,Entry,ResultKind,&Args);}
+FDasExecutionResult FDasRuntimeModule::RunNamedFloatPersistent(const FString& Path,const FString& Entry,float Input,TWeakObjectPtr<UObject> Self)
+{return RunCallback(Path,EDasCallback::Main,0,Input,Self,Entry,EDasMethodSignature::Float);}
+FDasExecutionResult FDasRuntimeModule::RunNamedBoolPersistent(const FString& Path,const FString& Entry,bool Input,TWeakObjectPtr<UObject> Self)
+{return RunCallback(Path,EDasCallback::Main,Input?1:0,0.f,Self,Entry,EDasMethodSignature::Bool);}
+FDasExecutionResult FDasRuntimeModule::RunNamedVoidPersistent(const FString& Path,const FString& Entry,TWeakObjectPtr<UObject> Self)
+{return RunCallback(Path,EDasCallback::Main,0,0.f,Self,Entry,EDasMethodSignature::Void);}
+
+FDasExecutionResult FDasRuntimeModule::RunNamedPersistent(const FString& Path, const FString& EntryPoint, int32 Input, TWeakObjectPtr<UObject> Self)
+{
+    if (EntryPoint.IsEmpty() || EntryPoint.Len()>=NAME_SIZE || FChar::IsDigit(EntryPoint[0]))
+    { FDasExecutionResult Result;Result.Error=TEXT("Invalid entry point name");return Result; }
+    for (TCHAR Ch:EntryPoint) if (!FChar::IsAlnum(Ch) && Ch!='_')
+    { FDasExecutionResult Result;Result.Error=TEXT("Invalid entry point name");return Result; }
+    return RunCallback(Path,EDasCallback::Main,Input,0.f,Self,EntryPoint);
+}
+
 FDasExecutionResult FDasRuntimeModule::RunPersistent(const FString& Path, int32 Input, TWeakObjectPtr<UObject> Self)
 {
     return RunCallback(Path, EDasCallback::Main, Input, 0.f, Self);
@@ -852,14 +982,22 @@ FDasExecutionResult FDasRuntimeModule::RunLifecycle(const FString& Path, EDasCal
     return RunCallback(Path, Event, EndReason, DeltaSeconds, Self);
 }
 
-FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCallback Event, int32 Input, float DeltaSeconds, TWeakObjectPtr<UObject> Self)
+FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCallback Event, int32 Input, float DeltaSeconds, TWeakObjectPtr<UObject> Self, const FString& EntryPoint, EDasMethodSignature Signature,const TArray<FDasScalarValue>* Frame)
 {
     FDasExecutionResult Result;
+    if(Event==EDasCallback::Main)
+    {
+        bool Valid=!EntryPoint.IsEmpty() && EntryPoint.Len()<NAME_SIZE && !FChar::IsDigit(EntryPoint[0]);
+        for(TCHAR Ch:EntryPoint) Valid &= FChar::IsAlnum(Ch) || Ch==TEXT('_');
+        if(!Valid){Result.Error=TEXT("Invalid entry point name");return Result;}
+    }
     if (!IsInGameThread() || !bInitialized || ActiveContext)
     {
         Result.Error = TEXT("Persistent calls require an initialized, idle runtime on the game thread.");
         return Result;
     }
+    FDasCallContract Expected=FDasCallContract::Scalar(Signature);
+    if(Frame){Expected.Inputs.Reset();if(Frame->Num()>16 || (static_cast<uint8>(Signature)>7 || Signature==EDasMethodSignature::Frame)){Result.Error=TEXT("Invalid scalar frame");return Result;}for(const auto& V:*Frame){if(V.Kind<0 || V.Kind>7 || V.Kind==3 || V.Kind==4){Result.Error=TEXT("Invalid scalar argument kind");return Result;}if(V.Kind==5)for(int32 I=0;I<V.StringValue.Len();++I)if(V.StringValue[I]==0){Result.Error=TEXT("embedded NUL is not supported in strings");return Result;}Expected.Inputs.Add(static_cast<EDasMethodSignature>(V.Kind));}}
     FDrainEventsOnExit DrainOnExit;
     UObject* Owner = Self.Get();
     if (!IsValid(Owner) || (Owner->IsA<AActor>() && CastChecked<AActor>(Owner)->IsActorBeingDestroyed() && Event != EDasCallback::EndPlay))
@@ -895,12 +1033,13 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Result.Revision = Session->Revision;
         return Result;
     }
-    bool bChanged = Session->AttemptedSources.IsEmpty();
+    bool bChanged = Session->AttemptedSources.IsEmpty() || (!Session->Live && (Session->AttemptedEntry!=EntryPoint || Session->AttemptedContract!=Expected));
     for (const auto& Source : Session->AttemptedSources)
         if (!Source.Value.Matches(Source.Key)) { bChanged = true; break; }
     if (bChanged && Event != EDasCallback::EndPlay)
     {
         // Rejected sources are remembered too: no compile storm for an unchanged broken file.
+        Session->AttemptedEntry=EntryPoint;Session->AttemptedContract=Expected;
         Session->AttemptedSources.Reset();
         Session->AttemptedSources.Add(FullPath, FSourceSnapshot::Read(FullPath));
         FString CandidateError;
@@ -914,6 +1053,9 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             const FTCHARToUTF8 Utf8Path(*FullPath);
             Candidate->Program = das::compileDaScript(Utf8Path.Get(), Access, Output, Candidate->Modules);
             if (!Candidate->Program || Candidate->Program->failed()) CandidateError = Errors(Candidate->Program, Output);
+            else if(!DSLValidateOwner(Candidate->Program,EntryPoint,Self.Get(),Candidate->DSLDeclaration,CandidateError)) {}
+            else if(Session->Live && Session->Live->DSLDeclaration!=Candidate->DSLDeclaration)
+                CandidateError=TEXT("DSL declaration changed; apply/reimport the Blueprint before runtime reload");
             else
             {
                 Candidate->Context = MakeUnique<FUnrealDasContext>(Candidate->Program->getContextStackSize());
@@ -930,15 +1072,24 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     Candidate->BeginPlay = Candidate->Context->findFunction("begin_play");
                     Candidate->Tick = Candidate->Context->findFunction("tick");
                     Candidate->EndPlay = Candidate->Context->findFunction("end_play");
-                    if ((Event == EDasCallback::Main && !Candidate->Function) ||
-                        (Candidate->Function && !das::verifyCall<int32, int32>(Candidate->Function->debugInfo, Candidate->Modules)))
-                        CandidateError = TEXT("Expected exported main(input: int): int.");
+                    const FTCHARToUTF8 EntryUtf8(*EntryPoint);
+                    auto* Selected=Event==EDasCallback::Main?Candidate->Context->findFunction(EntryUtf8.Get()):Candidate->Function;
+                    if ((Event==EDasCallback::Main && !Selected) || (Selected && !VerifyContract(Candidate->Program,Event==EDasCallback::Main?EntryPoint:TEXT("main"),Event==EDasCallback::Main?Expected:FDasCallContract::Scalar(EDasMethodSignature::Int))))
+                        CandidateError=TEXT("Expected exported ")+EntryPoint+TEXT(" with requested scalar signature.");
                     else if (Candidate->BeginPlay && !das::verifyCall<void>(Candidate->BeginPlay->debugInfo, Candidate->Modules))
                         CandidateError = TEXT("Expected exported begin_play(): void.");
                     else if (Candidate->Tick && !das::verifyCall<void, float>(Candidate->Tick->debugInfo, Candidate->Modules))
                         CandidateError = TEXT("Expected exported tick(delta_time: float): void.");
                     else if (Candidate->EndPlay && !das::verifyCall<void, int32>(Candidate->EndPlay->debugInfo, Candidate->Modules))
                         CandidateError = TEXT("Expected exported end_play(reason: int): void.");
+                    if (CandidateError.IsEmpty())
+                        for (const auto& Required:Session->RequiredEntries)
+                        {
+                            const FTCHARToUTF8 RequiredUtf8(*Required.Key);
+                            auto* RequiredFunction=Candidate->Context->findFunction(RequiredUtf8.Get());
+                            if (!RequiredFunction || !VerifyContract(Candidate->Program,Required.Key,Required.Value))
+                            {CandidateError=TEXT("Previously used entry point signature changed: ")+Required.Key;break;}
+                        }
                 }
                 if (CandidateError.IsEmpty())
                 {
@@ -1016,11 +1167,14 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             }
         }
         das::SimFunction* Function = nullptr;
-        vec4f Arguments[] = { Event == EDasCallback::Tick ? das::cast<float>::from(DeltaSeconds) : das::cast<int32>::from(Input) };
+        vec4f Arguments[] = { Event==EDasCallback::Tick || (Event==EDasCallback::Main && Signature==EDasMethodSignature::Float)?das::cast<float>::from(DeltaSeconds):Event==EDasCallback::Main && Signature==EDasMethodSignature::Bool?das::cast<bool>::from(Input!=0):das::cast<int32>::from(Input) };
         if (Event == EDasCallback::Main)
         {
-            Function = Session->Live->Function;
-            if (!Function) { Result.Error = TEXT("Expected exported main(input: int): int."); return Result; }
+            const FTCHARToUTF8 EntryUtf8(*EntryPoint);
+            Function=Context.findFunction(EntryUtf8.Get());
+            if (!Function || !VerifyContract(Session->Live->Program,EntryPoint,Expected))
+            { Result.Error=TEXT("Expected exported ")+EntryPoint+TEXT(" with requested scalar signature.");return Result; }
+            Session->RequiredEntries.Add(EntryPoint,Expected);
         }
         else if (Event == EDasCallback::Tick) Function = Session->Live->Tick;
         else if (Event == EDasCallback::EndPlay)
@@ -1031,8 +1185,20 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         }
         if (Function)
         {
-            const auto Value = Context.evalWithCatch(Function, Arguments);
-            if (Event == EDasCallback::Main) Result.Value = das::cast<int32>::to(Value);
+            das::vector<vec4f> Packed;
+            if(Frame) for(const auto& V:*Frame){
+                if(V.Kind==0)Packed.push_back(das::cast<int32>::from(V.IntValue));else if(V.Kind==1)Packed.push_back(das::cast<float>::from(V.FloatValue));else if(V.Kind==2)Packed.push_back(das::cast<bool>::from(V.BoolValue));
+                else if(V.Kind==5)Packed.push_back(das::cast<char*>::from(CopyDSLString(V.StringValue,&Context)));else if(V.Kind==6)Packed.push_back(das::cast<double>::from(V.DoubleValue));else Packed.push_back(das::cast<FDasNameValue>::from(MakeDSLName(V.NameValue,&Context)));
+            }
+            const auto Value = Context.evalWithCatch(Function,Frame?(Packed.empty()?nullptr:Packed.data()):Event==EDasCallback::Main && Signature==EDasMethodSignature::Void?nullptr:Arguments);
+            if(Event==EDasCallback::Main){
+                if(Signature==EDasMethodSignature::Int) Result.Value=das::cast<int32>::to(Value);
+                else if(Signature==EDasMethodSignature::Float) Result.FloatValue=das::cast<float>::to(Value);
+                else if(Signature==EDasMethodSignature::Bool) Result.BoolValue=das::cast<bool>::to(Value);
+                else if(!Context.getException() && Signature==EDasMethodSignature::String){const auto* Text=das::cast<char*>::to(Value);Result.StringValue=Text?UTF8_TO_TCHAR(Text):TEXT("");}
+                else if(Signature==EDasMethodSignature::Double)Result.DoubleValue=das::cast<double>::to(Value);
+                else if(!Context.getException() && Signature==EDasMethodSignature::Name)Result.NameValue=ResolveDSLName(das::cast<FDasNameValue>::to(Value),&Context);
+            }
         }
         if (const char* Exception = Context.getException()) Result.Error = UTF8_TO_TCHAR(Exception);
         else { Result.Types = Context.Types; Result.bSucceeded = true; }
