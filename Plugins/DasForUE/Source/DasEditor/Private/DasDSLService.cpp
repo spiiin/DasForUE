@@ -24,6 +24,7 @@
 #include "AssetRegistry/AssetData.h"
 #include "EdGraphSchema_K2.h"
 #include "K2Node.h"
+#include "DasNumericGraphMigration.h"
 #if WITH_DEV_AUTOMATION_TESTS
 static bool GDasFailWidenAfterCompile=false;
 void DasFailWidenAfterCompileForTesting(bool Enabled){GDasFailWidenAfterCompile=Enabled;}
@@ -180,7 +181,9 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP,FString& Error,bool In
     UE_LOG(LogTemp,Display,TEXT("DAS_FIELD_RENAME PASS %d fields; instance values preserved"),Renames.Num());return true;
 }
 
-bool FDasDSLService::ReimportWidenedNumericFields(UBlueprint* BP,FString& Error,bool IncludeDependencies){
+bool FDasDSLService::ReimportWidenedNumericFields(UBlueprint* BP,FString& Error,bool IncludeDependencies){FDasNumericMigrationOptions O;O.IncludeDependencies=IncludeDependencies;O.AdaptGraphs=false;O.WidenOnly=true;return ReimportConvertedNumericFields(BP,O,Error);}
+bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP,const FDasNumericMigrationOptions& Options,FString& Error){
+    const bool IncludeDependencies=Options.IncludeDependencies;if(uint8(Options.Integers)>4 || uint8(Options.Floats)>1){Error=TEXT("Unknown numeric rounding/precision policy");return false;}
     Error.Reset();if(!IsInGameThread() || !IsValid(BP) || !BP->GeneratedClass){Error=TEXT("Expected valid imported Blueprint on game thread");return false;}
     auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));auto& Meta=BP->GetOutermost()->GetMetaData();
     const FString Script=Meta.GetValue(BP,TEXT("DasDSLSource")),Id=Meta.GetValue(BP,TEXT("DasDSLClassId"));
@@ -191,16 +194,22 @@ bool FDasDSLService::ReimportWidenedNumericFields(UBlueprint* BP,FString& Error,
     if(!FDasBlueprintService::Apply(BP,Previous,Error,true))return false;
     const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});auto* New=Next.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});
     if(!Old || !New || Prior.Id!=Next.Id){Error=TEXT("Rename migration requires matching stored class/module identity");return false;}
-    struct FConversion {FName OldName,NewName;EDasScalarKind Kind;};TArray<FConversion> Renames;
+    struct FConversion {FName OldName,NewName;EDasScalarKind Kind,Target;};TArray<FConversion> Renames;
     auto Normalized=*New;
     for(auto& Property:Normalized.Properties){
         const auto* Before=Old->Properties.FindByPredicate([&](const auto& P){return P.Id==Property.Id;});
         if(!Before || Property.Name!=Before->Name){Error=TEXT("Numeric widening requires unchanged property names and stable IDs");return false;}
         if(Property.Type.Identity()!=Before->Type.Identity()){
-            if(Property.Type.Kind!=TEXT("double") || (Before->Type.Kind!=TEXT("int") && Before->Type.Kind!=TEXT("float"))){Error=TEXT("Only int32->double and finite float32->double widening supported");return false;}
+            auto Numeric=[](const FString& K){return K==TEXT("int") || K==TEXT("float") || K==TEXT("double");};
+            if(!Numeric(Property.Type.Kind) || !Numeric(Before->Type.Kind) || (Options.WidenOnly && (Property.Type.Kind!=TEXT("double") || (Before->Type.Kind!=TEXT("int") && Before->Type.Kind!=TEXT("float"))))){Error=TEXT("Unsupported numeric field conversion");return false;}
             const auto* Field=Previous.Fields.FindByPredicate([&](const auto& F){return F.StableId==Property.Id;});const auto* Variable=BP->NewVariables.FindByPredicate([&](const auto& V){return V.VarName==FName(*Property.Name);});
             if(!Field || !Variable || !Variable->RepNotifyFunc.IsNone() || (Variable->PropertyFlags & CPF_Net)){Error=TEXT("Numeric widening requires an authored non-replicated field");return false;}
-            Renames.Add({FName(*Property.Name),FName(*Property.Name),Field->Kind});Property.Type=Before->Type;
+            const auto* Target=Candidate.Fields.FindByPredicate([&](const auto& F){return F.StableId==Property.Id;});auto Default=CaptureRenamedField(BP->GeneratedClass->GetDefaultObject(),Field->Name,Field->Kind);FDasScalarValue Converted;
+            if(!Target || !ConvertDasNumber(Default,int32(Target->Kind),Options.Integers,Options.Floats,Converted,Error))return false;
+            const double Expected=Converted.Kind==0?double(Converted.IntValue):Converted.Kind==1?double(Converted.FloatValue):Converted.DoubleValue;
+            const double Declared=Target->Kind==EDasScalarKind::Int32?double(Target->IntDefault):Target->Kind==EDasScalarKind::Float32?double(Target->FloatDefault):Target->DoubleDefault;
+            if(Expected!=Declared){Error=FString::Printf(TEXT("New default must equal policy-converted prior default %.17g: %s"),Expected,*Property.Name);return false;}
+            Renames.Add({FName(*Property.Name),FName(*Property.Name),Field->Kind,Target->Kind});Property.Type=Before->Type;Property.Default=Before->Default;
         }
     }
     const auto Delta=FDasAuthoringModule::Compare(*Old,Normalized);
@@ -239,11 +248,14 @@ bool FDasDSLService::ReimportWidenedNumericFields(UBlueprint* BP,FString& Error,
     }
     // A raw Blueprint property node may need a conversion or narrowing adapter.
     // Refuse it before mutation; DSL method call graphs retain their contracts.
-    for(auto* B:ScopeBlueprints){TArray<UK2Node*> Nodes;FBlueprintEditorUtils::GetAllNodesOfClass(B,Nodes);for(const auto& R:Renames)if(Nodes.ContainsByPredicate([&](const auto* Node){return Node->ReferencesVariable(R.OldName,nullptr);})){Error=TEXT("Blueprint property references require an explicit graph conversion policy: ")+B->GetPathName()+TEXT(".")+R.OldName.ToString();return false;}}
+    if(!Options.AdaptGraphs)for(auto* B:ScopeBlueprints){TArray<UK2Node*> Nodes;FBlueprintEditorUtils::GetAllNodesOfClass(B,Nodes);for(const auto& R:Renames)if(Nodes.ContainsByPredicate([&](const auto* Node){return Node->ReferencesVariable(R.OldName,nullptr);})){Error=TEXT("Use convert_numeric policy to adapt Blueprint property links");return false;}}
+    auto NumericPin=[](EDasScalarKind K){FEdGraphPinType T;T.PinCategory=K==EDasScalarKind::Int32?UEdGraphSchema_K2::PC_Int:UEdGraphSchema_K2::PC_Real;if(K!=EDasScalarKind::Int32)T.PinSubCategory=K==EDasScalarKind::Float32?UEdGraphSchema_K2::PC_Float:UEdGraphSchema_K2::PC_Double;return T;};
+    FDasNumericGraphMigration GraphMigration;TMap<FName,FEdGraphPinType> ChangedTypes;for(const auto& R:Renames)ChangedTypes.Add(R.OldName,NumericPin(R.Target));
+    if(Options.AdaptGraphs && !GraphMigration.Prepare(ScopeBlueprints,BP->GeneratedClass,ChangedTypes,Options.Integers,Options.Floats,Error))return false;
     struct FSnapshot {TStrongObjectPtr<UObject> Object;TArray<FDasScalarValue> Values,Converted;};TArray<FSnapshot> Snapshots;
     TArray<UObject*> Objects;GetObjectsOfClass(BP->GeneratedClass,Objects,IncludeDependencies,RF_NoFlags);
     if(IncludeDependencies)for(auto* Object:Objects)if(auto* Actor=Cast<AActor>(Object))if(auto* World=Actor->GetWorld())if(World->IsPartitionedWorld() || !World->GetStreamingLevels().IsEmpty()){Error=TEXT("Loaded World Partition/streaming instances require a separate migration scope");return false;}else if(!ScopePackages.Contains(World->GetOutermost()->GetFName())){ScopePackages.Add(World->GetOutermost()->GetFName());UE_LOG(LogTemp,Display,TEXT("DAS_WIDEN_SCOPE live map %s"),*World->GetOutermost()->GetName());}
-    for(auto* Object:Objects)if(IsValid(Object) && !Object->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) && !Object->GetClass()->GetName().StartsWith(TEXT("SKEL_")) && !Object->GetClass()->GetName().StartsWith(TEXT("REINST_"))){FSnapshot S;S.Object.Reset(Object);for(const auto& R:Renames){auto V=CaptureRenamedField(Object,R.OldName,R.Kind);FDasScalarValue Converted;Converted.Kind=6;Converted.DoubleValue=V.Kind==0?static_cast<double>(V.IntValue):static_cast<double>(V.FloatValue);if(!FMath::IsFinite(Converted.DoubleValue)){Error=TEXT("Non-finite instance value refuses widening before mutation: ")+Object->GetPathName()+TEXT(".")+R.OldName.ToString();return false;}S.Values.Add(V);S.Converted.Add(MoveTemp(Converted));}Snapshots.Add(MoveTemp(S));}
+    for(auto* Object:Objects)if(IsValid(Object) && !Object->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) && !Object->GetClass()->GetName().StartsWith(TEXT("SKEL_")) && !Object->GetClass()->GetName().StartsWith(TEXT("REINST_"))){FSnapshot S;S.Object.Reset(Object);for(const auto& R:Renames){auto V=CaptureRenamedField(Object,R.OldName,R.Kind);FDasScalarValue Converted;if(!ConvertDasNumber(V,int32(R.Target),Options.Integers,Options.Floats,Converted,Error)){Error+=TEXT(": ")+Object->GetPathName()+TEXT(".")+R.OldName.ToString();return false;}S.Values.Add(V);S.Converted.Add(MoveTemp(Converted));}Snapshots.Add(MoveTemp(S));}
     const auto Handle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([&](const FCoreUObjectDelegates::FReplacementObjectMap& Map){for(auto& S:Snapshots)if(auto* Replacement=Map.Find(S.Object.Get()))S.Object.Reset(*Replacement);});
     ON_SCOPE_EXIT {FCoreUObjectDelegates::OnObjectsReplaced.Remove(Handle);};
     for(auto* B:ScopeBlueprints)if(B->Status!=BS_UpToDate && B->Status!=BS_UpToDateWithWarnings){Error=TEXT("Compile scoped Blueprints before numeric widening: ")+B->GetPathName();return false;}
@@ -255,7 +267,7 @@ bool FDasDSLService::ReimportWidenedNumericFields(UBlueprint* BP,FString& Error,
     for(auto* B:ScopeBlueprints)RememberDirty(B);for(auto& S:Snapshots)RememberDirty(S.Object.Get());for(auto& Asset:ScopeAssets)RememberDirty(Asset.Get());
     auto CompileScope=[&](){for(auto* B:ScopeBlueprints){FKismetEditorUtilities::CompileBlueprint(B);FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();if(B->Status==BS_Error || !B->GeneratedClass)return false;}return true;};
     auto Rollback=[&](const FString& Failure){
-        BP->NewVariables=OriginalVariables;FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BP);bool Restored=CompileScope();
+        BP->NewVariables=OriginalVariables;FString GraphError;bool Restored=!Options.AdaptGraphs || GraphMigration.Restore(GraphError);FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BP);Restored &= CompileScope();if(Options.AdaptGraphs)Restored &= GraphMigration.Restore(GraphError);
         for(auto& S:Snapshots)for(int32 I=0;I<Renames.Num();++I)Restored &= RestoreRenamedField(S.Object.Get(),Renames[I].OldName,S.Values[I]);
         FString Validation;Restored &= FDasBlueprintService::Apply(BP,Previous,Validation,true);
         if(Restored)for(const auto& Dirty:OriginalDirty)Dirty.Key->SetDirtyFlag(Dirty.Value);
@@ -263,9 +275,9 @@ bool FDasDSLService::ReimportWidenedNumericFields(UBlueprint* BP,FString& Error,
         UE_LOG(LogTemp,Display,TEXT("DAS_NUMERIC_ROLLBACK=%s"),Restored?TEXT("PASS"):TEXT("FAIL"));return false;
     };
     for(auto* B:ScopeBlueprints)B->Modify();for(auto& S:Snapshots)S.Object->Modify();
-    FEdGraphPinType DoublePin;DoublePin.PinCategory=UEdGraphSchema_K2::PC_Real;DoublePin.PinSubCategory=UEdGraphSchema_K2::PC_Double;
-    for(const auto& R:Renames){auto* Variable=BP->NewVariables.FindByPredicate([&](const auto& V){return V.VarName==R.OldName;});Variable->VarType=DoublePin;const auto* Field=Candidate.Fields.FindByPredicate([&](const auto& F){return F.Name==R.OldName;});Variable->DefaultValue=FString::Printf(TEXT("%.17g"),Field->DoubleDefault);}
+    for(const auto& R:Renames){auto* Variable=BP->NewVariables.FindByPredicate([&](const auto& V){return V.VarName==R.OldName;});Variable->VarType=NumericPin(R.Target);const auto* Field=Candidate.Fields.FindByPredicate([&](const auto& F){return F.Name==R.OldName;});Variable->DefaultValue=R.Target==EDasScalarKind::Int32?FString::FromInt(Field->IntDefault):FString::Printf(TEXT("%.17g"),R.Target==EDasScalarKind::Float32?double(Field->FloatDefault):Field->DoubleDefault);}
     FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BP);
+    if(Options.AdaptGraphs && !GraphMigration.Apply(Error)){const FString Failure=Error;return Rollback(Failure);}
     if(!CompileScope())return Rollback(TEXT("Blueprint compilation failed"));
 #if WITH_DEV_AUTOMATION_TESTS
     if(GDasFailWidenAfterCompile)return Rollback(TEXT("Injected development test failure"));

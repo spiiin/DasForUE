@@ -28,9 +28,11 @@
 #include "UObject/UnrealType.h"
 #include "UObject/NoExportTypes.h"
 UDasFrameCommandlet::UDasFrameCommandlet(){IsClient=false;IsServer=false;IsEditor=true;LogToConsole=true;}
+int32 RunDasNumericConvertProbe(const FString& Params);
 int32 RunDasNumericWidenProbe(const FString& Params);
 int32 RunDasRenameScopeProbe(const FString& Params);
 int32 UDasFrameCommandlet::Main(const FString& Params){
+    if(FParse::Param(*Params,TEXT("NumericConvert")))return RunDasNumericConvertProbe(Params);
     if(FParse::Param(*Params,TEXT("NumericWiden")))return RunDasNumericWidenProbe(Params);
     if(FParse::Param(*Params,TEXT("RenameScope")))return RunDasRenameScopeProbe(Params);
     if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke")))return 1;

@@ -1367,3 +1367,59 @@ bool FDasNumericWidenPIETest::RunTest(const FString& Parameters){
     FActorSpawnParameters Spawn;Spawn.Name=TEXT("WidenActor");auto* Actor=World->SpawnActor<ADasProbeActor>(Child->GeneratedClass,FTransform::Identity,Spawn);Spawn.Name=TEXT("WidenUntouched");auto* Untouched=World->SpawnActor<ADasProbeActor>(Child->GeneratedClass,FTransform::Identity,Spawn);if(!TestTrue(TEXT("Spawn widening actors"),Actor && Untouched)){IFileManager::Get().Delete(*Path);return false;}
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasNumericWidenPIECommand>(BP,this,Path,Source));return true;
 }
+
+#include "Blueprint/BlueprintExceptionInfo.h"
+#include "UObject/Script.h"
+void DasCreateNumericGraphFixture(UBlueprint* B);
+int32 DasReadNumericGraphFixture(ADasProbeActor* A);
+int32 DasNumericGraphAdapterCount(UBlueprint* B);
+namespace {
+class FDasNumericConvertPIECommand final : public IAutomationLatentCommand {
+    FString Path,Source;TStrongObjectPtr<UBlueprint> BP;FAutomationTestBase* Test;double Start=0;bool Ending=false,Passed=true;
+public:
+    FDasNumericConvertPIECommand(UBlueprint* B,FAutomationTestBase* T,FString P,FString S):Path(P),Source(S),BP(B),Test(T){}
+    virtual bool Update() override {
+        if(Start==0)Start=FPlatformTime::Seconds();auto Check=[&](bool V,const TCHAR* N){Passed &= Test->TestTrue(N,V);UE_LOG(LogTemp,Display,TEXT("DAS_NUMERIC_CONVERT_PIE %s %s"),V?TEXT("PASS"):TEXT("FAIL"),N);};
+        if(Ending){if(GEditor->PlayWorld && FPlatformTime::Seconds()-Start<30)return false;Check(!GEditor->PlayWorld,TEXT("EndPIE"));IFileManager::Get().Delete(*Path);UE_LOG(LogTemp,Display,TEXT("DAS_NUMERIC_CONVERT_PIE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));return true;}
+        UWorld* World=GEditor->PlayWorld;if(!World || !World->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<60)return false;Check(false,TEXT("PIE_started"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
+        auto* Actor=Find(World,TEXT("WidenActor"));auto* Untouched=Find(World,TEXT("WidenUntouched"));Check(Actor && Untouched,TEXT("real_PIE_widen_actors"));
+        if(Actor && Untouched){
+            auto* Score=FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Score"));auto* Rate=FindFProperty<FFloatProperty>(Actor->GetClass(),TEXT("Rate"));Score->SetPropertyValue_InContainer(Actor,MAX_int32);Rate->SetPropertyValue_InContainer(Actor,0.1f);
+            auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto BeforeCall=Runtime.RunNamedFramePersistent(Path,TEXT("ue_WidenFields_ReadScore"),{},EDasMethodSignature::Double,Actor);Check(BeforeCall.bSucceeded && BeforeCall.DoubleValue==MAX_int32,TEXT("PIE_old_numeric_callback"));
+            Test->AddExpectedError(TEXT("Potential data loss during conversion of integer property Rate"),EAutomationExpectedErrorFlags::Contains,0);
+            const FString Changed=Source.Replace(TEXT("Score : int = 5"),TEXT("Score : double = 5.0lf")).Replace(TEXT("Rate : float = 1.5"),TEXT("Rate : int = 2"));FString Error;FDasNumericMigrationOptions Options;Options.IncludeDependencies=true;Options.Integers=EDasIntegerRule::NearestAway;Check(FFileHelper::SaveStringToFile(Changed,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_write_double_fields"));
+#if WITH_DEV_AUTOMATION_TESTS
+            DasFailWidenAfterCompileForTesting(true);const bool RolledBack=!FDasDSLService::ReimportConvertedNumericFields(BP.Get(),Options,Error);DasFailWidenAfterCompileForTesting(false);Actor=Find(World,TEXT("WidenActor"));
+            Check(RolledBack && Error.StartsWith(TEXT("Numeric migration rolled back:")) && Actor && FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Score")) && FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Score"))->GetPropertyValue_InContainer(Actor)==MAX_int32,TEXT("PIE_type_and_override_rollback"));Check(DasNumericGraphAdapterCount(BP.Get())==0 && Actor && DasReadNumericGraphFixture(Actor)==MAX_int32,TEXT("PIE_rollback_restores_original_graph_execution"));
+            const auto LastGood=Runtime.RunNamedFramePersistent(Path,TEXT("ue_WidenFields_ReadScore"),{},EDasMethodSignature::Double,Actor);Check(LastGood.bSucceeded && LastGood.DoubleValue==MAX_int32,TEXT("PIE_last_good_callback_after_rollback"));Test->AddInfo(FString::Printf(TEXT("Rollback callback: success=%d value=%.17g error=%s"),LastGood.bSucceeded,LastGood.DoubleValue,*LastGood.Error));
+#endif
+            Check(FDasDSLService::ReimportConvertedNumericFields(BP.Get(),Options,Error),TEXT("PIE_exact_numeric_widen"));if(!Error.IsEmpty())Test->AddInfo(Error);
+            Actor=Find(World,TEXT("WidenActor"));Untouched=Find(World,TEXT("WidenUntouched"));auto* D=Actor?FindFProperty<FDoubleProperty>(Actor->GetClass(),TEXT("Score")):nullptr;auto* R=Actor?FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Rate")):nullptr;
+            Check(Actor && Untouched && D && R && D->GetPropertyValue_InContainer(Actor)==MAX_int32 && R->GetPropertyValue_InContainer(Actor)==0 && D->GetPropertyValue_InContainer(Untouched)==23 && R->GetPropertyValue_InContainer(Untouched)==2,TEXT("PIE_exact_override_and_child_default_values"));
+            Check(DasNumericGraphAdapterCount(BP.Get())>=2 && Actor && DasReadNumericGraphFixture(Actor)==MAX_int32,TEXT("PIE_checked_graph_adapters_execute"));
+            D->SetPropertyValue_InContainer(Actor,-2.5);Check(DasReadNumericGraphFixture(Actor)==-3,TEXT("PIE_graph_rounding_half_away"));D->SetPropertyValue_InContainer(Actor,1e20);
+            int32 Aborts=0;const auto ExceptionHandle=FBlueprintCoreDelegates::OnScriptException.AddLambda([&](const UObject*,const FFrame&,const FBlueprintExceptionInfo& Info){if(Info.GetType()==EBlueprintExceptionType::AbortExecution && Info.GetDescription().ToString().Contains(TEXT("int32 range")))++Aborts;});
+            Test->AddExpectedError(TEXT("Numeric value exceeds int32 range"),EAutomationExpectedErrorFlags::Contains,1);DasReadNumericGraphFixture(Actor);FBlueprintCoreDelegates::OnScriptException.Remove(ExceptionHandle);Check(Aborts==1 && D->GetPropertyValue_InContainer(Actor)==1e20,TEXT("PIE_runtime_overflow_aborts_without_field_write"));D->SetPropertyValue_InContainer(Actor,double(MAX_int32));
+            R->SetPropertyValue_InContainer(Actor,123);int32 SetterAborts=0;const auto SetterHandle=FBlueprintCoreDelegates::OnScriptException.AddLambda([&](const UObject*,const FFrame&,const FBlueprintExceptionInfo& Info){if(Info.GetType()==EBlueprintExceptionType::AbortExecution && Info.GetDescription().ToString().Contains(TEXT("int32 range")))++SetterAborts;});
+            auto* Setter=Actor->FindFunction(TEXT("WriteRateByGraph"));FStructOnScope SetterFrame(Setter);FindFProperty<FFloatProperty>(Setter,TEXT("Input"))->SetPropertyValue_InContainer(SetterFrame.GetStructMemory(),TNumericLimits<float>::Max());Test->AddExpectedError(TEXT("Numeric value exceeds int32 range"),EAutomationExpectedErrorFlags::Contains,1);{FEditorScriptExecutionGuard Guard;Actor->ProcessEvent(Setter,SetterFrame.GetStructMemory());}FBlueprintCoreDelegates::OnScriptException.Remove(SetterHandle);Check(SetterAborts==1 && R->GetPropertyValue_InContainer(Actor)==123,TEXT("PIE_failed_setter_adapter_leaves_destination_unchanged"));R->SetPropertyValue_InContainer(Actor,0);
+            const auto AfterCall=Runtime.RunNamedFramePersistent(Path,TEXT("ue_WidenFields_ReadRate"),{},EDasMethodSignature::Double,Actor);Check(AfterCall.bSucceeded && AfterCall.DoubleValue==0,TEXT("PIE_callback_uses_new_double_field"));
+            auto* Fresh=World->SpawnActor<ADasProbeActor>(Actor->GetClass(),FTransform::Identity);Check(Fresh && D && R && D->GetPropertyValue_InContainer(Fresh)==23 && R->GetPropertyValue_InContainer(Fresh)==2,TEXT("PIE_fresh_child_uses_promoted_defaults"));
+            Check(FFileHelper::SaveStringToFile(TEXT("options gen2\nrequire ue_foundation\n[export]\ndef ue_WidenFields_ReadScore():double { return 12.0lf }\n[export]\ndef ue_WidenFields_ReadRate():double { return 13.0lf }\n"),*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_write_removed_DSL_declaration"));
+            const auto RemovedDSL=Runtime.RunNamedFramePersistent(Path,TEXT("ue_WidenFields_ReadScore"),{},EDasMethodSignature::Double,Actor);Check(RemovedDSL.bSucceeded && RemovedDSL.DoubleValue==MAX_int32 && RemovedDSL.ReloadError.Contains(TEXT("DSL declaration changed")),TEXT("PIE_missing_declaration_does_not_bypass_approval_guard"));
+            Check(FFileHelper::SaveStringToFile(Changed,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("PIE_restore_promoted_source"));
+            Check(FDasDSLService::ReimportConvertedNumericFields(BP.Get(),Options,Error),TEXT("PIE_widen_idempotent"));CollectGarbage(RF_NoFlags);Check(Find(World,TEXT("WidenActor"))!=nullptr,TEXT("PIE_promoted_actor_survives_GC"));
+        }
+        GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasNumericConvertPIETest,"DasForUE.DSL.NumericConvertPIE",EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasNumericConvertPIETest::RunTest(const FString& Parameters){
+    if(FApp::GetProjectName()!=FString(TEXT("DasForUESmoke"))){AddError(TEXT("Isolated project required"));return false;}auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FString Source;FFileHelper::LoadFileToString(Source,*Runtime.ScriptPath(TEXT("dsl_widen_numeric.das")));
+    const FString Guid=FGuid::NewGuid().ToString(EGuidFormats::Digits),Script=TEXT("dsl_convert_pie_")+Guid+TEXT(".das"),Path=Runtime.ScriptPath(Script);if(!FFileHelper::SaveStringToFile(Source,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))return false;
+    auto* World=FAutomationEditorCommonUtils::CreateNewMap();UBlueprint* BP=nullptr;FString Error;const FString Package=TEXT("/Game/DasFrameAssetProbe/WidenPIE_")+Guid+TEXT("/BP_Parent");if(!TestTrue(TEXT("Create widening Blueprint"),FDasDSLService::Apply(Script,Package,TEXT("widen.WidenFields"),BP,Error))){AddInfo(Error);IFileManager::Get().Delete(*Path);return false;}
+    DasCreateNumericGraphFixture(BP);
+    auto* Child=FKismetEditorUtilities::CreateBlueprint(BP->GeneratedClass,CreatePackage(*(Package+TEXT("_Child"))),TEXT("BP_Child"),BPTYPE_Normal,UBlueprint::StaticClass(),UBlueprintGeneratedClass::StaticClass(),TEXT("DasWidenPIE"));UObject* CDO=Child->GeneratedClass->GetDefaultObject();FindFProperty<FIntProperty>(Child->GeneratedClass,TEXT("Score"))->SetPropertyValue_InContainer(CDO,23);FindFProperty<FFloatProperty>(Child->GeneratedClass,TEXT("Rate"))->SetPropertyValue_InContainer(CDO,2.25f);
+    FActorSpawnParameters Spawn;Spawn.Name=TEXT("WidenActor");auto* Actor=World->SpawnActor<ADasProbeActor>(Child->GeneratedClass,FTransform::Identity,Spawn);Spawn.Name=TEXT("WidenUntouched");auto* Untouched=World->SpawnActor<ADasProbeActor>(Child->GeneratedClass,FTransform::Identity,Spawn);if(!TestTrue(TEXT("Spawn widening actors"),Actor && Untouched)){IFileManager::Get().Delete(*Path);return false;}
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasNumericConvertPIECommand>(BP,this,Path,Source));return true;
+}

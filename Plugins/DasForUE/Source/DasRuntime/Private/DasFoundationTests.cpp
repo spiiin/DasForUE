@@ -1,4 +1,7 @@
 #include "DasRuntime.h"
+#include "DasNumericLibrary.h"
+#include "UObject/StructOnScope.h"
+#include <limits>
 #include "DasSchema.h"
 #include "DasAuthoring.h"
 #include "Misc/FileHelper.h"
@@ -1104,6 +1107,24 @@ bool RunDasFoundationTests(FString& Report)
         const auto BundleResult=Runtime.RunNamedFramePersistent(EnumStructPath,TEXT("ue_EnumStructBridge_UpdateBundle"),{BundleArg},EDasMethodSignature::Struct,EnumStructOwner.Get(),BundleArg.ObjectClass);
         const auto* UpdatedBundle=BundleResult.StructValue.GetPtr<FDasEnumBundle>();Expect(BundleResult.bSucceeded && UpdatedBundle && UpdatedBundle->Legacy==DasLegacyActive && UpdatedBundle->Nested.Mode==EDasCallMode::Paused && UpdatedBundle->Nested.Key==Named.Key,TEXT("enum_byte_leaf_and_nested_enum_update"),BundleResult.Error);
         Runtime.ReleaseObject(EnumStructOwner.Get());
+    }
+    {
+        FDasScalarValue NumericInput,NumericOutput;FString NumericError;NumericInput.Kind=6;
+        auto IntRule=[&](double N,EDasIntegerRule Rule,int32 Expected,const TCHAR* Label){NumericInput.DoubleValue=N;Expect(ConvertDasNumber(NumericInput,0,Rule,EDasFloatRule::Exact,NumericOutput,NumericError) && NumericOutput.IntValue==Expected,Label,NumericError);};
+        IntRule(-1.75,EDasIntegerRule::Truncate,-1,TEXT("numeric_truncate_toward_zero"));IntRule(-1.25,EDasIntegerRule::Floor,-2,TEXT("numeric_floor_negative"));IntRule(-1.75,EDasIntegerRule::Ceil,-1,TEXT("numeric_ceil_negative"));IntRule(-2.5,EDasIntegerRule::NearestAway,-3,TEXT("numeric_nearest_half_away_negative"));IntRule(2.5,EDasIntegerRule::NearestAway,3,TEXT("numeric_nearest_half_away_positive"));IntRule(double(MIN_int32),EDasIntegerRule::Exact,MIN_int32,TEXT("numeric_exact_int32_min"));IntRule(double(MAX_int32),EDasIntegerRule::Exact,MAX_int32,TEXT("numeric_exact_int32_max"));
+        NumericInput.DoubleValue=1.5;Expect(!ConvertDasNumber(NumericInput,0,EDasIntegerRule::Exact,EDasFloatRule::Exact,NumericOutput,NumericError),TEXT("numeric_fraction_requires_rounding"));NumericInput.DoubleValue=double(MAX_int32)+1;Expect(!ConvertDasNumber(NumericInput,0,EDasIntegerRule::Truncate,EDasFloatRule::Exact,NumericOutput,NumericError),TEXT("numeric_integer_overflow_refused"));
+        NumericInput.DoubleValue=0.1;Expect(!ConvertDasNumber(NumericInput,1,EDasIntegerRule::Exact,EDasFloatRule::Exact,NumericOutput,NumericError),TEXT("numeric_float_precision_exact_refuses_loss"));Expect(ConvertDasNumber(NumericInput,1,EDasIntegerRule::Exact,EDasFloatRule::RoundNearest,NumericOutput,NumericError) && NumericOutput.FloatValue==0.1f,TEXT("numeric_float_round_is_explicit"));NumericInput.DoubleValue=std::numeric_limits<double>::max();Expect(!ConvertDasNumber(NumericInput,1,EDasIntegerRule::Exact,EDasFloatRule::RoundNearest,NumericOutput,NumericError),TEXT("numeric_float_overflow_refused"));
+        NumericInput.DoubleValue=std::numeric_limits<double>::infinity();Expect(!ConvertDasNumber(NumericInput,6,EDasIntegerRule::Exact,EDasFloatRule::Exact,NumericOutput,NumericError),TEXT("numeric_infinity_refused"));NumericInput.DoubleValue=std::numeric_limits<double>::quiet_NaN();Expect(!ConvertDasNumber(NumericInput,0,EDasIntegerRule::NearestAway,EDasFloatRule::RoundNearest,NumericOutput,NumericError),TEXT("numeric_NaN_refused"));
+        NumericInput.Kind=0;NumericInput.IntValue=16777217;Expect(!ConvertDasNumber(NumericInput,1,EDasIntegerRule::Exact,EDasFloatRule::Exact,NumericOutput,NumericError),TEXT("numeric_large_integer_precision_refused"));Expect(ConvertDasNumber(NumericInput,1,EDasIntegerRule::Exact,EDasFloatRule::RoundNearest,NumericOutput,NumericError) && NumericOutput.FloatValue==16777216.f,TEXT("numeric_large_integer_explicit_round"));
+        NumericInput.Kind=1;NumericInput.FloatValue=0.1f;Expect(ConvertDasNumber(NumericInput,6,EDasIntegerRule::Exact,EDasFloatRule::Exact,NumericOutput,NumericError) && NumericOutput.DoubleValue==double(0.1f),TEXT("numeric_float_to_double_exact"));
+        NumericInput.Kind=6;NumericInput.DoubleValue=1;Expect(!ConvertDasNumber(NumericInput,0,static_cast<EDasIntegerRule>(99),EDasFloatRule::Exact,NumericOutput,NumericError),TEXT("numeric_unknown_policy_refused"));
+    }
+    {
+        auto* Library=UDasNumericLibrary::StaticClass()->GetDefaultObject();
+        for(const FName Name:{FName(TEXT("IntToDouble")),FName(TEXT("FloatToDouble")),FName(TEXT("IntToFloat")),FName(TEXT("DoubleToFloat")),FName(TEXT("FloatToInt")),FName(TEXT("DoubleToInt"))}){
+            auto* Function=Library->FindFunction(Name);FStructOnScope Memory(Function);auto* Value=FindFProperty<FNumericProperty>(Function,TEXT("Value"));void* Address=Value->ContainerPtrToValuePtr<void>(Memory.GetStructMemory());if(Value->IsFloatingPoint())Value->SetFloatingPointPropertyValue(Address,2.0);else Value->SetIntPropertyValue(Address,int64(2));
+            Library->ProcessEvent(Function,Memory.GetStructMemory());auto* Result=CastField<FNumericProperty>(Function->GetReturnProperty());const void* Returned=Result->ContainerPtrToValuePtr<void>(Memory.GetStructMemory());const double Number=Result->IsFloatingPoint()?Result->GetFloatingPointPropertyValue(Returned):double(Result->GetSignedIntPropertyValue(Returned));Expect(Number==2.0,*(FString(TEXT("numeric_native_thunk_"))+Name.ToString()));
+        }
     }
     TWeakObjectPtr<UObject> DeadOwner(Second.Get());
     First.Reset(); Second.Reset(); CollectGarbage(RF_NoFlags);

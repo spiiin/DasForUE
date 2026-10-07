@@ -344,3 +344,5 @@ Stable ID field rename migration: Docs/DSLFieldRename.md (`fields=rename_by_id`)
 Dependent Blueprint/map rename: Docs/DSLRenameDependencies.md (`fields=rename_with_dependencies`).
 
 Exact numeric field widening: Docs/DSLNumericWiden.md (`fields=widen_numeric_with_dependencies`).
+
+Numeric graph conversion and rollback: Docs/DSLNumericConversions.md (`fields=convert_numeric_with_dependencies`).

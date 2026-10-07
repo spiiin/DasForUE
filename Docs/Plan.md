@@ -664,3 +664,16 @@ reinstance rollback; reflected host changes force retry of rejected source valid
 Details: Docs/DSLNumericWiden.md. Next: explicit Blueprint pin/link adaptation and
 additional conversion policies, field removal with retained data, then lifecycle/
 delegate context preservation and general rollback beyond numeric migration.
+
+
+## Combined numeric conversion/graph/rollback stages — 2026-10-07
+
+Implemented all scalar numeric directions with explicit integer rounding and float
+precision rules. Standard getter/setter pins/literals update, compatible links
+persist, typed checked adapters handle other numeric boundaries. Runtime failures
+abort Blueprint execution. Numeric rollback restores original nodes, pin defaults/
+types/connections and native CDO/instance data before leaving prior metadata intact.
+Details: Docs/DSLNumericConversions.md. Remaining separate tasks: field removal with
+retained data, general rollback for other migrations, lifecycle/delegate preservation,
+and World Partition/streaming/other asset scopes. Scalar numeric type-change work no
+longer requires another basic pin/link or rounding stage.
