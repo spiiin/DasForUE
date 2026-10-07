@@ -219,9 +219,9 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     {
         if (BP->ParentClass->FindPropertyByName(Field.Name) || BP->GeneratedClass->FindFunctionByName(Field.Name))
         { Error = TEXT("Field conflicts with an inherited property or function"); return false; }
-        Pins.Add(Field.Name,ScalarPin(Field.Kind,Field.StructPath));
+        Pins.Add(Field.Name,ScalarPin(Field.Kind,Field.Kind==EDasScalarKind::Object?Field.ObjectClass:Field.StructPath));
         if(Field.Kind==EDasScalarKind::Struct){FInstancedStruct Value;if(!ParseDasStructDefault(Field.StructPath,Field.StructDefault,Value,Error))return false;FString Text;Value.GetScriptStruct()->ExportText(Text,Value.GetMemory(),nullptr,nullptr,PPF_None,nullptr,false);Defaults.Add(Field.Name,Text);continue;}
-        Defaults.Add(Field.Name,Field.Kind==EDasScalarKind::Int32?FString::FromInt(Field.IntDefault):Field.Kind==EDasScalarKind::Float32?FString::Printf(TEXT("%.9g"),Field.FloatDefault):Field.Kind==EDasScalarKind::Bool?(Field.BoolDefault?TEXT("true"):TEXT("false")):Field.Kind==EDasScalarKind::Double?FString::Printf(TEXT("%.17g"),Field.DoubleDefault):Field.Kind==EDasScalarKind::String?Field.StringDefault:Field.NameDefault.ToString());
+        Defaults.Add(Field.Name,Field.Kind==EDasScalarKind::Object?TEXT("None"):Field.Kind==EDasScalarKind::Int32?FString::FromInt(Field.IntDefault):Field.Kind==EDasScalarKind::Float32?FString::Printf(TEXT("%.9g"),Field.FloatDefault):Field.Kind==EDasScalarKind::Bool?(Field.BoolDefault?TEXT("true"):TEXT("false")):Field.Kind==EDasScalarKind::Double?FString::Printf(TEXT("%.17g"),Field.DoubleDefault):Field.Kind==EDasScalarKind::String?Field.StringDefault:Field.NameDefault.ToString());
     }
     for (const auto& Old : BP->NewVariables)
     {
@@ -231,6 +231,7 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
         { Error = TEXT("Removal, type, default or editability changes require a migration policy"); return false; }
         UObject* DefaultsObject = BP->GeneratedClass->GetDefaultObject();
         if(!ScalarProperty(BP->GeneratedClass->FindPropertyByName(Old.VarName),static_cast<EDasMethodSignature>(Field->Kind))){Error=TEXT("Default migration requires matching reflected property");return false;}
+        if(Field->Kind==EDasScalarKind::Object){auto* P=FindFProperty<FObjectProperty>(BP->GeneratedClass,Old.VarName);if(!P || CastField<FClassProperty>(P) || P->PropertyClass->GetPathName()!=Field->ObjectClass || (!MigrateDefaults && P->GetObjectPropertyValue_InContainer(DefaultsObject))){Error=TEXT("Object class/default changes require an explicit migration");return false;}continue;}
         if(Field->Kind==EDasScalarKind::Struct){auto* P=FindFProperty<FStructProperty>(BP->GeneratedClass,Old.VarName);FInstancedStruct Value;if(!P || P->Struct->GetPathName()!=Field->StructPath || !ParseDasStructDefault(Field->StructPath,Field->StructDefault,Value,Error))return false;if(!MigrateDefaults && !P->Struct->CompareScriptStruct(P->ContainerPtrToValuePtr<void>(DefaultsObject),Value.GetMemory(),0)){Error=TEXT("Changing a struct class default requires a migration policy");return false;}continue;}
         const auto* IntProperty = FindFProperty<FIntProperty>(BP->GeneratedClass, Old.VarName);
         const auto* FloatProperty = FindFProperty<FFloatProperty>(BP->GeneratedClass, Old.VarName);
@@ -268,6 +269,7 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
                 case EDasScalarKind::Double:CastFieldChecked<FDoubleProperty>(P)->SetPropertyValue_InContainer(CDO,F.DoubleDefault);break;
                 case EDasScalarKind::String:CastFieldChecked<FStrProperty>(P)->SetPropertyValue_InContainer(CDO,F.StringDefault);break;
                 case EDasScalarKind::Name:CastFieldChecked<FNameProperty>(P)->SetPropertyValue_InContainer(CDO,F.NameDefault);break;
+                case EDasScalarKind::Object:CastFieldChecked<FObjectProperty>(P)->SetObjectPropertyValue_InContainer(CDO,nullptr);break;
                 case EDasScalarKind::Struct:CastFieldChecked<FStructProperty>(P)->Struct->CopyScriptStruct(P->ContainerPtrToValuePtr<void>(CDO),StructDefaults.FindChecked(F.Name).GetMemory());break;
             }
             Variable.DefaultValue=Defaults.FindChecked(F.Name);

@@ -14,12 +14,14 @@
 #include "EdGraphSchema_K2.h"
 #include "UObject/UnrealType.h"
 #include "UObject/SavePackage.h"
+#include "UObject/MetaData.h"
 #include "UObject/StructOnScope.h"
 #include "Misc/Parse.h"
 #include "Misc/Paths.h"
 #include "Misc/PackageName.h"
 #include "Misc/FileHelper.h"
 #include "HAL/FileManager.h"
+void DasFailRenameForTesting(int32 Stage);
 namespace {
 int32 ScopeScore(UObject* Object,FName Name=TEXT("Total")){auto* P=Object?FindFProperty<FIntProperty>(Object->GetClass(),Name):nullptr;return P?P->GetPropertyValue_InContainer(Object):-1;}
 int32 ScopeCount(UObject* Object,FName Name=TEXT("Data")){auto* P=Object?FindFProperty<FStructProperty>(Object->GetClass(),Name):nullptr;auto* C=P?FindFProperty<FIntProperty>(P->Struct,TEXT("Count")):nullptr;return C?C->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Object)):-1;}
@@ -53,6 +55,9 @@ int32 RunDasRenameScopeProbe(const FString& Params){
             auto* CollisionChild=ScopeBP(Base,TEXT("BP_Child"));FEdGraphPinType CollisionType;CollisionType.PinCategory=UEdGraphSchema_K2::PC_Int;Check(FBlueprintEditorUtils::AddMemberVariable(CollisionChild,TEXT("Total"),CollisionType),TEXT("create_child_rename_collision"));FKismetEditorUtilities::CompileBlueprint(CollisionChild);
             Before=Parent->GeneratedClass;Check(!FDasDSLService::ReimportRenamedFields(Parent,Error,true) && Parent->GeneratedClass==Before && Parent->GeneratedClass->FindPropertyByName(TEXT("Score")) && !Parent->GeneratedClass->FindPropertyByName(TEXT("Total")),TEXT("child_destination_collision_refused_before_rename"));
             FBlueprintEditorUtils::RemoveMemberVariable(CollisionChild,TEXT("Total"));FKismetEditorUtilities::CompileBlueprint(CollisionChild);
+            for(int32 Stage=1;Stage<=3;++Stage){const FString OldModel=Parent->GetOutermost()->GetMetaData().GetValue(Parent,TEXT("DasDSLModel"));const bool WasDirty=Parent->GetOutermost()->IsDirty();DasFailRenameForTesting(Stage);const bool Failed=!FDasDSLService::ReimportRenamedFields(Parent,Error,true);DasFailRenameForTesting(0);Child=ScopeBP(Base,TEXT("BP_Child"));Grand=ScopeBP(Base,TEXT("BP_Grand"));External=ScopeBP(Base,TEXT("BP_External"));World=LoadObject<UWorld>(nullptr,*(Base+TEXT("Map.Map")));TArray<UK2Node_VariableGet*> Nodes;FBlueprintEditorUtils::GetAllNodesOfClass(External,Nodes);
+                Check(Failed && Error.StartsWith(TEXT("Rename migration rolled back:")) && OldModel==Parent->GetOutermost()->GetMetaData().GetValue(Parent,TEXT("DasDSLModel")) && Parent->GetOutermost()->IsDirty()==WasDirty && ScopeScore(Parent->GeneratedClass->GetDefaultObject(),TEXT("Score"))==5 && ScopeScore(Child->GeneratedClass->GetDefaultObject(),TEXT("Score"))==23 && ScopeScore(Grand->GeneratedClass->GetDefaultObject(),TEXT("Score"))==45 && ScopeScore(ScopeActor(World,TEXT("ParentActor")),TEXT("Score"))==77 && ScopeCount(ScopeActor(World,TEXT("GrandActor")),TEXT("Payload"))==112 && Nodes.ContainsByPredicate([](const auto* N){return N->VariableReference.GetMemberName()==TEXT("Score");}) && !Nodes.ContainsByPredicate([](const auto* N){return N->VariableReference.GetMemberName()==TEXT("Total");}),TEXT("rename_fault_restores_saved_scope_values_graph_reference_model_and_dirty"));if(!Failed || !Error.StartsWith(TEXT("Rename migration rolled back:")))UE_LOG(LogTemp,Error,TEXT("Rollback: %s"),*Error);
+            }
             Check(FDasDSLService::ReimportRenamedFields(Parent,Error,true),TEXT("migrate_complete_dependency_scope"));if(!Error.IsEmpty())UE_LOG(LogTemp,Error,TEXT("Scope: %s"),*Error);
         }
         Child=ScopeBP(Base,TEXT("BP_Child"));Grand=ScopeBP(Base,TEXT("BP_Grand"));External=ScopeBP(Base,TEXT("BP_External"));World=LoadObject<UWorld>(nullptr,*(Base+TEXT("Map.Map")));

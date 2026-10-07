@@ -677,3 +677,88 @@ Details: Docs/DSLNumericConversions.md. Remaining separate tasks: field removal 
 retained data, general rollback for other migrations, lifecycle/delegate preservation,
 and World Partition/streaming/other asset scopes. Scalar numeric type-change work no
 longer requires another basic pin/link or rounding stage.
+
+
+## Field retirement with retained data — 2026-10-07
+
+Added explicit archive_remove/archive_restore policies, isolated or with ordinary
+Blueprint/map dependencies. Hidden native instance/CDO maps retain values by class
+and stable field ID; editor metadata retains declarations and original variable
+GUIDs. Exact restoration consumes retained values only on success. Fresh actors
+created during retirement inherit archived child defaults. Missing/incompatible
+values, altered restoration declarations, replicated fields and direct graph
+references are refused before mutation. Post-compile faults roll back descriptors,
+graphs, values and archive maps; eligible method-only contexts survive in real PIE.
+Details: Docs/DSLFieldArchive.md. Next: lifecycle/delegate/cached-call preservation
+during reinstancing, general rollback for other structural migrations, and separate
+World Partition/streaming/other asset scopes. Archive purge and combined restore
+plus rename/type conversion remain explicit future policies.
+
+
+## Lifecycle/delegate preservation during reinstancing — 2026-10-07
+
+Expanded the editor preservation scope to lifecycle and managed delegate contexts,
+including unmodified owners subscribed to replaced peers. Managed proxies detach
+before compilation and reinstall once with remapped sources/new IDs; BeginPlay and
+EndPlay delivery flags persist. Native adapter lifecycle path/Tick state restore
+on replacement actors. Archive/numeric rollback keeps last-good lifecycle and
+handler state; source promotion remains exact-declaration guarded. DSL structural
+reimport and rename now use the same scope. Real Tick/Destroy/EndPIE, independent
+listener state, self/peer subscriptions, external owner source replacement and GC
+are checked in PIE. Call frames were already invocation-local: no cross-call cache
+preservation stage is needed for the current API; future caching would need its
+own contract. Details: Docs/DSLLifecycleMigration.md. Next: general rollback for
+ordinary structural reimport/rename, broader asset scopes, and further authoring
+capabilities from the main plan.
+
+
+## Bounded structural reimport/rename rollback — 2026-10-07
+
+Added reusable Blueprint definition/graph/metadata/value snapshots for existing
+DSL declaration reimport and stable-ID rename. Failures after mutation, compilation
+or metadata writes restore previous variable GUIDs, graph references/pins/links,
+class/function metadata, CDO/instance values, retirement maps and package dirty
+flags. Added method graphs are removed; a corrected retry can recreate their exact
+names. Runtime lifecycle/delegate contexts survive forward and rollback reinstance.
+Ordinary declaration reimport now loads bounded saved ordinary Blueprint/map
+dependencies before snapshot and compiles them before success. Separate-process
+save/reopen tests and real PIE fault injection cover these paths. Details:
+Docs/DSLStructuralRollback.md. This closes rollback for currently supported
+declaration reimport and rename operations; arbitrary engine transactions/native
+reload side effects remain outside scope. Next migration extensions: explicit
+World Partition/streaming/other asset scopes and coordinated dependent DSL source
+changes. Further authoring capabilities remain in the main plan.
+
+
+## Typed UObject authoring properties — 2026-10-07
+
+Added UObjectHandle fields with a literal ue_object_value(native_class_path)
+initializer and null default. Native annotations/model/backend produce typed
+FObjectProperty fields; self reads/writes use checked native accessors. Strong UE
+property ownership and weak VM handles remain distinct. Null, wrong-class and
+read-only access, GC retention/release and explicit Actor destruction are covered.
+Object-valued migration snapshots pin and remap actor/component references during
+rename, retirement/restoration and structural rollback. Saved maps preserve cycles,
+component references and ordinary UObject asset references through separate-process
+reopen and migration. Details: Docs/DSLObjectFields.md. Next authoring stages:
+script-defined reflected UEnum and UStruct declarations, components and event/
+override declarations. Soft/weak/class/interface properties, component construction,
+non-null asset defaults and script-defined property class identities remain explicit
+extensions. Broader migration asset scopes remain separate work.
+
+
+## Reflected enum/struct declaration backend — 2026-10-07
+
+Added native ue_enum/ue_struct annotations and a separate compile-only reflected
+types model. Das.DSL.Types.Apply creates Blueprint-usable reflected enum/struct
+assets in a selected /Game folder, with stable identities, metadata, explicit enum
+values and scalar struct defaults. Enum assets use runtime UDasDefinedEnum to avoid
+UUserDefinedEnum's editor-load renumbering. Structs use UUserDefinedStruct/compiler
+and persist Unreal variable GUIDs plus DasMemberId. Existing assets are immutable
+in this slice: exact reimport reuses identities; changed declarations/native drift
+require explicit migration. Save/reopen validates values 7/42, Unicode defaults and
+ordinary Blueprint fields/defaults referencing the generated types. Details:
+Docs/DSLTypeDeclarations.md. Next: resolve authored type identities in ue_class
+properties/method frames, checked native enum/struct value adapters, then bounded
+type changes/data migration. Nested/complex struct fields, component declarations
+and event/override authoring remain further stages.

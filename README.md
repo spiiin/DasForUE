@@ -346,3 +346,26 @@ Dependent Blueprint/map rename: Docs/DSLRenameDependencies.md (`fields=rename_wi
 Exact numeric field widening: Docs/DSLNumericWiden.md (`fields=widen_numeric_with_dependencies`).
 
 Numeric graph conversion and rollback: Docs/DSLNumericConversions.md (`fields=convert_numeric_with_dependencies`).
+
+
+Field retirement/restoration: Docs/DSLFieldArchive.md
+(`fields=archive_remove_with_dependencies` / `fields=archive_restore_with_dependencies`).
+Tests: Scripts/TestDSLArchiveFieldsAsset.ps1 and Scripts/TestDSLArchiveFieldsPIE.ps1.
+
+
+Lifecycle/delegate preservation during DSL reimport and field migration:
+Docs/DSLLifecycleMigration.md. PIE test: Scripts/TestDSLLifecycleMigrationPIE.ps1.
+
+
+Bounded structural reimport/rename rollback: Docs/DSLStructuralRollback.md.
+Save/reopen test: Scripts/TestDSLStructuralRollbackAsset.ps1.
+
+
+Typed UObject DSL fields: Docs/DSLObjectFields.md.
+Example: Plugins/DasForUE/Content/Das/Scripts/dsl_object_fields.das.
+Tests: Scripts/TestDSLObjectFieldsPIE.ps1 and Scripts/TestDSLObjectFieldsAsset.ps1.
+
+
+Authored reflected type declarations: Docs/DSLTypeDeclarations.md.
+Example: Plugins/DasForUE/Content/Das/Scripts/dsl_type_declarations.das.
+Editor command: Das.DSL.Types.Apply Script.das /Game/Folder.

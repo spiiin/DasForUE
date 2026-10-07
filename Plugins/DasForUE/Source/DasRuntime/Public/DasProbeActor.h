@@ -13,6 +13,9 @@ class DASRUNTIME_API ADasProbeActor : public AActor
     GENERATED_BODY()
 public:
     ADasProbeActor();
+    // Internal persistent retirement storage. Hidden from Details and script API.
+    UPROPERTY(SaveGame) TMap<FString,FDasScalarValue> RetiredDasValues;
+
     UPROPERTY(BlueprintAssignable, Category="daScript")
     FDasIntSignal OnDasSignal;
     UFUNCTION(BlueprintCallable, Category="daScript")
@@ -42,6 +45,7 @@ public:
     UFUNCTION(BlueprintCallable,Category="daScript Probe",meta=(BlueprintInternalUseOnly="true"))
     FDasScalarValue ExecuteDasFrame(const FString& ScriptFile,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,int32 ResultKind,const FString& ResultClass);
 private:
+    friend class FDasRuntimeModule;
     FString ActiveLifecyclePath;
     bool bLifecycleActive = false;
     void RecordLifecycleResult(const struct FDasExecutionResult& Result);

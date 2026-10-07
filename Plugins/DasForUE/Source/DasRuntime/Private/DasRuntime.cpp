@@ -1,4 +1,5 @@
 #include "DasRuntime.h"
+#include "DasReflectedTypes.h"
 #include "DasAuthoring.h"
 #include "Serialization/JsonSerializer.h"
 #include "Dom/JsonObject.h"
@@ -408,6 +409,10 @@ namespace
         if (!Class) Context->throw_error("class is not loaded");
         return Class;
     }
+    FDasObjectHandle ObjectValue(const char* Path,das::Context* C){const FString P=Path?UTF8_TO_TCHAR(Path):TEXT("");if(!P.StartsWith(TEXT("/Script/")))C->throw_error("Object field requires a native class path");ResolveClass(Path,C);return {};}
+    FObjectProperty* SelfObjectProperty(const char* N,bool Write,das::Context* C){auto* P=ResolveProperty<FObjectProperty>(ResolveSelf(C),N,Write,C);if(CastField<FClassProperty>(P))C->throw_error("class properties are not object fields");return P;}
+    FDasObjectHandle GetSelfObject(const char* N,das::Context* C){auto* P=SelfObjectProperty(N,false,C);return MakeObjectHandle(P->GetObjectPropertyValue_InContainer(ResolveSelf(C)),P->PropertyClass,C);}
+    void SetSelfObject(const char* N,const FDasObjectHandle& V,das::Context* C){ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("self writes are forbidden in bind_events");auto* P=SelfObjectProperty(N,true,C);UObject* O=V.Token?ResolveObject(V,C):nullptr;if(O && !O->IsA(P->PropertyClass))C->throw_error("Object assignment does not match field class");P->SetObjectPropertyValue_InContainer(ResolveSelf(C),O);}
     bool ObjectIsA(const FDasObjectHandle& Handle, const char* ClassPath, das::Context* Context)
     {
         UClass* Class = ResolveClass(ClassPath, Context);
@@ -629,7 +634,7 @@ namespace
     public:
         FUnrealFoundationModule() : das::Module("ue_foundation")
         {
-            addAnnotation(new FUEClassAnnotation());
+            addAnnotation(new FUEClassAnnotation());addAnnotation(new FUEEnumAnnotation());addAnnotation(new FUEStructAnnotation());
             addAnnotation(new FUEFunctionAnnotation());
             das::ModuleLibrary Library(this);
             Library.addBuiltInModule();
@@ -664,6 +669,9 @@ namespace
             das::addExtern<DAS_BIND_FUN(SetCallString)>(*this, Library, "ue_arg_string", das::SideEffects::modifyExternal, "SetCallString");
             das::addExtern<DAS_BIND_FUN(GetCallString)>(*this, Library, "ue_result_string", das::SideEffects::modifyExternal, "GetCallString");
 
+            das::addExtern<DAS_BIND_FUN(ObjectValue),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"ue_object_value",das::SideEffects::modifyExternal,"ObjectValue");
+            das::addExtern<DAS_BIND_FUN(GetSelfObject),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"ue_get_self_object",das::SideEffects::modifyExternal,"GetSelfObject");
+            das::addExtern<DAS_BIND_FUN(SetSelfObject)>(*this,Library,"ue_set_self_object",das::SideEffects::modifyExternal,"SetSelfObject");
             das::addExtern<DAS_BIND_FUN(NullObject), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_null_object", das::SideEffects::none, "NullObject");
             das::addExtern<DAS_BIND_FUN(ObjectSelf), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_self_object", das::SideEffects::modifyExternal, "ObjectSelf");
             das::addExtern<DAS_BIND_FUN(ObjectProperty), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_get_object", das::SideEffects::modifyExternal, "ObjectProperty");
@@ -787,11 +795,15 @@ namespace
         bool bEndDelivered = false;
         bool bReleaseRequested = false;
         TArray<TUniquePtr<FManagedSubscription>> Bindings;
+#if WITH_EDITOR
+        bool bReinstanceOwnerInScope=false,bReinstanceOwnerChanged=false,bReinstanceTickEnabled=false;
+        FString ReinstanceLifecyclePath;
+#endif
     };
     TArray<TUniquePtr<FPersistentSession>> Sessions;
 #if WITH_EDITOR
-    TArray<TUniquePtr<FPersistentSession>> PreservedMethodSessions;
-    bool bPreservingMethodSessions=false;
+    TArray<TUniquePtr<FPersistentSession>> PreservedSessions;
+    bool bPreservingSessions=false;
 #endif
     uint64 NextSubscriptionId = 1;
     struct FPendingIntEvent { uint64 Id; int32 Value; };
@@ -835,6 +847,9 @@ namespace
     void DrainEvents()
     {
         if (ActiveContext || bDrainingEvents || !IsInGameThread()) return;
+#if WITH_EDITOR
+        if(bPreservingSessions)return;
+#endif
         TGuardValue<bool> Draining(bDrainingEvents, true);
         FlushReleasedSessions();
         int32 Index = 0;
@@ -901,15 +916,19 @@ void FDasRuntimeModule::StartupModule()
     {
         for (const auto& Session : Sessions)
             if (Session->World.Get() == World) RevokeSession(*Session);
+#if WITH_EDITOR
+        for (const auto& Session : PreservedSessions)
+            if (Session->World.Get() == World) RevokeSession(*Session);
+#endif
         FlushReleasedSessions();
     });
     PostGCHandle = FCoreUObjectDelegates::GetPostGarbageCollect().AddStatic(&PruneSessions);
 #if WITH_EDITOR
     ObjectsReplacedHandle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([](const FCoreUObjectDelegates::FReplacementObjectMap& Map){
         if(!IsInGameThread())return;
-        for(auto& Session:PreservedMethodSessions){
-            if(UObject* const* New=Map.Find(Session->Owner.GetEvenIfUnreachable())){Session->Owner=*New;Session->World=*New?(*New)->GetWorld():nullptr;}
-            if(Session->Live){auto& C=*Session->Live->Context;if(UObject* const* New=Map.Find(C.Self.GetEvenIfUnreachable()))C.Self=*New;for(auto& Pair:C.ObjectHandles){auto& Entry=Pair.Value;if(UObject* const* New=Map.Find(Entry.ExpectedClass.GetEvenIfUnreachable()))Entry.ExpectedClass=Cast<UClass>(*New);if(UObject* const* New=Map.Find(Entry.Object.GetEvenIfUnreachable()))Entry.Object=*New;if(Entry.Object.IsValid() && (!Entry.ExpectedClass.IsValid() || !Entry.Object->IsA(Entry.ExpectedClass.Get())))Entry.Object.Reset();}}
+        for(auto& Session:PreservedSessions){
+            if(UObject* const* New=Map.Find(Session->Owner.GetEvenIfUnreachable())){Session->Owner=*New;Session->World=*New?(*New)->GetWorld():nullptr;Session->bReinstanceOwnerChanged=true;}
+            if(Session->Live){auto& C=*Session->Live->Context;if(UObject* const* New=Map.Find(C.Self.GetEvenIfUnreachable()))C.Self=*New;for(auto& Declaration:C.Subscriptions)if(UObject* const* New=Map.Find(Declaration.Source.GetEvenIfUnreachable()))Declaration.Source=*New;for(auto& Pair:C.ObjectHandles){auto& Entry=Pair.Value;if(UObject* const* New=Map.Find(Entry.ExpectedClass.GetEvenIfUnreachable()))Entry.ExpectedClass=Cast<UClass>(*New);if(UObject* const* New=Map.Find(Entry.Object.GetEvenIfUnreachable()))Entry.Object=*New;if(Entry.Object.IsValid() && (!Entry.ExpectedClass.IsValid() || !Entry.Object->IsA(Entry.ExpectedClass.Get())))Entry.Object.Reset();}}
         }
         for(const auto& Session:Sessions)if(Session->Live)for(auto& Pair:Session->Live->Context->ObjectHandles){auto& Entry=Pair.Value;
             if(UObject* const* New=Map.Find(Entry.ExpectedClass.GetEvenIfUnreachable()))Entry.ExpectedClass=Cast<UClass>(*New);
@@ -932,7 +951,7 @@ void FDasRuntimeModule::ShutdownModule()
         FCoreUObjectDelegates::OnObjectsReplaced.Remove(ObjectsReplacedHandle);
 #endif
 #if WITH_EDITOR
-        PreservedMethodSessions.Empty();bPreservingMethodSessions=false;
+        PreservedSessions.Empty();bPreservingSessions=false;
 #endif
         Sessions.Empty();
         PendingEvents.Empty();
@@ -947,6 +966,10 @@ uint64 FDasRuntimeModule::StructSnapshotsReclaimed(const UObject* Owner) const{u
 FString FDasRuntimeModule::ScriptPath(const FString& Name) const
 {
     return Root / TEXT("Scripts") / Name;
+}
+
+bool FDasRuntimeModule::ReadReflectedTypes(const FString& Path,FDasReflectedTypes& Out,FString& Error){
+ Error.Reset();if(!IsInGameThread() || !bInitialized){Error=TEXT("Type declaration compilation requires initialized game-thread runtime");return false;}try{das::TextWriter Text;das::ModuleGroup Group;auto Access=das::make_smart<das::FsFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);const FTCHARToUTF8 File(*Path);auto Program=das::compileDaScript(File.Get(),Access,Text,Group);if(!Program || Program->failed()){Error=Errors(Program,Text);return false;}FDasReflectedTypes Model;bool OK=true;auto Append=[&](const das::AnnotationList& List,const char* Name){const auto* A=DSLAnnotation(List,Name);if(!A || !OK)return;const auto* J=A->arguments.find(DSLTypesKey,das::Type::tString);FDasReflectedTypes Part;if(!J || !FDasReflectedTypes::FromJson(DSLText(J->sValue),Part,Error)){OK=false;return;}if(!Model.Id.IsEmpty() && Model.Id!=Part.Id){Error=TEXT("Reflected declarations must share module ID");OK=false;return;}Model.Id=Part.Id;Model.Enums.Append(Part.Enums);Model.Structs.Append(Part.Structs);};Program->getThisModule()->enumerations.foreach([&](const das::EnumerationPtr& E){Append(E->annotations,"ue_enum");});Program->getThisModule()->structures.foreach([&](const das::StructurePtr& S){Append(S->annotations,"ue_struct");});if(!OK || !Model.Validate(Error))return false;Out=MoveTemp(Model);return true;}catch(const std::exception& X){Error=UTF8_TO_TCHAR(X.what());return false;}
 }
 
 bool FDasRuntimeModule::ReadAuthoringScript(const FString& Path,FDasAuthoringModule& Out,FString& Error)
@@ -1001,6 +1024,9 @@ FDasExecutionResult FDasRuntimeModule::RunFile(const FString& Path, int32 Input,
         Result.Error = TEXT("daScript calls require an initialized runtime on the game thread.");
         return Result;
     }
+#if WITH_EDITOR
+    if(bPreservingSessions){Result.Error=TEXT("Runtime callbacks are suspended during class migration");return Result;}
+#endif
     FDrainEventsOnExit DrainOnExit;
     try
     {
@@ -1054,6 +1080,9 @@ FDasExecutionResult FDasRuntimeModule::RunFile(const FString& Path, int32 Input,
 void FDasRuntimeModule::DispatchIntEvent(uint64 SubscriptionId, int32 Value)
 {
     if (!IsInGameThread() || !bInitialized) return;
+#if WITH_EDITOR
+    if(bPreservingSessions)return; // Old proxy IDs are detached and must never enter a VM during migration.
+#endif
     if (PendingEvents.Num() < 1024) PendingEvents.Add({SubscriptionId, Value});
     DrainEvents();
 }
@@ -1132,6 +1161,14 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Result.Error = TEXT("Persistent calls require an initialized, idle runtime on the game thread.");
         return Result;
     }
+#if WITH_EDITOR
+    if(bPreservingSessions){
+        // Native teardown/reconstruction is not a gameplay lifecycle transition.
+        Result.bSucceeded=Event!=EDasCallback::Main;
+        if(!Result.bSucceeded)Result.Error=TEXT("Runtime callbacks are suspended during class migration");
+        return Result;
+    }
+#endif
     FDasCallContract Expected=FDasCallContract::Scalar(Signature);
     if(Frame){Expected.Inputs.Reset();if(Frame->Num()>16 || (static_cast<uint8>(Signature)>12 || Signature==EDasMethodSignature::Frame)){Result.Error=TEXT("Invalid scalar frame");return Result;}for(const auto& V:*Frame){if(V.Kind<0 || V.Kind>12 || V.Kind==3 || V.Kind==4){Result.Error=TEXT("Invalid scalar argument kind");return Result;}if(V.Kind==5)for(int32 I=0;I<V.StringValue.Len();++I)if(V.StringValue[I]==0){Result.Error=TEXT("embedded NUL is not supported in strings");return Result;}if((V.Kind==9 && V.VectorValue.ContainsNaN()) || (V.Kind==10 && V.RotatorValue.ContainsNaN()) || (V.Kind==11 && (V.TransformValue.ContainsNaN() || !V.TransformValue.IsRotationNormalized()))){Result.Error=TEXT("Invalid/non-finite math struct input");return Result;}Expected.Inputs.Add(static_cast<EDasMethodSignature>(V.Kind));}}
     TArray<TStrongObjectPtr<UObject>> ObjectPins;
@@ -1359,20 +1396,41 @@ IMPLEMENT_MODULE(FDasRuntimeModule, DasRuntime)
 #include "DasBindingExport.inl"
 
 #if WITH_EDITOR
-bool FDasRuntimeModule::BeginPreserveMethodContextsForReinstance(UClass* RootClass){
-    if(!bInitialized || !IsInGameThread() || ActiveContext || bPreservingMethodSessions || !RootClass)return false;
-    bPreservingMethodSessions=true;
-    for(int32 I=Sessions.Num()-1;I>=0;--I){const auto& S=Sessions[I];auto* Owner=S->Owner.Get();if(Owner && Owner->IsA(RootClass) && S->Live && !S->bBeginDelivered && !S->bEndDelivered && !S->bReleaseRequested && S->Bindings.IsEmpty() && S->Live->Context->Calls.IsEmpty()){PreservedMethodSessions.Add(MoveTemp(Sessions[I]));Sessions.RemoveAt(I);}}
+bool FDasRuntimeModule::BeginPreserveContextsForReinstance(UClass* RootClass){
+    if(!bInitialized || !IsInGameThread() || ActiveContext || bDrainingEvents || bPreservingSessions || !RootClass || !PendingEvents.IsEmpty())return false;
+    PruneSessions();
+    // Call frames are invocation-local and own reflected addresses. Require an
+    // empty table at this idle boundary before any host layout can change.
+    for(const auto& S:Sessions)if(S->Live && !S->Live->Context->Calls.IsEmpty())return false;
+    bPreservingSessions=true;
+    // Suspend all contexts: an unaffected owner can subscribe to a replaced peer.
+    PreservedSessions=MoveTemp(Sessions);
+    for(auto& S:PreservedSessions){
+        S->bReinstanceOwnerInScope=S->Owner.IsValid() && S->Owner->IsA(RootClass);
+        S->bReinstanceOwnerChanged=false;S->ReinstanceLifecyclePath.Empty();
+        if(auto* A=Cast<ADasProbeActor>(S->Owner.Get())){
+            if(A->bLifecycleActive)S->ReinstanceLifecyclePath=A->ActiveLifecyclePath;
+            S->bReinstanceTickEnabled=A->IsActorTickEnabled();
+        }
+        S->Bindings.Empty(); // Remove old proxies before Unreal copies delegate properties.
+    }
     return true;
 }
-void FDasRuntimeModule::EndPreserveMethodContextsForReinstance(const FString& ApprovedDeclaration){
-    if(!IsInGameThread() || !bPreservingMethodSessions)return;
-    for(auto& Saved:PreservedMethodSessions)if(Saved->Owner.IsValid()){
-        Sessions.RemoveAll([&](const auto& S){return S->Owner==Saved->Owner && S->Path==Saved->Path;});
-        Saved->ApprovedDSLDeclaration=ApprovedDeclaration;
-        Saved->AttemptedSources.Reset(); // The reflected owner layout changed even if source bytes did not.
-        Sessions.Add(MoveTemp(Saved));
+void FDasRuntimeModule::EndPreserveContextsForReinstance(const FString& ApprovedDeclaration){
+    if(!IsInGameThread() || !bPreservingSessions)return;
+    for(auto& Saved:PreservedSessions)if(Saved->Owner.IsValid() && !Saved->bReleaseRequested){
+        if(auto* Actor=Cast<ADasProbeActor>(Saved->Owner.Get())){
+            if(Actor->IsActorBeingDestroyed())continue;
+            if(Saved->bReinstanceOwnerChanged && !Saved->ReinstanceLifecyclePath.IsEmpty() && !Saved->bEndDelivered){
+                Actor->ActiveLifecyclePath=Saved->ReinstanceLifecyclePath;Actor->bLifecycleActive=true;
+                Actor->SetActorTickEnabled(Saved->bReinstanceTickEnabled);
+            }
+        }
+        if(Saved->bReinstanceOwnerInScope)Saved->ApprovedDSLDeclaration=ApprovedDeclaration;
+        if(Saved->bReinstanceOwnerInScope || Saved->bReinstanceOwnerChanged)Saved->AttemptedSources.Reset();
+        if(Saved->Live && !Saved->bEndDelivered)InstallSubscriptions(*Saved);
+        Saved->ReinstanceLifecyclePath.Empty();Sessions.Add(MoveTemp(Saved));
     }
-    PreservedMethodSessions.Empty();bPreservingMethodSessions=false;
+    PreservedSessions.Empty();bPreservingSessions=false;
 }
 #endif

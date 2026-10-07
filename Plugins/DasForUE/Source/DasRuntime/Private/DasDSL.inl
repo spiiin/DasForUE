@@ -36,14 +36,14 @@
         das::ExpressionPtr Read(das::ExprField* F)
         {
             const auto* P=Property(F);if(!P) return F;
-            auto* C=new das::ExprCall(F->at,P->Type.Kind==TEXT("int")?"ue_get_self_int":P->Type.Kind==TEXT("float")?"ue_get_self_float":P->Type.Kind==TEXT("bool")?"ue_get_self_bool":P->Type.Kind==TEXT("double")?"ue_get_self_double":P->Type.Kind==TEXT("string")?"ue_get_self_string":P->Type.Kind==TEXT("struct")?"ue_get_self_struct":"ue_get_self_name");
+            auto* C=new das::ExprCall(F->at,P->Type.Kind==TEXT("int")?"ue_get_self_int":P->Type.Kind==TEXT("float")?"ue_get_self_float":P->Type.Kind==TEXT("bool")?"ue_get_self_bool":P->Type.Kind==TEXT("double")?"ue_get_self_double":P->Type.Kind==TEXT("string")?"ue_get_self_string":P->Type.Kind==TEXT("struct")?"ue_get_self_struct":P->Type.Kind==TEXT("object")?"ue_get_self_object":"ue_get_self_name");
             C->arguments.push_back(new das::ExprConstString(F->at,DSLUtf8(P->Name)));return C;
         }
         das::ExpressionPtr Write(das::ExprOp2* E,das::ExprField* F,bool Compound)
         {
             const auto* P=Property(F);if(!P) return E;
             if(P->bReadOnly){Error=TEXT("Cannot write BlueprintReadOnly self property: ")+P->Name;return E;}
-            auto* C=new das::ExprCall(E->at,P->Type.Kind==TEXT("int")?"ue_set_self_int":P->Type.Kind==TEXT("float")?"ue_set_self_float":P->Type.Kind==TEXT("bool")?"ue_set_self_bool":P->Type.Kind==TEXT("double")?"ue_set_self_double":P->Type.Kind==TEXT("string")?"ue_set_self_string":P->Type.Kind==TEXT("struct")?"ue_set_self_struct":"ue_set_self_name");
+            auto* C=new das::ExprCall(E->at,P->Type.Kind==TEXT("int")?"ue_set_self_int":P->Type.Kind==TEXT("float")?"ue_set_self_float":P->Type.Kind==TEXT("bool")?"ue_set_self_bool":P->Type.Kind==TEXT("double")?"ue_set_self_double":P->Type.Kind==TEXT("string")?"ue_set_self_string":P->Type.Kind==TEXT("struct")?"ue_set_self_struct":P->Type.Kind==TEXT("object")?"ue_set_self_object":"ue_set_self_name");
             C->arguments.push_back(new das::ExprConstString(E->at,DSLUtf8(P->Name)));
             C->arguments.push_back(Compound?new das::ExprOp2(E->at,E->op.substr(0,E->op.size()-1),Read(F),E->right):E->right);return C;
         }
@@ -107,8 +107,14 @@
                     if(ReadWrite && ReadOnly) DSLFail(TEXT("Conflicting BlueprintReadOnly/BlueprintReadWrite specifiers"));
                     if(!Marked) DSLFail(TEXT("Script-private fields unsupported; add @ue_property: ")+P.Name);
                     const FString FieldType=DSLTypeName(F.type);
-                    if(!F.type || F.type->ref || FieldType.IsEmpty() || (FieldType==TEXT("void") || FieldType==TEXT("object"))) DSLFail(TEXT("Adapter supports int/float/bool/string/double/name properties: ")+P.Name);
+                    if(!F.type || F.type->ref || FieldType.IsEmpty() || FieldType==TEXT("void")) DSLFail(TEXT("Adapter supports int/float/bool/string/double/name properties: ")+P.Name);
                     P.Type.Kind=FieldType;
+                    if(FieldType==TEXT("object")){
+                        if(!F.init || !F.init->rtti_isCall())DSLFail(TEXT("Object field requires literal ue_object_value(native_class_path) initializer"));
+                        auto* Call=static_cast<das::ExprCall*>(F.init);if(Call->name!="ue_object_value" || Call->arguments.size()!=1 || Call->arguments[0]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Object field initializer requires one literal native class path"));
+                        P.Type.TypePath=DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text);if(!P.Type.TypePath.StartsWith(TEXT("/Script/")) || !FindObject<UClass>(nullptr,*P.Type.TypePath))DSLFail(TEXT("Object field requires a loaded native class path"));
+                        P.Default.Kind=TEXT("null");C.Properties.Add(MoveTemp(P));continue;
+                    }
                     if(FieldType==TEXT("struct")){
                         if(F.type->annotation->name!="UEStructValue" || !F.init || !F.init->rtti_isCall())DSLFail(TEXT("Struct property requires UEStructValue and literal ue_struct_value/default initializer"));
                         auto* Call=static_cast<das::ExprCall*>(F.init);
@@ -167,6 +173,29 @@
         }
     };
 
+
+    const char* DSLTypesKey="_ue_types_json";
+    void DSLTypeArgs(const das::AnnotationArgumentList& Args,TMap<FString,FString>& Meta){for(const auto& A:Args){if(A.name=="module_id" || A.name=="id")continue;if(A.name=="BlueprintType"){if(!DSLBool(A))DSLFail(TEXT("BlueprintType must be enabled"));continue;}if(DSLIsMetadata(A.name))DSLMetadata(A,Meta);else DSLFail(TEXT("Unknown reflected type annotation"));}}
+    struct FUEEnumAnnotation:das::EnumerationAnnotation {
+        FUEEnumAnnotation():EnumerationAnnotation("ue_enum"){}
+        virtual bool touch(const das::EnumerationPtr& E,das::ModuleGroup&,das::AnnotationArgumentList& Args,das::string& Error)override{try{
+            if(const auto* Wire=Args.find(DSLTypesKey,das::Type::tString)){if(Wire->at.fileInfo)DSLFail(TEXT("Reserved type annotation argument"));return true;}
+            FDasReflectedTypes M;M.Id=DSLString(Args,"module_id",FPaths::GetBaseFilename(DSLText(E->at.fileInfo->name)));FDasEnumDeclaration D;D.Name=DSLText(E->name);D.Id=DSLString(Args,"id",M.Id+TEXT(".")+D.Name);DSLTypeArgs(Args,D.Metadata);
+            for(const auto& V:E->list){if(!V.value || V.value->__rtti!=das::string("ExprConstInt"))DSLFail(TEXT("ue_enum requires explicit int literal values"));D.Entries.Add({DSLText(V.name),static_cast<das::ExprConstInt*>(V.value)->getValue()});}M.Enums.Add(D);FString Wire,Issue;if(!M.ToJson(Wire,Issue))DSLFail(Issue);Args.push_back(das::AnnotationArgument(DSLTypesKey,DSLUtf8(Wire)));return true;
+        }catch(const std::exception& X){Error=X.what();return false;}}
+    };
+    struct FUEStructAnnotation:das::StructureAnnotation {
+        FUEStructAnnotation():StructureAnnotation("ue_struct"){}
+        virtual bool look(const das::StructurePtr&,das::ModuleGroup&,das::AnnotationArgumentList&,das::string&)override{return true;}
+        virtual bool touch(const das::StructurePtr& S,das::ModuleGroup&,das::AnnotationArgumentList& Args,das::string& Error)override{try{
+            if(const auto* Wire=Args.find(DSLTypesKey,das::Type::tString)){if(Wire->at.fileInfo)DSLFail(TEXT("Reserved type annotation argument"));return true;}
+            if(S->isClass || S->parent)DSLFail(TEXT("ue_struct requires plain struct without inheritance"));FDasReflectedTypes M;M.Id=DSLString(Args,"module_id",FPaths::GetBaseFilename(DSLText(S->at.fileInfo->name)));FDasDeclaredClass D;D.Name=DSLText(S->name);D.Id=DSLString(Args,"id",M.Id+TEXT(".")+D.Name);DSLTypeArgs(Args,D.Metadata);
+            for(const auto& F:S->fields){if(F.generated)continue;if(F.classMethod)DSLFail(TEXT("Reflected struct methods require separate support"));FDasDeclaredProperty P;P.Name=DSLText(F.name);P.Id=D.Id+TEXT(".")+P.Name;P.Type.Kind=DSLTypeName(F.type);bool Marked=false;for(const auto& A:F.annotation){if(A.name=="ue_property"){Marked=true;if(A.type==das::Type::tString && A.sValue=="BlueprintReadOnly")P.bReadOnly=true;else if(A.type==das::Type::tString && (A.sValue=="EditAnywhere" || A.sValue=="BlueprintReadWrite")){}else if(A.type!=das::Type::tBool || !A.bValue)DSLFail(TEXT("Unsupported struct property annotation"));}else if(A.name=="ue_id")P.Id=DSLText(A.sValue);else if(DSLIsMetadata(A.name))DSLMetadata(A,P.Metadata);else DSLFail(TEXT("Unknown struct field annotation"));}if(!Marked || !F.type || F.type->ref)DSLFail(TEXT("Struct fields require ue_property and by-value scalar type"));
+                if(F.init){if(F.init->__rtti==das::string("ExprConstInt")){P.Default.Kind=TEXT("number");P.Default.Number=static_cast<das::ExprConstInt*>(F.init)->getValue();}else if(F.init->__rtti==das::string("ExprConstFloat")){P.Default.Kind=TEXT("number");P.Default.Number=static_cast<das::ExprConstFloat*>(F.init)->getValue();}else if(F.init->__rtti==das::string("ExprConstDouble")){P.Default.Kind=TEXT("number");P.Default.Number=static_cast<das::ExprConstDouble*>(F.init)->getValue();}else if(F.init->__rtti==das::string("ExprConstBool")){P.Default.Kind=TEXT("bool");P.Default.Boolean=static_cast<das::ExprConstBool*>(F.init)->getValue();}else if(F.init->__rtti==das::string("ExprConstString")){P.Default.Kind=TEXT("string");P.Default.String=DSLText(static_cast<das::ExprConstString*>(F.init)->text);}else DSLFail(TEXT("Struct defaults require scalar literals"));}D.Properties.Add(P);
+            }M.Structs.Add(D);FString Wire,Issue;if(!M.ToJson(Wire,Issue))DSLFail(Issue);Args.push_back(das::AnnotationArgument(DSLTypesKey,DSLUtf8(Wire)));return true;
+        }catch(const std::exception& X){Error=X.what();return false;}}
+    };
+
     bool DSLValidateOwner(const das::ProgramPtr& Program,const FString& Entry,UObject* Self,FString& Wire,FString& Error)
     {
         bool OK=true;
@@ -184,6 +213,7 @@
                     FProperty* Actual=Self->GetClass()->FindPropertyByName(*P.Name);
                     if(!DSLPropertyMatches(Actual,P.Type.Kind) || P.bReadOnly!=Actual->HasAnyPropertyFlags(CPF_BlueprintReadOnly))
                     {Error=TEXT("DSL property differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}
+                    if(P.Type.Kind==TEXT("object")){auto* Object=CastField<FObjectProperty>(Actual);if(Object->PropertyClass->GetPathName()!=P.Type.TypePath || (ActorAdapter && Object->GetObjectPropertyValue_InContainer(Actual->GetOwnerClass()->GetDefaultObject()))){Error=TEXT("DSL object type/default differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}continue;}
                     if(P.Type.Kind==TEXT("struct")){
                         auto* Struct=CastField<FStructProperty>(Actual);FInstancedStruct Default;
                         if(Struct->Struct->GetPathName()!=P.Type.TypePath || !ParseDasStructDefault(P.Type.TypePath,P.Default.String,Default,Error) || (ActorAdapter && !Struct->Struct->CompareScriptStruct(Struct->ContainerPtrToValuePtr<void>(Actual->GetOwnerClass()->GetDefaultObject()),Default.GetMemory(),0))){Error=TEXT("DSL struct type/default differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}continue;

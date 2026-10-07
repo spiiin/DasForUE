@@ -34,18 +34,20 @@ struct FDasExecutionResult
 
 enum class EDasCallback : uint8 { Main, BeginPlay, Tick, EndPlay };
 
+struct FDasReflectedTypes;
 class DASRUNTIME_API FDasRuntimeModule final : public IModuleInterface
 {
 public:
 #if WITH_EDITOR
-    bool BeginPreserveMethodContextsForReinstance(UClass* RootClass);
-    void EndPreserveMethodContextsForReinstance(const FString& ApprovedDeclaration=FString());
+    bool BeginPreserveContextsForReinstance(UClass* RootClass);
+    void EndPreserveContextsForReinstance(const FString& ApprovedDeclaration=FString());
 #endif
 
     virtual void StartupModule() override;
     virtual void ShutdownModule() override;
     virtual bool SupportsDynamicReloading() override { return false; }
     // Compile-only annotation collection; no global/body execution, Out unchanged on failure.
+    bool ReadReflectedTypes(const FString& Path,FDasReflectedTypes& Out,FString& Error);
     bool ReadAuthoringScript(const FString& Path,FDasAuthoringModule& Out,FString& Error);
     bool ValidateFrameMethod(const FString& Path,FString& Error,const FString& EntryPoint,const FDasCallContract& Contract);
     FDasExecutionResult RunNamedFramePersistent(const FString& Path,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,EDasMethodSignature ReturnKind,TWeakObjectPtr<UObject> Self,const FString& ReturnClass = FString());

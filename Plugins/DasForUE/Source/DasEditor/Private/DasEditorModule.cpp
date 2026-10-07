@@ -1,18 +1,21 @@
 #include "Modules/ModuleManager.h"
 #include "HAL/IConsoleManager.h"
 #include "DasDSLService.h"
+#include "DasTypeService.h"
 #include "Engine/Blueprint.h"
 #include "Misc/PackageName.h"
 class FDasEditorModule final : public IModuleInterface {
-    IConsoleObject* ApplyCommand=nullptr;IConsoleObject* ReimportCommand=nullptr;
+    IConsoleObject* TypesCommand=nullptr;IConsoleObject* ApplyCommand=nullptr;IConsoleObject* ReimportCommand=nullptr;
 public:
     virtual void StartupModule() override {
+        TypesCommand=IConsoleManager::Get().RegisterConsoleCommand(TEXT("Das.DSL.Types.Apply"),TEXT("Das.DSL.Types.Apply Script.das /Game/Folder"),FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args){FString Error;TArray<UObject*> Assets;if(Args.Num()!=2 || !FDasTypeService::Apply(Args[0],Args[1],Assets,Error))UE_LOG(LogTemp,Warning,TEXT("DAS_TYPES_APPLY rejected: %s"),*Error);}),ECVF_Default);
         ApplyCommand=IConsoleManager::Get().RegisterConsoleCommand(TEXT("Das.DSL.Apply"),TEXT("Das.DSL.Apply ScriptName.das /Game/Folder/BP_Name ClassStableId"),FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args){
             FString Error;UBlueprint* BP=nullptr;
             if(Args.Num()!=3 || !FDasDSLService::Apply(Args[0],Args[1],Args[2],BP,Error)) UE_LOG(LogTemp,Warning,TEXT("DAS_DSL_APPLY rejected: %s"),Args.Num()!=3?TEXT("Expected script, asset package and class ID"):*Error);
         }),ECVF_Default);
-        ReimportCommand=IConsoleManager::Get().RegisterConsoleCommand(TEXT("Das.DSL.Reimport"),TEXT("Das.DSL.Reimport /Game/Folder/BP_Name [defaults=preserve_instances | fields=rename_by_id | fields=rename_with_dependencies | fields=widen_numeric | fields=widen_numeric_with_dependencies | fields=convert_numeric[_with_dependencies] [integers=exact|truncate|floor|ceil|nearest_away] [floats=exact|round]]"),FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args){
+        ReimportCommand=IConsoleManager::Get().RegisterConsoleCommand(TEXT("Das.DSL.Reimport"),TEXT("Das.DSL.Reimport /Game/Folder/BP_Name [defaults=preserve_instances | fields=rename_by_id | fields=rename_with_dependencies | fields=widen_numeric | fields=widen_numeric_with_dependencies | fields=convert_numeric[_with_dependencies] | fields=archive_remove[_with_dependencies] | fields=archive_restore[_with_dependencies] [integers=exact|truncate|floor|ceil|nearest_away] [floats=exact|round]]"),FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args){
             FString Error;UBlueprint* BP=nullptr;
+            if(Args.Num()==2 && (Args[1]==TEXT("fields=archive_remove") || Args[1]==TEXT("fields=archive_remove_with_dependencies") || Args[1]==TEXT("fields=archive_restore") || Args[1]==TEXT("fields=archive_restore_with_dependencies"))){BP=LoadObject<UBlueprint>(nullptr,*(Args[0]+TEXT(".")+FPackageName::GetLongPackageAssetName(Args[0])),nullptr,LOAD_NoWarn);if(!FDasDSLService::ReimportArchivedFields(BP,Args[1].Contains(TEXT("restore")),Args[1].EndsWith(TEXT("with_dependencies")),Error))UE_LOG(LogTemp,Warning,TEXT("DAS_DSL_ARCHIVE rejected: %s"),*Error);return;}
             if(Args.Num()>=2 && (Args[1]==TEXT("fields=convert_numeric") || Args[1]==TEXT("fields=convert_numeric_with_dependencies"))){
                 FDasNumericMigrationOptions O;O.IncludeDependencies=Args[1].EndsWith(TEXT("with_dependencies"));bool Good=Args.Num()<=4;TSet<FString> Seen;
                 for(int32 I=2;I<Args.Num();++I){FString Key,Value;if(!Args[I].Split(TEXT("="),&Key,&Value) || Seen.Contains(Key)){Good=false;break;}Seen.Add(Key);
@@ -28,6 +31,6 @@ public:
             if(!Valid || !(Args.Num()==2 && (Args[1]==TEXT("fields=rename_by_id") || Args[1]==TEXT("fields=rename_with_dependencies"))?FDasDSLService::ReimportRenamedFields(BP,Error,Args[1]==TEXT("fields=rename_with_dependencies")):FDasDSLService::Reimport(BP,Error,Args.Num()==2?EDasDefaultMigrationPolicy::PreserveInstances:EDasDefaultMigrationPolicy::Refuse))) UE_LOG(LogTemp,Warning,TEXT("DAS_DSL_REIMPORT rejected: %s"),!Valid?TEXT("Expected asset package and optional defaults=preserve_instances or fields=rename_by_id"):*Error);
         }),ECVF_Default);
     }
-    virtual void ShutdownModule() override {if(ApplyCommand) IConsoleManager::Get().UnregisterConsoleObject(ApplyCommand);if(ReimportCommand) IConsoleManager::Get().UnregisterConsoleObject(ReimportCommand);}
+    virtual void ShutdownModule() override {if(TypesCommand)IConsoleManager::Get().UnregisterConsoleObject(TypesCommand);if(ApplyCommand) IConsoleManager::Get().UnregisterConsoleObject(ApplyCommand);if(ReimportCommand) IConsoleManager::Get().UnregisterConsoleObject(ReimportCommand);}
 };
 IMPLEMENT_MODULE(FDasEditorModule,DasEditor)

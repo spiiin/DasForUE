@@ -6,7 +6,7 @@ struct FInstancedStruct;
 DASRUNTIME_API bool ValidateDasStructSnapshot(const FInstancedStruct& Value,FString& Error);
 DASRUNTIME_API bool ParseDasStructDefault(const FString& Path,const FString& Text,FInstancedStruct& Out,FString& Error);
 DASRUNTIME_API bool ValidateDasValueStruct(const FString& Path,FString& Error);
-enum class EDasScalarKind : uint8 { Int32, Float32, Bool, String=5, Double=6, Name=7, Struct=12 };
+enum class EDasScalarKind : uint8 { Int32, Float32, Bool, String=5, Double=6, Name=7, Object=8, Struct=12 };
 
 struct FDasFieldSchema
 {
@@ -16,7 +16,7 @@ struct FDasFieldSchema
     float FloatDefault = 0;
     bool BoolDefault = false;
     double DoubleDefault=0;FString StringDefault;FName NameDefault;
-    FString StructPath;FString StructDefault;
+    FString StructPath;FString StructDefault;FString ObjectClass;
     bool bInstanceEditable = true;
     FString StableId;
     bool bReadOnly = false;

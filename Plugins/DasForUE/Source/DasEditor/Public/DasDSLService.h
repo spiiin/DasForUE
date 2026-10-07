@@ -7,6 +7,7 @@ class UBlueprint;
 // Explicit game-thread DSL import. Assets stay dirty until the user saves them.
 class DASEDITOR_API FDasDSLService {
 public:
+    static bool ReimportArchivedFields(UBlueprint* Blueprint,bool Restore,bool IncludeDependencies,FString& Error);
     static bool ReimportConvertedNumericFields(UBlueprint* Blueprint,const FDasNumericMigrationOptions& Options,FString& Error);
     static bool ReimportWidenedNumericFields(UBlueprint* Blueprint,FString& Error,bool IncludeDependencies=false);
     static bool ReimportRenamedFields(UBlueprint* Blueprint,FString& Error,bool IncludeDependencies=false);

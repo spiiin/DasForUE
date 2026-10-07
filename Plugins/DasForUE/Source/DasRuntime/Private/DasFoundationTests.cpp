@@ -1,4 +1,5 @@
 #include "DasRuntime.h"
+#include "DasReflectedTypes.h"
 #include "DasNumericLibrary.h"
 #include "UObject/StructOnScope.h"
 #include <limits>
@@ -1083,6 +1084,27 @@ bool RunDasFoundationTests(FString& Report)
         Expect(!ParseDasStructDefault(TEXT("/Script/DasRuntime.DasNamedMode"),TEXT("(Mode=Invalid)"),ParsedDefault,StructDefaultError),TEXT("struct_default_unknown_enum_rejected"));
         FDasAuthoringModule StructFieldsModel;
         Expect(Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_struct_fields.das")),StructFieldsModel,StructDefaultError),TEXT("struct_fields_native_DSL_model"),StructDefaultError);
+    {
+        FDasReflectedTypes Types;FString TypeError;const bool Read=Runtime.ReadReflectedTypes(Runtime.ScriptPath(TEXT("dsl_type_declarations.das")),Types,TypeError);Expect(Read && Types.Enums.Num()==1 && Types.Structs.Num()==1,TEXT("reflected_type_annotations_native_AST"),TypeError);
+        Expect(Read && Types.Enums[0].Entries[0].Value==7 && Types.Enums[0].Entries[1].Value==42 && Types.Structs[0].Properties.Num()==4,TEXT("reflected_types_explicit_values_and_scalar_fields"),TypeError);
+        FString Wire;FDasReflectedTypes Roundtrip;Expect(Read && Types.ToJson(Wire,TypeError) && FDasReflectedTypes::FromJson(Wire,Roundtrip,TypeError) && Roundtrip.Enums[0].Entries[1].Value==42,TEXT("reflected_type_model_roundtrip"),TypeError);
+        if(Read){auto Bad=Types;Bad.Enums[0].Entries[1].Value=7;Expect(!Bad.Validate(TypeError),TEXT("reflected_enum_duplicate_values_refused"));Bad=Types;Bad.Enums[0].Entries[1].Value=255;Expect(!Bad.Validate(TypeError),TEXT("reflected_enum_reserved_byte_value_refused"));Bad=Types;Bad.Structs[0].Properties[0].Type.Kind=TEXT("object");Bad.Structs[0].Properties[0].Type.TypePath=TEXT("/Script/CoreUObject.Object");Expect(!Bad.Validate(TypeError),TEXT("initial_authored_struct_object_field_refused"));}
+        FString Source;FFileHelper::LoadFileToString(Source,*Runtime.ScriptPath(TEXT("dsl_type_declarations.das")));const FString Temp=FPaths::ProjectSavedDir()/ (TEXT("TypeAnnotationNegative_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT(".das"));FFileHelper::SaveStringToFile(Source.Replace(TEXT("Active = 42"),TEXT("Active")),*Temp,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);auto Unchanged=Types;Expect(!Runtime.ReadReflectedTypes(Temp,Unchanged,TypeError) && Unchanged.Id==Types.Id,TEXT("implicit_enum_value_refused_without_partial_model"),TypeError);IFileManager::Get().Delete(*Temp);
+    }
+    {
+        FDasAuthoringModule Objects;FString ObjectError;const bool ReadObjects=Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_object_fields.das")),Objects,ObjectError);
+        Expect(ReadObjects && Objects.Classes.Num()==1 && Objects.Classes[0].Properties.Num()==4,TEXT("object_fields_frontend_typed_nulls"),ObjectError);
+        FDasClassSchema ObjectSchema;Expect(ReadObjects && Objects.ToActorSchema(TEXT("objectfields.ObjectFields"),ObjectSchema,ObjectError) && ObjectSchema.Fields.Num()==4 && ObjectSchema.Fields.ContainsByPredicate([](const auto& F){return F.Name==TEXT("Target") && F.Kind==EDasScalarKind::Object && F.ObjectClass==TEXT("/Script/Engine.Actor");}),TEXT("object_fields_schema_native_class"),ObjectError);
+        FString Wire;FDasAuthoringModule Roundtrip;Expect(ReadObjects && Objects.ToJson(Wire,ObjectError) && FDasAuthoringModule::FromJson(Wire,Roundtrip,ObjectError) && Roundtrip.Classes[0].Properties[0].Default.Kind==TEXT("null"),TEXT("object_fields_authoring_null_roundtrip"),ObjectError);
+        if(ReadObjects){auto Bad=Objects;Bad.Classes[0].Properties[0].Type.TypePath=TEXT("/Game/NotLoaded.BP_C");Expect(!Bad.ToActorSchema(TEXT("objectfields.ObjectFields"),ObjectSchema,ObjectError),TEXT("object_fields_unloaded_blueprint_type_refused"),ObjectError);}
+        FString Source;FFileHelper::LoadFileToString(Source,*Runtime.ScriptPath(TEXT("dsl_object_fields.das")));const FString Temporary=FPaths::ProjectSavedDir()/ (TEXT("ObjectFieldNegative_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT(".das"));
+        auto Reject=[&](const FString& Text,const TCHAR* Label){const bool Written=FFileHelper::SaveStringToFile(Text,*Temporary,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);auto Candidate=Objects;Expect(Written && !Runtime.ReadAuthoringScript(Temporary,Candidate,ObjectError) && Candidate.Id==Objects.Id,Label,ObjectError);};
+        Reject(Source.Replace(TEXT("/Script/Engine.ActorComponent"),TEXT("/Script/Engine.MissingComponent")),TEXT("object_field_unknown_class_refused"));
+        Reject(Source.Replace(TEXT("ue_object_value(\"/Script/Engine.Actor\")"),TEXT("ue_null_object()")),TEXT("object_field_untyped_initializer_refused"));
+        Reject(Source.Replace(TEXT("def SetTarget(value:UObjectHandle):void { self.Target = value }"),TEXT("def SetTarget(value:UObjectHandle):void { self.Observed = value }")),TEXT("object_field_readonly_write_refused_by_macro"));
+        IFileManager::Get().Delete(*Temporary);
+
+    }
         FDasClassSchema StructFieldsSchema;Expect(StructFieldsModel.ToActorSchema(TEXT("structfields.StructFields"),StructFieldsSchema,StructDefaultError) && StructFieldsSchema.Fields.Num()==2 && StructFieldsSchema.Fields[0].Kind==EDasScalarKind::Struct,TEXT("struct_fields_schema_adapter"),StructDefaultError);
         FString EnumStructError;Expect(ValidateDasValueStruct(TEXT("/Script/DasRuntime.DasNamedMode"),EnumStructError) && ValidateDasValueStruct(TEXT("/Script/DasRuntime.DasEnumBundle"),EnumStructError),TEXT("reflected_struct_enum_leaf_capabilities"),EnumStructError);
         const FString EnumStructPath=Runtime.ScriptPath(TEXT("dsl_struct_enum_methods.das"));FDasAuthoringModule EnumStructModel;

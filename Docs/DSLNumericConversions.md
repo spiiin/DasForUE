@@ -63,3 +63,14 @@ Examples: dsl_widen_numeric.das; retain IDs/names and edit types/defaults in pla
 Tests: TestDSLNumericConvertAsset.ps1 runs Create/Migrate/Reopen/NarrowFloat/ReopenFloat
 in separate processes. TestDSLNumericConvertPIE.ps1 exercises connected graph execution,
 rounding, VM abort and rollback. Foundation checks cover policy/range/precision rules.
+
+
+Lifecycle and managed delegate preservation is now supported by the shared editor
+migration scope; see DSLLifecycleMigration.md. Existing numeric rollback remains
+bounded to the compiled Blueprint/map scope. Existing-Blueprint structural reimport/rename rollback is now supported;
+additional asset scopes and arbitrary engine transactions remain separate work.
+
+
+Existing-Blueprint structural reimport and stable-ID rename now have bounded
+rollback too; see DSLStructuralRollback.md. Expanded asset scopes and arbitrary
+Unreal transactions remain separate work.

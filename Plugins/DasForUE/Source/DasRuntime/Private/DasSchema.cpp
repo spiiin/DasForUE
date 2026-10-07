@@ -52,9 +52,10 @@ bool FDasClassSchema::Validate(FString& Error) const
     {
         if (Field.Name.IsNone() || !Identifier(Field.Name.ToString()) || Names.Contains(Field.Name))
         { Error = FString::Printf(TEXT("Invalid or duplicate field: %s"), *Field.Name.ToString()); return false; }
-        if ((Field.Kind != EDasScalarKind::Int32 && Field.Kind != EDasScalarKind::Float32 && Field.Kind != EDasScalarKind::Bool && Field.Kind!=EDasScalarKind::String && Field.Kind!=EDasScalarKind::Double && Field.Kind!=EDasScalarKind::Name && Field.Kind!=EDasScalarKind::Struct) ||
+        if ((Field.Kind != EDasScalarKind::Int32 && Field.Kind != EDasScalarKind::Float32 && Field.Kind != EDasScalarKind::Bool && Field.Kind!=EDasScalarKind::String && Field.Kind!=EDasScalarKind::Double && Field.Kind!=EDasScalarKind::Name && Field.Kind!=EDasScalarKind::Struct && Field.Kind!=EDasScalarKind::Object) ||
             ((Field.Kind == EDasScalarKind::Float32 && !FMath::IsFinite(Field.FloatDefault)) || (Field.Kind==EDasScalarKind::Double && !FMath::IsFinite(Field.DoubleDefault))))
         { Error = TEXT("Unsupported scalar kind or non-finite default"); return false; }
+        if(Field.Kind==EDasScalarKind::Object && (!Field.ObjectClass.StartsWith(TEXT("/Script/")) || !FindObject<UClass>(nullptr,*Field.ObjectClass))){Error=TEXT("Object field requires a loaded native class path");return false;}
         if(Field.Kind==EDasScalarKind::Struct){FInstancedStruct Value;if(!ParseDasStructDefault(Field.StructPath,Field.StructDefault,Value,Error))return false;}
         if (!ValidMeta(Field.Metadata)) return false;
         Names.Add(Field.Name);
