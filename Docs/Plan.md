@@ -5,6 +5,20 @@
 не подтверждение работоспособности NimForUE на UE 5.8.3. В этой ревизии заявлена
 поддержка UE 5.7. Старый DasForUE не используется как основа.
 
+
+## Current priority — 2026-10-08
+
+User decision: defer broader structural/data migration logic and continue binding
+functionality. Existing supported migration policies remain; unsupported transitions
+must reject explicitly. Deferred: outer nested/container definition changes,
+primitive/set/map state/key migration, nonempty defaults, split/custom graph repair,
+DataTables, multiple roots, base/components and active-PIE structural reload.
+
+Active sequence: container DSL and typed interop (primitive arrays, set/map and
+standalone signatures), then out/ref and interfaces; lifecycle/production/network
+work follows the relevant original stages. Universal migration is not a prerequisite.
+See DSLPrimitiveArrays.md for the current feature boundary.
+
 ## Что добавлено по результатам аудита
 
 Первоначальная архитектура охватывала главные направления, но не весь функционал.
@@ -762,3 +776,470 @@ Docs/DSLTypeDeclarations.md. Next: resolve authored type identities in ue_class
 properties/method frames, checked native enum/struct value adapters, then bounded
 type changes/data migration. Nested/complex struct fields, component declarations
 and event/override authoring remain further stages.
+
+
+## Authored enum/struct class fields and typed frames — 2026-10-07
+
+Loaded authored UEnum/UUserDefinedStruct identities now connect to ue_class fields
+and method frames through checked UEEnumValue/UEStructValue wrappers. Enum kind 13
+and native Blueprint packing thunks preserve exact UEnum identity and explicit
+values; wrong/unknown/reserved values refuse before mutation. Struct snapshots
+support authored friendly field names and translate strict default text to native
+GUID property names. No native/daScript binary layout equality is assumed. Typed
+Blueprint ProcessEvent, mixed frames, save/reopen, GC and structural rollback with
+last-good callback are exercised. Details: Docs/DSLAuthoredValues.md. Next: direct
+plain daScript enum/struct value adapters and stable-ID type resolution, then bounded
+type changes/data migration and nested/complex declared fields. Type assets remain
+immutable; components, event/override authoring and broader asset scopes remain
+separate capabilities.
+
+
+## Direct authored daScript values — 2026-10-07
+
+Annotated plain enums/structs now work in ue_class properties and method frames.
+Native AST adapters preserve the existing checked token/snapshot ABI internally.
+The same file may declare types and a class; collection-only compilation allows
+the first type import before assets exist. type_folder resolves loaded assets by
+declared name, with enum value/layout/default checks. Reflected self reads, whole
+struct writes and scalar leaf writes/compound updates are supported without
+native/daScript layout assumptions. Details: Docs/DSLDirectTypes.md.
+
+Next: stable-ID type resolution and a cooked end-to-end direct-types fixture,
+then explicit type-definition migration policies (enum members and struct fields,
+dependent Blueprint/map repair and rollback), followed by nested/complex types.
+Components and event/override authoring remain later capabilities.
+
+
+## Stable-ID catalogs and cooked direct types — 2026-10-07
+
+UDasTypeRegistry catalogs resolve plain authored enums/structs by stable IDs through
+the type_registry class annotation. Binary catalog bindings carry hard references,
+kind and struct GUID; enums serialize their ID. The catalog works without editor
+metadata after cook. IDs remain automatic unless intentionally preserved across
+source declaration renames. Folder/name resolution remains a compatible option.
+Types.Apply accepts an optional catalog package; exact publication is idempotent,
+while catalog rebinding requires a later explicit migration policy.
+
+The native Actor adapter exposes a catalog reference for cook/GC dependencies.
+An isolated saved Blueprint/map uses renamed source declarations to reference the
+original assets. Its packaged game exercises direct scalar leaf writes, mixed
+enum/struct frames, ProcessEvent, persisted overrides, Unicode, identity failures
+and GC. Details and validation: Docs/DSLTypeRegistry.md.
+
+Next: explicit authored type-definition migrations, starting with enum additions
+and stable member identities, then struct field changes with dependent Blueprint/
+map repair and transactional rollback. Nested/complex types, components and event/
+override authoring remain later capabilities.
+
+
+## Append-only enum definition migration — 2026-10-07
+
+Das.DSL.Types.ExtendEnums adds explicit enum members through a runtime catalog,
+preserving existing names/order/numbers and object/stable-ID identity. Existing
+ordinary Blueprint variables/method wrappers and map values need no data rewrite.
+Preflight bounds dependency scope, verifies old values and unchanged class/struct
+declarations, and rejects enum nodes requiring reconstruction. Mutation/model
+publication rollback restores entries, metadata and dirty flags. Source edits and
+asset saves remain explicit. The first policy requires stopped PIE and no active
+script contexts. Details: Docs/DSLEnumAppend.md.
+
+Next: stable enum-member IDs and graph reconstruction/transactional repair,
+followed by rename/removal policies and struct field migrations with dependent
+Blueprint/map repair. Full type-definition hot reload and broader scopes remain
+later stages.
+
+
+## Stable enum-member IDs and Switch reconstruction — 2026-10-07
+
+Enum entries now carry automatic/optional explicit IDs, serialized in v2 type
+models and binary UDasDefinedEnum maps; v1 models remain readable. Append migration
+and direct adapters check identity drift. `graphs=repair` supports Switch on Enum
+within one imported DSL Actor root and ordinary dependent Blueprint/map scope.
+It reconstructs new outputs, compiles root/dependents, verifies old links and uses
+graph/class/value rollback after reconstruction or compilation failures. Details:
+Docs/DSLEnumMembersAndSwitch.md.
+
+Next: expand enum-node support (literal/select/count/iteration with verified sparse
+value semantics), then member rename by ID and explicit removal/value policies.
+Struct field migration and broader type hot reload remain later stages.
+
+
+## Standard enum-node family reconstruction — 2026-10-07
+
+graphs=repair now supports literal, select, count, safe byte cast and iteration,
+in addition to Switch. Native enum reload/reconstruction and Blueprint compilation
+preserve old links/defaults with transactional graph/class/value rollback. Tests
+exercise actual sparse values 7/42/200, count 2->3, select/literal results and
+iteration sums 49->249 before/after append, rollback, reopen and cook. Safe casts
+retain Unreal's MAX-on-invalid behavior; the binding still rejects MAX. Unsafe
+casts and broader independent-root coordination remain outside this scope.
+Details: Docs/DSLEnumNodeRepair.md.
+
+Next: member rename by stable ID with graph-default/branch repair and explicit
+class default rules, then removal/value policies and struct field migrations.
+
+
+## Enum member rename by stable ID — 2026-10-07
+
+Das.DSL.Types.RenameEnumMembers changes member names with unchanged ID/order/value.
+Native enum, Blueprint variable/pin defaults, Literal and Switch/Select names are
+updated in the existing rollback scope. Class enum default symbols may change only
+through the same value-preserving rename map; other declaration changes reject.
+Graph links/defaults, executable node results, CDO/map values, four failure stages,
+reopen and cooked invocation are verified. Details: Docs/DSLEnumRename.md.
+
+Next: explicit removal/value-change policies, then struct field add/rename and
+remove/type-change with Blueprint/map repair. Multi-root coordination and active
+PIE type reload remain broader later stages.
+
+
+## Explicit enum removal/value rules — 2026-10-07
+
+MigrateEnumValues reads a bounded, explicit JSON transition map. Surviving IDs and
+names retain identity while numbers change; removed member data uses a declared
+existing target. The first storage scope covers declared scalar enum Actor fields
+and current CDOs with snapshot/remap through reinstance. Linked/overridden removed
+case/options reject; empty cases/options and typed defaults are repaired. Four
+failure stages, saved map/CDO, updated node results and cook are validated.
+Containers/nested/archive state remain explicitly outside this storage policy.
+Details: Docs/DSLEnumValuePolicies.md.
+
+Next: authored struct field add/rename with stable IDs, copied native values and
+dependent Make/Break Struct repair, then remove/type-change policies. Wider enum
+storage, multiple roots and active-PIE type reload remain later expansions.
+
+
+## Authored struct field add/rename — 2026-10-07
+
+MigrateStructFields supports one scalar authored struct and one DSL Actor root.
+Stable IDs/GUIDs identify old fields; friendly/native GUID-suffixed names change
+together for cook. Independent per-field snapshots preserve overrides/Unicode/CDO
+data across native structure/Blueprint recompilation, new fields use defaults,
+and Make/Break Struct pins/graphs are repaired. Old layouts are not retained in
+FInstancedStruct snapshots for the changing type. Four-stage rollback, ID/type
+refusal, idempotency, save/reopen and cook are verified. Bounds:
+Docs/DSLStructFieldMigration.md.
+
+Next: explicit struct removal/type-change policies and supported value conversion,
+then nested/container state, split/custom struct nodes and multi-root coordination.
+Active-PIE type-definition reload remains a broader later stage.
+
+
+## Explicit authored struct field removal — 2026-10-08
+
+MigrateStructFields optionally accepts bounded per-stable-ID drop rules. Explicit
+rules discard direct Actor/CDO field data; Blueprint member links and changed
+Make Struct defaults reject before mutation. Surviving IDs/GUIDs and values use
+the existing independent scalar snapshots and Make/Break repair. Old removed
+values remain available for rollback. Verification covers missing/stale rules,
+linked/default refusal, four rollback stages, save/reopen and cooked execution.
+Details: Docs/DSLStructFieldMigration.md.
+
+Next: explicit numeric struct field type-conversion policies, native value/default
+conversion and checked graph adapters. Nested/container state, split/custom nodes,
+multiple roots and active-PIE type reload remain broader later stages.
+
+
+## Authored struct numeric field conversions — 2026-10-08
+
+MigrateStructFields accepts an explicit numeric convert rule using existing
+integer/float policies. One field changes type per transaction; identity/name
+remain stable. New defaults must be converted old defaults. Actor/CDO snapshots
+retain round-trip numeric precision and separate original/forward values. The
+shared numeric graph migration also accepts explicit Make/Break pins, preserves
+user/default distinctions and inserts checked conversion nodes. Four-stage
+rollback removes adapters and restores layout/data/graphs. Bounds and syntax:
+Docs/DSLStructFieldMigration.md.
+
+Next: nested/container value state and dependent graph repair, including split
+pins/custom struct operations. Multiple roots and active-PIE type definition reload
+remain broader stages. Numeric conversion currently cannot combine add/drop/rename
+and does not simplify existing adapter chains.
+
+
+## Nested struct storage migration — 2026-10-08
+
+Existing user-struct wrapper trees on the DSL Actor/CDO family now use recursive
+independent scalar snapshots during authored scalar struct add/rename/drop/numeric
+conversion. Repeated inner occurrences have separate path/ID keys. Unrelated
+sibling values, native wrapper defaults and GUIDs survive; wrappers are explicitly
+included in loaded/asset dependency scope. Root/default and editor numeric text
+round-trip guards reject inconsistent defaults. Old-layout FInstancedStruct values
+are excluded throughout the affected trees. The bridge's Blueprint default exporter
+preserves numeric precision recursively. Details: DSLStructFieldMigration.md.
+
+This milestone covers nested storage, not nested daScript type authoring. Next:
+allow nested `[ue_struct]` field declarations and recursive pack/unpack helpers;
+then container storage/state migration, split/custom graph repair, multiple roots
+and active-PIE type reload. Wrapper operation nodes and explicit nested defaults
+remain outside the current migration policy.
+
+
+## Nested authored type declarations — 2026-10-08
+
+ue_struct supports by-value fields of other authored structs with empty child
+constructors. Private stable-ID references form a closed validated DAG; native
+assets are created child-first. Recursive scalar-path AST helpers pack/unpack
+owned values. Deep self scalar writes commit to the Actor, while whole nested
+member writes reject explicitly and whole root-property assignment is supported.
+Typed frames, ProcessEvent, aliases, idempotency, save/reopen and cook are verified.
+Details: Docs/DSLNestedTypeAuthoring.md; example: dsl_nested_authoring.das.
+
+Next: container declarations/storage migration, then broader nested writes and
+split/custom graph repair. Nested child-member definition changes, multiple roots
+and active-PIE type reload remain separate policies.
+
+
+## Arrays of struct: storage and migration — 2026-10-08
+
+Owned struct snapshots support bounded arrays of supported structs and scalar
+indexed paths. Independent migration images capture lengths, ordered element paths
+and stable-ID values; new layouts allocate/initialize elements before restoration.
+Add/rename/drop/numeric rules apply to each element with precise rollback. Empty
+native/CDO array defaults are the initial policy. Details: DSLStructArrayStorage.md.
+
+This milestone extends native wrapper storage and UEStructValue access, not DSL
+container declarations. Next: array declarations/recursive dynamic pack-unpack,
+then set/map key/state migration, nonempty defaults and container graph repair.
+Direct Actor container fields, multiple roots and active-PIE type reload remain
+separate work.
+
+
+## DSL array fields and dynamic owned helpers — 2026-10-08
+
+ue_struct supports implicit-empty array<authored struct> fields. Closed model
+references include element types and the native factory creates typed FArrayProperty
+fields child-first. Statement/loop AST helpers compose owned nested values and
+array elements, with checked size/type/index APIs. Whole self move assignment and
+daScript clone/move typed values work; direct indexed self writes reject explicitly.
+Details: DSLArrayTypeAuthoring.md; example: dsl_array_authoring.das.
+
+Next: primitive/standalone array coverage and set/map key/identity declarations,
+then direct mutations and container-definition/graph migration. Declared defaults
+remain empty; active-PIE definition reload and multiple roots remain later policies.
+
+
+## Primitive array DSL functionality — 2026-10-08
+
+ue_struct supports array<int/float/double/bool/string/UENameValue>. Native fields,
+bounded owned snapshots and loop helpers preserve values, Unicode and name identity.
+Managed names pass to setters by const-reference; no native element alias escapes.
+Typed enclosing-struct interop, native state, reopen and cook are verified.
+Migration expansion is explicitly deferred. Details: DSLPrimitiveArrays.md.
+
+Next functionality: set/map and standalone container signatures, then out/ref and
+interfaces. Deferred migration policies should be revisited as separate tasks.
+
+
+## Initial map DSL and owned interop — 2026-10-08
+
+table<int;int> fields in ue_struct create typed native TMap storage. Readonly
+pack loops and owned unpacked tables preserve keys/values through typed frames,
+root-property commits and save/reopen/cook. Duplicate keys update values; missing
+keys reject. Iterators over temporary self reads reject and local clone usage is
+documented. Structural map migrations remain deferred. Details: DSLMapAuthoring.md.
+
+Next functionality: broaden map types, set and standalone container signatures,
+then out/ref and interfaces. Do not expand deferred migration logic as a prerequisite.
+
+
+## String map keys and values — 2026-10-08
+
+All int/string key/value map combinations are supported inside ue_struct. Owned
+FString/daScript storage preserves Unicode and empty text. Native-equality string
+key collisions reject explicitly before root commit; exact duplicate keys update.
+Typed values, save/reopen and cook are verified. Details: DSLMapAuthoring.md;
+example: dsl_string_maps.das. Map migrations remain deferred.
+
+Next functionality: set, more map value types and standalone container signatures,
+then out/ref and interfaces. Do not make universal migrations a prerequisite.
+
+
+## Set DSL and owned interop — 2026-10-08
+
+Key-only daScript tables `table<int>` / `table<string>` inside ue_struct map
+to native TSet storage. Generated keys/insert helpers preserve owned sets in
+typed input/output and whole Actor property commits. Native equality collisions
+reject explicitly. Snapshot APIs provide size, sorted ordinal enumeration,
+contains and owned add/remove. Empty defaults only; set migration is deferred.
+Details: DSLSetAuthoring.md; example: dsl_set_authoring.das.
+
+Next functionality: more map value types and standalone container signatures,
+followed by out/ref and interfaces. Keep universal migrations deferred.
+
+
+## Scalar/name map values — 2026-10-08
+
+Authored map fields accept int/string keys and int/float/double/bool/string/name
+values. Native float/double terminal types remain distinct and UENameValue uses
+owned FName identity. The bridge provides typed helpers and explicit owned
+snapshot get/with APIs. Empty defaults and earlier collision/budget rules remain.
+Details: DSLMapAuthoring.md; example: dsl_scalar_maps.das.
+
+Next: standalone DSL container parameters/results, followed by out/ref and
+interfaces. Further map key types and enum/struct/object values remain separate
+extensions. Migration development remains deferred.
+
+
+## Standalone container calls — 2026-10-08
+
+BlueprintCallable DSL instance methods accept/return primitive arrays, int/string
+sets and all current scalar/name maps directly. Twenty native container shapes
+use ordinary Blueprint pins and internal compiled owned carriers through the
+existing frame ABI. Mixed scalar/container input order is supported. K2 array
+ref/out flags are native implementation details; script input values remain owned
+copies. Details: DSLContainerCalls.md; example: dsl_container_calls.das.
+
+Next: explicit DSL out/ref semantics, then interfaces. Further container element/
+key types, class container properties and migration expansion remain separate.
+Migration development remains deferred.
+
+
+## Explicit out/ref method parameters — 2026-10-08
+
+ue_function(ref="counter", out="total") defines parameter directions; named
+arguments require mutable daScript references. Primitive and current standalone
+container values use owned locals and deferred publication of all outputs.
+Blueprint gets native output/reference pins and copy-back graphs. Failed calls,
+including late output packing errors, preserve ref input values and return out
+defaults. Per-slot reference aliasing is not preserved. Details: DSLOutRef.md;
+example: dsl_out_ref.das.
+
+Next: interfaces. Object/enum/struct/math out/ref extensions remain separate
+follow-up work, along with further container/class property support. Structural
+migration development remains deferred.
+
+
+## Existing native interface implementations — 2026-10-08
+
+ue_class(implements="/Script/Module.Interface") records native interface identities.
+Exact method contracts validate before mutation. Real Blueprint interface graphs
+dispatch through C++ Execute_* / ProcessEvent into DSL methods, including owned
+array returns and out/ref copy-back. Checked daScript membership and initial
+int/string dispatch to ordinary Blueprint receivers are supported.
+Details: DSLInterfaces.md; example: dsl_interfaces.das.
+
+Next interface work: broader typed binding dispatch, authored interface definitions
+and event-only methods. Reentrant VM callbacks, native fallback wrappers,
+interface-value properties and structural membership changes remain explicit
+follow-up capabilities. Migration development remains deferred.
+
+
+## Typed interface frame dispatch — 2026-10-08
+
+ue_begin_interface_call constrains an existing UCallHandle to a declared native
+interface method, checking identity/signatures at creation and invocation. All
+existing supported marshalling shapes and directions reuse the owned native frame.
+Scalar, array, map/set and multiple out/ref interface calls to ordinary Blueprint
+receivers are verified in editor/reopen/cooked. Missing inputs, type mismatch and
+released handles reject. Details: DSLInterfaces.md; example: dsl_interfaces.das.
+
+Next: DSL-authored interface definitions. Automatic generated interface wrappers,
+event-only implementation, native fallback wrappers and reentrant VM entry remain
+separate capabilities. Migration development remains deferred.
+
+
+## DSL-authored interface definitions — 2026-10-08
+
+ue_interface class declarations use native daScript def abstract signatures.
+Methods default to BlueprintCallable; mutable references are inout and the
+interface-level out list marks output-only slots. Abstract methods cannot carry
+function annotations in the pinned parser. Collection emits validated authoring
+IR; Das.DSL.Interfaces.Apply creates real BPI assets with a custom compiler and
+persistent runtime contract identity. DSL classes implement generated /Game
+interface paths with existing owned calls. Details: DSLAuthoredInterfaces.md.
+
+Next interface capabilities: event-only methods, additional authored type
+references and automatic typed wrappers. Structural interface/contract migration,
+interface-value properties, native fallback and reentrant VM entry remain deferred
+or separate capabilities.
+
+
+### Repeatable interface annotations — 2026-10-08
+
+- Added ue_implements(interface=CounterContract), repeatable on ue_class.
+- Short names resolve within the implementing module ID; qualified stable IDs
+  and full Unreal interface paths are supported. Existing implements path lists
+  remain compatible. Unknown, ambiguous and duplicate identities reject.
+- Authored Blueprint StableId is searchable in editor asset registry; generated
+  class identity handles loaded/cooked execution. Resolution occurs after all
+  annotations are attached and persists concrete Unreal paths in authoring IR.
+- No reader macro, custom parser or type expression in annotation arguments.
+- Generated typed interface references/calls using typemacro_boost are a later
+  stage, alongside event-only methods and additional contract types.
+
+
+### DSL syntax audit — 2026-10-08
+
+See DSLSyntaxAudit.md. Fixed source parameter names when repeatable ue_implements
+is attached after legacy scalar lowering. Recommended core follow-ups: connect
+generated typed native wrappers to authoring, share scoped identity rules, add
+native tuple direction lists and reject repeated singleton/conflicting redundant
+annotations. Keep annotation-only declarations and current compatibility syntax;
+typed macro sketches are not implemented capabilities. Migration work stays deferred.
+
+
+### Typed UObject authoring — 2026-10-08
+
+- UEObject type macro reuses existing generated native object wrappers. Native
+  metadata and unambiguous short aliases connect them to class fields/signatures.
+- Concrete ActorRef/ObjectRef aliases live in a separately compiled module to
+  respect the pinned parser's generic member-method restriction. No reader or
+  parser modification is used.
+- Source signatures infer native class constraints; conflicts reject. Bridge ABI,
+  weak VM handles, strong UPROPERTY fields and checked native conversions remain.
+- Later work: broader native exports, convenient checked source conversions,
+  authored classes/interfaces, generic matching, object containers and out/ref.
+  Migration work remains deferred. See DSLTypedObjects.md.
+
+
+### Annotated interface method stubs — 2026-10-08
+
+- Ordinary empty methods replace abstract signatures in current interface examples.
+  ue_function carries stable IDs, native method metadata and explicit out/ref.
+- The compiler supplies non-void placeholder returns behind a direct-call trap;
+  source implementations/nonempty bodies reject. Legacy abstract sources remain
+  readable. Reader/preprocessor/parser changes are not used.
+- Metadata is applied to native UFunctions and signature graphs. Metadata-only
+  reapplication preserves the class; structural contract changes remain deferred.
+- Event-only methods, broader interface types and typed interface references/calls
+  remain subsequent core stages. General migration work stays deferred.
+
+
+### Shared DSL identity and annotation rules — 2026-10-08
+
+- Added canonical, kind-checked resolution for parent/classes, interfaces, enums
+  and structs. Native names/aliases and source stable IDs are supported; named
+  authored enum/struct resolution keeps explicit registry/folder scope and hard
+  cook dependencies. Missing/ambiguous/wrong-kind references reject.
+- Added native tuple direction lists to class/interface methods, preserving
+  single names, legacy CSV, parameter IDs and copy-back ABI.
+- Singleton method/scalar options and conflicting natural-type constraints now
+  reject explicitly; ue_implements remains repeatable.
+- Actor-only parent capability and unsupported structural migrations are unchanged.
+  See DSLTypeResolution.md. General migration work remains deferred.
+
+
+### Interface event backend — 2026-10-09
+
+- Added authored/native void/no-output interface event declarations and actual
+  overriding UK2Node_Event nodes in Actor Event Graphs. Function graphs remain for
+  return/out/inout methods. Shared owned input frame marshalling is reused.
+- Stable IDs, reimport shape/ownership checks and native interface signature
+  validation cover event adapters. Body reload keeps the class; unsupported event
+  removal/rename rejects under the existing deferred structural policy.
+- Core follow-ups: broader authored interface type references and generated typed
+  interface wrappers/calls, then relevant lifecycle/production/network stages.
+  General migrations and VM reentry remain deferred. See DSLInterfaceEvents.md.
+
+
+### Parameter-local directions — 2026-10-09
+
+- Preferred syntax: mutable var references infer inout, @ue_out marks output-only,
+  and @ue_ref is optional explicit inout. Classes and ordinary interface methods
+  share validation and preserve source names/automatic IDs.
+- Legacy tuple/CSV function lists remain compatible; contradictory/repeated/invalid
+  parameter directions reject. Native frame initialization/copy-back semantics
+  and primitive/container capability limits are unchanged.
+- Examples and runtime/editor/cook probes use the parameter-local form. General
+  migrations and remaining core binding stages stay on the existing plan.

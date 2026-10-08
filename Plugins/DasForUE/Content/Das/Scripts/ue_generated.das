@@ -6,11 +6,20 @@ require ue_foundation
 struct UEName { value : string }
 def ue_name(value : string) : UEName { return UEName(value = value) }
 
+[ue_native_object(path="/Script/CoreUObject.Object")]
 struct C_Object_55c3753a { handle : UObjectHandle }
 
+[ue_native_object(path="/Script/DasRuntime.DasObjectFixture")]
 struct C_DasObjectFixture_5f019a81 { handle : UObjectHandle }
 
+[ue_native_object(path="/Script/Engine.Actor")]
 struct C_Actor_adf65d5b { handle : UObjectHandle }
+
+typedef Actor = C_Actor_adf65d5b
+
+typedef DasObjectFixture = C_DasObjectFixture_5f019a81
+
+typedef Object = C_Object_55c3753a
 
 def C_Object_55c3753a_from(value : UObjectHandle) : C_Object_55c3753a { return C_Object_55c3753a(handle = ue_cast_nullable_object(value, "/Script/CoreUObject.Object")) }
 def C_Object_55c3753a_raw(value : C_Object_55c3753a) : UObjectHandle { return ue_cast_nullable_object(value.handle, "/Script/CoreUObject.Object") }

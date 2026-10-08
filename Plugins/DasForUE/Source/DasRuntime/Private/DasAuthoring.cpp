@@ -1,4 +1,5 @@
 #include "DasAuthoring.h"
+#include "DasContainerTypes.h"
 #include "StructUtils/InstancedStruct.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
@@ -156,6 +157,7 @@ bool FDasAuthoringModule::Validate(FString& Error) const
     for (const auto& C : Classes)
     {
         if (C.NativeParent.IsEmpty() == C.ParentId.IsEmpty() || (!C.NativeParent.IsEmpty() && !NativePath(C.NativeParent)) || (!C.ParentId.IsEmpty() && !ClassIds.Contains(C.ParentId))) return Fail(Error,TEXT("Expected one valid parent for ")+C.Id);
+        if(C.Interfaces.Num()>16)return Fail(Error,TEXT("Interface count limit exceeded"));TSet<FString> SeenInterfaces;for(const auto& I:C.Interfaces){if((!I.StartsWith(TEXT("/Script/")) && !I.StartsWith(TEXT("/Game/"))) || !NativePath(I) || SeenInterfaces.Contains(I))return Fail(Error,TEXT("Invalid/duplicate native interface path"));SeenInterfaces.Add(I);}
         if (!MetadataValid(C.Metadata,Error)) return false;
         if (C.Properties.Num() > 1024 || C.Methods.Num() > 1024) return Fail(Error,TEXT("Declaration count limit exceeded"));
         TSet<FString> Names;
@@ -204,9 +206,10 @@ bool FDasAuthoringModule::FromJson(const FString& Json, FDasAuthoringModule& Out
     for (const auto& J : ClassesJson)
     {
         FDasDeclaredClass C;
-        if (!Keys(J,{TEXT("id"),TEXT("name"),TEXT("native_parent"),TEXT("parent_id"),TEXT("properties"),TEXT("methods"),TEXT("metadata")},Error) || !String(J,TEXT("id"),C.Id,Error) || !String(J,TEXT("name"),C.Name,Error) || !Meta(J,C.Metadata,Error)) return false;
+        if (!Keys(J,{TEXT("id"),TEXT("name"),TEXT("native_parent"),TEXT("parent_id"),TEXT("interfaces"),TEXT("properties"),TEXT("methods"),TEXT("metadata")},Error) || !String(J,TEXT("id"),C.Id,Error) || !String(J,TEXT("name"),C.Name,Error) || !Meta(J,C.Metadata,Error)) return false;
         if (J->HasField(TEXT("native_parent")) && !String(J,TEXT("native_parent"),C.NativeParent,Error)) return false;
         if (J->HasField(TEXT("parent_id")) && !String(J,TEXT("parent_id"),C.ParentId,Error)) return false;
+        if(J->HasField(TEXT("interfaces"))){const TArray<TSharedPtr<FJsonValue>>* Items=nullptr;if(!J->TryGetArrayField(TEXT("interfaces"),Items))return Fail(Error,TEXT("Expected interfaces array"));for(const auto& V:*Items){FString I;if(!V->TryGetString(I))return Fail(Error,TEXT("Expected interface path string"));C.Interfaces.Add(I);}}
         TArray<TSharedPtr<FJsonObject>> Ps, Ms; if (!Objects(J,TEXT("properties"),Ps,Error) || !Objects(J,TEXT("methods"),Ms,Error)) return false;
         for (const auto& V : Ps)
         {
@@ -262,6 +265,7 @@ bool FDasAuthoringModule::ToJson(FString& Out, FString& Error) const
             else if (P->Default.Kind == TEXT("null")) V->SetField(TEXT("default"),MakeShared<FJsonValueNull>());
             Pj.Add(MakeShared<FJsonValueObject>(V));
         }
+        if(!C->Interfaces.IsEmpty()){TArray<TSharedPtr<FJsonValue>> Interfaces;for(const auto& I:C->Interfaces)Interfaces.Add(MakeShared<FJsonValueString>(I));J->SetArrayField(TEXT("interfaces"),Interfaces);}
         J->SetArrayField(TEXT("properties"),Pj);
         TArray<const FDasDeclaredMethod*> Ms; for (const auto& M : C->Methods) Ms.Add(&M); Ms.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});
         TArray<TSharedPtr<FJsonValue>> Mj;
@@ -284,7 +288,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
     const auto* C = Classes.FindByPredicate([&](const auto& X){return X.Id == ClassId;}); if (!C) return Fail(Error,TEXT("Unknown authored class ID"));
     if (C->NativeParent != TEXT("/Script/Engine.Actor") || !C->ParentId.IsEmpty()) return Fail(Error,TEXT("Actor adapter requires direct native Actor parent"));
     if (C->Methods.IsEmpty() || C->Methods.Num()>64) return Fail(Error,TEXT("Actor adapter requires 1..64 methods"));
-    FDasClassSchema Result;Result.StableId=C->Id;Result.Name=*C->Name;Result.Parent=TEXT("Actor");Result.Metadata=C->Metadata;
+    FDasClassSchema Result;Result.StableId=C->Id;Result.Name=*C->Name;Result.Parent=TEXT("Actor");Result.Interfaces=C->Interfaces;Result.Metadata=C->Metadata;
     TArray<const FDasDeclaredMethod*> Methods;for (const auto& M:C->Methods) Methods.Add(&M);
     Methods.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});
     for (const auto* Ptr:Methods)
@@ -293,12 +297,12 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         const FString K=M.ReturnType.Kind;
         const bool Action=K==TEXT("void") && M.Parameters.IsEmpty();
         const bool Scalar=(K==TEXT("int") || K==TEXT("float") || K==TEXT("bool")) && M.Parameters.Num()==1 && M.Parameters[0].Type.Kind==K && M.Parameters[0].Direction==TEXT("in") && M.Parameters[0].Name==TEXT("Input");
-        auto Kind=[](const FString& T){return T==TEXT("int")?EDasMethodSignature::Int:T==TEXT("float")?EDasMethodSignature::Float:T==TEXT("bool")?EDasMethodSignature::Bool:T==TEXT("void")?EDasMethodSignature::Void:T==TEXT("string")?EDasMethodSignature::String:T==TEXT("double")?EDasMethodSignature::Double:T==TEXT("name")?EDasMethodSignature::Name:T==TEXT("object")?EDasMethodSignature::Object:EDasMethodSignature::Frame;};
-        auto ValueKind=[&](const FDasDeclaredType& T){if(T.Kind==TEXT("struct")){if(T.TypePath==TEXT("/Script/CoreUObject.Vector"))return EDasMethodSignature::Vector;if(T.TypePath==TEXT("/Script/CoreUObject.Rotator"))return EDasMethodSignature::Rotator;if(T.TypePath==TEXT("/Script/CoreUObject.Transform"))return EDasMethodSignature::Transform;return EDasMethodSignature::Struct;}return Kind(T.Kind);};
+        auto Kind=[](const FString& T){return T==TEXT("int")?EDasMethodSignature::Int:T==TEXT("float")?EDasMethodSignature::Float:T==TEXT("bool")?EDasMethodSignature::Bool:T==TEXT("void")?EDasMethodSignature::Void:T==TEXT("string")?EDasMethodSignature::String:T==TEXT("double")?EDasMethodSignature::Double:T==TEXT("name")?EDasMethodSignature::Name:T==TEXT("object")?EDasMethodSignature::Object:T==TEXT("enum")?EDasMethodSignature::Enum:EDasMethodSignature::Frame;};
+        auto ValueKind=[&](const FDasDeclaredType& T){if(T.Kind==TEXT("array") || T.Kind==TEXT("map") || T.Kind==TEXT("set"))return DasContainerCarrier(T)?EDasMethodSignature::Struct:EDasMethodSignature::Frame;if(T.Kind==TEXT("struct")){if(T.TypePath==TEXT("/Script/CoreUObject.Vector"))return EDasMethodSignature::Vector;if(T.TypePath==TEXT("/Script/CoreUObject.Rotator"))return EDasMethodSignature::Rotator;if(T.TypePath==TEXT("/Script/CoreUObject.Transform"))return EDasMethodSignature::Transform;return EDasMethodSignature::Struct;}return Kind(T.Kind);};
         if(ValueKind(M.ReturnType)==EDasMethodSignature::Frame || M.Parameters.Num()>16 || !M.bCallable || M.bPure || M.bStatic) return Fail(Error,TEXT("Actor adapter requires callable scalar/void methods with up to 16 by-value inputs, without pure/static: ")+M.Id);
-        FDasMethodSchema Method;Method.Name=*M.Name;Method.ScriptFile=M.ScriptFile;Method.EntryPoint=M.EntryPoint;Method.StableId=M.Id;Method.InputStableId=M.Parameters.Num()==1?M.Parameters[0].Id:FString();Method.Metadata=M.Metadata;Method.ReturnKind=ValueKind(M.ReturnType);Method.ReturnClass=(K==TEXT("object") || (K==TEXT("struct") && Method.ReturnKind==EDasMethodSignature::Struct))?M.ReturnType.TypePath:FString();
-        for(const auto& P:M.Parameters){if((ValueKind(P.Type)==EDasMethodSignature::Frame || ValueKind(P.Type)==EDasMethodSignature::Void) || P.Direction!=TEXT("in")) return Fail(Error,TEXT("Actor adapter parameter capability missing: ")+P.Id);Method.Parameters.Add({*P.Name,P.Id,ValueKind(P.Type),(P.Type.Kind==TEXT("object") || (P.Type.Kind==TEXT("struct") && ValueKind(P.Type)==EDasMethodSignature::Struct))?P.Type.TypePath:FString()});}
-        Method.Signature=Action?EDasMethodSignature::Void:Scalar?Kind(K):EDasMethodSignature::Frame;
+        FDasMethodSchema Method;Method.Name=*M.Name;Method.ScriptFile=M.ScriptFile;Method.EntryPoint=M.EntryPoint;Method.StableId=M.Id;Method.InputStableId=M.Parameters.Num()==1?M.Parameters[0].Id:FString();Method.Metadata=M.Metadata;Method.ReturnKind=ValueKind(M.ReturnType);Method.ReturnClass=DasContainerCarrier(M.ReturnType)?DasContainerCarrier(M.ReturnType)->GetPathName():(K==TEXT("enum") || K==TEXT("object") || (K==TEXT("struct") && Method.ReturnKind==EDasMethodSignature::Struct))?M.ReturnType.TypePath:FString();
+        for(const auto& P:M.Parameters){if((ValueKind(P.Type)==EDasMethodSignature::Frame || ValueKind(P.Type)==EDasMethodSignature::Void) || (P.Direction!=TEXT("in") && P.Direction!=TEXT("out") && P.Direction!=TEXT("inout"))) return Fail(Error,TEXT("Actor adapter parameter capability missing: ")+P.Id);Method.Parameters.Add({*P.Name,P.Id,ValueKind(P.Type),DasContainerCarrier(P.Type)?DasContainerCarrier(P.Type)->GetPathName():(P.Type.Kind==TEXT("enum") || P.Type.Kind==TEXT("object") || (P.Type.Kind==TEXT("struct") && ValueKind(P.Type)==EDasMethodSignature::Struct))?P.Type.TypePath:FString(),P.Direction});}
+        Method.Signature=!C->Interfaces.IsEmpty()?EDasMethodSignature::Frame:Action?EDasMethodSignature::Void:Scalar?Kind(K):EDasMethodSignature::Frame;
         Result.Methods.Add(MoveTemp(Method));
     }
     Result.Method=Result.Methods[0];
@@ -307,15 +311,15 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
     for (const auto* Ptr : Properties)
     {
         const auto& P=*Ptr;
-        if ((P.Type.Kind != TEXT("int") && P.Type.Kind != TEXT("float") && P.Type.Kind != TEXT("bool") && P.Type.Kind!=TEXT("string") && P.Type.Kind!=TEXT("double") && P.Type.Kind!=TEXT("name") && P.Type.Kind!=TEXT("struct") && P.Type.Kind!=TEXT("object"))) return Fail(Error,TEXT("Actor adapter property capability missing: ")+P.Name);
-        FDasFieldSchema F; F.StableId = P.Id; F.Name = *P.Name; F.Kind = P.Type.Kind == TEXT("int")?EDasScalarKind::Int32:P.Type.Kind==TEXT("float")?EDasScalarKind::Float32:P.Type.Kind==TEXT("bool")?EDasScalarKind::Bool:P.Type.Kind==TEXT("string")?EDasScalarKind::String:P.Type.Kind==TEXT("double")?EDasScalarKind::Double:P.Type.Kind==TEXT("struct")?EDasScalarKind::Struct:P.Type.Kind==TEXT("object")?EDasScalarKind::Object:EDasScalarKind::Name; F.bInstanceEditable=P.bEditable;F.bReadOnly=P.bReadOnly;F.Metadata=P.Metadata;
-        F.IntDefault=P.Type.Kind==TEXT("int")?static_cast<int32>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.FloatDefault=P.Type.Kind==TEXT("float")?static_cast<float>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.BoolDefault=P.Default.Boolean;F.DoubleDefault=P.Default.Number;F.StringDefault=P.Default.String;F.NameDefault=P.Type.Kind==TEXT("name")?FName(*P.Default.String):NAME_None; F.StructPath=P.Type.Kind==TEXT("struct")?P.Type.TypePath:FString();F.StructDefault=P.Default.String;F.ObjectClass=P.Type.Kind==TEXT("object")?P.Type.TypePath:FString(); Result.Fields.Add(F);
+        if ((P.Type.Kind != TEXT("int") && P.Type.Kind != TEXT("float") && P.Type.Kind != TEXT("bool") && P.Type.Kind!=TEXT("string") && P.Type.Kind!=TEXT("double") && P.Type.Kind!=TEXT("name") && P.Type.Kind!=TEXT("struct") && P.Type.Kind!=TEXT("object") && P.Type.Kind!=TEXT("enum"))) return Fail(Error,TEXT("Actor adapter property capability missing: ")+P.Name);
+        FDasFieldSchema F; F.StableId = P.Id; F.Name = *P.Name; F.Kind = P.Type.Kind == TEXT("int")?EDasScalarKind::Int32:P.Type.Kind==TEXT("float")?EDasScalarKind::Float32:P.Type.Kind==TEXT("bool")?EDasScalarKind::Bool:P.Type.Kind==TEXT("string")?EDasScalarKind::String:P.Type.Kind==TEXT("double")?EDasScalarKind::Double:P.Type.Kind==TEXT("struct")?EDasScalarKind::Struct:P.Type.Kind==TEXT("object")?EDasScalarKind::Object:P.Type.Kind==TEXT("enum")?EDasScalarKind::Enum:EDasScalarKind::Name; F.bInstanceEditable=P.bEditable;F.bReadOnly=P.bReadOnly;F.Metadata=P.Metadata;
+        F.IntDefault=P.Type.Kind==TEXT("int")?static_cast<int32>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.FloatDefault=P.Type.Kind==TEXT("float")?static_cast<float>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.BoolDefault=P.Default.Boolean;F.DoubleDefault=P.Default.Number;F.StringDefault=P.Default.String;F.NameDefault=P.Type.Kind==TEXT("name")?FName(*P.Default.String):NAME_None; F.StructPath=P.Type.Kind==TEXT("struct")?P.Type.TypePath:FString();F.StructDefault=P.Default.String;F.ObjectClass=P.Type.Kind==TEXT("object")?P.Type.TypePath:FString(); F.EnumPath=P.Type.Kind==TEXT("enum")?P.Type.TypePath:FString();F.EnumDefault=P.Type.Kind==TEXT("enum")?P.Default.String:FString();Result.Fields.Add(F);
     }
     if (!Result.Validate(Error)) return false; Out = MoveTemp(Result); return true;
 }
 FDasAuthoringDelta FDasAuthoringModule::Compare(const FDasDeclaredClass& Old, const FDasDeclaredClass& Next)
 {
-    FDasAuthoringDelta D; D.bStructural = Old.Id!=Next.Id || Old.Name!=Next.Name || Old.NativeParent!=Next.NativeParent || Old.ParentId!=Next.ParentId;
+    FDasAuthoringDelta D; D.bStructural = Old.Id!=Next.Id || Old.Name!=Next.Name || Old.NativeParent!=Next.NativeParent || Old.ParentId!=Next.ParentId || Old.Interfaces!=Next.Interfaces;
     D.bMetadata = !SameMetadata(Old.Metadata,Next.Metadata);
     for (const auto& P : Next.Properties)
     {

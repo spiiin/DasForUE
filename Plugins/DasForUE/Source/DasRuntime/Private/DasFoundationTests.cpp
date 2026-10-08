@@ -1085,6 +1085,10 @@ bool RunDasFoundationTests(FString& Report)
         FDasAuthoringModule StructFieldsModel;
         Expect(Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_struct_fields.das")),StructFieldsModel,StructDefaultError),TEXT("struct_fields_native_DSL_model"),StructDefaultError);
     {
+        FString E;const FString EnumPath=TEXT("/Script/DasRuntime.EDasCallMode");Expect(ValidateDasEnumNumber(EnumPath,42,E),TEXT("enum_value_valid_sparse_native_member"),E);Expect(!ValidateDasEnumNumber(EnumPath,255,E),TEXT("enum_reserved_unknown_value_refused"),E);Expect(!ValidateDasEnumNumber(TEXT("/Script/DasRuntime.NotAnEnum"),42,E),TEXT("enum_unknown_type_refused"),E);
+        const FString Temp=FPaths::ProjectSavedDir()/ (TEXT("EnumValueToken_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT(".das"));const FString Text=TEXT("options gen2\nrequire ue_foundation\n[export]\ndef main(input:int):int { return ue_enum_number(ue_enum_value(\"/Script/DasRuntime.EDasCallMode\",\"Paused\")) }\n");FFileHelper::SaveStringToFile(Text,*Temp,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);const auto Value=Runtime.RunFile(Temp,0);Expect(Value.bSucceeded && Value.Value==42,TEXT("enum_value_POD_native_ABI"),Value.Error);FFileHelper::SaveStringToFile(Text.Replace(TEXT("Paused"),TEXT("not_a_member")),*Temp,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);const auto Bad=Runtime.RunFile(Temp,0);Expect(!Bad.bSucceeded,TEXT("enum_unknown_symbol_runtime_refused"),Bad.Error);IFileManager::Get().Delete(*Temp);
+    }
+    {
         FDasReflectedTypes Types;FString TypeError;const bool Read=Runtime.ReadReflectedTypes(Runtime.ScriptPath(TEXT("dsl_type_declarations.das")),Types,TypeError);Expect(Read && Types.Enums.Num()==1 && Types.Structs.Num()==1,TEXT("reflected_type_annotations_native_AST"),TypeError);
         Expect(Read && Types.Enums[0].Entries[0].Value==7 && Types.Enums[0].Entries[1].Value==42 && Types.Structs[0].Properties.Num()==4,TEXT("reflected_types_explicit_values_and_scalar_fields"),TypeError);
         FString Wire;FDasReflectedTypes Roundtrip;Expect(Read && Types.ToJson(Wire,TypeError) && FDasReflectedTypes::FromJson(Wire,Roundtrip,TypeError) && Roundtrip.Enums[0].Entries[1].Value==42,TEXT("reflected_type_model_roundtrip"),TypeError);
@@ -1154,6 +1158,121 @@ bool RunDasFoundationTests(FString& Report)
     Expect(!Persistent(DeadOwner.Get()).bSucceeded, TEXT("persistent_dead_owner_rejected"));
     IFileManager::Get().Delete(*Scratch);
 
+    {FDasReflectedTypes MemberTypes;FString Issue,Wire;const bool Compiled=Runtime.ReadReflectedTypes(Runtime.ScriptPath(TEXT("dsl_enum_member_ids.das")),MemberTypes,Issue);Expect(Compiled && MemberTypes.Enums.Num()==1 && MemberTypes.Enums[0].Entries[1].Id==TEXT("memberids.State.running"),TEXT("enum_member_ID_annotation"),Issue);Expect(Compiled && MemberTypes.Enums[0].Entries[0].Id==TEXT("memberids.State.Idle"),TEXT("enum_member_ID_automatic"));if(Compiled){MemberTypes.Enums[0].Entries[1].Id=MemberTypes.Enums[0].Entries[0].Id;Expect(!MemberTypes.Validate(Issue),TEXT("enum_member_ID_duplicate_refused"));}FDasReflectedTypes Legacy;Expect(FDasReflectedTypes::FromJson(TEXT("{\"schema_version\":1,\"module_id\":\"legacy\",\"enums\":[{\"id\":\"legacy.Mode\",\"name\":\"Mode\",\"metadata\":{},\"entries\":[{\"name\":\"Idle\",\"value\":7}]}],\"structs\":[]}"),Legacy,Issue) && Legacy.Enums[0].Entries[0].Id==TEXT("legacy.Mode.Idle") && Legacy.ToJson(Wire,Issue) && Wire.Contains(TEXT("\"schema_version\": 2")),TEXT("enum_member_ID_legacy_wire_upgrade"),Issue);}
+    {
+        FDasReflectedTypes Sets,Roundtrip;FString Issue,Wire;
+        const bool Compiled=Runtime.ReadReflectedTypes(Runtime.ScriptPath(TEXT("dsl_set_authoring.das")),Sets,Issue);
+        Expect(Compiled && Sets.Structs.Num()==1 && Sets.Structs[0].Properties.Num()==2,TEXT("set_example_declarations"),Issue);
+        if(Compiled && Sets.Structs.Num()==1){
+            Expect(Sets.ToJson(Wire,Issue) && FDasReflectedTypes::FromJson(Wire,Roundtrip,Issue) && Roundtrip.Structs[0].Properties[0].Type.Kind==TEXT("set") && Roundtrip.Structs[0].Properties[0].Type.Element->Kind==TEXT("int") && Roundtrip.Structs[0].Properties[1].Type.Element->Kind==TEXT("string"),TEXT("set_IR_roundtrip"),Issue);
+            auto Invalid=Sets;auto Element=MakeShared<FDasDeclaredType>();Element->Kind=TEXT("float");Invalid.Structs[0].Properties[0].Type.Element=Element;
+            Expect(!Invalid.Validate(Issue),TEXT("set_IR_unsupported_element_refused"));
+            Invalid=Sets;auto MapKey=MakeShared<FDasDeclaredType>();MapKey->Kind=TEXT("int");Invalid.Structs[0].Properties[0].Type.Key=MapKey;
+            Expect(!Invalid.Validate(Issue),TEXT("set_IR_map_shape_refused"));
+        }
+    }
+    {
+        FDasReflectedTypes Maps,Roundtrip;FString Issue,Wire;
+        const bool Compiled=Runtime.ReadReflectedTypes(Runtime.ScriptPath(TEXT("dsl_scalar_maps.das")),Maps,Issue);
+        Expect(Compiled && Maps.Structs.Num()==1 && Maps.Structs[0].Properties.Num()==3,TEXT("scalar_map_example_declarations"),Issue);
+        if(Compiled && Maps.Structs.Num()==1){
+            const bool Parsed=Maps.ToJson(Wire,Issue) && FDasReflectedTypes::FromJson(Wire,Roundtrip,Issue);
+            const auto* Weights=Parsed?Roundtrip.Structs[0].Properties.FindByPredicate([](const auto& P){return P.Name==TEXT("Weights");}):nullptr;
+            const auto* Enabled=Parsed?Roundtrip.Structs[0].Properties.FindByPredicate([](const auto& P){return P.Name==TEXT("Enabled");}):nullptr;
+            const auto* Labels=Parsed?Roundtrip.Structs[0].Properties.FindByPredicate([](const auto& P){return P.Name==TEXT("Labels");}):nullptr;
+            Expect(Weights && Enabled && Labels && Weights->Type.Value->Kind==TEXT("double") && Enabled->Type.Value->Kind==TEXT("bool") && Labels->Type.Value->Kind==TEXT("name"),TEXT("scalar_map_IR_preserves_value_types"),Issue);
+            auto Invalid=Maps;auto Element=MakeShared<FDasDeclaredType>();Element->Kind=TEXT("array");auto Inner=MakeShared<FDasDeclaredType>();Inner->Kind=TEXT("float");Element->Element=Inner;Invalid.Structs[0].Properties[0].Type.Value=Element;
+            Expect(!Invalid.Validate(Issue),TEXT("scalar_map_IR_nested_container_refused"));
+            Invalid=Maps;auto Key=MakeShared<FDasDeclaredType>();Key->Kind=TEXT("float");Invalid.Structs[0].Properties[0].Type.Key=Key;
+            Expect(!Invalid.Validate(Issue),TEXT("scalar_map_IR_unsupported_key_refused"));
+        }
+    }
+    {
+        FDasAuthoringModule Containers,Roundtrip;FString Issue,Wire;
+        const bool Compiled=Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_container_calls.das")),Containers,Issue);
+        Expect(Compiled && Containers.Classes.Num()==1 && Containers.Classes[0].Methods.Num()==21,TEXT("container_calls_example_declarations"),Issue);
+        if(Compiled){FDasClassSchema Adapter;Expect(Containers.ToJson(Wire,Issue) && FDasAuthoringModule::FromJson(Wire,Roundtrip,Issue) && Roundtrip.ToActorSchema(TEXT("containers.ContainerActor"),Adapter,Issue) && Adapter.Methods.Num()==21,TEXT("container_calls_IR_native_adapter_roundtrip"),Issue);}
+    }
+    {
+        FDasAuthoringModule OutRef,Roundtrip;FString Issue,Wire;
+        const bool Compiled=Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_out_ref.das")),OutRef,Issue);
+        Expect(Compiled && OutRef.Classes.Num()==1 && OutRef.Classes[0].Methods.Num()==30,TEXT("out_ref_example_declarations"),Issue);
+        if(Compiled){const auto* Adjust=OutRef.Classes[0].Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Adjust");});Expect(Adjust && Adjust->Parameters[0].Direction==TEXT("inout") && Adjust->Parameters[1].Direction==TEXT("out") && Adjust->Parameters[2].Direction==TEXT("in"),TEXT("out_ref_annotation_directions"));FDasClassSchema Adapter;const bool Parsed=OutRef.ToJson(Wire,Issue) && FDasAuthoringModule::FromJson(Wire,Roundtrip,Issue) && Roundtrip.ToActorSchema(TEXT("outref.OutActor"),Adapter,Issue);const auto* Projected=Parsed?Adapter.Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Adjust");}):nullptr;Expect(Projected && Projected->Contract().InputDirections==TArray<int32>{2,1,0},TEXT("out_ref_IR_adapter_contract_roundtrip"),Issue);}
+    }
+    {
+        FDasAuthoringModule Interfaces,Roundtrip;FString Issue,Wire;
+        const bool Compiled=Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_interfaces.das")),Interfaces,Issue);
+        Expect(Compiled && Interfaces.Classes.Num()==1 && Interfaces.Classes[0].Interfaces==TArray<FString>{TEXT("/Script/DasRuntime.DasProbeInterface")},TEXT("interface_example_contract_compiles"),Issue);
+        if(Compiled){FDasClassSchema Adapter;Expect(Interfaces.ToJson(Wire,Issue) && FDasAuthoringModule::FromJson(Wire,Roundtrip,Issue) && Roundtrip.ToActorSchema(TEXT("interfaces.InterfaceActor"),Adapter,Issue) && Adapter.Interfaces==Interfaces.Classes[0].Interfaces,TEXT("interface_IR_identity_roundtrip"),Issue);auto Changed=Interfaces.Classes[0];Changed.Interfaces.Reset();Expect(FDasAuthoringModule::Compare(Interfaces.Classes[0],Changed).bStructural,TEXT("interface_membership_change_is_structural"));}
+    }
+    {
+        FDasAuthoringModule Interfaces,Roundtrip;FString Issue,Wire;
+        const bool Compiled=Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_definition.das")),Interfaces,Issue);
+        Expect(Compiled && Interfaces.Classes.Num()==1 && Interfaces.Classes[0].Methods.Num()==7,TEXT("authored_interface_stub_definition_compiles"),Issue);
+        if(Compiled){Expect(Interfaces.ToJson(Wire,Issue) && FDasAuthoringModule::FromJson(Wire,Roundtrip,Issue) && Roundtrip.Classes[0].Id==TEXT("authoredinterface.CounterContract"),TEXT("authored_interface_IR_stable_identity"),Issue);const auto* Stats=Interfaces.Classes[0].Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Stats");});Expect(Stats && Stats->Parameters[0].Direction==TEXT("inout") && Stats->Parameters[1].Direction==TEXT("out"),TEXT("authored_interface_method_ref_out_directions"));}
+    }
+    {
+        FDasAuthoringModule TypedModel;FString Issue;
+        const bool Compiled=Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_typed_objects.das")),TypedModel,Issue);
+        Expect(Compiled && TypedModel.Classes.Num()==1,TEXT("typed_object_macro_example_compiles"),Issue);
+        if(Compiled){const auto& C=TypedModel.Classes[0];const auto* Get=C.Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("GetTarget");});const auto* Echo=C.Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("EchoActor");});const auto* Target=C.Properties.FindByPredicate([](const auto& P){return P.Name==TEXT("Target");});Expect(C.Properties.Num()==2 && Target && Target->Type.Kind==TEXT("object") && Target->Type.TypePath==TEXT("/Script/Engine.Actor") && Target->Default.Kind==TEXT("null"),TEXT("typed_object_field_infers_native_class_and_null"));Expect(Get && Echo && Get->ReturnType.TypePath==TEXT("/Script/Engine.Actor") && Echo->Parameters[0].Type.TypePath==Get->ReturnType.TypePath,TEXT("typed_object_parameters_results_infer_native_class"));}
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_typed_objects_bad_macro.das")),TypedModel,Issue),TEXT("typed_object_nonobject_macro_argument_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_typed_objects_bad_assignment.das")),TypedModel,Issue),TEXT("typed_object_incompatible_source_assignment_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_typed_objects_bad_constraint.das")),TypedModel,Issue),TEXT("typed_object_conflicting_constraint_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_typed_objects_bad_dimension.das")),TypedModel,Issue) && Issue.Contains(TEXT("fixed-array")),TEXT("typed_object_fixed_array_not_lowered_to_scalar"));
+    }
+    {
+        FDasAuthoringModule StubInterfaces;FString StubIssue;
+        Expect(Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_abstract_legacy.das")),StubInterfaces,StubIssue) && StubInterfaces.Classes[0].Methods.Num()==4,TEXT("interface_legacy_abstract_syntax_remains_readable"),StubIssue);
+        Expect(Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_definition.das")),StubInterfaces,StubIssue) && StubInterfaces.Classes[0].Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Query");})->Metadata.FindRef(TEXT("Category"))==TEXT("Counter"),TEXT("interface_method_annotation_metadata_collected"),StubIssue);
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_body.das")),StubInterfaces,StubIssue),TEXT("interface_stub_body_refused"));
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_missing_annotation.das")),StubInterfaces,StubIssue),TEXT("interface_stub_missing_annotation_refused"));
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_unknown_out.das")),StubInterfaces,StubIssue),TEXT("interface_stub_unknown_out_refused"));
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_overlap.das")),StubInterfaces,StubIssue),TEXT("interface_stub_overlap_refused"));
+        Expect(Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_missing_ref.das")),StubInterfaces,StubIssue),TEXT("interface_stub_mutable_ref_infers_inout"),StubIssue);
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_duplicate_annotation.das")),StubInterfaces,StubIssue),TEXT("interface_stub_duplicate_annotation_refused"));
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_unknown_flag.das")),StubInterfaces,StubIssue),TEXT("interface_stub_unknown_flag_refused"));
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_default.das")),StubInterfaces,StubIssue),TEXT("interface_stub_default_refused"));
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_field.das")),StubInterfaces,StubIssue),TEXT("interface_stub_field_refused"));
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_static.das")),StubInterfaces,StubIssue),TEXT("interface_stub_static_refused"));
+        const auto StubCall=Run(TEXT("dsl_interface_stub_call.das"));
+        Expect(!StubCall.bSucceeded && StubCall.Error.Contains(TEXT("declaration stub cannot be called directly")),TEXT("interface_stub_direct_call_traps"),StubCall.Error);
+    }
+    {
+        FDasAuthoringModule RulesModel,LegacyModel;FString RulesIssue,RulesWire,LegacyWire;
+        const bool RulesOK=Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_type_syntax.das")),RulesModel,RulesIssue);
+        Expect(RulesOK && RulesModel.Classes[0].NativeParent==TEXT("/Script/Engine.Actor"),TEXT("type_syntax_parent_native_name_resolves"),RulesIssue);
+        if(RulesOK){const auto& C=RulesModel.Classes[0];const auto* Echo=C.Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Echo");});const auto* Payload=C.Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Payload");});const auto* Mode=C.Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Mode");});Expect(Echo && Echo->ReturnType.TypePath==TEXT("/Script/Engine.Actor") && Echo->Parameters[0].Type.TypePath==Echo->ReturnType.TypePath,TEXT("native_class_names_canonicalize"));Expect(Payload && Payload->ReturnType.TypePath==TEXT("/Script/DasRuntime.DasCallPayload") && Mode && Mode->ReturnType.TypePath==TEXT("/Script/DasRuntime.EDasCallMode"),TEXT("native_enum_struct_names_canonicalize"));}
+        Expect(Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_interface_native_names.das")),RulesModel,RulesIssue) && RulesModel.Classes[0].Interfaces[0]==TEXT("/Script/DasRuntime.DasProbeInterface"),TEXT("native_interface_name_uses_shared_resolver"),RulesIssue);
+        Expect(Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_out_ref.das")),RulesModel,RulesIssue) && Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_out_ref_csv_legacy.das")),LegacyModel,RulesIssue) && RulesModel.ToJson(RulesWire,RulesIssue) && LegacyModel.ToJson(LegacyWire,RulesIssue) && RulesWire.Replace(TEXT("dsl_out_ref.das"),TEXT("dsl_out_ref_csv_legacy.das"))==LegacyWire,TEXT("tuple_and_CSV_directions_produce_identical_contracts"),RulesIssue);
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_type_syntax_bad_parent_missing.das")),RulesModel,RulesIssue),TEXT("type_syntax_parent_missing_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_type_syntax_bad_wrong_kind.das")),RulesModel,RulesIssue),TEXT("type_syntax_wrong_kind_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_type_syntax_bad_duplicate_function.das")),RulesModel,RulesIssue),TEXT("type_syntax_duplicate_function_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_type_syntax_bad_duplicate_constraint.das")),RulesModel,RulesIssue),TEXT("type_syntax_duplicate_constraint_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_type_syntax_bad_duplicate_return.das")),RulesModel,RulesIssue),TEXT("type_syntax_duplicate_return_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_type_syntax_bad_duplicate_callable.das")),RulesModel,RulesIssue),TEXT("type_syntax_duplicate_callable_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_tuple_bad_duplicate.das")),RulesModel,RulesIssue),TEXT("tuple_duplicate_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_tuple_bad_overlap.das")),RulesModel,RulesIssue),TEXT("tuple_overlap_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_tuple_bad_wrong_value.das")),RulesModel,RulesIssue),TEXT("tuple_wrong_value_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_tuple_bad_unknown.das")),RulesModel,RulesIssue),TEXT("tuple_unknown_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_tuple_bad_empty.das")),RulesModel,RulesIssue),TEXT("tuple_empty_refused"));
+        Expect(Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_method_id.das")),RulesModel,RulesIssue) && RulesModel.Classes[0].Methods.ContainsByPredicate([](const auto& M){return M.Name==TEXT("Query") && M.Id==TEXT("contract.score");}),TEXT("interface_explicit_method_ID_roundtrips"),RulesIssue);
+    }
+    {
+        FDasAuthoringModule ParameterModel,ExplicitParameterModel;FString ParameterIssue,ImplicitWire,ExplicitWire;
+        const bool ParameterOK=Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_directions.das")),ParameterModel,ParameterIssue);
+        Expect(ParameterOK,TEXT("parameter_metadata_directions_compile"),ParameterIssue);
+        if(ParameterOK){const auto& C=ParameterModel.Classes[0];const auto* Adjust=C.Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Adjust");});const auto* Bump=C.Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Bump");});Expect(Adjust && Adjust->Parameters[0].Direction==TEXT("inout") && Adjust->Parameters[1].Direction==TEXT("out") && Adjust->Parameters[2].Direction==TEXT("in"),TEXT("parameter_inferred_ref_out_and_input_contract"));Expect(Bump && Bump->Parameters[0].Name==TEXT("value") && Bump->Parameters[0].Id==TEXT("paramdirections.Counter.Bump.value") && Bump->Parameters[0].Direction==TEXT("inout"),TEXT("inferred_single_ref_preserves_source_name_and_ID"));}
+        Expect(ParameterOK && Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_directions_explicit.das")),ExplicitParameterModel,ParameterIssue) && ParameterModel.ToJson(ImplicitWire,ParameterIssue) && ExplicitParameterModel.ToJson(ExplicitWire,ParameterIssue) && ImplicitWire.Replace(TEXT("dsl_parameter_directions.das"),TEXT("dsl_parameter_directions_explicit.das"))==ExplicitWire,TEXT("optional_ue_ref_marker_has_identical_contract"),ParameterIssue);
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_direction_bad_by_value.das")),ParameterModel,ParameterIssue),TEXT("parameter_direction_by_value_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_direction_bad_constant.das")),ParameterModel,ParameterIssue),TEXT("parameter_direction_constant_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_direction_bad_overlap.das")),ParameterModel,ParameterIssue),TEXT("parameter_direction_overlap_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_direction_bad_duplicate.das")),ParameterModel,ParameterIssue),TEXT("parameter_direction_duplicate_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_direction_bad_false.das")),ParameterModel,ParameterIssue),TEXT("parameter_direction_false_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_direction_bad_wrong_value.das")),ParameterModel,ParameterIssue),TEXT("parameter_direction_wrong_value_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_direction_bad_unknown.das")),ParameterModel,ParameterIssue),TEXT("parameter_direction_unknown_refused"));
+        Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_direction_bad_legacy_conflict.das")),ParameterModel,ParameterIssue),TEXT("parameter_direction_legacy_conflict_refused"));
+    }
     const auto Recovery = Run(TEXT("smoke.das"));
     Expect(Recovery.bSucceeded && Recovery.Value == 42, TEXT("recovery_after_failures"), Recovery.Error);
     Report += FString::Printf(TEXT("DAS_FOUNDATION_RESULT=%s failures=%d\n"), Failures ? TEXT("FAIL") : TEXT("PASS"), Failures);

@@ -4,6 +4,8 @@
 #include "DasCallFrame.h"
 #include "DasProbeActor.generated.h"
 
+class UDasTypeRegistry;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasIntSignal, int32, Value);
 
 // Fixed native adapter for the editor feasibility experiment, not the public DSL API.
@@ -13,6 +15,8 @@ class DASRUNTIME_API ADasProbeActor : public AActor
     GENERATED_BODY()
 public:
     ADasProbeActor();
+    // Keep the selected identity catalog and its reflected types as cook/GC dependencies.
+    UPROPERTY(EditAnywhere, Category="daScript") TObjectPtr<UDasTypeRegistry> TypeRegistry;
     // Internal persistent retirement storage. Hidden from Details and script API.
     UPROPERTY(SaveGame) TMap<FString,FDasScalarValue> RetiredDasValues;
 
@@ -44,6 +48,8 @@ public:
     void ExecuteDasVoid(const FString& ScriptFile,const FString& EntryPoint);
     UFUNCTION(BlueprintCallable,Category="daScript Probe",meta=(BlueprintInternalUseOnly="true"))
     FDasScalarValue ExecuteDasFrame(const FString& ScriptFile,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,int32 ResultKind,const FString& ResultClass);
+    UFUNCTION(BlueprintCallable,Category="daScript Probe",meta=(BlueprintInternalUseOnly="true"))
+    FDasScalarValue ExecuteDasFrameOutputs(const FString& ScriptFile,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,int32 ResultKind,const FString& ResultClass,TArray<FDasScalarValue>& Outputs);
 private:
     friend class FDasRuntimeModule;
     FString ActiveLifecyclePath;

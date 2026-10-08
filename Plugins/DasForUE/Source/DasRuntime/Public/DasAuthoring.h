@@ -43,6 +43,7 @@ struct FDasDeclaredMethod
 struct FDasDeclaredClass
 {
     FString Id, Name, NativeParent, ParentId;
+    TArray<FString> Interfaces;
     TArray<FDasDeclaredProperty> Properties;
     TArray<FDasDeclaredMethod> Methods;
     TMap<FString, FString> Metadata;

@@ -19,6 +19,22 @@ class GeneratorTests(unittest.TestCase):
         self.ir['structs'].reverse()
         self.ir['classes'].reverse()
         self.assertEqual(generate(self.ir), expected)
+    def test_native_object_metadata_and_short_alias(self):
+        text = generate(self.ir)
+        self.assertIn('[ue_native_object(path="/Script/Engine.Actor")]', text)
+        self.assertIn('typedef Actor = ' + class_name('/Script/Engine.Actor'), text)
+    def test_ambiguous_native_short_name_is_not_exported(self):
+        self.ir['classes'].append(dict(type_path='/Script/Other.Actor', parent='/Script/CoreUObject.Object'))
+        text = generate(self.ir)
+        self.assertNotIn('typedef Actor = ', text)
+        self.assertIn('struct ' + class_name('/Script/Other.Actor'), text)
+        self.assertIn('struct ' + class_name('/Script/Engine.Actor'), text)
+    def test_native_short_alias_does_not_hide_function(self):
+        alias = self.ir['functions'][0]['alias']
+        self.ir['classes'].append(dict(type_path='/Script/Other.' + alias, parent='/Script/CoreUObject.Object'))
+        text = generate(self.ir)
+        self.assertNotIn('typedef ' + alias + ' = ', text)
+        self.assertIn('def ' + alias + '(', text)
     def test_schema_version(self):
         self.ir['schema_version'] = 9
         with self.assertRaises(ValueError): generate(self.ir)

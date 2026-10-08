@@ -178,6 +178,10 @@
         return **Found;
     }
 
+    FDasCallHandle BeginInterfaceCall(const FDasObjectHandle& Target,const char* Path,const char* Name,das::Context* C){
+        auto* Object=ResolveObject(Target,C);auto* Interface=CheckedInterface(Path,C);CheckedInterfaceFunction(Object,Path,Name,C);
+        auto Handle=BeginCall(Target,Name,C);auto& Call=ResolveCall(Handle,C);Call.RequiredInterface=Interface;Call.InterfaceSignatureKey=CallSignatureKey(Interface->FindFunctionByName(Call.Function->GetFName()));return Handle;
+    }
     void ExpectCallSignature(const FDasCallHandle& Handle, const char* Expected, das::Context* Context)
     {
         auto& Call = ResolveCall(Handle, Context);
@@ -495,6 +499,7 @@
         UObject* Object = Call.Target.Get();
         if (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed()))
             Context->throw_error("call target expired");
+        if(!Call.InterfaceSignatureKey.IsEmpty()){auto* Interface=Call.RequiredInterface.Get();auto* Declared=Interface?Interface->FindFunctionByName(Call.Function->GetFName()):nullptr;if(!Interface || !Object->GetClass()->ImplementsInterface(Interface) || !Declared || CallSignatureKey(Declared)!=Call.InterfaceSignatureKey || !Call.Function->IsSignatureCompatibleWith(Declared))Context->throw_error("interface contract changed; create a new interface frame");}
         if (Object->FindFunction(Call.Function->GetFName()) != Call.Function.Get()) Context->throw_error("UFunction changed; create a new call frame");
         for (const auto& Parameter : Call.Signature)
             if (Parameter.bInput && !Parameter.Path.Contains(TEXT(".*")) && !Call.Assigned.Contains(Parameter.Path))

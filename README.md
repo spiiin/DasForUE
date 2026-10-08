@@ -369,3 +369,165 @@ Tests: Scripts/TestDSLObjectFieldsPIE.ps1 and Scripts/TestDSLObjectFieldsAsset.p
 Authored reflected type declarations: Docs/DSLTypeDeclarations.md.
 Example: Plugins/DasForUE/Content/Das/Scripts/dsl_type_declarations.das.
 Editor command: Das.DSL.Types.Apply Script.das /Game/Folder.
+
+
+Authored enum/struct fields and method frames: Docs/DSLAuthoredValues.md.
+Example: Plugins/DasForUE/Content/Das/Scripts/dsl_authored_values.das.
+Tests: Scripts/TestDSLAuthoredValuesAsset.ps1 and Scripts/TestDSLAuthoredValuesPIE.ps1.
+
+
+Direct plain daScript enum/struct DSL values: Docs/DSLDirectTypes.md.
+Example: Plugins/DasForUE/Content/Das/Scripts/dsl_direct_types.das.
+Tests: Scripts/TestDSLDirectTypesAsset.ps1 and Scripts/TestDSLDirectTypesPIE.ps1.
+
+
+Stable-ID type catalogs and cooked direct values: Docs/DSLTypeRegistry.md.
+Example: Plugins/DasForUE/Content/Das/Scripts/dsl_registered_types.das.
+Test: Scripts/TestDSLTypeRegistry.ps1 -Cooked.
+
+
+Append-only enum definition migration: Docs/DSLEnumAppend.md.
+Command: Das.DSL.Types.ExtendEnums Script.das /Game/Registry.Registry.
+Test: Scripts/TestDSLTypeRegistry.ps1 -EnumAppend -Cooked.
+
+
+Stable enum member IDs and Switch repair: Docs/DSLEnumMembersAndSwitch.md.
+Example IDs: Plugins/DasForUE/Content/Das/Scripts/dsl_enum_member_ids.das.
+Test: Scripts/TestDSLTypeRegistry.ps1 -EnumAppend -EnumGraphs -Cooked.
+
+
+Standard enum-node reconstruction: Docs/DSLEnumNodeRepair.md.
+Test: Scripts/TestDSLTypeRegistry.ps1 -EnumAppend -EnumGraphs -EnumNodes -Cooked.
+
+
+Enum member rename by stable ID: Docs/DSLEnumRename.md.
+Command: Das.DSL.Types.RenameEnumMembers Script.das /Game/Registry.Registry.
+Test: Scripts/TestDSLTypeRegistry.ps1 -EnumAppend -EnumGraphs -EnumNodes -EnumRename -Cooked.
+
+
+Explicit enum removal/value policies: Docs/DSLEnumValuePolicies.md.
+Command: Das.DSL.Types.MigrateEnumValues Script.das /Game/Registry.Registry Rules.json.
+
+
+Authored struct add/rename: Docs/DSLStructFieldMigration.md.
+Command: Das.DSL.Types.MigrateStructFields Script.das /Game/Registry.Registry.
+Test: Scripts/TestDSLTypeRegistry.ps1 -StructFields -Cooked.
+
+
+## Authored struct containers
+
+Owned ue_struct fields now support primitive arrays, nested authored structs,
+arrays of authored structs, maps with int/string keys and scalar/name values,
+and int/string sets. A daScript
+key-only table `table<T>` maps to native TSet, while `table<K;V>` maps to TMap.
+See [Docs/DSLSetAuthoring.md](Docs/DSLSetAuthoring.md),
+[Docs/DSLMapAuthoring.md](Docs/DSLMapAuthoring.md) and
+[Docs/DSLPrimitiveArrays.md](Docs/DSLPrimitiveArrays.md).
+Set example: `Plugins/DasForUE/Content/Das/Scripts/dsl_set_authoring.das`.
+Container schema migration remains deferred; supported values travel inside
+owned enclosing structs through typed frames and whole-property assignment.
+
+
+## Standalone authored container methods
+
+BlueprintCallable DSL methods can take/return primitive arrays, int/string sets
+and scalar/name maps directly, with native Blueprint container pins. Twenty
+shapes use private compiled owned carriers inside the existing frame ABI; no
+authored wrapper struct or type registry is required. See
+[Docs/DSLContainerCalls.md](Docs/DSLContainerCalls.md) and
+Plugins/DasForUE/Content/Das/Scripts/dsl_container_calls.das.
+Mixed scalar/container calls and packaged execution are verified. Explicit
+DSL out/ref semantics remain the next step; migration work stays deferred.
+
+
+## Explicit authored out/ref parameters
+
+ue_function(ref="counter", out="total") supports primitive and current standalone
+container parameters with mutable daScript references. Native Blueprint output/
+reference pins use owned locals and deferred copy-back of all outputs after a
+successful call. Failed execution or packing preserves ref inputs and returns
+out defaults. See [Docs/DSLOutRef.md](Docs/DSLOutRef.md) and
+Plugins/DasForUE/Content/Das/Scripts/dsl_out_ref.das. The next milestone is
+interfaces; further out/ref types and migration policies remain separate work.
+
+
+## Existing native interface implementations
+
+ue_class(implements="/Script/Module.Interface") validates exact native method
+contracts and emits real Blueprint interface function graphs. C++ Execute_* /
+ProcessEvent dispatch to DSL methods supports current array and out/ref adapters.
+Checked daScript membership and initial int/string dispatch to ordinary Blueprint
+receivers are verified through cook. See [Docs/DSLInterfaces.md](Docs/DSLInterfaces.md)
+and Plugins/DasForUE/Content/Das/Scripts/dsl_interfaces.das. Broader typed dispatch,
+Authored interface definitions are supported; see Docs/DSLAuthoredInterfaces.md.
+Remaining interface capabilities are later work.
+
+
+## Typed interface call frames
+
+ue_begin_interface_call(object,path,method) returns an interface-constrained
+UCallHandle. Existing ue_arg_* / ue_result_* APIs cover supported scalar, struct,
+array, map/set and out/inout values. Interface membership and reflected signature
+are checked again at invocation. Scalar, array, hash and out/ref dispatch to
+ordinary Blueprint receivers pass packaged checks. See
+[Docs/DSLInterfaces.md](Docs/DSLInterfaces.md) and dsl_interfaces.das.
+DSL-authored interface definitions are supported. VM reentry and native Execute fallback
+remain separate capabilities.
+
+
+## DSL-authored Blueprint Interfaces
+
+ue_interface classes with annotated empty method stubs create real Blueprint Interface
+assets through Das.DSL.Interfaces.Apply. Primitive/current container contracts,
+inout references and named out slots use the existing Actor bridge. Runtime
+generated classes preserve stable contract identity through cook and independent
+recompilation. See [Docs/DSLAuthoredInterfaces.md](Docs/DSLAuthoredInterfaces.md),
+dsl_interface_definition.das and dsl_interface_implementation.das. Structural
+contract changes are explicitly deferred.
+
+
+Repeatable `ue_implements(interface=CounterContract)` annotations resolve short
+names within module_id; complete stable IDs and full Unreal paths also work.
+Existing ue_class implements path lists remain compatible. Create/save interface
+assets first. Unknown, ambiguous, duplicate and overlapping-method interface
+contracts reject before mutation. See Docs/DSLAuthoredInterfaces.md.
+
+
+DSL syntax audit and recommended follow-up work: [Docs/DSLSyntaxAudit.md](Docs/DSLSyntaxAudit.md).
+
+
+## Typed UObject authoring
+
+Import ue_object_types and use ActorRef/ObjectRef directly in reflected fields,
+parameters and results. The aliases instantiate `$UEObject<Actor>`/Object in a
+separate module and reuse generated nominal wrappers; native constraints follow
+the declared type, without arg_name_class/return_class. This module boundary is
+required by daScript's generic class-method parser restriction. Existing raw
+handle syntax remains supported. See [Docs/DSLTypedObjects.md](Docs/DSLTypedObjects.md)
+and dsl_typed_objects.das.
+
+
+Interface methods now use `[ue_function(BlueprintCallable, ...)] def Name(...):Type {}`.
+Per-method out/ref and metadata are supported; nonempty bodies reject and direct
+script calls trap. Legacy abstract signatures remain readable. Metadata-only
+interface reapplication preserves the generated class. See DSLAuthoredInterfaces.md.
+
+
+## Shared type and annotation rules
+
+Use parent=Actor, native/source type names or qualified stable IDs with the
+existing explicit type_registry/type_folder scope. Class/interface out/ref lists
+accept native tuples, e.g. ref=(counter,weights), out=(total,message), with legacy
+CSV compatibility. Repeated singleton options and conflicting type constraints
+reject before application. See [Docs/DSLTypeResolution.md](Docs/DSLTypeResolution.md).
+
+
+Void/no-output interface methods now use real Actor Event Graph overrides, with
+native Execute_* / ProcessEvent dispatch, owned input frames and body reload.
+Return/out/inout methods retain function graph adapters. See
+[Docs/DSLInterfaceEvents.md](Docs/DSLInterfaceEvents.md).
+
+
+Preferred out/ref declarations now mark parameters directly: `var counter:int&`
+means inout, `@ue_out var total:int&` means output-only, and `@ue_ref` is optional.
+Legacy function lists remain compatible. See [Docs/DSLOutRef.md](Docs/DSLOutRef.md).

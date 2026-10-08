@@ -5,13 +5,16 @@
 #include "Misc/Parse.h"
 #include "DasRuntime.h"
 
+bool RunDasRegisteredCooked(FString& Report);
+
 class FDasForUESmokeModule : public FDefaultGameModuleImpl
 {
     FDelegateHandle InitHandle;
 public:
     virtual void StartupModule() override
     {
-        if (FParse::Param(FCommandLine::Get(), TEXT("DasSmoke")))
+        if(FParse::Param(FCommandLine::Get(),TEXT("DasRegisteredCooked"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{FString Report;const bool Success=RunDasRegisteredCooked(Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);FPlatformMisc::RequestExitWithStatus(false,Success?0:1);});}
+        else if (FParse::Param(FCommandLine::Get(), TEXT("DasSmoke")))
         {
             InitHandle = FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]
             {

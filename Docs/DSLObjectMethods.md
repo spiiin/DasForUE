@@ -2,7 +2,8 @@
 
 Общий frame теперь принимает UObject references и возвращает объекты.
 В daScript используется существующий nominal `UObjectHandle`, в Unreal —
-object pins и FObjectProperty. Fields типа object пока не добавлены.
+object pins и FObjectProperty. Объектные поля также поддерживаются;
+актуальное описание — Docs/DSLObjectFields.md.
 
 ~~~das
 options gen2

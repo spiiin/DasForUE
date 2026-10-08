@@ -61,3 +61,20 @@ UUserDefinedStruct.
 
 Example: Plugins/DasForUE/Content/Das/Scripts/dsl_type_declarations.das.
 Tests: Scripts/TestDSLTypesAsset.ps1; results: DSLTypeDeclarationsValidation.md.
+
+
+Loaded type assets can now be used by ue_class through checked UEEnumValue/
+UEStructValue field and frame adapters; see DSLAuthoredValues.md. Direct plain
+daScript type conversion and type-change migration remain follow-up stages.
+
+
+## Container field extensions
+
+The initial scalar-only scope above has since expanded to nested authored
+structs, struct/primitive arrays, maps with int/string keys and scalar/name
+values, and int/string sets.
+Key-only daScript `table<T>` fields create TSet, with ordinary ue_property
+annotations. See DSLSetAuthoring.md, DSLMapAuthoring.md,
+DSLPrimitiveArrays.md and DSLNestedTypeAuthoring.md for current support.
+Defaults for these containers remain implicit empty values and unsupported
+container structural migrations explicitly reject.

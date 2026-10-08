@@ -3,10 +3,14 @@
 
 struct FDasTypeDeclaration;
 struct FInstancedStruct;
+class UScriptStruct;class FProperty;class UEnum;
+DASRUNTIME_API UEnum* ResolveDasEnum(const FString& Path,FString& Error);
+DASRUNTIME_API bool ValidateDasEnumNumber(const FString& Path,int64 Value,FString& Error);
+DASRUNTIME_API FProperty* FindDasStructField(UScriptStruct* Type,const FString& Name);
 DASRUNTIME_API bool ValidateDasStructSnapshot(const FInstancedStruct& Value,FString& Error);
 DASRUNTIME_API bool ParseDasStructDefault(const FString& Path,const FString& Text,FInstancedStruct& Out,FString& Error);
 DASRUNTIME_API bool ValidateDasValueStruct(const FString& Path,FString& Error);
-enum class EDasScalarKind : uint8 { Int32, Float32, Bool, String=5, Double=6, Name=7, Object=8, Struct=12 };
+enum class EDasScalarKind : uint8 { Int32, Float32, Bool, String=5, Double=6, Name=7, Object=8, Struct=12, Enum=13 };
 
 struct FDasFieldSchema
 {
@@ -16,23 +20,23 @@ struct FDasFieldSchema
     float FloatDefault = 0;
     bool BoolDefault = false;
     double DoubleDefault=0;FString StringDefault;FName NameDefault;
-    FString StructPath;FString StructDefault;FString ObjectClass;
+    FString StructPath;FString StructDefault;FString ObjectClass;FString EnumPath,EnumDefault;
     bool bInstanceEditable = true;
     FString StableId;
     bool bReadOnly = false;
     TMap<FString,FString> Metadata;
 };
 
-enum class EDasMethodSignature : uint8 { Int, Float, Bool, Void, Frame, String, Double, Name, Object, Vector, Rotator, Transform, Struct };
+enum class EDasMethodSignature : uint8 { Int, Float, Bool, Void, Frame, String, Double, Name, Object, Vector, Rotator, Transform, Struct, Enum };
 struct FDasCallContract {
     EDasMethodSignature ReturnKind=EDasMethodSignature::Int;
     TArray<EDasMethodSignature> Inputs;
-    TArray<FString> InputClasses;FString ReturnClass;
-    bool operator==(const FDasCallContract& Other) const {return ReturnKind==Other.ReturnKind && Inputs==Other.Inputs && InputClasses==Other.InputClasses && ReturnClass==Other.ReturnClass;}
+    TArray<FString> InputClasses;FString ReturnClass;TArray<int32> InputDirections;
+    bool operator==(const FDasCallContract& Other) const {return ReturnKind==Other.ReturnKind && Inputs==Other.Inputs && InputClasses==Other.InputClasses && ReturnClass==Other.ReturnClass && InputDirections==Other.InputDirections;}
     bool operator!=(const FDasCallContract& Other) const {return !(*this==Other);}
     static FDasCallContract Scalar(EDasMethodSignature Kind){FDasCallContract C;C.ReturnKind=Kind;if(Kind!=EDasMethodSignature::Void) C.Inputs.Add(Kind);return C;}
 };
-struct FDasParameterSchema {FName Name;FString StableId;EDasMethodSignature Kind=EDasMethodSignature::Int;FString ClassPath;};
+struct FDasParameterSchema {FName Name;FString StableId;EDasMethodSignature Kind=EDasMethodSignature::Int;FString ClassPath;FString Direction=TEXT("in");};
 // Legacy adapters and a bounded generic scalar call frame.
 struct FDasMethodSchema
 {
@@ -40,7 +44,7 @@ struct FDasMethodSchema
     EDasMethodSignature ReturnKind=EDasMethodSignature::Int;
     FString ReturnClass;
     TArray<FDasParameterSchema> Parameters;
-    FDasCallContract Contract() const {if(Signature!=EDasMethodSignature::Frame) return FDasCallContract::Scalar(Signature);FDasCallContract C;C.ReturnKind=ReturnKind;C.ReturnClass=ReturnClass;bool Objects=false;for(const auto& P:Parameters){C.Inputs.Add(P.Kind);Objects |= P.Kind==EDasMethodSignature::Object || P.Kind==EDasMethodSignature::Struct;}if(Objects)for(const auto& P:Parameters) C.InputClasses.Add(P.ClassPath);return C;}
+    FDasCallContract Contract() const {if(Signature!=EDasMethodSignature::Frame) return FDasCallContract::Scalar(Signature);FDasCallContract C;C.ReturnKind=ReturnKind;C.ReturnClass=ReturnClass;bool Objects=false;for(const auto& P:Parameters){C.Inputs.Add(P.Kind);Objects |= P.Kind==EDasMethodSignature::Object || P.Kind==EDasMethodSignature::Struct || P.Kind==EDasMethodSignature::Enum;}if(Objects)for(const auto& P:Parameters) C.InputClasses.Add(P.ClassPath);bool Outputs=false;for(const auto& P:Parameters)Outputs |= P.Direction!=TEXT("in");if(Outputs)for(const auto& P:Parameters)C.InputDirections.Add(P.Direction==TEXT("out")?1:P.Direction==TEXT("inout")?2:0);return C;}
     TArray<FDasParameterSchema> EffectiveParameters() const {if(Signature==EDasMethodSignature::Frame) return Parameters;if(Signature==EDasMethodSignature::Void) return {};return {{TEXT("Input"),InputStableId,Signature}};}
     FName Name = TEXT("Evaluate");
     FString ScriptFile;
@@ -58,6 +62,7 @@ struct DASRUNTIME_API FDasClassSchema
     FDasMethodSchema Method;
     FString StableId;
     TArray<FDasMethodSchema> Methods;
+    TArray<FString> Interfaces;
     TMap<FString,FString> Metadata;
     TArray<FDasMethodSchema> EffectiveMethods() const;
 

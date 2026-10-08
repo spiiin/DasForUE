@@ -275,7 +275,16 @@ def generate(ir):
              'struct UEName { value : string }',
              'def ue_name(value : string) : UEName { return UEName(value = value) }', '']
     for path in sorted(classes):
-        lines += [f'struct {class_name(path)} {{ handle : UObjectHandle }}', '']
+        lines += [f'[ue_native_object(path={quote(path)})]', f'struct {class_name(path)} {{ handle : UObjectHandle }}', '']
+    # Short names are aliases of existing wrappers, never a second object representation.
+    names = {}
+    for path in sorted(classes):
+        name = ident(path.rsplit('.', 1)[-1])
+        names.setdefault(name, []).append(path)
+    for name, paths in sorted(names.items()):
+        if len(paths) == 1 and name not in symbols:
+            register(name)
+            lines += [f'typedef {name} = {class_name(paths[0])}', '']
     for path in sorted(classes):
         name = class_name(path)
         lines += [

@@ -25,6 +25,7 @@ struct FDasExecutionResult
     bool BoolValue = false;
     FString StringValue;double DoubleValue=0;FName NameValue;TWeakObjectPtr<UObject> ObjectValue;
     FInstancedStruct StructValue;
+    TArray<FDasScalarValue> OutputValues;
     FVector VectorValue=FVector::ZeroVector;FRotator RotatorValue=FRotator::ZeroRotator;FTransform TransformValue=FTransform::Identity;
     FString Error;
     FString ReloadError; // Candidate rejected; a successful result may still use the previous version.
@@ -47,6 +48,7 @@ public:
     virtual void ShutdownModule() override;
     virtual bool SupportsDynamicReloading() override { return false; }
     // Compile-only annotation collection; no global/body execution, Out unchanged on failure.
+    bool ReadAuthoredInterfaces(const FString& Path,FDasAuthoringModule& Out,FString& Error);
     bool ReadReflectedTypes(const FString& Path,FDasReflectedTypes& Out,FString& Error);
     bool ReadAuthoringScript(const FString& Path,FDasAuthoringModule& Out,FString& Error);
     bool ValidateFrameMethod(const FString& Path,FString& Error,const FString& EntryPoint,const FDasCallContract& Contract);
@@ -66,6 +68,7 @@ public:
     void ReleaseObject(UObject* Object);
     int32 StructSnapshotCount(const UObject* Owner=nullptr) const;
     uint64 StructSnapshotsReclaimed(const UObject* Owner=nullptr) const;
+    bool CanMigrateAuthoredTypes()const;
     int32 PersistentContextCount(const UWorld* World = nullptr) const;
     bool ExportBindings(const FString& SelectionPath, const FString& OutputPath, FString& Error);
     FString ScriptPath(const FString& Name) const;

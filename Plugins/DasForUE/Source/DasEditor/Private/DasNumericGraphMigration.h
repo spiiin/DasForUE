@@ -7,7 +7,7 @@ class FDasNumericGraphMigration {
  struct FImpl;TUniquePtr<FImpl> Impl;
 public:
  FDasNumericGraphMigration();~FDasNumericGraphMigration();
- bool Prepare(const TArray<UBlueprint*>& Blueprints,UClass* Root,const TMap<FName,FEdGraphPinType>& Types,EDasIntegerRule I,EDasFloatRule F,FString& Error);
+ bool Prepare(const TArray<UBlueprint*>& Blueprints,UClass* Root,const TMap<FName,FEdGraphPinType>& Types,EDasIntegerRule I,EDasFloatRule F,FString& Error,const TMap<UEdGraphPin*,FEdGraphPinType>& Pins={});
  bool Apply(FString& Error);
  bool Restore(FString& Error);
 };
