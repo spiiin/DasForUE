@@ -214,6 +214,46 @@
       "class": "/Script/DasRuntime.DasObjectFixture",
       "function": "EchoFloatKeyMap",
       "alias": "fixture_EchoFloatKeyMap"
+    },
+    {
+      "class": "/Script/DasRuntime.DasProbeInterface",
+      "function": "Query",
+      "alias": "ue_probe_Query"
+    },
+    {
+      "class": "/Script/DasRuntime.DasProbeInterface",
+      "function": "Label",
+      "alias": "ue_probe_Label"
+    },
+    {
+      "class": "/Script/DasRuntime.DasProbeInterface",
+      "function": "Weights",
+      "alias": "ue_probe_Weights"
+    },
+    {
+      "class": "/Script/DasRuntime.DasProbeInterface",
+      "function": "Stats",
+      "alias": "ue_probe_Stats"
+    },
+    {
+      "class": "/Script/DasRuntime.DasCollectionInterface",
+      "function": "EchoMap",
+      "alias": "ue_collection_EchoMap"
+    },
+    {
+      "class": "/Script/DasRuntime.DasCollectionInterface",
+      "function": "EchoSet",
+      "alias": "ue_collection_EchoSet"
+    },
+    {
+      "class": "/Script/DasRuntime.DasEventInterface",
+      "function": "Notify",
+      "alias": "ue_event_Notify"
+    },
+    {
+      "class": "/Script/DasRuntime.DasEventInterface",
+      "function": "ResetCounter",
+      "alias": "ue_event_ResetCounter"
     }
   ],
   "policy": {

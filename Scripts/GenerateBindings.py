@@ -82,15 +82,26 @@ def default_expr(field, enums):
     raise ValueError('unsupported default kind or representation: ' + kind)
 
 
-def generate(ir):
+def generate(ir, module="ue_generated", source_types=None):
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", module): raise ValueError("Invalid module name")
     if ir.get('schema_version') != 5:
         raise ValueError('Unsupported IR schema version')
     classes = {}
+    interfaces = set()
+    interface_ids = {}
     for item in ir['classes']:
         path = item['type_path']
         if not path.startswith('/') or path in classes:
             raise ValueError('Invalid or duplicate class identity')
         classes[path] = item['parent']
+        if type(item.get('interface', False)) is not bool: raise ValueError('Invalid interface class marker')
+        if item.get('interface', False):
+            stable = item.get('interface_id', '')
+            if path.startswith('/Game/'):
+                if not isinstance(stable, str) or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_.-]*', stable): raise ValueError('Generated authored interface requires stable identity')
+                interface_ids[path] = stable
+            elif not path.startswith('/Script/') or stable: raise ValueError('Invalid generated interface identity')
+            interfaces.add(path)
     def ancestors(path):
         seen = {path}
         parent = classes[path]
@@ -230,6 +241,30 @@ def generate(ir):
         if flattened != expected:
             raise ValueError('Struct tree does not match validated leaf signature')
 
+    source_mappings = {}
+    source_module = None
+    if source_types is not None:
+        if not isinstance(source_types, dict) or set(source_types) != {'module', 'registry', 'types'}: raise ValueError('Invalid source type manifest')
+        source_module = source_types['module']
+        if not isinstance(source_module, str) or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', source_module) or source_module == module: raise ValueError('Invalid source type module')
+        if not isinstance(source_types['registry'], str) or not source_types['registry'].startswith('/Game/'): raise ValueError('Explicit source registry required')
+        if not isinstance(source_types['types'], list): raise ValueError('Invalid source type list')
+        for mapping in source_types['types']:
+            if not isinstance(mapping, dict) or set(mapping) != {'path', 'kind', 'name', 'id', 'members'}: raise ValueError('Invalid source type mapping')
+            path, kind = mapping['path'], mapping['kind']
+            if not isinstance(path, str) or path in source_mappings or not path.startswith('/Game/'): raise ValueError('Duplicate or nonauthored source identity')
+            if not isinstance(mapping['name'], str) or not isinstance(mapping['id'], str) or not isinstance(mapping['members'], dict) or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', mapping['name']) or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_.-]*', mapping['id']): raise ValueError('Invalid source declaration identity')
+            if kind == 'enum':
+                expected = {member['name']: int(member['value']) for member in enums.get(path, [])}
+                if not expected or mapping['members'] != expected: raise ValueError('Source enum values differ from exported identity')
+            elif kind == 'struct':
+                definition = structures.get(path)
+                if not definition or set(mapping['members']) != {field['path'] for field in definition['fields']}: raise ValueError('Source struct members differ from exported layout')
+                if any(field['kind'] not in ('int', 'float', 'double', 'bool', 'string') for field in definition['fields']): raise ValueError('Source struct binding currently requires scalar/string fields')
+                members = list(mapping['members'].values())
+                if len(set(members)) != len(members) or any(not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', member) for member in members): raise ValueError('Invalid source struct member names')
+            else: raise ValueError('Invalid source value kind')
+            source_mappings[path] = mapping
     defaults = {}
     for fn in ir['functions']:
         seen_default = False
@@ -251,7 +286,8 @@ def generate(ir):
         name = class_name(path)
         for suffix in ('', '_from', '_raw', '_null', '_valid'):
             register(name + suffix)
-        for parent in ancestors(path): register(name + '_as_' + class_name(parent))
+        if path not in interfaces:
+            for parent in ancestors(path): register(name + '_as_' + class_name(parent))
     for path in enums:
         name = enum_name(path)
         for symbol in (name, name + '_to_symbol', name + '_from_symbol'):
@@ -270,23 +306,37 @@ def generate(ir):
         if field['kind'] == 'array': return 'array<' + typ(field['element']) + '>'
         return {'object': class_name(field['type_path']), 'name': 'UEName', 'enum': enum_name(field['type_path']), 'struct': struct_name(field['type_path'])}.get(field['kind'], field['kind'])
 
-    lines = ['options gen2', 'module ue_generated public', 'require ue_foundation', '',
+    lines = ['options gen2', 'module ' + module + ' public', 'require ue_foundation', '',
              '// Generated by Scripts/GenerateBindings.py. Do not edit.',
              'struct UEName { value : string }',
              'def ue_name(value : string) : UEName { return UEName(value = value) }', '']
+    if source_module: lines += ['require ' + source_module + ' public', '']
     for path in sorted(classes):
-        lines += [f'[ue_native_object(path={quote(path)})]', f'struct {class_name(path)} {{ handle : UObjectHandle }}', '']
+        annotation = 'ue_native_interface' if path in interfaces else 'ue_native_object'
+        args = 'path=' + quote(path)
+        if path in interface_ids: annotation = 'ue_interface_ref'; args += ', id=' + quote(interface_ids[path])
+        lines += [f'[{annotation}({args})]', f'struct {class_name(path)} {{ handle : UObjectHandle }}', '']
     # Short names are aliases of existing wrappers, never a second object representation.
     names = {}
+    short_aliases = set()
     for path in sorted(classes):
-        name = ident(path.rsplit('.', 1)[-1])
+        leaf = path.rsplit('.', 1)[-1]
+        name = ident(leaf[:-2] if path in interface_ids and leaf.endswith('_C') else leaf)
         names.setdefault(name, []).append(path)
     for name, paths in sorted(names.items()):
         if len(paths) == 1 and name not in symbols:
             register(name)
+            short_aliases.add(name)
             lines += [f'typedef {name} = {class_name(paths[0])}', '']
     for path in sorted(classes):
         name = class_name(path)
+        if path in interfaces:
+            lines += [
+                f'def {name}_from(value : UObjectHandle) : {name} {{ return {name}(handle = ue_cast_interface(value, {quote(path)})) }}',
+                f'def {name}_raw(value : {name}) : UObjectHandle {{ return ue_cast_interface(value.handle, {quote(path)}) }}',
+                f'def {name}_null() : {name} {{ return {name}(handle = ue_null_object()) }}',
+                f'def {name}_valid(value : {name}) : bool {{ return ue_implements_interface(value.handle, {quote(path)}) }}', '']
+            continue
         lines += [
             f'def {name}_from(value : UObjectHandle) : {name} {{ return {name}(handle = ue_cast_nullable_object(value, {quote(path)})) }}',
             f'def {name}_raw(value : {name}) : UObjectHandle {{ return ue_cast_nullable_object(value.handle, {quote(path)}) }}',
@@ -295,6 +345,20 @@ def generate(ir):
         for parent in ancestors(path):
             base = class_name(parent)
             lines += [f'def {name}_as_{base}(value : {name}) : {base} {{ return {base}_from({name}_raw(value)) }}', '']
+    for path in sorted(interfaces):
+        name = class_name(path)
+        lines += [f'def ue_interface(requested : type<{name}>; value : UObjectHandle) : {name} {{ return {name}_from(value) }}', '']
+    # Friendly interface helpers are emitted only as one collision-free group.
+    for short, paths in sorted(names.items()):
+        if len(paths) != 1 or paths[0] not in interfaces or short not in short_aliases: continue
+        helper_names = [short + suffix for suffix in ('_from', '_raw', '_null', '_valid')]
+        if any(helper in symbols for helper in helper_names): continue
+        for helper in helper_names: register(helper)
+        name = class_name(paths[0])
+        lines += [f'def {short}_from(value : UObjectHandle) : {short} {{ return {name}_from(value) }}',
+                  f'def {short}_raw(value : {short}) : UObjectHandle {{ return {name}_raw(value) }}',
+                  f'def {short}_null() : {short} {{ return {name}_null() }}',
+                  f'def {short}_valid(value : {short}) : bool {{ return {name}_valid(value) }}', '']
     for path, members in sorted(enums.items()):
         name = enum_name(path)
         # daScript enum ordinals are private to the binding; conversion uses UE symbols, not numeric casts.
@@ -321,6 +385,42 @@ def generate(ir):
         # Replace the validated array wildcard after quoting, inserting only our loop variable.
         return quote(path).replace('.*', '.{index}')
 
+    # Friendly authored value names stay aliases of the generated representation.
+    authored_values = {}
+    for path in [*enums, *order]:
+        if path.startswith('/Game/') and path not in source_mappings: authored_values.setdefault(ident(path.rsplit('.', 1)[-1]), []).append(path)
+    for short, paths in sorted(authored_values.items()):
+        if len(paths) == 1 and short not in symbols:
+            register(short)
+            full = enum_name(paths[0]) if paths[0] in enums else struct_name(paths[0])
+            lines += [f'typedef {short} = {full}', '']
+            if paths[0] in enums and all(short + suffix not in symbols for suffix in ('_from_symbol', '_to_symbol')):
+                register(short + '_from_symbol'); register(short + '_to_symbol')
+                lines += [f'def {short}_from_symbol(value : string) : {short} {{ return {full}_from_symbol(value) }}', f'def {short}_to_symbol(value : {short}) : string {{ return {full}_to_symbol(value) }}', '']
+    def source_name(field):
+        mapping = source_mappings.get(field.get('type_path', ''))
+        return source_module + '::' + mapping['name'] if mapping else typ(field)
+    for path, mapping in sorted(source_mappings.items()):
+        full = enum_name(path) if mapping['kind'] == 'enum' else struct_name(path)
+        source = source_module + '::' + mapping['name']
+        to_native, from_native = 'ue_source_to_' + full, 'ue_source_from_' + full
+        args = ', '.join(key + '=' + quote(value) for key, value in [('kind', mapping['kind']), ('id', mapping['id']), ('path', path), ('registry', source_types['registry'])])
+        lines += ['[ue_source_value_binding(' + args + ')]', f'def {to_native}(value : {source}) : {full} {{']
+        if mapping['kind'] == 'enum':
+            for member in enums[path]: lines += [f'    if (value == {source}.{member["name"]}) {{ return {full}.v_{ident(member["name"])} }}']
+            lines += ['    panic("invalid source enum binding value")', f'    return {full}.v_{ident(enums[path][0]["name"])}']
+        else:
+            values = [f'f_{ident(field["path"])} = value.{mapping["members"][field["path"]]}' for field in structures[path]['fields']]
+            lines += [f'    return {full}(' + ', '.join(values) + ')']
+        lines += ['}', '', '[ue_source_value_binding(' + args + ')]', f'def {from_native}(value : {full}) : {source} {{']
+        if mapping['kind'] == 'enum':
+            for member in enums[path]: lines += [f'    if (value == {full}.v_{ident(member["name"])}) {{ return {source}.{member["name"]} }}']
+            lines += ['    panic("invalid generated enum binding value")', f'    return {source}.{enums[path][0]["name"]}']
+        else:
+            lines += [f'    var result = {source}()']
+            for field in structures[path]['fields']: lines += [f'    result.{mapping["members"][field["path"]]} = value.f_{ident(field["path"])}']
+            lines += ['    return result']
+        lines += ['}', '']
     def write_input(field, path, val, indent='    '):
         if field['kind'] in ('map', 'set'):
             items = val + ('.entries' if field['kind'] == 'map' else '.values')
@@ -363,10 +463,15 @@ def generate(ir):
         if len(outputs) > 1:
             lines += [f'struct {result_type} {{'] + [f'    out_{ident(p["path"])} : {typ(p)}' for p in outputs] + ['}', '']
         params = ['target : ' + class_name(fn['class'])] + [f'arg_{ident(p["path"])} : {typ(p)}' + (' = ' + defaults[(alias, p['path'])] if (alias, p['path']) in defaults else '') for p in inputs]
-        lines += [f'def {alias}(' + '; '.join(params) + ')' + (f' : {result_type}' if result_type else '') + ' {',
-                  f'    let receiver = ue_cast_object({class_name(fn["class"])}_raw(target), {quote(fn["class"])})',
-                  f'    let call = ue_begin_call(receiver, {quote(fn["function"])})',
-                  f'    ue_expect_signature(call, {quote(fn["signature"])})']
+        lines += [f'def {alias}(' + '; '.join(params) + ')' + (f' : {result_type}' if result_type else '') + ' {']
+        if fn['class'] in interfaces:
+            lines += [f'    let receiver = {class_name(fn["class"])}_raw(target)',
+                      f'    let call = ue_begin_interface_call(receiver, {quote(fn["class"])}, {quote(fn["function"])})',
+                      f'    ue_expect_interface_signature(call, {quote(fn["signature"])})']
+        else:
+            lines += [f'    let receiver = ue_cast_object({class_name(fn["class"])}_raw(target), {quote(fn["class"])})',
+                      f'    let call = ue_begin_call(receiver, {quote(fn["function"])})',
+                      f'    ue_expect_signature(call, {quote(fn["signature"])})']
         for p in inputs: write_input(p, p['path'], 'arg_' + ident(p['path']))
         lines += ['    ue_invoke_call(call)']
         has_arrays = any(p['kind'] in ('array', 'map', 'set') for p in outputs)
@@ -396,6 +501,54 @@ def generate(ir):
         lines += ['    ue_release_call(call)']
         if outputs: lines += ['    return <- result' if has_arrays else '    return result']
         lines += ['}', '']
+    # daScript resolves value.Method(args) to Method(value, args) for free functions.
+    # Keep the checked low-level wrappers as the single native call implementation.
+    emitted_methods = set()
+    for fn in sorted(ir['functions'], key=lambda f: f['alias']):
+        if fn['class'] not in interfaces: continue
+        method = fn['function']
+        if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', method) or method == 'handle': continue
+        key = (fn['class'], method)
+        if key in emitted_methods: continue
+        emitted_methods.add(key)
+        parameters = fn['parameters']
+        returns = [p for p in parameters if p['path'].lower() == 'returnvalue']
+        if len(returns) > 1: raise ValueError('Duplicate interface return parameter')
+        returned = returns[0] if returns else None
+        arguments = [p for p in parameters if p is not returned]
+        outputs = [p for p in parameters if p['output']]
+        signature = ['target : ' + class_name(fn['class'])]
+        for param in arguments:
+            name = 'arg_' + ident(param['path'])
+            mutable = param['output']
+            declaration = ('var ' if mutable else '') + name + ' : ' + source_name(param) + ('&' if mutable else '')
+            if not mutable and (fn['alias'], param['path']) in defaults:
+                default_value = defaults[(fn['alias'], param['path'])]
+                if param.get('type_path') in source_mappings:
+                    if param['kind'] != 'enum': raise ValueError('Source-mapped default requires enum')
+                    member = default_value.split('.v_', 1)[1]
+                    default_value = source_name(param) + '.' + member
+                declaration += ' = ' + default_value
+            signature.append(declaration)
+        lines += [f'def {method}(' + '; '.join(signature) + ')' + (' : ' + source_name(returned) if returned else ' : void') + ' {']
+        input_values = ['target'] + [('ue_source_to_' + (enum_name(p['type_path']) if p['kind'] == 'enum' else struct_name(p['type_path'])) + '(arg_' + ident(p['path']) + ')' if p.get('type_path') in source_mappings else 'arg_' + ident(p['path'])) for p in parameters if p['input']]
+        call = fn['alias'] + '(' + ', '.join(input_values) + ')'
+        container_outputs = any(p['kind'] in ('array', 'map', 'set') for p in outputs)
+        if outputs: lines += [('    var result <- ' if container_outputs else '    let result = ') + call]
+        else: lines += ['    ' + call]
+        def selected_output(param):
+            value = 'result.out_' + ident(param['path']) if len(outputs) > 1 else 'result'
+            if param.get('type_path') in source_mappings: value = 'ue_source_from_' + (enum_name(param['type_path']) if param['kind'] == 'enum' else struct_name(param['type_path'])) + '(' + value + ')'
+            return value
+        # Native validation/result extraction completes before modifying caller variables.
+        for param in arguments:
+            if param['output']:
+                operation = '<-' if param['kind'] in ('array', 'map', 'set') else '='
+                lines += ['    arg_' + ident(param['path']) + ' ' + operation + ' ' + selected_output(param)]
+        if returned:
+            operation = '<-' if returned['kind'] in ('array', 'map', 'set') else ''
+            lines += ['    return ' + (operation + ' ' if operation else '') + selected_output(returned)]
+        lines += ['}', '']
     return '\n'.join(lines)
 
 
@@ -403,9 +556,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('ir', type=Path)
     parser.add_argument('output', type=Path)
+    parser.add_argument('--module', default='ue_generated')
+    parser.add_argument('--source-types', type=Path)
     parser.add_argument('--check', action='store_true', help='Fail if the checked-in module differs')
     args = parser.parse_args()
-    text = generate(json.loads(args.ir.read_text(encoding='utf-8-sig')))
+    source_types = json.loads(args.source_types.read_text(encoding='utf-8-sig')) if args.source_types else None
+    text = generate(json.loads(args.ir.read_text(encoding='utf-8-sig')), args.module, source_types)
     if args.check:
         if not args.output.exists() or args.output.read_text(encoding='utf-8') != text:
             parser.exit(1, 'Generated bindings are stale\n')

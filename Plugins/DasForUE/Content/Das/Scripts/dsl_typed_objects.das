@@ -5,6 +5,12 @@ require ue_object_types
 var remembered : ActorRef
 [ue_class(module_id="typedobjects", Blueprintable)]
 class TargetHolder {
+    [ue_function(BlueprintCallable)]
+    def IsActor(target:ActorRef):bool {
+        let converted = ue_cast_nullable_object(target.handle, ue_type(Actor))
+        return ue_object_is_a(converted, "Actor")
+    }
+
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Target : ActorRef
     @ue_property=(EditAnywhere, BlueprintReadWrite)

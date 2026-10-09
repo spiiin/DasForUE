@@ -71,3 +71,8 @@ struct DASRUNTIME_API FDasClassSchema
     static bool FromDeclaration(const FDasTypeDeclaration& Declaration, const FString& Script,
                                 FDasClassSchema& Out, FString& Error);
 };
+
+// Shared enum frame access: Blueprint byte enums and strongly typed native enums.
+DASRUNTIME_API UEnum* DasEnumPropertyType(FProperty* Property);
+DASRUNTIME_API int64 DasEnumPropertyNumber(FProperty* Property,const void* Memory);
+DASRUNTIME_API bool SetDasEnumPropertyNumber(FProperty* Property,void* Memory,int64 Value);

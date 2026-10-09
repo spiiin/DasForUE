@@ -18,7 +18,7 @@
     void DSLAnnotationArguments(const das::AnnotationArgumentList& Args,const TSet<FString>& Repeatable={}){
         TSet<FString> Seen;for(const auto& A:Args){const FString Name=DSLText(A.name);if(Seen.Contains(Name) && !Repeatable.Contains(Name))DSLFail(TEXT("Repeated annotation option: ")+Name);Seen.Add(Name);}
     }
-    void DSLDeclarationKind(const das::AnnotationList& Args){TArray<FString> Kinds;for(const auto* A:Args){const auto& Name=A->annotation->name;if(Name=="ue_class" || Name=="ue_interface" || Name=="ue_struct" || Name=="ue_native_object")Kinds.Add(DSLText(Name));}if(Kinds.Num()>1)DSLFail(TEXT("Repeated/conflicting declaration annotations: ")+FString::Join(Kinds,TEXT(",")));}
+    void DSLDeclarationKind(const das::AnnotationList& Args){TArray<FString> Kinds;for(const auto* A:Args){const auto& Name=A->annotation->name;if(Name=="ue_class" || Name=="ue_interface" || Name=="ue_struct" || Name=="ue_native_object" || Name=="ue_native_interface" || Name=="ue_interface_ref")Kinds.Add(DSLText(Name));}if(Kinds.Num()>1)DSLFail(TEXT("Repeated/conflicting declaration annotations: ")+FString::Join(Kinds,TEXT(",")));}
     void DSLAddDirections(const das::AnnotationArgument& A,TMap<FString,FString>& Directions){
         if(A.type!=das::Type::tString)DSLFail(TEXT("Out/ref requires parameter names"));TArray<FString> Names;DSLText(A.sValue).ParseIntoArray(Names,TEXT(","),false);if(Names.IsEmpty())DSLFail(TEXT("Empty out/ref parameter list"));for(auto Name:Names){Name=Name.TrimStartAndEnd();if(Name.IsEmpty() || Directions.Contains(Name))DSLFail(TEXT("Duplicate/overlapping out/ref parameter name"));Directions.Add(Name,A.name=="out"?TEXT("out"):TEXT("inout"));}
     }
@@ -33,10 +33,43 @@
         if(!Explicit.IsEmpty())DSLFail(TEXT("Out/ref direction requires a mutable reference: ")+DSLText(Parameter->name));return TEXT("in");
     }
     #include "DasTypeResolution.inl"
+    // Source-only type tokens lower to the existing checked runtime ABI.
+    struct FDSLTypeCallVisitor:das::Visitor {
+        FDSLTypeScope Scope;bool Resolve;
+        explicit FDSLTypeCallVisitor(const FDSLTypeScope& InScope,bool InResolve=true):Scope(InScope),Resolve(InResolve){}
+        virtual void preVisit(das::ExprCall* Call)override{
+            das::string Name=Call->name;
+            const das::string Prefix="ue_foundation::";
+            if(Name.find(Prefix)==0)Name=Name.substr(Prefix.size());
+            int32 Index=-1;EDSLTypeKind Kind=EDSLTypeKind::Class;
+            if(Name=="ue_object_value")Index=0;
+            else if(Name=="ue_cast_object" || Name=="ue_cast_nullable_object" || Name=="ue_object_is_a")Index=1;
+            else if(Name=="ue_cast_interface" || Name=="ue_begin_interface_call" || Name=="ue_implements_interface" || Name=="ue_interface_call_int" || Name=="ue_interface_call_string"){Index=1;Kind=EDSLTypeKind::Interface;}
+            else if(Name=="ue_enum_value" || Name=="ue_enum_from_number"){Index=0;Kind=EDSLTypeKind::Enum;}
+            else if(Name=="ue_struct_value" || Name=="ue_struct_default"){Index=0;Kind=EDSLTypeKind::Struct;}
+            if(Index<0 || Call->arguments.size()<=size_t(Index))return;
+            auto* Argument=Call->arguments[size_t(Index)];bool Token=false;
+            if(Argument->rtti_isCall()){
+                auto* Marker=static_cast<das::ExprCall*>(Argument);
+                if(Marker->name!="ue_type" && Marker->name!="ue_dsl::ue_type")return;
+                if(Marker->arguments.size()!=1)DSLFail(TEXT("ue_type requires exactly one type identity"));
+                Argument=Marker->arguments[0];Token=true;
+            }
+            FString Identity;
+            if(Argument->__rtti==das::string("ExprConstString"))Identity=DSLText(static_cast<das::ExprConstString*>(Argument)->text);
+            else if(Token && Argument->rtti_isVar())Identity=DSLText(static_cast<das::ExprVar*>(Argument)->name);
+            else {if(Token)DSLFail(TEXT("ue_type requires a type name or literal identity"));return;}
+            // Explicit full paths retain low-level runtime validation compatibility.
+            if(!Token && Identity.StartsWith(TEXT("/")))return;
+            if(!Resolve){if(Token)Call->arguments[size_t(Index)]=new das::ExprConstString(Argument->at,DSLUtf8(Identity));return;}
+            const FString Canonical=DSLResolveType(Kind,Identity,Scope);
+            Call->arguments[size_t(Index)]=new das::ExprConstString(Argument->at,DSLUtf8(Canonical));
+        }
+    };
     #include "DasObjectTypes.inl"
     FString DSLTypeName(const das::TypeDeclPtr& T){if(!T)return {};if(DSLTypedObject(T))return TEXT("object");if(T->baseType==das::Type::tEnumeration && T->enumType && DSLAnnotation(T->enumType->annotations,"ue_enum"))return TEXT("enum");if(T->baseType==das::Type::tStructure && T->structType && DSLAnnotation(T->structType->annotations,"ue_struct"))return TEXT("struct");switch(T->baseType){case das::Type::tArray:return TEXT("array");case das::Type::tTable:return T->secondType && T->secondType->baseType==das::Type::tVoid?TEXT("set"):TEXT("map");case das::Type::tInt:return TEXT("int");case das::Type::tFloat:return TEXT("float");case das::Type::tBool:return TEXT("bool");case das::Type::tDouble:return TEXT("double");case das::Type::tString:return TEXT("string");case das::Type::tVoid:return TEXT("void");case das::Type::tHandle:if(T->annotation && T->annotation->name=="UEEnumValue")return TEXT("enum");if(T->annotation && T->annotation->name=="UENameValue")return TEXT("name");if(T->annotation && T->annotation->name=="UObjectHandle")return TEXT("object");if(T->annotation && (T->annotation->name=="UEVector" || T->annotation->name=="UERotator" || T->annotation->name=="UETransform" || T->annotation->name=="UEStructValue"))return TEXT("struct");default:break;}return {};}
     FString DSLMathPath(const das::TypeDeclPtr& T){if(!T || !T->annotation)return {};return T->annotation->name=="UEVector"?TEXT("/Script/CoreUObject.Vector"):T->annotation->name=="UERotator"?TEXT("/Script/CoreUObject.Rotator"):TEXT("/Script/CoreUObject.Transform");}
-    bool DSLPropertyMatches(FProperty* P,const FString& K){return K==TEXT("int")?CastField<FIntProperty>(P)!=nullptr:K==TEXT("float")?CastField<FFloatProperty>(P)!=nullptr:K==TEXT("bool")?CastField<FBoolProperty>(P)!=nullptr:K==TEXT("double")?CastField<FDoubleProperty>(P)!=nullptr:K==TEXT("string")?CastField<FStrProperty>(P)!=nullptr:K==TEXT("struct")?CastField<FStructProperty>(P)!=nullptr:K==TEXT("name")?CastField<FNameProperty>(P)!=nullptr:K==TEXT("enum")?(CastField<FByteProperty>(P) && CastField<FByteProperty>(P)->Enum):CastField<FObjectProperty>(P)!=nullptr && !CastField<FClassProperty>(P);}
+    bool DSLPropertyMatches(FProperty* P,const FString& K){return K==TEXT("int")?CastField<FIntProperty>(P)!=nullptr:K==TEXT("float")?CastField<FFloatProperty>(P)!=nullptr:K==TEXT("bool")?CastField<FBoolProperty>(P)!=nullptr:K==TEXT("double")?CastField<FDoubleProperty>(P)!=nullptr:K==TEXT("string")?CastField<FStrProperty>(P)!=nullptr:K==TEXT("struct")?CastField<FStructProperty>(P)!=nullptr:K==TEXT("name")?CastField<FNameProperty>(P)!=nullptr:K==TEXT("enum")?DasEnumPropertyType(P)!=nullptr:CastField<FObjectProperty>(P)!=nullptr && !CastField<FClassProperty>(P);}
     bool DSLSet(const das::TypeDeclPtr& T){return T && T->baseType==das::Type::tTable && T->secondType && T->secondType->baseType==das::Type::tVoid;}
     bool DSLContainer(const das::TypeDeclPtr& T){return T && (T->baseType==das::Type::tArray || T->baseType==das::Type::tTable);}
     FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T){
@@ -47,6 +80,19 @@
         return D;
     }
     #include "DasDirectTypes.inl"
+    struct FUESourceValueBinding:das::FunctionAnnotation {
+        FUESourceValueBinding():FunctionAnnotation("ue_source_value_binding"){}
+        virtual bool apply(das::ExprBlock*,das::ModuleGroup&,das::AnnotationArgumentList&,das::string&)override{return false;}
+        virtual bool finalize(das::ExprBlock*,das::ModuleGroup&,das::AnnotationArgumentList&,const das::AnnotationArgumentList&,das::string&)override{return false;}
+        virtual bool apply(const das::FunctionPtr&,das::ModuleGroup&,das::AnnotationArgumentList&,das::string&)override{return true;}
+        virtual bool finalize(const das::FunctionPtr& Function,das::ModuleGroup& Group,das::AnnotationArgumentList& Args,const das::AnnotationArgumentList&,das::string& Error)override{try{
+            DSLAnnotationArguments(Args);if(Args.size()!=4)DSLFail(TEXT("Source value binding requires kind, id, path and registry"));const FString Kind=DSLString(Args,"kind"),Id=DSLString(Args,"id"),Path=DSLString(Args,"path"),Registry=DSLString(Args,"registry");
+            das::TypeDeclPtr Source=Function->result;if(!DSLDirectEnum(Source) && !DSLDirectStruct(Source)){if(Function->arguments.size()!=1)DSLFail(TEXT("Source value converter requires one parameter"));Source=Function->arguments[0]->type;}
+            if((Kind==TEXT("enum")?!DSLDirectEnum(Source):Kind==TEXT("struct")?!DSLDirectStruct(Source):true) || Registry.IsEmpty())DSLFail(TEXT("Source value binding type/kind mismatch"));
+            const auto* A=DSLDirectEnum(Source)?DSLAnnotation(Source->enumType->annotations,"ue_enum"):DSLAnnotation(Source->structType->annotations,"ue_struct");const auto* Wire=A->arguments.find("_ue_types_json",das::Type::tString);FDasReflectedTypes Declared;FString Issue;if(!Wire || !FDasReflectedTypes::FromJson(DSLText(Wire->sValue),Declared,Issue,true))DSLFail(TEXT("Source binding has no declaration identity"));const FString ActualId=Kind==TEXT("enum")?Declared.Enums[0].Id:Declared.Structs[0].Id;
+            if(ActualId!=Id || DSLDirectPath(Source,FString(),Registry)!=Path)DSLFail(TEXT("Source value binding identity/layout mismatch"));return true;
+        }catch(const std::exception& X){Error=X.what();return false;}}
+    };
     struct FDSLBodyVisitor:das::Visitor
     {
         const FDasDeclaredClass& Decl;das::string Self;const das::StructurePtr Source;FString Folder;TSet<const das::Expression*> LeftFields;FString Error;
@@ -123,7 +169,14 @@
             try
             {
                 DSLAnnotationArguments(Args,{TEXT("implements")});
-                if(CollectTypesOnly)return true;
+                if(CollectTypesOnly){
+                    // Declaration collection runs before authored assets/registries exist.
+                    // Erase syntax markers only; no body runs in this compilation pass.
+                    FDSLTypeCallVisitor SyntaxOnly(FDSLTypeScope{},false);
+                    for(const auto& Field:St->fields)if(Field.init)Field.init->visit(SyntaxOnly);
+                    St->module->functions.foreach([&](const das::FunctionPtr& Function){if(Function->classParent==St && Function->body && DSLAnnotation(Function->annotations,"ue_function"))Function->body=Function->body->visit(SyntaxOnly);});
+                    return true;
+                }
                 if(const auto* Wire=Args.find(DSLModelKey,das::Type::tString)){if(Wire->at.fileInfo) DSLFail(TEXT("Reserved internal annotation argument"));return true;}
                 FDasAuthoringModule Model;const FString Script=FPaths::GetCleanFilename(DSLText(St->at.fileInfo->name));
                 Model.Id=DSLString(Args,"module_id",FPaths::GetBaseFilename(Script));
@@ -163,6 +216,7 @@
                     }
                     if(ReadWrite && ReadOnly) DSLFail(TEXT("Conflicting BlueprintReadOnly/BlueprintReadWrite specifiers"));
                     if(!Marked) DSLFail(TEXT("Script-private fields unsupported; add @ue_property: ")+P.Name);
+                    if(F.init){FDSLTypeCallVisitor TypeCalls(TypeScope);F.init->visit(TypeCalls);}
                     const FString FieldType=DSLTypeName(F.type);
                     if(!F.type || F.type->ref || FieldType.IsEmpty() || FieldType==TEXT("void")) DSLFail(TEXT("Adapter supports int/float/bool/string/double/name properties: ")+P.Name);
                     P.Type.Kind=FieldType;
@@ -220,6 +274,7 @@
                     const bool LegacySingle=C.Interfaces.IsEmpty() && Directions.IsEmpty() && F->arguments.size()==2 && !F->arguments[1]->type->ref && (ResultType==TEXT("int") || ResultType==TEXT("float") || ResultType==TEXT("bool")) && DSLTypeName(F->arguments[1]->type)==ResultType;
                     for(size_t I=1;I<F->arguments.size();++I){const auto& V=F->arguments[I];const FString K=DSLTypeName(V->type);const FString Direction=DSLParameterDirection(V,Directions.FindRef(DSLText(V->name)));if(K.IsEmpty() || K==TEXT("void") || V->init) DSLFail(TEXT("Unsupported parameter type/ref/default: ")+DSLText(V->name));FDasDeclaredParameter P;P.Direction=Direction;Directions.Remove(DSLText(V->name));if(P.Direction!=TEXT("in") && K!=TEXT("int") && K!=TEXT("float") && K!=TEXT("double") && K!=TEXT("bool") && K!=TEXT("string") && K!=TEXT("name") && !DSLContainer(V->type))DSLFail(TEXT("Out/ref currently requires primitives or standalone containers"));P.Name=LegacySingle?TEXT("Input"):DSLText(V->name);P.Id=M.Id+TEXT(".")+(LegacySingle?TEXT("input"):P.Name);P.Type.Kind=K;if(DSLContainer(V->type)){P.Type=DSLContainerType(V->type);DSLEnsureStructHelpers(V->type,DSLDirectPath(V->type,TypeFolder,TypeRegistry),Group,St->module,HelpersGenerated,Helpers);}if(K==TEXT("enum")){const FString Key=TEXT("arg_")+DSLText(V->name)+TEXT("_enum");P.Type.TypePath=DSLConstraint(ObjectClasses,Key,EDSLTypeKind::Enum,DSLDirectEnum(V->type)?DSLDirectPath(V->type,TypeFolder,TypeRegistry):FString(),TypeScope);if(P.Type.TypePath.IsEmpty())DSLFail(TEXT("Enum argument requires arg_name_enum"));}if(K==TEXT("struct")){if(DSLDirectStruct(V->type)){const FString Key=TEXT("arg_")+DSLText(V->name)+TEXT("_struct");P.Type.TypePath=DSLConstraint(ObjectClasses,Key,EDSLTypeKind::Struct,DSLDirectPath(V->type,TypeFolder,TypeRegistry),TypeScope);DSLEnsureStructHelpers(V->type,P.Type.TypePath,Group,St->module,HelpersGenerated,Helpers);}else if(V->type->annotation->name=="UEStructValue"){const FString Key=TEXT("arg_")+DSLText(V->name)+TEXT("_struct");P.Type.TypePath=DSLConstraint(ObjectClasses,Key,EDSLTypeKind::Struct,FString(),TypeScope);if(P.Type.TypePath.IsEmpty())DSLFail(TEXT("UEStructValue parameter requires arg_name_struct"));}else{const FString Key=TEXT("arg_")+DSLText(V->name)+TEXT("_struct");P.Type.TypePath=DSLConstraint(ObjectClasses,Key,EDSLTypeKind::Struct,DSLMathPath(V->type),TypeScope);}}if(K==TEXT("object")){const FString Key=TEXT("arg_")+DSLText(V->name)+TEXT("_class");P.Type.TypePath=DSLConstraint(ObjectClasses,Key,EDSLTypeKind::Class,DSLTypedObject(V->type)?DSLTypedObjectPath(V->type):FString(),TypeScope);if(P.Type.TypePath.IsEmpty())P.Type.TypePath=TEXT("/Script/CoreUObject.Object");}M.Parameters.Add(P);}
                     if(!ObjectClasses.IsEmpty())DSLFail(TEXT("Unused object class annotation"));if(!Directions.IsEmpty())DSLFail(TEXT("Unknown out/ref parameter name"));
+                    FDSLTypeCallVisitor TypeCalls(TypeScope);F->body=F->body->visit(TypeCalls);
                     auto Clone=F->clone();Clone->name=DSLUtf8(M.EntryPoint);Clone->classParent=nullptr;Clone->annotations.clear();Clone->exports=true;Clone->generated=true;Clone->privateFunction=false;Clone->isStaticClassMethod=false;Clone->isConstClassMethod=false;
                     FDSLBodyVisitor Rewrite(C,Clone->arguments[0]->name,St,TypeFolder);Clone->body=Clone->body->visit(Rewrite);Clone->arguments.erase(Clone->arguments.begin());
                     if(!Rewrite.Error.IsEmpty()) DSLFail(Rewrite.Error);
@@ -256,17 +311,25 @@
     struct FUEInterfaceAnnotation:das::StructureAnnotation {
         FUEInterfaceAnnotation():StructureAnnotation("ue_interface"){}
         virtual bool look(const das::StructurePtr& St,das::ModuleGroup&,das::AnnotationArgumentList&,das::string& Error)override{try{DSLDeclarationKind(St->annotations);DSLAnnotation(St->annotations,"ue_interface");return true;}catch(const std::exception& X){Error=X.what();return false;}}
-        virtual bool touch(const das::StructurePtr& St,das::ModuleGroup&,das::AnnotationArgumentList& Args,das::string& Error)override{try{
+        virtual bool touch(const das::StructurePtr& St,das::ModuleGroup& Group,das::AnnotationArgumentList& Args,das::string& Error)override{try{
             if(const auto* Wire=Args.find(DSLInterfaceKey,das::Type::tString)){if(Wire->at.fileInfo)DSLFail(TEXT("Reserved interface annotation argument"));return true;}
             DSLAnnotationArguments(Args,{TEXT("out")});if(!St->isClass || St->parent)DSLFail(TEXT("ue_interface requires a class without inheritance"));
             FDasAuthoringModule Model;Model.Id=DSLString(Args,"module_id",FPaths::GetBaseFilename(DSLText(St->at.fileInfo->name)));FDasDeclaredClass C;C.Id=DSLString(Args,"id",Model.Id+TEXT(".")+DSLText(St->name));C.Name=DSLText(St->name);C.NativeParent=TEXT("/Script/CoreUObject.Interface");TSet<FString> LegacyOuts;
-            for(const auto& A:Args){if(A.name=="module_id" || A.name=="id")continue;if(A.name=="BlueprintType"){if(!DSLBool(A))DSLFail(TEXT("BlueprintType must be true"));continue;}if(A.name=="out"){TArray<FString> Names;DSLString(Args,"out").ParseIntoArray(Names,TEXT(","),false);for(auto N:Names){N=N.TrimStartAndEnd();if(N.IsEmpty() || LegacyOuts.Contains(N))DSLFail(TEXT("Duplicate/empty interface out name"));LegacyOuts.Add(N);}continue;}if(DSLIsMetadata(A.name))DSLMetadata(A,C.Metadata);else DSLFail(TEXT("Unknown ue_interface annotation"));}
-            auto Type=[&](const das::TypeDeclPtr& T){FDasDeclaredType D;D.Kind=DSLTypeName(T);if(DSLContainer(T))return DSLContainerType(T);if(D.Kind!=TEXT("int") && D.Kind!=TEXT("float") && D.Kind!=TEXT("double") && D.Kind!=TEXT("bool") && D.Kind!=TEXT("string") && D.Kind!=TEXT("name") && D.Kind!=TEXT("void"))DSLFail(TEXT("Authored interface requires primitive/current container types"));return D;};
+            for(const auto& A:Args){if(A.name=="module_id" || A.name=="id" || A.name=="type_registry" || A.name=="type_folder")continue;if(A.name=="BlueprintType"){if(!DSLBool(A))DSLFail(TEXT("BlueprintType must be true"));continue;}if(A.name=="out"){TArray<FString> Names;DSLString(Args,"out").ParseIntoArray(Names,TEXT(","),false);for(auto N:Names){N=N.TrimStartAndEnd();if(N.IsEmpty() || LegacyOuts.Contains(N))DSLFail(TEXT("Duplicate/empty interface out name"));LegacyOuts.Add(N);}continue;}if(DSLIsMetadata(A.name))DSLMetadata(A,C.Metadata);else DSLFail(TEXT("Unknown ue_interface annotation"));}
+            const FString Folder=DSLString(Args,"type_folder"),Registry=DSLString(Args,"type_registry");if(!Folder.IsEmpty() && !Registry.IsEmpty())DSLFail(TEXT("Choose type_registry or type_folder"));const FDSLTypeScope TypeScope{Model.Id,Folder,Registry,&Group,St->module};
+            auto Type=[&](const das::TypeDeclPtr& T,TMap<FString,FString>& Constraints,const FString& Prefix){
+                FDasDeclaredType D;D.Kind=DSLTypeName(T);if(DSLContainer(T))return DSLContainerType(T);
+                if(D.Kind==TEXT("object")){D.TypePath=DSLConstraint(Constraints,Prefix+TEXT("class"),EDSLTypeKind::Class,DSLTypedObject(T)?DSLTypedObjectPath(T):FString(),TypeScope);if(D.TypePath.IsEmpty())D.TypePath=TEXT("/Script/CoreUObject.Object");}
+                else if(D.Kind==TEXT("enum")){D.TypePath=DSLConstraint(Constraints,Prefix+TEXT("enum"),EDSLTypeKind::Enum,DSLDirectEnum(T)?DSLDirectPath(T,Folder,Registry):FString(),TypeScope);if(D.TypePath.IsEmpty())DSLFail(TEXT("Interface enum requires an explicit type constraint"));}
+                else if(D.Kind==TEXT("struct")){const FString Inferred=DSLDirectStruct(T)?DSLDirectPath(T,Folder,Registry):T->annotation && T->annotation->name!="UEStructValue"?DSLMathPath(T):FString();D.TypePath=DSLConstraint(Constraints,Prefix+TEXT("struct"),EDSLTypeKind::Struct,Inferred,TypeScope);if(D.TypePath.IsEmpty())DSLFail(TEXT("Interface snapshot requires an explicit struct constraint"));}
+                else if(D.Kind!=TEXT("int") && D.Kind!=TEXT("float") && D.Kind!=TEXT("double") && D.Kind!=TEXT("bool") && D.Kind!=TEXT("string") && D.Kind!=TEXT("name") && D.Kind!=TEXT("void"))DSLFail(TEXT("Unsupported authored interface signature type"));
+                return D;
+            };
             St->module->functions.foreach([&](const das::FunctionPtr& F){if(F->classParent!=St || F->generated)return;const auto Name=F->name.substr(F->name.find_last_of("`")+1);if(F->isStaticClassMethod || Name==St->name || Name=="finalize" || !St->findField(Name))DSLFail(TEXT("Interface definitions cannot declare static methods, constructors or finalizers"));});
             for(const auto& Field:St->fields){
                 if(Field.generated || Field.name=="__rtti")continue;if(!Field.classMethod)DSLFail(TEXT("Interface definitions cannot declare fields"));
                 FDasDeclaredMethod M;M.Name=DSLText(Field.name);M.Id=C.Id+TEXT(".")+M.Name;M.ScriptFile=FPaths::GetCleanFilename(DSLText(St->at.fileInfo->name));M.EntryPoint=M.Name;
-                TMap<FString,FString> Directions;das::FunctionPtr Function=nullptr;das::TypeDeclPtr Return;das::vector<das::TypeDeclPtr> Types;das::vector<das::string> Names;
+                TMap<FString,FString> Directions,Constraints;das::FunctionPtr Function=nullptr;das::TypeDeclPtr Return;das::vector<das::TypeDeclPtr> Types;das::vector<das::string> Names;
                 if(Field._abstract){
                     if(Field.init || !Field.type || Field.type->baseType!=das::Type::tFunction)DSLFail(TEXT("Invalid legacy abstract interface signature"));Return=Field.type->firstType;
                     for(size_t I=1;I<Field.type->argTypes.size();++I){Types.push_back(Field.type->argTypes[I]);Names.push_back(Field.type->argNames[I]);}
@@ -279,6 +342,7 @@
                         if(A.name=="id"){M.Id=DSLString(Annotation->arguments,"id");continue;}
                         if(A.name=="BlueprintCallable"){M.bCallable=DSLBool(A);continue;}
                         if(A.name=="out" || A.name=="ref"){DSLAddDirections(A,Directions);continue;}
+                        const FString ConstraintKey=DSLText(A.name);const bool ArgumentConstraint=ConstraintKey.StartsWith(TEXT("arg_")) && (ConstraintKey.EndsWith(TEXT("_class")) || ConstraintKey.EndsWith(TEXT("_enum")) || ConstraintKey.EndsWith(TEXT("_struct")));if(ConstraintKey==TEXT("return_class") || ConstraintKey==TEXT("return_enum") || ConstraintKey==TEXT("return_struct") || ArgumentConstraint){if(A.type!=das::Type::tString)DSLFail(TEXT("Interface type constraint requires a type identity"));Constraints.Add(ConstraintKey,DSLText(A.sValue));continue;}
                         if(DSLIsMetadata(A.name))DSLMetadata(A,M.Metadata);else DSLFail(TEXT("Unsupported interface ue_function specifier: ")+DSLText(A.name));
                     }
                     if(!M.bCallable)DSLFail(TEXT("Interface stub requires BlueprintCallable"));
@@ -287,16 +351,17 @@
                     if(!Body || !Body->rtti_isBlock())DSLFail(TEXT("Interface method body must be an empty declaration stub"));auto* Stub=static_cast<das::ExprBlock*>(Body);if(!Stub->list.empty() || !Stub->finalList.empty() || !Stub->arguments.empty())DSLFail(TEXT("Interface method body must be an empty declaration stub"));
                     Return=Function->result;for(size_t I=1;I<Function->arguments.size();++I){if(Function->arguments[I]->init)DSLFail(TEXT("Interface parameter defaults are unsupported"));Types.push_back(Function->arguments[I]->type);Names.push_back(Function->arguments[I]->name);}
                 }
-                M.ReturnType=Type(Return);if(!Return || Return->ref)DSLFail(TEXT("Interface return references unsupported"));
-                for(size_t I=0;I<Types.size();++I){const auto& T=Types[I];FDasDeclaredParameter P;P.Name=DSLText(Names[I]);P.Id=M.Id+TEXT(".")+P.Name;P.Type=Type(T);if(!T || P.Type.Kind==TEXT("void") || (T->ref && T->constant))DSLFail(TEXT("Interface parameters require value or var mutable reference types"));const FString Key=M.Name+TEXT(".")+P.Name;const bool LegacyOut=LegacyOuts.Contains(Key);const FString Direction=Directions.FindRef(P.Name);
+                Return=DSLObjectNormalize(Return,Group,St->module);if(Function)Function->result=Return;M.ReturnType=Type(Return,Constraints,TEXT("return_"));if(!Return || Return->ref)DSLFail(TEXT("Interface return references unsupported"));
+                for(size_t I=0;I<Types.size();++I){Types[I]=DSLObjectNormalize(Types[I],Group,St->module);const auto& T=Types[I];if(Function)Function->arguments[I+1]->type=T;FDasDeclaredParameter P;P.Name=DSLText(Names[I]);P.Id=M.Id+TEXT(".")+P.Name;P.Type=Type(T,Constraints,TEXT("arg_")+P.Name+TEXT("_"));if(!T || P.Type.Kind==TEXT("void") || (T->ref && T->constant))DSLFail(TEXT("Interface parameters require value or var mutable reference types"));const FString Key=M.Name+TEXT(".")+P.Name;const bool LegacyOut=LegacyOuts.Contains(Key);const FString Direction=Directions.FindRef(P.Name);
                     if(LegacyOut && !Direction.IsEmpty())DSLFail(TEXT("Do not mix class-level and method-level directions for one parameter"));if(Field._abstract){P.Direction=LegacyOut?TEXT("out"):T->ref?TEXT("inout"):TEXT("in");if(LegacyOut && !T->ref)DSLFail(TEXT("Interface out requires mutable reference"));}else{P.Direction=DSLParameterDirection(Function->arguments[I+1],LegacyOut?TEXT("out"):Direction);}
+                    if(P.Direction!=TEXT("in") && (P.Type.Kind==TEXT("object") || P.Type.Kind==TEXT("enum") || P.Type.Kind==TEXT("struct")))DSLFail(TEXT("Interface out/ref currently requires primitives or standalone containers"));
                     Directions.Remove(P.Name);LegacyOuts.Remove(Key);M.Parameters.Add(P);
                 }
-                if(!Directions.IsEmpty())DSLFail(TEXT("Unknown interface out/ref parameter name"));if(M.Parameters.Num()>16)DSLFail(TEXT("Interface parameter count exceeds 16"));bool Output=M.ReturnType.Kind!=TEXT("void");for(const auto& P:M.Parameters)Output |= P.Direction!=TEXT("in");C.Methods.Add(M);
+                if(!Constraints.IsEmpty())DSLFail(TEXT("Unused interface type constraint"));                if(!Directions.IsEmpty())DSLFail(TEXT("Unknown interface out/ref parameter name"));if(M.Parameters.Num()>16)DSLFail(TEXT("Interface parameter count exceeds 16"));bool Output=M.ReturnType.Kind!=TEXT("void");for(const auto& P:M.Parameters)Output |= P.Direction!=TEXT("in");C.Methods.Add(M);
                 if(Function){
                     // Empty source bodies are declaration markers. Compiled direct calls trap.
                     auto* Trap=new das::ExprBlock();Trap->at=Function->at;Trap->generated=true;Trap->list.push_back(DSLCall(Function->at,"panic",{new das::ExprConstString(Function->at,"ue_interface declaration stub cannot be called directly")}));
-                    if(M.ReturnType.Kind!=TEXT("void")){auto* Default=new das::ExprMakeStruct(Function->at);Default->makeType=DSLCopyType(Return);Default->alwaysUseInitializer=true;auto* Result=new das::ExprReturn(Function->at,Default);Result->moveSemantics=DSLContainer(Return);Trap->list.push_back(Result);}Function->body=Trap;
+                    if(M.ReturnType.Kind!=TEXT("void")){auto* Default=new das::ExprMakeStruct(Function->at);Default->makeType=DSLCopyType(Return);Default->alwaysUseInitializer=true;das::ExpressionPtr Placeholder=Default;if(DSLDirectStruct(Return))Placeholder=DSLCall(Function->at,Return->structType->name,{});if(DSLDirectEnum(Return)){if(Return->enumType->list.empty())DSLFail(TEXT("Empty interface enum declaration"));Placeholder=new das::ExprField(Function->at,new das::ExprVar(Function->at,Return->enumType->name),Return->enumType->list.front().name);}auto* Result=new das::ExprReturn(Function->at,Placeholder);Result->moveSemantics=DSLContainer(Return);Trap->list.push_back(Result);}Function->body=Trap;
                 }
             }
             if(C.Methods.IsEmpty() || C.Methods.Num()>64 || !LegacyOuts.IsEmpty())DSLFail(TEXT("Expected 1..64 interface methods and known legacy out names"));Model.Classes.Add(C);FString Wire,Issue;if(!Model.ToJson(Wire,Issue))DSLFail(Issue);Args.push_back(das::AnnotationArgument(DSLInterfaceKey,DSLUtf8(Wire)));return true;
@@ -341,7 +406,7 @@
                     FProperty* Actual=Self->GetClass()->FindPropertyByName(*P.Name);
                     if(!DSLPropertyMatches(Actual,P.Type.Kind) || P.bReadOnly!=Actual->HasAnyPropertyFlags(CPF_BlueprintReadOnly))
                     {Error=TEXT("DSL property differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}
-                    if(P.Type.Kind==TEXT("enum")){auto* E=CastField<FByteProperty>(Actual);auto* Type=ResolveDasEnum(P.Type.TypePath,Error);if(!Type || E->Enum!=Type || (ActorAdapter && E->GetPropertyValue_InContainer(Actual->GetOwnerClass()->GetDefaultObject())!=Type->GetValueByNameString(P.Default.String))){Error=TEXT("DSL enum identity/default differs from owner");OK=false;return;}continue;}
+                    if(P.Type.Kind==TEXT("enum")){auto* Type=ResolveDasEnum(P.Type.TypePath,Error);if(!Type || DasEnumPropertyType(Actual)!=Type || (ActorAdapter && DasEnumPropertyNumber(Actual,Actual->ContainerPtrToValuePtr<void>(Actual->GetOwnerClass()->GetDefaultObject()))!=Type->GetValueByNameString(P.Default.String))){Error=TEXT("DSL enum identity/default differs from owner");OK=false;return;}continue;}
                     if(P.Type.Kind==TEXT("object")){auto* Object=CastField<FObjectProperty>(Actual);if(Object->PropertyClass->GetPathName()!=P.Type.TypePath || (ActorAdapter && Object->GetObjectPropertyValue_InContainer(Actual->GetOwnerClass()->GetDefaultObject()))){Error=TEXT("DSL object type/default differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}continue;}
                     if(P.Type.Kind==TEXT("struct")){
                         auto* Struct=CastField<FStructProperty>(Actual);FInstancedStruct Default;
@@ -363,9 +428,9 @@
                     auto Matches=[](FProperty* P,const FDasDeclaredType& T){if(auto* Carrier=DasContainerCarrier(T))return P && Carrier->FindPropertyByName(TEXT("Values"))->SameType(P);return DSLPropertyMatches(P,T.Kind);};
                     bool Fits=Method && Method->NumParms==M.Parameters.Num()+(M.ReturnType.Kind==TEXT("void")?0:1);
                     bool Directed=false;for(const auto& P:M.Parameters)Directed |= P.Direction!=TEXT("in");if(Fits && !Directed){int32 Index=0;for(TFieldIterator<FProperty> It(Method);It;++It) if(It->HasAnyPropertyFlags(CPF_Parm) && !It->HasAnyPropertyFlags(CPF_ReturnParm)){Fits &= M.Parameters.IsValidIndex(Index) && It->GetFName()==FName(*M.Parameters[Index].Name);++Index;}Fits &= Index==M.Parameters.Num();}
-                    if(Fits) for(const auto& P:M.Parameters){auto* Actual=Method->FindPropertyByName(*P.Name);Fits &= Matches(Actual,P.Type) && (P.Direction==TEXT("out")?Actual->HasAnyPropertyFlags(CPF_OutParm) && !Actual->HasAnyPropertyFlags(CPF_ReferenceParm):P.Direction==TEXT("inout")?Actual->HasAllPropertyFlags(CPF_OutParm|CPF_ReferenceParm):(Actual->HasAnyPropertyFlags(CPF_ConstParm) || P.Type.Kind==TEXT("array") || !Actual->HasAnyPropertyFlags(CPF_OutParm|CPF_ReferenceParm)));if(Fits && P.Type.Kind==TEXT("enum"))Fits=CastField<FByteProperty>(Actual)->Enum->GetPathName()==P.Type.TypePath;if(Fits && P.Type.Kind==TEXT("struct"))Fits=CastField<FStructProperty>(Actual)->Struct->GetPathName()==P.Type.TypePath;if(Fits && P.Type.Kind==TEXT("object"))Fits=CastField<FObjectProperty>(Actual)->PropertyClass->GetPathName()==P.Type.TypePath;}
+                    if(Fits) for(const auto& P:M.Parameters){auto* Actual=Method->FindPropertyByName(*P.Name);Fits &= Matches(Actual,P.Type) && (P.Direction==TEXT("out")?Actual->HasAnyPropertyFlags(CPF_OutParm) && !Actual->HasAnyPropertyFlags(CPF_ReferenceParm):P.Direction==TEXT("inout")?Actual->HasAllPropertyFlags(CPF_OutParm|CPF_ReferenceParm):(Actual->HasAnyPropertyFlags(CPF_ConstParm) || P.Type.Kind==TEXT("array") || !Actual->HasAnyPropertyFlags(CPF_OutParm|CPF_ReferenceParm)));if(Fits && P.Type.Kind==TEXT("enum"))Fits=DasEnumPropertyType(Actual)->GetPathName()==P.Type.TypePath;if(Fits && P.Type.Kind==TEXT("struct"))Fits=CastField<FStructProperty>(Actual)->Struct->GetPathName()==P.Type.TypePath;if(Fits && P.Type.Kind==TEXT("object"))Fits=CastField<FObjectProperty>(Actual)->PropertyClass->GetPathName()==P.Type.TypePath;}
                     if(Fits) Fits=M.ReturnType.Kind==TEXT("void")?!Method->GetReturnProperty():Matches(Method->GetReturnProperty(),M.ReturnType);
-                    if(Fits && M.ReturnType.Kind==TEXT("enum"))Fits=CastField<FByteProperty>(Method->GetReturnProperty())->Enum->GetPathName()==M.ReturnType.TypePath;if(Fits && M.ReturnType.Kind==TEXT("struct"))Fits=CastField<FStructProperty>(Method->GetReturnProperty())->Struct->GetPathName()==M.ReturnType.TypePath;
+                    if(Fits && M.ReturnType.Kind==TEXT("enum"))Fits=DasEnumPropertyType(Method->GetReturnProperty())->GetPathName()==M.ReturnType.TypePath;if(Fits && M.ReturnType.Kind==TEXT("struct"))Fits=CastField<FStructProperty>(Method->GetReturnProperty())->Struct->GetPathName()==M.ReturnType.TypePath;
                     if(Fits && M.ReturnType.Kind==TEXT("object"))Fits=CastField<FObjectProperty>(Method->GetReturnProperty())->PropertyClass->GetPathName()==M.ReturnType.TypePath;
                     if(!Fits)
                     {Error=TEXT("DSL method differs from owner; apply/reimport Blueprint: ")+M.Name;OK=false;return;}

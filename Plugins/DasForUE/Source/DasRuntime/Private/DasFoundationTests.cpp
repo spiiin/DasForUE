@@ -1208,8 +1208,29 @@ bool RunDasFoundationTests(FString& Report)
     {
         FDasAuthoringModule Interfaces,Roundtrip;FString Issue,Wire;
         const bool Compiled=Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_definition.das")),Interfaces,Issue);
-        Expect(Compiled && Interfaces.Classes.Num()==1 && Interfaces.Classes[0].Methods.Num()==7,TEXT("authored_interface_stub_definition_compiles"),Issue);
+        Expect(Compiled && Interfaces.Classes.Num()==1 && Interfaces.Classes[0].Methods.Num()==14,TEXT("authored_interface_stub_definition_compiles"),Issue);
         if(Compiled){Expect(Interfaces.ToJson(Wire,Issue) && FDasAuthoringModule::FromJson(Wire,Roundtrip,Issue) && Roundtrip.Classes[0].Id==TEXT("authoredinterface.CounterContract"),TEXT("authored_interface_IR_stable_identity"),Issue);const auto* Stats=Interfaces.Classes[0].Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Stats");});Expect(Stats && Stats->Parameters[0].Direction==TEXT("inout") && Stats->Parameters[1].Direction==TEXT("out"),TEXT("authored_interface_method_ref_out_directions"));}
+    }
+    {
+        TStrongObjectPtr<UDasObjectFixture> NonInterface(NewObject<UDasObjectFixture>());
+        const FString InterfacePath=Runtime.ScriptPath(TEXT("generated_interface_calls.das"));
+        auto Null=Runtime.RunFile(InterfacePath,9,false,NonInterface.Get());Expect(Null.bSucceeded && Null.Value==1,TEXT("generated_interface_null_reference_membership"),Null.Error);
+        auto NullCall=Runtime.RunFile(InterfacePath,10,false,NonInterface.Get());Expect(!NullCall.bSucceeded && NullCall.Error.Contains(TEXT("null")),TEXT("generated_interface_null_dispatch_refused"),NullCall.Error);
+        auto Wrong=Runtime.RunFile(InterfacePath,0,false,NonInterface.Get());Expect(!Wrong.bSucceeded && Wrong.Error.Contains(TEXT("does not implement")),TEXT("generated_interface_nonimplementer_conversion_refused"),Wrong.Error);
+        auto Forged=Runtime.RunFile(InterfacePath,11,false,NonInterface.Get());Expect(!Forged.bSucceeded && Forged.Error.Contains(TEXT("does not implement")),TEXT("generated_interface_forged_reference_refused"),Forged.Error);
+        auto Nominal=Runtime.RunFile(Runtime.ScriptPath(TEXT("generated_interface_wrong_type.das")),0,false,NonInterface.Get());Expect(!Nominal.bSucceeded && Nominal.Error.Contains(TEXT("ue_probe_Query")),TEXT("generated_interface_wrong_nominal_type_refused"),Nominal.Error);
+    }
+    const auto EnumCopy=Run(TEXT("enum_local_copy.das"));
+    Expect(EnumCopy.bSucceeded && EnumCopy.Value==7,TEXT("enum_token_local_copy_and_reassignment"),EnumCopy.Error);
+    {
+        FDasAuthoringModule TypeCalls;FString TypeCallIssue;
+        Expect(Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_type_calls.das")),TypeCalls,TypeCallIssue),TEXT("body_type_tokens_and_short_strings_compile"),TypeCallIssue);
+        for(const auto* InvalidName:{TEXT("wrong_kind"),TEXT("unknown"),TEXT("expression"),TEXT("arity")}){
+            const FString InvalidFile=TEXT("dsl_type_calls_bad_")+FString(InvalidName)+TEXT(".das");
+            const bool Refused=!Runtime.ReadAuthoringScript(Runtime.ScriptPath(InvalidFile),TypeCalls,TypeCallIssue);
+            const FString Required=FString(InvalidName)==TEXT("wrong_kind")?TEXT("Unknown authored interface"):FString(InvalidName)==TEXT("unknown")?TEXT("Unknown class type identity"):FString(InvalidName)==TEXT("expression")?TEXT("requires a type name or literal identity"):TEXT("requires exactly one type identity");
+            Expect(Refused && TypeCallIssue.Contains(Required),*(FString(TEXT("body_type_token_refuses_"))+FString(InvalidName)),TypeCallIssue);
+        }
     }
     {
         FDasAuthoringModule TypedModel;FString Issue;
@@ -1220,6 +1241,18 @@ bool RunDasFoundationTests(FString& Report)
         Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_typed_objects_bad_assignment.das")),TypedModel,Issue),TEXT("typed_object_incompatible_source_assignment_refused"));
         Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_typed_objects_bad_constraint.das")),TypedModel,Issue),TEXT("typed_object_conflicting_constraint_refused"));
         Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_typed_objects_bad_dimension.das")),TypedModel,Issue) && Issue.Contains(TEXT("fixed-array")),TEXT("typed_object_fixed_array_not_lowered_to_scalar"));
+    }
+    {
+        FDasAuthoringModule NativeInterface;FString NativeIssue;
+        const bool NativeOK=Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_definition.das")),NativeInterface,NativeIssue);
+        auto Method=[&](const TCHAR* Name)->const FDasDeclaredMethod*{return NativeOK?NativeInterface.Classes[0].Methods.FindByPredicate([&](const auto& M){return M.Name==Name;}):nullptr;};
+        const auto* ActorMethod=Method(TEXT("EchoActor"));const auto* VectorMethod=Method(TEXT("EchoVector"));const auto* EnumMethod=Method(TEXT("EchoMode"));const auto* StructMethod=Method(TEXT("EchoPayload"));
+        Expect(ActorMethod && ActorMethod->ReturnType.TypePath==TEXT("/Script/Engine.Actor") && ActorMethod->Parameters[0].Type.TypePath==ActorMethod->ReturnType.TypePath,TEXT("authored_interface_typed_object_identity_inferred"),NativeIssue);
+        Expect(VectorMethod && VectorMethod->ReturnType.TypePath==TEXT("/Script/CoreUObject.Vector"),TEXT("authored_interface_math_identity_inferred"),NativeIssue);
+        Expect(EnumMethod && StructMethod && EnumMethod->ReturnType.TypePath==TEXT("/Script/DasRuntime.EDasCallMode") && StructMethod->ReturnType.TypePath==TEXT("/Script/DasRuntime.DasCallPayload"),TEXT("authored_interface_native_enum_struct_constraints"),NativeIssue);
+        for(const auto* Name:{TEXT("constraint"),TEXT("wrong_kind"),TEXT("missing_enum"),TEXT("missing_struct"),TEXT("unused"),TEXT("object_ref"),TEXT("math_ref")}){
+            const FString File=TEXT("dsl_interface_native_bad_")+FString(Name)+TEXT(".das");Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(File),NativeInterface,NativeIssue),*(TEXT("authored_interface_native_refuses_")+FString(Name)),NativeIssue);
+        }
     }
     {
         FDasAuthoringModule StubInterfaces;FString StubIssue;

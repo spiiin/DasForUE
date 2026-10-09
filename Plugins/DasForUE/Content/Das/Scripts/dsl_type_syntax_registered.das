@@ -15,6 +15,17 @@ struct GameSettings {
 }
 [ue_class(parent=Actor, module_id="authoredvalues", type_registry="/Game/DasRegisteredTypes/TypesRegistry.TypesRegistry", Blueprintable)]
 class TypedActor {
+    [ue_function(BlueprintCallable)]
+    def NamedMode():int { return ue_enum_number(ue_enum_value(ue_type(PlayState), "Active")) }
+    [ue_function(BlueprintCallable)]
+    def NamedStruct():int { return ue_struct_get_int(ue_struct_value(ue_type(GameSettings)), "Count") }
+    [ue_function(BlueprintCallable)]
+    def NativeValues():int {
+        let mode = ue_enum_value("EDasCallMode", "Active")
+        let data = ue_struct_value(ue_type(DasCallPayload))
+        return ue_enum_number(mode) + ue_struct_get_int(data, "Count")
+    }
+
     [ue_function(BlueprintCallable, arg_value_enum="direct.State", return_enum=PlayState)]
     def RawMode(value:UEEnumValue):UEEnumValue { return value }
     [ue_function(BlueprintCallable, arg_value_struct=GameSettings, return_struct="direct.Settings")]

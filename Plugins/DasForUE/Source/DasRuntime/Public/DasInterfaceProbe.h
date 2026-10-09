@@ -7,7 +7,15 @@
 #include "Components/SphereComponent.h"
 #include "Engine/World.h"
 #include "Engine/Level.h"
+inline void RunDasGeneratedInterfaceProbe(FDasRuntimeModule& R,UObject* Actor,UObject* Receiver,TFunctionRef<void(bool,const TCHAR*)> Check){
+ const FString Path=R.ScriptPath(TEXT("generated_interface_calls.das"));
+ const TArray<int32> Expected={123,30,1,375,1,31,1,1};
+ for(int32 Index=0;Index<Expected.Num();++Index){auto Result=R.RunFile(Path,Index,false,Receiver);if(!Result.bSucceeded)UE_LOG(LogTemp,Error,TEXT("Generated interface: %s"),*Result.Error);Check(Result.bSucceeded && Result.Value==Expected[Index],*(TEXT("generated_interface_case_")+FString::FromInt(Index)));if(Index==6 || Index==7){auto* Field=FindFProperty<FIntProperty>(Receiver->GetClass(),TEXT("EventCount"));Check(Field && Field->GetPropertyValue_InContainer(Receiver)==(Index==6?17:0),Index==6?TEXT("generated_interface_void_event_input"):TEXT("generated_interface_void_event_no_input"));}}
+ auto Stale=R.RunFile(Path,12,false,Receiver);Check(!Stale.bSucceeded && Stale.Error.Contains(TEXT("signature changed")),TEXT("generated_interface_stale_declaration_rejected"));
+ auto Reentry=R.RunFile(Path,0,false,Actor);Check(!Reentry.bSucceeded && Reentry.Error.Contains(TEXT("reentrant")),TEXT("generated_interface_VM_reentry_remains_rejected"));
+}
 inline void RunDasTypedInterfaceProbe(FDasRuntimeModule& R,UObject* Actor,UObject* Receiver,const FString& Script,TFunctionRef<void(bool,const TCHAR*)> Check){
+ RunDasGeneratedInterfaceProbe(R,Actor,Receiver,Check);
  FDasScalarValue Target,Input;Target.Kind=8;Target.ObjectClass=TEXT("/Script/CoreUObject.Object");Target.ObjectValue=Receiver;Input.Kind=0;Input.IntValue=5;
  auto Query=R.RunNamedFramePersistent(R.ScriptPath(Script),TEXT("ue_NestedActor_TypedQuery"),{Target,Input},EDasMethodSignature::Int,Actor);Check(Query.bSucceeded && Query.Value==123,TEXT("typed_interface_scalar_frame"));
  auto Weights=R.RunNamedFramePersistent(R.ScriptPath(Script),TEXT("ue_NestedActor_TypedWeights"),{Target},EDasMethodSignature::Double,Actor);Check(Weights.bSucceeded && Weights.DoubleValue==2.5+1.23456789012345+2,TEXT("typed_interface_array_double_roundtrip"));

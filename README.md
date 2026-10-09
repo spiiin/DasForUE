@@ -531,3 +531,31 @@ Return/out/inout methods retain function graph adapters. See
 Preferred out/ref declarations now mark parameters directly: `var counter:int&`
 means inout, `@ue_out var total:int&` means output-only, and `@ue_ref` is optional.
 Legacy function lists remain compatible. See [Docs/DSLOutRef.md](Docs/DSLOutRef.md).
+
+
+DSL method bodies can use source type identities instead of embedding Unreal paths:
+`ue_begin_interface_call(target, ue_type(CounterContract), "Query")`. See
+[DSLTypeCalls](Docs/DSLTypeCalls.md) for supported calls and scoped resolution.
+
+
+Native interfaces selected for export now have typed references and generated calls:
+`let api = DasProbeInterface_from(target); let result = ue_probe_Query(api, 5)`.
+See [DSLGeneratedInterfaces](Docs/DSLGeneratedInterfaces.md) for outputs, ownership
+and current capability limits.
+
+
+Authored interface stubs now support native objects, math values and constrained
+native enum/struct snapshots. See [DSLAuthoredInterfaceNativeTypes](Docs/DSLAuthoredInterfaceNativeTypes.md).
+
+
+Authored interfaces can use concrete enum/struct signatures through a registry and
+export isolated typed binding modules. See [DSLAuthoredInterfaceRegistryBindings](Docs/DSLAuthoredInterfaceRegistryBindings.md).
+
+
+Interface bindings now support `api.Query(5)` and `api.Stats(counter, total)` with
+automatic caller ref/out copyback. See [DSLInterfaceMethodCalls](Docs/DSLInterfaceMethodCalls.md).
+
+
+Typed factory syntax is `ue_interface(type<CounterContract>, target)`. Explicit
+source-type mappings allow `api.EchoState(InterfaceState.Active)` and natural struct
+fields. See [DSLInterfaceSourceValues](Docs/DSLInterfaceSourceValues.md).

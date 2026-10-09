@@ -107,3 +107,8 @@ their existing metadata syntax and supported flag rules.
 Examples: dsl_type_syntax.das, dsl_type_syntax_registered.das, dsl_out_ref.das and
 dsl_interface_definition.das. Validation includes TestEditor.ps1 and
 TestDSLTypeRegistry.ps1 -TypeSyntax/-OutRef/-AuthoredInterface.
+
+
+Source type references are now also resolved in reflected method bodies and field
+initializers using ue_type(TypeName) or short string literals in known type slots.
+See DSLTypeCalls.md for exact scope, native/registry precedence and compatibility.

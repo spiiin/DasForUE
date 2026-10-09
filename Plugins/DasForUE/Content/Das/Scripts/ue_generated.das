@@ -6,25 +6,60 @@ require ue_foundation
 struct UEName { value : string }
 def ue_name(value : string) : UEName { return UEName(value = value) }
 
+[ue_native_interface(path="/Script/CoreUObject.Interface")]
+struct C_Interface_479883b5 { handle : UObjectHandle }
+
 [ue_native_object(path="/Script/CoreUObject.Object")]
 struct C_Object_55c3753a { handle : UObjectHandle }
 
+[ue_native_interface(path="/Script/DasRuntime.DasCollectionInterface")]
+struct C_DasCollectionInterface_0db01736 { handle : UObjectHandle }
+
+[ue_native_interface(path="/Script/DasRuntime.DasEventInterface")]
+struct C_DasEventInterface_8cc64841 { handle : UObjectHandle }
+
 [ue_native_object(path="/Script/DasRuntime.DasObjectFixture")]
 struct C_DasObjectFixture_5f019a81 { handle : UObjectHandle }
+
+[ue_native_interface(path="/Script/DasRuntime.DasProbeInterface")]
+struct C_DasProbeInterface_149aa9c6 { handle : UObjectHandle }
 
 [ue_native_object(path="/Script/Engine.Actor")]
 struct C_Actor_adf65d5b { handle : UObjectHandle }
 
 typedef Actor = C_Actor_adf65d5b
 
+typedef DasCollectionInterface = C_DasCollectionInterface_0db01736
+
+typedef DasEventInterface = C_DasEventInterface_8cc64841
+
 typedef DasObjectFixture = C_DasObjectFixture_5f019a81
 
+typedef DasProbeInterface = C_DasProbeInterface_149aa9c6
+
+typedef Interface = C_Interface_479883b5
+
 typedef Object = C_Object_55c3753a
+
+def C_Interface_479883b5_from(value : UObjectHandle) : C_Interface_479883b5 { return C_Interface_479883b5(handle = ue_cast_interface(value, "/Script/CoreUObject.Interface")) }
+def C_Interface_479883b5_raw(value : C_Interface_479883b5) : UObjectHandle { return ue_cast_interface(value.handle, "/Script/CoreUObject.Interface") }
+def C_Interface_479883b5_null() : C_Interface_479883b5 { return C_Interface_479883b5(handle = ue_null_object()) }
+def C_Interface_479883b5_valid(value : C_Interface_479883b5) : bool { return ue_implements_interface(value.handle, "/Script/CoreUObject.Interface") }
 
 def C_Object_55c3753a_from(value : UObjectHandle) : C_Object_55c3753a { return C_Object_55c3753a(handle = ue_cast_nullable_object(value, "/Script/CoreUObject.Object")) }
 def C_Object_55c3753a_raw(value : C_Object_55c3753a) : UObjectHandle { return ue_cast_nullable_object(value.handle, "/Script/CoreUObject.Object") }
 def C_Object_55c3753a_null() : C_Object_55c3753a { return C_Object_55c3753a(handle = ue_null_object()) }
 def C_Object_55c3753a_valid(value : C_Object_55c3753a) : bool { return ue_object_is_a(value.handle, "/Script/CoreUObject.Object") }
+
+def C_DasCollectionInterface_0db01736_from(value : UObjectHandle) : C_DasCollectionInterface_0db01736 { return C_DasCollectionInterface_0db01736(handle = ue_cast_interface(value, "/Script/DasRuntime.DasCollectionInterface")) }
+def C_DasCollectionInterface_0db01736_raw(value : C_DasCollectionInterface_0db01736) : UObjectHandle { return ue_cast_interface(value.handle, "/Script/DasRuntime.DasCollectionInterface") }
+def C_DasCollectionInterface_0db01736_null() : C_DasCollectionInterface_0db01736 { return C_DasCollectionInterface_0db01736(handle = ue_null_object()) }
+def C_DasCollectionInterface_0db01736_valid(value : C_DasCollectionInterface_0db01736) : bool { return ue_implements_interface(value.handle, "/Script/DasRuntime.DasCollectionInterface") }
+
+def C_DasEventInterface_8cc64841_from(value : UObjectHandle) : C_DasEventInterface_8cc64841 { return C_DasEventInterface_8cc64841(handle = ue_cast_interface(value, "/Script/DasRuntime.DasEventInterface")) }
+def C_DasEventInterface_8cc64841_raw(value : C_DasEventInterface_8cc64841) : UObjectHandle { return ue_cast_interface(value.handle, "/Script/DasRuntime.DasEventInterface") }
+def C_DasEventInterface_8cc64841_null() : C_DasEventInterface_8cc64841 { return C_DasEventInterface_8cc64841(handle = ue_null_object()) }
+def C_DasEventInterface_8cc64841_valid(value : C_DasEventInterface_8cc64841) : bool { return ue_implements_interface(value.handle, "/Script/DasRuntime.DasEventInterface") }
 
 def C_DasObjectFixture_5f019a81_from(value : UObjectHandle) : C_DasObjectFixture_5f019a81 { return C_DasObjectFixture_5f019a81(handle = ue_cast_nullable_object(value, "/Script/DasRuntime.DasObjectFixture")) }
 def C_DasObjectFixture_5f019a81_raw(value : C_DasObjectFixture_5f019a81) : UObjectHandle { return ue_cast_nullable_object(value.handle, "/Script/DasRuntime.DasObjectFixture") }
@@ -33,12 +68,45 @@ def C_DasObjectFixture_5f019a81_valid(value : C_DasObjectFixture_5f019a81) : boo
 
 def C_DasObjectFixture_5f019a81_as_C_Object_55c3753a(value : C_DasObjectFixture_5f019a81) : C_Object_55c3753a { return C_Object_55c3753a_from(C_DasObjectFixture_5f019a81_raw(value)) }
 
+def C_DasProbeInterface_149aa9c6_from(value : UObjectHandle) : C_DasProbeInterface_149aa9c6 { return C_DasProbeInterface_149aa9c6(handle = ue_cast_interface(value, "/Script/DasRuntime.DasProbeInterface")) }
+def C_DasProbeInterface_149aa9c6_raw(value : C_DasProbeInterface_149aa9c6) : UObjectHandle { return ue_cast_interface(value.handle, "/Script/DasRuntime.DasProbeInterface") }
+def C_DasProbeInterface_149aa9c6_null() : C_DasProbeInterface_149aa9c6 { return C_DasProbeInterface_149aa9c6(handle = ue_null_object()) }
+def C_DasProbeInterface_149aa9c6_valid(value : C_DasProbeInterface_149aa9c6) : bool { return ue_implements_interface(value.handle, "/Script/DasRuntime.DasProbeInterface") }
+
 def C_Actor_adf65d5b_from(value : UObjectHandle) : C_Actor_adf65d5b { return C_Actor_adf65d5b(handle = ue_cast_nullable_object(value, "/Script/Engine.Actor")) }
 def C_Actor_adf65d5b_raw(value : C_Actor_adf65d5b) : UObjectHandle { return ue_cast_nullable_object(value.handle, "/Script/Engine.Actor") }
 def C_Actor_adf65d5b_null() : C_Actor_adf65d5b { return C_Actor_adf65d5b(handle = ue_null_object()) }
 def C_Actor_adf65d5b_valid(value : C_Actor_adf65d5b) : bool { return ue_object_is_a(value.handle, "/Script/Engine.Actor") }
 
 def C_Actor_adf65d5b_as_C_Object_55c3753a(value : C_Actor_adf65d5b) : C_Object_55c3753a { return C_Object_55c3753a_from(C_Actor_adf65d5b_raw(value)) }
+
+def ue_interface(requested : type<C_Interface_479883b5>; value : UObjectHandle) : C_Interface_479883b5 { return C_Interface_479883b5_from(value) }
+
+def ue_interface(requested : type<C_DasCollectionInterface_0db01736>; value : UObjectHandle) : C_DasCollectionInterface_0db01736 { return C_DasCollectionInterface_0db01736_from(value) }
+
+def ue_interface(requested : type<C_DasEventInterface_8cc64841>; value : UObjectHandle) : C_DasEventInterface_8cc64841 { return C_DasEventInterface_8cc64841_from(value) }
+
+def ue_interface(requested : type<C_DasProbeInterface_149aa9c6>; value : UObjectHandle) : C_DasProbeInterface_149aa9c6 { return C_DasProbeInterface_149aa9c6_from(value) }
+
+def DasCollectionInterface_from(value : UObjectHandle) : DasCollectionInterface { return C_DasCollectionInterface_0db01736_from(value) }
+def DasCollectionInterface_raw(value : DasCollectionInterface) : UObjectHandle { return C_DasCollectionInterface_0db01736_raw(value) }
+def DasCollectionInterface_null() : DasCollectionInterface { return C_DasCollectionInterface_0db01736_null() }
+def DasCollectionInterface_valid(value : DasCollectionInterface) : bool { return C_DasCollectionInterface_0db01736_valid(value) }
+
+def DasEventInterface_from(value : UObjectHandle) : DasEventInterface { return C_DasEventInterface_8cc64841_from(value) }
+def DasEventInterface_raw(value : DasEventInterface) : UObjectHandle { return C_DasEventInterface_8cc64841_raw(value) }
+def DasEventInterface_null() : DasEventInterface { return C_DasEventInterface_8cc64841_null() }
+def DasEventInterface_valid(value : DasEventInterface) : bool { return C_DasEventInterface_8cc64841_valid(value) }
+
+def DasProbeInterface_from(value : UObjectHandle) : DasProbeInterface { return C_DasProbeInterface_149aa9c6_from(value) }
+def DasProbeInterface_raw(value : DasProbeInterface) : UObjectHandle { return C_DasProbeInterface_149aa9c6_raw(value) }
+def DasProbeInterface_null() : DasProbeInterface { return C_DasProbeInterface_149aa9c6_null() }
+def DasProbeInterface_valid(value : DasProbeInterface) : bool { return C_DasProbeInterface_149aa9c6_valid(value) }
+
+def Interface_from(value : UObjectHandle) : Interface { return C_Interface_479883b5_from(value) }
+def Interface_raw(value : Interface) : UObjectHandle { return C_Interface_479883b5_raw(value) }
+def Interface_null() : Interface { return C_Interface_479883b5_null() }
+def Interface_valid(value : Interface) : bool { return C_Interface_479883b5_valid(value) }
 
 enum E_EDasCallMode_aac7a973 {
     v_Idle
@@ -1021,5 +1089,153 @@ def fixture_TransformSet(target : C_DasObjectFixture_5f019a81; arg_values : H_Se
         result.values[index] = ue_result_int(call, "returnvalue.{index}")
     }
     ue_release_call(call)
+    return <- result
+}
+
+def ue_collection_EchoMap(target : C_DasCollectionInterface_0db01736; arg_values : H_Map_int_string_aa6f8c57) : H_Map_int_string_aa6f8c57 {
+    let receiver = C_DasCollectionInterface_0db01736_raw(target)
+    let call = ue_begin_interface_call(receiver, "/Script/DasRuntime.DasCollectionInterface", "EchoMap")
+    ue_expect_interface_signature(call, "v1;EchoMap;Values:MapProperty:134218114[Values_Key:IntProperty:0;Values:StrProperty:0;];ReturnValue:MapProperty:1408[ReturnValue_Key:IntProperty:0;ReturnValue:StrProperty:0;];")
+    ue_arg_hash(call, "values", int(length(arg_values.entries)))
+    for (index in range(length(arg_values.entries))) {
+        ue_arg_int(call, "values.{index}.key", arg_values.entries[index].key)
+        ue_arg_string(call, "values.{index}.value", arg_values.entries[index].value)
+    }
+    ue_invoke_call(call)
+    var result : H_Map_int_string_aa6f8c57
+    resize(result.entries, ue_result_hash_size(call, "returnvalue"))
+    for (index in range(length(result.entries))) {
+        result.entries[index] = H_Map_int_string_aa6f8c57_Entry(key = ue_result_int(call, "returnvalue.{index}.key"), value = ue_result_string(call, "returnvalue.{index}.value"))
+    }
+    ue_release_call(call)
+    return <- result
+}
+
+def ue_collection_EchoSet(target : C_DasCollectionInterface_0db01736; arg_values : H_Set_int_bf4eb51c) : H_Set_int_bf4eb51c {
+    let receiver = C_DasCollectionInterface_0db01736_raw(target)
+    let call = ue_begin_interface_call(receiver, "/Script/DasRuntime.DasCollectionInterface", "EchoSet")
+    ue_expect_interface_signature(call, "v1;EchoSet;Values:SetProperty:134218114[Values:IntProperty:0;];ReturnValue:SetProperty:1408[ReturnValue:IntProperty:0;];")
+    ue_arg_hash(call, "values", int(length(arg_values.values)))
+    for (index in range(length(arg_values.values))) {
+        ue_arg_int(call, "values.{index}", arg_values.values[index])
+    }
+    ue_invoke_call(call)
+    var result : H_Set_int_bf4eb51c
+    resize(result.values, ue_result_hash_size(call, "returnvalue"))
+    for (index in range(length(result.values))) {
+        result.values[index] = ue_result_int(call, "returnvalue.{index}")
+    }
+    ue_release_call(call)
+    return <- result
+}
+
+def ue_event_Notify(target : C_DasEventInterface_8cc64841; arg_amount : int) {
+    let receiver = C_DasEventInterface_8cc64841_raw(target)
+    let call = ue_begin_interface_call(receiver, "/Script/DasRuntime.DasEventInterface", "Notify")
+    ue_expect_interface_signature(call, "v1;Notify;Amount:IntProperty:128;")
+    ue_arg_int(call, "amount", arg_amount)
+    ue_invoke_call(call)
+    ue_release_call(call)
+}
+
+def ue_event_ResetCounter(target : C_DasEventInterface_8cc64841) {
+    let receiver = C_DasEventInterface_8cc64841_raw(target)
+    let call = ue_begin_interface_call(receiver, "/Script/DasRuntime.DasEventInterface", "ResetCounter")
+    ue_expect_interface_signature(call, "v1;ResetCounter;")
+    ue_invoke_call(call)
+    ue_release_call(call)
+}
+
+def ue_probe_Label(target : C_DasProbeInterface_149aa9c6) : string {
+    let receiver = C_DasProbeInterface_149aa9c6_raw(target)
+    let call = ue_begin_interface_call(receiver, "/Script/DasRuntime.DasProbeInterface", "Label")
+    ue_expect_interface_signature(call, "v1;Label;ReturnValue:StrProperty:1408;")
+    ue_invoke_call(call)
+    let result = ue_result_string(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_probe_Query(target : C_DasProbeInterface_149aa9c6; arg_input : int) : int {
+    let receiver = C_DasProbeInterface_149aa9c6_raw(target)
+    let call = ue_begin_interface_call(receiver, "/Script/DasRuntime.DasProbeInterface", "Query")
+    ue_expect_interface_signature(call, "v1;Query;Input:IntProperty:128;ReturnValue:IntProperty:1408;")
+    ue_arg_int(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_int(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+struct ue_probe_Stats_Result {
+    out_counter : int
+    out_total : int
+}
+
+def ue_probe_Stats(target : C_DasProbeInterface_149aa9c6; arg_counter : int) : ue_probe_Stats_Result {
+    let receiver = C_DasProbeInterface_149aa9c6_raw(target)
+    let call = ue_begin_interface_call(receiver, "/Script/DasRuntime.DasProbeInterface", "Stats")
+    ue_expect_interface_signature(call, "v1;Stats;Counter:IntProperty:134218112;Total:IntProperty:384;")
+    ue_arg_int(call, "counter", arg_counter)
+    ue_invoke_call(call)
+    let result = ue_probe_Stats_Result(out_counter = ue_result_int(call, "counter"), out_total = ue_result_int(call, "total"))
+    ue_release_call(call)
+    return result
+}
+
+def ue_probe_Weights(target : C_DasProbeInterface_149aa9c6; arg_values : array<double>) : array<double> {
+    let receiver = C_DasProbeInterface_149aa9c6_raw(target)
+    let call = ue_begin_interface_call(receiver, "/Script/DasRuntime.DasProbeInterface", "Weights")
+    ue_expect_interface_signature(call, "v1;Weights;Values:ArrayProperty:134218114[Values:DoubleProperty:0;];ReturnValue:ArrayProperty:1408[ReturnValue:DoubleProperty:0;];")
+    ue_arg_array(call, "values", int(length(arg_values)))
+    for (index in range(length(arg_values))) {
+        ue_arg_double(call, "values.{index}", arg_values[index])
+    }
+    ue_invoke_call(call)
+    var result : array<double>
+    resize(result, ue_result_array_size(call, "returnvalue"))
+    for (index in range(length(result))) {
+        result[index] = ue_result_double(call, "returnvalue.{index}")
+    }
+    ue_release_call(call)
+    return <- result
+}
+
+def EchoMap(target : C_DasCollectionInterface_0db01736; arg_values : H_Map_int_string_aa6f8c57) : H_Map_int_string_aa6f8c57 {
+    var result <- ue_collection_EchoMap(target, arg_values)
+    return <- result
+}
+
+def EchoSet(target : C_DasCollectionInterface_0db01736; arg_values : H_Set_int_bf4eb51c) : H_Set_int_bf4eb51c {
+    var result <- ue_collection_EchoSet(target, arg_values)
+    return <- result
+}
+
+def Notify(target : C_DasEventInterface_8cc64841; arg_amount : int) : void {
+    ue_event_Notify(target, arg_amount)
+}
+
+def ResetCounter(target : C_DasEventInterface_8cc64841) : void {
+    ue_event_ResetCounter(target)
+}
+
+def Label(target : C_DasProbeInterface_149aa9c6) : string {
+    let result = ue_probe_Label(target)
+    return result
+}
+
+def Query(target : C_DasProbeInterface_149aa9c6; arg_input : int) : int {
+    let result = ue_probe_Query(target, arg_input)
+    return result
+}
+
+def Stats(target : C_DasProbeInterface_149aa9c6; var arg_counter : int&; var arg_total : int&) : void {
+    let result = ue_probe_Stats(target, arg_counter)
+    arg_counter = result.out_counter
+    arg_total = result.out_total
+}
+
+def Weights(target : C_DasProbeInterface_149aa9c6; arg_values : array<double>) : array<double> {
+    var result <- ue_probe_Weights(target, arg_values)
     return <- result
 }

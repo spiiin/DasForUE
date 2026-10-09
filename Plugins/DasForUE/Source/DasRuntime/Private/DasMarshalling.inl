@@ -182,6 +182,7 @@
         auto* Object=ResolveObject(Target,C);auto* Interface=CheckedInterface(Path,C);CheckedInterfaceFunction(Object,Path,Name,C);
         auto Handle=BeginCall(Target,Name,C);auto& Call=ResolveCall(Handle,C);Call.RequiredInterface=Interface;Call.InterfaceSignatureKey=CallSignatureKey(Interface->FindFunctionByName(Call.Function->GetFName()));return Handle;
     }
+    void ExpectInterfaceSignature(const FDasCallHandle& Handle,const char* Expected,das::Context* C){auto& Call=ResolveCall(Handle,C);if(Call.bExecuted || !Call.RequiredInterface.IsValid() || !Expected || Call.InterfaceSignatureKey!=UTF8_TO_TCHAR(Expected))C->throw_error("generated interface signature changed; regenerate bindings");}
     void ExpectCallSignature(const FDasCallHandle& Handle, const char* Expected, das::Context* Context)
     {
         auto& Call = ResolveCall(Handle, Context);

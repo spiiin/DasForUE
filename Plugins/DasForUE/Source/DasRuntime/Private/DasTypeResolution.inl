@@ -12,11 +12,11 @@
     struct FDSLDeclaredReference {FString Id,Name,NativePath;};
     FDSLDeclaredReference DSLFindDeclaredReference(const FString& Name,EDSLTypeKind Kind,const FDSLTypeScope& Scope){
         FDSLDeclaredReference Result;if(!Scope.Group || !Scope.Module)return Result;TMap<FString,FDSLDeclaredReference> Matches;
-        auto Add=[&](const das::AnnotationList& Annotations,const das::string& TypeName,const das::LineInfo& At,const char* AnnotationName){const auto* A=DSLAnnotation(Annotations,AnnotationName);if(!A)return;FDSLDeclaredReference D;D.Name=DSLText(TypeName);if(AnnotationName==das::string("ue_native_object"))D.NativePath=DSLString(A->arguments,"path");else{const FString Module=DSLString(A->arguments,"module_id",FPaths::GetBaseFilename(DSLText(At.fileInfo->name)));D.Id=DSLString(A->arguments,"id",Module+TEXT(".")+D.Name);}Matches.Add(D.NativePath.IsEmpty()?D.Id:D.NativePath,D);};
+        auto Add=[&](const das::AnnotationList& Annotations,const das::string& TypeName,const das::LineInfo& At,const char* AnnotationName){const auto* A=DSLAnnotation(Annotations,AnnotationName);if(!A)return;FDSLDeclaredReference D;D.Name=DSLText(TypeName);if((AnnotationName==das::string("ue_native_object") || AnnotationName==das::string("ue_native_interface") || AnnotationName==das::string("ue_interface_ref")))D.NativePath=DSLString(A->arguments,"path");else{const FString Module=DSLString(A->arguments,"module_id",FPaths::GetBaseFilename(DSLText(At.fileInfo->name)));D.Id=DSLString(A->arguments,"id",Module+TEXT(".")+D.Name);}Matches.Add(D.NativePath.IsEmpty()?D.Id:D.NativePath,D);};
         if(Kind==EDSLTypeKind::Enum){if(auto E=Scope.Module->findEnum(DSLUtf8(Name)))Add(E->annotations,E->name,E->at,"ue_enum");for(const auto& E:Scope.Group->findEnum(DSLUtf8(Name),Scope.Module))Add(E->annotations,E->name,E->at,"ue_enum");auto EnumAliases=Scope.Group->findAlias(DSLUtf8(Name),Scope.Module);if(auto Alias=Scope.Module->findAlias(DSLUtf8(Name)))EnumAliases.push_back(Alias);for(const auto& Alias:EnumAliases)if(Alias->baseType==das::Type::tEnumeration && Alias->enumType)Add(Alias->enumType->annotations,Alias->enumType->name,Alias->enumType->at,"ue_enum");}
         else{
             auto Structures=Scope.Group->findStructure(DSLUtf8(Name),Scope.Module);if(auto Structure=Scope.Module->findStructure(DSLUtf8(Name)))Structures.push_back(Structure);auto Aliases=Scope.Group->findAlias(DSLUtf8(Name),Scope.Module);if(auto Alias=Scope.Module->findAlias(DSLUtf8(Name)))Aliases.push_back(Alias);for(const auto& Alias:Aliases)if(Alias->baseType==das::Type::tStructure && Alias->structType)Structures.push_back(Alias->structType);
-            for(const auto& S:Structures){if(Kind==EDSLTypeKind::Class)Add(S->annotations,S->name,S->at,"ue_native_object");else Add(S->annotations,S->name,S->at,Kind==EDSLTypeKind::Interface?"ue_interface":"ue_struct");}
+            for(const auto& S:Structures){if(Kind==EDSLTypeKind::Interface){Add(S->annotations,S->name,S->at,"ue_native_interface");Add(S->annotations,S->name,S->at,"ue_interface_ref");}if(Kind==EDSLTypeKind::Class)Add(S->annotations,S->name,S->at,"ue_native_object");else Add(S->annotations,S->name,S->at,Kind==EDSLTypeKind::Interface?"ue_interface":"ue_struct");}
         }
         if(Matches.Num()>1)DSLFail(TEXT("Ambiguous declared ")+DSLTypeKindLabel(Kind)+TEXT(" identity: ")+Name);if(Matches.Num()==1)Result=Matches.CreateConstIterator().Value();return Result;
     }
@@ -41,9 +41,15 @@
             auto* Registry=LoadObject<UDasTypeRegistry>(nullptr,*Scope.Registry,nullptr,LOAD_NoWarn);FString Error;if(!Registry || !Registry->Validate(Error))DSLFail(Error.IsEmpty()?TEXT("Type registry could not load: ")+Scope.Registry:Error);
             TSet<FString> IDs;bool Exact=false;for(const auto& B:Registry->Bindings)if(B.Id==Identity){IDs.Add(B.Id);Exact=true;}
             if(!Exact && Declared.Id.IsEmpty() && !Qualified)for(const auto& B:Registry->Bindings){FString Leaf;B.Id.Split(TEXT("."),nullptr,&Leaf,ESearchCase::CaseSensitive,ESearchDir::FromEnd);if(Leaf==Name || B.Type->GetName()==Name)IDs.Add(B.Id);}
+            if(IDs.IsEmpty() && Declared.Id.IsEmpty()){const FString Native=DSLFindNativeReference(Name,Kind);if(!Native.IsEmpty())return DSLCheckTypePath(Kind,Native);}
             if(IDs.Num()!=1)DSLFail((IDs.IsEmpty()?TEXT("Stable type ID is not registered: "):TEXT("Ambiguous registered type identity: "))+Identity);auto* Type=Registry->Resolve(IDs.Array()[0],Kind==EDSLTypeKind::Enum,Error);if(!Type)DSLFail(Error);return DSLCheckTypePath(Kind,Type->GetPathName());
         }
         if((Kind==EDSLTypeKind::Enum || Kind==EDSLTypeKind::Struct) && (!Declared.Id.IsEmpty() || !Scope.Folder.IsEmpty())){
+            if(Declared.Id.IsEmpty()){
+                // Preserve an explicitly selected folder's existing asset identity/kind.
+                if(Scope.Folder.StartsWith(TEXT("/Game/")) && !Name.Contains(TEXT("."))){const FString Candidate=Scope.Folder+TEXT("/")+Name+TEXT(".")+Name;if(LoadObject<UObject>(nullptr,*Candidate,nullptr,LOAD_NoWarn))return DSLCheckTypePath(Kind,Candidate);}
+                const FString Native=DSLFindNativeReference(Name,Kind);if(!Native.IsEmpty())return DSLCheckTypePath(Kind,Native);
+            }
             if(!Scope.Folder.StartsWith(TEXT("/Game/")))DSLFail(TEXT("Direct authored types require type_registry or type_folder"));const FString Leaf=Declared.Name.IsEmpty()?Name:Declared.Name;if(Leaf.Contains(TEXT(".")))DSLFail(TEXT("Stable type ID requires an explicit type registry: ")+Identity);return DSLCheckTypePath(Kind,Scope.Folder+TEXT("/")+Leaf+TEXT(".")+Leaf);
         }
         if(Kind==EDSLTypeKind::Interface){

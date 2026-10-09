@@ -103,3 +103,17 @@ wrappers as a later integration with the binding generator.
 Void/no-output native interface events are now supported through owned Event Graph
 nodes. See DSLInterfaceEvents.md. Return/out/ref interface methods keep the existing
 function graph backend; VM reentry and unsupported flags remain separate work.
+
+
+## Source identities in reflected DSL methods
+
+The runtime functions above retain their path ABI. Within ue_class reflected
+methods, the compiler can lower `ue_type(DasProbeInterface)` or a short literal
+name in the interface argument: `ue_begin_interface_call(target,
+ue_type(CounterContract), "Query")`. See DSLTypeCalls.md for scoped resolution
+and the distinction from future typed interface-reference values.
+
+
+Selected native interfaces now have generated nominal references and typed calls
+that hide frame allocation and parameter marshalling. See DSLGeneratedInterfaces.md
+for supported signatures, friendly helpers and declared-signature validation.

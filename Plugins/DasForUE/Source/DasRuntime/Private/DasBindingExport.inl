@@ -156,6 +156,8 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
                 FString ClassPath, Prefix;
                 if (!(*Rule)->TryGetStringField(TEXT("class"), ClassPath) || !(*Rule)->TryGetStringField(TEXT("prefix"), Prefix) || Prefix.IsEmpty()) ExportPolicyError(TEXT("class rule needs class and prefix"));
                 UClass* Class = FindObject<UClass>(nullptr, *ClassPath);
+            if(!Class && ClassPath.StartsWith(TEXT("/Game/")))Class=LoadObject<UDasAuthoredInterfaceClass>(nullptr,*ClassPath,nullptr,LOAD_NoWarn);
+            if(ClassPath.StartsWith(TEXT("/Game/")) && (!Cast<UDasAuthoredInterfaceClass>(Class) || CastChecked<UDasAuthoredInterfaceClass>(Class)->StableId.IsEmpty()))ExportPolicyError(TEXT("Expected an authored interface identity"));
                 if (!Class) ExportPolicyError(TEXT("Rule class is not loaded: ") + ClassPath);
                 const auto Include = PolicyPatterns(*Rule, TEXT("include"));
                 const auto Exclude = PolicyPatterns(*Rule, TEXT("exclude"));
@@ -201,7 +203,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
             if (Excluded.Contains(Alias)) ExportPolicyError(TEXT("excluded_by_rule"));
             UClass* Class = FindObject<UClass>(nullptr, *ClassPath);
             UFunction* Function = Class && FunctionName.Len() < NAME_SIZE ? Class->FindFunctionByName(FName(*FunctionName)) : nullptr;
-            if (!Function || !Function->HasAnyFunctionFlags(FUNC_BlueprintCallable) ||
+            if (!Function || (!Function->HasAnyFunctionFlags(FUNC_BlueprintCallable) && !(Cast<UDasAuthoredInterfaceClass>(Class) && Function->HasAnyFunctionFlags(FUNC_BlueprintEvent))) ||
                 Function->HasAnyFunctionFlags(FUNC_Static | FUNC_Net | FUNC_Delegate | FUNC_MulticastDelegate))
             { ExportPolicyError(TEXT("Expected loaded class and local BlueprintCallable instance function: ") + ClassPath + TEXT(".") + FunctionName); }
 #if WITH_EDITOR
@@ -210,6 +212,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
             if (!bAllowDeprecated && Function->HasMetaData(TEXT("DeprecatedFunction"))) ExportPolicyError(TEXT("deprecated_function"));
             if (!bAllowInternal && Function->HasMetaData(TEXT("BlueprintInternalUseOnly"))) ExportPolicyError(TEXT("internal_function"));
 #endif
+            if(Class->HasAnyClassFlags(CLASS_Interface) && (!Function->GetOuterUClass()->HasAnyClassFlags(CLASS_Interface) || !Function->HasAnyFunctionFlags(FUNC_BlueprintEvent)))ExportPolicyError(TEXT("requires_reflected_interface_method"));
             auto Signature = DescribeCall(Function, &Context);
             AddClass(Class);
             auto Item = MakeShared<FJsonObject>();
@@ -295,6 +298,8 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
     {
         auto Definition = MakeShared<FJsonObject>();
         Definition->SetStringField(TEXT("type_path"), Path);
+        if(Classes[Path]->HasAnyClassFlags(CLASS_Interface))Definition->SetBoolField(TEXT("interface"),true);
+        if(auto* Authored=Cast<UDasAuthoredInterfaceClass>(Classes[Path]))Definition->SetStringField(TEXT("interface_id"),Authored->StableId);
         Definition->SetObjectField(TEXT("metadata"), ExportMetadata(Classes[Path]));
         UClass* Parent = Classes[Path]->GetSuperClass();
         Definition->SetStringField(TEXT("parent"), Parent ? Parent->GetPathName() : FString());

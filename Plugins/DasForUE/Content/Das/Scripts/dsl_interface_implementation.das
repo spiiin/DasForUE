@@ -1,10 +1,35 @@
 options gen2
 options gc
 require ue_dsl
+require ue_object_types
 [ue_class(module_id="authoredinterface", Blueprintable),
  ue_implements(interface=CounterContract),
  ue_implements(interface="/Script/DasRuntime.DasEventInterface")]
 class CounterActor {
+    [ue_function(BlueprintCallable)]
+    def EchoActor(value:ActorRef):ActorRef { return value }
+    [ue_function(BlueprintCallable)]
+    def EchoObject(value:ObjectRef):ObjectRef { return value }
+    [ue_function(BlueprintCallable)]
+    def EchoVector(value:UEVector):UEVector { return value }
+    [ue_function(BlueprintCallable)]
+    def EchoRotator(value:UERotator):UERotator { return value }
+    [ue_function(BlueprintCallable)]
+    def EchoTransform(value:UETransform):UETransform { return value }
+    [ue_function(BlueprintCallable, arg_value_enum=EDasCallMode, return_enum=EDasCallMode)]
+    def EchoMode(value:UEEnumValue):UEEnumValue { return value }
+    [ue_function(BlueprintCallable, arg_value_struct=DasCallPayload, return_struct=DasCallPayload)]
+    def EchoPayload(value:UEStructValue):UEStructValue { return value }
+
+    [ue_function(BlueprintCallable)]
+    def SupportsContract():bool {
+        return ue_implements_interface(ue_self_object(), ue_type(CounterContract))
+    }
+    [ue_function(BlueprintCallable)]
+    def SupportsNative():bool {
+        return ue_implements_interface(ue_self_object(), "DasEventInterface")
+    }
+
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     LastMessage : string = ""
     [ue_function(BlueprintCallable)]

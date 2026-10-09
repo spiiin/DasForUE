@@ -92,3 +92,9 @@ _from helpers and results/writes packed through _raw helpers.
 Example: Plugins/DasForUE/Content/Das/Scripts/dsl_typed_objects.das.
 Validation: Scripts/TestDSLTypeRegistry.ps1 -TypedObjects -Cooked,
 Scripts/TestEditor.ps1, Scripts/TestBindingsGenerator.py and TestBindingsPolicy.py.
+
+
+Reflected method bodies can also use `ue_cast_nullable_object(target.handle,
+ue_type(Actor))` and `ue_object_is_a(handle, "Actor")` without spelling native
+paths. Type aliases can identify the native class. The compiler resolves these
+references; the checked weak-handle runtime ABI is unchanged. See DSLTypeCalls.md.

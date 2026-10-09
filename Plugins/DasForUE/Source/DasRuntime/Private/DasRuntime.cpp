@@ -60,6 +60,8 @@ MAKE_TYPE_FACTORY(UENameValue,FDasNameValue);
 namespace das {template<> struct cast<FDasNameValue>{static vec4f from(FDasNameValue V){return cast<uint64_t>::from(V.Token);}static FDasNameValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
 // Keep native returns and the annotation's uint64 value representation in the same ABI slot.
 namespace das {
+template<> struct ext_ret_carrier<FDasEnumValue> {using type=uint64_t;};
+template<> struct ext_ret_to_carrier<FDasEnumValue,uint64_t> {static uint64_t from(FDasEnumValue V){return V.Token;}};
 template<> struct ext_ret_carrier<FDasNameValue> {using type=uint64_t;};
 template<> struct ext_ret_to_carrier<FDasNameValue,uint64_t> {static uint64_t from(FDasNameValue V){return V.Token;}};
 }
@@ -440,8 +442,8 @@ namespace
     FDasEnumValue EnumValue(const char* Path,const char* Member,das::Context* C){FString Error;auto* E=ResolveDasEnum(Path?UTF8_TO_TCHAR(Path):TEXT(""),Error);if(!E)C->throw_error(TCHAR_TO_UTF8(*Error));return MakeEnumValue(E->GetPathName(),int32(E->GetValueByNameString(Member?UTF8_TO_TCHAR(Member):TEXT(""))),C);}
     FDasEnumValue EnumFromNumber(const char* Path,int32 V,das::Context* C){return MakeEnumValue(Path?UTF8_TO_TCHAR(Path):TEXT(""),V,C);}
     int32 EnumNumber(FDasEnumValue V,das::Context* C){return ResolveEnumValue(V,C).Value;}
-    FDasEnumValue GetSelfEnum(const char* Name,das::Context* C){auto* Self=ResolveSelf(C);auto* P=ResolveProperty<FByteProperty>(Self,Name,false,C);if(!P->Enum)C->throw_error("Expected enum property");return MakeEnumValue(P->Enum->GetPathName(),P->GetPropertyValue_InContainer(Self),C);}
-    void SetSelfEnum(const char* Name,FDasEnumValue V,das::Context* C){auto* Self=ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("self writes are forbidden in bind_events");auto* P=ResolveProperty<FByteProperty>(Self,Name,true,C);const auto& Value=ResolveEnumValue(V,C);if(P->Enum!=Value.Type.Get())C->throw_error("Enum assignment type mismatch");P->SetPropertyValue_InContainer(Self,uint8(Value.Value));}
+    FDasEnumValue GetSelfEnum(const char* Name,das::Context* C){auto* Self=ResolveSelf(C);auto* P=ResolveProperty<FProperty>(Self,Name,false,C);auto* Enum=DasEnumPropertyType(P);if(!Enum)C->throw_error("Expected enum property");return MakeEnumValue(Enum->GetPathName(),int32(DasEnumPropertyNumber(P,P->ContainerPtrToValuePtr<void>(Self))),C);}
+    void SetSelfEnum(const char* Name,FDasEnumValue V,das::Context* C){auto* Self=ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("self writes are forbidden in bind_events");auto* P=ResolveProperty<FProperty>(Self,Name,true,C);const auto& Value=ResolveEnumValue(V,C);if(DasEnumPropertyType(P)!=Value.Type.Get() || !SetDasEnumPropertyNumber(P,P->ContainerPtrToValuePtr<void>(Self),Value.Value))C->throw_error("Enum assignment type mismatch");}
     void PublishFrameValue(int32 Index,FDasScalarValue Value,das::Context* C){
         if(C!=ActiveContext || !ActiveOutputFrame || !ActiveOutputFrame->Arguments || !ActiveOutputFrame->Arguments->IsValidIndex(Index))C->throw_error("output requires active declared frame slot");
         const auto& Expected=(*ActiveOutputFrame->Arguments)[Index];
@@ -636,6 +638,7 @@ namespace
         return CastFieldChecked<FIntProperty>(Call.Output)->GetPropertyValue_InContainer(Frame.GetStructMemory());
     }
     UClass* CheckedInterface(const char* Path,das::Context* C){auto* I=ResolveClass(Path,C);if((!FString(Path).StartsWith(TEXT("/Script/")) && !FString(Path).StartsWith(TEXT("/Game/"))) || !I->HasAnyClassFlags(CLASS_Interface))C->throw_error("expected loaded native UInterface path");return I;}
+    FDasObjectHandle CastInterface(const FDasObjectHandle& Handle,const char* Path,das::Context* C){auto* Interface=CheckedInterface(Path,C);if(!Handle.Token)return {};auto* Object=ResolveObject(Handle,C);if(!Object->GetClass()->ImplementsInterface(Interface))C->throw_error("object does not implement requested interface");return Handle;}
     bool ObjectImplementsInterface(const FDasObjectHandle& H,const char* Path,das::Context* C){auto* I=CheckedInterface(Path,C);auto* O=TryObject(H,C);return O && O->GetClass()->ImplementsInterface(I);}
     UFunction* CheckedInterfaceFunction(UObject* O,const char* Path,const char* Name,das::Context* C){auto* I=CheckedInterface(Path,C);if(!O->GetClass()->ImplementsInterface(I))C->throw_error("object does not implement requested interface");if(!Name || !*Name)C->throw_error("expected interface method name");auto* Declared=I->FindFunctionByName(FName(UTF8_TO_TCHAR(Name)));auto* Actual=O->FindFunction(FName(UTF8_TO_TCHAR(Name)));if(O->IsA<ADasProbeActor>() && ActiveContext)C->throw_error("interface dispatch into daScript requires a later reentrant backend");if(!Declared || !Declared->HasAnyFunctionFlags(FUNC_BlueprintEvent) || !Actual)C->throw_error("reflected interface implementation is unavailable");if(!Actual->IsSignatureCompatibleWith(Declared))C->throw_error("interface dispatch signature mismatch");return Actual;}
     int32 InterfaceCallInt(const FDasObjectHandle& H,const char* Path,const char* Name,int32 Input,das::Context* C){auto* O=ResolveObject(H,C);CheckedInterfaceFunction(O,Path,Name,C);return CallInt(H,Name,Input,C);}
@@ -753,7 +756,7 @@ namespace
         virtual bool canBePlacedInContainer() const override { return true; }
     };
 
-    struct FDSLEnumAnnotation:das::ManagedStructureAnnotation<FDasEnumValue,false>{FDSLEnumAnnotation(das::ModuleLibrary& L):ManagedStructureAnnotation("UEEnumValue",L,"FDasEnumValue"){}virtual bool isRefType()const override{return false;}virtual bool isLocal()const override{return true;}virtual bool canCopy()const override{return true;}virtual bool canMove()const override{return true;}virtual bool hasNonTrivialCtor()const override{return false;}virtual bool isPod()const override{return true;}};
+    struct FDSLEnumAnnotation:das::ManagedStructureAnnotation<FDasEnumValue,false>{FDSLEnumAnnotation(das::ModuleLibrary& L):ManagedStructureAnnotation("UEEnumValue",L,"FDasEnumValue"){}virtual das::TypeDeclPtr makeValueType()const override{static_assert(sizeof(FDasEnumValue)==sizeof(uint64));return new das::TypeDecl(das::Type::tUInt64,das::LineInfo());}virtual das::SimNode* simulateClone(das::Context& C,const das::LineInfo& At,das::SimNode* Left,das::SimNode* Right)const override{return C.code->makeNode<das::SimNode_Set<FDasEnumValue>>(At,Left,Right);}virtual bool isRefType()const override{return false;}virtual bool isLocal()const override{return true;}virtual bool canCopy()const override{return true;}virtual bool canMove()const override{return true;}virtual bool hasNonTrivialCtor()const override{return false;}virtual bool isPod()const override{return true;}};
     struct FDSLNameAnnotation:das::ManagedStructureAnnotation<FDasNameValue,false>{
         FDSLNameAnnotation(das::ModuleLibrary& L):ManagedStructureAnnotation("UENameValue",L,"FDasNameValue"){}
         // Reference-to-value conversion during table cloning/calls copies the owned token.
@@ -778,7 +781,7 @@ namespace
         FUnrealFoundationModule() : das::Module("ue_foundation")
         {
             addAnnotation(new FUEClassAnnotation());addAnnotation(new FUEEnumAnnotation());addAnnotation(new FUEStructAnnotation());
-            addAnnotation(new FUEObjectTypeAnnotation());addTypeMacro(new FUEObjectTypeMacro());
+            addAnnotation(new FUENativeInterfaceAnnotation());addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));addAnnotation(new FUESourceValueBinding());addAnnotation(new FUEObjectTypeAnnotation());addTypeMacro(new FUEObjectTypeMacro());
             addAnnotation(new FUEFunctionAnnotation());addAnnotation(new FUEInterfaceAnnotation());addAnnotation(new FUEImplementsAnnotation());
             das::ModuleLibrary Library(this);
             Library.addBuiltInModule();
@@ -795,6 +798,7 @@ namespace
             das::addExtern<DAS_BIND_FUN(SetCallName)>(*this, Library, "ue_arg_name", das::SideEffects::modifyExternal, "SetCallName");
             das::addExtern<DAS_BIND_FUN(SetCallObject)>(*this, Library, "ue_arg_object", das::SideEffects::modifyExternal, "SetCallObject");
             das::addExtern<DAS_BIND_FUN(GetCallObject), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_result_object", das::SideEffects::modifyExternal, "GetCallObject");
+            das::addExtern<DAS_BIND_FUN(ExpectInterfaceSignature)>(*this,Library,"ue_expect_interface_signature",das::SideEffects::modifyExternal,"ExpectInterfaceSignature");
             das::addExtern<DAS_BIND_FUN(BeginInterfaceCall),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"ue_begin_interface_call",das::SideEffects::modifyExternal,"BeginInterfaceCall");
             das::addExtern<DAS_BIND_FUN(BeginCall), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_begin_call", das::SideEffects::modifyExternal, "BeginCall");
             das::addExtern<DAS_BIND_FUN(InvokeCall)>(*this, Library, "ue_invoke_call", das::SideEffects::modifyExternal, "InvokeCall");
@@ -886,6 +890,7 @@ namespace
             das::addExtern<DAS_BIND_FUN(PublishFrameDouble)>(*this,Library,"ue_frame_out_double",das::SideEffects::modifyExternal,"PublishFrameDouble");
             das::addExtern<DAS_BIND_FUN(PublishFrameName)>(*this,Library,"ue_frame_out_name",das::SideEffects::modifyExternal,"PublishFrameName");
             das::addExtern<DAS_BIND_FUN(PublishFrameStruct)>(*this,Library,"ue_frame_out_struct",das::SideEffects::modifyExternal,"PublishFrameStruct");
+            das::addExtern<DAS_BIND_FUN(CastInterface),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"ue_cast_interface",das::SideEffects::modifyExternal,"CastInterface");
             das::addExtern<DAS_BIND_FUN(ObjectImplementsInterface)>(*this,Library,"ue_implements_interface",das::SideEffects::modifyExternal,"ObjectImplementsInterface");
             das::addExtern<DAS_BIND_FUN(InterfaceCallInt)>(*this,Library,"ue_interface_call_int",das::SideEffects::modifyExternal,"InterfaceCallInt");
             das::addExtern<DAS_BIND_FUN(InterfaceCallString)>(*this,Library,"ue_interface_call_string",das::SideEffects::modifyExternal,"InterfaceCallString");

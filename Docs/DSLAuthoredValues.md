@@ -59,3 +59,9 @@ authored structs and type hot reload remain separate extensions.
 Example: Plugins/DasForUE/Content/Das/Scripts/dsl_authored_values.das (paths initially
 use /Game/DasAuthoredTypes). Tests: TestDSLAuthoredValuesAsset.ps1 and
 TestDSLAuthoredValuesPIE.ps1. Results: DSLAuthoredValuesValidation.md.
+
+
+Within reflected ue_class methods and field initializers, these raw snapshot
+constructors now accept scoped short literal names or `ue_type(GameSettings)` /
+`ue_type(PlayState)` in the type argument. Natural typed fields/signatures remain
+preferred. See DSLTypeCalls.md for registry rules and standalone-function limits.

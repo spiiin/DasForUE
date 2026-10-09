@@ -22,3 +22,12 @@
         FUEObjectTypeMacro():TypeMacro("UEObject"){}
         virtual das::TypeDeclPtr visit(das::Program* Program,das::Module* Module,const das::TypeDeclPtr& Type,const das::TypeDeclPtr& Pass)override{try{auto C=DSLObjectNormalize(Type,*Program->thisModuleGroup,Module);if(!DSLTypedObject(C))DSLFail(TEXT("UEObject requires a concrete native wrapper"));if(Pass && (Pass->baseType!=das::Type::tStructure || Pass->structType!=C->structType))return nullptr;return C;}catch(const std::exception& X){Program->error("UEObject type macro failed",X.what(),"",Type->at,das::CompilationError::invalid_type);return nullptr;}}
     };
+
+    struct FUENativeInterfaceAnnotation:das::StructureAnnotation {
+        FUENativeInterfaceAnnotation(const char* Name="ue_native_interface"):StructureAnnotation(Name){}
+        virtual bool touch(const das::StructurePtr& S,das::ModuleGroup&,das::AnnotationArgumentList& Args,das::string& Error)override{try{
+            if(S->isClass || S->parent || S->fields.size()!=1 || S->fields[0].name!="handle" || !S->fields[0].type || S->fields[0].type->ref || S->fields[0].type->baseType!=das::Type::tHandle || !S->fields[0].type->annotation || S->fields[0].type->annotation->name!="UObjectHandle" || S->fields[0].init || Args.size()!=(name=="ue_interface_ref"?2u:1u) || Args[0].name!="path" || Args[0].type!=das::Type::tString)DSLFail(TEXT("Native interface reference requires one UObjectHandle field and path"));
+            const FString Path=DSLString(Args,"path");auto* Interface=FindObject<UClass>(nullptr,*Path);if(!Interface || !Interface->HasAnyClassFlags(CLASS_Interface))DSLFail(TEXT("Interface reference requires a loaded interface"));if(name=="ue_interface_ref"){auto* Authored=Cast<UDasAuthoredInterfaceClass>(Interface);if(!Path.StartsWith(TEXT("/Game/")) || !Authored || DSLString(Args,"id")!=Authored->StableId || Authored->StableId.IsEmpty())DSLFail(TEXT("Authored interface reference identity mismatch"));}else if(!Path.StartsWith(TEXT("/Script/")))DSLFail(TEXT("Native interface reference requires a native path"));return true;
+        }catch(const std::exception& X){Error=X.what();return false;}}
+        virtual bool look(const das::StructurePtr& S,das::ModuleGroup&,das::AnnotationArgumentList&,das::string& Error)override{try{DSLDeclarationKind(S->annotations);DSLAnnotation(S->annotations,name.c_str());return true;}catch(const std::exception& X){Error=X.what();return false;}}
+    };

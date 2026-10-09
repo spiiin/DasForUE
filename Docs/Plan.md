@@ -1243,3 +1243,78 @@ typed macro sketches are not implemented capabilities. Migration work stays defe
   and primitive/container capability limits are unchanged.
 - Examples and runtime/editor/cook probes use the parameter-local form. General
   migrations and remaining core binding stages stay on the existing plan.
+
+
+### Source type references in DSL bodies — 2026-10-09
+
+- Added compiler lowering of ue_type(TypeName) and short literal names in object,
+  interface, enum and struct runtime calls within reflected class bodies/defaults.
+- Reuses scoped identity/kind/ambiguity validation and the existing checked runtime
+  ABI; canonical paths stay internal. Registry identities retain precedence, with
+  native-only fallback when no authored declaration/entry matches.
+- Generated typed interface-reference values/method wrappers remain subsequent work.
+  General migrations and VM reentry remain deferred. See DSLTypeCalls.md.
+
+
+### Generated native interface bindings — 2026-10-09
+
+- Native interface receiver metadata now reaches the reflection IR/generator.
+  Nominal weak references, collision-safe friendly helpers and typed methods
+  reuse checked membership, declared signature guards and owned marshalling.
+- Includes scalar/string, arrays, map/set, multiple out/ref results and void calls.
+  Blueprint receivers exercise real event state changes as well as functions.
+- Scoped authored BPI wrapper generation, broader authored signature types and
+  reflected interface storage remain next integrations. Native Execute fallback,
+  VM reentry and general migration work remain deferred. See DSLGeneratedInterfaces.md.
+
+
+### Authored interface native value signatures — 2026-10-09
+
+- Added typed/native object identities, math types and constrained native enum/struct
+  snapshots to ordinary interface stubs and actual Blueprint interface pins.
+- Shared type resolution and inferred/explicit constraint conflict checks match
+  class declarations. Unsupported object/math/enum/struct out/ref rejects explicitly.
+- Enum contract/owner checks and wildcard frame packing now support both native
+  FEnumProperty and Blueprint FByteProperty without relaxing identity/value rules.
+- Next: scoped natural authored enum/struct signatures and authored interface wrapper
+  generation. Reflected interface storage, VM reentry and structural migrations
+  remain separate/deferred. See DSLAuthoredInterfaceNativeTypes.md.
+
+
+### Authored interface registry values and bindings — 2026-10-09
+
+- Interface signatures infer concrete authored enum/struct identities through an
+  explicit registry/folder, preserving IDs, GUID/layout/default checks and conflict
+  rules. Empty declaration stubs support enums without a zero member and initialized
+  structs behind the existing direct-call trap.
+- Reflection export now prepares selected authored BPI signatures and retains stable
+  identity. The generator supports isolated module names, authored nominal receivers,
+  short aliases and enum symbol helpers; real Blueprint calls cover enum/struct too.
+- Reflected interface storage, broader out/ref, unification of generated vs authored
+  source value types, VM reentry and general migrations remain separate stages.
+  See DSLAuthoredInterfaceRegistryBindings.md.
+
+
+### Interface method calls and ref/out copyback — 2026-10-09
+
+- Added typed method-name facades resolved by ordinary daScript dot calls over the
+  existing native/authored interface wrappers. No reader/parser changes are required.
+- ReturnValue becomes a return; non-return outputs become mutable references, with
+  copyback/move after successful result extraction. Arrays/containers retain owned
+  transport and receiver/signature/lifetime guards remain on the same call boundary.
+- Natural enum/struct representation unification and a generic reference factory
+  remain next ergonomics integrations; reflected interface storage and broader
+  authoring out/ref, VM reentry and migrations remain separate. See DSLInterfaceMethodCalls.md.
+
+
+### Typed interface factory and source value facade — 2026-10-09
+
+- Added exact `ue_interface(type<Interface>, target)` overloads using the existing
+  checked weak capability factory, following verified daScript grammar.
+- Optional explicit source-type manifests connect facade signatures to public
+  ue_enum/ue_struct declarations. Symbol/member converters retain low-level ABI.
+- Compile-time annotations validate source IDs against the selected registry and
+  canonical path/layout/default/GUID checks; bad identity fails before invocation.
+- First struct mapping covers primitive/string fields. Nested/container/name/object
+  shapes and broader reflection/storage remain subsequent extensions; VM reentry
+  and general migrations remain deferred. See DSLInterfaceSourceValues.md.

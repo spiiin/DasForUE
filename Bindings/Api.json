@@ -4014,6 +4014,472 @@
 			]
 		},
 		{
+			"class": "/Script/DasRuntime.DasProbeInterface",
+			"function": "Query",
+			"alias": "ue_probe_Query",
+			"signature": "v1;Query;Input:IntProperty:128;ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "daScript Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasProbeInterface",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "input",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "input",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasProbeInterface",
+			"function": "Label",
+			"alias": "ue_probe_Label",
+			"signature": "v1;Label;ReturnValue:StrProperty:1408;",
+			"metadata":
+			{
+				"Category": "daScript Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasProbeInterface",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "returnvalue",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "string",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasProbeInterface",
+			"function": "Weights",
+			"alias": "ue_probe_Weights",
+			"signature": "v1;Weights;Values:ArrayProperty:134218114[Values:DoubleProperty:0;];ReturnValue:ArrayProperty:1408[ReturnValue:DoubleProperty:0;];",
+			"metadata":
+			{
+				"Category": "daScript Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasProbeInterface",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "array",
+					"input": true,
+					"output": false,
+					"type_path": "DoubleProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "double",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "DoubleProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "double",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "DoubleProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "double",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "DoubleProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "double",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasProbeInterface",
+			"function": "Stats",
+			"alias": "ue_probe_Stats",
+			"signature": "v1;Stats;Counter:IntProperty:134218112;Total:IntProperty:384;",
+			"metadata":
+			{
+				"Category": "daScript Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasProbeInterface",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "counter",
+					"kind": "int",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "total",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "counter",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "total",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasCollectionInterface",
+			"function": "EchoMap",
+			"alias": "ue_collection_EchoMap",
+			"signature": "v1;EchoMap;Values:MapProperty:134218114[Values_Key:IntProperty:0;Values:StrProperty:0;];ReturnValue:MapProperty:1408[ReturnValue_Key:IntProperty:0;ReturnValue:StrProperty:0;];",
+			"metadata":
+			{
+				"Category": "daScript Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasCollectionInterface",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "map",
+					"input": true,
+					"output": false,
+					"type_path": "IntProperty;StrProperty"
+				},
+				{
+					"path": "values.*.key",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "values.*.value",
+					"kind": "string",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "map",
+					"input": false,
+					"output": true,
+					"type_path": "IntProperty;StrProperty"
+				},
+				{
+					"path": "returnvalue.*.key",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue.*.value",
+					"kind": "string",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;StrProperty",
+					"key":
+					{
+						"path": "values_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "map",
+					"type_path": "IntProperty;StrProperty",
+					"key":
+					{
+						"path": "returnvalue_key",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "string",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasCollectionInterface",
+			"function": "EchoSet",
+			"alias": "ue_collection_EchoSet",
+			"signature": "v1;EchoSet;Values:SetProperty:134218114[Values:IntProperty:0;];ReturnValue:SetProperty:1408[ReturnValue:IntProperty:0;];",
+			"metadata":
+			{
+				"Category": "daScript Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasCollectionInterface",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "values",
+					"kind": "set",
+					"input": true,
+					"output": false,
+					"type_path": "IntProperty"
+				},
+				{
+					"path": "values.*",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "set",
+					"input": false,
+					"output": true,
+					"type_path": "IntProperty"
+				},
+				{
+					"path": "returnvalue.*",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "values",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "IntProperty",
+					"element":
+					{
+						"path": "values",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "set",
+					"type_path": "IntProperty",
+					"element":
+					{
+						"path": "returnvalue",
+						"metadata":
+						{
+						},
+						"kind": "int",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasEventInterface",
+			"function": "Notify",
+			"alias": "ue_event_Notify",
+			"signature": "v1;Notify;Amount:IntProperty:128;",
+			"metadata":
+			{
+				"Category": "daScript Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasEventInterface",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "amount",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "amount",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": true,
+					"output": false
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasEventInterface",
+			"function": "ResetCounter",
+			"alias": "ue_event_ResetCounter",
+			"signature": "v1;ResetCounter;",
+			"metadata":
+			{
+				"Category": "daScript Probe"
+			},
+			"declaring_class": "/Script/DasRuntime.DasEventInterface",
+			"pure": false,
+			"const": false,
+			"fields": [],
+			"parameters": []
+		},
+		{
 			"class": "/Script/Engine.Actor",
 			"function": "ActorHasTag",
 			"alias": "actor_ActorHasTag",
@@ -4581,6 +5047,14 @@
 	],
 	"classes": [
 		{
+			"type_path": "/Script/CoreUObject.Interface",
+			"interface": true,
+			"metadata":
+			{
+			},
+			"parent": "/Script/CoreUObject.Object"
+		},
+		{
 			"type_path": "/Script/CoreUObject.Object",
 			"metadata":
 			{
@@ -4589,12 +5063,36 @@
 			"parent": ""
 		},
 		{
+			"type_path": "/Script/DasRuntime.DasCollectionInterface",
+			"interface": true,
+			"metadata":
+			{
+			},
+			"parent": "/Script/CoreUObject.Interface"
+		},
+		{
+			"type_path": "/Script/DasRuntime.DasEventInterface",
+			"interface": true,
+			"metadata":
+			{
+			},
+			"parent": "/Script/CoreUObject.Interface"
+		},
+		{
 			"type_path": "/Script/DasRuntime.DasObjectFixture",
 			"metadata":
 			{
 				"ToolTip": "Small reflected fixture shared by the editor and packaged interop tests."
 			},
 			"parent": "/Script/CoreUObject.Object"
+		},
+		{
+			"type_path": "/Script/DasRuntime.DasProbeInterface",
+			"interface": true,
+			"metadata":
+			{
+			},
+			"parent": "/Script/CoreUObject.Interface"
 		},
 		{
 			"type_path": "/Script/Engine.Actor",

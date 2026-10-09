@@ -35,6 +35,89 @@ class GeneratorTests(unittest.TestCase):
         text = generate(self.ir)
         self.assertNotIn('typedef ' + alias + ' = ', text)
         self.assertIn('def ' + alias + '(', text)
+    def test_interface_receiver_uses_membership_and_declared_signature(self):
+        text = generate(self.ir)
+        self.assertIn('[ue_native_interface(path="/Script/DasRuntime.DasProbeInterface")]', text)
+        self.assertIn('def DasProbeInterface_from(value : UObjectHandle)', text)
+        body = text.split('def ue_probe_Query(', 1)[1].split('\n}\n', 1)[0]
+        self.assertIn('ue_begin_interface_call(', body)
+        self.assertIn('ue_expect_interface_signature(', body)
+        self.assertNotIn('ue_cast_object(', body)
+    def test_interface_marker_must_be_boolean(self):
+        self.ir['classes'][0]['interface'] = 'true'
+        with self.assertRaisesRegex(ValueError, 'interface class marker'): generate(self.ir)
+    def test_ambiguous_interface_alias_does_not_emit_helpers(self):
+        self.ir['classes'].append(dict(type_path='/Script/Other.DasProbeInterface', parent='/Script/CoreUObject.Interface', interface=True))
+        text = generate(self.ir)
+        self.assertNotIn('typedef DasProbeInterface = ', text)
+        self.assertNotIn('def DasProbeInterface_from(', text)
+    def test_interface_helpers_do_not_hide_selected_function(self):
+        self.ir['functions'][0]['alias'] = 'ue_DasProbeInterface_from'
+        self.ir['classes'].append(dict(type_path='/Script/Other.ue_DasProbeInterface', parent='/Script/CoreUObject.Interface', interface=True))
+        text = generate(self.ir)
+        self.assertEqual(text.count('def ue_DasProbeInterface_from('), 1)
+        self.assertNotIn('def ue_DasProbeInterface_raw(', text)
+    def authored_ir(self, identity=True):
+        old = '/Script/DasRuntime.DasProbeInterface'
+        path = '/Game/Contracts/Probe.Probe_C'
+        for item in self.ir['classes']:
+            if item['type_path'] == old:
+                item['type_path'] = path
+                if identity: item['interface_id'] = 'contracts.Probe'
+        for fn in self.ir['functions']:
+            if fn['class'] == old: fn['class'] = path
+        return path
+    def test_authored_interface_identity_metadata(self):
+        path = self.authored_ir()
+        text = generate(self.ir)
+        self.assertIn('[ue_interface_ref(path="' + path + '", id="contracts.Probe")]', text)
+        self.assertIn('typedef Probe = ', text)
+        self.assertIn('def Probe_from(', text)
+    def test_authored_interface_missing_identity_refused(self):
+        self.authored_ir(False)
+        with self.assertRaisesRegex(ValueError, 'stable identity'): generate(self.ir)
+    def test_authored_interface_bad_identity_refused(self):
+        path = self.authored_ir()
+        next(c for c in self.ir['classes'] if c['type_path'] == path)['interface_id'] = 'bad identity'
+        with self.assertRaisesRegex(ValueError, 'stable identity'): generate(self.ir)
+    def test_custom_binding_module(self):
+        self.assertIn('module ue_contracts public', generate(self.ir, 'ue_contracts'))
+    def test_binding_module_injection_refused(self):
+        with self.assertRaisesRegex(ValueError, 'module name'): generate(self.ir, 'bad; panic()')
+    def test_native_interface_must_not_have_authored_identity(self):
+        next(c for c in self.ir['classes'] if c.get('interface'))['interface_id'] = 'contracts.Probe'
+        with self.assertRaisesRegex(ValueError, 'interface identity'): generate(self.ir)
+    def test_interface_method_facade_and_copyback(self):
+        text = generate(self.ir)
+        self.assertIn('def Query(target : ' + class_name('/Script/DasRuntime.DasProbeInterface'), text)
+        stats = text.split('def Stats(', 1)[1].split('\n}\n', 1)[0]
+        self.assertIn('var arg_counter : int&', stats)
+        self.assertIn('var arg_total : int&', stats)
+        self.assertIn('let result = ue_probe_Stats(target, arg_counter)', stats)
+        self.assertIn('arg_counter = result.out_counter', stats)
+        self.assertIn('arg_total = result.out_total', stats)
+    def test_interface_container_facade_moves_owned_result(self):
+        body = generate(self.ir).split('def Weights(', 1)[1].split('\n}\n', 1)[0]
+        self.assertIn('var result <- ue_probe_Weights', body)
+        self.assertIn('return <- result', body)
+    def test_duplicate_interface_alias_does_not_duplicate_method(self):
+        duplicate = copy.deepcopy(next(f for f in self.ir['functions'] if f['alias'] == 'ue_probe_Query'))
+        duplicate['alias'] = 'ue_extra_Query'
+        self.ir['functions'].append(duplicate)
+        self.assertEqual(generate(self.ir).count('def Query('), 1)
+    def test_typed_interface_factory_is_specific(self):
+        text = generate(self.ir)
+        self.assertIn('def ue_interface(requested : type<' + class_name('/Script/DasRuntime.DasProbeInterface') + '>', text)
+        self.assertNotIn('type<' + class_name('/Script/Engine.Actor') + '>', text)
+    def test_source_manifest_needs_explicit_registry(self):
+        manifest = dict(module='ue_values',registry='',types=[])
+        with self.assertRaisesRegex(ValueError,'registry'): generate(self.ir, source_types=manifest)
+    def test_source_manifest_module_injection_refused(self):
+        manifest = dict(module='bad; code',registry='/Game/Test.Registry',types=[])
+        with self.assertRaisesRegex(ValueError,'module'): generate(self.ir, source_types=manifest)
+    def test_source_manifest_unknown_enum_refused(self):
+        manifest = dict(module='ue_values',registry='/Game/Test.Registry',types=[dict(kind='enum',path='/Game/Types/Missing.Missing',name='State',id='types.State',members={'Active':42})])
+        with self.assertRaisesRegex(ValueError,'enum values'): generate(self.ir, source_types=manifest)
     def test_schema_version(self):
         self.ir['schema_version'] = 9
         with self.assertRaises(ValueError): generate(self.ir)

@@ -124,3 +124,12 @@ methods are supported; see DSLInterfaceEvents.md.
 
 Type references, tuple direction lists and singleton options use the shared rules
 in DSLTypeResolution.md.
+
+
+Native UObject/Actor, Vector/Rotator/Transform and constrained native enum/struct
+signatures are now supported. See DSLAuthoredInterfaceNativeTypes.md for inference,
+constraints, FEnumProperty/FByteProperty handling and the remaining input-only limits.
+
+
+Concrete authored enum/struct signatures through explicit registries and generated
+authored interface wrappers are now supported; see DSLAuthoredInterfaceRegistryBindings.md.
