@@ -68,6 +68,8 @@ public:
     void ReleaseObject(UObject* Object);
     int32 StructSnapshotCount(const UObject* Owner=nullptr) const;
     uint64 StructSnapshotsReclaimed(const UObject* Owner=nullptr) const;
+    // Nested authored calls report failures to the caller VM, which may recover them.
+    bool IsAuthoredMethodDispatchActive()const;
     bool CanMigrateAuthoredTypes()const;
     int32 PersistentContextCount(const UWorld* World = nullptr) const;
     bool ExportBindings(const FString& SelectionPath, const FString& OutputPath, FString& Error);

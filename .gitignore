@@ -16,3 +16,7 @@ __pycache__/
 
 /Tests/DasForUESmoke/Content/DasAuthoringProbe/
 /Tests/DasForUESmoke/Content/DasFrameAssetProbe/
+
+/Tests/DasForUESmoke/Content/DasMethodValues/
+/Plugins/DasForUE/Content/Das/Scripts/dsl_registered_methodvalues_*.das
+/Tests/DasForUESmoke/Content/DasActorComponent/

@@ -17,13 +17,13 @@ namespace
 }
 
 TArray<FDasMethodSchema> FDasClassSchema::EffectiveMethods() const
-{ return Methods.IsEmpty()?TArray<FDasMethodSchema>{Method}:Methods; }
+{ return Methods.IsEmpty()?(Method.ScriptFile.IsEmpty()?TArray<FDasMethodSchema>{}:TArray<FDasMethodSchema>{Method}):Methods; }
 
 bool FDasClassSchema::Validate(FString& Error) const
 {
     Error.Reset();
-    if (!Identifier(Name.ToString()) || Name.IsNone() || Parent != TEXT("Actor"))
-    { Error = TEXT("Expected a named Actor-derived schema"); return false; }
+    if (!Identifier(Name.ToString()) || Name.IsNone() || (Parent != TEXT("Actor") && Parent != TEXT("ActorComponent")))
+    { Error = TEXT("Expected a named Actor or ActorComponent schema"); return false; }
     auto ValidMeta=[&](const TMap<FString,FString>& Values)
     {
         for (const auto& Pair:Values)
@@ -43,9 +43,8 @@ bool FDasClassSchema::Validate(FString& Error) const
         if (M.Signature!=EDasMethodSignature::Int && M.Signature!=EDasMethodSignature::Float && M.Signature!=EDasMethodSignature::Bool && M.Signature!=EDasMethodSignature::Void && M.Signature!=EDasMethodSignature::Frame) {Error=TEXT("Unsupported method signature");return false;}
         const auto Contract=M.Contract();if(Contract.Inputs.Num()>16 || (static_cast<uint8>(Contract.ReturnKind)>13 || Contract.ReturnKind==EDasMethodSignature::Frame)){Error=TEXT("Invalid scalar frame contract");return false;}
         TSet<FName> ParameterNames;for(const auto& P:M.EffectiveParameters()){if((P.Direction!=TEXT("in") && P.Direction!=TEXT("out") && P.Direction!=TEXT("inout")) || !Identifier(P.Name.ToString()) || P.Name==TEXT("ReturnValue") || ParameterNames.Contains(P.Name) || (static_cast<uint8>(P.Kind)>13 || P.Kind==EDasMethodSignature::Void || P.Kind==EDasMethodSignature::Frame)){Error=TEXT("Invalid scalar frame parameter");return false;}ParameterNames.Add(P.Name);}
-        for(const auto& P:M.EffectiveParameters())if(P.Kind==EDasMethodSignature::Object && (!P.ClassPath.StartsWith(TEXT("/Script/")) || !FindObject<UClass>(nullptr,*P.ClassPath))){Error=TEXT("Object parameter requires loaded native class path");return false;}
-        if(Contract.ReturnKind==EDasMethodSignature::Object && (!M.ReturnClass.StartsWith(TEXT("/Script/")) || !FindObject<UClass>(nullptr,*M.ReturnClass))){Error=TEXT("Object result requires loaded native class path");return false;}
-        for(const auto& P:M.EffectiveParameters())if(P.Direction!=TEXT("in") && !(P.Kind==EDasMethodSignature::Int || P.Kind==EDasMethodSignature::Float || P.Kind==EDasMethodSignature::Bool || P.Kind==EDasMethodSignature::String || P.Kind==EDasMethodSignature::Double || P.Kind==EDasMethodSignature::Name || (P.Kind==EDasMethodSignature::Struct && DasContainerProperty(P.ClassPath)))){Error=TEXT("Out/ref capability requires primitive or standalone container");return false;}
+        for(const auto& P:M.EffectiveParameters())if(P.Kind==EDasMethodSignature::Object && (!FindObject<UClass>(nullptr,*P.ClassPath) || (!P.ClassPath.StartsWith(TEXT("/Script/")) && !FindObject<UClass>(nullptr,*P.ClassPath)->HasAnyClassFlags(CLASS_Interface)))){Error=TEXT("Object parameter requires loaded native class path");return false;}
+        if(Contract.ReturnKind==EDasMethodSignature::Object && (!FindObject<UClass>(nullptr,*M.ReturnClass) || (!M.ReturnClass.StartsWith(TEXT("/Script/")) && !FindObject<UClass>(nullptr,*M.ReturnClass)->HasAnyClassFlags(CLASS_Interface)))){Error=TEXT("Object result requires loaded native class path");return false;}
         for(const auto& P:M.EffectiveParameters())if(P.Kind==EDasMethodSignature::Struct && !ValidateDasValueStruct(P.ClassPath,Error))return false;
         if(Contract.ReturnKind==EDasMethodSignature::Struct && !ValidateDasValueStruct(M.ReturnClass,Error))return false;
         for(const auto& P:M.EffectiveParameters())if(P.Kind==EDasMethodSignature::Enum && !ResolveDasEnum(P.ClassPath,Error))return false;
@@ -61,7 +60,7 @@ bool FDasClassSchema::Validate(FString& Error) const
             ((Field.Kind == EDasScalarKind::Float32 && !FMath::IsFinite(Field.FloatDefault)) || (Field.Kind==EDasScalarKind::Double && !FMath::IsFinite(Field.DoubleDefault))))
         { Error = TEXT("Unsupported scalar kind or non-finite default"); return false; }
         if(Field.Kind==EDasScalarKind::Enum){auto* E=ResolveDasEnum(Field.EnumPath,Error);if(!E || !ValidateDasEnumNumber(Field.EnumPath,E->GetValueByNameString(Field.EnumDefault),Error))return false;}
-        if(Field.Kind==EDasScalarKind::Object && (!Field.ObjectClass.StartsWith(TEXT("/Script/")) || !FindObject<UClass>(nullptr,*Field.ObjectClass))){Error=TEXT("Object field requires a loaded native class path");return false;}
+        if(Field.Kind==EDasScalarKind::Object && (!FindObject<UClass>(nullptr,*Field.ObjectClass) || (!Field.ObjectClass.StartsWith(TEXT("/Script/")) && !FindObject<UClass>(nullptr,*Field.ObjectClass)->HasAnyClassFlags(CLASS_Interface)))){Error=TEXT("Object field requires a loaded native class path");return false;}
         if(Field.Kind==EDasScalarKind::Struct){FInstancedStruct Value;if(!ParseDasStructDefault(Field.StructPath,Field.StructDefault,Value,Error))return false;}
         if (!ValidMeta(Field.Metadata)) return false;
         Names.Add(Field.Name);

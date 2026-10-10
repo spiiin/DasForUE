@@ -118,6 +118,121 @@ class GeneratorTests(unittest.TestCase):
     def test_source_manifest_unknown_enum_refused(self):
         manifest = dict(module='ue_values',registry='/Game/Test.Registry',types=[dict(kind='enum',path='/Game/Types/Missing.Missing',name='State',id='types.State',members={'Active':42})])
         with self.assertRaisesRegex(ValueError,'enum values'): generate(self.ir, source_types=manifest)
+    def nested_source_fixture(self):
+        child = '/Game/Test/Child.Child'
+        parent = '/Game/Test/Parent.Parent'
+        self.ir['structs'].extend([
+            dict(type_path=child,cpp_type='Child',fields=[dict(path='value_native',kind='int',type_path='')]),
+            dict(type_path=parent,cpp_type='Parent',fields=[dict(path='nested_native',kind='struct',type_path=child),dict(path='items_native',kind='array',type_path='StructProperty',element=dict(kind='struct',path='items_native',type_path=child))])])
+        manifest = dict(module='ue_values',registry='/Game/Test/Registry.Registry',types=[
+            dict(path=parent,kind='struct',name='Parent',id='test.Parent',members={'nested_native':'Nested','items_native':'Items'}),
+            dict(path=child,kind='struct',name='Child',id='test.Child',members={'value_native':'Value'})])
+        return manifest
+    def test_nested_source_conversion_copies_owned_array_elements(self):
+        text = generate(self.ir,source_types=self.nested_source_fixture())
+        self.assertIn('resize(result.f_items_native, length(value.Items))',text)
+        self.assertIn('source_index_0',text)
+        self.assertIn('result.Items[source_index_0]',text)
+        self.assertIn('return <- result',text)
+    def test_nested_source_mapping_requires_child_identity(self):
+        manifest = self.nested_source_fixture()
+        manifest['types'].pop()
+        with self.assertRaisesRegex(ValueError,'explicit matching mapping'): generate(self.ir,source_types=manifest)
+    def test_source_struct_direct_nested_array_refused(self):
+        manifest = self.nested_source_fixture()
+        field=self.ir['structs'][-1]['fields'][-1]
+        field['element'] = dict(kind='array',path='items_native',type_path='IntProperty',element=dict(kind='int',type_path=''))
+        field['type_path']='ArrayProperty'
+        with self.assertRaisesRegex(ValueError,'struct array member'): generate(self.ir,source_types=manifest)
+    def test_source_name_and_object_conversion(self):
+        manifest=self.nested_source_fixture()
+        self.ir['structs'][-2]['fields'].extend([dict(path='key_native',kind='name',type_path=''),dict(path='actor_native',kind='object',type_path='/Script/Engine.Actor')])
+        manifest['types'][-1]['members'].update(key_native='Key',actor_native='Target')
+        text=generate(self.ir,source_types=manifest)
+        self.assertIn('ue_name(ue_name_text(value.Key))',text)
+        self.assertIn('result.Key = ue_name_value(value.f_key_native.value)',text)
+        self.assertIn(class_name('/Script/Engine.Actor')+'_from(value.Target.handle)',text)
+        self.assertIn('result.Target.handle = ue_generated::'+class_name('/Script/Engine.Actor')+'_raw(value.f_actor_native)',text)
+    def test_source_bindings_qualify_internal_symbols(self):
+        manifest=self.nested_source_fixture()
+        text=generate(self.ir,'ue_custom',manifest)
+        actor=class_name('/Script/Engine.Actor')
+        self.assertIn('typedef Actor = ue_custom::'+actor,text)
+        self.assertIn('def '+actor+'_from(value : UObjectHandle) : ue_custom::'+actor,text)
+        self.assertIn('return ue_custom::'+actor+'(handle = ',text)
+        self.assertIn('struct '+actor+' { handle : UObjectHandle }',text)
+        self.assertIn('[ue_native_object(path="/Script/Engine.Actor")]',text)
+    def test_source_qualification_preserves_shadowing_local(self):
+        manifest=self.nested_source_fixture()
+        self.ir['classes'].append(dict(type_path='/Script/Other.result',parent='/Script/CoreUObject.Object'))
+        text=generate(self.ir,'ue_custom',manifest)
+        self.assertIn('typedef result = ue_custom::',text)
+        self.assertIn('let result = ue_custom::ue_probe_Query(target, arg_input)',text)
+        self.assertIn('return result',text)
+        self.assertNotIn('let ue_custom::result',text)
+    def test_source_struct_interface_reference_conversion(self):
+        manifest=self.nested_source_fixture()
+        field=self.ir['structs'][-2]['fields'][0]
+        field.update(kind='object',type_path='/Script/DasRuntime.DasProbeInterface')
+        text=generate(self.ir,source_types=manifest)
+        self.assertIn(class_name('/Script/DasRuntime.DasProbeInterface')+'_from(value.Value.handle)',text)
+    def source_hash_fixture(self):
+        manifest=self.nested_source_fixture()
+        fields=self.ir['structs'][-2]['fields']
+        fields.extend([dict(path='weights_native',kind='map',type_path='StringProperty;DoubleProperty',key=dict(kind='string',type_path=''),value=dict(kind='double',type_path='')),dict(path='tags_native',kind='set',type_path='StrProperty',element=dict(kind='string',type_path=''))])
+        fields[-2]['type_path']='StrProperty;DoubleProperty'
+        manifest['types'][-1]['members'].update(weights_native='Weights',tags_native='Tags')
+        return manifest
+    def test_source_nested_hash_conversion(self):
+        text=generate(self.ir,source_types=self.source_hash_fixture())
+        self.assertIn('keys(value.Weights)',text)
+        self.assertIn('values(value.Weights)',text)
+        self.assertNotIn('value.Weights[source_key_0]',text)
+        self.assertIn('insert(result.Tags,',text)
+        self.assertIn('duplicate source hash key/element',text)
+        self.assertLess(text.index('struct H_Map_string_double_'),text.index('struct S_Child_'))
+    def test_nested_hash_invalid_marker_rejected(self):
+        manifest=self.source_hash_fixture()
+        self.ir['structs'][-2]['fields'][-2]['type_path']='IntProperty;DoubleProperty'
+        with self.assertRaisesRegex(ValueError,'hash container member'):generate(self.ir,source_types=manifest)
+    def test_source_hash_object_value_rejected(self):
+        manifest=self.source_hash_fixture()
+        field=self.ir['structs'][-2]['fields'][-2]
+        field['type_path']='StrProperty;ObjectProperty';field['value'].update(kind='object',type_path='/Script/Engine.Actor')
+        with self.assertRaisesRegex(ValueError,'hash container member'):generate(self.ir,source_types=manifest)
+    def test_source_hash_name_key_rejected(self):
+        manifest=self.source_hash_fixture()
+        field=self.ir['structs'][-2]['fields'][-2]
+        field['type_path']='NameProperty;DoubleProperty';field['key'].update(kind='name',type_path='')
+        with self.assertRaisesRegex(ValueError,'int/string'):generate(self.ir,source_types=manifest)
+    def test_source_struct_array_method_facade(self):
+        manifest=self.nested_source_fixture()
+        child=self.ir['structs'][-2]['type_path']
+        fields=self.ir['structs'][-2]['fields']
+        fn=copy.deepcopy(next(f for f in self.ir['functions'] if f['alias']=='ue_probe_Query'))
+        fn.update(function='EchoDetails',alias='ue_probe_EchoDetails')
+        fn['parameters']=[dict(path='values',kind='array',type_path='StructProperty',element=dict(kind='struct',type_path=child),input=True,output=False),dict(path='returnvalue',kind='array',type_path='StructProperty',element=dict(kind='struct',type_path=child),input=False,output=True)]
+        fn['fields']=[]
+        for p in fn['parameters']:
+            fn['fields'].append({k:p[k] for k in ('path','kind','type_path','input','output')})
+            for f in fields:fn['fields'].append(dict(path=p['path']+'.*.'+f['path'],kind=f['kind'],type_path=f['type_path'],input=p['input'],output=p['output']))
+        self.ir['functions'].append(fn)
+        text=generate(self.ir,'ue_custom',manifest)
+        self.assertIn('arg_values : array<ue_values::Child>',text)
+        self.assertIn('resize(native_arg_values, length(arg_values))',text)
+        self.assertIn('source_out_returnvalue : array<ue_values::Child>',text)
+        self.assertIn('return <- source_out_returnvalue',text)
+    def test_source_struct_array_ref_copyback_uses_converted_output(self):
+        manifest=self.nested_source_fixture();child=self.ir['structs'][-2]['type_path']
+        fn=copy.deepcopy(next(f for f in self.ir['functions'] if f['alias']=='ue_probe_Query'))
+        fn.update(function='BumpDetails',alias='ue_probe_BumpDetails')
+        fn['parameters']=[dict(path='values',kind='array',type_path='StructProperty',element=dict(kind='struct',type_path=child),input=True,output=True)]
+        fn['fields']=[dict(path='values',kind='array',type_path='StructProperty',input=True,output=True),dict(path='values.*.value_native',kind='int',type_path='',input=True,output=True)]
+        self.ir['functions'].append(fn)
+        body=generate(self.ir,'ue_custom',manifest).split('def BumpDetails(',1)[1].split('\n}\n',1)[0]
+        self.assertIn('var arg_values : array<ue_values::Child>&',body)
+        self.assertIn('arg_values <- source_out_values',body)
+        self.assertLess(body.index('resize(source_out_values'),body.index('arg_values <- source_out_values'))
     def test_schema_version(self):
         self.ir['schema_version'] = 9
         with self.assertRaises(ValueError): generate(self.ir)
@@ -161,9 +276,9 @@ class GeneratorTests(unittest.TestCase):
         fields[0]['path'] = 'a-b'
         fields[1]['path'] = 'a_b'
         with self.assertRaisesRegex(ValueError, 'colliding struct field'): generate(self.ir)
-    def test_object_struct_field_rejected(self):
+    def test_object_struct_missing_class_rejected(self):
         self.ir['structs'][0]['fields'][0]['kind'] = 'object'
-        with self.assertRaisesRegex(ValueError, 'Unsupported struct leaf'): generate(self.ir)
+        with self.assertRaisesRegex(ValueError, 'struct object class'): generate(self.ir)
     def test_parameter_direction_type(self):
         self.ir['functions'][0]['parameters'][0]['input'] = 1
         with self.assertRaisesRegex(ValueError, 'parameter direction'): generate(self.ir)

@@ -1,5 +1,6 @@
 #pragma once
 #include "DasAuthoring.h"
+DASRUNTIME_API bool IsDasMathStructPath(const FString& Path);
 struct FDasEnumEntry {FString Name;int64 Value=0;FString Id;};
 struct FDasEnumDeclaration {FString Id,Name;TArray<FDasEnumEntry> Entries;TMap<FString,FString> Metadata;};
 struct DASRUNTIME_API FDasReflectedTypes {

@@ -8,6 +8,30 @@ class CounterContract {
     [ue_function(BlueprintCallable)]
     def EchoState(value:InterfaceState):InterfaceState {}
     [ue_function(BlueprintCallable)]
+    def NewDetails():array<InterfaceDetails> {}
+    [ue_function(BlueprintCallable)]
+    def CopyDetails(Values:array<InterfaceDetails>; @ue_out var Copies:array<InterfaceDetails>&):void {}
+    [ue_function(BlueprintCallable)]
+    def BumpDetails(var Values:array<InterfaceDetails>&):void {}
+    [ue_function(BlueprintCallable)]
+    def RefActor(var value:ActorRef&; @ue_out var previous:ActorRef&):void {}
+    [ue_function(BlueprintCallable)]
+    def RefEvents(var value:DasEventInterface&; @ue_out var previous:DasEventInterface&):void {}
+    [ue_function(BlueprintCallable)]
+    def RefState(var value:InterfaceState&; @ue_out var previous:InterfaceState&):void {}
+    [ue_function(BlueprintCallable)]
+    def RefSettings(var value:InterfaceSettings&; @ue_out var previous:InterfaceSettings&):void {}
+    [ue_function(BlueprintCallable)]
+    def RefVector(var value:UEVector&; @ue_out var previous:UEVector&):void {}
+    [ue_function(BlueprintCallable)]
+    def RefRotator(var value:UERotator&; @ue_out var previous:UERotator&):void {}
+    [ue_function(BlueprintCallable)]
+    def RefTransform(var value:UETransform&; @ue_out var previous:UETransform&):void {}
+    [ue_function(BlueprintCallable)]
+    def EchoEvents(value:DasEventInterface):DasEventInterface {}
+    [ue_function(BlueprintCallable)]
+    def EchoDetails(Values:array<InterfaceDetails>):array<InterfaceDetails> {}
+    [ue_function(BlueprintCallable)]
     def EchoSettings(value:InterfaceSettings):InterfaceSettings {}
 
     [ue_function(BlueprintCallable)]

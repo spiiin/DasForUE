@@ -1,4 +1,6 @@
 #include "Modules/ModuleManager.h"
+#include "DasComponentCompilerExtension.h"
+#include "BlueprintCompilationManager.h"
 #include "HAL/IConsoleManager.h"
 #include "DasDSLService.h"
 #include "DasInterfaceService.h"
@@ -10,6 +12,7 @@ class FDasEditorModule final : public IModuleInterface {
 public:
     virtual void StartupModule() override {
         FDasInterfaceService::RegisterCompiler();
+        FBlueprintCompilationManager::RegisterCompilerExtension(UBlueprint::StaticClass(),NewObject<UDasComponentCompilerExtension>());
         InterfacesCommand=IConsoleManager::Get().RegisterConsoleCommand(TEXT("Das.DSL.Interfaces.Apply"),TEXT("Das.DSL.Interfaces.Apply Definition.das /Game/Interfaces"),FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args){FString Error;TArray<UBlueprint*> Types;if(Args.Num()!=2 || !FDasInterfaceService::Apply(Args[0],Args[1],Types,Error)){UE_LOG(LogTemp,Warning,TEXT("DAS_INTERFACE_APPLY rejected: %s"),*Error);}else{UE_LOG(LogTemp,Display,TEXT("DAS_INTERFACE_APPLY PASS %d"),Types.Num());}}),ECVF_Default);
         StructFieldsCommand=IConsoleManager::Get().RegisterConsoleCommand(TEXT("Das.DSL.Types.MigrateStructFields"),TEXT("Das.DSL.Types.MigrateStructFields Script.das /Game/Registry.Registry [Rules.json]"),FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args){FString Error;if((Args.Num()!=2 && Args.Num()!=3) || !FDasTypeService::MigrateStructFields(Args[0],Args[1],Error,Args.Num()==3?Args[2]:FString()))UE_LOG(LogTemp,Warning,TEXT("DAS_STRUCT_MIGRATION rejected: %s"),*Error);}),ECVF_Default);
 

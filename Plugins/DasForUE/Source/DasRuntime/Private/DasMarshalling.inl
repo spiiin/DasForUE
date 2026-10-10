@@ -31,7 +31,7 @@
         if (CastField<FDoubleProperty>(Property)) return EMarshallingKind::Double;
         if (CastField<FBoolProperty>(Property)) return EMarshallingKind::Bool;
         if (CastField<FStrProperty>(Property)) return EMarshallingKind::String;
-        if (CastField<FObjectProperty>(Property) && !CastField<FClassProperty>(Property)) return EMarshallingKind::Object;
+        if (DasReferencePropertyClass(Property)) return EMarshallingKind::Object;
         if (CastField<FStructProperty>(Property)) return EMarshallingKind::Struct;
         Context->throw_error("unsupported UFunction or struct field type");
     }
@@ -45,9 +45,10 @@
     // Recursively validate the entire signature, including outputs, before allocating a frame.
     void ValidateCallField(FProperty* Property, const FString& Path, bool bInput, bool bOutput, TArray<FMarshalledParameter>& Signature, das::Context* Context, int32 Depth = 0)
     {
+        if (Depth > 16) Context->throw_error("call struct nesting limit exceeded");
         if (auto* Map = CastField<FMapProperty>(Property))
         {
-            if (Depth != 0 || Path.Contains(TEXT(".*")) || Property->ArrayDim != 1) Context->throw_error("nested hash containers require an adapter");
+            if (Property->ArrayDim != 1) Context->throw_error("fixed hash arrays require an adapter");
             if (!IsHashScalar(Map->KeyProp, Context) || !IsHashScalar(Map->ValueProp, Context)) Context->throw_error("unsupported map key or value type");
             if (!Map->KeyProp->HasAllPropertyFlags(CPF_HasGetValueTypeHash)) Context->throw_error("map key requires UE value hashing");
             Signature.Add({Path.ToLower(), EMarshallingKind::Map, bInput, bOutput, Map->KeyProp->GetClass()->GetName() + TEXT(";") + Map->ValueProp->GetClass()->GetName()});
@@ -57,7 +58,7 @@
         }
         if (auto* Set = CastField<FSetProperty>(Property))
         {
-            if (Depth != 0 || Path.Contains(TEXT(".*")) || Property->ArrayDim != 1) Context->throw_error("nested hash containers require an adapter");
+            if (Property->ArrayDim != 1) Context->throw_error("fixed hash arrays require an adapter");
             if (!IsHashScalar(Set->ElementProp, Context)) Context->throw_error("unsupported set element type");
             if (!Set->ElementProp->HasAllPropertyFlags(CPF_HasGetValueTypeHash)) Context->throw_error("set element requires UE value hashing");
             Signature.Add({Path.ToLower(), EMarshallingKind::Set, bInput, bOutput, Set->ElementProp->GetClass()->GetName()});
@@ -67,16 +68,14 @@
         if (auto* Array = CastField<FArrayProperty>(Property))
         {
             if (Property->ArrayDim != 1) Context->throw_error("fixed arrays are not supported by call marshalling");
-            if (Depth != 0) Context->throw_error("array fields inside structs are not supported yet");
             if (FieldKind(Array->Inner, Context) == EMarshallingKind::Array)
                 Context->throw_error("nested arrays require a dedicated adapter");
             Signature.Add({Path.ToLower(), EMarshallingKind::Array, bInput, bOutput, Array->Inner->GetClass()->GetName()});
             // Wildcard leaves describe every element without storing UE property addresses.
-            // Direct object elements are supported; object fields inside structs still require another adapter.
+            // Reflected object leaves are pinned independently, including nested structs.
             ValidateCallField(Array->Inner, Path + TEXT(".*"), bInput, bOutput, Signature, Context);
             return;
         }
-        if (Depth > 0 && FieldKind(Property, Context) == EMarshallingKind::Object) Context->throw_error("object fields inside structs require a GC-aware struct adapter");
         if (Depth > 16) Context->throw_error("call struct nesting limit exceeded");
         if (FieldKind(Property, Context) == EMarshallingKind::Struct)
         {
@@ -86,7 +85,7 @@
                 Context->throw_error("structs with native object references are unsupported");
             for (TFieldIterator<FProperty> It(Type); It; ++It) ValidateCallField(*It, Path + TEXT(".") + It->GetName(), bInput, bOutput, Signature, Context, Depth + 1);
         }
-        else Signature.Add({Path.ToLower(), FieldKind(Property, Context), bInput, bOutput, CallEnumType(Property) ? CallEnumType(Property)->GetPathName() : (CastField<FObjectProperty>(Property) ? CastFieldChecked<FObjectProperty>(Property)->PropertyClass->GetPathName() : FString())});
+        else Signature.Add({Path.ToLower(), FieldKind(Property, Context), bInput, bOutput, CallEnumType(Property) ? CallEnumType(Property)->GetPathName() : (DasReferencePropertyClass(Property) ? DasReferencePropertyClass(Property)->GetPathName() : FString())});
     }
 
     TArray<FMarshalledParameter> DescribeCall(UFunction* Function, das::Context* Context)
@@ -123,7 +122,7 @@
         Key += Property->GetName() + TEXT(":") + Property->GetClass()->GetName() + TEXT(":") +
             FString::Printf(TEXT("%llu"), uint64(Property->GetPropertyFlags() & (CPF_Parm | CPF_ReturnParm | CPF_OutParm | CPF_ReferenceParm | CPF_ConstParm)));
         if (UEnum* Enum = CallEnumType(Property)) Key += TEXT(":") + Enum->GetPathName();
-        if (auto* Object = CastField<FObjectProperty>(Property)) Key += TEXT(":") + Object->PropertyClass->GetPathName();
+        if (auto* ReferenceClass = DasReferencePropertyClass(Property)) Key += TEXT(":") + ReferenceClass->GetPathName();
         if (auto* Array = CastField<FArrayProperty>(Property))
         {
             Key += TEXT("["); AppendCallShape(Array->Inner, Key); Key += TEXT("]");
@@ -232,7 +231,7 @@
                 auto* Map = CastField<FMapProperty>(Property);
                 auto* Set = CastField<FSetProperty>(Property);
                 const FString Root = Canonical;
-                const auto* Direction = Call.Signature.FindByPredicate([&](const auto& Item) { return Item.Path == Root; });
+                const auto* Direction = Call.Signature.FindByPredicate([&](const auto& Item) { return Item.Path == DescriptionPath; });
                 if (!Direction || !(bOutput ? Direction->bOutput : Direction->bInput)) Context->throw_error("wrong hash container direction");
                 const FString& Number = Parts[++Index];
                 int64 Parsed = -1;
@@ -297,6 +296,7 @@
         const FString Prefix = Field.Path + TEXT(".");
         for (auto It = Call.Assigned.CreateIterator(); It; ++It) if (It->StartsWith(Prefix)) It.RemoveCurrent();
         for (auto It = Call.ObjectPins.CreateIterator(); It; ++It) if (It.Key().StartsWith(Prefix)) It.RemoveCurrent();
+        for (auto It = Call.PendingHashes.CreateIterator(); It; ++It) if (It.Key().StartsWith(Prefix)) It.RemoveCurrent();
         Call.Assigned.Add(Field.Path);
     }
     int32 GetCallArraySize(const FDasCallHandle& Handle, const char* Path, das::Context* Context)
@@ -310,6 +310,17 @@
         return Helper.Num();
     }
 
+    void VisitCallContainerPaths(FMarshalledCall& Call,const FString& Path,bool Output,das::Context* Context,TFunctionRef<void(const FString&)> Visit,int32& Budget,int32 Depth=0){
+        if(Depth>16 || --Budget<0)Context->throw_error("call container traversal limit exceeded");const int32 Wildcard=Path.Find(TEXT(".*"));if(Wildcard==INDEX_NONE){Visit(Path);return;}
+        const FString Root=Path.Left(Wildcard);auto Field=ResolveCallField(Call,TCHAR_TO_UTF8(*Root),Output,Context);if(!Output && !Call.Assigned.Contains(Field.Path))Context->throw_error("missing input container initialization");int32 Count=0;
+        if(auto* Array=CastField<FArrayProperty>(Field.Property)){FScriptArrayHelper Values(Array,Field.Memory);Count=Values.Num();}
+        else if(CastField<FMapProperty>(Field.Property) || CastField<FSetProperty>(Field.Property)){
+            if(Output){const auto* Indices=Call.HashIndices.Find(Field.Path);if(!Indices)Context->throw_error("hash output indices are not initialized");Count=Indices->Num();}
+            else {const auto* Pending=Call.PendingHashes.Find(Field.Path);if(!Pending)Context->throw_error("missing input hash initialization");Count=(*Pending)->Keys.Num();}
+        }else Context->throw_error("container wildcard traverses a non-container");
+        if(Count>MaxCallArrayElements)Context->throw_error("container size limit exceeded");
+        for(int32 Index=0;Index<Count;++Index){const FString Concrete=Root+TEXT(".")+FString::FromInt(Index)+Path.Mid(Wildcard+2);VisitCallContainerPaths(Call,Concrete,Output,Context,Visit,Budget,Depth+1);}
+    }
     void ValidateHashNumber(FProperty* Property, void* Memory, bool bNormalizeZero, das::Context* Context)
     {
         if (auto* Float = CastField<FFloatProperty>(Property))
@@ -475,21 +486,21 @@
     {
         auto& Call = ResolveCall(Handle, Context);
         auto Field = ResolveCallField(Call, Path, false, Context);
-        auto* Property = CastField<FObjectProperty>(Field.Property);
-        if (!Property || CastField<FClassProperty>(Property)) Context->throw_error("argument object type mismatch");
+        auto* Property = DasReferencePropertyClass(Field.Property);
+        if (!Property) Context->throw_error("argument object type mismatch");
         UObject* Object = Value.Token ? ResolveObject(Value, Context) : nullptr;
-        if (Object && !Object->IsA(Property->PropertyClass)) Context->throw_error("object argument has an incompatible class");
+        if (Object && !DasReferenceMatches(Object,Property)) Context->throw_error("object argument has an incompatible class");
         Call.ObjectPins.Add(Field.Path, TStrongObjectPtr<UObject>(Object));
-        Property->SetObjectPropertyValue(Field.Memory, Object);
+        DasReferenceSet(Field.Property,Field.Memory,Object);
         Call.Assigned.Add(Field.Path);
     }
     FDasObjectHandle GetCallObject(const FDasCallHandle& Handle, const char* Path, das::Context* Context)
     {
         auto& Call = ResolveCall(Handle, Context);
         auto Field = ResolveCallField(Call, Path, true, Context);
-        auto* Property = CastField<FObjectProperty>(Field.Property);
-        if (!Property || CastField<FClassProperty>(Property)) Context->throw_error("result object type mismatch");
-        return MakeObjectHandle(Property->GetObjectPropertyValue(Field.Memory), Property->PropertyClass, Context);
+        auto* Property = DasReferencePropertyClass(Field.Property);
+        if (!Property) Context->throw_error("result object type mismatch");
+        return MakeObjectHandle(DasReferenceGet(Field.Property,Field.Memory), Property, Context);
     }
 
     void InvokeCall(const FDasCallHandle& Handle, das::Context* Context)
@@ -502,21 +513,12 @@
             Context->throw_error("call target expired");
         if(!Call.InterfaceSignatureKey.IsEmpty()){auto* Interface=Call.RequiredInterface.Get();auto* Declared=Interface?Interface->FindFunctionByName(Call.Function->GetFName()):nullptr;if(!Interface || !Object->GetClass()->ImplementsInterface(Interface) || !Declared || CallSignatureKey(Declared)!=Call.InterfaceSignatureKey || !Call.Function->IsSignatureCompatibleWith(Declared))Context->throw_error("interface contract changed; create a new interface frame");}
         if (Object->FindFunction(Call.Function->GetFName()) != Call.Function.Get()) Context->throw_error("UFunction changed; create a new call frame");
+        auto WholeInput=[&](const FString& Path){for(const auto& Root:Call.WholeInputs)if(Path==Root || Path.StartsWith(Root+TEXT(".")))return true;return false;};
         for (const auto& Parameter : Call.Signature)
-            if (Parameter.bInput && !Parameter.Path.Contains(TEXT(".*")) && !Call.Assigned.Contains(Parameter.Path))
+            if (Parameter.bInput && !WholeInput(Parameter.Path) && !Parameter.Path.Contains(TEXT(".*")) && !Call.Assigned.Contains(Parameter.Path))
                 Context->throw_error("missing input argument or struct field");
-        for (const auto& Parameter : Call.Signature)
-            if (Parameter.bInput && Parameter.Kind == EMarshallingKind::Array)
-            {
-                auto Field = ResolveCallField(Call, TCHAR_TO_UTF8(*Parameter.Path), false, Context);
-                FScriptArrayHelper Helper(CastFieldChecked<FArrayProperty>(Field.Property), Field.Memory);
-                const FString Prefix = Parameter.Path + TEXT(".*");
-                for (const auto& Leaf : Call.Signature)
-                    if (Leaf.Path.StartsWith(Prefix))
-                        for (int32 Index = 0; Index < Helper.Num(); ++Index)
-                            if (!Call.Assigned.Contains(Leaf.Path.Replace(TEXT(".*"), *(TEXT(".") + FString::FromInt(Index)))))
-                                Context->throw_error("missing array element or struct field");
-            }
+        int32 InputTraversalBudget=1048576;
+        for(const auto& Parameter:Call.Signature)if(Parameter.bInput && !WholeInput(Parameter.Path) && Parameter.Path.Contains(TEXT(".*")))VisitCallContainerPaths(Call,Parameter.Path,false,Context,[&](const FString& Concrete){if(!Call.Assigned.Contains(Concrete))Context->throw_error("missing array element or struct field; missing map key/value or set element");},InputTraversalBudget);
         CommitPendingHashes(Call, Context);
         for (const auto& Pin : Call.ObjectPins)
             if (UObject* Argument = Pin.Value.Get(); Argument && (!IsValid(Argument) || (Cast<AActor>(Argument) && CastChecked<AActor>(Argument)->IsActorBeingDestroyed())))
@@ -525,13 +527,21 @@
         Call.bExecuted = true;
         bool bComplete = false;
         ON_SCOPE_EXIT { if (!bComplete) Call.bFailed = true; };
-        Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
+        FString DispatchFailure;
+        if(Call.bAuthored){
+            if(AuthoredDispatchDepth>=32)Context->throw_error("authored method recursion limit exceeded");
+            TGuardValue<int32> Depth(AuthoredDispatchDepth,AuthoredDispatchDepth+1);
+            TGuardValue<FString*> Failure(AuthoredDispatchFailure,&DispatchFailure);
+            Object->ProcessEvent(Call.Function.Get(),Call.Frame->GetStructMemory());
+        }else Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
+        if(!DispatchFailure.IsEmpty())Context->throw_error(TCHAR_TO_UTF8(*DispatchFailure));
+        int32 OutputTraversalBudget=1048576;
         for (const auto& Parameter : Call.Signature)
             if (Parameter.bOutput && Parameter.Kind == EMarshallingKind::Array)
-                GetCallArraySize(Handle, TCHAR_TO_UTF8(*Parameter.Path), Context);
+                VisitCallContainerPaths(Call,Parameter.Path,true,Context,[&](const FString& Concrete){GetCallArraySize(Handle,TCHAR_TO_UTF8(*Concrete),Context);},OutputTraversalBudget);
         for (const auto& Parameter : Call.Signature)
             if (Parameter.bOutput && (Parameter.Kind == EMarshallingKind::Map || Parameter.Kind == EMarshallingKind::Set))
-                GetCallHashSize(Handle, TCHAR_TO_UTF8(*Parameter.Path), Context);
+                VisitCallContainerPaths(Call,Parameter.Path,true,Context,[&](const FString& Concrete){GetCallHashSize(Handle,TCHAR_TO_UTF8(*Concrete),Context);},OutputTraversalBudget);
         // Hold every new object output before control returns to the VM (where scripts may collect GC).
         // Release old inout-array pins only after replacement pins are established.
         TMap<FString, TStrongObjectPtr<UObject>> OutputPins;
@@ -541,18 +551,10 @@
                 auto Pin = [&](const FString& Path)
                 {
                     auto Field = ResolveCallField(Call, TCHAR_TO_UTF8(*Path), true, Context);
-                    UObject* Output = CastFieldChecked<FObjectProperty>(Field.Property)->GetObjectPropertyValue(Field.Memory);
+                    UObject* Output = DasReferenceGet(Field.Property,Field.Memory);
                     OutputPins.Add(Path, TStrongObjectPtr<UObject>(IsValid(Output) ? Output : nullptr));
                 };
-                const int32 Wildcard = Parameter.Path.Find(TEXT(".*"));
-                if (Wildcard == INDEX_NONE) Pin(Parameter.Path);
-                else
-                {
-                    const FString Root = Parameter.Path.Left(Wildcard);
-                    const int32 Count = GetCallArraySize(Handle, TCHAR_TO_UTF8(*Root), Context);
-                    for (int32 Index = 0; Index < Count; ++Index)
-                        Pin(Parameter.Path.Replace(TEXT(".*"), *(TEXT(".") + FString::FromInt(Index))));
-                }
+                VisitCallContainerPaths(Call,Parameter.Path,true,Context,Pin,OutputTraversalBudget);
             }
         for (const auto& Parameter : Call.Signature)
             if (Parameter.Kind == EMarshallingKind::Array && Parameter.bOutput)

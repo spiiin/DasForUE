@@ -14,6 +14,8 @@ class DASRUNTIME_API ADasProbeActor : public AActor
 {
     GENERATED_BODY()
 public:
+    // Cooked identity for checked authored references; not exposed as a script field.
+    UPROPERTY() FString AuthoredTypeId;
     ADasProbeActor();
     // Keep the selected identity catalog and its reflected types as cook/GC dependencies.
     UPROPERTY(EditAnywhere, Category="daScript") TObjectPtr<UDasTypeRegistry> TypeRegistry;

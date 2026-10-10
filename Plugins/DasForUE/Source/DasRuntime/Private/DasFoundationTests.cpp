@@ -12,6 +12,7 @@
 #include "DasIntDelegateProxy.h"
 #include "UObject/StrongObjectPtr.h"
 #include "Modules/ModuleManager.h"
+#include "Engine/World.h"
 
 bool RunDasFoundationTests(FString& Report)
 {
@@ -624,6 +625,18 @@ bool RunDasFoundationTests(FString& Report)
     const auto StaleBinding = ObjectRun(TEXT("let c = ue_begin_call(ue_self_object(), \"AddHealth\"); ue_expect_signature(c, \"old signature\"); ue_arg_int(c, \"Value\", 999); ue_invoke_call(c); return 1"));
     Expect(!StaleBinding.bSucceeded && StaleBinding.Error.Contains(TEXT("regenerate bindings")) && First->health == GuardHealth,
         TEXT("generated_signature_guard_prevents_side_effects"), StaleBinding.Error);
+    { const int32 Before=First->MarshalledCalls;const auto H=ObjectRun(TEXT("let c = ue_begin_call(ue_self_object(), \"EchoNestedHashes\"); ue_arg_array(c, \"Data.Items\", 1); ue_arg_hash(c,\"Data.Items.0.Tags\",0); ue_invoke_call(c); return 1"));
+      Expect(!H.bSucceeded && H.Error.Contains(TEXT("missing")) && First->MarshalledCalls==Before,TEXT("nested_hash_missing_header"),H.Error); }
+    { const int32 Before=First->MarshalledCalls;const auto H=ObjectRun(TEXT("let c = ue_begin_call(ue_self_object(), \"EchoNestedHashes\"); ue_arg_array(c, \"Data.Items\", 1); ue_arg_hash(c,\"Data.Items.0.Values\",1); ue_arg_int(c,\"Data.Items.0.Values.0.key\",5); ue_arg_hash(c,\"Data.Items.0.Tags\",0); ue_invoke_call(c); return 1"));
+      Expect(!H.bSucceeded && H.Error.Contains(TEXT("missing")) && First->MarshalledCalls==Before,TEXT("nested_hash_missing_value"),H.Error); }
+    { const int32 Before=First->MarshalledCalls;const auto H=ObjectRun(TEXT("let c = ue_begin_call(ue_self_object(), \"EchoNestedHashes\"); ue_arg_array(c, \"Data.Items\", 1); ue_arg_hash(c,\"Data.Items.0.Values\",2); ue_arg_int(c,\"Data.Items.0.Values.0.key\",5); ue_arg_string(c,\"Data.Items.0.Values.0.value\",\"a\"); ue_arg_int(c,\"Data.Items.0.Values.1.key\",5); ue_arg_string(c,\"Data.Items.0.Values.1.value\",\"b\"); ue_arg_hash(c,\"Data.Items.0.Tags\",0); ue_invoke_call(c); return 1"));
+      Expect(!H.bSucceeded && H.Error.Contains(TEXT("duplicate")) && First->MarshalledCalls==Before,TEXT("nested_hash_duplicate_key"),H.Error); }
+    { const int32 Before=First->MarshalledCalls;const auto H=ObjectRun(TEXT("let c = ue_begin_call(ue_self_object(), \"EchoNestedHashes\"); ue_arg_array(c, \"Data.Items\", 1); ue_arg_hash(c,\"Data.Items.0.Values\",0); ue_arg_hash(c,\"Data.Items.0.Tags\",2); ue_arg_string(c,\"Data.Items.0.Tags.0\",\"same\"); ue_arg_string(c,\"Data.Items.0.Tags.1\",\"same\"); ue_invoke_call(c); return 1"));
+      Expect(!H.bSucceeded && H.Error.Contains(TEXT("duplicate")) && First->MarshalledCalls==Before,TEXT("nested_hash_duplicate_set_element"),H.Error); }
+    { const int32 Before=First->MarshalledCalls;const auto H=ObjectRun(TEXT("let c = ue_begin_call(ue_self_object(), \"EchoNestedHashes\"); ue_arg_array(c, \"Data.Items\", 1); ue_arg_hash(c,\"Data.Items.0.Values\",1); ue_arg_hash(c,\"Data.Items.0.Tags\",1); ue_arg_array(c,\"Data.Items\",0); ue_invoke_call(c); verify(ue_result_array_size(c,\"ReturnValue.Items\")==0); return 1"));
+      Expect(H.bSucceeded && H.Value==1 && First->MarshalledCalls==Before+1,TEXT("nested_hash_array_resize_discards_pending"),H.Error); }
+    { const int32 Before=First->MarshalledCalls;const auto H=ObjectRun(TEXT("let c = ue_begin_call(ue_self_object(), \"EchoNestedHashes\"); ue_arg_array(c, \"Data.Items\", 1); ue_arg_hash(c,\"Data.Items.0.Values\",2); ue_arg_int(c,\"Data.Items.0.Values.0.key\",-100); ue_arg_string(c,\"Data.Items.0.Values.0.value\",\"drop\"); ue_arg_int(c,\"Data.Items.0.Values.1.key\",5); ue_arg_string(c,\"Data.Items.0.Values.1.value\",\"Value 世界\"); ue_arg_hash(c,\"Data.Items.0.Tags\",2); ue_arg_string(c,\"Data.Items.0.Tags.0\",\"drop\"); ue_arg_string(c,\"Data.Items.0.Tags.1\",\"kept\"); ue_invoke_call(c); verify(ue_result_hash_size(c,\"ReturnValue.Items.0.Values\")==1); verify(ue_result_int(c,\"ReturnValue.Items.0.Values.0.key\")==5); verify(ue_result_string(c,\"ReturnValue.Items.0.Values.0.value\")==\"Value 世界\"); verify(ue_result_hash_size(c,\"ReturnValue.Items.0.Tags\")==1); verify(ue_result_string(c,\"ReturnValue.Items.0.Tags.0\")==\"kept\"); return 1"));
+      Expect(H.bSucceeded && H.Value==1 && First->MarshalledCalls==Before+1,TEXT("nested_hash_sparse_output"),H.Error); }
     { const auto G = Runtime.RunFile(Runtime.ScriptPath(TEXT("generated_bad_struct.das")), 0, false, First.Get());
       Expect(!G.bSucceeded && G.Error.Contains(TEXT("no matching functions or generics: fixture_TransformPayload")), TEXT("generated_bad_struct"), G.Error); }
     { const auto G = Runtime.RunFile(Runtime.ScriptPath(TEXT("generated_fake_vector.das")), 0, false, First.Get());
@@ -1077,6 +1090,42 @@ bool RunDasFoundationTests(FString& Report)
         Runtime.ReleaseObject(SnapshotOwner.Get());Expect(Runtime.StructSnapshotCount(SnapshotOwner.Get())==0,TEXT("struct_snapshot_release_reclaims_all"));
     }
     {
+        TStrongObjectPtr<UDasObjectFixture> SnapshotOwner(NewObject<UDasObjectFixture>());
+        UObject* Owned=NewObject<UDasObjectFixture>();TWeakObjectPtr<UObject> Weak(Owned);SnapshotOwner->Target=Owned;
+        const FString Script=Runtime.ScriptPath(TEXT("struct_object_snapshot.das"));
+        auto Store=Runtime.RunPersistent(Script,0,SnapshotOwner.Get());
+        Expect(Store.bSucceeded,TEXT("object_snapshot_nested_array_pack"),Store.Error);
+        SnapshotOwner->Target=nullptr;Owned=nullptr;CollectGarbage(RF_NoFlags);
+        const auto Read=Runtime.RunPersistent(Script,1,SnapshotOwner.Get());
+        Expect(Weak.IsValid() && Read.bSucceeded && Read.Value==1,TEXT("object_snapshot_nested_array_pins_survive_GC_and_copy"),Read.Error);
+        SnapshotOwner->Target=NewObject<UDasObjectFixture>();
+        const auto Wrong=Runtime.RunPersistent(Script,3,SnapshotOwner.Get());
+        Expect(!Wrong.bSucceeded && Wrong.Error.Contains(TEXT("incompatible class")),TEXT("object_snapshot_wrong_class_rejected"),Wrong.Error);
+        SnapshotOwner->Target=nullptr;
+        const auto Clear=Runtime.RunPersistent(Script,2,SnapshotOwner.Get());CollectGarbage(RF_NoFlags);
+        Expect(Clear.bSucceeded && !Weak.IsValid(),TEXT("object_snapshot_collection_releases_pins"),Clear.Error);
+        TStrongObjectPtr<UWorld> World(UWorld::CreateWorld(EWorldType::Game,false));
+        AActor* Target=World->SpawnActor<AActor>();SnapshotOwner->Target=Target;
+        const auto ActorStore=Runtime.RunPersistent(Script,4,SnapshotOwner.Get());Target->Destroy();SnapshotOwner->Target=nullptr;CollectGarbage(RF_NoFlags);
+        const auto Destroyed=Runtime.RunPersistent(Script,5,SnapshotOwner.Get());
+        Expect(ActorStore.bSucceeded && Destroyed.bSucceeded && Destroyed.Value==0,TEXT("object_snapshot_destroyed_actor_reads_null"),Destroyed.Error);
+        Runtime.ReleaseObject(SnapshotOwner.Get());World->DestroyWorld(false);
+    }
+    {
+        TStrongObjectPtr<UDasObjectFixture> InterfaceOwner(NewObject<UDasObjectFixture>());
+        auto* NativeTarget=NewObject<UDasReferenceFixture>();TWeakObjectPtr<UObject> WeakNative(NativeTarget);InterfaceOwner->Target=NativeTarget;
+        const FString InterfaceScript=Runtime.ScriptPath(TEXT("interface_reference_lifetime.das"));
+        const auto StoredInterface=Runtime.RunPersistent(InterfaceScript,0,InterfaceOwner.Get());
+        Expect(StoredInterface.bSucceeded && InterfaceOwner->Events.GetObject()==NativeTarget && InterfaceOwner->Events.GetInterface()!=nullptr,TEXT("interface_reference_native_pointer_set"),StoredInterface.Error);
+        InterfaceOwner->Target=nullptr;CollectGarbage(RF_NoFlags);const auto ReadInterface=Runtime.RunPersistent(InterfaceScript,1,InterfaceOwner.Get());
+        Expect(WeakNative.IsValid() && ReadInterface.bSucceeded && ReadInterface.Value==1,TEXT("interface_UPROPERTY_keeps_object_alive"),ReadInterface.Error);
+        const auto ClearedInterface=Runtime.RunPersistent(InterfaceScript,2,InterfaceOwner.Get());CollectGarbage(RF_NoFlags);const auto RememberedInterface=Runtime.RunPersistent(InterfaceScript,3,InterfaceOwner.Get());
+        Expect(ClearedInterface.bSucceeded && !WeakNative.IsValid() && RememberedInterface.bSucceeded && RememberedInterface.Value==0,TEXT("interface_VM_wrapper_is_weak"),RememberedInterface.Error);
+        InterfaceOwner->Target=NewObject<UDasObjectFixture>();const auto BadInterface=Runtime.RunPersistent(InterfaceScript,4,InterfaceOwner.Get());
+        Expect(!BadInterface.bSucceeded && !InterfaceOwner->Events.GetObject(),TEXT("interface_self_nonimplementer_rejected_without_write"),BadInterface.Error);
+        Runtime.ReleaseObject(InterfaceOwner.Get());
+    }
+    {
         FString StructDefaultError;FInstancedStruct ParsedDefault;
         Expect(ParseDasStructDefault(TEXT("/Script/DasRuntime.DasCallPayload"),TEXT("(Metrics=(Ratio=1.5),Count=10,Label=\"Initial\",bEnabled=True,Weight=2.25)"),ParsedDefault,StructDefaultError) && ParsedDefault.GetPtr<FDasCallPayload>() && ParsedDefault.Get<FDasCallPayload>().Count==10 && ParsedDefault.Get<FDasCallPayload>().Metrics.Ratio==1.5f,TEXT("struct_default_recursive_import"),StructDefaultError);
         Expect(!ParseDasStructDefault(TEXT("/Script/DasRuntime.DasCallPayload"),TEXT("(Unknown=10)"),ParsedDefault,StructDefaultError),TEXT("struct_default_unknown_field_rejected"));
@@ -1250,7 +1299,8 @@ bool RunDasFoundationTests(FString& Report)
         Expect(ActorMethod && ActorMethod->ReturnType.TypePath==TEXT("/Script/Engine.Actor") && ActorMethod->Parameters[0].Type.TypePath==ActorMethod->ReturnType.TypePath,TEXT("authored_interface_typed_object_identity_inferred"),NativeIssue);
         Expect(VectorMethod && VectorMethod->ReturnType.TypePath==TEXT("/Script/CoreUObject.Vector"),TEXT("authored_interface_math_identity_inferred"),NativeIssue);
         Expect(EnumMethod && StructMethod && EnumMethod->ReturnType.TypePath==TEXT("/Script/DasRuntime.EDasCallMode") && StructMethod->ReturnType.TypePath==TEXT("/Script/DasRuntime.DasCallPayload"),TEXT("authored_interface_native_enum_struct_constraints"),NativeIssue);
-        for(const auto* Name:{TEXT("constraint"),TEXT("wrong_kind"),TEXT("missing_enum"),TEXT("missing_struct"),TEXT("unused"),TEXT("object_ref"),TEXT("math_ref")}){
+        for(const auto* RefType:{TEXT("object"),TEXT("math")}){const FString File=TEXT("dsl_interface_native_")+FString(RefType)+TEXT("_ref.das");Expect(Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(File),NativeInterface,NativeIssue) && NativeInterface.Classes[0].Methods[0].Parameters[0].Direction==(FString(RefType)==TEXT("math")?TEXT("out"):TEXT("inout")),*(TEXT("authored_interface_native_accepts_")+FString(RefType)+TEXT("_ref")),NativeIssue);}
+        for(const auto* Name:{TEXT("constraint"),TEXT("wrong_kind"),TEXT("missing_enum"),TEXT("missing_struct"),TEXT("unused")}){
             const FString File=TEXT("dsl_interface_native_bad_")+FString(Name)+TEXT(".das");Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(File),NativeInterface,NativeIssue),*(TEXT("authored_interface_native_refuses_")+FString(Name)),NativeIssue);
         }
     }

@@ -1,8 +1,10 @@
 #include "DasDSLService.h"
+#include "DasComponentComposition.h"
 #include "DasAuthoring.h"
 #include "DasBlueprintService.h"
 #include "DasRuntime.h"
 #include "DasProbeActor.h"
+#include "DasScriptComponent.h"
 #include "DasObjectReferencePins.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -52,6 +54,13 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     UBlueprint* BP=Cast<UBlueprint>(Existing);
     if(Existing && !BP){Error=TEXT("Asset exists and is not a Blueprint");return false;}
     const bool Created=!BP;
+    if(!Created && BP->GeneratedClass){const UObject* CDO=BP->GeneratedClass->GetDefaultObject();const FString ExistingIdentity=Cast<ADasProbeActor>(CDO)?CastChecked<ADasProbeActor>(CDO)->AuthoredTypeId:Cast<UDasScriptComponent>(CDO)?CastChecked<UDasScriptComponent>(CDO)->AuthoredTypeId:FString();if(!ExistingIdentity.IsEmpty() && ExistingIdentity!=Id){Error=TEXT("Cooked authored identity differs from import declaration");return false;}}
+    const auto& Declaration=*Model.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});
+    if(!Created){const FString PriorWire=BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"));if(!PriorWire.IsEmpty()){FDasAuthoringModule Prior;if(!FDasAuthoringModule::FromJson(PriorWire,Prior,Error))return false;const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});if(!Old || Old->Components!=Declaration.Components){Error=TEXT("Component composition migration is deferred");return false;}for(const auto& Property:Declaration.Properties){const auto* Before=Old->Properties.FindByPredicate([&](const auto& P){return P.Id==Property.Id;});if(Before && Before->Type.AuthoredId!=Property.Type.AuthoredId){Error=TEXT("Authored reference field identity migration is deferred");return false;}}}else if(!Declaration.Components.IsEmpty()){Error=TEXT("Adding components to an existing unimported Blueprint is unsupported");return false;}}
+    if(!Created){const FString PriorWire=BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"));FDasAuthoringModule Prior;if(!PriorWire.IsEmpty() && !FDasAuthoringModule::FromJson(PriorWire,Prior,Error))return false;const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});auto HasContainers=[](const FDasDeclaredClass& C){return C.Properties.ContainsByPredicate([](const auto& P){return P.Type.Kind==TEXT("array") || P.Type.Kind==TEXT("map") || P.Type.Kind==TEXT("set");});};if((HasContainers(Declaration) || (Old && HasContainers(*Old))) && (DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse || PriorWire!=Json)){Error=TEXT("Direct container class declaration migration is deferred; body-only reimport is supported");return false;}}
+    if(!Created && !Declaration.Components.IsEmpty() && (DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse || BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"))!=Json)){Error=TEXT("Actor declarations with components support body-only reimport while migration is deferred");return false;}
+    TMap<FString,UBlueprint*> ComponentBlueprints;if(!DasPrepareComponentComposition(Declaration,Package,ComponentBlueprints,Error))return false;
+    if(!Created && Schema.Parent==TEXT("ActorComponent") && (DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse || BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"))!=Json)){Error=TEXT("Component declaration migration is deferred; body-only reimport is supported");return false;}
     if(DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse){
         if(DefaultPolicy!=EDasDefaultMigrationPolicy::PreserveInstances || Created){Error=TEXT("Default migration requires an existing imported Blueprint and a known policy");return false;}
         FDasAuthoringModule Prior;
@@ -65,9 +74,10 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     if(Created)
     {
         UPackage* P=CreatePackage(*Package);
-        BP=FKismetEditorUtilities::CreateBlueprint(ADasProbeActor::StaticClass(),P,*FPackageName::GetLongPackageAssetName(Package),BPTYPE_Normal,UBlueprint::StaticClass(),UBlueprintGeneratedClass::StaticClass(),TEXT("DasDSL"));
+        BP=FKismetEditorUtilities::CreateBlueprint(Schema.Parent==TEXT("ActorComponent")?UDasScriptComponent::StaticClass():ADasProbeActor::StaticClass(),P,*FPackageName::GetLongPackageAssetName(Package),BPTYPE_Normal,UBlueprint::StaticClass(),UBlueprintGeneratedClass::StaticClass(),TEXT("DasDSL"));
     }
     if(!BP){Error=TEXT("Cannot create Blueprint");return false;}
+    if(!DasApplyComponentComposition(BP,Declaration,ComponentBlueprints,Created,Error))return false;
     auto& Metadata=BP->GetOutermost()->GetMetaData();
     const bool BodyOnly=!Created && Metadata.GetValue(BP,TEXT("DasDSLModel"))==Json;
     const bool Preserve=!Created && !BodyOnly && DefaultPolicy==EDasDefaultMigrationPolicy::Refuse;
@@ -95,6 +105,9 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     if(Rollback && GDasFailStructuralStage==2)return Restore(TEXT("Injected post-metadata development failure"));
 #endif
     if(Rollback && !Rollback->Finish(Error)){const FString Reason=Error;return Restore(Reason);}
+    if(Created && Schema.Parent==TEXT("Actor") && !Declaration.Callbacks.IsEmpty()){CastChecked<ADasProbeActor>(BP->GeneratedClass->GetDefaultObject())->LifecycleScript=Script;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
+    if(Created && Schema.Parent==TEXT("ActorComponent")){CastChecked<UDasScriptComponent>(BP->GeneratedClass->GetDefaultObject())->LifecycleScript=Script;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
+    {UObject* CDO=BP->GeneratedClass->GetDefaultObject();if(auto* Actor=Cast<ADasProbeActor>(CDO);Actor && Actor->AuthoredTypeId.IsEmpty()){CDO->Modify();Actor->AuthoredTypeId=Id;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}else if(auto* Component=Cast<UDasScriptComponent>(CDO);Component && Component->AuthoredTypeId.IsEmpty()){CDO->Modify();Component->AuthoredTypeId=Id;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}}
     Out=BP;Applied=true;
     UE_LOG(LogTemp,Display,TEXT("DAS_DSL_APPLY PASS %s (%s)"),*ObjectPath,BodyOnly?TEXT("body-only; no Blueprint recompile"):TEXT("declaration applied"));return true;
 }
@@ -144,6 +157,7 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP,FString& Error,bool In
     if(Script.IsEmpty() || FPaths::GetCleanFilename(Script)!=Script){Error=TEXT("Blueprint has no local DSL source");return false;}
     FDasAuthoringModule Prior,Next;FDasClassSchema Previous,Candidate;FString Json;
     if(!FDasAuthoringModule::FromJson(Meta.GetValue(BP,TEXT("DasDSLModel")),Prior,Error) || !Runtime.ReadAuthoringScript(Runtime.ScriptPath(Script),Next,Error) || !Prior.ToActorSchema(Id,Previous,Error) || !Next.ToActorSchema(Id,Candidate,Error) || !Next.ToJson(Json,Error))return false;
+    if(const auto* Class=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});Class && !Class->Components.IsEmpty()){Error=TEXT("Actor declarations with components require a later migration policy");return false;}
     for(const auto& M:Candidate.EffectiveMethods())if(!Runtime.ValidateFrameMethod(Runtime.ScriptPath(M.ScriptFile),Error,M.EntryPoint,M.Contract()))return false;
     if(!FDasBlueprintService::Apply(BP,Previous,Error,true))return false;
     const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});auto* New=Next.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});
@@ -238,6 +252,7 @@ bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP,const FDasNum
     if(Script.IsEmpty() || FPaths::GetCleanFilename(Script)!=Script){Error=TEXT("Blueprint has no local DSL source");return false;}
     FDasAuthoringModule Prior,Next;FDasClassSchema Previous,Candidate;FString Json;
     if(!FDasAuthoringModule::FromJson(Meta.GetValue(BP,TEXT("DasDSLModel")),Prior,Error) || !Runtime.ReadAuthoringScript(Runtime.ScriptPath(Script),Next,Error) || !Prior.ToActorSchema(Id,Previous,Error) || !Next.ToActorSchema(Id,Candidate,Error) || !Next.ToJson(Json,Error))return false;
+    if(const auto* Class=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});Class && !Class->Components.IsEmpty()){Error=TEXT("Actor declarations with components require a later migration policy");return false;}
     for(const auto& M:Candidate.EffectiveMethods())if(!Runtime.ValidateFrameMethod(Runtime.ScriptPath(M.ScriptFile),Error,M.EntryPoint,M.Contract()))return false;
     if(!FDasBlueprintService::Apply(BP,Previous,Error,true))return false;
     const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});auto* New=Next.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});
@@ -353,6 +368,7 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP,bool Restore,bool Inc
     if(Script.IsEmpty() || FPaths::GetCleanFilename(Script)!=Script){Error=TEXT("Expected local imported source");return false;}
     FDasAuthoringModule Prior,Next;FDasClassSchema Previous,Candidate;FString Json;
     if(!FDasAuthoringModule::FromJson(OldWire,Prior,Error) || !Runtime.ReadAuthoringScript(Runtime.ScriptPath(Script),Next,Error) || !Prior.ToActorSchema(Id,Previous,Error) || !Next.ToActorSchema(Id,Candidate,Error) || !Next.ToJson(Json,Error) || !FDasBlueprintService::Apply(BP,Previous,Error,true))return false;
+    if(const auto* Class=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});Class && !Class->Components.IsEmpty()){Error=TEXT("Actor declarations with components require a later migration policy");return false;}
     for(const auto& M:Candidate.EffectiveMethods())if(!Runtime.ValidateFrameMethod(Runtime.ScriptPath(M.ScriptFile),Error,M.EntryPoint,M.Contract()))return false;
     const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});const auto* New=Next.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});if(!Old || !New || Prior.Id!=Next.Id){Error=TEXT("Archive operation requires matching class/module identity");return false;}
     struct FAction {FDasFieldSchema Field;FDasDeclaredProperty Declaration;FGuid Guid;FString MetaKey,StoredModel;};TArray<FAction> Actions;

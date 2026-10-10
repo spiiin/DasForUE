@@ -4,6 +4,10 @@
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "DasRuntime.h"
+#include "DasActorComponentProbe.h"
+#include "DasMethodValuesProbe.h"
+#include "Engine/Engine.h"
+#include "Engine/Level.h"
 
 bool RunDasRegisteredCooked(FString& Report);
 
@@ -13,7 +17,9 @@ class FDasForUESmokeModule : public FDefaultGameModuleImpl
 public:
     virtual void StartupModule() override
     {
-        if(FParse::Param(FCommandLine::Get(),TEXT("DasRegisteredCooked"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{FString Report;const bool Success=RunDasRegisteredCooked(Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);FPlatformMisc::RequestExitWithStatus(false,Success?0:1);});}
+        if(FParse::Param(FCommandLine::Get(),TEXT("DasMethodValues"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{UClass* Driver=nullptr;UClass* Target=nullptr;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld())for(const auto& Actor:World->PersistentLevel->Actors)if(auto* Probe=Cast<ADasProbeActor>(Actor)){if(Probe->Peer){Driver=Probe->GetClass();Target=Probe->Peer->GetClass();}}FString Report;const bool Good=Driver && Target && RunDasMethodValuesProbe(Driver,Target,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasActorComponent"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{UClass* Class=nullptr;for(const auto& Context:GEngine->GetWorldContexts())if(auto* W=Context.World())if(W->IsGameWorld())for(const auto& A:W->PersistentLevel->Actors)if(A && A->IsA<ADasProbeActor>() && A->GetClass()!=ADasProbeActor::StaticClass())Class=A->GetClass();FString Report;const bool Good=Class && RunDasActorComponentProbe(Class,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasRegisteredCooked"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{FString Report;const bool Success=RunDasRegisteredCooked(Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);FPlatformMisc::RequestExitWithStatus(false,Success?0:1);});}
         else if (FParse::Param(FCommandLine::Get(), TEXT("DasSmoke")))
         {
             InitHandle = FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]

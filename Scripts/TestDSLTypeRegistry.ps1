@@ -20,7 +20,7 @@ try {
             $WrapperSelection = Join-Path $WrapperStage ('Authored_' + $ProbeId + '.selection.json')
             $WrapperIR = Join-Path $WrapperStage ('Authored_' + $ProbeId + '.json')
             $WrapperPath = $Base + '/Types/CounterContract.CounterContract_C'
-            @{ functions = @('Query','Label','Stats','EchoState','EchoSettings') | ForEach-Object { @{class=$WrapperPath;function=$_;alias=('ue_contract_' + $_)} } } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $WrapperSelection -Encoding utf8
+            @{ functions = @('Query','Label','Stats','EchoState','EchoSettings','EchoDetails','EchoEvents','RefActor','RefEvents','RefState','RefSettings') | ForEach-Object { @{class=$WrapperPath;function=$_;alias=('ue_contract_' + $_)} } } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $WrapperSelection -Encoding utf8
             & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') $Project -run=DasExport "-Selection=$WrapperSelection" "-Output=$WrapperIR" -unattended -NullRHI -nosplash -stdout "-abslog=$Logs\authored-wrapper-export.log"
             if ($LASTEXITCODE) { throw 'Authored interface export failed' }
             & 'C:\Python312\python.exe' (Join-Path $Repo 'Scripts\GenerateAuthoredInterfaceProbe.py') $WrapperIR (Join-Path $Repo 'Plugins\DasForUE\Content\Das\Scripts') $ProbeId
@@ -46,7 +46,7 @@ try {
         if ($Process.ExitCode -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_REGISTERED_COOKED_RESULT=PASS')) { throw 'Cooked registry game failed' }
     }
 } finally {
-    foreach ($GeneratedName in @(('ue_authored_' + $ProbeId + '.das'),('authored_wrapper_check_' + $ProbeId + '.das'))) { $GeneratedFile = Join-Path $Repo ('Plugins\DasForUE\Content\Das\Scripts\' + $GeneratedName); if (Test-Path -LiteralPath $GeneratedFile) { Remove-Item -LiteralPath $GeneratedFile } }
+    foreach ($GeneratedName in @(('ue_authored_' + $ProbeId + '.das'),('authored_wrapper_check_' + $ProbeId + '.das'),('interface_holder_' + $ProbeId + '.das'))) { $GeneratedFile = Join-Path $Repo ('Plugins\DasForUE\Content\Das\Scripts\' + $GeneratedName); if (Test-Path -LiteralPath $GeneratedFile) { Remove-Item -LiteralPath $GeneratedFile } }
 
     $InterfaceDefinition = Join-Path $Repo ('Plugins\DasForUE\Content\Das\Scripts\dsl_registered_' + $ProbeId + '_interface.das')
     if (Test-Path -LiteralPath $InterfaceDefinition) { Remove-Item -LiteralPath $InterfaceDefinition }

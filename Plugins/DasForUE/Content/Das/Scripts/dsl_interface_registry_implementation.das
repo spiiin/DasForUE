@@ -8,9 +8,56 @@ require ue_object_types
  ue_implements(interface="/Script/DasRuntime.DasEventInterface")]
 class CounterActor {
     [ue_function(BlueprintCallable)]
+    def FailRefVector(var value:UEVector&; @ue_out var previous:UEVector&):void { value = ue_vector(5.0lf,6.0lf,7.0lf); previous = value; panic("expected_ref_failure") }
+    [ue_function(BlueprintCallable, arg_value_enum=EDasCallMode, arg_previous_enum=EDasCallMode)]
+    def WrongRefEnum(var value:UEEnumValue&; @ue_out var previous:UEEnumValue&):void { value = ue_enum_value("EDasCallMode","Active"); previous = ue_enum_value("EDasLegacyMode","DasLegacyActive") }
+    [ue_function(BlueprintCallable, arg_value_struct=DasCallPayload, arg_previous_struct=DasCallPayload)]
+    def WrongRefStruct(var value:UEStructValue&; @ue_out var previous:UEStructValue&):void { previous = ue_struct_value("DasCallMetrics") }
+
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    HeldEvents : DasEventInterface
+    [ue_function(BlueprintCallable)]
+    def SetEvents(value:DasEventInterface):void { self.HeldEvents = value }
+    [ue_function(BlueprintCallable)]
+    def GetEvents():DasEventInterface { return self.HeldEvents }
+    [ue_function(BlueprintCallable)]
+    def ClearEvents():void { self.HeldEvents = default<DasEventInterface> }
+
+    [ue_function(BlueprintCallable)]
     def EchoState(value:InterfaceState):InterfaceState { return value }
     [ue_function(BlueprintCallable)]
-    def EchoSettings(value:InterfaceSettings):InterfaceSettings { return value }
+    def NewDetails():array<InterfaceDetails> {
+        var result : array<InterfaceDetails>
+        var item = InterfaceDetails()
+        item.Amount = 77
+        item.Text = "New 世界"
+        push_clone(result,item)
+        return <- result
+    }
+    [ue_function(BlueprintCallable)]
+    def CopyDetails(Values:array<InterfaceDetails>; @ue_out var Copies:array<InterfaceDetails>&):void { Copies <- clone(Values) }
+    [ue_function(BlueprintCallable)]
+    def BumpDetails(var Values:array<InterfaceDetails>&):void { if (length(Values)>0) { Values[0].Amount += 3 } }
+    [ue_function(BlueprintCallable)]
+    def RefActor(var value:ActorRef&; @ue_out var previous:ActorRef&):void {previous = value; value = default<ActorRef>}
+    [ue_function(BlueprintCallable)]
+    def RefEvents(var value:DasEventInterface&; @ue_out var previous:DasEventInterface&):void {previous = value; value = default<DasEventInterface>}
+    [ue_function(BlueprintCallable)]
+    def RefState(var value:InterfaceState&; @ue_out var previous:InterfaceState&):void {previous = value; value = InterfaceState.Idle}
+    [ue_function(BlueprintCallable)]
+    def RefSettings(var value:InterfaceSettings&; @ue_out var previous:InterfaceSettings&):void {previous <- clone(value); value.Count += 3; value.Details.Amount += 1}
+    [ue_function(BlueprintCallable)]
+    def RefVector(var value:UEVector&; @ue_out var previous:UEVector&):void {previous = value; value = ue_vector(5.0lf,6.0lf,7.0lf)}
+    [ue_function(BlueprintCallable)]
+    def RefRotator(var value:UERotator&; @ue_out var previous:UERotator&):void {previous = value; value = ue_rotator(10.0lf,20.0lf,30.0lf)}
+    [ue_function(BlueprintCallable)]
+    def RefTransform(var value:UETransform&; @ue_out var previous:UETransform&):void {previous = value; value = ue_transform_identity()}
+    [ue_function(BlueprintCallable)]
+    def EchoEvents(value:DasEventInterface):DasEventInterface { return value }
+    [ue_function(BlueprintCallable)]
+    def EchoDetails(Values:array<InterfaceDetails>):array<InterfaceDetails> { return <- clone(Values) }
+    [ue_function(BlueprintCallable)]
+    def EchoSettings(value:InterfaceSettings):InterfaceSettings { return <- clone(value) }
 
     [ue_function(BlueprintCallable)]
     def EchoActor(value:ActorRef):ActorRef { return value }

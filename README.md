@@ -559,3 +559,93 @@ automatic caller ref/out copyback. See [DSLInterfaceMethodCalls](Docs/DSLInterfa
 Typed factory syntax is `ue_interface(type<CounterContract>, target)`. Explicit
 source-type mappings allow `api.EchoState(InterfaceState.Active)` and natural struct
 fields. See [DSLInterfaceSourceValues](Docs/DSLInterfaceSourceValues.md).
+
+
+Natural interface values can contain nested authored structs and arrays of mapped
+values with owned conversion. See [DSLNestedSourceValues](Docs/DSLNestedSourceValues.md).
+
+
+Natural source structs support Name and typed native UObject fields, including
+nested values and struct-array elements, with Unreal GC ownership for snapshots.
+See [DSLSourceObjectValues](Docs/DSLSourceObjectValues.md).
+
+
+Source struct tables now map to reflected map/set fields, including nested structs
+and struct-array elements. See [DSLSourceHashValues](Docs/DSLSourceHashValues.md).
+
+
+Standalone `array<ue_struct>` parameters/results and out/ref now work in class
+and interface DSL functions. See [DSLAuthoredStructArrays](Docs/DSLAuthoredStructArrays.md).
+
+
+Typed native/authored interface wrappers now work in reflected DSL fields and
+function inputs/results, with real Blueprint interface pins and checked GC/lifetime
+behavior. See [DSLInterfaceReferences](Docs/DSLInterfaceReferences.md).
+
+
+Authoring out/ref now includes objects, interfaces, enum/struct and math values,
+with checked publication and failure-safe Blueprint copyback.
+See [DSLExtendedOutRef](Docs/DSLExtendedOutRef.md).
+
+
+A DSL Actor plus native ScriptComponent example covers independent lifecycle
+sessions, owner delegate and world cleanup. See [ActorComponentExample](Docs/ActorComponentExample.md).
+
+Authored Component Blueprint declarations: [DSLActorComponents](Docs/DSLActorComponents.md).
+
+Actor component composition: [DSLComponentComposition](Docs/DSLComponentComposition.md).
+
+Lifecycle/event methods in classes: [DSLClassCallbacks](Docs/DSLClassCallbacks.md).
+
+Typed fields on authored objects: [DSLAuthoredObjectReferences](Docs/DSLAuthoredObjectReferences.md).
+
+Additional authored reference field values: [DSLAuthoredReferenceValues](Docs/DSLAuthoredReferenceValues.md).
+
+Component field access: [DSLComponentFieldAccess](Docs/DSLComponentFieldAccess.md).
+
+Universal reference properties: [DSLUniversalAccessors](Docs/DSLUniversalAccessors.md).
+
+Typed authored method calls, including ref/out and bounded Actor/Component reentry:
+[DSLAuthoredMethodCalls](Docs/DSLAuthoredMethodCalls.md).
+
+Natural enum/struct values in reference method calls:
+[DSLMethodSourceValues](Docs/DSLMethodSourceValues.md).
+
+Typed container method calls:
+[DSLMethodContainers](Docs/DSLMethodContainers.md).
+
+Native object/interface and math values in reference method calls:
+[DSLMethodObjectMath](Docs/DSLMethodObjectMath.md).
+
+Authored Actor/Component references in method signatures:
+[DSLAuthoredReferenceSignatures](Docs/DSLAuthoredReferenceSignatures.md).
+
+Native math class fields: [DSLMathFields](Docs/DSLMathFields.md).
+
+- [Native math members in authored structs](Docs/DSLStructMath.md).
+
+- [Natural authored property values](Docs/DSLPropertySourceValues.md).
+
+- [Typed native object/interface fields](Docs/DSLNativeReferenceFields.md).
+
+- [Authored enum members in structs](Docs/DSLStructEnum.md).
+
+- [Direct self native reference member writes](Docs/DSLSelfReferenceWrites.md).
+
+- [Whole nested self struct/math values](Docs/DSLSelfNestedValues.md).
+
+- [Whole self container member replacement](Docs/DSLSelfContainerMembers.md).
+
+- [Authored class reference fields](Docs/DSLAuthoredReferenceFields.md).
+
+- [Self container operations](Docs/DSLSelfContainerOperations.md).
+
+Indexed self and typed-reference container writes: [DSLIndexedContainers](Docs/DSLIndexedContainers.md).
+
+Direct ue_class array/map/set fields: [DSLClassContainers](Docs/DSLClassContainers.md).
+
+Multi-level self indexing and container mutations: [DSLMultiIndexSelf](Docs/DSLMultiIndexSelf.md).
+
+Native math arrays: [DSLMathArrays](Docs/DSLMathArrays.md).
+
+Authored enum arrays: [DSLEnumArrays](Docs/DSLEnumArrays.md).

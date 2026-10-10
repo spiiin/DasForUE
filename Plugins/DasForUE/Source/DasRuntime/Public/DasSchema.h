@@ -72,6 +72,11 @@ struct DASRUNTIME_API FDasClassSchema
                                 FDasClassSchema& Out, FString& Error);
 };
 
+// Object and interface references share checked object capabilities in the VM.
+DASRUNTIME_API UClass* DasReferencePropertyClass(const FProperty* Property);
+DASRUNTIME_API bool DasReferenceMatches(const UObject* Object,const UClass* Class);
+DASRUNTIME_API UObject* DasReferenceGet(const FProperty* Property,const void* Memory);
+DASRUNTIME_API bool DasReferenceSet(const FProperty* Property,void* Memory,UObject* Object);
 // Shared enum frame access: Blueprint byte enums and strongly typed native enums.
 DASRUNTIME_API UEnum* DasEnumPropertyType(FProperty* Property);
 DASRUNTIME_API int64 DasEnumPropertyNumber(FProperty* Property,const void* Memory);

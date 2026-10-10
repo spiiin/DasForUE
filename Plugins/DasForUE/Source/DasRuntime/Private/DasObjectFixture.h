@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "DasProbeActor.h"
+#include "DasProbeInterface.h"
 #include "DasObjectFixture.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasFloatTestSignal, float, Value);
@@ -43,12 +44,51 @@ struct FDasCallPayload
     UPROPERTY(BlueprintReadWrite, Category="Probe") double Weight = 0;
 };
 
+USTRUCT(BlueprintType)
+struct FDasObjectSnapshot
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite, Category="Probe") TObjectPtr<UObject> Object;
+    UPROPERTY(BlueprintReadWrite, Category="Probe") TObjectPtr<AActor> Actor;
+    UPROPERTY(BlueprintReadWrite, Category="Probe") FName Key;
+};
+USTRUCT(BlueprintType)
+struct FDasNestedObjectSnapshot
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite, Category="Probe") FDasObjectSnapshot Details;
+    UPROPERTY(BlueprintReadWrite, Category="Probe") TArray<FDasObjectSnapshot> Items;
+};
+
+USTRUCT(BlueprintType)
+struct FDasHashSnapshot
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite, Category="Probe") TMap<int32,FString> Values;
+    UPROPERTY(BlueprintReadWrite, Category="Probe") TSet<FString> Tags;
+};
+USTRUCT(BlueprintType)
+struct FDasHashContainerSnapshot
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite, Category="Probe") TArray<FDasHashSnapshot> Items;
+};
+
+UCLASS(Transient)
+class UDasReferenceFixture:public UObject,public IDasEventInterface {
+    GENERATED_BODY()
+public:
+    virtual void Notify_Implementation(int32) override {}
+    virtual void ResetCounter_Implementation() override {}
+};
+
 // Small reflected fixture shared by the editor and packaged interop tests.
 UCLASS(Transient, NotBlueprintable)
 class UDasObjectFixture : public UObject
 {
     GENERATED_BODY()
 public:
+    UPROPERTY(BlueprintReadWrite, Category="Probe") TScriptInterface<IDasEventInterface> Events;
     UPROPERTY(BlueprintReadWrite, Category="Probe") FString DSLText;
     UPROPERTY(BlueprintReadWrite, Category="Probe") double DSLPrecise=1.23456789012345;
     UPROPERTY(BlueprintReadWrite, Category="Probe") FName DSLKey;
@@ -56,6 +96,11 @@ public:
     UPROPERTY(BlueprintAssignable, Category="Probe") FDasIntSignal OnDasSignal;
     UPROPERTY(BlueprintAssignable, Category="Probe") FDasFloatTestSignal OnFloatSignal;
     UPROPERTY(BlueprintReadWrite, Category="Probe") TObjectPtr<UObject> Target;
+    UFUNCTION(BlueprintCallable, Category="Probe") FDasHashContainerSnapshot EchoNestedHashes(const FDasHashContainerSnapshot& Data) {
+        ++MarshalledCalls;FDasHashContainerSnapshot Result=Data;
+        for(auto& Item:Result.Items){Item.Values.Remove(-100);Item.Tags.Remove(TEXT("drop"));}
+        return Result;
+    }
     UFUNCTION(BlueprintCallable, Category="Probe") int32 AddHealth(int32 Value) { health += Value; return health; }
     UFUNCTION(BlueprintCallable, Category="Probe") float ScaleSpeed(float Value) { return speed * Value; }
     UFUNCTION(BlueprintCallable, Category="Probe") void SetHealthValue(int32 Value) { health = Value; }

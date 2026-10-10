@@ -83,3 +83,7 @@ the known declaration module and actual reflected assets for an isolated test.
 Production generation uses GenerateBindings.py --module ... --source-types ....
 The executable scenario uses InterfaceState values 7/42 and initialized InterfaceSettings,
 then verifies a Unicode/int roundtrip on a plain Blueprint receiver in editor/game.
+
+
+Nested mapped enum/struct fields and arrays are now supported; see DSLNestedSourceValues.md
+for ownership, frame validation limits and the remaining hash/object/name restrictions.

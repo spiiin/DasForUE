@@ -1318,3 +1318,434 @@ typed macro sketches are not implemented capabilities. Migration work stays defe
 - First struct mapping covers primitive/string fields. Nested/container/name/object
   shapes and broader reflection/storage remain subsequent extensions; VM reentry
   and general migrations remain deferred. See DSLInterfaceSourceValues.md.
+
+
+### Nested source structs and arrays — 2026-10-09
+
+- Source mapping now validates nested enum/struct identities and array element
+  mappings; recursive converters own and move container-containing values.
+- Generic reflected call frames support arrays inside structs with bounded concrete
+  wildcard traversal and required-leaf validation; generated owned readers recurse.
+- Source/interface probes cover deep copies, distinct array values, Unicode, empty
+  arrays/defaults, save/reopen/game. Source name/object/map/set shapes and standalone
+  authored struct-array signatures remain later extensions. See DSLNestedSourceValues.md.
+
+
+### Source struct Name and native UObject references — 2026-10-09
+
+- Added natural UENameValue and typed native object fields with implicit null
+  defaults, exact reflected class identity checks and source facade conversion.
+- Context snapshots use Unreal FGCObject/FInstancedStruct reference collection;
+  reflected call-frame object leaves retain checked input/output pinning.
+- Nested fields and struct-array elements cover Name/null values, independent
+  copies, GC retention/reclamation and destroyed Actor reads after collection.
+- Map/set source conversion, object arrays, standalone authored struct-array
+  signatures and interface storage remain subsequent stages. General migrations
+  stay deferred. See DSLSourceObjectValues.md.
+
+
+### Source struct maps and sets — 2026-10-09
+
+- Added natural table<K; V>/table<T> conversion in mapped authored source structs,
+  including nested structs and struct-array elements, with owned output tables.
+- Map keys/set elements retain int/string authoring rules; map values retain the
+  existing scalar/Name rules. Native type markers and source identities are checked.
+- Generalized call-frame wildcard validation for arrays and scalar hash fields;
+  required slots, UE duplicate detection, resize invalidation and sparse outputs
+  are covered. Container-valued hashes remain rejected.
+- Standalone authored struct-array signatures, reflected interface storage and
+  broader authoring out/ref remain subsequent stages. General migrations stay
+  deferred. See DSLSourceHashValues.md.
+
+
+### Standalone authored struct arrays — 2026-10-09
+
+- Added ordinary array<ue_struct> function input/result and out/ref signatures
+  with explicit registry/folder identity and real authored struct-array BP pins.
+- Internal reflection-built carriers preserve exact element/layout identity,
+  bounded owned snapshots and GC; reversible paths support return-only/out calls.
+- Natural interface facades convert array elements and independent output arrays
+  before mutable copyback; Actor/ProcessEvent and direct runtime tests cover it.
+- Reflected interface fields/parameters and broader authoring out/ref remain next.
+  General migrations remain deferred. See DSLAuthoredStructArrays.md.
+
+
+### Reflected interface references — 2026-10-09
+
+- Existing native/authored nominal interface wrappers infer real interface fields
+  and input/result BP pins; Class vs Interface type resolution stays explicit.
+- Shared checked object/interface property access preserves Blueprint-only object
+  semantics, native interface pointers, null/defaults and GC lifetime.
+- Blueprint wildcard frame conversion and generic reflected call marshalling retain
+  exact interface identity. Source structs can contain interface reference fields.
+- Native/authored holder probes, ProcessEvent/runtime roundtrips, generated calls,
+  GC/weak lifetime and actor destruction are covered. Interface out/ref and wider
+  collections/VM reentry stay separate; migrations remain deferred.
+  See DSLInterfaceReferences.md.
+
+
+### Extended authoring out/ref — 2026-10-09
+
+- Added object/interface, authored/raw enum/struct and math mutable parameters
+  using existing var T& and @ue_out annotations, with valid type-specific defaults.
+- Outputs use strict kind/identity/value/bounds validation and GC ownership;
+  Blueprint abort on failure prevents partial caller copyback.
+- Source facades convert mapped outputs before any argument updates. Native
+  ProcessEvent and runtime tests cover every new type plus negative failures.
+- Broader lifecycle/world integration and an end-to-end Actor/Component example
+  remain next; structural migrations and VM reentry remain deferred.
+  See DSLExtendedOutRef.md.
+
+
+### Actor + native script Component example — 2026-10-09
+
+- Added a Blueprint-spawnable ActorComponent lifecycle adapter with independent
+  VM ownership, owner-handle access and managed owner-delegate subscription.
+- Example Actor is created from ue_class DSL with an SCS ScriptComponent; defaults,
+  saved Blueprint/map, editor reopen and packaged script staging are checked.
+- Two-world isolation, component/Actor destruction and real PIE Tick/EndPIE cleanup
+  are covered. Component class DSL/default-subobject syntax and structural migration
+  remain separate work. See ActorComponentExample.md.
+
+### Authored ActorComponent classes — 2026-10-09
+
+- ue_class accepts the native ActorComponent parent via the shared resolver and
+  produces a Component Blueprint on the fixed UDasScriptComponent host.
+- Reflected fields/defaults and methods use the existing typed frame backend,
+  including ref/out. Component source/lifecycle defaults are installed by import.
+- The Actor/Component example now uses an authored Component Blueprint. Body-only
+  reimport avoids Blueprint recompilation; declaration migration stays deferred.
+- Component composition/default-subobject DSL and SceneComponent-specific behavior
+  remain subsequent steps. See DSLActorComponents.md.
+
+### Actor component composition — 2026-10-09
+
+- Added repeatable ue_component(name, script, type) annotations on Actor classes,
+  explicit authored source/type references and derived component stable IDs.
+- Import creates/reuses dependent Component Blueprints and builds Actor SCS nodes;
+  repeated instances of one type have distinct templates. Asset ownership/path
+  conflicts are refused before Actor creation.
+- Existing Actor/Component probes now rely on DSL composition instead of manual
+  SCS setup. Body-only reimport remains; migrations of composed Actor declarations
+  are guarded until component-aware preservation exists.
+- Typed component access, instance defaults, native/SceneComponent declarations and
+  attachments/transforms remain next. See DSLComponentComposition.md.
+
+### Lifecycle and event class methods — 2026-10-09
+
+- Standard BeginPlay/Tick/EndPlay methods are inferred without annotations and
+  rewritten to the existing persistent runtime callback ABI with direct self access.
+- Added ue_event source/delegate mapping and automatic bind_events generation;
+  the current event contract is one by-value int and void result.
+- Callback-only classes are supported; newly created Actor/Component Blueprints
+  receive lifecycle source defaults automatically. Callback declaration identity
+  participates in owner/reload validation.
+- Typed access to fields of other authored objects and wider delegate signatures
+  remain follow-ups. See DSLClassCallbacks.md.
+
+### Typed authored object field references — 2026-10-10
+
+- Added nominal ue_object_ref declarations resolved from explicit source/class,
+  ue_ref factory syntax and direct scalar field reads/assignments in class bodies.
+- References retain weak context-local handles and validate cooked class identity,
+  current field kind and permissions on each operation. Existing imports receive
+  identity on body-only reimport; no new adapter is needed per authored class.
+- Owner example now uses actor.Score += 1. Tests cover six scalar kinds, aliases,
+  typed globals, another instance of the same class, forged/wrong/null/destroyed
+  handles and readonly/unknown fields.
+- Authored method dispatch, component members, richer field kinds and native views
+  remain next. Structural migration remains deferred.
+
+### Additional authored reference value fields — 2026-10-10
+
+- Added whole enum, struct snapshot and object/interface field reads/assignments
+  through typed authored reference member syntax, using existing value ownership.
+- Writes validate exact enum/struct identity and object property membership before
+  mutation; struct reads own independent GC-aware snapshots.
+- Natural value mappings, nested access/containers and authored method dispatch
+  remain next. See DSLAuthoredReferenceValues.md. Migrations remain deferred.
+
+### Component owner shorthand — 2026-10-10
+
+- Added ue_owner(type<Reference>) in ActorComponent DSL bodies, lowering to the
+  existing checked owner/reference APIs. The main example now uses this form.
+- Compile checks enforce component context and Actor reference target; runtime
+  keeps authored identity and weak liveness validation. No runtime ABI changed.
+
+### Component field syntax and metadata — 2026-10-10
+
+- Current examples use imported reference types and @ue_component fields instead
+  of class-level name/script/type declarations. The collector supplies reference
+  initialization while Unreal creates the actual SCS component instance.
+- Added VisibleAnywhere/EditAnywhere and BlueprintReadOnly/ReadWrite component
+  flags, separate Category/DisplayName/ToolTip metadata and persistent compiler
+  replay on generated properties. Legacy class annotations remain compatibility.
+- Metadata is part of declaration identity; existing migration guards remain.
+  Component access/defaults, attachments and richer component types stay separate.
+
+### Typed self component access — 2026-10-10
+
+- self.Component returns the real component's typed weak view. Direct field reads,
+  assignments, local aliases and compound writes reuse checked authored adapters.
+- Compound receivers are evaluated once. Readonly reference replacement and unknown
+  fields reject; destroyed component references fail safely. Method dispatch is next.
+- Synthetic probe worlds now initialize Actor gameplay to enable ProcessEvent;
+  Actor post-initialization alone did not enable Blueprint calls.
+
+### Universal authored-reference properties — 2026-10-10
+
+- Replaced FDSLAuthoredRefVisitor and lexical type/assignment tracking with generated
+  native daScript property operators and compiler-resolved receiver types.
+- Ordinary imported functions now perform the same primitive and value-field
+  operations as DSL methods. Factories/type-name normalization are shared too.
+- self remains an execution-context bridge; component references use common
+  property operators. Low-level interop APIs are not removed.
+
+### Typed authored method calls — 2026-10-10
+
+- Compiler-resolved method syntax now generates receiver-first overloads for
+  authored reference types, shared by DSL methods and ordinary functions.
+- Reflected call frames validate current identities/signatures. Scalars, Name,
+  whole enum/struct/object values, void and ref/out copyback are implemented.
+- Checked nested calls preserve executing VM stacks and pending output/call
+  frames, defer reload of active contexts, propagate recoverable failures and
+  bound recursive dispatch. Blueprint dispatch still uses ProcessEvent.
+- Automatic source type mappings, container method adapters and automatic
+  reference types/import discovery remain next work. General migration stays
+  deferred. See DSLAuthoredMethodCalls.md for supported syntax and boundaries.
+
+### Natural authored method values — 2026-10-10
+
+- Authored enum/struct argument, return and ref/out types are preserved by the
+  reference method emitter. Qualified source descriptors live only within the
+  current compile chain; nested compiler AST pointers are not retained.
+- Existing source-value converters and reflected frames perform the transfer;
+  the caller uses ordinary enum/struct values, including nested fields.
+- Explicit registry/folder and imports remain. Wrong enum/struct types produce
+  compile errors. Failure recovery preserves caller values.
+- Native-object/math wrapper signatures, container method adapters and automatic
+  reference/import discovery remain next; general migration stays deferred.
+
+### Typed authored container method calls — 2026-10-10
+
+- Reference overloads preserve supported array/map/set source types for inputs,
+  results and ref/out. Arrays of authored structs and container fields inside
+  nested authored structs use existing source converters and owned snapshots.
+- Whole snapshot inputs share reflected call frames, bounded validation and object
+  pinning. Blueprint physical by-reference container inputs normalize to logical
+  DAS in semantics; only explicit ref/out values are published back to callers.
+- Output conversion completes before move publication. Recovered failures preserve
+  caller containers. Wrong element types reject during compilation.
+- Existing carrier limits remain. Natural native-object/math method signatures and
+  automatic references/import discovery are next; general migration stays deferred.
+
+### Native object/interface and math method signatures — 2026-10-10
+
+- Reference overloads retain generated native object/interface wrappers and
+  UEVector/UERotator/UETransform for inputs/results/ref/out. Source descriptors
+  remain compile-chain names; native wrappers reuse existing checked converters.
+- ue_ref accepts native object/interface wrappers as well as authored views.
+  Math adapters copy native values into the shared reflected frame and validate
+  identity, finite values and normalized transforms before publishing outputs.
+- Null/ref/out and recovery behavior retain existing checked capability semantics.
+- Authored views in reflected signatures and automatic reference/import discovery
+  remain next; general migration stays deferred.
+
+### Authored reference method signatures — 2026-10-10
+
+- Author Actor/Component views support parameters/results/ref/out through the
+  common reference/object frame path, including null and same-class references.
+- Native DAS-host reflected storage avoids Blueprint bootstrap for self types;
+  optional authored_id in type IR preserves logical identity and change detection.
+- Packing/unpacking checks stable identity and liveness, including Blueprint entry.
+- Concrete Blueprint-class pins/class catalogs, authored field ownership and
+  automatic references/import discovery remain next; migration remains deferred.
+
+### Native math ue_class properties — 2026-10-10
+
+- UEVector/UERotator/UETransform are native struct properties with zero/identity
+  defaults or finite literal constructors. Save/reopen/cook use existing schema.
+- self reads/whole writes and Vector/Rotator scalar member writes share checked
+  snapshots; authored view property operators return/accept native math values.
+- readonly/type checks and math validity remain enforced. Generic struct members,
+  direct class container fields and automatic discovery remain next work.
+
+### Native math authored struct members — 2026-10-10
+
+- ue_struct supports native UEVector/UERotator/UETransform members, with the same
+  literal default rules as class properties. Native types need no registry rows.
+- Type validation and editor asset construction distinguish builtin native
+  structs from authored dependencies; exact native identity and defaults are
+  checked on reuse. Existing nested/array-of-authored-struct snapshot adapters
+  reuse checked native math converters.
+- Direct math containers, nested self member writes, ordinary authored-reference
+  field ownership and automatic discovery remain separate work.
+
+### Nested self math scalar writes — 2026-10-10
+
+- self authored struct fields preserve the full path when writing nested
+  Vector x/y/z or Rotator pitch/yaw/roll; assignment/compound operations reuse
+  existing scalar snapshot commits. Readonly/type validation remains.
+- Snapshot validation now checks native math values recursively, including
+  nested/array children, before publishing updates. Recovered invalid updates
+  preserve the field's previous value.
+- Indexed container writes, direct math containers, typed-view in-place writes,
+  authored-reference field ownership and automatic discovery remain separate.
+
+### Natural authored property values — 2026-10-10
+
+- Common authored-reference property operators retain source enum/struct types,
+  using compile-chain qualified-name/scope descriptors and the existing method
+  source resolver. No nested AST pointers or new runtime storage format.
+- Getter copies and whole setters reuse checked pack/unpack helpers for nested
+  structs, math values and supported containers. Nominal type, readonly and asset
+  identity/layout/default validation remain enforced; explicit imports remain.
+- Nested writes through foreign views, direct class containers, authored-reference
+  field ownership and automatic reference/import discovery remain separate.
+
+### Typed native object/interface properties — 2026-10-10
+
+- Common source property descriptors preserve native object/interface wrapper
+  types. Getters/setters now compare the reflected property's native class path
+  to its declared path before transfer, including null assignments.
+- Native null/liveness/type checks and readonly operators remain; destroyed Actor
+  properties normalize to empty wrappers. Component views retain their separate
+  authored identity validation within the same accessor implementation.
+- Ordinary authored-reference field ownership, object containers, soft/class
+  references and automatic discovery remain separate work.
+
+### Authored enum members in structs — 2026-10-10
+
+- ue_struct supports same-module authored enum members with explicit named
+  defaults, including enums without zero. Model validation checks references
+  and members; editor creation seeds the enum default before compiling the field.
+- Source snapshot helpers validate native enum identity/defaults and transfer
+  enum members in nested/array-of-authored structs, properties and method ref/out.
+- Direct self enum leaf writes, standalone enum containers, generated native enum
+  source types and cross-module reflected enum dependencies remain separate.
+
+### Direct self enum member assignment — 2026-10-10
+
+- self nested authored enum assignments use typed source commit helpers and the
+  existing latest-snapshot member update. Source nominal type checks precede
+  enum packing; other enums and integers cannot silently supply their numbers.
+- Registry/folder identity, runtime enum checks and readonly roots remain.
+  Compound enum arithmetic, indexed self container writes and foreign-view
+  nested writes remain separate/unsupported as documented.
+
+### Direct self native object/interface member writes — 2026-10-10
+
+- Object/interface and enum leaves share a source-typed commit helper generator.
+  Nested self native reference assignments reuse existing snapshot member writes,
+  including null; nominal RHS, readonly and runtime reference checks remain.
+- Destroyed Actor members normalize to empty views and can be cleared; other
+  struct members remain intact. Ordinary Unreal ownership is unchanged.
+- Authored-reference member ownership, soft/class refs, indexed self mutations
+  and foreign-view nested writes remain separate work.
+
+### Whole nested self struct/math values — 2026-10-10
+
+- The common typed leaf commit supports authored structs and native math values,
+  reusing nested snapshot replacement and whole-root commit. Nominal source type,
+  native identity/math validity and readonly checks remain.
+- ExprClone is handled for self properties/members. Container-bearing structs
+  use native DAS := semantics; sibling data and independent containers persist.
+- Indexed self mutations and foreign-view nested writes remain separate work.
+
+### Whole self container member replacement — 2026-10-10
+
+- The common typed leaf helper supports source array/map/set members with :=,
+  generating missing carrier converters within the owning compile scope.
+- Nested snapshot replacement accepts exact matching native carrier Values,
+  with owned CopyCompleteValue, aggregate validation and whole-root commit.
+- Source type/element and readonly checks remain; empty replacement clears.
+  Direct class containers, new container shapes, indexed/live self mutation
+  and foreign-view nested writes remain separate work.
+
+### Authored class reference fields — 2026-10-10
+
+- Nullable ue_class object properties retain authored_id and use common native
+  Actor/Component host storage, as for signatures. Source typed self/property
+  setters and nullable stable-ID converters guard values before transfer.
+- Self references avoid concrete Blueprint bootstrap. Ordinary Unreal ownership
+  remains; concrete class pins/pickers are separate. Ordinary Apply blocks
+  changes to existing logical authored field identities.
+- Authored struct members, richer ownership/default instancing and automatic
+  imports/reference catalogs remain separate work.
+
+### Self container insert/erase/clear — 2026-10-10
+
+- Typed helpers perform supported set/map insert, array/table erase and clear
+  using standard DAS operations on owned local containers, then snapshot commit.
+  Table erase returns bool; array erase/clear/insert preserve void semantics.
+- Exact RHS types, readonly, identity and aggregate validation remain. Operands
+  are evaluated before native read; no live UE container view is introduced.
+- Indexed assignments, push/pop, int64 array overloads, iterators and foreign-view
+  container mutations remain separate work.
+
+
+### Indexed containers and typed-reference mutations — 2026-10-10
+
+- Indexed self array/map assignment, compound arithmetic, authored element fields
+  and math leaves use owned root snapshots with publication after validation.
+- Added element push/push_clone (optional insertion index), pop and map insert_clone.
+  Array index, insertion and erase adapters accept int/int64 overloads.
+- Compiler-resolved authored references support equivalent container operations
+  and nested field assignments in ordinary functions, preserving receiver identity,
+  source types, readonly annotations and bool erase results.
+- Existing supported container shapes remain unchanged. Direct class containers,
+  multiple indexed self levels, consuming moves/live iterators and mutable argument
+  projections are still separate work. See DSLIndexedContainers.md.
+
+
+### Direct ue_class container fields — 2026-10-10
+
+- Direct authored array/map/set properties use existing supported carrier shapes
+  and implicit empty defaults. Authoring JSON retains recursive container types;
+  the Actor adapter derives native Blueprint container pins from the carrier.
+- Common property snapshot adapters handle both structs and real native containers.
+  Self/reference getters, replacements, indexed writes and operations preserve
+  source types, native identity, readonly and atomic publication.
+- Runtime owner validation checks container identity and empty class defaults.
+  Body-only reimport is supported; declaration/default migrations of classes
+  containing direct containers are explicitly deferred before rollback capture.
+- New element/value families, nonempty defaults, mutable projections, live
+  iterators and multiple indexed self levels remain separate work.
+  See DSLClassContainers.md.
+
+
+### Multi-level indexed self mutations — 2026-10-10
+
+- Replaced the single-index self helper with full field/index path reconstruction.
+  Assignments, compound writes, container replacement and operations below indices
+  commit one validated owned root snapshot.
+- Generic int|int64 arguments support mixed index widths independently; map keys
+  and leaf values retain exact source types. No exponential overload generation.
+- Existing array-of-authored-struct shapes can contain other supported containers.
+  New native shapes, mutable projections, live iterators, consuming moves and
+  declaration/default migrations remain separate work. See DSLMultiIndexSelf.md.
+
+
+### Native math arrays — 2026-10-10
+
+- Supported Vector/Rotator/Transform arrays in authored class/struct properties
+  and reflected input/result/ref/out signatures with native Blueprint element types.
+- Existing dynamic struct-array carriers now also accept an explicit native math
+  allowlist; layout identity/cache and path validation remain in place.
+- Natural pack/unpack uses existing math value adapters for every element, with
+  owned copies, readonly/type validation and atomic native publication.
+- Enum/object arrays, other native struct arrays, new map/set families and
+  declaration/default migrations remain separate work. See DSLMathArrays.md.
+
+
+### Authored enum arrays — 2026-10-10
+
+- Added exact authored-enum array carriers for class/struct fields and reflected
+  input/result/ref/out signatures, retaining native enum Blueprint identity.
+- Source converters use checked typed enum values per element. Snapshot validation
+  now rejects unknown/reserved enum elements; resizing seeds only new elements
+  with a valid first member, supporting sparse enums without zero.
+- Carrier cache validation includes enum members and stable IDs. Source nominal
+  typing, readonly, snapshot bounds and atomic publication/copyback remain.
+- Native enum arrays, enum maps/sets, object arrays, nonempty defaults and general
+  type/declaration migration remain separate work. See DSLEnumArrays.md.

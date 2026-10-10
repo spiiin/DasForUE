@@ -7,6 +7,7 @@ struct DASRUNTIME_API FDasDeclaredType
 {
     FString Kind = TEXT("int");
     FString TypePath;
+    FString AuthoredId; // Optional authored object identity, separate from host storage.
     TSharedPtr<const FDasDeclaredType> Element, Key, Value;
     FString Identity() const;
 };
@@ -40,10 +41,23 @@ struct FDasDeclaredMethod
     bool bCallable = true, bPure = false, bStatic = false;
     TMap<FString, FString> Metadata;
 };
+struct FDasDeclaredComponent
+{
+    FString Id,Name,ScriptFile,ClassName;
+    bool bReadOnly=false,bEditable=false,bVisible=false;
+    TMap<FString,FString> Metadata;
+    bool operator==(const FDasDeclaredComponent& Other)const{return Id==Other.Id && Name==Other.Name && ScriptFile==Other.ScriptFile && ClassName==Other.ClassName && bReadOnly==Other.bReadOnly && bEditable==Other.bEditable && bVisible==Other.bVisible && Metadata.OrderIndependentCompareEqual(Other.Metadata);}
+};
+struct FDasDeclaredCallback {
+    FString Name,Kind,Source,EventName;
+    bool operator==(const FDasDeclaredCallback& O)const{return Name==O.Name && Kind==O.Kind && Source==O.Source && EventName==O.EventName;}
+};
 struct FDasDeclaredClass
 {
     FString Id, Name, NativeParent, ParentId;
     TArray<FString> Interfaces;
+    TArray<FDasDeclaredComponent> Components;
+    TArray<FDasDeclaredCallback> Callbacks;
     TArray<FDasDeclaredProperty> Properties;
     TArray<FDasDeclaredMethod> Methods;
     TMap<FString, FString> Metadata;

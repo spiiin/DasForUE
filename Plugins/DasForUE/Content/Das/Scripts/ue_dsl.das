@@ -21,3 +21,15 @@ def ue_dsl_commit_struct_member_string(property:string; member:string; value:str
 def ue_dsl_commit_struct_member_name(property:string; member:string; value:UENameValue):void {
     ue_set_self_struct(property, ue_struct_with_name(ue_get_self_struct(property), member, value))
 }
+
+def ue_dsl_commit_struct_member_enum(property:string; member:string; value:UEEnumValue):void {
+    ue_set_self_struct(property, __ue_struct_with_enum_value(ue_get_self_struct(property), member, value))
+}
+
+def ue_dsl_commit_struct_member_object(property:string; member:string; value:UObjectHandle):void {
+    ue_set_self_struct(property, ue_struct_with_object(ue_get_self_struct(property), member, value))
+}
+
+def ue_dsl_commit_struct_member_struct(property:string; member:string; value:UEStructValue):void {
+    ue_set_self_struct(property, ue_struct_nested_with(ue_get_self_struct(property), member, -1, value))
+}

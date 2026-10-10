@@ -1,3 +1,4 @@
+#include "DasContainerTypes.h"
 #include "DasBlueprintRollback.h"
 #include "DasNumericGraphMigration.h"
 #include "DasProbeActor.h"
@@ -46,6 +47,7 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root,TArray<UBlueprint*>& BP
  BPs.Sort([&](const UBlueprint& A,const UBlueprint& B){if(&A==Root)return &B!=Root;if(&B==Root)return false;auto Depth=[](const UClass* C){int32 N=0;while(C){++N;C=C->GetSuperClass();}return N;};return Depth(A.GeneratedClass)<Depth(B.GeneratedClass);});return true;
 }
 bool FDasBlueprintRollback::Prepare(UBlueprint* Root,const FDasClassSchema& Schema,const TArray<UBlueprint*>& BPs,const TArray<TStrongObjectPtr<UObject>>& Assets,FString& Error){
+ for(TFieldIterator<FProperty> It(Root->GeneratedClass,EFieldIteratorFlags::ExcludeSuper);It;++It)if(DasContainerCarrierForProperty(*It)){Error=TEXT("Direct container class rollback/migration is deferred");return false;}
  auto& S=*Impl;auto Remember=[&](UObject* O){if(!S.Dirty.Contains(O->GetOutermost()))S.Dirty.Add(O->GetOutermost(),O->GetOutermost()->IsDirty());};
  for(auto* B:BPs){if(!B || !B->GeneratedClass || (B->Status!=BS_UpToDate && B->Status!=BS_UpToDateWithWarnings)){Error=TEXT("Compile scoped Blueprints before rollback snapshot");return false;}FImpl::FBlueprint Image;Image.BP.Reset(B);Image.OriginalClass.Reset(B->GeneratedClass);Image.Variables=B->NewVariables;Image.Functions=B->FunctionGraphs;Image.Uber=B->UbergraphPages;Image.Delegates=B->DelegateSignatureGraphs;Image.Macros=B->MacroGraphs;Image.Display=B->BlueprintDisplayName;Image.Description=B->BlueprintDescription;Image.Category=B->BlueprintCategory;Image.Metadata=RollbackMetadata(B);Image.ClassMetadata=RollbackMetadata(B->GeneratedClass);for(TFieldIterator<UFunction> It(B->GeneratedClass,EFieldIteratorFlags::ExcludeSuper);It;++It)Image.FunctionMetadata.Add(It->GetFName(),RollbackMetadata(*It));S.Blueprints.Add(MoveTemp(Image));Remember(B);
   TArray<UEdGraph*> Graphs;B->GetAllGraphs(Graphs);for(auto* G:Graphs){FImpl::FGraph Graph;Graph.Graph.Reset(G);Graph.Metadata=RollbackMetadata(G);S.Graphs.Add(MoveTemp(Graph));for(auto& E:G->Nodes)if(auto* Node=Cast<UK2Node>(E.Get())){FImpl::FNode N;N.Node.Reset(Node);if(auto* V=Cast<UK2Node_Variable>(Node))N.Reference=V->VariableReference;else if(auto* C=Cast<UK2Node_CallFunction>(Node))N.Reference=C->FunctionReference;else if(auto* Entry=Cast<UK2Node_FunctionEntry>(Node))N.EntryMetadata=Entry->MetaData;else continue;S.Nodes.Add(MoveTemp(N));}}

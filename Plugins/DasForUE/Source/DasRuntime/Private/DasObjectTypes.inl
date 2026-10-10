@@ -1,5 +1,13 @@
+bool DSLAuthoredView(const das::TypeDeclPtr&);
+FString DSLAuthoredReferencePath(const das::TypeDeclPtr&);
+das::ExpressionPtr DSLAuthoredUnpack(const das::LineInfo&,const das::TypeDeclPtr&,das::ExpressionPtr);
+das::ExpressionPtr DSLAuthoredPack(const das::LineInfo&,const das::TypeDeclPtr&,das::ExpressionPtr);
 // UEObject reuses generated nominal wrappers; it never assumes a UObject layout.
     bool DSLTypedObject(const das::TypeDeclPtr& T){return T && T->baseType==das::Type::tStructure && T->structType && DSLAnnotation(T->structType->annotations,"ue_native_object");}
+    FString DSLTypedObjectPath(const das::TypeDeclPtr&);
+    bool DSLTypedInterface(const das::TypeDeclPtr& T){return T && T->baseType==das::Type::tStructure && T->structType && (DSLAnnotation(T->structType->annotations,"ue_native_interface") || DSLAnnotation(T->structType->annotations,"ue_interface_ref"));}
+    bool DSLTypedReference(const das::TypeDeclPtr& T){return DSLTypedObject(T) || DSLTypedInterface(T) || DSLAuthoredView(T);}
+    FString DSLTypedReferencePath(const das::TypeDeclPtr& T){if(DSLAuthoredView(T))return DSLAuthoredReferencePath(T);if(DSLTypedInterface(T)){const auto* A=DSLAnnotation(T->structType->annotations,"ue_native_interface");if(!A)A=DSLAnnotation(T->structType->annotations,"ue_interface_ref");const FString Path=DSLString(A->arguments,"path");auto* C=FindObject<UClass>(nullptr,*Path);if(!C || !C->HasAnyClassFlags(CLASS_Interface))DSLFail(TEXT("Typed interface requires loaded interface"));if(A->annotation->name=="ue_interface_ref"){auto* Authored=Cast<UDasAuthoredInterfaceClass>(C);if(!Authored || Authored->StableId!=DSLString(A->arguments,"id"))DSLFail(TEXT("Typed interface stable ID mismatch"));}return Path;}return DSLTypedObjectPath(T);}
     FString DSLTypedObjectPath(const das::TypeDeclPtr& T){const auto* A=DSLAnnotation(T->structType->annotations,"ue_native_object");const FString Path=DSLString(A->arguments,"path");auto* C=FindObject<UClass>(nullptr,*Path);if(!Path.StartsWith(TEXT("/Script/")) || !C || C->HasAnyClassFlags(CLASS_Interface))DSLFail(TEXT("Typed object requires a loaded native UObject class: ")+Path);return Path;}
     das::TypeDeclPtr DSLObjectCopyType(const das::TypeDeclPtr& T){das::TypeDeclPtr C=nullptr;das::TypeDecl::clone(C,T);return C;}
     das::TypeDeclPtr DSLObjectNormalize(const das::TypeDeclPtr& T,das::ModuleGroup& Group,das::Module* Module,int32 Depth=0){

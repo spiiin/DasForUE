@@ -149,6 +149,20 @@ def generate(ir, module="ue_generated", source_types=None):
                     raise ValueError('Inconsistent enum definitions')
                 enums[path] = members
 
+    hash_containers = {}
+    scalar_properties = {'int':'IntProperty','float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty','string':'StrProperty','name':'NameProperty','enum':'EnumProperty'}
+    def register_hash(field):
+        children = [field.get('key',{}),field.get('value',{})] if field['kind']=='map' else [field.get('element',{})]
+        markers=field['type_path'].split(';')
+        if len(markers)!=len(children): raise ValueError('Invalid hash container type markers')
+        for child,marker in zip(children,markers):
+            kind,path=child.get('kind'),child.get('type_path')
+            if kind not in scalar_properties or (marker not in ('EnumProperty','ByteProperty') if kind=='enum' else marker!=scalar_properties[kind]): raise ValueError('Unsupported hash container member')
+            if kind=='enum' and path not in enums: raise ValueError('Missing hash enum definition')
+            if kind!='enum' and path!='': raise ValueError('Invalid hash member identity')
+        name=hash_container_name(field)
+        if name in hash_containers and hash_container_identity(hash_containers[name])!=hash_container_identity(field): raise ValueError('Hash container generated symbol collision')
+        hash_containers[name]=field
     structures = {}
     for item in ir['structs']:
         path = item['type_path']
@@ -171,11 +185,20 @@ def generate(ir, module="ue_generated", source_types=None):
             if not name or '.' in name or ident(name) in seen:
                 raise ValueError('Invalid or colliding struct field')
             seen.add(ident(name))
-            if field['kind'] == 'struct': visit(field['type_path'])
-            elif field['kind'] not in kinds or field['kind'] in ('object', 'array', 'map', 'set'):
-                raise ValueError('Unsupported struct leaf')
-            if field['kind'] == 'enum' and field['type_path'] not in enums:
-                raise ValueError('Missing struct enum definition')
+            def validate_member(member):
+                if member['kind'] == 'struct': visit(member['type_path'])
+                elif member['kind'] == 'array':
+                    element = member.get('element', {})
+                    properties = {'int':'IntProperty','float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty','string':'StrProperty','name':'NameProperty','struct':'StructProperty','enum':'EnumProperty'}
+                    kind = element.get('kind')
+                    if kind not in properties or (member['type_path'] not in ('EnumProperty','ByteProperty') if kind == 'enum' else member['type_path'] != properties[kind]): raise ValueError('Unsupported struct array member')
+                    validate_member(element)
+                elif member['kind'] in ('map','set'): register_hash(member)
+                elif member['kind'] == 'object':
+                    if member['type_path'] not in classes: raise ValueError('Missing or incompatible struct object class')
+                elif member['kind'] not in kinds: raise ValueError('Unsupported struct leaf')
+                if member['kind'] == 'enum' and member['type_path'] not in enums: raise ValueError('Missing struct enum definition')
+            validate_member(field)
         visiting.remove(path)
         visited.add(path)
         order.append(path)
@@ -198,25 +221,10 @@ def generate(ir, module="ue_generated", source_types=None):
                 yield from leaves(child, path + '.' + child['path'])
         else:
             yield dict(path=path, kind=field['kind'], type_path=field['type_path'])
-    hash_containers = {}
-    scalar_properties = {'int':'IntProperty', 'float':'FloatProperty', 'double':'DoubleProperty', 'bool':'BoolProperty', 'string':'StrProperty', 'name':'NameProperty', 'enum':'EnumProperty'}
     for fn in ir['functions']:
         flattened, names = [], set()
         for param in fn['parameters']:
-            if param['kind'] in ('map', 'set'):
-                children = [param.get('key', {}), param.get('value', {})] if param['kind'] == 'map' else [param.get('element', {})]
-                markers = param['type_path'].split(';')
-                if len(markers) != len(children): raise ValueError('Invalid hash container type markers')
-                for child, marker in zip(children, markers):
-                    kind, path = child.get('kind'), child.get('type_path')
-                    if kind not in scalar_properties or (marker not in ('EnumProperty', 'ByteProperty') if kind == 'enum' else marker != scalar_properties[kind]):
-                        raise ValueError('Unsupported hash container member')
-                    if kind == 'enum' and path not in enums: raise ValueError('Missing hash enum definition')
-                    if kind != 'enum' and path != '': raise ValueError('Invalid hash member identity')
-                container_name = hash_container_name(param)
-                if container_name in hash_containers and hash_container_identity(hash_containers[container_name]) != hash_container_identity(param):
-                    raise ValueError('Hash container generated symbol collision')
-                hash_containers[container_name] = param
+            if param['kind'] in ('map', 'set'): register_hash(param)
             if param['kind'] == 'array':
                 element = param.get('element', {})
                 property_types = {'int':'IntProperty', 'float':'FloatProperty', 'double':'DoubleProperty', 'bool':'BoolProperty', 'string':'StrProperty', 'name':'NameProperty', 'object':'ObjectProperty', 'struct':'StructProperty', 'enum':'EnumProperty'}
@@ -260,11 +268,35 @@ def generate(ir, module="ue_generated", source_types=None):
             elif kind == 'struct':
                 definition = structures.get(path)
                 if not definition or set(mapping['members']) != {field['path'] for field in definition['fields']}: raise ValueError('Source struct members differ from exported layout')
-                if any(field['kind'] not in ('int', 'float', 'double', 'bool', 'string') for field in definition['fields']): raise ValueError('Source struct binding currently requires scalar/string fields')
+
                 members = list(mapping['members'].values())
                 if len(set(members)) != len(members) or any(not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', member) for member in members): raise ValueError('Invalid source struct member names')
             else: raise ValueError('Invalid source value kind')
             source_mappings[path] = mapping
+    def check_source_field(field, depth=0):
+        if depth > 16: raise ValueError('Source mapping nesting limit exceeded')
+        kind = field['kind']
+        if kind in ('int', 'float', 'double', 'bool', 'string', 'name', 'object'): return
+        if kind in ('struct', 'enum'):
+            mapped = source_mappings.get(field['type_path'])
+            if not mapped or mapped['kind'] != kind: raise ValueError('Nested source identity requires an explicit matching mapping')
+            if kind == 'struct':
+                for child in structures[field['type_path']]['fields']: check_source_field(child, depth + 1)
+            return
+        if kind in ('map','set'):
+            key=field['key'] if kind=='map' else field['element']
+            if key['kind'] not in ('int','string'): raise ValueError('Source hash keys/elements require int/string')
+            if kind=='map' and field['value']['kind'] not in ('int','float','double','bool','string','name'): raise ValueError('Unsupported source hash value')
+            return
+        if kind == 'array': check_source_field(field['element'], depth + 1); return
+        raise ValueError('Unsupported source mapping field kind: ' + kind)
+    for path, mapping in source_mappings.items():
+        if mapping['kind'] == 'struct':
+            for field in structures[path]['fields']: check_source_field(field)
+    def owns_container(field):
+        if field['kind'] in ('array', 'map', 'set'): return True
+        if field['kind'] == 'struct': return any(owns_container(child) for child in structures[field['type_path']]['fields'])
+        return False
     defaults = {}
     for fn in ir['functions']:
         seen_default = False
@@ -372,10 +404,16 @@ def generate(ir, module="ue_generated", source_types=None):
             lines += [f'    if (value == {quote(m["name"])}) {{ return {name}.v_{ident(m["name"])} }}']
         lines += ['    panic("unknown enum result; regenerate bindings")', f'    return {name}.v_{ident(members[0]["name"])}', '}', '']
 
+    nested_hashes={hash_container_name(f) for s in structures.values() for f in s['fields'] if f['kind'] in ('map','set')}
+    for name in sorted(nested_hashes):
+        field=hash_containers[name]
+        if field['kind']=='map': lines += [f'struct {name}_Entry {{ key : {typ(field["key"])}; value : {typ(field["value"])} }}',f'struct {name} {{ entries : array<{name}_Entry> }}','']
+        else: lines += [f'struct {name} {{ values : array<{typ(field["element"])}> }}','']
     for path in order:
         lines += [f'struct {struct_name(path)} {{'] + [f'    f_{ident(p["path"])} : {typ(p)}' for p in structures[path]['fields']] + ['}', '']
 
     for name, field in sorted(hash_containers.items()):
+        if name in nested_hashes: continue
         if field['kind'] == 'map':
             lines += [f'struct {name}_Entry {{ key : {typ(field["key"])}; value : {typ(field["value"])} }}',
                       f'struct {name} {{ entries : array<{name}_Entry> }}', '']
@@ -383,7 +421,10 @@ def generate(ir, module="ue_generated", source_types=None):
 
     def path_expr(path):
         # Replace the validated array wildcard after quoting, inserting only our loop variable.
-        return quote(path).replace('.*', '.{index}')
+        text = quote(path)
+        for depth in range(16,0,-1): text = text.replace('.*i' + str(depth), '.{input_index_' + str(depth) + '}')
+        for depth in range(16,-1,-1): text = text.replace('.*' + str(depth), '.{output_index_' + str(depth) + '}')
+        return text.replace('.*', '.{index}')
 
     # Friendly authored value names stay aliases of the generated representation.
     authored_values = {}
@@ -399,7 +440,55 @@ def generate(ir, module="ue_generated", source_types=None):
                 lines += [f'def {short}_from_symbol(value : string) : {short} {{ return {full}_from_symbol(value) }}', f'def {short}_to_symbol(value : {short}) : string {{ return {full}_to_symbol(value) }}', '']
     def source_name(field):
         mapping = source_mappings.get(field.get('type_path', ''))
+        if field['kind'] == 'array': return 'array<' + source_name(field['element']) + '>'
         return source_module + '::' + mapping['name'] if mapping else typ(field)
+    def uses_source(field):
+        return uses_source(field['element']) if field['kind']=='array' else field.get('type_path') in source_mappings
+    def source_convert_expr(field, value, to_generated):
+        if field.get('type_path') in source_mappings:
+            full = enum_name(field['type_path']) if field['kind'] == 'enum' else struct_name(field['type_path'])
+            return ('ue_source_to_' if to_generated else 'ue_source_from_') + full + '(' + value + ')'
+        return value
+    def convert_field(field, value, target, to_generated, depth=0):
+        if field['kind'] in ('map','set'):
+            kind=field['kind']; index='source_index_'+str(depth); key='source_key_'+str(depth)
+            child=field['key'] if kind=='map' else field['element']
+            if to_generated:
+                items=target+('.entries' if kind=='map' else '.values')
+                mapped='source_value_'+str(depth)
+                iteration=f'{key}, {mapped}, {index} in keys({value}), values({value}), range(length({value}))' if kind=='map' else f'{key}, {index} in keys({value}), range(length({value}))'
+                lines.extend([f'    resize({items}, length({value}))',f'    for ({iteration}) {{'])
+                lines.append(f'        {items}[{index}]'+('.key' if kind=='map' else '')+' = '+key)
+                if kind=='map':
+                    before=len(lines);convert_field(field['value'],mapped,items+'['+index+'].value',True,depth+1)
+                    for i in range(before,len(lines)): lines[i]='    '+lines[i]
+                lines.append('    }')
+            else:
+                items=value+('.entries' if kind=='map' else '.values')
+                key_value=items+'['+index+']'+('.key' if kind=='map' else '')
+                lines.extend([f'    for ({index} in range(length({items}))) {{',f'        if (key_exists({target}, {key_value})) {{ panic("duplicate source hash key/element") }}'])
+                if kind=='map':
+                    before=len(lines);convert_field(field['value'],items+'['+index+'].value',target+'['+key_value+']',False,depth+1)
+                    for i in range(before,len(lines)): lines[i]='    '+lines[i]
+                else: lines.append(f'        insert({target}, {key_value})')
+                lines.append('    }')
+        elif field['kind'] == 'array':
+            index = 'source_index_'  + str(depth)
+            lines.extend([f'    resize({target}, length({value}))', f'    for ({index} in range(length({value}))) {{'])
+            before = len(lines)
+            convert_field(field['element'], value + '[' + index + ']', target + '[' + index + ']', to_generated, depth + 1)
+            for i in range(before, len(lines)): lines[i] = '    ' + lines[i]
+            lines.append('    }')
+        elif field['kind'] == 'name':
+            expression = 'ue_name(ue_name_text(' + value + '))' if to_generated else 'ue_name_value(' + value + '.value)'
+            lines.append('    ' + target + ' = ' + expression)
+        elif field['kind'] == 'object':
+            wrapper = class_name(field['type_path'])
+            if to_generated: lines.append('    ' + target + ' = ' + wrapper + '_from(' + value + '.handle)')
+            else: lines.append('    ' + target + '.handle = ' + wrapper + '_raw(' + value + ')')
+        else:
+            operation = '<-' if owns_container(field) else '='
+            lines.append('    ' + target + ' ' + operation + ' ' + source_convert_expr(field, value, to_generated))
     for path, mapping in sorted(source_mappings.items()):
         full = enum_name(path) if mapping['kind'] == 'enum' else struct_name(path)
         source = source_module + '::' + mapping['name']
@@ -410,36 +499,43 @@ def generate(ir, module="ue_generated", source_types=None):
             for member in enums[path]: lines += [f'    if (value == {source}.{member["name"]}) {{ return {full}.v_{ident(member["name"])} }}']
             lines += ['    panic("invalid source enum binding value")', f'    return {full}.v_{ident(enums[path][0]["name"])}']
         else:
-            values = [f'f_{ident(field["path"])} = value.{mapping["members"][field["path"]]}' for field in structures[path]['fields']]
-            lines += [f'    return {full}(' + ', '.join(values) + ')']
+            lines += [f'    var result : {full}']
+            for field in structures[path]['fields']:
+                convert_field(field, 'value.' + mapping['members'][field['path']], 'result.f_' + ident(field['path']), True)
+            lines += ['    return <- result' if owns_container(dict(kind='struct',type_path=path)) else '    return result']
         lines += ['}', '', '[ue_source_value_binding(' + args + ')]', f'def {from_native}(value : {full}) : {source} {{']
         if mapping['kind'] == 'enum':
             for member in enums[path]: lines += [f'    if (value == {full}.v_{ident(member["name"])}) {{ return {source}.{member["name"]} }}']
             lines += ['    panic("invalid generated enum binding value")', f'    return {source}.{enums[path][0]["name"]}']
         else:
             lines += [f'    var result = {source}()']
-            for field in structures[path]['fields']: lines += [f'    result.{mapping["members"][field["path"]]} = value.f_{ident(field["path"])}']
-            lines += ['    return result']
+            for field in structures[path]['fields']:
+                convert_field(field, 'value.f_' + ident(field['path']), 'result.' + mapping['members'][field['path']], False)
+            lines += ['    return <- result' if owns_container(dict(kind='struct',type_path=path)) else '    return result']
         lines += ['}', '']
-    def write_input(field, path, val, indent='    '):
+    def write_input(field, path, val, indent='    ', depth=0):
         if field['kind'] in ('map', 'set'):
             items = val + ('.entries' if field['kind'] == 'map' else '.values')
-            lines.extend([f'{indent}ue_arg_hash(call, {quote(path)}, int(length({items})))', f'{indent}for (index in range(length({items}))) {{'])
+            index='index' if depth==0 else 'input_index_'+str(depth)
+            marker='.*' if depth==0 else '.*i'+str(depth)
+            lines.extend([f'{indent}ue_arg_hash(call, {path_expr(path)}, int(length({items})))', f'{indent}for ({index} in range(length({items}))) {{'])
             if field['kind'] == 'map':
-                write_input(field['key'], path + '.*.key', items + '[index].key', indent + '    ')
-                write_input(field['value'], path + '.*.value', items + '[index].value', indent + '    ')
-            else: write_input(field['element'], path + '.*', items + '[index]', indent + '    ')
+                write_input(field['key'], path + marker + '.key', items + '['+index+'].key', indent + '    ', depth+1)
+                write_input(field['value'], path + marker + '.value', items + '['+index+'].value', indent + '    ', depth+1)
+            else: write_input(field['element'], path + marker, items + '['+index+']', indent + '    ', depth+1)
             lines.append(indent + '}')
             return
         if field['kind'] == 'array':
+            index = 'index' if depth == 0 else 'input_index_' + str(depth)
             lines.extend([f'{indent}ue_arg_array(call, {path_expr(path)}, int(length({val})))',
-                          f'{indent}for (index in range(length({val}))) {{'])
-            write_input(field['element'], path + '.*', val + '[index]', indent + '    ')
+                          f'{indent}for ({index} in range(length({val}))) {{'])
+            marker = '.*' if depth == 0 else '.*i' + str(depth)
+            write_input(field['element'], path + marker, val + '[' + index + ']', indent + '    ', depth + 1)
             lines.append(indent + '}')
             return
         if field['kind'] == 'struct':
             for child in structures[field['type_path']]['fields']:
-                write_input(child, path + '.' + child['path'], val + '.f_' + ident(child['path']), indent)
+                write_input(child, path + '.' + child['path'], val + '.f_' + ident(child['path']), indent, depth)
             return
         if field['kind'] == 'object': val = class_name(field['type_path']) + '_raw(' + val + ')'
         if field['kind'] == 'name': val += '.value'
@@ -455,6 +551,32 @@ def generate(ir, module="ue_generated", source_types=None):
         if field['kind'] == 'enum': expr = enum_name(field['type_path']) + '_from_symbol(' + expr + ')'
         return expr
 
+    def read_owned_output(field, path, target, depth=0, indent='    '):
+        if field['kind'] == 'struct':
+            for child in structures[field['type_path']]['fields']: read_owned_output(child, path + '.' + child['path'], target + '.f_' + ident(child['path']), depth, indent)
+        elif field['kind'] in ('map','set'):
+            index='output_index_'+str(depth)
+            items=target+('.entries' if field['kind']=='map' else '.values')
+            lines.extend([f'{indent}resize({items}, ue_result_hash_size(call, {path_expr(path)}))',f'{indent}for ({index} in range(length({items}))) {{'])
+            if field['kind']=='map':
+                read_owned_output(field['key'],path+'.*'+str(depth)+'.key',items+'['+index+'].key',depth+1,indent+'    ')
+                read_owned_output(field['value'],path+'.*'+str(depth)+'.value',items+'['+index+'].value',depth+1,indent+'    ')
+            else: read_owned_output(field['element'],path+'.*'+str(depth),items+'['+index+']',depth+1,indent+'    ')
+            lines.append(indent+'}')
+        elif field['kind'] == 'array':
+            index = 'output_index_'  + str(depth)
+            def indexed_quote(value):
+                text = quote(value)
+                for i in range(16,-1,-1): text = text.replace('.*' + str(i), '.{output_index_' + str(i) + '}')
+                return text
+            lines.extend([f'{indent}resize({target}, ue_result_array_size(call, {indexed_quote(path)}))', f'{indent}for ({index} in range(length({target}))) {{'])
+            read_owned_output(field['element'], path + '.*' + str(depth), target + '[' + index + ']', depth + 1, indent + '    ')
+            lines.append(indent + '}')
+        else:
+            value = read_output(field, path)
+            # read_output preserves the generic wildcard syntax; replace typed indices.
+            for i in range(16,-1,-1): value = value.replace('.*' + str(i), '.{output_index_' + str(i) + '}')
+            lines.append(indent + target + ' = ' + value)
     for fn in sorted(ir['functions'], key=lambda item: item['alias']):
         alias, params_ir = fn['alias'], fn['parameters']
         inputs = [p for p in params_ir if p['input']]
@@ -474,7 +596,7 @@ def generate(ir, module="ue_generated", source_types=None):
                       f'    ue_expect_signature(call, {quote(fn["signature"])})']
         for p in inputs: write_input(p, p['path'], 'arg_' + ident(p['path']))
         lines += ['    ue_invoke_call(call)']
-        has_arrays = any(p['kind'] in ('array', 'map', 'set') for p in outputs)
+        has_arrays = any(owns_container(p) for p in outputs)
         values = [read_output(p, p['path']) for p in outputs] if not has_arrays else []
         if has_arrays:
             lines += [f'    var result : {result_type}']
@@ -487,6 +609,9 @@ def generate(ir, module="ue_generated", source_types=None):
                     else: expr = read_output(p['element'], p['path'] + '.*')
                     lines += [f'    resize({items}, ue_result_hash_size(call, {quote(p["path"])}))',
                               f'    for (index in range(length({items}))) {{', f'        {items}[index] = {expr}', '    }']
+                    continue
+                if (p['kind'] == 'struct' and owns_container(p)) or (p['kind'] == 'array' and owns_container(p['element'])):
+                    read_owned_output(p, p['path'], target)
                     continue
                 if p['kind'] != 'array':
                     lines.append(f"    {target} = {read_output(p, p['path'])}")
@@ -531,25 +656,60 @@ def generate(ir, module="ue_generated", source_types=None):
                 declaration += ' = ' + default_value
             signature.append(declaration)
         lines += [f'def {method}(' + '; '.join(signature) + ')' + (' : ' + source_name(returned) if returned else ' : void') + ' {']
-        input_values = ['target'] + [('ue_source_to_' + (enum_name(p['type_path']) if p['kind'] == 'enum' else struct_name(p['type_path'])) + '(arg_' + ident(p['path']) + ')' if p.get('type_path') in source_mappings else 'arg_' + ident(p['path'])) for p in parameters if p['input']]
+        input_values=['target']
+        for p in parameters:
+            if not p['input']: continue
+            value='arg_'+ident(p['path'])
+            if p['kind']=='array' and uses_source(p):
+                local='native_'+value;lines.append('    var '+local+' : '+typ(p));convert_field(p,value,local,True);value=local
+            elif p.get('type_path') in source_mappings: value=source_convert_expr(p,value,True)
+            input_values.append(value)
         call = fn['alias'] + '(' + ', '.join(input_values) + ')'
-        container_outputs = any(p['kind'] in ('array', 'map', 'set') for p in outputs)
+        container_outputs = any(owns_container(p) for p in outputs)
         if outputs: lines += [('    var result <- ' if container_outputs else '    let result = ') + call]
         else: lines += ['    ' + call]
+        source_outputs={}
+        for p in outputs:
+            if uses_source(p):
+                local='source_out_'+ident(p['path']);value='result.out_'+ident(p['path']) if len(outputs)>1 else 'result'
+                if p['kind']=='array':
+                    lines.append('    var '+local+' : '+source_name(p));convert_field(p,value,local,False)
+                else: lines.append('    var '+local+(' <- ' if owns_container(p) else ' = ')+source_convert_expr(p,value,False))
+                source_outputs[p['path']]=local
         def selected_output(param):
+            if param['path'] in source_outputs:return source_outputs[param['path']]
             value = 'result.out_' + ident(param['path']) if len(outputs) > 1 else 'result'
             if param.get('type_path') in source_mappings: value = 'ue_source_from_' + (enum_name(param['type_path']) if param['kind'] == 'enum' else struct_name(param['type_path'])) + '(' + value + ')'
             return value
         # Native validation/result extraction completes before modifying caller variables.
         for param in arguments:
             if param['output']:
-                operation = '<-' if param['kind'] in ('array', 'map', 'set') else '='
+                operation = '<-' if owns_container(param) else '='
                 lines += ['    arg_' + ident(param['path']) + ' ' + operation + ' ' + selected_output(param)]
         if returned:
-            operation = '<-' if returned['kind'] in ('array', 'map', 'set') else ''
+            operation = '<-' if owns_container(returned) else ''
             lines += ['    return ' + (operation + ' ' if operation else '') + selected_output(returned)]
         lines += ['}', '']
-    return '\n'.join(lines)
+    text = '\n'.join(lines)
+    if source_module:
+        # Source declarations may transitively import another binding module.
+        # Qualify our own references without rewriting declarations, fields,
+        # comments, quoted metadata or already-qualified names.
+        owned_functions = set(re.findall(r'^def ([A-Za-z_][A-Za-z0-9_]*)', text, re.M))
+        owned_types = set(re.findall(r'^(?:struct|enum|typedef) ([A-Za-z_][A-Za-z0-9_]*)', text, re.M))
+        owned_enums = set(re.findall(r'^enum ([A-Za-z_][A-Za-z0-9_]*)', text, re.M))
+        tokens = re.findall(r'//[^\n]*|"(?:\\.|[^"\\])*"|[A-Za-z_][A-Za-z0-9_]*|::|\s+|.', text)
+        significant = [i for i, token in enumerate(tokens) if not token.isspace() and not token.startswith('//')]
+        for position, i in enumerate(significant):
+            token = tokens[i]
+            before = tokens[significant[position - 1]] if position else ''
+            after = tokens[significant[position + 1]] if position + 1 < len(significant) else ''
+            alias_rhs = before == '=' and position >= 3 and tokens[significant[position - 3]] == 'typedef'
+            reference = (token in owned_functions and after == '(') or (token in owned_types and (before in (':','<') or after == '(' or alias_rhs)) or (token in owned_enums and after == '.')
+            if reference and before not in ('def','struct','enum','typedef','module','require','.','::') and after != '::':
+                tokens[i] = module + '::' + token
+        text = ''.join(tokens)
+    return text
 
 
 def main():

@@ -23,6 +23,12 @@ public class DasRuntime : ModuleRules
         foreach (string Library in new[] { "libDaScript", "libDaScript_runtime", "libUriParser" })
             PublicAdditionalLibraries.Add(Path.Combine(Das, "lib", "Release", Library + ".lib"));
         PublicSystemLibraries.AddRange(new[] { "ws2_32.lib", "psapi.lib", "bcrypt.lib" });
-        RuntimeDependencies.Add("$(PluginDir)/Content/Das/...", StagedFileType.UFS);
+        // Enumerate dependencies in the rules so the receipt contains every staged script.
+        string Scripts = Path.Combine(PluginDirectory, "Content", "Das");
+        foreach (string File in Directory.GetFiles(Scripts, "*", SearchOption.AllDirectories))
+        {
+            RuntimeDependencies.Add(File, StagedFileType.UFS);
+            ExternalDependencies.Add(File);
+        }
     }
 }

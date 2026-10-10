@@ -94,7 +94,7 @@ namespace
             Field->SetStringField(TEXT("kind"), CallKindName(FieldKind(Property, &Context)));
             FString Path;
             if (UEnum* Enum = CallEnumType(Property)) Path = Enum->GetPathName();
-            else if (auto* Object = CastField<FObjectProperty>(Property)) Path = Object->PropertyClass->GetPathName();
+            else if (auto* ReferenceClass = DasReferencePropertyClass(Property)) Path = ReferenceClass->GetPathName();
             Field->SetStringField(TEXT("type_path"), Path);
         }
         return Field;
