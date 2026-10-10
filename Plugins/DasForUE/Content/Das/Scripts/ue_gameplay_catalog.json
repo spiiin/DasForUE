@@ -1,0 +1,18 @@
+{
+  "schema_version": 3,
+  "classes": [
+    {
+      "id": "gameplaydemo.GameplayActor",
+      "name": "GameplayActor",
+      "script": "dsl_gameplay_actor.das",
+      "reference": "GameplayActorRef"
+    },
+    {
+      "id": "gameplaydemo.GameplayBehavior",
+      "name": "GameplayBehavior",
+      "script": "dsl_gameplay_behavior.das",
+      "reference": "GameplayBehaviorRef"
+    }
+  ],
+  "value_modules": []
+}

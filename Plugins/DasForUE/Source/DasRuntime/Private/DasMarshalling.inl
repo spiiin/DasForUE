@@ -49,7 +49,10 @@
         if (auto* Map = CastField<FMapProperty>(Property))
         {
             if (Property->ArrayDim != 1) Context->throw_error("fixed hash arrays require an adapter");
-            if (!IsHashScalar(Map->KeyProp, Context) || !IsHashScalar(Map->ValueProp, Context)) Context->throw_error("unsupported map key or value type");
+            const auto ValueKind = FieldKind(Map->ValueProp, Context);
+            if (!IsHashScalar(Map->KeyProp, Context) ||
+                (!IsHashScalar(Map->ValueProp, Context) && ValueKind != EMarshallingKind::Struct && ValueKind != EMarshallingKind::Object))
+                Context->throw_error("unsupported map key or value type");
             if (!Map->KeyProp->HasAllPropertyFlags(CPF_HasGetValueTypeHash)) Context->throw_error("map key requires UE value hashing");
             Signature.Add({Path.ToLower(), EMarshallingKind::Map, bInput, bOutput, Map->KeyProp->GetClass()->GetName() + TEXT(";") + Map->ValueProp->GetClass()->GetName()});
             ValidateCallField(Map->KeyProp, Path + TEXT(".*.key"), bInput, bOutput, Signature, Context);

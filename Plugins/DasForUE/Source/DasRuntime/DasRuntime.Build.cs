@@ -11,7 +11,7 @@ public class DasRuntime : ModuleRules
         bUseUnity = false;
         bEnableExceptions = true;
         PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine" });
-        PrivateDependencyModuleNames.AddRange(new[] { "Projects", "Json", "AssetRegistry" });
+        PrivateDependencyModuleNames.AddRange(new[] { "Projects", "Json", "AssetRegistry", "InputCore", "EnhancedInput" });
         string Root = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../.."));
         string Das = Path.Combine(Root, "ThirdParty", "daScript");
         PublicSystemIncludePaths.Add(Path.Combine(Das, "include"));

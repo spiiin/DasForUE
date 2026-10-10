@@ -8,6 +8,7 @@
 #include "UObject/WeakObjectPtrTemplates.h"
 
 struct FDasAuthoringModule;
+struct FDasSourceCatalog;
 
 struct FDasTypeDeclaration
 {
@@ -49,8 +50,9 @@ public:
     virtual bool SupportsDynamicReloading() override { return false; }
     // Compile-only annotation collection; no global/body execution, Out unchanged on failure.
     bool ReadAuthoredInterfaces(const FString& Path,FDasAuthoringModule& Out,FString& Error);
-    bool ReadReflectedTypes(const FString& Path,FDasReflectedTypes& Out,FString& Error);
-    bool ReadAuthoringScript(const FString& Path,FDasAuthoringModule& Out,FString& Error);
+    bool ReadReflectedTypes(const FString& Path,FDasReflectedTypes& Out,FString& Error,FString* SourceModule=nullptr);
+    bool ReadAuthoringScript(const FString& Path,FDasAuthoringModule& Out,FString& Error,FDasSourceCatalog* ImportedValues=nullptr);
+    bool ReadSourceCatalogImports(const FString& Path,FDasSourceCatalog& Out,FString& Error);
     bool ValidateFrameMethod(const FString& Path,FString& Error,const FString& EntryPoint,const FDasCallContract& Contract);
     FDasExecutionResult RunNamedFramePersistent(const FString& Path,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,EDasMethodSignature ReturnKind,TWeakObjectPtr<UObject> Self,const FString& ReturnClass = FString());
     bool ValidateScalarMethod(const FString& Path,FString& Error,const FString& EntryPoint,EDasMethodSignature Signature);
@@ -64,6 +66,7 @@ public:
     FDasExecutionResult RunLifecycle(const FString& Path, EDasCallback Event, TWeakObjectPtr<UObject> Self, float DeltaSeconds = 0.f, int32 EndReason = 0);
     // Internal reflected delegate bridge: IDs never contain a VM/function pointer.
     void DispatchIntEvent(uint64 SubscriptionId, int32 Value);
+    void DispatchScalarEvent(uint64 SubscriptionId,const FDasScalarValue& Value);
     int32 SubscriptionCount(const UObject* Owner = nullptr) const;
     void ReleaseObject(UObject* Object);
     int32 StructSnapshotCount(const UObject* Owner=nullptr) const;
@@ -76,6 +79,7 @@ public:
     FString ScriptPath(const FString& Name) const;
 private:
     FDasExecutionResult RunCallback(const FString& Path, EDasCallback Event, int32 Input, float DeltaSeconds, TWeakObjectPtr<UObject> Self, const FString& EntryPoint = TEXT("main"), EDasMethodSignature Signature = EDasMethodSignature::Int,const TArray<FDasScalarValue>* Frame = nullptr,const FString& ReturnClass = FString());
+    FDelegateHandle InputRestoreTickHandle;
     FDelegateHandle WorldCleanupHandle;
     FDelegateHandle PostGCHandle;
     FDelegateHandle ObjectsReplacedHandle;

@@ -157,6 +157,50 @@ def exercise_values(api:ValueTargetRef):int {
     erase(api.DirectStates,0l)
     clear(api.DirectStates)
     clear(api.Groups)
+    if (api.ReferenceArrays(ue_ref(type<ActorRef>,api.handle),DasEventInterface_from(api.handle))!=1) { return -61 }
+    var actors=api.CopyActors(api.DirectActors)
+    var oldActors:array<ActorRef>
+    api.RefActors(actors,oldActors)
+    var eventRefs=api.CopyEventRefs(api.DirectEventRefs)
+    var oldEventRefs:array<DasEventInterface>
+    api.RefEventRefs(eventRefs,oldEventRefs)
+    if (ue_object_valid(actors[0].handle) || length(actors)!=3 || !ue_object_valid(oldActors[0].handle) || ue_object_valid(eventRefs[0].handle) || !ue_object_valid(oldEventRefs[0].handle) || !ue_object_valid(api.DirectActors[0].handle)) { return -62 }
+    api.DirectActors := actors
+    api.DirectActors[0]=oldActors[0]
+    api.Groups[0].Actors[0]=oldActors[0]
+    api.DirectEventRefs := oldEventRefs
+    var referenceRejected=false
+    try { api.FailActors(oldActors) } recover { referenceRejected=true }
+    if (!referenceRejected || !ue_object_valid(oldActors[0].handle) || !ue_object_valid(api.DirectActors[0].handle) || !ue_object_valid(api.Groups[0].Actors[0].handle)) { return -63 }
+    clear(api.DirectActors)
+    clear(api.DirectEventRefs)
+    clear(api.Groups)
+    if (api.AuthoredReferenceArrays(api)!=1) { return -64 }
+    var partners=api.CopyPartners(api.DirectPartners)
+    var oldPartners:array<ValueTargetRef>
+    api.RefPartners(partners,oldPartners,false)
+    if (ue_object_valid(partners[0].handle) || length(partners)!=3 || !ue_object_valid(oldPartners[0].handle) || !ue_object_valid(api.DirectPartners[0].handle)) { return -65 }
+    api.DirectPartners := partners
+    api.DirectPartners[0]=api
+    var forgedPartner=api
+    forgedPartner.handle=ue_self_object()
+    var partnerRejected=false
+    try { api.DirectPartners[0]=forgedPartner } recover { partnerRejected=true }
+    var failedPartners=false
+    var failedPartnerOut:array<ValueTargetRef>
+    try { api.RefPartners(oldPartners,failedPartnerOut,true) } recover { failedPartners=true }
+    var alternative:array<AlternativeTargetRef>
+    push(alternative,ue_ref(type<AlternativeTargetRef>,api.handle))
+    api.AlternativePartners := alternative
+    var alternateCopy=api.AlternativePartners
+    if (!partnerRejected || !failedPartners || !ue_object_valid(oldPartners[0].handle) || !ue_object_valid(api.DirectPartners[0].handle) || !ue_object_valid(alternateCopy[0].handle)) { return -66 }
+    var forgedPartners:array<ValueTargetRef>
+    push(forgedPartners,forgedPartner)
+    var argumentRejected=false
+    try { api.CopyPartners(forgedPartners) } recover { argumentRejected=true }
+    if (!argumentRejected || !ue_object_valid(api.DirectPartners[0].handle)) { return -67 }
+    clear(api.DirectPartners)
+    clear(api.AlternativePartners)
     if (api.DirectContainers()!=1) { return -51 }
     api.DirectPoints[0].Count += 4
     push(api.DirectSamples,9.0lf)
@@ -242,6 +286,15 @@ def exercise_values(api:ValueTargetRef):int {
 [ue_class(module_id="methodvalues", type_registry="REGISTRY", Blueprintable)]
 class ValueDriver {
     [ue_function(BlueprintCallable)]
+    def RejectNativeAuthoredArrays(target:UObjectHandle):int {
+        let api=ue_ref(type<ValueTargetRef>,target)
+        var rejected=false
+        try { let invalid=api.DirectPartners; length(invalid) } recover { rejected=true }
+        var empty:array<ValueTargetRef>
+        api.DirectPartners := empty
+        return (rejected && length(api.DirectPartners)==0) ? 1 : 0
+    }
+    [ue_function(BlueprintCallable)]
     def RejectNativeAuthoredField(target:UObjectHandle):int {
         let api=ue_ref(type<ValueTargetRef>,target)
         var rejected=false
@@ -254,6 +307,9 @@ class ValueDriver {
         let api=ue_ref(type<ValueTargetRef>,target)
         let expired=api.NativeActor
         let expiredNested=api.Settings.Point.Owner
+        let expiredArray=api.DirectActors
+        if (length(expiredArray)!=1 || ue_object_valid(expiredArray[0].handle)) { return 0 }
+        clear(api.DirectActors)
         if (api.SetSelfReferences(default<ActorRef>,default<DasEventInterface>)!=1) { return 0 }
         api.NativeActor=default<ActorRef>
         return (!ue_object_is_a(expired.handle,"Actor") && !ue_object_is_a(expiredNested.handle,"Actor") && !ue_object_is_a(api.Settings.Point.Owner.handle,"Actor") && !ue_object_is_a(api.NativeActor.handle,"Actor")) ? 1 : 0

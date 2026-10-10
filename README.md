@@ -649,3 +649,47 @@ Multi-level self indexing and container mutations: [DSLMultiIndexSelf](Docs/DSLM
 Native math arrays: [DSLMathArrays](Docs/DSLMathArrays.md).
 
 Authored enum arrays: [DSLEnumArrays](Docs/DSLEnumArrays.md).
+
+Native object/interface arrays: [DSLReferenceArrays](Docs/DSLReferenceArrays.md).
+
+Authored class reference arrays: [DSLAuthoredReferenceArrays](Docs/DSLAuthoredReferenceArrays.md).
+
+Maps with math/authored struct values (validation pending): [DSLStructMaps](Docs/DSLStructMaps.md).
+
+Enum/reference map values (validation pending): [DSLReflectedMaps](Docs/DSLReflectedMaps.md).
+
+Authored source catalog and generated reference imports (validation pending): [DSLSourceCatalog](Docs/DSLSourceCatalog.md).
+
+Owner-managed named timers (validation pending): [ManagedTimers](Docs/ManagedTimers.md).
+
+Scalar/void dynamic event callbacks (validation pending): [DSLScalarEvents](Docs/DSLScalarEvents.md).
+
+Double/Vector/native object event payloads (validation pending): [DSLValueEvents](Docs/DSLValueEvents.md).
+
+Math const-ref events and checked reference views (validation pending): [DSLMathReferenceEvents](Docs/DSLMathReferenceEvents.md).
+
+Name/primitive array event payloads (validation pending): [DSLArrayEvents](Docs/DSLArrayEvents.md).
+
+Captured timer values (validation pending): [ManagedTimerArguments](Docs/ManagedTimerArguments.md).
+
+Captured primitive arrays in class timers (validation pending): [ManagedTimerArrays](Docs/ManagedTimerArrays.md).
+
+Named next-tick timers and queries (validation pending): [ManagedNextTickTimers](Docs/ManagedNextTickTimers.md).
+
+Owner-managed legacy Action/Axis input (validation pending): [ManagedLegacyInput](Docs/ManagedLegacyInput.md).
+
+Managed Enhanced Input actions (validation pending): [ManagedEnhancedInput](Docs/ManagedEnhancedInput.md).
+
+Managed LocalPlayer mapping contexts (validation pending): [ManagedMappingContexts](Docs/ManagedMappingContexts.md).
+
+Vector2D and Enhanced Input Axis2D (validation pending): [DSLVector2D](Docs/DSLVector2D.md).
+
+Desired input/context restoration (validation pending): [ManagedInputRestore](Docs/ManagedInputRestore.md).
+
+Native SceneComponent gameplay adapters (validation pending): [DSLSceneComponents](Docs/DSLSceneComponents.md).
+
+Managed latent delay callbacks (validation pending): [ManagedLatentDelay](Docs/ManagedLatentDelay.md).
+
+Managed asynchronous asset loading (validation pending): [ManagedAsyncAssets](Docs/ManagedAsyncAssets.md).
+
+Integrated gameplay sources and setup specification (scene/validation pending): [GameplayDemo](Examples/GameplayDemo/README.md).

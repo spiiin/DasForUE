@@ -1749,3 +1749,313 @@ typed macro sketches are not implemented capabilities. Migration work stays defe
   typing, readonly, snapshot bounds and atomic publication/copyback remain.
 - Native enum arrays, enum maps/sets, object arrays, nonempty defaults and general
   type/declaration migration remain separate work. See DSLEnumArrays.md.
+
+
+### Native object/interface arrays — 2026-10-10
+
+- Added native-class/interface array carriers, exact Blueprint pins and natural
+  typed element conversion for class/struct fields and input/result/ref/out.
+- Snapshot validation checks live element class/interface constraints. Existing
+  FGCObject snapshot/frame collectors retain references while DAS wrappers use
+  weak handles; null and destroyed-Actor reads follow existing checked semantics.
+- Existing indexed/multi-level mutations, owned replacement and readonly/source
+  nominal checks apply to the new arrays.
+- Authored object/interface view arrays, soft/class arrays, new map/set families,
+  ownership/default extensions and structural migration remain separate work.
+  See DSLReferenceArrays.md.
+
+
+### Authored class reference arrays — 2026-10-10
+
+- Class properties and input/result/ref/out arrays preserve authored element ID
+  and validate every source element while sharing physical Actor/Component hosts.
+- Source-aware converter/helper keys prevent nominal wrapper collisions on one
+  native carrier; null, readonly and atomic publication/copyback remain.
+- Parameter contract verification now matches native properties by name, allowing
+  Blueprint's physical input/out ordering to differ from source argument order.
+- Authored struct member bootstrap, authored interface arrays, concrete class pins,
+  nonempty defaults, ownership extensions and structural migration remain deferred.
+  See DSLAuthoredReferenceArrays.md.
+
+
+### Struct and math map values — 2026-10-10 (validation pending)
+
+- Added int/string-key maps with Vector/Rotator/Transform or authored ue_struct
+  values across class/struct properties and input/result/ref/out declarations.
+- Dynamic carriers preserve key/value identity and layout fingerprints; source
+  converters use per-value owned snapshots. Nested snapshot bounds/math checks,
+  Blueprint struct value pins and reflected dependency ordering were extended.
+- Added complete type/class examples; no build, tests, PIE or cook were run for
+  this batch at the user's request. See DSLStructMaps.md for pending validation.
+- Object/enum map values, new key families, live projections and migrations remain
+  separate work.
+
+
+### Enum/native-reference/authored-class map values — 2026-10-10 (validation pending)
+
+- Added int/string-key maps with authored enums, native object/interface wrappers,
+  and authored class views for class fields and input/result/ref/out. Struct
+  members accept enums and native references; authored views there remain deferred.
+- Native carriers, exact Blueprint pins, enum/reference snapshot validation and
+  source converters extended together. Nominal reference helper keys now cover
+  both arrays and map values, including alternate native wrappers.
+- Added examples and pending validation checklist. No build, tests, PIE or cook
+  were run. See DSLReflectedMaps.md.
+- Native enum maps, authored interface views, new keys, sets, live projections
+  and structural migration remain separate work.
+
+
+### Authored source catalog and reference import generation — 2026-10-10 (validation pending)
+
+- Added an explicit class source catalog; ue_object_ref can resolve a simple name
+  or stable ID without script. Canonical source keys preserve existing accessors,
+  components and container behavior; expected stable IDs are checked on resolution.
+- Catalog bytes join persistent compile dependency tracking. Existing runtime
+  staging includes the JSON files. Unknown/ambiguous identities fail explicitly.
+- Added DasSourceCatalog commandlet for compiler-model-based manifest and reference
+  module generation from explicit source lists, plus non-writing -Check.
+- One generated require imports class wrappers; value-type imports and broader
+  enum/struct/interface catalog bootstrap remain separate work. No build/tests run.
+  See DSLSourceCatalog.md and dsl_catalog_access.das.
+
+
+### Catalog value modules and consolidated imports — 2026-10-10 (validation pending)
+
+- Catalog v2 adds compiler-inventoried enum/struct modules and their type identities;
+  v1 manifests remain readable. Dedicated value modules are selected by TypeScripts.
+- Generated reference modules publicly import these modules, making one require
+  sufficient for selected class wrappers and value types. Type-only catalogs allowed.
+- Added module/source/ID/name-collision and self-import/input-overwrite guards;
+  examples now use consolidated imports. Automatic transitive source discovery,
+  authored interface catalogs and asset creation remain separate. No build/tests run.
+  See DSLSourceCatalog.md.
+
+
+### Compiler-based catalog value dependency discovery — 2026-10-10 (validation pending)
+
+- Selected class roots now inventory imported enum/struct modules from the compiler
+  library, including transitive imports. No directory or textual source scanning.
+- Generator merges shared/manual dependencies only when source/module/type inventory
+  agrees; automatic imports are sorted. ExplicitTypeImports retains manual selection.
+- Local source, dedicated value module and output-overwrite boundaries remain.
+  Class roots, interface catalogs and separate reference-source bootstrap are still
+  explicit. No build, commandlet or tests run. See DSLSourceCatalog.md.
+
+
+### Catalog interface declarations and existing bindings — 2026-10-10 (validation pending)
+
+- Catalog v3 inventories ue_interface definitions and ue_interface_ref view modules;
+  v1/v2 remain readable. Automatic class discovery and InterfaceScripts selection
+  collect them plus value dependencies through one shared compiler collector.
+- Interface definitions/views share logical IDs; duplicate definitions and public
+  name collisions fail. Binding views replace redundant declaration-only imports
+  in the aggregate while the manifest keeps the full inventory.
+- Existing reflection generator remains responsible for interface call adapters;
+  source catalogs do not create assets or bypass native interface identity checks.
+  Added declaration example/documentation; no build, generation or tests run.
+
+
+### Managed timers and class callback names — 2026-10-10 (validation pending)
+
+- Added named UE TimerManager schedules scoped to owner/script sessions: replace,
+  cancel, pause/resume, active/remaining queries. Exported void callbacks, weak
+  ownership, bounded idle dispatch and callback failure cancellation implemented.
+- ue_class short literal callback names lower to existing annotated method exports.
+  EndPlay/release/world teardown/reinstancing/accepted reload cancel schedules;
+  rejected reload retains the old VM. Restart after reload remains explicit.
+- Added DSL/plain-function examples and limitations. No build/tests/PIE/cook run.
+  Wider delegate callbacks, captured timer args, input and async/latent are next.
+  See ManagedTimers.md.
+
+
+### Scalar/void dynamic delegate callbacks — 2026-10-10 (validation pending)
+
+- Extended shared managed subscription/proxy/queue/lifecycle path from int32 to
+  float32, bool, owned FString and zero-argument BlueprintAssignable events.
+- ue_event source signatures select adapters automatically. Callback metadata
+  records non-int parameter_kind while preserving legacy int JSON output.
+- Added native probe-host signals and DSL example, exact signature/queue checks;
+  no build/UHT/tests run. Multiple arguments, object/struct payloads, native/single
+  delegates and authored delegate declarations remain separate. See DSLScalarEvents.md.
+
+
+### Double, Vector and native object event payloads — 2026-10-10 (validation pending)
+
+- Extended the shared dynamic multicast bridge with double64, by-value FVector and
+  exact native UObject* signals. Typed native object callbacks lower to checked
+  handle transport/unpack; queued object records temporarily pin against GC.
+- Added probe-host signals/emitters and DSL example. Derived-class native delegate
+  signatures, authored/interface views, const Vector refs and multi-argument events
+  remain separate. No UHT/build/tests run. See DSLValueEvents.md.
+
+
+### Math const-reference and checked object event views — 2026-10-10 (validation pending)
+
+- Added Rotator/Transform values and Vector/Rotator/Transform const-ref proxies,
+  copied owned transport and math validity checks. Subscriptions retain the exact
+  proxy function used for registration/removal.
+- UObject native payloads can use interface/authored source wrappers, lowering
+  through existing checked converters and stable IDs. Native property signature
+  remains exactly UObject*. Added three source examples and support boundaries.
+- No UHT/build/tests run. Multiple arguments, derived/interface native signatures,
+  enum/struct payloads and authored delegates remain separate. See DSLMathReferenceEvents.md.
+
+
+### Name and primitive array event payloads — 2026-10-10 (validation pending)
+
+- Added FName and const-input TArray<int32/double/FString> proxy payloads, exact
+  carrier/element checks, owned native/DAS copies and bounded string array transport.
+- Event dispatch now tracks execution depth and collects temporary struct snapshots
+  on exit. Added probe signals/emitters and DSL example. No UHT/build/tests run.
+- Other array families, map/set/struct/enum and multi-argument delegate payloads
+  remain separate. See DSLArrayEvents.md.
+
+
+### Captured scalar/name/math timer arguments — 2026-10-10 (validation pending)
+
+- ue_timer_start adds one immutable captured int/float/bool/double/string/name/math
+  value with persistent frame delivery and exact void callback contract checking.
+- Class short callback names support zero/one supported by-value argument, including
+  forward declarations. Captured strings/math validation precedes replacement.
+- Added example and ownership/reload boundaries; no build/tests run. Object/struct/
+  container/enum captures, multiple args and closures remain separate.
+  See ManagedTimerArguments.md.
+
+
+### Captured primitive array timer arguments — 2026-10-10 (validation pending)
+
+- Class timers accept one saved array<int/double/string> through existing exact
+  owned snapshot converters and persistent struct frame delivery. Timer records
+  own native copies independently of originating context tokens/caller arrays.
+- Carrier/string/snapshot/contract checks precede replacement. Example includes
+  caller mutation, repeating local mutation and one-shot replacements.
+- No build/tests run; other arrays, object/struct/container capture families and
+  plain exported array callback lowering remain separate. See ManagedTimerArrays.md.
+
+
+### Named next-tick scheduling and timer queries — 2026-10-10 (validation pending)
+
+- Added TimerManager next-tick requests with the same named owner/session scope,
+  replacement/capture/contract checks and lifetime cleanup as interval timers.
+- Shared source helper handles both callback argument layouts; all existing capture
+  families retained. Added paused/elapsed queries and current-session cancel-all.
+- Example/documentation added; no build/tests run. UE pending/paused timing,
+  overload ABI, rearm, cancellation, reload and packaged checks remain pending.
+  See ManagedNextTickTimers.md.
+
+
+### Managed legacy Action/Axis input — 2026-10-10 (validation pending)
+
+- Added owner/script-scoped bindings on existing Actor InputComponents (Component
+  owners use their Actor): action phases, float axes, consume/paused flags, ready
+  query and selective/session-wide unbind. Existing proxy/idle dispatch reused.
+- Exact action handles and proxy-specific axis removal preserve unrelated bindings.
+  Lifecycle cleanup/accepted reload removes bindings; explicit rebind remains needed.
+- Added DSL example and setup boundaries; no mappings/assets/build/tests changed
+  or run. Enhanced Input, possession hooks and input configuration remain separate.
+  See ManagedLegacyInput.md.
+
+
+### Managed Enhanced Input bindings — 2026-10-10 (validation pending)
+
+- Added typed InputActionRef source module and owned asset/trigger binding records
+  on existing EnhancedInputComponents. Boolean/Axis1D/Axis3D select exact bool/float/
+  Vector void handlers, using the reflected dynamic proxy and shared queued dispatch.
+- Asset GC pin, uint32 binding-handle removal, callback lowering and lifecycle cleanup
+  implemented; shared input cancel-all/count limit retained. Plugin/runtime dependency
+  declared and module explicitly loaded. No project mappings/contexts/assets changed.
+- Added example/documentation; no UHT/build/tests run. Axis2D, context APIs and
+  automatic possession/component hooks remain separate. See ManagedEnhancedInput.md.
+
+
+### Explicit LocalPlayer mapping context ownership — 2026-10-10 (validation pending)
+
+- Added typed PlayerController/MappingContext views and explicit add/update/query/
+  release/clear APIs, validating local controller/world/subsystem readiness.
+- Session context records pin assets, reject acquiring externally installed contexts
+  and preserve externally changed priorities on cleanup. Lifecycle/reload teardown
+  releases owned records after handlers. Cooperative ownership boundaries documented.
+- No assets/project settings/build/tests run or changed. Added source example;
+  real input, priority/rebuild/ownership and multi-player validation remain pending.
+  See ManagedMappingContexts.md.
+
+
+### Vector2D source/runtime and Enhanced Input Axis2D — 2026-10-10 (validation pending)
+
+- Added copied UEVector2D, x/y and constructor/default support; actual native struct
+  identity with existing kind-12 snapshot transport for properties/calls/ref/out.
+  Existing math array/map carriers recognize native Vector2D without ABI renumbering.
+- Added value/const-ref event proxies and timer/next-tick captures; Enhanced Input
+  Axis2D uses exact Vector2D snapshots and typed callback lowering.
+- Added source example/documentation. No build/UHT/tests run. Generator/AOT coverage,
+  frame/ABI parity and all gameplay execution remain pending. See DSLVector2D.md.
+
+
+### Desired input/context state restoration — 2026-10-10 (validation pending)
+
+- Retained successful legacy/enhanced binding and owned context recipes. Idle world
+  tick reconciliation replaces stale component handlers and restores accepted-reload
+  state through existing signature/ownership checks, without replaying BeginPlay.
+- Missing components/subsystems defer; errors retain recipes with bounded retries.
+  Explicit cancellation and EndPlay/release/teardown discard desired state/assets.
+- Restores last installed configuration, not edited setup-call execution. No build/
+  reload/input tests run; lifecycle, delegate ABI and conflict/GC/performance checks
+  remain pending. See ManagedInputRestore.md.
+
+
+### Native SceneComponent gameplay adapters — 2026-10-10 (validation pending)
+
+- Added checked SceneComponentRef, Actor root/parent, relative/world transforms,
+  attach/detach with socket/cycle/world checks and explicit native rules.
+- Native game-world USceneComponent creation registers Actor-owned transient instances;
+  tracked same-owner destruction refuses existing/foreign components and children.
+- Source module/example added; no build/tests run. Authored SceneComponent hosts,
+  arbitrary native classes, sweeps/replication and structural remapping remain separate.
+  See DSLSceneComponents.md.
+
+
+### Managed world latent delay — 2026-10-10 (validation pending)
+
+- Added named delay/replace/pending/cancel APIs through LatentActionManager, private
+  UObject completion targets and shared idle void dispatch. Completion record is
+  consumed before user rearm; exact-target removal follows session lifecycle.
+- Export contract validated before replacement; game-world/duration/count guards and
+  native proxy lifetime pin implemented. No coroutine/await or worker execution.
+- Added DSL example and pending signature/timing/cleanup checks; no build/tests run.
+  Async asset/task adapters, payloads and coroutine syntax remain separate.
+  See ManagedLatentDelay.md.
+
+
+### Managed Streamable Manager async assets — 2026-10-10 (validation pending)
+
+- Added named load/replace/pending/cancel API, stalled registration, private weak
+  completion targets and game-thread object dispatch. Typed native callback class
+  contracts, nullable failures and handle/result lifetime ownership implemented.
+- Session/reload/teardown cancels requests without touching shared engine loads;
+  queued results pin assets through delivery. Cook inclusion remains project policy.
+- Added source example/documentation; no build/loading/tests run. Futures/await,
+  structured results, multiple-asset progress and soft-reference DSL remain separate.
+  See ManagedAsyncAssets.md.
+
+
+### Integrated gameplay source example — 2026-10-10 (scene/validation pending)
+
+- Added coherent Actor/Component sources with catalog-backed refs, component timer/
+  owner signal, Axis2D controls, pivot SceneComponent motion, latent Ready and async
+  asset result. Natural fields/method calls and public native adapters used together.
+- Added isolated setup manifest and scene/reload/cook instructions under
+  Examples/GameplayDemo. This custom manifest is not an Unreal importer format.
+- No Blueprint/input assets/map, build, import, PIE or cook created/run. Executable
+  scene and coupled behavior verification remain required; no completion claim.
+  See Examples/GameplayDemo/README.md.
+
+### Gameplay runtime validation — 2026-10-10
+
+- Editor build and new DasForUE.Gameplay.RuntimePIE automation passed with no
+  automation warnings/errors. Timers/captures, typed delegates, scene operations,
+  latent delay, async success and Destroy/EndPIE cleanup are exercised together.
+- Scene validity/access rejects components already being destroyed; cyclic
+  attachment and destroyed-component reads are tested. Tests use unsaved packages.
+- Input dispatch/context restoration, managed-operation reload and async negative
+  paths remain the next validation batch. Packaged gameplay and a playable demo
+  map remain separate. See GameplayRuntimePIEValidation.md.

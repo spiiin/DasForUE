@@ -50,7 +50,8 @@ struct FDasDeclaredComponent
 };
 struct FDasDeclaredCallback {
     FString Name,Kind,Source,EventName;
-    bool operator==(const FDasDeclaredCallback& O)const{return Name==O.Name && Kind==O.Kind && Source==O.Source && EventName==O.EventName;}
+    FString ParameterKind=TEXT("int");
+    bool operator==(const FDasDeclaredCallback& O)const{return Name==O.Name && Kind==O.Kind && Source==O.Source && EventName==O.EventName && (Kind!=TEXT("event") || ParameterKind==O.ParameterKind);}
 };
 struct FDasDeclaredClass
 {

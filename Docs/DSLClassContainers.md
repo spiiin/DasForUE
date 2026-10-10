@@ -75,3 +75,5 @@ Update: multi-level self writes and operations are covered in DSLMultiIndexSelf.
 Update: arrays of UEVector/UERotator/UETransform are supported in DSLMathArrays.md.
 
 Update: authored enum arrays are supported in DSLEnumArrays.md.
+
+Update: native object/interface arrays are supported in DSLReferenceArrays.md.

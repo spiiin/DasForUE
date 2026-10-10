@@ -71,4 +71,8 @@ struct MethodGroup {
     Path:array<UEVector>
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     States:array<MethodState>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    Actors:array<ActorRef>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    EventRefs:array<DasEventInterface>
 }

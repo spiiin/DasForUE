@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "status": "source_only_validation_pending",
+  "folder": "/Game/DasGameplayDemo",
+  "actor": {
+    "source": "dsl_gameplay_actor.das",
+    "id": "gameplaydemo.GameplayActor",
+    "asset": "BP_GameplayActor"
+  },
+  "component": {
+    "source": "dsl_gameplay_behavior.das",
+    "id": "gameplaydemo.GameplayBehavior",
+    "asset": "BP_GameplayBehavior"
+  },
+  "references": [
+    "ue_gameplay_refs.das",
+    "ue_gameplay_catalog.json"
+  ],
+  "input": {
+    "component_class": "/Script/EnhancedInput.EnhancedInputComponent",
+    "player_input_class": "/Script/EnhancedInput.EnhancedPlayerInput",
+    "actions": [
+      {
+        "name": "IA_Jump",
+        "value_type": "Boolean",
+        "keys": [
+          "SpaceBar"
+        ]
+      },
+      {
+        "name": "IA_Move",
+        "value_type": "Axis2D",
+        "keys": [
+          {
+            "key": "D",
+            "axis": "X",
+            "sign": 1
+          },
+          {
+            "key": "A",
+            "axis": "X",
+            "sign": -1
+          },
+          {
+            "key": "W",
+            "axis": "Y",
+            "sign": 1
+          },
+          {
+            "key": "S",
+            "axis": "Y",
+            "sign": -1
+          }
+        ]
+      }
+    ],
+    "context": "IMC_Gameplay",
+    "priority": 0,
+    "player": "explicit_local_PlayerController_same_world",
+    "setup_call": "SetupControls after component/player readiness"
+  },
+  "scene": {
+    "runtime_component": "GameplayPivot",
+    "type": "native_SceneComponent",
+    "visual_mesh": "optional_child_configured_externally"
+  },
+  "async_asset": {
+    "object_path": "user_selected_cook_included_asset",
+    "requires_cook_reference_or_asset_manager_rule": true
+  },
+  "expected_observations": [
+    "Behavior timer adds one Score per world-second while active",
+    "OnDasSignal adds payload once and increments Behavior.SignalCount",
+    "Axis2D changes Move and runtime pivot XY transform",
+    "Ready becomes true after latent update reaches 0.25 world-seconds",
+    "Async completion assigns nullable Loaded and LoadSucceeded",
+    "Accepted body reload restores input recipes but cancels timers/latent/async requests"
+  ]
+}

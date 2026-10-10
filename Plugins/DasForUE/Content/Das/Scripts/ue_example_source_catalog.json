@@ -1,0 +1,56 @@
+{
+  "schema_version": 3,
+  "classes": [
+    {
+      "id": "structmaps.StructMapActor",
+      "name": "StructMapActor",
+      "script": "dsl_struct_maps.das",
+      "reference": "StructMapActorRef"
+    },
+    {
+      "id": "structmaps.ReflectedMapActor",
+      "name": "ReflectedMapActor",
+      "script": "dsl_reflected_maps.das",
+      "reference": "ReflectedMapActorRef"
+    }
+  ],
+  "value_modules": [
+    {
+      "module": "ue_struct_map_types",
+      "script": "ue_struct_map_types.das",
+      "types": [
+        {
+          "kind": "struct",
+          "id": "structmaps.MapEntry",
+          "name": "MapEntry"
+        },
+        {
+          "kind": "struct",
+          "id": "structmaps.MapCatalog",
+          "name": "MapCatalog"
+        },
+        {
+          "kind": "enum",
+          "id": "structmaps.MapStatus",
+          "name": "MapStatus"
+        },
+        {
+          "kind": "struct",
+          "id": "structmaps.ReferenceMapCatalog",
+          "name": "ReferenceMapCatalog"
+        }
+      ]
+    },
+    {
+      "module": "ue_catalog_contract",
+      "script": "ue_catalog_contract.das",
+      "types": [
+        {
+          "kind": "interface",
+          "id": "catalogcontract.CatalogContract",
+          "name": "CatalogContract"
+        }
+      ]
+    }
+  ]
+}

@@ -2,13 +2,27 @@
   "FileVersion": 3,
   "Version": 1,
   "VersionName": "0.1-foundation",
-  "FriendlyName": "Das For Unreal — Foundation",
+  "FriendlyName": "Das For Unreal \u2014 Foundation",
   "Description": "Independent daScript integration and DSL feasibility tests.",
   "Category": "Scripting",
   "CanContainContent": true,
   "IsExperimentalVersion": true,
   "Modules": [
-    { "Name": "DasRuntime", "Type": "Runtime", "LoadingPhase": "Default" },
-    { "Name": "DasEditor", "Type": "Editor", "LoadingPhase": "Default" }
+    {
+      "Name": "DasRuntime",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "DasEditor",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "EnhancedInput",
+      "Enabled": true
+    }
   ]
 }

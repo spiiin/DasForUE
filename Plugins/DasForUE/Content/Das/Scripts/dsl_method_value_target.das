@@ -219,6 +219,66 @@ class ValueTarget {
         try { self.DirectStates[0]=invalid } recover { rejected=true }
         return (rejected && self.DirectStates[0]==MethodState.Active && self.DirectStates[1]==MethodState.Active && self.Groups[0].States[0]==MethodState.Idle) ? 1 : 0
     }
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    DirectActors:array<ActorRef>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    DirectEventRefs:array<DasEventInterface>
+    @ue_property=(EditAnywhere, BlueprintReadOnly)
+    LockedActors:array<ActorRef>
+    [ue_function(BlueprintCallable)]
+    def CopyActors(values:array<ActorRef>):array<ActorRef> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def CopyEventRefs(values:array<DasEventInterface>):array<DasEventInterface> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def RefActors(var values:array<ActorRef>&; @ue_out var previous:array<ActorRef>&):void {
+        previous <- clone(values)
+        values[0]=default<ActorRef>
+        push(values,default<ActorRef>)
+    }
+    [ue_function(BlueprintCallable)]
+    def RefEventRefs(var values:array<DasEventInterface>&; @ue_out var previous:array<DasEventInterface>&):void {
+        previous <- clone(values)
+        values[0]=default<DasEventInterface>
+    }
+    [ue_function(BlueprintCallable)]
+    def FailActors(var values:array<ActorRef>&):void {
+        values[0]=default<ActorRef>
+        panic("reference array failure")
+    }
+    [ue_function(BlueprintCallable)]
+    def ReferenceArrays(actor:ActorRef; events:DasEventInterface):int {
+        push(self.DirectActors,actor)
+        push(self.DirectActors,default<ActorRef>)
+        self.DirectActors[1l]=actor
+        push(self.DirectEventRefs,events)
+        push_clone(self.Groups,MethodGroup())
+        push(self.Groups[0].Actors,actor)
+        push(self.Groups[0].EventRefs,events)
+        self.Groups[0].Actors[0l]=default<ActorRef>
+        return (ue_object_valid(self.DirectActors[0].handle) && ue_object_valid(self.DirectActors[1].handle) && ue_object_valid(self.DirectEventRefs[0].handle) && !ue_object_valid(self.Groups[0].Actors[0].handle) && ue_object_valid(self.Groups[0].EventRefs[0].handle)) ? 1 : 0
+    }
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    DirectPartners:array<ValueTargetRef>
+    @ue_property=(EditAnywhere, BlueprintReadOnly)
+    LockedPartners:array<ValueTargetRef>
+    [ue_function(BlueprintCallable)]
+    def CopyPartners(values:array<ValueTargetRef>):array<ValueTargetRef> { return <- clone(values) }
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    AlternativePartners:array<AlternativeTargetRef>
+    [ue_function(BlueprintCallable)]
+    def RefPartners(var values:array<ValueTargetRef>&; @ue_out var previous:array<ValueTargetRef>&; fail:bool):void {
+        previous <- clone(values)
+        values[0]=default<ValueTargetRef>
+        if (fail) { panic("authored reference array failure") }
+        push(values,default<ValueTargetRef>)
+    }
+    [ue_function(BlueprintCallable)]
+    def AuthoredReferenceArrays(value:ValueTargetRef):int {
+        push(self.DirectPartners,value)
+        push(self.DirectPartners,default<ValueTargetRef>)
+        self.DirectPartners[1l]=value
+        return (ue_object_valid(self.DirectPartners[0].handle) && ue_object_valid(self.DirectPartners[1].handle)) ? 1 : 0
+    }
     [ue_function(BlueprintCallable)]
     def DirectContainers():int {
         if (length(self.DirectSamples)!=0 || length(self.DirectPoints)!=0 || length(self.DirectWeights)!=0 || length(self.DirectTags)!=0) { return 0 }
