@@ -5,33 +5,25 @@ require ue_scene_components
 
 [ue_class(module_id="gameplaydemo",Blueprintable)]
 class GameplayActor {
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    Score:int=0
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    Move:UEVector2D=ue_vector2d(0.0lf,0.0lf)
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    Speed:double=100.0lf
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    Ready:bool=false
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    Loaded:ObjectRef
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    LoadSucceeded:bool=false
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    AssetPath:string=""
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    Player:PlayerControllerRef
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    Controls:InputMappingContextRef
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    JumpAction:InputActionRef
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    MoveAction:InputActionRef
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    Pivot:SceneComponentRef
-    @ue_component
-    @ue_property=(VisibleAnywhere,BlueprintReadOnly)
-    Behavior:GameplayBehaviorRef
+    properties = ue_properties(EditAnywhere, BlueprintReadWrite) {
+        // Текущие очки игрока.
+        var Score:int=0
+        var Move:UEVector2D=ue_vector2d(0.0lf,0.0lf)
+        var Speed:double=100.0lf
+        var Ready:bool=false
+        var Loaded:ObjectRef
+        var LoadSucceeded:bool=false
+        var AssetPath:string=""
+        var Player:PlayerControllerRef
+        var Controls:InputMappingContextRef
+        var JumpAction:InputActionRef
+        var MoveAction:InputActionRef
+        var Pivot:SceneComponentRef
+    }
+    components = ue_components(VisibleAnywhere, BlueprintReadOnly) {
+        // Обновляет очки и обрабатывает события владельца.
+        var Behavior:GameplayBehaviorRef
+    }
 
     def BeginPlay():void {
         let actor = ue_ref(type<ActorRef>,ue_self_object())

@@ -1,7 +1,8 @@
 # Native SceneComponent reference and gameplay adapters
 
-Added 2026-10-10. **Not built or tested**. UHT/build, source wrappers, actual scene
-creation/registration/transforms/attachment, lifecycle, PIE and packaging are pending.
+Added 2026-10-10. Basic creation, transforms, attachment, detachment and destruction
+are covered by `DasForUE.Components.Native` in an Editor-hosted game UWorld.
+This is not a PIE or packaging test; advanced socket/physics cases remain pending.
 
 ```das
 require ue_scene_components
@@ -59,3 +60,25 @@ Pending checks: build/UHT/DAS default arguments; nullable references; duplicate 
 game-world/template/context restrictions; registration/root behavior; relative/world
 math/teleport; socket/mobility/cycle/refusal rules; exact owned destruction/children;
 Actor/GC/logic reload and reinstancing boundaries; real PIE and packaged Development.
+
+## Named lookup and reuse
+
+`ue_scene_get(actor,name)` returns a nullable `SceneComponentRef` for an owned
+component with that exact UObject name (Unreal FName comparison). Missing names
+return an invalid reference. A matching non-scene/destroying component is an error.
+Names follow the same validation as creation. Actor must be live, non-template,
+and in the script owner's game world.
+
+`ue_scene_get_or_create(actor,name)` returns the existing scene component or calls
+the normal creation path. Existing components retain their transform, attachment
+and ownership; lookup never grants destruction rights. An unrelated UObject name
+collision still fails creation. This searches instance names, not DSL field names
+or component tags. No arbitrary component class parameter is provided yet.
+
+```das
+let pivot = ue_scene_get_or_create(actor,"ScriptPivot")
+let existing = ue_scene_get(actor,"ScriptPivot")
+```
+
+The native-components fixture checks missing lookup, creation, repeat reuse,
+lookup after creation and invalidation of both references after destruction.

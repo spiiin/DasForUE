@@ -24,10 +24,10 @@ bool FDasClassSchema::Validate(FString& Error) const
     Error.Reset();
     if (!Identifier(Name.ToString()) || Name.IsNone() || (Parent != TEXT("Actor") && Parent != TEXT("ActorComponent")))
     { Error = TEXT("Expected a named Actor or ActorComponent schema"); return false; }
-    auto ValidMeta=[&](const TMap<FString,FString>& Values)
+    auto ValidMeta=[&](const TMap<FString,FString>& Values,bool Method=false)
     {
         for (const auto& Pair:Values)
-            if ((Pair.Key!=TEXT("Category") && Pair.Key!=TEXT("DisplayName") && Pair.Key!=TEXT("ToolTip")) || Pair.Value.Len()>4096)
+            if ((Pair.Key!=TEXT("Category") && Pair.Key!=TEXT("DisplayName") && Pair.Key!=TEXT("ToolTip") && !(Method && Pair.Key==TEXT("DasFunctionKind") && (Pair.Value==TEXT("Event") || Pair.Value==TEXT("Callable")))) || Pair.Value.Len()>4096)
             {Error=TEXT("Unsupported adapter metadata");return false;}
         return true;
     };
@@ -49,7 +49,7 @@ bool FDasClassSchema::Validate(FString& Error) const
         if(Contract.ReturnKind==EDasMethodSignature::Struct && !ValidateDasValueStruct(M.ReturnClass,Error))return false;
         for(const auto& P:M.EffectiveParameters())if(P.Kind==EDasMethodSignature::Enum && !ResolveDasEnum(P.ClassPath,Error))return false;
         if(Contract.ReturnKind==EDasMethodSignature::Enum && !ResolveDasEnum(M.ReturnClass,Error))return false;
-        if (!ValidMeta(M.Metadata)) return false;
+        if (!ValidMeta(M.Metadata,true)) return false;
         Names.Add(M.Name);
     }
     for (const auto& Field : Fields)

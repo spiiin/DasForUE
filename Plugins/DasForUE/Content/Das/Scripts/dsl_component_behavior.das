@@ -4,18 +4,14 @@ require ue_actor_refs
 require ue_component_types
 [ue_class(module_id="actorcomponent", parent="ActorComponent", Blueprintable)]
 class ScoreBehavior {
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    Bonus : int = 10
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    SignalTotal : int = 0
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    BeginCount : int = 0
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    TickCount : int = 0
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    EndCount : int = 0
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    Seconds : float = 0.0
+    properties = ue_properties(EditAnywhere, BlueprintReadWrite) {
+        var Bonus:int=10
+        var SignalTotal:int=0
+        var BeginCount:int=0
+        var TickCount:int=0
+        var EndCount:int=0
+        var Seconds:float=0.0
+    }
     [ue_function(BlueprintCallable)]
     def Evaluate(input:int):int { return self.Bonus + input }
     [ue_function(BlueprintCallable)]

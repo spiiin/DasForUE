@@ -92,6 +92,8 @@ public:
     FString LastDasError;
     virtual void EndPlay(const EEndPlayReason::Type Reason) override;
     virtual void Destroyed() override;
+    virtual void OnConstruction(const FTransform& Transform) override;
+    UPROPERTY() FName DasSceneRootProperty;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="daScript Probe")
     TObjectPtr<AActor> Peer;
 

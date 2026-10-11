@@ -26,3 +26,7 @@ def ue_scene_attach(child:SceneComponentRef; parent:SceneComponentRef; socket:st
 def ue_scene_detach(value:SceneComponentRef; rule:string="KeepWorld"):void { __ue_scene_detach(SceneComponentRef_raw(value),rule) }
 def ue_scene_create(actor:ActorRef; name:string):SceneComponentRef { return SceneComponentRef_from(__ue_scene_create(ue_cast_nullable_object(actor.handle,"/Script/Engine.Actor"),name)) }
 def ue_scene_destroy(value:SceneComponentRef):bool { return __ue_scene_destroy(SceneComponentRef_raw(value)) }
+
+def ue_scene_get(actor:ActorRef; name:string):SceneComponentRef { return SceneComponentRef_from(__ue_scene_get(ue_cast_nullable_object(actor.handle,"/Script/Engine.Actor"),name)) }
+
+def ue_scene_get_or_create(actor:ActorRef; name:string):SceneComponentRef { return SceneComponentRef_from(__ue_scene_get_or_create(ue_cast_nullable_object(actor.handle,"/Script/Engine.Actor"),name)) }

@@ -16,6 +16,7 @@ struct FDasDeclaredLiteral
     FString Kind; // Empty means no explicit default; null/bool/number/string otherwise.
     double Number = 0;
     bool Boolean = false;
+    bool operator==(const FDasDeclaredLiteral& O)const{return Kind==O.Kind && Number==O.Number && Boolean==O.Boolean && String==O.String;}
     FString String;
 };
 struct FDasDeclaredProperty
@@ -39,14 +40,19 @@ struct FDasDeclaredMethod
     TArray<FDasDeclaredParameter> Parameters;
     FString ScriptFile, EntryPoint = TEXT("main");
     bool bCallable = true, bPure = false, bStatic = false;
+    bool bBlueprintEvent = false;
     TMap<FString, FString> Metadata;
 };
 struct FDasDeclaredComponent
 {
     FString Id,Name,ScriptFile,ClassName;
+    TMap<FString,FDasDeclaredLiteral> Defaults;
+    FString Attach, AttachSocket;
+    bool bRoot=false;
+    FString NativeClass; // Native component path; mutually exclusive with authored source.
     bool bReadOnly=false,bEditable=false,bVisible=false;
     TMap<FString,FString> Metadata;
-    bool operator==(const FDasDeclaredComponent& Other)const{return Id==Other.Id && Name==Other.Name && ScriptFile==Other.ScriptFile && ClassName==Other.ClassName && bReadOnly==Other.bReadOnly && bEditable==Other.bEditable && bVisible==Other.bVisible && Metadata.OrderIndependentCompareEqual(Other.Metadata);}
+    bool operator==(const FDasDeclaredComponent& Other)const{return Id==Other.Id && Name==Other.Name && ScriptFile==Other.ScriptFile && ClassName==Other.ClassName && NativeClass==Other.NativeClass && Attach==Other.Attach && AttachSocket==Other.AttachSocket && bRoot==Other.bRoot && Defaults.OrderIndependentCompareEqual(Other.Defaults) && bReadOnly==Other.bReadOnly && bEditable==Other.bEditable && bVisible==Other.bVisible && Metadata.OrderIndependentCompareEqual(Other.Metadata);}
 };
 struct FDasDeclaredCallback {
     FString Name,Kind,Source,EventName;

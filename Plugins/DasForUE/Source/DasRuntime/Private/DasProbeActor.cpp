@@ -7,11 +7,25 @@
 #include "Blueprint/BlueprintExceptionInfo.h"
 #include "UObject/Stack.h"
 #include "UObject/Script.h"
+#include "UObject/UnrealType.h"
 
 ADasProbeActor::ADasProbeActor()
 {
     PrimaryActorTick.bCanEverTick = true;
     RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ProbeRoot"));
+}
+
+void ADasProbeActor::OnConstruction(const FTransform& Transform)
+{
+    Super::OnConstruction(Transform);
+    if(DasSceneRootProperty.IsNone())return;
+    auto* Property=FindFProperty<FObjectProperty>(GetClass(),DasSceneRootProperty);
+    auto* Scene=Property?Cast<USceneComponent>(Property->GetObjectPropertyValue_InContainer(this)):nullptr;
+    if(!Scene || Scene->GetOwner()!=this || Scene==GetRootComponent())return;
+    auto* Previous=GetRootComponent();
+    Scene->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+    SetRootComponent(Scene);
+    if(Previous)Previous->AttachToComponent(Scene,FAttachmentTransformRules::KeepWorldTransform);
 }
 
 int32 ADasProbeActor::ExecuteDas(const FString& ScriptFile, int32 Input)

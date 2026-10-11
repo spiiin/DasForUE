@@ -51,6 +51,7 @@ struct FDasMethodSchema
     FString StableId;
     FString InputStableId;
     FString EntryPoint = TEXT("main");
+    bool bBlueprintEvent = false;
     TMap<FString,FString> Metadata;
 };
 

@@ -8,7 +8,7 @@ struct FDSLMethodSourceSignature {das::string Result;das::vector<das::string> Pa
 TMap<FString,FDSLMethodSourceSignature> DSLMethodSourceSignatures;
 struct FDSLPropertySourceSignature {das::string Name;FDSLTypeScope Scope;};
 TMap<FString,FDSLPropertySourceSignature> DSLPropertySourceSignatures;
-void DSLResetReferenceDeclarations(){DSLSourceCatalogExpectedIds.Reset();DSLActiveRefDeclarations.Reset();DSLMethodSourceSignatures.Reset();DSLPropertySourceSignatures.Reset();}
+void DSLResetReferenceDeclarations(){DSLResetDocComments();DSLSourceCatalogExpectedIds.Reset();DSLActiveRefDeclarations.Reset();DSLMethodSourceSignatures.Reset();DSLPropertySourceSignatures.Reset();}
 das::string DSLMethodSourceName(const das::TypeDeclPtr& Type){if(!DSLMathPath(Type).IsEmpty())return das::string("@math:")+Type->annotation->name;if(DSLTypedReference(Type))return Type->structType->module->name+"::"+Type->structType->name;if(DSLContainer(Type))return das::string("@container:")+DSLMethodSourceName(Type->firstType);if(DSLDirectEnum(Type))return Type->enumType->module->name+"::"+Type->enumType->name;if(DSLDirectStruct(Type))return Type->structType->module->name+"::"+Type->structType->name;return {};}
 void DSLRememberMethodSource(const FString& Key,FDasDeclaredMethod& Method,const das::FunctionPtr& Function,const FDSLTypeScope& Scope){FDSLMethodSourceSignature Descriptor;Descriptor.Scope={Scope.ModuleId,Scope.Folder,Scope.Registry,nullptr,nullptr};Descriptor.Result=DSLMethodSourceName(Function->result);if(DSLAuthoredView(Function->result))Method.ReturnType.AuthoredId=DSLReferenceDeclaration(Function->result).Id;for(size_t Index=1;Index<Function->arguments.size();++Index){Descriptor.Parameters.push_back(DSLMethodSourceName(Function->arguments[Index]->type));if(DSLAuthoredView(Function->arguments[Index]->type))Method.Parameters[int32(Index)-1].Type.AuthoredId=DSLReferenceDeclaration(Function->arguments[Index]->type).Id;}DSLMethodSourceSignatures.Add(Key+TEXT("::")+Method.Name,MoveTemp(Descriptor));}
 
@@ -43,7 +43,31 @@ FDasDeclaredClass DSLReferenceDeclaration(const das::TypeDeclPtr& T){const auto*
 FString DSLAuthoredReferencePath(const das::TypeDeclPtr& Type){const auto Class=DSLReferenceDeclaration(Type);if(Class.NativeParent==TEXT("/Script/Engine.Actor"))return TEXT("/Script/DasRuntime.DasProbeActor");if(Class.NativeParent==TEXT("/Script/Engine.ActorComponent"))return TEXT("/Script/DasRuntime.DasScriptComponent");DSLFail(TEXT("Authored signature reference requires an Actor/Component host"));return {};}
 das::ExpressionPtr DSLAuthoredPack(const das::LineInfo& At,const das::TypeDeclPtr& Type,das::ExpressionPtr Value){const auto Class=DSLReferenceDeclaration(Type);return DSLCall(At,"__ue_authored_nullable_check",{new das::ExprField(At,Value,"handle"),new das::ExprConstString(At,DSLUtf8(Class.Id))});}
 das::ExpressionPtr DSLAuthoredUnpack(const das::LineInfo& At,const das::TypeDeclPtr& Type,das::ExpressionPtr Handle){const auto Class=DSLReferenceDeclaration(Type);auto* Value=new das::ExprMakeStruct(At);Value->makeType=DSLObjectCopyType(Type);Value->makeType->ref=false;Value->makeType->constant=false;auto* Fields=new das::MakeStruct();Fields->push_back(new das::MakeFieldDecl(At,"handle",DSLCall(At,"__ue_authored_nullable_check",{Handle,new das::ExprConstString(At,DSLUtf8(Class.Id))}),false,false));Value->structs.push_back(Fields);return Value;}
-das::ExpressionPtr DSLReferenceValue(const das::LineInfo& At,const das::TypeDeclPtr& T,das::ExpressionPtr H){auto C=DSLReferenceDeclaration(T);auto* V=new das::ExprMakeStruct(At);V->makeType=DSLObjectCopyType(T);auto* Fields=new das::MakeStruct();Fields->push_back(new das::MakeFieldDecl(At,"handle",DSLCall(At,"__ue_authored_object_check",{H,new das::ExprConstString(At,DSLUtf8(C.Id))}),false,false));V->structs.push_back(Fields);return V;}
+das::ExpressionPtr DSLReferenceValue(const das::LineInfo& At,const das::TypeDeclPtr& T,das::ExpressionPtr H){if(!DSLAuthoredView(T))return DSLDirectUnpack(At,T,H,DSLTypedReferencePath(T));auto C=DSLReferenceDeclaration(T);auto* V=new das::ExprMakeStruct(At);V->makeType=DSLObjectCopyType(T);auto* Fields=new das::MakeStruct();Fields->push_back(new das::MakeFieldDecl(At,"handle",DSLCall(At,"__ue_authored_object_check",{H,new das::ExprConstString(At,DSLUtf8(C.Id))}),false,false));V->structs.push_back(Fields);return V;}
+struct FUENativeComponentFactory:das::CallMacro {
+ int Mode;
+ FUENativeComponentFactory(int V):CallMacro(V==0?"ue_component_get":V==1?"ue_component_create":"ue_component_get_or_create"),Mode(V){}
+ virtual bool canVisitArguments(das::ExprCallMacro*,int Index)override{return Index!=0;}
+ virtual das::ExpressionPtr visit(das::Program* P,das::Module* M,das::ExprCallMacro* E)override{
+  try{
+   if((E->arguments.size()!=3 && E->arguments.size()!=4) || !E->arguments[0]->rtti_isTypeDecl())DSLFail(TEXT("Expected component operation(type<ComponentRef>, actor, name[, generatedClassPath])"));
+   auto T=DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(E->arguments[0])->typeexpr,*P->thisModuleGroup,M);
+   if(DSLAuthoredView(T)){
+    const auto Declaration=DSLReferenceDeclaration(T);
+    if(E->arguments.size()!=(Mode==0?3:4))DSLFail(TEXT("Authored create/get_or_create requires explicit generated class path"));
+    if(Declaration.NativeParent!=TEXT("/Script/Engine.ActorComponent"))DSLFail(TEXT("Expected authored ActorComponent reference"));
+    auto* Call=Mode==0?DSLCall(E->at,"__ue_authored_component_get",{new das::ExprField(E->at,E->arguments[1],"handle"),new das::ExprConstString(E->at,DSLUtf8(Declaration.Id)),E->arguments[2]}):DSLCall(E->at,"__ue_native_component_operation",{new das::ExprField(E->at,E->arguments[1],"handle"),E->arguments[3],E->arguments[2],new das::ExprConstInt(E->at,Mode),new das::ExprConstString(E->at,DSLUtf8(Declaration.Id))});
+    return DSLAuthoredUnpack(E->at,T,Call);
+   }
+   if(!DSLTypedReference(T) || DSLAuthoredView(T) || DSLTypedInterface(T))DSLFail(TEXT("Component operation requires a native object reference"));
+   if(E->arguments.size()!=3)DSLFail(TEXT("Native component operation takes three arguments"));
+   const FString Path=DSLTypedReferencePath(T);auto* Class=FindObject<UClass>(nullptr,*Path);
+   if(!Path.StartsWith(TEXT("/Script/")) || !Class || !Class->IsChildOf(UActorComponent::StaticClass()) || Class->HasAnyClassFlags(CLASS_Abstract|CLASS_Deprecated|CLASS_NewerVersionExists))DSLFail(TEXT("Expected concrete native ActorComponent reference"));
+   auto* Call=DSLCall(E->at,"__ue_native_component_operation",{new das::ExprField(E->at,E->arguments[1],"handle"),new das::ExprConstString(E->at,DSLUtf8(Path)),E->arguments[2],new das::ExprConstInt(E->at,Mode),new das::ExprConstString(E->at,"")});
+   return DSLDirectUnpack(E->at,T,Call,Path);
+  }catch(const std::exception& X){P->error("Native component factory failed",X.what(),"",E->at,das::CompilationError::invalid_type);return nullptr;}
+ }
+};
 struct FUEReferenceFactory:das::CallMacro {
  bool Owner;
  FUEReferenceFactory(bool O):CallMacro(O?"ue_owner":"ue_ref"),Owner(O){}
@@ -58,8 +82,8 @@ bool DSLEmitProperty(das::Program* P,das::Module* M,const das::TypeDeclPtr& T,co
  das::TypeDeclPtr ValueType=nullptr;FDasDeclaredProperty ComponentProperty;
  const auto* Reference=DSLAnnotation(T->structType->annotations,"ue_object_ref");const FString SourceKey=DSLString(Reference->arguments,"script")+TEXT("::")+DSLString(Reference->arguments,"type")+TEXT("::")+DSLText(Name);const auto* Descriptor=DSLPropertySourceSignatures.Find(SourceKey);
  if(Component){
-  P->library.foreach([&](das::Module* Mod){Mod->structures.foreach([&](const das::StructurePtr& Structure){const auto* Annotation=DSLAnnotation(Structure->annotations,"ue_object_ref");if(!Annotation || DSLString(Annotation->arguments,"script")!=Component->ScriptFile || DSLString(Annotation->arguments,"type")!=Component->ClassName)return;if(ValueType && ValueType->structType!=Structure)DSLFail(TEXT("Ambiguous component reference view; import only the declared component view"));ValueType=new das::TypeDecl(das::Type::tStructure,At);ValueType->structType=Structure;});return true;},"*");
-  if(!ValueType)DSLFail(TEXT("Import the component reference type before accessing its member"));ComponentProperty.Name=Component->Name;ComponentProperty.Type.Kind=TEXT("object");ComponentProperty.bReadOnly=true;Prop=&ComponentProperty;
+  P->library.foreach([&](das::Module* Mod){Mod->structures.foreach([&](const das::StructurePtr& Structure){const auto* Annotation=DSLAnnotation(Structure->annotations,"ue_object_ref");if(Component->NativeClass.IsEmpty()){if(!Annotation || DSLString(Annotation->arguments,"script")!=Component->ScriptFile || DSLString(Annotation->arguments,"type")!=Component->ClassName)return;}else{const auto* Native=DSLAnnotation(Structure->annotations,"ue_native_object");if(!Native || DSLString(Native->arguments,"path")!=Component->NativeClass)return;}if(ValueType && ValueType->structType!=Structure)DSLFail(TEXT("Ambiguous component reference view; import only the declared component view"));ValueType=new das::TypeDecl(das::Type::tStructure,At);ValueType->structType=Structure;});return true;},"*");
+  if(!ValueType)DSLFail(TEXT("Import the component reference type before accessing its member"));ComponentProperty.Name=Component->Name;ComponentProperty.Type.Kind=TEXT("object");ComponentProperty.Type.TypePath=Component->NativeClass;ComponentProperty.bReadOnly=true;Prop=&ComponentProperty;
  }else if(Descriptor && !Descriptor->Name.empty())ValueType=DSLMethodValueType(P,M,Prop->Type,Descriptor->Name,Descriptor->Scope,At);else if(Prop->Type.Kind==TEXT("struct") && (Prop->Type.TypePath==TEXT("/Script/CoreUObject.Vector") || Prop->Type.TypePath==TEXT("/Script/CoreUObject.Rotator") || Prop->Type.TypePath==TEXT("/Script/CoreUObject.Transform")))ValueType=DSLHandleType(*P->thisModuleGroup,M,Prop->Type.TypePath==TEXT("/Script/CoreUObject.Vector")?"UEVector":Prop->Type.TypePath==TEXT("/Script/CoreUObject.Rotator")?"UERotator":"UETransform");else ValueType=DSLPropertyType(Prop->Type.Kind,*P->thisModuleGroup,M,At);if(ValueType->baseType==das::Type::tVoid)DSLFail(TEXT("Unsupported authored property kind: ")+Prop->Type.Kind);
  const bool Container=DSLContainer(ValueType);const FString ValuePath=Container?DasContainerCarrier(Prop->Type)->GetPathName():Prop->Type.TypePath;const FString RuntimeKind=Container?TEXT("struct"):Prop->Type.Kind;
  const bool Convert=Container || DSLDirectStruct(ValueType) || DSLDirectEnum(ValueType) || DSLTypedReference(ValueType) || !DSLMathPath(ValueType).IsEmpty();

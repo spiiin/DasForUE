@@ -59,6 +59,16 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     if(!Created){const FString PriorWire=BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"));if(!PriorWire.IsEmpty()){FDasAuthoringModule Prior;if(!FDasAuthoringModule::FromJson(PriorWire,Prior,Error))return false;const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});if(!Old || Old->Components!=Declaration.Components){Error=TEXT("Component composition migration is deferred");return false;}for(const auto& Property:Declaration.Properties){const auto* Before=Old->Properties.FindByPredicate([&](const auto& P){return P.Id==Property.Id;});if(Before && Before->Type.AuthoredId!=Property.Type.AuthoredId){Error=TEXT("Authored reference field identity migration is deferred");return false;}}}else if(!Declaration.Components.IsEmpty()){Error=TEXT("Adding components to an existing unimported Blueprint is unsupported");return false;}}
     if(!Created){const FString PriorWire=BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"));FDasAuthoringModule Prior;if(!PriorWire.IsEmpty() && !FDasAuthoringModule::FromJson(PriorWire,Prior,Error))return false;const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});auto HasContainers=[](const FDasDeclaredClass& C){return C.Properties.ContainsByPredicate([](const auto& P){return P.Type.Kind==TEXT("array") || P.Type.Kind==TEXT("map") || P.Type.Kind==TEXT("set");});};if((HasContainers(Declaration) || (Old && HasContainers(*Old))) && (DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse || PriorWire!=Json)){Error=TEXT("Direct container class declaration migration is deferred; body-only reimport is supported");return false;}}
     if(!Created && !Declaration.Components.IsEmpty() && (DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse || BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"))!=Json)){Error=TEXT("Actor declarations with components support body-only reimport while migration is deferred");return false;}
+    if(!Created){
+        const FString Wire=BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"));FDasAuthoringModule Prior;
+        if(!Wire.IsEmpty()){
+            if(!FDasAuthoringModule::FromJson(Wire,Prior,Error))return false;
+            if(const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;}))for(const auto& M:Declaration.Methods){
+                const auto* Before=Old->Methods.FindByPredicate([&](const auto& P){return P.Id==M.Id;});
+                if(Before && Before->bBlueprintEvent!=M.bBlueprintEvent){Error=TEXT("Changing callable/BlueprintEvent role requires a later dependency migration; create a new Blueprint for this declaration");return false;}
+            }
+        }
+    }
     TMap<FString,UBlueprint*> ComponentBlueprints;if(!DasPrepareComponentComposition(Declaration,Package,ComponentBlueprints,Error))return false;
     if(!Created && Schema.Parent==TEXT("ActorComponent") && (DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse || BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"))!=Json)){Error=TEXT("Component declaration migration is deferred; body-only reimport is supported");return false;}
     if(DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse){
@@ -99,6 +109,7 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
 #if WITH_DEV_AUTOMATION_TESTS
     if(Rollback && GDasFailStructuralStage==1)return Restore(TEXT("Injected post-compile development failure"));
 #endif
+    if(Created)if(auto* Actor=Cast<ADasProbeActor>(BP->GeneratedClass->GetDefaultObject())){const auto* Root=Declaration.Components.FindByPredicate([](const auto& C){return C.bRoot;});Actor->DasSceneRootProperty=Root?FName(*Root->Name):NAME_None;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
     BP->Modify();Metadata.SetValue(BP,TEXT("DasDSLSource"),*Script);Metadata.SetValue(BP,TEXT("DasDSLClassId"),*Id);Metadata.SetValue(BP,TEXT("DasDSLModel"),*Json);
     BP->MarkPackageDirty();if(Created) FAssetRegistryModule::AssetCreated(BP);
 #if WITH_DEV_AUTOMATION_TESTS

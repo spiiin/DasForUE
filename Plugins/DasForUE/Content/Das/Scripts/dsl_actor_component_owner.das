@@ -3,23 +3,19 @@ require ue_dsl
 require ue_component_types
 [ue_class(module_id="actorcomponent", Blueprintable)]
 class ComponentOwner {
-    @ue_component
-    @ue_property=(VisibleAnywhere, BlueprintReadOnly)
-    @Category="Components"
-    @ToolTip="Подсчёт очков"
-    Behavior : ScoreComponent
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    Score : int = 0
+    components = ue_components(VisibleAnywhere, BlueprintReadOnly, Category="Components") {
+        // Подсчёт очков
+        var Behavior:ScoreComponent
+    }
+    properties = ue_properties(EditAnywhere, BlueprintReadWrite) {
+        // Текущие очки владельца.
+        var Score:int=0
+        var Begins:int=0
+        var Ticks:int=0
+        var Ends:int=0
+    }
 
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    Begins : int = 0
-
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    Ticks : int = 0
-
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    Ends : int = 0
-
+    // Возвращает текущие очки владельца.
     [ue_function(BlueprintCallable)]
     def GetScore():int { return self.Score }
 

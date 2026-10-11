@@ -2,7 +2,9 @@
 
 Status: **source-only, validation pending** (2026-10-10). This is a cohesive source
 example and setup specification. Blueprint/InputAction/MappingContext assets and a
-playable map have not been created; no build, editor import, PIE or cook was run.
+playable map have not been created. Source compilation is validated; this demo map
+has not been imported, played or cooked. Runtime API coverage is described in
+Docs/GameplayRuntimePIEValidation.md.
 
 ## Source files
 
@@ -12,10 +14,11 @@ playable map have not been created; no build, editor import, PIE or cook was run
 - Plugins/DasForUE/Content/Das/Scripts/ue_gameplay_catalog.json
 
 Actor/Component reference views share the source catalog; the Actor has one
-@ue_component Behavior field. Actor uses typed native input/scene/object fields.
+Behavior component field declared through ue_components. Shared field flags use
+ue_properties; the Actor uses typed native input/scene/object fields.
 Component timer and owner delegate update Actor.Score through ordinary typed access.
 Source references follow the existing forward-declaration/cycle-aware compiler path;
-that path has not been exercised for this new example.
+that path was compile-validated after conversion to declaration groups on 2026-10-11.
 
 ## Intended gameplay
 

@@ -1356,6 +1356,8 @@ bool RunDasFoundationTests(FString& Report)
         Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_direction_bad_unknown.das")),ParameterModel,ParameterIssue),TEXT("parameter_direction_unknown_refused"));
         Expect(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_parameter_direction_bad_legacy_conflict.das")),ParameterModel,ParameterIssue),TEXT("parameter_direction_legacy_conflict_refused"));
     }
+    #include "DasDeclarationGroupTests.inl"
+    #include "DasCommentTooltipTests.inl"
     const auto Recovery = Run(TEXT("smoke.das"));
     Expect(Recovery.bSucceeded && Recovery.Value == 42, TEXT("recovery_after_failures"), Recovery.Error);
     Report += FString::Printf(TEXT("DAS_FOUNDATION_RESULT=%s failures=%d\n"), Failures ? TEXT("FAIL") : TEXT("PASS"), Failures);

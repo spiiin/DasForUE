@@ -2059,3 +2059,69 @@ typed macro sketches are not implemented capabilities. Migration work stays defe
 - Input dispatch/context restoration, managed-operation reload and async negative
   paths remain the next validation batch. Packaged gameplay and a playable demo
   map remain separate. See GameplayRuntimePIEValidation.md.
+### Native declaration groups — 2026-10-11
+
+- Added properties = ue_properties(flags, metadata) { var Field:Type=Default }
+  in ue_class and ue_struct, plus components = ue_components(...) for Actor SCS
+  fields. AST expansion occurs before inference; labels are erased. Existing
+  property/component collectors remain the only IR/runtime implementation.
+- Supports multiple groups, individual fields, per-member metadata overrides and
+  existing stable IDs. Rejects duplicate fields, unknown/conflicting flags,
+  executable statements, inferred/reference fields and empty/nested blocks.
+- Converted both main Actor/Component and GameplayDemo sources. Foundation IR
+  equivalence/negative checks and main Actor/Component create/reopen/PIE passed.
+- Ordinary def and enum/class/interface declarations are forbidden by the pinned
+  expression-block grammar. Those entities keep their annotations until another
+  valid group syntax is chosen; no reader macro or parser modification was added.
+  See DSLDeclarationGroups.md.
+### Functions/events parity audit — 2026-10-11
+
+- Compared the specified Hazelight functions/events page with current code and
+  four temporary compiler probes. Callable methods and fixed lifecycle hooks
+  work; parity is incomplete. See AngelScriptFunctionsEventsAudit.md.
+- Prioritize usable script-only self method calls, then child Blueprint override/
+  parent-call tests and explicit overridable-event dispatch policies. Existing
+  ue_event multicast subscriptions are not BlueprintOverride/BlueprintEvent.
+- Authored class inheritance/Super, global reflected function libraries, optional
+  callable defaults, comment tooltips and parent-event aliases remain extensions.
+- Generated BP graph functions already receive BlueprintEvent through UE. Audit
+  the current behavior before replacing it; full child-BP dispatch is not verified.
+## Actor/Component expansion checkpoint — 2026-10-11
+Native component fields and root/attachment declarations implemented; Editor integration test passes. See [DSLNativeComponents](DSLNativeComponents.md) for the exact validation boundary and remaining authorized stages. Component defaults, general creation/query/spawn APIs, user construction and inheritance overrides are still open.
+
+## Component template defaults — 2026-10-11
+Implemented literal component defaults through ue_defaults, native scalar/vector/rotator template properties and authored scalar overrides. See [DSLComponentDefaults](DSLComponentDefaults.md). Defaults migration and arbitrary method calls remain deferred; component lookup/create/spawn and construction/inheritance remain open.
+
+### SceneComponent named lookup (2026-10-11)
+Added `ue_scene_get` and `ue_scene_get_or_create` with nullable lookup and existing creation/lifetime rules. Integration coverage lives in `DasForUE.Components.Native`. This is the SceneComponent slice; generalized typed ActorComponent creation, authored component resolution, enumeration and Actor spawning remain separate steps.
+
+### Own methods and explicit Blueprint events — 2026-10-11
+
+- Lowered script-only helpers and ordinary own reflected calls into typed
+  same-context DAS bodies. Helpers do not enter reflection or authoring IR.
+- Added ue_function(BlueprintEvent), optional true-only blueprint_event JSON,
+  structural role comparison, and self event calls through the existing authored
+  reference/ProcessEvent transport. Callable functions are Final; events and
+  interface implementations remain overridable through an editor precompile policy.
+- Real child-BP tests cover inherited default execution, override+Call to Parent,
+  replacement without parent, and runtime/context cleanup. Core foundation,
+  Actor/Component and MethodValues editor/PIE regressions passed.
+- Role changes on existing BP are refused before mutation pending dependency
+  migration. DAS class inheritance/Super and general native BlueprintOverride
+  remain separate; this completes the child-Blueprint parent-call stage only.
+  See DSLMethodDispatch.md and DSLMethodDispatchValidation.md.
+### Typed native component operations (2026-10-11)
+Added type-token create/get/get_or_create for concrete native ActorComponent classes and owned destruction. Authored/Blueprint component resolution, enumeration and Actor spawn remain pending. See DSLTypedComponents.md.
+
+### Authored component lookup (2026-10-11)
+ue_component_get now supports authored ActorComponent references with stable type-ID checking. Dynamic authored creation and Blueprint-class resolution remain pending.
+
+### Authored dynamic component creation (2026-10-11)
+Added explicit loaded generated-class path to authored create/get_or_create, guarded by CDO stable type identity. Basic game-UWorld integration coverage added; active PIE lifecycle and cooked class availability remain pending.
+
+### Dynamic component lifecycle in PIE (2026-10-11)
+DasForUE.Components.DynamicPIE passed: nested BeginPlay before create returns, ticks, one EndPlay on script-owned destruction, unregistration and session cleanup after EndPIE. Fixed runtime guard to allow lifecycle only for the component under adapter registration/destruction. Packaged builds and replication remain unverified.
+
+### Documentation comments → ToolTip
+
+Added the native daScript CommentReader integration: adjacent declaration comments provide default ToolTip metadata for reflected types, fields/components, methods and interface stubs. Explicit ToolTip remains an override. Examples use comments; enum-entry tooltips remain outside this step. See [DSLCommentTooltips.md](DSLCommentTooltips.md).

@@ -5,17 +5,18 @@ require ue_dsl
 require ue_component_types
 [ue_class(module_id="actorcomponent", Blueprintable)]
 class ComponentOwner {
-    @ue_component
-    @ue_property=(VisibleAnywhere, BlueprintReadOnly)
-    @Category="Components"
-    @ToolTip="Подсчёт очков"
-    Behavior : ScoreComponent
-
-    @ue_property=(EditAnywhere, BlueprintReadWrite)
-    Score : int = 0
+    components = ue_components(VisibleAnywhere, BlueprintReadOnly, Category="Components") {
+        // Подсчёт очков
+        var Behavior:ScoreComponent
+    }
+    properties = ue_properties(EditAnywhere, BlueprintReadWrite) {
+        var Score:int=0
+    }
     // Methods and lifecycle callbacks use the existing class DSL.
 }
 ```
+
+See [declaration groups](DSLDeclarationGroups.md) for grouped metadata and grammar limits. Individual annotations remain supported.
 
 Name comes from Behavior; source and class come from the imported reference type.
 There are no name/script/type strings in the Actor's component declaration.
@@ -75,3 +76,5 @@ ue_component_types.das and dsl_component_behavior.das under Content/Das/Scripts.
 Validation: [ComponentFieldsValidation](ComponentFieldsValidation.md).
 
 Direct component field access is supported; see [DSLComponentFieldAccess](DSLComponentFieldAccess.md).
+
+Comments immediately above reflected declarations provide default `ToolTip` metadata; see [comment tooltips](DSLCommentTooltips.md). Explicit metadata takes priority.

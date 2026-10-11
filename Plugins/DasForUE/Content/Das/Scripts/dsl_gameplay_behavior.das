@@ -3,10 +3,11 @@ require ue_gameplay_refs
 
 [ue_class(module_id="gameplaydemo",parent="ActorComponent",Blueprintable)]
 class GameplayBehavior {
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    Seconds:float=0.0
-    @ue_property=(EditAnywhere,BlueprintReadWrite)
-    SignalCount:int=0
+    properties = ue_properties(EditAnywhere, BlueprintReadWrite) {
+        // Время работы компонента в секундах.
+        var Seconds:float=0.0
+        var SignalCount:int=0
+    }
 
     def BeginPlay():void {
         ue_timer_start("score",1.0,"Pulse",true,1)
