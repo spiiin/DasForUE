@@ -204,7 +204,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
             UClass* Class = FindObject<UClass>(nullptr, *ClassPath);
             UFunction* Function = Class && FunctionName.Len() < NAME_SIZE ? Class->FindFunctionByName(FName(*FunctionName)) : nullptr;
             if (!Function || (!Function->HasAnyFunctionFlags(FUNC_BlueprintCallable) && !(Cast<UDasAuthoredInterfaceClass>(Class) && Function->HasAnyFunctionFlags(FUNC_BlueprintEvent))) ||
-                Function->HasAnyFunctionFlags(FUNC_Static | FUNC_Net | FUNC_Delegate | FUNC_MulticastDelegate))
+                Function->HasAnyFunctionFlags(FUNC_Net | FUNC_Delegate | FUNC_MulticastDelegate))
             { ExportPolicyError(TEXT("Expected loaded class and local BlueprintCallable instance function: ") + ClassPath + TEXT(".") + FunctionName); }
 #if WITH_EDITOR
             if (Function->HasMetaData(TEXT("Latent")) || Function->HasMetaData(TEXT("CustomThunk"))) ExportPolicyError(TEXT("requires_special_call_adapter"));
@@ -213,6 +213,13 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
             if (!bAllowInternal && Function->HasMetaData(TEXT("BlueprintInternalUseOnly"))) ExportPolicyError(TEXT("internal_function"));
 #endif
             if(Class->HasAnyClassFlags(CLASS_Interface) && (!Function->GetOuterUClass()->HasAnyClassFlags(CLASS_Interface) || !Function->HasAnyFunctionFlags(FUNC_BlueprintEvent)))ExportPolicyError(TEXT("requires_reflected_interface_method"));
+            const bool bStatic=Function->HasAnyFunctionFlags(FUNC_Static);
+            if(bStatic && (!Class->IsChildOf(UBlueprintFunctionLibrary::StaticClass()) || !Function->HasAnyFunctionFlags(FUNC_Native)))ExportPolicyError(TEXT("requires_native_function_library"));
+            FString WorldContext;
+#if WITH_EDITOR
+            WorldContext=Function->GetMetaData(TEXT("WorldContext")).ToLower();
+#endif
+            if(!WorldContext.IsEmpty()){if(!bStatic)ExportPolicyError(TEXT("instance_world_context_requires_adapter"));StaticWorldParameter(Function,WorldContext,&Context);}
             auto Signature = DescribeCall(Function, &Context);
             AddClass(Class);
             auto Item = MakeShared<FJsonObject>();
@@ -222,6 +229,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
             Item->SetStringField(TEXT("signature"), CallSignatureKey(Function));
             Item->SetObjectField(TEXT("metadata"), ExportMetadata(Function));
             Item->SetStringField(TEXT("declaring_class"), Function->GetOuterUClass()->GetPathName());
+            if(bStatic){Item->SetBoolField(TEXT("static"),true);Item->SetStringField(TEXT("world_context"),WorldContext);}
             Item->SetBoolField(TEXT("pure"), Function->HasAnyFunctionFlags(FUNC_BlueprintPure));
             Item->SetBoolField(TEXT("const"), Function->HasAnyFunctionFlags(FUNC_Const));
             TArray<TSharedPtr<FJsonValue>> Fields;

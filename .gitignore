@@ -21,3 +21,5 @@ __pycache__/
 /Plugins/DasForUE/Content/Das/Scripts/dsl_registered_methodvalues_*.das
 /Tests/DasForUESmoke/Content/DasActorComponent/
 /Tests/DasForUESmoke/Content/DasDelegates/
+
+/Tests/DasForUESmoke/Content/DasCookedGameplay/

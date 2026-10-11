@@ -53,3 +53,5 @@ Pending checks: zero/all captured value overloads; source forward declarations;
 real next-tick timing, callback rearm and interval/next-tick replacement; pause and
 elapsed behavior for pending handles; cancel-all owner/world isolation; cancelled
 queued IDs; limits/error preservation; reload/teardown, PIE and packaged Development.
+
+2026-10-11 validation: cancellation, typed Vector2D capture and owner-Destroy cleanup passed in actual PIE and packaged Development. See [AccumulatedValidation.md](AccumulatedValidation.md) for the exact scope. The initial untested status above is historical.

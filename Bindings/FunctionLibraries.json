@@ -1,0 +1,29 @@
+{
+  "functions": [
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Abs",
+      "alias": "ue_lib_Abs"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "GetTimeSeconds",
+      "alias": "ue_lib_Time"
+    },
+    {
+      "class": "/Script/DasRuntime.DasFunctionLibraryFixture",
+      "function": "Add",
+      "alias": "ue_lib_Add"
+    },
+    {
+      "class": "/Script/DasRuntime.DasFunctionLibraryFixture",
+      "function": "IsContextActor",
+      "alias": "ue_lib_Context"
+    },
+    {
+      "class": "/Script/DasRuntime.DasFunctionLibraryFixture",
+      "function": "ContextWorldId",
+      "alias": "ue_lib_WorldId"
+    }
+  ]
+}

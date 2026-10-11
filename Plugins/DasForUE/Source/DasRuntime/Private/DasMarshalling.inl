@@ -150,6 +150,38 @@
         return Key;
     }
 
+    FObjectProperty* StaticWorldParameter(UFunction* Function,const FString& Name,das::Context* Context)
+    {
+        if(Name.IsEmpty())return nullptr;
+        auto* P=FindFProperty<FObjectProperty>(Function,*Name);
+        if(!P || CastField<FClassProperty>(P) || P->ArrayDim!=1 || !P->HasAnyPropertyFlags(CPF_Parm) || P->HasAnyPropertyFlags(CPF_ReturnParm) || (P->HasAnyPropertyFlags(CPF_OutParm|CPF_ReferenceParm) && !P->HasAnyPropertyFlags(CPF_ConstParm)))Context->throw_error("WorldContext must name an input object parameter");
+        return P;
+    }
+    FDasCallHandle BeginStaticCall(const char* Path,const char* Name,const char* WorldParameter,das::Context* Context)
+    {
+        RequireObjectContext(Context);
+        if(ActiveContext->bCollectingSubscriptions)Context->throw_error("UFunction calls are forbidden in bind_events");
+        const FString ClassPath=Path?UTF8_TO_TCHAR(Path):TEXT("");
+        auto* Class=FindObject<UClass>(nullptr,*ClassPath);
+        if(!ClassPath.StartsWith(TEXT("/Script/")) || !Class || !Class->IsChildOf(UBlueprintFunctionLibrary::StaticClass()))Context->throw_error("expected loaded native BlueprintFunctionLibrary");
+        if(!Name || !*Name || FCStringAnsi::Strlen(Name)>=NAME_SIZE)Context->throw_error("invalid static function name");
+        auto* Function=Class->FindFunctionByName(FName(UTF8_TO_TCHAR(Name)));
+        if(!Function || !Function->HasAllFunctionFlags(FUNC_Static|FUNC_Native|FUNC_BlueprintCallable) || Function->HasAnyFunctionFlags(FUNC_Net|FUNC_Delegate|FUNC_MulticastDelegate))Context->throw_error("expected local native static BlueprintCallable library function");
+        const FString WorldName=WorldParameter?UTF8_TO_TCHAR(WorldParameter):TEXT("");
+#if WITH_EDITOR
+        if(Function->HasMetaData(TEXT("Latent")) || Function->HasMetaData(TEXT("CustomThunk")))Context->throw_error("static function needs a special call adapter");
+        if(Function->GetMetaData(TEXT("WorldContext")).ToLower()!=WorldName.ToLower())Context->throw_error("WorldContext contract changed; regenerate bindings");
+#endif
+        auto* WorldProperty=StaticWorldParameter(Function,WorldName,Context);
+        UObject* WorldObject=nullptr;UWorld* World=nullptr;
+        if(WorldProperty){WorldObject=ResolveSelf(Context);World=GEngine?GEngine->GetWorldFromContextObject(WorldObject,EGetWorldErrorMode::ReturnNull):nullptr;if(!World || !World->IsGameWorld() || !WorldObject->IsA(WorldProperty->PropertyClass))Context->throw_error("WorldContext requires script owner's live game world and compatible object");}
+        auto Signature=DescribeCall(Function,Context);
+        if(ActiveContext->Calls.Num()>=256)Context->throw_error("call frame limit reached");
+        auto Call=MakeShared<FMarshalledCall>();Call->Signature=MoveTemp(Signature);Call->SignatureKey=CallSignatureKey(Function);Call->Target=Class->GetDefaultObject();Call->Function.Reset(Function);Call->Frame=MakeUnique<FStructOnScope>(Function);
+        if(WorldProperty){WorldProperty->SetObjectPropertyValue_InContainer(Call->Frame->GetStructMemory(),WorldObject);Call->AutomaticWorldContext=WorldProperty->GetName().ToLower();Call->StaticWorld=World;Call->Assigned.Add(Call->AutomaticWorldContext);Call->ObjectPins.Add(Call->AutomaticWorldContext,TStrongObjectPtr<UObject>(WorldObject));}
+        const uint64 Token=NextCallHandle++;ActiveContext->Calls.Add(Token,MoveTemp(Call));return {Token};
+    }
+
     FDasCallHandle BeginCall(const FDasObjectHandle& Target, const char* Name, das::Context* Context)
     {
         UObject* Object = ResolveObject(Target, Context);
@@ -197,6 +229,7 @@
         if (Call.bFailed) Context->throw_error("call failed; results are unavailable");
         if (Call.bExecuted != bOutput) Context->throw_error("arguments require a pending call; results require an executed call");
         if (!Path || !*Path) Context->throw_error("parameter path is empty");
+        if(!bOutput && !Call.AutomaticWorldContext.IsEmpty() && Call.AutomaticWorldContext.Equals(UTF8_TO_TCHAR(Path),ESearchCase::IgnoreCase))Context->throw_error("automatic WorldContext cannot be overridden");
         TArray<FString> Parts;
         FString(UTF8_TO_TCHAR(Path)).ParseIntoArray(Parts, TEXT("."), false);
         UStruct* Type = Call.Function.Get();
@@ -516,6 +549,11 @@
             Context->throw_error("call target expired");
         if(!Call.InterfaceSignatureKey.IsEmpty()){auto* Interface=Call.RequiredInterface.Get();auto* Declared=Interface?Interface->FindFunctionByName(Call.Function->GetFName()):nullptr;if(!Interface || !Object->GetClass()->ImplementsInterface(Interface) || !Declared || CallSignatureKey(Declared)!=Call.InterfaceSignatureKey || !Call.Function->IsSignatureCompatibleWith(Declared))Context->throw_error("interface contract changed; create a new interface frame");}
         if (!Call.DelegateInvoke && Object->FindFunction(Call.Function->GetFName()) != Call.Function.Get()) Context->throw_error("UFunction changed; create a new call frame");
+        if(!Call.AutomaticWorldContext.IsEmpty()){
+            auto* Self=ResolveSelf(Context);auto* World=GEngine?GEngine->GetWorldFromContextObject(Self,EGetWorldErrorMode::ReturnNull):nullptr;
+            auto* P=StaticWorldParameter(Call.Function.Get(),Call.AutomaticWorldContext,Context);
+            if(!World || !World->IsGameWorld() || World!=Call.StaticWorld.Get() || P->GetObjectPropertyValue_InContainer(Call.Frame->GetStructMemory())!=Self)Context->throw_error("WorldContext expired or changed before invocation");
+        }
         auto WholeInput=[&](const FString& Path){for(const auto& Root:Call.WholeInputs)if(Path==Root || Path.StartsWith(Root+TEXT(".")))return true;return false;};
         for (const auto& Parameter : Call.Signature)
             if (Parameter.bInput && !WholeInput(Parameter.Path) && !Parameter.Path.Contains(TEXT(".*")) && !Call.Assigned.Contains(Parameter.Path))

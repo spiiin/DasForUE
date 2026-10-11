@@ -2149,3 +2149,10 @@ ref/out signatures and VS Code handler generation remain separate. See
 
 ### Actor/component queries by type (2026-10-11)
 Added ue_actor_find/find_all and ue_component_find/find_all for native subclasses and authored stable IDs. First is nullable; all materializes an ordinary typed DAS array using temporary weak snapshots, reclaimed on success and error. Queries stay in the owner's game world; component owner must be in that world. SpawnPIE passed missing/multiple matches, native+authored types, same-type Actor in foreign world, rejected foreign component owner, stale array entries and 70 interrupted snapshots. Ordering is unspecified; tags/radius/interface queries, class-handle filters and reflected result arrays remain deferred.
+
+### Blueprint Function Libraries (2026-10-11)
+Native static BlueprintCallable library functions now export and generate free DAS wrappers with signature checks. WorldContext is recorded in IR, omitted from wrapper inputs and automatically filled/pinned from script owner; override/mismatched/stale contexts are rejected. FunctionLibraries.PIE passed engine+user C++ functions, two distinct worlds, pure worldless calls, world-required rejection and cleanup. Generator: 90 tests PASS; export policy: 9 checks PASS. Latent/CustomThunk, unsupported parameter shapes, Blueprint-authored libraries and packaged validation remain separate. See DSLFunctionLibraries.md.
+
+### Accumulated validation and cooked gameplay — 2026-10-11
+
+Editor/foundation, 19 gameplay DSL fixtures, 90 generator tests, real PIE suites and packaged Development passed. Fixed class-reference Blueprint pins and cooked SCS root restoration; added reproducible cooked gameplay/map export coverage. See [AccumulatedValidation.md](AccumulatedValidation.md).

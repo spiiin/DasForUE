@@ -69,3 +69,5 @@ see ManagedTimerArguments.md. Earlier no-argument limits describe the initial sl
 
 Named next-tick scheduling, paused/elapsed queries and session cancel-all were
 added subsequently (validation pending); see ManagedNextTickTimers.md.
+
+2026-10-11: repeating, one-shot array capture, next-tick Vector2D capture, cancellation, owner isolation and Destroy/EndPIE cleanup passed in real PIE and packaged Development. Other earlier pending timer edge cases remain targeted future checks; see [AccumulatedValidation.md](AccumulatedValidation.md).

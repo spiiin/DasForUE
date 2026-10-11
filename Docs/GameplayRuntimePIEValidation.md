@@ -36,3 +36,5 @@ Remaining validation: legacy/Enhanced Input dispatch, mapping-context ownership
 and restoration, accepted/rejected reload of these managed operations, async
 failure/class-mismatch/cancellation, and cooked gameplay execution. This test
 does not turn GameplayDemo's source/setup manifest into a playable map.
+
+2026-10-11: rerun passed after class-pin and cooked-root fixes. Packaged gameplay coverage now also passes; see [AccumulatedValidation.md](AccumulatedValidation.md).

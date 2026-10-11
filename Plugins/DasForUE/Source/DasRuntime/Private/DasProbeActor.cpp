@@ -18,6 +18,17 @@ ADasProbeActor::ADasProbeActor()
 void ADasProbeActor::OnConstruction(const FTransform& Transform)
 {
     Super::OnConstruction(Transform);
+    ApplyDasSceneRoot();
+}
+void ADasProbeActor::PostInitializeComponents()
+{
+    Super::PostInitializeComponents();
+    // Loaded/cooked level actors do not necessarily run OnConstruction. Promote
+    // the declared SCS root after components have been restored and initialized.
+    ApplyDasSceneRoot();
+}
+void ADasProbeActor::ApplyDasSceneRoot()
+{
     if(DasSceneRootProperty.IsNone())return;
     auto* Property=FindFProperty<FObjectProperty>(GetClass(),DasSceneRootProperty);
     auto* Scene=Property?Cast<USceneComponent>(Property->GetObjectPropertyValue_InContainer(this)):nullptr;

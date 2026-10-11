@@ -160,3 +160,5 @@ typed foreign accessors and asset reopening in a new process. Validation results
 are recorded after the final run below.
 
 Final validation (2026-10-11, UE 5.8.3): TestEditor.ps1 — build succeeded, DAS_FOUNDATION_RESULT=PASS failures=0, including all six new delegate checks and both bound-factory target forms. TestAuthoredDelegates.ps1 — Create and Reopen in separate processes passed; actual Blueprint handler execution, DAS/native dispatch, unique registration, individual removal, native Broadcast and typed foreign accessors passed. Packaged execution, a Level Blueprint binding-node graph, structural migration and replacement-specific regression tests were not run for this step. Existing object-replacement handling also remaps stored delegate weak targets/views.
+
+2026-10-11 accumulated validation: editor/create/reopen, actual Blueprint handlers and packaged authored dispatcher add/broadcast/remove all passed. See [AccumulatedValidation.md](AccumulatedValidation.md).

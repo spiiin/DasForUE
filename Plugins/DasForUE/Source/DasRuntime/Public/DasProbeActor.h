@@ -93,6 +93,7 @@ public:
     virtual void EndPlay(const EEndPlayReason::Type Reason) override;
     virtual void Destroyed() override;
     virtual void OnConstruction(const FTransform& Transform) override;
+    virtual void PostInitializeComponents() override;
     UPROPERTY() FName DasSceneRootProperty;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="daScript Probe")
     TObjectPtr<AActor> Peer;
@@ -115,6 +116,7 @@ private:
     friend class FDasRuntimeModule;
     FString ActiveLifecyclePath;
     bool bLifecycleActive = false;
+    void ApplyDasSceneRoot();
     void RecordLifecycleResult(const struct FDasExecutionResult& Result);
 
 };

@@ -128,6 +128,17 @@ def generate(ir, module="ue_generated", source_types=None):
         for key in ('class', 'function', 'signature'):
             if not isinstance(fn[key], str) or not fn[key]:
                 raise ValueError('Missing ' + key)
+        if type(fn.get('static', False)) is not bool: raise ValueError('static marker must be boolean')
+        world_context = fn.get('world_context', '')
+        if not isinstance(world_context, str) or (world_context and not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', world_context)): raise ValueError('Invalid WorldContext name')
+        if world_context and not fn.get('static', False): raise ValueError('WorldContext requires static function')
+        if fn.get('static', False):
+            library = fn['class']
+            while library and library != '/Script/Engine.BlueprintFunctionLibrary': library = classes.get(library, '')
+            if not library: raise ValueError('Static call requires BlueprintFunctionLibrary class')
+        if world_context:
+            contexts = [p for p in fn['parameters'] if p['path'] == world_context]
+            if len(contexts) != 1 or contexts[0]['kind'] != 'object' or not contexts[0]['input'] or contexts[0]['output']: raise ValueError('WorldContext must name one input object parameter')
         names = set()
         for field in fn['fields']:
             name = ident(field['path'])
@@ -579,14 +590,17 @@ def generate(ir, module="ue_generated", source_types=None):
             lines.append(indent + target + ' = ' + value)
     for fn in sorted(ir['functions'], key=lambda item: item['alias']):
         alias, params_ir = fn['alias'], fn['parameters']
-        inputs = [p for p in params_ir if p['input']]
+        inputs = [p for p in params_ir if p['input'] and p['path'] != fn.get('world_context', '')]
         outputs = [p for p in params_ir if p['output']]
         result_type = alias + '_Result' if len(outputs) > 1 else typ(outputs[0]) if outputs else ''
         if len(outputs) > 1:
             lines += [f'struct {result_type} {{'] + [f'    out_{ident(p["path"])} : {typ(p)}' for p in outputs] + ['}', '']
-        params = ['target : ' + class_name(fn['class'])] + [f'arg_{ident(p["path"])} : {typ(p)}' + (' = ' + defaults[(alias, p['path'])] if (alias, p['path']) in defaults else '') for p in inputs]
+        params = ([] if fn.get('static', False) else ['target : ' + class_name(fn['class'])]) + [f'arg_{ident(p["path"])} : {typ(p)}' + (' = ' + defaults[(alias, p['path'])] if (alias, p['path']) in defaults else '') for p in inputs]
         lines += [f'def {alias}(' + '; '.join(params) + ')' + (f' : {result_type}' if result_type else '') + ' {']
-        if fn['class'] in interfaces:
+        if fn.get('static', False):
+            lines += [f'    let call = ue_begin_static_call({quote(fn["class"])}, {quote(fn["function"])}, {quote(fn.get("world_context", ""))})',
+                      f'    ue_expect_signature(call, {quote(fn["signature"])})']
+        elif fn['class'] in interfaces:
             lines += [f'    let receiver = {class_name(fn["class"])}_raw(target)',
                       f'    let call = ue_begin_interface_call(receiver, {quote(fn["class"])}, {quote(fn["function"])})',
                       f'    ue_expect_interface_signature(call, {quote(fn["signature"])})']

@@ -19,6 +19,44 @@ class GeneratorTests(unittest.TestCase):
         self.ir['structs'].reverse()
         self.ir['classes'].reverse()
         self.assertEqual(generate(self.ir), expected)
+    def static_fixture(self):
+        fn = self.ir['functions'][0]
+        library = '/Script/Test.Library'
+        self.ir['classes'].extend([dict(type_path='/Script/Engine.BlueprintFunctionLibrary', parent='/Script/CoreUObject.Object'), dict(type_path=library, parent='/Script/Engine.BlueprintFunctionLibrary')])
+        fn.update({'static': True, 'world_context': '', 'class': library})
+        return fn
+    def test_static_library_has_no_receiver(self):
+        fn = self.static_fixture()
+        body = generate(self.ir).split('def ' + fn['alias'] + '(', 1)[1].split('\n}\n', 1)[0]
+        self.assertNotIn('target :', body)
+        self.assertIn('ue_begin_static_call(', body)
+        self.assertIn('ue_expect_signature(', body)
+    def test_world_context_is_hidden_from_wrapper_inputs(self):
+        fn = self.static_fixture()
+        field = dict(path='world', kind='object', type_path='/Script/CoreUObject.Object', input=True, output=False)
+        fn['parameters'].insert(0, field.copy())
+        fn['fields'].insert(0, field.copy())
+        fn['world_context'] = 'world'
+        body = generate(self.ir).split('def ' + fn['alias'] + '(', 1)[1].split('\n}\n', 1)[0]
+        self.assertNotIn('arg_world', body)
+        self.assertIn('"world")', body)
+    def test_world_context_requires_input_only_object(self):
+        fn = self.static_fixture()
+        field = dict(path='world', kind='object', type_path='/Script/CoreUObject.Object', input=True, output=True)
+        fn['parameters'].insert(0, field.copy())
+        fn['fields'].insert(0, field.copy())
+        fn['world_context'] = 'world'
+        with self.assertRaisesRegex(ValueError, 'WorldContext'): generate(self.ir)
+    def test_static_on_nonlibrary_rejected(self):
+        self.ir['functions'][0]['static'] = True
+        with self.assertRaisesRegex(ValueError, 'BlueprintFunctionLibrary'): generate(self.ir)
+    def test_invalid_world_context_rejected(self):
+        fn = self.static_fixture()
+        fn['world_context'] = 'missing'
+        with self.assertRaisesRegex(ValueError, 'WorldContext'): generate(self.ir)
+    def test_static_marker_requires_boolean(self):
+        self.ir['functions'][0]['static'] = 'yes'
+        with self.assertRaisesRegex(ValueError, 'static marker'): generate(self.ir)
     def test_native_object_metadata_and_short_alias(self):
         text = generate(self.ir)
         self.assertIn('[ue_native_object(path="/Script/Engine.Actor")]', text)

@@ -17,6 +17,8 @@
 #include "Engine/LatentActionManager.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
+#include "Engine/Engine.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "EngineUtils.h"
 #include "DasSourceCatalog.h"
 #include "DasAuthoredInterfaceClass.h"
@@ -213,6 +215,8 @@ namespace
         TMap<FString, TSharedPtr<FPendingHash>> PendingHashes;
         TMap<FString, TArray<int32>> HashIndices;
         TFunction<void(void*)> DelegateInvoke;
+        FString AutomaticWorldContext;
+        TWeakObjectPtr<UWorld> StaticWorld;
         bool bAuthored = false;
         bool bExecuted = false;
         bool bFailed = false;
@@ -1415,6 +1419,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             das::addExtern<DAS_BIND_FUN(MethodResultenum)>(*this,Library,"__ue_method_result_enum",das::SideEffects::modifyExternal,"MethodResultenum");
             das::addExtern<DAS_BIND_FUN(MethodArgstruct)>(*this,Library,"__ue_method_arg_struct",das::SideEffects::modifyExternal,"MethodArgstruct");
             das::addExtern<DAS_BIND_FUN(MethodResultstruct),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_method_result_struct",das::SideEffects::modifyExternal,"MethodResultstruct")->needCallerStackFrame=true;
+            das::addExtern<DAS_BIND_FUN(BeginStaticCall),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"ue_begin_static_call",das::SideEffects::modifyExternal,"BeginStaticCall");
             das::addExtern<DAS_BIND_FUN(BeginCall), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_begin_call", das::SideEffects::modifyExternal, "BeginCall");
             das::addExtern<DAS_BIND_FUN(InvokeCall)>(*this, Library, "ue_invoke_call", das::SideEffects::modifyExternal, "InvokeCall");
             das::addExtern<DAS_BIND_FUN(ReleaseCall)>(*this, Library, "ue_release_call", das::SideEffects::modifyExternal, "ReleaseCall");

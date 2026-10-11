@@ -35,3 +35,4 @@ Source: `Plugins/DasForUE/Content/Das/Scripts/dsl_native_components.das`.
 Reports: `logs/native-components-report/index.json`, `logs/native-components.log`.
 
 Remaining authorized roadmap: component template defaults (including a deliberate policy for method calls), general typed component lookup/create/GetOrCreate, Actor spawn and class references, all-Actor/component queries, user ConstructionScript, broader native/authored inheritance and OverrideComponent. Existing component structural migration guards remain active.
+2026-10-11: accumulated validation passed native/dynamic/actor-component PIE and cooked native/authored templates, root, attachments and component lifecycle. Loaded cooked actors now restore the declared root in PostInitializeComponents. See [AccumulatedValidation.md](AccumulatedValidation.md).

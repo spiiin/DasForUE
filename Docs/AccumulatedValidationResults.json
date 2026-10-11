@@ -1,0 +1,58 @@
+{
+  "native-components-report": {
+    "reportCreatedOn": "2026.10.11-14.58.20",
+    "succeeded": 1,
+    "succeededWithWarnings": 0,
+    "failed": 0,
+    "notRun": 0
+  },
+  "gameplay-runtime-pie-report": {
+    "reportCreatedOn": "2026.10.11-14.58.41",
+    "succeeded": 1,
+    "succeededWithWarnings": 0,
+    "failed": 0,
+    "notRun": 0
+  },
+  "dynamic-components-pie-report": {
+    "reportCreatedOn": "2026.10.11-14.59.02",
+    "succeeded": 1,
+    "succeededWithWarnings": 0,
+    "failed": 0,
+    "notRun": 0
+  },
+  "class-property-reload-report": {
+    "reportCreatedOn": "2026.10.11-14.59.16",
+    "succeeded": 1,
+    "succeededWithWarnings": 0,
+    "failed": 0,
+    "notRun": 0
+  },
+  "actor-spawn-pie-report": {
+    "reportCreatedOn": "2026.10.11-14.59.38",
+    "succeeded": 1,
+    "succeededWithWarnings": 0,
+    "failed": 0,
+    "notRun": 0
+  },
+  "actor-component-pie-report": {
+    "reportCreatedOn": "2026.10.11-14.59.59",
+    "succeeded": 1,
+    "succeededWithWarnings": 0,
+    "failed": 0,
+    "notRun": 0
+  },
+  "method-dispatch-pie-report": {
+    "reportCreatedOn": "2026.10.11-15.00.56",
+    "succeeded": 1,
+    "succeededWithWarnings": 0,
+    "failed": 0,
+    "notRun": 0
+  },
+  "function-libraries-report": {
+    "reportCreatedOn": "2026.10.11-15.01.23",
+    "succeeded": 1,
+    "succeededWithWarnings": 0,
+    "failed": 0,
+    "notRun": 0
+  }
+}
