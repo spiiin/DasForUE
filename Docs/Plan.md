@@ -2217,3 +2217,62 @@ reopening, optional execution and multicast ref are covered. See
 [DSLAuthoredDelegates.md](DSLAuthoredDelegates.md).
 
 Final validation passed: foundation with zero failures, method-dispatch regression PIE, gameplay PIE and packaged Development ref/out scenarios (NullRHI).
+
+
+### Authored class inheritance / Super: first slice — 2026-10-11
+
+Added class Child : Parent for ue_class declarations, parent_id plus owned IR
+members, effective-view resolution with conflict/override checks, canonical parent
+Blueprint assets and owned-only child emission. Super.Method explicitly dispatches
+to the parent's UFunction on the same object. Typed base accessors accept descendant
+CDO identities. Imported generated functions now clear isClassMethod when detached
+from classParent, fixing a null-parent crash during module symbol-use analysis.
+
+Actor Create/Reopen and foundation scenarios passed, including inherited fields,
+event override, parent invocation once, inherited callable and a typed base reference.
+Details and limits: [DSLInheritance.md](DSLInheritance.md). Remaining inheritance
+work: inherited-component scenarios, lifecycle/constructor chaining, script-only
+helpers, richer parent asset selection and ancestor-aware query/class-handle filters.
+Structural hierarchy migration remains deferred.
+
+Final first-slice validation passed: foundation (zero failures), fresh-process Create/Reopen, method-dispatch regression PIE, gameplay PIE and packaged Development inheritance/Super scenario (NullRHI).
+
+### Inherited components and parent lifecycle — 2026-10-11
+
+Added inherited SCS/root composition and authored ActorComponent descendants as
+component field types. Parent source is retained in IR instead of inferred from an
+owned method. Lifecycle callbacks can override parent hooks, call Super explicitly,
+or inherit omitted hooks through generated forwarding entries. Parent calls use
+separate sessions on the same UObject; destruction and repeated BeginPlay retain
+delivery guards. Inherited editable component defaults resolve through ancestors.
+
+Remaining inheritance work: adding/overriding child component nodes, managed event
+subscription policy, script-only helpers/constructors, arbitrary parent asset
+selection and ancestor-aware queries/class handles. Hierarchy migration stays
+deferred. Details: [DSLInheritance.md](DSLInheritance.md).
+
+Validation passed: foundation, Create/Reopen, PIE without warnings, native-component regression and packaged Development, including Tick-only inheritance. Fixed a PIE duplication cycle involving the native fallback root.
+
+### New components in authored child classes — 2026-10-11
+
+Added owned-only child SCS emission with implicit inherited-root attachment and
+explicit attachment to inherited/owned scene nodes. Cross-Blueprint attachments
+use USCS_Node::SetParent; inherited graphs are not modified. Root/count/cycle and
+member-conflict checks operate on the effective class. Updated lifecycle example
+adds two native scene nodes and another derived authored ActorComponent with an
+independent template default. Replacing inherited nodes and composition migration
+remain deferred.
+
+Validation of new child components passed: foundation (zero failures), fresh-process Create/Reopen, PIE (one success, zero warnings/errors) and packaged Development. Both inherited/owned scene attachments, separate authored-component template defaults and BeginPlay/EndPlay delivery are covered.
+
+### Defaults for inherited component templates — 2026-10-11
+
+The existing ue_defaults syntax now distinguishes owned templates from inherited
+component overrides. IR stores component_overrides by inherited stable ID and
+merges effective defaults without changing parent declarations. Editor uses
+InheritableComponentHandler/FComponentKey templates; parent SCS nodes are untouched.
+Native values and authored editable scalars share existing preflight checks.
+Changing component type/topology, inherited field metadata and migration of existing
+composition/override declarations remain deferred.
+
+Inherited-default override validation passed: foundation with zero failures, PIE with one successful test and zero warnings/errors, fresh-process Create/Reopen and packaged Development. Parent templates retain Bonus=42 and native visibility; the child gets Bonus=55 and bHiddenInGame=true while its owned ExtraBehavior retains Bonus=77. The PIE launcher now waits for the editor process itself instead of persistent helper descendants.

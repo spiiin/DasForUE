@@ -15,12 +15,12 @@ int32 Int(UObject* O,const TCHAR* N){auto* P=O?FindFProperty<FIntProperty>(O->Ge
 bool Bool(UObject* O,const TCHAR* N){auto* P=O?FindFProperty<FBoolProperty>(O->GetClass(),N):nullptr;return P && P->GetPropertyValue_InContainer(O);}
 UObject* Object(UObject* O,const TCHAR* N){auto* P=O?FindFProperty<FObjectProperty>(O->GetClass(),N):nullptr;return P?P->GetObjectPropertyValue_InContainer(O):nullptr;}
 struct FCookedGameplayState {
- TWeakObjectPtr<UWorld> World;TWeakObjectPtr<ADasProbeActor> First,Second,Native,Delegate,Single;
+ TWeakObjectPtr<UWorld> World;TWeakObjectPtr<ADasProbeActor> First,Second,Native,Delegate,Single,Inherited,Life,TickOnly;
  TStrongObjectPtr<ADasProbeActor> Destroyed;
  double Started=FPlatformTime::Seconds();float StoppedAt=0;int32 Phase=0,Pulses=0,DestroyedPulses=0;bool Good=true;
  void Check(bool OK,const TCHAR* Name){Good &= OK;UE_LOG(LogTemp,Display,TEXT("DAS_COOKED_GAMEPLAY %s %s"),OK?TEXT("PASS"):TEXT("FAIL"),Name);}
  void Call(ADasProbeActor* O,const TCHAR* Name,int32 Value=0){auto* F=O?O->FindFunction(Name):nullptr;Check(F!=nullptr,Name);if(F)O->ProcessEvent(F,F->NumParms?&Value:nullptr);}
- bool Finish(){auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));for(auto* O:{First.Get(),Second.Get(),Native.Get(),Delegate.Get(),Single.Get()})if(O){R.ReleaseObject(O);O->Destroy();}Destroyed.Reset();Check(R.PersistentContextCount(World.Get())==0,TEXT("all_contexts_released"));UE_LOG(LogTemp,Display,TEXT("DAS_COOKED_GAMEPLAY_RESULT=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);return false;}
+ bool Finish(){auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));for(auto* O:{First.Get(),Second.Get(),Native.Get(),Delegate.Get(),Single.Get(),Inherited.Get(),Life.Get(),TickOnly.Get()})if(O){R.ReleaseObject(O);O->Destroy();}Destroyed.Reset();Check(R.PersistentContextCount(World.Get())==0,TEXT("all_contexts_released"));UE_LOG(LogTemp,Display,TEXT("DAS_COOKED_GAMEPLAY_RESULT=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);return false;}
  bool Tick(float){
   auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));auto* W=World.Get();auto* A=First.Get();auto* B=Second.Get();
   if(FPlatformTime::Seconds()-Started>60){Check(false,TEXT("timeout"));if(A)UE_LOG(LogTemp,Error,TEXT("%s"),*A->LastDasError);return Finish();}
@@ -35,10 +35,23 @@ struct FCookedGameplayState {
    const auto DelegateMethods=R.RunNamedPersistent(R.ScriptPath(TEXT("single_delegate_reference_probe.das")),TEXT("method_probe"),2,Single.Get());Check(DelegateMethods.bSucceeded && DelegateMethods.Value==14,TEXT("single_delegate_method_parameter_and_result"));
    int32 DelegateRefValue=0;if(auto* Fn=Single->FindFunction(TEXT("ProbeRefOut")))Single->ProcessEvent(Fn,&DelegateRefValue);Check(DelegateRefValue==30 && Single->LastDasError.IsEmpty(),TEXT("delegate_ref_out_and_multicast_ref"));
    int32 ArrayRef=0;if(auto* Fn=Single->FindFunction(TEXT("ProbeRefArray")))Single->ProcessEvent(Fn,&ArrayRef);Check(ArrayRef==1,TEXT("delegate_array_ref_out"));
+   struct FInheritanceArgs{int32 Input=2,Result=0;};FInheritanceArgs IA;auto* I=Inherited.Get();if(I)if(auto* Fn=I->FindFunction(TEXT("Probe")))I->ProcessEvent(Fn,&IA);Check(I && IA.Result==27 && I->LastDasError.IsEmpty(),TEXT("authored_inheritance_override_Super"));
+   auto* L=Life.Get();TStrongObjectPtr<ADasProbeActor> KeepLife(L);TStrongObjectPtr<UObject> LifeBehavior(Object(L,TEXT("Behavior")));
+   Check(L && Object(L,TEXT("Pivot"))==L->GetRootComponent() && Int(L,TEXT("BaseBegins"))==1 && Int(L,TEXT("ChildBegins"))==1 && Int(L,TEXT("BaseTicks"))>0,TEXT("inherited_actor_root_parent_BeginPlay_and_Tick"));
+   Check(L && L->GetRootComponent() && L->GetRootComponent()->bHiddenInGame,TEXT("inherited_native_template_override"));
+   Check(Int(LifeBehavior.Get(),TEXT("Bonus"))==55,TEXT("inherited_component_template_default"));
+   Check(Int(LifeBehavior.Get(),TEXT("BaseBegins"))==1 && Int(LifeBehavior.Get(),TEXT("ChildBegins"))==1 && Int(LifeBehavior.Get(),TEXT("BaseTicks"))>0 && Int(LifeBehavior.Get(),TEXT("BaseTicks"))==Int(LifeBehavior.Get(),TEXT("ChildTicks")),TEXT("inherited_component_parent_lifecycle"));
+   auto* Extension=Cast<USceneComponent>(Object(L,TEXT("Extension")));auto* Marker=Cast<USceneComponent>(Object(L,TEXT("Marker")));TStrongObjectPtr<UObject> ExtraBehavior(Object(L,TEXT("ExtraBehavior")));
+   Check(L && Extension && Marker && Extension->GetAttachParent()==L->GetRootComponent() && Marker->GetAttachParent()==Extension && Extension->GetRelativeLocation().Equals(FVector(0,0,25)),TEXT("derived_scene_attachment_and_defaults"));
+   Check(Int(ExtraBehavior.Get(),TEXT("Bonus"))==77 && Int(ExtraBehavior.Get(),TEXT("BaseBegins"))==1 && Int(ExtraBehavior.Get(),TEXT("ChildBegins"))==1,TEXT("derived_authored_component_defaults_and_lifecycle"));
+   if(L)L->Destroy();
+   Check(Int(ExtraBehavior.Get(),TEXT("BaseEnds"))==1 && Int(ExtraBehavior.Get(),TEXT("ChildEnds"))==1,TEXT("derived_component_EndPlay_once"));
+   Check(Int(L,TEXT("BaseEnds"))==1 && Int(L,TEXT("ChildEnds"))==1 && Int(LifeBehavior.Get(),TEXT("BaseEnds"))==1 && Int(LifeBehavior.Get(),TEXT("ChildEnds"))==1,TEXT("inherited_actor_component_EndPlay_once"));
+   Check(TickOnly.IsValid() && Int(TickOnly.Get(),TEXT("Ticks"))>0 && TickOnly->LastDasError.IsEmpty(),TEXT("inherited_Tick_without_BeginPlay_or_parent_UFunction"));
    Call(A,TEXT("Stop"));Pulses=Int(A,TEXT("Pulses"));Call(B,TEXT("ArmPending"));Destroyed.Reset(B);DestroyedPulses=Int(B,TEXT("Pulses"));B->Destroy();Check(R.SubscriptionCount(B)==0,TEXT("destroy_revokes_owner_subscriptions"));StoppedAt=W->GetTimeSeconds();Phase=1;return true;
   }
   if(W->GetTimeSeconds()-StoppedAt<0.2f)return true;Check(Int(A,TEXT("Pulses"))==Pulses && Int(Destroyed.Get(),TEXT("Pulses"))==DestroyedPulses && Int(Destroyed.Get(),TEXT("CancelledCalls"))==0,TEXT("timer_cancel_destroy_pending_cleanup"));return Finish();
  }
 };
 }
-void StartDasCookedGameplayValidation(){auto S=MakeShared<FCookedGameplayState>();for(const auto& C:GEngine->GetWorldContexts())if(auto* W=C.World();W && W->IsGameWorld()){S->World=W;for(TActorIterator<ADasProbeActor> It(W);It;++It){auto* A=*It;if(A->ActorHasTag(TEXT("GameplayFirst")))S->First=A;if(A->ActorHasTag(TEXT("GameplaySecond")))S->Second=A;if(A->ActorHasTag(TEXT("NativeOwner")))S->Native=A;if(A->ActorHasTag(TEXT("DelegateOwner")))S->Delegate=A;if(A->ActorHasTag(TEXT("SingleOwner")))S->Single=A;}}FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([S](float Delta){return S->Tick(Delta);}));}
+void StartDasCookedGameplayValidation(){auto S=MakeShared<FCookedGameplayState>();for(const auto& C:GEngine->GetWorldContexts())if(auto* W=C.World();W && W->IsGameWorld()){S->World=W;for(TActorIterator<ADasProbeActor> It(W);It;++It){auto* A=*It;if(A->ActorHasTag(TEXT("GameplayFirst")))S->First=A;if(A->ActorHasTag(TEXT("GameplaySecond")))S->Second=A;if(A->ActorHasTag(TEXT("NativeOwner")))S->Native=A;if(A->ActorHasTag(TEXT("DelegateOwner")))S->Delegate=A;if(A->ActorHasTag(TEXT("SingleOwner")))S->Single=A;if(A->ActorHasTag(TEXT("InheritedOwner")))S->Inherited=A;if(A->ActorHasTag(TEXT("LifeOwner")))S->Life=A;if(A->ActorHasTag(TEXT("TickOnlyOwner")))S->TickOnly=A;}}FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([S](float Delta){return S->Tick(Delta);}));}

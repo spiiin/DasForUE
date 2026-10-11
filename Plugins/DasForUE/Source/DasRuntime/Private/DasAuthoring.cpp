@@ -166,21 +166,14 @@ bool FDasAuthoringModule::Validate(FString& Error) const
     for (const auto& C : Classes)
     {
         if (C.NativeParent.IsEmpty() == C.ParentId.IsEmpty() || (!C.NativeParent.IsEmpty() && !NativePath(C.NativeParent)) || (!C.ParentId.IsEmpty() && !ClassIds.Contains(C.ParentId))) return Fail(Error,TEXT("Expected one valid parent for ")+C.Id);
+        if(!C.SourceScript.IsEmpty() && (FPaths::GetCleanFilename(C.SourceScript)!=C.SourceScript || !C.SourceScript.EndsWith(TEXT(".das")) || C.SourceScript.Contains(TEXT(":"))))return Fail(Error,TEXT("Invalid authored source filename"));
         if(C.Interfaces.Num()>16)return Fail(Error,TEXT("Interface count limit exceeded"));TSet<FString> SeenInterfaces;for(const auto& I:C.Interfaces){if((!I.StartsWith(TEXT("/Script/")) && !I.StartsWith(TEXT("/Game/"))) || !NativePath(I) || SeenInterfaces.Contains(I))return Fail(Error,TEXT("Invalid/duplicate native interface path"));SeenInterfaces.Add(I);}
         if (!MetadataValid(C.Metadata,Error)) return false;
         if (C.Properties.Num() > 1024 || C.Methods.Num() > 1024) return Fail(Error,TEXT("Declaration count limit exceeded"));
         TSet<FString> Names;
-        if(C.Components.Num()>32 || (!C.Components.IsEmpty() && C.NativeParent!=TEXT("/Script/Engine.Actor")))return Fail(Error,TEXT("Components require native Actor parent and at most 32 declarations"));
+        if(C.Components.Num()>32 || (!C.Components.IsEmpty() && !C.NativeParent.IsEmpty() && C.NativeParent!=TEXT("/Script/Engine.Actor")))return Fail(Error,TEXT("Components require native Actor parent and at most 32 declarations"));
         for(const auto& Component:C.Components){if(!AddId(Component.Id) || !Identifier(Component.Name) || Names.Contains(Component.Name.ToLower()) || (Component.NativeClass.IsEmpty() ? (!Identifier(Component.ClassName) || Component.ScriptFile.IsEmpty() || FPaths::GetCleanFilename(Component.ScriptFile)!=Component.ScriptFile || Component.ScriptFile.Contains(TEXT(":")) || !Component.ScriptFile.EndsWith(TEXT(".das"))) : (!Component.NativeClass.StartsWith(TEXT("/Script/")) || !NativePath(Component.NativeClass) || !Component.ScriptFile.IsEmpty() || !Component.ClassName.IsEmpty())))return Fail(Error,TEXT("Invalid/duplicate component declaration: ")+Component.Name);Names.Add(Component.Name.ToLower());if((Component.bEditable && Component.bVisible) || !MetadataValid(Component.Metadata,Error))return Fail(Error,TEXT("Invalid component metadata/visibility"));}
         for(const auto& Component:C.Components)if(!ValidateComponentDefaults(Component,Error))return false;
-        int32 Roots=0;
-        for(const auto& Component:C.Components){
-            if(Component.bRoot && (++Roots>1 || !Component.Attach.IsEmpty() || !Component.AttachSocket.IsEmpty()))return Fail(Error,TEXT("Expected one unattached root component"));
-            if(!Component.Attach.IsEmpty() && !Identifier(Component.Attach))return Fail(Error,TEXT("Invalid component attachment name"));
-            if(Component.AttachSocket.Len()>=NAME_SIZE)return Fail(Error,TEXT("Component socket name too long"));
-            TSet<FString> Visited;const FDasDeclaredComponent* Current=&Component;
-            while(Current){if(Visited.Contains(Current->Name))return Fail(Error,TEXT("Component attachment cycle"));Visited.Add(Current->Name);if(Current->Attach.IsEmpty())break;const FString Parent=Current->Attach;Current=C.Components.FindByPredicate([&](const auto& V){return V.Name==Parent;});if(!Current)return Fail(Error,TEXT("Unknown component attachment parent: ")+Parent);}
-        }
         for (const auto& P : C.Properties)
         {
             if (!AddId(P.Id) || !Identifier(P.Name) || Names.Contains(P.Name.ToLower())) return Fail(Error,TEXT("Invalid or duplicate property: ")+P.Name);
@@ -204,18 +197,7 @@ bool FDasAuthoringModule::Validate(FString& Error) const
         }
     }
     // Inheritance dependencies are acyclic; object references may legitimately point to self.
-    for (const auto& C : Classes)
-    {
-        TSet<FString> Chain, InheritedNames; const FDasDeclaredClass* Current = &C;
-        while (Current)
-        {
-            if (Chain.Contains(Current->Id)) return Fail(Error,TEXT("Inheritance cycle: ")+C.Id);
-            Chain.Add(Current->Id);
-            for (const auto& P : Current->Properties) { const FString N=P.Name.ToLower(); if (InheritedNames.Contains(N)) return Fail(Error,TEXT("Inherited member name conflict: ")+P.Name); InheritedNames.Add(N); }
-            for (const auto& M : Current->Methods) { const FString N=M.Name.ToLower(); if (InheritedNames.Contains(N)) return Fail(Error,TEXT("Inherited member name conflict: ")+M.Name); InheritedNames.Add(N); }
-            Current = Current->ParentId.IsEmpty() ? nullptr : Classes.FindByPredicate([&](const auto& P){return P.Id == Current->ParentId;});
-        }
-    }
+    for(const auto& C:Classes){FDasDeclaredClass Effective;if(!ResolveClass(C.Id,Effective,Error))return false;}
     return true;
 }
 bool FDasAuthoringModule::FromJson(const FString& Json, FDasAuthoringModule& Out, FString& Error)
@@ -229,11 +211,13 @@ bool FDasAuthoringModule::FromJson(const FString& Json, FDasAuthoringModule& Out
     for (const auto& J : ClassesJson)
     {
         FDasDeclaredClass C;
-        if (!Keys(J,{TEXT("id"),TEXT("name"),TEXT("native_parent"),TEXT("parent_id"),TEXT("interfaces"),TEXT("components"),TEXT("callbacks"),TEXT("properties"),TEXT("methods"),TEXT("metadata")},Error) || !String(J,TEXT("id"),C.Id,Error) || !String(J,TEXT("name"),C.Name,Error) || !Meta(J,C.Metadata,Error)) return false;
+        if (!Keys(J,{TEXT("id"),TEXT("name"),TEXT("native_parent"),TEXT("parent_id"),TEXT("source_script"),TEXT("interfaces"),TEXT("components"),TEXT("component_overrides"),TEXT("callbacks"),TEXT("properties"),TEXT("methods"),TEXT("metadata")},Error) || !String(J,TEXT("id"),C.Id,Error) || !String(J,TEXT("name"),C.Name,Error) || !Meta(J,C.Metadata,Error)) return false;
         if (J->HasField(TEXT("native_parent")) && !String(J,TEXT("native_parent"),C.NativeParent,Error)) return false;
         if (J->HasField(TEXT("parent_id")) && !String(J,TEXT("parent_id"),C.ParentId,Error)) return false;
+        if(J->HasField(TEXT("source_script")) && !String(J,TEXT("source_script"),C.SourceScript,Error))return false;
         if(J->HasField(TEXT("interfaces"))){const TArray<TSharedPtr<FJsonValue>>* Items=nullptr;if(!J->TryGetArrayField(TEXT("interfaces"),Items))return Fail(Error,TEXT("Expected interfaces array"));for(const auto& V:*Items){FString I;if(!V->TryGetString(I))return Fail(Error,TEXT("Expected interface path string"));C.Interfaces.Add(I);}}
         if(J->HasField(TEXT("components"))){TArray<TSharedPtr<FJsonObject>> Items;if(!Objects(J,TEXT("components"),Items,Error))return false;for(const auto& Item:Items){FDasDeclaredComponent Component;if(!Keys(Item,{TEXT("id"),TEXT("name"),TEXT("script_file"),TEXT("class_name"),TEXT("native_class"),TEXT("defaults"),TEXT("attach"),TEXT("attach_socket"),TEXT("root"),TEXT("read_only"),TEXT("editable"),TEXT("visible"),TEXT("metadata")},Error) || !String(Item,TEXT("id"),Component.Id,Error) || !String(Item,TEXT("name"),Component.Name,Error) || !String(Item,TEXT("script_file"),Component.ScriptFile,Error) || !String(Item,TEXT("class_name"),Component.ClassName,Error))return false;if(!ReadComponentDefaults(Item,Component.Defaults,Error))return false;if(Item->HasField(TEXT("attach")) && !String(Item,TEXT("attach"),Component.Attach,Error))return false;if(Item->HasField(TEXT("attach_socket")) && !String(Item,TEXT("attach_socket"),Component.AttachSocket,Error))return false;if(Item->HasField(TEXT("root")) && !Boolean(Item,TEXT("root"),Component.bRoot,Error))return false;if(Item->HasField(TEXT("native_class")) && !String(Item,TEXT("native_class"),Component.NativeClass,Error))return false;if(Item->HasField(TEXT("read_only")) && !Boolean(Item,TEXT("read_only"),Component.bReadOnly,Error))return false;if(Item->HasField(TEXT("editable")) && !Boolean(Item,TEXT("editable"),Component.bEditable,Error))return false;if(Item->HasField(TEXT("visible")) && !Boolean(Item,TEXT("visible"),Component.bVisible,Error))return false;if(!Meta(Item,Component.Metadata,Error))return false;C.Components.Add(Component);}}
+        if(J->HasField(TEXT("component_overrides"))){TArray<TSharedPtr<FJsonObject>> Items;if(!Objects(J,TEXT("component_overrides"),Items,Error))return false;for(const auto& Item:Items){FDasComponentOverride O;if(!Keys(Item,{TEXT("id"),TEXT("name"),TEXT("defaults")},Error) || !String(Item,TEXT("id"),O.Id,Error) || !String(Item,TEXT("name"),O.Name,Error) || !ReadComponentDefaults(Item,O.Defaults,Error))return false;C.ComponentOverrides.Add(O);}}
         if(J->HasField(TEXT("callbacks"))){TArray<TSharedPtr<FJsonObject>> Items;if(!Objects(J,TEXT("callbacks"),Items,Error))return false;for(const auto& Item:Items){FDasDeclaredCallback Callback;if(!Keys(Item,{TEXT("name"),TEXT("kind"),TEXT("source"),TEXT("event_name"),TEXT("parameter_kind")},Error) || !String(Item,TEXT("name"),Callback.Name,Error) || !String(Item,TEXT("kind"),Callback.Kind,Error) || !String(Item,TEXT("source"),Callback.Source,Error) || !String(Item,TEXT("event_name"),Callback.EventName,Error))return false;if(Item->HasField(TEXT("parameter_kind")) && (Callback.Kind!=TEXT("event") || !String(Item,TEXT("parameter_kind"),Callback.ParameterKind,Error)))return false;C.Callbacks.Add(Callback);}}
         TArray<TSharedPtr<FJsonObject>> Ps, Ms; if (!Objects(J,TEXT("properties"),Ps,Error) || !Objects(J,TEXT("methods"),Ms,Error)) return false;
         for (const auto& V : Ps)
@@ -279,9 +263,10 @@ bool FDasAuthoringModule::ToJson(FString& Out, FString& Error) const
     for (const auto* C : Cs)
     {
         auto J = MakeShared<FJsonObject>(); J->SetStringField(TEXT("id"),C->Id); J->SetStringField(TEXT("name"),C->Name);
+        if(!C->ComponentOverrides.IsEmpty()){TArray<FDasComponentOverride> Sorted=C->ComponentOverrides;Sorted.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});TArray<TSharedPtr<FJsonValue>> Items;for(const auto& O:Sorted){auto Item=MakeShared<FJsonObject>();Item->SetStringField(TEXT("id"),O.Id);Item->SetStringField(TEXT("name"),O.Name);WriteComponentDefaults(O.Defaults,Item);Items.Add(MakeShared<FJsonValueObject>(Item));}J->SetArrayField(TEXT("component_overrides"),Items);}
         if(!C->Callbacks.IsEmpty()){TArray<TSharedPtr<FJsonValue>> Items;for(const auto& Callback:C->Callbacks){auto Item=MakeShared<FJsonObject>();Item->SetStringField(TEXT("name"),Callback.Name);Item->SetStringField(TEXT("kind"),Callback.Kind);Item->SetStringField(TEXT("source"),Callback.Source);Item->SetStringField(TEXT("event_name"),Callback.EventName);if(Callback.Kind==TEXT("event") && Callback.ParameterKind!=TEXT("int"))Item->SetStringField(TEXT("parameter_kind"),Callback.ParameterKind);Items.Add(MakeShared<FJsonValueObject>(Item));}J->SetArrayField(TEXT("callbacks"),Items);}
         if(!C->Components.IsEmpty()){TArray<FDasDeclaredComponent> Components=C->Components;Components.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});TArray<TSharedPtr<FJsonValue>> Items;for(const auto& Component:Components){auto Item=MakeShared<FJsonObject>();Item->SetStringField(TEXT("id"),Component.Id);Item->SetStringField(TEXT("name"),Component.Name);Item->SetStringField(TEXT("script_file"),Component.ScriptFile);Item->SetStringField(TEXT("class_name"),Component.ClassName);WriteComponentDefaults(Component.Defaults,Item);if(!Component.Attach.IsEmpty())Item->SetStringField(TEXT("attach"),Component.Attach);if(!Component.AttachSocket.IsEmpty())Item->SetStringField(TEXT("attach_socket"),Component.AttachSocket);if(Component.bRoot)Item->SetBoolField(TEXT("root"),true);if(!Component.NativeClass.IsEmpty())Item->SetStringField(TEXT("native_class"),Component.NativeClass);if(Component.bReadOnly || Component.bEditable || Component.bVisible || !Component.Metadata.IsEmpty()){Item->SetBoolField(TEXT("read_only"),Component.bReadOnly);Item->SetBoolField(TEXT("editable"),Component.bEditable);Item->SetBoolField(TEXT("visible"),Component.bVisible);MetadataJson(Component.Metadata,Item);}Items.Add(MakeShared<FJsonValueObject>(Item));}J->SetArrayField(TEXT("components"),Items);}
-        J->SetStringField(C->ParentId.IsEmpty()?TEXT("native_parent"):TEXT("parent_id"),C->ParentId.IsEmpty()?C->NativeParent:C->ParentId); MetadataJson(C->Metadata,J);
+        J->SetStringField(C->ParentId.IsEmpty()?TEXT("native_parent"):TEXT("parent_id"),C->ParentId.IsEmpty()?C->NativeParent:C->ParentId); MetadataJson(C->Metadata,J);if(!C->SourceScript.IsEmpty())J->SetStringField(TEXT("source_script"),C->SourceScript);
         TArray<const FDasDeclaredProperty*> Ps; for (const auto& P : C->Properties) Ps.Add(&P); Ps.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});
         TArray<TSharedPtr<FJsonValue>> Pj;
         for (const auto* P : Ps)
@@ -310,14 +295,44 @@ bool FDasAuthoringModule::ToJson(FString& Out, FString& Error) const
     }
     Root->SetArrayField(TEXT("classes"),Cj); FString Result; FJsonSerializer::Serialize(Root,TJsonWriterFactory<>::Create(&Result)); Out = MoveTemp(Result); return true;
 }
+bool FDasAuthoringModule::ResolveClass(const FString& ClassId,FDasDeclaredClass& Out,FString& Error) const
+{
+    Error.Reset();const auto* Leaf=Classes.FindByPredicate([&](const auto& C){return C.Id==ClassId;});if(!Leaf)return Fail(Error,TEXT("Unknown authored class: ")+ClassId);
+    TArray<const FDasDeclaredClass*> Chain;TSet<FString> Seen;
+    for(const auto* C=Leaf;C;){if(Seen.Contains(C->Id) || Chain.Num()>=32)return Fail(Error,TEXT("Inheritance cycle or depth limit: ")+ClassId);Seen.Add(C->Id);Chain.Add(C);if(C->ParentId.IsEmpty())break;const FString Parent=C->ParentId;C=Classes.FindByPredicate([&](const auto& P){return P.Id==Parent;});if(!C)return Fail(Error,TEXT("Missing authored parent: ")+Parent);}
+    FDasDeclaredClass Effective;Effective.Id=Leaf->Id;Effective.Name=Leaf->Name;Effective.NativeParent=Chain.Last()->NativeParent;Effective.Metadata=Leaf->Metadata;Effective.SourceScript=Leaf->SourceScript;
+    auto SameSignature=[](const FDasDeclaredMethod& A,const FDasDeclaredMethod& B){if(A.ReturnType.Identity()!=B.ReturnType.Identity() || A.Parameters.Num()!=B.Parameters.Num() || A.bPure!=B.bPure || A.bStatic!=B.bStatic)return false;for(int32 I=0;I<A.Parameters.Num();++I)if(A.Parameters[I].Name!=B.Parameters[I].Name || A.Parameters[I].Type.Identity()!=B.Parameters[I].Type.Identity() || A.Parameters[I].Direction!=B.Parameters[I].Direction)return false;return true;};
+    for(int32 I=Chain.Num()-1;I>=0;--I){const auto& C=*Chain[I];
+        for(const auto& Interface:C.Interfaces)Effective.Interfaces.AddUnique(Interface);
+        for(const auto& P:C.Properties){if(Effective.Properties.ContainsByPredicate([&](const auto& Old){return Old.Name.Equals(P.Name,ESearchCase::IgnoreCase);}) || Effective.Methods.ContainsByPredicate([&](const auto& M){return M.Name.Equals(P.Name,ESearchCase::IgnoreCase);} ))return Fail(Error,TEXT("Inherited member cannot be shadowed: ")+C.Id+TEXT(".")+P.Name);Effective.Properties.Add(P);}
+        for(const auto& M:C.Methods){if(Effective.Properties.ContainsByPredicate([&](const auto& P){return P.Name.Equals(M.Name,ESearchCase::IgnoreCase);} ))return Fail(Error,TEXT("Method shadows inherited property: ")+M.Name);auto* Parent=Effective.Methods.FindByPredicate([&](const auto& P){return P.Name.Equals(M.Name,ESearchCase::IgnoreCase);});if(Parent){if(!Parent->bBlueprintEvent || !M.bBlueprintEvent || !SameSignature(*Parent,M))return Fail(Error,TEXT("Override requires a BlueprintEvent with unchanged signature: ")+C.Id+TEXT(".")+M.Name);*Parent=M;}else Effective.Methods.Add(M);}
+        TSet<FString> Overridden;
+        for(const auto& O:C.ComponentOverrides){auto* Target=Effective.Components.FindByPredicate([&](const auto& V){return V.Id==O.Id && V.Name==O.Name;});if(C.ParentId.IsEmpty() || !Target || Overridden.Contains(O.Id) || O.Defaults.IsEmpty())return Fail(Error,TEXT("Invalid/duplicate inherited component override: ")+O.Name);Overridden.Add(O.Id);FDasDeclaredComponent Check=*Target;Check.Defaults=O.Defaults;if(!ValidateComponentDefaults(Check,Error))return false;for(const auto& Pair:O.Defaults)Target->Defaults.Add(Pair.Key,Pair.Value);if(!ValidateComponentDefaults(*Target,Error))return false;}
+        for(const auto& Component:C.Components){if(Effective.Components.ContainsByPredicate([&](const auto& P){return P.Name.Equals(Component.Name,ESearchCase::IgnoreCase);} ))return Fail(Error,TEXT("Inherited component cannot be shadowed: ")+Component.Name);Effective.Components.Add(Component);}
+        for(const auto& Callback:C.Callbacks){auto* Parent=Effective.Callbacks.FindByPredicate([&](const auto& P){return P.Kind==Callback.Kind && (Callback.Kind!=TEXT("event") || P.Name==Callback.Name);});if(Parent){if(Callback.Kind==TEXT("event"))return Fail(Error,TEXT("Inherited managed event callback override is unsupported: ")+Callback.Name);*Parent=Callback;}else Effective.Callbacks.Add(Callback);}
+    }
+    if(Effective.Components.Num()>32 || (!Effective.Components.IsEmpty() && Effective.NativeParent!=TEXT("/Script/Engine.Actor")))return Fail(Error,TEXT("Components require Actor root and at most 32 total declarations"));
+    for(const auto& Component:Effective.Components)if(Effective.Properties.ContainsByPredicate([&](const auto& P){return P.Name.Equals(Component.Name,ESearchCase::IgnoreCase);}) || Effective.Methods.ContainsByPredicate([&](const auto& M){return M.Name.Equals(Component.Name,ESearchCase::IgnoreCase);}))return Fail(Error,TEXT("Component conflicts with inherited member: ")+Component.Name);
+        int32 Roots=0;
+        for(const auto& Component:Effective.Components){
+            if(Component.bRoot && (++Roots>1 || !Component.Attach.IsEmpty() || !Component.AttachSocket.IsEmpty()))return Fail(Error,TEXT("Expected one unattached root component"));
+            if(!Component.Attach.IsEmpty() && !Identifier(Component.Attach))return Fail(Error,TEXT("Invalid component attachment name"));
+            if(Component.AttachSocket.Len()>=NAME_SIZE)return Fail(Error,TEXT("Component socket name too long"));
+            TSet<FString> Visited;const FDasDeclaredComponent* Current=&Component;
+            while(Current){if(Visited.Contains(Current->Name))return Fail(Error,TEXT("Component attachment cycle"));Visited.Add(Current->Name);if(Current->Attach.IsEmpty())break;const FString Parent=Current->Attach;Current=Effective.Components.FindByPredicate([&](const auto& V){return V.Name==Parent;});if(!Current)return Fail(Error,TEXT("Unknown component attachment parent: ")+Parent);}
+        }
+    Out=MoveTemp(Effective);return true;
+}
+
 bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema& Out, FString& Error) const
 {
     if (!Validate(Error)) return false;
     const auto* C = Classes.FindByPredicate([&](const auto& X){return X.Id == ClassId;}); if (!C) return Fail(Error,TEXT("Unknown authored class ID"));
-    if ((C->NativeParent != TEXT("/Script/Engine.Actor") && C->NativeParent != TEXT("/Script/Engine.ActorComponent")) || !C->ParentId.IsEmpty()) return Fail(Error,TEXT("Class adapter requires direct native Actor or ActorComponent parent"));
+    FDasDeclaredClass Effective;if(!ResolveClass(ClassId,Effective,Error))return false;const auto* Declared=C;C=&Effective;
+    if ((C->NativeParent != TEXT("/Script/Engine.Actor") && C->NativeParent != TEXT("/Script/Engine.ActorComponent"))) return Fail(Error,TEXT("Class adapter requires an Actor or ActorComponent root"));
     if ((C->Methods.IsEmpty() && C->Callbacks.IsEmpty()) || C->Methods.Num()>64) return Fail(Error,TEXT("Actor adapter requires 1..64 methods"));
-    FDasClassSchema Result;Result.StableId=C->Id;Result.Name=*C->Name;Result.Parent=C->NativeParent==TEXT("/Script/Engine.ActorComponent")?TEXT("ActorComponent"):TEXT("Actor");Result.Interfaces=C->Interfaces;Result.Metadata=C->Metadata;
-    TArray<const FDasDeclaredMethod*> Methods;for (const auto& M:C->Methods) Methods.Add(&M);
+    FDasClassSchema Result;Result.ParentStableId=Declared->ParentId;Result.StableId=C->Id;Result.Name=*C->Name;Result.Parent=C->NativeParent==TEXT("/Script/Engine.ActorComponent")?TEXT("ActorComponent"):TEXT("Actor");Result.Interfaces=C->Interfaces;Result.Metadata=C->Metadata;
+    TArray<const FDasDeclaredMethod*> Methods;for (const auto& M:Declared->Methods) Methods.Add(&M);
     Methods.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});
     for (const auto* Ptr:Methods)
     {
@@ -334,7 +349,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         Result.Methods.Add(MoveTemp(Method));
     }
     if(!Result.Methods.IsEmpty())Result.Method=Result.Methods[0];
-    TArray<const FDasDeclaredProperty*> Properties; for (const auto& P : C->Properties) Properties.Add(&P);
+    TArray<const FDasDeclaredProperty*> Properties; for (const auto& P : Declared->Properties) Properties.Add(&P);
     Properties.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});
     for (const auto* Ptr : Properties)
     {
@@ -347,7 +362,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
 }
 FDasAuthoringDelta FDasAuthoringModule::Compare(const FDasDeclaredClass& Old, const FDasDeclaredClass& Next)
 {
-    FDasAuthoringDelta D; D.bStructural = Old.Id!=Next.Id || Old.Name!=Next.Name || Old.NativeParent!=Next.NativeParent || Old.ParentId!=Next.ParentId || Old.Interfaces!=Next.Interfaces || Old.Components!=Next.Components || Old.Callbacks!=Next.Callbacks;
+    FDasAuthoringDelta D; D.bStructural = Old.Id!=Next.Id || Old.Name!=Next.Name || Old.NativeParent!=Next.NativeParent || Old.ParentId!=Next.ParentId || Old.Interfaces!=Next.Interfaces || Old.Components!=Next.Components || Old.ComponentOverrides!=Next.ComponentOverrides || Old.Callbacks!=Next.Callbacks;
     D.bMetadata = !SameMetadata(Old.Metadata,Next.Metadata);
     for (const auto& P : Next.Properties)
     {

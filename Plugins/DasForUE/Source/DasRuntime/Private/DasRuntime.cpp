@@ -211,6 +211,7 @@ namespace
         TArray<FMarshalledParameter> Signature;
         FString SignatureKey;
         TWeakObjectPtr<UClass> RequiredInterface;
+        TWeakObjectPtr<UClass> FunctionScopeClass;
         FString InterfaceSignatureKey;
         TMap<FString, TSharedPtr<FPendingHash>> PendingHashes;
         TMap<FString, TArray<int32>> HashIndices;
@@ -735,7 +736,7 @@ namespace
         auto* Property = ResolveProperty<FObjectProperty>(Object, Name, false, Context);
         return MakeObjectHandle(Property->GetObjectPropertyValue_InContainer(Object), Property->PropertyClass, Context);
     }
-UObject* ResolveAuthoredObject(const FDasObjectHandle& Handle,const char* Id,das::Context* C){auto* Object=ResolveObject(Handle,C);const UObject* CDO=Object->GetClass()->GetDefaultObject();const FString Actual=Cast<ADasProbeActor>(CDO)?CastChecked<ADasProbeActor>(CDO)->AuthoredTypeId:Cast<UDasScriptComponent>(CDO)?CastChecked<UDasScriptComponent>(CDO)->AuthoredTypeId:FString();if(!Id || Actual.IsEmpty() || Actual!=UTF8_TO_TCHAR(Id))C->throw_error("authored object identity mismatch");return Object;}
+UObject* ResolveAuthoredObject(const FDasObjectHandle& Handle,const char* Id,das::Context* C){auto* Object=ResolveObject(Handle,C);const UObject* CDO=Object->GetClass()->GetDefaultObject();const FString Actual=Cast<ADasProbeActor>(CDO)?CastChecked<ADasProbeActor>(CDO)->AuthoredTypeId:Cast<UDasScriptComponent>(CDO)?CastChecked<UDasScriptComponent>(CDO)->AuthoredTypeId:FString();bool Matches=false;if(Id)for(auto* Class=Object->GetClass();Class;Class=Class->GetSuperClass()){const auto* Default=Class->GetDefaultObject();const FString Identity=Cast<ADasProbeActor>(Default)?CastChecked<ADasProbeActor>(Default)->AuthoredTypeId:Cast<UDasScriptComponent>(Default)?CastChecked<UDasScriptComponent>(Default)->AuthoredTypeId:FString();if(Identity==UTF8_TO_TCHAR(Id) && !Identity.IsEmpty()){Matches=true;break;}}if(!Matches)C->throw_error("authored object identity mismatch");return Object;}
 FDasObjectHandle AuthoredObjectCheck(const FDasObjectHandle& H,const char* Id,das::Context* C){ResolveAuthoredObject(H,Id,C);return H;}
 FDasObjectHandle AuthoredNullableCheck(const FDasObjectHandle& Handle,const char* Id,das::Context* Context){RequireObjectContext(Context);if(!Handle.Token)return {};ResolveAuthoredObject(Handle,Id,Context);return Handle;}
 int32 AuthoredGetint(const FDasObjectHandle& H,const char* Id,const char* Name,das::Context* C){auto* Object=ResolveAuthoredObject(H,Id,C);return ResolveProperty<FIntProperty>(Object,Name,false,C)->GetPropertyValue_InContainer(Object);}
@@ -871,10 +872,10 @@ void AuthoredSetobject(const FDasObjectHandle& H,const char* Id,const char* Name
 
 // Cleanup is idempotent: a rejected BeginCall may not have produced a handle yet.
 void ReleaseAuthoredCall(const FDasCallHandle& H,das::Context* C){if(C==ActiveContext && ActiveContext)ActiveContext->Calls.Remove(H.Token);}
-FDasCallHandle BeginAuthoredCall(const FDasObjectHandle& Target,const char* Id,const char* Name,const char* Wire,das::Context* Context){
+FDasCallHandle BeginAuthoredCallSelected(const FDasObjectHandle& Target,const char* Id,const char* Name,const char* Wire,das::Context* Context,UFunction* Selected=nullptr){
  auto* Object=ResolveAuthoredObject(Target,Id,Context);FDasAuthoringModule Model;FString Error;if(!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire),Model,Error) || Model.Classes.Num()!=1 || Model.Classes[0].Id!=UTF8_TO_TCHAR(Id))Context->throw_error("invalid authored method contract");
  const auto* Method=Model.Classes[0].Methods.FindByPredicate([&](const auto& Item){return Name && Item.Name==UTF8_TO_TCHAR(Name);});if(!Method || !Method->bCallable || Method->bStatic)Context->throw_error("unknown callable authored method");
- auto Handle=BeginCall(Target,Name,Context);auto& Call=ResolveCall(Handle,Context);
+ auto Handle=BeginCallSelected(Target,Name,Context,Selected);auto& Call=ResolveCall(Handle,Context);
 
  auto Matches=[&](FProperty* Property,const FDasDeclaredType& Type){if(!Property || FString(CallKindName(FieldKind(Property,Context)))!=Type.Kind)return false;if(Type.Kind==TEXT("array") || Type.Kind==TEXT("map") || Type.Kind==TEXT("set")){auto* Carrier=DasContainerCarrier(Type);auto* Values=Carrier?Carrier->FindPropertyByName(TEXT("Values")):nullptr;return Values && Values->SameType(Property);}if(auto* D=CastField<FDelegateProperty>(Property)){TStrongObjectPtr<UFunction> S(MakeDasSingleDelegateSignature(Type.DelegateWire,Error));return S && D->SignatureFunction && S->IsSignatureCompatibleWith(D->SignatureFunction);}if(auto* Enum=CallEnumType(Property))return Enum->GetPathName()==Type.TypePath;if(auto* Struct=CastField<FStructProperty>(Property))return Struct->Struct->GetPathName()==Type.TypePath;if(auto* Class=DasReferencePropertyClass(Property))return Class->GetPathName()==Type.TypePath;return true;};
  if(Method->ReturnType.Kind==TEXT("void")?Call.Function->GetReturnProperty()!=nullptr:!Matches(Call.Function->GetReturnProperty(),Method->ReturnType))Context->throw_error("authored method return contract changed");
@@ -889,6 +890,11 @@ FDasEnumValue MethodResultenum(const FDasCallHandle& H,const char* Path,das::Con
 FCallField MethodStructField(FMarshalledCall& Call,const char* Path,bool Output,das::Context* C){
  if(Call.bFailed || Call.bExecuted!=Output || !Path)C->throw_error("invalid method snapshot access direction");auto* Prop=FindFProperty<FProperty>(Call.Function.Get(),FName(UTF8_TO_TCHAR(Path)));if(!Prop || !Prop->HasAnyPropertyFlags(CPF_Parm) || (!CastField<FStructProperty>(Prop) && !DasContainerCarrierForProperty(Prop)))C->throw_error("expected struct/container method parameter");const bool MutableOut=Prop->HasAnyPropertyFlags(CPF_OutParm) && !Prop->HasAnyPropertyFlags(CPF_ConstParm);const bool Return=Prop->HasAnyPropertyFlags(CPF_ReturnParm);if(Output?!(Return || MutableOut):(Return || (MutableOut && !Prop->HasAnyPropertyFlags(CPF_ReferenceParm))))C->throw_error("wrong snapshot parameter direction");return {Prop,Prop->ContainerPtrToValuePtr<void>(Call.Frame->GetStructMemory()),Prop->GetName().ToLower()};
 }
+FDasCallHandle BeginAuthoredCall(const FDasObjectHandle& T,const char* Id,const char* N,const char* W,das::Context* C){return BeginAuthoredCallSelected(T,Id,N,W,C);}
+thread_local bool ExplicitParentTick=false;
+thread_local UObject* ParentLifecycleTarget=nullptr;
+FDasCallHandle BeginAuthoredSuperCall(const FDasObjectHandle& Target,const char* CurrentId,const char* ParentId,const char* Name,const char* Wire,das::Context* C){auto* Object=ResolveAuthoredObject(Target,CurrentId,C);auto Identity=[](UClass* Class){const auto* D=Class?Class->GetDefaultObject():nullptr;return Cast<ADasProbeActor>(D)?CastChecked<ADasProbeActor>(D)->AuthoredTypeId:Cast<UDasScriptComponent>(D)?CastChecked<UDasScriptComponent>(D)->AuthoredTypeId:FString();};UClass* Owner=nullptr;for(auto* Class=Object->GetClass();Class;Class=Class->GetSuperClass())if(Identity(Class)==UTF8_TO_TCHAR(CurrentId) && Identity(Class->GetSuperClass())!=UTF8_TO_TCHAR(CurrentId)){Owner=Class;break;}auto* Parent=Owner?Owner->GetSuperClass():nullptr;if(!Parent || Identity(Parent)!=UTF8_TO_TCHAR(ParentId))C->throw_error("Super parent identity changed");auto* Function=Parent->FindFunctionByName(FName(UTF8_TO_TCHAR(Name)));if(!Function)C->throw_error("Super method is missing");auto H=BeginAuthoredCallSelected(Target,ParentId,Name,Wire,C,Function);ResolveCall(H,C).FunctionScopeClass=Parent;return H;}
+void InvokeParentLifecycle(const char* Id,int32 Kind,float Delta,int32 Reason,das::Context* C){RequireObjectContext(C);if(Kind<0 || Kind>2 || !FMath::IsFinite(Delta) || Delta<0)C->throw_error("invalid parent lifecycle call");auto* Object=ResolveSelf(C);auto Identity=[](UClass* Class){const auto* D=Class?Class->GetDefaultObject():nullptr;return Cast<ADasProbeActor>(D)?CastChecked<ADasProbeActor>(D)->AuthoredTypeId:Cast<UDasScriptComponent>(D)?CastChecked<UDasScriptComponent>(D)->AuthoredTypeId:FString();};UClass* Owner=nullptr;for(auto* Class=Object->GetClass();Class;Class=Class->GetSuperClass())if(Identity(Class)==UTF8_TO_TCHAR(Id) && Identity(Class->GetSuperClass())!=UTF8_TO_TCHAR(Id)){Owner=Class;break;}if(!Owner || !Owner->GetSuperClass())C->throw_error("authored lifecycle parent is missing");const auto* Default=Owner->GetSuperClass()->GetDefaultObject();const FString File=Cast<ADasProbeActor>(Default)?CastChecked<ADasProbeActor>(Default)->LifecycleScript:Cast<UDasScriptComponent>(Default)?CastChecked<UDasScriptComponent>(Default)->LifecycleScript:FString();if(File.IsEmpty())return;TGuardValue<bool> TickScope(ExplicitParentTick,Kind==1);TGuardValue<UObject*> ParentScope(ParentLifecycleTarget,Object);auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto Result=R.RunLifecycle(R.ScriptPath(File),Kind==0?EDasCallback::BeginPlay:Kind==1?EDasCallback::Tick:EDasCallback::EndPlay,Object,Delta,Reason);if(!Result.bSucceeded)C->throw_error(TCHAR_TO_UTF8(*Result.Error));}
 void PinMethodSnapshot(FProperty* Property,void* Memory,FMarshalledCall& Call,const FString& Path,das::Context* C,int32& Budget,int32 Depth=0){
  if(Depth>16 || --Budget<0)C->throw_error("method snapshot traversal limit exceeded");
  if(DasReferencePropertyClass(Property)){auto* Object=DasReferenceGet(Property,Memory);if(Object && (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))C->throw_error("method snapshot object is expired");Call.ObjectPins.Add(Path,TStrongObjectPtr<UObject>(Object));}
@@ -1416,6 +1422,8 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             das::addExtern<DAS_BIND_FUN(MethodArgtransform)>(*this,Library,"__ue_method_arg_transform",das::SideEffects::modifyExternal,"MethodArgtransform");
             das::addExtern<DAS_BIND_FUN(MethodResulttransform),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_method_result_transform",das::SideEffects::modifyExternal,"MethodResulttransform");
             das::addExtern<DAS_BIND_FUN(ReleaseAuthoredCall)>(*this,Library,"__ue_release_authored_call",das::SideEffects::modifyExternal,"ReleaseAuthoredCall");
+            das::addExtern<DAS_BIND_FUN(InvokeParentLifecycle)>(*this,Library,"__ue_parent_lifecycle",das::SideEffects::modifyExternal,"InvokeParentLifecycle");
+            das::addExtern<DAS_BIND_FUN(BeginAuthoredSuperCall),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_begin_super_call",das::SideEffects::modifyExternal,"BeginAuthoredSuperCall");
             das::addExtern<DAS_BIND_FUN(BeginAuthoredCall),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_begin_authored_call",das::SideEffects::modifyExternal,"BeginAuthoredCall");
             das::addExtern<DAS_BIND_FUN(MethodArgname)>(*this,Library,"__ue_method_arg_name",das::SideEffects::modifyExternal,"MethodArgname");
             das::addExtern<DAS_BIND_FUN(MethodResultname)>(*this,Library,"__ue_method_result_name",das::SideEffects::modifyExternal,"MethodResultname");
@@ -2137,7 +2145,7 @@ bool FDasRuntimeModule::ReadAuthoringScript(const FString& Path,FDasAuthoringMod
             const auto* Wire=A->arguments.find(DSLModelKey,das::Type::tString);FDasAuthoringModule Part;
             if(!Wire || !FDasAuthoringModule::FromJson(DSLText(Wire->sValue),Part,Error)){OK=false;return;}
             if(!Candidate.Id.IsEmpty() && Candidate.Id!=Part.Id){Error=TEXT("Declarations in a file must share module ID");OK=false;return;}
-            Candidate.Id=Part.Id;Candidate.Classes.Append(Part.Classes);
+            Candidate.Id=Part.Id;for(const auto& C:Part.Classes){if(!Candidate.Classes.ContainsByPredicate([&](const auto& P){return P.Id==C.Id;}))Candidate.Classes.Add(C);}
         });
         if(!OK || !Candidate.Validate(Error)) return false;
         FDasSourceCatalog Discovered;if(ImportedValues && !CollectDasCatalogModules(Program.get(),*this,Discovered,Error))return false;
@@ -2327,7 +2335,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     const auto* LifecycleComponent=Cast<UDasScriptComponent>(Self.Get());
     const bool ActorLifecycle=ActorLifecycleTarget && (Self.Get()==ActorLifecycleTarget || (LifecycleComponent && LifecycleComponent->GetOwner()==ActorLifecycleTarget)) && (Event==EDasCallback::BeginPlay || Event==EDasCallback::EndPlay);
     const bool ComponentLifecycle=ComponentLifecycleTarget && Self.Get()==ComponentLifecycleTarget && (Event==EDasCallback::BeginPlay || Event==EDasCallback::EndPlay);
-    if (!IsInGameThread() || !bInitialized || (ActiveContext && !ActorLifecycle && !ComponentLifecycle && (AuthoredDispatchDepth==0 || Event!=EDasCallback::Main)))
+    const bool ParentLifecycle=ParentLifecycleTarget && Self.Get()==ParentLifecycleTarget && Event!=EDasCallback::Main;
+    if (!IsInGameThread() || !bInitialized || (ActiveContext && !ActorLifecycle && !ComponentLifecycle && !ParentLifecycle && (AuthoredDispatchDepth==0 || Event!=EDasCallback::Main)))
     {
         Result.Error = TEXT("Persistent calls require an initialized runtime and authorized method dispatch on the game thread.");
         return Result;
@@ -2520,6 +2529,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     TGuardValue<bool> EndingScope(Context.bEnding, Event == EDasCallback::EndPlay);
     try
     {
+        if(ExplicitParentTick && Event==EDasCallback::Tick && Session->Live->BeginPlay && !Session->bBeginDelivered){Result.Error=TEXT("Call Super.BeginPlay before parent Tick");return Result;}
         // Delivery flags belong to the session, so swapping code cannot replay BeginPlay.
         if ((Event == EDasCallback::BeginPlay || Event == EDasCallback::Tick) && !Session->bBeginDelivered)
         {

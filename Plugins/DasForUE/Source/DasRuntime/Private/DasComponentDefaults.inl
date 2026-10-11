@@ -36,11 +36,16 @@ TArray<FDSLComponentDefault> DSLCollectComponentDefaults(const das::StructurePtr
  }
  S->fields=std::move(Fields);return Result;
 }
-void DSLApplyComponentDefaults(FDasDeclaredClass& C,const TArray<FDSLComponentDefault>& Defaults){
+void DSLApplyComponentDefaults(FDasDeclaredClass& C,const TArray<FDSLComponentDefault>& Defaults,const TArray<FDasDeclaredComponent>& Inherited){
+ TSet<FString> Seen;
  for(const auto& D:Defaults){auto* Component=C.Components.FindByPredicate([&](const auto& V){return V.Name==D.Component;});
   if(!Component)DSLFail(TEXT("Unknown defaults component: ")+D.Component);
-
-  if(Component->Defaults.Contains(D.Property))DSLFail(TEXT("Duplicate component default: ")+D.Component+TEXT(".")+D.Property);
+  const FString Key=D.Component+TEXT(".")+D.Property;if(Seen.Contains(Key.ToLower()))DSLFail(TEXT("Duplicate component default: ")+Key);Seen.Add(Key.ToLower());
+  if(Inherited.ContainsByPredicate([&](const auto& V){return V.Id==Component->Id;})){
+   auto* Override=C.ComponentOverrides.FindByPredicate([&](const auto& V){return V.Id==Component->Id;});
+   if(!Override){FDasComponentOverride New;New.Id=Component->Id;New.Name=Component->Name;C.ComponentOverrides.Add(New);Override=&C.ComponentOverrides.Last();}
+   Override->Defaults.Add(D.Property,D.Value);
+  }else if(Component->Defaults.Contains(D.Property))DSLFail(TEXT("Duplicate component default: ")+Key);
   Component->Defaults.Add(D.Property,D.Value);
  }
 }

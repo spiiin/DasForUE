@@ -21,6 +21,7 @@
 #include "EdGraph/EdGraph.h"
 #include "EdGraphSchema_K2.h"
 #include "K2Node_CallFunction.h"
+#include "K2Node_CallParentFunction.h"
 #include "K2Node_MakeArray.h"
 #include "K2Node_MakeStruct.h"
 #include "K2Node_BreakStruct.h"
@@ -107,15 +108,16 @@ namespace
         auto* Call=NewObject<UK2Node_CallFunction>(Graph);Call->SetFromFunction(BP->ParentClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasFrame)));Graph->AddNode(Call,false,false);Call->CreateNewGuid();Call->PostPlacedNewNode();Call->AllocateDefaultPins();const auto* Schema=Graph->GetSchema();Schema->TrySetDefaultValue(*Call->FindPinChecked(TEXT("ScriptFile")),M.ScriptFile);Schema->TrySetDefaultValue(*Call->FindPinChecked(TEXT("EntryPoint")),M.EntryPoint);Schema->TrySetDefaultValue(*Call->FindPinChecked(TEXT("ResultKind")),FString::FromInt(static_cast<int32>(EDasMethodSignature::Void)));Schema->TrySetDefaultValue(*Call->FindPinChecked(TEXT("ResultClass")),TEXT(""));
         const bool Linked=Schema->TryCreateConnection(Event->FindPinChecked(UEdGraphSchema_K2::PN_Then),Call->GetExecPin()) && BuildFrameInputs(Graph,Event,M,Call);Metadata.SetValue(Event,TEXT("DasMemberId"),*M.StableId);FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BP);return Linked;
     }
+    void DasCanonicalOverridePins(UK2Node_EditablePinBase* Node,UFunction* Parent,bool Entry){if(!Parent)return;TArray<UK2Node_CallParentFunction*> Calls;Node->GetGraph()->GetNodesOfClass(Calls);for(auto* Call:Calls){Call->BreakAllNodeLinks();Node->GetGraph()->RemoveNode(Call);}TArray<FName> Names;for(TFieldIterator<FProperty> It(Parent);It;++It)if(It->HasAnyPropertyFlags(CPF_Parm)){const bool Return=It->HasAnyPropertyFlags(CPF_ReturnParm);const bool OutOnly=It->HasAnyPropertyFlags(CPF_OutParm) && !It->HasAnyPropertyFlags(CPF_ReferenceParm|CPF_ConstParm);if(Entry?(!Return && !OutOnly):(Return || OutOnly))Names.Add(It->GetFName());}int32 I=0;for(auto* Pin:Node->Pins)if(Pin->PinType.PinCategory!=UEdGraphSchema_K2::PC_Exec && Names.IsValidIndex(I)){const FName Old=Pin->PinName,Name=Names[I++];Pin->PinName=Name;for(auto& User:Node->UserDefinedPins)if(User->PinName==Old)User->PinName=Name;}}
     bool SetFrameMethod(UBlueprint* BP,const FDasMethodSchema& M)
     {
         if(DasIsInterfaceEvent(BP,M))return SetInterfaceEvent(BP,M);
         bool Directed=false;for(const auto& P:M.Parameters)Directed |= P.Direction!=TEXT("in");const FName Target=Directed?GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasFrameOutputs):GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasFrame);UEdGraph* G=nullptr;for(UEdGraph* Existing:DasOwnedMethodGraphs(BP)) if(Existing->GetFName()==M.Name) G=Existing;
         if(G){for(UEdGraphNode* Item:G->Nodes) if(auto* Call=Cast<UK2Node_CallFunction>(Item)) if(Call->GetTargetFunction()==BP->ParentClass->FindFunctionByName(Target)){if(!Call->FindPin(TEXT("ResultClass")))Call->ReconstructNode();G->GetSchema()->TrySetDefaultValue(*Call->FindPinChecked(TEXT("ResultClass")),M.ReturnClass);G->GetSchema()->TrySetDefaultValue(*Call->FindPinChecked(TEXT("ScriptFile")),M.ScriptFile);G->GetSchema()->TrySetDefaultValue(*Call->FindPinChecked(TEXT("EntryPoint")),M.EntryPoint);MethodMetadata(G,M);return true;}return false;}
-        G=FBlueprintEditorUtils::CreateNewGraph(BP,M.Name,UEdGraph::StaticClass(),UEdGraphSchema_K2::StaticClass());auto* Interface=DasMethodInterface(BP,M.Name);if(Interface){FBlueprintEditorUtils::AddInterfaceGraph(BP,G,Interface);G->bAllowDeletion=false;for(auto& I:BP->ImplementedInterfaces)if(I.Interface==Interface)I.Graphs.Add(G);}else FBlueprintEditorUtils::AddFunctionGraph<UClass>(BP,G,true,nullptr);
-        TArray<UK2Node_FunctionEntry*> Entries;G->GetNodesOfClass(Entries);if(Entries.Num()!=1) return false;auto* Entry=Entries[0];
+        G=FBlueprintEditorUtils::CreateNewGraph(BP,M.Name,UEdGraph::StaticClass(),UEdGraphSchema_K2::StaticClass());auto* Interface=DasMethodInterface(BP,M.Name);if(Interface){FBlueprintEditorUtils::AddInterfaceGraph(BP,G,Interface);G->bAllowDeletion=false;for(auto& I:BP->ImplementedInterfaces)if(I.Interface==Interface)I.Graphs.Add(G);}else if(auto* Parent=BP->ParentClass->FindFunctionByName(M.Name))FBlueprintEditorUtils::AddFunctionGraph<UClass>(BP,G,false,Parent->GetOwnerClass());else FBlueprintEditorUtils::AddFunctionGraph<UClass>(BP,G,true,nullptr);
+        TArray<UK2Node_FunctionEntry*> Entries;G->GetNodesOfClass(Entries);if(Entries.Num()!=1) return false;auto* Entry=Entries[0];DasCanonicalOverridePins(Entry,BP->ParentClass->FindFunctionByName(M.Name),true);
         for(const auto& P:M.Parameters)if(P.Direction!=TEXT("out")){auto Pin=ScalarPin(static_cast<EDasScalarKind>(P.Kind),P.ClassPath,CastChecked<UBlueprint>(G->GetOuter()));Pin.bIsReference=P.Direction==TEXT("inout");if(!Entry->FindPin(P.Name))Entry->CreateUserDefinedPin(P.Name,Pin,EGPD_Output);}
-        TArray<UK2Node_FunctionResult*> ExistingResults;G->GetNodesOfClass(ExistingResults);auto* Result=ExistingResults.Num()?ExistingResults[0]:Node<UK2Node_FunctionResult>(G);Entry->FindPinChecked(UEdGraphSchema_K2::PN_Then)->BreakAllPinLinks();
+        TArray<UK2Node_FunctionResult*> ExistingResults;G->GetNodesOfClass(ExistingResults);auto* Result=ExistingResults.Num()?ExistingResults[0]:Node<UK2Node_FunctionResult>(G);DasCanonicalOverridePins(Result,BP->ParentClass->FindFunctionByName(M.Name),false);Entry->FindPinChecked(UEdGraphSchema_K2::PN_Then)->BreakAllPinLinks();
         for(const auto& P:M.Parameters)if(P.Direction==TEXT("out") && !Result->FindPin(P.Name))Result->CreateUserDefinedPin(P.Name,ScalarPin(static_cast<EDasScalarKind>(P.Kind),P.ClassPath,CastChecked<UBlueprint>(G->GetOuter())),EGPD_Input);
         // Match declaration order: inputs/ref, out-only parameters, then return.
         if(M.ReturnKind!=EDasMethodSignature::Void && !Result->FindPin(UEdGraphSchema_K2::PN_ReturnValue)) Result->CreateUserDefinedPin(UEdGraphSchema_K2::PN_ReturnValue,ScalarPin(static_cast<EDasScalarKind>(M.ReturnKind),M.ReturnClass,BP),EGPD_Input);
@@ -164,17 +166,17 @@ namespace
             return false;
         }
         Graph = FBlueprintEditorUtils::CreateNewGraph(BP, Method.Name, UEdGraph::StaticClass(), UEdGraphSchema_K2::StaticClass());
-        FBlueprintEditorUtils::AddFunctionGraph<UClass>(BP, Graph, true, nullptr);
+        if(auto* Parent=BP->ParentClass->FindFunctionByName(Method.Name))FBlueprintEditorUtils::AddFunctionGraph<UClass>(BP,Graph,false,Parent->GetOwnerClass());else FBlueprintEditorUtils::AddFunctionGraph<UClass>(BP, Graph, true, nullptr);
         TArray<UK2Node_FunctionEntry*> Entries;
         Graph->GetNodesOfClass(Entries);
         if (Entries.Num() != 1) return false;
-        auto* Entry = Entries[0];
+        auto* Entry = Entries[0];DasCanonicalOverridePins(Entry,BP->ParentClass->FindFunctionByName(Method.Name),true);
         const auto ValueType=ScalarPin(Method.Signature==EDasMethodSignature::Float?EDasScalarKind::Float32:Method.Signature==EDasMethodSignature::Bool?EDasScalarKind::Bool:EDasScalarKind::Int32);
-        if(!Action) Entry->CreateUserDefinedPin(TEXT("Input"),ValueType,EGPD_Output);
+        if(!Action && !Entry->FindPin(TEXT("Input"))) Entry->CreateUserDefinedPin(TEXT("Input"),ValueType,EGPD_Output);
         TArray<UK2Node_FunctionResult*> Results;
         Graph->GetNodesOfClass(Results);
-        auto* Result = Results.Num() ? Results[0] : Node<UK2Node_FunctionResult>(Graph);
-        if(!Action) Result->CreateUserDefinedPin(UEdGraphSchema_K2::PN_ReturnValue,ValueType,EGPD_Input);
+        auto* Result = Results.Num() ? Results[0] : Node<UK2Node_FunctionResult>(Graph);DasCanonicalOverridePins(Result,BP->ParentClass->FindFunctionByName(Method.Name),false);
+        if(!Action && !Result->FindPin(UEdGraphSchema_K2::PN_ReturnValue)) Result->CreateUserDefinedPin(UEdGraphSchema_K2::PN_ReturnValue,ValueType,EGPD_Input);
         auto* Call = NewObject<UK2Node_CallFunction>(Graph);
         Call->SetFromFunction(Target);
         Graph->AddNode(Call, false, false);
@@ -222,6 +224,7 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     if (!IsInGameThread() || !IsValid(BP) || !BP->GeneratedClass || !BP->ParentClass || (!BP->ParentClass->IsChildOf(ADasProbeActor::StaticClass()) && !BP->ParentClass->IsChildOf(UDasScriptComponent::StaticClass())))
     { Error = TEXT("Expected an Actor or Component adapter Blueprint on the game thread"); return false; }
     if (!Schema.Validate(Error)) return false;
+    if(!Schema.ParentStableId.IsEmpty()){const auto* CDO=BP->ParentClass->GetDefaultObject();const FString Id=Cast<ADasProbeActor>(CDO)?CastChecked<ADasProbeActor>(CDO)->AuthoredTypeId:Cast<UDasScriptComponent>(CDO)?CastChecked<UDasScriptComponent>(CDO)->AuthoredTypeId:FString();if(Id!=Schema.ParentStableId){Error=TEXT("Authored parent identity differs from declaration");return false;}}
     if((Schema.Parent==TEXT("ActorComponent"))!=BP->ParentClass->IsChildOf(UDasScriptComponent::StaticClass())){Error=TEXT("DSL parent differs from Blueprint adapter");return false;}
     const FString ExistingId = BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasClassId"));
     if (!ExistingId.IsEmpty() && Schema.StableId != ExistingId)
@@ -255,8 +258,8 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     }
     for (const auto& M:Methods)
     {
-        if (BP->ParentClass->FindFunctionByName(M.Name) || BP->ParentClass->FindPropertyByName(M.Name)) {Error=TEXT("Method conflicts with inherited member");return false;}
-        if (UFunction* Prior=BP->GeneratedClass->FindFunctionByName(M.Name))
+        if(auto* ParentMethod=BP->ParentClass->FindFunctionByName(M.Name)){if(Schema.ParentStableId.IsEmpty() || !M.bBlueprintEvent || ParentMethod->HasAnyFunctionFlags(FUNC_Final) || !MethodShape(ParentMethod,M)){Error=TEXT("Override requires a compatible non-final authored BlueprintEvent");return false;}}else if(BP->ParentClass->FindPropertyByName(M.Name)){Error=TEXT("Method conflicts with inherited property");return false;}
+        if (UFunction* Prior=BP->GeneratedClass->FindFunctionByName(M.Name);Prior && Prior->GetOuterUClass()==BP->GeneratedClass)
         {
             const FString PriorId=Prior->GetMetaData(TEXT("DasMemberId"));
             const FString PriorInput=BP->GetOutermost()->GetMetaData().GetValue(BP,*(TEXT("DasInputId.")+M.Name.ToString()));

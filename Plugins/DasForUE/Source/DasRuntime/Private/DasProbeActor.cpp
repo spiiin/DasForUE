@@ -36,7 +36,11 @@ void ADasProbeActor::ApplyDasSceneRoot()
     auto* Previous=GetRootComponent();
     Scene->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
     SetRootComponent(Scene);
-    if(Previous)Previous->AttachToComponent(Scene,FAttachmentTransformRules::KeepWorldTransform);
+    // PIE duplication restores the CDO native root before restoring the SCS root.
+    // Keeping the fallback below the SCS root would then create a reverse edge/cycle.
+    if(Previous && Previous->CreationMethod==EComponentCreationMethod::Native && Previous->GetFName()==TEXT("ProbeRoot"))
+        Previous->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+    else if(Previous)Previous->AttachToComponent(Scene,FAttachmentTransformRules::KeepWorldTransform);
 }
 
 int32 ADasProbeActor::ExecuteDas(const FString& ScriptFile, int32 Input)

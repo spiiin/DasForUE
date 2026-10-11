@@ -60,6 +60,7 @@ struct DASRUNTIME_API FDasClassSchema
 {
     FName Name;
     FName Parent = TEXT("Actor");
+    FString ParentStableId; // Immediate authored parent; fields/methods here are owned only.
     TArray<FDasFieldSchema> Fields;
     FDasMethodSchema Method;
     FString StableId;

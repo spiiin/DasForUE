@@ -185,12 +185,12 @@
         const uint64 Token=NextCallHandle++;ActiveContext->Calls.Add(Token,MoveTemp(Call));return {Token};
     }
 
-    FDasCallHandle BeginCall(const FDasObjectHandle& Target, const char* Name, das::Context* Context)
+    FDasCallHandle BeginCallSelected(const FDasObjectHandle& Target, const char* Name, das::Context* Context,UFunction* Selected=nullptr)
     {
         UObject* Object = ResolveObject(Target, Context);
         if (ActiveContext->bCollectingSubscriptions) Context->throw_error("UFunction calls are forbidden in bind_events");
         if (!Name || !*Name || FCStringAnsi::Strlen(Name) >= NAME_SIZE) Context->throw_error("invalid function name");
-        UFunction* Function = Object->FindFunction(FName(UTF8_TO_TCHAR(Name)));
+        UFunction* Function = Selected?Selected:Object->FindFunction(FName(UTF8_TO_TCHAR(Name)));
         if (!Function || !Function->HasAnyFunctionFlags(FUNC_BlueprintCallable) ||
             Function->HasAnyFunctionFlags(FUNC_Static | FUNC_Net | FUNC_Delegate | FUNC_MulticastDelegate))
             Context->throw_error("expected a local BlueprintCallable instance UFunction");
@@ -206,6 +206,8 @@
         ActiveContext->Calls.Add(Token, MoveTemp(Call));
         return {Token};
     }
+
+    FDasCallHandle BeginCall(const FDasObjectHandle& T,const char* N,das::Context* C){return BeginCallSelected(T,N,C);}
 
     FMarshalledCall& ResolveCall(const FDasCallHandle& Handle, das::Context* Context)
     {
@@ -551,7 +553,7 @@
         if (!Call.DelegateInvoke && (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))
             Context->throw_error("call target expired");
         if(!Call.InterfaceSignatureKey.IsEmpty()){auto* Interface=Call.RequiredInterface.Get();auto* Declared=Interface?Interface->FindFunctionByName(Call.Function->GetFName()):nullptr;if(!Interface || !Object->GetClass()->ImplementsInterface(Interface) || !Declared || CallSignatureKey(Declared)!=Call.InterfaceSignatureKey || !Call.Function->IsSignatureCompatibleWith(Declared))Context->throw_error("interface contract changed; create a new interface frame");}
-        if (!Call.DelegateInvoke && Object->FindFunction(Call.Function->GetFName()) != Call.Function.Get()) Context->throw_error("UFunction changed; create a new call frame");
+        if (!Call.DelegateInvoke && (Call.FunctionScopeClass.IsValid()?Call.FunctionScopeClass->FindFunctionByName(Call.Function->GetFName()):Object->FindFunction(Call.Function->GetFName())) != Call.Function.Get()) Context->throw_error("UFunction changed; create a new call frame");
         if(!Call.AutomaticWorldContext.IsEmpty()){
             auto* Self=ResolveSelf(Context);auto* World=GEngine?GEngine->GetWorldFromContextObject(Self,EGetWorldErrorMode::ReturnNull):nullptr;
             auto* P=StaticWorldParameter(Call.Function.Get(),Call.AutomaticWorldContext,Context);

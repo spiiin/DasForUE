@@ -13,7 +13,9 @@ $Arguments = @(('"' + $Project + '"'), '-unattended', '-NullRHI', '-nosplash', '
     '-ExecCmds="Automation RunTests DasForUE.Gameplay.RuntimePIE"', '-TestExit="Automation Test Queue Empty"',
     ('-ReportExportPath="' + $Report + '"'), ('-abslog="' + $Log + '"'))
 $Process = Start-Process -FilePath (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') `
-    -ArgumentList $Arguments -WindowStyle Hidden -PassThru -Wait
+    -ArgumentList $Arguments -WindowStyle Hidden -PassThru
+# Wait for the editor itself; persistent helper services must not hold this test open.
+$Process.WaitForExit()
 if ($Process.ExitCode) { throw "PIE editor exited with $($Process.ExitCode)" }
 if (!(Select-String -LiteralPath $Log -SimpleMatch 'DAS_GAMEPLAY_RUNTIME_PIE_RESULT=PASS')) { throw 'PIE probe did not report PASS' }
 $Result = Get-Content -LiteralPath (Join-Path $Report 'index.json') -Raw | ConvertFrom-Json

@@ -1,6 +1,10 @@
 #include "DasDSLService.h"
 #include "DasProbeActor.h"
 #include "DasRuntime.h"
+#include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
+#include "Engine/SimpleConstructionScript.h"
+#include "Engine/SCS_Node.h"
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -13,7 +17,7 @@
 
 namespace {
 struct FGameplayPIEState {
-    TStrongObjectPtr<UBlueprint> Blueprint,SingleBlueprint;
+    TStrongObjectPtr<UBlueprint> Blueprint,SingleBlueprint,InheritedBlueprint,LifeBlueprint;
     TWeakObjectPtr<ADasProbeActor> First, Second;
     TStrongObjectPtr<ADasProbeActor> DestroyedOwner;
     int32 DestroyedPulses=0;
@@ -77,7 +81,34 @@ public:
                 int32 RefValue=0;if(auto* Fn=Single->FindFunction(TEXT("ProbeRefOut")))Single->ProcessEvent(Fn,&RefValue);
                 Check(RefValue==30 && Single->LastDasError.IsEmpty(),TEXT("single_delegate_ref_out_and_multicast_ref_in_PIE"));
                 int32 ArrayRef=0;if(auto* Fn=Single->FindFunction(TEXT("ProbeRefArray")))Single->ProcessEvent(Fn,&ArrayRef);Check(ArrayRef==1,TEXT("delegate_array_ref_out_in_PIE"));
+                ADasProbeActor* Inherited=nullptr;for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->GetFName()==TEXT("InheritedOwner"))Inherited=*It;
+                struct FInheritanceArgs{int32 Input=2,Result=0;};FInheritanceArgs IA;if(Inherited)if(auto* Fn=Inherited->FindFunction(TEXT("Probe")))Inherited->ProcessEvent(Fn,&IA);Check(Inherited && IA.Result==27 && Inherited->LastDasError.IsEmpty(),TEXT("authored_inheritance_override_Super_in_PIE"));if(Inherited)Inherited->Destroy();
                 Single->Destroy();Check(R.SubscriptionCount(Single)==0,TEXT("single_delegate_owner_destroy_cleanup"));
+            }
+            ADasProbeActor* Life=nullptr;
+            for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->GetFName()==TEXT("LifeOwner"))Life=*It;
+            Check(Life!=nullptr,TEXT("inherited_lifecycle_actor_in_PIE"));
+            if(Life){
+                auto* BehaviorField=FindFProperty<FObjectProperty>(Life->GetClass(),TEXT("Behavior"));
+                auto* PivotField=FindFProperty<FObjectProperty>(Life->GetClass(),TEXT("Pivot"));
+                TStrongObjectPtr<UActorComponent> Behavior(BehaviorField?Cast<UActorComponent>(BehaviorField->GetObjectPropertyValue_InContainer(Life)):nullptr);
+                TStrongObjectPtr<ADasProbeActor> KeepLife(Life);
+                Check(Life->GetRootComponent() && Life->GetRootComponent()->bHiddenInGame,TEXT("inherited_native_template_override"));
+                Check(ProbeInt(Behavior.Get(),TEXT("Bonus"))==55,TEXT("inherited_component_editable_template_default"));
+                Check(Behavior.IsValid() && PivotField && PivotField->GetObjectPropertyValue_InContainer(Life)==Life->GetRootComponent(),TEXT("inherited_SCS_fields_and_root"));
+                Check(ProbeInt(Life,TEXT("BaseBegins"))==1 && ProbeInt(Life,TEXT("ChildBegins"))==1 && ProbeInt(Life,TEXT("BaseTicks"))>0,TEXT("explicit_parent_BeginPlay_and_inherited_Tick"));
+                Check(ProbeInt(Behavior.Get(),TEXT("BaseBegins"))==1 && ProbeInt(Behavior.Get(),TEXT("ChildBegins"))==1 && ProbeInt(Behavior.Get(),TEXT("BaseTicks"))>0 && ProbeInt(Behavior.Get(),TEXT("BaseTicks"))==ProbeInt(Behavior.Get(),TEXT("ChildTicks")),TEXT("authored_component_parent_lifecycle_once"));
+                auto ComponentField=[&](const TCHAR* Name){auto* P=FindFProperty<FObjectProperty>(Life->GetClass(),Name);return P?P->GetObjectPropertyValue_InContainer(Life):nullptr;};
+                auto* Extension=Cast<USceneComponent>(ComponentField(TEXT("Extension")));auto* Marker=Cast<USceneComponent>(ComponentField(TEXT("Marker")));
+                TStrongObjectPtr<UObject> ExtraBehavior(ComponentField(TEXT("ExtraBehavior")));
+                Check(Extension && Marker && Extension->GetAttachParent()==Life->GetRootComponent() && Marker->GetAttachParent()==Extension && Extension->GetRelativeLocation().Equals(FVector(0,0,25)),TEXT("derived_scene_components_attach_to_inherited_root_and_owned_node"));
+                Check(ProbeInt(ExtraBehavior.Get(),TEXT("Bonus"))==77 && ProbeInt(ExtraBehavior.Get(),TEXT("BaseBegins"))==1 && ProbeInt(ExtraBehavior.Get(),TEXT("ChildBegins"))==1,TEXT("derived_authored_component_defaults_and_lifecycle"));
+                struct FLifeArgs{int32 Input=0,Result=0;};FLifeArgs LA;
+                if(auto* Fn=Life->FindFunction(TEXT("Probe")))Life->ProcessEvent(Fn,&LA);
+                Check(LA.Result==3 && Life->LastDasError.IsEmpty(),TEXT("inherited_component_typed_access"));
+                Life->Destroy();
+                Check(ProbeInt(ExtraBehavior.Get(),TEXT("BaseEnds"))==1 && ProbeInt(ExtraBehavior.Get(),TEXT("ChildEnds"))==1,TEXT("derived_component_EndPlay_once"));
+                Check(ProbeInt(Life,TEXT("BaseEnds"))==1 && ProbeInt(Life,TEXT("ChildEnds"))==1 && ProbeInt(Behavior.Get(),TEXT("BaseEnds"))==1 && ProbeInt(Behavior.Get(),TEXT("ChildEnds"))==1,TEXT("parent_EndPlay_actor_and_component_once"));
             }
             Check(A->LastDasError.IsEmpty() && B->LastDasError.IsEmpty(),TEXT("no_script_runtime_errors"));
             Check(ProbeInt(A,TEXT("SnapshotSum"))==7 && ProbeInt(A,TEXT("NextSum"))==13,TEXT("owned_array_capture_and_Vector2D_next_tick"));
@@ -122,6 +153,16 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&) {
     if(!TestTrue(TEXT("Create single delegate DSL actor"),FDasDSLService::Apply(TEXT("dsl_single_delegate_actor.das"),Root+TEXT("/BP_SingleDelegate"),TEXT("singledelegate.SingleDelegateActor"),BP,Error))){AddError(Error);return false;}
     State->SingleBlueprint.Reset(BP);FActorSpawnParameters SingleSpawn;SingleSpawn.Name=TEXT("SingleDelegateOwner");
     if(!TestNotNull(TEXT("Spawn single delegate owner"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,SingleSpawn)))return false;
+    if(!TestTrue(TEXT("Create authored child"),FDasDSLService::Apply(TEXT("dsl_inheritance_child.das"),Root+TEXT("/BP_ChildCounter"),TEXT("inheritance.ChildCounter"),BP,Error))){AddError(Error);return false;}State->InheritedBlueprint.Reset(BP);FActorSpawnParameters InheritSpawn;InheritSpawn.Name=TEXT("InheritedOwner");if(!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,InheritSpawn))return false;
+    if(!TestTrue(TEXT("Create inherited lifecycle actor"),FDasDSLService::Apply(TEXT("dsl_life_actor_child.das"),Root+TEXT("/BP_ChildLifeActor"),TEXT("lifefamily.ChildLifeActor"),BP,Error))){AddError(Error);return false;}
+    auto* ParentLifeBP=Cast<UBlueprint>(BP->ParentClass->ClassGeneratedBy);
+    USCS_Node* ParentBehavior=nullptr;USCS_Node* ParentPivot=nullptr;
+    if(ParentLifeBP && ParentLifeBP->SimpleConstructionScript)for(auto* Node:ParentLifeBP->SimpleConstructionScript->GetAllNodes()){if(Node->GetVariableName()==TEXT("Behavior"))ParentBehavior=Node;if(Node->GetVariableName()==TEXT("Pivot"))ParentPivot=Node;}
+    if(!TestTrue(TEXT("Parent component templates unchanged"),ParentBehavior && ProbeInt(ParentBehavior->ComponentTemplate,TEXT("Bonus"))==42 && ParentPivot && !CastChecked<USceneComponent>(ParentPivot->ComponentTemplate)->bHiddenInGame))return false;
+    State->LifeBlueprint.Reset(BP);
+    if(!TestTrue(TEXT("Child owns only its three new SCS nodes"),BP->SimpleConstructionScript && BP->SimpleConstructionScript->GetAllNodes().Num()==3))return false;
+    FActorSpawnParameters LifeSpawn;LifeSpawn.Name=TEXT("LifeOwner");
+    if(!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,LifeSpawn))return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FGameplayPIECommand>(State,this));
     return true;

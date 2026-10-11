@@ -56,6 +56,11 @@ struct FDasDeclaredComponent
     TMap<FString,FString> Metadata;
     bool operator==(const FDasDeclaredComponent& Other)const{return Id==Other.Id && Name==Other.Name && ScriptFile==Other.ScriptFile && ClassName==Other.ClassName && NativeClass==Other.NativeClass && Attach==Other.Attach && AttachSocket==Other.AttachSocket && bRoot==Other.bRoot && Defaults.OrderIndependentCompareEqual(Other.Defaults) && bReadOnly==Other.bReadOnly && bEditable==Other.bEditable && bVisible==Other.bVisible && Metadata.OrderIndependentCompareEqual(Other.Metadata);}
 };
+struct FDasComponentOverride {
+    FString Id,Name; // Stable identity of an inherited SCS node.
+    TMap<FString,FDasDeclaredLiteral> Defaults;
+    bool operator==(const FDasComponentOverride& O)const{return Id==O.Id && Name==O.Name && Defaults.OrderIndependentCompareEqual(O.Defaults);}
+};
 struct FDasDeclaredCallback {
     FString Name,Kind,Source,EventName;
     FString ParameterKind=TEXT("int");
@@ -63,9 +68,10 @@ struct FDasDeclaredCallback {
 };
 struct FDasDeclaredClass
 {
-    FString Id, Name, NativeParent, ParentId;
+    FString Id, Name, NativeParent, ParentId, SourceScript;
     TArray<FString> Interfaces;
     TArray<FDasDeclaredComponent> Components;
+    TArray<FDasComponentOverride> ComponentOverrides;
     TArray<FDasDeclaredCallback> Callbacks;
     TArray<FDasDeclaredProperty> Properties;
     TArray<FDasDeclaredMethod> Methods;
@@ -81,6 +87,8 @@ struct DASRUNTIME_API FDasAuthoringModule
     FString Id;
     TArray<FDasDeclaredClass> Classes;
     bool Validate(FString& Error) const;
+    // Effective view; source declarations retain only their own members.
+    bool ResolveClass(const FString& ClassId,FDasDeclaredClass& Out,FString& Error) const;
     static bool FromJson(const FString& Json, FDasAuthoringModule& Out, FString& Error);
     bool ToJson(FString& Out, FString& Error) const;
     // Preflight for the existing Actor adapter: all unsupported capabilities are refused explicitly.

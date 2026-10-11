@@ -71,5 +71,36 @@ int32 UDasDelegateCommandlet::Main(const FString& Params){
  int32 RefResult=0;auto* RefFunction=SingleActor->FindFunction(TEXT("ProbeRefOut"));if(!RefFunction)return 1;SingleActor->ProcessEvent(RefFunction,&RefResult);if(RefResult!=30){UE_LOG(LogTemp,Error,TEXT("Authored ref/out delegate: %d %s"),RefResult,*SingleActor->LastDasError);return 1;}UE_LOG(LogTemp,Display,TEXT("PASS delegate_saved_ref_out_signature_and_multicast_ref_%s"),*Phase);
  Runtime.ReleaseObject(SingleActor);SingleActor->Destroy();UE_LOG(LogTemp,Display,TEXT("PASS single_delegate_field_reflection_bind_copy_clear_foreign_accessor_%s"),*Phase);
  int32 ArrayResult=0;auto* ArrayOwner=World->SpawnActor<ADasProbeActor>(SingleBP->GeneratedClass);if(!ArrayOwner)return 1;auto* ArrayFn=ArrayOwner->FindFunction(TEXT("ProbeRefArray"));if(!ArrayFn)return 1;ArrayOwner->ProcessEvent(ArrayFn,&ArrayResult);if(ArrayResult!=1){UE_LOG(LogTemp,Error,TEXT("Delegate array ref/out: %s"),*ArrayOwner->LastDasError);return 1;}Runtime.ReleaseObject(ArrayOwner);ArrayOwner->Destroy();UE_LOG(LogTemp,Display,TEXT("PASS delegate_array_ref_out_%s"),*Phase);
+ const FString ChildPackage=FPackageName::GetLongPackagePath(Package)+TEXT("/BP_ChildCounter");UBlueprint* ChildBP=nullptr;
+ if(Phase==TEXT("Create")){if(!FDasDSLService::Apply(TEXT("dsl_inheritance_child.das"),ChildPackage,TEXT("inheritance.ChildCounter"),ChildBP,Error)){UE_LOG(LogTemp,Error,TEXT("Inheritance import: %s"),*Error);return 1;}for(auto* SaveBP:{ChildBP,Cast<UBlueprint>(ChildBP->ParentClass->ClassGeneratedBy)}){if(!SaveBP)return 1;const FString File=FPackageName::LongPackageNameToFilename(SaveBP->GetOutermost()->GetName(),FPackageName::GetAssetPackageExtension());FSavePackageArgs Save;Save.TopLevelFlags=RF_Public|RF_Standalone;if(!UPackage::SavePackage(SaveBP->GetOutermost(),SaveBP,*File,Save))return 1;}}
+ else ChildBP=LoadObject<UBlueprint>(nullptr,*(ChildPackage+TEXT(".BP_ChildCounter")));
+ if(!ChildBP || !ChildBP->GeneratedClass || ChildBP->NewVariables.Num()!=1 || !Cast<UBlueprint>(ChildBP->ParentClass->ClassGeneratedBy))return 1;auto* Child=World->SpawnActor<ADasProbeActor>(ChildBP->GeneratedClass);if(!Child)return 1;auto* Probe=Child->FindFunction(TEXT("Probe"));struct FChildArgs{int32 Input=2,ReturnValue=0;};FChildArgs ChildArgs;if(!Probe)return 1;Child->ProcessEvent(Probe,&ChildArgs);if(ChildArgs.ReturnValue!=27 || Child->AuthoredTypeId!=TEXT("inheritance.ChildCounter")){UE_LOG(LogTemp,Error,TEXT("Inheritance result %d: %s"),ChildArgs.ReturnValue,*Child->LastDasError);return 1;}const auto AsBase=Runtime.RunPersistent(Runtime.ScriptPath(TEXT("inheritance_reference_probe.das")),1,Child);if(!AsBase.bSucceeded || AsBase.Value!=16){UE_LOG(LogTemp,Error,TEXT("Base reference on authored child: %s %d"),*AsBase.Error,AsBase.Value);return 1;}
+ Runtime.ReleaseObject(Child);Child->Destroy();UE_LOG(LogTemp,Display,TEXT("PASS authored_inheritance_fields_override_Super_%s"),*Phase);
+ const FString LifePackage=FPackageName::GetLongPackagePath(Package)+TEXT("/BP_ChildLifeActor");UBlueprint* LifeBP=nullptr;
+ if(Phase==TEXT("Create")){
+  if(!FDasDSLService::Apply(TEXT("dsl_life_actor_child.das"),LifePackage,TEXT("lifefamily.ChildLifeActor"),LifeBP,Error)){UE_LOG(LogTemp,Error,TEXT("Lifecycle import: %s"),*Error);return 1;}
+  TArray<UBlueprint*> Family{LifeBP,Cast<UBlueprint>(LifeBP->ParentClass->ClassGeneratedBy)};
+  auto* BehaviorProperty=FindFProperty<FObjectProperty>(LifeBP->GeneratedClass,TEXT("Behavior"));
+  auto* BehaviorClass=BehaviorProperty?BehaviorProperty->PropertyClass.Get():nullptr;
+  if(BehaviorClass){Family.Add(Cast<UBlueprint>(BehaviorClass->ClassGeneratedBy));Family.Add(Cast<UBlueprint>(BehaviorClass->GetSuperClass()->ClassGeneratedBy));}
+  for(auto* FamilyBP:Family){if(!FamilyBP)return 1;const FString File=FPackageName::LongPackageNameToFilename(FamilyBP->GetOutermost()->GetName(),FPackageName::GetAssetPackageExtension());FSavePackageArgs Save;Save.TopLevelFlags=RF_Public|RF_Standalone;if(!UPackage::SavePackage(FamilyBP->GetOutermost(),FamilyBP,*File,Save))return 1;}
+ }else LifeBP=LoadObject<UBlueprint>(nullptr,*(LifePackage+TEXT(".BP_ChildLifeActor")));
+ if(!LifeBP || !LifeBP->GeneratedClass)return 1;
+ auto* Life=World->SpawnActor<ADasProbeActor>(LifeBP->GeneratedClass);if(!Life)return 1;
+ auto IntField=[](UObject* Object,const TCHAR* Name){auto* Field=Object?FindFProperty<FIntProperty>(Object->GetClass(),Name):nullptr;return Field?Field->GetPropertyValue_InContainer(Object):MIN_int32;};
+ const auto BeginResult=Runtime.RunLifecycle(Runtime.ScriptPath(TEXT("dsl_life_actor_child.das")),EDasCallback::BeginPlay,Life);
+ const auto TickResult=Runtime.RunLifecycle(Runtime.ScriptPath(TEXT("dsl_life_actor_child.das")),EDasCallback::Tick,Life,0.1f);
+ const auto BeginAgain=Runtime.RunLifecycle(Runtime.ScriptPath(TEXT("dsl_life_actor_child.das")),EDasCallback::BeginPlay,Life);
+ const auto EndResult=Runtime.RunLifecycle(Runtime.ScriptPath(TEXT("dsl_life_actor_child.das")),EDasCallback::EndPlay,Life,0.f,0);
+ if(!BeginResult.bSucceeded || !TickResult.bSucceeded || !BeginAgain.bSucceeded || !EndResult.bSucceeded || IntField(Life,TEXT("BaseBegins"))!=1 || IntField(Life,TEXT("ChildBegins"))!=1 || IntField(Life,TEXT("BaseTicks"))!=1 || IntField(Life,TEXT("BaseEnds"))!=1 || IntField(Life,TEXT("ChildEnds"))!=1){UE_LOG(LogTemp,Error,TEXT("Lifecycle chain: %s / %s / %s"),*BeginResult.Error,*TickResult.Error,*EndResult.Error);return 1;}
+ Runtime.ReleaseObject(Life);Life->Destroy();
+ UE_LOG(LogTemp,Display,TEXT("PASS inherited_lifecycle_saved_chain_once_%s"),*Phase);
+ UBlueprint* TickOnlyBP=nullptr;
+ if(!FDasDSLService::Apply(TEXT("dsl_life_tick_child.das"),FPackageName::GetLongPackagePath(Package)+TEXT("/BP_TickOnlyChild"),TEXT("lifetick.TickOnlyChild"),TickOnlyBP,Error)){UE_LOG(LogTemp,Error,TEXT("Tick-only import: %s"),*Error);return 1;}
+ auto* TickOnly=World->SpawnActor<ADasProbeActor>(TickOnlyBP->GeneratedClass);if(!TickOnly)return 1;
+ const auto TickOnlyResult=Runtime.RunLifecycle(Runtime.ScriptPath(TEXT("dsl_life_tick_child.das")),EDasCallback::Tick,TickOnly,0.1f);
+ if(!TickOnlyResult.bSucceeded || IntField(TickOnly,TEXT("Ticks"))!=1){UE_LOG(LogTemp,Error,TEXT("Tick-only chain: %s"),*TickOnlyResult.Error);return 1;}
+ Runtime.ReleaseObject(TickOnly);TickOnly->Destroy();
+ UE_LOG(LogTemp,Display,TEXT("PASS inherited_tick_without_BeginPlay_or_parent_method_%s"),*Phase);
  UE_LOG(LogTemp,Display,TEXT("DAS_AUTHORED_DELEGATES_RESULT=PASS"));return 0;
 }
