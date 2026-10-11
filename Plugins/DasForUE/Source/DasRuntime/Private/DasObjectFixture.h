@@ -101,6 +101,9 @@ public:
         for(auto& Item:Result.Items){Item.Values.Remove(-100);Item.Tags.Remove(TEXT("drop"));}
         return Result;
     }
+    UFUNCTION() void DelegatePair(UObject* Object,float Value){health+=Object?int32(Value):0;}
+    UFUNCTION() void DelegateIncrement(int32 Value){health+=Value;}
+    UFUNCTION() void DelegateDouble(int32 Value){health+=Value*2;}
     UFUNCTION(BlueprintCallable, Category="Probe") int32 AddHealth(int32 Value) { health += Value; return health; }
     UFUNCTION(BlueprintCallable, Category="Probe") float ScaleSpeed(float Value) { return speed * Value; }
     UFUNCTION(BlueprintCallable, Category="Probe") void SetHealthValue(int32 Value) { health = Value; }

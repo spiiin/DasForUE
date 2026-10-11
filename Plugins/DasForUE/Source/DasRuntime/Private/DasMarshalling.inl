@@ -512,10 +512,10 @@
         if (ActiveContext->bCollectingSubscriptions) Context->throw_error("UFunction calls are forbidden in bind_events");
         if (Call.bExecuted) Context->throw_error("a call frame may only execute once");
         UObject* Object = Call.Target.Get();
-        if (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed()))
+        if (!Call.DelegateInvoke && (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))
             Context->throw_error("call target expired");
         if(!Call.InterfaceSignatureKey.IsEmpty()){auto* Interface=Call.RequiredInterface.Get();auto* Declared=Interface?Interface->FindFunctionByName(Call.Function->GetFName()):nullptr;if(!Interface || !Object->GetClass()->ImplementsInterface(Interface) || !Declared || CallSignatureKey(Declared)!=Call.InterfaceSignatureKey || !Call.Function->IsSignatureCompatibleWith(Declared))Context->throw_error("interface contract changed; create a new interface frame");}
-        if (Object->FindFunction(Call.Function->GetFName()) != Call.Function.Get()) Context->throw_error("UFunction changed; create a new call frame");
+        if (!Call.DelegateInvoke && Object->FindFunction(Call.Function->GetFName()) != Call.Function.Get()) Context->throw_error("UFunction changed; create a new call frame");
         auto WholeInput=[&](const FString& Path){for(const auto& Root:Call.WholeInputs)if(Path==Root || Path.StartsWith(Root+TEXT(".")))return true;return false;};
         for (const auto& Parameter : Call.Signature)
             if (Parameter.bInput && !WholeInput(Parameter.Path) && !Parameter.Path.Contains(TEXT(".*")) && !Call.Assigned.Contains(Parameter.Path))
@@ -535,7 +535,7 @@
             if(AuthoredDispatchDepth>=32)Context->throw_error("authored method recursion limit exceeded");
             TGuardValue<int32> Depth(AuthoredDispatchDepth,AuthoredDispatchDepth+1);
             TGuardValue<FString*> Failure(AuthoredDispatchFailure,&DispatchFailure);
-            Object->ProcessEvent(Call.Function.Get(),Call.Frame->GetStructMemory());
+            if(Call.DelegateInvoke)Call.DelegateInvoke(Call.Frame->GetStructMemory());else Object->ProcessEvent(Call.Function.Get(),Call.Frame->GetStructMemory());
         }else Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
         if(!DispatchFailure.IsEmpty())Context->throw_error(TCHAR_TO_UTF8(*DispatchFailure));
         int32 OutputTraversalBudget=1048576;

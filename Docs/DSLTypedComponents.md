@@ -97,3 +97,5 @@ Creation nesting is limited to 16 and checked before allocating the component.
 This does not establish packaged-build or replication coverage.
 
 Validation 2026-10-11: TestDynamicComponentsPIE.ps1 PASS; one successful automation test, zero warnings/errors.
+
+Class handle stage: ue_class_loaded(type<T>, path) returns UEClassHandle for an already-loaded class. Both authored and native create/get_or_create accept this as a fourth argument. See DSLClassReferences.md for lifetime and property-support limits.

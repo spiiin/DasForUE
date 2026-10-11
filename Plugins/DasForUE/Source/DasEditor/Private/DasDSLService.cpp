@@ -69,6 +69,7 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
             }
         }
     }
+    if(!Created){const FString Wire=BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"));FDasAuthoringModule Prior;if(!Wire.IsEmpty()){if(!FDasAuthoringModule::FromJson(Wire,Prior,Error))return false;const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});auto HasEvents=[](const FDasDeclaredClass& C){return C.Properties.ContainsByPredicate([](const auto& P){return P.Type.Kind==TEXT("event");});};if((HasEvents(Declaration) || (Old && HasEvents(*Old))) && (!Old || DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse || FDasAuthoringModule::Compare(*Old,Declaration).bStructural)){Error=TEXT("Structural migration of classes with authored events is deferred; body/metadata-only reimport is supported");return false;}}}
     TMap<FString,UBlueprint*> ComponentBlueprints;if(!DasPrepareComponentComposition(Declaration,Package,ComponentBlueprints,Error))return false;
     if(!Created && Schema.Parent==TEXT("ActorComponent") && (DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse || BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"))!=Json)){Error=TEXT("Component declaration migration is deferred; body-only reimport is supported");return false;}
     if(DefaultPolicy!=EDasDefaultMigrationPolicy::Refuse){
@@ -142,7 +143,7 @@ FDasScalarValue CaptureRenamedField(UObject* Object,FName Name,EDasScalarKind Ki
     case EDasScalarKind::Double:V.DoubleValue=CastFieldChecked<FDoubleProperty>(P)->GetPropertyValue_InContainer(Object);break;
     case EDasScalarKind::Name:V.NameValue=CastFieldChecked<FNameProperty>(P)->GetPropertyValue_InContainer(Object);break;
     case EDasScalarKind::Enum:{auto* E=CastFieldChecked<FByteProperty>(P);V.IntValue=E->GetPropertyValue_InContainer(Object);V.ObjectClass=E->Enum->GetPathName();break;}
-    case EDasScalarKind::Object:{auto* F=CastFieldChecked<FObjectProperty>(P);V.ObjectValue=F->GetObjectPropertyValue_InContainer(Object);V.ObjectClass=F->PropertyClass->GetPathName();break;}
+    case EDasScalarKind::Class:{auto* F=CastFieldChecked<FClassProperty>(P);V.ObjectValue=F->GetObjectPropertyValue_InContainer(Object);V.ObjectClass=F->MetaClass->GetPathName();break;}case EDasScalarKind::Object:{auto* F=CastFieldChecked<FObjectProperty>(P);V.ObjectValue=F->GetObjectPropertyValue_InContainer(Object);V.ObjectClass=F->PropertyClass->GetPathName();break;}
     case EDasScalarKind::Struct:V.StructValue.InitializeAs(CastFieldChecked<FStructProperty>(P)->Struct,P->ContainerPtrToValuePtr<uint8>(Object));break;
     }return V;
 }
@@ -156,7 +157,7 @@ bool RestoreRenamedField(UObject* Object,FName Name,const FDasScalarValue& V){
     case EDasScalarKind::Double:if(auto* F=CastField<FDoubleProperty>(P)){F->SetPropertyValue_InContainer(Object,V.DoubleValue);return true;}break;
     case EDasScalarKind::Name:if(auto* F=CastField<FNameProperty>(P)){F->SetPropertyValue_InContainer(Object,V.NameValue);return true;}break;
     case EDasScalarKind::Enum:if(auto* E=CastField<FByteProperty>(P)){FString Error;if(!E->Enum || E->Enum->GetPathName()!=V.ObjectClass || !ValidateDasEnumNumber(V.ObjectClass,V.IntValue,Error))return false;E->SetPropertyValue_InContainer(Object,uint8(V.IntValue));return true;}break;
-    case EDasScalarKind::Object:if(auto* F=CastField<FObjectProperty>(P)){auto* Target=IsValid(V.ObjectValue.Get())?V.ObjectValue.Get():nullptr;if(F->PropertyClass->GetPathName()!=V.ObjectClass || (Target && !Target->IsA(F->PropertyClass)))return false;F->SetObjectPropertyValue_InContainer(Object,Target);return true;}break;
+    case EDasScalarKind::Class:if(auto* F=CastField<FClassProperty>(P)){auto* Target=Cast<UClass>(V.ObjectValue.Get());if(!F->MetaClass || F->MetaClass->GetPathName()!=V.ObjectClass || (Target && !Target->IsChildOf(F->MetaClass)))return false;F->SetObjectPropertyValue_InContainer(Object,Target);return true;}break;case EDasScalarKind::Object:if(auto* F=CastField<FObjectProperty>(P)){auto* Target=IsValid(V.ObjectValue.Get())?V.ObjectValue.Get():nullptr;if(F->PropertyClass->GetPathName()!=V.ObjectClass || (Target && !Target->IsA(F->PropertyClass)))return false;F->SetObjectPropertyValue_InContainer(Object,Target);return true;}break;
     case EDasScalarKind::Struct:if(auto* F=CastField<FStructProperty>(P))if(F->Struct==V.StructValue.GetScriptStruct()){F->Struct->CopyScriptStruct(P->ContainerPtrToValuePtr<void>(Object),V.StructValue.GetMemory());return true;}break;
     }return false;
 }
@@ -380,6 +381,7 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP,bool Restore,bool Inc
     FDasAuthoringModule Prior,Next;FDasClassSchema Previous,Candidate;FString Json;
     if(!FDasAuthoringModule::FromJson(OldWire,Prior,Error) || !Runtime.ReadAuthoringScript(Runtime.ScriptPath(Script),Next,Error) || !Prior.ToActorSchema(Id,Previous,Error) || !Next.ToActorSchema(Id,Candidate,Error) || !Next.ToJson(Json,Error) || !FDasBlueprintService::Apply(BP,Previous,Error,true))return false;
     if(const auto* Class=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});Class && !Class->Components.IsEmpty()){Error=TEXT("Actor declarations with components require a later migration policy");return false;}
+    if(Previous.Fields.ContainsByPredicate([](const FDasFieldSchema& F){return F.Kind==EDasScalarKind::Class;}) || Candidate.Fields.ContainsByPredicate([](const FDasFieldSchema& F){return F.Kind==EDasScalarKind::Class;})){Error=TEXT("Retired-field migration of class references is deferred");return false;}
     for(const auto& M:Candidate.EffectiveMethods())if(!Runtime.ValidateFrameMethod(Runtime.ScriptPath(M.ScriptFile),Error,M.EntryPoint,M.Contract()))return false;
     const auto* Old=Prior.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});const auto* New=Next.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});if(!Old || !New || Prior.Id!=Next.Id){Error=TEXT("Archive operation requires matching class/module identity");return false;}
     struct FAction {FDasFieldSchema Field;FDasDeclaredProperty Declaration;FGuid Guid;FString MetaKey,StoredModel;};TArray<FAction> Actions;

@@ -24,6 +24,7 @@ struct FDasDeclaredProperty
     FString Id, Name;
     FDasDeclaredType Type;
     FDasDeclaredLiteral Default;
+    FString DelegateWire; // Authoring-only signature contract for event fields.
     bool bEditable = true;
     bool bReadOnly = false;
     TMap<FString, FString> Metadata;

@@ -122,3 +122,5 @@ delegates, worker-thread доставки, скриптовых лямбд и о
 Дополнение: UObjectHandle и `ue_subscribe_object_int` теперь позволяют выбирать
 произвольный доступный объектный источник вместо self/peer. См. Docs/Objects.md.
 Ограничения сигнатуры самого события (dynamic multicast int32) сохраняются.
+
+Current extension: authored single delegates and multicast Event Dispatchers are described in [DSLAuthoredDelegates.md](DSLAuthoredDelegates.md); the limitations above describe the earlier subscription adapter.

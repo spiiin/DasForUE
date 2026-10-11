@@ -41,6 +41,8 @@
 #include "UObject/UnrealType.h"
 #include "UObject/MetaData.h"
 
+
+#include "DasEventDispatchers.h"
 namespace
 {
     FString PreciseDasStructDefault(const UScriptStruct* Type,const void* Memory){FString Text=TEXT("(");bool First=true;for(TFieldIterator<FProperty> It(Type);It;++It){auto* P=*It;const void* Value=P->ContainerPtrToValuePtr<void>(Memory);FString Field;if(auto* S=CastField<FStructProperty>(P))Field=PreciseDasStructDefault(S->Struct,Value);else if(auto* N=CastField<FNumericProperty>(P);N && N->IsFloatingPoint())Field=FString::Printf(TEXT("%.17g"),N->GetFloatingPointPropertyValue(Value));else P->ExportTextItem_Direct(Field,Value,nullptr,nullptr,PPF_Delimited);if(!First)Text+=TEXT(",");First=false;Text+=P->GetName()+TEXT("=")+Field;}return Text+TEXT(")");}
@@ -267,6 +269,7 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     {
         if (BP->ParentClass->FindPropertyByName(Field.Name) || BP->GeneratedClass->FindFunctionByName(Field.Name))
         { Error = TEXT("Field conflicts with an inherited property or function"); return false; }
+        if(Field.Kind==EDasScalarKind::Event){FEdGraphPinType Pin;Pin.PinCategory=UEdGraphSchema_K2::PC_MCDelegate;Pins.Add(Field.Name,Pin);Defaults.Add(Field.Name,TEXT(""));continue;}
         Pins.Add(Field.Name,ScalarPin(Field.Kind,Field.Kind==EDasScalarKind::Enum?Field.EnumPath:Field.Kind==EDasScalarKind::Object?Field.ObjectClass:Field.StructPath));
         if(Field.Kind==EDasScalarKind::Struct && DasContainerProperty(Field.StructPath)){Defaults.Add(Field.Name,TEXT(""));continue;}if(Field.Kind==EDasScalarKind::Struct){FInstancedStruct Value;if(!ParseDasStructDefault(Field.StructPath,Field.StructDefault,Value,Error))return false;Defaults.Add(Field.Name,PreciseDasStructDefault(Value.GetScriptStruct(),Value.GetMemory()));continue;}
         Defaults.Add(Field.Name,Field.Kind==EDasScalarKind::Enum?Field.EnumDefault:Field.Kind==EDasScalarKind::Object?TEXT("None"):Field.Kind==EDasScalarKind::Int32?FString::FromInt(Field.IntDefault):Field.Kind==EDasScalarKind::Float32?FString::Printf(TEXT("%.9g"),Field.FloatDefault):Field.Kind==EDasScalarKind::Bool?(Field.BoolDefault?TEXT("true"):TEXT("false")):Field.Kind==EDasScalarKind::Double?FString::Printf(TEXT("%.17g"),Field.DoubleDefault):Field.Kind==EDasScalarKind::String?Field.StringDefault:Field.NameDefault.ToString());
@@ -274,10 +277,11 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     for (const auto& Old : BP->NewVariables)
     {
         const auto* Field = Schema.Fields.FindByPredicate([&](const FDasFieldSchema& F) { return F.Name == Old.VarName; });
-        if (!Field || Pins[Old.VarName] != Old.VarType ||
+        if (!Field || (Field->Kind==EDasScalarKind::Event?Old.VarType.PinCategory!=UEdGraphSchema_K2::PC_MCDelegate:Pins[Old.VarName] != Old.VarType) ||
             Field->bInstanceEditable == !!(Old.PropertyFlags & CPF_DisableEditOnInstance) || Field->bReadOnly != !!(Old.PropertyFlags & CPF_BlueprintReadOnly))
         { Error = TEXT("Removal, type, default or editability changes require a migration policy"); return false; }
         UObject* DefaultsObject = BP->GeneratedClass->GetDefaultObject();
+        if(Field->Kind==EDasScalarKind::Event){if(!DasValidateEventField(BP,*Field,Error))return false;if(MigrateDefaults){Error=TEXT("Default migration of classes with events is deferred");return false;}continue;}
         if(!(Field->Kind==EDasScalarKind::Struct && DasContainerProperty(Field->StructPath)) && !ScalarProperty(BP->GeneratedClass->FindPropertyByName(Old.VarName),static_cast<EDasMethodSignature>(Field->Kind))){Error=TEXT("Default migration requires matching reflected property");return false;}
         if(Field->Kind==EDasScalarKind::Enum){auto* P=BP->GeneratedClass->FindPropertyByName(Old.VarName);auto* E=FindObject<UEnum>(nullptr,*Field->EnumPath);if(!P || DasEnumPropertyType(P)!=E || (!MigrateDefaults && DasEnumPropertyNumber(P,P->ContainerPtrToValuePtr<void>(DefaultsObject))!=E->GetValueByNameString(Field->EnumDefault))){Error=TEXT("Enum type/default changes require explicit migration");return false;}continue;}
         if(Field->Kind==EDasScalarKind::Object){auto* P=BP->GeneratedClass->FindPropertyByName(Old.VarName);auto* ReferenceClass=DasReferencePropertyClass(P);if(!ReferenceClass || ReferenceClass->GetPathName()!=Field->ObjectClass || (!MigrateDefaults && DasReferenceGet(P,P->ContainerPtrToValuePtr<void>(DefaultsObject)))){Error=TEXT("Object class/default changes require an explicit migration");return false;}continue;}
@@ -347,6 +351,7 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
         FBlueprintEditorUtils::SetBlueprintVariableCategory(BP,Field.Name,nullptr,FText::FromString(Field.Metadata.FindRef(TEXT("Category"))),true);
         for (const auto& Pair:Field.Metadata) FBlueprintEditorUtils::SetBlueprintVariableMetaData(BP,Field.Name,nullptr,*Pair.Key,Pair.Value);
     }
+    for(const auto& Field:Schema.Fields)if(Field.Kind==EDasScalarKind::Event && !DasCreateEventGraph(BP,Field,Error))return false;
     for(const auto& Path:Schema.Interfaces){auto* Interface=FindObject<UClass>(nullptr,*Path);if(!BP->ImplementedInterfaces.ContainsByPredicate([&](const auto& I){return I.Interface==Interface;})){FBPInterfaceDescription Description;Description.Interface=Interface;BP->ImplementedInterfaces.Add(Description);}}
     for (const auto& M:Methods) if (!SetMethod(BP,M)) {Error=TEXT("Unable to create method graph");return false;}
     FKismetEditorUtilities::CompileBlueprint(BP);

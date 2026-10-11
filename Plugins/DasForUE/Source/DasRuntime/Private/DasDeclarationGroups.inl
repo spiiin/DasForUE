@@ -27,7 +27,7 @@ void DSLExpandDeclarationGroups(const das::StructurePtr& S,bool ComponentsAllowe
         for(size_t I=0;I+1<Arguments.size();++I){
             auto* E=Arguments[I];if(!E || !E->rtti_isVar())DSLFail(TEXT("Declaration group flags must be bare names"));
             const auto Flag=static_cast<das::ExprVar*>(E)->name;
-            if(Flag!="EditAnywhere" && Flag!="BlueprintReadWrite" && Flag!="BlueprintReadOnly" && !(Components && Flag=="VisibleAnywhere"))DSLFail(TEXT("Unsupported declaration group flag: ")+DSLText(Flag));
+            if(Flag!="EditAnywhere" && Flag!="BlueprintReadWrite" && Flag!="BlueprintReadOnly" && !(!Components && Flag=="BlueprintAssignable") && !(Components && Flag=="VisibleAnywhere"))DSLFail(TEXT("Unsupported declaration group flag: ")+DSLText(Flag));
             if(SharedKeys.Contains(DSLText(Flag)))DSLFail(TEXT("Repeated declaration group flag: ")+DSLText(Flag));
             SharedKeys.Add(DSLText(Flag));Shared.push_back(das::AnnotationArgument("ue_property",Flag));
         }

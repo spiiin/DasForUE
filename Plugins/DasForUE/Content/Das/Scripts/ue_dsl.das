@@ -33,3 +33,9 @@ def ue_dsl_commit_struct_member_object(property:string; member:string; value:UOb
 def ue_dsl_commit_struct_member_struct(property:string; member:string; value:UEStructValue):void {
     ue_set_self_struct(property, ue_struct_nested_with(ue_get_self_struct(property), member, -1, value))
 }
+
+// Concrete weak handles and nominal object views share the bound-delegate factory.
+def ue_delegate_target(target:UObjectHandle):UObjectHandle { return target }
+def ue_delegate_target(target:auto):UObjectHandle { return target.handle }
+def ue_delegate_name(method:string):string { return method }
+def ue_delegate_name(method:UENameValue):string { return ue_name_text(method) }

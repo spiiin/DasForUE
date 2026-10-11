@@ -1,5 +1,6 @@
 #include "DasAuthoring.h"
 #include "DasContainerTypes.h"
+#include "Misc/SecureHash.h"
 #include "StructUtils/InstancedStruct.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
@@ -57,7 +58,7 @@ namespace
             return TypeValid(*Type.Key, Classes, false, Error, Depth + 1) && TypeValid(*Type.Value, Classes, false, Error, Depth + 1);
         }
         if (Type.Element || Type.Key || Type.Value) return Fail(Error, TEXT("Scalar/reference type has container members"));
-        if (K == TEXT("object") || K == TEXT("enum") || K == TEXT("struct"))
+        if (K == TEXT("object") || K == TEXT("enum") || K == TEXT("struct") || K == TEXT("event") || K == TEXT("class"))
             return (NativePath(Type.TypePath) || (K == TEXT("object") && Classes.Contains(Type.TypePath))) || Fail(Error, TEXT("Missing type identity: ") + Type.TypePath);
         if (!Type.TypePath.IsEmpty()) return Fail(Error, TEXT("Primitive type has a type_path"));
         if (K == TEXT("int") || K == TEXT("float") || K == TEXT("double") || K == TEXT("bool") || K == TEXT("string") || K == TEXT("name") || (bVoid && K == TEXT("void"))) return true;
@@ -76,7 +77,7 @@ namespace
         if (K == TEXT("bool") && D.Kind == TEXT("bool")) return true;
         if ((K == TEXT("string") || K == TEXT("name") || K == TEXT("enum")) && D.Kind == TEXT("string") && (K != TEXT("name") || D.String.Len() < NAME_SIZE) && (K != TEXT("enum") || Identifier(D.String))) return true;
         if(K==TEXT("struct") && D.Kind==TEXT("string")){FInstancedStruct Value;return ParseDasStructDefault(P.Type.TypePath,D.String,Value,Error);}
-        if (K == TEXT("object") && D.Kind == TEXT("null")) return true;
+        if ((K == TEXT("object") || K == TEXT("class")) && D.Kind == TEXT("null")) return true;
         return Fail(Error, TEXT("Invalid default for property ") + P.Name);
     }
     bool SameDefault(const FDasDeclaredLiteral& A, const FDasDeclaredLiteral& B)
@@ -180,6 +181,7 @@ bool FDasAuthoringModule::Validate(FString& Error) const
         for (const auto& P : C.Properties)
         {
             if (!AddId(P.Id) || !Identifier(P.Name) || Names.Contains(P.Name.ToLower())) return Fail(Error,TEXT("Invalid or duplicate property: ")+P.Name);
+            if(P.Type.Kind==TEXT("event")){if(P.DelegateWire.IsEmpty() || P.DelegateWire.Len()>131072 || P.Type.TypePath!=TEXT("/DasDelegates/")+FMD5::HashAnsiString(*P.DelegateWire)+TEXT(".Type") || !P.Default.Kind.IsEmpty() || P.bEditable || P.bReadOnly)return Fail(Error,TEXT("Invalid authored event signature/default/flags"));}else if(!P.DelegateWire.IsEmpty())return Fail(Error,TEXT("Delegate signature is only valid on event fields"));
             Names.Add(P.Name.ToLower()); if (!TypeValid(P.Type,ClassIds,false,Error) || !DefaultValid(P,Error) || !MetadataValid(P.Metadata,Error)) return false;
         }
         if(C.Callbacks.Num()>64)return Fail(Error,TEXT("Callback limit exceeded"));TSet<FString> LifecycleKinds;
@@ -234,7 +236,8 @@ bool FDasAuthoringModule::FromJson(const FString& Json, FDasAuthoringModule& Out
         for (const auto& V : Ps)
         {
             FDasDeclaredProperty P;
-            if (!Keys(V,{TEXT("id"),TEXT("name"),TEXT("type"),TEXT("default"),TEXT("editable"),TEXT("read_only"),TEXT("metadata")},Error) || !String(V,TEXT("id"),P.Id,Error) || !String(V,TEXT("name"),P.Name,Error) || !Type(V,TEXT("type"),P.Type,Error) || !Meta(V,P.Metadata,Error) || !Boolean(V,TEXT("editable"),P.bEditable,Error) || !Boolean(V,TEXT("read_only"),P.bReadOnly,Error)) return false;
+            if (!Keys(V,{TEXT("id"),TEXT("name"),TEXT("type"),TEXT("default"),TEXT("editable"),TEXT("read_only"),TEXT("metadata"),TEXT("delegate_wire")},Error) || !String(V,TEXT("id"),P.Id,Error) || !String(V,TEXT("name"),P.Name,Error) || !Type(V,TEXT("type"),P.Type,Error) || !Meta(V,P.Metadata,Error) || !Boolean(V,TEXT("editable"),P.bEditable,Error) || !Boolean(V,TEXT("read_only"),P.bReadOnly,Error)) return false;
+            if(V->HasField(TEXT("delegate_wire")) && !String(V,TEXT("delegate_wire"),P.DelegateWire,Error))return false;
             if (const auto* D = V->Values.Find(TEXT("default")))
             {
                 if ((*D)->Type == EJson::Null) P.Default.Kind = TEXT("null");
@@ -280,7 +283,7 @@ bool FDasAuthoringModule::ToJson(FString& Out, FString& Error) const
         TArray<TSharedPtr<FJsonValue>> Pj;
         for (const auto* P : Ps)
         {
-            auto V = MakeShared<FJsonObject>(); V->SetStringField(TEXT("id"),P->Id); V->SetStringField(TEXT("name"),P->Name); V->SetObjectField(TEXT("type"),TypeJson(P->Type)); V->SetBoolField(TEXT("editable"),P->bEditable); V->SetBoolField(TEXT("read_only"),P->bReadOnly); MetadataJson(P->Metadata,V);
+            auto V = MakeShared<FJsonObject>(); V->SetStringField(TEXT("id"),P->Id); V->SetStringField(TEXT("name"),P->Name); V->SetObjectField(TEXT("type"),TypeJson(P->Type)); V->SetBoolField(TEXT("editable"),P->bEditable); V->SetBoolField(TEXT("read_only"),P->bReadOnly); MetadataJson(P->Metadata,V);if(!P->DelegateWire.IsEmpty())V->SetStringField(TEXT("delegate_wire"),P->DelegateWire);
             if (P->Default.Kind == TEXT("number")) V->SetNumberField(TEXT("default"),P->Default.Number);
             else if (P->Default.Kind == TEXT("bool")) V->SetBoolField(TEXT("default"),P->Default.Boolean);
             else if (P->Default.Kind == TEXT("string")) V->SetStringField(TEXT("default"),P->Default.String);
@@ -333,9 +336,9 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
     for (const auto* Ptr : Properties)
     {
         const auto& P=*Ptr;
-        if ((P.Type.Kind != TEXT("int") && P.Type.Kind != TEXT("float") && P.Type.Kind != TEXT("bool") && P.Type.Kind!=TEXT("string") && P.Type.Kind!=TEXT("double") && P.Type.Kind!=TEXT("name") && P.Type.Kind!=TEXT("struct") && P.Type.Kind!=TEXT("object") && P.Type.Kind!=TEXT("enum") && !DasContainerCarrier(P.Type))) return Fail(Error,TEXT("Actor adapter property capability missing: ")+P.Name);
-        FDasFieldSchema F; F.StableId = P.Id; F.Name = *P.Name; F.Kind = P.Type.Kind == TEXT("int")?EDasScalarKind::Int32:P.Type.Kind==TEXT("float")?EDasScalarKind::Float32:P.Type.Kind==TEXT("bool")?EDasScalarKind::Bool:P.Type.Kind==TEXT("string")?EDasScalarKind::String:P.Type.Kind==TEXT("double")?EDasScalarKind::Double:(P.Type.Kind==TEXT("struct") || DasContainerCarrier(P.Type))?EDasScalarKind::Struct:P.Type.Kind==TEXT("object")?EDasScalarKind::Object:P.Type.Kind==TEXT("enum")?EDasScalarKind::Enum:EDasScalarKind::Name; F.bInstanceEditable=P.bEditable;F.bReadOnly=P.bReadOnly;F.Metadata=P.Metadata;
-        F.IntDefault=P.Type.Kind==TEXT("int")?static_cast<int32>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.FloatDefault=P.Type.Kind==TEXT("float")?static_cast<float>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.BoolDefault=P.Default.Boolean;F.DoubleDefault=P.Default.Number;F.StringDefault=P.Default.String;F.NameDefault=P.Type.Kind==TEXT("name")?FName(*P.Default.String):NAME_None; F.StructPath=DasContainerCarrier(P.Type)?DasContainerCarrier(P.Type)->GetPathName():P.Type.Kind==TEXT("struct")?P.Type.TypePath:FString();F.StructDefault=P.Default.String;F.ObjectClass=P.Type.Kind==TEXT("object")?P.Type.TypePath:FString(); F.EnumPath=P.Type.Kind==TEXT("enum")?P.Type.TypePath:FString();F.EnumDefault=P.Type.Kind==TEXT("enum")?P.Default.String:FString();Result.Fields.Add(F);
+        if ((P.Type.Kind != TEXT("int") && P.Type.Kind != TEXT("float") && P.Type.Kind != TEXT("bool") && P.Type.Kind!=TEXT("string") && P.Type.Kind!=TEXT("double") && P.Type.Kind!=TEXT("name") && P.Type.Kind!=TEXT("struct") && P.Type.Kind!=TEXT("object") && P.Type.Kind!=TEXT("enum") && P.Type.Kind!=TEXT("event") && P.Type.Kind!=TEXT("class") && !DasContainerCarrier(P.Type))) return Fail(Error,TEXT("Actor adapter property capability missing: ")+P.Name);
+        FDasFieldSchema F; F.StableId = P.Id; F.Name = *P.Name; F.DelegateWire=P.DelegateWire; F.Kind = P.Type.Kind==TEXT("class")?EDasScalarKind::Class:P.Type.Kind==TEXT("event")?EDasScalarKind::Event:P.Type.Kind == TEXT("int")?EDasScalarKind::Int32:P.Type.Kind==TEXT("float")?EDasScalarKind::Float32:P.Type.Kind==TEXT("bool")?EDasScalarKind::Bool:P.Type.Kind==TEXT("string")?EDasScalarKind::String:P.Type.Kind==TEXT("double")?EDasScalarKind::Double:(P.Type.Kind==TEXT("struct") || DasContainerCarrier(P.Type))?EDasScalarKind::Struct:P.Type.Kind==TEXT("object")?EDasScalarKind::Object:P.Type.Kind==TEXT("enum")?EDasScalarKind::Enum:EDasScalarKind::Name; F.bInstanceEditable=P.bEditable;F.bReadOnly=P.bReadOnly;F.Metadata=P.Metadata;
+        F.IntDefault=P.Type.Kind==TEXT("int")?static_cast<int32>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.FloatDefault=P.Type.Kind==TEXT("float")?static_cast<float>(P.Default.Kind==TEXT("number")?P.Default.Number:0):0; F.BoolDefault=P.Default.Boolean;F.DoubleDefault=P.Default.Number;F.StringDefault=P.Default.String;F.NameDefault=P.Type.Kind==TEXT("name")?FName(*P.Default.String):NAME_None; F.StructPath=DasContainerCarrier(P.Type)?DasContainerCarrier(P.Type)->GetPathName():P.Type.Kind==TEXT("struct")?P.Type.TypePath:FString();F.StructDefault=P.Default.String;F.ObjectClass=(P.Type.Kind==TEXT("object") || P.Type.Kind==TEXT("class"))?P.Type.TypePath:FString(); F.EnumPath=P.Type.Kind==TEXT("enum")?P.Type.TypePath:FString();F.EnumDefault=P.Type.Kind==TEXT("enum")?P.Default.String:FString();Result.Fields.Add(F);
     }
     if (!Result.Validate(Error)) return false; Out = MoveTemp(Result); return true;
 }

@@ -10,7 +10,7 @@ DASRUNTIME_API FProperty* FindDasStructField(UScriptStruct* Type,const FString& 
 DASRUNTIME_API bool ValidateDasStructSnapshot(const FInstancedStruct& Value,FString& Error);
 DASRUNTIME_API bool ParseDasStructDefault(const FString& Path,const FString& Text,FInstancedStruct& Out,FString& Error);
 DASRUNTIME_API bool ValidateDasValueStruct(const FString& Path,FString& Error);
-enum class EDasScalarKind : uint8 { Int32, Float32, Bool, String=5, Double=6, Name=7, Object=8, Struct=12, Enum=13 };
+enum class EDasScalarKind : uint8 { Int32, Float32, Bool, String=5, Double=6, Name=7, Object=8, Struct=12, Enum=13, Event=14, Class=15 };
 
 struct FDasFieldSchema
 {
@@ -23,6 +23,7 @@ struct FDasFieldSchema
     FString StructPath;FString StructDefault;FString ObjectClass;FString EnumPath,EnumDefault;
     bool bInstanceEditable = true;
     FString StableId;
+    FString DelegateWire;
     bool bReadOnly = false;
     TMap<FString,FString> Metadata;
 };

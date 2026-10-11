@@ -2125,3 +2125,27 @@ DasForUE.Components.DynamicPIE passed: nested BeginPlay before create returns, t
 ### Documentation comments → ToolTip
 
 Added the native daScript CommentReader integration: adjacent declaration comments provide default ToolTip metadata for reflected types, fields/components, methods and interface stubs. Explicit ToolTip remains an override. Examples use comments; enum-entry tooltips remain outside this step. See [DSLCommentTooltips.md](DSLCommentTooltips.md).
+
+### Runtime class handles (2026-10-11)
+Added ue_class_loaded(type<T>, path), UEClassHandle, validity/path APIs and component creation through checked class handles. Resolution and use validate native base and authored identity. DynamicPIE passed with wrong-base/identity/missing-class/wrong-create rejection checks. This is runtime scope: reflected FClassProperty, Details picker, serialized defaults, soft loading and cook dependency collection remain next. See DSLClassReferences.md.
+
+### Reflected class properties (2026-10-11)
+UEClassHandle fields with ue_class_base now become FClassProperty/PC_Class constrained by native base. Runtime reads/writes are checked; unchanged reimport preserves editor-selected class defaults. DynamicPIE and ClassReload passed, including saved package dependency recorded by AssetRegistry, fresh-process CDO reload and creation/lifecycle. Syntax defaults, class method parameters, containers, exact authored-ID picker filtering, retired-field/default migrations and packaged-build validation remain deferred.
+
+### Actor spawning and PIE (2026-10-11)
+Added ue_actor_spawn(type<T>, classHandle[, transform, owner, collision]) and owned actor destruction. Checked native/authored identity, game world, transform and collision rule; deferred construction installs scoped lifecycle permission for spawned Actor and its authored components. SpawnPIE passed: native Actor, Blueprint child of authored Actor, owner/transform, actor+SCS component BeginPlay/Tick/EndPlay, invalidation and rejection before mutation. Physical collision outcomes, replication and packaged runtime remain unverified.
+
+### Authored dynamic delegates and events — 2026-10-11
+
+Added ue_delegate/ue_multicast signature declarations using normal DAS function
+types; typed BindUFunction, Execute/ExecuteIfBound, IsBound, Unbind and multicast
+AddUFunction/RemoveUFunction/Broadcast/Clear. Authored multicast fields create saved
+Blueprint Event Dispatchers and use universal self/object-reference accessors.
+Bindings are weak, single delegates copy their binding value, and VM root collection
+reclaims unused values. Structural migration of classes with events is deferred.
+The typed ue_bind factory provides direct bound construction. Single delegate class fields, reflected delegate arguments,
+ref/out signatures and VS Code handler generation remain separate. See
+[DSLAuthoredDelegates.md](DSLAuthoredDelegates.md).
+
+### Actor/component queries by type (2026-10-11)
+Added ue_actor_find/find_all and ue_component_find/find_all for native subclasses and authored stable IDs. First is nullable; all materializes an ordinary typed DAS array using temporary weak snapshots, reclaimed on success and error. Queries stay in the owner's game world; component owner must be in that world. SpawnPIE passed missing/multiple matches, native+authored types, same-type Actor in foreign world, rejected foreign component owner, stale array entries and 70 interrupted snapshots. Ordering is unspecified; tags/radius/interface queries, class-handle filters and reflected result arrays remain deferred.

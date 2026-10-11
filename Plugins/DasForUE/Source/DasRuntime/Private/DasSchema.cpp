@@ -1,4 +1,8 @@
 #include "DasSchema.h"
+#include "DasAuthoring.h"
+#include "DasDelegateSignatures.h"
+#include "UObject/StrongObjectPtr.h"
+#include "UObject/Package.h"
 #include "DasInterfaceContracts.h"
 #include "DasContainerTypes.h"
 #include "DasRuntime.h"
@@ -56,11 +60,13 @@ bool FDasClassSchema::Validate(FString& Error) const
     {
         if (Field.Name.IsNone() || !Identifier(Field.Name.ToString()) || Names.Contains(Field.Name))
         { Error = FString::Printf(TEXT("Invalid or duplicate field: %s"), *Field.Name.ToString()); return false; }
-        if ((Field.Kind != EDasScalarKind::Int32 && Field.Kind != EDasScalarKind::Float32 && Field.Kind != EDasScalarKind::Bool && Field.Kind!=EDasScalarKind::String && Field.Kind!=EDasScalarKind::Double && Field.Kind!=EDasScalarKind::Name && Field.Kind!=EDasScalarKind::Struct && Field.Kind!=EDasScalarKind::Object && Field.Kind!=EDasScalarKind::Enum) ||
+        if ((Field.Kind != EDasScalarKind::Int32 && Field.Kind != EDasScalarKind::Float32 && Field.Kind != EDasScalarKind::Bool && Field.Kind!=EDasScalarKind::String && Field.Kind!=EDasScalarKind::Double && Field.Kind!=EDasScalarKind::Name && Field.Kind!=EDasScalarKind::Struct && Field.Kind!=EDasScalarKind::Object && Field.Kind!=EDasScalarKind::Enum && Field.Kind!=EDasScalarKind::Event && Field.Kind!=EDasScalarKind::Class) ||
             ((Field.Kind == EDasScalarKind::Float32 && !FMath::IsFinite(Field.FloatDefault)) || (Field.Kind==EDasScalarKind::Double && !FMath::IsFinite(Field.DoubleDefault))))
         { Error = TEXT("Unsupported scalar kind or non-finite default"); return false; }
+        if(Field.Kind==EDasScalarKind::Event){FDasAuthoringModule Definition;if(!FDasAuthoringModule::FromJson(Field.DelegateWire,Definition,Error) || Definition.Classes.Num()!=1 || Definition.Classes[0].Methods.Num()!=1)return false;TStrongObjectPtr<UFunction> Signature(MakeDasDelegateSignature(Definition.Classes[0].Methods[0],true,GetTransientPackage(),NAME_None,Error));if(!Signature || Field.bInstanceEditable || Field.bReadOnly)return false;}
         if(Field.Kind==EDasScalarKind::Enum){auto* E=ResolveDasEnum(Field.EnumPath,Error);if(!E || !ValidateDasEnumNumber(Field.EnumPath,E->GetValueByNameString(Field.EnumDefault),Error))return false;}
         if(Field.Kind==EDasScalarKind::Object && (!FindObject<UClass>(nullptr,*Field.ObjectClass) || (!Field.ObjectClass.StartsWith(TEXT("/Script/")) && !FindObject<UClass>(nullptr,*Field.ObjectClass)->HasAnyClassFlags(CLASS_Interface)))){Error=TEXT("Object field requires a loaded native class path");return false;}
+        if(Field.Kind==EDasScalarKind::Class){auto* Base=FindObject<UClass>(nullptr,*Field.ObjectClass);if(!Field.ObjectClass.StartsWith(TEXT("/Script/")) || !Base || Base->HasAnyClassFlags(CLASS_Interface)){Error=TEXT("Class field requires loaded native base class");return false;}}
         if(Field.Kind==EDasScalarKind::Struct){FInstancedStruct Value;if(!ParseDasStructDefault(Field.StructPath,Field.StructDefault,Value,Error))return false;}
         if (!ValidMeta(Field.Metadata)) return false;
         Names.Add(Field.Name);
