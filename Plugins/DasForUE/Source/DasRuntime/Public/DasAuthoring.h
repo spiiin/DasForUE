@@ -7,6 +7,7 @@ struct DASRUNTIME_API FDasDeclaredType
 {
     FString Kind = TEXT("int");
     FString TypePath;
+    FString DelegateWire; // Single-cast method value signature; not a UObject path.
     FString AuthoredId; // Optional authored object identity, separate from host storage.
     TSharedPtr<const FDasDeclaredType> Element, Key, Value;
     FString Identity() const;

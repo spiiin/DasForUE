@@ -2156,3 +2156,64 @@ Native static BlueprintCallable library functions now export and generate free D
 ### Accumulated validation and cooked gameplay — 2026-10-11
 
 Editor/foundation, 19 gameplay DSL fixtures, 90 generator tests, real PIE suites and packaged Development passed. Fixed class-reference Blueprint pins and cooked SCS root restoration; added reproducible cooked gameplay/map export coverage. See [AccumulatedValidation.md](AccumulatedValidation.md).
+
+
+### Single-cast delegate fields — 2026-10-11
+
+Added `ue_delegate` fields on authored Actor/Component classes, represented by UE
+`FDelegateProperty`. Assignment copies a binding, reads return a value snapshot;
+`ue_bind` assignment and empty-value assignment bind/clear the property. Own-object
+and typed foreign accessors share this behavior. Readonly properties reject writes;
+unsupported editor defaults/EditAnywhere fail explicitly. Generated signature
+Blueprints use separate sibling packages and ownership checks; reflected references
+retain the cook dependency without loading the owning class recursively.
+
+Validation covers creation/reopening in fresh processes, reflected dispatch, copied
+binding independence, foreign accessors, actual PIE including Destroy/EndPIE, and
+packaged Development gameplay. Details: [DSLAuthoredDelegates.md](DSLAuthoredDelegates.md).
+
+Next delegate work: reflected method parameters/results, then ref/out in signatures.
+Structural/default migration of classes containing delegate/event fields remains
+deferred and is rejected by the normal import and explicit field migration commands.
+
+
+### Delegate-valued reflected methods — 2026-10-11
+
+Added single-cast delegate input parameters/results to callable `ue_function`
+Actor/Component methods. The authoring type contains a signature contract and its
+identity; saved Blueprint function pins refer to the generated signature asset.
+Internal frame transport copies native weak bindings, with receiving-context tokens
+created at VM entry. Typed foreign method accessors pack/unpack the value using the
+same checked call marshaller. Existing scalar/struct/object frame kinds retain their
+numeric values. Native roundtrip, empty binding, cross-owner/context invocation,
+fresh-process asset reopen, foundation and actual PIE scenarios are covered.
+
+Next: ref/out payloads in delegate signatures. Delegate-valued ref/out method
+parameters, multicast parameters/results, delegate containers and authored interface
+method declarations require their own adapters. Structural migration stays deferred.
+
+Final packaged Development method parameter/result scenario passed as well
+(TestCookedGameplay, 2026-10-11); rendering disabled with NullRHI.
+
+
+### Ref/out payloads in delegate signatures — 2026-10-11
+
+Added an empty `def signature(...)` declaration inside ue_delegate/ue_multicast
+structs to retain variable-level @ue_out/@ue_ref metadata. Mutable T& infers ref;
+@ue_out selects out-only. Existing by-value function-type syntax remains supported;
+reference function-type syntax is rejected because daScript discards annotations.
+No parser change or reader macro was introduced.
+
+Single-cast calls stage return/output values before publishing caller updates;
+unbound ExecuteIfBound preserves variables. Multicast supports ref, rejects out-only
+and returns. Native signatures carry proper property flags. Binding additionally
+checks frame offsets, and newly generated Blueprint methods put out-only pins before
+the return to align their frame layout. Delegate-local converters are private to
+avoid duplicate container helper overloads across modules. Old mismatched graph
+layouts are rejected; structural migration remains deferred.
+
+Native scalar/string and authored scalar/string/array<double> cases, saved asset
+reopening, optional execution and multicast ref are covered. See
+[DSLAuthoredDelegates.md](DSLAuthoredDelegates.md).
+
+Final validation passed: foundation with zero failures, method-dispatch regression PIE, gameplay PIE and packaged Development ref/out scenarios (NullRHI).

@@ -26,6 +26,7 @@ struct FDasExecutionResult
     bool BoolValue = false;
     FString StringValue;double DoubleValue=0;FName NameValue;TWeakObjectPtr<UObject> ObjectValue;
     FInstancedStruct StructValue;
+    FScriptDelegate DelegateValue;
     TArray<FDasScalarValue> OutputValues;
     FVector VectorValue=FVector::ZeroVector;FRotator RotatorValue=FRotator::ZeroRotator;FTransform TransformValue=FTransform::Identity;
     FString Error;

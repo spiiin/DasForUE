@@ -19,3 +19,11 @@
         const auto Weak=Runtime.RunFile(Runtime.ScriptPath(TEXT("delegate_weak_probe.das")),0,false,DelegateOwner.Get());
         Expect(Weak.bSucceeded && Weak.Value==1,TEXT("delegate_weak_target_does_not_keep_UObject_alive"),Weak.Error);
     }
+
+    {
+        TStrongObjectPtr<UDasObjectFixture> Owner(NewObject<UDasObjectFixture>());Owner->health=10;
+        const auto Ref=Runtime.RunFile(Runtime.ScriptPath(TEXT("delegate_refout_probe.das")),0,false,Owner.Get());
+        Expect(Ref.bSucceeded && Ref.Value==24,TEXT("delegate_native_ref_out_return_and_unbound_optional_preservation"),Ref.Error);
+        const auto Wrong=Runtime.RunFile(Runtime.ScriptPath(TEXT("delegate_ref_bad_direction.das")),0,false,Owner.Get());
+        Expect(!Wrong.bSucceeded && Wrong.Error.Contains(TEXT("matching")),TEXT("delegate_ref_out_direction_mismatch_rejected"),Wrong.Error);
+    }

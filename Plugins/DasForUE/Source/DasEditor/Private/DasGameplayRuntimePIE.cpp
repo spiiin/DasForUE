@@ -13,7 +13,7 @@
 
 namespace {
 struct FGameplayPIEState {
-    TStrongObjectPtr<UBlueprint> Blueprint;
+    TStrongObjectPtr<UBlueprint> Blueprint,SingleBlueprint;
     TWeakObjectPtr<ADasProbeActor> First, Second;
     TStrongObjectPtr<ADasProbeActor> DestroyedOwner;
     int32 DestroyedPulses=0;
@@ -62,6 +62,23 @@ public:
                 if(A)Test->AddError(A->LastDasError);
                 End();return false;
             }
+            ADasProbeActor* Single=nullptr;
+            for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->GetFName()==TEXT("SingleDelegateOwner"))Single=*It;
+            Check(Single!=nullptr,TEXT("single_delegate_actor_duplicated_into_PIE"));
+            if(Single){
+                auto Invoke=[&](const TCHAR* Name,int32 Input=0){struct FArgs{int32 Value,ReturnValue=0;};FArgs Args{Input};auto* F=Single->FindFunction(Name);if(F)Single->ProcessEvent(F,F->NumParms?&Args:nullptr);return Args.ReturnValue;};
+                Invoke(TEXT("Bind"));Check(Invoke(TEXT("Invoke"),3)==3,TEXT("single_delegate_field_executes_in_PIE"));
+                Invoke(TEXT("Clear"));auto* Field=FindFProperty<FDelegateProperty>(Single->GetClass(),TEXT("Callback"));
+                Check(Field && !Field->GetPropertyValue_InContainer(Single).IsBound() && Invoke(TEXT("InvokeCopy"),4)==7,TEXT("single_delegate_copy_survives_clearing_field"));
+                auto Result=R.RunPersistent(R.ScriptPath(TEXT("single_delegate_reference_probe.das")),5,Single);
+                Check(Result.bSucceeded && Result.Value==12 && Single->LastDasError.IsEmpty(),TEXT("single_delegate_foreign_accessors_in_PIE"));
+                auto Methods=R.RunNamedPersistent(R.ScriptPath(TEXT("single_delegate_reference_probe.das")),TEXT("method_probe"),2,Single);
+                Check(Methods.bSucceeded && Methods.Value==14 && Single->LastDasError.IsEmpty(),TEXT("single_delegate_method_parameter_and_result_in_PIE"));
+                int32 RefValue=0;if(auto* Fn=Single->FindFunction(TEXT("ProbeRefOut")))Single->ProcessEvent(Fn,&RefValue);
+                Check(RefValue==30 && Single->LastDasError.IsEmpty(),TEXT("single_delegate_ref_out_and_multicast_ref_in_PIE"));
+                int32 ArrayRef=0;if(auto* Fn=Single->FindFunction(TEXT("ProbeRefArray")))Single->ProcessEvent(Fn,&ArrayRef);Check(ArrayRef==1,TEXT("delegate_array_ref_out_in_PIE"));
+                Single->Destroy();Check(R.SubscriptionCount(Single)==0,TEXT("single_delegate_owner_destroy_cleanup"));
+            }
             Check(A->LastDasError.IsEmpty() && B->LastDasError.IsEmpty(),TEXT("no_script_runtime_errors"));
             Check(ProbeInt(A,TEXT("SnapshotSum"))==7 && ProbeInt(A,TEXT("NextSum"))==13,TEXT("owned_array_capture_and_Vector2D_next_tick"));
             Check(ProbeInt(A,TEXT("Delays"))==1 && ProbeInt(A,TEXT("Loads"))==1 && ProbeBool(A,TEXT("LoadOK")),TEXT("latent_and_async_completion_once"));
@@ -102,6 +119,9 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&) {
         FActorSpawnParameters Spawn;Spawn.Name=Name;
         if(!TestNotNull(TEXT("Spawn probe actor"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn)))return false;
     }
+    if(!TestTrue(TEXT("Create single delegate DSL actor"),FDasDSLService::Apply(TEXT("dsl_single_delegate_actor.das"),Root+TEXT("/BP_SingleDelegate"),TEXT("singledelegate.SingleDelegateActor"),BP,Error))){AddError(Error);return false;}
+    State->SingleBlueprint.Reset(BP);FActorSpawnParameters SingleSpawn;SingleSpawn.Name=TEXT("SingleDelegateOwner");
+    if(!TestNotNull(TEXT("Spawn single delegate owner"),World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,SingleSpawn)))return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FGameplayPIECommand>(State,this));
     return true;

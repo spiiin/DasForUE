@@ -24,6 +24,7 @@
         if (CastField<FMapProperty>(Property)) return EMarshallingKind::Map;
         if (CastField<FSetProperty>(Property)) return EMarshallingKind::Set;
         if (CastField<FArrayProperty>(Property)) return EMarshallingKind::Array;
+        if(CastField<FDelegateProperty>(Property))return EMarshallingKind::Delegate;
         if (CallEnumType(Property)) return EMarshallingKind::Enum;
         if (CastField<FNameProperty>(Property)) return EMarshallingKind::Name;
         if (CastField<FIntProperty>(Property)) return EMarshallingKind::Int;
@@ -115,6 +116,7 @@
         case EMarshallingKind::Object: return TEXT("object");
         case EMarshallingKind::Name: return TEXT("name");
         case EMarshallingKind::Enum: return TEXT("enum");
+        case EMarshallingKind::Delegate:return TEXT("delegate");
         case EMarshallingKind::Array: return TEXT("array");
         case EMarshallingKind::Map: return TEXT("map");
         case EMarshallingKind::Set: return TEXT("set");
@@ -124,6 +126,7 @@
     {
         Key += Property->GetName() + TEXT(":") + Property->GetClass()->GetName() + TEXT(":") +
             FString::Printf(TEXT("%llu"), uint64(Property->GetPropertyFlags() & (CPF_Parm | CPF_ReturnParm | CPF_OutParm | CPF_ReferenceParm | CPF_ConstParm)));
+        if(auto* D=CastField<FDelegateProperty>(Property)){Key+=TEXT(":")+(D->SignatureFunction?D->SignatureFunction->GetPathName():TEXT("missing"));if(D->SignatureFunction)for(TFieldIterator<FProperty> It(D->SignatureFunction);It;++It){if(CastField<FDelegateProperty>(*It))Key+=TEXT(":nested_delegate");else AppendCallShape(*It,Key);}}
         if (UEnum* Enum = CallEnumType(Property)) Key += TEXT(":") + Enum->GetPathName();
         if (auto* ReferenceClass = DasReferencePropertyClass(Property)) Key += TEXT(":") + ReferenceClass->GetPathName();
         if (auto* Array = CastField<FArrayProperty>(Property))

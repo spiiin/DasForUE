@@ -19,3 +19,25 @@ struct FObjectValueDelegate {
 struct FScoreEvent {
     signature:function<(Counter:int):void>
 }
+
+// Parameter annotations survive on a method declaration (unlike a function type).
+[ue_delegate]
+struct FValueMutation {
+    def signature(var Count:int&; var Text:string&;
+                  @ue_out var Accepted:bool&; @ue_out var Description:string&):int {}
+}
+
+[ue_delegate]
+struct FOutputValue {
+    def signature(@ue_out var Value:int&):void {}
+}
+
+[ue_multicast]
+struct FCountChanged {
+    def signature(var Counter:int&):void {}
+}
+
+[ue_delegate]
+struct FArrayMutation {
+    def signature(var Values:array<double>&; @ue_out var Previous:array<double>&):void {}
+}
