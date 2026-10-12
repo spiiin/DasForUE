@@ -103,10 +103,15 @@ public:
                 TStrongObjectPtr<UObject> ExtraBehavior(ComponentField(TEXT("ExtraBehavior")));
                 Check(Extension && Marker && Extension->GetAttachParent()==Life->GetRootComponent() && Marker->GetAttachParent()==Extension && Extension->GetRelativeLocation().Equals(FVector(0,0,25)),TEXT("derived_scene_components_attach_to_inherited_root_and_owned_node"));
                 Check(ProbeInt(ExtraBehavior.Get(),TEXT("Bonus"))==77 && ProbeInt(ExtraBehavior.Get(),TEXT("BaseBegins"))==1 && ProbeInt(ExtraBehavior.Get(),TEXT("ChildBegins"))==1,TEXT("derived_authored_component_defaults_and_lifecycle"));
+                Life->EmitDasSignal(4);
+                Check(ProbeInt(Life,TEXT("BaseSignals"))==4 && ProbeInt(Life,TEXT("ChildSignals"))==40 && ProbeInt(Behavior.Get(),TEXT("BaseSignals"))==4 && ProbeInt(Behavior.Get(),TEXT("ChildSignals"))==40 && ProbeInt(ExtraBehavior.Get(),TEXT("BaseSignals"))==4 && ProbeInt(ExtraBehavior.Get(),TEXT("ChildSignals"))==40,TEXT("inherited_and_owned_actor_component_event_subscriptions"));
+                Life->EmitDasSignal(1);
+                Check(ProbeInt(Life,TEXT("BaseSignals"))==5 && ProbeInt(Life,TEXT("ChildSignals"))==50,TEXT("inherited_event_delivered_once_per_handler"));
                 struct FLifeArgs{int32 Input=0,Result=0;};FLifeArgs LA;
                 if(auto* Fn=Life->FindFunction(TEXT("Probe")))Life->ProcessEvent(Fn,&LA);
                 Check(LA.Result==3 && Life->LastDasError.IsEmpty(),TEXT("inherited_component_typed_access"));
                 Life->Destroy();
+                Check(R.SubscriptionCount(Life)==0 && R.SubscriptionCount(Behavior.Get())==0 && R.SubscriptionCount(ExtraBehavior.Get())==0,TEXT("inherited_event_subscriptions_released_on_Destroy"));
                 Check(ProbeInt(ExtraBehavior.Get(),TEXT("BaseEnds"))==1 && ProbeInt(ExtraBehavior.Get(),TEXT("ChildEnds"))==1,TEXT("derived_component_EndPlay_once"));
                 Check(ProbeInt(Life,TEXT("BaseEnds"))==1 && ProbeInt(Life,TEXT("ChildEnds"))==1 && ProbeInt(Behavior.Get(),TEXT("BaseEnds"))==1 && ProbeInt(Behavior.Get(),TEXT("ChildEnds"))==1,TEXT("parent_EndPlay_actor_and_component_once"));
             }

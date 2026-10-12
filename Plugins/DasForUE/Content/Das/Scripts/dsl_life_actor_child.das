@@ -19,6 +19,10 @@ class ChildLifeActor : BaseLifeActor {
     ChildBegins:int=0
     @ue_property=(BlueprintReadWrite)
     ChildEnds:int=0
+    @ue_property=(BlueprintReadWrite)
+    ChildSignals:int=0
+    [ue_event(source="self",name="OnDasSignal")]
+    def ChildSignal(value:int):void { self.ChildSignals+=value*10 }
     [ue_lifecycle]
     def override BeginPlay():void {
         Super.BeginPlay()

@@ -7,6 +7,8 @@ struct ChildBehaviorRef { handle:UObjectHandle }
 
 [ue_class(module_id="lifefamily",parent="Actor",Blueprintable)]
 class BaseLifeActor {
+    @ue_property=(BlueprintReadWrite)
+    BaseSignals:int=0
     @ue_component
     @RootComponent
     Pivot:SceneComponentRef
@@ -20,6 +22,8 @@ class BaseLifeActor {
     @ue_property=(BlueprintReadWrite)
     BaseEnds:int=0
     defaults=ue_defaults() { self.Behavior.Bonus=42 }
+    [ue_event(source="self",name="OnDasSignal")]
+    def ParentSignal(value:int):void { self.BaseSignals+=value }
     [ue_lifecycle]
     def BeginPlay():void { self.BaseBegins+=1 }
     [ue_lifecycle]

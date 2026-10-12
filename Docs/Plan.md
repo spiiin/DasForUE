@@ -2276,3 +2276,20 @@ Changing component type/topology, inherited field metadata and migration of exis
 composition/override declarations remain deferred.
 
 Inherited-default override validation passed: foundation with zero failures, PIE with one successful test and zero warnings/errors, fresh-process Create/Reopen and packaged Development. Parent templates retain Bonus=42 and native visibility; the child gets Bonus=55 and bHiddenInGame=true while its owned ExtraBehavior retains Bonus=77. The PIE launcher now waits for the editor process itself instead of persistent helper descendants.
+
+### Inherited events; component-class replacement audit — 2026-10-11
+
+Committed the previously validated inheritance/lifecycle/component/default work as
+5fa213d. Engine source audit found that SCS override templates must retain the exact
+component class; native class overrides only apply to native default subobjects.
+Authored SCS type replacement therefore needs a separate construction-backend proof
+and is deferred, rather than forcing a record UE will invalidate.
+
+Added additive parent/child managed event subscriptions for Actors and components.
+Missing lifecycle hooks synthesize parent BeginPlay/EndPlay forwarding for event
+parents too. Explicit overridden BeginPlay retains the Super policy. Derived owner
+callbacks validate against the effective ActorComponent root. Same-name handler
+replacement remains rejected; unrelated handler names coexist. Fixtures cover
+self/owner sources, once-per-handler delivery and Destroy/EndPlay cleanup.
+
+Inherited-event validation passed: foundation (zero failures), Create/Reopen, PIE (one success, zero warnings/errors) and packaged Development. Covered additive Actor self events, component owner events, one delivery per handler and cleanup. An imported-parent binder was initially resolved in a child without its own handlers, causing duplicate subscriptions; an explicit empty child binder now prevents this, and the no-BeginPlay/EndPlay parent regression passes.

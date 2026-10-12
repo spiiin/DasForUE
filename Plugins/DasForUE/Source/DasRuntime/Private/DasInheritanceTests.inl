@@ -11,7 +11,7 @@
         FDasAuthoringModule LifeModel;FString LifeError;FDasDeclaredClass LifeEffective;
         const bool LifeRead=Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_life_actor_child.das")),LifeModel,LifeError);
         const auto* LifeChild=LifeModel.Classes.FindByPredicate([](const auto& C){return C.Id==TEXT("lifefamily.ChildLifeActor");});
-        Expect(LifeRead && LifeChild && LifeChild->Components.Num()==3 && LifeChild->Callbacks.Num()==2 && LifeChild->SourceScript==TEXT("dsl_life_actor_child.das") && LifeModel.ResolveClass(LifeChild->Id,LifeEffective,LifeError) && LifeEffective.Components.Num()==5 && LifeEffective.Callbacks.Num()==3,TEXT("inherited_components_owned_callbacks_and_source"),LifeError);
+        Expect(LifeRead && LifeChild && LifeChild->Components.Num()==3 && LifeChild->Callbacks.Num()==3 && LifeChild->SourceScript==TEXT("dsl_life_actor_child.das") && LifeModel.ResolveClass(LifeChild->Id,LifeEffective,LifeError) && LifeEffective.Components.Num()==5 && LifeEffective.Callbacks.Num()==5,TEXT("inherited_components_owned_callbacks_and_source"),LifeError);
         if(LifeRead){
             auto Invalid=LifeModel;auto* Child=Invalid.Classes.FindByPredicate([](const auto& C){return C.Id==TEXT("lifefamily.ChildLifeActor");});
             Child->Components[0].bRoot=true;Expect(!Invalid.Validate(LifeError),TEXT("derived_second_root_rejected"),LifeError);

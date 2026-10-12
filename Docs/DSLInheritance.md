@@ -57,8 +57,9 @@ symbol-use pass to dereference a null class parent.
 - Derived declarations can add new native scene or authored ActorComponent nodes.
   Child defaults can override inherited templates. Replacing inherited node types
   or migrating composition on an existing imported class remains deferred.
-- Overriding managed event subscriptions, script-only helpers, constructors and
-  general native virtual overrides are not included.
+- Parent/child managed event subscriptions are supported. Replacing a parent
+  handler with the same name, script-only helpers, constructors and general native
+  virtual overrides are not included.
 - Changing the parent or applying explicit field structural migration to an authored
   hierarchy is rejected. Broad dependent Blueprint/map migration remains deferred.
 - Base compatibility currently covers typed object checks/accessors. Broader
@@ -186,3 +187,48 @@ changing the declared override values is explicitly refused until the compositio
 migration policy is implemented. This is an initial-import capability.
 
 Inherited-default override validation passed: foundation with zero failures, PIE with one successful test and zero warnings/errors, fresh-process Create/Reopen and packaged Development. Parent templates retain Bonus=42 and native visibility; the child gets Bonus=55 and bHiddenInGame=true while its owned ExtraBehavior retains Bonus=77. The PIE launcher now waits for the editor process itself instead of persistent helper descendants.
+
+## Inherited event subscriptions
+
+Parent and child can each declare a handler for the same Unreal event:
+
+```das
+[ue_event(source="self",name="OnDasSignal")]
+def ChildSignal(value:int):void { self.ChildSignals+=value*10 }
+```
+
+The parent handler lives in its own script session. Calling Super.BeginPlay starts
+that session and its subscriptions; omitted BeginPlay forwards automatically. A
+parent with events but no BeginPlay/EndPlay hook still receives generated forwarding
+in the child, so subscriptions are initialized and cleared. An overridden BeginPlay
+that omits Super deliberately skips parent initialization/subscriptions. EndPlay
+uses the same explicit/automatic chaining policy; Destroy releases all sessions.
+Handlers on both levels are additive and run once per subscription. Do not depend
+on their relative delivery order. Redefining the same inherited handler name is
+explicitly rejected; use a distinct name to add a handler.
+
+The example subscribes both Actor levels to self.OnDasSignal and both authored
+component levels to owner.OnDasSignal. Signal 4 yields BaseSignals=4 and
+ChildSignals=40 independently on the Actor and each component. The TickOnly example
+also covers a parent without explicit BeginPlay/EndPlay and unsubscribe on EndPlay.
+
+## Component class replacement: engine constraint
+
+Changing an inherited SCS component to a subclass is not implemented. UE 5.8's
+InheritableComponentHandler::IsRecordValid requires the override template's class
+**to equal** the original template's class. The engine discards mismatched records.
+The native ComponentClassOverrides path only supports native default subobjects;
+ChangeSubobjectClass tests IsNativeComponent, and Kismet's override validator looks
+for the subobject in the parent CDO. Our authored component nodes are SCS nodes.
+
+Verified locally in Engine/Source/Runtime/Engine/Private/InheritableComponentHandler.cpp
+(IsRecordValid), Engine/Source/Editor/SubobjectDataInterface/Private/SubobjectDataSubsystem.cpp
+(ChangeSubobjectClass), and Engine/Source/Editor/KismetCompiler/Private/KismetCompiler.cpp
+(ValidateComponentClassOverrides).
+
+This needs a separate construction backend investigation, e.g. native component
+slots/factory data available before actor construction. It cannot be implemented
+by changing the handler record or mutating the parent's SCS node. No engine patch,
+duplicate hidden node or spawn-time replacement is added in this slice.
+
+Inherited-event validation passed: foundation (zero failures), Create/Reopen, PIE (one success, zero warnings/errors) and packaged Development. Covered additive Actor self events, component owner events, one delivery per handler and cleanup. An imported-parent binder was initially resolved in a child without its own handlers, causing duplicate subscriptions; an explicit empty child binder now prevents this, and the no-BeginPlay/EndPlay parent regression passes.

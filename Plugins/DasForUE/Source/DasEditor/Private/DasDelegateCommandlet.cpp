@@ -100,6 +100,12 @@ int32 UDasDelegateCommandlet::Main(const FString& Params){
  auto* TickOnly=World->SpawnActor<ADasProbeActor>(TickOnlyBP->GeneratedClass);if(!TickOnly)return 1;
  const auto TickOnlyResult=Runtime.RunLifecycle(Runtime.ScriptPath(TEXT("dsl_life_tick_child.das")),EDasCallback::Tick,TickOnly,0.1f);
  if(!TickOnlyResult.bSucceeded || IntField(TickOnly,TEXT("Ticks"))!=1){UE_LOG(LogTemp,Error,TEXT("Tick-only chain: %s"),*TickOnlyResult.Error);return 1;}
+ TickOnly->EmitDasSignal(3);
+ if(IntField(TickOnly,TEXT("BaseSignals"))!=3){UE_LOG(LogTemp,Error,TEXT("Inherited event-only initialization failed"));return 1;}
+ const auto EventOnlyEnd=Runtime.RunLifecycle(Runtime.ScriptPath(TEXT("dsl_life_tick_child.das")),EDasCallback::EndPlay,TickOnly,0.f,0);
+ if(!EventOnlyEnd.bSucceeded || Runtime.SubscriptionCount(TickOnly)!=0)return 1;
+ TickOnly->EmitDasSignal(5);if(IntField(TickOnly,TEXT("BaseSignals"))!=3)return 1;
+ UE_LOG(LogTemp,Display,TEXT("PASS inherited_event_without_parent_BeginPlay_EndPlay_cleanup_%s"),*Phase);
  Runtime.ReleaseObject(TickOnly);TickOnly->Destroy();
  UE_LOG(LogTemp,Display,TEXT("PASS inherited_tick_without_BeginPlay_or_parent_method_%s"),*Phase);
  UE_LOG(LogTemp,Display,TEXT("DAS_AUTHORED_DELEGATES_RESULT=PASS"));return 0;

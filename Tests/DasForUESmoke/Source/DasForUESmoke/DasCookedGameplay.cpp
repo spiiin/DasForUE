@@ -44,9 +44,13 @@ struct FCookedGameplayState {
    auto* Extension=Cast<USceneComponent>(Object(L,TEXT("Extension")));auto* Marker=Cast<USceneComponent>(Object(L,TEXT("Marker")));TStrongObjectPtr<UObject> ExtraBehavior(Object(L,TEXT("ExtraBehavior")));
    Check(L && Extension && Marker && Extension->GetAttachParent()==L->GetRootComponent() && Marker->GetAttachParent()==Extension && Extension->GetRelativeLocation().Equals(FVector(0,0,25)),TEXT("derived_scene_attachment_and_defaults"));
    Check(Int(ExtraBehavior.Get(),TEXT("Bonus"))==77 && Int(ExtraBehavior.Get(),TEXT("BaseBegins"))==1 && Int(ExtraBehavior.Get(),TEXT("ChildBegins"))==1,TEXT("derived_authored_component_defaults_and_lifecycle"));
+   if(L)L->EmitDasSignal(4);
+   Check(Int(L,TEXT("BaseSignals"))==4 && Int(L,TEXT("ChildSignals"))==40 && Int(LifeBehavior.Get(),TEXT("BaseSignals"))==4 && Int(LifeBehavior.Get(),TEXT("ChildSignals"))==40 && Int(ExtraBehavior.Get(),TEXT("BaseSignals"))==4 && Int(ExtraBehavior.Get(),TEXT("ChildSignals"))==40,TEXT("inherited_actor_component_events"));
    if(L)L->Destroy();
    Check(Int(ExtraBehavior.Get(),TEXT("BaseEnds"))==1 && Int(ExtraBehavior.Get(),TEXT("ChildEnds"))==1,TEXT("derived_component_EndPlay_once"));
    Check(Int(L,TEXT("BaseEnds"))==1 && Int(L,TEXT("ChildEnds"))==1 && Int(LifeBehavior.Get(),TEXT("BaseEnds"))==1 && Int(LifeBehavior.Get(),TEXT("ChildEnds"))==1,TEXT("inherited_actor_component_EndPlay_once"));
+   if(TickOnly.IsValid())TickOnly->EmitDasSignal(3);
+   Check(Int(TickOnly.Get(),TEXT("BaseSignals"))==3,TEXT("event_only_parent_initialization_without_BeginPlay_hook"));
    Check(TickOnly.IsValid() && Int(TickOnly.Get(),TEXT("Ticks"))>0 && TickOnly->LastDasError.IsEmpty(),TEXT("inherited_Tick_without_BeginPlay_or_parent_UFunction"));
    Call(A,TEXT("Stop"));Pulses=Int(A,TEXT("Pulses"));Call(B,TEXT("ArmPending"));Destroyed.Reset(B);DestroyedPulses=Int(B,TEXT("Pulses"));B->Destroy();Check(R.SubscriptionCount(B)==0,TEXT("destroy_revokes_owner_subscriptions"));StoppedAt=W->GetTimeSeconds();Phase=1;return true;
   }
