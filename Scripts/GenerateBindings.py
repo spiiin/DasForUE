@@ -77,6 +77,7 @@ def default_expr(field, enums):
             if text in (member['name'], short_type + '::' + member['name']):
                 return enum_name(field['type_path']) + '.v_' + ident(member['name'])
         raise ValueError('unknown enum default symbol')
+    if kind == 'class' and text in ('None', 'nullptr', 'NULL'): return 'ue_class_null()'
     if kind == 'object' and text in ('None', 'nullptr', 'NULL'):
         return class_name(field['type_path']) + '_null()'
     raise ValueError('unsupported default kind or representation: ' + kind)
@@ -119,7 +120,7 @@ def generate(ir, module="ue_generated", source_types=None):
                 raise ValueError('Missing object class')
     aliases = set()
     enums = {}
-    kinds = {'int', 'float', 'double', 'bool', 'string', 'object', 'name', 'enum', 'array', 'map', 'set'}
+    kinds = {'int', 'float', 'double', 'bool', 'string', 'object', 'class', 'name', 'enum', 'array', 'map', 'set'}
     for fn in ir['functions']:
         alias = fn['alias']
         if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', alias) or alias in aliases or not alias.startswith(('actor_', 'fixture_', 'ue_')):
@@ -145,6 +146,7 @@ def generate(ir, module="ue_generated", source_types=None):
             if name in names or field['kind'] not in kinds:
                 raise ValueError('Unsupported or colliding field: ' + field['path'])
             names.add(name)
+            if field['kind'] == 'class' and field['type_path'] not in classes: raise ValueError('Missing class MetaClass identity')
             if type(field['input']) is not bool or type(field['output']) is not bool or not (field['input'] or field['output']):
                 raise ValueError('Invalid field direction')
             if field['kind'] == 'enum':
@@ -205,7 +207,7 @@ def generate(ir, module="ue_generated", source_types=None):
                     if kind not in properties or (member['type_path'] not in ('EnumProperty','ByteProperty') if kind == 'enum' else member['type_path'] != properties[kind]): raise ValueError('Unsupported struct array member')
                     validate_member(element)
                 elif member['kind'] in ('map','set'): register_hash(member)
-                elif member['kind'] == 'object':
+                elif member['kind'] in ('object', 'class'):
                     if member['type_path'] not in classes: raise ValueError('Missing or incompatible struct object class')
                 elif member['kind'] not in kinds: raise ValueError('Unsupported struct leaf')
                 if member['kind'] == 'enum' and member['type_path'] not in enums: raise ValueError('Missing struct enum definition')
@@ -238,15 +240,15 @@ def generate(ir, module="ue_generated", source_types=None):
             if param['kind'] in ('map', 'set'): register_hash(param)
             if param['kind'] == 'array':
                 element = param.get('element', {})
-                property_types = {'int':'IntProperty', 'float':'FloatProperty', 'double':'DoubleProperty', 'bool':'BoolProperty', 'string':'StrProperty', 'name':'NameProperty', 'object':'ObjectProperty', 'struct':'StructProperty', 'enum':'EnumProperty'}
+                property_types = {'int':'IntProperty', 'float':'FloatProperty', 'double':'DoubleProperty', 'bool':'BoolProperty', 'string':'StrProperty', 'name':'NameProperty', 'object':'ObjectProperty', 'class':'ClassProperty', 'struct':'StructProperty', 'enum':'EnumProperty'}
                 kind = element.get('kind')
                 if kind not in property_types or (param['type_path'] not in ('EnumProperty', 'ByteProperty') if kind == 'enum' else param['type_path'] != property_types[kind]):
                     raise ValueError('Unsupported or inconsistent array element')
                 path = element.get('type_path')
-                if kind == 'object' and path not in classes: raise ValueError('Missing object class for array element')
+                if kind in ('object', 'class') and path not in classes: raise ValueError('Missing object class for array element')
                 if kind == 'struct' and path not in structures: raise ValueError('Missing struct definition for array element')
                 if kind == 'enum' and path not in enums: raise ValueError('Missing enum definition for array element')
-                if kind not in ('object', 'struct', 'enum') and path != '': raise ValueError('Unexpected type identity for array element')
+                if kind not in ('object', 'class', 'struct', 'enum') and path != '': raise ValueError('Unexpected type identity for array element')
             if type(param['input']) is not bool or type(param['output']) is not bool or not (param['input'] or param['output']):
                 raise ValueError('Invalid parameter direction')
             name = param['path']
@@ -287,7 +289,7 @@ def generate(ir, module="ue_generated", source_types=None):
     def check_source_field(field, depth=0):
         if depth > 16: raise ValueError('Source mapping nesting limit exceeded')
         kind = field['kind']
-        if kind in ('int', 'float', 'double', 'bool', 'string', 'name', 'object'): return
+        if kind in ('int', 'float', 'double', 'bool', 'string', 'name', 'object', 'class'): return
         if kind in ('struct', 'enum'):
             mapped = source_mappings.get(field['type_path'])
             if not mapped or mapped['kind'] != kind: raise ValueError('Nested source identity requires an explicit matching mapping')
@@ -347,7 +349,7 @@ def generate(ir, module="ue_generated", source_types=None):
     def typ(field):
         if field['kind'] in ('map', 'set'): return hash_container_name(field)
         if field['kind'] == 'array': return 'array<' + typ(field['element']) + '>'
-        return {'object': class_name(field['type_path']), 'name': 'UEName', 'enum': enum_name(field['type_path']), 'struct': struct_name(field['type_path'])}.get(field['kind'], field['kind'])
+        return {'class': 'UEClassHandle', 'object': class_name(field['type_path']), 'name': 'UEName', 'enum': enum_name(field['type_path']), 'struct': struct_name(field['type_path'])}.get(field['kind'], field['kind'])
 
     lines = ['options gen2', 'module ' + module + ' public', 'require ue_foundation', '',
              '// Generated by Scripts/GenerateBindings.py. Do not edit.',

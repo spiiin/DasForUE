@@ -42,3 +42,5 @@ Actor and SCS component, stale handles, rejected class/collision and foreign des
 Physical collision outcomes, replication and packaged builds remain separate tests.
 
 Validation: TestActorSpawnPIE.ps1 PASS; one successful test without warnings/errors.
+
+Packaged validation: these features passed TestCookedCalls.ps1 in Win64 Development NullRHI on 2026-10-13. See PackagedCallsValidation.md for coverage and remaining limits.

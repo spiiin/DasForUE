@@ -35,7 +35,7 @@ struct FDasExecutionResult
     TArray<FDasTypeDeclaration> Types;
 };
 
-enum class EDasCallback : uint8 { Main, BeginPlay, Tick, EndPlay };
+enum class EDasCallback : uint8 { Main, BeginPlay, Tick, EndPlay, Initialize, Construction };
 
 struct FDasReflectedTypes;
 class DASRUNTIME_API FDasRuntimeModule final : public IModuleInterface
@@ -65,6 +65,7 @@ public:
     FDasExecutionResult RunNamedPersistent(const FString& Path, const FString& EntryPoint, int32 Input, TWeakObjectPtr<UObject> Self);
     FDasExecutionResult RunPersistent(const FString& Path, int32 Input, TWeakObjectPtr<UObject> Self);
     FDasExecutionResult RunLifecycle(const FString& Path, EDasCallback Event, TWeakObjectPtr<UObject> Self, float DeltaSeconds = 0.f, int32 EndReason = 0);
+    FDasExecutionResult RunConstruction(const FString& Path, TWeakObjectPtr<UObject> Self);
     // Internal reflected delegate bridge: IDs never contain a VM/function pointer.
     void DispatchIntEvent(uint64 SubscriptionId, int32 Value);
     void DispatchScalarEvent(uint64 SubscriptionId,const FDasScalarValue& Value);

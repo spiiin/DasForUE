@@ -5,7 +5,7 @@ $Stage = Join-Path $Repo 'Build\Bindings'
 New-Item -ItemType Directory -Path $Stage -Force | Out-Null
 $Selection = Join-Path $Stage 'Unsupported.json'
 $Output = Join-Path $Stage 'Rejected.json'
-@{ functions = @(@{class='/Script/DasRuntime.DasObjectFixture';function='AddHealth';alias='fixture_AddHealth'},@{class='/Script/Engine.Actor';function='K2_GetComponentsByClass';alias='actor_GetComponentsByClass'}) } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $Selection -Encoding utf8
+@{ functions = @(@{class='/Script/DasRuntime.DasObjectFixture';function='AddHealth';alias='fixture_AddHealth'},@{class='/Script/DasRuntime.DasFunctionLibraryFixture';function='UnsupportedInt64';alias='ue_UnsupportedInt64'}) } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $Selection -Encoding utf8
 [IO.File]::WriteAllText($Output,'previous validated output')
 & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') "$Repo\Tests\DasForUESmoke\DasForUESmoke.uproject" -run=DasExport "-Selection=$Selection" "-Output=$Output" -unattended -NullRHI -nosplash -stdout "-abslog=$Repo\logs\bindings-export-rejected.log"
 if ($LASTEXITCODE -ne 1) { throw "Expected exporter failure 1, got $LASTEXITCODE" }

@@ -94,6 +94,7 @@ public:
     virtual void Destroyed() override;
     virtual void OnConstruction(const FTransform& Transform) override;
     virtual void PostInitializeComponents() override;
+    UPROPERTY() bool bDasConstructionScript = false;
     UPROPERTY() FName DasSceneRootProperty;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="daScript Probe")
     TObjectPtr<AActor> Peer;

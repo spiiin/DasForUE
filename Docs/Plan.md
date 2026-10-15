@@ -2293,3 +2293,116 @@ replacement remains rejected; unrelated handler names coexist. Fixtures cover
 self/owner sources, once-per-handler delivery and Destroy/EndPlay cleanup.
 
 Inherited-event validation passed: foundation (zero failures), Create/Reopen, PIE (one success, zero warnings/errors) and packaged Development. Covered additive Actor self events, component owner events, one delivery per handler and cleanup. An imported-parent binder was initially resolved in a child without its own handlers, causing duplicate subscriptions; an explicit empty child binder now prevents this, and the no-BeginPlay/EndPlay parent regression passes.
+
+### Class parameters in reflected calls (2026-10-12)
+Added class marshalling kind, MetaClass in export IR and signature fingerprints, checked UEClassHandle arguments/results and null defaults. Return/out/inout, array elements and supported struct leaves share the general frame backend; class map/set support remains deferred. General class handles can represent abstract classes; construction still rejects them. Generator tests: 93 PASS. Function-library integration covers UClass/TSubclassOf, out, arrays, null/abstract values, bad MetaClass and GameplayStatics.GetActorOfClass; instance Actor.GetComponentsByClass added. Authored ue_function class signatures and packaged validation remain separate.
+
+Class-marshalling validation completed: instance GetComponentsByClass, static GetActorOfClass, generator 93 tests, negative export preserving previous output, and editor foundation smoke all PASS.
+
+### Script-only helper hierarchy — 2026-10-13
+
+Committed inherited-event work as 270a70f. Added effective same-context helper
+inheritance, child helper selection for self calls, explicit Super variants and
+remapping of lowered ancestor calls through three levels. Helpers retain normal DAS
+parameters/results and remain absent from reflected IR/Blueprint function graphs.
+Original source calls are module-qualified so imported class methods infer without
+an unbound receiver. Cross-context helper virtual dispatch remains a separate step:
+an inherited reflected UFunction still runs its declaring script's helper table.
+
+Construction audit separates a once-per-instance runtime initializer before
+BeginPlay from repeatable editor construction. Neither hook is added in this slice;
+parent ordering, body reload, instance edits and editor side-effect policy are the
+next construction work. See DSLInheritance.md for the contract and limits.
+
+Helper hierarchy validation passed: foundation with zero failures, three-level Create/Reopen, PIE and packaged Development. LocalProbe(2) returned 21 and Score became 12; Offset/Template remain absent from UFunctions and reflected IR. Temporary AST diagnostics were removed.
+
+### Packaged classes/spawn/query/libraries (2026-10-13)
+TestCookedCalls.ps1 full pipeline PASS on Win64 Development NullRHI: class-property cook dependency, native/authored Spawn, Actor/component queries, BeginPlay/Tick/EndPlay, stale handles, static engine/user libraries, WorldContext without editor metadata, UClass/TSubclassOf input/return/out/arrays and instance GetComponentsByClass. Packaged foundation smoke PASS failures=0. Shipping, graphics/physics collision outcomes and replication remain unverified.
+
+
+### Class references in authored ue_function — 2026-10-15
+
+Added UEClassHandle input/result and ref/out support for authored Actor and
+ActorComponent callable methods. Native base constraints use arg_<name>_class and
+return_class; omitted constraints default to UObject. Generated Blueprint signatures
+use FClassProperty.MetaClass, including class casts for result/output pins. Internal
+transport carries GC-visible UClass values and creates fresh receiving-context
+capabilities, rather than sharing VM tokens. Input/result/output base checks reject
+incompatible and obsolete classes; null is accepted and outputs stage atomically.
+Saved-owner checks and reference-call contracts compare MetaClass as well as kind.
+
+Validation passed: real SpawnPIE (one success, zero warnings/errors), native
+ProcessEvent on Actors/components, saved Blueprint reopening in another process,
+editor foundation (zero failures), and complete Win64 Development NullRHI packaged
+calls plus packaged foundation (zero failures). Includes Blueprint subclasses, null,
+ref/out, wrong input/result/output bases, and cross-context method calls. The export
+commandlet uses a scoped editor script guard for deliberate Actor graph execution.
+Class containers, class-valued delegates and authored-interface class signatures
+remain separate adapters. See [DSLClassMethods.md](DSLClassMethods.md).
+
+
+### UEClass type macro / inferred class constraints — 2026-10-15
+
+Added $UEClass<NativeWrapper> and public ActorClass/ObjectClass aliases in
+ue_object_types. A nominal struct view carries one checked UEClassHandle; native
+base identity resides on ue_class_ref and supplies function/property constraints.
+Callable ue_function inputs/results/ref/out no longer need string hints when using
+these types. Raw UEClassHandle remains available and contradictory hints fail.
+Added checked ue_class_cast/ue_class_handle conversion, typed class_loaded results,
+Spawn/component argument lowering, typed properties and authored accessors. Aliases
+must resolve in an imported module before class methods are parsed; no grammar
+change or reader macro. Multiple aliases of a base reuse one nominal declaration.
+
+Validation: source-negative checks, actual SpawnPIE (one success, zero warnings/errors),
+editor foundation (zero failures), saved Blueprint reopen in a fresh process, complete
+packaged Win64 Development NullRHI class/call pipeline and packaged foundation (zero
+failures) all passed. Includes typed properties, ref/out, null, Blueprint subclasses,
+cross-context calls and forged typed-class values. See DSLClassMethods.md.
+
+
+### Once-per-instance runtime Initialize — 2026-10-15
+
+Added Initialize():void to authored Actor/ActorComponent lifecycle IR and lowering.
+Omitted hooks forward through parents; overrides use explicit Super.Initialize.
+Repeated parent calls are no-ops and Super.Initialize outside Initialize is rejected.
+Parent BeginPlay does not implicitly run an initializer deliberately skipped by a
+child override. Delivery state uses weak UObject/source-path records outside VMs,
+survives body reload/session recreation, transfers on object replacement and is
+pruned on GC/world cleanup. Errors latch once, cancel owned managed registrations
+and block subsequent gameplay callbacks; previous writes are not rolled back.
+
+Ordering is before daScript BeginPlay, following engine component-before-Actor
+lifecycle order; native/Blueprint ReceiveBeginPlay ordering is unchanged. Editor
+construction/CDOs are excluded. Existing manual lifecycle calls without an
+initializer preserve their old behavior.
+
+Validation passed: final real SpawnPIE (one success, zero warnings/errors), editor
+foundation zero failures, saved assets reopened in another process, and full packaged
+Win64 Development NullRHI calls plus foundation zero failures. Tests cover three
+Actor/two component levels, repeated/omitted/skipped Super, instance/CDO edits,
+component availability, failure once, session recreation and body-only reload with
+an increased revision and unchanged initialization count. Repeatable editor
+ConstructionScript remains a separate next stage. See DSLInitialization.md.
+
+
+### Repeatable Actor ConstructionScript — 2026-10-15
+
+Added ConstructionScript():void lifecycle collection/IR, implicit authored-parent
+forwarding and explicit Super.ConstructionScript. Native OnConstruction runs it
+after Blueprint/SCS construction, excluding templates and Actors after BeginPlay.
+Temporary script contexts preserve gameplay sessions and initializer delivery;
+queued gameplay events are not drained while those sessions are isolated.
+Existing component lookup works in the editor construction world. Managed callbacks,
+event emission and dynamic Actor/component creation/destruction through bridge APIs
+are blocked. Errors are retryable and writes are not rolled back. Cooked placed
+Actors preserve saved construction results. ActorComponent construction callbacks
+and native UObject constructors remain deferred. See DSLConstruction.md.
+
+
+Construction validation passed: editor foundation zero failures; Create/Reopen with
+editor reconstruction, instance edits, CDO exclusion, preservation of an existing
+gameplay VM and recoverable forbidden-timer errors; real Gameplay.RuntimePIE with
+one success and zero warnings/failures; full Win64 Development NullRHI packaged
+gameplay plus foundation zero failures. Packaged probes cover saved map values and
+runtime-spawn construction. Cross-context authored method entry during construction
+remains rejected; same-context helpers and native property access are available.

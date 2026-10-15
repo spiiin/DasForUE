@@ -47,6 +47,20 @@ class GeneratorTests(unittest.TestCase):
         fn['fields'].insert(0, field.copy())
         fn['world_context'] = 'world'
         with self.assertRaisesRegex(ValueError, 'WorldContext'): generate(self.ir)
+    def test_class_parameters_and_output_use_handles(self):
+        fn = self.static_fixture()
+        fn['parameters'] = [dict(path='value',kind='class',type_path='/Script/Engine.Actor',input=True,output=False),dict(path='returnvalue',kind='class',type_path='/Script/Engine.Actor',input=False,output=True)]
+        fn['fields'] = copy.deepcopy(fn['parameters'])
+        body = generate(self.ir).split('def ' + fn['alias'] + '(', 1)[1].split('\n}\n', 1)[0]
+        self.assertIn('arg_value : UEClassHandle', body)
+        self.assertIn('ue_arg_class(', body)
+        self.assertIn('ue_result_class(', body)
+    def test_class_requires_metaclass_identity(self):
+        fn = self.static_fixture()
+        fn['fields'][0].update(kind='class',type_path='/Script/Missing.Base')
+        with self.assertRaisesRegex(ValueError,'MetaClass'): generate(self.ir)
+    def test_null_class_default(self):
+        self.assertEqual(default_expr(dict(kind='class',default_text='None',input=True,output=False),{}),'ue_class_null()')
     def test_static_on_nonlibrary_rejected(self):
         self.ir['functions'][0]['static'] = True
         with self.assertRaisesRegex(ValueError, 'BlueprintFunctionLibrary'): generate(self.ir)

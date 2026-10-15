@@ -108,5 +108,32 @@ int32 UDasDelegateCommandlet::Main(const FString& Params){
  UE_LOG(LogTemp,Display,TEXT("PASS inherited_event_without_parent_BeginPlay_EndPlay_cleanup_%s"),*Phase);
  Runtime.ReleaseObject(TickOnly);TickOnly->Destroy();
  UE_LOG(LogTemp,Display,TEXT("PASS inherited_tick_without_BeginPlay_or_parent_method_%s"),*Phase);
+ UBlueprint* HelperBP=nullptr;const FString HelperPackage=FPackageName::GetLongPackagePath(Package)+TEXT("/BP_GrandCounter");
+ if(Phase==TEXT("Create")){if(!FDasDSLService::Apply(TEXT("dsl_inheritance_grandchild.das"),HelperPackage,TEXT("inheritance.GrandCounter"),HelperBP,Error)){UE_LOG(LogTemp,Error,TEXT("Helper inheritance import: %s"),*Error);return 1;}const FString File=FPackageName::LongPackageNameToFilename(HelperPackage,FPackageName::GetAssetPackageExtension());FSavePackageArgs Save;Save.TopLevelFlags=RF_Public|RF_Standalone;if(!UPackage::SavePackage(HelperBP->GetOutermost(),HelperBP,*File,Save))return 1;}
+ else HelperBP=LoadObject<UBlueprint>(nullptr,*(HelperPackage+TEXT(".BP_GrandCounter")));
+ if(!HelperBP || !HelperBP->GeneratedClass)return 1;auto* HelperActor=World->SpawnActor<ADasProbeActor>(HelperBP->GeneratedClass);if(!HelperActor)return 1;
+ // A fresh editor-world instance executes construction after SCS, and reruns use edited values.
+ TStrongObjectPtr<UWorld> ConstructionWorld(UWorld::CreateWorld(EWorldType::Editor,false));
+ auto* Constructed=ConstructionWorld->SpawnActor<ADasProbeActor>(HelperBP->GeneratedClass);
+ if(!Constructed || !Constructed->LastDasError.IsEmpty() || IntField(Constructed,TEXT("ConstructionValue"))!=23 || IntField(Constructed,TEXT("ConstructionTrace"))!=12)return 1;
+ struct FReadScore{int32 Result=0;} ReadScore;auto* Reader=HelperActor->FindFunction(TEXT("ReadScore"));if(!Reader)return 1;HelperActor->ProcessEvent(Reader,&ReadScore);if(ReadScore.Result!=10)return 1;
+ const int32 ContextsBefore=Runtime.PersistentContextCount();if(ContextsBefore<1)return 1;
+ auto* ScoreProperty=FindFProperty<FIntProperty>(Constructed->GetClass(),TEXT("Score"));ScoreProperty->SetPropertyValue_InContainer(Constructed,20);
+ Constructed->RerunConstructionScripts();
+ if(!Constructed->LastDasError.IsEmpty() || IntField(Constructed,TEXT("ConstructionValue"))!=43 || IntField(Constructed,TEXT("ConstructionTrace"))!=12 || Runtime.PersistentContextCount()!=ContextsBefore || Runtime.SubscriptionCount(Constructed)!=0)return 1;
+ if(IntField(HelperBP->GeneratedClass->GetDefaultObject(),TEXT("ConstructionValue"))!=0)return 1;
+ UBlueprint* FailureBP=nullptr;
+ if(!FDasDSLService::Apply(TEXT("dsl_construction_failure.das"),FPackageName::GetLongPackagePath(Package)+TEXT("/BP_ConstructionFailure"),TEXT("construction.ConstructionFailure"),FailureBP,Error)){UE_LOG(LogTemp,Error,TEXT("Construction failure fixture import: %s"),*Error);return 1;}
+ auto* FailedConstruction=ConstructionWorld->SpawnActor<ADasProbeActor>(FailureBP->GeneratedClass);
+ if(!FailedConstruction || !FailedConstruction->LastDasError.Contains(TEXT("managed callbacks are forbidden during ConstructionScript")) || IntField(FailedConstruction,TEXT("ConstructionTrace"))!=1)return 1;
+ FailedConstruction->OnConstruction(FTransform::Identity);
+ if(IntField(FailedConstruction,TEXT("ConstructionTrace"))!=2 || Runtime.SubscriptionCount(FailedConstruction)!=0 || Runtime.PersistentContextCount()!=ContextsBefore)return 1;
+ FailedConstruction->Destroy();
+ Constructed->Destroy();ConstructionWorld->DestroyWorld(false);
+ UE_LOG(LogTemp,Display,TEXT("PASS editor_construction_repeat_Super_instance_edits_no_CDO_no_VM_leak_%s"),*Phase);
+ if(IntField(HelperActor,TEXT("ConstructionValue"))!=23 || IntField(HelperActor,TEXT("ConstructionTrace"))!=12 || !HelperActor->LastDasError.IsEmpty())return 1;
+ struct FHelperArgs{int32 Input=2,Result=0;};FHelperArgs HA;auto* HelperFunction=HelperActor->FindFunction(TEXT("LocalProbe"));if(!HelperFunction)return 1;HelperActor->ProcessEvent(HelperFunction,&HA);
+ if(HA.Result!=21 || IntField(HelperActor,TEXT("Score"))!=12 || HelperActor->FindFunction(TEXT("Offset")) || HelperActor->FindFunction(TEXT("Template"))){UE_LOG(LogTemp,Error,TEXT("Helpers: result=%d score=%d error=%s"),HA.Result,IntField(HelperActor,TEXT("Score")),*HelperActor->LastDasError);return 1;}
+ Runtime.ReleaseObject(HelperActor);HelperActor->Destroy();UE_LOG(LogTemp,Display,TEXT("PASS three_level_same_context_helpers_override_Super_%s"),*Phase);
  UE_LOG(LogTemp,Display,TEXT("DAS_AUTHORED_DELEGATES_RESULT=PASS"));return 0;
 }

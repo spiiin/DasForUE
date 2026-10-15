@@ -86,4 +86,32 @@ class SpawnDriver {
         }
         return length(actors)==2 && !ue_object_valid(actor.handle) && !ue_object_valid(actors[0].handle) && !ue_object_valid(actors[1].handle) && !ue_object_valid(components[0].handle) && length(ue_actor_find_all(type<SpawnTargetRef>))==0
     }
+
+    [ue_function(BlueprintCallable)]
+    def ClassMethods(input:bool):bool {
+        let api=self.Spawned
+        let actorClass=ue_class_loaded(type<ActorClassViaRef>,"/Script/Engine.Actor")
+        let componentClass=ue_class_loaded(type<ObjectClass>,"/Script/Engine.SceneComponent")
+        var output=default<ActorClass>
+        var changed=actorClass
+        let result=api.ClassOutputs(actorClass,output,changed)
+        api.SelectedClass=actorClass
+        let fieldOK=ue_class_path(api.SelectedClass)=="/Script/Engine.Actor"
+        let actorOK=ue_class_path(api.EchoClass(result))=="/Script/Engine.Actor" && ue_class_path(output)=="/Script/Engine.Actor" && !ue_class_valid(changed)
+        let componentOK=ue_class_path(api.Life.EchoClass(actorClass))=="/Script/Engine.Actor" && ue_class_path(api.Life.EchoAnyClass(componentClass))=="/Script/Engine.SceneComponent"
+        return fieldOK && actorOK && componentOK && !ue_class_valid(api.EchoClass(default<ActorClass>))
+    }
+    [ue_function(BlueprintCallable)]
+    def WrongClassMethod(input:bool):bool {
+        let value=self.Spawned.EchoClass(ue_class_cast(type<ActorClass>,ue_class_loaded(type<ObjectRef>,"/Script/Engine.SceneComponent")))
+        return ue_class_valid(value)
+    }
+
+    [ue_function(BlueprintCallable)]
+    def ForgedClassMethod(input:bool):bool {
+        var forged=default<ActorClass>
+        forged.handle=ue_class_loaded(type<ObjectRef>,"/Script/Engine.SceneComponent")
+        let result=self.Spawned.EchoClass(forged)
+        return ue_class_valid(result)
+    }
 }

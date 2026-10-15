@@ -44,3 +44,7 @@ non-library static calls and frame/session cleanup. Generator tests also cover
 malformed static/WorldContext contracts and compatibility of existing output.
 
 Validation: TestFunctionLibraries.ps1 PASS (one successful PIE test, zero test warnings/errors); 90 generator tests PASS; TestBindingsPolicy.py PASS (9 export cases). Existing editor startup compression-asset warnings occur outside the automation test.
+
+Class parameters are now supported through UEClassHandle in native reflected calls; see DSLClassMarshalling.md. GetActorOfClass and instance GetComponentsByClass are included in the generated integration probe.
+
+Packaged validation: these features passed TestCookedCalls.ps1 in Win64 Development NullRHI on 2026-10-13. See PackagedCallsValidation.md for coverage and remaining limits.

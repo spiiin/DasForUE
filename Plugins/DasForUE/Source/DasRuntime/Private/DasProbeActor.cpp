@@ -19,12 +19,16 @@ void ADasProbeActor::OnConstruction(const FTransform& Transform)
 {
     Super::OnConstruction(Transform);
     ApplyDasSceneRoot();
+    if(bDasConstructionScript && !IsTemplate() && !LifecycleScript.IsEmpty() && GetWorld()) {
+        auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+        const FString Path=FPaths::IsRelative(LifecycleScript)?Runtime.ScriptPath(LifecycleScript):LifecycleScript;
+        RecordLifecycleResult(Runtime.RunConstruction(Path,this));
+    }
 }
 void ADasProbeActor::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
-    // Loaded/cooked level actors do not necessarily run OnConstruction. Promote
-    // the declared SCS root after components have been restored and initialized.
+    // Loaded/cooked actors restore the SCS root without repeating construction.
     ApplyDasSceneRoot();
 }
 void ADasProbeActor::ApplyDasSceneRoot()
@@ -73,14 +77,14 @@ void ADasProbeActor::ExecuteDasVoid(const FString& File,const FString& Entry)
 
 FDasScalarValue ADasProbeActor::ExecuteDasFrame(const FString& File,const FString& Entry,const TArray<FDasScalarValue>& Args,int32 Kind,const FString& ResultClass)
 {
-    if(Kind<0 || (Kind>13 && Kind!=16) || Kind==4){FDasExecutionResult Error;Error.Error=TEXT("Invalid scalar result kind");RecordLifecycleResult(Error);FDasScalarValue Failed;Failed.Kind=-1;return Failed;}
+    if(Kind<0 || (Kind>13 && Kind!=15 && Kind!=16) || Kind==4){FDasExecutionResult Error;Error.Error=TEXT("Invalid scalar result kind");RecordLifecycleResult(Error);FDasScalarValue Failed;Failed.Kind=-1;return Failed;}
     auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto V=R.RunNamedFramePersistent(R.ScriptPath(File),Entry,Args,static_cast<EDasMethodSignature>(Kind),this,ResultClass);RecordLifecycleResult(V);
-    FDasScalarValue Result;Result.Kind=V.bSucceeded?Kind:-1;Result.IntValue=V.Value;Result.FloatValue=V.FloatValue;Result.BoolValue=V.BoolValue;Result.StringValue=V.StringValue;Result.DoubleValue=V.DoubleValue;Result.NameValue=V.NameValue;Result.ObjectValue=V.ObjectValue.Get();Result.VectorValue=V.VectorValue;Result.RotatorValue=V.RotatorValue;Result.TransformValue=V.TransformValue;Result.StructValue=V.StructValue;Result.DelegateValue=V.DelegateValue;Result.ObjectClass=(Kind==8 || Kind==13 || Kind==16)?ResultClass:FString();return Result;
+    FDasScalarValue Result;Result.Kind=V.bSucceeded?Kind:-1;Result.IntValue=V.Value;Result.FloatValue=V.FloatValue;Result.BoolValue=V.BoolValue;Result.StringValue=V.StringValue;Result.DoubleValue=V.DoubleValue;Result.NameValue=V.NameValue;Result.ObjectValue=V.ObjectValue.Get();Result.ClassValue=Cast<UClass>(V.ObjectValue.Get());Result.VectorValue=V.VectorValue;Result.RotatorValue=V.RotatorValue;Result.TransformValue=V.TransformValue;Result.StructValue=V.StructValue;Result.DelegateValue=V.DelegateValue;Result.ObjectClass=(Kind==8 || Kind==13 || Kind==15 || Kind==16)?ResultClass:FString();return Result;
 }
 FDasScalarValue ADasProbeActor::ExecuteDasFrameOutputs(const FString& File,const FString& Entry,const TArray<FDasScalarValue>& Args,int32 Kind,const FString& ResultClass,TArray<FDasScalarValue>& Outputs){
-    Outputs=Args;if(Kind<0 || (Kind>13 && Kind!=16) || Kind==4){FDasScalarValue Failed;Failed.Kind=-1;return Failed;}
+    Outputs=Args;if(Kind<0 || (Kind>13 && Kind!=15 && Kind!=16) || Kind==4){FDasScalarValue Failed;Failed.Kind=-1;return Failed;}
     auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));auto V=R.RunNamedFramePersistent(R.ScriptPath(File),Entry,Args,static_cast<EDasMethodSignature>(Kind),this,ResultClass);RecordLifecycleResult(V);if(V.bSucceeded)Outputs=V.OutputValues;else if(!R.IsAuthoredMethodDispatchActive()) if(auto* Stack=FFrame::GetThreadLocalTopStackFrame()){FBlueprintExceptionInfo Info(EBlueprintExceptionType::AbortExecution,FText::FromString(V.Error));FBlueprintCoreDelegates::ThrowScriptException(this,*Stack,Info);}
-    FDasScalarValue Result;Result.Kind=V.bSucceeded?Kind:-1;Result.IntValue=V.Value;Result.FloatValue=V.FloatValue;Result.BoolValue=V.BoolValue;Result.StringValue=V.StringValue;Result.DoubleValue=V.DoubleValue;Result.NameValue=V.NameValue;Result.StructValue=V.StructValue;Result.DelegateValue=V.DelegateValue;Result.ObjectValue=V.ObjectValue.Get();Result.VectorValue=V.VectorValue;Result.RotatorValue=V.RotatorValue;Result.TransformValue=V.TransformValue;Result.ObjectClass=(Kind==8 || Kind==13 || Kind==16)?ResultClass:FString();return Result;
+    FDasScalarValue Result;Result.Kind=V.bSucceeded?Kind:-1;Result.IntValue=V.Value;Result.FloatValue=V.FloatValue;Result.BoolValue=V.BoolValue;Result.StringValue=V.StringValue;Result.DoubleValue=V.DoubleValue;Result.NameValue=V.NameValue;Result.StructValue=V.StructValue;Result.DelegateValue=V.DelegateValue;Result.ObjectValue=V.ObjectValue.Get();Result.ClassValue=Cast<UClass>(V.ObjectValue.Get());Result.VectorValue=V.VectorValue;Result.RotatorValue=V.RotatorValue;Result.TransformValue=V.TransformValue;Result.ObjectClass=(Kind==8 || Kind==13 || Kind==15 || Kind==16)?ResultClass:FString();return Result;
 }
 void ADasProbeActor::RecordLifecycleResult(const FDasExecutionResult& Result)
 {

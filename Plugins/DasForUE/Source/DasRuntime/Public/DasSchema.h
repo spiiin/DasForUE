@@ -28,7 +28,7 @@ struct FDasFieldSchema
     TMap<FString,FString> Metadata;
 };
 
-enum class EDasMethodSignature : uint8 { Int, Float, Bool, Void, Frame, String, Double, Name, Object, Vector, Rotator, Transform, Struct, Enum, Delegate=16 };
+enum class EDasMethodSignature : uint8 { Int, Float, Bool, Void, Frame, String, Double, Name, Object, Vector, Rotator, Transform, Struct, Enum, Class=15, Delegate=16 };
 struct FDasCallContract {
     EDasMethodSignature ReturnKind=EDasMethodSignature::Int;
     TArray<EDasMethodSignature> Inputs;
@@ -45,7 +45,7 @@ struct FDasMethodSchema
     EDasMethodSignature ReturnKind=EDasMethodSignature::Int;
     FString ReturnClass;
     TArray<FDasParameterSchema> Parameters;
-    FDasCallContract Contract() const {if(Signature!=EDasMethodSignature::Frame) return FDasCallContract::Scalar(Signature);FDasCallContract C;C.ReturnKind=ReturnKind;C.ReturnClass=ReturnClass;bool Objects=false;for(const auto& P:Parameters){C.Inputs.Add(P.Kind);Objects |= P.Kind==EDasMethodSignature::Object || P.Kind==EDasMethodSignature::Struct || P.Kind==EDasMethodSignature::Enum || P.Kind==EDasMethodSignature::Delegate;}if(Objects)for(const auto& P:Parameters) C.InputClasses.Add(P.ClassPath);bool Outputs=false;for(const auto& P:Parameters)Outputs |= P.Direction!=TEXT("in");if(Outputs)for(const auto& P:Parameters)C.InputDirections.Add(P.Direction==TEXT("out")?1:P.Direction==TEXT("inout")?2:0);return C;}
+    FDasCallContract Contract() const {if(Signature!=EDasMethodSignature::Frame) return FDasCallContract::Scalar(Signature);FDasCallContract C;C.ReturnKind=ReturnKind;C.ReturnClass=ReturnClass;bool Objects=false;for(const auto& P:Parameters){C.Inputs.Add(P.Kind);Objects |= P.Kind==EDasMethodSignature::Class || P.Kind==EDasMethodSignature::Object || P.Kind==EDasMethodSignature::Struct || P.Kind==EDasMethodSignature::Enum || P.Kind==EDasMethodSignature::Delegate;}if(Objects)for(const auto& P:Parameters) C.InputClasses.Add(P.ClassPath);bool Outputs=false;for(const auto& P:Parameters)Outputs |= P.Direction!=TEXT("in");if(Outputs)for(const auto& P:Parameters)C.InputDirections.Add(P.Direction==TEXT("out")?1:P.Direction==TEXT("inout")?2:0);return C;}
     TArray<FDasParameterSchema> EffectiveParameters() const {if(Signature==EDasMethodSignature::Frame) return Parameters;if(Signature==EDasMethodSignature::Void) return {};return {{TEXT("Input"),InputStableId,Signature}};}
     FName Name = TEXT("Evaluate");
     FString ScriptFile;

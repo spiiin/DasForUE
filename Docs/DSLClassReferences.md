@@ -9,7 +9,7 @@ let same = ue_component_get_or_create(type<DynamicLifeRef>, actor, "DynamicLife"
 `ue_class_loaded` resolves an already-loaded UClass and returns an opaque
 `UEClassHandle`. The type argument constrains resolution: native references check
 IsChildOf; authored references also check the generated class CDO's AuthoredTypeId.
-Missing, abstract, deprecated, superseded and interface classes are rejected.
+Missing, deprecated and superseded classes are rejected. Abstract classes can be held as references; construction rejects them.
 `ue_class_valid(handle)` checks validity; `ue_class_path(handle)` returns its path.
 The handle supports local values, copying and containers. It is not a compile-time
 TSubclassOf<T>: component calls re-check their own requested type and authored ID.
@@ -21,8 +21,7 @@ Native component calls accept an optional fourth class handle and permit compati
 Blueprint subclasses. Authored create/get_or_create accept either the existing
 path string or a class handle. Existing three-argument native calls are unchanged.
 
-The runtime stage below is extended by reflected FClassProperty in the later section. It still does not implement
-Blueprint parameters or soft loading. Standalone runtime values
+The runtime stage below is extended by reflected FClassProperty and class parameters in generated native UFunction wrappers (DSLClassMarshalling.md). Soft loading remains separate. Standalone runtime values
 must not be treated as serialized class references. Those features require the
 reflected field form described below.
 
@@ -49,16 +48,19 @@ The VM creates a context-local handle when the property is read.
 
 Initializers are omitted (null). A class can be selected on the Blueprint CDO or an
 instance. Unchanged reimport preserves editor-selected CDO values. Runtime assignment
-supports null and concrete compatible classes, checks before writing and obeys
+supports null and compatible class values, checks before writing and obeys
 BlueprintReadOnly. Assignment and creation reject incompatible or obsolete classes.
 The Details picker filters by native inheritance; exact daScript identity is checked
-by the typed create operation. Class references in method signatures, containers,
-authored structs and retired-field/default migrations are still deferred.
+by the typed create operation. Callable ue_function parameters/results and ref/out
+are documented in [DSLClassMethods.md](DSLClassMethods.md). Class containers,
+authored structs and retired-field/default migrations remain deferred.
 
 A hard class reference participates in Unreal serialization and dependency traversal.
 TestDynamicComponentsPIE.ps1 saves test-owned component and owner Blueprint assets,
 starts a fresh editor, reloads the selected CDO class, and repeats creation/lifecycle
-in PIE. Packaged-build/cooker coverage is a separate remaining check.
+in PIE. Packaged-build/cooker coverage passed; see the validation note below.
 
 
 Validation: DynamicPIE and ClassReload each report one success, zero failures/warnings. The saved owner package dependency list contains the selected component's package. Generated test assets are deleted after both processes exit.
+
+Packaged validation: these features passed TestCookedCalls.ps1 in Win64 Development NullRHI on 2026-10-13. See PackagedCallsValidation.md for coverage and remaining limits.

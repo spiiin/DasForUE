@@ -18,6 +18,7 @@ struct DASRUNTIME_API FDasScalarValue {
     UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="daScript") double DoubleValue=0;
     UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="daScript") FName NameValue;
     UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="daScript") TObjectPtr<UObject> ObjectValue=nullptr;
+    UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="daScript") TObjectPtr<UClass> ClassValue=nullptr;
     UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="daScript") FString ObjectClass;
     UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="daScript") FInstancedStruct StructValue;
     UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="daScript") FVector VectorValue=FVector::ZeroVector;

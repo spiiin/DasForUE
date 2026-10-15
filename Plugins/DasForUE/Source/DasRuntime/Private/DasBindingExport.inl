@@ -93,7 +93,8 @@ namespace
             FUnrealDasContext Context(4096);
             Field->SetStringField(TEXT("kind"), CallKindName(FieldKind(Property, &Context)));
             FString Path;
-            if (UEnum* Enum = CallEnumType(Property)) Path = Enum->GetPathName();
+            if(auto* Class=CastField<FClassProperty>(Property))Path=Class->MetaClass->GetPathName();
+            else if (UEnum* Enum = CallEnumType(Property)) Path = Enum->GetPathName();
             else if (auto* ReferenceClass = DasReferencePropertyClass(Property)) Path = ReferenceClass->GetPathName();
             Field->SetStringField(TEXT("type_path"), Path);
         }
@@ -235,7 +236,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
             TArray<TSharedPtr<FJsonValue>> Fields;
             for (const auto& Parameter : Signature)
             {
-                if (Parameter.Kind == EMarshallingKind::Object) AddClass(FindObject<UClass>(nullptr, *Parameter.TypePath));
+                if (Parameter.Kind == EMarshallingKind::Object || Parameter.Kind == EMarshallingKind::Class) AddClass(FindObject<UClass>(nullptr, *Parameter.TypePath));
                 auto Field = MakeShared<FJsonObject>();
                 Field->SetStringField(TEXT("path"), Parameter.Path);
                 Field->SetStringField(TEXT("kind"), CallKindName(Parameter.Kind));

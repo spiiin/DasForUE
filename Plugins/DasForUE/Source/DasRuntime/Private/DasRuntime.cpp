@@ -182,7 +182,7 @@ namespace
     };
     uint64 NextObjectHandle = 1;
 
-    enum class EMarshallingKind { Int, Float, Double, Bool, String, Struct, Object, Name, Enum, Array, Map, Set, Delegate };
+    enum class EMarshallingKind { Int, Float, Double, Bool, String, Struct, Object, Name, Enum, Array, Map, Set, Delegate, Class };
     // Flattened scalar signature IR: names/types/directions, independent of property addresses.
     struct FMarshalledParameter { FString Path; EMarshallingKind Kind; bool bInput; bool bOutput; FString TypePath; };
     struct FHashValue
@@ -245,6 +245,7 @@ namespace
         int32 ExecutionDepth = 0;
         bool bEnding = false;
         bool bCollectingSubscriptions = false;
+        bool bInitializingObject = false;
         TArray<FSubscriptionDeclaration> Subscriptions;
         TWeakObjectPtr<UObject> Self;
         struct FObjectQuery {TWeakObjectPtr<UClass> Base;TArray<TWeakObjectPtr<UObject>> Objects;};
@@ -592,11 +593,13 @@ namespace
     void RequireStructType(const FDasStructValue& V,const char* Path,das::Context* C){const auto& Value=ResolveStructValue(V,C);if(!Path || Value.GetScriptStruct()->GetPathName()!=UTF8_TO_TCHAR(Path))C->throw_error("Source struct snapshot identity mismatch");}
     FDasEnumValue GetSelfEnum(const char* Name,das::Context* C){auto* Self=ResolveSelf(C);auto* P=ResolveProperty<FProperty>(Self,Name,false,C);auto* Enum=DasEnumPropertyType(P);if(!Enum)C->throw_error("Expected enum property");return MakeEnumValue(Enum->GetPathName(),int32(DasEnumPropertyNumber(P,P->ContainerPtrToValuePtr<void>(Self))),C);}
     void SetSelfEnum(const char* Name,FDasEnumValue V,das::Context* C){auto* Self=ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("self writes are forbidden in bind_events");auto* P=ResolveProperty<FProperty>(Self,Name,true,C);const auto& Value=ResolveEnumValue(V,C);if(DasEnumPropertyType(P)!=Value.Type.Get() || !SetDasEnumPropertyNumber(P,P->ContainerPtrToValuePtr<void>(Self),Value.Value))C->throw_error("Enum assignment type mismatch");}
+    bool FrameClassMatches(UClass* Value,const FString& BasePath){auto* Base=FindObject<UClass>(nullptr,*BasePath);return BasePath.StartsWith(TEXT("/Script/")) && IsValid(Base) && !Base->HasAnyClassFlags(CLASS_Interface|CLASS_Deprecated|CLASS_NewerVersionExists) && (!Value || (IsValid(Value) && Value->IsChildOf(Base) && !Value->HasAnyClassFlags(CLASS_Deprecated|CLASS_NewerVersionExists)));}
     void PublishFrameValue(int32 Index,FDasScalarValue Value,das::Context* C){
         if(C!=ActiveContext || !ActiveOutputFrame || !ActiveOutputFrame->Arguments || !ActiveOutputFrame->Arguments->IsValidIndex(Index))C->throw_error("output requires active declared frame slot");
         const auto& Expected=(*ActiveOutputFrame->Arguments)[Index];
         if(Expected.Direction==0 || Value.Kind!=Expected.Kind || ActiveOutputFrame->Values.Contains(Index))C->throw_error("output slot direction/type/duplicate mismatch");
         if(Value.Kind==13){FString Error;if(Value.ObjectClass!=Expected.ObjectClass || !ValidateDasEnumNumber(Expected.ObjectClass,Value.IntValue,Error))C->throw_error("output enum identity/value mismatch");}
+        if(Value.Kind==15){if(!FrameClassMatches(Value.ClassValue.Get(),Expected.ObjectClass))C->throw_error("output class base mismatch");if(Value.ClassValue)ActiveOutputFrame->ObjectPins.Emplace(Value.ClassValue.Get());}
         if(Value.Kind==8){auto* Object=Value.ObjectValue.Get();auto* Class=FindObject<UClass>(nullptr,*Expected.ObjectClass);if(!Class || !DasReferenceMatches(Object,Class) || (Object && (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed()))))C->throw_error("output object/interface identity mismatch");if(Object)ActiveOutputFrame->ObjectPins.Emplace(Object);}
         if((Value.Kind==9 && Value.VectorValue.ContainsNaN()) || (Value.Kind==10 && Value.RotatorValue.ContainsNaN()) || (Value.Kind==11 && (Value.TransformValue.ContainsNaN() || !Value.TransformValue.IsRotationNormalized())))C->throw_error("invalid math frame output");
         Value.Direction=Expected.Direction;Value.ObjectClass=Expected.ObjectClass;
@@ -612,19 +615,20 @@ namespace
     void PublishFrameName(int32 I,FDasNameValue X,das::Context* C){FDasScalarValue V;V.Kind=7;V.NameValue=ResolveDSLName(X,C);PublishFrameValue(I,MoveTemp(V),C);}
     void PublishFrameStruct(int32 I,const FDasStructValue& X,das::Context* C){FDasScalarValue V;V.Kind=12;V.StructValue=ResolveStructValue(X,C);PublishFrameValue(I,MoveTemp(V),C);}
     void PublishFrameObject(int32 I,const FDasObjectHandle& X,das::Context* C){FDasScalarValue V;V.Kind=8;V.ObjectValue=X.Token?ResolveObject(X,C):nullptr;PublishFrameValue(I,MoveTemp(V),C);}
+    void PublishFrameClass(int32 I,FDasClassHandle X,das::Context* C){FDasScalarValue V;V.Kind=15;if(X.Token){auto* O=ResolveObject(FDasObjectHandle{X.Token},C);V.ClassValue=Cast<UClass>(O);if(!V.ClassValue)C->throw_error("expected class capability");}PublishFrameValue(I,MoveTemp(V),C);}
     void PublishFrameEnum(int32 I,FDasEnumValue X,das::Context* C){const auto& Value=ResolveEnumValue(X,C);FDasScalarValue V;V.Kind=13;V.ObjectClass=Value.Type->GetPathName();V.IntValue=Value.Value;PublishFrameValue(I,MoveTemp(V),C);}
     void PublishFrameVector(int32 I,const FVector& X,das::Context* C){FDasScalarValue V;V.Kind=9;V.VectorValue=X;PublishFrameValue(I,MoveTemp(V),C);}
     void PublishFrameRotator(int32 I,const FRotator& X,das::Context* C){FDasScalarValue V;V.Kind=10;V.RotatorValue=X;PublishFrameValue(I,MoveTemp(V),C);}
     void PublishFrameTransform(int32 I,const FTransform& X,das::Context* C){FDasScalarValue V;V.Kind=11;V.TransformValue=X;PublishFrameValue(I,MoveTemp(V),C);}
     bool VerifyContract(const das::ProgramPtr& Program,const FString& Entry,const FDasCallContract& C)
     {
-        if(C.Inputs.Num()>16 || ((static_cast<uint8>(C.ReturnKind)>13 && C.ReturnKind!=EDasMethodSignature::Delegate) || C.ReturnKind==EDasMethodSignature::Frame)) return false;
+        if(C.Inputs.Num()>16 || ((static_cast<uint8>(C.ReturnKind)>13 && C.ReturnKind!=EDasMethodSignature::Class && C.ReturnKind!=EDasMethodSignature::Delegate) || C.ReturnKind==EDasMethodSignature::Frame)) return false;
         const FTCHARToUTF8 N(*Entry);auto* F=Program->getThisModule()->findUniqueFunction(N.Get());
-        auto Matches=[](const das::TypeDeclPtr& T,EDasMethodSignature K){if(!T || T->ref || ((static_cast<uint8>(K)>13 && K!=EDasMethodSignature::Delegate) || K==EDasMethodSignature::Frame))return false;if(K==EDasMethodSignature::Delegate)return T->isSimpleType(das::Type::tUInt64);if(K==EDasMethodSignature::Enum)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UEEnumValue";if(K==EDasMethodSignature::Struct)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UEStructValue";if(K==EDasMethodSignature::Vector || K==EDasMethodSignature::Rotator || K==EDasMethodSignature::Transform)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name==(K==EDasMethodSignature::Vector?"UEVector":K==EDasMethodSignature::Rotator?"UERotator":"UETransform");if(K==EDasMethodSignature::Object)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UObjectHandle";if(K==EDasMethodSignature::Name)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UENameValue";const auto D=K==EDasMethodSignature::String?das::Type::tString:K==EDasMethodSignature::Double?das::Type::tDouble:K==EDasMethodSignature::Int?das::Type::tInt:K==EDasMethodSignature::Float?das::Type::tFloat:K==EDasMethodSignature::Bool?das::Type::tBool:das::Type::tVoid;return K==EDasMethodSignature::Void?T->baseType==D:T->isSimpleType(D);};
+        auto Matches=[](const das::TypeDeclPtr& T,EDasMethodSignature K){if(!T || T->ref || ((static_cast<uint8>(K)>13 && K!=EDasMethodSignature::Class && K!=EDasMethodSignature::Delegate) || K==EDasMethodSignature::Frame))return false;if(K==EDasMethodSignature::Class)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UEClassHandle";if(K==EDasMethodSignature::Delegate)return T->isSimpleType(das::Type::tUInt64);if(K==EDasMethodSignature::Enum)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UEEnumValue";if(K==EDasMethodSignature::Struct)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UEStructValue";if(K==EDasMethodSignature::Vector || K==EDasMethodSignature::Rotator || K==EDasMethodSignature::Transform)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name==(K==EDasMethodSignature::Vector?"UEVector":K==EDasMethodSignature::Rotator?"UERotator":"UETransform");if(K==EDasMethodSignature::Object)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UObjectHandle";if(K==EDasMethodSignature::Name)return T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UENameValue";const auto D=K==EDasMethodSignature::String?das::Type::tString:K==EDasMethodSignature::Double?das::Type::tDouble:K==EDasMethodSignature::Int?das::Type::tInt:K==EDasMethodSignature::Float?das::Type::tFloat:K==EDasMethodSignature::Bool?das::Type::tBool:das::Type::tVoid;return K==EDasMethodSignature::Void?T->baseType==D:T->isSimpleType(D);};
         if(!F || !F->exports || F->arguments.size()!=static_cast<size_t>(C.Inputs.Num()) || !Matches(F->result,C.ReturnKind)) return false;
         for(int32 I=0;I<C.Inputs.Num();++I) if(C.Inputs[I]==EDasMethodSignature::Void || !Matches(F->arguments[I]->type,C.Inputs[I])) return false;
         bool Objects=C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Object || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum;for(auto K:C.Inputs)Objects |= K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Object || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum;
-        {bool Found=false,Valid=true;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St){for(auto* A:St->annotations)if(A->annotation->name=="ue_class"){auto* Wire=A->arguments.find("_ue_model_json",das::Type::tString);FDasAuthoringModule M;FString Error;if(!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire->sValue.c_str()),M,Error)){Valid=false;continue;}for(const auto& Cl:M.Classes)for(const auto& Method:Cl.Methods)if(Method.EntryPoint==Entry){FDasClassSchema Schema;if(!M.ToActorSchema(Cl.Id,Schema,Error)){Valid=false;continue;}for(const auto& S:Schema.Methods)if(S.EntryPoint==Entry){Found=true;Valid &= S.Contract()==C;}}}});if(!Valid)return false;if(!Found){if(!C.InputDirections.IsEmpty())return false;if(C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum)return false;for(auto K:C.Inputs)if(K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum)return false;if(C.ReturnKind==EDasMethodSignature::Object && C.ReturnClass!=TEXT("/Script/CoreUObject.Object"))return false;for(int32 I=0;I<C.Inputs.Num();++I)if(C.Inputs[I]==EDasMethodSignature::Object && (!C.InputClasses.IsValidIndex(I) || C.InputClasses[I]!=TEXT("/Script/CoreUObject.Object")))return false;}}
+        {bool Found=false,Valid=true;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St){for(auto* A:St->annotations)if(A->annotation->name=="ue_class"){auto* Wire=A->arguments.find("_ue_model_json",das::Type::tString);FDasAuthoringModule M;FString Error;if(!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire->sValue.c_str()),M,Error)){Valid=false;continue;}for(const auto& Cl:M.Classes)for(const auto& Method:Cl.Methods)if(Method.EntryPoint==Entry){FDasClassSchema Schema;if(!M.ToActorSchema(Cl.Id,Schema,Error)){Valid=false;continue;}for(const auto& S:Schema.Methods)if(S.EntryPoint==Entry){Found=true;Valid &= S.Contract()==C;}}}});if(!Valid)return false;if(!Found){if(!C.InputDirections.IsEmpty())return false;if(C.ReturnKind==EDasMethodSignature::Class || C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum)return false;for(auto K:C.Inputs)if(K==EDasMethodSignature::Class || K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum)return false;if(C.ReturnKind==EDasMethodSignature::Object && C.ReturnClass!=TEXT("/Script/CoreUObject.Object"))return false;for(int32 I=0;I<C.Inputs.Num();++I)if(C.Inputs[I]==EDasMethodSignature::Object && (!C.InputClasses.IsValidIndex(I) || C.InputClasses[I]!=TEXT("/Script/CoreUObject.Object")))return false;}}
         return true;
     }
     int32 GetSelfInt(const char* Name, das::Context* Context)
@@ -877,7 +881,7 @@ FDasCallHandle BeginAuthoredCallSelected(const FDasObjectHandle& Target,const ch
  const auto* Method=Model.Classes[0].Methods.FindByPredicate([&](const auto& Item){return Name && Item.Name==UTF8_TO_TCHAR(Name);});if(!Method || !Method->bCallable || Method->bStatic)Context->throw_error("unknown callable authored method");
  auto Handle=BeginCallSelected(Target,Name,Context,Selected);auto& Call=ResolveCall(Handle,Context);
 
- auto Matches=[&](FProperty* Property,const FDasDeclaredType& Type){if(!Property || FString(CallKindName(FieldKind(Property,Context)))!=Type.Kind)return false;if(Type.Kind==TEXT("array") || Type.Kind==TEXT("map") || Type.Kind==TEXT("set")){auto* Carrier=DasContainerCarrier(Type);auto* Values=Carrier?Carrier->FindPropertyByName(TEXT("Values")):nullptr;return Values && Values->SameType(Property);}if(auto* D=CastField<FDelegateProperty>(Property)){TStrongObjectPtr<UFunction> S(MakeDasSingleDelegateSignature(Type.DelegateWire,Error));return S && D->SignatureFunction && S->IsSignatureCompatibleWith(D->SignatureFunction);}if(auto* Enum=CallEnumType(Property))return Enum->GetPathName()==Type.TypePath;if(auto* Struct=CastField<FStructProperty>(Property))return Struct->Struct->GetPathName()==Type.TypePath;if(auto* Class=DasReferencePropertyClass(Property))return Class->GetPathName()==Type.TypePath;return true;};
+ auto Matches=[&](FProperty* Property,const FDasDeclaredType& Type){if(!Property || FString(CallKindName(FieldKind(Property,Context)))!=Type.Kind)return false;if(Type.Kind==TEXT("array") || Type.Kind==TEXT("map") || Type.Kind==TEXT("set")){auto* Carrier=DasContainerCarrier(Type);auto* Values=Carrier?Carrier->FindPropertyByName(TEXT("Values")):nullptr;return Values && Values->SameType(Property);}if(auto* D=CastField<FDelegateProperty>(Property)){TStrongObjectPtr<UFunction> S(MakeDasSingleDelegateSignature(Type.DelegateWire,Error));return S && D->SignatureFunction && S->IsSignatureCompatibleWith(D->SignatureFunction);}if(auto* Enum=CallEnumType(Property))return Enum->GetPathName()==Type.TypePath;if(auto* Struct=CastField<FStructProperty>(Property))return Struct->Struct->GetPathName()==Type.TypePath;if(auto* Class=CastField<FClassProperty>(Property))return Class->MetaClass->GetPathName()==Type.TypePath;if(auto* Class=DasReferencePropertyClass(Property))return Class->GetPathName()==Type.TypePath;return true;};
  if(Method->ReturnType.Kind==TEXT("void")?Call.Function->GetReturnProperty()!=nullptr:!Matches(Call.Function->GetReturnProperty(),Method->ReturnType))Context->throw_error("authored method return contract changed");
  int32 Index=0;for(TFieldIterator<FProperty> It(Call.Function.Get());It;++It){if(!It->HasAnyPropertyFlags(CPF_Parm) || It->HasAnyPropertyFlags(CPF_ReturnParm))continue;++Index;const auto* DeclaredParameter=Method->Parameters.FindByPredicate([&](const auto& P){return P.Name==It->GetName();});if(!DeclaredParameter)Context->throw_error("authored method parameter name changed");const auto& Param=*DeclaredParameter;const bool Out=It->HasAnyPropertyFlags(CPF_OutParm) && !It->HasAnyPropertyFlags(CPF_ConstParm);const FString Direction=Out?(It->HasAnyPropertyFlags(CPF_ReferenceParm)?TEXT("inout"):TEXT("out")):TEXT("in");const bool ContainerInput=Param.Direction==TEXT("in") && Direction==TEXT("inout") && (Param.Type.Kind==TEXT("array") || Param.Type.Kind==TEXT("map") || Param.Type.Kind==TEXT("set"));if(It->GetName()!=Param.Name || (Direction!=Param.Direction && !ContainerInput) || !Matches(*It,Param.Type))Context->throw_error(TCHAR_TO_UTF8(*FString::Printf(TEXT("authored method parameter contract changed: %s.%s direction=%s/%s kind=%s/%s matches=%d"),*Method->Name,*It->GetName(),*Direction,*Param.Direction,CallKindName(FieldKind(*It,Context)),*Param.Type.Kind,Matches(*It,Param.Type))));}
  if(Index!=Method->Parameters.Num())Context->throw_error("authored method parameter count changed");Call.bAuthored=true;return Handle;
@@ -892,9 +896,10 @@ FCallField MethodStructField(FMarshalledCall& Call,const char* Path,bool Output,
 }
 FDasCallHandle BeginAuthoredCall(const FDasObjectHandle& T,const char* Id,const char* N,const char* W,das::Context* C){return BeginAuthoredCallSelected(T,Id,N,W,C);}
 thread_local bool ExplicitParentTick=false;
+thread_local bool ConstructingObject=false;
 thread_local UObject* ParentLifecycleTarget=nullptr;
 FDasCallHandle BeginAuthoredSuperCall(const FDasObjectHandle& Target,const char* CurrentId,const char* ParentId,const char* Name,const char* Wire,das::Context* C){auto* Object=ResolveAuthoredObject(Target,CurrentId,C);auto Identity=[](UClass* Class){const auto* D=Class?Class->GetDefaultObject():nullptr;return Cast<ADasProbeActor>(D)?CastChecked<ADasProbeActor>(D)->AuthoredTypeId:Cast<UDasScriptComponent>(D)?CastChecked<UDasScriptComponent>(D)->AuthoredTypeId:FString();};UClass* Owner=nullptr;for(auto* Class=Object->GetClass();Class;Class=Class->GetSuperClass())if(Identity(Class)==UTF8_TO_TCHAR(CurrentId) && Identity(Class->GetSuperClass())!=UTF8_TO_TCHAR(CurrentId)){Owner=Class;break;}auto* Parent=Owner?Owner->GetSuperClass():nullptr;if(!Parent || Identity(Parent)!=UTF8_TO_TCHAR(ParentId))C->throw_error("Super parent identity changed");auto* Function=Parent->FindFunctionByName(FName(UTF8_TO_TCHAR(Name)));if(!Function)C->throw_error("Super method is missing");auto H=BeginAuthoredCallSelected(Target,ParentId,Name,Wire,C,Function);ResolveCall(H,C).FunctionScopeClass=Parent;return H;}
-void InvokeParentLifecycle(const char* Id,int32 Kind,float Delta,int32 Reason,das::Context* C){RequireObjectContext(C);if(Kind<0 || Kind>2 || !FMath::IsFinite(Delta) || Delta<0)C->throw_error("invalid parent lifecycle call");auto* Object=ResolveSelf(C);auto Identity=[](UClass* Class){const auto* D=Class?Class->GetDefaultObject():nullptr;return Cast<ADasProbeActor>(D)?CastChecked<ADasProbeActor>(D)->AuthoredTypeId:Cast<UDasScriptComponent>(D)?CastChecked<UDasScriptComponent>(D)->AuthoredTypeId:FString();};UClass* Owner=nullptr;for(auto* Class=Object->GetClass();Class;Class=Class->GetSuperClass())if(Identity(Class)==UTF8_TO_TCHAR(Id) && Identity(Class->GetSuperClass())!=UTF8_TO_TCHAR(Id)){Owner=Class;break;}if(!Owner || !Owner->GetSuperClass())C->throw_error("authored lifecycle parent is missing");const auto* Default=Owner->GetSuperClass()->GetDefaultObject();const FString File=Cast<ADasProbeActor>(Default)?CastChecked<ADasProbeActor>(Default)->LifecycleScript:Cast<UDasScriptComponent>(Default)?CastChecked<UDasScriptComponent>(Default)->LifecycleScript:FString();if(File.IsEmpty())return;TGuardValue<bool> TickScope(ExplicitParentTick,Kind==1);TGuardValue<UObject*> ParentScope(ParentLifecycleTarget,Object);auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto Result=R.RunLifecycle(R.ScriptPath(File),Kind==0?EDasCallback::BeginPlay:Kind==1?EDasCallback::Tick:EDasCallback::EndPlay,Object,Delta,Reason);if(!Result.bSucceeded)C->throw_error(TCHAR_TO_UTF8(*Result.Error));}
+void InvokeParentLifecycle(const char* Id,int32 Kind,float Delta,int32 Reason,das::Context* C){RequireObjectContext(C);if(Kind<0 || Kind>4 || !FMath::IsFinite(Delta) || Delta<0)C->throw_error("invalid parent lifecycle call");if(Kind==3 && !ActiveContext->bInitializingObject)C->throw_error("Super.Initialize is only allowed during Initialize");if(Kind==4 && !ConstructingObject)C->throw_error("Super.ConstructionScript is only allowed during ConstructionScript");if(ConstructingObject && Kind!=4)C->throw_error("gameplay lifecycle is forbidden during ConstructionScript");auto* Object=ResolveSelf(C);auto Identity=[](UClass* Class){const auto* D=Class?Class->GetDefaultObject():nullptr;return Cast<ADasProbeActor>(D)?CastChecked<ADasProbeActor>(D)->AuthoredTypeId:Cast<UDasScriptComponent>(D)?CastChecked<UDasScriptComponent>(D)->AuthoredTypeId:FString();};UClass* Owner=nullptr;for(auto* Class=Object->GetClass();Class;Class=Class->GetSuperClass())if(Identity(Class)==UTF8_TO_TCHAR(Id) && Identity(Class->GetSuperClass())!=UTF8_TO_TCHAR(Id)){Owner=Class;break;}if(!Owner || !Owner->GetSuperClass())C->throw_error("authored lifecycle parent is missing");const auto* Default=Owner->GetSuperClass()->GetDefaultObject();const FString File=Cast<ADasProbeActor>(Default)?CastChecked<ADasProbeActor>(Default)->LifecycleScript:Cast<UDasScriptComponent>(Default)?CastChecked<UDasScriptComponent>(Default)->LifecycleScript:FString();if(File.IsEmpty())return;TGuardValue<bool> TickScope(ExplicitParentTick,Kind==1);TGuardValue<UObject*> ParentScope(ParentLifecycleTarget,Object);auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto Result=R.RunLifecycle(R.ScriptPath(File),Kind==0?EDasCallback::BeginPlay:Kind==1?EDasCallback::Tick:Kind==2?EDasCallback::EndPlay:Kind==3?EDasCallback::Initialize:EDasCallback::Construction,Object,Delta,Reason);if(!Result.bSucceeded)C->throw_error(TCHAR_TO_UTF8(*Result.Error));}
 void PinMethodSnapshot(FProperty* Property,void* Memory,FMarshalledCall& Call,const FString& Path,das::Context* C,int32& Budget,int32 Depth=0){
  if(Depth>16 || --Budget<0)C->throw_error("method snapshot traversal limit exceeded");
  if(DasReferencePropertyClass(Property)){auto* Object=DasReferenceGet(Property,Memory);if(Object && (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))C->throw_error("method snapshot object is expired");Call.ObjectPins.Add(Path,TStrongObjectPtr<UObject>(Object));}
@@ -957,12 +962,12 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     void SceneSetWorld(const FDasObjectHandle& H,const FTransform& V,bool Teleport,das::Context* C){auto* S=ScriptScene(H,C);SceneMutation(S,C);if(!MethodMathValid(V))C->throw_error("invalid scene transform");S->SetWorldTransform(V,false,nullptr,Teleport?ETeleportType::TeleportPhysics:ETeleportType::None);}
     bool SceneAttach(const FDasObjectHandle& H,const FDasObjectHandle& Parent,const char* Socket,const char* Rule,bool Weld,das::Context* C){auto* Child=ScriptScene(H,C);auto* P=ScriptScene(Parent,C);SceneMutation(Child,C);SceneMutation(P,C);if(Child==P || P->IsAttachedTo(Child))C->throw_error("scene attachment would form a cycle");const FString SocketText=Socket?UTF8_TO_TCHAR(Socket):TEXT("");if(SocketText.Len()>=NAME_SIZE)C->throw_error("socket name too long");const FName SocketName=SocketText.IsEmpty()?NAME_None:FName(*SocketText);if(SocketName!=NAME_None && !P->DoesSocketExist(SocketName))C->throw_error("unknown parent socket");const FString R=Rule?UTF8_TO_TCHAR(Rule):TEXT("");FAttachmentTransformRules Rules=FAttachmentTransformRules::KeepRelativeTransform;if(R==TEXT("KeepRelative")){}else if(R==TEXT("KeepWorld"))Rules=FAttachmentTransformRules::KeepWorldTransform;else if(R==TEXT("SnapIncludingScale"))Rules=FAttachmentTransformRules::SnapToTargetIncludingScale;else if(R==TEXT("SnapNotIncludingScale"))Rules=FAttachmentTransformRules::SnapToTargetNotIncludingScale;else C->throw_error("unknown scene attachment rule");Rules.bWeldSimulatedBodies=Weld;return Child->AttachToComponent(P,Rules,SocketName);}
     void SceneDetach(const FDasObjectHandle& H,const char* Rule,das::Context* C){auto* S=ScriptScene(H,C);SceneMutation(S,C);const FString R=Rule?UTF8_TO_TCHAR(Rule):TEXT("");if(R==TEXT("KeepWorld"))S->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,false));else if(R==TEXT("KeepRelative"))S->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepRelative,false));else C->throw_error("detach rule must be KeepWorld or KeepRelative");}
-    FDasObjectHandle SceneCreate(const FDasObjectHandle& H,const char* Name,das::Context* C){auto* Self=ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions || ActiveContext->bEnding)C->throw_error("cannot create scene components during bind_events/EndPlay");auto* Actor=Cast<AActor>(ResolveObject(H,C));if(!Actor || Actor->IsTemplate() || !Actor->GetWorld() || !Actor->GetWorld()->IsGameWorld() || Actor->GetWorld()!=Self->GetWorld())C->throw_error("scene creation requires live game-world Actor in owner's world");const FString N=Name?UTF8_TO_TCHAR(Name):TEXT("");if(N.IsEmpty() || N.Len()>=NAME_SIZE || N.Equals(TEXT("None"),ESearchCase::IgnoreCase))C->throw_error("scene component name is required");for(TCHAR Ch:N)if(!FChar::IsAlnum(Ch) && Ch!='_')C->throw_error("scene component name supports letters/digits/underscore");if(FindObject<UObject>(Actor,*N))C->throw_error("scene component name already exists");for(auto I=CreatedScriptScenes.CreateIterator();I;++I)if(!I.Key().IsValid())I.RemoveCurrent();if(CreatedScriptScenes.Num()>=1024)C->throw_error("created scene component tracking limit");TStrongObjectPtr<AActor> Keep(Actor);auto* Component=NewObject<USceneComponent>(Actor,*N,RF_Transient);const bool Root=Actor->GetRootComponent()==nullptr;Actor->AddInstanceComponent(Component);if(Root)Actor->SetRootComponent(Component);else Component->SetupAttachment(Actor->GetRootComponent());Component->RegisterComponent();if(!Component->IsRegistered()){if(Root)Actor->SetRootComponent(nullptr);Actor->RemoveInstanceComponent(Component);Component->DestroyComponent();C->throw_error("scene component registration failed");}CreatedScriptScenes.Add(TWeakObjectPtr<UActorComponent>(Component),TWeakObjectPtr<UObject>(Self));return MakeObjectHandle(Component,USceneComponent::StaticClass(),C);}
+    FDasObjectHandle SceneCreate(const FDasObjectHandle& H,const char* Name,das::Context* C){auto* Self=ResolveSelf(C);if(ConstructingObject || ActiveContext->bCollectingSubscriptions || ActiveContext->bEnding)C->throw_error("cannot create scene components during bind_events/EndPlay");auto* Actor=Cast<AActor>(ResolveObject(H,C));if(!Actor || Actor->IsTemplate() || !Actor->GetWorld() || (!Actor->GetWorld()->IsGameWorld() && !ConstructingObject) || Actor->GetWorld()!=Self->GetWorld())C->throw_error("scene creation requires live game-world Actor in owner's world");const FString N=Name?UTF8_TO_TCHAR(Name):TEXT("");if(N.IsEmpty() || N.Len()>=NAME_SIZE || N.Equals(TEXT("None"),ESearchCase::IgnoreCase))C->throw_error("scene component name is required");for(TCHAR Ch:N)if(!FChar::IsAlnum(Ch) && Ch!='_')C->throw_error("scene component name supports letters/digits/underscore");if(FindObject<UObject>(Actor,*N))C->throw_error("scene component name already exists");for(auto I=CreatedScriptScenes.CreateIterator();I;++I)if(!I.Key().IsValid())I.RemoveCurrent();if(CreatedScriptScenes.Num()>=1024)C->throw_error("created scene component tracking limit");TStrongObjectPtr<AActor> Keep(Actor);auto* Component=NewObject<USceneComponent>(Actor,*N,RF_Transient);const bool Root=Actor->GetRootComponent()==nullptr;Actor->AddInstanceComponent(Component);if(Root)Actor->SetRootComponent(Component);else Component->SetupAttachment(Actor->GetRootComponent());Component->RegisterComponent();if(!Component->IsRegistered()){if(Root)Actor->SetRootComponent(nullptr);Actor->RemoveInstanceComponent(Component);Component->DestroyComponent();C->throw_error("scene component registration failed");}CreatedScriptScenes.Add(TWeakObjectPtr<UActorComponent>(Component),TWeakObjectPtr<UObject>(Self));return MakeObjectHandle(Component,USceneComponent::StaticClass(),C);}
     FDasObjectHandle SceneGet(const FDasObjectHandle& H,const char* Name,das::Context* C)
     {
         auto* Self=ResolveSelf(C);
         auto* Actor=Cast<AActor>(ResolveObject(H,C));
-        if(!Actor || Actor->IsActorBeingDestroyed() || Actor->IsTemplate() || !Actor->GetWorld() || !Actor->GetWorld()->IsGameWorld() || Actor->GetWorld()!=Self->GetWorld())C->throw_error("scene lookup requires live game-world Actor in owner's world");
+        if(!Actor || Actor->IsActorBeingDestroyed() || Actor->IsTemplate() || !Actor->GetWorld() || (!Actor->GetWorld()->IsGameWorld() && !ConstructingObject) || Actor->GetWorld()!=Self->GetWorld())C->throw_error("scene lookup requires live game-world Actor in owner's world");
         const FString N=Name?UTF8_TO_TCHAR(Name):TEXT("");
         if(N.IsEmpty() || N.Len()>=NAME_SIZE || N.Equals(TEXT("None"),ESearchCase::IgnoreCase))C->throw_error("scene component name is required");
         for(TCHAR Ch:N)if(!FChar::IsAlnum(Ch) && Ch!='_')C->throw_error("scene component name supports letters/digits/underscore");
@@ -986,7 +991,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     {
         auto* Self=ResolveSelf(C);
         auto* Actor=Cast<AActor>(ResolveObject(H,C));
-        if(!Actor || Actor->IsTemplate() || Actor->IsActorBeingDestroyed() || !Actor->GetWorld() || !Actor->GetWorld()->IsGameWorld() || Actor->GetWorld()!=Self->GetWorld())C->throw_error("component operation requires live Actor in owner's game world");
+        if(!Actor || Actor->IsTemplate() || Actor->IsActorBeingDestroyed() || !Actor->GetWorld() || (!Actor->GetWorld()->IsGameWorld() && !ConstructingObject) || Actor->GetWorld()!=Self->GetWorld())C->throw_error("component operation requires live Actor in owner's game world");
         const bool Authored=AuthoredId && *AuthoredId;
         if(!Class || !Class->IsChildOf(UActorComponent::StaticClass()) || Class->HasAnyClassFlags(CLASS_Abstract|CLASS_Deprecated|CLASS_NewerVersionExists))C->throw_error("expected loaded concrete ActorComponent class");
         if(Authored){
@@ -1002,7 +1007,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             return MakeObjectHandle(Component,Class,C);
         }
         if(Mode==0)return MakeObjectHandle(nullptr,Class,C);
-        if(ActiveContext->bCollectingSubscriptions || ActiveContext->bEnding)C->throw_error("cannot create components during bind_events/EndPlay");
+        if(ConstructingObject || ActiveContext->bCollectingSubscriptions || ActiveContext->bEnding)C->throw_error("cannot create components during bind_events/EndPlay");
         if(FindObject<UObject>(Actor,*N))C->throw_error("component name already exists");
         for(auto I=CreatedScriptScenes.CreateIterator();I;++I)if(!I.Key().IsValid())I.RemoveCurrent();
         if(CreatedScriptScenes.Num()>=1024)C->throw_error("created component tracking limit");
@@ -1028,7 +1033,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     {
         const FString B=Base?UTF8_TO_TCHAR(Base):TEXT("");
         auto* Parent=FindObject<UClass>(nullptr,*B);
-        if(!Parent || !IsValid(Class) || !Class->IsChildOf(Parent) || Class->HasAnyClassFlags(CLASS_Abstract|CLASS_Deprecated|CLASS_NewerVersionExists|CLASS_Interface))C->throw_error("class reference is missing, abstract, obsolete or has incompatible base");
+        if(!Parent || !IsValid(Class) || !Class->IsChildOf(Parent) || Class->HasAnyClassFlags(CLASS_Deprecated|CLASS_NewerVersionExists))C->throw_error("class reference is missing, abstract, obsolete or has incompatible base");
         if(Id && *Id){
             const auto* Defaults=Class->GetDefaultObject();
             const FString Actual=Cast<UDasScriptComponent>(Defaults)?CastChecked<UDasScriptComponent>(Defaults)->AuthoredTypeId:Cast<ADasProbeActor>(Defaults)?CastChecked<ADasProbeActor>(Defaults)->AuthoredTypeId:FString();
@@ -1044,10 +1049,11 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
         auto* Class=CheckedClass(FindObject<UClass>(nullptr,*P),Base,Id,C);
         return {MakeObjectHandle(Class,UClass::StaticClass(),C).Token};
     }
+    FDasClassHandle CheckTypedClass(FDasClassHandle H,const char* Base,das::Context* C){RequireObjectContext(C);if(H.Token)CheckedClass(Cast<UClass>(ResolveObject(FDasObjectHandle{H.Token},C)),Base,"",C);return H;}
     bool ClassValid(FDasClassHandle H,das::Context* C)
     {
         auto* Class=Cast<UClass>(TryObject(FDasObjectHandle{H.Token},C));
-        return Class && !Class->HasAnyClassFlags(CLASS_Abstract|CLASS_Deprecated|CLASS_NewerVersionExists|CLASS_Interface);
+        return Class && !Class->HasAnyClassFlags(CLASS_Deprecated|CLASS_NewerVersionExists);
     }
     char* ClassPath(FDasClassHandle H,das::Context* C)
     {
@@ -1109,7 +1115,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     FDasObjectHandle AuthoredComponentGet(const FDasObjectHandle& H,const char* Id,const char* Name,das::Context* C)
     {
         auto* Self=ResolveSelf(C);auto* Actor=Cast<AActor>(ResolveObject(H,C));
-        if(!Actor || Actor->IsTemplate() || Actor->IsActorBeingDestroyed() || !Actor->GetWorld() || !Actor->GetWorld()->IsGameWorld() || Actor->GetWorld()!=Self->GetWorld())C->throw_error("component lookup requires live Actor in owner's game world");
+        if(!Actor || Actor->IsTemplate() || Actor->IsActorBeingDestroyed() || !Actor->GetWorld() || (!Actor->GetWorld()->IsGameWorld() && !ConstructingObject) || Actor->GetWorld()!=Self->GetWorld())C->throw_error("component lookup requires live Actor in owner's game world");
         const FString N=Name?UTF8_TO_TCHAR(Name):TEXT("");
         if(N.IsEmpty() || N.Len()>=NAME_SIZE || N.Equals(TEXT("None"),ESearchCase::IgnoreCase))C->throw_error("component name is required");
         for(TCHAR Ch:N)if(!FChar::IsAlnum(Ch) && Ch!='_')C->throw_error("component name supports letters/digits/underscore");
@@ -1123,7 +1129,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     bool NativeComponentDestroy(const FDasObjectHandle& H,das::Context* C)
     {
         auto* Component=Cast<UActorComponent>(ResolveObject(H,C));auto* Self=ResolveSelf(C);
-        if(!Component || Component->IsBeingDestroyed() || Component->IsTemplate() || !Component->GetWorld() || Component->GetWorld()!=Self->GetWorld() || ActiveContext->bCollectingSubscriptions)C->throw_error("invalid component destruction context");
+        if(!Component || Component->IsBeingDestroyed() || Component->IsTemplate() || !Component->GetWorld() || Component->GetWorld()!=Self->GetWorld() || ConstructingObject || ActiveContext->bCollectingSubscriptions)C->throw_error("invalid component destruction context");
         const auto* Creator=CreatedScriptScenes.Find(TWeakObjectPtr<UActorComponent>(Component));
         if(!Creator || Creator->Get()!=Self)C->throw_error("only components created by this script owner may be destroyed");
         auto* Scene=Cast<USceneComponent>(Component);
@@ -1134,7 +1140,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
         TGuardValue<UDasScriptComponent*> LifecycleTarget(ComponentLifecycleTarget,Cast<UDasScriptComponent>(Component));
         Component->DestroyComponent();return true;
     }
-    bool SceneDestroy(const FDasObjectHandle& H,das::Context* C){auto* S=ScriptScene(H,C);SceneMutation(S,C);const auto* Creator=CreatedScriptScenes.Find(TWeakObjectPtr<UActorComponent>(S));if(!Creator || Creator->Get()!=ResolveSelf(C))C->throw_error("only scene components created by this script owner may be destroyed");if(S->GetAttachChildren().Num()!=0)C->throw_error("detach children before destroying created scene component");auto* Actor=S->GetOwner();CreatedScriptScenes.Remove(TWeakObjectPtr<UActorComponent>(S));if(Actor){if(Actor->GetRootComponent()==S)Actor->SetRootComponent(nullptr);Actor->RemoveInstanceComponent(S);}S->DestroyComponent();return true;}
+    bool SceneDestroy(const FDasObjectHandle& H,das::Context* C){if(ConstructingObject)C->throw_error("component destruction is forbidden during ConstructionScript");auto* S=ScriptScene(H,C);SceneMutation(S,C);const auto* Creator=CreatedScriptScenes.Find(TWeakObjectPtr<UActorComponent>(S));if(!Creator || Creator->Get()!=ResolveSelf(C))C->throw_error("only scene components created by this script owner may be destroyed");if(S->GetAttachChildren().Num()!=0)C->throw_error("detach children before destroying created scene component");auto* Actor=S->GetOwner();CreatedScriptScenes.Remove(TWeakObjectPtr<UActorComponent>(S));if(Actor){if(Actor->GetRootComponent()==S)Actor->SetRootComponent(nullptr);Actor->RemoveInstanceComponent(S);}S->DestroyComponent();return true;}
 
     FMulticastDelegateProperty* ScalarEventProperty(UObject* Source,FName Name,EDasMethodSignature Kind){
         auto* P=FindFProperty<FMulticastDelegateProperty>(Source->GetClass(),Name);if(!P || !P->HasAnyPropertyFlags(CPF_BlueprintAssignable) || P->ArrayDim!=1 || !P->SignatureFunction)return nullptr;auto* Sig=P->SignatureFunction.Get();if(Kind==EDasMethodSignature::Void)return Sig->NumParms==0?P:nullptr;if(Sig->NumParms!=1)return nullptr;
@@ -1200,7 +1206,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
 
     void EmitSignal(int32 Value, das::Context* Context)
     {
-        if (ActiveContext && ActiveContext->bCollectingSubscriptions) Context->throw_error("event emission is forbidden in bind_events");
+        if (ConstructingObject || (ActiveContext && ActiveContext->bCollectingSubscriptions)) Context->throw_error("event emission is forbidden in bind_events/ConstructionScript");
         auto* Actor = Cast<ADasProbeActor>(ResolveSelf(Context));
         if (!Actor) Context->throw_error("signal emission requires a DasProbeActor");
         Actor->EmitDasSignal(Value);
@@ -1312,7 +1318,8 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
         {
             addCommentReader(new FUECommentReader());
             addAnnotation(new FUEClassAnnotation());addAnnotation(new FUEEnumAnnotation());addAnnotation(new FUEStructAnnotation());
-            addAnnotation(new FUENativeInterfaceAnnotation());addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));addAnnotation(new FUESourceValueBinding());addAnnotation(new FUEObjectTypeAnnotation());addAnnotation(new FUEAuthoredRefAnnotation());addTypeMacro(new FUEObjectTypeMacro());
+            addAnnotation(new FUENativeInterfaceAnnotation());addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));addAnnotation(new FUESourceValueBinding());addAnnotation(new FUEObjectTypeAnnotation());addAnnotation(new FUEAuthoredRefAnnotation());addTypeMacro(new FUEObjectTypeMacro());addAnnotation(new FUEClassTypeAnnotation());addTypeMacro(new FUEClassTypeMacro());
+            for(bool Raw:{false,true}){auto* Macro=new FUEClassCastFactory(Raw);ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
             addAnnotation(new FUEDelegateAnnotation(false));addAnnotation(new FUEDelegateAnnotation(true));
             addAnnotation(new FUEFunctionAnnotation());addAnnotation(new FUECallbackAnnotation(false));addAnnotation(new FUECallbackAnnotation(true));addAnnotation(new FUEInterfaceAnnotation());addAnnotation(new FUEImplementsAnnotation());addAnnotation(new FUEComponentAnnotation());
             {auto* Macro=new FUEBoundDelegateFactory();ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
@@ -1401,6 +1408,10 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             das::addExtern<DAS_BIND_FUN(SetCallEnum)>(*this, Library, "ue_arg_enum", das::SideEffects::modifyExternal, "SetCallEnum");
             das::addExtern<DAS_BIND_FUN(GetCallName)>(*this, Library, "ue_result_name", das::SideEffects::modifyExternal, "GetCallName");
             das::addExtern<DAS_BIND_FUN(SetCallName)>(*this, Library, "ue_arg_name", das::SideEffects::modifyExternal, "SetCallName");
+            das::addExtern<DAS_BIND_FUN(SetCallClass)>(*this,Library,"ue_arg_class",das::SideEffects::modifyExternal,"SetCallClass");
+            das::addExtern<DAS_BIND_FUN(GetCallClass)>(*this,Library,"ue_result_class",das::SideEffects::modifyExternal,"GetCallClass");
+            das::addExtern<DAS_BIND_FUN(CheckTypedClass)>(*this,Library,"__ue_class_check",das::SideEffects::accessExternal,"CheckTypedClass");
+            das::addExtern<DAS_BIND_FUN(NullClass)>(*this,Library,"ue_class_null",das::SideEffects::none,"NullClass");
             das::addExtern<DAS_BIND_FUN(SetCallObject)>(*this, Library, "ue_arg_object", das::SideEffects::modifyExternal, "SetCallObject");
             das::addExtern<DAS_BIND_FUN(GetCallObject), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_result_object", das::SideEffects::modifyExternal, "GetCallObject");
             das::addExtern<DAS_BIND_FUN(ExpectInterfaceSignature)>(*this,Library,"ue_expect_interface_signature",das::SideEffects::modifyExternal,"ExpectInterfaceSignature");
@@ -1605,6 +1616,7 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
             das::addExtern<DAS_BIND_FUN(PublishFrameDouble)>(*this,Library,"ue_frame_out_double",das::SideEffects::modifyExternal,"PublishFrameDouble");
             das::addExtern<DAS_BIND_FUN(PublishFrameName)>(*this,Library,"ue_frame_out_name",das::SideEffects::modifyExternal,"PublishFrameName");
             das::addExtern<DAS_BIND_FUN(PublishFrameObject)>(*this,Library,"ue_frame_out_object",das::SideEffects::modifyExternal,"PublishFrameObject");
+            das::addExtern<DAS_BIND_FUN(PublishFrameClass)>(*this,Library,"ue_frame_out_class",das::SideEffects::modifyExternal,"PublishFrameClass");
             das::addExtern<DAS_BIND_FUN(PublishFrameEnum)>(*this,Library,"ue_frame_out_enum",das::SideEffects::modifyExternal,"PublishFrameEnum");
             das::addExtern<DAS_BIND_FUN(PublishFrameVector)>(*this,Library,"ue_frame_out_vector",das::SideEffects::modifyExternal,"PublishFrameVector");
             das::addExtern<DAS_BIND_FUN(PublishFrameRotator)>(*this,Library,"ue_frame_out_rotator",das::SideEffects::modifyExternal,"PublishFrameRotator");
@@ -1682,6 +1694,8 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
         das::ProgramPtr Program;
         TUniquePtr<FUnrealDasContext> Context;
         das::SimFunction* Function = nullptr;
+        das::SimFunction* Initializer = nullptr;
+        das::SimFunction* Construction = nullptr;
         das::SimFunction* BeginPlay = nullptr;
         das::SimFunction* Tick = nullptr;
         das::SimFunction* EndPlay = nullptr;
@@ -1747,6 +1761,10 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
         FString ReinstanceLifecyclePath;
 #endif
     };
+    // Delivery belongs to the UObject lifetime, independently of VM/session replacement.
+    enum class EInitializerDelivery:uint8 {Running,Complete,Failed};
+    struct FInitializerDelivery {EInitializerDelivery State=EInitializerDelivery::Running;FString Error;};
+    TMap<TWeakObjectPtr<UObject>,TMap<FString,FInitializerDelivery>> InitializerDeliveries;
     TArray<TUniquePtr<FPersistentSession>> Sessions;
 #if WITH_EDITOR
     TArray<TUniquePtr<FPersistentSession>> PreservedSessions;
@@ -1762,7 +1780,7 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
     TArray<uint64> PendingScriptTimers;uint64 NextScriptTimer=1;bool bDrainingScriptTimers=false;
     void DrainEvents();
     void ClearSessionTimers(FPersistentSession& S){if(!S.Live)return;for(auto I=ScriptTimers.CreateIterator();I;++I)if(I.Value()->Context==S.Live->Context.Get())I.RemoveCurrent();}
-    FPersistentSession* ManagedOwnerSession(das::Context* C){ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("managed callback operations are forbidden in bind_events");for(const auto& S:Sessions)if(S->Live && S->Live->Context.Get()==ActiveContext && !S->bReleaseRequested && !S->bEndDelivered)return S.Get();C->throw_error("managed callbacks require a live persistent owner session");return nullptr;}
+    FPersistentSession* ManagedOwnerSession(das::Context* C){ResolveSelf(C);if(ConstructingObject)C->throw_error("managed callbacks are forbidden during ConstructionScript");if(ActiveContext->bCollectingSubscriptions)C->throw_error("managed callback operations are forbidden in bind_events");for(const auto& S:Sessions)if(S->Live && S->Live->Context.Get()==ActiveContext && !S->bReleaseRequested && !S->bEndDelivered)return S.Get();C->throw_error("managed callbacks require a live persistent owner session");return nullptr;}
     FString TimerName(const char* Name,das::Context* C){const FString N=Name?UTF8_TO_TCHAR(Name):TEXT("");if(N.IsEmpty() || N.Len()>128)C->throw_error("timer name requires 1..128 characters");return N;}
     FManagedScriptTimer* FindScriptTimer(FPersistentSession* S,const FString& Name){for(auto& P:ScriptTimers)if(P.Value->Context==S->Live->Context.Get() && P.Value->Name==Name)return P.Value.Get();return nullptr;}
     void QueueScriptTimer(uint64 Id){if(!ScriptTimers.Contains(Id))return;if(!PendingScriptTimers.Contains(Id)){if(PendingScriptTimers.Num()>=1024){UE_LOG(LogDasRuntime,Warning,TEXT("Script timer dispatch queue limit reached"));return;}PendingScriptTimers.Add(Id);}DrainEvents();}
@@ -1962,7 +1980,7 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
 
     void DrainEvents()
     {
-        if (ActiveContext || bDrainingEvents || !IsInGameThread()) return;
+        if (ConstructingObject || ActiveContext || bDrainingEvents || !IsInGameThread()) return;
         DrainScriptTimers();
 #if WITH_EDITOR
         if(bPreservingSessions)return;
@@ -2016,6 +2034,7 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
 
     void PruneSessions()
     {
+        for(auto It=InitializerDeliveries.CreateIterator();It;++It)if(!It.Key().IsValid())It.RemoveCurrent();
         for (const auto& Session : Sessions)
         {
             if (!Session->Owner.IsValid()) RevokeSession(*Session);
@@ -2037,6 +2056,7 @@ void FDasRuntimeModule::StartupModule()
     InputRestoreTickHandle=FWorldDelegates::OnWorldTickStart.AddLambda([](UWorld* World,ELevelTick,float){ReconcileScriptInput(World);});
     WorldCleanupHandle = FWorldDelegates::OnWorldCleanup.AddLambda([](UWorld* World, bool, bool)
     {
+        for(auto It=InitializerDeliveries.CreateIterator();It;++It){auto* O=It.Key().Get();if(!O || O->GetWorld()==World)It.RemoveCurrent();}
         for (const auto& Session : Sessions)
             if (Session->World.Get() == World) RevokeSession(*Session);
 #if WITH_EDITOR
@@ -2049,6 +2069,7 @@ void FDasRuntimeModule::StartupModule()
 #if WITH_EDITOR
     ObjectsReplacedHandle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([](const FCoreUObjectDelegates::FReplacementObjectMap& Map){
         if(!IsInGameThread())return;
+        for(const auto& Pair:Map)if(Pair.Key!=Pair.Value && IsValid(Pair.Value))if(auto* Old=InitializerDeliveries.Find(Pair.Key)){auto State=*Old;InitializerDeliveries.Remove(Pair.Key);InitializerDeliveries.Add(Pair.Value,MoveTemp(State));}
         for(auto& Session:PreservedSessions){
             if(UObject* const* New=Map.Find(Session->Owner.GetEvenIfUnreachable())){Session->Owner=*New;Session->World=*New?(*New)->GetWorld():nullptr;Session->bReinstanceOwnerChanged=true;}
             if(Session->Live){auto& C=*Session->Live->Context;if(UObject* const* New=Map.Find(C.Self.GetEvenIfUnreachable()))C.Self=*New;for(auto& Declaration:C.Subscriptions)if(UObject* const* New=Map.Find(Declaration.Source.GetEvenIfUnreachable()))Declaration.Source=*New;for(auto& Pair:C.DelegateValues){auto& V=Pair.Value;if(UObject* const* New=Map.Find(V.Source.GetEvenIfUnreachable()))V.Source=*New;auto Remap=[&](FScriptDelegate& D){if(UObject* const* New=Map.Find(const_cast<UObject*>(D.GetUObjectEvenIfUnreachable()))){const FName N=D.GetFunctionName();if(IsValid(*New))D.BindUFunction(*New,N);else D.Unbind();}};Remap(V.Single);for(auto& D:V.Listeners)Remap(D);}
@@ -2067,6 +2088,7 @@ void FDasRuntimeModule::StartupModule()
 
 void FDasRuntimeModule::ShutdownModule()
 {
+    InitializerDeliveries.Empty();
     if (bInitialized)
     {
         FWorldDelegates::OnWorldTickStart.Remove(InputRestoreTickHandle);
@@ -2311,6 +2333,23 @@ FDasExecutionResult FDasRuntimeModule::RunPersistent(const FString& Path, int32 
     return RunCallback(Path, EDasCallback::Main, Input, 0.f, Self);
 }
 
+FDasExecutionResult FDasRuntimeModule::RunConstruction(const FString& Path,TWeakObjectPtr<UObject> Self)
+{
+    FDasExecutionResult Result;
+    auto* Actor=Cast<AActor>(Self.Get());
+    if(!IsInGameThread() || !bInitialized || ConstructingObject || !Actor || Actor->IsTemplate() || !Actor->GetWorld() || Actor->IsActorBeingDestroyed() || Actor->HasActorBegunPlay()) {
+        Result.Error=TEXT("ConstructionScript requires a non-template Actor before BeginPlay and cannot recurse");return Result;
+    }
+#if WITH_EDITOR
+    if(bPreservingSessions){Result.bSucceeded=true;return Result;}
+#endif
+    // Construction contexts are temporary: never reset or reuse gameplay VMs.
+    auto SavedSessions=MoveTemp(Sessions);
+    ON_SCOPE_EXIT { Sessions.Empty(); Sessions=MoveTemp(SavedSessions); };
+    TGuardValue<bool> ConstructionScope(ConstructingObject,true);
+    return RunCallback(Path,EDasCallback::Construction,0,0.f,Self);
+}
+
 FDasExecutionResult FDasRuntimeModule::RunLifecycle(const FString& Path, EDasCallback Event, TWeakObjectPtr<UObject> Self, float DeltaSeconds, int32 EndReason)
 {
     if (Event == EDasCallback::Main)
@@ -2333,8 +2372,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         if(!Valid){Result.Error=TEXT("Invalid entry point name");return Result;}
     }
     const auto* LifecycleComponent=Cast<UDasScriptComponent>(Self.Get());
-    const bool ActorLifecycle=ActorLifecycleTarget && (Self.Get()==ActorLifecycleTarget || (LifecycleComponent && LifecycleComponent->GetOwner()==ActorLifecycleTarget)) && (Event==EDasCallback::BeginPlay || Event==EDasCallback::EndPlay);
-    const bool ComponentLifecycle=ComponentLifecycleTarget && Self.Get()==ComponentLifecycleTarget && (Event==EDasCallback::BeginPlay || Event==EDasCallback::EndPlay);
+    const bool ActorLifecycle=ActorLifecycleTarget && (Self.Get()==ActorLifecycleTarget || (LifecycleComponent && LifecycleComponent->GetOwner()==ActorLifecycleTarget)) && (Event==EDasCallback::BeginPlay || Event==EDasCallback::EndPlay || Event==EDasCallback::Construction);
+    const bool ComponentLifecycle=ComponentLifecycleTarget && Self.Get()==ComponentLifecycleTarget && (Event==EDasCallback::BeginPlay || Event==EDasCallback::EndPlay || Event==EDasCallback::Construction);
     const bool ParentLifecycle=ParentLifecycleTarget && Self.Get()==ParentLifecycleTarget && Event!=EDasCallback::Main;
     if (!IsInGameThread() || !bInitialized || (ActiveContext && !ActorLifecycle && !ComponentLifecycle && !ParentLifecycle && (AuthoredDispatchDepth==0 || Event!=EDasCallback::Main)))
     {
@@ -2349,21 +2388,24 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         return Result;
     }
 #endif
+    if(Event==EDasCallback::Construction && !ConstructingObject){Result.Error=TEXT("Use RunConstruction for ConstructionScript");return Result;}
+    if(ConstructingObject && Event!=EDasCallback::Construction){Result.Error=TEXT("Gameplay callbacks are forbidden during ConstructionScript");return Result;}
     TArray<FDasScalarValue> NormalizedFrame,PendingOutputs;
     if(Frame){NormalizedFrame=*Frame;for(auto& V:NormalizedFrame){if(V.Direction<0 || V.Direction>2){Result.Error=TEXT("Invalid frame direction");return Result;}if(V.Direction==1)V=UDasFrameLibrary::DefaultValue(V.Kind,V.ObjectClass,1);}Frame=&NormalizedFrame;}
     FStructFrameRoots FrameRoots(NormalizedFrame);
     FDasCallContract Expected=FDasCallContract::Scalar(Signature);
-    if(Frame){Expected.Inputs.Reset();if(Frame->Num()>16 || ((static_cast<uint8>(Signature)>13 && Signature!=EDasMethodSignature::Delegate) || Signature==EDasMethodSignature::Frame)){Result.Error=TEXT("Invalid scalar frame");return Result;}for(const auto& V:*Frame){if(V.Kind<0 || (V.Kind>13 && V.Kind!=16) || V.Kind==3 || V.Kind==4){Result.Error=TEXT("Invalid scalar argument kind");return Result;}if(V.Kind==5)for(int32 I=0;I<V.StringValue.Len();++I)if(V.StringValue[I]==0){Result.Error=TEXT("embedded NUL is not supported in strings");return Result;}if((V.Kind==9 && V.VectorValue.ContainsNaN()) || (V.Kind==10 && V.RotatorValue.ContainsNaN()) || (V.Kind==11 && (V.TransformValue.ContainsNaN() || !V.TransformValue.IsRotationNormalized()))){Result.Error=TEXT("Invalid/non-finite math struct input");return Result;}Expected.Inputs.Add(static_cast<EDasMethodSignature>(V.Kind));}}
+    if(Frame){Expected.Inputs.Reset();if(Frame->Num()>16 || ((static_cast<uint8>(Signature)>13 && Signature!=EDasMethodSignature::Class && Signature!=EDasMethodSignature::Delegate) || Signature==EDasMethodSignature::Frame)){Result.Error=TEXT("Invalid scalar frame");return Result;}for(const auto& V:*Frame){if(V.Kind<0 || (V.Kind>13 && V.Kind!=15 && V.Kind!=16) || V.Kind==3 || V.Kind==4){Result.Error=TEXT("Invalid scalar argument kind");return Result;}if(V.Kind==5)for(int32 I=0;I<V.StringValue.Len();++I)if(V.StringValue[I]==0){Result.Error=TEXT("embedded NUL is not supported in strings");return Result;}if((V.Kind==9 && V.VectorValue.ContainsNaN()) || (V.Kind==10 && V.RotatorValue.ContainsNaN()) || (V.Kind==11 && (V.TransformValue.ContainsNaN() || !V.TransformValue.IsRotationNormalized()))){Result.Error=TEXT("Invalid/non-finite math struct input");return Result;}Expected.Inputs.Add(static_cast<EDasMethodSignature>(V.Kind));}}
     TArray<TStrongObjectPtr<UObject>> ObjectPins;
     if(Frame){bool Directed=false;for(const auto& V:*Frame)Directed |= V.Direction!=0;if(Directed)for(const auto& V:*Frame)Expected.InputDirections.Add(V.Direction);}
-    if(Frame){bool Objects=false;for(const auto& V:*Frame)Objects |= V.Kind==8 || V.Kind==12 || V.Kind==13 || V.Kind==16;
-        if(Objects)for(const auto& V:*Frame){const FString PathClass=(V.Kind==12 || V.Kind==13 || V.Kind==16)?V.ObjectClass:V.Kind==8?(V.ObjectClass.IsEmpty()?TEXT("/Script/CoreUObject.Object"):V.ObjectClass):FString();Expected.InputClasses.Add(PathClass);if(V.Kind==8){UClass* Class=FindObject<UClass>(nullptr,*PathClass);UObject* Object=V.ObjectValue.Get();if(!Class || (Object && (!IsValid(Object) || !DasReferenceMatches(Object,Class) || (Object->IsA<AActor>() && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))){Result.Error=TEXT("Object argument is expired or has wrong class");return Result;}if(Object)ObjectPins.Emplace(Object);}}
+    if(Frame){bool Objects=false;for(const auto& V:*Frame)Objects |= V.Kind==15 || V.Kind==8 || V.Kind==12 || V.Kind==13 || V.Kind==16;
+        if(Objects)for(const auto& V:*Frame){const FString PathClass=(V.Kind==12 || V.Kind==13 || V.Kind==15 || V.Kind==16)?V.ObjectClass:V.Kind==8?(V.ObjectClass.IsEmpty()?TEXT("/Script/CoreUObject.Object"):V.ObjectClass):FString();Expected.InputClasses.Add(PathClass);if(V.Kind==15){if(!FrameClassMatches(V.ClassValue.Get(),PathClass)){Result.Error=TEXT("Class argument has wrong base or is obsolete");return Result;}if(V.ClassValue)ObjectPins.Emplace(V.ClassValue.Get());}if(V.Kind==8){UClass* Class=FindObject<UClass>(nullptr,*PathClass);UObject* Object=V.ObjectValue.Get();if(!Class || (Object && (!IsValid(Object) || !DasReferenceMatches(Object,Class) || (Object->IsA<AActor>() && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))){Result.Error=TEXT("Object argument is expired or has wrong class");return Result;}if(Object)ObjectPins.Emplace(Object);}}
     }
     if(Frame)for(const auto& V:*Frame)if(V.Kind==12){FString E;if(!V.StructValue.IsValid() || V.StructValue.GetScriptStruct()->GetPathName()!=V.ObjectClass || !ValidateDasStructSnapshot(V.StructValue,E)){Result.Error=TEXT("Invalid reflected struct input: ")+E;return Result;}}
     if(Signature==EDasMethodSignature::Delegate){Expected.ReturnClass=ReturnClass;FString E;TStrongObjectPtr<UFunction> Sig(MakeDasSingleDelegateSignature(ReturnClass,E));if(!Sig){Result.Error=E;return Result;}}
     if(Signature==EDasMethodSignature::Enum){Expected.ReturnClass=ReturnClass;FString E;if(!ResolveDasEnum(ReturnClass,E)){Result.Error=E;return Result;}}
     if(Frame)for(const auto& V:*Frame)if(V.Kind==13){FString E;if(!ValidateDasEnumNumber(V.ObjectClass,V.IntValue,E)){Result.Error=E;return Result;}}
     if(Signature==EDasMethodSignature::Struct){DasContainerProperty(ReturnClass);Expected.ReturnClass=ReturnClass;FString E;if(!ValidateDasValueStruct(ReturnClass,E)){Result.Error=E;return Result;}}
+    if(Signature==EDasMethodSignature::Class){Expected.ReturnClass=ReturnClass;if(!FrameClassMatches(nullptr,ReturnClass)){Result.Error=TEXT("Class result requires a loaded native base");return Result;}}
     if(Signature==EDasMethodSignature::Object){Expected.ReturnClass=ReturnClass.IsEmpty()?TEXT("/Script/CoreUObject.Object"):ReturnClass;if(!FindObject<UClass>(nullptr,*Expected.ReturnClass)){Result.Error=TEXT("Object result class is not loaded");return Result;}}
     FDrainEventsOnExit DrainOnExit;
     UObject* Owner = Self.Get();
@@ -2376,6 +2418,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     FString FullPath = FPaths::ConvertRelativePathToFull(Path);
     FPaths::NormalizeFilename(FullPath);
     FPaths::CollapseRelativeDirectories(FullPath);
+    if(Event==EDasCallback::Initialize && (!Owner->GetWorld() || !Owner->GetWorld()->IsGameWorld() || Owner->IsTemplate())){Result.Error=TEXT("Initialize requires a live game-world instance");return Result;}
+    if(Event!=EDasCallback::EndPlay)if(const auto* Deliveries=InitializerDeliveries.Find(Self))for(const auto& Delivery:*Deliveries)if(Delivery.Value.State==EInitializerDelivery::Failed){Result.Error=Delivery.Value.Error;return Result;}
     FPersistentSession* Session = nullptr;
     for (const auto& Existing : Sessions)
         if (Existing->Owner == Self && Existing->Path == FullPath) { Session = Existing.Get(); break; }
@@ -2439,6 +2483,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 else
                 {
                     Candidate->Function = Candidate->Context->findFunction("main");
+                    Candidate->Initializer = Candidate->Context->findFunction("__ue_initialize");
+                    Candidate->Construction = Candidate->Context->findFunction("__ue_construct");
                     Candidate->BeginPlay = Candidate->Context->findFunction("begin_play");
                     Candidate->Tick = Candidate->Context->findFunction("tick");
                     Candidate->EndPlay = Candidate->Context->findFunction("end_play");
@@ -2446,6 +2492,10 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     auto* Selected=Event==EDasCallback::Main?Candidate->Context->findFunction(EntryUtf8.Get()):Candidate->Function;
                     if ((Event==EDasCallback::Main && !Selected) || (Selected && !VerifyContract(Candidate->Program,Event==EDasCallback::Main?EntryPoint:TEXT("main"),Event==EDasCallback::Main?Expected:FDasCallContract::Scalar(EDasMethodSignature::Int))))
                         CandidateError=TEXT("Expected exported ")+EntryPoint+TEXT(" with requested scalar signature.");
+                    else if (Candidate->Construction && !das::verifyCall<void>(Candidate->Construction->debugInfo,Candidate->Modules))
+                        CandidateError=TEXT("Expected exported __ue_construct(): void.");
+                    else if (Candidate->Initializer && !das::verifyCall<void>(Candidate->Initializer->debugInfo,Candidate->Modules))
+                        CandidateError=TEXT("Expected exported __ue_initialize(): void.");
                     else if (Candidate->BeginPlay && !das::verifyCall<void>(Candidate->BeginPlay->debugInfo, Candidate->Modules))
                         CandidateError = TEXT("Expected exported begin_play(): void.");
                     else if (Candidate->Tick && !das::verifyCall<void, float>(Candidate->Tick->debugInfo, Candidate->Modules))
@@ -2466,7 +2516,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     if (Session->Live) Candidate->Context->PersistentInts = Session->Live->Context->PersistentInts;
                     Candidate->Context->Self = Self;
                     auto* BindEvents = Candidate->Context->findFunction("bind_events");
-                    if (BindEvents)
+                    if (BindEvents && !ConstructingObject)
                     {
                         if (!das::verifyCall<void>(BindEvents->debugInfo, Candidate->Modules))
                             CandidateError = TEXT("Expected exported bind_events(): void.");
@@ -2529,7 +2579,32 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     TGuardValue<bool> EndingScope(Context.bEnding, Event == EDasCallback::EndPlay);
     try
     {
+        if(Event==EDasCallback::Construction){
+            if(Session->Live->Construction)Context.evalWithCatch(Session->Live->Construction,nullptr);
+            if(const char* Exception=Context.getException()){Result.Error=FString(TEXT("ConstructionScript failed: "))+UTF8_TO_TCHAR(Exception);return Result;}
+            Result.bSucceeded=true;return Result;
+        }
         if(ExplicitParentTick && Event==EDasCallback::Tick && Session->Live->BeginPlay && !Session->bBeginDelivered){Result.Error=TEXT("Call Super.BeginPlay before parent Tick");return Result;}
+        // Parent BeginPlay does not implicitly opt back into an overridden initializer.
+        const bool CanInitialize=Owner->GetWorld() && Owner->GetWorld()->IsGameWorld() && !Owner->IsTemplate();
+        if(!CanInitialize && Session->Live->Initializer && (Event==EDasCallback::BeginPlay || Event==EDasCallback::Tick)){Result.Error=TEXT("Initialize requires a live game-world instance");return Result;}
+        const bool NeedInitialize=Event==EDasCallback::Initialize || (CanInitialize && !ParentLifecycle && (Event==EDasCallback::BeginPlay || Event==EDasCallback::Tick));
+        if(NeedInitialize){
+            if(!Owner->GetWorld() || !Owner->GetWorld()->IsGameWorld() || Owner->IsTemplate()){Result.Error=TEXT("Initialize requires a live game-world instance");return Result;}
+            const auto* ExistingOwner=InitializerDeliveries.Find(Self);const auto* Existing=ExistingOwner?ExistingOwner->Find(FullPath):nullptr;
+            if(Existing && Existing->State==EInitializerDelivery::Running){Result.Error=TEXT("Recursive object initialization is forbidden");return Result;}
+            if(!Existing){
+                InitializerDeliveries.FindOrAdd(Self).Add(FullPath,FInitializerDelivery{});
+                bool Initialized=false;
+                ON_SCOPE_EXIT{if(!Initialized){auto& Delivery=InitializerDeliveries.FindOrAdd(Self).FindOrAdd(FullPath);Delivery.State=EInitializerDelivery::Failed;Delivery.Error=Result.Error.IsEmpty()?TEXT("Object initialization failed; recreate the instance"):Result.Error;for(const auto& S:Sessions)if(S->Owner==Self){ClearSessionTimers(*S);S->Bindings.Empty();S->InputContexts.Empty();S->InputRecipes.Empty();S->ContextRecipes.Empty();}}};
+                TGuardValue<bool> Initializing(Context.bInitializingObject,true);
+                if(Session->Live->Initializer)Context.evalWithCatch(Session->Live->Initializer,nullptr);
+                if(const char* Exception=Context.getException()){Result.Error=FString(TEXT("Initialize failed: "))+UTF8_TO_TCHAR(Exception);return Result;}
+                if(!IsValid(Owner) || (Cast<AActor>(Owner) && CastChecked<AActor>(Owner)->IsActorBeingDestroyed()) || (Cast<UActorComponent>(Owner) && CastChecked<UActorComponent>(Owner)->IsBeingDestroyed())){Result.Error=TEXT("Owner destroyed during Initialize");return Result;}
+                InitializerDeliveries.FindOrAdd(Self).FindOrAdd(FullPath).State=EInitializerDelivery::Complete;Initialized=true;
+            }
+            if(Event==EDasCallback::Initialize){Result.bSucceeded=true;return Result;}
+        }
         // Delivery flags belong to the session, so swapping code cannot replay BeginPlay.
         if ((Event == EDasCallback::BeginPlay || Event == EDasCallback::Tick) && !Session->bBeginDelivered)
         {
@@ -2563,13 +2638,13 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         {
             das::vector<vec4f> Packed;TArray<FDasObjectHandle> ObjectArgs;if(Frame)ObjectArgs.Reserve(Frame->Num());FDasStructValue ReturnedStructToken;TArray<FDasStructValue> StructArgs;if(Frame)StructArgs.Reserve(Frame->Num());FDasObjectHandle ReturnedObject;TArray<FVector> VectorArgs;TArray<FRotator> RotatorArgs;TArray<FTransform> TransformArgs;if(Frame){VectorArgs.Reserve(Frame->Num());RotatorArgs.Reserve(Frame->Num());TransformArgs.Reserve(Frame->Num());}FVector ReturnedVector=FVector::ZeroVector;FRotator ReturnedRotator=FRotator::ZeroRotator;FTransform ReturnedTransform=FTransform::Identity;
             if(Frame) for(const auto& V:*Frame){
-                if(V.Kind==16){auto D=ResolveDelegateValue(0,TCHAR_TO_UTF8(*V.ObjectClass),false,&Context);D.Single=V.DelegateValue;Packed.push_back(das::cast<uint64>::from(StoreDelegateValue(MoveTemp(D),&Context)));}else if(V.Kind==0)Packed.push_back(das::cast<int32>::from(V.IntValue));else if(V.Kind==1)Packed.push_back(das::cast<float>::from(V.FloatValue));else if(V.Kind==2)Packed.push_back(das::cast<bool>::from(V.BoolValue));
+                if(V.Kind==15){Packed.push_back(das::cast<FDasClassHandle>::from(FDasClassHandle{V.ClassValue?MakeObjectHandle(V.ClassValue.Get(),UClass::StaticClass(),&Context).Token:0}));}else if(V.Kind==16){auto D=ResolveDelegateValue(0,TCHAR_TO_UTF8(*V.ObjectClass),false,&Context);D.Single=V.DelegateValue;Packed.push_back(das::cast<uint64>::from(StoreDelegateValue(MoveTemp(D),&Context)));}else if(V.Kind==0)Packed.push_back(das::cast<int32>::from(V.IntValue));else if(V.Kind==1)Packed.push_back(das::cast<float>::from(V.FloatValue));else if(V.Kind==2)Packed.push_back(das::cast<bool>::from(V.BoolValue));
                 else if(V.Kind==5)Packed.push_back(das::cast<char*>::from(CopyDSLString(V.StringValue,&Context)));else if(V.Kind==6)Packed.push_back(das::cast<double>::from(V.DoubleValue));else if(V.Kind==13)Packed.push_back(das::cast<FDasEnumValue>::from(MakeEnumValue(V.ObjectClass,V.IntValue,&Context)));else if(V.Kind==7)Packed.push_back(das::cast<FDasNameValue>::from(MakeDSLName(V.NameValue,&Context)));else if(V.Kind==9){VectorArgs.Add(V.VectorValue);Packed.push_back(das::cast<void*>::from(&VectorArgs.Last()));}else if(V.Kind==10){RotatorArgs.Add(V.RotatorValue);Packed.push_back(das::cast<void*>::from(&RotatorArgs.Last()));}else if(V.Kind==12){StructArgs.Add(StoreStructValue(V.StructValue,&Context));Packed.push_back(das::cast<void*>::from(&StructArgs.Last()));}else if(V.Kind==11){TransformArgs.Add(V.TransformValue);Packed.push_back(das::cast<void*>::from(&TransformArgs.Last()));}else{const FString ClassPath=V.ObjectClass.IsEmpty()?TEXT("/Script/CoreUObject.Object"):V.ObjectClass;ObjectArgs.Add(MakeObjectHandle(V.ObjectValue.Get(),FindObject<UClass>(nullptr,*ClassPath),&Context));Packed.push_back(das::cast<void*>::from(&ObjectArgs.Last()));}
             }
             FOutputFrame OutFrame;OutFrame.Arguments=Frame;TGuardValue<FOutputFrame*> OutScope(ActiveOutputFrame,&OutFrame);
             const auto Value = Context.evalWithCatch(Function,Frame?(Packed.empty()?nullptr:Packed.data()):Event==EDasCallback::Main && Signature==EDasMethodSignature::Void?nullptr:Arguments,Signature==EDasMethodSignature::Struct?static_cast<void*>(&ReturnedStructToken):Signature==EDasMethodSignature::Object?static_cast<void*>(&ReturnedObject):Signature==EDasMethodSignature::Vector?static_cast<void*>(&ReturnedVector):Signature==EDasMethodSignature::Rotator?static_cast<void*>(&ReturnedRotator):Signature==EDasMethodSignature::Transform?static_cast<void*>(&ReturnedTransform):nullptr);
             if(Event==EDasCallback::Main){
-                if(Signature==EDasMethodSignature::Delegate && !Context.getException()){Result.DelegateValue=ResolveDelegateValue(das::cast<uint64>::to(Value),TCHAR_TO_UTF8(*Expected.ReturnClass),false,&Context).Single;}else if(Signature==EDasMethodSignature::Enum && !Context.getException()){const auto& E=ResolveEnumValue(das::cast<FDasEnumValue>::to(Value),&Context);if(E.Type->GetPathName()!=Expected.ReturnClass){Result.Error=TEXT("Enum result type mismatch");return Result;}Result.Value=E.Value;}else if(Signature==EDasMethodSignature::Struct && !Context.getException()){const auto& S=ResolveStructValue(ReturnedStructToken,&Context);if(S.GetScriptStruct()->GetPathName()!=Expected.ReturnClass){Result.Error=TEXT("Reflected struct result type mismatch");return Result;}Result.StructValue=S;}else if(Signature==EDasMethodSignature::Vector)Result.VectorValue=ReturnedVector;else if(Signature==EDasMethodSignature::Rotator)Result.RotatorValue=ReturnedRotator;else if(Signature==EDasMethodSignature::Transform)Result.TransformValue=ReturnedTransform;else if(Signature==EDasMethodSignature::Int) Result.Value=das::cast<int32>::to(Value);
+                if(Signature==EDasMethodSignature::Class && !Context.getException()){auto H=das::cast<FDasClassHandle>::to(Value);UObject* O=H.Token?TryObject(FDasObjectHandle{H.Token},&Context):nullptr;auto* K=Cast<UClass>(O);if((H.Token && !K) || !FrameClassMatches(K,Expected.ReturnClass)){Result.Error=TEXT("Class result is expired, belongs to another context or has wrong base");return Result;}Result.ObjectValue=K;}else if(Signature==EDasMethodSignature::Delegate && !Context.getException()){Result.DelegateValue=ResolveDelegateValue(das::cast<uint64>::to(Value),TCHAR_TO_UTF8(*Expected.ReturnClass),false,&Context).Single;}else if(Signature==EDasMethodSignature::Enum && !Context.getException()){const auto& E=ResolveEnumValue(das::cast<FDasEnumValue>::to(Value),&Context);if(E.Type->GetPathName()!=Expected.ReturnClass){Result.Error=TEXT("Enum result type mismatch");return Result;}Result.Value=E.Value;}else if(Signature==EDasMethodSignature::Struct && !Context.getException()){const auto& S=ResolveStructValue(ReturnedStructToken,&Context);if(S.GetScriptStruct()->GetPathName()!=Expected.ReturnClass){Result.Error=TEXT("Reflected struct result type mismatch");return Result;}Result.StructValue=S;}else if(Signature==EDasMethodSignature::Vector)Result.VectorValue=ReturnedVector;else if(Signature==EDasMethodSignature::Rotator)Result.RotatorValue=ReturnedRotator;else if(Signature==EDasMethodSignature::Transform)Result.TransformValue=ReturnedTransform;else if(Signature==EDasMethodSignature::Int) Result.Value=das::cast<int32>::to(Value);
                 else if(Signature==EDasMethodSignature::Float) Result.FloatValue=das::cast<float>::to(Value);
                 else if(Signature==EDasMethodSignature::Bool) Result.BoolValue=das::cast<bool>::to(Value);
                 else if(!Context.getException() && Signature==EDasMethodSignature::String){const auto* Text=das::cast<char*>::to(Value);Result.StringValue=Text?UTF8_TO_TCHAR(Text):TEXT("");}

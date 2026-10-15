@@ -43,3 +43,5 @@ foreign component owner, and invalidation of stored array entries after destruct
 
 
 Validation: TestActorSpawnPIE.ps1 PASS, one successful automation test with zero failures/warnings. Seventy deliberately interrupted internal queries verify callback-scope cleanup beyond the 64-snapshot limit.
+
+Packaged validation: these features passed TestCookedCalls.ps1 in Win64 Development NullRHI on 2026-10-13. See PackagedCallsValidation.md for coverage and remaining limits.

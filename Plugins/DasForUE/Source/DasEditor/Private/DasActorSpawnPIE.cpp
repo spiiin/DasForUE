@@ -2,6 +2,8 @@
 #include "DasProbeActor.h"
 #include "DasScriptComponent.h"
 #include "DasRuntime.h"
+#include "DasClassMethodsProbe.h"
+#include "DasInitializerProbe.h"
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -42,6 +44,8 @@ public:
    Test->TestTrue(TEXT("spawn transform applied"),Actor->GetActorLocation().Equals(FVector(125,250,375)) && Actor->GetActorRotation().Equals(FRotator(0,30,0)));
    auto* Life=FindFProperty<FObjectProperty>(Actor->GetClass(),TEXT("Life"));S->Component.Reset(Life?Cast<UDasScriptComponent>(Life->GetObjectPropertyValue_InContainer(Actor)):nullptr);
    Test->TestTrue(TEXT("SCS component BeginPlay during actor spawn"),SpawnValue(S->Component.Get(),TEXT("Begins"))==1);
+   FString InitReport;Test->TestTrue(TEXT("Initialize hierarchy and once guards"),RunDasInitializerProbe(Actor,S->Component.Get(),InitReport));UE_LOG(LogTemp,Display,TEXT("%s"),*InitReport);
+   FString ClassReport;Test->TestTrue(TEXT("Actor class methods"),RunDasClassMethodsProbe(Actor,ClassReport));Test->TestTrue(TEXT("Component class methods"),RunDasClassMethodsProbe(S->Component.Get(),ClassReport));UE_LOG(LogTemp,Display,TEXT("%s"),*ClassReport);auto Classes=Call(TEXT("ClassMethods"));Test->TestTrue(TEXT("cross-context class methods"),Classes.bSucceeded && Classes.BoolValue);if(!Classes.bSucceeded)Test->AddError(Classes.Error);auto BadClass=Call(TEXT("WrongClassMethod"));Test->TestTrue(TEXT("cross-context class base rejected"),!BadClass.bSucceeded);auto ForgedClass=Call(TEXT("ForgedClassMethod"));Test->TestTrue(TEXT("forged typed class base rejected"),!ForgedClass.bSucceeded);
    auto Extra=Call(TEXT("SpawnExtra"));Test->TestTrue(TEXT("spawn second query match"),Extra.bSucceeded && Extra.BoolValue);
    auto Queries=Call(TEXT("QueryMatches"));Test->TestTrue(TEXT("typed Actor/component first/all and foreign-world exclusion"),Queries.bSucceeded && Queries.BoolValue);if(!Queries.bSucceeded)Test->AddError(Queries.Error);
    Phase=1;Started=FPlatformTime::Seconds();return false;

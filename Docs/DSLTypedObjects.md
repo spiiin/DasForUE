@@ -98,3 +98,12 @@ Reflected method bodies can also use `ue_cast_nullable_object(target.handle,
 ue_type(Actor))` and `ue_object_is_a(handle, "Actor")` without spelling native
 paths. Type aliases can identify the native class. The compiler resolves these
 references; the checked weak-handle runtime ABI is unchanged. See DSLTypeCalls.md.
+
+
+## Typed class values
+
+`ue_object_types` also exports `ActorClass = $UEClass<Actor>` and
+`ObjectClass = $UEClass<Object>`. These describe classes, whereas ActorRef/ObjectRef
+refer to instances. Authored method signatures infer their class constraints from
+these nominal types without string hints. See [DSLClassMethods.md](DSLClassMethods.md)
+for imported alias modules, checked conversion and validation.

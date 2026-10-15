@@ -11,6 +11,7 @@
 
 bool RunDasRegisteredCooked(FString& Report);
 void StartDasCookedGameplayValidation();
+void StartDasCookedCallsValidation();
 
 class FDasForUESmokeModule : public FDefaultGameModuleImpl
 {
@@ -18,7 +19,8 @@ class FDasForUESmokeModule : public FDefaultGameModuleImpl
 public:
     virtual void StartupModule() override
     {
-        if(FParse::Param(FCommandLine::Get(),TEXT("DasCookedGameplay"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasCookedGameplayValidation();});}
+        if(FParse::Param(FCommandLine::Get(),TEXT("DasCookedCalls"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasCookedCallsValidation();});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasCookedGameplay"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasCookedGameplayValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasMethodValues"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{UClass* Driver=nullptr;UClass* Target=nullptr;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld())for(const auto& Actor:World->PersistentLevel->Actors)if(auto* Probe=Cast<ADasProbeActor>(Actor)){if(Probe->Peer){Driver=Probe->GetClass();Target=Probe->Peer->GetClass();}}FString Report;const bool Good=Driver && Target && RunDasMethodValuesProbe(Driver,Target,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasActorComponent"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{UClass* Class=nullptr;for(const auto& Context:GEngine->GetWorldContexts())if(auto* W=Context.World())if(W->IsGameWorld())for(const auto& A:W->PersistentLevel->Actors)if(A && A->IsA<ADasProbeActor>() && A->GetClass()!=ADasProbeActor::StaticClass())Class=A->GetClass();FString Report;const bool Good=Class && RunDasActorComponentProbe(Class,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasRegisteredCooked"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{FString Report;const bool Success=RunDasRegisteredCooked(Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);FPlatformMisc::RequestExitWithStatus(false,Success?0:1);});}

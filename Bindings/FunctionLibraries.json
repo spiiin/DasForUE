@@ -24,6 +24,36 @@
       "class": "/Script/DasRuntime.DasFunctionLibraryFixture",
       "function": "ContextWorldId",
       "alias": "ue_lib_WorldId"
+    },
+    {
+      "class": "/Script/DasRuntime.DasFunctionLibraryFixture",
+      "function": "EchoActorClass",
+      "alias": "ue_lib_EchoActorClass"
+    },
+    {
+      "class": "/Script/DasRuntime.DasFunctionLibraryFixture",
+      "function": "EchoAnyClass",
+      "alias": "ue_lib_EchoAnyClass"
+    },
+    {
+      "class": "/Script/DasRuntime.DasFunctionLibraryFixture",
+      "function": "ClassOutputs",
+      "alias": "ue_lib_ClassOutputs"
+    },
+    {
+      "class": "/Script/DasRuntime.DasFunctionLibraryFixture",
+      "function": "EchoClassArray",
+      "alias": "ue_lib_EchoClassArray"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "GetActorOfClass",
+      "alias": "ue_lib_GetActorOfClass"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_GetComponentsByClass",
+      "alias": "ue_lib_GetComponentsByClass"
     }
   ]
 }

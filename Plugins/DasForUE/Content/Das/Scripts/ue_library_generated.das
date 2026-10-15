@@ -12,6 +12,12 @@ struct C_Object_55c3753a { handle : UObjectHandle }
 [ue_native_object(path="/Script/DasRuntime.DasFunctionLibraryFixture")]
 struct C_DasFunctionLibraryFixture_d0ecfd3a { handle : UObjectHandle }
 
+[ue_native_object(path="/Script/Engine.Actor")]
+struct C_Actor_adf65d5b { handle : UObjectHandle }
+
+[ue_native_object(path="/Script/Engine.ActorComponent")]
+struct C_ActorComponent_97441d45 { handle : UObjectHandle }
+
 [ue_native_object(path="/Script/Engine.BlueprintFunctionLibrary")]
 struct C_BlueprintFunctionLibrary_a62507e5 { handle : UObjectHandle }
 
@@ -20,6 +26,10 @@ struct C_GameplayStatics_d17b60b9 { handle : UObjectHandle }
 
 [ue_native_object(path="/Script/Engine.KismetMathLibrary")]
 struct C_KismetMathLibrary_0d6e9948 { handle : UObjectHandle }
+
+typedef Actor = C_Actor_adf65d5b
+
+typedef ActorComponent = C_ActorComponent_97441d45
 
 typedef BlueprintFunctionLibrary = C_BlueprintFunctionLibrary_a62507e5
 
@@ -44,6 +54,20 @@ def C_DasFunctionLibraryFixture_d0ecfd3a_valid(value : C_DasFunctionLibraryFixtu
 def C_DasFunctionLibraryFixture_d0ecfd3a_as_C_BlueprintFunctionLibrary_a62507e5(value : C_DasFunctionLibraryFixture_d0ecfd3a) : C_BlueprintFunctionLibrary_a62507e5 { return C_BlueprintFunctionLibrary_a62507e5_from(C_DasFunctionLibraryFixture_d0ecfd3a_raw(value)) }
 
 def C_DasFunctionLibraryFixture_d0ecfd3a_as_C_Object_55c3753a(value : C_DasFunctionLibraryFixture_d0ecfd3a) : C_Object_55c3753a { return C_Object_55c3753a_from(C_DasFunctionLibraryFixture_d0ecfd3a_raw(value)) }
+
+def C_Actor_adf65d5b_from(value : UObjectHandle) : C_Actor_adf65d5b { return C_Actor_adf65d5b(handle = ue_cast_nullable_object(value, "/Script/Engine.Actor")) }
+def C_Actor_adf65d5b_raw(value : C_Actor_adf65d5b) : UObjectHandle { return ue_cast_nullable_object(value.handle, "/Script/Engine.Actor") }
+def C_Actor_adf65d5b_null() : C_Actor_adf65d5b { return C_Actor_adf65d5b(handle = ue_null_object()) }
+def C_Actor_adf65d5b_valid(value : C_Actor_adf65d5b) : bool { return ue_object_is_a(value.handle, "/Script/Engine.Actor") }
+
+def C_Actor_adf65d5b_as_C_Object_55c3753a(value : C_Actor_adf65d5b) : C_Object_55c3753a { return C_Object_55c3753a_from(C_Actor_adf65d5b_raw(value)) }
+
+def C_ActorComponent_97441d45_from(value : UObjectHandle) : C_ActorComponent_97441d45 { return C_ActorComponent_97441d45(handle = ue_cast_nullable_object(value, "/Script/Engine.ActorComponent")) }
+def C_ActorComponent_97441d45_raw(value : C_ActorComponent_97441d45) : UObjectHandle { return ue_cast_nullable_object(value.handle, "/Script/Engine.ActorComponent") }
+def C_ActorComponent_97441d45_null() : C_ActorComponent_97441d45 { return C_ActorComponent_97441d45(handle = ue_null_object()) }
+def C_ActorComponent_97441d45_valid(value : C_ActorComponent_97441d45) : bool { return ue_object_is_a(value.handle, "/Script/Engine.ActorComponent") }
+
+def C_ActorComponent_97441d45_as_C_Object_55c3753a(value : C_ActorComponent_97441d45) : C_Object_55c3753a { return C_Object_55c3753a_from(C_ActorComponent_97441d45_raw(value)) }
 
 def C_BlueprintFunctionLibrary_a62507e5_from(value : UObjectHandle) : C_BlueprintFunctionLibrary_a62507e5 { return C_BlueprintFunctionLibrary_a62507e5(handle = ue_cast_nullable_object(value, "/Script/Engine.BlueprintFunctionLibrary")) }
 def C_BlueprintFunctionLibrary_a62507e5_raw(value : C_BlueprintFunctionLibrary_a62507e5) : UObjectHandle { return ue_cast_nullable_object(value.handle, "/Script/Engine.BlueprintFunctionLibrary") }
@@ -91,6 +115,16 @@ def ue_lib_Add(arg_a : int; arg_b : int) : int {
     return result
 }
 
+def ue_lib_ClassOutputs(arg_value : UEClassHandle) : UEClassHandle {
+    let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "ClassOutputs", "")
+    ue_expect_signature(call, "v1;ClassOutputs;Value:ClassProperty:128:meta:/Script/Engine.Actor;Output:ClassProperty:384:meta:/Script/Engine.Actor;")
+    ue_arg_class(call, "value", arg_value)
+    ue_invoke_call(call)
+    let result = ue_result_class(call, "output")
+    ue_release_call(call)
+    return result
+}
+
 def ue_lib_Context() : bool {
     let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "IsContextActor", "context")
     ue_expect_signature(call, "v1;IsContextActor;Context:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -98,6 +132,68 @@ def ue_lib_Context() : bool {
     let result = ue_result_bool(call, "returnvalue")
     ue_release_call(call)
     return result
+}
+
+def ue_lib_EchoActorClass(arg_value : UEClassHandle) : UEClassHandle {
+    let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "EchoActorClass", "")
+    ue_expect_signature(call, "v1;EchoActorClass;Value:ClassProperty:128:meta:/Script/Engine.Actor;ReturnValue:ClassProperty:1408:meta:/Script/Engine.Actor;")
+    ue_arg_class(call, "value", arg_value)
+    ue_invoke_call(call)
+    let result = ue_result_class(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_lib_EchoAnyClass(arg_value : UEClassHandle) : UEClassHandle {
+    let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "EchoAnyClass", "")
+    ue_expect_signature(call, "v1;EchoAnyClass;Value:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")
+    ue_arg_class(call, "value", arg_value)
+    ue_invoke_call(call)
+    let result = ue_result_class(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_lib_EchoClassArray(arg_values : array<UEClassHandle>) : array<UEClassHandle> {
+    let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "EchoClassArray", "")
+    ue_expect_signature(call, "v1;EchoClassArray;Values:ArrayProperty:134218114[Values:ClassProperty:0:meta:/Script/Engine.Actor;];ReturnValue:ArrayProperty:1408[ReturnValue:ClassProperty:0:meta:/Script/Engine.Actor;];")
+    ue_arg_array(call, "values", int(length(arg_values)))
+    for (index in range(length(arg_values))) {
+        ue_arg_class(call, "values.{index}", arg_values[index])
+    }
+    ue_invoke_call(call)
+    var result : array<UEClassHandle>
+    resize(result, ue_result_array_size(call, "returnvalue"))
+    for (index in range(length(result))) {
+        result[index] = ue_result_class(call, "returnvalue.{index}")
+    }
+    ue_release_call(call)
+    return <- result
+}
+
+def ue_lib_GetActorOfClass(arg_actorclass : UEClassHandle) : C_Actor_adf65d5b {
+    let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetActorOfClass", "worldcontextobject")
+    ue_expect_signature(call, "v1;GetActorOfClass;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ActorClass:ClassProperty:128:meta:/Script/Engine.Actor;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;")
+    ue_arg_class(call, "actorclass", arg_actorclass)
+    ue_invoke_call(call)
+    let result = C_Actor_adf65d5b_from(ue_result_object(call, "returnvalue"))
+    ue_release_call(call)
+    return result
+}
+
+def ue_lib_GetComponentsByClass(target : C_Actor_adf65d5b; arg_componentclass : UEClassHandle) : array<C_ActorComponent_97441d45> {
+    let receiver = ue_cast_object(C_Actor_adf65d5b_raw(target), "/Script/Engine.Actor")
+    let call = ue_begin_call(receiver, "K2_GetComponentsByClass")
+    ue_expect_signature(call, "v1;K2_GetComponentsByClass;ComponentClass:ClassProperty:128:meta:/Script/Engine.ActorComponent;ReturnValue:ArrayProperty:1408[ReturnValue:ObjectProperty:0:/Script/Engine.ActorComponent;];")
+    ue_arg_class(call, "componentclass", arg_componentclass)
+    ue_invoke_call(call)
+    var result : array<C_ActorComponent_97441d45>
+    resize(result, ue_result_array_size(call, "returnvalue"))
+    for (index in range(length(result))) {
+        result[index] = C_ActorComponent_97441d45_from(ue_result_object(call, "returnvalue.{index}"))
+    }
+    ue_release_call(call)
+    return <- result
 }
 
 def ue_lib_Time() : double {

@@ -23,6 +23,10 @@ public:
   if(!Actor || !W->HasBegunPlay()){if(FPlatformTime::Seconds()-Start<45)return false;Test->AddError(TEXT("PIE startup timeout"));GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;}
   auto Result=R.RunNamedBoolPersistent(R.ScriptPath(TEXT("dsl_function_libraries.das")),TEXT("ue_LibraryProbe_Check"),false,Actor);
   Test->TestTrue(TEXT("generated engine and user C++ libraries; implicit owner WorldContext"),Result.bSucceeded && Result.BoolValue);if(!Result.bSucceeded)Test->AddError(Result.Error);
+  for(const auto* Name:{TEXT("Classes"),TEXT("AbstractClass")}){
+   auto ClassResult=R.RunNamedBoolPersistent(R.ScriptPath(TEXT("dsl_function_libraries.das")),FString(TEXT("ue_LibraryProbe_"))+Name,false,Actor);
+   Test->TestTrue(FString(TEXT("class marshalling "))+Name,ClassResult.bSucceeded && ClassResult.BoolValue);if(!ClassResult.bSucceeded)Test->AddError(ClassResult.Error);
+  }
   auto ActualWorld=R.RunNamedPersistent(R.ScriptPath(TEXT("dsl_function_libraries.das")),TEXT("ue_LibraryProbe_WorldId"),0,Actor);
   Test->TestTrue(TEXT("library context is PIE owner's world"),ActualWorld.bSucceeded && ActualWorld.Value==int32(W->GetUniqueID()));
   TStrongObjectPtr<UWorld> OtherWorld(UWorld::CreateWorld(EWorldType::Game,false));
@@ -30,7 +34,7 @@ public:
   auto OtherResult=R.RunNamedPersistent(R.ScriptPath(TEXT("dsl_function_libraries.das")),TEXT("ue_LibraryProbe_WorldId"),0,OtherActor);
   Test->TestTrue(TEXT("library context follows owner in a different game world"),OtherResult.bSucceeded && OtherResult.Value==int32(OtherWorld->GetUniqueID()) && OtherResult.Value!=ActualWorld.Value);
   OtherWorld->DestroyWorld(false);
-  for(const auto* N:{TEXT("OverrideWorld"),TEXT("BadWorldContract"),TEXT("NotLibrary")}){auto Failed=R.RunNamedBoolPersistent(R.ScriptPath(TEXT("dsl_function_libraries.das")),FString(TEXT("ue_LibraryProbe_"))+N,false,Actor);Test->TestTrue(FString(TEXT("reject "))+N,!Failed.bSucceeded && !Failed.Error.IsEmpty());}
+  for(const auto* N:{TEXT("OverrideWorld"),TEXT("BadWorldContract"),TEXT("NotLibrary"),TEXT("WrongMetaClass")}){auto Failed=R.RunNamedBoolPersistent(R.ScriptPath(TEXT("dsl_function_libraries.das")),FString(TEXT("ue_LibraryProbe_"))+N,false,Actor);Test->TestTrue(FString(TEXT("reject "))+N,!Failed.bSucceeded && !Failed.Error.IsEmpty());}
   GEditor->RequestEndPlayMap();Ending=true;Start=FPlatformTime::Seconds();return false;
  }
 };

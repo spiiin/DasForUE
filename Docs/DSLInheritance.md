@@ -58,8 +58,9 @@ symbol-use pass to dereference a null class parent.
   Child defaults can override inherited templates. Replacing inherited node types
   or migrating composition on an existing imported class remains deferred.
 - Parent/child managed event subscriptions are supported. Replacing a parent
-  handler with the same name, script-only helpers, constructors and general native
-  virtual overrides are not included.
+  handler with the same name, constructors and general native virtual overrides
+  are not included. Script-only helper inheritance is supported within a compiled
+  script context, as described below.
 - Changing the parent or applying explicit field structural migration to an authored
   hierarchy is rejected. Broad dependent Blueprint/map migration remains deferred.
 - Base compatibility currently covers typed object checks/accessors. Broader
@@ -232,3 +233,65 @@ by changing the handler record or mutating the parent's SCS node. No engine patc
 duplicate hidden node or spawn-time replacement is added in this slice.
 
 Inherited-event validation passed: foundation (zero failures), Create/Reopen, PIE (one success, zero warnings/errors) and packaged Development. Covered additive Actor self events, component owner events, one delivery per handler and cleanup. An imported-parent binder was initially resolved in a child without its own handlers, causing duplicate subscriptions; an explicit empty child binder now prevents this, and the no-BeginPlay/EndPlay parent regression passes.
+
+## Script-only helpers in an authored hierarchy
+
+Unannotated instance methods remain ordinary DAS helpers. No UFunction, Blueprint
+function graph or IR method entry is created for them. Each compiled script lowers
+its helper hierarchy into internal functions; self calls select the most derived
+helper visible in that script and Super selects the next ancestor implementation.
+Return and parameter types must match on override; static and ref-result helpers
+remain unsupported.
+
+```das
+// BaseCounter
+def Offset(value:int):int { self.Score+=value;return self.Score }
+def Template(value:int):int { return self.Offset(value)+1 }
+
+// ChildCounter : BaseCounter
+def override Offset(value:int):int { return Super.Offset(value)+self.Bonus }
+
+// GrandCounter : ChildCounter
+def override Offset(value:int):int { return Super.Offset(value)+self.GrandBonus }
+[ue_function(BlueprintCallable)]
+def LocalProbe(input:int):int { return self.Template(input) }
+```
+
+With Score=10, Bonus=3 and GrandBonus=5, LocalProbe(2) returns 21 and leaves Score=12.
+The inherited Template calls GrandCounter.Offset, then Super follows Child and Base.
+Each helper body shares the caller's persistent context and the real UObject fields.
+Generated names contain an owner hash to distinguish ancestor implementations; user
+code keeps normal method names. Imported helper calls are module-qualified and
+already lowered parent Super calls are remapped when cloned into a descendant.
+
+Dispatch is **within the compiled script context**. An inherited reflected UFunction
+still executes the parent script and uses the helper table of that parent script.
+Calling an own child/grandchild reflected entry executes its effective helper table.
+Cross-context virtual dispatch for script-only methods is not implemented; external
+typed object references expose reflected methods, not helpers.
+
+## Constructor follow-up contract
+
+Native UObject constructors and a script-session initializer are distinct. AActor's
+ExecuteConstruction executes SCS/user Blueprint construction before OnConstruction
+(Engine/Source/Runtime/Engine/Private/ActorConstruction.cpp). Construction can repeat
+when an editor actor is reconstructed, so running gameplay initialization there
+unconditionally would repeat side effects.
+
+The construction contract separates a once-per-instance runtime initializer from
+a repeatable editor construction callback. The runtime part is implemented as
+Initialize (see below), including parent chaining, instance values and component
+availability. Repeatable Actor construction and its side-effect policy are described
+in [DSLConstruction.md](DSLConstruction.md). Ordinary DAS class constructors are not UObject constructors.
+
+Helper hierarchy validation passed: foundation with zero failures, three-level Create/Reopen, PIE and packaged Development. LocalProbe(2) returned 21 and Score became 12; Offset/Template remain absent from UFunctions and reflected IR. Temporary AST diagnostics were removed.
+
+
+## Runtime initializer implementation
+
+The once-per-instance runtime half of the constructor follow-up is implemented as
+`Initialize():void`, with omitted-hook forwarding and explicit `Super.Initialize()`.
+Delivery survives VM/session replacement. See [DSLInitialization.md](DSLInitialization.md)
+for ordering, skipped parent hooks, failures and tests. Repeatable Actor construction
+is implemented separately as ConstructionScript; native UObject constructor integration
+and component construction callbacks remain separate work.

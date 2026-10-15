@@ -32,6 +32,7 @@
         if (CastField<FDoubleProperty>(Property)) return EMarshallingKind::Double;
         if (CastField<FBoolProperty>(Property)) return EMarshallingKind::Bool;
         if (CastField<FStrProperty>(Property)) return EMarshallingKind::String;
+        if (CastField<FClassProperty>(Property)) return EMarshallingKind::Class;
         if (DasReferencePropertyClass(Property)) return EMarshallingKind::Object;
         if (CastField<FStructProperty>(Property)) return EMarshallingKind::Struct;
         Context->throw_error("unsupported UFunction or struct field type");
@@ -89,7 +90,7 @@
                 Context->throw_error("structs with native object references are unsupported");
             for (TFieldIterator<FProperty> It(Type); It; ++It) ValidateCallField(*It, Path + TEXT(".") + It->GetName(), bInput, bOutput, Signature, Context, Depth + 1);
         }
-        else Signature.Add({Path.ToLower(), FieldKind(Property, Context), bInput, bOutput, CallEnumType(Property) ? CallEnumType(Property)->GetPathName() : (DasReferencePropertyClass(Property) ? DasReferencePropertyClass(Property)->GetPathName() : FString())});
+        else Signature.Add({Path.ToLower(), FieldKind(Property, Context), bInput, bOutput, CastField<FClassProperty>(Property)?CastFieldChecked<FClassProperty>(Property)->MetaClass->GetPathName(): CallEnumType(Property) ? CallEnumType(Property)->GetPathName() : (DasReferencePropertyClass(Property) ? DasReferencePropertyClass(Property)->GetPathName() : FString())});
     }
 
     TArray<FMarshalledParameter> DescribeCall(UFunction* Function, das::Context* Context)
@@ -114,6 +115,7 @@
         case EMarshallingKind::Bool: return TEXT("bool");
         case EMarshallingKind::String: return TEXT("string");
         case EMarshallingKind::Object: return TEXT("object");
+        case EMarshallingKind::Class: return TEXT("class");
         case EMarshallingKind::Name: return TEXT("name");
         case EMarshallingKind::Enum: return TEXT("enum");
         case EMarshallingKind::Delegate:return TEXT("delegate");
@@ -128,6 +130,7 @@
             FString::Printf(TEXT("%llu"), uint64(Property->GetPropertyFlags() & (CPF_Parm | CPF_ReturnParm | CPF_OutParm | CPF_ReferenceParm | CPF_ConstParm)));
         if(auto* D=CastField<FDelegateProperty>(Property)){Key+=TEXT(":")+(D->SignatureFunction?D->SignatureFunction->GetPathName():TEXT("missing"));if(D->SignatureFunction)for(TFieldIterator<FProperty> It(D->SignatureFunction);It;++It){if(CastField<FDelegateProperty>(*It))Key+=TEXT(":nested_delegate");else AppendCallShape(*It,Key);}}
         if (UEnum* Enum = CallEnumType(Property)) Key += TEXT(":") + Enum->GetPathName();
+        if(auto* Class=CastField<FClassProperty>(Property))Key+=TEXT(":meta:")+Class->MetaClass->GetPathName();
         if (auto* ReferenceClass = DasReferencePropertyClass(Property)) Key += TEXT(":") + ReferenceClass->GetPathName();
         if (auto* Array = CastField<FArrayProperty>(Property))
         {
@@ -523,6 +526,26 @@
         return Context->allocateString(Utf8.Get(), Utf8.Length(), nullptr);
     }
 
+    FDasClassHandle NullClass(){return {};}
+    UClass* ValidateCallClass(FClassProperty* Property,UClass* Class,das::Context* C)
+    {
+        if(!Property || !Property->MetaClass)C->throw_error("expected reflected class parameter");
+        if(Class && (!IsValid(Class) || !Class->IsChildOf(Property->MetaClass) || Class->HasAnyClassFlags(CLASS_Deprecated|CLASS_NewerVersionExists)))C->throw_error("class argument/result has incompatible MetaClass or is obsolete");
+        return Class;
+    }
+    void SetCallClass(const FDasCallHandle& H,const char* Path,FDasClassHandle V,das::Context* C)
+    {
+        auto& Call=ResolveCall(H,C);auto Field=ResolveCallField(Call,Path,false,C);auto* P=CastField<FClassProperty>(Field.Property);
+        auto* Class=V.Token?Cast<UClass>(ResolveObject(FDasObjectHandle{V.Token},C)):nullptr;
+        if(V.Token && !Class)C->throw_error("expected class handle");ValidateCallClass(P,Class,C);
+        P->SetObjectPropertyValue(Field.Memory,Class);Call.ObjectPins.Add(Field.Path,TStrongObjectPtr<UObject>(Class));Call.Assigned.Add(Field.Path);
+    }
+    FDasClassHandle GetCallClass(const FDasCallHandle& H,const char* Path,das::Context* C)
+    {
+        auto& Call=ResolveCall(H,C);auto Field=ResolveCallField(Call,Path,true,C);auto* P=CastField<FClassProperty>(Field.Property);
+        if(!P)C->throw_error("expected reflected class result");auto* Class=ValidateCallClass(P,Cast<UClass>(P->GetObjectPropertyValue(Field.Memory)),C);
+        return {MakeObjectHandle(Class,UClass::StaticClass(),C).Token};
+    }
     void SetCallObject(const FDasCallHandle& Handle, const char* Path, const FDasObjectHandle& Value, das::Context* Context)
     {
         auto& Call = ResolveCall(Handle, Context);
@@ -592,12 +615,12 @@
         // Release old inout-array pins only after replacement pins are established.
         TMap<FString, TStrongObjectPtr<UObject>> OutputPins;
         for (const auto& Parameter : Call.Signature)
-            if (Parameter.Kind == EMarshallingKind::Object && Parameter.bOutput)
+            if ((Parameter.Kind == EMarshallingKind::Object || Parameter.Kind == EMarshallingKind::Class) && Parameter.bOutput)
             {
                 auto Pin = [&](const FString& Path)
                 {
                     auto Field = ResolveCallField(Call, TCHAR_TO_UTF8(*Path), true, Context);
-                    UObject* Output = DasReferenceGet(Field.Property,Field.Memory);
+                    UObject* Output = CastField<FClassProperty>(Field.Property)?ValidateCallClass(CastFieldChecked<FClassProperty>(Field.Property),Cast<UClass>(CastFieldChecked<FClassProperty>(Field.Property)->GetObjectPropertyValue(Field.Memory)),Context):DasReferenceGet(Field.Property,Field.Memory);
                     OutputPins.Add(Path, TStrongObjectPtr<UObject>(IsValid(Output) ? Output : nullptr));
                 };
                 VisitCallContainerPaths(Call,Parameter.Path,true,Context,Pin,OutputTraversalBudget);

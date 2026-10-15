@@ -120,7 +120,7 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
 #if WITH_DEV_AUTOMATION_TESTS
     if(Rollback && GDasFailStructuralStage==1)return Restore(TEXT("Injected post-compile development failure"));
 #endif
-    if(Created)if(auto* Actor=Cast<ADasProbeActor>(BP->GeneratedClass->GetDefaultObject())){const auto* Root=EffectiveDeclaration.Components.FindByPredicate([](const auto& C){return C.bRoot;});Actor->DasSceneRootProperty=Root?FName(*Root->Name):NAME_None;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
+    if(Created)if(auto* Actor=Cast<ADasProbeActor>(BP->GeneratedClass->GetDefaultObject())){const auto* Root=EffectiveDeclaration.Components.FindByPredicate([](const auto& C){return C.bRoot;});Actor->bDasConstructionScript=EffectiveDeclaration.Callbacks.ContainsByPredicate([](const auto& C){return C.Kind==TEXT("ConstructionScript");});Actor->DasSceneRootProperty=Root?FName(*Root->Name):NAME_None;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
     BP->Modify();Metadata.SetValue(BP,TEXT("DasDSLSource"),*Script);Metadata.SetValue(BP,TEXT("DasDSLClassId"),*Id);Metadata.SetValue(BP,TEXT("DasDSLModel"),*Json);
     BP->MarkPackageDirty();if(Created) FAssetRegistryModule::AssetCreated(BP);
 #if WITH_DEV_AUTOMATION_TESTS

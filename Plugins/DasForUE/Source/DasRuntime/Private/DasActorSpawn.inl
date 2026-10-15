@@ -3,9 +3,9 @@ TMap<TWeakObjectPtr<AActor>,TWeakObjectPtr<UObject>> CreatedScriptActors;
 FDasObjectHandle ActorSpawn(FDasClassHandle H,const FTransform& Transform,const FDasObjectHandle& Owner,const char* Collision,const char* Base,const char* Id,das::Context* C)
 {
  auto* Self=ResolveSelf(C);auto* World=Self->GetWorld();
- if(ActiveContext->bCollectingSubscriptions || ActiveContext->bEnding || !World || !World->IsGameWorld() || Self->IsTemplate())C->throw_error("actor spawning requires script owner's active game world");
+ if(ConstructingObject || ActiveContext->bCollectingSubscriptions || ActiveContext->bEnding || !World || !World->IsGameWorld() || Self->IsTemplate())C->throw_error("actor spawning requires script owner's active game world");
  auto* Class=CheckedClass(Cast<UClass>(ResolveObject(FDasObjectHandle{H.Token},C)),Base,Id,C);
- if(!Class->IsChildOf(AActor::StaticClass()))C->throw_error("actor spawn requires Actor class");
+ if(!Class->IsChildOf(AActor::StaticClass()) || Class->HasAnyClassFlags(CLASS_Abstract))C->throw_error("actor spawn requires Actor class");
  if(!MethodMathValid(Transform))C->throw_error("invalid actor spawn transform");
  AActor* OwnerActor=Owner.Token?Cast<AActor>(ResolveObject(Owner,C)):nullptr;
  if(Owner.Token && (!OwnerActor || OwnerActor->IsTemplate() || OwnerActor->IsActorBeingDestroyed() || OwnerActor->GetWorld()!=World))C->throw_error("spawn owner must be live Actor in script owner's world");
@@ -31,7 +31,7 @@ FDasObjectHandle ActorSpawn(FDasClassHandle H,const FTransform& Transform,const 
 bool ActorDestroy(const FDasObjectHandle& H,das::Context* C)
 {
  auto* Self=ResolveSelf(C);auto* Actor=Cast<AActor>(ResolveObject(H,C));
- if(!Actor || Actor->IsTemplate() || Actor->IsActorBeingDestroyed() || !Actor->GetWorld() || !Actor->GetWorld()->IsGameWorld() || Actor->GetWorld()!=Self->GetWorld() || ActiveContext->bCollectingSubscriptions)C->throw_error("invalid actor destruction context");
+ if(!Actor || Actor->IsTemplate() || Actor->IsActorBeingDestroyed() || !Actor->GetWorld() || !Actor->GetWorld()->IsGameWorld() || Actor->GetWorld()!=Self->GetWorld() || ConstructingObject || ActiveContext->bCollectingSubscriptions)C->throw_error("invalid actor destruction context");
  const auto* Creator=CreatedScriptActors.Find(TWeakObjectPtr<AActor>(Actor));
  if(!Creator || Creator->Get()!=Self)C->throw_error("only actors spawned by this script owner may be destroyed");
  TGuardValue<AActor*> LifecycleTarget(ActorLifecycleTarget,Actor);

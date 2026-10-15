@@ -17,7 +17,7 @@
 
 namespace {
 struct FGameplayPIEState {
-    TStrongObjectPtr<UBlueprint> Blueprint,SingleBlueprint,InheritedBlueprint,LifeBlueprint;
+    TStrongObjectPtr<UBlueprint> Blueprint,SingleBlueprint,InheritedBlueprint,LifeBlueprint,HelperBlueprint;
     TWeakObjectPtr<ADasProbeActor> First, Second;
     TStrongObjectPtr<ADasProbeActor> DestroyedOwner;
     int32 DestroyedPulses=0;
@@ -115,6 +115,12 @@ public:
                 Check(ProbeInt(ExtraBehavior.Get(),TEXT("BaseEnds"))==1 && ProbeInt(ExtraBehavior.Get(),TEXT("ChildEnds"))==1,TEXT("derived_component_EndPlay_once"));
                 Check(ProbeInt(Life,TEXT("BaseEnds"))==1 && ProbeInt(Life,TEXT("ChildEnds"))==1 && ProbeInt(Behavior.Get(),TEXT("BaseEnds"))==1 && ProbeInt(Behavior.Get(),TEXT("ChildEnds"))==1,TEXT("parent_EndPlay_actor_and_component_once"));
             }
+            ADasProbeActor* HelperOwner=nullptr;for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->GetFName()==TEXT("HelperOwner"))HelperOwner=*It;
+            struct FHelperPIEArgs{int32 Input=2,Result=0;};FHelperPIEArgs HelperArgs;
+            if(HelperOwner)if(auto* Fn=HelperOwner->FindFunction(TEXT("LocalProbe")))HelperOwner->ProcessEvent(Fn,&HelperArgs);
+            Check(HelperOwner && HelperArgs.Result==21 && ProbeInt(HelperOwner,TEXT("Score"))==12 && HelperOwner->LastDasError.IsEmpty(),TEXT("three_level_local_helpers_self_override_Super"));
+            Check(HelperOwner && ProbeInt(HelperOwner,TEXT("ConstructionValue"))==23 && ProbeInt(HelperOwner,TEXT("ConstructionTrace"))==12,TEXT("construction_values_survive_PIE"));
+            if(HelperOwner)HelperOwner->Destroy();
             Check(A->LastDasError.IsEmpty() && B->LastDasError.IsEmpty(),TEXT("no_script_runtime_errors"));
             Check(ProbeInt(A,TEXT("SnapshotSum"))==7 && ProbeInt(A,TEXT("NextSum"))==13,TEXT("owned_array_capture_and_Vector2D_next_tick"));
             Check(ProbeInt(A,TEXT("Delays"))==1 && ProbeInt(A,TEXT("Loads"))==1 && ProbeBool(A,TEXT("LoadOK")),TEXT("latent_and_async_completion_once"));
@@ -168,6 +174,8 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&) {
     if(!TestTrue(TEXT("Child owns only its three new SCS nodes"),BP->SimpleConstructionScript && BP->SimpleConstructionScript->GetAllNodes().Num()==3))return false;
     FActorSpawnParameters LifeSpawn;LifeSpawn.Name=TEXT("LifeOwner");
     if(!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,LifeSpawn))return false;
+    if(!TestTrue(TEXT("Create grandchild helper actor"),FDasDSLService::Apply(TEXT("dsl_inheritance_grandchild.das"),Root+TEXT("/BP_GrandCounter"),TEXT("inheritance.GrandCounter"),BP,Error))){AddError(Error);return false;}
+    State->HelperBlueprint.Reset(BP);FActorSpawnParameters HelperSpawn;HelperSpawn.Name=TEXT("HelperOwner");if(!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,HelperSpawn))return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FGameplayPIECommand>(State,this));
     return true;
