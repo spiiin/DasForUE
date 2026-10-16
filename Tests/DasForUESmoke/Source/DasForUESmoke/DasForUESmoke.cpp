@@ -7,6 +7,8 @@
 #include "DasExtendedDefaultsProbe.h"
 #include "DasDefaultsMergeProbe.h"
 #include "DasInheritedDefaultsProbe.h"
+#include "DasComputedDefaultsProbe.h"
+#include "DasNativeDefaultsProbe.h"
 #include "Engine/World.h"
 #include "DasActorComponentProbe.h"
 #include "DasMethodValuesProbe.h"
@@ -23,7 +25,9 @@ class FDasForUESmokeModule : public FDefaultGameModuleImpl
 public:
     virtual void StartupModule() override
     {
-        if(FParse::Param(FCommandLine::Get(),TEXT("DasInheritedDefaults"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld()){FString Report;Good=RunDasInheritedDefaultsProbe(World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_INHERITED_DEFAULTS_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
+        if(FParse::Param(FCommandLine::Get(),TEXT("DasNativeDefaults"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld()){FString Report;Good=RunDasNativeDefaultsProbe(World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_NATIVE_DEFAULTS_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});return;}
+        if(FParse::Param(FCommandLine::Get(),TEXT("DasComputedDefaults"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld()){FString Report;Good=RunDasComputedDefaultsProbe(World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_COMPUTED_DEFAULTS_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasInheritedDefaults"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld()){FString Report;Good=RunDasInheritedDefaultsProbe(World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_INHERITED_DEFAULTS_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasDefaultsMerge"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld()){FString Report;Good=RunDasDefaultsMergeProbe(World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_DEFAULTS_MERGE_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasExtendedDefaults"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld())for(const auto& Actor:TArray<TObjectPtr<AActor>>(World->PersistentLevel->Actors))if(Actor && Actor->ActorHasTag(TEXT("ExtendedDefaultsFixture"))){FString Report;Good=RunDasExtendedDefaultsProbe(Actor->GetClass(),World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_EXTENDED_DEFAULTS_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasCookedCalls"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasCookedCallsValidation();});}

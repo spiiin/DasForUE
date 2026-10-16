@@ -13,9 +13,10 @@ void ApplyDasFunctionPolicy(UBlueprint* Blueprint) {
         for(auto* Entry:Entries){
             const FString Kind=Entry->MetaData.GetMetaData(TEXT("DasFunctionKind"));
             if(Kind.IsEmpty())continue;
-            Entry->ClearExtraFlags(FUNC_Final|FUNC_BlueprintPure|FUNC_Const);
+            Entry->ClearExtraFlags(FUNC_Final|FUNC_BlueprintPure|FUNC_Const|FUNC_Static);
             if(Entry->MetaData.GetMetaData(TEXT("DasFunctionPure"))==TEXT("true"))Entry->AddExtraFlags(FUNC_BlueprintPure|FUNC_BlueprintCallable);
             if(Entry->MetaData.GetMetaData(TEXT("DasFunctionConst"))==TEXT("true"))Entry->AddExtraFlags(FUNC_Const);
+            if(Entry->MetaData.GetMetaData(TEXT("DasFunctionStatic"))==TEXT("true")){Entry->AddExtraFlags(FUNC_Static);const FString World=Entry->MetaData.GetMetaData(TEXT("DasWorldContext"));if(World.IsEmpty())Entry->MetaData.SetMetaData(TEXT("CallableWithoutWorldContext"),FString(TEXT("true")));else{Entry->MetaData.SetMetaData(TEXT("WorldContext"),World);Entry->MetaData.RemoveMetaData(TEXT("CallableWithoutWorldContext"));}}
             if(Kind==TEXT("Callable"))Entry->AddExtraFlags(FUNC_Final);
         }
     }

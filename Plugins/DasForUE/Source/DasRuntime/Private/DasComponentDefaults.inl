@@ -1,5 +1,5 @@
 
-struct FDSLComponentDefault {FString Component,Property;FDasDeclaredLiteral Value;das::ExpressionPtr Expression;};
+struct FDSLComponentDefault {bool Native=false;FString Component,Property;FDasDeclaredLiteral Value;das::ExpressionPtr Expression;};
 double DSLDefaultNumber(das::ExpressionPtr E){
  double V=0;
  if(E->__rtti==das::string("ExprConstInt"))V=static_cast<das::ExprConstInt*>(E)->getValue();
@@ -61,8 +61,13 @@ TArray<FDSLComponentDefault> DSLCollectComponentDefaults(const das::StructurePtr
    const bool Own=Property && Property->value->rtti_isVar() && static_cast<das::ExprVar*>(Property->value)->name=="self";
    if(!Own && (!Component || !Component->value->rtti_isVar() || static_cast<das::ExprVar*>(Component->value)->name!="self"))DSLFail(TEXT("Expected self.Property or self.Component.Property in ue_defaults"));
    FDSLComponentDefault D;D.Property=DSLText(Property->name);D.Expression=Assignment->right;
-   if(Own){Result.Add(MoveTemp(D));continue;}
-   D.Component=DSLText(Component->name);auto* V=Assignment->right;
+   D.Native=Own?!S->findField(Property->name):!S->findField(Component->name);
+   if(Own && !D.Native){Result.Add(MoveTemp(D));continue;}
+   if(!Own)D.Component=DSLText(Component->name);auto* V=Assignment->right;
+   if(DSLComputedDefaults && !DSLComputedDefaults->Resolved && DSLComputedDefaults->PendingNativeExpressions.Contains(V))continue;
+   // Type/interface discovery erases class-default syntax without evaluating it.
+   if(CollectTypesOnly){Result.Add(MoveTemp(D));continue;}
+   if(DSLComputedDefaults && !DSLComputedDefaults->Resolved && DSLComputedDefaults->PendingReferences.Contains(V))continue;
    if(V->__rtti==das::string("ExprConstBool")){D.Value.Kind=TEXT("bool");D.Value.Boolean=static_cast<das::ExprConstBool*>(V)->getValue();}
    else if(V->__rtti==das::string("ExprConstString")){D.Value.Kind=TEXT("string");D.Value.String=DSLText(static_cast<das::ExprConstString*>(V)->text);}
    else if(V->rtti_isCall()){
@@ -83,7 +88,10 @@ TArray<FDSLComponentDefault> DSLCollectComponentDefaults(const das::StructurePtr
 }
 void DSLApplyComponentDefaults(FDasDeclaredClass& C,const TArray<FDSLComponentDefault>& Defaults,const TArray<FDasDeclaredComponent>& Inherited){
  TSet<FString> Seen;
- for(const auto& D:Defaults){if(D.Component.IsEmpty())continue;auto* Component=C.Components.FindByPredicate([&](const auto& V){return V.Name==D.Component;});
+ for(const auto& D:Defaults){if(D.Native){
+  auto* G=C.NativeDefaults.FindByPredicate([&](const auto& V){return V.Component==D.Component;});if(!G){FDasNativeDefaultGroup N;N.Component=D.Component;C.NativeDefaults.Add(N);G=&C.NativeDefaults.Last();}
+  if(G->Defaults.Contains(D.Property)){DSLFail(TEXT("Duplicate native default: ")+D.Component+TEXT(".")+D.Property);}G->Defaults.Add(D.Property,D.Value);continue;
+ }if(D.Component.IsEmpty())continue;auto* Component=C.Components.FindByPredicate([&](const auto& V){return V.Name==D.Component;});
   if(!Component)DSLFail(TEXT("Unknown defaults component: ")+D.Component);
   const FString Key=D.Component+TEXT(".")+D.Property;if(Seen.Contains(Key.ToLower()))DSLFail(TEXT("Duplicate component default: ")+Key);Seen.Add(Key.ToLower());
   if(Inherited.ContainsByPredicate([&](const auto& V){return V.Id==Component->Id;})){
@@ -97,17 +105,19 @@ void DSLApplyComponentDefaults(FDasDeclaredClass& C,const TArray<FDSLComponentDe
 
 void DSLPrepareClassDefaults(const das::StructurePtr& S,const TArray<FDSLComponentDefault>& Defaults){
  TSet<FString> Seen;
- for(const auto& D:Defaults)if(D.Component.IsEmpty()){
+ for(const auto& D:Defaults)if(D.Component.IsEmpty() && !D.Native){
   const FString Key=D.Property.ToLower();if(Seen.Contains(Key))DSLFail(TEXT("Duplicate class default: ")+D.Property);Seen.Add(Key);
   auto It=std::find_if(S->fields.begin(),S->fields.end(),[&](const auto& F){return DSLText(F.name)==D.Property && !F.classMethod && !F.generated;});
   if(It==S->fields.end() || std::any_of(It->annotation.begin(),It->annotation.end(),[](const auto& A){return A.name=="ue_component";}))DSLFail(TEXT("Class default requires a reflected property: ")+D.Property);
   // A defaults block explicitly takes precedence over the field initializer.
   It->init=D.Expression->clone();
+  if(DSLComputedDefaults && DSLComputedDefaults->PendingReferences.Contains(D.Expression))DSLComputedDefaults->PendingReferences.Add(It->init);
  }
 }
 FDasDeclaredLiteral DSLReferencePropertyDefault(das::Structure::FieldDeclaration& F,bool Class){
  FDasDeclaredLiteral V;V.Kind=TEXT("null");if(!F.init)return V;
  auto* Call=F.init->rtti_isCall()?static_cast<das::ExprCall*>(F.init):nullptr;
  if(!Call || Call->name!=(Class?"ue_class_default":"ue_asset_default") || Call->arguments.size()!=1 || Call->arguments[0]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Reference defaults require ue_class_default/ue_asset_default with a literal path"));
+ if(DSLComputedDefaults && !DSLComputedDefaults->Resolved && DSLComputedDefaults->PendingReferences.Contains(Call)){F.init=nullptr;return V;}
  V.Kind=TEXT("string");V.String=DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text);F.init=nullptr;return V;
 }

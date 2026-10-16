@@ -131,6 +131,10 @@ bool PlanRoot(FPlan& Plan,UObject* Root,FProperty* P,const void* Old,const void*
   // An unopened editor map can retain pre-construction component data. Do not
   // run arbitrary construction scripts from a defaults preflight or merge it.
   if(O->IsA<UActorComponent>() && !O->IsTemplate())if(auto* W=O->GetWorld();W && !W->IsInitialized()){Error=TEXT("Open/initialize the referencing editor map before updating component defaults: ")+W->GetPathName();return false;}
+  UObject* NativeOwner=O->HasAnyFlags(RF_ClassDefaultObject)?O:O->GetOuter();
+  if(NativeOwner && NativeOwner->HasAnyFlags(RF_ClassDefaultObject))if(auto* BP=Cast<UBlueprint>(NativeOwner->GetClass()->ClassGeneratedBy)){
+   const FString Wire=BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel")),Id=BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLClassId"));if(!Wire.IsEmpty()){FDasAuthoringModule M;FDasDeclaredClass E;if(!FDasAuthoringModule::FromJson(Wire,M,Error) || !M.ResolveClass(Id,E,Error))return false;const auto* D=M.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});bool Explicit=false;if(D)for(const auto& G:D->NativeDefaults)if(G.Defaults.Contains(P->GetName()) && DasNativeDefaultTarget(E.NativeParent,NativeOwner,G.Component,Error)==O)Explicit=true;if(Explicit)continue;}
+  }
   auto* Archetype=O->GetArchetype();if(Distance(Archetype,Root)==MAX_int32)continue;
   auto& Parent=Plan.Image(Archetype);auto& Child=Plan.Image(O);
   if(O->HasAnyFlags(RF_ClassDefaultObject))if(auto* BP=Cast<UBlueprint>(O->GetClass()->ClassGeneratedBy)){
@@ -162,6 +166,16 @@ bool DasInitializeInheritedDefaults(UClass* Class,const FDasAuthoringModule& Mod
  if(!Contracts){Error=TEXT("Unsupported inherited default host");return false;}
  CDO->Modify();for(auto* P:Properties)P->CopyCompleteValue(P->ContainerPtrToValuePtr<void>(CDO),P->ContainerPtrToValuePtr<void>(Values.GetStructMemory()));
  for(const auto& O:Decl->PropertyOverrides)if(const auto* P=Effective.Properties.FindByPredicate([&](const auto& V){return V.Id==O.Id;}))Contracts->Add(P->Id,DasDefaultSourceContract(*P));
+ CastChecked<UBlueprintGeneratedClass>(Class)->UpdateCustomPropertyListForPostConstruction();CDO->MarkPackageDirty();return true;
+}
+bool DasInitializeNativeDefaults(UClass* Class,const FDasAuthoringModule& Model,const FString& Id,FString& Error,bool ValidateOnly){
+ const auto* Decl=Model.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});FDasDeclaredClass Effective;if(!Class || !Decl || !Model.ResolveClass(Id,Effective,Error))return false;if(Decl->NativeDefaults.IsEmpty())return true;
+ auto* CDO=Class->GetDefaultObject();FPlan Plan;
+ for(const auto& G:Decl->NativeDefaults){auto* Target=DasNativeDefaultTarget(Effective.NativeParent,CDO,G.Component,Error);if(!Target)return false;auto& Image=Plan.Image(Target);for(const auto& V:G.Defaults){auto* P=Target->GetClass()->FindPropertyByName(*V.Key);if(!DasParseEditableDefault(P,V.Value,P?P->ContainerPtrToValuePtr<void>(Image.After->GetStructMemory()):nullptr,Error))return false;Plan.Changes.Add({&Image,P});}}
+ if(ValidateOnly)return true;
+ auto* Contracts=Cast<ADasProbeActor>(CDO)?&CastChecked<ADasProbeActor>(CDO)->DasDefaultSourceContracts:Cast<UDasScriptComponent>(CDO)?&CastChecked<UDasScriptComponent>(CDO)->DasDefaultSourceContracts:nullptr;if(!Contracts){Error=TEXT("Unsupported native defaults host");return false;}
+ for(const auto& Change:Plan.Changes){auto* O=Change.Image->Object.Get();auto* P=Change.Property;O->Modify();if(O->IsA<UActorComponent>())O->PreEditChange(P);P->CopyCompleteValue(P->ContainerPtrToValuePtr<void>(O),P->ContainerPtrToValuePtr<void>(Change.Image->After->GetStructMemory()));NotifyTemplate(O,P);O->MarkPackageDirty();}
+ for(const auto& G:Decl->NativeDefaults)for(const auto& V:G.Defaults)Contracts->Add(DasNativeDefaultKey(Id,G.Component,V.Key),DasNativeDefaultContract(V.Value));
  CastChecked<UBlueprintGeneratedClass>(Class)->UpdateCustomPropertyListForPostConstruction();CDO->MarkPackageDirty();return true;
 }
 bool DasMergeDefaults(UBlueprint* BP,const FDasAuthoringModule& Next,const FString& Id,FString& Error){
@@ -196,6 +210,19 @@ bool DasMergeDefaults(UBlueprint* BP,const FDasAuthoringModule& Next,const FStri
   if(!IsOwn && !OldOverride)P->CopyCompleteValue(OldData,P->ContainerPtrToValuePtr<void>(BP->ParentClass->GetDefaultObject()));else if(!OwnValue(P,F,OldData,Error))return false;
   if(!IsOwn && !NewOverride)P->CopyCompleteValue(NewData,P->ContainerPtrToValuePtr<void>(BP->ParentClass->GetDefaultObject()));else if(!OwnValue(P,*NF,NewData,Error))return false;
   if(!PlanRoot(Plan,CDO,P,P->ContainerPtrToValuePtr<void>(OldValues.GetStructMemory()),P->ContainerPtrToValuePtr<void>(NewValues.GetStructMemory()),Error))return false;
+ }
+ // Native host fields and fixed native default subobjects. Absent source keys
+ // return to the actual immediate parent CDO, retaining manual overrides.
+ FDasDeclaredClass NativeEffective;if(!Next.ResolveClass(Id,NativeEffective,Error))return false;
+ TSet<FString> NativeGroups;for(const auto& G:Old->NativeDefaults)NativeGroups.Add(G.Component);for(const auto& G:New->NativeDefaults)NativeGroups.Add(G.Component);
+ for(const auto& Component:NativeGroups){auto* Target=DasNativeDefaultTarget(NativeEffective.NativeParent,CDO,Component,Error);auto* Baseline=DasNativeDefaultTarget(NativeEffective.NativeParent,BP->ParentClass->GetDefaultObject(),Component,Error);if(!Target || !Baseline)return false;
+  const auto* OG=Old->NativeDefaults.FindByPredicate([&](const auto& G){return G.Component==Component;});const auto* NG=New->NativeDefaults.FindByPredicate([&](const auto& G){return G.Component==Component;});
+  TSet<FString> Names;if(OG)for(const auto& V:OG->Defaults)Names.Add(V.Key);if(NG)for(const auto& V:NG->Defaults)Names.Add(V.Key);
+  auto& OV=Plan.Value(Target->GetClass());auto& NV=Plan.Value(Target->GetClass());for(const auto& Name:Names){auto* P=Target->GetClass()->FindPropertyByName(*Name);if(!P){Error=TEXT("Native default field is missing");return false;}auto* A=P->ContainerPtrToValuePtr<void>(OV.GetStructMemory());auto* B=P->ContainerPtrToValuePtr<void>(NV.GetStructMemory());auto* Base=P->ContainerPtrToValuePtr<void>(Baseline);P->CopyCompleteValue(A,Base);P->CopyCompleteValue(B,Base);
+   if(OG)if(const auto* V=OG->Defaults.Find(Name))if(!DasParseEditableDefault(P,*V,A,Error))return false;
+   if(NG)if(const auto* V=NG->Defaults.Find(Name))if(!DasParseEditableDefault(P,*V,B,Error))return false;
+   if(!PlanRoot(Plan,Target,P,A,B,Error))return false;
+  }
  }
  // Root SCS templates: compare source baselines, not another template's manual edits.
  if(!Old->Components.IsEmpty() && !BP->SimpleConstructionScript){Error=TEXT("Missing component composition");return false;}
@@ -248,6 +275,8 @@ bool DasMergeDefaults(UBlueprint* BP,const FDasAuthoringModule& Next,const FStri
  if(!Contracts)return Restore(TEXT("Unsupported default owner"));CDO->Modify();for(const auto& P:New->Properties)Contracts->Add(P.Id,DasDefaultSourceContract(P));
  for(const auto& O:Old->PropertyOverrides)Contracts->Remove(O.Id);
  FDasDeclaredClass Effective;if(!Next.ResolveClass(Id,Effective,Error))return Restore(Error);for(const auto& O:New->PropertyOverrides)if(const auto* P=Effective.Properties.FindByPredicate([&](const auto& V){return V.Id==O.Id;}))Contracts->Add(P->Id,DasDefaultSourceContract(*P));
+ const FString NativePrefix=TEXT("native:")+Id+TEXT(":");for(auto It=Contracts->CreateIterator();It;++It)if(It.Key().StartsWith(NativePrefix))It.RemoveCurrent();
+ for(const auto& G:New->NativeDefaults)for(const auto& V:G.Defaults)Contracts->Add(DasNativeDefaultKey(Id,G.Component,V.Key),DasNativeDefaultContract(V.Value));
  FString Wire;if(!Next.ToJson(Wire,Error))return Restore(Error);BP->Modify();BP->GetOutermost()->GetMetaData().SetValue(BP,TEXT("DasDSLModel"),*Wire);
 #if WITH_DEV_AUTOMATION_TESTS
  if(GDasDefaultsFailure==2)return Restore(TEXT("Injected metadata-stage failure"));

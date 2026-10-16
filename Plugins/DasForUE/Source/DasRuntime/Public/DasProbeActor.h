@@ -38,6 +38,14 @@ public:
     UPROPERTY() FString AuthoredTypeId;
     // Approved source default fingerprints; actual CDO values may be editor overrides.
     UPROPERTY() TMap<FString,FString> DasDefaultSourceContracts;
+    // Native storage used only by the scoped array regression fixture.
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TArray<ESpawnActorCollisionHandlingMethod> DasNativeArrayEnums;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TArray<TEnumAsByte<EComponentMobility::Type>> DasNativeArrayBytes;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TArray<FVector> DasNativeArrayVectors;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TArray<FRotator> DasNativeArrayRotators;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TArray<FTransform> DasNativeArrayTransforms;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TArray<FIntPoint> DasNativeArrayPoints;
+    UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TArray<FVector> DasNativeArrayReadonly;
     ADasProbeActor();
     // Keep the selected identity catalog and its reflected types as cook/GC dependencies.
     UPROPERTY(EditAnywhere, Category="daScript") TObjectPtr<UDasTypeRegistry> TypeRegistry;

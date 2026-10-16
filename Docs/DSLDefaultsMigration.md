@@ -37,8 +37,9 @@ default keys can be added or removed: an absent key uses the component class CDO
 as its baseline. Other component templates and their class CDO are independent.
 Supported values are the same static scalars, enums, math/reflected structs and
 strong asset/class references accepted by the defaults importer. New components,
-new inherited component-template override entries and executable/computed defaults
-are separate work. Adding/removing inherited authored property defaults is supported;
+new inherited component-template override entries and general executable CDO callbacks
+are separate work. Pure computed defaults lower to these same resolved values;
+see [DSLComputedDefaults.md](DSLComputedDefaults.md). Adding/removing inherited authored property defaults is supported;
 see [DSLInheritedPropertyDefaults.md](DSLInheritedPropertyDefaults.md).
 
 This is a value comparison, not an edit-history tracker. A manually entered value
@@ -102,3 +103,7 @@ probe checks saved overrides, fresh spawn and cooked source-contract validation.
 Example declaration: `Plugins/DasForUE/Content/Das/Scripts/dsl_defaults_merge.das`.
 
 Verified 2026-10-16: Editor build; Create/Reopen/Recompile/Unopened commandlet phases; automatic and explicit console reimport; two rollback injection stages; Editor and packaged foundation (zero failures); Win64 Development NullRHI packaged defaults probe without errors/ensures; legacy PreserveInstances Create/Reopen and real DefaultMigrationPIE (one success, zero warnings/failures).
+
+Computed scalar expressions/helpers: see [DSLComputedDefaults.md](DSLComputedDefaults.md).
+
+Native host/default-subobject defaults: see [DSLNativeDefaults.md](DSLNativeDefaults.md).

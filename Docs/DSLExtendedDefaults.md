@@ -57,13 +57,15 @@ the declaring CDO without forbidding legitimate per-instance edits.
 The existing authoring model holds these values: own defaults in property `default`,
 component defaults in the component defaults map. Vector/Rotator component defaults
 keep their previous wire spelling for unchanged-source reimport compatibility.
-No arbitrary daScript expression, user function or control flow runs during import.
+This data-only stage does not execute arbitrary daScript code. The subsequent
+computed-defaults stage adds audited pure scalar expressions/helpers; see
+[DSLComputedDefaults.md](DSLComputedDefaults.md).
 Asset loading follows ordinary Unreal asset-loading behavior.
 
 Changing defaults on an already imported class still follows the existing migration
 guards. This extension does not overwrite edited instances or implement default
-migration for component-bearing classes. Computed defaults and containers remain
-separate work.
+migration for component-bearing classes by itself. The later safe-merge stage
+implements that migration. Container default syntax remains separate work.
 
 Example: Plugins/DasForUE/Content/Das/Scripts/dsl_extended_defaults.das.
 Reproduction: Scripts/TestExtendedDefaults.ps1, with -PIE for real editor play and -Package for a
@@ -96,3 +98,5 @@ an Actor-array snapshot because its probe spawns an Actor.
 Safe default-only reimport and preservation of manual values: see [DSLDefaultsMigration.md](DSLDefaultsMigration.md).
 
 Defaults on inherited authored properties: see [DSLInheritedPropertyDefaults.md](DSLInheritedPropertyDefaults.md).
+
+Computed scalar expressions/helpers: see [DSLComputedDefaults.md](DSLComputedDefaults.md).

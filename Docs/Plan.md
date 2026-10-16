@@ -2493,7 +2493,7 @@ are validated before Blueprint mutation. Reflected CDO/template hard references
 provide saved/cooked dependencies; non-null authored object identity remains deferred.
 Existing Vector/Rotator component wire spelling is preserved. Repeated/unknown
 assignments, executable expressions and invalid references are rejected. Defaults
-migration is implemented below; inherited property override declarations are implemented below; computed defaults remain next.
+migration is implemented below; inherited property override declarations are implemented below; computed scalar defaults are implemented below.
 See DSLExtendedDefaults.md and TestExtendedDefaults.ps1.
 
 Static defaults validation passed: Create/Reopen, JSON roundtrip and six negative
@@ -2556,8 +2556,8 @@ member-wise struct edits survive; no Blueprint reinstance occurs. Parent import
 uses Automatic policy to retain manual parent defaults. Layout/access checks run
 before native writes. Record comparisons are order-independent; low-level backend
 authoring refuses models needing DSL provenance. See DSLInheritedPropertyDefaults.md
-and TestInheritedDefaults.ps1. Computed defaults and arbitrary native-parent field
-projection remain separate work.
+and TestInheritedDefaults.ps1. Computed scalar defaults are implemented below;
+arbitrary native-parent field projection remains separate work.
 
 Inherited-property defaults validation passed: actor/component Create/Reopen/Recompile, manual parent/child/instance values, three-level overrides, add/remove, rollback, unchanged reimport and unapplied-parent refusal; Win64 Development NullRHI packaged probe; editor/packaged foundation zero failures. Existing safe-default regression also passed; its startup Zen assert was bypassed for the remaining phase using filesystem DDC without modifying the engine/service.
 
@@ -2581,3 +2581,316 @@ interface Create/Reopen/packaged dispatch plus mismatch refusal, strict RuntimeP
 one success and zero warnings/failures, and full Win64 Development NullRHI packaged
 gameplay/foundation all pass. Const graph compilation requires const native adapter
 UFunctions; ordinary non-const dispatch functions cannot be called on readonly self.
+
+
+### Computed class defaults — 2026-10-16
+
+Added real daScript scalar calculations and pure helper calls in ue_class field
+initializers and ue_defaults. Defaults assignments see source fields and earlier
+assignments, including authored ancestor values. Source snapshots are isolated
+per class so sibling overrides cannot affect each other. Explicit defaults take
+precedence over inline initializers. Actor/ActorComponent and component-template
+defaults share the existing typed lowering; math coordinates and asset/class/text
+marker arguments accept computed scalars/strings.
+
+A collection compilation retains helper bodies without RunFolding execution,
+audits their call graph, and evaluates them in an isolated Context with global
+init/shutdown disabled. A second normal compilation substitutes canonical
+literals. Temporary AST clones have an explicit GC root across imported modules
+and compiler passes. Global state, side effects, World/UObject calls, unsafe code,
+loops, recursion, indirect calls and non-scalar helpers reject; graph/depth/memory
+limits bound evaluation. Errors occur before Blueprint mutation.
+
+IR/saved metadata remain resolved data. The existing transactional merge handles
+changes to computed results while preserving manual values. Cook stores normal
+CDO/template values and reflected asset/class dependencies. Pure calculations may
+repeat during source compilation for runtime contract validation; objects inherit
+baked defaults rather than executing a defaults callback on Spawn.
+
+See DSLComputedDefaults.md, dsl_computed_defaults.das and TestComputedDefaults.ps1.
+Returning arbitrary structs/objects from helpers, reading native-parent fields,
+instance-method calls in defaults and unrestricted CDO constructors remain future
+work. Instance side effects belong in Initialize/ConstructionScript.
+
+
+Validation completed: Editor Create/Reopen/Recompile; computed int/double/bool/
+string/math/asset values; unchanged reimport and helper-result migration with
+manual CDO/instance overrides; inherited properties, isolated siblings and
+ActorComponent; source cycles, type mismatch, global state, side effects, loops,
+recursion, World calls and division-by-zero refusal. Failed reimport preserves
+the working class and metadata. Declaration-only interface collection skips
+computed component defaults. First-launch global initializers do not execute
+inside the defaults evaluator.
+
+Existing inherited-default Create/Reopen/Recompile and safe-merge
+Create/Reopen/Recompile/Unopened regressions passed. Editor and packaged foundation
+report zero failures. Final Win64 Development NullRHI cook/package and runtime
+probe passed: saved CDO/template values, strong asset dependency, child/sibling
+isolation, ActorComponent, runtime source contracts and fresh Spawn. Shipping and
+rendered gameplay were not exercised. Logs: computed-defaults-final-package-suite.log,
+computed-defaults-packaged.log, computed-defaults-foundation-editor.log and
+smoke-packaged.log under logs/.
+
+
+### Static library first slice
+
+Added `ue_library` + native `def static`: real Blueprint Function Library assets,
+worldless callable/pure scalar functions, out/ref, direct DAS static calls,
+metadata/comment tooltips and saved source contracts. See [DSLStaticLibraries.md](DSLStaticLibraries.md).
+WorldContext, aggregate/object signatures and structural library migrations remain
+follow-up work.
+
+
+### Native host and built-in component defaults — 2026-10-16
+
+ue_defaults now accepts editable Engine.Actor/ActorComponent properties and
+fixed native default-subobject properties without declaring Blueprint variables.
+Optional native_defaults IR groups are separate from authored properties/SCS
+nodes. Lookup excludes bridge bookkeeping and requires a native reflected owner,
+editable template property and stable native component class/name/outer identity.
+The shared strict editable-value parser now resides in Runtime and is reused by
+both default-import paths.
+
+Pure calculations can read native scalar source defaults, including authored
+ancestor source overrides and earlier assignments. Native-only calculations are
+omitted from the collection model until evaluated. The second compiler pass now
+rebuilds its module group and restores declaration caches so imported parents
+cannot retain placeholder models from the collection pass.
+
+Initial import changes only the new authored CDO/native templates. Reimport uses
+the existing transactional three-way merge, preserving manual values and struct
+members, explicit child defaults, class identity and runtime sessions. Removing a
+source key falls back to the actual immediate parent CDO. Cooked native source
+fingerprints are scoped by authored class, target and property; runtime validation
+allows manual CDO overrides but refuses changed/removed source contracts until
+reimport. Low-level authoring refuses models needing DSL native provenance.
+
+Actor/ActorComponent Create/Reopen/Recompile passed, including computed native
+ancestor reads, rollback at both stages, native subobject struct members, key
+removal/re-addition and pre-asset rejection of unknown/private/wrong-type/duplicate
+targets. Existing computed defaults and Editor foundation (zero failures) passed.
+Existing inherited-default and safe-merge regressions passed as well.
+
+See DSLNativeDefaults.md and TestNativeDefaults.ps1. Gameplay-method native field
+projection, Character/Pawn host adapters, component replacement, native enums/
+containers, deep destinations and mixing native subobject defaults with SCS
+composition remain separate work.
+
+Verified: Create/Reopen + reload/refusal; strict RuntimePIE; Editor and packaged foundation failures=0; Win64 Development cook/package/gameplay with a separate Blueprint library caller. Shipping/rendered gameplay not tested.
+
+
+Final validation: TestNativeDefaults.ps1 -SkipBuild -Package passed all
+Create/Reopen/Recompile phases and the Win64 Development NullRHI runtime probe.
+Cooked actor/component CDO values, manual instance and struct-member overrides,
+authored descendants, source contracts and fresh Spawn all passed. No engine
+errors/ensures were reported by the final packaged probe. Editor and packaged
+foundation each report zero failures. Existing computed defaults, inherited
+defaults and safe-merge Create/Reopen/Recompile/Unopened regressions also passed.
+Case aliases are rejected before asset creation. Shipping and rendered gameplay
+were not exercised.
+
+Logs: logs/native-defaults-final-suite.log, native-defaults-packaged.log,
+native-defaults-foundation-editor.log and smoke-packaged.log. Packaging now uses
+AutomationTool's -WaitForUATMutex so concurrent UAT runs serialize instead of
+failing or stopping another run.
+
+## Native self fields in gameplay methods
+
+Implemented checked native field reads/writes for Actor and ActorComponent,
+including script-only helpers, inherited implementations and lifecycle lowering.
+Scalar/name and strong object/class ABI values reuse the existing runtime checks.
+No authored IR fields or Blueprint variables are generated. Readonly, hidden,
+accessor-backed and unsupported types are rejected; native field shadowing is
+rejected. See DSLNativeSelfFields.md for syntax, scope and test coverage.
+Next: typed native reference projection, native enum/container/struct fields,
+and additional host adapters (Pawn/Character).
+
+Validation (2026-10-16): Editor build and TestNativeDefaults.ps1 -Package passed
+Create/Reopen/Recompile and the Win64 Development NullRHI game probe. Nine invalid
+native-method variants, the positive control and the const-write check passed.
+Editor and packaged foundation each report DAS_FOUNDATION_RESULT=PASS failures=0.
+Logs: logs/native-self-verified-suite.log,
+logs/native-self-foundation-editor-final.log, logs/native-defaults-packaged.log,
+and logs/smoke-packaged.log. Shipping and rendered gameplay were not exercised.
+
+### Static libraries: WorldContext and complex values
+
+Added named input-object WorldContext with Blueprint automatic pin defaulting,
+explicit direct DAS calls and exception-safe nested world scopes. No implicit
+self or instance lifecycle is granted. Game-world validation rejects null,
+destroyed/template/non-game contexts; context-bound VM ownership follows the
+supplied object and its world. Existing native-library automatic WorldContext,
+actor/component operations and queries resolve the selected context.
+
+Library signatures now use existing typed object/interface/class, authored
+enum/struct, math and supported array/map/set snapshot ABIs, including complex
+out/ref. Delegate values use the shared ABI; delegate out/ref remains deferred.
+Registry and value assets are retained on the native library CDO for cook.
+Structural library migration and parameter defaults remain follow-up work.
+See DSLStaticLibraries.md and dsl_library_values.das.
+
+## Typed native self references
+
+Native object/class fields resolve exact, visible canonical wrapper declarations.
+Reads and assignment lower through their checked typed converters. Missing and
+ambiguous wrappers fail explicitly; no fake fields or new authored property IR.
+Actor.Owner is a readonly GetOwner facade. RootComponent projects to
+SceneComponentRef, and typed references can feed existing component APIs directly.
+The native enum/container/struct field and Pawn/Character host work remains next.
+Validation is tracked in DSLNativeSelfFields.md.
+
+Validated final extension: Create/Reopen/recompile; cross-world and recovered DAS calls; nested Actor ConstructionScript; strict RuntimePIE with automatic WorldContext; Editor and packaged foundation failures=0; Win64 Development cook/package/gameplay with authored enum/struct and map/set snapshots. Logs: library-values-*-final.log, cooked-gameplay-runtime.log, smoke-packaged.log. Shipping/rendered gameplay not tested.
+
+Typed-reference validation (2026-10-16): Editor Create/Reopen/Recompile and
+Win64 Development NullRHI packaged probe passed. Covered typed SceneComponent
+returns and direct scene API calls, inherited methods, null/live Actor owners,
+Pawn assignment/return/null/recovery, wrong nominal types, readonly Owner,
+missing/ambiguous wrappers and forged wrapper rejection before UE storage changed.
+Editor and packaged foundation each report PASS failures=0.
+Logs: logs/typed-native-refs-editor-2.log, typed-native-refs-foundation.log,
+typed-native-refs-package.log, typed-native-refs-packaged.log and smoke-packaged.log.
+Native UClass wrapper projection shares the implementation but the current
+Actor/ActorComponent host surface has no native UClass property fixture; it has
+not been separately exercised. Shipping and rendered gameplay remain untested.
+## Native self primitive arrays
+
+Native primitive arrays use the existing container snapshot/carrier pipeline.
+Actor.Tags and ActorComponent.ComponentTags project to array<UENameValue>, with
+indexed read/write, whole-array clone assignment, push/push_clone, erase, pop and
+clear. Source templates and declaration-only passes generate the necessary helpers
+without adding synthetic fields or authored property IR. Tests cover snapshots,
+inherited methods, component fields, bounds failure/recovery and RHS side effects.
+Next: native enum/struct fields and additional container element kinds/maps/sets.
+See DSLNativeSelfFields.md for scope and validation.
+
+Native-array validation (2026-10-16): Editor build, Create/Reopen/Recompile and
+Win64 Development NullRHI packaged probe passed. Verified live Actor.Tags and
+ActorComponent.ComponentTags mutation, inherited methods, whole-array assignment,
+snapshot return/isolation, indexed reads/writes, clear/push/erase/pop, preservation
+of RHS side effects, bounds failure without partial commit and recovery. Wrong
+array element/assignment types and const writes were rejected. Declaration-only
+compilation with the native array methods also passed. Editor and packaged
+foundation each report DAS_FOUNDATION_RESULT=PASS failures=0.
+Logs: logs/native-arrays-editor-verified.log, native-arrays-foundation-editor.log,
+native-arrays-package.log, native-arrays-packaged.log and smoke-packaged.log.
+Only the FName native arrays have live host fixtures; other primitive arrays share
+the carrier implementation. Shipping and rendered gameplay were not exercised.
+
+### Static library parameter defaults
+
+Added ordinary trailing int/float/double/bool/string literal defaults, including
+negative numbers, exact double values, Unicode and empty strings. Authoring IR
+retains optional defaults separately from the full native call ABI. Source DAS
+omitted arguments and new Blueprint call pins use the same declarations.
+Default changes are metadata reimports: explicit caller pin values survive;
+removing defaults clears stale metadata. Out/ref, WorldContext, computed and
+complex defaults are rejected. Instance-method defaults are implemented below;
+migration of unloaded dependent caller assets remains follow-up work. See DSLStaticLibraries.md.
+
+Parameter defaults validated: Create/Reopen/recompile, DAS omission/partial/explicit calls, scalar pin metadata, six rejection cases, default-only reimport preserving explicit pins, changed/removed defaults, strict RuntimePIE, Editor/packaged foundation failures=0, Win64 Development cook/package/gameplay. Logs: library-defaults-*.log. Shipping/rendered gameplay not tested.
+
+
+### Native enum and struct values through self
+
+Implemented canonical ue_native_enum declarations for loaded native UEnums, checked
+nominal packing, native self field inference and typed ue_function parameters/results.
+Native FStructProperty projection uses existing validated snapshot/math ABI. Added
+readonly RootComponent relative math reads and explicit whole-value ActorTransform
+world-transform facade. Preserve native visibility/readonly, const and lifetime/world
+checks without additional authored fields. Native enum nesting in authored structs,
+all-engine wrapper generation and native enum/struct containers remain separate work.
+See DSLNativeSelfFields.md and ue_native_engine_values.das.
+
+
+### Ordinary method parameter defaults
+
+Implemented trailing scalar literal defaults for Actor and ActorComponent
+ue_function declarations using the same collector helper and IR validation as
+static libraries. Defaults work for self calls, typed authored references from
+free functions, Blueprint calls, inherited BlueprintEvents and Super calls.
+Typed dispatch wrappers reconstruct source-level defaults before entering the
+complete native parameter ABI. Existing legacy scalar ABI/pin names are retained.
+
+Defaults belong to the call-site declaration: a base view/call uses base defaults
+while dispatch still invokes the derived override; a derived view uses derived
+defaults. Super uses parent defaults. Overrides retain signature validation.
+
+Blueprint entry pins and generated metadata carry the defaults. Default-only
+reimport changes new pin values, clears removed defaults and preserves explicit
+values on an existing caller. No automatic migration of unloaded callers.
+Supported: int/float/double/bool/string literals, negatives, Unicode and empty
+strings. Ref/out, computed and complex defaults remain unsupported.
+
+Validated Editor build, Create/Reopen/recompile, Actor and ActorComponent self/
+reference/Blueprint calls, virtual/Super dispatch, five invalid declarations,
+changed/removed default metadata and preserved explicit caller arguments.
+Foundation smoke: PASS failures=0. Logs: instance-defaults-editor.log,
+static-library-Create.log, static-library-Reopen.log,
+instance-defaults-foundation.log. See DSLParameterDefaults.md.
+
+
+Native enum/struct validation (2026-10-16): Editor build, Create/Reopen/Recompile,
+Editor foundation and Win64 Development NullRHI package passed. Native UEnum
+parameters/results and all five values, inherited methods, forged enum rejection
+without partial write and recovery, missing/ambiguous/wrong nominal declarations,
+declaration member mismatch, readonly/const/type rejection, nested math leaf reads,
+exact nonzero rotation getters and whole-value world-transform writes were verified.
+Packaged native probe reports DAS_NATIVE_DEFAULTS_PACKAGED=PASS; Editor and packaged
+foundation report DAS_FOUNDATION_RESULT=PASS failures=0. Logs:
+logs/native-enum-struct-editor-verified.log, native-enum-struct-foundation.log,
+native-enum-struct-package.log, native-enum-struct-packaged.log and smoke-packaged.log.
+Probe map: /Game/DasNativeDefaults/281e6c57275c4c8ea8e3b1609a0d38e8/Map.
+Shipping and rendered gameplay were not exercised.
+
+Validation: strict DasForUE.Gameplay.RuntimePIE regression PASS (1 success,
+0 failures, 0 warning tests; instance-defaults-pie.log and
+instance-defaults-pie-report/index.json). The original stage covered saved/reopened commandlet consumers. The game-world
+and packaged checks below extend that coverage.
+
+
+### Native enum and struct arrays through self
+
+Added native array descriptor/type inference, exact enum-class/TEnumAsByte carriers,
+safe native struct carriers, math element arrays and generic UEStructValue snapshots.
+Reuse checked container reads/mutations and preserve readonly/const/snapshot isolation.
+Wider enum storage is rejected explicitly. Live regression fixtures use scoped native
+C++ test adapter properties; fixed Engine hosts have no eligible fields of these kinds.
+See DSLNativeSelfFields.md and dsl_native_array_self.das. Object arrays, native maps/sets
+and arbitrary native C++ parent adapters are separate work.
+
+
+### Instance-default game-world and cook integration — 2026-10-17
+
+Closed the missing direct PIE/packaged assertions for ordinary method defaults.
+The shared Runtime probe now runs on live Actor, dynamically registered
+ActorComponent and inherited Actor instances after BeginPlay. The same editor
+fixture helper creates source classes and Blueprint consumers for both paths;
+reflected carrier references retain their cooked class/parent dependencies.
+
+Verified self/reference calls, omitted/partial/explicit arguments, scalar literal
+precision and strings, Blueprint disconnected-pin values, virtual/base-view
+defaults, Super, component registration/BeginPlay and context cleanup.
+Editor build, strict RuntimePIE, Win64 Development cook/package/gameplay and
+packaged foundation (failures=0) passed with NullRHI. Logs:
+instance-defaults-game-pie.log, instance-defaults-game-pie-report.json,
+instance-defaults-game-cooked.log, cooked-gameplay-runtime.log,
+smoke-packaged.log. Shipping/rendered gameplay remain untested. See
+DSLParameterDefaults.md; broader migration and complex defaults remain deferred.
+
+
+Native value-array validation (2026-10-17 Europe/Budapest): Editor build and
+Create/Reopen/Recompile passed. Verified real FEnumProperty and FByteProperty
+UPROPERTY array storage; FVector, FRotator, FTransform and generic FIntPoint arrays;
+indexed and vector/rotator leaf writes, clone assignment, clear/push/pop/erase,
+detached snapshots, invalid enum and bounds recovery, wrong generic struct identity
+and whole-array failure after a valid element without partial commit. Wrong nominal
+enum/math types and readonly mutation are rejected at compilation. No authored
+Blueprint variables were generated for the fixture. Win64 Development NullRHI
+cook/package and packaged native probe passed with exit 0; Editor and packaged
+foundation each report DAS_FOUNDATION_RESULT=PASS failures=0. Logs:
+logs/native-value-arrays-editor-verified.log, native-value-arrays-foundation.log,
+native-value-arrays-package.log, native-value-arrays-packaged.log and
+native-value-arrays-foundation-packaged.log. Probe map:
+/Game/DasNativeDefaults/19ec0214580b4e8a9c45e72bf24aaf87/Map.
+Vector2D shares the math array path but has no additional live fixture here.
+Shipping and rendered gameplay were not exercised.

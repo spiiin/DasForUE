@@ -72,7 +72,7 @@ int32 UDasInheritedDefaultsCommandlet::Main(const FString& Params){
    if(FString(Case)==TEXT("unknown"))BadSource.ReplaceInline(TEXT("self.Score=25"),TEXT("self.Missing=25"));
    if(FString(Case)==TEXT("duplicate"))BadSource.ReplaceInline(TEXT("self.Manual=25"),TEXT("self.Score=25"));
    if(FString(Case)==TEXT("type"))BadSource.ReplaceInline(TEXT("self.Score=25"),TEXT("self.Score=true"));
-   if(FString(Case)==TEXT("expression"))BadSource.ReplaceInline(TEXT("self.Score=25"),TEXT("self.Score=1+2"));
+   if(FString(Case)==TEXT("expression"))BadSource.ReplaceInline(TEXT("self.Score=25"),TEXT("self.Score=ue_get_self_int(\"Score\")"));
    const FString Script=TEXT("dsl_inherited_bad_")+Id+TEXT("_")+Case+TEXT(".das"),File=R.ScriptPath(Script),Package=Root+TEXT("/BP_Rejected_")+Case;
    if(!Write(File,BadSource))return 1;ON_SCOPE_EXIT{IFileManager::Get().Delete(*File);};UBlueprint* Rejected=nullptr;
    if(!Check(!FDasDSLService::Apply(Script,Package,TEXT("inheriteddefaults.BadDefaults"),Rejected,Error) && !FindPackage(nullptr,*Package),*(TEXT("negative_")+FString(Case)+TEXT("_before_asset_creation"))))return 1;

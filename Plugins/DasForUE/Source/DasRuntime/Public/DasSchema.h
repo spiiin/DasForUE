@@ -39,7 +39,7 @@ struct FDasCallContract {
     bool operator!=(const FDasCallContract& Other) const {return !(*this==Other);}
     static FDasCallContract Scalar(EDasMethodSignature Kind){FDasCallContract C;C.ReturnKind=Kind;if(Kind!=EDasMethodSignature::Void) C.Inputs.Add(Kind);return C;}
 };
-struct FDasParameterSchema {FName Name;FString StableId;EDasMethodSignature Kind=EDasMethodSignature::Int;FString ClassPath;FString Direction=TEXT("in");};
+struct FDasParameterSchema {FName Name;FString StableId;EDasMethodSignature Kind=EDasMethodSignature::Int;FString ClassPath;FString Direction=TEXT("in");bool bHasDefault=false;FString DefaultValue;};
 // Legacy adapters and a bounded generic scalar call frame.
 struct FDasMethodSchema
 {
@@ -57,6 +57,9 @@ struct FDasMethodSchema
     bool bBlueprintEvent = false;
     bool bPure = false;
     bool bConst = false;
+    bool bStatic = false;
+    FString LibraryContract;
+    FString WorldContext;
     TMap<FString,FString> Metadata;
 };
 

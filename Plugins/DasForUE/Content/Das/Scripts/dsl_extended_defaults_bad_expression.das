@@ -12,7 +12,7 @@ class BadDefaults {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Asset:ObjectRef
     defaults=ue_defaults() {
-        self.Value=10+20
+        self.Value=ue_get_self_int("Value")
     }
     [ue_function(BlueprintCallable)]
     def Ping():int { return self.Value }

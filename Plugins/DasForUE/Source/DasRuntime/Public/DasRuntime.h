@@ -57,6 +57,7 @@ public:
     bool ReadAuthoringScript(const FString& Path,FDasAuthoringModule& Out,FString& Error,FDasSourceCatalog* ImportedValues=nullptr);
     bool ReadSourceCatalogImports(const FString& Path,FDasSourceCatalog& Out,FString& Error);
     bool ValidateFrameMethod(const FString& Path,FString& Error,const FString& EntryPoint,const FDasCallContract& Contract);
+    FDasExecutionResult RunLibraryFrame(const FString& Contract,const FString& Script,const FString& Entry,const TArray<FDasScalarValue>& Arguments,EDasMethodSignature ReturnKind,const FString& ReturnClass);
     FDasExecutionResult RunNamedFramePersistent(const FString& Path,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,EDasMethodSignature ReturnKind,TWeakObjectPtr<UObject> Self,const FString& ReturnClass = FString());
     bool ValidateScalarMethod(const FString& Path,FString& Error,const FString& EntryPoint,EDasMethodSignature Signature);
     bool ValidateIntMethod(const FString& Path, FString& Error, const FString& EntryPoint = TEXT("main"));

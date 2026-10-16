@@ -33,6 +33,7 @@ struct FDasDeclaredProperty
 struct FDasDeclaredParameter
 {
     FString Id, Name, Direction = TEXT("in");
+    FDasDeclaredLiteral Default; // Optional literal for an input parameter.
     FDasDeclaredType Type;
 };
 struct FDasDeclaredMethod
@@ -41,6 +42,7 @@ struct FDasDeclaredMethod
     FDasDeclaredType ReturnType;
     TArray<FDasDeclaredParameter> Parameters;
     FString ScriptFile, EntryPoint = TEXT("main");
+    FString WorldContext; // Optional input object parameter of a static library method.
     bool bCallable = true, bPure = false, bStatic = false, bConst = false;
     bool bBlueprintEvent = false;
     TMap<FString, FString> Metadata;
@@ -71,13 +73,20 @@ struct FDasPropertyDefaultOverride {
     FDasDeclaredLiteral Default;
     bool operator==(const FDasPropertyDefaultOverride& O)const{return Id==O.Id && Name==O.Name && Default==O.Default;}
 };
+struct FDasNativeDefaultGroup {
+    FString Component; // Empty: native host property; otherwise a native subobject reference.
+    TMap<FString,FDasDeclaredLiteral> Defaults;
+    bool operator==(const FDasNativeDefaultGroup& O)const{return Component==O.Component && Defaults.OrderIndependentCompareEqual(O.Defaults);}
+};
 struct FDasDeclaredClass
 {
     FString Id, Name, NativeParent, ParentId, SourceScript;
+    FString LibraryTypeRegistry;
     TArray<FString> Interfaces;
     TArray<FDasDeclaredComponent> Components;
     TArray<FDasComponentOverride> ComponentOverrides;
     TArray<FDasPropertyDefaultOverride> PropertyOverrides;
+    TArray<FDasNativeDefaultGroup> NativeDefaults;
     TArray<FDasDeclaredCallback> Callbacks;
     TArray<FDasDeclaredProperty> Properties;
     TArray<FDasDeclaredMethod> Methods;

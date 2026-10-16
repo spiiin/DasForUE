@@ -180,7 +180,7 @@
 #endif
         auto* WorldProperty=StaticWorldParameter(Function,WorldName,Context);
         UObject* WorldObject=nullptr;UWorld* World=nullptr;
-        if(WorldProperty){WorldObject=ResolveSelf(Context);World=GEngine?GEngine->GetWorldFromContextObject(WorldObject,EGetWorldErrorMode::ReturnNull):nullptr;if(!World || !World->IsGameWorld() || !WorldObject->IsA(WorldProperty->PropertyClass))Context->throw_error("WorldContext requires script owner's live game world and compatible object");}
+        if(WorldProperty){WorldObject=ResolveWorldContextObject(Context);World=GEngine?GEngine->GetWorldFromContextObject(WorldObject,EGetWorldErrorMode::ReturnNull):nullptr;if(!World || !World->IsGameWorld() || !WorldObject->IsA(WorldProperty->PropertyClass))Context->throw_error("WorldContext requires script owner's live game world and compatible object");}
         auto Signature=DescribeCall(Function,Context);
         if(ActiveContext->Calls.Num()>=256)Context->throw_error("call frame limit reached");
         auto Call=MakeShared<FMarshalledCall>();Call->Signature=MoveTemp(Signature);Call->SignatureKey=CallSignatureKey(Function);Call->Target=Class->GetDefaultObject();Call->Function.Reset(Function);Call->Frame=MakeUnique<FStructOnScope>(Function);
@@ -578,7 +578,7 @@
         if(!Call.InterfaceSignatureKey.IsEmpty()){auto* Interface=Call.RequiredInterface.Get();auto* Declared=Interface?Interface->FindFunctionByName(Call.Function->GetFName()):nullptr;if(!Interface || !Object->GetClass()->ImplementsInterface(Interface) || !Declared || CallSignatureKey(Declared)!=Call.InterfaceSignatureKey || !Call.Function->IsSignatureCompatibleWith(Declared))Context->throw_error("interface contract changed; create a new interface frame");}
         if (!Call.DelegateInvoke && (Call.FunctionScopeClass.IsValid()?Call.FunctionScopeClass->FindFunctionByName(Call.Function->GetFName()):Object->FindFunction(Call.Function->GetFName())) != Call.Function.Get()) Context->throw_error("UFunction changed; create a new call frame");
         if(!Call.AutomaticWorldContext.IsEmpty()){
-            auto* Self=ResolveSelf(Context);auto* World=GEngine?GEngine->GetWorldFromContextObject(Self,EGetWorldErrorMode::ReturnNull):nullptr;
+            auto* Self=ResolveWorldContextObject(Context);auto* World=GEngine?GEngine->GetWorldFromContextObject(Self,EGetWorldErrorMode::ReturnNull):nullptr;
             auto* P=StaticWorldParameter(Call.Function.Get(),Call.AutomaticWorldContext,Context);
             if(!World || !World->IsGameWorld() || World!=Call.StaticWorld.Get() || P->GetObjectPropertyValue_InContainer(Call.Frame->GetStructMemory())!=Self)Context->throw_error("WorldContext expired or changed before invocation");
         }

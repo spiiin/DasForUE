@@ -28,11 +28,14 @@
 #include "DasDefinedEnum.h"
 #include "DasTypeRegistry.h"
 #include "DasRuntime.h"
+#include "DasBlueprintLibrary.h"
 #include "DasContainerTypes.h"
 #include "DasFrameLibrary.h"
 #include <type_traits>
 #include "DasReflectedTypes.h"
 #include "DasAuthoring.h"
+#include "DasNativeDefaults.h"
+#include "DasNativeDefaultsProbe.h"
 #include "DasDelegateSignatures.h"
 #include "Serialization/JsonSerializer.h"
 #include "Dom/JsonObject.h"
@@ -247,6 +250,7 @@ namespace
         bool bEnding = false;
         bool bCollectingSubscriptions = false;
         bool bInitializingObject = false;
+        bool bLibraryScope=false;TWeakObjectPtr<UObject> LibraryWorld;
         TArray<FSubscriptionDeclaration> Subscriptions;
         TWeakObjectPtr<UObject> Self;
         struct FObjectQuery {TWeakObjectPtr<UClass> Base;TArray<TWeakObjectPtr<UObject>> Objects;};
@@ -266,6 +270,8 @@ namespace
         virtual FString GetReferencerName() const override {return TEXT("daScript native input frame snapshots");}
     };
     thread_local FUnrealDasContext* ActiveContext = nullptr;
+    thread_local const FString* LibraryInvocationContract=nullptr;
+    thread_local FString LibraryInvocationScript;
     struct FOutputFrame:FGCObject {const TArray<FDasScalarValue>* Arguments=nullptr;TMap<int32,FDasScalarValue> Values;TArray<TStrongObjectPtr<UObject>> ObjectPins;
         virtual void AddReferencedObjects(FReferenceCollector& Collector)override{for(auto& V:Values)if(V.Value.Kind==12)V.Value.StructValue.AddStructReferencedObjects(Collector);}
         virtual FString GetReferencerName()const override{return TEXT("daScript pending frame outputs");}
@@ -326,9 +332,17 @@ namespace
         if (!IsInGameThread() || Context != ActiveContext || !ActiveContext)
         { Context->throw_error("self access requires the active game-thread runtime context"); }
         UObject* Self = ActiveContext->Self.Get();
+        if(LibraryInvocationContract || ActiveContext->bLibraryScope || (Self && Self->IsA<UDasBlueprintLibrary>()))Context->throw_error("Static library has no implicit self or WorldContext");
         if (!IsValid(Self) || (Self->IsA<AActor>() && CastChecked<AActor>(Self)->IsActorBeingDestroyed() && !ActiveContext->bEnding))
         { Context->throw_error("self is missing or expired"); }
         return Self;
+    }
+
+    UObject* ResolveWorldContextObject(das::Context* C){
+        if(C!=ActiveContext || !IsInGameThread())C->throw_error("WorldContext requires active game-thread context");
+        if(!ActiveContext->bLibraryScope){if(LibraryInvocationContract)C->throw_error("Library WorldContext is only available inside a method");return ResolveSelf(C);}
+        auto* Object=ActiveContext->LibraryWorld.Get();auto* World=IsValid(Object) && GEngine?GEngine->GetWorldFromContextObject(Object,EGetWorldErrorMode::ReturnNull):nullptr;
+        if(!World || !World->IsGameWorld() || World->bIsTearingDown || Object->IsTemplate() || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed()) || (Cast<UActorComponent>(Object) && CastChecked<UActorComponent>(Object)->IsBeingDestroyed()))C->throw_error("Library requires a live game-world WorldContext");return Object;
     }
 
     template<class P> P* ResolveProperty(UObject* Self, const char* Name, bool bWrite, das::Context* Context)
@@ -629,7 +643,7 @@ namespace
         if(!F || !F->exports || F->arguments.size()!=static_cast<size_t>(C.Inputs.Num()) || !Matches(F->result,C.ReturnKind)) return false;
         for(int32 I=0;I<C.Inputs.Num();++I) if(C.Inputs[I]==EDasMethodSignature::Void || !Matches(F->arguments[I]->type,C.Inputs[I])) return false;
         bool Objects=C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Object || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum;for(auto K:C.Inputs)Objects |= K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Object || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum;
-        {bool Found=false,Valid=true;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St){for(auto* A:St->annotations)if(A->annotation->name=="ue_class"){auto* Wire=A->arguments.find("_ue_model_json",das::Type::tString);FDasAuthoringModule M;FString Error;if(!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire->sValue.c_str()),M,Error)){Valid=false;continue;}for(const auto& Cl:M.Classes)for(const auto& Method:Cl.Methods)if(Method.EntryPoint==Entry){FDasClassSchema Schema;if(!M.ToActorSchema(Cl.Id,Schema,Error)){Valid=false;continue;}for(const auto& S:Schema.Methods)if(S.EntryPoint==Entry){Found=true;Valid &= S.Contract()==C;}}}});if(!Valid)return false;if(!Found){if(!C.InputDirections.IsEmpty())return false;if(C.ReturnKind==EDasMethodSignature::Class || C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum)return false;for(auto K:C.Inputs)if(K==EDasMethodSignature::Class || K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum)return false;if(C.ReturnKind==EDasMethodSignature::Object && C.ReturnClass!=TEXT("/Script/CoreUObject.Object"))return false;for(int32 I=0;I<C.Inputs.Num();++I)if(C.Inputs[I]==EDasMethodSignature::Object && (!C.InputClasses.IsValidIndex(I) || C.InputClasses[I]!=TEXT("/Script/CoreUObject.Object")))return false;}}
+        {bool Found=false,Valid=true;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St){for(auto* A:St->annotations)if(A->annotation->name=="ue_class" || A->annotation->name=="ue_library"){auto* Wire=A->arguments.find("_ue_model_json",das::Type::tString);FDasAuthoringModule M;FString Error;if(!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire->sValue.c_str()),M,Error)){Valid=false;continue;}for(const auto& Cl:M.Classes)for(const auto& Method:Cl.Methods)if(Method.EntryPoint==Entry){FDasClassSchema Schema;if(!M.ToActorSchema(Cl.Id,Schema,Error)){Valid=false;continue;}for(const auto& S:Schema.Methods)if(S.EntryPoint==Entry){Found=true;Valid &= S.Contract()==C;}}}});if(!Valid)return false;if(!Found){if(!C.InputDirections.IsEmpty())return false;if(C.ReturnKind==EDasMethodSignature::Class || C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum)return false;for(auto K:C.Inputs)if(K==EDasMethodSignature::Class || K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum)return false;if(C.ReturnKind==EDasMethodSignature::Object && C.ReturnClass!=TEXT("/Script/CoreUObject.Object"))return false;for(int32 I=0;I<C.Inputs.Num();++I)if(C.Inputs[I]==EDasMethodSignature::Object && (!C.InputClasses.IsValidIndex(I) || C.InputClasses[I]!=TEXT("/Script/CoreUObject.Object")))return false;}}
         return true;
     }
     int32 GetSelfInt(const char* Name, das::Context* Context)
@@ -695,6 +709,15 @@ namespace
         return Object;
     }
 
+    void LibraryScope(const FDasObjectHandle& H,bool RequiresWorld,const das::TBlock<void>& Block,das::Context* C){
+        if(C!=ActiveContext || !IsInGameThread())C->throw_error("Library scope requires active game-thread context");
+        auto* Object=H.Token?ResolveObject(H,C):nullptr;auto* ResolvedWorld=IsValid(Object) && GEngine?GEngine->GetWorldFromContextObject(Object,EGetWorldErrorMode::ReturnNull):nullptr;
+        if(RequiresWorld && (!ResolvedWorld || !ResolvedWorld->IsGameWorld() || ResolvedWorld->bIsTearingDown || Object->IsTemplate() || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed()) || (Cast<UActorComponent>(Object) && CastChecked<UActorComponent>(Object)->IsBeingDestroyed())))C->throw_error("Library requires a live game-world WorldContext");
+        bool Good=false;{
+            TStrongObjectPtr<UObject> Root(Object);TGuardValue<bool> Library(ActiveContext->bLibraryScope,true);TGuardValue<TWeakObjectPtr<UObject>> World(ActiveContext->LibraryWorld,Object);
+            Good=C->runWithCatch([&](){C->invoke(Block,nullptr,nullptr,nullptr);});
+        }if(!Good)C->rethrow();
+    }
     FDasObjectHandle NullObject() { return {}; }
     FDasObjectHandle ComponentOwner(const FDasObjectHandle& H,das::Context* C){auto* Component=Cast<UActorComponent>(ResolveObject(H,C));if(!Component)C->throw_error("expected ActorComponent handle");return MakeObjectHandle(Component->GetOwner(),AActor::StaticClass(),C);}
     FDasObjectHandle ObjectSelf(das::Context* Context) { return MakeObjectHandle(ResolveSelf(Context), UObject::StaticClass(), Context); }
@@ -953,20 +976,24 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
 
     TMap<TWeakObjectPtr<UActorComponent>,TWeakObjectPtr<UObject>> CreatedScriptScenes;
     USceneComponent* ScriptScene(const FDasObjectHandle& H,das::Context* C){auto* S=Cast<USceneComponent>(ResolveObject(H,C));if(!S || S->IsBeingDestroyed())C->throw_error("expected live SceneComponent");if(auto* A=S->GetOwner();A && A->IsActorBeingDestroyed() && !ActiveContext->bEnding)C->throw_error("SceneComponent owner is being destroyed");return S;}
-    void SceneMutation(USceneComponent* S,das::Context* C){auto* Self=ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("scene mutations are forbidden in bind_events");if(!S->GetWorld() || S->GetWorld()!=Self->GetWorld() || S->IsTemplate())C->throw_error("scene mutation requires component in script owner's world");}
+    void SceneMutation(USceneComponent* S,das::Context* C){auto* Self=ResolveWorldContextObject(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("scene mutations are forbidden in bind_events");if(!S->GetWorld() || S->GetWorld()!=Self->GetWorld() || S->IsTemplate())C->throw_error("scene mutation requires component in script owner's world");}
     bool SceneValid(const FDasObjectHandle& H,das::Context* C){auto* S=Cast<USceneComponent>(TryObject(H,C));return S && !S->IsBeingDestroyed() && (!S->GetOwner() || !S->GetOwner()->IsActorBeingDestroyed());}
+    FDasObjectHandle ActorOwner(const FDasObjectHandle& H,das::Context* C){auto* A=Cast<AActor>(ResolveObject(H,C));if(!A)C->throw_error("expected Actor for owner");return MakeObjectHandle(A->GetOwner(),AActor::StaticClass(),C);}
     FDasObjectHandle SceneActorRoot(const FDasObjectHandle& H,das::Context* C){auto* A=Cast<AActor>(ResolveObject(H,C));if(!A)C->throw_error("expected Actor for root component");return MakeObjectHandle(A->GetRootComponent(),USceneComponent::StaticClass(),C);}
     FDasObjectHandle SceneParent(const FDasObjectHandle& H,das::Context* C){return MakeObjectHandle(ScriptScene(H,C)->GetAttachParent(),USceneComponent::StaticClass(),C);}
     FTransform SceneRelative(const FDasObjectHandle& H,das::Context* C){return ScriptScene(H,C)->GetRelativeTransform();}
     FTransform SceneWorld(const FDasObjectHandle& H,das::Context* C){return ScriptScene(H,C)->GetComponentTransform();}
+    FVector SceneRelativeTranslation(const FDasObjectHandle& H,das::Context* C){return ScriptScene(H,C)->GetRelativeLocation();}
+    FRotator SceneRelativeRotation(const FDasObjectHandle& H,das::Context* C){return ScriptScene(H,C)->GetRelativeRotation();}
+    FVector SceneRelativeScale(const FDasObjectHandle& H,das::Context* C){return ScriptScene(H,C)->GetRelativeScale3D();}
     void SceneSetRelative(const FDasObjectHandle& H,const FTransform& V,bool Teleport,das::Context* C){auto* S=ScriptScene(H,C);SceneMutation(S,C);if(!MethodMathValid(V))C->throw_error("invalid scene transform");S->SetRelativeTransform(V,false,nullptr,Teleport?ETeleportType::TeleportPhysics:ETeleportType::None);}
     void SceneSetWorld(const FDasObjectHandle& H,const FTransform& V,bool Teleport,das::Context* C){auto* S=ScriptScene(H,C);SceneMutation(S,C);if(!MethodMathValid(V))C->throw_error("invalid scene transform");S->SetWorldTransform(V,false,nullptr,Teleport?ETeleportType::TeleportPhysics:ETeleportType::None);}
     bool SceneAttach(const FDasObjectHandle& H,const FDasObjectHandle& Parent,const char* Socket,const char* Rule,bool Weld,das::Context* C){auto* Child=ScriptScene(H,C);auto* P=ScriptScene(Parent,C);SceneMutation(Child,C);SceneMutation(P,C);if(Child==P || P->IsAttachedTo(Child))C->throw_error("scene attachment would form a cycle");const FString SocketText=Socket?UTF8_TO_TCHAR(Socket):TEXT("");if(SocketText.Len()>=NAME_SIZE)C->throw_error("socket name too long");const FName SocketName=SocketText.IsEmpty()?NAME_None:FName(*SocketText);if(SocketName!=NAME_None && !P->DoesSocketExist(SocketName))C->throw_error("unknown parent socket");const FString R=Rule?UTF8_TO_TCHAR(Rule):TEXT("");FAttachmentTransformRules Rules=FAttachmentTransformRules::KeepRelativeTransform;if(R==TEXT("KeepRelative")){}else if(R==TEXT("KeepWorld"))Rules=FAttachmentTransformRules::KeepWorldTransform;else if(R==TEXT("SnapIncludingScale"))Rules=FAttachmentTransformRules::SnapToTargetIncludingScale;else if(R==TEXT("SnapNotIncludingScale"))Rules=FAttachmentTransformRules::SnapToTargetNotIncludingScale;else C->throw_error("unknown scene attachment rule");Rules.bWeldSimulatedBodies=Weld;return Child->AttachToComponent(P,Rules,SocketName);}
     void SceneDetach(const FDasObjectHandle& H,const char* Rule,das::Context* C){auto* S=ScriptScene(H,C);SceneMutation(S,C);const FString R=Rule?UTF8_TO_TCHAR(Rule):TEXT("");if(R==TEXT("KeepWorld"))S->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld,false));else if(R==TEXT("KeepRelative"))S->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepRelative,false));else C->throw_error("detach rule must be KeepWorld or KeepRelative");}
-    FDasObjectHandle SceneCreate(const FDasObjectHandle& H,const char* Name,das::Context* C){auto* Self=ResolveSelf(C);if(ConstructingObject || ActiveContext->bCollectingSubscriptions || ActiveContext->bEnding)C->throw_error("cannot create scene components during bind_events/EndPlay");auto* Actor=Cast<AActor>(ResolveObject(H,C));if(!Actor || Actor->IsTemplate() || !Actor->GetWorld() || (!Actor->GetWorld()->IsGameWorld() && !ConstructingObject) || Actor->GetWorld()!=Self->GetWorld())C->throw_error("scene creation requires live game-world Actor in owner's world");const FString N=Name?UTF8_TO_TCHAR(Name):TEXT("");if(N.IsEmpty() || N.Len()>=NAME_SIZE || N.Equals(TEXT("None"),ESearchCase::IgnoreCase))C->throw_error("scene component name is required");for(TCHAR Ch:N)if(!FChar::IsAlnum(Ch) && Ch!='_')C->throw_error("scene component name supports letters/digits/underscore");if(FindObject<UObject>(Actor,*N))C->throw_error("scene component name already exists");for(auto I=CreatedScriptScenes.CreateIterator();I;++I)if(!I.Key().IsValid())I.RemoveCurrent();if(CreatedScriptScenes.Num()>=1024)C->throw_error("created scene component tracking limit");TStrongObjectPtr<AActor> Keep(Actor);auto* Component=NewObject<USceneComponent>(Actor,*N,RF_Transient);const bool Root=Actor->GetRootComponent()==nullptr;Actor->AddInstanceComponent(Component);if(Root)Actor->SetRootComponent(Component);else Component->SetupAttachment(Actor->GetRootComponent());Component->RegisterComponent();if(!Component->IsRegistered()){if(Root)Actor->SetRootComponent(nullptr);Actor->RemoveInstanceComponent(Component);Component->DestroyComponent();C->throw_error("scene component registration failed");}CreatedScriptScenes.Add(TWeakObjectPtr<UActorComponent>(Component),TWeakObjectPtr<UObject>(Self));return MakeObjectHandle(Component,USceneComponent::StaticClass(),C);}
+    FDasObjectHandle SceneCreate(const FDasObjectHandle& H,const char* Name,das::Context* C){auto* Self=ResolveWorldContextObject(C);if(ConstructingObject || ActiveContext->bCollectingSubscriptions || ActiveContext->bEnding)C->throw_error("cannot create scene components during bind_events/EndPlay");auto* Actor=Cast<AActor>(ResolveObject(H,C));if(!Actor || Actor->IsTemplate() || !Actor->GetWorld() || (!Actor->GetWorld()->IsGameWorld() && !ConstructingObject) || Actor->GetWorld()!=Self->GetWorld())C->throw_error("scene creation requires live game-world Actor in owner's world");const FString N=Name?UTF8_TO_TCHAR(Name):TEXT("");if(N.IsEmpty() || N.Len()>=NAME_SIZE || N.Equals(TEXT("None"),ESearchCase::IgnoreCase))C->throw_error("scene component name is required");for(TCHAR Ch:N)if(!FChar::IsAlnum(Ch) && Ch!='_')C->throw_error("scene component name supports letters/digits/underscore");if(FindObject<UObject>(Actor,*N))C->throw_error("scene component name already exists");for(auto I=CreatedScriptScenes.CreateIterator();I;++I)if(!I.Key().IsValid())I.RemoveCurrent();if(CreatedScriptScenes.Num()>=1024)C->throw_error("created scene component tracking limit");TStrongObjectPtr<AActor> Keep(Actor);auto* Component=NewObject<USceneComponent>(Actor,*N,RF_Transient);const bool Root=Actor->GetRootComponent()==nullptr;Actor->AddInstanceComponent(Component);if(Root)Actor->SetRootComponent(Component);else Component->SetupAttachment(Actor->GetRootComponent());Component->RegisterComponent();if(!Component->IsRegistered()){if(Root)Actor->SetRootComponent(nullptr);Actor->RemoveInstanceComponent(Component);Component->DestroyComponent();C->throw_error("scene component registration failed");}CreatedScriptScenes.Add(TWeakObjectPtr<UActorComponent>(Component),TWeakObjectPtr<UObject>(Self));return MakeObjectHandle(Component,USceneComponent::StaticClass(),C);}
     FDasObjectHandle SceneGet(const FDasObjectHandle& H,const char* Name,das::Context* C)
     {
-        auto* Self=ResolveSelf(C);
+        auto* Self=ResolveWorldContextObject(C);
         auto* Actor=Cast<AActor>(ResolveObject(H,C));
         if(!Actor || Actor->IsActorBeingDestroyed() || Actor->IsTemplate() || !Actor->GetWorld() || (!Actor->GetWorld()->IsGameWorld() && !ConstructingObject) || Actor->GetWorld()!=Self->GetWorld())C->throw_error("scene lookup requires live game-world Actor in owner's world");
         const FString N=Name?UTF8_TO_TCHAR(Name):TEXT("");
@@ -990,7 +1017,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     }
     FDasObjectHandle ComponentOperation(const FDasObjectHandle& H,UClass* Class,const char* Name,int Mode,const char* AuthoredId,das::Context* C)
     {
-        auto* Self=ResolveSelf(C);
+        auto* Self=ResolveWorldContextObject(C);
         auto* Actor=Cast<AActor>(ResolveObject(H,C));
         if(!Actor || Actor->IsTemplate() || Actor->IsActorBeingDestroyed() || !Actor->GetWorld() || (!Actor->GetWorld()->IsGameWorld() && !ConstructingObject) || Actor->GetWorld()!=Self->GetWorld())C->throw_error("component operation requires live Actor in owner's game world");
         const bool Authored=AuthoredId && *AuthoredId;
@@ -1115,7 +1142,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     #include "DasObjectQueries.inl"
     FDasObjectHandle AuthoredComponentGet(const FDasObjectHandle& H,const char* Id,const char* Name,das::Context* C)
     {
-        auto* Self=ResolveSelf(C);auto* Actor=Cast<AActor>(ResolveObject(H,C));
+        auto* Self=ResolveWorldContextObject(C);auto* Actor=Cast<AActor>(ResolveObject(H,C));
         if(!Actor || Actor->IsTemplate() || Actor->IsActorBeingDestroyed() || !Actor->GetWorld() || (!Actor->GetWorld()->IsGameWorld() && !ConstructingObject) || Actor->GetWorld()!=Self->GetWorld())C->throw_error("component lookup requires live Actor in owner's game world");
         const FString N=Name?UTF8_TO_TCHAR(Name):TEXT("");
         if(N.IsEmpty() || N.Len()>=NAME_SIZE || N.Equals(TEXT("None"),ESearchCase::IgnoreCase))C->throw_error("component name is required");
@@ -1129,7 +1156,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     }
     bool NativeComponentDestroy(const FDasObjectHandle& H,das::Context* C)
     {
-        auto* Component=Cast<UActorComponent>(ResolveObject(H,C));auto* Self=ResolveSelf(C);
+        auto* Component=Cast<UActorComponent>(ResolveObject(H,C));auto* Self=ResolveWorldContextObject(C);
         if(!Component || Component->IsBeingDestroyed() || Component->IsTemplate() || !Component->GetWorld() || Component->GetWorld()!=Self->GetWorld() || ConstructingObject || ActiveContext->bCollectingSubscriptions)C->throw_error("invalid component destruction context");
         const auto* Creator=CreatedScriptScenes.Find(TWeakObjectPtr<UActorComponent>(Component));
         if(!Creator || Creator->Get()!=Self)C->throw_error("only components created by this script owner may be destroyed");
@@ -1141,7 +1168,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
         TGuardValue<UDasScriptComponent*> LifecycleTarget(ComponentLifecycleTarget,Cast<UDasScriptComponent>(Component));
         Component->DestroyComponent();return true;
     }
-    bool SceneDestroy(const FDasObjectHandle& H,das::Context* C){if(ConstructingObject)C->throw_error("component destruction is forbidden during ConstructionScript");auto* S=ScriptScene(H,C);SceneMutation(S,C);const auto* Creator=CreatedScriptScenes.Find(TWeakObjectPtr<UActorComponent>(S));if(!Creator || Creator->Get()!=ResolveSelf(C))C->throw_error("only scene components created by this script owner may be destroyed");if(S->GetAttachChildren().Num()!=0)C->throw_error("detach children before destroying created scene component");auto* Actor=S->GetOwner();CreatedScriptScenes.Remove(TWeakObjectPtr<UActorComponent>(S));if(Actor){if(Actor->GetRootComponent()==S)Actor->SetRootComponent(nullptr);Actor->RemoveInstanceComponent(S);}S->DestroyComponent();return true;}
+    bool SceneDestroy(const FDasObjectHandle& H,das::Context* C){if(ConstructingObject)C->throw_error("component destruction is forbidden during ConstructionScript");auto* S=ScriptScene(H,C);SceneMutation(S,C);const auto* Creator=CreatedScriptScenes.Find(TWeakObjectPtr<UActorComponent>(S));if(!Creator || Creator->Get()!=ResolveWorldContextObject(C))C->throw_error("only scene components created by this script owner may be destroyed");if(S->GetAttachChildren().Num()!=0)C->throw_error("detach children before destroying created scene component");auto* Actor=S->GetOwner();CreatedScriptScenes.Remove(TWeakObjectPtr<UActorComponent>(S));if(Actor){if(Actor->GetRootComponent()==S)Actor->SetRootComponent(nullptr);Actor->RemoveInstanceComponent(S);}S->DestroyComponent();return true;}
 
     FMulticastDelegateProperty* ScalarEventProperty(UObject* Source,FName Name,EDasMethodSignature Kind){
         auto* P=FindFProperty<FMulticastDelegateProperty>(Source->GetClass(),Name);if(!P || !P->HasAnyPropertyFlags(CPF_BlueprintAssignable) || P->ArrayDim!=1 || !P->SignatureFunction)return nullptr;auto* Sig=P->SignatureFunction.Get();if(Kind==EDasMethodSignature::Void)return Sig->NumParms==0?P:nullptr;if(Sig->NumParms!=1)return nullptr;
@@ -1318,7 +1345,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
         FUnrealFoundationModule() : das::Module("ue_foundation")
         {
             addCommentReader(new FUECommentReader());
-            addAnnotation(new FUENativeBaseAnnotation());addAnnotation(new FUEClassAnnotation());addAnnotation(new FUEEnumAnnotation());addAnnotation(new FUEStructAnnotation());
+            addAnnotation(new FUENativeBaseAnnotation());addAnnotation(new FUEClassAnnotation());addAnnotation(new FUELibraryAnnotation());addAnnotation(new FUEEnumAnnotation());addAnnotation(new FUENativeEnumAnnotation());addAnnotation(new FUEStructAnnotation());
             addAnnotation(new FUENativeInterfaceAnnotation());addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));addAnnotation(new FUESourceValueBinding());addAnnotation(new FUEObjectTypeAnnotation());addAnnotation(new FUEAuthoredRefAnnotation());addTypeMacro(new FUEObjectTypeMacro());addAnnotation(new FUEClassTypeAnnotation());addTypeMacro(new FUEClassTypeMacro());
             for(bool Raw:{false,true}){auto* Macro=new FUEClassCastFactory(Raw);ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
             addAnnotation(new FUEDelegateAnnotation(false));addAnnotation(new FUEDelegateAnnotation(true));
@@ -1474,6 +1501,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             das::addExtern<DAS_BIND_FUN(RequireStructType)>(*this,Library,"__ue_require_struct_type",das::SideEffects::accessExternal,"RequireStructType");
             das::addExtern<DAS_BIND_FUN(GetSelfEnum)>(*this,Library,"ue_get_self_enum",das::SideEffects::modifyExternal,"GetSelfEnum");
             das::addExtern<DAS_BIND_FUN(SetSelfEnum)>(*this,Library,"ue_set_self_enum",das::SideEffects::modifyExternal,"SetSelfEnum");
+            das::addExtern<DAS_BIND_FUN(LibraryScope)>(*this,Library,"__ue_library_scope",das::SideEffects::modifyExternal,"LibraryScope");
             das::addExtern<DAS_BIND_FUN(NullObject), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_null_object", das::SideEffects::none, "NullObject");
             das::addExtern<DAS_BIND_FUN(ObjectSelf), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_self_object", das::SideEffects::modifyExternal, "ObjectSelf");
             das::addExtern<DAS_BIND_FUN(ComponentOwner),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"ue_component_owner",das::SideEffects::accessExternal,"ComponentOwner");
@@ -1518,10 +1546,14 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
             das::addExtern<DAS_BIND_FUN(SubscribeObjectArrayString)>(*this,Library,"ue_subscribe_object_array_string",das::SideEffects::modifyExternal,"SubscribeObjectArrayString");
             das::addExtern<DAS_BIND_FUN(SubscribeObjectVector2d)>(*this,Library,"ue_subscribe_object_vector2d",das::SideEffects::modifyExternal,"SubscribeObjectVector2d");
             das::addExtern<DAS_BIND_FUN(SceneValid)>(*this,Library,"__ue_scene_valid",das::SideEffects::modifyExternal,"SceneValid");
+            das::addExtern<DAS_BIND_FUN(ActorOwner),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_actor_owner",das::SideEffects::modifyExternal,"ActorOwner");
             das::addExtern<DAS_BIND_FUN(SceneActorRoot),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_scene_actor_root",das::SideEffects::modifyExternal,"SceneActorRoot");
             das::addExtern<DAS_BIND_FUN(SceneParent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_scene_parent",das::SideEffects::modifyExternal,"SceneParent");
             das::addExtern<DAS_BIND_FUN(SceneRelative),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_scene_relative_transform",das::SideEffects::modifyExternal,"SceneRelative");
             das::addExtern<DAS_BIND_FUN(SceneWorld),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_scene_world_transform",das::SideEffects::modifyExternal,"SceneWorld");
+            das::addExtern<DAS_BIND_FUN(SceneRelativeTranslation),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_scene_relative_translation",das::SideEffects::modifyExternal,"SceneRelativeTranslation");
+            das::addExtern<DAS_BIND_FUN(SceneRelativeRotation),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_scene_relative_rotation",das::SideEffects::modifyExternal,"SceneRelativeRotation");
+            das::addExtern<DAS_BIND_FUN(SceneRelativeScale),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_scene_relative_scale",das::SideEffects::modifyExternal,"SceneRelativeScale");
             das::addExtern<DAS_BIND_FUN(SceneSetRelative)>(*this,Library,"__ue_scene_set_relative_transform",das::SideEffects::modifyExternal,"SceneSetRelative");
             das::addExtern<DAS_BIND_FUN(SceneSetWorld)>(*this,Library,"__ue_scene_set_world_transform",das::SideEffects::modifyExternal,"SceneSetWorld");
             das::addExtern<DAS_BIND_FUN(SceneAttach)>(*this,Library,"__ue_scene_attach",das::SideEffects::modifyExternal,"SceneAttach");
@@ -2165,7 +2197,7 @@ bool FDasRuntimeModule::ReadAuthoringScript(const FString& Path,FDasAuthoringMod
         FDasAuthoringModule Candidate;bool OK=true;
         Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St)
         {
-            const auto* A=DSLAnnotation(St->annotations,"ue_class");if(!A || !OK) return;
+            const auto* A=DSLAnnotation(St->annotations,"ue_class");if(!A)A=DSLAnnotation(St->annotations,"ue_library");if(!A || !OK) return;
             const auto* Wire=A->arguments.find(DSLModelKey,das::Type::tString);FDasAuthoringModule Part;
             if(!Wire || !FDasAuthoringModule::FromJson(DSLText(Wire->sValue),Part,Error)){OK=false;return;}
             if(!Candidate.Id.IsEmpty() && Candidate.Id!=Part.Id){Error=TEXT("Declarations in a file must share module ID");OK=false;return;}
@@ -2207,6 +2239,7 @@ bool FDasRuntimeModule::ValidateFrameMethod(const FString& Path,FString& Error,c
 
 FDasExecutionResult FDasRuntimeModule::RunFile(const FString& Path, int32 Input, bool bUseAot, TWeakObjectPtr<UObject> Self)
 {
+    TGuardValue<const FString*> LibraryContractScope(LibraryInvocationContract,FPaths::GetCleanFilename(Path)==LibraryInvocationScript?LibraryInvocationContract:nullptr);
     FDasExecutionResult Result;
     if (!IsInGameThread() || !bInitialized)
     {
@@ -2371,6 +2404,7 @@ FDasExecutionResult FDasRuntimeModule::RunLifecycle(const FString& Path, EDasCal
 
 FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCallback Event, int32 Input, float DeltaSeconds, TWeakObjectPtr<UObject> Self, const FString& EntryPoint, EDasMethodSignature Signature,const TArray<FDasScalarValue>* Frame,const FString& ReturnClass)
 {
+    TGuardValue<const FString*> LibraryContractScope(LibraryInvocationContract,FPaths::GetCleanFilename(Path)==LibraryInvocationScript?LibraryInvocationContract:nullptr);
     FDasExecutionResult Result;
     ON_SCOPE_EXIT{if(AuthoredDispatchFailure && !Result.bSucceeded)*AuthoredDispatchFailure=Result.Error;};
     if(Event==EDasCallback::Main)
@@ -2731,3 +2765,13 @@ void FDasRuntimeModule::EndPreserveContextsForReinstance(const FString& Approved
     PreservedSessions.Empty();bPreservingSessions=false;
 }
 #endif
+
+FDasExecutionResult FDasRuntimeModule::RunLibraryFrame(const FString& Contract,const FString& Script,const FString& Entry,const TArray<FDasScalarValue>& Arguments,EDasMethodSignature Kind,const FString& ReturnClass){
+ FDasExecutionResult Failed;FDasAuthoringModule Model;FDasClassSchema Schema;
+ if(!IsInGameThread() || !bInitialized || Script!=FPaths::GetCleanFilename(Script) || FPaths::GetExtension(Script)!=TEXT("das") || Contract.Len()>1048576 || !FDasAuthoringModule::FromJson(Contract,Model,Failed.Error) || Model.Classes.Num()!=1 || !Model.ToActorSchema(Model.Classes[0].Id,Schema,Failed.Error) || Schema.Parent!=TEXT("FunctionLibrary")){if(Failed.Error.IsEmpty())Failed.Error=TEXT("Invalid static library invocation contract");return Failed;}
+ const auto* Method=Schema.Methods.FindByPredicate([&](const auto& M){return M.EntryPoint==Entry && M.ScriptFile==Script && M.ReturnKind==Kind && M.ReturnClass==ReturnClass;});
+ if(!Method){Failed.Error=TEXT("Static library entry/result differs from saved declaration");return Failed;}
+ UObject* Owner=GetMutableDefault<UDasBlueprintLibrary>();if(!Method->WorldContext.IsEmpty()){const int32 Index=Method->Parameters.IndexOfByPredicate([&](const auto& P){return P.Name==Method->WorldContext;});if(!Arguments.IsValidIndex(Index) || Arguments[Index].Kind!=8){Failed.Error=TEXT("Missing library WorldContext object");return Failed;}Owner=Arguments[Index].ObjectValue.Get();auto* World=IsValid(Owner) && GEngine?GEngine->GetWorldFromContextObject(Owner,EGetWorldErrorMode::ReturnNull):nullptr;if(!World || !World->IsGameWorld() || World->bIsTearingDown || Owner->IsTemplate() || Owner->GetWorld()!=World || (Cast<AActor>(Owner) && CastChecked<AActor>(Owner)->IsActorBeingDestroyed()) || (Cast<UActorComponent>(Owner) && CastChecked<UActorComponent>(Owner)->IsBeingDestroyed())){Failed.Error=TEXT("Library requires a live game-world WorldContext");return Failed;}}
+ TGuardValue<FString> ScriptScope(LibraryInvocationScript,Script);TGuardValue<const FString*> Scope(LibraryInvocationContract,&Contract);
+ return RunNamedFramePersistent(ScriptPath(Script),Entry,Arguments,Kind,Owner,ReturnClass);
+}

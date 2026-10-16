@@ -50,7 +50,7 @@ TArray<FDasMethodSchema> FDasClassSchema::EffectiveMethods() const
 bool FDasClassSchema::Validate(FString& Error) const
 {
     Error.Reset();
-    if (!Identifier(Name.ToString()) || Name.IsNone() || (Parent != TEXT("Actor") && Parent != TEXT("ActorComponent")))
+    if (!Identifier(Name.ToString()) || Name.IsNone() || (Parent != TEXT("Actor") && Parent != TEXT("ActorComponent") && Parent != TEXT("FunctionLibrary")))
     { Error = TEXT("Expected a named Actor or ActorComponent schema"); return false; }
     auto ValidMeta=[&](const TMap<FString,FString>& Values,bool Method=false)
     {
@@ -62,9 +62,11 @@ bool FDasClassSchema::Validate(FString& Error) const
     if (!ValidMeta(Metadata)) return false;
     TSet<FName> Names;
     const auto AllMethods=EffectiveMethods();
+    if(Parent==TEXT("FunctionLibrary") && (!Fields.IsEmpty() || !ParentStableId.IsEmpty())){Error=TEXT("Function library cannot have fields or authored parent");return false;}
     if (AllMethods.Num()>64) {Error=TEXT("Adapter method count exceeds 64");return false;}
     for (const auto& M:AllMethods)
     {
+        if(M.bStatic!=(Parent==TEXT("FunctionLibrary")) || (M.bStatic && (M.bConst || M.bBlueprintEvent || M.LibraryContract.IsEmpty()))){Error=TEXT("Static methods require a function library contract");return false;}
         if (!Identifier(M.Name.ToString()) || M.Name.IsNone() || Names.Contains(M.Name) || !Identifier(M.EntryPoint) ||
             M.ScriptFile.IsEmpty() || FPaths::GetCleanFilename(M.ScriptFile)!=M.ScriptFile || M.ScriptFile.Contains(TEXT(":")) || !M.ScriptFile.EndsWith(TEXT(".das")))
         {Error=TEXT("Invalid method name, entry point or local script filename");return false;}

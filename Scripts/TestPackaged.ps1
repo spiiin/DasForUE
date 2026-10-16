@@ -23,7 +23,7 @@ foreach ($Script in Get-ChildItem -LiteralPath (Join-Path $Repo 'Plugins\DasForU
 # The game is already built above; cook/stage/archive must consume that verified receipt.
 $Maps=(@('/Engine/Maps/Entry')+$AdditionalMaps) -join '+'
 $CookerArgs=@();if($SkipZenStore){$CookerArgs=@('-AdditionalCookerOptions=-SkipZenStore')}
-& (Join-Path $Engine 'Engine\Build\BatchFiles\RunUAT.bat') BuildCookRun "-project=$Project" `
+& (Join-Path $Engine 'Engine\Build\BatchFiles\RunUAT.bat') -WaitForUATMutex BuildCookRun "-project=$Project" `
     -noP4 -platform=Win64 -clientconfig=Development -cook -stage -pak -archive `
     "-archivedirectory=$Archive" "-map=$Maps" -unattended -utf8output -nullrhi `
     -nocompileeditor -skipbuildeditor -nodebuginfo @CookerArgs

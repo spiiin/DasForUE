@@ -8,3 +8,5 @@ void DasFailDefaultsMergeForTesting(int32 Stage);
 
 // Stage inherited literals against the actual parent layout before asset creation.
 bool DasInitializeInheritedDefaults(UClass* Class,const FDasAuthoringModule& Model,const FString& Id,FString& Error,bool ValidateOnly=false);
+
+bool DasInitializeNativeDefaults(UClass* Class,const FDasAuthoringModule& Model,const FString& Id,FString& Error,bool ValidateOnly=false);

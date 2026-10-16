@@ -86,8 +86,8 @@ models: use `FDasDSLService` so source provenance and merge policy are retained.
 
 This stage covers properties declared by authored ancestors in the source chain.
 It does not project arbitrary native-parent UPROPERTYs into daScript, add native
-host adapters such as Character, change property type/flags, or introduce computed
-defaults. Nested native component properties continue to use their existing
+host adapters such as Character, or change property type/flags.
+Computed scalar defaults are implemented separately in [DSLComputedDefaults.md](DSLComputedDefaults.md). Nested native component properties continue to use their existing
 `self.Component.Property` syntax and component policy.
 
 ## Verification
@@ -109,3 +109,7 @@ Win64 Development NullRHI package checks saved values and reflected calls throug
 base, child and leaf entries, including cooked component defaults.
 
 Validation passed on 2026-10-16: Editor build; Create/Reopen/Recompile; actor and ActorComponent defaults; three-level and ordinary Blueprint inheritance; add/remove and equal-old-parent overrides; two rollback stages; existing VM; order-independent body-only reimport; unapplied-parent preflight; four negative DSL cases and two negative IR cases; Win64 Development NullRHI packaged probe including cooked component defaults; packaged/editor foundation with zero failures. Existing safe-default merge Create/Reopen/Recompile passed. Its Unopened phase initially hit an engine ZenServerState startup assert before the commandlet; a direct retry with -ddc=NoZenLocalFallback -NoZenAutoLaunch passed, as did editor foundation with the same filesystem-DDC flags. No engine/cache service changes were made.
+
+Computed scalar expressions/helpers: see [DSLComputedDefaults.md](DSLComputedDefaults.md).
+
+Native host/default-subobject defaults: see [DSLNativeDefaults.md](DSLNativeDefaults.md).

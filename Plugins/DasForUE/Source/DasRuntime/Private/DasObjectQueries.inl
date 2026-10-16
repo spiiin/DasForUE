@@ -1,7 +1,7 @@
 uint64 NextObjectQuery=1;
 FUnrealDasContext::FObjectQuery CollectObjectsByType(const FDasObjectHandle& H,const char* Base,const char* Id,bool Components,bool First,das::Context* C)
 {
- auto* Self=ResolveSelf(C);auto* World=Self->GetWorld();
+ auto* Self=ResolveWorldContextObject(C);auto* World=Self->GetWorld();
  if(!World || !World->IsGameWorld() || Self->IsTemplate())C->throw_error("object query requires script owner's game world");
  const FString Path=Base?UTF8_TO_TCHAR(Base):TEXT("");auto* Class=FindObject<UClass>(nullptr,*Path);
  if(!Path.StartsWith(TEXT("/Script/")) || !Class || Class->HasAnyClassFlags(CLASS_Interface|CLASS_Deprecated|CLASS_NewerVersionExists) || !Class->IsChildOf(Components?UActorComponent::StaticClass():AActor::StaticClass()))C->throw_error("query type does not match Actor/component domain");

@@ -339,6 +339,15 @@ Reflected struct properties and defaults: Docs/DSLStructFields.md. Example: Plug
 
 Explicit default-only migration: Docs/DSLDefaultMigration.md (`defaults=preserve_instances`).
 
+Computed class defaults support pure scalar daScript expressions/helpers, source-field
+dependencies, inherited properties and component templates. Values lower to the
+existing IR and safe defaults merge; see [Docs/DSLComputedDefaults.md](Docs/DSLComputedDefaults.md)
+and `dsl_computed_defaults.das`.
+
+Native Actor/ActorComponent and built-in component defaults can be set without
+redeclaring fields; safe reimport preserves manual values. See
+[Docs/DSLNativeDefaults.md](Docs/DSLNativeDefaults.md) and `dsl_native_defaults.das`.
+
 Stable ID field rename migration: Docs/DSLFieldRename.md (`fields=rename_by_id`).
 
 Dependent Blueprint/map rename: Docs/DSLRenameDependencies.md (`fields=rename_with_dependencies`).
@@ -696,3 +705,5 @@ Integrated gameplay sources and setup specification (scene/validation pending): 
 
 Native host inheritance: `class Counter : Actor` and `class Behavior : ActorComponent`
 are available through `require ue_dsl`. See [DSLNativeBases](Docs/DSLNativeBases.md).
+
+Native Blueprint-visible self fields in instance methods: [DSLNativeSelfFields](Docs/DSLNativeSelfFields.md).
