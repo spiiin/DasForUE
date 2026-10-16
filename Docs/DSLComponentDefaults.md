@@ -22,3 +22,11 @@ The existing component migration guard remains: changing defaults on an already 
 Validation: `Scripts/TestNativeComponents.ps1` / `DasForUE.Components.Native` covers JSON roundtrip, spawned native location/rotation/visibility, authored Bonus override, unchanged sibling and class CDO, invalid target/type rejection and frontend rejection of duplicate/unknown/executable/computed defaults. Editor automation uses a game UWorld, not real PIE. Save/reopen and packaged checks remain pending.
 
 Executable example: `Plugins/DasForUE/Content/Das/Scripts/dsl_native_components.das`.
+
+## Static defaults extension — 2026-10-16
+
+The original slice above is extended by [DSLExtendedDefaults.md](DSLExtendedDefaults.md).
+ue_defaults now also accepts own class properties. Component values include
+Vector2D/Transform, supported reflected structs, typed class references and assets.
+The existing migration guards remain in force. See the extension document for the
+declaration markers, type checks, wire compatibility and reproduction script.

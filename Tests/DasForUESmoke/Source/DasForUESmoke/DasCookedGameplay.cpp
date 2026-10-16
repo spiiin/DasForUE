@@ -3,6 +3,7 @@
 #include "DasRuntime.h"
 #include "DasProbeActor.h"
 #include "DasScriptComponent.h"
+#include "DasComponentConstructionProbe.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
@@ -39,6 +40,9 @@ struct FCookedGameplayState {
    auto* L=Life.Get();TStrongObjectPtr<ADasProbeActor> KeepLife(L);TStrongObjectPtr<UObject> LifeBehavior(Object(L,TEXT("Behavior")));
    Check(L && Object(L,TEXT("Pivot"))==L->GetRootComponent() && Int(L,TEXT("BaseBegins"))==1 && Int(L,TEXT("ChildBegins"))==1 && Int(L,TEXT("BaseTicks"))>0,TEXT("inherited_actor_root_parent_BeginPlay_and_Tick"));
    Check(L && L->GetRootComponent() && L->GetRootComponent()->bHiddenInGame,TEXT("inherited_native_template_override"));
+   Check(Int(LifeBehavior.Get(),TEXT("ConstructionValue"))==113 && Int(LifeBehavior.Get(),TEXT("ConstructionTrace"))==12 && Int(L,TEXT("ConstructionObserved"))==113,TEXT("component_construction_before_actor_survives_cook"));
+   int32 PureOutput=0;auto* Snapshot=LifeBehavior.IsValid()?LifeBehavior->FindFunction(TEXT("Snapshot")):nullptr;if(Snapshot)LifeBehavior->ProcessEvent(Snapshot,&PureOutput);
+   Check(Snapshot && Snapshot->HasAnyFunctionFlags(FUNC_BlueprintPure) && PureOutput==55,TEXT("component_pure_void_out_in_cooked_game"));
    Check(Int(LifeBehavior.Get(),TEXT("Bonus"))==55,TEXT("inherited_component_template_default"));
    Check(Int(LifeBehavior.Get(),TEXT("BaseBegins"))==1 && Int(LifeBehavior.Get(),TEXT("ChildBegins"))==1 && Int(LifeBehavior.Get(),TEXT("BaseTicks"))>0 && Int(LifeBehavior.Get(),TEXT("BaseTicks"))==Int(LifeBehavior.Get(),TEXT("ChildTicks")),TEXT("inherited_component_parent_lifecycle"));
    auto* Extension=Cast<USceneComponent>(Object(L,TEXT("Extension")));auto* Marker=Cast<USceneComponent>(Object(L,TEXT("Marker")));TStrongObjectPtr<UObject> ExtraBehavior(Object(L,TEXT("ExtraBehavior")));
@@ -55,6 +59,13 @@ struct FCookedGameplayState {
    struct FHelperCookedArgs{int32 Input=2,Result=0;};FHelperCookedArgs HelperArgs;auto* H=Helper.Get();if(H)if(auto* Fn=H->FindFunction(TEXT("LocalProbe")))H->ProcessEvent(Fn,&HelperArgs);
    Check(H && HelperArgs.Result==21 && Int(H,TEXT("Score"))==12 && H->LastDasError.IsEmpty(),TEXT("three_level_local_helpers_self_override_Super"));
    Check(H && Int(H,TEXT("ConstructionValue"))==23 && Int(H,TEXT("ConstructionTrace"))==12,TEXT("construction_values_survive_cook"));
+   AActor* StandaloneOwner=nullptr;for(TActorIterator<AActor> It(W);It;++It)if(It->ActorHasTag(TEXT("StandaloneConstructionOwner")))StandaloneOwner=*It;
+   auto* Standalone=StandaloneOwner?StandaloneOwner->FindComponentByClass<UDasScriptComponent>():nullptr;
+   Check(Standalone && Int(Standalone,TEXT("Score"))==8 && Int(Standalone,TEXT("ConstructionValue"))==21 && Int(Standalone,TEXT("ConstructionCalls"))==1 && Int(Standalone,TEXT("InitializeCalls"))==1 && Int(Standalone,TEXT("BeginSaw"))==21 && Standalone->LastDasError.IsEmpty(),TEXT("loaded_native_component_retains_saved_construction_values"));
+   FString ConstructionReport;Check(Standalone && RunDasComponentConstructionProbe(Standalone->GetClass(),W,ConstructionReport),TEXT("dynamic_native_component_construction"));UE_LOG(LogTemp,Display,TEXT("%s"),*ConstructionReport);if(StandaloneOwner)StandaloneOwner->Destroy();
+   ADasProbeActor* PureOwner=nullptr;for(TActorIterator<ADasProbeActor> It(W);It;++It)if(It->ActorHasTag(TEXT("PureOwner")))PureOwner=*It;
+   int32 PureResult=0;if(PureOwner)if(auto* Fn=PureOwner->FindFunction(TEXT("EvaluatePure")))PureOwner->ProcessEvent(Fn,&PureResult);
+   Check(PureOwner && PureResult==15 && PureOwner->FindFunction(TEXT("Query"))->HasAnyFunctionFlags(FUNC_BlueprintPure) && PureOwner->LastDasError.IsEmpty(),TEXT("pure_Blueprint_data_node_override_Super_in_cooked_game"));if(PureOwner)PureOwner->Destroy();
    auto* SpawnedHelper=H?W->SpawnActor<ADasProbeActor>(H->GetClass()):nullptr;
    Check(SpawnedHelper && Int(SpawnedHelper,TEXT("ConstructionValue"))==23 && Int(SpawnedHelper,TEXT("ConstructionTrace"))==12 && SpawnedHelper->LastDasError.IsEmpty(),TEXT("runtime_spawn_executes_construction_before_BeginPlay"));if(SpawnedHelper)SpawnedHelper->Destroy();
    Call(A,TEXT("Stop"));Pulses=Int(A,TEXT("Pulses"));Call(B,TEXT("ArmPending"));Destroyed.Reset(B);DestroyedPulses=Int(B,TEXT("Pulses"));B->Destroy();Check(R.SubscriptionCount(B)==0,TEXT("destroy_revokes_owner_subscriptions"));StoppedAt=W->GetTimeSeconds();Phase=1;return true;

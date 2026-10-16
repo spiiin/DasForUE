@@ -42,6 +42,8 @@ class DASRUNTIME_API FDasRuntimeModule final : public IModuleInterface
 {
 public:
 #if WITH_EDITOR
+    bool BeginDefaultUpdate();
+    void EndDefaultUpdate(UClass* RootClass,bool Applied);
     bool BeginPreserveContextsForReinstance(UClass* RootClass);
     void EndPreserveContextsForReinstance(const FString& ApprovedDeclaration=FString());
 #endif

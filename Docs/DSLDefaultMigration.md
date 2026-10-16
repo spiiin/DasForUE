@@ -1,7 +1,7 @@
 # Explicit default migration
 
 The first migration policy supports **default-only changes** for an existing DSL
-Actor Blueprint. Reimport without a policy still refuses default changes.
+Actor Blueprint. Reimport without a policy now selects the safe override-preserving merge; see [DSLDefaultsMigration.md](DSLDefaultsMigration.md). This page describes the explicit policy that preserves every existing instance value.
 
 ```text
 Das.DSL.Reimport /Game/MyFolder/BP_Counter defaults=preserve_instances

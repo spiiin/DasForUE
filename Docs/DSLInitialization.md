@@ -8,7 +8,7 @@ BeginPlay in a game world, including the implicit BeginPlay delivered by Tick.
 
 ```das
 // In a separately imported parent module:
-[ue_class(module_id="game", Blueprintable)]
+[ue_class(Blueprintable)]
 class BaseActor {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Score:int=10
@@ -16,7 +16,7 @@ class BaseActor {
 }
 
 // In the child script, after importing the parent module:
-[ue_class(module_id="game", Blueprintable)]
+[ue_class(Blueprintable)]
 class ChildActor : BaseActor {
     def override Initialize():void {
         Super.Initialize()

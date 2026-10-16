@@ -18,9 +18,10 @@ class ChildCounter : BaseCounter {
 }
 ```
 
-The parent must be a declared `ue_class`. A native `parent=Actor` or
-`parent=ActorComponent` annotation still selects the root adapter; do not combine it
-with `class Child : Parent`. The IR keeps `parent_id` and only owned declarations.
+The parent may be an authored `ue_class` or the native host marker `Actor` /
+`ActorComponent` exported by ue_dsl. For native roots use `class Counter : Actor`
+or `class Behavior : ActorComponent`; see DSLNativeBases.md. Legacy native parent=
+annotations remain accepted, but cannot be combined with an explicit DAS base. The IR keeps `parent_id` and only owned declarations.
 ResolveClass computes the effective fields/methods/interfaces/components, rejects
 cycles/depth >32, field shadowing, final-method overrides and incompatible event
 signatures. Overriding requires BlueprintEvent on both methods and unchanged
@@ -294,4 +295,7 @@ The once-per-instance runtime half of the constructor follow-up is implemented a
 Delivery survives VM/session replacement. See [DSLInitialization.md](DSLInitialization.md)
 for ordering, skipped parent hooks, failures and tests. Repeatable Actor construction
 is implemented separately as ConstructionScript; native UObject constructor integration
-and component construction callbacks remain separate work.
+remains separate work. Component construction callbacks are described in
+[DSLComponentConstruction.md](DSLComponentConstruction.md).
+
+Defaults on inherited authored properties: see [DSLInheritedPropertyDefaults.md](DSLInheritedPropertyDefaults.md).

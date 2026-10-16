@@ -2,7 +2,7 @@ options gen2
 module ue_initialize_actor_base public
 require ue_dsl public
 [ue_class(module_id="initactors",Blueprintable)]
-class InitActorBase {
+class InitActorBase : Actor {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     InitTrace:int=0
     @ue_property=(EditAnywhere,BlueprintReadWrite)

@@ -7,7 +7,7 @@ Native wrappers annotated with `ue_native_object` can now appear in `ue_componen
 ```das
 require ue_scene_components
 
-[ue_class(module_id="example", Blueprintable)]
+[ue_class(Blueprintable)]
 class Example {
     @ue_component
     @RootComponent

@@ -15,7 +15,7 @@
 ~~~das
 options gen2
 require ue_dsl
-[ue_class(module_id="math",Blueprintable)]
+[ue_class(Blueprintable)]
 class MathBridge {
     [ue_function(BlueprintCallable)]
     def Shift(value:UEVector; delta:double):UEVector {

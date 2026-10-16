@@ -48,6 +48,7 @@
 #include "Engine/World.h"
 #include "UObject/UObjectGlobals.h"
 #include "UObject/UnrealType.h"
+#include "UObject/Script.h"
 #include "Interfaces/IPluginManager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/ScopeExit.h"
@@ -1317,7 +1318,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
         FUnrealFoundationModule() : das::Module("ue_foundation")
         {
             addCommentReader(new FUECommentReader());
-            addAnnotation(new FUEClassAnnotation());addAnnotation(new FUEEnumAnnotation());addAnnotation(new FUEStructAnnotation());
+            addAnnotation(new FUENativeBaseAnnotation());addAnnotation(new FUEClassAnnotation());addAnnotation(new FUEEnumAnnotation());addAnnotation(new FUEStructAnnotation());
             addAnnotation(new FUENativeInterfaceAnnotation());addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));addAnnotation(new FUESourceValueBinding());addAnnotation(new FUEObjectTypeAnnotation());addAnnotation(new FUEAuthoredRefAnnotation());addTypeMacro(new FUEObjectTypeMacro());addAnnotation(new FUEClassTypeAnnotation());addTypeMacro(new FUEClassTypeMacro());
             for(bool Raw:{false,true}){auto* Macro=new FUEClassCastFactory(Raw);ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
             addAnnotation(new FUEDelegateAnnotation(false));addAnnotation(new FUEDelegateAnnotation(true));
@@ -1746,7 +1747,8 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
         FString Path;
         FSourceSet AttemptedSources;
         TMap<FString,FDasCallContract> RequiredEntries;
-        FString ApprovedDSLDeclaration;FString AttemptedEntry;FDasCallContract AttemptedContract;
+        FString ApprovedDSLDeclaration;
+        bool bDefaultsUpdateApproved=false;FString AttemptedEntry;FDasCallContract AttemptedContract;
         TUniquePtr<FCompiledContext> Live;
         FString ReloadError;
         uint32 Revision = 0;
@@ -2336,9 +2338,11 @@ FDasExecutionResult FDasRuntimeModule::RunPersistent(const FString& Path, int32 
 FDasExecutionResult FDasRuntimeModule::RunConstruction(const FString& Path,TWeakObjectPtr<UObject> Self)
 {
     FDasExecutionResult Result;
-    auto* Actor=Cast<AActor>(Self.Get());
-    if(!IsInGameThread() || !bInitialized || ConstructingObject || !Actor || Actor->IsTemplate() || !Actor->GetWorld() || Actor->IsActorBeingDestroyed() || Actor->HasActorBegunPlay()) {
-        Result.Error=TEXT("ConstructionScript requires a non-template Actor before BeginPlay and cannot recurse");return Result;
+    auto* Object=Self.Get();auto* Component=Cast<UDasScriptComponent>(Object);
+    auto* Actor=Component?Component->GetOwner():Cast<AActor>(Object);
+    const bool Begun=Component?Component->HasBegunPlay():(Actor && Actor->HasActorBegunPlay());
+    if(!IsInGameThread() || !bInitialized || ConstructingObject || !IsValid(Object) || Object->IsTemplate() || !IsValid(Actor) || Actor->IsTemplate() || !Actor->GetWorld() || Actor->IsActorBeingDestroyed() || (Component && Component->IsBeingDestroyed()) || Begun) {
+        Result.Error=TEXT("ConstructionScript requires a live Actor or ActorComponent before its BeginPlay and cannot recurse");return Result;
     }
 #if WITH_EDITOR
     if(bPreservingSessions){Result.bSucceeded=true;return Result;}
@@ -2347,6 +2351,10 @@ FDasExecutionResult FDasRuntimeModule::RunConstruction(const FString& Path,TWeak
     auto SavedSessions=MoveTemp(Sessions);
     ON_SCOPE_EXIT { Sessions.Empty(); Sessions=MoveTemp(SavedSessions); };
     TGuardValue<bool> ConstructionScope(ConstructingObject,true);
+#if WITH_EDITOR
+    // Actor ProcessEvent otherwise skips Blueprint method graphs in editor worlds.
+    FEditorScriptExecutionGuard ScriptExecution;
+#endif
     return RunCallback(Path,EDasCallback::Construction,0,0.f,Self);
 }
 
@@ -2389,7 +2397,10 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     }
 #endif
     if(Event==EDasCallback::Construction && !ConstructingObject){Result.Error=TEXT("Use RunConstruction for ConstructionScript");return Result;}
-    if(ConstructingObject && Event!=EDasCallback::Construction){Result.Error=TEXT("Gameplay callbacks are forbidden during ConstructionScript");return Result;}
+    // Nested authored UFunction calls share this construction's temporary session set.
+    // They may evaluate methods, but must never deliver gameplay lifecycle callbacks.
+    const bool ConstructionMethod=ConstructingObject && ActiveContext && AuthoredDispatchDepth>0 && Event==EDasCallback::Main;
+    if(ConstructingObject && Event!=EDasCallback::Construction && !ConstructionMethod){Result.Error=TEXT("Gameplay callbacks are forbidden during ConstructionScript");return Result;}
     TArray<FDasScalarValue> NormalizedFrame,PendingOutputs;
     if(Frame){NormalizedFrame=*Frame;for(auto& V:NormalizedFrame){if(V.Direction<0 || V.Direction>2){Result.Error=TEXT("Invalid frame direction");return Result;}if(V.Direction==1)V=UDasFrameLibrary::DefaultValue(V.Kind,V.ObjectClass,1);}Frame=&NormalizedFrame;}
     FStructFrameRoots FrameRoots(NormalizedFrame);
@@ -2468,7 +2479,11 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             {TGuardValue<FSourceSet*> ReferenceDependencies(AuthoredReferenceSources,&Session->AttemptedSources);Candidate->Program = DSLCompile(Utf8Path.Get(), Access, Output, Candidate->Modules);}
             if (!Candidate->Program || Candidate->Program->failed()) CandidateError = Errors(Candidate->Program, Output);
             else if(!DSLValidateOwner(Candidate->Program,EntryPoint,Self.Get(),Candidate->DSLDeclaration,CandidateError)) {}
-            else if(Session->Live && Session->Live->DSLDeclaration!=Candidate->DSLDeclaration && (Session->ApprovedDSLDeclaration.IsEmpty() || Session->ApprovedDSLDeclaration!=Candidate->DSLDeclaration))
+            else if(Session->Live && Session->Live->DSLDeclaration!=Candidate->DSLDeclaration && (Session->ApprovedDSLDeclaration.IsEmpty() || Session->ApprovedDSLDeclaration!=Candidate->DSLDeclaration) && !([&]{
+                if(!Session->bDefaultsUpdateApproved)return false;
+                FDasAuthoringModule Old,Next;FString Issue;
+                return FDasAuthoringModule::FromJson(Session->Live->DSLDeclaration,Old,Issue) && FDasAuthoringModule::FromJson(Candidate->DSLDeclaration,Next,Issue) && FDasAuthoringModule::DefaultsOnly(Old,Next,Issue);
+            })())
                 CandidateError=TEXT("DSL declaration changed; apply/reimport the Blueprint before runtime reload");
             else
             {
@@ -2544,7 +2559,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             Session->Bindings.Empty();Session->InputContexts.Empty(); // Revoke old IDs before destroying any old VM state.
             Candidate->Context->Self = Self;
             Session->Live = MoveTemp(Candidate);
-            Session->ApprovedDSLDeclaration.Empty();
+            Session->ApprovedDSLDeclaration.Empty();Session->bDefaultsUpdateApproved=false;
             InstallSubscriptions(*Session);
             ++Session->Revision;
             Session->ReloadError.Empty();
@@ -2667,6 +2682,16 @@ IMPLEMENT_MODULE(FDasRuntimeModule, DasRuntime)
 #include "DasBindingExport.inl"
 
 #if WITH_EDITOR
+bool FDasRuntimeModule::BeginDefaultUpdate(){
+    if(!bInitialized || !IsInGameThread() || ActiveContext || bDrainingEvents || bPreservingSessions || !PendingEvents.IsEmpty())return false;
+    for(const auto& S:Sessions)if(S->Live && !S->Live->Context->Calls.IsEmpty())return false;
+    bPreservingSessions=true;return true; // Do not detach sessions, timers or subscriptions.
+}
+void FDasRuntimeModule::EndDefaultUpdate(UClass* RootClass,bool Applied){
+    if(!bPreservingSessions || !IsInGameThread())return;
+    if(Applied)for(const auto& S:Sessions)if(S->Owner.IsValid() && S->Owner->IsA(RootClass)){S->bDefaultsUpdateApproved=true;S->AttemptedSources.Reset();}
+    bPreservingSessions=false;
+}
 bool FDasRuntimeModule::BeginPreserveContextsForReinstance(UClass* RootClass){
     if(!bInitialized || !IsInGameThread() || ActiveContext || bDrainingEvents || bPreservingSessions || !RootClass || !PendingEvents.IsEmpty())return false;
     PruneSessions();

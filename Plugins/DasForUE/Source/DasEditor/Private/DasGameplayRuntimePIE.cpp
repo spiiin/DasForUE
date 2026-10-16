@@ -1,5 +1,7 @@
 #include "DasDSLService.h"
+#include "DasPureFunctionTestGraph.h"
 #include "DasProbeActor.h"
+#include "DasComponentConstructionProbe.h"
 #include "DasRuntime.h"
 #include "Components/ActorComponent.h"
 #include "Components/SceneComponent.h"
@@ -17,7 +19,7 @@
 
 namespace {
 struct FGameplayPIEState {
-    TStrongObjectPtr<UBlueprint> Blueprint,SingleBlueprint,InheritedBlueprint,LifeBlueprint,HelperBlueprint;
+    TStrongObjectPtr<UBlueprint> Blueprint,SingleBlueprint,InheritedBlueprint,LifeBlueprint,HelperBlueprint,ConstructionBlueprint,PureBlueprint;
     TWeakObjectPtr<ADasProbeActor> First, Second;
     TStrongObjectPtr<ADasProbeActor> DestroyedOwner;
     int32 DestroyedPulses=0;
@@ -94,6 +96,9 @@ public:
                 TStrongObjectPtr<UActorComponent> Behavior(BehaviorField?Cast<UActorComponent>(BehaviorField->GetObjectPropertyValue_InContainer(Life)):nullptr);
                 TStrongObjectPtr<ADasProbeActor> KeepLife(Life);
                 Check(Life->GetRootComponent() && Life->GetRootComponent()->bHiddenInGame,TEXT("inherited_native_template_override"));
+                Check(ProbeInt(Behavior.Get(),TEXT("ConstructionValue"))==113 && ProbeInt(Behavior.Get(),TEXT("ConstructionTrace"))==12 && ProbeInt(Life,TEXT("ConstructionObserved"))==113,TEXT("component_construction_before_actor_survives_PIE"));
+                int32 PureOutput=0;auto* Snapshot=Behavior.IsValid()?Behavior->FindFunction(TEXT("Snapshot")):nullptr;if(Snapshot)Behavior->ProcessEvent(Snapshot,&PureOutput);
+                Check(Snapshot && Snapshot->HasAnyFunctionFlags(FUNC_BlueprintPure) && PureOutput==55,TEXT("component_pure_void_out_in_PIE"));
                 Check(ProbeInt(Behavior.Get(),TEXT("Bonus"))==55,TEXT("inherited_component_editable_template_default"));
                 Check(Behavior.IsValid() && PivotField && PivotField->GetObjectPropertyValue_InContainer(Life)==Life->GetRootComponent(),TEXT("inherited_SCS_fields_and_root"));
                 Check(ProbeInt(Life,TEXT("BaseBegins"))==1 && ProbeInt(Life,TEXT("ChildBegins"))==1 && ProbeInt(Life,TEXT("BaseTicks"))>0,TEXT("explicit_parent_BeginPlay_and_inherited_Tick"));
@@ -115,6 +120,15 @@ public:
                 Check(ProbeInt(ExtraBehavior.Get(),TEXT("BaseEnds"))==1 && ProbeInt(ExtraBehavior.Get(),TEXT("ChildEnds"))==1,TEXT("derived_component_EndPlay_once"));
                 Check(ProbeInt(Life,TEXT("BaseEnds"))==1 && ProbeInt(Life,TEXT("ChildEnds"))==1 && ProbeInt(Behavior.Get(),TEXT("BaseEnds"))==1 && ProbeInt(Behavior.Get(),TEXT("ChildEnds"))==1,TEXT("parent_EndPlay_actor_and_component_once"));
             }
+            AActor* StandaloneOwner=nullptr;for(TActorIterator<AActor> It(World);It;++It)if(It->ActorHasTag(TEXT("StandaloneConstructionOwner")))StandaloneOwner=*It;
+            auto* Standalone=StandaloneOwner?StandaloneOwner->FindComponentByClass<UDasScriptComponent>():nullptr;
+            if(Standalone)UE_LOG(LogTemp,Display,TEXT("DAS_COMPONENT_PIE_STATE Score=%d Value=%d Calls=%d Init=%d BeginSaw=%d Error=%s"),ProbeInt(Standalone,TEXT("Score")),ProbeInt(Standalone,TEXT("ConstructionValue")),ProbeInt(Standalone,TEXT("ConstructionCalls")),ProbeInt(Standalone,TEXT("InitializeCalls")),ProbeInt(Standalone,TEXT("BeginSaw")),*Standalone->LastDasError);
+            Check(Standalone && ProbeInt(Standalone,TEXT("Score"))==8 && ProbeInt(Standalone,TEXT("ConstructionValue"))==21 && ProbeInt(Standalone,TEXT("ConstructionCalls"))==1 && ProbeInt(Standalone,TEXT("InitializeCalls"))==1 && ProbeInt(Standalone,TEXT("BeginSaw"))==21 && Standalone->LastDasError.IsEmpty(),TEXT("native_owner_component_construction_values_survive_PIE"));
+            FString ConstructionReport;Check(Standalone && RunDasComponentConstructionProbe(Standalone->GetClass(),World,ConstructionReport),TEXT("dynamic_native_component_construction"));UE_LOG(LogTemp,Display,TEXT("%s"),*ConstructionReport);
+            if(StandaloneOwner)StandaloneOwner->Destroy();
+            ADasProbeActor* PureOwner=nullptr;for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->ActorHasTag(TEXT("PureOwner")))PureOwner=*It;
+            int32 PureResult=0;if(PureOwner)if(auto* Fn=PureOwner->FindFunction(TEXT("EvaluatePure")))PureOwner->ProcessEvent(Fn,&PureResult);
+            Check(PureOwner && PureResult==15 && PureOwner->FindFunction(TEXT("Query"))->HasAnyFunctionFlags(FUNC_BlueprintPure) && PureOwner->LastDasError.IsEmpty(),TEXT("pure_Blueprint_data_node_override_Super_in_PIE"));if(PureOwner)PureOwner->Destroy();
             ADasProbeActor* HelperOwner=nullptr;for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->GetFName()==TEXT("HelperOwner"))HelperOwner=*It;
             struct FHelperPIEArgs{int32 Input=2,Result=0;};FHelperPIEArgs HelperArgs;
             if(HelperOwner)if(auto* Fn=HelperOwner->FindFunction(TEXT("LocalProbe")))HelperOwner->ProcessEvent(Fn,&HelperArgs);
@@ -176,6 +190,9 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&) {
     if(!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,LifeSpawn))return false;
     if(!TestTrue(TEXT("Create grandchild helper actor"),FDasDSLService::Apply(TEXT("dsl_inheritance_grandchild.das"),Root+TEXT("/BP_GrandCounter"),TEXT("inheritance.GrandCounter"),BP,Error))){AddError(Error);return false;}
     State->HelperBlueprint.Reset(BP);FActorSpawnParameters HelperSpawn;HelperSpawn.Name=TEXT("HelperOwner");if(!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,HelperSpawn))return false;
+    auto* PureBP=CreateDasPureConsumer(BP->GeneratedClass,CreatePackage(*(Root+TEXT("/BP_PureConsumer"))),TEXT("BP_PureConsumer"),Error);if(!PureBP){AddError(Error);return false;}State->PureBlueprint.Reset(PureBP);auto* PureActor=World->SpawnActor<ADasProbeActor>(PureBP->GeneratedClass);if(!PureActor)return false;PureActor->Tags.Add(TEXT("PureOwner"));
+    if(!TestTrue(TEXT("Create standalone construction component"),FDasDSLService::Apply(TEXT("dsl_construction_component_leaf.das"),Root+TEXT("/BP_LeafConstruction"),TEXT("construction.LeafConstruction"),BP,Error))){AddError(Error);return false;}
+    State->ConstructionBlueprint.Reset(BP);auto* StandaloneOwner=World->SpawnActor<AActor>();StandaloneOwner->Tags.Add(TEXT("StandaloneConstructionOwner"));auto* Standalone=NewObject<UDasScriptComponent>(StandaloneOwner,BP->GeneratedClass,TEXT("StandaloneConstruction"),RF_Transactional);StandaloneOwner->AddInstanceComponent(Standalone);Standalone->RegisterComponent();FindFProperty<FIntProperty>(Standalone->GetClass(),TEXT("Score"))->SetPropertyValue_InContainer(Standalone,8);
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FGameplayPIECommand>(State,this));
     return true;

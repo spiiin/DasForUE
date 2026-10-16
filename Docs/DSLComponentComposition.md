@@ -3,7 +3,7 @@
 ```das
 require ue_dsl
 require ue_component_types
-[ue_class(module_id="actorcomponent", Blueprintable)]
+[ue_class(Blueprintable)]
 class ComponentOwner {
     components = ue_components(VisibleAnywhere, BlueprintReadOnly, Category="Components") {
         // Подсчёт очков

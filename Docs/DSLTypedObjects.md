@@ -41,7 +41,7 @@ options gc
 require ue_dsl
 require ue_object_types
 
-[ue_class(module_id="game", Blueprintable)]
+[ue_class(Blueprintable)]
 class TargetHolder {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Target : ActorRef

@@ -8,7 +8,7 @@ void action с аргументами. Return type задаётся явно.
 ~~~das
 options gen2
 require ue_dsl
-[ue_class(module_id="mixed",Blueprintable)]
+[ue_class(Blueprintable)]
 class MixedCounter {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     health : int = 10

@@ -4,7 +4,7 @@ require ue_enhanced_input
 require ue_scene_components
 
 [ue_class(module_id="gameplaydemo",Blueprintable)]
-class GameplayActor {
+class GameplayActor : Actor {
     properties = ue_properties(EditAnywhere, BlueprintReadWrite) {
         // Текущие очки игрока.
         var Score:int=0

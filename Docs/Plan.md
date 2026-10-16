@@ -2404,5 +2404,180 @@ editor reconstruction, instance edits, CDO exclusion, preservation of an existin
 gameplay VM and recoverable forbidden-timer errors; real Gameplay.RuntimePIE with
 one success and zero warnings/failures; full Win64 Development NullRHI packaged
 gameplay plus foundation zero failures. Packaged probes cover saved map values and
-runtime-spawn construction. Cross-context authored method entry during construction
-remains rejected; same-context helpers and native property access are available.
+runtime-spawn construction. Cross-context authored method entry during construction is now supported through
+temporary VMs; see the 2026-10-16 construction-call follow-up below.
+
+
+## 2026-10-16 — reflected authored calls during construction
+
+ConstructionScript can call ue_function methods on authored Actors and components
+using ordinary typed references. Nested dispatch uses the construction invocation's
+temporary session set, preserves existing persistent VMs/subscriptions and does not
+deliver Initialize or BeginPlay. Editor construction scopes enable Actor Blueprint
+method graphs. Existing lifecycle, recursive construction, managed-callback,
+event-emission and dynamic object creation/destruction restrictions remain active
+inside nested methods; errors propagate and the next construction may retry.
+
+Dedicated dsl_construction_calls / dsl_construction_call_worker fixtures and
+TestConstructionCalls.ps1 cover Editor and Game worlds, saved Blueprint reopening,
+Actor/component dispatch, temporary globals, preservation of a persistent component
+VM and subscription, no initializer delivery, reconstruction, forbidden timer calls,
+panic propagation and retry. See DSLConstructionCalls.md.
+
+
+### ActorComponent ConstructionScript — 2026-10-16
+
+Enabled lifecycle collection/IR for authored components, explicit Super and omitted
+overrides. The authored Actor bridge configures all components after SCS/instance
+data restoration and before its own hook. Standalone/new dynamic components use
+first registration before their own Initialize/BeginPlay. Unregister/Register does
+not repeat the hook; editor component property changes repeat it, avoiding a double
+delivery when the owning Actor already reconstructed. PostLoad/PIE duplication keep
+saved construction results. Native owner fallback cannot promise a complete
+after-SCS owner pass; that ordering requires the authored Actor bridge.
+Temporary contexts and construction side-effect policy are shared with Actors.
+Errors are retryable and propagate from the component pass to the authored Actor.
+See DSLComponentConstruction.md for the complete delivery contract and examples.
+
+
+ActorComponent construction validation passed: editor foundation zero failures,
+Create/Reopen with explicit/omitted Super, property-edit/reregistration delivery,
+CDO exclusion, timer rejection/recovery and VM preservation; real RuntimePIE with
+one success and zero warnings/failures; full Win64 Development NullRHI package plus
+foundation zero failures. PIE required explicit duplication-state handling. Cooked
+tests confirm that saved Score=8/value=21 is retained and newly registered dynamic
+components run construction before Initialize/BeginPlay. See DSLComponentConstruction.md.
+
+
+### Authored BlueprintPure functions — 2026-10-16
+
+Enabled BlueprintPure instance methods for authored Actors and ActorComponents.
+The DSL normalizes callable flags and validates an output contract; IR/schema,
+Blueprint generation, precompile policy and runtime contract checks preserve
+purity. Ordinary pure methods remain final; BlueprintEvent permits inherited
+overrides and explicit Super while preserving purity. BlueprintPure=false retains
+execution pins. Pure interfaces, static and const-method authoring remain deferred.
+See DSLPureFunctions.md for syntax and semantics.
+
+Validation passed: editor foundation zero failures, saved Create/Reopen with a
+real pure data-node consumer, strict RuntimePIE one success and zero warnings or
+failures, and Win64 Development packaged NullRHI gameplay plus foundation. Probes
+exercise inherited pure overrides/Super, saved flags, impure opt-out and component
+void/out results. The consumer fixture removes an automatic unused return node so
+Blueprint compilation remains warning-free.
+
+
+### Pure interface contracts — 2026-10-16
+
+Added BlueprintPure to annotated authored interface stubs and allowed matching
+pure native/authored UInterface implementations. Callable normalization and output
+validation match authored class methods. Interface signature entry flags persist
+through compilation; implementing methods remain overridable. A purity mismatch
+rejects before Blueprint mutation. Structural interface changes retain controlled
+refusal; const/static methods are separate work. See DSLPureFunctions.md.
+
+Validation: editor foundation zero failures; authored interface Create/Reopen,
+independent interface recompilation, negative implementation mismatch, Blueprint
+pure data-node execution through the interface UFunction, generated DAS wrappers,
+and the full Win64 Development NullRHI packaged interface probe all pass.
+
+
+### Static class/component defaults extension — 2026-10-16
+
+Added self.Property assignments in ue_defaults, lowering into the existing owned
+property default contract. Block values override inline initializers. Expanded
+math constructors to nonidentity Transform; native/authored component templates
+accept math and supported reflected struct values, class references and assets.
+Declaration-only ue_class_default/ue_asset_default and ue_default_text markers
+are validated before Blueprint mutation. Reflected CDO/template hard references
+provide saved/cooked dependencies; non-null authored object identity remains deferred.
+Existing Vector/Rotator component wire spelling is preserved. Repeated/unknown
+assignments, executable expressions and invalid references are rejected. Defaults
+migration is implemented below; inherited property override declarations are implemented below; computed defaults remain next.
+See DSLExtendedDefaults.md and TestExtendedDefaults.ps1.
+
+Static defaults validation passed: Create/Reopen, JSON roundtrip and six negative
+preflight cases, real Defaults.RuntimePIE (one success, zero warnings/failures),
+editor/packaged foundation (zero failures), existing native-component automation
+(one success, zero warnings/failures), and final Win64 Development NullRHI packaged
+runtime without engine errors/ensures. Unreal-specific Transform pin formatting,
+exact Euler/quaternion default matching and native template edit notifications are
+covered. See DSLExtendedDefaults.md for the full contract and test commands.
+
+### Safe defaults reimport with manual overrides — 2026-10-16
+
+Implemented Automatic / PreserveOverrides reimport for default-only declarations.
+Three-way source/CDO comparison preserves manual values; archetype comparison
+propagates new defaults through ordinary Blueprint children, existing inheritable
+component templates and editor instances. Struct members merge independently;
+quaternions remain atomic. Static asset/class defaults share the same policy.
+CDO variable defaults survive later Blueprint compilation, and cooked source
+fingerprints preserve runtime owner validation with manual CDO edits.
+
+No Blueprint compilation, actor reconstruction or VM detachment occurs during
+the merge. Staging, bounded dependency discovery and snapshot rollback guard
+property/metadata updates. Affected PIE/game worlds, active VM calls/events,
+uninitialized component maps and unsupported dependency scopes are rejected.
+Packages are marked dirty for user review/save. See DSLDefaultsMigration.md and
+TestDefaultsMerge.ps1 for semantics, limitations and regression commands.
+
+Safe defaults validation passed: Create/Reopen/Recompile/Unopened; automatic and explicit console commands; two rollback stages; Editor/packaged foundation with zero failures; final NullRHI packaged runtime; legacy PreserveInstances asset and PIE regressions (one PIE success, zero warnings/failures).
+
+
+### Native base inheritance syntax — 2026-10-16
+
+ue_dsl exports Actor and ActorComponent classes marked with ue_native_base native
+identity metadata. ue_class accepts these as DAS parents and emits the existing
+native_parent IR without an authored parent_id or extra asset. Authored parent
+resolution/Super remain separate; helper ancestor traversal stops at host markers.
+Type resolution recognizes marker identity alongside existing native reference
+aliases. Parent annotations remain compatible; mixed declarations and unsupported,
+stateful or unmarked bases reject. Principal Actor/component, gameplay, inherited
+lifecycle/initialization and construction examples now use class inheritance.
+See DSLNativeBases.md.
+
+Validation: foundation zero failures, Create/Reopen, strict RuntimePIE one success
+and zero warnings/failures, Win64 Development packaged NullRHI gameplay and
+packaged foundation all pass with the updated examples.
+
+
+### Defaults on inherited authored properties — 2026-10-16
+
+Added `self.Property` defaults on authored ancestors without redeclaration. Optional
+property_overrides records retain ancestor stable ID/name and a typed literal;
+effective resolution preserves the original property's type, flags and owner.
+Initial import changes the child's CDO only. Runtime validation selects the nearest
+authored default owner, preserving base entry calls and cooked manual overrides.
+
+Safe reimport supports changing, adding and removing inherited defaults. Absent
+overrides use the actual parent CDO baseline; explicit child values block parent
+propagation even when equal to the previous parent default. Manual values and
+member-wise struct edits survive; no Blueprint reinstance occurs. Parent import
+uses Automatic policy to retain manual parent defaults. Layout/access checks run
+before native writes. Record comparisons are order-independent; low-level backend
+authoring refuses models needing DSL provenance. See DSLInheritedPropertyDefaults.md
+and TestInheritedDefaults.ps1. Computed defaults and arbitrary native-parent field
+projection remain separate work.
+
+Inherited-property defaults validation passed: actor/component Create/Reopen/Recompile, manual parent/child/instance values, three-level overrides, add/remove, rollback, unchanged reimport and unapplied-parent refusal; Win64 Development NullRHI packaged probe; editor/packaged foundation zero failures. Existing safe-default regression also passed; its startup Zen assert was bypassed for the remaining phase using filesystem DDC without modifying the engine/service.
+
+
+### Const authored methods — 2026-10-16
+
+Native DAS def const now emits optional const IR/schema state and FUNC_Const for
+Actor/ActorComponent methods and annotated interface stubs. Purity remains
+independent; BlueprintPure=false preserves exec pins. Overrides and interfaces
+must preserve const; source/runtime signature checks and precompile metadata
+preserve it through reload/recompile/save/cook. Const transitions are structural.
+An original-source visitor rejects ordinary self writes/container mutations and
+known non-const self/Super calls before property lowering, including helper bodies.
+Thin const frame adapters share the existing dispatcher without duplicate VM or
+marshalling implementations. Const is not a side-effect sandbox. Static authored
+functions remain separate work. See DSLConstMethods.md.
+
+Validation: foundation zero failures, negative const bodies/overrides and IR
+roundtrip, saved Create/Reopen const flags and Super/helper execution, authored
+interface Create/Reopen/packaged dispatch plus mismatch refusal, strict RuntimePIE
+one success and zero warnings/failures, and full Win64 Development NullRHI packaged
+gameplay/foundation all pass. Const graph compilation requires const native adapter
+UFunctions; ordinary non-const dispatch functions cannot be called on readonly self.

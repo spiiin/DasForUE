@@ -28,10 +28,11 @@ Blueprint/DSL classes through the existing interface dispatch bridge.
 
 Only empty source bodies are accepted; statements, returns, local state, fields,
 static methods, constructors and finalizers reject. Ordinary declaration methods
-require exactly one ue_function annotation and BlueprintCallable. Supported method
-options are id, Category, DisplayName, ToolTip and explicit out/ref directions.
+require exactly one ue_function annotation and BlueprintCallable or BlueprintPure. Supported method
+options include BlueprintPure, id, Category, DisplayName, ToolTip and explicit out/ref directions.
 Metadata reaches the generated Unreal UFunction and signature graph. Unknown
-options and parameter defaults reject. BlueprintPure remains separate capability work. Void/no-output events are now
+options and parameter defaults reject. BlueprintPure is supported and implies callable;
+implementations must match purity. See DSLPureFunctions.md. Void/no-output events are now
 supported through Event Graph adapters; see DSLInterfaceEvents.md.
 
 For ordinary methods, mutable `var ... &` parameters default to inout;
@@ -133,3 +134,6 @@ constraints, FEnumProperty/FByteProperty handling and the remaining input-only l
 
 Concrete authored enum/struct signatures through explicit registries and generated
 authored interface wrappers are now supported; see DSLAuthoredInterfaceRegistryBindings.md.
+
+Const declarations use `def const Method(...):Result {}` and require matching
+const implementations. See [DSLConstMethods](DSLConstMethods.md).

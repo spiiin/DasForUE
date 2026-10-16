@@ -2,6 +2,13 @@ options gen2
 module ue_dsl public
 require ue_foundation public
 
+// Native host identity markers for authored class inheritance.
+// These declarations do not construct Unreal objects or expose native virtuals.
+[ue_native_base(path="/Script/Engine.Actor")]
+class Actor {}
+[ue_native_base(path="/Script/Engine.ActorComponent")]
+class ActorComponent {}
+
 // Read the latest native snapshot after evaluating the assigned value.
 def ue_dsl_commit_struct_member_int(property:string; member:string; value:int):void {
     ue_set_self_struct(property, ue_struct_with_int(ue_get_self_struct(property), member, value))

@@ -1,8 +1,8 @@
 options gen2
 require ue_gameplay_refs
 
-[ue_class(module_id="gameplaydemo",parent="ActorComponent",Blueprintable)]
-class GameplayBehavior {
+[ue_class(module_id="gameplaydemo",Blueprintable)]
+class GameplayBehavior : ActorComponent {
     properties = ue_properties(EditAnywhere, BlueprintReadWrite) {
         // Время работы компонента в секундах.
         var Seconds:float=0.0

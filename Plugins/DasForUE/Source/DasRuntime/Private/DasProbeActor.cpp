@@ -1,6 +1,7 @@
 #include "DasTypeRegistry.h"
 #include "DasProbeActor.h"
 #include "DasRuntime.h"
+#include "DasScriptComponent.h"
 #include "Components/SceneComponent.h"
 #include "Modules/ModuleManager.h"
 #include "Misc/Paths.h"
@@ -19,11 +20,20 @@ void ADasProbeActor::OnConstruction(const FTransform& Transform)
 {
     Super::OnConstruction(Transform);
     ApplyDasSceneRoot();
-    if(bDasConstructionScript && !IsTemplate() && !LifecycleScript.IsEmpty() && GetWorld()) {
+    if(IsTemplate() || !GetWorld() || IsActorBeingDestroyed() || HasActorBegunPlay())return;
+    FDasExecutionResult Result;Result.bSucceeded=true;
+    TArray<UDasScriptComponent*> Components;GetComponents(Components);
+    for(auto* Component:Components)if(IsValid(Component) && !Component->IsBeingDestroyed()){
+        const auto ComponentResult=Component->RunDasConstruction();
+        if(!ComponentResult.bSucceeded && Result.bSucceeded)Result=ComponentResult;
+    }
+    // Actor construction can depend on configured component values. Do not run it on failure.
+    if(Result.bSucceeded && bDasConstructionScript && !LifecycleScript.IsEmpty()) {
         auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
         const FString Path=FPaths::IsRelative(LifecycleScript)?Runtime.ScriptPath(LifecycleScript):LifecycleScript;
-        RecordLifecycleResult(Runtime.RunConstruction(Path,this));
+        Result=Runtime.RunConstruction(Path,this);
     }
+    RecordLifecycleResult(Result);
 }
 void ADasProbeActor::PostInitializeComponents()
 {
@@ -140,4 +150,13 @@ void ADasProbeActor::Destroyed()
     // Super routes EndPlay; its callback must run before the context is released.
     Super::Destroyed();
     if (auto* Runtime = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"))) Runtime->ReleaseObject(this);
+}
+
+// Const graph adapters share dispatch/session and diagnostic handling with ordinary
+// calls. Source contracts are validated before these internal entry points are used.
+FDasScalarValue ADasProbeActor::ExecuteDasConstFrame(const FString& File,const FString& Entry,const TArray<FDasScalarValue>& Args,int32 Kind,const FString& ResultClass) const {
+    return const_cast<ADasProbeActor*>(this)->ExecuteDasFrame(File,Entry,Args,Kind,ResultClass);
+}
+FDasScalarValue ADasProbeActor::ExecuteDasConstFrameOutputs(const FString& File,const FString& Entry,const TArray<FDasScalarValue>& Args,int32 Kind,const FString& ResultClass,TArray<FDasScalarValue>& Outputs) const {
+    return const_cast<ADasProbeActor*>(this)->ExecuteDasFrameOutputs(File,Entry,Args,Kind,ResultClass,Outputs);
 }

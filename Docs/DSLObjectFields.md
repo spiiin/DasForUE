@@ -1,7 +1,7 @@
 # Typed UObject properties in DSL classes
 
 ```text
-[ue_class(module_id="example", Blueprintable)]
+[ue_class(Blueprintable)]
 class Tracker {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Target : UObjectHandle = ue_object_value("/Script/Engine.Actor")

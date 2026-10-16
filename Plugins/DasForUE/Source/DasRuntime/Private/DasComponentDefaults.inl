@@ -1,5 +1,5 @@
 
-struct FDSLComponentDefault {FString Component,Property;FDasDeclaredLiteral Value;};
+struct FDSLComponentDefault {FString Component,Property;FDasDeclaredLiteral Value;das::ExpressionPtr Expression;};
 double DSLDefaultNumber(das::ExpressionPtr E){
  double V=0;
  if(E->__rtti==das::string("ExprConstInt"))V=static_cast<das::ExprConstInt*>(E)->getValue();
@@ -7,6 +7,42 @@ double DSLDefaultNumber(das::ExpressionPtr E){
  else if(E->__rtti==das::string("ExprConstDouble"))V=static_cast<das::ExprConstDouble*>(E)->getValue();
  else DSLFail(TEXT("Component defaults require numeric literals"));
  if(!FMath::IsFinite(V))DSLFail(TEXT("Component defaults require finite numbers"));return V;
+}
+// These constructors are parsed as data. No daScript code executes during import.
+FDasDeclaredLiteral DSLDefaultMath(das::ExpressionPtr E){
+ if(!E || !E->rtti_isCall())DSLFail(TEXT("Math defaults require literal constructors"));
+ auto* Call=static_cast<das::ExprCall*>(E);FDasDeclaredLiteral V;UScriptStruct* Type=nullptr;
+ FVector Vector;FVector2D Vector2;FRotator Rotation;FTransform Transform=FTransform::Identity;const void* Memory=nullptr;
+ if(Call->name=="ue_vector" || Call->name=="ue_rotator"){
+  if(Call->arguments.size()!=3)DSLFail(TEXT("Expected three numeric coordinates"));
+  Vector=FVector(DSLDefaultNumber(Call->arguments[0]),DSLDefaultNumber(Call->arguments[1]),DSLDefaultNumber(Call->arguments[2]));
+  if(Call->name=="ue_vector"){V.Kind=TEXT("vector");Type=TBaseStructure<FVector>::Get();Memory=&Vector;}
+  else{V.Kind=TEXT("rotator");Rotation=FRotator(Vector.X,Vector.Y,Vector.Z);Type=TBaseStructure<FRotator>::Get();Memory=&Rotation;}
+ }else if(Call->name=="ue_vector2d"){
+  if(Call->arguments.size()!=2)DSLFail(TEXT("Expected two numeric coordinates"));
+  V.Kind=TEXT("vector2d");Vector2=FVector2D(DSLDefaultNumber(Call->arguments[0]),DSLDefaultNumber(Call->arguments[1]));Type=TBaseStructure<FVector2D>::Get();Memory=&Vector2;
+ }else if(Call->name=="ue_transform" || Call->name=="ue_transform_identity"){
+  V.Kind=TEXT("transform");Type=TBaseStructure<FTransform>::Get();Memory=&Transform;
+  if(Call->name=="ue_transform_identity"){if(!Call->arguments.empty())DSLFail(TEXT("Identity transform takes no arguments"));}
+  else{
+   if(Call->arguments.size()!=3)DSLFail(TEXT("Transform requires literal translation, rotation and scale"));
+   auto T=DSLDefaultMath(Call->arguments[0]),R=DSLDefaultMath(Call->arguments[1]),S=DSLDefaultMath(Call->arguments[2]);
+   if(T.Kind!=TEXT("vector") || R.Kind!=TEXT("rotator") || S.Kind!=TEXT("vector"))DSLFail(TEXT("Transform requires vector, rotator, vector"));
+   FInstancedStruct Translation,Scale,Rotator;FString Issue;
+   if(!ParseDasStructDefault(TEXT("/Script/CoreUObject.Vector"),T.String,Translation,Issue) || !ParseDasStructDefault(TEXT("/Script/CoreUObject.Vector"),S.String,Scale,Issue) || !ParseDasStructDefault(TEXT("/Script/CoreUObject.Rotator"),R.String,Rotator,Issue))DSLFail(Issue);
+   Transform=FTransform(Rotator.Get<FRotator>(),Translation.Get<FVector>(),Scale.Get<FVector>());if(Transform.ContainsNaN() || !Transform.IsRotationNormalized())DSLFail(TEXT("Invalid transform default"));
+  }
+ }else DSLFail(TEXT("Unsupported default constructor: ")+DSLText(Call->name));
+ Type->ExportText(V.String,Memory,nullptr,nullptr,PPF_None,nullptr);return V;
+}
+FString DSLMathPropertyDefault(const das::Structure::FieldDeclaration& Field){
+ const FString Path=DSLMathPath(Field.type);if(Field.init){const auto V=DSLDefaultMath(Field.init);
+  const FString Expected=Path==TEXT("/Script/CoreUObject.Vector")?TEXT("vector"):Path==TEXT("/Script/CoreUObject.Rotator")?TEXT("rotator"):Path==TEXT("/Script/CoreUObject.Vector2D")?TEXT("vector2d"):TEXT("transform");
+  if(V.Kind!=Expected)DSLFail(TEXT("Math default constructor does not match property type"));return V.String;}
+ FVector Vector=FVector::ZeroVector;FRotator Rotation=FRotator::ZeroRotator;FVector2D Vector2=FVector2D::ZeroVector;FTransform Transform=FTransform::Identity;
+ UScriptStruct* Type=Path==TEXT("/Script/CoreUObject.Vector")?TBaseStructure<FVector>::Get():Path==TEXT("/Script/CoreUObject.Rotator")?TBaseStructure<FRotator>::Get():Path==TEXT("/Script/CoreUObject.Vector2D")?TBaseStructure<FVector2D>::Get():TBaseStructure<FTransform>::Get();
+ const void* Memory=Path==TEXT("/Script/CoreUObject.Vector")?static_cast<const void*>(&Vector):Path==TEXT("/Script/CoreUObject.Rotator")?static_cast<const void*>(&Rotation):Path==TEXT("/Script/CoreUObject.Vector2D")?static_cast<const void*>(&Vector2):static_cast<const void*>(&Transform);
+ FString Text;Type->ExportText(Text,Memory,nullptr,nullptr,PPF_None,nullptr);return Text;
 }
 TArray<FDSLComponentDefault> DSLCollectComponentDefaults(const das::StructurePtr& S){
  TArray<FDSLComponentDefault> Result;das::vector<das::Structure::FieldDeclaration> Fields;
@@ -22,14 +58,23 @@ TArray<FDSLComponentDefault> DSLCollectComponentDefaults(const das::StructurePtr
    auto* Assignment=static_cast<das::ExprCopy*>(E);
    auto* Property=Assignment->left->rtti_isField()?static_cast<das::ExprField*>(Assignment->left):nullptr;
    auto* Component=Property && Property->value->rtti_isField()?static_cast<das::ExprField*>(Property->value):nullptr;
-   if(!Component || !Component->value->rtti_isVar() || static_cast<das::ExprVar*>(Component->value)->name!="self")DSLFail(TEXT("Expected self.Component.Property in ue_defaults"));
-   FDSLComponentDefault D;D.Component=DSLText(Component->name);D.Property=DSLText(Property->name);auto* V=Assignment->right;
+   const bool Own=Property && Property->value->rtti_isVar() && static_cast<das::ExprVar*>(Property->value)->name=="self";
+   if(!Own && (!Component || !Component->value->rtti_isVar() || static_cast<das::ExprVar*>(Component->value)->name!="self"))DSLFail(TEXT("Expected self.Property or self.Component.Property in ue_defaults"));
+   FDSLComponentDefault D;D.Property=DSLText(Property->name);D.Expression=Assignment->right;
+   if(Own){Result.Add(MoveTemp(D));continue;}
+   D.Component=DSLText(Component->name);auto* V=Assignment->right;
    if(V->__rtti==das::string("ExprConstBool")){D.Value.Kind=TEXT("bool");D.Value.Boolean=static_cast<das::ExprConstBool*>(V)->getValue();}
    else if(V->__rtti==das::string("ExprConstString")){D.Value.Kind=TEXT("string");D.Value.String=DSLText(static_cast<das::ExprConstString*>(V)->text);}
    else if(V->rtti_isCall()){
-    auto* Math=static_cast<das::ExprCall*>(V);if((Math->name!="ue_vector" && Math->name!="ue_rotator") || Math->arguments.size()!=3)DSLFail(TEXT("Only ue_vector/ue_rotator literal constructors are supported in defaults"));
-    const double X=DSLDefaultNumber(Math->arguments[0]),Y=DSLDefaultNumber(Math->arguments[1]),Z=DSLDefaultNumber(Math->arguments[2]);
-    D.Value.Kind=Math->name=="ue_vector"?TEXT("vector"):TEXT("rotator");D.Value.String=FString::Printf(TEXT("X=%.17g Y=%.17g Z=%.17g"),X,Y,Z);
+    auto* CallValue=static_cast<das::ExprCall*>(V);
+    if(CallValue->name=="ue_class_default" || CallValue->name=="ue_asset_default" || CallValue->name=="ue_default_text"){
+     if(CallValue->arguments.size()!=1 || CallValue->arguments[0]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Reference defaults require a literal object path"));
+     D.Value.Kind=CallValue->name=="ue_class_default"?TEXT("class"):CallValue->name=="ue_default_text"?TEXT("struct"):TEXT("asset");D.Value.String=DSLText(static_cast<das::ExprConstString*>(CallValue->arguments[0])->text);
+    }else{
+     D.Value=DSLDefaultMath(V);
+     // Preserve the established wire spelling so unchanged source remains body-only.
+     if(D.Value.Kind==TEXT("vector") || D.Value.Kind==TEXT("rotator"))D.Value.String=FString::Printf(TEXT("X=%.17g Y=%.17g Z=%.17g"),DSLDefaultNumber(CallValue->arguments[0]),DSLDefaultNumber(CallValue->arguments[1]),DSLDefaultNumber(CallValue->arguments[2]));
+    }
    }else{D.Value.Kind=TEXT("number");D.Value.Number=DSLDefaultNumber(V);}
    Result.Add(MoveTemp(D));
   }
@@ -38,7 +83,7 @@ TArray<FDSLComponentDefault> DSLCollectComponentDefaults(const das::StructurePtr
 }
 void DSLApplyComponentDefaults(FDasDeclaredClass& C,const TArray<FDSLComponentDefault>& Defaults,const TArray<FDasDeclaredComponent>& Inherited){
  TSet<FString> Seen;
- for(const auto& D:Defaults){auto* Component=C.Components.FindByPredicate([&](const auto& V){return V.Name==D.Component;});
+ for(const auto& D:Defaults){if(D.Component.IsEmpty())continue;auto* Component=C.Components.FindByPredicate([&](const auto& V){return V.Name==D.Component;});
   if(!Component)DSLFail(TEXT("Unknown defaults component: ")+D.Component);
   const FString Key=D.Component+TEXT(".")+D.Property;if(Seen.Contains(Key.ToLower()))DSLFail(TEXT("Duplicate component default: ")+Key);Seen.Add(Key.ToLower());
   if(Inherited.ContainsByPredicate([&](const auto& V){return V.Id==Component->Id;})){
@@ -48,4 +93,21 @@ void DSLApplyComponentDefaults(FDasDeclaredClass& C,const TArray<FDSLComponentDe
   }else if(Component->Defaults.Contains(D.Property))DSLFail(TEXT("Duplicate component default: ")+Key);
   Component->Defaults.Add(D.Property,D.Value);
  }
+}
+
+void DSLPrepareClassDefaults(const das::StructurePtr& S,const TArray<FDSLComponentDefault>& Defaults){
+ TSet<FString> Seen;
+ for(const auto& D:Defaults)if(D.Component.IsEmpty()){
+  const FString Key=D.Property.ToLower();if(Seen.Contains(Key))DSLFail(TEXT("Duplicate class default: ")+D.Property);Seen.Add(Key);
+  auto It=std::find_if(S->fields.begin(),S->fields.end(),[&](const auto& F){return DSLText(F.name)==D.Property && !F.classMethod && !F.generated;});
+  if(It==S->fields.end() || std::any_of(It->annotation.begin(),It->annotation.end(),[](const auto& A){return A.name=="ue_component";}))DSLFail(TEXT("Class default requires a reflected property: ")+D.Property);
+  // A defaults block explicitly takes precedence over the field initializer.
+  It->init=D.Expression->clone();
+ }
+}
+FDasDeclaredLiteral DSLReferencePropertyDefault(das::Structure::FieldDeclaration& F,bool Class){
+ FDasDeclaredLiteral V;V.Kind=TEXT("null");if(!F.init)return V;
+ auto* Call=F.init->rtti_isCall()?static_cast<das::ExprCall*>(F.init):nullptr;
+ if(!Call || Call->name!=(Class?"ue_class_default":"ue_asset_default") || Call->arguments.size()!=1 || Call->arguments[0]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Reference defaults require ue_class_default/ue_asset_default with a literal path"));
+ V.Kind=TEXT("string");V.String=DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text);F.init=nullptr;return V;
 }

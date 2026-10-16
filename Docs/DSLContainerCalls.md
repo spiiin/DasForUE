@@ -3,7 +3,7 @@
 Container types can now appear directly in BlueprintCallable instance methods:
 
 ```das
-[ue_class(module_id="sample", Blueprintable)]
+[ue_class(Blueprintable)]
 class ListsActor {
     [ue_function(BlueprintCallable)]
     def Echo(input:array<string>):array<string> {

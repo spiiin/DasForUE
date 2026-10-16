@@ -693,3 +693,6 @@ Managed latent delay callbacks (validation pending): [ManagedLatentDelay](Docs/M
 Managed asynchronous asset loading (validation pending): [ManagedAsyncAssets](Docs/ManagedAsyncAssets.md).
 
 Integrated gameplay sources and setup specification (scene/validation pending): [GameplayDemo](Examples/GameplayDemo/README.md).
+
+Native host inheritance: `class Counter : Actor` and `class Behavior : ActorComponent`
+are available through `require ue_dsl`. See [DSLNativeBases](Docs/DSLNativeBases.md).

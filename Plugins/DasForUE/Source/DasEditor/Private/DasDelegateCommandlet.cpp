@@ -1,6 +1,9 @@
 #include "DasDelegateCommandlet.h"
+#include "DasPureFunctionTestGraph.h"
 #include "DasDSLService.h"
 #include "DasProbeActor.h"
+#include "DasScriptComponent.h"
+#include "DasComponentConstructionProbe.h"
 #include "DasRuntime.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
@@ -129,11 +132,44 @@ int32 UDasDelegateCommandlet::Main(const FString& Params){
  FailedConstruction->OnConstruction(FTransform::Identity);
  if(IntField(FailedConstruction,TEXT("ConstructionTrace"))!=2 || Runtime.SubscriptionCount(FailedConstruction)!=0 || Runtime.PersistentContextCount()!=ContextsBefore)return 1;
  FailedConstruction->Destroy();
+ UBlueprint* StandaloneBP=nullptr;const FString StandalonePackage=FPackageName::GetLongPackagePath(Package)+TEXT("/BP_StandaloneConstruction");
+ if(Phase==TEXT("Create")){
+  if(!FDasDSLService::Apply(TEXT("dsl_construction_component.das"),StandalonePackage,TEXT("construction.StandaloneConstruction"),StandaloneBP,Error)){UE_LOG(LogTemp,Error,TEXT("Component construction import: %s"),*Error);return 1;}
+  const FString File=FPackageName::LongPackageNameToFilename(StandalonePackage,FPackageName::GetAssetPackageExtension());FSavePackageArgs Save;Save.TopLevelFlags=RF_Public|RF_Standalone;if(!UPackage::SavePackage(StandaloneBP->GetOutermost(),StandaloneBP,*File,Save))return 1;
+ }else StandaloneBP=LoadObject<UBlueprint>(nullptr,*(StandalonePackage+TEXT(".BP_StandaloneConstruction")));
+ FString ComponentReport;if(!StandaloneBP || !RunDasComponentConstructionProbe(StandaloneBP->GeneratedClass,ConstructionWorld.Get(),ComponentReport)){UE_LOG(LogTemp,Error,TEXT("%s"),*ComponentReport);return 1;}UE_LOG(LogTemp,Display,TEXT("%s"),*ComponentReport);
+ UBlueprint* LeafBP=nullptr;const FString LeafPackage=FPackageName::GetLongPackagePath(Package)+TEXT("/BP_LeafConstruction");
+ if(Phase==TEXT("Create")){
+  if(!FDasDSLService::Apply(TEXT("dsl_construction_component_leaf.das"),LeafPackage,TEXT("construction.LeafConstruction"),LeafBP,Error)){UE_LOG(LogTemp,Error,TEXT("Leaf component construction import: %s"),*Error);return 1;}
+  const FString File=FPackageName::LongPackageNameToFilename(LeafPackage,FPackageName::GetAssetPackageExtension());FSavePackageArgs Save;Save.TopLevelFlags=RF_Public|RF_Standalone;if(!UPackage::SavePackage(LeafBP->GetOutermost(),LeafBP,*File,Save))return 1;
+ }else LeafBP=LoadObject<UBlueprint>(nullptr,*(LeafPackage+TEXT(".BP_LeafConstruction")));
+ ComponentReport.Empty();if(!LeafBP || !RunDasComponentConstructionProbe(LeafBP->GeneratedClass,ConstructionWorld.Get(),ComponentReport)){UE_LOG(LogTemp,Error,TEXT("Leaf: %s"),*ComponentReport);return 1;}UE_LOG(LogTemp,Display,TEXT("PASS omitted_component_hook_override_%s\n%s"),*Phase,*ComponentReport);
+ auto* LifeConstruction=ConstructionWorld->SpawnActor<ADasProbeActor>(LifeBP->GeneratedClass);
+ auto ComponentField=[](UObject* O,const TCHAR* N){auto* P=O?FindFProperty<FObjectProperty>(O->GetClass(),N):nullptr;return P?P->GetObjectPropertyValue_InContainer(O):nullptr;};
+ auto* Behavior=Cast<UDasScriptComponent>(ComponentField(LifeConstruction,TEXT("Behavior")));
+ if(!Behavior || IntField(Behavior,TEXT("ConstructionValue"))!=113 || IntField(Behavior,TEXT("ConstructionTrace"))!=12 || IntField(LifeConstruction,TEXT("ConstructionObserved"))!=113 || !LifeConstruction->LastDasError.IsEmpty())return 1;
+ // Native instance components survive reconstruction, so their own Details edits are retained.
+ auto* NativeOwner=ConstructionWorld->SpawnActor<ADasProbeActor>();auto* NativeComponent=NewObject<UDasScriptComponent>(NativeOwner,StandaloneBP->GeneratedClass,TEXT("OwnedNativeConstruction"),RF_Transactional);NativeOwner->AddInstanceComponent(NativeComponent);NativeComponent->RegisterComponent();NativeOwner->OnConstruction(FTransform::Identity);
+ if(IntField(NativeComponent,TEXT("ConstructionCalls"))!=1)return 1;
+ auto* ComponentScore=FindFProperty<FIntProperty>(NativeComponent->GetClass(),TEXT("Score"));ComponentScore->SetPropertyValue_InContainer(NativeComponent,11);NativeOwner->RerunConstructionScripts();
+ if(IntField(NativeComponent,TEXT("ConstructionValue"))!=33 || IntField(NativeComponent,TEXT("ConstructionCalls"))!=2 || Runtime.PersistentContextCount()!=ContextsBefore)return 1;
+ NativeComponent->UnregisterComponent();NativeComponent->RegisterComponent();if(IntField(NativeComponent,TEXT("ConstructionCalls"))!=2)return 1;
+ NativeOwner->Destroy();LifeConstruction->Destroy();
+ UE_LOG(LogTemp,Display,TEXT("PASS inherited_component_construction_before_actor_and_rerun_%s"),*Phase);
  Constructed->Destroy();ConstructionWorld->DestroyWorld(false);
  UE_LOG(LogTemp,Display,TEXT("PASS editor_construction_repeat_Super_instance_edits_no_CDO_no_VM_leak_%s"),*Phase);
  if(IntField(HelperActor,TEXT("ConstructionValue"))!=23 || IntField(HelperActor,TEXT("ConstructionTrace"))!=12 || !HelperActor->LastDasError.IsEmpty())return 1;
  struct FHelperArgs{int32 Input=2,Result=0;};FHelperArgs HA;auto* HelperFunction=HelperActor->FindFunction(TEXT("LocalProbe"));if(!HelperFunction)return 1;HelperActor->ProcessEvent(HelperFunction,&HA);
  if(HA.Result!=21 || IntField(HelperActor,TEXT("Score"))!=12 || HelperActor->FindFunction(TEXT("Offset")) || HelperActor->FindFunction(TEXT("Template"))){UE_LOG(LogTemp,Error,TEXT("Helpers: result=%d score=%d error=%s"),HA.Result,IntField(HelperActor,TEXT("Score")),*HelperActor->LastDasError);return 1;}
  Runtime.ReleaseObject(HelperActor);HelperActor->Destroy();UE_LOG(LogTemp,Display,TEXT("PASS three_level_same_context_helpers_override_Super_%s"),*Phase);
+ UBlueprint* PureBP=nullptr;const FString PurePackage=FPackageName::GetLongPackagePath(Package)+TEXT("/BP_PureConsumer");
+ if(Phase==TEXT("Create")){PureBP=CreateDasPureConsumer(HelperBP->GeneratedClass,CreatePackage(*PurePackage),TEXT("BP_PureConsumer"),Error);if(!PureBP){UE_LOG(LogTemp,Error,TEXT("Pure: %s"),*Error);return 1;}const FString File=FPackageName::LongPackageNameToFilename(PurePackage,FPackageName::GetAssetPackageExtension());FSavePackageArgs Save;Save.TopLevelFlags=RF_Public|RF_Standalone;if(!UPackage::SavePackage(PureBP->GetOutermost(),PureBP,*File,Save))return 1;}
+ else PureBP=LoadObject<UBlueprint>(nullptr,*(PurePackage+TEXT(".BP_PureConsumer")));
+ if(!PureBP)return 1;auto* PureActor=World->SpawnActor<ADasProbeActor>(PureBP->GeneratedClass);if(!PureActor)return 1;
+ auto* PureFn=PureActor->FindFunction(TEXT("EvaluatePure"));int32 PureResult=0;if(!PureFn)return 1;PureActor->ProcessEvent(PureFn,&PureResult);
+ auto* Getter=PureActor->FindFunction(TEXT("ReadScore"));auto* Query=PureActor->FindFunction(TEXT("Query"));auto* Impure=PureActor->FindFunction(TEXT("ReadImpure"));
+ if(PureResult!=15 || !Getter || !Getter->HasAllFunctionFlags(FUNC_BlueprintPure|FUNC_Final) || Getter->HasAnyFunctionFlags(FUNC_Const) || !Query || !Query->HasAllFunctionFlags(FUNC_BlueprintPure|FUNC_Const) || Query->HasAnyFunctionFlags(FUNC_Final) || !Impure || !Impure->HasAnyFunctionFlags(FUNC_Const) || Impure->HasAnyFunctionFlags(FUNC_BlueprintPure) || !PureActor->LastDasError.IsEmpty()){UE_LOG(LogTemp,Error,TEXT("Pure invocation result=%d error=%s"),PureResult,*PureActor->LastDasError);return 1;}
+ Runtime.ReleaseObject(PureActor);PureActor->Destroy();
+ UE_LOG(LogTemp,Display,TEXT("PASS pure_data_node_overridable_Super_and_saved_flags_%s"),*Phase);
  UE_LOG(LogTemp,Display,TEXT("DAS_AUTHORED_DELEGATES_RESULT=PASS"));return 0;
 }

@@ -1,8 +1,8 @@
 options gen2
 require ue_dsl
 require ue_component_types
-[ue_class(module_id="actorcomponent", Blueprintable)]
-class ComponentOwner {
+[ue_class(Blueprintable)]
+class ComponentOwner : Actor {
     components = ue_components(VisibleAnywhere, BlueprintReadOnly, Category="Components") {
         // Подсчёт очков
         var Behavior:ScoreComponent

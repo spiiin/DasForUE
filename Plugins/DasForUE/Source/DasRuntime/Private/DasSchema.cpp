@@ -7,8 +7,10 @@
 #include "DasContainerTypes.h"
 #include "DasRuntime.h"
 #include "Misc/Paths.h"
+#include "Misc/PackageName.h"
 #include "UObject/Class.h"
 #include "StructUtils/InstancedStruct.h"
+#include "UObject/SoftObjectPath.h"
 
 namespace
 {
@@ -18,6 +20,28 @@ namespace
         for (TCHAR Ch : Value) if (!FChar::IsAlnum(Ch) && Ch != TEXT('_')) return false;
         return FName(*Value) != NAME_None;
     }
+}
+
+bool MatchesDasStructDefault(UScriptStruct* Type,const void* Actual,const void* Expected){
+ if(Type->CompareScriptStruct(Actual,Expected,0))return true;
+ if(Type!=TBaseStructure<FTransform>::Get())return false;
+ const auto& Value=*static_cast<const FTransform*>(Expected);
+ // Blueprint variable defaults serialize rotation as Euler angles. Reproduce that
+ // exact conversion rather than accepting an arbitrary numerical tolerance.
+ const FTransform BlueprintValue(Value.Rotator(),Value.GetTranslation(),Value.GetScale3D());
+ return Type->CompareScriptStruct(Actual,&BlueprintValue,0);
+}
+
+bool ResolveDasReferenceDefault(bool IsClass,const FString& BasePath,const FString& Path,UObject*& Out,FString& Error){
+ Out=nullptr;if(Path.IsEmpty())return true;
+ if(Path.Len()>4096 || !FPackageName::IsValidObjectPath(Path)){Error=TEXT("Default requires a valid object path");return false;}
+ auto* Base=FindObject<UClass>(nullptr,*BasePath);FSoftObjectPath ObjectPath(Path);
+ if(!Base || !ObjectPath.IsValid() || !ObjectPath.GetSubPathString().IsEmpty() || Path.Len()>4096){Error=TEXT("Default requires a valid top-level object path and loaded base class");return false;}
+ Out=LoadObject<UObject>(nullptr,*Path,nullptr,LOAD_NoWarn);
+ bool Good=IsValid(Out);
+ if(IsClass){auto* Class=Cast<UClass>(Out);Good &= Class && Class->IsChildOf(Base) && !Class->HasAnyClassFlags(CLASS_Deprecated|CLASS_NewerVersionExists);}
+ else Good &= Out && Out->IsAsset() && !Out->IsA<UClass>() && (Base->HasAnyClassFlags(CLASS_Interface)?Out->GetClass()->ImplementsInterface(Base):Out->IsA(Base));
+ if(!Good){Out=nullptr;Error=TEXT("Default asset/class is missing, obsolete or incompatible: ")+Path;return false;}return true;
 }
 
 TArray<FDasMethodSchema> FDasClassSchema::EffectiveMethods() const
@@ -46,6 +70,7 @@ bool FDasClassSchema::Validate(FString& Error) const
         {Error=TEXT("Invalid method name, entry point or local script filename");return false;}
         if (M.Signature!=EDasMethodSignature::Int && M.Signature!=EDasMethodSignature::Float && M.Signature!=EDasMethodSignature::Bool && M.Signature!=EDasMethodSignature::Void && M.Signature!=EDasMethodSignature::Frame) {Error=TEXT("Unsupported method signature");return false;}
         const auto Contract=M.Contract();if(Contract.Inputs.Num()>16 || ((static_cast<uint8>(Contract.ReturnKind)>13 && Contract.ReturnKind!=EDasMethodSignature::Class && Contract.ReturnKind!=EDasMethodSignature::Delegate) || Contract.ReturnKind==EDasMethodSignature::Frame)){Error=TEXT("Invalid scalar frame contract");return false;}
+        if(M.bPure && Contract.ReturnKind==EDasMethodSignature::Void && !M.EffectiveParameters().ContainsByPredicate([](const auto& P){return P.Direction!=TEXT("in");})){Error=TEXT("BlueprintPure requires a result or output parameter");return false;}
         TSet<FName> ParameterNames;for(const auto& P:M.EffectiveParameters()){if((P.Direction!=TEXT("in") && P.Direction!=TEXT("out") && P.Direction!=TEXT("inout")) || !Identifier(P.Name.ToString()) || P.Name==TEXT("ReturnValue") || ParameterNames.Contains(P.Name) || ((static_cast<uint8>(P.Kind)>13 && P.Kind!=EDasMethodSignature::Class && P.Kind!=EDasMethodSignature::Delegate) || P.Kind==EDasMethodSignature::Void || P.Kind==EDasMethodSignature::Frame)){Error=TEXT("Invalid scalar frame parameter");return false;}ParameterNames.Add(P.Name);}
         for(const auto& P:M.EffectiveParameters())if(P.Kind==EDasMethodSignature::Object && (!FindObject<UClass>(nullptr,*P.ClassPath) || (!P.ClassPath.StartsWith(TEXT("/Script/")) && !FindObject<UClass>(nullptr,*P.ClassPath)->HasAnyClassFlags(CLASS_Interface)))){Error=TEXT("Object parameter requires loaded native class path");return false;}
         if(Contract.ReturnKind==EDasMethodSignature::Object && (!FindObject<UClass>(nullptr,*M.ReturnClass) || (!M.ReturnClass.StartsWith(TEXT("/Script/")) && !FindObject<UClass>(nullptr,*M.ReturnClass)->HasAnyClassFlags(CLASS_Interface)))){Error=TEXT("Object result requires loaded native class path");return false;}
@@ -72,6 +97,7 @@ bool FDasClassSchema::Validate(FString& Error) const
         if(Field.Kind==EDasScalarKind::Enum){auto* E=ResolveDasEnum(Field.EnumPath,Error);if(!E || !ValidateDasEnumNumber(Field.EnumPath,E->GetValueByNameString(Field.EnumDefault),Error))return false;}
         if(Field.Kind==EDasScalarKind::Object && (!FindObject<UClass>(nullptr,*Field.ObjectClass) || (!Field.ObjectClass.StartsWith(TEXT("/Script/")) && !FindObject<UClass>(nullptr,*Field.ObjectClass)->HasAnyClassFlags(CLASS_Interface)))){Error=TEXT("Object field requires a loaded native class path");return false;}
         if(Field.Kind==EDasScalarKind::Class){auto* Base=FindObject<UClass>(nullptr,*Field.ObjectClass);if(!Field.ObjectClass.StartsWith(TEXT("/Script/")) || !Base || Base->HasAnyClassFlags(CLASS_Interface)){Error=TEXT("Class field requires loaded native base class");return false;}}
+        if((Field.Kind==EDasScalarKind::Class || Field.Kind==EDasScalarKind::Object) && !Field.StringDefault.IsEmpty()){UObject* Value=nullptr;if(!ResolveDasReferenceDefault(Field.Kind==EDasScalarKind::Class,Field.ObjectClass,Field.StringDefault,Value,Error))return false;}
         if(Field.Kind==EDasScalarKind::Struct){FInstancedStruct Value;if(!ParseDasStructDefault(Field.StructPath,Field.StructDefault,Value,Error))return false;}
         if (!ValidMeta(Field.Metadata)) return false;
         Names.Add(Field.Name);

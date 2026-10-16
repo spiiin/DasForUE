@@ -11,6 +11,8 @@ class ChildCounter : BaseCounter {
         self.ConstructionTrace=self.ConstructionTrace*10+2
     }
     def override Offset(value:int):int { return Super.Offset(value)+self.Bonus }
+    [ue_function(BlueprintPure,BlueprintEvent)]
+    def override const Query(input:int):int { return Super.Query(input)+self.Bonus }
     [ue_function(BlueprintCallable)]
     def HelperProbe(input:int):int { return self.Template(input) }
     [ue_function(BlueprintCallable,BlueprintEvent)]

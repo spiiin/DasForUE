@@ -36,6 +36,8 @@ class DASRUNTIME_API ADasProbeActor : public AActor
 public:
     // Cooked identity for checked authored references; not exposed as a script field.
     UPROPERTY() FString AuthoredTypeId;
+    // Approved source default fingerprints; actual CDO values may be editor overrides.
+    UPROPERTY() TMap<FString,FString> DasDefaultSourceContracts;
     ADasProbeActor();
     // Keep the selected identity catalog and its reflected types as cook/GC dependencies.
     UPROPERTY(EditAnywhere, Category="daScript") TObjectPtr<UDasTypeRegistry> TypeRegistry;
@@ -113,6 +115,11 @@ public:
     FDasScalarValue ExecuteDasFrame(const FString& ScriptFile,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,int32 ResultKind,const FString& ResultClass);
     UFUNCTION(BlueprintCallable,Category="daScript Probe",meta=(BlueprintInternalUseOnly="true"))
     FDasScalarValue ExecuteDasFrameOutputs(const FString& ScriptFile,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,int32 ResultKind,const FString& ResultClass,TArray<FDasScalarValue>& Outputs);
+    UFUNCTION(BlueprintCallable,BlueprintPure=false,Category="daScript Internal",meta=(BlueprintInternalUseOnly="true"))
+    FDasScalarValue ExecuteDasConstFrame(const FString& ScriptFile,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,int32 ResultKind,const FString& ResultClass) const;
+    UFUNCTION(BlueprintCallable,BlueprintPure=false,Category="daScript Internal",meta=(BlueprintInternalUseOnly="true"))
+    FDasScalarValue ExecuteDasConstFrameOutputs(const FString& ScriptFile,const FString& EntryPoint,const TArray<FDasScalarValue>& Arguments,int32 ResultKind,const FString& ResultClass,TArray<FDasScalarValue>& Outputs) const;
+
 private:
     friend class FDasRuntimeModule;
     FString ActiveLifecyclePath;

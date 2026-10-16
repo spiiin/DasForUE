@@ -18,7 +18,7 @@ UENameValue — новый nominal value type, зарегистрированн�
 ~~~das
 options gen2
 require ue_dsl
-[ue_class(module_id="text",Blueprintable)]
+[ue_class(Blueprintable)]
 class TextCounter {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Label : string = "Привет"

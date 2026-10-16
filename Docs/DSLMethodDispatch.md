@@ -1,7 +1,7 @@
 # Own methods and Blueprint events
 
 ```das
-[ue_class(module_id="example",Blueprintable)]
+[ue_class(Blueprintable)]
 class Counter {
     properties=ue_properties(EditAnywhere,BlueprintReadWrite) { var Score:int=0 }
 
@@ -63,3 +63,6 @@ C++ BlueprintOverride hooks. BeginPlay/Tick/EndPlay keep the existing native hos
 ordering. Do not label those separate facilities as completed.
 
 See `dsl_method_dispatch_probe.das` and `Scripts/TestMethodDispatchPIE.ps1`.
+
+Const instance methods and script helpers use native DAS `def const`; see
+[DSLConstMethods](DSLConstMethods.md) for readonly-self checks and Unreal flags.

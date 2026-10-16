@@ -1308,6 +1308,13 @@ bool RunDasFoundationTests(FString& Report)
         FDasAuthoringModule StubInterfaces;FString StubIssue;
         Expect(Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_abstract_legacy.das")),StubInterfaces,StubIssue) && StubInterfaces.Classes[0].Methods.Num()==4,TEXT("interface_legacy_abstract_syntax_remains_readable"),StubIssue);
         Expect(Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_definition.das")),StubInterfaces,StubIssue) && StubInterfaces.Classes[0].Methods.FindByPredicate([](const auto& M){return M.Name==TEXT("Query");})->Metadata.FindRef(TEXT("Category"))==TEXT("Counter"),TEXT("interface_method_annotation_metadata_collected"),StubIssue);
+        FDasAuthoringModule PureInterfaces;FString PureIssue;
+        const bool PureRead=Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_pure.das")),PureInterfaces,PureIssue);
+        Expect(PureRead && PureInterfaces.Classes.Num()==1 && PureInterfaces.Classes[0].Methods.Num()==3 && PureInterfaces.Classes[0].Methods.ContainsByPredicate([](const auto& M){return M.Name==TEXT("Query") && M.bPure && M.bCallable;}) && PureInterfaces.Classes[0].Methods.ContainsByPredicate([](const auto& M){return M.Name==TEXT("Snapshot") && M.bPure;}) && PureInterfaces.Classes[0].Methods.ContainsByPredicate([](const auto& M){return M.Name==TEXT("Impure") && !M.bPure;}),TEXT("interface_pure_collector_flags_out_and_impure_optout"),PureIssue);
+        FString PureJson;FDasAuthoringModule PureRoundTrip;
+        Expect(PureRead && PureInterfaces.ToJson(PureJson,PureIssue) && FDasAuthoringModule::FromJson(PureJson,PureRoundTrip,PureIssue) && PureRoundTrip.Classes[0].Methods.ContainsByPredicate([](const auto& M){return M.Name==TEXT("Query") && M.bPure;}),TEXT("interface_pure_IR_roundtrip"),PureIssue);
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_pure_bad_void.das")),PureInterfaces,PureIssue),TEXT("interface_pure_void_without_output_refused"));
+        Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_pure_bad_callable.das")),PureInterfaces,PureIssue),TEXT("interface_pure_noncallable_refused"));
         Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_body.das")),StubInterfaces,StubIssue),TEXT("interface_stub_body_refused"));
         Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_missing_annotation.das")),StubInterfaces,StubIssue),TEXT("interface_stub_missing_annotation_refused"));
         Expect(!Runtime.ReadAuthoredInterfaces(Runtime.ScriptPath(TEXT("dsl_interface_stub_bad_unknown_out.das")),StubInterfaces,StubIssue),TEXT("interface_stub_unknown_out_refused"));

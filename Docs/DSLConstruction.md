@@ -34,13 +34,16 @@ cannot recurse or run after Actor BeginPlay. Hook errors are reported through
 LastDasError; property writes are not rolled back, and the next reconstruction can
 retry after the source is fixed.
 
-Calls that enter another authored DAS VM through a reflected method are currently
-rejected during construction. Same-context script helpers and native property/scene
-access remain available. This restriction is separate from the ordinary gameplay
-method-call support.
+Reflected calls to authored Actor/ActorComponent methods run in the current
+construction invocation's temporary VMs. They preserve gameplay VMs and do not
+deliver Initialize/BeginPlay. Construction restrictions also apply inside nested
+methods. See [DSLConstructionCalls.md](DSLConstructionCalls.md) for semantics and
+the dedicated Create/Reopen probe.
 
-The first version is Actor-only. ActorComponent construction callbacks require a
-separate policy for registration/re-registration and are not introduced here.
+ActorComponents also support ConstructionScript, with an authored-owner pass and
+a separate registration/property-edit policy. See
+[DSLComponentConstruction.md](DSLComponentConstruction.md) for ordering and native-owner
+limitations.
 Loaded cooked map Actors retain saved construction results; they are not forced
 through construction at load. Actors spawned at runtime execute construction
 before their Initialize/BeginPlay.

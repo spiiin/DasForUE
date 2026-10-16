@@ -115,7 +115,7 @@ int32 UDasFrameCommandlet::Main(const FString& Params){
             UClass* Before=BP->GeneratedClass;const FName ActorName=Actor->GetFName();const FName UntouchedName=Untouched->GetFName();
             const FString Changed=Original.Replace(TEXT("Count=10"),TEXT("Count=11")).Replace(TEXT("Score : int = 5"),TEXT("Score : int = 8"));
             Check(FFileHelper::SaveStringToFile(Changed,*Path,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),TEXT("write_new_defaults"));
-            Check(!FDasDSLService::Reimport(BP,Error) && BP->GeneratedClass==Before && CountOf(BP->GeneratedClass->GetDefaultObject())==10,TEXT("implicit_default_migration_refused"));
+            Check(!FDasDSLService::Reimport(BP,Error,EDasDefaultMigrationPolicy::Refuse) && BP->GeneratedClass==Before && CountOf(BP->GeneratedClass->GetDefaultObject())==10,TEXT("explicit_refuse_default_policy"));
             Check(FDasDSLService::Reimport(BP,Error,EDasDefaultMigrationPolicy::PreserveInstances) && BP->GeneratedClass==Before,TEXT("explicit_migration_updates_CDO_without_reinstance"));if(!Error.IsEmpty())UE_LOG(LogTemp,Error,TEXT("Migration: %s"),*Error);
             Check(CountOf(Actor)==77 && CountOf(Untouched)==10 && ScoreOf(Actor)==5 && ScoreOf(Untouched)==5,TEXT("migration_preserves_overridden_and_unmodified_existing_instances"));
             auto* Fresh=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,Spawn);Check(CountOf(Fresh)==11 && ScoreOf(Fresh)==8,TEXT("new_instances_use_migrated_defaults"));

@@ -4,7 +4,7 @@ Standard lifecycle names are recognized automatically on ue_class methods:
 
 ```das
 require ue_dsl
-[ue_class(module_id="example", Blueprintable)]
+[ue_class(Blueprintable)]
 class Counter {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Score : int = 0
@@ -30,7 +30,7 @@ does not construct a second, independent daScript object to hold those fields.
 Delegate handlers use an annotation to specify the source and delegate mapping:
 
 ```das
-[ue_class(module_id="example", parent="ActorComponent", Blueprintable)]
+[ue_class(parent="ActorComponent", Blueprintable)]
 class Behavior {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     SignalTotal : int = 0

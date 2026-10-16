@@ -79,6 +79,10 @@ namespace
         if ((K == TEXT("string") || K == TEXT("name") || K == TEXT("enum")) && D.Kind == TEXT("string") && (K != TEXT("name") || D.String.Len() < NAME_SIZE) && (K != TEXT("enum") || Identifier(D.String))) return true;
         if(K==TEXT("struct") && D.Kind==TEXT("string")){FInstancedStruct Value;return ParseDasStructDefault(P.Type.TypePath,D.String,Value,Error);}
         if ((K == TEXT("object") || K == TEXT("class")) && D.Kind == TEXT("null")) return true;
+        if ((K == TEXT("object") || K == TEXT("class")) && D.Kind == TEXT("string") && !D.String.IsEmpty()){
+            if(!P.Type.AuthoredId.IsEmpty())return Fail(Error,TEXT("Non-null authored object defaults require a separate identity contract"));
+            UObject* Value=nullptr;return ResolveDasReferenceDefault(K==TEXT("class"),P.Type.TypePath,D.String,Value,Error);
+        }
         return Fail(Error, TEXT("Invalid default for property ") + P.Name);
     }
     bool SameDefault(const FDasDeclaredLiteral& A, const FDasDeclaredLiteral& B)
@@ -185,7 +189,7 @@ bool FDasAuthoringModule::Validate(FString& Error) const
         for (const auto& M : C.Methods)
         {
             if (!AddId(M.Id) || !Identifier(M.Name) || Names.Contains(M.Name.ToLower())) return Fail(Error,TEXT("Invalid or duplicate method: ")+M.Name);
-            Names.Add(M.Name.ToLower()); if (!TypeValid(M.ReturnType,ClassIds,true,Error) || !MetadataValid(M.Metadata,Error)) return false;
+            Names.Add(M.Name.ToLower()); if(M.bPure && (!M.bCallable || (M.ReturnType.Kind==TEXT("void") && !M.Parameters.ContainsByPredicate([](const auto& P){return P.Direction==TEXT("out") || P.Direction==TEXT("inout");}))))return Fail(Error,TEXT("BlueprintPure requires callable function with a result or output parameter: ")+M.Name); if (!TypeValid(M.ReturnType,ClassIds,true,Error) || !MetadataValid(M.Metadata,Error)) return false;
             if (!Identifier(M.EntryPoint) || M.ScriptFile.IsEmpty() || FPaths::GetCleanFilename(M.ScriptFile) != M.ScriptFile || M.ScriptFile.Contains(TEXT(":")) || !M.ScriptFile.EndsWith(TEXT(".das"))) return Fail(Error,TEXT("Expected local script filename and entry point: ")+M.Id);
             if (M.Parameters.Num() > 64) return Fail(Error,TEXT("Parameter count limit exceeded"));
             TSet<FString> Parameters;
@@ -197,7 +201,7 @@ bool FDasAuthoringModule::Validate(FString& Error) const
         }
     }
     // Inheritance dependencies are acyclic; object references may legitimately point to self.
-    for(const auto& C:Classes){FDasDeclaredClass Effective;if(!ResolveClass(C.Id,Effective,Error))return false;if(Effective.NativeParent!=TEXT("/Script/Engine.Actor") && Effective.Callbacks.ContainsByPredicate([](const auto& Hook){return Hook.Kind==TEXT("ConstructionScript");}))return Fail(Error,TEXT("ConstructionScript requires an authored Actor"));}
+    for(const auto& C:Classes){FDasDeclaredClass Effective;if(!ResolveClass(C.Id,Effective,Error))return false;}
     return true;
 }
 bool FDasAuthoringModule::FromJson(const FString& Json, FDasAuthoringModule& Out, FString& Error)
@@ -211,12 +215,18 @@ bool FDasAuthoringModule::FromJson(const FString& Json, FDasAuthoringModule& Out
     for (const auto& J : ClassesJson)
     {
         FDasDeclaredClass C;
-        if (!Keys(J,{TEXT("id"),TEXT("name"),TEXT("native_parent"),TEXT("parent_id"),TEXT("source_script"),TEXT("interfaces"),TEXT("components"),TEXT("component_overrides"),TEXT("callbacks"),TEXT("properties"),TEXT("methods"),TEXT("metadata")},Error) || !String(J,TEXT("id"),C.Id,Error) || !String(J,TEXT("name"),C.Name,Error) || !Meta(J,C.Metadata,Error)) return false;
+        if (!Keys(J,{TEXT("id"),TEXT("name"),TEXT("native_parent"),TEXT("parent_id"),TEXT("source_script"),TEXT("interfaces"),TEXT("components"),TEXT("component_overrides"),TEXT("property_overrides"),TEXT("callbacks"),TEXT("properties"),TEXT("methods"),TEXT("metadata")},Error) || !String(J,TEXT("id"),C.Id,Error) || !String(J,TEXT("name"),C.Name,Error) || !Meta(J,C.Metadata,Error)) return false;
         if (J->HasField(TEXT("native_parent")) && !String(J,TEXT("native_parent"),C.NativeParent,Error)) return false;
         if (J->HasField(TEXT("parent_id")) && !String(J,TEXT("parent_id"),C.ParentId,Error)) return false;
         if(J->HasField(TEXT("source_script")) && !String(J,TEXT("source_script"),C.SourceScript,Error))return false;
         if(J->HasField(TEXT("interfaces"))){const TArray<TSharedPtr<FJsonValue>>* Items=nullptr;if(!J->TryGetArrayField(TEXT("interfaces"),Items))return Fail(Error,TEXT("Expected interfaces array"));for(const auto& V:*Items){FString I;if(!V->TryGetString(I))return Fail(Error,TEXT("Expected interface path string"));C.Interfaces.Add(I);}}
         if(J->HasField(TEXT("components"))){TArray<TSharedPtr<FJsonObject>> Items;if(!Objects(J,TEXT("components"),Items,Error))return false;for(const auto& Item:Items){FDasDeclaredComponent Component;if(!Keys(Item,{TEXT("id"),TEXT("name"),TEXT("script_file"),TEXT("class_name"),TEXT("native_class"),TEXT("defaults"),TEXT("attach"),TEXT("attach_socket"),TEXT("root"),TEXT("read_only"),TEXT("editable"),TEXT("visible"),TEXT("metadata")},Error) || !String(Item,TEXT("id"),Component.Id,Error) || !String(Item,TEXT("name"),Component.Name,Error) || !String(Item,TEXT("script_file"),Component.ScriptFile,Error) || !String(Item,TEXT("class_name"),Component.ClassName,Error))return false;if(!ReadComponentDefaults(Item,Component.Defaults,Error))return false;if(Item->HasField(TEXT("attach")) && !String(Item,TEXT("attach"),Component.Attach,Error))return false;if(Item->HasField(TEXT("attach_socket")) && !String(Item,TEXT("attach_socket"),Component.AttachSocket,Error))return false;if(Item->HasField(TEXT("root")) && !Boolean(Item,TEXT("root"),Component.bRoot,Error))return false;if(Item->HasField(TEXT("native_class")) && !String(Item,TEXT("native_class"),Component.NativeClass,Error))return false;if(Item->HasField(TEXT("read_only")) && !Boolean(Item,TEXT("read_only"),Component.bReadOnly,Error))return false;if(Item->HasField(TEXT("editable")) && !Boolean(Item,TEXT("editable"),Component.bEditable,Error))return false;if(Item->HasField(TEXT("visible")) && !Boolean(Item,TEXT("visible"),Component.bVisible,Error))return false;if(!Meta(Item,Component.Metadata,Error))return false;C.Components.Add(Component);}}
+        if(J->HasField(TEXT("property_overrides"))){TArray<TSharedPtr<FJsonObject>> Items;if(!Objects(J,TEXT("property_overrides"),Items,Error))return false;
+            for(const auto& Item:Items){FDasPropertyDefaultOverride O;if(!Keys(Item,{TEXT("id"),TEXT("name"),TEXT("default")},Error) || !String(Item,TEXT("id"),O.Id,Error) || !String(Item,TEXT("name"),O.Name,Error))return false;
+                const auto* Value=Item->Values.Find(TEXT("default"));if(!Value)return Fail(Error,TEXT("Inherited override needs explicit default"));
+                switch((*Value)->Type){case EJson::Null:O.Default.Kind=TEXT("null");break;case EJson::Boolean:O.Default.Kind=TEXT("bool");O.Default.Boolean=(*Value)->AsBool();break;case EJson::Number:O.Default.Kind=TEXT("number");O.Default.Number=(*Value)->AsNumber();break;case EJson::String:O.Default.Kind=TEXT("string");O.Default.String=(*Value)->AsString();break;default:return Fail(Error,TEXT("Inherited default must be a literal"));}C.PropertyOverrides.Add(O);
+            }
+        }
         if(J->HasField(TEXT("component_overrides"))){TArray<TSharedPtr<FJsonObject>> Items;if(!Objects(J,TEXT("component_overrides"),Items,Error))return false;for(const auto& Item:Items){FDasComponentOverride O;if(!Keys(Item,{TEXT("id"),TEXT("name"),TEXT("defaults")},Error) || !String(Item,TEXT("id"),O.Id,Error) || !String(Item,TEXT("name"),O.Name,Error) || !ReadComponentDefaults(Item,O.Defaults,Error))return false;C.ComponentOverrides.Add(O);}}
         if(J->HasField(TEXT("callbacks"))){TArray<TSharedPtr<FJsonObject>> Items;if(!Objects(J,TEXT("callbacks"),Items,Error))return false;for(const auto& Item:Items){FDasDeclaredCallback Callback;if(!Keys(Item,{TEXT("name"),TEXT("kind"),TEXT("source"),TEXT("event_name"),TEXT("parameter_kind")},Error) || !String(Item,TEXT("name"),Callback.Name,Error) || !String(Item,TEXT("kind"),Callback.Kind,Error) || !String(Item,TEXT("source"),Callback.Source,Error) || !String(Item,TEXT("event_name"),Callback.EventName,Error))return false;if(Item->HasField(TEXT("parameter_kind")) && (Callback.Kind!=TEXT("event") || !String(Item,TEXT("parameter_kind"),Callback.ParameterKind,Error)))return false;C.Callbacks.Add(Callback);}}
         TArray<TSharedPtr<FJsonObject>> Ps, Ms; if (!Objects(J,TEXT("properties"),Ps,Error) || !Objects(J,TEXT("methods"),Ms,Error)) return false;
@@ -238,7 +248,7 @@ bool FDasAuthoringModule::FromJson(const FString& Json, FDasAuthoringModule& Out
         for (const auto& V : Ms)
         {
             FDasDeclaredMethod M;
-            if (!Keys(V,{TEXT("id"),TEXT("name"),TEXT("return_type"),TEXT("parameters"),TEXT("implementation"),TEXT("callable"),TEXT("pure"),TEXT("static"),TEXT("blueprint_event"),TEXT("metadata")},Error) || !String(V,TEXT("id"),M.Id,Error) || !String(V,TEXT("name"),M.Name,Error) || !Type(V,TEXT("return_type"),M.ReturnType,Error) || !Meta(V,M.Metadata,Error) || !Boolean(V,TEXT("callable"),M.bCallable,Error) || !Boolean(V,TEXT("pure"),M.bPure,Error) || !Boolean(V,TEXT("static"),M.bStatic,Error) || !Boolean(V,TEXT("blueprint_event"),M.bBlueprintEvent,Error)) return false;
+            if (!Keys(V,{TEXT("id"),TEXT("name"),TEXT("return_type"),TEXT("parameters"),TEXT("implementation"),TEXT("callable"),TEXT("pure"),TEXT("static"),TEXT("const"),TEXT("blueprint_event"),TEXT("metadata")},Error) || !String(V,TEXT("id"),M.Id,Error) || !String(V,TEXT("name"),M.Name,Error) || !Type(V,TEXT("return_type"),M.ReturnType,Error) || !Meta(V,M.Metadata,Error) || !Boolean(V,TEXT("callable"),M.bCallable,Error) || !Boolean(V,TEXT("pure"),M.bPure,Error) || !Boolean(V,TEXT("static"),M.bStatic,Error) || !Boolean(V,TEXT("const"),M.bConst,Error) || !Boolean(V,TEXT("blueprint_event"),M.bBlueprintEvent,Error)) return false;
             const TSharedPtr<FJsonObject>* Impl;
             if (!V->TryGetObjectField(TEXT("implementation"),Impl) || !Keys(*Impl,{TEXT("script_file"),TEXT("entry_point")},Error) || !String(*Impl,TEXT("script_file"),M.ScriptFile,Error) || !String(*Impl,TEXT("entry_point"),M.EntryPoint,Error)) return Fail(Error,Error.IsEmpty()?TEXT("Expected method implementation"):Error);
             TArray<TSharedPtr<FJsonObject>> Params; if (!Objects(V,TEXT("parameters"),Params,Error)) return false;
@@ -263,6 +273,7 @@ bool FDasAuthoringModule::ToJson(FString& Out, FString& Error) const
     for (const auto* C : Cs)
     {
         auto J = MakeShared<FJsonObject>(); J->SetStringField(TEXT("id"),C->Id); J->SetStringField(TEXT("name"),C->Name);
+        if(!C->PropertyOverrides.IsEmpty()){auto Sorted=C->PropertyOverrides;Sorted.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});TArray<TSharedPtr<FJsonValue>> Items;for(const auto& O:Sorted){auto Item=MakeShared<FJsonObject>();Item->SetStringField(TEXT("id"),O.Id);Item->SetStringField(TEXT("name"),O.Name);const auto& D=O.Default;if(D.Kind==TEXT("number"))Item->SetNumberField(TEXT("default"),D.Number);else if(D.Kind==TEXT("bool"))Item->SetBoolField(TEXT("default"),D.Boolean);else if(D.Kind==TEXT("string"))Item->SetStringField(TEXT("default"),D.String);else Item->SetField(TEXT("default"),MakeShared<FJsonValueNull>());Items.Add(MakeShared<FJsonValueObject>(Item));}J->SetArrayField(TEXT("property_overrides"),Items);}
         if(!C->ComponentOverrides.IsEmpty()){TArray<FDasComponentOverride> Sorted=C->ComponentOverrides;Sorted.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});TArray<TSharedPtr<FJsonValue>> Items;for(const auto& O:Sorted){auto Item=MakeShared<FJsonObject>();Item->SetStringField(TEXT("id"),O.Id);Item->SetStringField(TEXT("name"),O.Name);WriteComponentDefaults(O.Defaults,Item);Items.Add(MakeShared<FJsonValueObject>(Item));}J->SetArrayField(TEXT("component_overrides"),Items);}
         if(!C->Callbacks.IsEmpty()){TArray<TSharedPtr<FJsonValue>> Items;for(const auto& Callback:C->Callbacks){auto Item=MakeShared<FJsonObject>();Item->SetStringField(TEXT("name"),Callback.Name);Item->SetStringField(TEXT("kind"),Callback.Kind);Item->SetStringField(TEXT("source"),Callback.Source);Item->SetStringField(TEXT("event_name"),Callback.EventName);if(Callback.Kind==TEXT("event") && Callback.ParameterKind!=TEXT("int"))Item->SetStringField(TEXT("parameter_kind"),Callback.ParameterKind);Items.Add(MakeShared<FJsonValueObject>(Item));}J->SetArrayField(TEXT("callbacks"),Items);}
         if(!C->Components.IsEmpty()){TArray<FDasDeclaredComponent> Components=C->Components;Components.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});TArray<TSharedPtr<FJsonValue>> Items;for(const auto& Component:Components){auto Item=MakeShared<FJsonObject>();Item->SetStringField(TEXT("id"),Component.Id);Item->SetStringField(TEXT("name"),Component.Name);Item->SetStringField(TEXT("script_file"),Component.ScriptFile);Item->SetStringField(TEXT("class_name"),Component.ClassName);WriteComponentDefaults(Component.Defaults,Item);if(!Component.Attach.IsEmpty())Item->SetStringField(TEXT("attach"),Component.Attach);if(!Component.AttachSocket.IsEmpty())Item->SetStringField(TEXT("attach_socket"),Component.AttachSocket);if(Component.bRoot)Item->SetBoolField(TEXT("root"),true);if(!Component.NativeClass.IsEmpty())Item->SetStringField(TEXT("native_class"),Component.NativeClass);if(Component.bReadOnly || Component.bEditable || Component.bVisible || !Component.Metadata.IsEmpty()){Item->SetBoolField(TEXT("read_only"),Component.bReadOnly);Item->SetBoolField(TEXT("editable"),Component.bEditable);Item->SetBoolField(TEXT("visible"),Component.bVisible);MetadataJson(Component.Metadata,Item);}Items.Add(MakeShared<FJsonValueObject>(Item));}J->SetArrayField(TEXT("components"),Items);}
@@ -285,7 +296,7 @@ bool FDasAuthoringModule::ToJson(FString& Out, FString& Error) const
         for (const auto* M : Ms)
         {
             auto V = MakeShared<FJsonObject>(); V->SetStringField(TEXT("id"),M->Id); V->SetStringField(TEXT("name"),M->Name); V->SetObjectField(TEXT("return_type"),TypeJson(M->ReturnType)); MetadataJson(M->Metadata,V);
-            V->SetBoolField(TEXT("callable"),M->bCallable); V->SetBoolField(TEXT("pure"),M->bPure); V->SetBoolField(TEXT("static"),M->bStatic);if(M->bBlueprintEvent)V->SetBoolField(TEXT("blueprint_event"),true);
+            V->SetBoolField(TEXT("callable"),M->bCallable); V->SetBoolField(TEXT("pure"),M->bPure); V->SetBoolField(TEXT("static"),M->bStatic);if(M->bConst)V->SetBoolField(TEXT("const"),true);if(M->bBlueprintEvent)V->SetBoolField(TEXT("blueprint_event"),true);
             auto Impl = MakeShared<FJsonObject>(); Impl->SetStringField(TEXT("script_file"),M->ScriptFile); Impl->SetStringField(TEXT("entry_point"),M->EntryPoint); V->SetObjectField(TEXT("implementation"),Impl);
             TArray<TSharedPtr<FJsonValue>> Qj; for (const auto& P : M->Parameters)
             { auto Q = MakeShared<FJsonObject>(); Q->SetStringField(TEXT("id"),P.Id); Q->SetStringField(TEXT("name"),P.Name); Q->SetStringField(TEXT("direction"),P.Direction); Q->SetObjectField(TEXT("type"),TypeJson(P.Type)); Qj.Add(MakeShared<FJsonValueObject>(Q)); }
@@ -301,9 +312,15 @@ bool FDasAuthoringModule::ResolveClass(const FString& ClassId,FDasDeclaredClass&
     TArray<const FDasDeclaredClass*> Chain;TSet<FString> Seen;
     for(const auto* C=Leaf;C;){if(Seen.Contains(C->Id) || Chain.Num()>=32)return Fail(Error,TEXT("Inheritance cycle or depth limit: ")+ClassId);Seen.Add(C->Id);Chain.Add(C);if(C->ParentId.IsEmpty())break;const FString Parent=C->ParentId;C=Classes.FindByPredicate([&](const auto& P){return P.Id==Parent;});if(!C)return Fail(Error,TEXT("Missing authored parent: ")+Parent);}
     FDasDeclaredClass Effective;Effective.Id=Leaf->Id;Effective.Name=Leaf->Name;Effective.NativeParent=Chain.Last()->NativeParent;Effective.Metadata=Leaf->Metadata;Effective.SourceScript=Leaf->SourceScript;
-    auto SameSignature=[](const FDasDeclaredMethod& A,const FDasDeclaredMethod& B){if(A.ReturnType.Identity()!=B.ReturnType.Identity() || A.Parameters.Num()!=B.Parameters.Num() || A.bPure!=B.bPure || A.bStatic!=B.bStatic)return false;for(int32 I=0;I<A.Parameters.Num();++I)if(A.Parameters[I].Name!=B.Parameters[I].Name || A.Parameters[I].Type.Identity()!=B.Parameters[I].Type.Identity() || A.Parameters[I].Direction!=B.Parameters[I].Direction)return false;return true;};
+    auto SameSignature=[](const FDasDeclaredMethod& A,const FDasDeclaredMethod& B){if(A.ReturnType.Identity()!=B.ReturnType.Identity() || A.Parameters.Num()!=B.Parameters.Num() || A.bPure!=B.bPure || A.bConst!=B.bConst || A.bStatic!=B.bStatic)return false;for(int32 I=0;I<A.Parameters.Num();++I)if(A.Parameters[I].Name!=B.Parameters[I].Name || A.Parameters[I].Type.Identity()!=B.Parameters[I].Type.Identity() || A.Parameters[I].Direction!=B.Parameters[I].Direction)return false;return true;};
     for(int32 I=Chain.Num()-1;I>=0;--I){const auto& C=*Chain[I];
         for(const auto& Interface:C.Interfaces)Effective.Interfaces.AddUnique(Interface);
+        if(C.PropertyOverrides.Num()>128)return Fail(Error,TEXT("At most 128 inherited property defaults"));
+        TSet<FString> PropertyDefaults;
+        for(const auto& O:C.PropertyOverrides){auto* P=Effective.Properties.FindByPredicate([&](const auto& V){return V.Id==O.Id && V.Name==O.Name;});
+            if(C.ParentId.IsEmpty() || !P || !P->bEditable || PropertyDefaults.Contains(O.Id) || O.Default.Kind.IsEmpty() || P->Type.Kind==TEXT("event") || P->Type.Kind==TEXT("delegate") || DasContainerCarrier(P->Type))return Fail(Error,TEXT("Invalid, noneditable or duplicate inherited property default: ")+O.Name);
+            PropertyDefaults.Add(O.Id);auto Value=*P;Value.Default=O.Default;if(!DefaultValid(Value,Error))return false;P->Default=O.Default;
+        }
         for(const auto& P:C.Properties){if(Effective.Properties.ContainsByPredicate([&](const auto& Old){return Old.Name.Equals(P.Name,ESearchCase::IgnoreCase);}) || Effective.Methods.ContainsByPredicate([&](const auto& M){return M.Name.Equals(P.Name,ESearchCase::IgnoreCase);} ))return Fail(Error,TEXT("Inherited member cannot be shadowed: ")+C.Id+TEXT(".")+P.Name);Effective.Properties.Add(P);}
         for(const auto& M:C.Methods){if(Effective.Properties.ContainsByPredicate([&](const auto& P){return P.Name.Equals(M.Name,ESearchCase::IgnoreCase);} ))return Fail(Error,TEXT("Method shadows inherited property: ")+M.Name);auto* Parent=Effective.Methods.FindByPredicate([&](const auto& P){return P.Name.Equals(M.Name,ESearchCase::IgnoreCase);});if(Parent){if(!Parent->bBlueprintEvent || !M.bBlueprintEvent || !SameSignature(*Parent,M))return Fail(Error,TEXT("Override requires a BlueprintEvent with unchanged signature: ")+C.Id+TEXT(".")+M.Name);*Parent=M;}else Effective.Methods.Add(M);}
         TSet<FString> Overridden;
@@ -325,7 +342,7 @@ bool FDasAuthoringModule::ResolveClass(const FString& ClassId,FDasDeclaredClass&
     Out=MoveTemp(Effective);return true;
 }
 
-bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema& Out, FString& Error) const
+bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema& Out, FString& Error,bool IncludeInherited) const
 {
     if (!Validate(Error)) return false;
     const auto* C = Classes.FindByPredicate([&](const auto& X){return X.Id == ClassId;}); if (!C) return Fail(Error,TEXT("Unknown authored class ID"));
@@ -343,14 +360,14 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         const bool Scalar=(K==TEXT("int") || K==TEXT("float") || K==TEXT("bool")) && M.Parameters.Num()==1 && M.Parameters[0].Type.Kind==K && M.Parameters[0].Direction==TEXT("in") && M.Parameters[0].Name==TEXT("Input");
         auto Kind=[](const FString& T){return T==TEXT("int")?EDasMethodSignature::Int:T==TEXT("float")?EDasMethodSignature::Float:T==TEXT("bool")?EDasMethodSignature::Bool:T==TEXT("void")?EDasMethodSignature::Void:T==TEXT("string")?EDasMethodSignature::String:T==TEXT("double")?EDasMethodSignature::Double:T==TEXT("name")?EDasMethodSignature::Name:T==TEXT("class")?EDasMethodSignature::Class:T==TEXT("object")?EDasMethodSignature::Object:T==TEXT("delegate")?EDasMethodSignature::Delegate:T==TEXT("enum")?EDasMethodSignature::Enum:EDasMethodSignature::Frame;};
         auto ValueKind=[&](const FDasDeclaredType& T){if(T.Kind==TEXT("array") || T.Kind==TEXT("map") || T.Kind==TEXT("set"))return DasContainerCarrier(T)?EDasMethodSignature::Struct:EDasMethodSignature::Frame;if(T.Kind==TEXT("struct")){if(T.TypePath==TEXT("/Script/CoreUObject.Vector"))return EDasMethodSignature::Vector;if(T.TypePath==TEXT("/Script/CoreUObject.Rotator"))return EDasMethodSignature::Rotator;if(T.TypePath==TEXT("/Script/CoreUObject.Transform"))return EDasMethodSignature::Transform;return EDasMethodSignature::Struct;}return Kind(T.Kind);};
-        if(ValueKind(M.ReturnType)==EDasMethodSignature::Frame || M.Parameters.Num()>16 || !M.bCallable || M.bPure || M.bStatic) return Fail(Error,TEXT("Actor adapter requires callable scalar/void methods with up to 16 by-value inputs, without pure/static: ")+M.Id);
-        FDasMethodSchema Method;Method.Name=*M.Name;Method.ScriptFile=M.ScriptFile;Method.EntryPoint=M.EntryPoint;Method.StableId=M.Id;Method.InputStableId=M.Parameters.Num()==1?M.Parameters[0].Id:FString();Method.Metadata=M.Metadata;Method.bBlueprintEvent=M.bBlueprintEvent;Method.Metadata.Add(TEXT("DasFunctionKind"),(M.bBlueprintEvent || C->Interfaces.ContainsByPredicate([&](const FString& Path){auto* I=FindObject<UClass>(nullptr,*Path);return I && I->FindFunctionByName(*M.Name);}))?TEXT("Event"):TEXT("Callable"));Method.ReturnKind=ValueKind(M.ReturnType);Method.ReturnClass=K==TEXT("delegate")?M.ReturnType.DelegateWire:DasContainerCarrier(M.ReturnType)?DasContainerCarrier(M.ReturnType)->GetPathName():(K==TEXT("class") || K==TEXT("enum") || K==TEXT("object") || (K==TEXT("struct") && Method.ReturnKind==EDasMethodSignature::Struct))?M.ReturnType.TypePath:FString();
+        if(ValueKind(M.ReturnType)==EDasMethodSignature::Frame || M.Parameters.Num()>16 || !M.bCallable || M.bStatic) return Fail(Error,TEXT("Actor adapter requires callable scalar/void methods with up to 16 by-value inputs, without static: ")+M.Id);
+        FDasMethodSchema Method;Method.Name=*M.Name;Method.ScriptFile=M.ScriptFile;Method.EntryPoint=M.EntryPoint;Method.StableId=M.Id;Method.InputStableId=M.Parameters.Num()==1?M.Parameters[0].Id:FString();Method.Metadata=M.Metadata;Method.bBlueprintEvent=M.bBlueprintEvent;Method.bPure=M.bPure;Method.bConst=M.bConst;Method.Metadata.Add(TEXT("DasFunctionKind"),(M.bBlueprintEvent || C->Interfaces.ContainsByPredicate([&](const FString& Path){auto* I=FindObject<UClass>(nullptr,*Path);return I && I->FindFunctionByName(*M.Name);}))?TEXT("Event"):TEXT("Callable"));Method.ReturnKind=ValueKind(M.ReturnType);Method.ReturnClass=K==TEXT("delegate")?M.ReturnType.DelegateWire:DasContainerCarrier(M.ReturnType)?DasContainerCarrier(M.ReturnType)->GetPathName():(K==TEXT("class") || K==TEXT("enum") || K==TEXT("object") || (K==TEXT("struct") && Method.ReturnKind==EDasMethodSignature::Struct))?M.ReturnType.TypePath:FString();
         for(const auto& P:M.Parameters){if((ValueKind(P.Type)==EDasMethodSignature::Frame || ValueKind(P.Type)==EDasMethodSignature::Void) || (P.Direction!=TEXT("in") && P.Direction!=TEXT("out") && P.Direction!=TEXT("inout"))) return Fail(Error,TEXT("Actor adapter parameter capability missing: ")+P.Id);Method.Parameters.Add({*P.Name,P.Id,ValueKind(P.Type),P.Type.Kind==TEXT("delegate")?P.Type.DelegateWire:DasContainerCarrier(P.Type)?DasContainerCarrier(P.Type)->GetPathName():(P.Type.Kind==TEXT("class") || P.Type.Kind==TEXT("enum") || P.Type.Kind==TEXT("object") || (P.Type.Kind==TEXT("struct") && ValueKind(P.Type)==EDasMethodSignature::Struct))?P.Type.TypePath:FString(),P.Direction});}
-        Method.Signature=Result.Parent==TEXT("ActorComponent") || !C->Interfaces.IsEmpty()?EDasMethodSignature::Frame:Action?EDasMethodSignature::Void:Scalar?Kind(K):EDasMethodSignature::Frame;
+        Method.Signature=M.bConst || Result.Parent==TEXT("ActorComponent") || !C->Interfaces.IsEmpty()?EDasMethodSignature::Frame:Action?EDasMethodSignature::Void:Scalar?Kind(K):EDasMethodSignature::Frame;
         Result.Methods.Add(MoveTemp(Method));
     }
     if(!Result.Methods.IsEmpty())Result.Method=Result.Methods[0];
-    TArray<const FDasDeclaredProperty*> Properties; for (const auto& P : Declared->Properties) Properties.Add(&P);
+    TArray<const FDasDeclaredProperty*> Properties; for (const auto& P : (IncludeInherited?Effective.Properties:Declared->Properties)) Properties.Add(&P);
     Properties.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});
     for (const auto* Ptr : Properties)
     {
@@ -364,7 +381,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
 FDasAuthoringDelta FDasAuthoringModule::Compare(const FDasDeclaredClass& Old, const FDasDeclaredClass& Next)
 {
     FDasAuthoringDelta D; D.bStructural = Old.Id!=Next.Id || Old.Name!=Next.Name || Old.NativeParent!=Next.NativeParent || Old.ParentId!=Next.ParentId || Old.Interfaces!=Next.Interfaces || Old.Components!=Next.Components || Old.ComponentOverrides!=Next.ComponentOverrides || Old.Callbacks!=Next.Callbacks;
-    D.bMetadata = !SameMetadata(Old.Metadata,Next.Metadata);
+    D.bMetadata = !SameMetadata(Old.Metadata,Next.Metadata);D.bDefaults=Old.PropertyOverrides.Num()!=Next.PropertyOverrides.Num() || Old.PropertyOverrides.ContainsByPredicate([&](const auto& O){return !Next.PropertyOverrides.Contains(O);});
     for (const auto& P : Next.Properties)
     {
         const auto* Prior=Old.Properties.FindByPredicate([&](const auto& X){return X.Id==P.Id;});
@@ -377,11 +394,25 @@ FDasAuthoringDelta FDasAuthoringModule::Compare(const FDasDeclaredClass& Old, co
     {
         const auto* Prior=Old.Methods.FindByPredicate([&](const auto& X){return X.Id==M.Id;});
         if (!Prior) {D.Added.Add(M.Id);D.bStructural=true;continue;}
-        D.bStructural |= M.Name!=Prior->Name || M.ReturnType.Identity()!=Prior->ReturnType.Identity() || M.Parameters.Num()!=Prior->Parameters.Num() || M.bCallable!=Prior->bCallable || M.bPure!=Prior->bPure || M.bStatic!=Prior->bStatic || M.bBlueprintEvent!=Prior->bBlueprintEvent;
+        D.bStructural |= M.Name!=Prior->Name || M.ReturnType.Identity()!=Prior->ReturnType.Identity() || M.Parameters.Num()!=Prior->Parameters.Num() || M.bCallable!=Prior->bCallable || M.bPure!=Prior->bPure || M.bConst!=Prior->bConst || M.bStatic!=Prior->bStatic || M.bBlueprintEvent!=Prior->bBlueprintEvent;
         for (int32 Index=0;Index<FMath::Min(M.Parameters.Num(),Prior->Parameters.Num());++Index)
         {const auto& A=M.Parameters[Index];const auto& B=Prior->Parameters[Index];D.bStructural |= A.Id!=B.Id || A.Name!=B.Name || A.Direction!=B.Direction || A.Type.Identity()!=B.Type.Identity();}
         D.bMetadata |= !SameMetadata(M.Metadata,Prior->Metadata); D.bImplementation |= M.ScriptFile!=Prior->ScriptFile || M.EntryPoint!=Prior->EntryPoint;
     }
     for (const auto& M:Old.Methods) if (!Next.Methods.ContainsByPredicate([&](const auto& X){return X.Id==M.Id;})){D.Removed.Add(M.Id);D.bStructural=true;}
     D.Added.Sort();D.Removed.Sort();return D;
+}
+
+FString DasDefaultSourceContract(const FDasDeclaredProperty& P){
+ const auto& D=P.Default;const FString Text=P.Id+TEXT("|")+P.Type.Identity()+TEXT("|")+D.Kind+TEXT("|")+FString::Printf(TEXT("%.17g|%d|"),D.Number,D.Boolean?1:0)+D.String;
+ FTCHARToUTF8 UTF8(*Text);FMD5 Hash;Hash.Update(reinterpret_cast<const uint8*>(UTF8.Get()),UTF8.Length());uint8 Digest[16];Hash.Final(Digest);return BytesToHex(Digest,16);
+}
+bool FDasAuthoringModule::DefaultsOnly(const FDasAuthoringModule& Before,const FDasAuthoringModule& After,FString& Error){
+ auto Strip=[](FDasAuthoringModule M){for(auto& C:M.Classes){C.PropertyOverrides.Reset();for(auto& P:C.Properties)P.Default={};for(auto& Cmp:C.Components)Cmp.Defaults.Reset();for(auto& O:C.ComponentOverrides){O.Defaults.Reset();FDasDeclaredLiteral Marker;Marker.Kind=TEXT("bool");O.Defaults.Add(TEXT("__defaults"),Marker);}}return M;};
+ // Validate the actual models before stripping defaults; stripped enum/reference
+ // declarations intentionally lack defaults and are compared as deterministic JSON.
+ if(!Before.Validate(Error) || !After.Validate(Error))return false;
+ auto A=Strip(Before),B=Strip(After);FString AJ,BJ;
+ if(!A.ToJson(AJ,Error) || !B.ToJson(BJ,Error))return false;
+ if(AJ!=BJ){Error=TEXT("Safe default update accepts default changes only; layout, metadata, hierarchy and callback contracts must stay unchanged");return false;}return true;
 }

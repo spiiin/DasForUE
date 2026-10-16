@@ -102,8 +102,8 @@ class CounterActor {
     [ue_function(BlueprintCallable)]
     def ResetCounter():void { self.Score = 0 }
 
-    [ue_function(BlueprintCallable)]
-    def Query(Input:int):int { return Input + 7 }
+    [ue_function(BlueprintPure)]
+    def const Query(Input:int):int { return Input + 7 }
     [ue_function(BlueprintCallable)]
     def Label():string { return "Authored 世界" }
     [ue_function(BlueprintCallable)]

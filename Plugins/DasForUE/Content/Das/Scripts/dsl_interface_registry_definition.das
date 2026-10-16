@@ -57,8 +57,8 @@ class CounterContract {
     [ue_function(BlueprintCallable, Category="Counter")]
     def ClearScore():void {}
 
-    [ue_function(BlueprintCallable, Category="Counter", DisplayName="Get Score", ToolTip="Read the current score")]
-    def Query(Input:int):int {}
+    [ue_function(BlueprintPure, Category="Counter", DisplayName="Get Score", ToolTip="Read the current score")]
+    def const Query(Input:int):int {}
     [ue_function(BlueprintCallable)]
     def Label():string {}
     [ue_function(BlueprintCallable)]

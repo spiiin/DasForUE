@@ -2,7 +2,7 @@
 #include "CoreMinimal.h"
 #include "DasSchema.h"
 
-enum class EDasDefaultMigrationPolicy : uint8 { Refuse, PreserveInstances };
+enum class EDasDefaultMigrationPolicy : uint8 { Refuse, PreserveInstances, PreserveOverrides, Automatic };
 class UBlueprint;
 struct FDasAuthoringModule;
 

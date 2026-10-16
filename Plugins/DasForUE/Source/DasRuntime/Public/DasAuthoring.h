@@ -41,7 +41,7 @@ struct FDasDeclaredMethod
     FDasDeclaredType ReturnType;
     TArray<FDasDeclaredParameter> Parameters;
     FString ScriptFile, EntryPoint = TEXT("main");
-    bool bCallable = true, bPure = false, bStatic = false;
+    bool bCallable = true, bPure = false, bStatic = false, bConst = false;
     bool bBlueprintEvent = false;
     TMap<FString, FString> Metadata;
 };
@@ -66,12 +66,18 @@ struct FDasDeclaredCallback {
     FString ParameterKind=TEXT("int");
     bool operator==(const FDasDeclaredCallback& O)const{return Name==O.Name && Kind==O.Kind && Source==O.Source && EventName==O.EventName && (Kind!=TEXT("event") || ParameterKind==O.ParameterKind);}
 };
+struct FDasPropertyDefaultOverride {
+    FString Id,Name;
+    FDasDeclaredLiteral Default;
+    bool operator==(const FDasPropertyDefaultOverride& O)const{return Id==O.Id && Name==O.Name && Default==O.Default;}
+};
 struct FDasDeclaredClass
 {
     FString Id, Name, NativeParent, ParentId, SourceScript;
     TArray<FString> Interfaces;
     TArray<FDasDeclaredComponent> Components;
     TArray<FDasComponentOverride> ComponentOverrides;
+    TArray<FDasPropertyDefaultOverride> PropertyOverrides;
     TArray<FDasDeclaredCallback> Callbacks;
     TArray<FDasDeclaredProperty> Properties;
     TArray<FDasDeclaredMethod> Methods;
@@ -82,16 +88,18 @@ struct FDasAuthoringDelta
     bool bStructural = false, bDefaults = false, bMetadata = false, bImplementation = false;
     TArray<FString> Added, Removed;
 };
+DASRUNTIME_API FString DasDefaultSourceContract(const FDasDeclaredProperty& Property);
 struct DASRUNTIME_API FDasAuthoringModule
 {
     FString Id;
     TArray<FDasDeclaredClass> Classes;
     bool Validate(FString& Error) const;
+    static bool DefaultsOnly(const FDasAuthoringModule& Before,const FDasAuthoringModule& After,FString& Error);
     // Effective view; source declarations retain only their own members.
     bool ResolveClass(const FString& ClassId,FDasDeclaredClass& Out,FString& Error) const;
     static bool FromJson(const FString& Json, FDasAuthoringModule& Out, FString& Error);
     bool ToJson(FString& Out, FString& Error) const;
     // Preflight for the existing Actor adapter: all unsupported capabilities are refused explicitly.
-    bool ToActorSchema(const FString& ClassId, FDasClassSchema& Out, FString& Error) const;
+    bool ToActorSchema(const FString& ClassId, FDasClassSchema& Out, FString& Error,bool IncludeInherited=false) const;
     static FDasAuthoringDelta Compare(const FDasDeclaredClass& Old, const FDasDeclaredClass& Next);
 };

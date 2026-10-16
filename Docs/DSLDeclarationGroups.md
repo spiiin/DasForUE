@@ -5,7 +5,7 @@ consumes such calls in the field initializer of `ue_class` / `ue_struct` before
 type inference. No reader macro, source preprocessing or parser patch is used.
 
 ```das
-[ue_class(module_id="example", Blueprintable)]
+[ue_class(Blueprintable)]
 class Example {
     properties = ue_properties(EditAnywhere, BlueprintReadWrite, Category="State") {
         var Score:int=0

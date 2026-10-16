@@ -19,7 +19,7 @@
     void DSLAnnotationArguments(const das::AnnotationArgumentList& Args,const TSet<FString>& Repeatable={}){
         TSet<FString> Seen;for(const auto& A:Args){const FString Name=DSLText(A.name);if(Seen.Contains(Name) && !Repeatable.Contains(Name))DSLFail(TEXT("Repeated annotation option: ")+Name);Seen.Add(Name);}
     }
-    void DSLDeclarationKind(const das::AnnotationList& Args){TArray<FString> Kinds;for(const auto* A:Args){const auto& Name=A->annotation->name;if(Name=="ue_object_ref" || Name=="ue_class" || Name=="ue_interface" || Name=="ue_struct" || Name=="ue_class_ref" || Name=="ue_native_object" || Name=="ue_native_interface" || Name=="ue_interface_ref" || Name=="ue_delegate" || Name=="ue_multicast")Kinds.Add(DSLText(Name));}if(Kinds.Num()>1)DSLFail(TEXT("Repeated/conflicting declaration annotations: ")+FString::Join(Kinds,TEXT(",")));}
+    void DSLDeclarationKind(const das::AnnotationList& Args){TArray<FString> Kinds;for(const auto* A:Args){const auto& Name=A->annotation->name;if(Name=="ue_native_base" || Name=="ue_object_ref" || Name=="ue_class" || Name=="ue_interface" || Name=="ue_struct" || Name=="ue_class_ref" || Name=="ue_native_object" || Name=="ue_native_interface" || Name=="ue_interface_ref" || Name=="ue_delegate" || Name=="ue_multicast")Kinds.Add(DSLText(Name));}if(Kinds.Num()>1)DSLFail(TEXT("Repeated/conflicting declaration annotations: ")+FString::Join(Kinds,TEXT(",")));}
     void DSLAddDirections(const das::AnnotationArgument& A,TMap<FString,FString>& Directions){
         if(A.type!=das::Type::tString)DSLFail(TEXT("Out/ref requires parameter names"));TArray<FString> Names;DSLText(A.sValue).ParseIntoArray(Names,TEXT(","),false);if(Names.IsEmpty())DSLFail(TEXT("Empty out/ref parameter list"));for(auto Name:Names){Name=Name.TrimStartAndEnd();if(Name.IsEmpty() || Directions.Contains(Name))DSLFail(TEXT("Duplicate/overlapping out/ref parameter name"));Directions.Add(Name,A.name=="out"?TEXT("out"):TEXT("inout"));}
     }
@@ -100,12 +100,7 @@
             if(ActualId!=Id || DSLDirectPath(Source,FString(),Registry)!=Path)DSLFail(TEXT("Source value binding identity/layout mismatch"));return true;
         }catch(const std::exception& X){Error=X.what();return false;}}
     };
-    FString DSLMathPropertyDefault(const das::Structure::FieldDeclaration& Field){
-        FVector Vector=FVector::ZeroVector;FRotator Rotator=FRotator::ZeroRotator;FTransform Transform=FTransform::Identity;const FString Path=DSLMathPath(Field.type);
-        if(Path==TEXT("/Script/CoreUObject.Vector2D")){FVector2D Value=FVector2D::ZeroVector;if(Field.init){if(!Field.init->rtti_isCall())DSLFail(TEXT("Vector2D default requires literal ue_vector2d(x,y)"));auto* Call=static_cast<das::ExprCall*>(Field.init);if(Call->name!="ue_vector2d" || Call->arguments.size()!=2)DSLFail(TEXT("Vector2D default requires two literal coordinates"));double Numbers[2];for(int32 I=0;I<2;++I){auto* A=Call->arguments[I];if(A->__rtti==das::string("ExprConstDouble"))Numbers[I]=static_cast<das::ExprConstDouble*>(A)->getValue();else if(A->__rtti==das::string("ExprConstFloat"))Numbers[I]=static_cast<das::ExprConstFloat*>(A)->getValue();else if(A->__rtti==das::string("ExprConstInt"))Numbers[I]=static_cast<das::ExprConstInt*>(A)->getValue();else DSLFail(TEXT("Vector2D default coordinates must be numeric literals"));if(!FMath::IsFinite(Numbers[I]))DSLFail(TEXT("Vector2D default must be finite"));}Value=FVector2D(Numbers[0],Numbers[1]);}FString Text;TBaseStructure<FVector2D>::Get()->ExportText(Text,&Value,nullptr,nullptr,PPF_None,nullptr);return Text;}
-        if(Field.init){if(!Field.init->rtti_isCall())DSLFail(TEXT("Math property defaults require literal constructors"));auto* Call=static_cast<das::ExprCall*>(Field.init);const das::string Expected=Path==TEXT("/Script/CoreUObject.Vector")?"ue_vector":Path==TEXT("/Script/CoreUObject.Rotator")?"ue_rotator":"ue_transform_identity";if(Call->name!=Expected || Call->arguments.size()!=(Expected=="ue_transform_identity"?0:3))DSLFail(TEXT("Math default requires ue_vector/ue_rotator literals or ue_transform_identity()"));double Values[3]={0,0,0};for(size_t Index=0;Index<Call->arguments.size();++Index){auto* Arg=Call->arguments[Index];if(Arg->__rtti==das::string("ExprConstDouble"))Values[Index]=static_cast<das::ExprConstDouble*>(Arg)->getValue();else if(Arg->__rtti==das::string("ExprConstFloat"))Values[Index]=static_cast<das::ExprConstFloat*>(Arg)->getValue();else if(Arg->__rtti==das::string("ExprConstInt"))Values[Index]=static_cast<das::ExprConstInt*>(Arg)->getValue();else DSLFail(TEXT("Math default components must be finite numeric literals"));if(!FMath::IsFinite(Values[Index]))DSLFail(TEXT("Math default must be finite"));}Vector=FVector(Values[0],Values[1],Values[2]);Rotator=FRotator(Values[0],Values[1],Values[2]);}
-        FString Text;auto* Struct=Path==TEXT("/Script/CoreUObject.Vector")?TBaseStructure<FVector>::Get():Path==TEXT("/Script/CoreUObject.Rotator")?TBaseStructure<FRotator>::Get():TBaseStructure<FTransform>::Get();const void* Memory=Path==TEXT("/Script/CoreUObject.Vector")?static_cast<const void*>(&Vector):Path==TEXT("/Script/CoreUObject.Rotator")?static_cast<const void*>(&Rotator):static_cast<const void*>(&Transform);Struct->ExportText(Text,Memory,nullptr,nullptr,PPF_None,nullptr);return Text;
-    }
+    FString DSLMathPropertyDefault(const das::Structure::FieldDeclaration& Field);
     FString DSLStructEnumDefault(const das::Structure::FieldDeclaration& Field){FString Name;if(!Field.init)DSLFail(TEXT("Enum struct members require an explicit named default"));if(Field.init->__rtti==das::string("ExprConstEnumeration")){auto* E=static_cast<das::ExprConstEnumeration*>(Field.init);if(E->enumType && E->enumType!=Field.type->enumType)DSLFail(TEXT("Enum struct default has a different enum type"));Name=DSLText(E->text);}else if(Field.init->rtti_isField()){auto* E=static_cast<das::ExprField*>(Field.init);const auto Qualified=Field.type->enumType->module->name+"::"+Field.type->enumType->name;if(!E->value->rtti_isVar() || (static_cast<das::ExprVar*>(E->value)->name!=Field.type->enumType->name && static_cast<das::ExprVar*>(E->value)->name!=Qualified))DSLFail(TEXT("Enum struct default must name its declared enum"));Name=DSLText(E->name);}else DSLFail(TEXT("Enum struct defaults require named enum literals"));if(Name.Contains(TEXT("::")))Name=Name.RightChop(Name.Find(TEXT("::"),ESearchCase::CaseSensitive,ESearchDir::FromEnd)+2);if(!std::any_of(Field.type->enumType->list.begin(),Field.type->enumType->list.end(),[&](const auto& V){return DSLText(V.name)==Name;}))DSLFail(TEXT("Unknown enum struct default member"));return Name;}
     bool DSLDelegate(const das::TypeDeclPtr&);
     das::ExpressionPtr DSLDelegateView(const das::LineInfo&,const das::TypeDeclPtr&,das::ExpressionPtr,const FString&);
@@ -336,6 +331,64 @@
             return E;
         }
     };
+    // Native host declarations carry identity only; they are not authored UE classes.
+    FString DSLNativeBasePath(const das::StructurePtr& St) {
+        const auto* A=St?DSLAnnotation(St->annotations,"ue_native_base"):nullptr;
+        return A?DSLString(A->arguments,"path"):FString();
+    }
+    struct FUENativeBaseAnnotation:das::StructureAnnotation {
+        FUENativeBaseAnnotation():StructureAnnotation("ue_native_base"){}
+        virtual bool touch(const das::StructurePtr& St,das::ModuleGroup&,das::AnnotationArgumentList& Args,das::string& Error)override{try{
+            DSLAnnotationArguments(Args);if(Args.size()!=1 || Args[0].name!="path")DSLFail(TEXT("Expected ue_native_base(path=NativeClassPath)"));
+            const FString Path=DSLString(Args,"path");
+            if(Path!=TEXT("/Script/Engine.Actor") && Path!=TEXT("/Script/Engine.ActorComponent"))DSLFail(TEXT("Unsupported native DSL base; expected Actor or ActorComponent"));
+            auto* Native=FindObject<UClass>(nullptr,*Path);if(!Native || !Native->HasAnyClassFlags(CLASS_Native) || Native->HasAnyClassFlags(CLASS_Interface))DSLFail(TEXT("Native DSL base class is not loaded"));
+            if(!St->isClass || St->parent)DSLFail(TEXT("Native DSL base requires an empty root class"));
+            for(const auto& F:St->fields)if(!F.generated && F.name!="__rtti")DSLFail(TEXT("Native DSL base cannot declare fields or methods"));
+            return true;
+        }catch(const std::exception& X){Error=X.what();return false;}}
+        virtual bool look(const das::StructurePtr& St,das::ModuleGroup&,das::AnnotationArgumentList&,das::string& Error)override{try{DSLDeclarationKind(St->annotations);return true;}catch(const std::exception& X){Error=X.what();return false;}}
+    };
+    void DSLValidateConstSource(const das::FunctionPtr& Function,const das::StructurePtr& Source) {
+        if(!Function->isConstClassMethod || !Function->body || Function->arguments.empty())return;
+        struct FCheck:das::Visitor {
+            das::string Self;das::StructurePtr Source;
+            FCheck(const das::string& Name,const das::StructurePtr& St):Self(Name),Source(St){}
+            bool SelfPath(das::Expression* E){
+                for(int Depth=0;E && Depth<64;++Depth){
+                    if(E->rtti_isVar())return static_cast<das::ExprVar*>(E)->name==Self;
+                    if(E->rtti_isField())E=static_cast<das::ExprField*>(E)->value;
+                    else if(E->rtti_isAt())E=static_cast<das::ExprAt*>(E)->subexpr;
+                    else return false;
+                }return false;
+            }
+            void Write(das::Expression* E){if(SelfPath(E))DSLFail(TEXT("Const method cannot modify self fields"));}
+            virtual void preVisit(das::ExprCopy* E)override{Write(E->left);}
+            virtual void preVisit(das::ExprMove* E)override{Write(E->left);}
+            virtual void preVisit(das::ExprClone* E)override{Write(E->left);}
+            virtual void preVisit(das::ExprOp2* E)override{if(E->op=="+=" || E->op=="-=" || E->op=="*=" || E->op=="/=" || E->op=="%=" || E->op=="|=" || E->op=="&=" || E->op=="^=" || E->op=="<<=" || E->op==">>=")Write(E->left);}
+            virtual void preVisit(das::ExprOp1* E)override{if(E->op=="++" || E->op=="--" || E->op=="+++")Write(E->subexpr);}
+            void Method(const das::string& Name,bool Super){
+                bool Found=false,IsConst=false;
+                for(auto Owner=Super?Source->parent:Source;Owner && !Found;Owner=Owner->parent)Owner->module->functions.foreach([&](const das::FunctionPtr& F){
+                    if(F->classParent==Owner && F->name==Owner->name+"`"+Name){Found=true;IsConst=F->isConstClassMethod;}
+                });
+                if(Found && !IsConst)DSLFail(TEXT("Const method cannot call a non-const self/Super method: ")+DSLText(Name));
+            }
+            virtual void preVisit(das::ExprInvoke* E)override{
+                if(!E->isInvokeMethod || E->arguments.empty() || !E->arguments[0]->rtti_isField())return;
+                auto* F=static_cast<das::ExprField*>(E->arguments[0]);if(!F->value->rtti_isVar())return;
+                const auto Name=static_cast<das::ExprVar*>(F->value)->name;
+                if(Name==Self || Name=="Super")Method(F->name,Name=="Super");
+            }
+            virtual void preVisit(das::ExprCall* E)override{
+                const auto Name=E->name.substr(E->name.find_last_of(':')+1);
+                if((Name=="push" || Name=="push_clone" || Name=="insert" || Name=="insert_clone" || Name=="erase" || Name=="clear" || Name=="pop" || Name=="resize") && !E->arguments.empty())Write(E->arguments[0]);
+                if(Name.find("ue_set_self_")==0)DSLFail(TEXT("Const method cannot use self property setters"));
+            }
+        } Check(Function->arguments[0]->name,Source);
+        Function->body->visit(Check);
+    }
     struct FUEClassAnnotation:das::StructureAnnotation
     {
         FUEClassAnnotation():StructureAnnotation("ue_class"){}
@@ -359,6 +412,7 @@
                 const auto ComponentDefaults=DSLCollectComponentDefaults(St);
                 DSLCommentTooltip(St->at,Args);
                 DSLExpandDeclarationGroups(St,true);
+                if(!CollectTypesOnly)DSLPrepareClassDefaults(St,ComponentDefaults);
                 for(auto& Field:St->fields)if(!Field.classMethod && !Field.generated && Field.name!="__rtti")DSLCommentTooltip(Field.at,Field.annotation);
                 DSLAnnotationArguments(Args,{TEXT("implements")});
                 if(CollectTypesOnly){
@@ -370,12 +424,14 @@
                     return true;
                 }
                 if(const auto* Wire=Args.find(DSLModelKey,das::Type::tString)){if(Wire->at.fileInfo) DSLFail(TEXT("Reserved internal annotation argument"));return true;}
+                St->module->functions.foreach([&](const das::FunctionPtr& F){if(F->classParent==St && !F->generated)DSLValidateConstSource(F,St);});
                 FDasAuthoringModule Model;const FString Script=FPaths::GetCleanFilename(DSLText(St->at.fileInfo->name));
                 Model.Id=DSLString(Args,"module_id",FPaths::GetBaseFilename(Script));
                 const FString TypeFolder=DSLString(Args,"type_folder"),TypeRegistry=DSLString(Args,"type_registry");if(!TypeFolder.IsEmpty() && !TypeRegistry.IsEmpty())DSLFail(TEXT("Choose type_registry or type_folder"));das::vector<das::FunctionPtr> HelpersGenerated;TSet<FString> Helpers;
-                FDasDeclaredClass C;C.SourceScript=Script;C.Name=DSLText(St->name);C.Id=DSLString(Args,"id",Model.Id+TEXT(".")+C.Name);const FDSLTypeScope TypeScope{Model.Id,TypeFolder,TypeRegistry,&Group,St->module};FDasDeclaredClass BaseEffective;FString BaseId;const bool Derived=St->parent!=nullptr;
+                FDasDeclaredClass C;C.SourceScript=Script;C.Name=DSLText(St->name);C.Id=DSLString(Args,"id",Model.Id+TEXT(".")+C.Name);const FDSLTypeScope TypeScope{Model.Id,TypeFolder,TypeRegistry,&Group,St->module};FDasDeclaredClass BaseEffective;FString BaseId;const FString NativeBase=DSLNativeBasePath(St->parent);const bool Derived=St->parent && NativeBase.IsEmpty();
+                if(St->parent && Args.find("parent",das::Type::tString))DSLFail(TEXT("Use either class inheritance or parent annotation"));
                 if(Derived){if(Args.find("parent",das::Type::tString))DSLFail(TEXT("Use either class inheritance or parent annotation"));const auto* A=DSLAnnotation(St->parent->annotations,"ue_class");const auto* Wire=A?A->arguments.find(DSLModelKey,das::Type::tString):nullptr;FDasAuthoringModule BaseModel;FString Issue;if(!Wire || !FDasAuthoringModule::FromJson(DSLText(Wire->sValue),BaseModel,Issue))DSLFail(TEXT("Authored inheritance requires a ue_class parent declaration"));const auto* Base=BaseModel.Classes.FindByPredicate([&](const auto& P){return P.Name==DSLText(St->parent->name);});if(!Base || !BaseModel.ResolveClass(Base->Id,BaseEffective,Issue))DSLFail(Issue.IsEmpty()?TEXT("Missing authored parent"):Issue);BaseId=Base->Id;Model.Classes=BaseModel.Classes;C.NativeParent=BaseEffective.NativeParent;C.Properties=BaseEffective.Properties;C.Components=BaseEffective.Components;C.Interfaces=BaseEffective.Interfaces;C.Callbacks=BaseEffective.Callbacks;}
-                else C.NativeParent=DSLResolveType(EDSLTypeKind::Class,DSLString(Args,"parent",TEXT("/Script/Engine.Actor")),TypeScope);
+                else C.NativeParent=NativeBase.IsEmpty()?DSLResolveType(EDSLTypeKind::Class,DSLString(Args,"parent",TEXT("/Script/Engine.Actor")),TypeScope):NativeBase;
                 // Identity/host is available before resolving self-referential property/method types.
                 DSLActiveRefDeclarations.Add(Script+TEXT("::")+C.Name,C);
                 for(const auto& A:Args)
@@ -390,7 +446,10 @@
                 for(auto& F:St->fields)
                 {
                     // Pinned makeClassRtti adds __rtti without setting generated.
-                    if(F.classMethod || F.generated || F.inherited || F.name=="__rtti") continue;
+                    const bool InheritedDefault=F.inherited && ComponentDefaults.ContainsByPredicate([&](const auto& D){return D.Component.IsEmpty() && D.Property==DSLText(F.name);});
+                    if(F.classMethod || F.generated || (F.inherited && !InheritedDefault) || F.name=="__rtti") continue;
+                    const auto* InheritedProperty=InheritedDefault?BaseEffective.Properties.FindByPredicate([&](const auto& P){return P.Name==DSLText(F.name);}):nullptr;
+                    if(InheritedDefault){if(!InheritedProperty || !InheritedProperty->bEditable)DSLFail(TEXT("Inherited default requires an editable authored property: ")+DSLText(F.name));C.Properties.RemoveAll([&](const auto& P){return P.Id==InheritedProperty->Id;});}
                     if(DSLComponentField(F,C))continue;
                     FDasDeclaredProperty P;P.Name=DSLText(F.name);P.Id=C.Id+TEXT(".")+P.Name;bool Marked=false,ReadWrite=false,ReadOnly=false,EditAnywhere=false;
                     for(const auto& A:F.annotation)
@@ -423,15 +482,20 @@
                     if(FieldType==TEXT("class")){
                         if(DSLTypedClass(F.type)){const FString Inferred=DSLTypedClassPath(F.type);if(!P.Type.TypePath.IsEmpty() && P.Type.TypePath!=Inferred)DSLFail(TEXT("Conflicting typed class property constraint"));P.Type.TypePath=Inferred;}
                         auto* Base=FindObject<UClass>(nullptr,*P.Type.TypePath);
-                        if(!P.Type.TypePath.StartsWith(TEXT("/Script/")) || !Base || Base->HasAnyClassFlags(CLASS_Interface) || F.init)DSLFail(TEXT("Class property requires ue_class_base with loaded native base and omitted initializer"));
-                        P.Default.Kind=TEXT("null");C.Properties.Add(MoveTemp(P));continue;
+                        if(!P.Type.TypePath.StartsWith(TEXT("/Script/")) || !Base || Base->HasAnyClassFlags(CLASS_Interface))DSLFail(TEXT("Class property requires ue_class_base with loaded native base"));
+                        P.Default=DSLReferencePropertyDefault(F,true);C.Properties.Add(MoveTemp(P));continue;
                     }
                     if(DSLContainer(F.type)){if(F.init)DSLFail(TEXT("Container class fields require implicit empty defaults"));P.Type=DSLContainerType(F.type,TypeFolder,TypeRegistry);const FString Path=DSLDirectPath(F.type,TypeFolder,TypeRegistry);DSLEnsureStructHelpers(F.type,Path,Group,St->module,HelpersGenerated,Helpers);C.Properties.Add(P);continue;}
                     if(!DSLMathPath(F.type).IsEmpty()){P.Type.TypePath=DSLMathPath(F.type);P.Default.Kind=TEXT("string");P.Default.String=DSLMathPropertyDefault(F);C.Properties.Add(P);continue;}
                     if(DSLDirectEnum(F.type)){P.Type.TypePath=DSLDirectPath(F.type,TypeFolder,TypeRegistry);P.Default.Kind=TEXT("string");if(F.init && F.init->__rtti==das::string("ExprConstEnumeration"))P.Default.String=DSLText(static_cast<das::ExprConstEnumeration*>(F.init)->text);else if(F.init && F.init->rtti_isField()){auto* Init=static_cast<das::ExprField*>(F.init);if(!Init->value || !Init->value->rtti_isVar() || static_cast<das::ExprVar*>(Init->value)->name!=F.type->enumType->name)DSLFail(TEXT("Direct enum initializer must name its declared enum"));P.Default.String=DSLText(Init->name);}else DSLFail(TEXT("Direct enum property requires named enum literal initializer: ")+(F.init?DSLText(F.init->__rtti):TEXT("none")));if(P.Default.String.Contains(TEXT(".")))P.Default.String=P.Default.String.RightChop(P.Default.String.Find(TEXT("."))+1);if(P.Default.String.Contains(TEXT("::")))P.Default.String=P.Default.String.RightChop(P.Default.String.Find(TEXT("::"))+2);FString Issue;auto* E=ResolveDasEnum(P.Type.TypePath,Issue);if(!E || !ValidateDasEnumNumber(P.Type.TypePath,E->GetValueByNameString(P.Default.String),Issue))DSLFail(Issue);C.Properties.Add(P);continue;}
-                    if(DSLDirectStruct(F.type)){P.Type.TypePath=DSLDirectPath(F.type,TypeFolder,TypeRegistry);DSLEnsureStructHelpers(F.type,P.Type.TypePath,Group,St->module,HelpersGenerated,Helpers);P.Default.Kind=TEXT("string");P.Default.String=TEXT("");if(F.init){bool Empty=false;if(F.init->rtti_isCall()){auto* I=static_cast<das::ExprCall*>(F.init);Empty=I->name==F.type->structType->name && I->arguments.empty();}else if(F.init->rtti_isMakeStruct()){auto* I=static_cast<das::ExprMakeStruct*>(F.init);Empty=I->structs.empty() && !I->block;}if(!Empty)DSLFail(TEXT("Direct struct defaults require empty struct constructor; field overrides are not supported yet"));}C.Properties.Add(P);continue;}
+                    if(DSLDirectStruct(F.type)){P.Type.TypePath=DSLDirectPath(F.type,TypeFolder,TypeRegistry);DSLEnsureStructHelpers(F.type,P.Type.TypePath,Group,St->module,HelpersGenerated,Helpers);P.Default.Kind=TEXT("string");P.Default.String=TEXT("");if(F.init && F.init->rtti_isCall()){
+                        auto* DefaultCall=static_cast<das::ExprCall*>(F.init);if(DefaultCall->name=="ue_default_text"){
+                            if(DefaultCall->arguments.size()!=1 || DefaultCall->arguments[0]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("ue_default_text requires a literal string"));
+                            P.Default.String=DSLText(static_cast<das::ExprConstString*>(DefaultCall->arguments[0])->text);F.init=nullptr;
+                            FInstancedStruct Value;FString Issue;if(!ParseDasStructDefault(P.Type.TypePath,P.Default.String,Value,Issue))DSLFail(Issue);
+                        }}if(F.init){bool Empty=false;if(F.init->rtti_isCall()){auto* I=static_cast<das::ExprCall*>(F.init);Empty=I->name==F.type->structType->name && I->arguments.empty();}else if(F.init->rtti_isMakeStruct()){auto* I=static_cast<das::ExprMakeStruct*>(F.init);Empty=I->structs.empty() && !I->block;}if(!Empty)DSLFail(TEXT("Direct struct defaults require empty struct constructor; field overrides are not supported yet"));}C.Properties.Add(P);continue;}
                     if(FieldType==TEXT("enum")){if(!F.init || !F.init->rtti_isCall())DSLFail(TEXT("Enum field requires ue_enum_value(path, member)"));auto* Call=static_cast<das::ExprCall*>(F.init);if(Call->name!="ue_enum_value" || Call->arguments.size()!=2 || Call->arguments[0]->__rtti!=das::string("ExprConstString") || Call->arguments[1]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Enum initializer requires literal path/member"));P.Type.TypePath=DSLResolveType(EDSLTypeKind::Enum,DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text),TypeScope);static_cast<das::ExprConstString*>(Call->arguments[0])->text=DSLUtf8(P.Type.TypePath);P.Default.Kind=TEXT("string");P.Default.String=DSLText(static_cast<das::ExprConstString*>(Call->arguments[1])->text);FString Issue;auto* E=ResolveDasEnum(P.Type.TypePath,Issue);if(!E || !ValidateDasEnumNumber(P.Type.TypePath,E->GetValueByNameString(P.Default.String),Issue))DSLFail(Issue);C.Properties.Add(P);continue;}
-                    if(DSLTypedReference(F.type)){P.Type.TypePath=DSLTypedReferencePath(F.type);if(DSLAuthoredView(F.type))P.Type.AuthoredId=DSLReferenceDeclaration(F.type).Id;if(F.init)DSLFail(TEXT("Typed object property defaults must be omitted (null)"));P.Default.Kind=TEXT("null");C.Properties.Add(MoveTemp(P));continue;}
+                    if(DSLTypedReference(F.type)){P.Type.TypePath=DSLTypedReferencePath(F.type);if(DSLAuthoredView(F.type))P.Type.AuthoredId=DSLReferenceDeclaration(F.type).Id;P.Default=DSLReferencePropertyDefault(F,false);C.Properties.Add(MoveTemp(P));continue;}
                     if(FieldType==TEXT("object")){
                         if(!F.init || !F.init->rtti_isCall())DSLFail(TEXT("Object field requires literal ue_object_value(native_class_path) initializer"));
                         auto* Call=static_cast<das::ExprCall*>(F.init);if(Call->name!="ue_object_value" || Call->arguments.size()!=1 || Call->arguments[0]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Object field initializer requires one literal native class path"));
@@ -463,6 +527,11 @@
                     C.Properties.Add(MoveTemp(P));
                 }
                 if(!C.Components.ContainsByPredicate([](const auto& V){return V.bRoot;}))for(auto& V:C.Components){auto* Native=V.NativeClass.IsEmpty()?nullptr:FindObject<UClass>(nullptr,*V.NativeClass);if(Native && Native->IsChildOf(USceneComponent::StaticClass()) && V.Attach.IsEmpty()){V.bRoot=true;break;}}
+                for(const auto& D:ComponentDefaults)if(D.Component.IsEmpty())if(const auto* Base=BaseEffective.Properties.FindByPredicate([&](const auto& P){return P.Name==D.Property;})){
+                    auto* Parsed=C.Properties.FindByPredicate([&](const auto& P){return P.Name==D.Property;});
+                    if(!Parsed || Parsed->Type.Identity()!=Base->Type.Identity())DSLFail(TEXT("Inherited default cannot change the property type: ")+D.Property);
+                    FDasPropertyDefaultOverride Override;Override.Id=Base->Id;Override.Name=Base->Name;Override.Default=Parsed->Default;C.PropertyOverrides.Add(Override);*Parsed=*Base;Parsed->Default=Override.Default;
+                }
                 DSLApplyComponentDefaults(C,ComponentDefaults,BaseEffective.Components);
                 const FString RefKey=Script+TEXT("::")+C.Name;DSLActiveRefDeclarations.Add(RefKey,C);DSLRememberPropertySources(RefKey,St,C,TypeScope);
                 das::vector<das::FunctionPtr> Functions,Generated;
@@ -470,16 +539,18 @@
                 for(const auto& F:Functions)
                 {
                     if(DSLAnnotation(F->annotations,"ue_lifecycle") || DSLAnnotation(F->annotations,"ue_event") || DSLStandardLifecycle(F))DSLFail(TEXT("Conflicting UE callback/function annotations"));auto* A=const_cast<das::AnnotationDeclaration*>(DSLAnnotation(F->annotations,"ue_function"));DSLCommentTooltip(F->at,A->arguments,&F->annotations);DSLAnnotationArguments(A->arguments,{TEXT("out"),TEXT("ref")});FDasDeclaredMethod M;
-                    M.Name=DSLText(F->name.substr(F->name.find_last_of(das::string(1,char(96))+das::string(1,char(39)))+1));M.Id=C.Id+TEXT(".")+M.Name;M.ScriptFile=Script;M.EntryPoint=TEXT("ue_")+C.Name+TEXT("_")+M.Name;M.bCallable=false;TMap<FString,FString> ObjectClasses;TMap<FString,FString> Directions;
+                    M.Name=DSLText(F->name.substr(F->name.find_last_of(das::string(1,char(96))+das::string(1,char(39)))+1));M.Id=C.Id+TEXT(".")+M.Name;M.ScriptFile=Script;M.EntryPoint=TEXT("ue_")+C.Name+TEXT("_")+M.Name;M.bCallable=false;M.bConst=F->isConstClassMethod;TMap<FString,FString> ObjectClasses;TMap<FString,FString> Directions;
                     for(const auto& V:A->arguments)
                     {
                         if(V.name=="id"){M.Id=DSLString(A->arguments,"id");continue;}
                         if(V.name=="out" || V.name=="ref"){DSLAddDirections(V,Directions);continue;}
                         if(V.name=="BlueprintCallable") M.bCallable=DSLBool(V);
+                        else if(V.name=="BlueprintPure")M.bPure=DSLBool(V);
                         else if(V.name=="BlueprintEvent")M.bBlueprintEvent=DSLBool(V);
                         else if(V.name=="return_class" || V.name=="return_struct" || V.name=="return_enum" || (V.name.find("arg_")==0 && V.name.size()>10 && (V.name.substr(V.name.size()-6)=="_class" || V.name.substr(V.name.size()-7)=="_struct" || V.name.substr(V.name.size()-5)=="_enum"))){ObjectClasses.Add(DSLText(V.name),DSLString(A->arguments,V.name.c_str()));}
                         else if(DSLIsMetadata(V.name)) DSLMetadata(V,M.Metadata);else DSLFail(TEXT("Unsupported ue_function specifier: ")+DSLText(V.name));
                     }
+                    if(M.bPure){const auto* Callable=A->arguments.find("BlueprintCallable",das::Type::tBool);if(Callable && !DSLBool(*Callable))DSLFail(TEXT("BlueprintPure conflicts with BlueprintCallable=false"));M.bCallable=true;}
                     if(M.bBlueprintEvent && !A->arguments.find("BlueprintCallable",das::Type::tBool))M.bCallable=true;
                     const FString ResultType=DSLTypeName(F->result);
                     if(!M.bCallable || F->isStaticClassMethod || !F->result || F->result->ref || ResultType.IsEmpty() || F->arguments.empty() || F->arguments.size()>17) DSLFail(TEXT("Adapter requires BlueprintCallable instance scalar/void method with up to 16 by-value inputs: ")+M.Name);
@@ -511,7 +582,7 @@
                 // Script-only instance methods are lowered once into same-context
                 // functions. They are not reflected, exported, or added to the IR.
                 struct FLocalVariant{das::StructurePtr Owner;das::FunctionPtr Function;FString Name;das::string Target;};
-                TArray<das::StructurePtr> LocalChain;for(auto Owner=St;Owner;Owner=Owner->parent)LocalChain.Add(Owner);
+                TArray<das::StructurePtr> LocalChain;for(auto Owner=St;Owner && DSLNativeBasePath(Owner).IsEmpty();Owner=Owner->parent)LocalChain.Add(Owner);
                 TMap<FString,das::string> QualifiedLocals;TArray<FLocalVariant> LocalVariants;TMap<FString,das::string> DynamicLocals,ParentLocals;TMap<FString,das::string> LocalRenames;
                 auto VariantName=[&](const FString& Context,das::StructurePtr Owner,const FString& Name){return DSLUtf8(TEXT("__ue_local_impl_")+Context+TEXT("_")+FMD5::HashAnsiString(*(DSLText(Owner->at.fileInfo->name)+TEXT("::")+DSLText(Owner->name)))+TEXT("_")+Name);};
                 for(int32 Depth=0;Depth<LocalChain.Num();++Depth){auto Owner=LocalChain[Depth];Owner->module->functions.foreach([&](const das::FunctionPtr& F){
@@ -520,7 +591,7 @@
                     const FString Name=DSLText(F->name.substr(F->name.find_last_of(das::string(1,char(96))+das::string(1,char(39)))+1));const auto Target=VariantName(C.Name,Owner,Name);
                     if(const auto* Selected=DynamicLocals.Find(Name)){
                         const auto* DerivedVariant=LocalVariants.FindByPredicate([&](const auto& V){return V.Target==*Selected;});auto* D=DerivedVariant->Function;
-                        if(D->arguments.size()!=F->arguments.size() || D->result->describe()!=F->result->describe())DSLFail(TEXT("Helper override requires unchanged signature: ")+Name);
+                        if(D->isConstClassMethod!=F->isConstClassMethod || D->arguments.size()!=F->arguments.size() || D->result->describe()!=F->result->describe())DSLFail(TEXT("Helper override requires unchanged signature: ")+Name);
                         for(size_t I=1;I<F->arguments.size();++I)if(D->arguments[I]->type->describe()!=F->arguments[I]->type->describe())DSLFail(TEXT("Helper override requires unchanged parameter types: ")+Name);
                     }else DynamicLocals.Add(Name,Target);
                     if(Depth>0 && !ParentLocals.Contains(Name))ParentLocals.Add(Name,Target);
@@ -565,7 +636,7 @@
                 TArray<FDasDeclaredCallback> OwnedCallbacks;
                 std::sort(Callbacks.begin(),Callbacks.end(),[](const das::FunctionPtr& A,const das::FunctionPtr& B){return A->name<B->name;});das::ExprBlock* BindBlock=nullptr;das::FunctionPtr BindPrototype=nullptr;
                 for(const auto& F:Callbacks){const auto* Life=DSLAnnotation(F->annotations,"ue_lifecycle");const auto* Event=DSLAnnotation(F->annotations,"ue_event");if((Life && Event) || DSLAnnotation(F->annotations,"ue_function"))DSLFail(TEXT("Conflicting UE callback/function annotations"));FDasDeclaredCallback Callback;Callback.Name=DSLText(F->name.substr(F->name.find_last_of(das::string(1,char(96))+das::string(1,char(39)))+1));Callback.Kind=Event?TEXT("event"):Callback.Name;if(F->result && F->result->baseType==das::Type::autoinfer)F->result=new das::TypeDecl(das::Type::tVoid,F->at);if(F->isStaticClassMethod || !F->result || F->result->ref || DSLTypeName(F->result)!=TEXT("void") || F->arguments.empty())DSLFail(TEXT("UE callbacks must return void"));FString Parameter=Event?(F->arguments.size()==1?FString():F->arguments.size()==2?DSLTypeName(F->arguments[1]->type):TEXT("invalid")):Callback.Kind==TEXT("Tick")?TEXT("float"):Callback.Kind==TEXT("EndPlay")?TEXT("int"):FString();if(Event){if(Parameter==TEXT("array"))Parameter=TEXT("array_")+DSLTypeName(F->arguments[1]->type->firstType);if(Parameter==TEXT("struct") && DSLMathPath(F->arguments[1]->type)==TEXT("/Script/CoreUObject.Vector2D"))Parameter=TEXT("vector2d");if(Parameter==TEXT("struct") && DSLMathPath(F->arguments[1]->type)==TEXT("/Script/CoreUObject.Vector"))Parameter=TEXT("vector");if(Parameter==TEXT("struct") && DSLMathPath(F->arguments[1]->type)==TEXT("/Script/CoreUObject.Rotator"))Parameter=TEXT("rotator");if(Parameter==TEXT("struct") && DSLMathPath(F->arguments[1]->type)==TEXT("/Script/CoreUObject.Transform"))Parameter=TEXT("transform");Callback.ParameterKind=Parameter.IsEmpty()?TEXT("void"):Parameter;if(Callback.ParameterKind!=TEXT("void") && Parameter!=TEXT("int") && Parameter!=TEXT("float") && Parameter!=TEXT("bool") && Parameter!=TEXT("string") && Parameter!=TEXT("double") && Parameter!=TEXT("object") && Parameter!=TEXT("vector") && Parameter!=TEXT("rotator") && Parameter!=TEXT("transform") && Parameter!=TEXT("name") && Parameter!=TEXT("array_int") && Parameter!=TEXT("array_double") && Parameter!=TEXT("array_string") && Parameter!=TEXT("vector2d"))DSLFail(TEXT("Unsupported event callback payload"));if(Parameter==TEXT("object") && !DSLTypedReference(F->arguments[1]->type))DSLFail(TEXT("Object events require a typed object/interface wrapper"));}if(F->arguments.size()!=(Parameter.IsEmpty()?1:2))DSLFail(TEXT("UE callback signature mismatch: ")+Callback.Name);if(!Parameter.IsEmpty() && (!F->arguments[1]->type || F->arguments[1]->type->ref || F->arguments[1]->init || DSLTypeName(F->arguments[1]->type)!=((Parameter==TEXT("vector2d") || Parameter==TEXT("vector") || Parameter==TEXT("rotator") || Parameter==TEXT("transform"))?TEXT("struct"):Parameter.StartsWith(TEXT("array_"))?TEXT("array"):Parameter)))DSLFail(TEXT("UE callback parameter must be by-value ")+Parameter);if(!Event && Callback.Kind!=TEXT("ConstructionScript") && Callback.Kind!=TEXT("Initialize") && Callback.Kind!=TEXT("BeginPlay") && Callback.Kind!=TEXT("Tick") && Callback.Kind!=TEXT("EndPlay"))DSLFail(TEXT("Unknown lifecycle method; expected ConstructionScript, Initialize, BeginPlay, Tick or EndPlay"));
-                    if(Callback.Kind==TEXT("ConstructionScript") && C.NativeParent!=TEXT("/Script/Engine.Actor"))DSLFail(TEXT("ConstructionScript requires an authored Actor"));const FString Entry=Event?TEXT("ue_")+C.Name+TEXT("_")+Callback.Name:Callback.Kind==TEXT("ConstructionScript")?TEXT("__ue_construct"):Callback.Kind==TEXT("Initialize")?TEXT("__ue_initialize"):Callback.Kind==TEXT("BeginPlay")?TEXT("begin_play"):Callback.Kind==TEXT("Tick")?TEXT("tick"):TEXT("end_play");FDSLTypeCallVisitor TypeCalls(TypeScope);F->body=F->body->visit(TypeCalls);auto Clone=F->clone();Clone->name=DSLUtf8(Entry);Clone->classParent=nullptr;Clone->isClassMethod=false;Clone->annotations.clear();Clone->exports=true;Clone->generated=true;Clone->privateFunction=false;Clone->isConstClassMethod=false;FDSLBodyVisitor Rewrite(C,Clone->arguments[0]->name,St,TypeFolder,TypeRegistry,Group,HelpersGenerated,Helpers);Rewrite.SelfReference=SelfEventReference;Rewrite.SuperReference=SuperReference;Rewrite.LocalTargets=DynamicLocals;Rewrite.LocalSupers=ParentLocals;Rewrite.LocalRenames=LocalRenames;Rewrite.QualifiedLocals=QualifiedLocals;Clone->body=Clone->body->visit(Rewrite);FDSLSourceTimerVisitor SourceTimers(Rewrite);F->body=F->body->visit(SourceTimers);if(Derived){struct FSuperSource:das::Visitor{FDSLBodyVisitor& Owner;explicit FSuperSource(FDSLBodyVisitor& In):Owner(In){}virtual das::ExpressionPtr visit(das::ExprInvoke* E)override{return Owner.SuperCall(E);}} SuperSource(Rewrite);F->body=F->body->visit(SuperSource);}Clone->arguments.erase(Clone->arguments.begin());if(Event && Parameter==TEXT("object")){auto Arg=Clone->arguments[0];const auto OriginalName=Arg->name;const auto SourceType=DSLCopyType(Arg->type);Arg->name="__ue_event_raw_object";Arg->type=DSLHandleType(Group,St->module,"UObjectHandle");auto* Local=new das::Variable();Local->at=F->at;Local->name=OriginalName;Local->type=SourceType;Local->type->ref=false;Local->init=DSLDirectUnpack(F->at,SourceType,new das::ExprVar(F->at,Arg->name),DSLTypedReferencePath(SourceType));auto* Let=new das::ExprLet();Let->at=F->at;Let->variables.push_back(Local);static_cast<das::ExprBlock*>(Clone->body)->list.insert(static_cast<das::ExprBlock*>(Clone->body)->list.begin(),Let);}if(Event && (Parameter.StartsWith(TEXT("array_")) || Parameter==TEXT("vector2d"))){auto Arg=Clone->arguments[0];const auto OriginalName=Arg->name;const auto SourceType=DSLCopyType(Arg->type);const FString Carrier=Parameter==TEXT("vector2d")?DSLMathPath(SourceType):DSLDirectPath(SourceType,TypeFolder,TypeRegistry);DSLEnsureStructHelpers(SourceType,Carrier,Group,St->module,HelpersGenerated,Helpers);Arg->name="__ue_event_raw_array";Arg->type=DSLHandleType(Group,St->module,"UEStructValue");auto* Local=new das::Variable();Local->at=F->at;Local->name=OriginalName;Local->type=SourceType;Local->type->ref=false;Local->type->constant=false;Local->init_via_move=true;Local->init=DSLDirectUnpack(F->at,SourceType,new das::ExprVar(F->at,Arg->name),Carrier);auto* Let=new das::ExprLet();Let->at=F->at;Let->variables.push_back(Local);static_cast<das::ExprBlock*>(Clone->body)->list.insert(static_cast<das::ExprBlock*>(Clone->body)->list.begin(),Let);}if(!Rewrite.Error.IsEmpty())DSLFail(Rewrite.Error);Generated.push_back(Clone);
+                    const FString Entry=Event?TEXT("ue_")+C.Name+TEXT("_")+Callback.Name:Callback.Kind==TEXT("ConstructionScript")?TEXT("__ue_construct"):Callback.Kind==TEXT("Initialize")?TEXT("__ue_initialize"):Callback.Kind==TEXT("BeginPlay")?TEXT("begin_play"):Callback.Kind==TEXT("Tick")?TEXT("tick"):TEXT("end_play");FDSLTypeCallVisitor TypeCalls(TypeScope);F->body=F->body->visit(TypeCalls);auto Clone=F->clone();Clone->name=DSLUtf8(Entry);Clone->classParent=nullptr;Clone->isClassMethod=false;Clone->annotations.clear();Clone->exports=true;Clone->generated=true;Clone->privateFunction=false;Clone->isConstClassMethod=false;FDSLBodyVisitor Rewrite(C,Clone->arguments[0]->name,St,TypeFolder,TypeRegistry,Group,HelpersGenerated,Helpers);Rewrite.SelfReference=SelfEventReference;Rewrite.SuperReference=SuperReference;Rewrite.LocalTargets=DynamicLocals;Rewrite.LocalSupers=ParentLocals;Rewrite.LocalRenames=LocalRenames;Rewrite.QualifiedLocals=QualifiedLocals;Clone->body=Clone->body->visit(Rewrite);FDSLSourceTimerVisitor SourceTimers(Rewrite);F->body=F->body->visit(SourceTimers);if(Derived){struct FSuperSource:das::Visitor{FDSLBodyVisitor& Owner;explicit FSuperSource(FDSLBodyVisitor& In):Owner(In){}virtual das::ExpressionPtr visit(das::ExprInvoke* E)override{return Owner.SuperCall(E);}} SuperSource(Rewrite);F->body=F->body->visit(SuperSource);}Clone->arguments.erase(Clone->arguments.begin());if(Event && Parameter==TEXT("object")){auto Arg=Clone->arguments[0];const auto OriginalName=Arg->name;const auto SourceType=DSLCopyType(Arg->type);Arg->name="__ue_event_raw_object";Arg->type=DSLHandleType(Group,St->module,"UObjectHandle");auto* Local=new das::Variable();Local->at=F->at;Local->name=OriginalName;Local->type=SourceType;Local->type->ref=false;Local->init=DSLDirectUnpack(F->at,SourceType,new das::ExprVar(F->at,Arg->name),DSLTypedReferencePath(SourceType));auto* Let=new das::ExprLet();Let->at=F->at;Let->variables.push_back(Local);static_cast<das::ExprBlock*>(Clone->body)->list.insert(static_cast<das::ExprBlock*>(Clone->body)->list.begin(),Let);}if(Event && (Parameter.StartsWith(TEXT("array_")) || Parameter==TEXT("vector2d"))){auto Arg=Clone->arguments[0];const auto OriginalName=Arg->name;const auto SourceType=DSLCopyType(Arg->type);const FString Carrier=Parameter==TEXT("vector2d")?DSLMathPath(SourceType):DSLDirectPath(SourceType,TypeFolder,TypeRegistry);DSLEnsureStructHelpers(SourceType,Carrier,Group,St->module,HelpersGenerated,Helpers);Arg->name="__ue_event_raw_array";Arg->type=DSLHandleType(Group,St->module,"UEStructValue");auto* Local=new das::Variable();Local->at=F->at;Local->name=OriginalName;Local->type=SourceType;Local->type->ref=false;Local->type->constant=false;Local->init_via_move=true;Local->init=DSLDirectUnpack(F->at,SourceType,new das::ExprVar(F->at,Arg->name),Carrier);auto* Let=new das::ExprLet();Let->at=F->at;Let->variables.push_back(Local);static_cast<das::ExprBlock*>(Clone->body)->list.insert(static_cast<das::ExprBlock*>(Clone->body)->list.begin(),Let);}if(!Rewrite.Error.IsEmpty())DSLFail(Rewrite.Error);Generated.push_back(Clone);
                     if(Event){if(!BindBlock){BindBlock=new das::ExprBlock();BindBlock->at=St->at;}Callback.Source=DSLString(Event->arguments,"source",TEXT("self"));Callback.EventName=DSLString(Event->arguments,"name");if(Callback.Source!=TEXT("self") && Callback.Source!=TEXT("owner"))DSLFail(TEXT("Event source must be self or owner"));if(Callback.Source==TEXT("owner") && C.NativeParent!=TEXT("/Script/Engine.ActorComponent"))DSLFail(TEXT("Owner event source requires ActorComponent"));auto* SelfObject=DSLCall(F->at,"ue_self_object",{});das::ExpressionPtr Source=Callback.Source==TEXT("owner")?DSLCall(F->at,"ue_component_owner",{SelfObject}):SelfObject;BindBlock->list.push_back(DSLCall(F->at,DSLUtf8(TEXT("ue_subscribe_object_")+Callback.ParameterKind),{Source,new das::ExprConstString(F->at,DSLUtf8(Callback.EventName)),new das::ExprConstString(F->at,DSLUtf8(Entry))}));BindPrototype=Clone;}
                     OwnedCallbacks.Add(Callback);C.Callbacks.RemoveAll([&](const auto& P){return P.Kind==Callback.Kind && Callback.Kind!=TEXT("event");});C.Callbacks.Add(Callback);
                 }
@@ -622,7 +693,7 @@
                 FDasDeclaredMethod M;M.Name=DSLText(Field.name);M.Id=C.Id+TEXT(".")+M.Name;M.ScriptFile=FPaths::GetCleanFilename(DSLText(St->at.fileInfo->name));M.EntryPoint=M.Name;
                 TMap<FString,FString> Directions,Constraints;das::FunctionPtr Function=nullptr;das::TypeDeclPtr Return;das::vector<das::TypeDeclPtr> Types;das::vector<das::string> Names;
                 if(Field._abstract){
-                    if(Field.init || !Field.type || Field.type->baseType!=das::Type::tFunction)DSLFail(TEXT("Invalid legacy abstract interface signature"));Return=Field.type->firstType;
+                    if(Field.init || !Field.type || Field.type->baseType!=das::Type::tFunction)DSLFail(TEXT("Invalid legacy abstract interface signature"));Return=Field.type->firstType;M.bConst=!Field.type->argTypes.empty() && Field.type->argTypes[0]->constant;
                     for(size_t I=1;I<Field.type->argTypes.size();++I){Types.push_back(Field.type->argTypes[I]);Names.push_back(Field.type->argNames[I]);}
                 }else{
                     St->module->functions.foreach([&](const das::FunctionPtr& Candidate){if(Candidate->classParent==St && Candidate->name==St->name+"`"+Field.name)Function=Candidate;});
@@ -632,15 +703,17 @@
                     for(const auto& A:Annotation->arguments){
                         if(A.name=="id"){M.Id=DSLString(Annotation->arguments,"id");continue;}
                         if(A.name=="BlueprintCallable"){M.bCallable=DSLBool(A);continue;}
+                        if(A.name=="BlueprintPure"){M.bPure=DSLBool(A);continue;}
                         if(A.name=="out" || A.name=="ref"){DSLAddDirections(A,Directions);continue;}
                         const FString ConstraintKey=DSLText(A.name);const bool ArgumentConstraint=ConstraintKey.StartsWith(TEXT("arg_")) && (ConstraintKey.EndsWith(TEXT("_class")) || ConstraintKey.EndsWith(TEXT("_enum")) || ConstraintKey.EndsWith(TEXT("_struct")));if(ConstraintKey==TEXT("return_class") || ConstraintKey==TEXT("return_enum") || ConstraintKey==TEXT("return_struct") || ArgumentConstraint){if(A.type!=das::Type::tString)DSLFail(TEXT("Interface type constraint requires a type identity"));Constraints.Add(ConstraintKey,DSLText(A.sValue));continue;}
                         if(DSLIsMetadata(A.name))DSLMetadata(A,M.Metadata);else DSLFail(TEXT("Unsupported interface ue_function specifier: ")+DSLText(A.name));
                     }
-                    if(!M.bCallable)DSLFail(TEXT("Interface stub requires BlueprintCallable"));
+                    if(M.bPure){const auto* Callable=Annotation->arguments.find("BlueprintCallable",das::Type::tBool);if(Callable && !DSLBool(*Callable))DSLFail(TEXT("BlueprintPure conflicts with BlueprintCallable=false"));M.bCallable=true;}
+                    if(!M.bCallable)DSLFail(TEXT("Interface stub requires BlueprintCallable or BlueprintPure"));
                     das::ExpressionPtr Body=Function->body;
                     if(Body && Body->rtti_isBlock()){auto* Outer=static_cast<das::ExprBlock*>(Body);if(Outer->generated && Outer->list.size()==1 && Outer->finalList.empty() && Outer->list[0]->rtti_isWith()){auto* With=static_cast<das::ExprWith*>(Outer->list[0]);if(With->generated)Body=With->body;}}
                     if(!Body || !Body->rtti_isBlock())DSLFail(TEXT("Interface method body must be an empty declaration stub"));auto* Stub=static_cast<das::ExprBlock*>(Body);if(!Stub->list.empty() || !Stub->finalList.empty() || !Stub->arguments.empty())DSLFail(TEXT("Interface method body must be an empty declaration stub"));
-                    Return=Function->result;for(size_t I=1;I<Function->arguments.size();++I){if(Function->arguments[I]->init)DSLFail(TEXT("Interface parameter defaults are unsupported"));Types.push_back(Function->arguments[I]->type);Names.push_back(Function->arguments[I]->name);}
+                    M.bConst=Function->isConstClassMethod;Return=Function->result;for(size_t I=1;I<Function->arguments.size();++I){if(Function->arguments[I]->init)DSLFail(TEXT("Interface parameter defaults are unsupported"));Types.push_back(Function->arguments[I]->type);Names.push_back(Function->arguments[I]->name);}
                 }
                 Return=DSLObjectNormalize(Return,Group,St->module);if(Function)Function->result=Return;M.ReturnType=Type(Return,Constraints,TEXT("return_"));if(!Return || Return->ref)DSLFail(TEXT("Interface return references unsupported"));
                 for(size_t I=0;I<Types.size();++I){Types[I]=DSLObjectNormalize(Types[I],Group,St->module);const auto& T=Types[I];if(Function)Function->arguments[I+1]->type=T;FDasDeclaredParameter P;P.Name=DSLText(Names[I]);P.Id=M.Id+TEXT(".")+P.Name;P.Type=Type(T,Constraints,TEXT("arg_")+P.Name+TEXT("_"));if(!T || P.Type.Kind==TEXT("void") || (T->ref && T->constant))DSLFail(TEXT("Interface parameters require value or var mutable reference types"));const FString Key=M.Name+TEXT(".")+P.Name;const bool LegacyOut=LegacyOuts.Contains(Key);const FString Direction=Directions.FindRef(P.Name);
@@ -696,24 +769,35 @@
                 Wire=DSLText(J->sValue);
                 if(!IsValid(Self)){Error=TEXT("DSL entry requires live self");OK=false;return;}
                 const bool ActorAdapter=Self->IsA<ADasProbeActor>() || Self->IsA<UDasScriptComponent>();
-                for(const auto& P:C.Properties)
+                FDasDeclaredClass EffectiveDefaults;if(!Model.ResolveClass(C.Id,EffectiveDefaults,Error)){OK=false;return;}
+                for(const auto& P:EffectiveDefaults.Properties)
                 {
                     FProperty* Actual=Self->GetClass()->FindPropertyByName(*P.Name);
-                    if(auto* Carrier=DasContainerCarrier(P.Type)){auto* Values=Carrier->FindPropertyByName(TEXT("Values"));if(!Actual || !Values || !Values->SameType(Actual) || P.bReadOnly!=Actual->HasAnyPropertyFlags(CPF_BlueprintReadOnly) || (ActorAdapter && !Actual->Identical(Actual->ContainerPtrToValuePtr<void>(Actual->GetOwnerClass()->GetDefaultObject()),nullptr))){Error=TEXT("DSL container identity/default differs from owner: ")+P.Name;OK=false;return;}continue;}
+                    auto* DeclaringCDO=Actual && Actual->GetOwnerClass()?Actual->GetOwnerClass()->GetDefaultObject():nullptr;
+                    for(const auto* Owner=&C;Owner;){
+                        if(Owner->PropertyOverrides.ContainsByPredicate([&](const auto& O){return O.Id==P.Id;})){
+                            DeclaringCDO=nullptr;for(auto* Class=Self->GetClass();Class;Class=Class->GetSuperClass()){auto* Candidate=Class->GetDefaultObject();const FString Identity=Cast<ADasProbeActor>(Candidate)?CastChecked<ADasProbeActor>(Candidate)->AuthoredTypeId:Cast<UDasScriptComponent>(Candidate)?CastChecked<UDasScriptComponent>(Candidate)->AuthoredTypeId:FString();if(Identity==Owner->Id)DeclaringCDO=Candidate;}
+                            if(!DeclaringCDO){Error=TEXT("Missing inherited default owner: ")+Owner->Id;OK=false;return;}break;
+                        }
+                        Owner=Owner->ParentId.IsEmpty()?nullptr:Model.Classes.FindByPredicate([&](const auto& V){return V.Id==Owner->ParentId;});
+                    }
+                    const auto* Contracts=Cast<ADasProbeActor>(DeclaringCDO)?&CastChecked<ADasProbeActor>(DeclaringCDO)->DasDefaultSourceContracts:Cast<UDasScriptComponent>(DeclaringCDO)?&CastChecked<UDasScriptComponent>(DeclaringCDO)->DasDefaultSourceContracts:nullptr;
+                    const bool CheckCDODefault=ActorAdapter && (!Contracts || Contracts->FindRef(P.Id)!=DasDefaultSourceContract(P));
+                    if(auto* Carrier=DasContainerCarrier(P.Type)){auto* Values=Carrier->FindPropertyByName(TEXT("Values"));if(!Actual || !Values || !Values->SameType(Actual) || P.bReadOnly!=Actual->HasAnyPropertyFlags(CPF_BlueprintReadOnly) || (CheckCDODefault && !Actual->Identical(Actual->ContainerPtrToValuePtr<void>(DeclaringCDO),nullptr))){Error=TEXT("DSL container identity/default differs from owner: ")+P.Name;OK=false;return;}continue;}
                     if(P.Type.Kind==TEXT("delegate")){auto* D=CastField<FDelegateProperty>(Actual);FDasAuthoringModule Definition;FString Issue;if(!FDasAuthoringModule::FromJson(P.DelegateWire,Definition,Issue)){Error=Issue;OK=false;return;}TStrongObjectPtr<UFunction> Sig(MakeDasDelegateSignature(Definition.Classes[0].Methods[0],false,GetTransientPackage(),NAME_None,Issue));if(!D || !Sig || !Sig->IsSignatureCompatibleWith(D->SignatureFunction) || P.bReadOnly!=D->HasAnyPropertyFlags(CPF_BlueprintReadOnly)){Error=TEXT("Single delegate field differs from owner: ")+P.Name;OK=false;return;}continue;}
                     if(P.Type.Kind==TEXT("event")){auto* Event=CastField<FMulticastDelegateProperty>(Actual);FDasAuthoringModule Definition;FString Issue;if(!FDasAuthoringModule::FromJson(P.DelegateWire,Definition,Issue)){Error=Issue;OK=false;return;}TStrongObjectPtr<UFunction> Signature(MakeDasDelegateSignature(Definition.Classes[0].Methods[0],true,GetTransientPackage(),NAME_None,Issue));if(!Event || !Signature || !Signature->IsSignatureCompatibleWith(Event->SignatureFunction) || !Event->HasAllPropertyFlags(CPF_BlueprintAssignable|CPF_BlueprintCallable)){Error=TEXT("Authored event differs from owner; reimport Blueprint: ")+P.Name;OK=false;return;}continue;}
                     if(!DSLPropertyMatches(Actual,P.Type.Kind) || P.bReadOnly!=Actual->HasAnyPropertyFlags(CPF_BlueprintReadOnly))
                     {Error=TEXT("DSL property differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}
-                    if(P.Type.Kind==TEXT("class")){auto* Class=CastField<FClassProperty>(Actual);if(!Class || !Class->MetaClass || Class->MetaClass->GetPathName()!=P.Type.TypePath){Error=TEXT("DSL class base differs from owner: ")+P.Name;OK=false;return;}continue;}
-                    if(P.Type.Kind==TEXT("enum")){auto* Type=ResolveDasEnum(P.Type.TypePath,Error);if(!Type || DasEnumPropertyType(Actual)!=Type || (ActorAdapter && DasEnumPropertyNumber(Actual,Actual->ContainerPtrToValuePtr<void>(Actual->GetOwnerClass()->GetDefaultObject()))!=Type->GetValueByNameString(P.Default.String))){Error=TEXT("DSL enum identity/default differs from owner");OK=false;return;}continue;}
-                    if(P.Type.Kind==TEXT("object")){auto* ReferenceClass=DasReferencePropertyClass(Actual);if(ReferenceClass->GetPathName()!=P.Type.TypePath || (ActorAdapter && DasReferenceGet(Actual,Actual->ContainerPtrToValuePtr<void>(Actual->GetOwnerClass()->GetDefaultObject())))){Error=TEXT("DSL object type/default differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}continue;}
+                    if(P.Type.Kind==TEXT("class")){auto* Class=CastField<FClassProperty>(Actual);if(!Class || !Class->MetaClass || Class->MetaClass->GetPathName()!=P.Type.TypePath || (CheckCDODefault && !P.Default.String.IsEmpty() && (Class->GetObjectPropertyValue_InContainer(DeclaringCDO)?Class->GetObjectPropertyValue_InContainer(DeclaringCDO)->GetPathName():FString())!=P.Default.String)){Error=TEXT("DSL class base differs from owner: ")+P.Name;OK=false;return;}continue;}
+                    if(P.Type.Kind==TEXT("enum")){auto* Type=ResolveDasEnum(P.Type.TypePath,Error);if(!Type || DasEnumPropertyType(Actual)!=Type || (CheckCDODefault && DasEnumPropertyNumber(Actual,Actual->ContainerPtrToValuePtr<void>(DeclaringCDO))!=Type->GetValueByNameString(P.Default.String))){Error=TEXT("DSL enum identity/default differs from owner");OK=false;return;}continue;}
+                    if(P.Type.Kind==TEXT("object")){auto* ReferenceClass=DasReferencePropertyClass(Actual);if(ReferenceClass->GetPathName()!=P.Type.TypePath || (CheckCDODefault && (DasReferenceGet(Actual,Actual->ContainerPtrToValuePtr<void>(DeclaringCDO))?DasReferenceGet(Actual,Actual->ContainerPtrToValuePtr<void>(DeclaringCDO))->GetPathName():FString())!=P.Default.String)){Error=TEXT("DSL object type/default differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}continue;}
                     if(P.Type.Kind==TEXT("struct")){
                         auto* Struct=CastField<FStructProperty>(Actual);FInstancedStruct Default;
-                        if(Struct->Struct->GetPathName()!=P.Type.TypePath || !ParseDasStructDefault(P.Type.TypePath,P.Default.String,Default,Error) || (ActorAdapter && !Struct->Struct->CompareScriptStruct(Struct->ContainerPtrToValuePtr<void>(Actual->GetOwnerClass()->GetDefaultObject()),Default.GetMemory(),0))){Error=TEXT("DSL struct type/default differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}continue;
+                        if(Struct->Struct->GetPathName()!=P.Type.TypePath || !ParseDasStructDefault(P.Type.TypePath,P.Default.String,Default,Error) || (CheckCDODefault && !MatchesDasStructDefault(Struct->Struct,Struct->ContainerPtrToValuePtr<void>(DeclaringCDO),Default.GetMemory()))){Error=TEXT("DSL struct type/default differs from owner; apply/reimport Blueprint: ")+P.Name;OK=false;return;}continue;
                     }
-                    if(ActorAdapter)
+                    if(CheckCDODefault)
                     {
-                        UObject* CDO=Actual->GetOwnerClass()->GetDefaultObject();
+                        UObject* CDO=DeclaringCDO;
                         const bool DefaultMatches=P.Type.Kind==TEXT("int")
                             ? CastField<FIntProperty>(Actual)->GetPropertyValue_InContainer(CDO)==static_cast<int32>(P.Default.Number)
                             : P.Type.Kind==TEXT("float")?CastField<FFloatProperty>(Actual)->GetPropertyValue_InContainer(CDO)==static_cast<float>(P.Default.Number):P.Type.Kind==TEXT("bool")?CastField<FBoolProperty>(Actual)->GetPropertyValue_InContainer(CDO)==P.Default.Boolean:P.Type.Kind==TEXT("double")?CastField<FDoubleProperty>(Actual)->GetPropertyValue_InContainer(CDO)==P.Default.Number:P.Type.Kind==TEXT("string")?CastField<FStrProperty>(Actual)->GetPropertyValue_InContainer(CDO)==P.Default.String:CastField<FNameProperty>(Actual)->GetPropertyValue_InContainer(CDO)==FName(*P.Default.String);
@@ -725,7 +809,7 @@
                 {
                     UFunction* Method=Self->FindFunction(*M.Name);
                     auto Matches=[](FProperty* P,const FDasDeclaredType& T){if(T.Kind==TEXT("delegate")){FString Error;TStrongObjectPtr<UFunction> Sig(MakeDasSingleDelegateSignature(T.DelegateWire,Error));auto* D=CastField<FDelegateProperty>(P);return D && Sig && D->SignatureFunction && Sig->IsSignatureCompatibleWith(D->SignatureFunction);}if(auto* Carrier=DasContainerCarrier(T))return P && Carrier->FindPropertyByName(TEXT("Values"))->SameType(P);return DSLPropertyMatches(P,T.Kind);};
-                    bool Fits=Method && Method->NumParms==M.Parameters.Num()+(M.ReturnType.Kind==TEXT("void")?0:1);
+                    bool Fits=Method && Method->HasAnyFunctionFlags(FUNC_BlueprintPure)==M.bPure && Method->HasAnyFunctionFlags(FUNC_Const)==M.bConst && Method->NumParms==M.Parameters.Num()+(M.ReturnType.Kind==TEXT("void")?0:1);
                     bool Directed=false;for(const auto& P:M.Parameters)Directed |= P.Direction!=TEXT("in");if(Fits && !Directed){int32 Index=0;for(TFieldIterator<FProperty> It(Method);It;++It) if(It->HasAnyPropertyFlags(CPF_Parm) && !It->HasAnyPropertyFlags(CPF_ReturnParm)){Fits &= M.Parameters.IsValidIndex(Index) && It->GetFName()==FName(*M.Parameters[Index].Name);++Index;}Fits &= Index==M.Parameters.Num();}
                     if(Fits) for(const auto& P:M.Parameters){auto* Actual=Method->FindPropertyByName(*P.Name);Fits &= Matches(Actual,P.Type) && (P.Direction==TEXT("out")?Actual->HasAnyPropertyFlags(CPF_OutParm) && !Actual->HasAnyPropertyFlags(CPF_ReferenceParm):P.Direction==TEXT("inout")?Actual->HasAllPropertyFlags(CPF_OutParm|CPF_ReferenceParm):(Actual->HasAnyPropertyFlags(CPF_ConstParm) || P.Type.Kind==TEXT("array") || !Actual->HasAnyPropertyFlags(CPF_OutParm|CPF_ReferenceParm)));if(Fits && P.Type.Kind==TEXT("enum"))Fits=DasEnumPropertyType(Actual)->GetPathName()==P.Type.TypePath;if(Fits && P.Type.Kind==TEXT("struct"))Fits=CastField<FStructProperty>(Actual)->Struct->GetPathName()==P.Type.TypePath;if(Fits && P.Type.Kind==TEXT("class"))Fits=CastFieldChecked<FClassProperty>(Actual)->MetaClass->GetPathName()==P.Type.TypePath;if(Fits && P.Type.Kind==TEXT("object"))Fits=DasReferencePropertyClass(Actual)->GetPathName()==P.Type.TypePath;}
                     if(Fits) Fits=M.ReturnType.Kind==TEXT("void")?!Method->GetReturnProperty():Matches(Method->GetReturnProperty(),M.ReturnType);

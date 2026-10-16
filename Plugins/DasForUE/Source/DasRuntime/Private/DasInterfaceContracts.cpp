@@ -19,7 +19,7 @@ bool ValidateDasInterfaceContracts(const FDasClassSchema& Schema,FString& Error)
   if(I->HasMetaData(TEXT("CannotImplementInterfaceInBlueprint"))){Error=TEXT("Interface cannot be implemented in Blueprint");return false;}
 #endif
   int32 Count=0;for(TFieldIterator<UFunction> It(I,EFieldIteratorFlags::IncludeSuper);It;++It){auto* F=*It;if(!F->GetOwnerClass()->HasAnyClassFlags(CLASS_Interface))continue;++Count;if(MethodNames.Contains(F->GetFName())){Error=TEXT("Overlapping interface method names require a later backend: ")+F->GetName();return false;}MethodNames.Add(F->GetFName());const auto* M=Methods.FindByPredicate([&](const auto& Candidate){return Candidate.Name==F->GetFName();});
-   if(!M || !F->HasAnyFunctionFlags(FUNC_BlueprintEvent) || F->HasAnyFunctionFlags(FUNC_Static|FUNC_Net|FUNC_Delegate|FUNC_MulticastDelegate|FUNC_BlueprintPure)){Error=TEXT("Missing/unsupported interface method: ")+F->GetName();return false;}
+   if(!M || M->bPure!=F->HasAnyFunctionFlags(FUNC_BlueprintPure) || M->bConst!=F->HasAnyFunctionFlags(FUNC_Const) || !F->HasAnyFunctionFlags(FUNC_BlueprintEvent) || F->HasAnyFunctionFlags(FUNC_Static|FUNC_Net|FUNC_Delegate|FUNC_MulticastDelegate)){Error=TEXT("Missing/unsupported interface method or purity/const mismatch: ")+F->GetName();return false;}
    #if WITH_EDITOR
    if(F->HasMetaData(TEXT("Latent"))){Error=TEXT("Latent interface method requires a later backend");return false;}
 #endif

@@ -50,7 +50,7 @@ This first stage does not author new UInterface types, interface properties or
 TScriptInterface values. Arbitrary native C++ Execute_* fallback cannot be invoked
 through generic reflection when a target has no reflected implementation.
 Generic typed/interface binding generation is later work. Event-only interface
-methods (void with no outputs), pure/static/latent/RPC methods and structural
+methods (void with no outputs), static/latent/RPC methods and structural
 interface membership changes remain outside this function-graph backend.
 
 Validation: Scripts/TestDSLTypeRegistry.ps1 -Interfaces -Cooked.
@@ -117,3 +117,7 @@ and the distinction from future typed interface-reference values.
 Selected native interfaces now have generated nominal references and typed calls
 that hide frame allocation and parameter marshalling. See DSLGeneratedInterfaces.md
 for supported signatures, friendly helpers and declared-signature validation.
+
+Pure native/authored Blueprint interface methods are supported with matching
+BlueprintPure implementations; see DSLPureFunctions.md. Earlier first-stage limits
+above are historical; event-only methods are covered by DSLInterfaceEvents.md.

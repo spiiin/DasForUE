@@ -1,8 +1,8 @@
 options gen2
 module ue_life_behavior_base public
 require ue_dsl public
-[ue_class(module_id="lifefamily",parent="ActorComponent",Blueprintable)]
-class BaseBehavior {
+[ue_class(module_id="lifefamily",Blueprintable)]
+class BaseBehavior : ActorComponent {
     @ue_property=(BlueprintReadWrite)
     BaseSignals:int=0
     @ue_property=(EditAnywhere,BlueprintReadWrite)
@@ -13,6 +13,14 @@ class BaseBehavior {
     BaseTicks:int=0
     @ue_property=(BlueprintReadWrite)
     BaseEnds:int=0
+    @ue_property=(BlueprintReadWrite)
+    ConstructionValue:int=0
+    @ue_property=(BlueprintReadWrite)
+    ConstructionTrace:int=0
+    def ConstructionScript():void {
+        self.ConstructionValue=self.Bonus*2
+        self.ConstructionTrace=1
+    }
     [ue_event(source="owner",name="OnDasSignal")]
     def ParentSignal(value:int):void { self.BaseSignals+=value }
     [ue_lifecycle]

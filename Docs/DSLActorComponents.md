@@ -4,8 +4,8 @@
 
 ```das
 require ue_dsl
-[ue_class(module_id="actorcomponent", parent="ActorComponent", Blueprintable)]
-class ScoreBehavior {
+[ue_class(Blueprintable)]
+class ScoreBehavior : ActorComponent {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Bonus : int = 10
     [ue_function(BlueprintCallable)]
@@ -40,3 +40,10 @@ Validation: [DSLActorComponentsValidation](DSLActorComponentsValidation.md).
 
 Actor SCS composition is now declared through repeatable ue_component annotations;
 see [DSLComponentComposition](DSLComponentComposition.md).
+
+The simple Actor/Component examples omit module_id. IDs default to the source
+filename plus class name: dsl_actor_component_owner.ComponentOwner and
+dsl_component_behavior.ScoreBehavior. The source reference declarations resolve
+these automatically. Previously generated example assets with actorcomponent.*
+identities require importing into a new example folder; this edit does not migrate
+or delete existing assets.

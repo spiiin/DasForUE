@@ -2,8 +2,8 @@ options gen2
 require ue_dsl
 require ue_actor_refs
 require ue_component_types
-[ue_class(module_id="actorcomponent", parent="ActorComponent", Blueprintable)]
-class ScoreBehavior {
+[ue_class(Blueprintable)]
+class ScoreBehavior : ActorComponent {
     properties = ue_properties(EditAnywhere, BlueprintReadWrite) {
         var Bonus:int=10
         var SignalTotal:int=0

@@ -8,7 +8,7 @@ DasCallPayload, уже присутствующий в exported binding IR.
 ~~~das
 options gen2
 require ue_dsl
-[ue_class(module_id="reflected",Blueprintable)]
+[ue_class(Blueprintable)]
 class StructBridge {
     [ue_function(BlueprintCallable,
                  arg_value_struct="/Script/DasRuntime.DasCallPayload",

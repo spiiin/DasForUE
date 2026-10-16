@@ -9,7 +9,9 @@ DASRUNTIME_API bool ValidateDasEnumNumber(const FString& Path,int64 Value,FStrin
 DASRUNTIME_API FProperty* FindDasStructField(UScriptStruct* Type,const FString& Name);
 DASRUNTIME_API bool ValidateDasStructSnapshot(const FInstancedStruct& Value,FString& Error);
 DASRUNTIME_API bool ParseDasStructDefault(const FString& Path,const FString& Text,FInstancedStruct& Out,FString& Error);
+DASRUNTIME_API bool MatchesDasStructDefault(UScriptStruct* Type,const void* Actual,const void* Expected);
 DASRUNTIME_API bool ValidateDasValueStruct(const FString& Path,FString& Error);
+DASRUNTIME_API bool ResolveDasReferenceDefault(bool IsClass,const FString& BasePath,const FString& Path,UObject*& Out,FString& Error);
 enum class EDasScalarKind : uint8 { Int32, Float32, Bool, String=5, Double=6, Name=7, Object=8, Struct=12, Enum=13, Event=14, Class=15, Delegate=16 };
 
 struct FDasFieldSchema
@@ -53,6 +55,8 @@ struct FDasMethodSchema
     FString InputStableId;
     FString EntryPoint = TEXT("main");
     bool bBlueprintEvent = false;
+    bool bPure = false;
+    bool bConst = false;
     TMap<FString,FString> Metadata;
 };
 
