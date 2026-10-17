@@ -22,4 +22,21 @@ class NativeGameplayGeneratorTests(unittest.TestCase):
     def test_reject_unsupported_type(self):
         self.ir['classes'][0]['fields'][0]['kind']='raw_pointer'
         with self.assertRaises(ValueError): generate(self.ir)
+    def test_enum_layout(self):
+        header,module=generate(self.ir)
+        self.assertIn('enum EMovementMode {',module)
+        self.assertIn('MOVE_Walking=1',module)
+        self.assertIn('ue_native_gameplay::EMovementMode',header)
+    def test_missing_enum(self):
+        self.ir['enums']=[]
+        with self.assertRaises(ValueError): generate(self.ir)
+    def test_duplicate_enum(self):
+        self.ir['enums'].append(copy.deepcopy(self.ir['enums'][0]))
+        with self.assertRaises(ValueError): generate(self.ir)
+    def test_bad_enum_value(self):
+        self.ir['enums'][0]['entries'][0]['value']=255
+        with self.assertRaises(ValueError): generate(self.ir)
+    def test_enum_alias(self):
+        self.ir['enums'][0]['entries'][1]['value']=self.ir['enums'][0]['entries'][0]['value']
+        with self.assertRaises(ValueError): generate(self.ir)
 if __name__=='__main__': unittest.main()

@@ -49,8 +49,8 @@ there and regenerate to extend this registry.
 ## Contracts and boundaries
 
 Supported types: int32, float, double, bool/bitfields, FString, FName (UENameValue),
-strong UObject references, UClass handles, Vector2D, Vector, Rotator and Transform.
-Unsupported enum/byte, text, delegate, container, custom struct and weak/soft fields
+strong UObject references, UClass handles, native enum, Vector2D, Vector, Rotator and Transform.
+Unsupported raw byte, text, delegate, container, custom struct and weak/soft fields
 or function signatures are reported as skipped. Existing authored/native-self
 adapters for those types remain available; they are not generalized by this slice.
 
@@ -69,8 +69,8 @@ Inputs, return values and native mutable out/ref parameters share the frame ABI.
 Output values are read before publishing ref/out changes; frames are released on
 normal/error paths. Only trailing supported scalar literal defaults become source
 defaults. Other parameters must be supplied explicitly; metadata expressions are
-not evaluated as source code. Object parameters use their declared nominal view;
-use an explicit checked upcast for a different native reference type.
+not evaluated as source code. Object value inputs accept automatic checked upcasts to a native parent view.
+Mutable out/ref arguments require the exact view type.
 
 Every access checks live owner/world context and expected receiver/member shape.
 Mutations/method calls are rejected in construction, bind_events and EndPlay.
@@ -86,13 +86,68 @@ explicitly, rather than becoming raw reflection calls.
 invalid manifests, duplicate classes/members and unsupported kinds.
 The shared RuntimePIE/cooked gameplay probe exercises the same playable Character
 with native self methods, fields, object results, math, scalar defaults, out params
-and a free camera function. Six invalid-source fixtures reject readonly/hidden/
-missing-method/argument/RPC access and nested snapshot writes; a runtime fixture rejects a wrong receiver.
+and a free camera function. Thirteen invalid-source fixtures reject readonly/hidden/
+missing-method/argument/RPC access, nested snapshot writes, enum identity/integer
+mismatches, downcasts, unrelated references, mutable ref upcasts and ambiguous overloads; a runtime fixture rejects a wrong receiver.
 
-Validated 2026-10-17: reproducible -Check, six generator tests, strict PIE,
+Validated 2026-10-17: reproducible -Check, eleven generator tests, strict PIE,
 Win64 Development packaged foundation/gameplay and a separate saved-map launch.
 See Docs/Plan.md for exact scope and logs. Tests use NullRHI and synthetic input;
 rendering, physical devices, Shipping and networking are not validated.
 
 Native math property reads return snapshots. Replace the entire property value
 to write it; nested writes such as `movement.Velocity.x=1.0lf` are rejected.
+
+## Native enum and reference upcasts
+
+Reflection manifest schema 2 includes native enum paths and explicit numeric
+layouts. The generator emits `[ue_native_enum]` declarations, reusing canonical
+imported enum declarations when available. Current selection: 21 enums,
+232 fields, 442 methods. Generated names are the native UEnum names.
+
+```das
+require ue_native_gameplay
+let character=ue_character_self()
+let player=PlayerControllerRef_from(character.GetController().handle)
+player.Possess(character) // CharacterRef -> NativePawnRef
+
+let camera=ue_component_get(type<CameraComponentRef>, ue_ref(type<ActorRef>,character.handle), "Camera")
+camera.SetProjectionMode(ECameraProjectionMode.Orthographic)
+camera.ProjectionMode=ECameraProjectionMode.Perspective
+let axis=character.CharacterMovement.GetPlaneConstraintAxisSetting()
+```
+
+`ue_component_get` is a separate macro with its own argument contract; use an
+explicit ActorRef there when required. Automatic conversions apply to concrete
+ordinary function/method value arguments, explicitly typed local initialization,
+copy/move assignment and function returns. They use loaded UClass ancestry and
+the existing checked source pack/target factory, without copying UObject state.
+Authored references can also convert to their native host's ancestor views.
+Null remains null. Downcasts, unrelated types and interfaces do not convert
+automatically. Mutable ref/out references are invariant: a function accepting
+`var NativePawnRef` cannot replace a caller's `CharacterRef` with an arbitrary Pawn.
+Containers do not become covariant. Generic signatures and lambda/block return
+type inference are left to daScript.
+
+Ordinary exact overloads take precedence. When no exact overload resolves, the
+compiler selects a unique concrete overload with the shortest summed native
+ancestry distance; ties remain unresolved. Conversion evaluates each input once.
+
+Enum reads/writes, inputs and return values use the existing typed enum carrier
+and identity/number checks. An integer or a different enum is rejected by source
+typing. Current shared enum ABI supports unique values 0..254, excludes `_MAX`
+sentinels and rejects invalid values at runtime; larger/signed/aliased enum
+layouts remain skipped. Enum defaults remain explicit arguments, as do other
+defaults unsupported by the scalar literal adapter. Methods with raw byte or
+other unsupported parameters remain skipped even when their other parameters
+are enums (for example SetMovementMode with a raw uint8 custom-mode argument).
+
+Enum/upcast verification: native camera enum input/property read/write, movement
+enum input/result and property roundtrip; Character-to-Pawn native Possess call,
+free function, local initialization/assignment, function return, null propagation,
+single evaluation, closest-parent and exact-overload selection. Thirteen negative
+source fixtures run during fixture preparation. Strict RuntimePIE reports exactly
+1 success, 0 warnings/failures/notRun. Win64 Development build/cook/stage,
+packaged foundation (0 failures), gameplay with the same enum/upcast probe and
+separate PlayableMap launch pass. Logs: native-enum-upcast-{check,pie,cooked}.log
+and native-enum-upcast-pie-report.json. NullRHI/synthetic input only.

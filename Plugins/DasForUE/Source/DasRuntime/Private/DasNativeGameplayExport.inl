@@ -3,7 +3,7 @@ bool FDasRuntimeModule::ExportNativeGameplay(const FString& OutputPath,FString& 
  Error=TEXT("Native gameplay export requires editor metadata");return false;
 #else
  if(!IsInGameThread()){Error=TEXT("Native gameplay export requires game thread");return false;}
- auto Manifest=MakeShared<FJsonObject>();Manifest->SetNumberField(TEXT("schema_version"),1);Manifest->SetStringField(TEXT("engine_version"),FEngineVersion::Current().ToString());
+ auto Manifest=MakeShared<FJsonObject>();Manifest->SetNumberField(TEXT("schema_version"),2);Manifest->SetStringField(TEXT("engine_version"),FEngineVersion::Current().ToString());
  TArray<TSharedPtr<FJsonValue>> Classes;auto Types=DasNativeGameplayClasses();Types.Sort([](const UClass& A,const UClass& B){return A.GetPathName()<B.GetPathName();});
  for(auto* Class:Types){auto Def=MakeShared<FJsonObject>();Def->SetStringField(TEXT("path"),Class->GetPathName());TArray<TSharedPtr<FJsonValue>> Fields,Methods,Skipped;
   auto Reject=[&](const TCHAR* Domain,const FString& Name,const FString& Reason){auto D=MakeShared<FJsonObject>();D->SetStringField(TEXT("domain"),Domain);D->SetStringField(TEXT("name"),Name);D->SetStringField(TEXT("reason"),Reason);Skipped.Add(MakeShared<FJsonValueObject>(D));};
@@ -28,6 +28,10 @@ bool FDasRuntimeModule::ExportNativeGameplay(const FString& OutputPath,FString& 
   }
   Def->SetArrayField(TEXT("fields"),Fields);Def->SetArrayField(TEXT("methods"),Methods);Def->SetArrayField(TEXT("skipped"),Skipped);Classes.Add(MakeShared<FJsonValueObject>(Def));
  }
+ // Record nominal enum layouts used by accepted members, once per native path.
+ TSet<FString> EnumPaths;for(const auto& C:Classes){const auto D=C->AsObject();for(const auto& F:D->GetArrayField(TEXT("fields")))if(F->AsObject()->GetStringField(TEXT("kind"))==TEXT("enum"))EnumPaths.Add(F->AsObject()->GetStringField(TEXT("type_path")));for(const auto& M:D->GetArrayField(TEXT("methods")))for(const auto& P:M->AsObject()->GetArrayField(TEXT("parameters")))if(P->AsObject()->GetStringField(TEXT("kind"))==TEXT("enum"))EnumPaths.Add(P->AsObject()->GetStringField(TEXT("type_path")));}
+ TArray<FString> Paths=EnumPaths.Array();Paths.Sort();TArray<TSharedPtr<FJsonValue>> Enums;
+ for(const auto& Path:Paths){auto* E=FindObject<UEnum>(nullptr,*Path);auto D=MakeShared<FJsonObject>();D->SetStringField(TEXT("path"),Path);TArray<TSharedPtr<FJsonValue>> Entries;for(int32 I=0;I<E->NumEnums();++I){const FString Name=E->GetNameStringByIndex(I);if(Name.EndsWith(TEXT("_MAX")))continue;auto V=MakeShared<FJsonObject>();V->SetStringField(TEXT("name"),Name);V->SetNumberField(TEXT("value"),E->GetValueByIndex(I));Entries.Add(MakeShared<FJsonValueObject>(V));}D->SetArrayField(TEXT("entries"),Entries);Enums.Add(MakeShared<FJsonValueObject>(D));}Manifest->SetArrayField(TEXT("enums"),Enums);
  Manifest->SetArrayField(TEXT("classes"),Classes);FString Json;FJsonSerializer::Serialize(Manifest,TJsonWriterFactory<>::Create(&Json));if(!FFileHelper::SaveStringToFile(Json,*OutputPath,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM)){Error=TEXT("Cannot save native gameplay manifest");return false;}return true;
 #endif
 }

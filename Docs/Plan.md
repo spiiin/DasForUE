@@ -3055,3 +3055,60 @@ Logs: native-gameplay-check.log, native-gameplay-pie.log,
 native-gameplay-pie-report.json, native-gameplay-cooked.log,
 cooked-gameplay-runtime.log and playable-map-runtime.log. NullRHI/synthetic input
 only; physical devices, rendered output, Shipping and network remain untested.
+
+
+### 2026-10-17 — UObject TSet and UObject-key TMap
+
+Completed native self fields, direct ue_class properties and ue_function input/
+result/out/inout for UObject sets and object-key maps. Source uses nominal
+by-value $UEObjectKey<Reference> keys (ActorKey/ObjectKey aliases), ue_key,
+ue_key_ref and ue_key_valid because ordinary reference-wrapper structs cannot
+serve as daScript table keys. Authored key constraints retain their stable class
+ID; native storage remains real class-constrained FObjectProperty containers.
+Object identity is interned by FObjectKey independently of handle ExpectedClass.
+Native object hashing, nulls, snapshot ownership/GC, destroyed/forged keys,
+readonly/type checks, complete validation before publication and recovery through
+empty assignment are covered. General call marshalling now accepts object keys
+and set elements while excluding interface/weak/soft/class keys.
+Native Create/Reopen/Recompile, fresh authored Create/Reopen, PIE (1 pass, no
+warnings), cook/stage and both packaged Win64 Development probes passed.
+See [DSLObjectHashContainers.md](DSLObjectHashContainers.md).
+Remaining container work: struct hash elements/keys, enum keys in authored maps,
+nonempty/computed defaults and declaration migration of container-bearing classes.
+
+
+### 2026-10-17 — Generated native enums and object-reference upcasts
+
+NativeGameplay reflection manifest schema 2 records nominal native enum layouts;
+source generation reuses imported enum views or emits checked ue_native_enum
+declarations. The selected four receiver classes now expose 232 fields and 442
+methods, using 21 enums. Property, input and return adapters share the existing
+typed enum carrier; int/different-enum source arguments are rejected. Existing
+0..254 unique-value ABI remains; raw byte, signed/wide/aliased enum layouts and
+enum default expressions remain explicit limitations.
+
+FUEPropertyPass adds contextual checked reference upcasts using loaded UClass
+ancestry for concrete function/method value arguments, local initialization,
+copy/move assignment and function return. Authored source views retain stable-ID
+validation before conversion to native ancestors. Native packing no longer
+requires an optional source `_raw` helper. Exact overloads win before any
+upcast; a unique shortest-distance parent overload is used otherwise, and ties
+remain errors. daScript's implicit method receiver slot is handled explicitly.
+Downcasts/unrelated/interface conversions, mutable out/ref covariance and
+container covariance are not introduced.
+
+Validation: 11 generator tests, reproducible GenerateNativeGameplay -Check,
+strict RuntimePIE (1 success, 0 warnings/failures/notRun), Win64 Development
+build/cook/stage, packaged foundation (0 failures), packaged gameplay and
+separate playable-map launch pass. The shared runtime probe covers native enum
+fields/input/results, native Possess(CharacterRef), free function/assignment/
+return upcasts, null, single evaluation and overload precedence. Thirteen bad
+source fixtures cover old native policy plus enum typing, invalid upcasts,
+mutable ref invariance and ambiguity. Logs: native-enum-upcast-check.log,
+native-enum-upcast-pie.log, native-enum-upcast-pie-report.json,
+native-enum-upcast-cooked.log, cooked-gameplay-runtime.log,
+smoke-packaged.log and playable-map-runtime.log.
+
+See NativeGameplayGeneration.md. Rendering/physical devices/Shipping/network
+are not validated. Network work remains deferred by user; native text, custom
+structs and container generation remain separate follow-ups.

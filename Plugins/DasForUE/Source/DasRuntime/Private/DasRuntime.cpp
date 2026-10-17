@@ -1464,6 +1464,8 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             das::addExtern<DAS_BIND_FUN(NativeReferenceSetbool)>(*this,Library,"__ue_native_set_bool",das::SideEffects::modifyExternal,"NativeReferenceSetbool");
             das::addExtern<DAS_BIND_FUN(NativeReferenceGetstring)>(*this,Library,"__ue_native_get_string",das::SideEffects::modifyExternal,"NativeReferenceGetstring");
             das::addExtern<DAS_BIND_FUN(NativeReferenceSetstring)>(*this,Library,"__ue_native_set_string",das::SideEffects::modifyExternal,"NativeReferenceSetstring");
+            das::addExtern<DAS_BIND_FUN(NativeReferenceGetenum)>(*this,Library,"__ue_native_get_enum",das::SideEffects::modifyExternal,"NativeReferenceGetenum");
+            das::addExtern<DAS_BIND_FUN(NativeReferenceSetenum)>(*this,Library,"__ue_native_set_enum",das::SideEffects::modifyExternal,"NativeReferenceSetenum");
             das::addExtern<DAS_BIND_FUN(NativeReferenceGetname)>(*this,Library,"__ue_native_get_name",das::SideEffects::modifyExternal,"NativeReferenceGetname");
             das::addExtern<DAS_BIND_FUN(NativeReferenceSetname)>(*this,Library,"__ue_native_set_name",das::SideEffects::modifyExternal,"NativeReferenceSetname");
             das::addExtern<DAS_BIND_FUN(NativeReferenceGetclass)>(*this,Library,"__ue_native_get_class",das::SideEffects::modifyExternal,"NativeReferenceGetclass");

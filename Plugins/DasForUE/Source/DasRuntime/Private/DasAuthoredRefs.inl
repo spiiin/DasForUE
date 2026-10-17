@@ -254,6 +254,7 @@ struct FUEReferenceMutationVisitor:das::Visitor {
  virtual das::ExpressionPtr visit(das::ExprOp2* E)override{return E->op=="+=" || E->op=="-=" || E->op=="*=" || E->op=="/="?Rewrite(E,E->left,E,nullptr):E;}
  virtual das::ExpressionPtr visit(das::ExprCall* E)override{return Operation(E->name) && !E->arguments.empty()?Rewrite(E,E->arguments[0],nullptr,E):E;}
 };
+#include "DasReferenceUpcasts.inl"
 struct FUEPropertyPass:das::PassMacro {
  FUEPropertyPass():PassMacro("ue_authored_accessors"){}
  virtual bool apply(das::Program* P,das::Module* M)override{
@@ -263,6 +264,6 @@ struct FUEPropertyPass:das::PassMacro {
    virtual das::ExpressionPtr visit(das::ExprField* E)override{if(!MethodFields.Contains(E) && E->name!="handle" && E->value && (DSLAuthoredView(E->value->type) || (DSLTypedReference(E->value->type) && !DSLTypedInterface(E->value->type))))Fields.push_back(E);return E;}
   }Scan;das::vector<das::FunctionPtr> Functions;M->functions.foreach([&](const das::FunctionPtr& F){if(!F->generated || F->name.find(".`")!=0)Functions.push_back(F);});for(const auto& F:Functions)if(F->body){FDSLTypeCallVisitor Types(FDSLTypeScope{DSLText(M->name),FString(),FString(),P->thisModuleGroup,M});F->body=F->body->visit(Types);F->body->visit(Scan);}bool Changed=false;
   for(auto* E:Scan.Fields)try{Changed |= DSLEmitProperty(P,M,E->value->type,E->name,E->at);}catch(const std::exception& X){P->error("Authored property generation failed",X.what(),"",E->at,das::CompilationError::invalid_type);}
-  for(const auto& Method:Scan.Methods)try{Changed |= DSLEmitReferenceMethod(P,M,Method.Type,Method.Name,Method.At);}catch(const std::exception& X){P->error("Authored method generation failed",X.what(),"",Method.At,das::CompilationError::invalid_type);}FUEReferenceMutationVisitor Mutations(P,M);for(const auto& F:Functions)if(F->body && F->name.find("__ue_reference_mutation_")!=0)F->body=F->body->visit(Mutations);for(const auto& F:Mutations.Helpers)if(!M->addFunction(F,true))P->error("Authored mutation helper collision","","",F->at,das::CompilationError::invalid_type);return Changed || Mutations.Changed;
+  for(const auto& Method:Scan.Methods)try{Changed |= DSLEmitReferenceMethod(P,M,Method.Type,Method.Name,Method.At);}catch(const std::exception& X){P->error("Authored method generation failed",X.what(),"",Method.At,das::CompilationError::invalid_type);}FUEReferenceMutationVisitor Mutations(P,M);for(const auto& F:Functions)if(F->body && F->name.find("__ue_reference_mutation_")!=0)F->body=F->body->visit(Mutations);for(const auto& F:Mutations.Helpers)if(!M->addFunction(F,true))P->error("Authored mutation helper collision","","",F->at,das::CompilationError::invalid_type);for(const auto& F:Functions)if(F->body){FUEReferenceUpcastVisitor Upcasts(P,M,F);F->body=F->body->visit(Upcasts);Changed |= Upcasts.Changed;}return Changed || Mutations.Changed;
  }
 };

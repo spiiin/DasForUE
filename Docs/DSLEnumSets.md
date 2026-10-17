@@ -94,3 +94,7 @@ platforms were not tested.
 
 Repeat Editor checks with `Scripts/TestNativeDefaults.ps1` and
 `Scripts/TestMethodValues.ps1`; the latter accepts `-Cooked -SkipZenStore`.
+
+Update 2026-10-17: UObject sets and object-key maps are supported through native
+self fields, direct properties and method inputs/results/out/inout using typed
+UEObjectKey values; see [DSLObjectHashContainers.md](DSLObjectHashContainers.md).

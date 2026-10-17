@@ -28,7 +28,8 @@ Map values use the existing carrier families: int, float, double, bool, string,
 UENameValue, supported UE math values, authored structs, reflected enums and
 typed native object/interface references. Set elements now include int, string,
 UENameValue and native/authored enums (see [DSLEnumSets.md](DSLEnumSets.md)).
-General struct/object Set keys and nested containers remain separate work.
+UObject hash keys are now supported; see [DSLObjectHashContainers.md](DSLObjectHashContainers.md).
+General struct Set keys and nested containers remain separate work.
 
 FName keys retain Unreal identity: case aliases are equal, None and empty share
 one identity, and numeric suffixes retain native semantics. Names are represented

@@ -1,6 +1,837 @@
 {
-	"schema_version": 1,
+	"schema_version": 2,
 	"engine_version": "5.8.3-0+UE5",
+	"enums": [
+		{
+			"path": "/Script/CoreUObject.EMouseCursor",
+			"entries": [
+				{
+					"name": "None",
+					"value": 0
+				},
+				{
+					"name": "Default",
+					"value": 1
+				},
+				{
+					"name": "TextEditBeam",
+					"value": 2
+				},
+				{
+					"name": "ResizeLeftRight",
+					"value": 3
+				},
+				{
+					"name": "ResizeUpDown",
+					"value": 4
+				},
+				{
+					"name": "ResizeSouthEast",
+					"value": 5
+				},
+				{
+					"name": "ResizeSouthWest",
+					"value": 6
+				},
+				{
+					"name": "CardinalCross",
+					"value": 7
+				},
+				{
+					"name": "Crosshairs",
+					"value": 8
+				},
+				{
+					"name": "Hand",
+					"value": 9
+				},
+				{
+					"name": "GrabHand",
+					"value": 10
+				},
+				{
+					"name": "GrabHandClosed",
+					"value": 11
+				},
+				{
+					"name": "SlashedCircle",
+					"value": 12
+				},
+				{
+					"name": "EyeDropper",
+					"value": 13
+				},
+				{
+					"name": "Custom",
+					"value": 14
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EAspectRatioAxisConstraint",
+			"entries": [
+				{
+					"name": "AspectRatio_MaintainYFOV",
+					"value": 0
+				},
+				{
+					"name": "AspectRatio_MaintainXFOV",
+					"value": 1
+				},
+				{
+					"name": "AspectRatio_MajorAxisFOV",
+					"value": 2
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EAttachLocation",
+			"entries": [
+				{
+					"name": "KeepRelativeOffset",
+					"value": 0
+				},
+				{
+					"name": "KeepWorldPosition",
+					"value": 1
+				},
+				{
+					"name": "SnapToTarget",
+					"value": 2
+				},
+				{
+					"name": "SnapToTargetIncludingScale",
+					"value": 3
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EAttachmentRule",
+			"entries": [
+				{
+					"name": "KeepRelative",
+					"value": 0
+				},
+				{
+					"name": "KeepWorld",
+					"value": 1
+				},
+				{
+					"name": "SnapToTarget",
+					"value": 2
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.ECameraProjectionMode",
+			"entries": [
+				{
+					"name": "Perspective",
+					"value": 0
+				},
+				{
+					"name": "Orthographic",
+					"value": 1
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.ECollisionChannel",
+			"entries": [
+				{
+					"name": "ECC_WorldStatic",
+					"value": 0
+				},
+				{
+					"name": "ECC_WorldDynamic",
+					"value": 1
+				},
+				{
+					"name": "ECC_Pawn",
+					"value": 2
+				},
+				{
+					"name": "ECC_Visibility",
+					"value": 3
+				},
+				{
+					"name": "ECC_Camera",
+					"value": 4
+				},
+				{
+					"name": "ECC_PhysicsBody",
+					"value": 5
+				},
+				{
+					"name": "ECC_Vehicle",
+					"value": 6
+				},
+				{
+					"name": "ECC_Destructible",
+					"value": 7
+				},
+				{
+					"name": "ECC_EngineTraceChannel1",
+					"value": 8
+				},
+				{
+					"name": "ECC_EngineTraceChannel2",
+					"value": 9
+				},
+				{
+					"name": "ECC_EngineTraceChannel3",
+					"value": 10
+				},
+				{
+					"name": "ECC_EngineTraceChannel4",
+					"value": 11
+				},
+				{
+					"name": "ECC_EngineTraceChannel5",
+					"value": 12
+				},
+				{
+					"name": "ECC_EngineTraceChannel6",
+					"value": 13
+				},
+				{
+					"name": "ECC_GameTraceChannel1",
+					"value": 14
+				},
+				{
+					"name": "ECC_GameTraceChannel2",
+					"value": 15
+				},
+				{
+					"name": "ECC_GameTraceChannel3",
+					"value": 16
+				},
+				{
+					"name": "ECC_GameTraceChannel4",
+					"value": 17
+				},
+				{
+					"name": "ECC_GameTraceChannel5",
+					"value": 18
+				},
+				{
+					"name": "ECC_GameTraceChannel6",
+					"value": 19
+				},
+				{
+					"name": "ECC_GameTraceChannel7",
+					"value": 20
+				},
+				{
+					"name": "ECC_GameTraceChannel8",
+					"value": 21
+				},
+				{
+					"name": "ECC_GameTraceChannel9",
+					"value": 22
+				},
+				{
+					"name": "ECC_GameTraceChannel10",
+					"value": 23
+				},
+				{
+					"name": "ECC_GameTraceChannel11",
+					"value": 24
+				},
+				{
+					"name": "ECC_GameTraceChannel12",
+					"value": 25
+				},
+				{
+					"name": "ECC_GameTraceChannel13",
+					"value": 26
+				},
+				{
+					"name": "ECC_GameTraceChannel14",
+					"value": 27
+				},
+				{
+					"name": "ECC_GameTraceChannel15",
+					"value": 28
+				},
+				{
+					"name": "ECC_GameTraceChannel16",
+					"value": 29
+				},
+				{
+					"name": "ECC_GameTraceChannel17",
+					"value": 30
+				},
+				{
+					"name": "ECC_GameTraceChannel18",
+					"value": 31
+				},
+				{
+					"name": "ECC_GameTraceChannel19",
+					"value": 32
+				},
+				{
+					"name": "ECC_GameTraceChannel20",
+					"value": 33
+				},
+				{
+					"name": "ECC_GameTraceChannel21",
+					"value": 34
+				},
+				{
+					"name": "ECC_GameTraceChannel22",
+					"value": 35
+				},
+				{
+					"name": "ECC_GameTraceChannel23",
+					"value": 36
+				},
+				{
+					"name": "ECC_GameTraceChannel24",
+					"value": 37
+				},
+				{
+					"name": "ECC_GameTraceChannel25",
+					"value": 38
+				},
+				{
+					"name": "ECC_GameTraceChannel26",
+					"value": 39
+				},
+				{
+					"name": "ECC_GameTraceChannel27",
+					"value": 40
+				},
+				{
+					"name": "ECC_GameTraceChannel28",
+					"value": 41
+				},
+				{
+					"name": "ECC_GameTraceChannel29",
+					"value": 42
+				},
+				{
+					"name": "ECC_GameTraceChannel30",
+					"value": 43
+				},
+				{
+					"name": "ECC_GameTraceChannel31",
+					"value": 44
+				},
+				{
+					"name": "ECC_GameTraceChannel32",
+					"value": 45
+				},
+				{
+					"name": "ECC_GameTraceChannel33",
+					"value": 46
+				},
+				{
+					"name": "ECC_GameTraceChannel34",
+					"value": 47
+				},
+				{
+					"name": "ECC_GameTraceChannel35",
+					"value": 48
+				},
+				{
+					"name": "ECC_GameTraceChannel36",
+					"value": 49
+				},
+				{
+					"name": "ECC_GameTraceChannel37",
+					"value": 50
+				},
+				{
+					"name": "ECC_GameTraceChannel38",
+					"value": 51
+				},
+				{
+					"name": "ECC_GameTraceChannel39",
+					"value": 52
+				},
+				{
+					"name": "ECC_GameTraceChannel40",
+					"value": 53
+				},
+				{
+					"name": "ECC_GameTraceChannel41",
+					"value": 54
+				},
+				{
+					"name": "ECC_GameTraceChannel42",
+					"value": 55
+				},
+				{
+					"name": "ECC_GameTraceChannel43",
+					"value": 56
+				},
+				{
+					"name": "ECC_GameTraceChannel44",
+					"value": 57
+				},
+				{
+					"name": "ECC_GameTraceChannel45",
+					"value": 58
+				},
+				{
+					"name": "ECC_GameTraceChannel46",
+					"value": 59
+				},
+				{
+					"name": "ECC_GameTraceChannel47",
+					"value": 60
+				},
+				{
+					"name": "ECC_GameTraceChannel48",
+					"value": 61
+				},
+				{
+					"name": "ECC_GameTraceChannel49",
+					"value": 62
+				},
+				{
+					"name": "ECC_GameTraceChannel50",
+					"value": 63
+				},
+				{
+					"name": "ECC_OverlapAll_Deprecated",
+					"value": 64
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EComponentMobility",
+			"entries": [
+				{
+					"name": "Static",
+					"value": 0
+				},
+				{
+					"name": "Stationary",
+					"value": 1
+				},
+				{
+					"name": "Movable",
+					"value": 2
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EControllerAnalogStick",
+			"entries": [
+				{
+					"name": "CAS_LeftStick",
+					"value": 0
+				},
+				{
+					"name": "CAS_RightStick",
+					"value": 1
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EDetachmentRule",
+			"entries": [
+				{
+					"name": "KeepRelative",
+					"value": 0
+				},
+				{
+					"name": "KeepWorld",
+					"value": 1
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EDetailMode",
+			"entries": [
+				{
+					"name": "DM_Low",
+					"value": 0
+				},
+				{
+					"name": "DM_Medium",
+					"value": 1
+				},
+				{
+					"name": "DM_High",
+					"value": 2
+				},
+				{
+					"name": "DM_Epic",
+					"value": 3
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EMovementMode",
+			"entries": [
+				{
+					"name": "MOVE_None",
+					"value": 0
+				},
+				{
+					"name": "MOVE_Walking",
+					"value": 1
+				},
+				{
+					"name": "MOVE_NavWalking",
+					"value": 2
+				},
+				{
+					"name": "MOVE_Falling",
+					"value": 3
+				},
+				{
+					"name": "MOVE_Swimming",
+					"value": 4
+				},
+				{
+					"name": "MOVE_Flying",
+					"value": 5
+				},
+				{
+					"name": "MOVE_Custom",
+					"value": 6
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.ENetDormancy",
+			"entries": [
+				{
+					"name": "DORM_Never",
+					"value": 0
+				},
+				{
+					"name": "DORM_Awake",
+					"value": 1
+				},
+				{
+					"name": "DORM_DormantAll",
+					"value": 2
+				},
+				{
+					"name": "DORM_DormantPartial",
+					"value": 3
+				},
+				{
+					"name": "DORM_Initial",
+					"value": 4
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.ENetRole",
+			"entries": [
+				{
+					"name": "ROLE_None",
+					"value": 0
+				},
+				{
+					"name": "ROLE_SimulatedProxy",
+					"value": 1
+				},
+				{
+					"name": "ROLE_AutonomousProxy",
+					"value": 2
+				},
+				{
+					"name": "ROLE_Authority",
+					"value": 3
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.ENetworkSmoothingMode",
+			"entries": [
+				{
+					"name": "Disabled",
+					"value": 0
+				},
+				{
+					"name": "Linear",
+					"value": 1
+				},
+				{
+					"name": "Exponential",
+					"value": 2
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EPlaneConstraintAxisSetting",
+			"entries": [
+				{
+					"name": "Custom",
+					"value": 0
+				},
+				{
+					"name": "X",
+					"value": 1
+				},
+				{
+					"name": "Y",
+					"value": 2
+				},
+				{
+					"name": "Z",
+					"value": 3
+				},
+				{
+					"name": "UseGlobalPhysicsSetting",
+					"value": 4
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.ERelativeTransformSpace",
+			"entries": [
+				{
+					"name": "RTS_World",
+					"value": 0
+				},
+				{
+					"name": "RTS_Actor",
+					"value": 1
+				},
+				{
+					"name": "RTS_Component",
+					"value": 2
+				},
+				{
+					"name": "RTS_ParentBoneSpace",
+					"value": 3
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.ESpawnActorCollisionHandlingMethod",
+			"entries": [
+				{
+					"name": "Undefined",
+					"value": 0
+				},
+				{
+					"name": "AlwaysSpawn",
+					"value": 1
+				},
+				{
+					"name": "AdjustIfPossibleButAlwaysSpawn",
+					"value": 2
+				},
+				{
+					"name": "AdjustIfPossibleButDontSpawnIfColliding",
+					"value": 3
+				},
+				{
+					"name": "DontSpawnIfColliding",
+					"value": 4
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.ETickingGroup",
+			"entries": [
+				{
+					"name": "TG_PrePhysics",
+					"value": 0
+				},
+				{
+					"name": "TG_StartPhysics",
+					"value": 1
+				},
+				{
+					"name": "TG_DuringPhysics",
+					"value": 2
+				},
+				{
+					"name": "TG_EndPhysics",
+					"value": 3
+				},
+				{
+					"name": "TG_PostPhysics",
+					"value": 4
+				},
+				{
+					"name": "TG_PostUpdateWork",
+					"value": 5
+				},
+				{
+					"name": "TG_LastDemotable",
+					"value": 6
+				},
+				{
+					"name": "TG_NewlySpawned",
+					"value": 7
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EViewTargetBlendFunction",
+			"entries": [
+				{
+					"name": "VTBlend_Linear",
+					"value": 0
+				},
+				{
+					"name": "VTBlend_Cubic",
+					"value": 1
+				},
+				{
+					"name": "VTBlend_EaseIn",
+					"value": 2
+				},
+				{
+					"name": "VTBlend_EaseOut",
+					"value": 3
+				},
+				{
+					"name": "VTBlend_EaseInOut",
+					"value": 4
+				},
+				{
+					"name": "VTBlend_PreBlended",
+					"value": 5
+				}
+			]
+		},
+		{
+			"path": "/Script/InputCore.EControllerHand",
+			"entries": [
+				{
+					"name": "Left",
+					"value": 0
+				},
+				{
+					"name": "Right",
+					"value": 1
+				},
+				{
+					"name": "AnyHand",
+					"value": 2
+				},
+				{
+					"name": "Pad",
+					"value": 3
+				},
+				{
+					"name": "ExternalCamera",
+					"value": 4
+				},
+				{
+					"name": "Gun",
+					"value": 5
+				},
+				{
+					"name": "HMD",
+					"value": 6
+				},
+				{
+					"name": "Chest",
+					"value": 7
+				},
+				{
+					"name": "LeftShoulder",
+					"value": 8
+				},
+				{
+					"name": "RightShoulder",
+					"value": 9
+				},
+				{
+					"name": "LeftElbow",
+					"value": 10
+				},
+				{
+					"name": "RightElbow",
+					"value": 11
+				},
+				{
+					"name": "Waist",
+					"value": 12
+				},
+				{
+					"name": "LeftKnee",
+					"value": 13
+				},
+				{
+					"name": "RightKnee",
+					"value": 14
+				},
+				{
+					"name": "LeftFoot",
+					"value": 15
+				},
+				{
+					"name": "RightFoot",
+					"value": 16
+				},
+				{
+					"name": "Special",
+					"value": 17
+				},
+				{
+					"name": "ControllerHand_Count",
+					"value": 18
+				}
+			]
+		},
+		{
+			"path": "/Script/InputCore.ETouchIndex",
+			"entries": [
+				{
+					"name": "Touch1",
+					"value": 0
+				},
+				{
+					"name": "Touch2",
+					"value": 1
+				},
+				{
+					"name": "Touch3",
+					"value": 2
+				},
+				{
+					"name": "Touch4",
+					"value": 3
+				},
+				{
+					"name": "Touch5",
+					"value": 4
+				},
+				{
+					"name": "Touch6",
+					"value": 5
+				},
+				{
+					"name": "Touch7",
+					"value": 6
+				},
+				{
+					"name": "Touch8",
+					"value": 7
+				},
+				{
+					"name": "Touch9",
+					"value": 8
+				},
+				{
+					"name": "Touch10",
+					"value": 9
+				},
+				{
+					"name": "CursorPointerIndex",
+					"value": 10
+				},
+				{
+					"name": "MAX_TOUCHES",
+					"value": 11
+				}
+			]
+		}
+	],
 	"classes": [
 		{
 			"path": "/Script/Engine.CameraComponent",
@@ -12,6 +843,14 @@
 					"declaring_class": "/Script/Engine.CameraComponent",
 					"readonly": false,
 					"signature": "AspectRatio:FloatProperty:0;"
+				},
+				{
+					"name": "AspectRatioAxisConstraint",
+					"kind": "enum",
+					"type_path": "/Script/Engine.EAspectRatioAxisConstraint",
+					"declaring_class": "/Script/Engine.CameraComponent",
+					"readonly": false,
+					"signature": "AspectRatioAxisConstraint:ByteProperty:0:/Script/Engine.EAspectRatioAxisConstraint;"
 				},
 				{
 					"name": "AutoPlaneShift",
@@ -198,6 +1037,14 @@
 					"signature": "bVisible:BoolProperty:0;"
 				},
 				{
+					"name": "DetailMode",
+					"kind": "enum",
+					"type_path": "/Script/Engine.EDetailMode",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": true,
+					"signature": "DetailMode:ByteProperty:0:/Script/Engine.EDetailMode;"
+				},
+				{
 					"name": "FieldOfView",
 					"kind": "float",
 					"type_path": "",
@@ -220,6 +1067,14 @@
 					"declaring_class": "/Script/Engine.CameraComponent",
 					"readonly": false,
 					"signature": "FirstPersonScale:FloatProperty:0;"
+				},
+				{
+					"name": "Mobility",
+					"kind": "enum",
+					"type_path": "/Script/Engine.EComponentMobility",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": true,
+					"signature": "Mobility:ByteProperty:0:/Script/Engine.EComponentMobility;"
 				},
 				{
 					"name": "OrthoFarClipPlane",
@@ -260,6 +1115,14 @@
 					"declaring_class": "/Script/Engine.CameraComponent",
 					"readonly": false,
 					"signature": "PostProcessBlendWeight:FloatProperty:0;"
+				},
+				{
+					"name": "ProjectionMode",
+					"kind": "enum",
+					"type_path": "/Script/Engine.ECameraProjectionMode",
+					"declaring_class": "/Script/Engine.CameraComponent",
+					"readonly": false,
+					"signature": "ProjectionMode:ByteProperty:0:/Script/Engine.ECameraProjectionMode;"
 				},
 				{
 					"name": "RelativeLocation",
@@ -578,6 +1441,33 @@
 					]
 				},
 				{
+					"name": "GetSocketTransform",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetSocketTransform;InSocketName:NameProperty:128;TransformSpace:ByteProperty:128:/Script/Engine.ERelativeTransformSpace;ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform{Rotation:StructProperty:0:/Script/CoreUObject.Quat{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;};Translation:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Scale3D:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};};",
+					"const": true,
+					"parameters": [
+						{
+							"name": "InSocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "TransformSpace",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ERelativeTransformSpace",
+							"direction": "in",
+							"default_text": "RTS_World"
+						},
+						{
+							"name": "ReturnValue",
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Transform",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "GetUpVector",
 					"declaring_class": "/Script/Engine.SceneComponent",
 					"signature": "v1;GetUpVector;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
@@ -669,6 +1559,97 @@
 					]
 				},
 				{
+					"name": "K2_AttachTo",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;K2_AttachTo;InParent:ObjectProperty:128:/Script/Engine.SceneComponent;InSocketName:NameProperty:128;AttachType:ByteProperty:128:/Script/Engine.EAttachLocation;bWeldSimulatedBodies:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "InParent",
+							"kind": "object",
+							"type_path": "/Script/Engine.SceneComponent",
+							"direction": "in"
+						},
+						{
+							"name": "InSocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "None"
+						},
+						{
+							"name": "AttachType",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachLocation",
+							"direction": "in",
+							"default_text": "KeepRelativeOffset"
+						},
+						{
+							"name": "bWeldSimulatedBodies",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "true"
+						},
+						{
+							"name": "ReturnValue",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_AttachToComponent",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;K2_AttachToComponent;Parent:ObjectProperty:128:/Script/Engine.SceneComponent;SocketName:NameProperty:128;LocationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;RotationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;ScaleRule:EnumProperty:128:/Script/Engine.EAttachmentRule;bWeldSimulatedBodies:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "Parent",
+							"kind": "object",
+							"type_path": "/Script/Engine.SceneComponent",
+							"direction": "in"
+						},
+						{
+							"name": "SocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "LocationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "RotationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "ScaleRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "bWeldSimulatedBodies",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "ReturnValue",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "K2_DestroyComponent",
 					"declaring_class": "/Script/Engine.ActorComponent",
 					"signature": "v1;K2_DestroyComponent;Object:ObjectProperty:128:/Script/CoreUObject.Object;",
@@ -679,6 +1660,42 @@
 							"kind": "object",
 							"type_path": "/Script/CoreUObject.Object",
 							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "K2_DetachFromComponent",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;K2_DetachFromComponent;LocationRule:EnumProperty:128:/Script/Engine.EDetachmentRule;RotationRule:EnumProperty:128:/Script/Engine.EDetachmentRule;ScaleRule:EnumProperty:128:/Script/Engine.EDetachmentRule;bCallModify:BoolProperty:128;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "LocationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						},
+						{
+							"name": "RotationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						},
+						{
+							"name": "ScaleRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						},
+						{
+							"name": "bCallModify",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "true"
 						}
 					]
 				},
@@ -812,6 +1829,20 @@
 							"name": "InAspectRatio",
 							"kind": "float",
 							"type_path": "",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetAspectRatioAxisConstraint",
+					"declaring_class": "/Script/Engine.CameraComponent",
+					"signature": "v1;SetAspectRatioAxisConstraint;InAspectRatioAxisConstraint:ByteProperty:128:/Script/Engine.EAspectRatioAxisConstraint;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "InAspectRatioAxisConstraint",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAspectRatioAxisConstraint",
 							"direction": "in"
 						}
 					]
@@ -1034,6 +2065,20 @@
 					]
 				},
 				{
+					"name": "SetMobility",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;SetMobility;NewMobility:ByteProperty:128:/Script/Engine.EComponentMobility;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "NewMobility",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EComponentMobility",
+							"direction": "in"
+						}
+					]
+				},
+				{
 					"name": "SetOrthoFarClipPlane",
 					"declaring_class": "/Script/Engine.CameraComponent",
 					"signature": "v1;SetOrthoFarClipPlane;InOrthoFarClipPlane:FloatProperty:128;",
@@ -1104,6 +2149,20 @@
 					]
 				},
 				{
+					"name": "SetProjectionMode",
+					"declaring_class": "/Script/Engine.CameraComponent",
+					"signature": "v1;SetProjectionMode;InProjectionMode:ByteProperty:128:/Script/Engine.ECameraProjectionMode;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "InProjectionMode",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ECameraProjectionMode",
+							"direction": "in"
+						}
+					]
+				},
+				{
 					"name": "SetRelativeScale3D",
 					"declaring_class": "/Script/Engine.SceneComponent",
 					"signature": "v1;SetRelativeScale3D;NewScale3D:StructProperty:128:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
@@ -1155,6 +2214,20 @@
 							"name": "bTickableWhenPaused",
 							"kind": "bool",
 							"type_path": "",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTickGroup",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetTickGroup;NewTickGroup:ByteProperty:128:/Script/Engine.ETickingGroup;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "NewTickGroup",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ETickingGroup",
 							"direction": "in"
 						}
 					]
@@ -1253,11 +2326,6 @@
 				}
 			],
 			"skipped": [
-				{
-					"domain": "field",
-					"name": "AspectRatioAxisConstraint",
-					"reason": "unsupported_property_type"
-				},
 				{
 					"domain": "field",
 					"name": "AssetUserData",
@@ -1435,16 +2503,6 @@
 				},
 				{
 					"domain": "field",
-					"name": "DetailMode",
-					"reason": "unsupported_property_type"
-				},
-				{
-					"domain": "field",
-					"name": "Mobility",
-					"reason": "unsupported_property_type"
-				},
-				{
-					"domain": "field",
 					"name": "OnComponentActivated",
 					"reason": "hidden_editor_or_deprecated"
 				},
@@ -1472,11 +2530,6 @@
 					"domain": "field",
 					"name": "PrimaryComponentTick",
 					"reason": "hidden_editor_or_deprecated"
-				},
-				{
-					"domain": "field",
-					"name": "ProjectionMode",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "field",
@@ -1545,11 +2598,6 @@
 				},
 				{
 					"domain": "method",
-					"name": "GetSocketTransform",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "IsActive",
 					"reason": "requires_adapter_or_nonpublic_policy"
 				},
@@ -1601,21 +2649,6 @@
 				{
 					"domain": "method",
 					"name": "K2_AddWorldTransformKeepScale",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_AttachTo",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_AttachToComponent",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_DetachFromComponent",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -1706,7 +2739,7 @@
 				{
 					"domain": "method",
 					"name": "ReceiveEndPlay",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -1725,27 +2758,7 @@
 				},
 				{
 					"domain": "method",
-					"name": "SetAspectRatioAxisConstraint",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "SetAsymmetricOverscan",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "SetMobility",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "SetProjectionMode",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "SetTickGroup",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -2023,6 +3036,14 @@
 					"signature": "Mesh:ObjectProperty:0:/Script/Engine.SkeletalMeshComponent;"
 				},
 				{
+					"name": "NetDormancy",
+					"kind": "enum",
+					"type_path": "/Script/Engine.ENetDormancy",
+					"declaring_class": "/Script/Engine.Actor",
+					"readonly": true,
+					"signature": "NetDormancy:ByteProperty:0:/Script/Engine.ENetDormancy;"
+				},
+				{
 					"name": "NetPriority",
 					"kind": "float",
 					"type_path": "",
@@ -2045,6 +3066,14 @@
 					"declaring_class": "/Script/Engine.Character",
 					"readonly": true,
 					"signature": "ProxyJumpForceStartedTime:FloatProperty:0;"
+				},
+				{
+					"name": "SpawnCollisionHandlingMethod",
+					"kind": "enum",
+					"type_path": "/Script/Engine.ESpawnActorCollisionHandlingMethod",
+					"declaring_class": "/Script/Engine.Actor",
+					"readonly": false,
+					"signature": "SpawnCollisionHandlingMethod:EnumProperty:0:/Script/Engine.ESpawnActorCollisionHandlingMethod;"
 				}
 			],
 			"methods": [
@@ -2823,6 +3852,20 @@
 					]
 				},
 				{
+					"name": "GetLocalRole",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;GetLocalRole;ReturnValue:ByteProperty:1408:/Script/Engine.ENetRole;",
+					"const": true,
+					"parameters": [
+						{
+							"name": "ReturnValue",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ENetRole",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "GetLocalViewingPlayerController",
 					"declaring_class": "/Script/Engine.Pawn",
 					"signature": "v1;GetLocalViewingPlayerController;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;",
@@ -2986,6 +4029,20 @@
 							"name": "ReturnValue",
 							"kind": "int",
 							"type_path": "",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetRemoteRole",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;GetRemoteRole;ReturnValue:ByteProperty:1408:/Script/Engine.ENetRole;",
+					"const": true,
+					"parameters": [
+						{
+							"name": "ReturnValue",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ENetRole",
 							"direction": "return"
 						}
 					]
@@ -3324,11 +4381,210 @@
 					"parameters": []
 				},
 				{
+					"name": "K2_AttachRootComponentTo",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;K2_AttachRootComponentTo;InParent:ObjectProperty:128:/Script/Engine.SceneComponent;InSocketName:NameProperty:128;AttachLocationType:ByteProperty:128:/Script/Engine.EAttachLocation;bWeldSimulatedBodies:BoolProperty:128;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "InParent",
+							"kind": "object",
+							"type_path": "/Script/Engine.SceneComponent",
+							"direction": "in"
+						},
+						{
+							"name": "InSocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "None"
+						},
+						{
+							"name": "AttachLocationType",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachLocation",
+							"direction": "in",
+							"default_text": "KeepRelativeOffset"
+						},
+						{
+							"name": "bWeldSimulatedBodies",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "true"
+						}
+					]
+				},
+				{
+					"name": "K2_AttachRootComponentToActor",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;K2_AttachRootComponentToActor;InParentActor:ObjectProperty:128:/Script/Engine.Actor;InSocketName:NameProperty:128;AttachLocationType:ByteProperty:128:/Script/Engine.EAttachLocation;bWeldSimulatedBodies:BoolProperty:128;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "InParentActor",
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"direction": "in"
+						},
+						{
+							"name": "InSocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "None"
+						},
+						{
+							"name": "AttachLocationType",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachLocation",
+							"direction": "in",
+							"default_text": "KeepRelativeOffset"
+						},
+						{
+							"name": "bWeldSimulatedBodies",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "true"
+						}
+					]
+				},
+				{
+					"name": "K2_AttachToActor",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;K2_AttachToActor;ParentActor:ObjectProperty:128:/Script/Engine.Actor;SocketName:NameProperty:128;LocationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;RotationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;ScaleRule:EnumProperty:128:/Script/Engine.EAttachmentRule;bWeldSimulatedBodies:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "ParentActor",
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"direction": "in"
+						},
+						{
+							"name": "SocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "LocationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "RotationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "ScaleRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "bWeldSimulatedBodies",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "ReturnValue",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_AttachToComponent",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;K2_AttachToComponent;Parent:ObjectProperty:128:/Script/Engine.SceneComponent;SocketName:NameProperty:128;LocationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;RotationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;ScaleRule:EnumProperty:128:/Script/Engine.EAttachmentRule;bWeldSimulatedBodies:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "Parent",
+							"kind": "object",
+							"type_path": "/Script/Engine.SceneComponent",
+							"direction": "in"
+						},
+						{
+							"name": "SocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "LocationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "RotationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "ScaleRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "bWeldSimulatedBodies",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "ReturnValue",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "K2_DestroyActor",
 					"declaring_class": "/Script/Engine.Actor",
 					"signature": "v1;K2_DestroyActor;",
 					"const": false,
 					"parameters": []
+				},
+				{
+					"name": "K2_DetachFromActor",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;K2_DetachFromActor;LocationRule:EnumProperty:128:/Script/Engine.EDetachmentRule;RotationRule:EnumProperty:128:/Script/Engine.EDetachmentRule;ScaleRule:EnumProperty:128:/Script/Engine.EDetachmentRule;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "LocationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						},
+						{
+							"name": "RotationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						},
+						{
+							"name": "ScaleRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						}
+					]
 				},
 				{
 					"name": "K2_GetActorLocation",
@@ -3742,6 +4998,20 @@
 					]
 				},
 				{
+					"name": "SetNetDormancy",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;SetNetDormancy;NewDormancy:ByteProperty:128:/Script/Engine.ENetDormancy;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "NewDormancy",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ENetDormancy",
+							"direction": "in"
+						}
+					]
+				},
+				{
 					"name": "SetNetUpdateFrequency",
 					"declaring_class": "/Script/Engine.Actor",
 					"signature": "v1;SetNetUpdateFrequency;Frequency:FloatProperty:128;",
@@ -3821,6 +5091,20 @@
 							"name": "bTickableWhenPaused",
 							"kind": "bool",
 							"type_path": "",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTickGroup",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;SetTickGroup;NewTickGroup:ByteProperty:128:/Script/Engine.ETickingGroup;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "NewTickGroup",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ETickingGroup",
 							"direction": "in"
 						}
 					]
@@ -4353,11 +5637,6 @@
 				},
 				{
 					"domain": "field",
-					"name": "NetDormancy",
-					"reason": "unsupported_property_type"
-				},
-				{
-					"domain": "field",
 					"name": "NetDriverName",
 					"reason": "hidden_editor_or_deprecated"
 				},
@@ -4598,11 +5877,6 @@
 				},
 				{
 					"domain": "field",
-					"name": "SpawnCollisionHandlingMethod",
-					"reason": "unsupported_property_type"
-				},
-				{
-					"domain": "field",
 					"name": "SpriteScale",
 					"reason": "hidden_editor_or_deprecated"
 				},
@@ -4748,11 +6022,6 @@
 				},
 				{
 					"domain": "method",
-					"name": "GetLocalRole",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "GetMovementBaseActor",
 					"reason": "not_public_local_native_instance_callable"
 				},
@@ -4779,11 +6048,6 @@
 				{
 					"domain": "method",
 					"name": "GetPlatformUserId",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "GetRemoteRole",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -4849,31 +6113,6 @@
 				{
 					"domain": "method",
 					"name": "K2_AddActorWorldTransformKeepScale",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_AttachRootComponentTo",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_AttachRootComponentToActor",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_AttachToActor",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_AttachToComponent",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_DetachFromActor",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -5059,22 +6298,22 @@
 				{
 					"domain": "method",
 					"name": "ReceiveActorOnInputTouchBegin",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
 					"name": "ReceiveActorOnInputTouchEnd",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
 					"name": "ReceiveActorOnInputTouchEnter",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
 					"name": "ReceiveActorOnInputTouchLeave",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -5109,7 +6348,7 @@
 				{
 					"domain": "method",
 					"name": "ReceiveEndPlay",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -5203,17 +6442,7 @@
 				},
 				{
 					"domain": "method",
-					"name": "SetNetDormancy",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "SetPhysicsReplicationMode",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "SetTickGroup",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -5747,6 +6976,22 @@
 					"signature": "bWantsToCrouch:BoolProperty:0;"
 				},
 				{
+					"name": "DefaultLandMovementMode",
+					"kind": "enum",
+					"type_path": "/Script/Engine.EMovementMode",
+					"declaring_class": "/Script/Engine.CharacterMovementComponent",
+					"readonly": false,
+					"signature": "DefaultLandMovementMode:ByteProperty:0:/Script/Engine.EMovementMode;"
+				},
+				{
+					"name": "DefaultWaterMovementMode",
+					"kind": "enum",
+					"type_path": "/Script/Engine.EMovementMode",
+					"declaring_class": "/Script/Engine.CharacterMovementComponent",
+					"readonly": false,
+					"signature": "DefaultWaterMovementMode:ByteProperty:0:/Script/Engine.EMovementMode;"
+				},
+				{
 					"name": "FallingLateralFriction",
 					"kind": "float",
 					"type_path": "",
@@ -5979,6 +7224,14 @@
 					"signature": "MinTouchForce:FloatProperty:0;"
 				},
 				{
+					"name": "MovementMode",
+					"kind": "enum",
+					"type_path": "/Script/Engine.EMovementMode",
+					"declaring_class": "/Script/Engine.CharacterMovementComponent",
+					"readonly": true,
+					"signature": "MovementMode:ByteProperty:0:/Script/Engine.EMovementMode;"
+				},
+				{
 					"name": "NavMeshProjectionHeightScaleDown",
 					"kind": "float",
 					"type_path": "",
@@ -6017,6 +7270,14 @@
 					"declaring_class": "/Script/Engine.CharacterMovementComponent",
 					"readonly": false,
 					"signature": "NavWalkingFloorDistTolerance:FloatProperty:0;"
+				},
+				{
+					"name": "NetworkSmoothingMode",
+					"kind": "enum",
+					"type_path": "/Script/Engine.ENetworkSmoothingMode",
+					"declaring_class": "/Script/Engine.CharacterMovementComponent",
+					"readonly": true,
+					"signature": "NetworkSmoothingMode:EnumProperty:0:/Script/Engine.ENetworkSmoothingMode;"
 				},
 				{
 					"name": "OutofWaterZ",
@@ -6715,6 +7976,20 @@
 					]
 				},
 				{
+					"name": "GetPlaneConstraintAxisSetting",
+					"declaring_class": "/Script/Engine.MovementComponent",
+					"signature": "v1;GetPlaneConstraintAxisSetting;ReturnValue:EnumProperty:1408:/Script/Engine.EPlaneConstraintAxisSetting;",
+					"const": true,
+					"parameters": [
+						{
+							"name": "ReturnValue",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EPlaneConstraintAxisSetting",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "GetPlaneConstraintNormal",
 					"declaring_class": "/Script/Engine.MovementComponent",
 					"signature": "v1;GetPlaneConstraintNormal;ReturnValue:StructProperty:134219138:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
@@ -7099,6 +8374,20 @@
 					]
 				},
 				{
+					"name": "SetPlaneConstraintAxisSetting",
+					"declaring_class": "/Script/Engine.MovementComponent",
+					"signature": "v1;SetPlaneConstraintAxisSetting;NewAxisSetting:EnumProperty:128:/Script/Engine.EPlaneConstraintAxisSetting;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "NewAxisSetting",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EPlaneConstraintAxisSetting",
+							"direction": "in"
+						}
+					]
+				},
+				{
 					"name": "SetPlaneConstraintEnabled",
 					"declaring_class": "/Script/Engine.MovementComponent",
 					"signature": "v1;SetPlaneConstraintEnabled;bEnabled:BoolProperty:128;",
@@ -7170,6 +8459,20 @@
 							"name": "bTickableWhenPaused",
 							"kind": "bool",
 							"type_path": "",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTickGroup",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetTickGroup;NewTickGroup:ByteProperty:128:/Script/Engine.ETickingGroup;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "NewTickGroup",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ETickingGroup",
 							"direction": "in"
 						}
 					]
@@ -7459,16 +8762,6 @@
 				},
 				{
 					"domain": "field",
-					"name": "DefaultLandMovementMode",
-					"reason": "unsupported_property_type"
-				},
-				{
-					"domain": "field",
-					"name": "DefaultWaterMovementMode",
-					"reason": "unsupported_property_type"
-				},
-				{
-					"domain": "field",
 					"name": "DeferredUpdatedMoveComponent",
 					"reason": "hidden_editor_or_deprecated"
 				},
@@ -7531,11 +8824,6 @@
 					"domain": "field",
 					"name": "MinTimeBetweenTimeStampResets",
 					"reason": "hidden_editor_or_deprecated"
-				},
-				{
-					"domain": "field",
-					"name": "MovementMode",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "field",
@@ -7606,11 +8894,6 @@
 					"domain": "field",
 					"name": "NetworkSimulatedSmoothRotationTime",
 					"reason": "hidden_editor_or_deprecated"
-				},
-				{
-					"domain": "field",
-					"name": "NetworkSmoothingMode",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "field",
@@ -7759,11 +9042,6 @@
 				},
 				{
 					"domain": "method",
-					"name": "GetPlaneConstraintAxisSetting",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "IsActive",
 					"reason": "requires_adapter_or_nonpublic_policy"
 				},
@@ -7815,7 +9093,7 @@
 				{
 					"domain": "method",
 					"name": "ReceiveEndPlay",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -7870,16 +9148,6 @@
 				{
 					"domain": "method",
 					"name": "SetMovementMode",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "SetPlaneConstraintAxisSetting",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "SetTickGroup",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -8069,12 +9337,44 @@
 					"signature": "CheatManager:ObjectProperty:0:/Script/Engine.CheatManager;"
 				},
 				{
+					"name": "CurrentClickTraceChannel",
+					"kind": "enum",
+					"type_path": "/Script/Engine.ECollisionChannel",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"readonly": false,
+					"signature": "CurrentClickTraceChannel:ByteProperty:0:/Script/Engine.ECollisionChannel;"
+				},
+				{
+					"name": "CurrentMouseCursor",
+					"kind": "enum",
+					"type_path": "/Script/CoreUObject.EMouseCursor",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"readonly": false,
+					"signature": "CurrentMouseCursor:ByteProperty:0:/Script/CoreUObject.EMouseCursor;"
+				},
+				{
 					"name": "CustomTimeDilation",
 					"kind": "float",
 					"type_path": "",
 					"declaring_class": "/Script/Engine.Actor",
 					"readonly": false,
 					"signature": "CustomTimeDilation:FloatProperty:0;"
+				},
+				{
+					"name": "DefaultClickTraceChannel",
+					"kind": "enum",
+					"type_path": "/Script/Engine.ECollisionChannel",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"readonly": true,
+					"signature": "DefaultClickTraceChannel:ByteProperty:0:/Script/Engine.ECollisionChannel;"
+				},
+				{
+					"name": "DefaultMouseCursor",
+					"kind": "enum",
+					"type_path": "/Script/CoreUObject.EMouseCursor",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"readonly": true,
+					"signature": "DefaultMouseCursor:ByteProperty:0:/Script/CoreUObject.EMouseCursor;"
 				},
 				{
 					"name": "HitResultTraceDistance",
@@ -8099,6 +9399,14 @@
 					"declaring_class": "/Script/Engine.Actor",
 					"readonly": false,
 					"signature": "Instigator:ObjectProperty:0:/Script/Engine.Pawn;"
+				},
+				{
+					"name": "NetDormancy",
+					"kind": "enum",
+					"type_path": "/Script/Engine.ENetDormancy",
+					"declaring_class": "/Script/Engine.Actor",
+					"readonly": true,
+					"signature": "NetDormancy:ByteProperty:0:/Script/Engine.ENetDormancy;"
 				},
 				{
 					"name": "NetPriority",
@@ -8139,6 +9447,14 @@
 					"declaring_class": "/Script/Engine.PlayerController",
 					"readonly": false,
 					"signature": "SmoothTargetViewRotationSpeed:FloatProperty:0;"
+				},
+				{
+					"name": "SpawnCollisionHandlingMethod",
+					"kind": "enum",
+					"type_path": "/Script/Engine.ESpawnActorCollisionHandlingMethod",
+					"declaring_class": "/Script/Engine.Actor",
+					"readonly": false,
+					"signature": "SpawnCollisionHandlingMethod:EnumProperty:0:/Script/Engine.ESpawnActorCollisionHandlingMethod;"
 				}
 			],
 			"methods": [
@@ -8896,6 +10212,32 @@
 					]
 				},
 				{
+					"name": "GetInputAnalogStickState",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"signature": "v1;GetInputAnalogStickState;WhichStick:ByteProperty:128:/Script/Engine.EControllerAnalogStick;StickX:FloatProperty:384;StickY:FloatProperty:384;",
+					"const": true,
+					"parameters": [
+						{
+							"name": "WhichStick",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EControllerAnalogStick",
+							"direction": "in"
+						},
+						{
+							"name": "StickX",
+							"kind": "float",
+							"type_path": "",
+							"direction": "out"
+						},
+						{
+							"name": "StickY",
+							"kind": "float",
+							"type_path": "",
+							"direction": "out"
+						}
+					]
+				},
+				{
 					"name": "GetInputMotionState",
 					"declaring_class": "/Script/Engine.PlayerController",
 					"signature": "v1;GetInputMotionState;Tilt:StructProperty:384:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};RotationRate:StructProperty:384:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Gravity:StructProperty:384:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Acceleration:StructProperty:384:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
@@ -8948,6 +10290,38 @@
 					]
 				},
 				{
+					"name": "GetInputTouchState",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"signature": "v1;GetInputTouchState;FingerIndex:ByteProperty:128:/Script/InputCore.ETouchIndex;LocationX:FloatProperty:384;LocationY:FloatProperty:384;bIsCurrentlyPressed:BoolProperty:384;",
+					"const": true,
+					"parameters": [
+						{
+							"name": "FingerIndex",
+							"kind": "enum",
+							"type_path": "/Script/InputCore.ETouchIndex",
+							"direction": "in"
+						},
+						{
+							"name": "LocationX",
+							"kind": "float",
+							"type_path": "",
+							"direction": "out"
+						},
+						{
+							"name": "LocationY",
+							"kind": "float",
+							"type_path": "",
+							"direction": "out"
+						},
+						{
+							"name": "bIsCurrentlyPressed",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "out"
+						}
+					]
+				},
+				{
 					"name": "GetLevel",
 					"declaring_class": "/Script/Engine.Actor",
 					"signature": "v1;GetLevel;ReturnValue:ObjectProperty:1408:/Script/Engine.Level;",
@@ -8985,6 +10359,20 @@
 							"name": "ReturnValue",
 							"kind": "float",
 							"type_path": "",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetLocalRole",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;GetLocalRole;ReturnValue:ByteProperty:1408:/Script/Engine.ENetRole;",
+					"const": true,
+					"parameters": [
+						{
+							"name": "ReturnValue",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ENetRole",
 							"direction": "return"
 						}
 					]
@@ -9143,6 +10531,20 @@
 							"name": "ReturnValue",
 							"kind": "int",
 							"type_path": "",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetRemoteRole",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;GetRemoteRole;ReturnValue:ByteProperty:1408:/Script/Engine.ENetRole;",
+					"const": true,
+					"parameters": [
+						{
+							"name": "ReturnValue",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ENetRole",
 							"direction": "return"
 						}
 					]
@@ -9486,6 +10888,176 @@
 					]
 				},
 				{
+					"name": "K2_AttachRootComponentTo",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;K2_AttachRootComponentTo;InParent:ObjectProperty:128:/Script/Engine.SceneComponent;InSocketName:NameProperty:128;AttachLocationType:ByteProperty:128:/Script/Engine.EAttachLocation;bWeldSimulatedBodies:BoolProperty:128;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "InParent",
+							"kind": "object",
+							"type_path": "/Script/Engine.SceneComponent",
+							"direction": "in"
+						},
+						{
+							"name": "InSocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "None"
+						},
+						{
+							"name": "AttachLocationType",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachLocation",
+							"direction": "in",
+							"default_text": "KeepRelativeOffset"
+						},
+						{
+							"name": "bWeldSimulatedBodies",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "true"
+						}
+					]
+				},
+				{
+					"name": "K2_AttachRootComponentToActor",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;K2_AttachRootComponentToActor;InParentActor:ObjectProperty:128:/Script/Engine.Actor;InSocketName:NameProperty:128;AttachLocationType:ByteProperty:128:/Script/Engine.EAttachLocation;bWeldSimulatedBodies:BoolProperty:128;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "InParentActor",
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"direction": "in"
+						},
+						{
+							"name": "InSocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "None"
+						},
+						{
+							"name": "AttachLocationType",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachLocation",
+							"direction": "in",
+							"default_text": "KeepRelativeOffset"
+						},
+						{
+							"name": "bWeldSimulatedBodies",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "true"
+						}
+					]
+				},
+				{
+					"name": "K2_AttachToActor",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;K2_AttachToActor;ParentActor:ObjectProperty:128:/Script/Engine.Actor;SocketName:NameProperty:128;LocationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;RotationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;ScaleRule:EnumProperty:128:/Script/Engine.EAttachmentRule;bWeldSimulatedBodies:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "ParentActor",
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"direction": "in"
+						},
+						{
+							"name": "SocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "LocationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "RotationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "ScaleRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "bWeldSimulatedBodies",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "ReturnValue",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_AttachToComponent",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;K2_AttachToComponent;Parent:ObjectProperty:128:/Script/Engine.SceneComponent;SocketName:NameProperty:128;LocationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;RotationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;ScaleRule:EnumProperty:128:/Script/Engine.EAttachmentRule;bWeldSimulatedBodies:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "Parent",
+							"kind": "object",
+							"type_path": "/Script/Engine.SceneComponent",
+							"direction": "in"
+						},
+						{
+							"name": "SocketName",
+							"kind": "name",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "LocationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "RotationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "ScaleRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"direction": "in"
+						},
+						{
+							"name": "bWeldSimulatedBodies",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "ReturnValue",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "K2_ClientPlayForceFeedback",
 					"declaring_class": "/Script/Engine.PlayerController",
 					"signature": "v1;K2_ClientPlayForceFeedback;ForceFeedbackEffect:ObjectProperty:128:/Script/Engine.ForceFeedbackEffect;Tag:NameProperty:128;bLooping:BoolProperty:128;bIgnoreTimeDilation:BoolProperty:128;bPlayWhilePaused:BoolProperty:128;",
@@ -9529,6 +11101,35 @@
 					"signature": "v1;K2_DestroyActor;",
 					"const": false,
 					"parameters": []
+				},
+				{
+					"name": "K2_DetachFromActor",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;K2_DetachFromActor;LocationRule:EnumProperty:128:/Script/Engine.EDetachmentRule;RotationRule:EnumProperty:128:/Script/Engine.EDetachmentRule;ScaleRule:EnumProperty:128:/Script/Engine.EDetachmentRule;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "LocationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						},
+						{
+							"name": "RotationRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						},
+						{
+							"name": "ScaleRule",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						}
+					]
 				},
 				{
 					"name": "K2_GetActorLocation",
@@ -9669,6 +11270,40 @@
 							"kind": "bool",
 							"type_path": "",
 							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "PlayHapticEffect",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"signature": "v1;PlayHapticEffect;HapticEffect:ObjectProperty:128:/Script/Engine.HapticFeedbackEffect_Base;Hand:EnumProperty:128:/Script/InputCore.EControllerHand;Scale:FloatProperty:128;bLoop:BoolProperty:128;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "HapticEffect",
+							"kind": "object",
+							"type_path": "/Script/Engine.HapticFeedbackEffect_Base",
+							"direction": "in"
+						},
+						{
+							"name": "Hand",
+							"kind": "enum",
+							"type_path": "/Script/InputCore.EControllerHand",
+							"direction": "in"
+						},
+						{
+							"name": "Scale",
+							"kind": "float",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "1.000000"
+						},
+						{
+							"name": "bLoop",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "false"
 						}
 					]
 				},
@@ -10130,6 +11765,32 @@
 					]
 				},
 				{
+					"name": "SetHapticsByValue",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"signature": "v1;SetHapticsByValue;Frequency:FloatProperty:130;Amplitude:FloatProperty:130;Hand:EnumProperty:128:/Script/InputCore.EControllerHand;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "Frequency",
+							"kind": "float",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "Amplitude",
+							"kind": "float",
+							"type_path": "",
+							"direction": "in"
+						},
+						{
+							"name": "Hand",
+							"kind": "enum",
+							"type_path": "/Script/InputCore.EControllerHand",
+							"direction": "in"
+						}
+					]
+				},
+				{
 					"name": "SetIgnoreLookInput",
 					"declaring_class": "/Script/Engine.Controller",
 					"signature": "v1;SetIgnoreLookInput;bNewLookInput:BoolProperty:128;",
@@ -10220,6 +11881,26 @@
 					]
 				},
 				{
+					"name": "SetMouseCursorWidget",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"signature": "v1;SetMouseCursorWidget;Cursor:ByteProperty:128:/Script/CoreUObject.EMouseCursor;CursorWidget:ObjectProperty:128:/Script/UMG.UserWidget;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "Cursor",
+							"kind": "enum",
+							"type_path": "/Script/CoreUObject.EMouseCursor",
+							"direction": "in"
+						},
+						{
+							"name": "CursorWidget",
+							"kind": "object",
+							"type_path": "/Script/UMG.UserWidget",
+							"direction": "in"
+						}
+					]
+				},
+				{
 					"name": "SetMouseLocation",
 					"declaring_class": "/Script/Engine.PlayerController",
 					"signature": "v1;SetMouseLocation;X:IntProperty:130;Y:IntProperty:130;",
@@ -10249,6 +11930,20 @@
 							"name": "DistanceSq",
 							"kind": "float",
 							"type_path": "",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetNetDormancy",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;SetNetDormancy;NewDormancy:ByteProperty:128:/Script/Engine.ENetDormancy;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "NewDormancy",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ENetDormancy",
 							"direction": "in"
 						}
 					]
@@ -10338,6 +12033,62 @@
 					]
 				},
 				{
+					"name": "SetTickGroup",
+					"declaring_class": "/Script/Engine.Actor",
+					"signature": "v1;SetTickGroup;NewTickGroup:ByteProperty:128:/Script/Engine.ETickingGroup;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "NewTickGroup",
+							"kind": "enum",
+							"type_path": "/Script/Engine.ETickingGroup",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetViewTargetWithBlend",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"signature": "v1;SetViewTargetWithBlend;NewViewTarget:ObjectProperty:128:/Script/Engine.Actor;BlendTime:FloatProperty:128;BlendFunc:ByteProperty:128:/Script/Engine.EViewTargetBlendFunction;BlendExp:FloatProperty:128;bLockOutgoing:BoolProperty:128;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "NewViewTarget",
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"direction": "in"
+						},
+						{
+							"name": "BlendTime",
+							"kind": "float",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "0.000000"
+						},
+						{
+							"name": "BlendFunc",
+							"kind": "enum",
+							"type_path": "/Script/Engine.EViewTargetBlendFunction",
+							"direction": "in",
+							"default_text": "VTBlend_Linear"
+						},
+						{
+							"name": "BlendExp",
+							"kind": "float",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "0.000000"
+						},
+						{
+							"name": "bLockOutgoing",
+							"kind": "bool",
+							"type_path": "",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				},
+				{
 					"name": "SetVirtualJoystickVisibility",
 					"declaring_class": "/Script/Engine.PlayerController",
 					"signature": "v1;SetVirtualJoystickVisibility;bVisible:BoolProperty:128;",
@@ -10347,6 +12098,20 @@
 							"name": "bVisible",
 							"kind": "bool",
 							"type_path": "",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "StopHapticEffect",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"signature": "v1;StopHapticEffect;Hand:EnumProperty:128:/Script/InputCore.EControllerHand;",
+					"const": false,
+					"parameters": [
+						{
+							"name": "Hand",
+							"kind": "enum",
+							"type_path": "/Script/InputCore.EControllerHand",
 							"direction": "in"
 						}
 					]
@@ -10732,16 +12497,6 @@
 				},
 				{
 					"domain": "field",
-					"name": "CurrentClickTraceChannel",
-					"reason": "unsupported_property_type"
-				},
-				{
-					"domain": "field",
-					"name": "CurrentMouseCursor",
-					"reason": "unsupported_property_type"
-				},
-				{
-					"domain": "field",
 					"name": "CurrentTouchInterface",
 					"reason": "hidden_editor_or_deprecated"
 				},
@@ -10754,16 +12509,6 @@
 					"domain": "field",
 					"name": "DataLayers",
 					"reason": "hidden_editor_or_deprecated"
-				},
-				{
-					"domain": "field",
-					"name": "DefaultClickTraceChannel",
-					"reason": "unsupported_property_type"
-				},
-				{
-					"domain": "field",
-					"name": "DefaultMouseCursor",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "field",
@@ -10909,11 +12654,6 @@
 					"domain": "field",
 					"name": "NetCullDistanceSquared",
 					"reason": "requires_native_accessor"
-				},
-				{
-					"domain": "field",
-					"name": "NetDormancy",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "field",
@@ -11119,11 +12859,6 @@
 					"domain": "field",
 					"name": "SeamlessTravelCount",
 					"reason": "hidden_editor_or_deprecated"
-				},
-				{
-					"domain": "field",
-					"name": "SpawnCollisionHandlingMethod",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "field",
@@ -11403,7 +13138,7 @@
 				{
 					"domain": "method",
 					"name": "ClientStartCameraShake",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -11562,11 +13297,6 @@
 				},
 				{
 					"domain": "method",
-					"name": "GetInputAnalogStickState",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "GetInputAxisKeyValue",
 					"reason": "unsupported_parameter_type"
 				},
@@ -11578,11 +13308,6 @@
 				{
 					"domain": "method",
 					"name": "GetInputKeyTimeDown",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "GetInputTouchState",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -11607,11 +13332,6 @@
 				},
 				{
 					"domain": "method",
-					"name": "GetLocalRole",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "GetOverlappingActors",
 					"reason": "unsupported_parameter_type"
 				},
@@ -11628,11 +13348,6 @@
 				{
 					"domain": "method",
 					"name": "GetPlatformUserId",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "GetRemoteRole",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -11713,31 +13428,6 @@
 				{
 					"domain": "method",
 					"name": "K2_AddActorWorldTransformKeepScale",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_AttachRootComponentTo",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_AttachRootComponentToActor",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_AttachToActor",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_AttachToComponent",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "K2_DetachFromActor",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -11852,11 +13542,6 @@
 				},
 				{
 					"domain": "method",
-					"name": "PlayHapticEffect",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "ReceiveActorBeginCursorOver",
 					"reason": "not_public_local_native_instance_callable"
 				},
@@ -11883,22 +13568,22 @@
 				{
 					"domain": "method",
 					"name": "ReceiveActorOnInputTouchBegin",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
 					"name": "ReceiveActorOnInputTouchEnd",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
 					"name": "ReceiveActorOnInputTouchEnter",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
 					"name": "ReceiveActorOnInputTouchLeave",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -11928,7 +13613,7 @@
 				{
 					"domain": "method",
 					"name": "ReceiveEndPlay",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -12127,18 +13812,8 @@
 				},
 				{
 					"domain": "method",
-					"name": "SetHapticsByValue",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "SetIsTemporarilyHiddenInEditor",
 					"reason": "not_public_local_native_instance_callable"
-				},
-				{
-					"domain": "method",
-					"name": "SetMouseCursorWidget",
-					"reason": "unsupported_parameter_type"
 				},
 				{
 					"domain": "method",
@@ -12147,32 +13822,12 @@
 				},
 				{
 					"domain": "method",
-					"name": "SetNetDormancy",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "SetPhysicsReplicationMode",
 					"reason": "unsupported_parameter_type"
 				},
 				{
 					"domain": "method",
-					"name": "SetTickGroup",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "SetViewTargetWithBlend",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "StartFire",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "StopHapticEffect",
 					"reason": "unsupported_parameter_type"
 				},
 				{

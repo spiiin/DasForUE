@@ -84,3 +84,7 @@ supported; see [DSLNameContainers.md](DSLNameContainers.md).
 Update 2026-10-17: native and authored enum sets are supported in native self
 fields, direct class properties and method inputs/results/out/inout; see
 [DSLEnumSets.md](DSLEnumSets.md).
+
+Update 2026-10-17: UObject sets and object-key maps are supported through native
+self fields, direct properties and method inputs/results/out/inout using typed
+UEObjectKey values; see [DSLObjectHashContainers.md](DSLObjectHashContainers.md).
