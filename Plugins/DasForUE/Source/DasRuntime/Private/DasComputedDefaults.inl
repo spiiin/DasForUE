@@ -63,7 +63,7 @@ void DSLPrepareComputedDefaults(const das::StructurePtr& St){
  TMap<FString,das::ExpressionPtr> Fields;
  // Source reads of native scalar defaults use the native host's CDO, never a live object.
  if(auto* Base=DasNativeDefaultBase(DSLNativeDefaultsParentHint)){
-  UObject* Profile=DSLNativeDefaultsParentHint==TEXT("/Script/Engine.Actor")?ADasProbeActor::StaticClass()->GetDefaultObject():UDasScriptComponent::StaticClass()->GetDefaultObject();
+  UObject* Profile=DasNativeScriptHost(DSLNativeDefaultsParentHint)->GetDefaultObject();
   for(TFieldIterator<FProperty> It(Base);It;++It){auto* P=*It;if(!P->HasAnyPropertyFlags(CPF_Edit) || P->HasAnyPropertyFlags(CPF_EditConst|CPF_DisableEditOnTemplate))continue;auto* Data=P->ContainerPtrToValuePtr<void>(Profile);das::ExpressionPtr E=nullptr;
    if(auto* Int=CastField<FIntProperty>(P))E=new das::ExprConstInt(St->at,Int->GetPropertyValue(Data));else if(auto* Float=CastField<FFloatProperty>(P))E=new das::ExprConstFloat(St->at,Float->GetPropertyValue(Data));else if(auto* Double=CastField<FDoubleProperty>(P))E=new das::ExprConstDouble(St->at,Double->GetPropertyValue(Data));else if(auto* Bool=CastField<FBoolProperty>(P))E=new das::ExprConstBool(St->at,Bool->GetPropertyValue(Data));else if(auto* String=CastField<FStrProperty>(P))E=new das::ExprConstString(St->at,DSLUtf8(String->GetPropertyValue(Data)));if(E)Fields.Add(P->GetName(),E);
   }

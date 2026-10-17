@@ -103,7 +103,7 @@
         FDasDeclaredType D;D.Kind=DSLTypeName(T);
         auto First=MakeShared<FDasDeclaredType>();First->Kind=DSLTypeName(T->firstType);if(D.Kind==TEXT("array") && DSLTypedReference(T->firstType)){if(DSLAuthoredView(T->firstType))First->AuthoredId=DSLReferenceDeclaration(T->firstType).Id;First->TypePath=DSLTypedReferencePath(T->firstType);if(!First->TypePath.StartsWith(TEXT("/Script/")))DSLFail(TEXT("Reference arrays require native object/interface types"));}if(D.Kind==TEXT("array") && DSLDirectEnum(T->firstType))First->TypePath=DSLDirectPath(T->firstType,Folder,Registry);if(D.Kind==TEXT("array") && First->Kind==TEXT("struct")){if(!DSLMathPath(T->firstType).IsEmpty())First->TypePath=DSLMathPath(T->firstType);else {if(!T->firstType->structType || !DSLAnnotation(T->firstType->structType->annotations,"ue_struct"))DSLFail(TEXT("Struct arrays require authored ue_struct or supported math elements"));First->TypePath=DSLDirectPath(T->firstType,Folder,Registry);}}
         if(D.Kind==TEXT("map")){D.Key=First;auto Value=MakeShared<FDasDeclaredType>();Value->Kind=DSLTypeName(T->secondType);if(DSLDirectEnum(T->secondType))Value->TypePath=DSLDirectPath(T->secondType,Folder,Registry);if(DSLTypedReference(T->secondType)){if(DSLAuthoredView(T->secondType))Value->AuthoredId=DSLReferenceDeclaration(T->secondType).Id;Value->TypePath=DSLTypedReferencePath(T->secondType);if(!Value->TypePath.StartsWith(TEXT("/Script/")))DSLFail(TEXT("Reference maps require native object/interface hosts"));}if(Value->Kind==TEXT("struct")){if(!DSLMathPath(T->secondType).IsEmpty())Value->TypePath=DSLMathPath(T->secondType);else {if(!T->secondType->structType || !DSLAnnotation(T->secondType->structType->annotations,"ue_struct"))DSLFail(TEXT("Struct maps require authored ue_struct or supported math values"));Value->TypePath=DSLDirectPath(T->secondType,Folder,Registry);}}D.Value=Value;}else D.Element=First;
-        if(!DasContainerCarrier(D))DSLFail(TEXT("Standalone containers require primitive/authored-struct arrays, int/string sets or scalar/name/struct/enum/reference maps"));
+        if(!DasContainerCarrier(D))DSLFail(TEXT("Standalone containers require primitive/authored-struct arrays, int/string/name sets or int/string/name-key scalar/name/struct/enum/reference maps"));
         return D;
     }
     bool DSLDelegate(const das::TypeDeclPtr&);
@@ -147,29 +147,32 @@
         // Explicit test-only native host extension, never inferred from bridge storage.
         if(C.NativeParent==TEXT("/Script/Engine.Actor") && IsDasNativeArraySelfProbeEnabled() && DSLText(Name).StartsWith(TEXT("DasNativeArray")))return ADasProbeActor::StaticClass()->FindPropertyByName(*DSLText(Name));return nullptr;
     }
-    bool DSLNativeSelfKnown(const FDasDeclaredClass& C,const das::string& N){return DSLNativeSelfField(C,N) || (C.NativeParent==TEXT("/Script/Engine.Actor") && DSLText(N).Equals(TEXT("ActorTransform"),ESearchCase::IgnoreCase));}
+    bool DSLNativeSelfKnown(const FDasDeclaredClass& C,const das::string& N){return DSLNativeSelfField(C,N) || (DasActorNativeParent(C.NativeParent) && DSLText(N).Equals(TEXT("ActorTransform"),ESearchCase::IgnoreCase));}
     FDasDeclaredProperty DSLNativeSelfProperty(const FDasDeclaredClass& C,const das::string& Name){
         const FString N=DSLText(Name);
-        if(C.NativeParent==TEXT("/Script/Engine.Actor") && N.Equals(TEXT("ActorTransform"),ESearchCase::CaseSensitive)){FDasDeclaredProperty D;D.Name=N;D.Type.Kind=TEXT("struct");D.Type.TypePath=TEXT("/Script/CoreUObject.Transform");return D;}
+        if(DasActorNativeParent(C.NativeParent) && N.Equals(TEXT("ActorTransform"),ESearchCase::CaseSensitive)){FDasDeclaredProperty D;D.Name=N;D.Type.Kind=TEXT("struct");D.Type.TypePath=TEXT("/Script/CoreUObject.Transform");return D;}
         auto* P=DSLNativeSelfField(C,Name);
         // Owner is an explicit readonly facade over the public GetOwner(), not
         // permission to access arbitrary non-Blueprint-visible native storage.
-        const bool OwnerFacade=C.NativeParent==TEXT("/Script/Engine.Actor") && N.Equals(TEXT("Owner"),ESearchCase::CaseSensitive);
+        const bool OwnerFacade=DasActorNativeParent(C.NativeParent) && N.Equals(TEXT("Owner"),ESearchCase::CaseSensitive);
         if(!P || !P->GetName().Equals(N,ESearchCase::CaseSensitive) || P->ArrayDim!=1 || P->HasAnyPropertyFlags(CPF_EditorOnly|CPF_Deprecated) || (!OwnerFacade && !P->HasAnyPropertyFlags(CPF_BlueprintVisible)))DSLFail(TEXT("Unknown or inaccessible native self property: ")+N);
         // Accessor-backed fields must go through their reflected getter/setter.
         // UE strips BlueprintGetter/Setter metadata when cooking. Keep the small
         // Actor adapter's accessor policy explicit so editor and game agree.
-        const bool ActorAccessor=C.NativeParent==TEXT("/Script/Engine.Actor") && (N==TEXT("bAutoDestroyWhenFinished") || N==TEXT("NetCullDistanceSquared") || N==TEXT("NetUpdateFrequency") || N==TEXT("MinNetUpdateFrequency"));
+        const bool ActorAccessor=DasActorNativeParent(C.NativeParent) && (N==TEXT("bAutoDestroyWhenFinished") || N==TEXT("NetCullDistanceSquared") || N==TEXT("NetUpdateFrequency") || N==TEXT("MinNetUpdateFrequency"));
         if(P->HasSetterOrGetter() || ActorAccessor)DSLFail(TEXT("Native self property requires its accessor: ")+N);
         FDasDeclaredProperty D;D.Name=N;D.bReadOnly=OwnerFacade || P->HasAnyPropertyFlags(CPF_BlueprintReadOnly);
         D.Type.Kind=CastField<FIntProperty>(P)?TEXT("int"):CastField<FFloatProperty>(P)?TEXT("float"):CastField<FDoubleProperty>(P)?TEXT("double"):CastField<FBoolProperty>(P)?TEXT("bool"):CastField<FStrProperty>(P)?TEXT("string"):CastField<FNameProperty>(P)?TEXT("name"):CastField<FClassProperty>(P)?TEXT("class"):CastField<FObjectProperty>(P)?TEXT("object"):TEXT("");
-        if(auto* Array=CastField<FArrayProperty>(P)){
-            auto Element=MakeShared<FDasDeclaredType>();auto* Inner=Array->Inner;
-            Element->Kind=CastField<FIntProperty>(Inner)?TEXT("int"):CastField<FFloatProperty>(Inner)?TEXT("float"):CastField<FDoubleProperty>(Inner)?TEXT("double"):CastField<FBoolProperty>(Inner)?TEXT("bool"):CastField<FStrProperty>(Inner)?TEXT("string"):CastField<FNameProperty>(Inner)?TEXT("name"):TEXT("");
-            if(auto* Enum=DasEnumPropertyType(Inner)){Element->Kind=TEXT("enum");Element->TypePath=Enum->GetPathName();}
-            if(auto* Struct=CastField<FStructProperty>(Inner)){FString Issue;if(!ValidateDasValueStruct(Struct->Struct->GetPathName(),Issue))DSLFail(Issue);Element->Kind=TEXT("struct");Element->TypePath=Struct->Struct->GetPathName();}
-            if(Inner->ArrayDim==1 && !Element->Kind.IsEmpty()){D.Type.Kind=TEXT("array");D.Type.Element=Element;auto* Carrier=DasContainerCarrierForProperty(P);auto* Values=Carrier?Carrier->FindPropertyByName(TEXT("Values")):nullptr;if(!Values || !Values->SameType(P))DSLFail(TEXT("Native array carrier differs from property: ")+N);}
-        }
+        auto NativeValue=[&](FProperty* Value){auto Type=MakeShared<FDasDeclaredType>();if(!Value || Value->ArrayDim!=1)return Type;
+            Type->Kind=CastField<FIntProperty>(Value)?TEXT("int"):CastField<FFloatProperty>(Value)?TEXT("float"):CastField<FDoubleProperty>(Value)?TEXT("double"):CastField<FBoolProperty>(Value)?TEXT("bool"):CastField<FStrProperty>(Value)?TEXT("string"):CastField<FNameProperty>(Value)?TEXT("name"):TEXT("");
+            if(auto* Enum=DasEnumPropertyType(Value)){Type->Kind=TEXT("enum");Type->TypePath=Enum->GetPathName();}
+            if(auto* Struct=CastField<FStructProperty>(Value)){FString Issue;if(!ValidateDasValueStruct(Struct->Struct->GetPathName(),Issue))DSLFail(Issue);Type->Kind=TEXT("struct");Type->TypePath=Struct->Struct->GetPathName();}
+            if(!CastField<FClassProperty>(Value) && DasReferencePropertyClass(Value)){Type->Kind=TEXT("object");Type->TypePath=DasReferencePropertyClass(Value)->GetPathName();}
+            return Type;};
+        if(auto* Array=CastField<FArrayProperty>(P)){D.Type.Kind=TEXT("array");D.Type.Element=NativeValue(Array->Inner);if(D.Type.Element->Kind.IsEmpty())DSLFail(TEXT("Unsupported native array element"));}
+        if(auto* Map=CastField<FMapProperty>(P)){D.Type.Kind=TEXT("map");D.Type.Key=NativeValue(Map->KeyProp);D.Type.Value=NativeValue(Map->ValueProp);if((D.Type.Key->Kind!=TEXT("int") && D.Type.Key->Kind!=TEXT("string") && D.Type.Key->Kind!=TEXT("name")) || D.Type.Value->Kind.IsEmpty())DSLFail(TEXT("Native maps require int/string/name keys and supported values"));}
+        if(auto* Set=CastField<FSetProperty>(P)){D.Type.Kind=TEXT("set");D.Type.Element=NativeValue(Set->ElementProp);if(D.Type.Element->Kind!=TEXT("int") && D.Type.Element->Kind!=TEXT("string") && D.Type.Element->Kind!=TEXT("name"))DSLFail(TEXT("Native sets require int/string/name elements"));}
+        if(D.Type.Kind==TEXT("array") || D.Type.Kind==TEXT("map") || D.Type.Kind==TEXT("set")){auto* Carrier=DasContainerCarrierForProperty(P);auto* Values=Carrier?Carrier->FindPropertyByName(TEXT("Values")):nullptr;if(!Values || !Values->SameType(P))DSLFail(TEXT("Native container carrier differs from property: ")+N);}
         if(auto* Enum=DasEnumPropertyType(P)){FString Issue;if(!ResolveDasEnum(Enum->GetPathName(),Issue))DSLFail(Issue);D.Type.Kind=TEXT("enum");D.Type.TypePath=Enum->GetPathName();}
         if(auto* Struct=CastField<FStructProperty>(P)){FString Issue;if(!ValidateDasValueStruct(Struct->Struct->GetPathName(),Issue))DSLFail(Issue);D.Type.Kind=TEXT("struct");D.Type.TypePath=Struct->Struct->GetPathName();}
         if(D.Type.Kind.IsEmpty())DSLFail(TEXT("Unsupported native self property type: ")+N);
@@ -201,6 +204,10 @@
         }
         das::TypeDeclPtr SelfPropertyType(das::ExprField* F,const FDasDeclaredProperty* P){
             if(const auto* Field=Source->findField(F->name))return Field->type;
+            if(P->Type.Kind==TEXT("map") || P->Type.Kind==TEXT("set")){
+                auto* Type=new das::TypeDecl(das::Type::tTable,F->at);auto Convert=[&](const auto& Value){FDasDeclaredProperty Child;Child.Type=*Value;auto Result=SelfPropertyType(F,&Child);return Result?Result:DSLPropertyType(Value->Kind,Group,Source->module,F->at);};
+                Type->firstType=Convert(P->Type.Kind==TEXT("map")?P->Type.Key:P->Type.Element);Type->secondType=P->Type.Kind==TEXT("map")?Convert(P->Type.Value):static_cast<das::TypeDeclPtr>(new das::TypeDecl(das::Type::tVoid,F->at));DSLEnsureStructHelpers(Type,PropertyPath(P),Group,Source->module,GeneratedHelpers,HelperPaths);return Type;
+            }
             if(P->Type.Kind==TEXT("array")){
                 auto* Type=new das::TypeDecl(das::Type::tArray,F->at);FDasDeclaredProperty Element;Element.Type=*P->Type.Element;Type->firstType=SelfPropertyType(F,&Element);if(!Type->firstType)Type->firstType=DSLPropertyType(P->Type.Element->Kind,Group,Source->module,F->at);
                 DSLEnsureStructHelpers(Type,PropertyPath(P),Group,Source->module,GeneratedHelpers,HelperPaths);return Type;
@@ -230,13 +237,13 @@
             if(!F)return nullptr;if(const auto* Field=Source->findField(F->name))return Field->type;
             if(!DSLNativeSelfKnown(Decl,F->name))return nullptr;const auto* P=Property(F);return P?SelfPropertyType(F,P):nullptr;
         }
-        FString PropertyPath(const FDasDeclaredProperty* P){if(!Source->findField(DSLUtf8(P->Name)) && P->Type.Kind==TEXT("array")){auto* Carrier=DasContainerCarrierForProperty(DSLNativeSelfField(Decl,DSLUtf8(P->Name)));if(!Carrier)DSLFail(TEXT("Native array has no exact carrier"));return Carrier->GetPathName();}auto* Carrier=DasContainerCarrier(P->Type);return Carrier?Carrier->GetPathName():P->Type.TypePath;}
+        FString PropertyPath(const FDasDeclaredProperty* P){if(!Source->findField(DSLUtf8(P->Name)) && (P->Type.Kind==TEXT("array") || P->Type.Kind==TEXT("map") || P->Type.Kind==TEXT("set"))){auto* Carrier=DasContainerCarrierForProperty(DSLNativeSelfField(Decl,DSLUtf8(P->Name)));if(!Carrier)DSLFail(TEXT("Native container has no exact carrier"));return Carrier->GetPathName();}auto* Carrier=DasContainerCarrier(P->Type);return Carrier?Carrier->GetPathName():P->Type.TypePath;}
         das::ExpressionPtr Read(das::ExprField* F)
         {
             if(Decl.Components.ContainsByPredicate([&](const auto& C){return C.Name==DSLText(F->name);})){const auto* Field=Source->findField(F->name);return DSLReferenceValue(F->at,Field->type,DSLCall(F->at,"ue_get_self_object",{new das::ExprConstString(F->at,F->name)}));}const auto* P=Property(F);if(!P) return F;
             if(!Source->findField(F->name) && P->Name==TEXT("ActorTransform"))return DSLCall(F->at,"__ue_scene_world_transform",{DSLCall(F->at,"__ue_scene_actor_root",{DSLCall(F->at,"ue_self_object",{})})});
-            if(!Source->findField(F->name) && Decl.NativeParent==TEXT("/Script/Engine.Actor") && P->Name==TEXT("RootComponent"))return DSLDirectUnpack(F->at,SelfPropertyType(F,P),DSLCall(F->at,"__ue_scene_actor_root",{DSLCall(F->at,"ue_self_object",{})}),P->Type.TypePath);
-            if(!Source->findField(F->name) && Decl.NativeParent==TEXT("/Script/Engine.Actor") && P->Name==TEXT("Owner"))return DSLDirectUnpack(F->at,SelfPropertyType(F,P),DSLCall(F->at,"__ue_actor_owner",{DSLCall(F->at,"ue_self_object",{})}),P->Type.TypePath);
+            if(!Source->findField(F->name) && DasActorNativeParent(Decl.NativeParent) && P->Name==TEXT("RootComponent"))return DSLDirectUnpack(F->at,SelfPropertyType(F,P),DSLCall(F->at,"__ue_scene_actor_root",{DSLCall(F->at,"ue_self_object",{})}),P->Type.TypePath);
+            if(!Source->findField(F->name) && DasActorNativeParent(Decl.NativeParent) && P->Name==TEXT("Owner"))return DSLDirectUnpack(F->at,SelfPropertyType(F,P),DSLCall(F->at,"__ue_actor_owner",{DSLCall(F->at,"ue_self_object",{})}),P->Type.TypePath);
             if(P->Type.Kind==TEXT("delegate")){const auto* Field=Source->findField(F->name);return DSLDelegateFieldRead(F->at,Field->type,DSLCall(F->at,"ue_self_object",{}),P->Name);}
             if(P->Type.Kind==TEXT("event")){const auto* Field=Source->findField(F->name);return DSLDelegateView(F->at,Field->type,DSLCall(F->at,"ue_self_object",{}),P->Name);}
             auto* C=new das::ExprCall(F->at,P->Type.Kind==TEXT("class")?"ue_get_self_class":P->Type.Kind==TEXT("int")?"ue_get_self_int":P->Type.Kind==TEXT("float")?"ue_get_self_float":P->Type.Kind==TEXT("bool")?"ue_get_self_bool":P->Type.Kind==TEXT("double")?"ue_get_self_double":P->Type.Kind==TEXT("string")?"ue_get_self_string":(P->Type.Kind==TEXT("struct") || DasContainerCarrier(P->Type))?"ue_get_self_struct":P->Type.Kind==TEXT("object")?"ue_get_self_object":P->Type.Kind==TEXT("enum")?"ue_get_self_enum":"ue_get_self_name");
@@ -454,7 +461,7 @@
         virtual bool touch(const das::StructurePtr& St,das::ModuleGroup&,das::AnnotationArgumentList& Args,das::string& Error)override{try{
             DSLAnnotationArguments(Args);if(Args.size()!=1 || Args[0].name!="path")DSLFail(TEXT("Expected ue_native_base(path=NativeClassPath)"));
             const FString Path=DSLString(Args,"path");
-            if(Path!=TEXT("/Script/Engine.Actor") && Path!=TEXT("/Script/Engine.ActorComponent"))DSLFail(TEXT("Unsupported native DSL base; expected Actor or ActorComponent"));
+            if(!DasActorNativeParent(Path) && Path!=TEXT("/Script/Engine.ActorComponent"))DSLFail(TEXT("Unsupported native DSL base; expected Actor, Pawn, Character or ActorComponent"));
             auto* Native=FindObject<UClass>(nullptr,*Path);if(!Native || !Native->HasAnyClassFlags(CLASS_Native) || Native->HasAnyClassFlags(CLASS_Interface))DSLFail(TEXT("Native DSL base class is not loaded"));
             if(!St->isClass || St->parent)DSLFail(TEXT("Native DSL base requires an empty root class"));
             for(const auto& F:St->fields)if(!F.generated && F.name!="__rtti")DSLFail(TEXT("Native DSL base cannot declare fields or methods"));
@@ -525,6 +532,7 @@
                 FString NativeHint=DSLString(Args,"parent",TEXT("/Script/Engine.Actor"));
                 auto* NativeRoot=St;while(NativeRoot->parent)NativeRoot=NativeRoot->parent;
                 const auto Marker=DSLNativeBasePath(NativeRoot);if(!Marker.IsEmpty())NativeHint=Marker;else if(NativeRoot!=St)if(const auto* ParentAnnotation=DSLAnnotation(NativeRoot->annotations,"ue_class"))NativeHint=DSLString(ParentAnnotation->arguments,"parent",TEXT("/Script/Engine.Actor"));
+                if(!NativeHint.StartsWith(TEXT("/")))NativeHint=DSLResolveType(EDSLTypeKind::Class,NativeHint,FDSLTypeScope{DSLString(Args,"module_id",FPaths::GetBaseFilename(DSLText(St->at.fileInfo->name))),DSLString(Args,"type_folder"),DSLString(Args,"type_registry"),&Group,St->module});
                 TGuardValue<FString> NativeDefaultsHint(DSLNativeDefaultsParentHint,NativeHint);
                 DSLExpandDeclarationGroups(St,true);
                 DSLPrepareComputedDefaults(St);
@@ -648,7 +656,7 @@
                     }
                     C.Properties.Add(MoveTemp(P));
                 }
-                if(!C.Components.ContainsByPredicate([](const auto& V){return V.bRoot;}))for(auto& V:C.Components){auto* Native=V.NativeClass.IsEmpty()?nullptr:FindObject<UClass>(nullptr,*V.NativeClass);if(Native && Native->IsChildOf(USceneComponent::StaticClass()) && V.Attach.IsEmpty()){V.bRoot=true;break;}}
+                if(C.NativeParent!=TEXT("/Script/Engine.Character") && !C.Components.ContainsByPredicate([](const auto& V){return V.bRoot;}))for(auto& V:C.Components){auto* Native=V.NativeClass.IsEmpty()?nullptr:FindObject<UClass>(nullptr,*V.NativeClass);if(Native && Native->IsChildOf(USceneComponent::StaticClass()) && V.Attach.IsEmpty()){V.bRoot=true;break;}}
                 for(const auto& D:ComponentDefaults)if(D.Component.IsEmpty())if(const auto* Base=BaseEffective.Properties.FindByPredicate([&](const auto& P){return P.Name==D.Property;})){
                     auto* Parsed=C.Properties.FindByPredicate([&](const auto& P){return P.Name==D.Property;});
                     if(!Parsed || Parsed->Type.Identity()!=Base->Type.Identity())DSLFail(TEXT("Inherited default cannot change the property type: ")+D.Property);
@@ -923,12 +931,12 @@
                     auto* DeclaringCDO=Actual && Actual->GetOwnerClass()?Actual->GetOwnerClass()->GetDefaultObject():nullptr;
                     for(const auto* Owner=&C;Owner;){
                         if(Owner->PropertyOverrides.ContainsByPredicate([&](const auto& O){return O.Id==P.Id;})){
-                            DeclaringCDO=nullptr;for(auto* Class=Self->GetClass();Class;Class=Class->GetSuperClass()){auto* Candidate=Class->GetDefaultObject();const FString Identity=Cast<ADasProbeActor>(Candidate)?CastChecked<ADasProbeActor>(Candidate)->AuthoredTypeId:Cast<UDasScriptComponent>(Candidate)?CastChecked<UDasScriptComponent>(Candidate)->AuthoredTypeId:FString();if(Identity==Owner->Id)DeclaringCDO=Candidate;}
+                            DeclaringCDO=nullptr;for(auto* Class=Self->GetClass();Class;Class=Class->GetSuperClass()){auto* Candidate=Class->GetDefaultObject();const FString Identity=DasHostIdentity(Candidate);if(Identity==Owner->Id)DeclaringCDO=Candidate;}
                             if(!DeclaringCDO){Error=TEXT("Missing inherited default owner: ")+Owner->Id;OK=false;return;}break;
                         }
                         Owner=Owner->ParentId.IsEmpty()?nullptr:Model.Classes.FindByPredicate([&](const auto& V){return V.Id==Owner->ParentId;});
                     }
-                    const auto* Contracts=Cast<ADasProbeActor>(DeclaringCDO)?&CastChecked<ADasProbeActor>(DeclaringCDO)->DasDefaultSourceContracts:Cast<UDasScriptComponent>(DeclaringCDO)?&CastChecked<UDasScriptComponent>(DeclaringCDO)->DasDefaultSourceContracts:nullptr;
+                    const auto* Contracts=DasHostContracts(DeclaringCDO);
                     const bool CheckCDODefault=ActorAdapter && (!Contracts || Contracts->FindRef(P.Id)!=DasDefaultSourceContract(P));
                     if(auto* Carrier=DasContainerCarrier(P.Type)){auto* Values=Carrier->FindPropertyByName(TEXT("Values"));if(!Actual || !Values || !Values->SameType(Actual) || P.bReadOnly!=Actual->HasAnyPropertyFlags(CPF_BlueprintReadOnly) || (CheckCDODefault && !Actual->Identical(Actual->ContainerPtrToValuePtr<void>(DeclaringCDO),nullptr))){Error=TEXT("DSL container identity/default differs from owner: ")+P.Name;OK=false;return;}continue;}
                     if(P.Type.Kind==TEXT("delegate")){auto* D=CastField<FDelegateProperty>(Actual);FDasAuthoringModule Definition;FString Issue;if(!FDasAuthoringModule::FromJson(P.DelegateWire,Definition,Issue)){Error=Issue;OK=false;return;}TStrongObjectPtr<UFunction> Sig(MakeDasDelegateSignature(Definition.Classes[0].Methods[0],false,GetTransientPackage(),NAME_None,Issue));if(!D || !Sig || !Sig->IsSignatureCompatibleWith(D->SignatureFunction) || P.bReadOnly!=D->HasAnyPropertyFlags(CPF_BlueprintReadOnly)){Error=TEXT("Single delegate field differs from owner: ")+P.Name;OK=false;return;}continue;}

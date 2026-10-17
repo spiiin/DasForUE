@@ -49,3 +49,15 @@ component destruction/absence/replacement; owner component/Actor behavior; callb
 contracts; explicit cancellation prevents recovery; contexts and priority conflicts;
 asset/subsystem GC; world/local-player isolation; retries and reentry; EndPlay before
 BeginPlay; reinstancing and rollback; real PIE and packaged execution/performance.
+
+
+## Playable Character integration validation — 2026-10-17
+
+The earlier "not tested" notes describe the original implementation slice.
+The playable Character integration now verifies Boolean Started/Completed and
+Axis2D Triggered callbacks, Mapping Context installation and synthetic W routing,
+unpossess/repossess setup and EndPlay cleanup in real PIE and packaged Development.
+The separate saved-map run verifies auto-possession and working native movement,
+jump and camera after cook/load. This does not validate every trigger/value shape,
+multi-player ownership scenario or hot reload combination listed above.
+See PlayableCharacter.md for reproduction and the exact scope.

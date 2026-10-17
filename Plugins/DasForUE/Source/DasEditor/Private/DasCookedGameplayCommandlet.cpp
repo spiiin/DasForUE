@@ -1,6 +1,9 @@
-#include "DasLibraryTestTypes.h"
-#include "DasInstanceDefaultsGameFixtures.h"
 #include "DasCookedGameplayCommandlet.h"
+#include "DasLibraryTestTypes.h"
+#include "Misc/ScopeExit.h"
+#include "DasPlayableDemo.h"
+#include "DasInstanceDefaultsGameFixtures.h"
+#include "DasPawnCharacterFixtures.h"
 #include "DasStaticLibraryProbe.h"
 #include "DasDSLService.h"
 #include "DasPureFunctionTestGraph.h"
@@ -38,11 +41,13 @@ int32 UDasCookedGameplayCommandlet::Main(const FString& Params){
  auto* World=UWorld::CreateWorld(EWorldType::Editor,false,TEXT("Map"),CreatePackage(*(Root+TEXT("/Map"))));World->SetFlags(RF_Public|RF_Standalone);World->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
  auto* LibraryCarrier=World->SpawnActor<ADasStaticLibraryProbe>();LibraryCarrier->LibraryClass=Library->GeneratedClass;LibraryCarrier->ValuesClass=Values->GeneratedClass;
  TArray<UBlueprint*> DefaultAssets;if(!PrepareDasInstanceDefaultGameFixtures(Root,LibraryCarrier,DefaultAssets,Error,true)){UE_LOG(LogTemp,Error,TEXT("Instance defaults export: %s"),*Error);World->DestroyWorld(false);return 1;}
+ if(!PrepareDasPawnCharacterFixtures(Root,LibraryCarrier,DefaultAssets,Error,true)){UE_LOG(LogTemp,Error,TEXT("Pawn/Character export: %s"),*Error);World->DestroyWorld(false);return 1;}
  auto Spawn=[&](UBlueprint* BP,const TCHAR* Name){FActorSpawnParameters P;P.Name=Name;auto* A=World->SpawnActor<ADasProbeActor>(BP->GeneratedClass,FTransform::Identity,P);if(A)A->Tags.Add(Name);return A;};
  auto* NativeConstructionOwner=World->SpawnActor<AActor>();NativeConstructionOwner->Tags.Add(TEXT("StandaloneConstructionOwner"));
  auto* NativeConstruction=NewObject<UDasScriptComponent>(NativeConstructionOwner,Standalone->GeneratedClass,TEXT("StandaloneConstruction"),RF_Transactional);NativeConstructionOwner->AddInstanceComponent(NativeConstruction);NativeConstruction->RegisterComponent();
  // Save a deliberate difference: loading must retain the result, not execute construction again.
  FindFProperty<FIntProperty>(NativeConstruction->GetClass(),TEXT("Score"))->SetPropertyValue_InContainer(NativeConstruction,8);
  const bool Good=Spawn(Gameplay,TEXT("GameplayFirst")) && Spawn(Gameplay,TEXT("GameplaySecond")) && Spawn(Native,TEXT("NativeOwner")) && Spawn(Delegate,TEXT("DelegateOwner")) && Spawn(Single,TEXT("SingleOwner")) && Spawn(Inherited,TEXT("InheritedOwner")) && Spawn(Life,TEXT("LifeOwner")) && Spawn(TickOnly,TEXT("TickOnlyOwner")) && Spawn(Helper,TEXT("HelperOwner")) && Spawn(Pure,TEXT("PureOwner")) && Spawn(LibraryConsumer,TEXT("LibraryConsumer")) && Spawn(WorldConsumer,TEXT("WorldLibraryConsumer")) && Spawn(DefaultConsumer,TEXT("DefaultLibraryConsumer")) && Save(World);
+ if(!SaveDasPlayableDemo(Root,LibraryCarrier->PlayableCharacterClass,Error)){UE_LOG(LogTemp,Error,TEXT("Playable map: %s"),*Error);World->DestroyWorld(false);return 1;}
  World->DestroyWorld(false);if(!Good)return 1;UE_LOG(LogTemp,Display,TEXT("DAS_COOKED_GAMEPLAY_EXPORT=PASS map=%s/Map"),*Root);return 0;
 }

@@ -46,6 +46,31 @@ public:
     UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TArray<FTransform> DasNativeArrayTransforms;
     UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TArray<FIntPoint> DasNativeArrayPoints;
     UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TArray<FVector> DasNativeArrayReadonly;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TArray<TObjectPtr<AActor>> DasNativeArrayObjects;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TArray<TObjectPtr<APawn>> DasNativeArrayPawns;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<int32,int32> DasNativeArrayIntMap;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FString,double> DasNativeArrayDoubleMap;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<int32,FName> DasNativeArrayNameMap;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FString,FVector> DasNativeArrayVectorMap;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<int32,FIntPoint> DasNativeArrayPointMap;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<int32,ESpawnActorCollisionHandlingMethod> DasNativeArrayEnumMap;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FString,TEnumAsByte<EComponentMobility::Type>> DasNativeArrayByteMap;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<int32,TObjectPtr<APawn>> DasNativeArrayPawnMap;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<int32> DasNativeArrayIntSet;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<FString> DasNativeArrayStringSet;
+    UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TMap<int32,int32> DasNativeArrayReadonlyMap;
+    UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TSet<FString> DasNativeArrayReadonlySet;
+    UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TArray<TObjectPtr<APawn>> DasNativeArrayReadonlyObjects;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<FName> DasNativeArrayNameSet;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FName,int32> DasNativeArrayNameKeys;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FName,FName> DasNativeArrayNameNames;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FName,FVector> DasNativeArrayNameVectors;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FName,FIntPoint> DasNativeArrayNamePoints;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FName,ESpawnActorCollisionHandlingMethod> DasNativeArrayNameEnums;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FName,TEnumAsByte<EComponentMobility::Type>> DasNativeArrayNameBytes;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FName,TObjectPtr<APawn>> DasNativeArrayNameObjects;
+    UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TSet<FName> DasNativeArrayReadonlyNameSet;
+    UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TMap<FName,int32> DasNativeArrayReadonlyNameMap;
     ADasProbeActor();
     // Keep the selected identity catalog and its reflected types as cook/GC dependencies.
     UPROPERTY(EditAnywhere, Category="daScript") TObjectPtr<UDasTypeRegistry> TypeRegistry;
@@ -130,6 +155,7 @@ public:
 
 private:
     friend class FDasRuntimeModule;
+    friend struct FDasActorHostRuntime;
     FString ActiveLifecyclePath;
     bool bLifecycleActive = false;
     void ApplyDasSceneRoot();

@@ -1,4 +1,5 @@
 #include "DasDSLService.h"
+#include "DasScriptHosts.h"
 #include "DasLibraryService.h"
 #include "DasComponentComposition.h"
 #include "DasDefaultsMigration.h"
@@ -59,7 +60,7 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     UBlueprint* BP=Cast<UBlueprint>(Existing);
     if(Existing && !BP){Error=TEXT("Asset exists and is not a Blueprint");return false;}
     const bool Created=!BP;
-    if(!Created && BP->GeneratedClass){const UObject* CDO=BP->GeneratedClass->GetDefaultObject();const FString ExistingIdentity=Cast<ADasProbeActor>(CDO)?CastChecked<ADasProbeActor>(CDO)->AuthoredTypeId:Cast<UDasScriptComponent>(CDO)?CastChecked<UDasScriptComponent>(CDO)->AuthoredTypeId:FString();if(!ExistingIdentity.IsEmpty() && ExistingIdentity!=Id){Error=TEXT("Cooked authored identity differs from import declaration");return false;}}
+    if(!Created && BP->GeneratedClass){const UObject* CDO=BP->GeneratedClass->GetDefaultObject();const FString ExistingIdentity=DasHostIdentity(CDO);if(!ExistingIdentity.IsEmpty() && ExistingIdentity!=Id){Error=TEXT("Cooked authored identity differs from import declaration");return false;}}
     const auto& Declaration=*Model.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});
     if(DefaultPolicy==EDasDefaultMigrationPolicy::Automatic){
         DefaultPolicy=EDasDefaultMigrationPolicy::Refuse;
@@ -105,7 +106,7 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
         if(Delta.bStructural || Delta.bMetadata || Delta.bImplementation){Error=TEXT("Default migration accepts only default changes; apply other declaration changes separately");return false;}
         FDasClassSchema Previous;if(!Prior.ToActorSchema(Id,Previous,Error) || !FDasBlueprintService::Apply(BP,Previous,Error,true))return false;
     }
-    UClass* DeclaredParent=Schema.Parent==TEXT("ActorComponent")?UDasScriptComponent::StaticClass():ADasProbeActor::StaticClass();
+    UClass* DeclaredParent=DasNativeScriptHost(Schema.Parent.ToString());
     if(!Schema.ParentStableId.IsEmpty()){
         const auto* Parent=Model.Classes.FindByPredicate([&](const auto& C){return C.Id==Schema.ParentStableId;});if(!Parent || Parent->SourceScript.IsEmpty()){Error=TEXT("Authored parent source is unavailable");return false;}
         const FString ParentPackage=FPackageName::GetLongPackagePath(Package)+TEXT("/BP_")+Parent->Name;if(ParentPackage==Package){Error=TEXT("Authored parent package conflicts with child");return false;}
@@ -122,6 +123,7 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     if(!DasApplyComponentComposition(BP,Declaration,EffectiveDeclaration,ComponentBlueprints,Created,Error))return false;
     auto& Metadata=BP->GetOutermost()->GetMetaData();
     const bool BodyOnly=!Created && Metadata.GetValue(BP,TEXT("DasDSLModel"))==Json;
+    if(!Created && !BodyOnly && (Schema.Parent==TEXT("Pawn") || Schema.Parent==TEXT("Character"))){FDasAuthoringModule Before;FDasDeclaredClass Old;if(!FDasAuthoringModule::FromJson(Metadata.GetValue(BP,TEXT("DasDSLModel")),Before,Error) || !Before.ResolveClass(Id,Old,Error))return false;if(FDasAuthoringModule::Compare(Old,EffectiveDeclaration).bStructural){Error=TEXT("Structural migration of Pawn/Character declarations is deferred; create a new Blueprint");return false;}}
     const bool Preserve=!Created && !BodyOnly && DefaultPolicy==EDasDefaultMigrationPolicy::Refuse;
     FString ApprovalWire;bool Applied=false;TUniquePtr<FDasBlueprintRollback> Rollback;
     if(Preserve){
@@ -141,7 +143,7 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
 #if WITH_DEV_AUTOMATION_TESTS
     if(Rollback && GDasFailStructuralStage==1)return Restore(TEXT("Injected post-compile development failure"));
 #endif
-    if(Created)if(auto* Actor=Cast<ADasProbeActor>(BP->GeneratedClass->GetDefaultObject())){const auto* Root=EffectiveDeclaration.Components.FindByPredicate([](const auto& C){return C.bRoot;});Actor->bDasConstructionScript=EffectiveDeclaration.Callbacks.ContainsByPredicate([](const auto& C){return C.Kind==TEXT("ConstructionScript");});Actor->DasSceneRootProperty=Root?FName(*Root->Name):NAME_None;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
+    if(Created)if(DasActorHostClass(BP->GeneratedClass)){auto* Host=BP->GeneratedClass->GetDefaultObject();const auto* Root=EffectiveDeclaration.Components.FindByPredicate([](const auto& C){return C.bRoot;});FindFProperty<FBoolProperty>(Host->GetClass(),TEXT("bDasConstructionScript"))->SetPropertyValue_InContainer(Host,EffectiveDeclaration.Callbacks.ContainsByPredicate([](const auto& C){return C.Kind==TEXT("ConstructionScript");}));FindFProperty<FNameProperty>(Host->GetClass(),TEXT("DasSceneRootProperty"))->SetPropertyValue_InContainer(Host,Root?FName(*Root->Name):NAME_None);CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
     if(Created && (!DasInitializeInheritedDefaults(BP->GeneratedClass,Model,Id,Error) || !DasInitializeNativeDefaults(BP->GeneratedClass,Model,Id,Error)))return false;
     BP->Modify();Metadata.SetValue(BP,TEXT("DasDSLSource"),*Script);Metadata.SetValue(BP,TEXT("DasDSLClassId"),*Id);Metadata.SetValue(BP,TEXT("DasDSLModel"),*Json);
     BP->MarkPackageDirty();if(Created) FAssetRegistryModule::AssetCreated(BP);
@@ -149,9 +151,9 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     if(Rollback && GDasFailStructuralStage==2)return Restore(TEXT("Injected post-metadata development failure"));
 #endif
     if(Rollback && !Rollback->Finish(Error)){const FString Reason=Error;return Restore(Reason);}
-    if(Created && Schema.Parent==TEXT("Actor") && !EffectiveDeclaration.Callbacks.IsEmpty()){CastChecked<ADasProbeActor>(BP->GeneratedClass->GetDefaultObject())->LifecycleScript=Script;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
+    if(Created && DasActorNativeParent(EffectiveDeclaration.NativeParent) && !EffectiveDeclaration.Callbacks.IsEmpty()){*DasHostString(BP->GeneratedClass->GetDefaultObject(),TEXT("LifecycleScript"))=Script;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
     if(Created && Schema.Parent==TEXT("ActorComponent")){auto* Component=CastChecked<UDasScriptComponent>(BP->GeneratedClass->GetDefaultObject());Component->LifecycleScript=Script;Component->bDasConstructionScript=EffectiveDeclaration.Callbacks.ContainsByPredicate([](const auto& C){return C.Kind==TEXT("ConstructionScript");});CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
-    {UObject* CDO=BP->GeneratedClass->GetDefaultObject();if(auto* Actor=Cast<ADasProbeActor>(CDO);Actor && (Created || Actor->AuthoredTypeId.IsEmpty())){CDO->Modify();Actor->AuthoredTypeId=Id;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}else if(auto* Component=Cast<UDasScriptComponent>(CDO);Component && (Created || Component->AuthoredTypeId.IsEmpty())){CDO->Modify();Component->AuthoredTypeId=Id;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}}
+    {auto* CDO=BP->GeneratedClass->GetDefaultObject();auto* Identity=DasHostString(CDO,TEXT("AuthoredTypeId"));if(Identity && (Created || Identity->IsEmpty())){CDO->Modify();*Identity=Id;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}}
     Out=BP;Applied=true;
     UE_LOG(LogTemp,Display,TEXT("DAS_DSL_APPLY PASS %s (%s)"),*ObjectPath,BodyOnly?TEXT("body-only; no Blueprint recompile"):TEXT("declaration applied"));return true;
 }

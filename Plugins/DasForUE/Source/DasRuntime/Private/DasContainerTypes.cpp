@@ -45,7 +45,7 @@ const FString StructMapPrefix=TEXT("/Script/DasRuntime.DasStructMap_");
 TMap<FString,TWeakObjectPtr<UScriptStruct>> StructMapCarriers;
 TMap<FString,FString> StructMapLayouts;
 UScriptStruct* StructMapCarrier(UScriptStruct* Element,bool StringKey){
-    if(!IsInGameThread() || !IsValid(Element) || (!IsDasMathStructPath(Element->GetPathName()) && (!Element->IsA<UUserDefinedStruct>() || !Element->GetPathName().StartsWith(TEXT("/Game/")))))return nullptr;
+    if(!IsInGameThread() || !IsValid(Element) || (!Element->GetPathName().StartsWith(TEXT("/Script/")) && (!Element->IsA<UUserDefinedStruct>() || !Element->GetPathName().StartsWith(TEXT("/Game/")))))return nullptr;
     FString Error;if(!ValidateDasValueStruct(Element->GetPathName(),Error))return nullptr;
     const FTCHARToUTF8 Text(*Element->GetPathName());const TCHAR* Digits=TEXT("0123456789ABCDEF");FString Path=StructMapPrefix+(StringKey?TEXT("S_"):TEXT("I_"));
     for(int32 I=0;I<Text.Length();++I){const uint8 Byte=uint8(Text.Get()[I]);Path.AppendChar(Digits[Byte>>4]);Path.AppendChar(Digits[Byte&15]);}
@@ -64,7 +64,7 @@ UScriptStruct* ResolveStructMapCarrier(const FString& Path){
     FString Encoded=Path.RightChop(StructMapPrefix.Len());const bool StringKey=Encoded.StartsWith(TEXT("S_"));if(!StringKey && !Encoded.StartsWith(TEXT("I_")))return nullptr;const FString Hex=Encoded.RightChop(2);if(Hex.IsEmpty() || Hex.Len()%2)return nullptr;
     auto Digit=[](TCHAR C){return C>='0' && C<='9'?int32(C-'0'):C>='A' && C<='F'?int32(C-'A'+10):-1;};TArray<ANSICHAR> Bytes;
     for(int32 I=0;I<Hex.Len();I+=2){const int32 H=Digit(Hex[I]),L=Digit(Hex[I+1]);if(H<0 || L<0 || !(H || L))return nullptr;Bytes.Add(ANSICHAR((H<<4)|L));}Bytes.Add(0);
-    const FString ElementPath=UTF8_TO_TCHAR(Bytes.GetData());if(!ElementPath.StartsWith(TEXT("/Game/")) && !IsDasMathStructPath(ElementPath))return nullptr;
+    const FString ElementPath=UTF8_TO_TCHAR(Bytes.GetData());if(!ElementPath.StartsWith(TEXT("/Game/")) && !ElementPath.StartsWith(TEXT("/Script/")))return nullptr;
     auto* Element=FindObject<UScriptStruct>(nullptr,*ElementPath);if(!Element)Element=LoadObject<UScriptStruct>(nullptr,*ElementPath,nullptr,LOAD_NoWarn);
     auto* S=StructMapCarrier(Element,StringKey);return S && S->GetPathName()==Path?S:nullptr;
 }
@@ -73,26 +73,26 @@ UScriptStruct* ResolveStructMapCarrier(const FString& Path){
 const FString ReflectedMapPrefix=TEXT("/Script/DasRuntime.DasReflectedMap_");
 TMap<FString,TWeakObjectPtr<UScriptStruct>> ReflectedMapCarriers;
 TMap<FString,FString> ReflectedMapLayouts;
-UScriptStruct* ReflectedMapCarrier(UObject* Element,bool StringKey){
+UScriptStruct* ReflectedMapCarrier(UObject* Element,bool StringKey,bool Strong=false){
     if(!IsInGameThread() || !IsValid(Element))return nullptr;
-    auto* Enum=Cast<UDasDefinedEnum>(Element);auto* Class=Cast<UClass>(Element);
-    if(Enum?!Element->GetPathName().StartsWith(TEXT("/Game/")):!Class || !Element->GetPathName().StartsWith(TEXT("/Script/")))return nullptr;
-    FString Layout=Element->GetPathName();if(Enum)for(int32 I=0;I<Enum->NumEnums();++I)Layout+=TEXT("|")+Enum->GetNameByIndex(I).ToString()+TEXT(":")+FString::Printf(TEXT("%lld"),Enum->GetValueByIndex(I))+TEXT(":")+Enum->MemberIds.FindRef(Enum->GetValueByIndex(I));else Layout+=Class->HasAnyClassFlags(CLASS_Interface)?TEXT(":interface"):TEXT(":object");
-    FString Path=ReflectedMapPrefix+(StringKey?TEXT("S_"):TEXT("I_"))+(Enum?TEXT("E_"):TEXT("C_"));const FTCHARToUTF8 Text(*Element->GetPathName());const TCHAR* Digits=TEXT("0123456789ABCDEF");
+    auto* Enum=Cast<UEnum>(Element);auto* Authored=Cast<UDasDefinedEnum>(Element);auto* Class=Cast<UClass>(Element);
+    if(Enum?(!Element->GetPathName().StartsWith(TEXT("/Script/")) && (!Authored || !Element->GetPathName().StartsWith(TEXT("/Game/")))):!Class || !Element->GetPathName().StartsWith(TEXT("/Script/")))return nullptr;
+    FString Layout=Element->GetPathName();if(Enum)for(int32 I=0;I<Enum->NumEnums();++I)Layout+=TEXT("|")+Enum->GetNameByIndex(I).ToString()+TEXT(":")+FString::Printf(TEXT("%lld"),Enum->GetValueByIndex(I))+TEXT(":")+(Authored?Authored->MemberIds.FindRef(Enum->GetValueByIndex(I)):FString());else Layout+=Class->HasAnyClassFlags(CLASS_Interface)?TEXT(":interface"):TEXT(":object");
+    FString Path=ReflectedMapPrefix+(StringKey?TEXT("S_"):TEXT("I_"))+(Enum?(Strong?TEXT("N_"):TEXT("E_")):TEXT("C_"));const FTCHARToUTF8 Text(*Element->GetPathName());const TCHAR* Digits=TEXT("0123456789ABCDEF");
     for(int32 I=0;I<Text.Length();++I){const uint8 B=uint8(Text.Get()[I]);Path.AppendChar(Digits[B>>4]);Path.AppendChar(Digits[B&15]);}if(Path.Len()>=NAME_SIZE)return nullptr;
     if(const auto* Cached=ReflectedMapCarriers.Find(Path)){auto* S=Cached->Get();auto* M=S?CastField<FMapProperty>(S->FindPropertyByName(TEXT("Values"))):nullptr;return M && (StringKey?M->KeyProp->IsA<FStrProperty>():M->KeyProp->IsA<FIntProperty>()) && (Enum?DasEnumPropertyType(M->ValueProp)==Enum:DasReferencePropertyClass(M->ValueProp)==Class && bool(CastField<FInterfaceProperty>(M->ValueProp))==Class->HasAnyClassFlags(CLASS_Interface)) && ReflectedMapLayouts.FindRef(Path)==Layout?S:nullptr;}
     if(ReflectedMapCarriers.Num()>=1024 || FindObject<UScriptStruct>(nullptr,*Path))return nullptr;
     auto* S=NewObject<UScriptStruct>(CreatePackage(TEXT("/Script/DasRuntime")),*Path.RightChop(FString(TEXT("/Script/DasRuntime.")).Len()),RF_Transient);auto* M=new FMapProperty(S,TEXT("Values"),RF_Transient);
     if(StringKey)M->KeyProp=new FStrProperty(M,TEXT("Key"),RF_Transient);else M->KeyProp=new FIntProperty(M,TEXT("Key"),RF_Transient);M->KeyProp->SetPropertyFlags(CPF_HasGetValueTypeHash);
-    if(Enum){auto* V=new FByteProperty(M,TEXT("Value"),RF_Transient);V->Enum=Enum;M->ValueProp=V;}else if(Class->HasAnyClassFlags(CLASS_Interface)){auto* V=new FInterfaceProperty(M,TEXT("Value"),RF_Transient);V->InterfaceClass=Class;M->ValueProp=V;}else {auto* V=new FObjectProperty(M,TEXT("Value"),RF_Transient);V->PropertyClass=Class;M->ValueProp=V;}
+    if(Enum){if(Strong){auto* V=new FEnumProperty(M,TEXT("Value"),RF_Transient);V->SetEnum(Enum);V->AddCppProperty(new FByteProperty(V,TEXT("UnderlyingType"),RF_Transient));M->ValueProp=V;}else {auto* V=new FByteProperty(M,TEXT("Value"),RF_Transient);V->Enum=Enum;M->ValueProp=V;}}else if(Class->HasAnyClassFlags(CLASS_Interface)){auto* V=new FInterfaceProperty(M,TEXT("Value"),RF_Transient);V->InterfaceClass=Class;M->ValueProp=V;}else {auto* V=new FObjectProperty(M,TEXT("Value"),RF_Transient);V->PropertyClass=Class;M->ValueProp=V;}
     S->AddCppProperty(M);S->Bind();S->StaticLink(true);S->AddToRoot();ReflectedMapCarriers.Add(Path,S);ReflectedMapLayouts.Add(Path,Layout);return S;
 }
 UScriptStruct* ResolveReflectedMapCarrier(const FString& Path){
     if(!Path.StartsWith(ReflectedMapPrefix) || Path.Len()>=NAME_SIZE)return nullptr;const FString Text=Path.RightChop(ReflectedMapPrefix.Len());const bool StringKey=Text.StartsWith(TEXT("S_"));if(!StringKey && !Text.StartsWith(TEXT("I_")))return nullptr;
-    const FString Kind=Text.Mid(2,2);if(Kind!=TEXT("E_") && Kind!=TEXT("C_"))return nullptr;const FString Hex=Text.RightChop(4);if(Hex.IsEmpty() || Hex.Len()%2)return nullptr;TArray<ANSICHAR> Bytes;
+    const FString Kind=Text.Mid(2,2);if(Kind!=TEXT("E_") && Kind!=TEXT("N_") && Kind!=TEXT("C_"))return nullptr;const FString Hex=Text.RightChop(4);if(Hex.IsEmpty() || Hex.Len()%2)return nullptr;TArray<ANSICHAR> Bytes;
     auto Digit=[](TCHAR C){return C>='0' && C<='9'?int32(C-'0'):C>='A' && C<='F'?int32(C-'A'+10):-1;};for(int32 I=0;I<Hex.Len();I+=2){int32 H=Digit(Hex[I]),L=Digit(Hex[I+1]);if(H<0 || L<0 || !(H || L))return nullptr;Bytes.Add(ANSICHAR((H<<4)|L));}Bytes.Add(0);
-    const FString ElementPath=UTF8_TO_TCHAR(Bytes.GetData());UObject* Element=nullptr;if(Kind==TEXT("E_")){if(!ElementPath.StartsWith(TEXT("/Game/")))return nullptr;Element=FindObject<UDasDefinedEnum>(nullptr,*ElementPath);if(!Element)Element=LoadObject<UEnum>(nullptr,*ElementPath,nullptr,LOAD_NoWarn);}else {if(!ElementPath.StartsWith(TEXT("/Script/")))return nullptr;Element=FindObject<UClass>(nullptr,*ElementPath);if(!Element)Element=LoadObject<UClass>(nullptr,*ElementPath,nullptr,LOAD_NoWarn);}
-    auto* S=ReflectedMapCarrier(Element,StringKey);return S && S->GetPathName()==Path?S:nullptr;
+    const FString ElementPath=UTF8_TO_TCHAR(Bytes.GetData());UObject* Element=nullptr;if(Kind==TEXT("E_") || Kind==TEXT("N_")){if(!ElementPath.StartsWith(TEXT("/Script/")) && !ElementPath.StartsWith(TEXT("/Game/")))return nullptr;Element=FindObject<UEnum>(nullptr,*ElementPath);if(!Element)Element=LoadObject<UEnum>(nullptr,*ElementPath,nullptr,LOAD_NoWarn);}else {if(!ElementPath.StartsWith(TEXT("/Script/")))return nullptr;Element=FindObject<UClass>(nullptr,*ElementPath);if(!Element)Element=LoadObject<UClass>(nullptr,*ElementPath,nullptr,LOAD_NoWarn);}
+    auto* S=ReflectedMapCarrier(Element,StringKey,Kind==TEXT("N_"));return S && S->GetPathName()==Path?S:nullptr;
 }
 
 const FString StrongEnumArrayPrefix=TEXT("/Script/DasRuntime.DasStrongEnumArray_");
@@ -142,10 +142,29 @@ UScriptStruct* ResolveReferenceArrayCarrier(const FString& Path){
     auto* S=ReferenceArrayCarrier(C);return S && S->GetPathName()==Path?S:nullptr;
 }
 
+const FString NameMapPrefix=TEXT("/Script/DasRuntime.DasNameKeyMap_");
+TMap<FString,TWeakObjectPtr<UScriptStruct>> NameMapCarriers;
+UScriptStruct* NameMapFromBase(FMapProperty* Base,const FString& BasePath){
+    if(!IsInGameThread() || !Base || !Base->KeyProp->IsA<FIntProperty>())return nullptr;
+    FString Path=NameMapPrefix;const FTCHARToUTF8 Text(*BasePath);const TCHAR* Digits=TEXT("0123456789ABCDEF");for(int32 I=0;I<Text.Length();++I){const uint8 B=uint8(Text.Get()[I]);Path.AppendChar(Digits[B>>4]);Path.AppendChar(Digits[B&15]);}if(Path.Len()>=NAME_SIZE)return nullptr;
+    if(const auto* Cached=NameMapCarriers.Find(Path)){auto* S=Cached->Get();auto* P=S?CastField<FMapProperty>(S->FindPropertyByName(TEXT("Values"))):nullptr;return P && P->KeyProp->IsA<FNameProperty>() && P->ValueProp->SameType(Base->ValueProp) && P->ValueProp->GetElementSize()==Base->ValueProp->GetElementSize()?S:nullptr;}
+    if(NameMapCarriers.Num()>=1024 || FindObject<UScriptStruct>(nullptr,*Path))return nullptr;
+    auto* S=NewObject<UScriptStruct>(CreatePackage(TEXT("/Script/DasRuntime")),*Path.RightChop(FString(TEXT("/Script/DasRuntime.")).Len()),RF_Transient);auto* P=new FMapProperty(S,TEXT("Values"),RF_Transient);P->KeyProp=new FNameProperty(P,TEXT("Key"),RF_Transient);P->KeyProp->SetPropertyFlags(CPF_HasGetValueTypeHash);P->ValueProp=CastFieldChecked<FProperty>(FField::Duplicate(Base->ValueProp,P,TEXT("Value")));S->AddCppProperty(P);S->Bind();S->StaticLink(true);S->AddToRoot();NameMapCarriers.Add(Path,S);return S;
 }
-void ResetDasStructArrayCarriers(){for(auto& Item:ReflectedMapCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();ReflectedMapCarriers.Empty();ReflectedMapLayouts.Empty();for(auto& Item:StructMapCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();StructMapCarriers.Empty();StructMapLayouts.Empty();for(auto& Item:ReferenceArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();ReferenceArrayCarriers.Empty();for(auto& Item:EnumArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();EnumArrayCarriers.Empty();EnumArrayLayouts.Empty();for(auto& Item:StructArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();StructArrayCarriers.Empty();StructArrayLayouts.Empty();}
+UScriptStruct* NameMapCarrier(const FDasDeclaredType& Type,bool Strong=false){FDasDeclaredType Proxy=Type;auto Key=MakeShared<FDasDeclaredType>();Key->Kind=TEXT("int");Proxy.Key=Key;auto* Base=Strong && Type.Value && Type.Value->Kind==TEXT("enum")?ReflectedMapCarrier(FindObject<UEnum>(nullptr,*Type.Value->TypePath),false,true):DasContainerCarrier(Proxy);return Base?NameMapFromBase(CastField<FMapProperty>(Base->FindPropertyByName(TEXT("Values"))),Base->GetPathName()):nullptr;}
+UScriptStruct* ResolveNameMap(const FString& Path){if(!Path.StartsWith(NameMapPrefix) || Path.Len()>=NAME_SIZE)return nullptr;const FString Hex=Path.RightChop(NameMapPrefix.Len());if(Hex.IsEmpty() || Hex.Len()%2)return nullptr;auto Digit=[](TCHAR C){return C>='0' && C<='9'?int32(C-'0'):C>='A' && C<='F'?int32(C-'A'+10):-1;};TArray<ANSICHAR> Bytes;for(int32 I=0;I<Hex.Len();I+=2){const int32 H=Digit(Hex[I]),L=Digit(Hex[I+1]);if(H<0 || L<0 || !(H || L))return nullptr;Bytes.Add(ANSICHAR((H<<4)|L));}Bytes.Add(0);const FString BasePath=UTF8_TO_TCHAR(Bytes.GetData());if(BasePath.StartsWith(NameMapPrefix))return nullptr;auto* S=NameMapFromBase(CastField<FMapProperty>(DasContainerProperty(BasePath)),BasePath);return S && S->GetPathName()==Path?S:nullptr;}
+UScriptStruct* NameMapForProperty(const FMapProperty* P){
+    FDasDeclaredType Type;Type.Kind=TEXT("map");auto Key=MakeShared<FDasDeclaredType>();Key->Kind=TEXT("name");Type.Key=Key;auto Value=MakeShared<FDasDeclaredType>();auto* V=P->ValueProp;
+    Value->Kind=V->IsA<FIntProperty>()?TEXT("int"):V->IsA<FFloatProperty>()?TEXT("float"):V->IsA<FDoubleProperty>()?TEXT("double"):V->IsA<FBoolProperty>()?TEXT("bool"):V->IsA<FStrProperty>()?TEXT("string"):V->IsA<FNameProperty>()?TEXT("name"):TEXT("");
+    if(auto* E=DasEnumPropertyType(V)){Value->Kind=TEXT("enum");Value->TypePath=E->GetPathName();}if(auto* S=CastField<FStructProperty>(V)){Value->Kind=TEXT("struct");Value->TypePath=S->Struct->GetPathName();}if(auto* C=DasReferencePropertyClass(V)){Value->Kind=TEXT("object");Value->TypePath=C->GetPathName();}if(Value->Kind.IsEmpty())return nullptr;Type.Value=Value;auto* Strong=CastField<FEnumProperty>(V);if(Strong && !Strong->GetUnderlyingProperty()->IsA<FByteProperty>())return nullptr;auto* S=NameMapCarrier(Type,Strong!=nullptr);auto* Values=S?S->FindPropertyByName(TEXT("Values")):nullptr;return Values && Values->SameType(P)?S:nullptr;
+}
+
+}
+void ResetDasStructArrayCarriers(){for(auto& I:NameMapCarriers)if(auto* S=I.Value.Get())S->RemoveFromRoot();NameMapCarriers.Empty();for(auto& Item:ReflectedMapCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();ReflectedMapCarriers.Empty();ReflectedMapLayouts.Empty();for(auto& Item:StructMapCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();StructMapCarriers.Empty();StructMapLayouts.Empty();for(auto& Item:ReferenceArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();ReferenceArrayCarriers.Empty();for(auto& Item:EnumArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();EnumArrayCarriers.Empty();EnumArrayLayouts.Empty();for(auto& Item:StructArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();StructArrayCarriers.Empty();StructArrayLayouts.Empty();}
 UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type){
-    if(Type.Kind==TEXT("map") && Type.Key && Type.Value && (Type.Key->Kind==TEXT("int") || Type.Key->Kind==TEXT("string"))){if(Type.Value->Kind==TEXT("enum"))return ReflectedMapCarrier(FindObject<UDasDefinedEnum>(nullptr,*Type.Value->TypePath),Type.Key->Kind==TEXT("string"));if(Type.Value->Kind==TEXT("object"))return ReflectedMapCarrier(FindObject<UClass>(nullptr,*Type.Value->TypePath),Type.Key->Kind==TEXT("string"));}
+    if(Type.Kind==TEXT("map") && Type.Key && Type.Key->Kind==TEXT("name") && Type.Value)return NameMapCarrier(Type);
+    if(Type.Kind==TEXT("set") && Type.Element && Type.Element->Kind==TEXT("name"))return FDasSetNameCarrier::StaticStruct();
+    if(Type.Kind==TEXT("map") && Type.Key && Type.Value && (Type.Key->Kind==TEXT("int") || Type.Key->Kind==TEXT("string"))){if(Type.Value->Kind==TEXT("enum"))return ReflectedMapCarrier(FindObject<UEnum>(nullptr,*Type.Value->TypePath),Type.Key->Kind==TEXT("string"));if(Type.Value->Kind==TEXT("object"))return ReflectedMapCarrier(FindObject<UClass>(nullptr,*Type.Value->TypePath),Type.Key->Kind==TEXT("string"));}
     if(Type.Kind==TEXT("map") && Type.Key && Type.Value && (Type.Key->Kind==TEXT("int") || Type.Key->Kind==TEXT("string")) && Type.Value->Kind==TEXT("struct"))return StructMapCarrier(FindObject<UScriptStruct>(nullptr,*Type.Value->TypePath),Type.Key->Kind==TEXT("string"));
     if(Type.Kind==TEXT("array") && Type.Element && Type.Element->Kind==TEXT("object"))return ReferenceArrayCarrier(FindObject<UClass>(nullptr,*Type.Element->TypePath));
     if(Type.Kind==TEXT("array") && Type.Element && Type.Element->Kind==TEXT("enum"))return EnumArrayCarrier(FindObject<UEnum>(nullptr,*Type.Element->TypePath));
@@ -173,6 +192,8 @@ UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type){
     return nullptr;
 }
 FProperty* DasContainerProperty(const FString& Path){
+    if(Path.StartsWith(NameMapPrefix)){auto* S=ResolveNameMap(Path);return S?S->FindPropertyByName(TEXT("Values")):nullptr;}
+    if(Path==FDasSetNameCarrier::StaticStruct()->GetPathName())return FDasSetNameCarrier::StaticStruct()->FindPropertyByName(TEXT("Values"));
     if(Path.StartsWith(ReflectedMapPrefix)){auto* S=ResolveReflectedMapCarrier(Path);return S?S->FindPropertyByName(TEXT("Values")):nullptr;}
     if(Path.StartsWith(StructMapPrefix)){auto* S=ResolveStructMapCarrier(Path);return S?S->FindPropertyByName(TEXT("Values")):nullptr;}
     if(Path.StartsWith(ReferenceArrayPrefix)){auto* S=ResolveReferenceArrayCarrier(Path);return S?S->FindPropertyByName(TEXT("Values")):nullptr;}
@@ -201,7 +222,9 @@ FProperty* DasContainerProperty(const FString& Path){
     return nullptr;
 }
 UScriptStruct* DasContainerCarrierForProperty(const FProperty* Property){
-    if(const auto* M=CastField<FMapProperty>(Property))if(M->KeyProp->IsA<FIntProperty>() || M->KeyProp->IsA<FStrProperty>()){if(auto* E=DasEnumPropertyType(M->ValueProp))if(auto* S=ReflectedMapCarrier(E,M->KeyProp->IsA<FStrProperty>()))return S;if(auto* C=DasReferencePropertyClass(M->ValueProp))if(auto* S=ReflectedMapCarrier(C,M->KeyProp->IsA<FStrProperty>()))return S;}
+    if(const auto* P=CastField<FMapProperty>(Property);P && P->KeyProp->IsA<FNameProperty>())return NameMapForProperty(P);
+    if(const auto* P=CastField<FSetProperty>(Property);P && P->ElementProp->IsA<FNameProperty>())return FDasSetNameCarrier::StaticStruct();
+    if(const auto* M=CastField<FMapProperty>(Property))if(M->KeyProp->IsA<FIntProperty>() || M->KeyProp->IsA<FStrProperty>()){if(auto* E=DasEnumPropertyType(M->ValueProp)){auto* Strong=CastField<FEnumProperty>(M->ValueProp);if(Strong && !Strong->GetUnderlyingProperty()->IsA<FByteProperty>())return nullptr;auto* S=ReflectedMapCarrier(E,M->KeyProp->IsA<FStrProperty>(),Strong!=nullptr);auto* Values=S?S->FindPropertyByName(TEXT("Values")):nullptr;return Values && Values->SameType(Property)?S:nullptr;}if(auto* C=DasReferencePropertyClass(M->ValueProp))if(auto* S=ReflectedMapCarrier(C,M->KeyProp->IsA<FStrProperty>()))return S;}
     if(const auto* Map=CastField<FMapProperty>(Property))if(const auto* Value=CastField<FStructProperty>(Map->ValueProp))if(Map->KeyProp->IsA<FIntProperty>() || Map->KeyProp->IsA<FStrProperty>())if(auto* Carrier=StructMapCarrier(Value->Struct,Map->KeyProp->IsA<FStrProperty>()))return Carrier;
     if(const auto* Array=CastField<FArrayProperty>(Property))if(auto* C=DasReferencePropertyClass(Array->Inner))if(auto* Carrier=ReferenceArrayCarrier(C))return Carrier;
     if(const auto* Array=CastField<FArrayProperty>(Property))if(auto* E=DasEnumPropertyType(Array->Inner)){if(auto* Strong=CastField<FEnumProperty>(Array->Inner);Strong && !Strong->GetUnderlyingProperty()->IsA<FByteProperty>())return nullptr;auto* Carrier=EnumArrayCarrier(E,Array->Inner->IsA<FEnumProperty>());auto* Values=Carrier?Carrier->FindPropertyByName(TEXT("Values")):nullptr;return Values && Values->SameType(Property)?Carrier:nullptr;}

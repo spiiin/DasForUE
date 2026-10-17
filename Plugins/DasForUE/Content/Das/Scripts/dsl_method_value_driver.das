@@ -283,8 +283,68 @@ def exercise_values(api:ValueTargetRef):int {
     try { api.EchoAuthored(ValueTargetRef(handle=ue_self_object())) } recover { return 1 }
     return -15
 }
+def exercise_names(api:ValueDriverRef):int {
+    api.SeedNames()
+    var names=api.CopyNameScores(api.NameScores)
+    var tags=api.CopyNameTags(api.NameTags)
+    if (length(names)!=1 || names[ue_name_value("unit_3")]!=8 || length(tags)!=1 || !key_exists(tags,ue_name_value("unit_3"))) { return -100 }
+    names[ue_name_value("None")]=10
+    names[ue_name_value("Unit_03")]=11
+    names[ue_name_value("東京")]=12
+    insert(tags,ue_name_value("None"))
+    insert(tags,ue_name_value("東京"))
+    api.NameScores := names
+    api.NameTags := tags
+    var previous:table<UENameValue;int>
+    api.RefNameScores(names,previous)
+    var previousTags:table<UENameValue>
+    api.RefNameTags(tags,previousTags)
+    if (length(previous)!=4 || length(names)!=5 || previous[ue_name_value("")]!=10 || names[ue_name_value("UPDATED")]!=99 || length(api.NameScores)!=4 || length(previousTags)!=3 || length(tags)!=4 || length(api.NameTags)!=3) { return -101 }
+    var vectors=api.CopyNameVectors(api.NameVectors)
+    vectors[ue_name_value("位置")].x=4.0lf
+    api.NameVectors := vectors
+    if (api.NameVectors[ue_name_value("位置")].x!=4.0lf || length(api.LockedNames)!=0) { return -102 }
+    var empty:table<UENameValue;int>
+    var emptyTags:table<UENameValue>
+    if (length(api.CopyNameScores(empty))!=0 || length(api.CopyNameTags(emptyTags))!=0) { return -103 }
+    return 1
+}
 [ue_class(module_id="methodvalues", type_registry="REGISTRY", Blueprintable)]
 class ValueDriver {
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    NameScores:table<UENameValue;int>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    NameTags:table<UENameValue>
+    @ue_property=(EditAnywhere, BlueprintReadOnly)
+    LockedNames:table<UENameValue>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    NameVectors:table<UENameValue;UEVector>
+    [ue_function(BlueprintCallable)]
+    def CopyNameScores(values:table<UENameValue;int>):table<UENameValue;int> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def CopyNameTags(values:table<UENameValue>):table<UENameValue> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def CopyNameVectors(values:table<UENameValue;UEVector>):table<UENameValue;UEVector> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def RefNameScores(var values:table<UENameValue;int>&; @ue_out var previous:table<UENameValue;int>&):void {
+        previous := values
+        values[ue_name_value("Updated")]=99
+    }
+    [ue_function(BlueprintCallable)]
+    def RefNameTags(var values:table<UENameValue>&; @ue_out var previous:table<UENameValue>&):void {
+        previous := values
+        insert(values,ue_name_value("Updated"))
+    }
+    [ue_function(BlueprintCallable)]
+    def SeedNames():void {
+        self.NameScores[ue_name_value("Unit_3")]=7
+        self.NameScores[ue_name_value("UNIT_3")]+=1
+        insert(self.NameTags,ue_name_value("Unit_3"))
+        insert(self.NameTags,ue_name_value("UNIT_3"))
+        self.NameVectors[ue_name_value("位置")]=ue_vector(1.0lf,2.0lf,3.0lf)
+    }
+
+
     [ue_function(BlueprintCallable)]
     def RejectNativeAuthoredArrays(target:UObjectHandle):int {
         let api=ue_ref(type<ValueTargetRef>,target)
@@ -315,5 +375,9 @@ class ValueDriver {
         return (!ue_object_is_a(expired.handle,"Actor") && !ue_object_is_a(expiredNested.handle,"Actor") && !ue_object_is_a(api.Settings.Point.Owner.handle,"Actor") && !ue_object_is_a(api.NativeActor.handle,"Actor")) ? 1 : 0
     }
     [ue_function(BlueprintCallable)]
-    def Exercise(target:UObjectHandle):int { return exercise_values(ue_ref(type<ValueTargetRef>,target)) }
+    def Exercise(target:UObjectHandle):int {
+        let status=exercise_names(ue_ref(type<ValueDriverRef>,ue_self_object()))
+        if (status!=1) { return status }
+        return exercise_values(ue_ref(type<ValueTargetRef>,target))
+    }
 }

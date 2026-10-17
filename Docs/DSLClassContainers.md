@@ -77,3 +77,6 @@ Update: arrays of UEVector/UERotator/UETransform are supported in DSLMathArrays.
 Update: authored enum arrays are supported in DSLEnumArrays.md.
 
 Update: native object/interface arrays are supported in DSLReferenceArrays.md.
+
+Update: FName map keys and sets in direct properties and method signatures are
+supported; see [DSLNameContainers.md](DSLNameContainers.md).

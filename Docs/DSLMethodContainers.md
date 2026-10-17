@@ -80,3 +80,6 @@ Validation: [DSLMethodContainersValidation](DSLMethodContainersValidation.md).
 
 Native object/interface and math method signatures:
 [DSLMethodObjectMath](DSLMethodObjectMath.md).
+
+Update: FName map keys and sets in direct properties and method signatures are
+supported; see [DSLNameContainers.md](DSLNameContainers.md).

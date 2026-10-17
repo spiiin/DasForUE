@@ -1,3 +1,4 @@
+#include "DasActorHostRuntime.h"
 #include "DasTypeRegistry.h"
 #include "DasProbeActor.h"
 #include "DasRuntime.h"
@@ -17,24 +18,7 @@ ADasProbeActor::ADasProbeActor()
 }
 
 void ADasProbeActor::OnConstruction(const FTransform& Transform)
-{
-    Super::OnConstruction(Transform);
-    ApplyDasSceneRoot();
-    if(IsTemplate() || !GetWorld() || IsActorBeingDestroyed() || HasActorBegunPlay())return;
-    FDasExecutionResult Result;Result.bSucceeded=true;
-    TArray<UDasScriptComponent*> Components;GetComponents(Components);
-    for(auto* Component:Components)if(IsValid(Component) && !Component->IsBeingDestroyed()){
-        const auto ComponentResult=Component->RunDasConstruction();
-        if(!ComponentResult.bSucceeded && Result.bSucceeded)Result=ComponentResult;
-    }
-    // Actor construction can depend on configured component values. Do not run it on failure.
-    if(Result.bSucceeded && bDasConstructionScript && !LifecycleScript.IsEmpty()) {
-        auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
-        const FString Path=FPaths::IsRelative(LifecycleScript)?Runtime.ScriptPath(LifecycleScript):LifecycleScript;
-        Result=Runtime.RunConstruction(Path,this);
-    }
-    RecordLifecycleResult(Result);
-}
+{Super::OnConstruction(Transform);FDasActorHostRuntime::OnConstruction(*this,Transform);}
 void ADasProbeActor::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
@@ -42,20 +26,7 @@ void ADasProbeActor::PostInitializeComponents()
     ApplyDasSceneRoot();
 }
 void ADasProbeActor::ApplyDasSceneRoot()
-{
-    if(DasSceneRootProperty.IsNone())return;
-    auto* Property=FindFProperty<FObjectProperty>(GetClass(),DasSceneRootProperty);
-    auto* Scene=Property?Cast<USceneComponent>(Property->GetObjectPropertyValue_InContainer(this)):nullptr;
-    if(!Scene || Scene->GetOwner()!=this || Scene==GetRootComponent())return;
-    auto* Previous=GetRootComponent();
-    Scene->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-    SetRootComponent(Scene);
-    // PIE duplication restores the CDO native root before restoring the SCS root.
-    // Keeping the fallback below the SCS root would then create a reverse edge/cycle.
-    if(Previous && Previous->CreationMethod==EComponentCreationMethod::Native && Previous->GetFName()==TEXT("ProbeRoot"))
-        Previous->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-    else if(Previous)Previous->AttachToComponent(Scene,FAttachmentTransformRules::KeepWorldTransform);
-}
+{FDasActorHostRuntime::ApplyDasSceneRoot(*this);}
 
 int32 ADasProbeActor::ExecuteDas(const FString& ScriptFile, int32 Input)
 {
@@ -86,64 +57,19 @@ void ADasProbeActor::ExecuteDasVoid(const FString& File,const FString& Entry)
 {auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));RecordLifecycleResult(R.RunNamedVoidPersistent(R.ScriptPath(File),Entry,this));}
 
 FDasScalarValue ADasProbeActor::ExecuteDasFrame(const FString& File,const FString& Entry,const TArray<FDasScalarValue>& Args,int32 Kind,const FString& ResultClass)
-{
-    if(Kind<0 || (Kind>13 && Kind!=15 && Kind!=16) || Kind==4){FDasExecutionResult Error;Error.Error=TEXT("Invalid scalar result kind");RecordLifecycleResult(Error);FDasScalarValue Failed;Failed.Kind=-1;return Failed;}
-    auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto V=R.RunNamedFramePersistent(R.ScriptPath(File),Entry,Args,static_cast<EDasMethodSignature>(Kind),this,ResultClass);RecordLifecycleResult(V);
-    FDasScalarValue Result;Result.Kind=V.bSucceeded?Kind:-1;Result.IntValue=V.Value;Result.FloatValue=V.FloatValue;Result.BoolValue=V.BoolValue;Result.StringValue=V.StringValue;Result.DoubleValue=V.DoubleValue;Result.NameValue=V.NameValue;Result.ObjectValue=V.ObjectValue.Get();Result.ClassValue=Cast<UClass>(V.ObjectValue.Get());Result.VectorValue=V.VectorValue;Result.RotatorValue=V.RotatorValue;Result.TransformValue=V.TransformValue;Result.StructValue=V.StructValue;Result.DelegateValue=V.DelegateValue;Result.ObjectClass=(Kind==8 || Kind==13 || Kind==15 || Kind==16)?ResultClass:FString();return Result;
-}
-FDasScalarValue ADasProbeActor::ExecuteDasFrameOutputs(const FString& File,const FString& Entry,const TArray<FDasScalarValue>& Args,int32 Kind,const FString& ResultClass,TArray<FDasScalarValue>& Outputs){
-    Outputs=Args;if(Kind<0 || (Kind>13 && Kind!=15 && Kind!=16) || Kind==4){FDasScalarValue Failed;Failed.Kind=-1;return Failed;}
-    auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));auto V=R.RunNamedFramePersistent(R.ScriptPath(File),Entry,Args,static_cast<EDasMethodSignature>(Kind),this,ResultClass);RecordLifecycleResult(V);if(V.bSucceeded)Outputs=V.OutputValues;else if(!R.IsAuthoredMethodDispatchActive()) if(auto* Stack=FFrame::GetThreadLocalTopStackFrame()){FBlueprintExceptionInfo Info(EBlueprintExceptionType::AbortExecution,FText::FromString(V.Error));FBlueprintCoreDelegates::ThrowScriptException(this,*Stack,Info);}
-    FDasScalarValue Result;Result.Kind=V.bSucceeded?Kind:-1;Result.IntValue=V.Value;Result.FloatValue=V.FloatValue;Result.BoolValue=V.BoolValue;Result.StringValue=V.StringValue;Result.DoubleValue=V.DoubleValue;Result.NameValue=V.NameValue;Result.StructValue=V.StructValue;Result.DelegateValue=V.DelegateValue;Result.ObjectValue=V.ObjectValue.Get();Result.ClassValue=Cast<UClass>(V.ObjectValue.Get());Result.VectorValue=V.VectorValue;Result.RotatorValue=V.RotatorValue;Result.TransformValue=V.TransformValue;Result.ObjectClass=(Kind==8 || Kind==13 || Kind==15 || Kind==16)?ResultClass:FString();return Result;
-}
+{return FDasActorHostRuntime::ExecuteDasFrame(*this,File,Entry,Args,Kind,ResultClass);}
+FDasScalarValue ADasProbeActor::ExecuteDasFrameOutputs(const FString& File,const FString& Entry,const TArray<FDasScalarValue>& Args,int32 Kind,const FString& ResultClass,TArray<FDasScalarValue>& Outputs){return FDasActorHostRuntime::ExecuteDasFrameOutputs(*this,File,Entry,Args,Kind,ResultClass,Outputs);}
 void ADasProbeActor::RecordLifecycleResult(const FDasExecutionResult& Result)
-{
-    const FString Error = Result.bSucceeded ? Result.ReloadError : Result.Error;
-    if (Error != LastDasError && !Error.IsEmpty())
-        UE_LOG(LogTemp, Display, TEXT("daScript lifecycle %s: %s"), *GetName(), *Error);
-    LastDasError = Error;
-}
+{FDasActorHostRuntime::RecordLifecycleResult(*this,Result);}
 
 void ADasProbeActor::BeginPlay()
-{
-    Super::BeginPlay();
-    if (IsActorBeingDestroyed() || LifecycleScript.IsEmpty())
-    {
-        SetActorTickEnabled(false);
-        return;
-    }
-    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
-    ActiveLifecyclePath = FPaths::IsRelative(LifecycleScript) ? Runtime.ScriptPath(LifecycleScript) : LifecycleScript;
-    bLifecycleActive = true;
-    SetActorTickEnabled(true);
-    RecordLifecycleResult(Runtime.RunLifecycle(ActiveLifecyclePath, EDasCallback::BeginPlay, this));
-}
+{Super::BeginPlay();FDasActorHostRuntime::BeginPlay(*this);}
 
 void ADasProbeActor::Tick(float DeltaSeconds)
-{
-    Super::Tick(DeltaSeconds);
-    if (bLifecycleActive && !IsActorBeingDestroyed())
-    {
-        auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
-        RecordLifecycleResult(Runtime.RunLifecycle(ActiveLifecyclePath, EDasCallback::Tick, this, DeltaSeconds));
-    }
-}
+{Super::Tick(DeltaSeconds);FDasActorHostRuntime::Tick(*this,DeltaSeconds);}
 
 void ADasProbeActor::EndPlay(const EEndPlayReason::Type Reason)
-{
-    SetActorTickEnabled(false);
-    if (auto* Runtime = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))
-    {
-        if (bLifecycleActive)
-        {
-            bLifecycleActive = false;
-            RecordLifecycleResult(Runtime->RunLifecycle(ActiveLifecyclePath, EDasCallback::EndPlay, this, 0.f, static_cast<int32>(Reason)));
-        }
-        Runtime->ReleaseObject(this);
-    }
-    ActiveLifecyclePath.Empty();
-    Super::EndPlay(Reason);
-}
+{FDasActorHostRuntime::EndPlay(*this,Reason);Super::EndPlay(Reason);}
 
 void ADasProbeActor::Destroyed()
 {

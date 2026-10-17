@@ -13,7 +13,7 @@ FUnrealDasContext::FObjectQuery CollectObjectsByType(const FDasObjectHandle& H,c
   if(auto* Component=Cast<UActorComponent>(Object);Component && (Component->IsBeingDestroyed() || !Component->GetOwner() || Component->GetOwner()->IsActorBeingDestroyed()))return false;
   if(!Wanted.IsEmpty()){
    const auto* Defaults=Object->GetClass()->GetDefaultObject();
-   const FString Actual=Cast<ADasProbeActor>(Defaults)?CastChecked<ADasProbeActor>(Defaults)->AuthoredTypeId:Cast<UDasScriptComponent>(Defaults)?CastChecked<UDasScriptComponent>(Defaults)->AuthoredTypeId:FString();
+   const FString Actual=DasHostIdentity(Defaults);
    if(Actual!=Wanted)return false;
   }
   if(Result.Objects.Num()>=4096)C->throw_error("object query result exceeds 4096 entries");

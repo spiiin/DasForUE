@@ -6,6 +6,10 @@ require ue_foundation public
 // These declarations do not construct Unreal objects or expose native virtuals.
 [ue_native_base(path="/Script/Engine.Actor")]
 class Actor {}
+[ue_native_base(path="/Script/Engine.Pawn")]
+class Pawn {}
+[ue_native_base(path="/Script/Engine.Character")]
+class Character {}
 [ue_native_base(path="/Script/Engine.ActorComponent")]
 class ActorComponent {}
 

@@ -1,3 +1,4 @@
+#include "DasScriptHosts.h"
 #include "DasSchema.h"
 #include "DasAuthoring.h"
 #include "DasDelegateSignatures.h"
@@ -50,8 +51,8 @@ TArray<FDasMethodSchema> FDasClassSchema::EffectiveMethods() const
 bool FDasClassSchema::Validate(FString& Error) const
 {
     Error.Reset();
-    if (!Identifier(Name.ToString()) || Name.IsNone() || (Parent != TEXT("Actor") && Parent != TEXT("ActorComponent") && Parent != TEXT("FunctionLibrary")))
-    { Error = TEXT("Expected a named Actor or ActorComponent schema"); return false; }
+    if (!Identifier(Name.ToString()) || Name.IsNone() || (Parent != TEXT("Actor") && Parent != TEXT("Pawn") && Parent != TEXT("Character") && Parent != TEXT("ActorComponent") && Parent != TEXT("FunctionLibrary")))
+    { Error = TEXT("Expected a named Actor, Pawn, Character, ActorComponent or function-library schema"); return false; }
     auto ValidMeta=[&](const TMap<FString,FString>& Values,bool Method=false)
     {
         for (const auto& Pair:Values)
@@ -62,6 +63,7 @@ bool FDasClassSchema::Validate(FString& Error) const
     if (!ValidMeta(Metadata)) return false;
     TSet<FName> Names;
     const auto AllMethods=EffectiveMethods();
+    if((Parent==TEXT("Pawn") || Parent==TEXT("Character")) && AllMethods.ContainsByPredicate([](const auto& M){return M.Signature!=EDasMethodSignature::Frame;})){Error=TEXT("Pawn/Character hosts require the frame method ABI");return false;}
     if(Parent==TEXT("FunctionLibrary") && (!Fields.IsEmpty() || !ParentStableId.IsEmpty())){Error=TEXT("Function library cannot have fields or authored parent");return false;}
     if (AllMethods.Num()>64) {Error=TEXT("Adapter method count exceeds 64");return false;}
     for (const auto& M:AllMethods)

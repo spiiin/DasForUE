@@ -1,3 +1,4 @@
+#include "DasScriptHosts.h"
 #include "DasAuthoring.h"
 #include "DasNativeDefaults.h"
 #include "DasContainerTypes.h"
@@ -181,7 +182,7 @@ bool FDasAuthoringModule::Validate(FString& Error) const
         if (!MetadataValid(C.Metadata,Error)) return false;
         if (C.Properties.Num() > 1024 || C.Methods.Num() > 1024) return Fail(Error,TEXT("Declaration count limit exceeded"));
         TSet<FString> Names;
-        if(C.Components.Num()>32 || (!C.Components.IsEmpty() && !C.NativeParent.IsEmpty() && C.NativeParent!=TEXT("/Script/Engine.Actor")))return Fail(Error,TEXT("Components require native Actor parent and at most 32 declarations"));
+        if(C.Components.Num()>32 || (!C.Components.IsEmpty() && !C.NativeParent.IsEmpty() && !DasActorNativeParent(C.NativeParent)))return Fail(Error,TEXT("Components require native Actor parent and at most 32 declarations"));
         for(const auto& Component:C.Components){if(!AddId(Component.Id) || !Identifier(Component.Name) || Names.Contains(Component.Name.ToLower()) || (Component.NativeClass.IsEmpty() ? (!Identifier(Component.ClassName) || Component.ScriptFile.IsEmpty() || FPaths::GetCleanFilename(Component.ScriptFile)!=Component.ScriptFile || Component.ScriptFile.Contains(TEXT(":")) || !Component.ScriptFile.EndsWith(TEXT(".das"))) : (!Component.NativeClass.StartsWith(TEXT("/Script/")) || !NativePath(Component.NativeClass) || !Component.ScriptFile.IsEmpty() || !Component.ClassName.IsEmpty())))return Fail(Error,TEXT("Invalid/duplicate component declaration: ")+Component.Name);Names.Add(Component.Name.ToLower());if((Component.bEditable && Component.bVisible) || !MetadataValid(Component.Metadata,Error))return Fail(Error,TEXT("Invalid component metadata/visibility"));}
         for(const auto& Component:C.Components)if(!ValidateComponentDefaults(Component,Error))return false;
         for (const auto& P : C.Properties)
@@ -349,7 +350,8 @@ bool FDasAuthoringModule::ResolveClass(const FString& ClassId,FDasDeclaredClass&
         for(const auto& Callback:C.Callbacks){auto* Parent=Effective.Callbacks.FindByPredicate([&](const auto& P){return P.Kind==Callback.Kind && (Callback.Kind!=TEXT("event") || P.Name==Callback.Name);});if(Parent){if(Callback.Kind==TEXT("event"))return Fail(Error,TEXT("Inherited managed event callback override is unsupported: ")+Callback.Name);*Parent=Callback;}else Effective.Callbacks.Add(Callback);}
     }
     if(!DasValidateNativeDefaults(Effective,Error))return false;
-    if(Effective.Components.Num()>32 || (!Effective.Components.IsEmpty() && Effective.NativeParent!=TEXT("/Script/Engine.Actor")))return Fail(Error,TEXT("Components require Actor root and at most 32 total declarations"));
+    if(Effective.NativeParent==TEXT("/Script/Engine.Character") && Effective.Components.ContainsByPredicate([](const auto& C){return C.bRoot;}))return Fail(Error,TEXT("Character must retain its native capsule root"));
+    if(Effective.Components.Num()>32 || (!Effective.Components.IsEmpty() && !DasActorNativeParent(Effective.NativeParent)))return Fail(Error,TEXT("Components require Actor root and at most 32 total declarations"));
     for(const auto& Component:Effective.Components)if(Effective.Properties.ContainsByPredicate([&](const auto& P){return P.Name.Equals(Component.Name,ESearchCase::IgnoreCase);}) || Effective.Methods.ContainsByPredicate([&](const auto& M){return M.Name.Equals(Component.Name,ESearchCase::IgnoreCase);}))return Fail(Error,TEXT("Component conflicts with inherited member: ")+Component.Name);
         int32 Roots=0;
         for(const auto& Component:Effective.Components){
@@ -369,9 +371,9 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
     const auto* C = Classes.FindByPredicate([&](const auto& X){return X.Id == ClassId;}); if (!C) return Fail(Error,TEXT("Unknown authored class ID"));
     FDasDeclaredClass Effective;if(!ResolveClass(ClassId,Effective,Error))return false;const auto* Declared=C;C=&Effective;
     const bool Library=C->NativeParent==TEXT("/Script/Engine.BlueprintFunctionLibrary");
-    if (!Library && (C->NativeParent != TEXT("/Script/Engine.Actor") && C->NativeParent != TEXT("/Script/Engine.ActorComponent"))) return Fail(Error,TEXT("Class adapter requires an Actor or ActorComponent root"));
+    if (!Library && (!DasActorNativeParent(C->NativeParent) && C->NativeParent != TEXT("/Script/Engine.ActorComponent"))) return Fail(Error,TEXT("Class adapter requires an Actor, Pawn, Character or ActorComponent root"));
     if ((C->Methods.IsEmpty() && C->Callbacks.IsEmpty()) || C->Methods.Num()>64) return Fail(Error,TEXT("Actor adapter requires 1..64 methods"));
-    FDasClassSchema Result;Result.ParentStableId=Declared->ParentId;Result.StableId=C->Id;Result.Name=*C->Name;Result.Parent=Library?TEXT("FunctionLibrary"):C->NativeParent==TEXT("/Script/Engine.ActorComponent")?TEXT("ActorComponent"):TEXT("Actor");Result.Interfaces=C->Interfaces;Result.Metadata=C->Metadata;
+    FDasClassSchema Result;Result.ParentStableId=Declared->ParentId;Result.StableId=C->Id;Result.Name=*C->Name;Result.Parent=Library?TEXT("FunctionLibrary"):C->NativeParent==TEXT("/Script/Engine.ActorComponent")?TEXT("ActorComponent"):C->NativeParent==TEXT("/Script/Engine.Pawn")?TEXT("Pawn"):C->NativeParent==TEXT("/Script/Engine.Character")?TEXT("Character"):TEXT("Actor");Result.Interfaces=C->Interfaces;Result.Metadata=C->Metadata;
     TArray<const FDasDeclaredMethod*> Methods;for (const auto& M:Declared->Methods) Methods.Add(&M);
     Methods.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});
     for (const auto* Ptr:Methods)
@@ -385,7 +387,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         if(ValueKind(M.ReturnType)==EDasMethodSignature::Frame || M.Parameters.Num()>16 || !M.bCallable || M.bStatic!=Library) return Fail(Error,TEXT("Actor adapter requires callable scalar/void methods with up to 16 by-value inputs, without static: ")+M.Id);
         FDasMethodSchema Method;Method.Name=*M.Name;Method.ScriptFile=M.ScriptFile;Method.EntryPoint=M.EntryPoint;Method.StableId=M.Id;Method.InputStableId=M.Parameters.Num()==1?M.Parameters[0].Id:FString();Method.Metadata=M.Metadata;Method.bBlueprintEvent=M.bBlueprintEvent;Method.bPure=M.bPure;Method.bConst=M.bConst;Method.bStatic=M.bStatic;Method.WorldContext=M.WorldContext;if(Library && !ToJson(Method.LibraryContract,Error))return false;Method.Metadata.Add(TEXT("DasFunctionKind"),(M.bBlueprintEvent || C->Interfaces.ContainsByPredicate([&](const FString& Path){auto* I=FindObject<UClass>(nullptr,*Path);return I && I->FindFunctionByName(*M.Name);}))?TEXT("Event"):TEXT("Callable"));Method.ReturnKind=ValueKind(M.ReturnType);Method.ReturnClass=K==TEXT("delegate")?M.ReturnType.DelegateWire:DasContainerCarrier(M.ReturnType)?DasContainerCarrier(M.ReturnType)->GetPathName():(K==TEXT("class") || K==TEXT("enum") || K==TEXT("object") || (K==TEXT("struct") && Method.ReturnKind==EDasMethodSignature::Struct))?M.ReturnType.TypePath:FString();
         for(const auto& P:M.Parameters){if((ValueKind(P.Type)==EDasMethodSignature::Frame || ValueKind(P.Type)==EDasMethodSignature::Void) || (P.Direction!=TEXT("in") && P.Direction!=TEXT("out") && P.Direction!=TEXT("inout"))) return Fail(Error,TEXT("Actor adapter parameter capability missing: ")+P.Id);Method.Parameters.Add({*P.Name,P.Id,ValueKind(P.Type),P.Type.Kind==TEXT("delegate")?P.Type.DelegateWire:DasContainerCarrier(P.Type)?DasContainerCarrier(P.Type)->GetPathName():(P.Type.Kind==TEXT("class") || P.Type.Kind==TEXT("enum") || P.Type.Kind==TEXT("object") || (P.Type.Kind==TEXT("struct") && ValueKind(P.Type)==EDasMethodSignature::Struct))?P.Type.TypePath:FString(),P.Direction});auto& Parameter=Method.Parameters.Last();Parameter.bHasDefault=!P.Default.Kind.IsEmpty();Parameter.DefaultValue=P.Default.Kind==TEXT("string")?P.Default.String:P.Default.Kind==TEXT("bool")?(P.Default.Boolean?TEXT("true"):TEXT("false")):P.Type.Kind==TEXT("int")?FString::Printf(TEXT("%.0f"),P.Default.Number):(P.Type.Kind==TEXT("float")?FString::Printf(TEXT("%.9g"),P.Default.Number):FString::Printf(TEXT("%.17g"),P.Default.Number));}
-        Method.Signature=Library || M.bConst || Result.Parent==TEXT("ActorComponent") || !C->Interfaces.IsEmpty()?EDasMethodSignature::Frame:Action?EDasMethodSignature::Void:Scalar?Kind(K):EDasMethodSignature::Frame;
+        Method.Signature=(Result.Parent==TEXT("Pawn") || Result.Parent==TEXT("Character")) || Library || M.bConst || Result.Parent==TEXT("ActorComponent") || !C->Interfaces.IsEmpty()?EDasMethodSignature::Frame:Action?EDasMethodSignature::Void:Scalar?Kind(K):EDasMethodSignature::Frame;
         Result.Methods.Add(MoveTemp(Method));
     }
     if(!Result.Methods.IsEmpty())Result.Method=Result.Methods[0];

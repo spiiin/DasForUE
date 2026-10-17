@@ -1,4 +1,5 @@
 #include "DasDefaultsMigration.h"
+#include "DasScriptHosts.h"
 #include "DasAuthoring.h"
 #include "DasBlueprintService.h"
 #include "DasBlueprintRollback.h"
@@ -162,7 +163,7 @@ bool DasInitializeInheritedDefaults(UClass* Class,const FDasAuthoringModule& Mod
   if(!OwnValue(P,*F,P->ContainerPtrToValuePtr<void>(Values.GetStructMemory()),Error))return false;Properties.Add(P);
  }
  if(ValidateOnly)return true;
- auto* CDO=Class->GetDefaultObject();auto* Contracts=Cast<ADasProbeActor>(CDO)?&CastChecked<ADasProbeActor>(CDO)->DasDefaultSourceContracts:Cast<UDasScriptComponent>(CDO)?&CastChecked<UDasScriptComponent>(CDO)->DasDefaultSourceContracts:nullptr;
+ auto* CDO=Class->GetDefaultObject();auto* Contracts=DasHostContracts(CDO);
  if(!Contracts){Error=TEXT("Unsupported inherited default host");return false;}
  CDO->Modify();for(auto* P:Properties)P->CopyCompleteValue(P->ContainerPtrToValuePtr<void>(CDO),P->ContainerPtrToValuePtr<void>(Values.GetStructMemory()));
  for(const auto& O:Decl->PropertyOverrides)if(const auto* P=Effective.Properties.FindByPredicate([&](const auto& V){return V.Id==O.Id;}))Contracts->Add(P->Id,DasDefaultSourceContract(*P));
@@ -173,7 +174,7 @@ bool DasInitializeNativeDefaults(UClass* Class,const FDasAuthoringModule& Model,
  auto* CDO=Class->GetDefaultObject();FPlan Plan;
  for(const auto& G:Decl->NativeDefaults){auto* Target=DasNativeDefaultTarget(Effective.NativeParent,CDO,G.Component,Error);if(!Target)return false;auto& Image=Plan.Image(Target);for(const auto& V:G.Defaults){auto* P=Target->GetClass()->FindPropertyByName(*V.Key);if(!DasParseEditableDefault(P,V.Value,P?P->ContainerPtrToValuePtr<void>(Image.After->GetStructMemory()):nullptr,Error))return false;Plan.Changes.Add({&Image,P});}}
  if(ValidateOnly)return true;
- auto* Contracts=Cast<ADasProbeActor>(CDO)?&CastChecked<ADasProbeActor>(CDO)->DasDefaultSourceContracts:Cast<UDasScriptComponent>(CDO)?&CastChecked<UDasScriptComponent>(CDO)->DasDefaultSourceContracts:nullptr;if(!Contracts){Error=TEXT("Unsupported native defaults host");return false;}
+ auto* Contracts=DasHostContracts(CDO);if(!Contracts){Error=TEXT("Unsupported native defaults host");return false;}
  for(const auto& Change:Plan.Changes){auto* O=Change.Image->Object.Get();auto* P=Change.Property;O->Modify();if(O->IsA<UActorComponent>())O->PreEditChange(P);P->CopyCompleteValue(P->ContainerPtrToValuePtr<void>(O),P->ContainerPtrToValuePtr<void>(Change.Image->After->GetStructMemory()));NotifyTemplate(O,P);O->MarkPackageDirty();}
  for(const auto& G:Decl->NativeDefaults)for(const auto& V:G.Defaults)Contracts->Add(DasNativeDefaultKey(Id,G.Component,V.Key),DasNativeDefaultContract(V.Value));
  CastChecked<UBlueprintGeneratedClass>(Class)->UpdateCustomPropertyListForPostConstruction();CDO->MarkPackageDirty();return true;
@@ -271,7 +272,7 @@ bool DasMergeDefaults(UBlueprint* BP,const FDasAuthoringModule& Next,const FStri
  }
  // Persist actual CDO defaults for future Blueprint recompilation, including manual values.
  for(auto& B:Blueprints){if(B.BP==BP)for(auto& V:B.BP->NewVariables)if(New->Properties.ContainsByPredicate([&](const auto& F){return F.Name==V.VarName.ToString() && F.Type.Kind!=TEXT("event") && F.Type.Kind!=TEXT("delegate");}))if(auto* P=B.BP->GeneratedClass->FindPropertyByName(V.VarName))V.DefaultValue=VariableText(P,B.BP->GeneratedClass->GetDefaultObject());CastChecked<UBlueprintGeneratedClass>(B.BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
- auto* Contracts=Cast<ADasProbeActor>(CDO)?&CastChecked<ADasProbeActor>(CDO)->DasDefaultSourceContracts:Cast<UDasScriptComponent>(CDO)?&CastChecked<UDasScriptComponent>(CDO)->DasDefaultSourceContracts:nullptr;
+ auto* Contracts=DasHostContracts(CDO);
  if(!Contracts)return Restore(TEXT("Unsupported default owner"));CDO->Modify();for(const auto& P:New->Properties)Contracts->Add(P.Id,DasDefaultSourceContract(P));
  for(const auto& O:Old->PropertyOverrides)Contracts->Remove(O.Id);
  FDasDeclaredClass Effective;if(!Next.ResolveClass(Id,Effective,Error))return Restore(Error);for(const auto& O:New->PropertyOverrides)if(const auto* P=Effective.Properties.FindByPredicate([&](const auto& V){return V.Id==O.Id;}))Contracts->Add(P->Id,DasDefaultSourceContract(*P));

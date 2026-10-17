@@ -81,3 +81,15 @@ Desired-state restoration was added subsequently (validation pending). Accepted
 reload/component replacement can restore last successful recipes on a world tick;
 see ManagedInputRestore.md. Earlier explicit-rebind statements describe the initial
 adapter slices. Initial setup and explicit configuration changes still require calls.
+
+
+## Playable Character integration validation — 2026-10-17
+
+The earlier "not tested" notes describe the original implementation slice.
+The playable Character integration now verifies Boolean Started/Completed and
+Axis2D Triggered callbacks, Mapping Context installation and synthetic W routing,
+unpossess/repossess setup and EndPlay cleanup in real PIE and packaged Development.
+The separate saved-map run verifies auto-possession and working native movement,
+jump and camera after cook/load. This does not validate every trigger/value shape,
+multi-player ownership scenario or hot reload combination listed above.
+See PlayableCharacter.md for reproduction and the exact scope.

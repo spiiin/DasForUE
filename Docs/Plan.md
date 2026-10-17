@@ -2894,3 +2894,123 @@ native-value-arrays-foundation-packaged.log. Probe map:
 /Game/DasNativeDefaults/19ec0214580b4e8a9c45e72bf24aaf87/Map.
 Vector2D shares the math array path but has no additional live fixture here.
 Shipping and rendered gameplay were not exercised.
+
+
+### Native maps, sets and object arrays through self
+
+Implemented strong native object arrays, int/string-keyed native maps with scalar,
+name, native enum, math/safe struct and object-reference values, and int/string
+native sets. Reuse canonical wrappers, checked snapshot mutation, readonly/const
+policies and exact enum storage carriers. Other key/set element types, weak/soft
+references, class containers and nested containers remain separate work. See
+DSLNativeSelfFields.md and dsl_native_array_self.das.
+
+
+Native map/set/object-array validation (2026-10-17 Europe/Budapest): Editor build,
+Create/Reopen/Recompile and Win64 Development NullRHI cook/package/runtime passed.
+Live C++ fixtures verify Actor/Pawn TObjectPtr arrays with nulls, detached clones,
+whole assignment and forged wrong-class rejection; int/string sets with duplicate
+insertion, erase, membership and clone assignment; int/int, string/double and int/name
+maps; string/vector, int/IntPoint, int/native-enum, string/byte-enum and int/Pawn maps.
+Verified indexed/compound writes, map insert/erase, clear, clone assignment,
+wrong enum/object/struct rejection with recovery and no partial native snapshot
+commit. Wrong key/value/wrapper/element types and readonly mutation were rejected
+during compilation. Actual native fields were compared against expected values.
+Other supported primitive map value combinations and interface references reuse
+existing carriers; they do not have additional native live fixtures in this stage.
+Editor and packaged foundation report DAS_FOUNDATION_RESULT=PASS failures=0;
+packaged native probe reports DAS_NATIVE_DEFAULTS_PACKAGED=PASS and exit 0.
+Logs: logs/native-containers-editor-verified.log, native-containers-foundation.log,
+native-containers-package.log, native-containers-packaged.log and
+native-containers-foundation-packaged.log. Map:
+/Game/DasNativeDefaults/877cccf7e8a74a9b873d717e293608cb/Map.
+Shipping and rendered gameplay were not exercised.
+
+
+### Pawn and Character native DSL roots — 2026-10-17
+
+Implemented `class Player : Pawn/Character` and equivalent explicit `ue_class`
+native parents. Blueprints use real APawn/ACharacter-derived native adapters.
+Actor/Pawn/Character share lifecycle/frame dispatch; trusted common-host access
+handles authored identity, default contracts, parent dispatch, error reporting
+and lifecycle preservation. New hosts use the frame ABI, including out/ref.
+
+Generalized native-self/default CDO selection, inherited lifecycle/Super,
+authored references and Blueprint validation. Character retains capsule/mesh/
+movement and rejects capsule-root replacement. Short parent names normalize
+before computed-default evaluation. Native Pawn/Character tick remains intact
+when there are no DAS lifecycle callbacks. Unsupported/mixed parents are rejected;
+broader structural/data migration remains deferred.
+
+Examples: dsl_pawn_player.das, dsl_character_player.das, their children/reference
+callers and dsl_pawn_explicit_parent.das. Shared runtime coverage validates them
+in strict RuntimePIE and Win64 Development NullRHI packaged gameplay, with
+packaged foundation failures=0. See DSLPawnCharacter.md and pawn-character-*.log.
+Possession/input/movement gameplay, arbitrary native roots/virtual overrides,
+networking, Shipping and rendered gameplay are not part of this step.
+
+
+### FName keys in native containers through self
+
+Added native TMap<FName, supported value> and TSet<FName> projection using UENameValue
+keys. Reuse canonical per-context FName tokens and daScript's uint64 handle-key
+representation, preserving Unreal name equality and suffix semantics. Added exact
+FName snapshot carriers and checked native key accessors. Authored property/method
+signatures using name-key containers, enum/struct/object keys and weak/soft references
+remain separate work. See DSLNativeSelfFields.md.
+
+
+### Playable Character integration — 2026-10-17
+
+Added explicit checked Pawn possession and Character move/look/jump APIs, native
+typed component views, a first-person DSL Character with a composed camera,
+readiness-based input setup/release, saved WASD/mouse/Space actions/context and a
+generated PlayableMap. Shared PIE/packaged probe exercises real EnhancedPlayerInput
+including keyboard mapping, native movement/jump/camera and owned-input teardown.
+The component-field collector now accepts Pawn/Character actor roots. See
+PlayableCharacter.md.
+
+Validated 2026-10-17: strict RuntimePIE (1 success, 0 failed, 0 warnings), Win64
+Development build/cook/stage/Pak/archive, packaged foundation failures=0, packaged
+gameplay and a separate run of the saved PlayableMap. Input injection evaluates
+real Enhanced Input bindings; a synthetic W key also verifies the Mapping Context.
+Coverage includes authority possession, move/look/jump, native camera, free-function
+movement accessors, rejected negative speed, unpossess/repossess and EndPlay cleanup.
+The saved map verifies auto-possession, readiness and movement on its cooked floor.
+Logs: playable-character-pie.log, playable-character-pie-report.json,
+playable-character-cooked.log, cooked-gameplay-runtime.log, playable-map-runtime.log.
+Rendered output, physical devices, multiplayer and Shipping were not tested.
+
+
+FName container validation (2026-10-17 Europe/Budapest): Editor build,
+Create/Reopen/Recompile and Win64 Development NullRHI package/runtime passed.
+Live native fixtures confirm CPP-origin name keys, case-insensitive aliases,
+Unit/Unit_0/Unit_1/Unit_01 distinctions, None/empty alias, Unicode, set duplicate
+handling, key membership, erase, compound writes, local snapshot isolation and
+whole-container clone assignment. FName-key map values tested: int, FName, FVector,
+FIntPoint, enum class, TEnumAsByte and Pawn references including null. Wrong enum,
+struct and object values are rejected without partial native commit; wrong key
+types and readonly mutations fail compilation. Other scalar map values reuse the
+same scalar accessor templates and do not have additional native fixtures here.
+Corrected new name/enum getter registration to the existing uint64 return ABI;
+managed object/struct getters retain their copy/move return ABI. No SDK changes.
+Editor and packaged foundation report DAS_FOUNDATION_RESULT=PASS failures=0;
+native packaged probe reports DAS_NATIVE_DEFAULTS_PACKAGED=PASS and exit 0.
+Logs: logs/native-name-containers-editor-final.log,
+native-name-containers-foundation.log, native-name-containers-package.log,
+native-name-containers-packaged.log, native-name-containers-foundation-packaged.log.
+Probe map: /Game/DasNativeDefaults/edfcc276c80349b6a66c559081148910/Map.
+Shipping and rendered gameplay were not exercised.
+
+
+### 2026-10-17 — authored FName maps and sets
+
+Completed FName-key TMap and TSet<FName> in direct ue_class properties and
+ue_function inputs/results/out/inout. Maps retain both key and value source
+descriptors when reconstructing typed accessors/calls; this fixes math-valued
+map signatures. Native pins/properties, name equality, copies, empty containers,
+readonly/type errors and body-only reimport are covered by method-value fixtures.
+Editor Create/Reopen, natural PIE (1 pass, no warnings) and packaged Win64
+Development passed. See [DSLNameContainers.md](DSLNameContainers.md).
+Nonempty defaults, general container declaration migration and richer Set element
+families remain separate work.

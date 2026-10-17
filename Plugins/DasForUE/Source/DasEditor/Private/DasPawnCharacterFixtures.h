@@ -1,0 +1,26 @@
+#pragma once
+#include "DasScriptHosts.h"
+#include "DasPlayableFixtures.h"
+#include "DasAuthoring.h"
+#include "DasRuntime.h"
+#include "DasInstanceDefaultsGameFixtures.h"
+inline bool PrepareDasPawnCharacterFixtures(const FString& Root,ADasStaticLibraryProbe* Carrier,TArray<UBlueprint*>& Assets,FString& Error,bool SaveAssets){
+ auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FDasAuthoringModule Explicit;FDasClassSchema Schema;
+ if(!R.ReadAuthoringScript(R.ScriptPath(TEXT("dsl_pawn_explicit_parent.das")),Explicit,Error) || !Explicit.ToActorSchema(TEXT("dsl_pawn_explicit_parent.ExplicitPawn"),Schema,Error) || Schema.Parent!=TEXT("Pawn") || !Explicit.ToActorSchema(TEXT("dsl_pawn_explicit_parent.ExplicitCharacter"),Schema,Error) || Schema.Parent!=TEXT("Character"))return false;
+ for(const auto* File:{TEXT("dsl_pawn_bad_unsupported.das"),TEXT("dsl_pawn_bad_conflict.das")}){FDasAuthoringModule Bad;if(R.ReadAuthoringScript(R.ScriptPath(File),Bad,Error)){Error=TEXT("Accepted invalid Pawn/Character parent: ")+FString(File);return false;}Error.Reset();}
+ FDasAuthoringModule RootModel;if(!R.ReadAuthoringScript(R.ScriptPath(TEXT("dsl_character_player.das")),RootModel,Error))return false;auto& RootClass=RootModel.Classes[0];RootClass.NativeDefaults.Reset();FDasDeclaredComponent Forbidden;Forbidden.Id=RootClass.Id+TEXT(".ForbiddenRoot");Forbidden.Name=TEXT("ForbiddenRoot");Forbidden.NativeClass=TEXT("/Script/Engine.SceneComponent");Forbidden.bRoot=true;RootClass.Components.Add(Forbidden);if(RootModel.ToActorSchema(RootClass.Id,Schema,Error) || !Error.Contains(TEXT("capsule"))){Error=TEXT("Character capsule-root rejection missing: ")+Error;return false;}Error.Reset();
+ UE_LOG(LogTemp,Display,TEXT("PASS pawn_character_reject_unsupported_conflicting_parent_capsule_replacement"));
+ Carrier->PawnCharacterClasses.Reset();
+ for(const auto* Kind:{TEXT("Pawn"),TEXT("Character")}){
+  const FString Lower=FString(Kind).ToLower(),File=TEXT("dsl_")+Lower+TEXT("_player.das"),ChildFile=TEXT("dsl_")+Lower+TEXT("_player_child.das"),Name=TEXT("Player")+FString(Kind),ChildName=TEXT("Child")+FString(Kind);
+  UBlueprint *BP=nullptr,*Child=nullptr;if(!FDasDSLService::Apply(File,Root+TEXT("/BP_")+Name,FPaths::GetBaseFilename(File)+TEXT(".")+Name,BP,Error) || !FDasDSLService::Apply(ChildFile,Root+TEXT("/BP_")+ChildName,FPaths::GetBaseFilename(ChildFile)+TEXT(".")+ChildName,Child,Error) || !FDasDSLService::Reimport(BP,Error))return false;
+  const FString ConsumerName=TEXT("BP_")+Name+TEXT("Consumer");auto* Consumer=CreateDasPureConsumer(BP->GeneratedClass,CreatePackage(*(Root+TEXT("/")+ConsumerName)),*ConsumerName,Error);if(!Consumer)return false;
+  for(auto* Asset:{BP,Child,Consumer}){Assets.Add(Asset);Carrier->PawnCharacterClasses.Add(Asset->GeneratedClass.Get());if(SaveAssets){const FString FileName=FPackageName::LongPackageNameToFilename(Asset->GetOutermost()->GetName(),FPackageName::GetAssetPackageExtension());IFileManager::Get().MakeDirectory(*FPaths::GetPath(FileName),true);FSavePackageArgs Save;Save.TopLevelFlags=RF_Public|RF_Standalone;if(!UPackage::SavePackage(Asset->GetOutermost(),Asset,*FileName,Save)){Error=TEXT("Cannot save Pawn/Character fixture");return false;}}}
+ }
+ for(const auto* Kind:{TEXT("Pawn"),TEXT("Character")}){const FString Name=TEXT("Explicit")+FString(Kind);UBlueprint* BP=nullptr;if(!FDasDSLService::Apply(TEXT("dsl_pawn_explicit_parent.das"),Root+TEXT("/BP_")+Name,TEXT("dsl_pawn_explicit_parent.")+Name,BP,Error))return false;Assets.Add(BP);Carrier->PawnCharacterClasses.Add(BP->GeneratedClass.Get());if(SaveAssets){FSavePackageArgs Save;Save.TopLevelFlags=RF_Public|RF_Standalone;const FString File=FPackageName::LongPackageNameToFilename(BP->GetOutermost()->GetName(),FPackageName::GetAssetPackageExtension());if(!UPackage::SavePackage(BP->GetOutermost(),BP,*File,Save)){Error=TEXT("Cannot save explicit native parent");return false;}}}
+ UBlueprint* Playable=nullptr;if(!FDasDSLService::Apply(TEXT("dsl_playable_character.das"),Root+TEXT("/BP_PlayableCharacter"),TEXT("dsl_playable_character.PlayableCharacter"),Playable,Error))return false;
+ if(!PrepareDasPlayableInputAssets(Root,Playable,Error,SaveAssets))return false;
+ Assets.Add(Playable);Carrier->PlayableCharacterClass=Playable->GeneratedClass;
+ if(SaveAssets){FSavePackageArgs Save;Save.TopLevelFlags=RF_Public|RF_Standalone;const FString File=FPackageName::LongPackageNameToFilename(Playable->GetOutermost()->GetName(),FPackageName::GetAssetPackageExtension());if(!UPackage::SavePackage(Playable->GetOutermost(),Playable,*File,Save)){Error=TEXT("Cannot save playable Character");return false;}}
+ return true;
+}

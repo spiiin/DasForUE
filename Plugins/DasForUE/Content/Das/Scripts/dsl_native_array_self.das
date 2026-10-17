@@ -1,6 +1,7 @@
 options gen2
 module dsl_native_array_self public
 require ue_native_engine_values public
+require ue_native_self_refs public
 [ue_native_enum(path="/Script/Engine.EComponentMobility")]
 enum NativeMobility {
     Static=0
@@ -72,5 +73,147 @@ class NativeArraySelf : Actor {
         var wholeRejected=false
         try { self.DasNativeArrayPoints := mixed } recover { wholeRejected=true }
         return rejected && wholeRejected && length(self.DasNativeArrayPoints)==1 && ue_struct_get_int(self.DasNativeArrayPoints[0],"X")==12
+    }
+    [ue_function(BlueprintCallable)]
+    def Objects():bool {
+        clear(self.DasNativeArrayObjects)
+        push(self.DasNativeArrayObjects,ue_ref(type<ActorRef>,ue_self_object()))
+        push(self.DasNativeArrayObjects,ue_ref(type<ActorRef>,ue_null_object()))
+        let pawn=self.DasNativeArrayPawns[0]
+        push(self.DasNativeArrayPawns,NativePawnRef_from(ue_null_object()))
+        var detached <- clone(self.DasNativeArrayPawns)
+        detached[0]=NativePawnRef_from(ue_null_object())
+        if(!ue_object_valid(NativePawnRef_raw(self.DasNativeArrayPawns[0]))) { return false }
+        self.DasNativeArrayPawns := detached
+        self.DasNativeArrayPawns[0]=pawn
+        var rejected=false
+        try { self.DasNativeArrayPawns[0]=NativePawnRef(handle=ue_self_object()) } recover { rejected=true }
+        return rejected && length(self.DasNativeArrayPawns)==2 && ue_object_valid(NativePawnRef_raw(self.DasNativeArrayPawns[0])) && !ue_object_valid(NativePawnRef_raw(self.DasNativeArrayPawns[1]))
+    }
+    [ue_function(BlueprintCallable)]
+    def Maps():bool {
+        clear(self.DasNativeArrayIntMap)
+        self.DasNativeArrayIntMap[1]=10
+        self.DasNativeArrayIntMap[1]+=5
+        insert(self.DasNativeArrayIntMap,2,20)
+        if(!erase(self.DasNativeArrayIntMap,2)) { return false }
+        var copy <- clone(self.DasNativeArrayIntMap)
+        copy[1]=99
+        if(self.DasNativeArrayIntMap[1]!=15) { return false }
+        self.DasNativeArrayIntMap := copy
+        clear(self.DasNativeArrayDoubleMap)
+        self.DasNativeArrayDoubleMap["speed"]=2.5lf
+        self.DasNativeArrayDoubleMap["speed"]*=2.0lf
+        clear(self.DasNativeArrayNameMap)
+        self.DasNativeArrayNameMap[7]=ue_name_value("Native")
+        return length(self.DasNativeArrayIntMap)==1 && self.DasNativeArrayIntMap[1]==99 && self.DasNativeArrayDoubleMap["speed"]==5.0lf
+    }
+    [ue_function(BlueprintCallable)]
+    def MapValues():bool {
+        clear(self.DasNativeArrayVectorMap)
+        self.DasNativeArrayVectorMap["origin"]=ue_vector(1.0lf,2.0lf,3.0lf)
+        self.DasNativeArrayVectorMap["origin"].x+=9.0lf
+        clear(self.DasNativeArrayEnumMap)
+        self.DasNativeArrayEnumMap[1]=SpawnCollision.AlwaysSpawn
+        var invalid:SpawnCollision
+        unsafe { invalid=reinterpret<SpawnCollision>(99) }
+        var enumRejected=false
+        try { self.DasNativeArrayEnumMap[2]=invalid } recover { enumRejected=true }
+        clear(self.DasNativeArrayByteMap)
+        self.DasNativeArrayByteMap["mode"]=NativeMobility.Movable
+        clear(self.DasNativeArrayPointMap)
+        self.DasNativeArrayPointMap[1]=ue_struct_with_int(ue_struct_value("/Script/CoreUObject.IntPoint"),"X",12)
+        var mixed <- clone(self.DasNativeArrayPointMap)
+        mixed[2]=ue_struct_value("/Script/CoreUObject.Vector")
+        var structRejected=false
+        try { self.DasNativeArrayPointMap := mixed } recover { structRejected=true }
+        clear(self.DasNativeArrayPawnMap)
+        self.DasNativeArrayPawnMap[1]=self.DasNativeArrayPawns[0]
+        self.DasNativeArrayPawnMap[2]=NativePawnRef_from(ue_null_object())
+        var objectRejected=false
+        try { self.DasNativeArrayPawnMap[1]=NativePawnRef(handle=ue_self_object()) } recover { objectRejected=true }
+        return enumRejected && structRejected && objectRejected && length(self.DasNativeArrayEnumMap)==1 && self.DasNativeArrayEnumMap[1]==SpawnCollision.AlwaysSpawn && length(self.DasNativeArrayPointMap)==1 && ue_struct_get_int(self.DasNativeArrayPointMap[1],"X")==12 && self.DasNativeArrayVectorMap["origin"].x==10.0lf && ue_object_valid(NativePawnRef_raw(self.DasNativeArrayPawnMap[1]))
+    }
+    [ue_function(BlueprintCallable)]
+    def Sets():bool {
+        clear(self.DasNativeArrayIntSet)
+        insert(self.DasNativeArrayIntSet,10)
+        insert(self.DasNativeArrayIntSet,10)
+        insert(self.DasNativeArrayIntSet,20)
+        if(length(self.DasNativeArrayIntSet)!=2 || !erase(self.DasNativeArrayIntSet,20)) { return false }
+        var copy <- clone(self.DasNativeArrayIntSet)
+        insert(copy,30)
+        if(key_exists(self.DasNativeArrayIntSet,30)) { return false }
+        self.DasNativeArrayIntSet := copy
+        clear(self.DasNativeArrayStringSet)
+        insert(self.DasNativeArrayStringSet,"alpha")
+        insert(self.DasNativeArrayStringSet,"alpha")
+        insert(self.DasNativeArrayStringSet,"beta")
+        erase(self.DasNativeArrayStringSet,"beta")
+        return length(self.DasNativeArrayIntSet)==2 && key_exists(self.DasNativeArrayIntSet,10) && key_exists(self.DasNativeArrayIntSet,30) && length(self.DasNativeArrayStringSet)==1 && key_exists(self.DasNativeArrayStringSet,"alpha")
+    }
+    [ue_function(BlueprintCallable)]
+    def NameKeys():bool {
+        if(self.DasNativeArrayNameKeys[ue_name_value("pRESET_3")]!=321) { return false }
+        clear(self.DasNativeArrayNameKeys)
+        let unit=ue_name_value("Unit")
+        self.DasNativeArrayNameKeys[unit]=1
+        self.DasNativeArrayNameKeys[ue_name_value("uNIT")]+=1
+        self.DasNativeArrayNameKeys[ue_name_value("Unit_0")]=10
+        self.DasNativeArrayNameKeys[ue_name_value("UNIT_1")]=20
+        self.DasNativeArrayNameKeys[ue_name_value("Unit_01")]=30
+        self.DasNativeArrayNameKeys[ue_name_value("None")]=40
+        self.DasNativeArrayNameKeys[ue_name_value("")]=41
+        self.DasNativeArrayNameKeys[ue_name_value("東京_3")]=50
+        if(length(self.DasNativeArrayNameKeys)!=6 || self.DasNativeArrayNameKeys[unit]!=2) { return false }
+        var copy <- clone(self.DasNativeArrayNameKeys)
+        copy[ue_name_value("UNIT")]=9
+        if(self.DasNativeArrayNameKeys[unit]!=2) { return false }
+        self.DasNativeArrayNameKeys := copy
+        if(!erase(self.DasNativeArrayNameKeys,ue_name_value("uNit_0"))) { return false }
+        clear(self.DasNativeArrayNameSet)
+        insert(self.DasNativeArrayNameSet,unit)
+        insert(self.DasNativeArrayNameSet,ue_name_value("UNIT"))
+        insert(self.DasNativeArrayNameSet,ue_name_value("Unit_0"))
+        insert(self.DasNativeArrayNameSet,ue_name_value("Unit_1"))
+        insert(self.DasNativeArrayNameSet,ue_name_value("Unit_01"))
+        insert(self.DasNativeArrayNameSet,ue_name_value("None"))
+        insert(self.DasNativeArrayNameSet,ue_name_value(""))
+        insert(self.DasNativeArrayNameSet,ue_name_value("東京_3"))
+        if(length(self.DasNativeArrayNameSet)!=6 || !erase(self.DasNativeArrayNameSet,ue_name_value("UNIT_0"))) { return false }
+        var names <- clone(self.DasNativeArrayNameSet)
+        insert(names,ue_name_value("Extra"))
+        if(key_exists(self.DasNativeArrayNameSet,ue_name_value("Extra"))) { return false }
+        self.DasNativeArrayNameSet := names
+        return length(self.DasNativeArrayNameKeys)==5 && self.DasNativeArrayNameKeys[ue_name_value("unit")]==9 && self.DasNativeArrayNameKeys[ue_name_value("UNIT_1")]==20 && self.DasNativeArrayNameKeys[ue_name_value("Unit_01")]==30 && self.DasNativeArrayNameKeys[ue_name_value("none")]==41 && length(self.DasNativeArrayNameSet)==6 && key_exists(self.DasNativeArrayNameSet,ue_name_value("unit")) && key_exists(self.DasNativeArrayNameSet,ue_name_value("EXTRA"))
+    }
+    [ue_function(BlueprintCallable)]
+    def NameValues():bool {
+        let key=ue_name_value("Value_1")
+        clear(self.DasNativeArrayNameNames)
+        self.DasNativeArrayNameNames[key]=ue_name_value("Result_2")
+        clear(self.DasNativeArrayNameVectors)
+        self.DasNativeArrayNameVectors[key]=ue_vector(1.0lf,2.0lf,3.0lf)
+        self.DasNativeArrayNameVectors[ue_name_value("value_1")].x+=9.0lf
+        clear(self.DasNativeArrayNamePoints)
+        self.DasNativeArrayNamePoints[key]=ue_struct_with_int(ue_struct_value("/Script/CoreUObject.IntPoint"),"X",12)
+        var bad <- clone(self.DasNativeArrayNamePoints)
+        bad[ue_name_value("Bad")]=ue_struct_value("/Script/CoreUObject.Vector")
+        var structRejected=false
+        try { self.DasNativeArrayNamePoints := bad } recover { structRejected=true }
+        clear(self.DasNativeArrayNameEnums)
+        self.DasNativeArrayNameEnums[key]=SpawnCollision.AlwaysSpawn
+        var invalid:SpawnCollision
+        unsafe { invalid=reinterpret<SpawnCollision>(99) }
+        var enumRejected=false
+        try { self.DasNativeArrayNameEnums[key]=invalid } recover { enumRejected=true }
+        clear(self.DasNativeArrayNameBytes)
+        self.DasNativeArrayNameBytes[key]=NativeMobility.Movable
+        clear(self.DasNativeArrayNameObjects)
+        self.DasNativeArrayNameObjects[key]=self.DasNativeArrayPawns[0]
+        self.DasNativeArrayNameObjects[ue_name_value("Null")]=NativePawnRef_from(ue_null_object())
+        var objectRejected=false
+        try { self.DasNativeArrayNameObjects[key]=NativePawnRef(handle=ue_self_object()) } recover { objectRejected=true }
+        return structRejected && enumRejected && objectRejected && ue_names_equal(self.DasNativeArrayNameNames[ue_name_value("VALUE_1")],ue_name_value("result_2")) && self.DasNativeArrayNameVectors[key].x==10.0lf && length(self.DasNativeArrayNamePoints)==1 && ue_struct_get_int(self.DasNativeArrayNamePoints[key],"X")==12 && self.DasNativeArrayNameEnums[key]==SpawnCollision.AlwaysSpawn && self.DasNativeArrayNameBytes[key]==NativeMobility.Movable && ue_object_valid(NativePawnRef_raw(self.DasNativeArrayNameObjects[key]))
     }
 }

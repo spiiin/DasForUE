@@ -35,9 +35,8 @@ checked ABI; ordinary method code receives the typed value.
 Primitive native arrays project to typed daScript arrays; see the native array
 section below. Native enums and safe struct snapshots are supported as described in
 the native enum/struct section. RootComponent relative math values support readonly
-member reads, including `self.RootComponent.RelativeLocation.x`. Native maps/sets,
-weak/soft references and arbitrary native object property projection remain separate
-follow-up work.
+member reads, including `self.RootComponent.RelativeLocation.x`. Native maps/sets and object arrays are described below. Weak/soft references and
+arbitrary native object property projection remain separate follow-up work.
 
 Native property names are case-sensitive. Only BlueprintVisible properties of
 the declared Engine host are eligible; bridge bookkeeping is not exposed.
@@ -155,8 +154,8 @@ The compiler supports primitive native arrays with int32, float, double, bool,
 FString or FName elements when the existing carrier matches the property exactly.
 Name arrays are exercised against the actual Actor and ActorComponent host fields;
 the other primitive paths reuse existing carriers but lack native host fixtures.
-Native object arrays, maps, sets and native container defaults remain outside
-this stage. Native enum/struct arrays are described in the later section. No additional authored IR properties or Blueprint variables
+Native object arrays, maps and sets are described in the later sections; native
+container defaults remain separate work. No additional authored IR properties or Blueprint variables
 are generated.
 
 Reading a native array produces a separate snapshot. Use `length`, indexed reads
@@ -247,8 +246,8 @@ authored properties are added to the DSL class or persisted IR.
 Live fixtures exercise the Engine collision enum and root math structs. Generic safe
 struct snapshots share the existing runtime path but have no additional native base
 host fixture in this stage. Arbitrary native object dot-property access, automatic
-nominal wrappers for all native structs and native struct/enum maps/sets are separate
-work.
+nominal wrappers for all native structs and native struct/enum map keys or set
+elements are separate work.
 
 
 Native enum/struct validation (2026-10-16): Editor build, Create/Reopen/Recompile,
@@ -316,3 +315,138 @@ native-value-arrays-foundation-packaged.log. Probe map:
 /Game/DasNativeDefaults/19ec0214580b4e8a9c45e72bf24aaf87/Map.
 Vector2D shares the math array path but has no additional live fixture here.
 Shipping and rendered gameplay were not exercised.
+
+
+## Native maps, sets and object arrays through self
+
+Accessible native containers now project to typed daScript containers without
+declaring authored ue_property fields:
+
+| Unreal field | daScript value |
+| --- | --- |
+| TArray<UObject subtype / TObjectPtr> | array<canonical native object wrapper> |
+| TMap<int32 or FString, scalar/name> | table<int or string; scalar/name> |
+| TMap<int32 or FString, byte-sized enum> | table<int or string; canonical ue_native_enum> |
+| TMap<int32 or FString, safe struct> | table<int or string; math handle / UEStructValue> |
+| TMap<int32 or FString, UObject subtype> | table<int or string; canonical native object wrapper> |
+| TSet<int32 or FString> | table<int or string> (set) |
+
+Map keys and set elements also support FName as described in the next section.
+Enum, object or struct keys/set elements are not included. Weak/soft references,
+UClass container elements and nested native containers are not included. Canonical
+object wrappers must match the exact native class/interface; raw handles and
+different nominal wrapper types cannot be passed implicitly. Null references use
+the existing checked nullable wrapper converters. Pointer lifetime and class checks
+remain in the existing object handle/snapshot machinery.
+
+Object arrays support the existing array operations. Maps support indexed reads,
+indexed/compound writes, insert, erase, clear and whole-table clone assignment.
+Sets support insert, erase, clear, membership/length and whole-set clone assignment;
+duplicate insertions remain one set element. Math members of indexed map values
+follow the existing vector/rotator update rules. Other structs use explicit snapshot
+accessors and value assignment. Iterate keys/values on a local clone.
+
+All reads are detached snapshots. A mutable local copy affects native storage only
+when assigned back. Mutation helpers evaluate arguments, read current storage and
+commit a validated snapshot; snapshot packing failures cannot partially write the
+native container. Previous side effects from argument evaluation are not rolled back.
+BlueprintReadOnly, native accessor, visibility and const checks still apply.
+
+Enum maps retain the exact FEnumProperty vs FByteProperty representation in separate
+snapshot carriers. Wider-than-byte enum storage is rejected, independently of Unreal
+SameType. Native enum names/numbers and native struct identity remain checked. Native
+struct map carriers now accept the same validated native layouts as struct arrays.
+
+The existing scoped C++ regression adapter is extended with real reflected map/set
+and TObjectPtr array fields. The test DSL is dsl_native_array_self.das; the native
+field descriptor extension stays disabled outside that harness. No bridge bookkeeping
+is made available and no authored Blueprint variables are generated for these fields.
+
+
+Native map/set/object-array validation (2026-10-17 Europe/Budapest): Editor build,
+Create/Reopen/Recompile and Win64 Development NullRHI cook/package/runtime passed.
+Live C++ fixtures verify Actor/Pawn TObjectPtr arrays with nulls, detached clones,
+whole assignment and forged wrong-class rejection; int/string sets with duplicate
+insertion, erase, membership and clone assignment; int/int, string/double and int/name
+maps; string/vector, int/IntPoint, int/native-enum, string/byte-enum and int/Pawn maps.
+Verified indexed/compound writes, map insert/erase, clear, clone assignment,
+wrong enum/object/struct rejection with recovery and no partial native snapshot
+commit. Wrong key/value/wrapper/element types and readonly mutation were rejected
+during compilation. Actual native fields were compared against expected values.
+Other supported primitive map value combinations and interface references reuse
+existing carriers; they do not have additional native live fixtures in this stage.
+Editor and packaged foundation report DAS_FOUNDATION_RESULT=PASS failures=0;
+packaged native probe reports DAS_NATIVE_DEFAULTS_PACKAGED=PASS and exit 0.
+Logs: logs/native-containers-editor-verified.log, native-containers-foundation.log,
+native-containers-package.log, native-containers-packaged.log and
+native-containers-foundation-packaged.log. Map:
+/Game/DasNativeDefaults/877cccf7e8a74a9b873d717e293608cb/Map.
+Shipping and rendered gameplay were not exercised.
+
+
+## FName map keys and set elements
+
+Native TMap<FName, Value> now projects to table<UENameValue; Value> and native
+TSet<FName> to table<UENameValue>. The map value families remain scalar/name,
+byte-sized enum, math/safe struct and strong native object/interface references.
+This stage covers native fields through self and their local snapshots; new authored
+ue_property declarations or ue_function container signatures using FName keys are
+not part of this stage's public authoring contract.
+
+```das
+let key=ue_name_value("Score_1")
+self.Scores[key]=10
+self.Scores[ue_name_value("score_1")]+=5
+insert(self.Labels,ue_name_value("Visible"))
+let present=key_exists(self.Labels,ue_name_value("VISIBLE"))
+```
+
+These example field names denote native reflected properties, not fields the DSL
+creates. The concrete regression fixture is dsl_native_array_self.das, NameKeys and
+NameValues, using the existing scoped C++ test adapter.
+
+Names remain UENameValue values rather than string keys. MakeDSLName interns names
+in a context-owned TMap<FName,uint64>: equal FNames receive the same opaque token.
+daScript's existing non-ref handle table keys use the annotation's uint64 value
+representation for hashing/equality. Thus case variants have equal keys, while
+Unreal's numeric suffix rules, including leading-zero distinctions, remain intact.
+NAME_None/default UENameValue, empty text and "None" share the native None identity.
+The numeric table hash/token is VM-local, not a serialized FName ID or a promise of
+the same numeric GetTypeHash result as Unreal. Tokens cannot be transferred between
+contexts; native conversion validates ownership. Name display spelling is not the
+key identity and follows the existing name interning behavior.
+
+Snapshot carriers use actual FNameProperty keys and preserve the exact value layout,
+including enum-class versus TEnumAsByte storage. Packing resolves every key back
+to FName before modifying the temporary native snapshot. The native setter commits
+only after complete snapshot validation. Readonly, const, bounds/size, object class,
+enum and struct identity checks continue to apply. Reading or iterating local copies
+does not retain native container storage pointers. No parser or daScript SDK changes
+were needed.
+
+
+FName container validation (2026-10-17 Europe/Budapest): Editor build,
+Create/Reopen/Recompile and Win64 Development NullRHI package/runtime passed.
+Live native fixtures confirm CPP-origin name keys, case-insensitive aliases,
+Unit/Unit_0/Unit_1/Unit_01 distinctions, None/empty alias, Unicode, set duplicate
+handling, key membership, erase, compound writes, local snapshot isolation and
+whole-container clone assignment. FName-key map values tested: int, FName, FVector,
+FIntPoint, enum class, TEnumAsByte and Pawn references including null. Wrong enum,
+struct and object values are rejected without partial native commit; wrong key
+types and readonly mutations fail compilation. Other scalar map values reuse the
+same scalar accessor templates and do not have additional native fixtures here.
+Corrected new name/enum getter registration to the existing uint64 return ABI;
+managed object/struct getters retain their copy/move return ABI. No SDK changes.
+Editor and packaged foundation report DAS_FOUNDATION_RESULT=PASS failures=0;
+native packaged probe reports DAS_NATIVE_DEFAULTS_PACKAGED=PASS and exit 0.
+Logs: logs/native-name-containers-editor-final.log,
+native-name-containers-foundation.log, native-name-containers-package.log,
+native-name-containers-packaged.log, native-name-containers-foundation-packaged.log.
+Probe map: /Game/DasNativeDefaults/edfcc276c80349b6a66c559081148910/Map.
+Shipping and rendered gameplay were not exercised.
+
+
+The playable Character step adds an explicit native-reference field policy for CharacterMovement MaxWalkSpeed/JumpZVelocity through the shared property operator generator. These accessors also work in free DAS functions. General native object property projection is still separate; see PlayableCharacter.md.
+
+Update 2026-10-17: authored class properties and method signatures also support
+FName-key maps and FName sets; see [DSLNameContainers.md](DSLNameContainers.md).

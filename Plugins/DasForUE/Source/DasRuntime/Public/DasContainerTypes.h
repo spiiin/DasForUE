@@ -104,6 +104,9 @@ struct DASRUNTIME_API FDasMapStringNameCarrier {
     UPROPERTY() TMap<FString,FName> Values;
 };
 
+USTRUCT()
+struct DASRUNTIME_API FDasSetNameCarrier { GENERATED_BODY() UPROPERTY() TSet<FName> Values; };
+
 struct FDasDeclaredType;
 class UScriptStruct;class FProperty;
 DASRUNTIME_API void ResetDasStructArrayCarriers();
