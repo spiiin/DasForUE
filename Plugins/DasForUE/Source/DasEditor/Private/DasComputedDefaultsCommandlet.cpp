@@ -1,4 +1,5 @@
 #include "DasComputedDefaultsCommandlet.h"
+#include "DasContainerDefaultsProbe.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "DasAuthoring.h"
@@ -11,12 +12,14 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "UObject/UnrealType.h"
 #include "UObject/StructOnScope.h"
+#include "UObject/StrongObjectPtr.h"
 #include "UObject/SavePackage.h"
 #include "Misc/FileHelper.h"
 #include "Misc/ScopeExit.h"
 #include "Misc/PackageName.h"
 #include "HAL/FileManager.h"
 namespace {
+
 int32 ComputedInt(UObject* O,const TCHAR* N){return FindFProperty<FIntProperty>(O->GetClass(),N)->GetPropertyValue_InContainer(O);}
 void ComputedSet(UObject* O,const TCHAR* N,int32 V){FindFProperty<FIntProperty>(O->GetClass(),N)->SetPropertyValue_InContainer(O,V);}
 bool ComputedSave(UObject* O){const FString File=FPackageName::LongPackageNameToFilename(O->GetOutermost()->GetName(),O->IsA<UWorld>()?FPackageName::GetMapPackageExtension():FPackageName::GetAssetPackageExtension());IFileManager::Get().MakeDirectory(*FPaths::GetPath(File),true);FSavePackageArgs Args;Args.TopLevelFlags=RF_Public|RF_Standalone;return UPackage::SavePackage(O->GetOutermost(),O,*File,Args);}
@@ -30,6 +33,7 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params){
  const FString Root=TEXT("/Game/DasComputedDefaults/")+Id,Script=TEXT("dsl_computed_defaults.das"),Path=R.ScriptPath(Script);FString Final;if(!FFileHelper::LoadFileToString(Final,*Path))return 1;
  auto Write=[](const FString& P,const FString& S){return FFileHelper::SaveStringToFile(S,*P,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);};
  ON_SCOPE_EXIT{Write(Path,Final);};
+ TStrongObjectPtr<UWorld> WorldKeep;
  UBlueprint* BP=nullptr;UWorld* W=nullptr;ADasProbeActor* A=nullptr;ADasProbeActor* Manual=nullptr;
  ON_SCOPE_EXIT{if(W){if(A)R.ReleaseObject(A);if(Manual)R.ReleaseObject(Manual);if(W->IsInitialized())W->DestroyWorld(false);}};
  if(Phase==TEXT("Create")){
@@ -39,13 +43,15 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params){
   if(!Check(Effective.Properties.FindByPredicate([](const auto& P){return P.Name==TEXT("Score");})->Default.Number==40 && !Wire.Contains(TEXT("__ue_computed")),TEXT("IR_contains_only_resolved_values")))return 1;
   const FString Old=Final.Replace(TEXT("value * 4"),TEXT("value * 3"));if(!Write(Path,Old))return 1;
   if(!Check(FDasDSLService::Apply(Script,Root+TEXT("/BP_ComputedDefaults"),TEXT("computeddefaults.ComputedDefaults"),BP,Error),TEXT("initial_import")))return 1;
-  FKismetEditorUtilities::CompileBlueprint(BP);auto* CDO=BP->GeneratedClass->GetDefaultObject();ComputedSet(CDO,TEXT("Manual"),77);
+  FKismetEditorUtilities::CompileBlueprint(BP);auto* CDO=BP->GeneratedClass->GetDefaultObject();ComputedSet(CDO,TEXT("Manual"),77);ComputedArrayManual(CDO,TEXT("ManualNumbers"));
   if(!Check(FDasDSLService::Reimport(BP,Error),TEXT("record_manual_CDO_source_contract")))return 1;
-  W=UWorld::CreateWorld(EWorldType::Editor,false,TEXT("Map"),CreatePackage(*(Root+TEXT("/Map"))));if(!W)return 1;W->SetFlags(RF_Public|RF_Standalone);W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
-  A=W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);Manual=W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);if(!A || !Manual)return 1;A->Tags.Add(TEXT("ComputedDefault"));Manual->Tags.Add(TEXT("ComputedManual"));ComputedSet(Manual,TEXT("Score"),111);
+  W=UWorld::CreateWorld(EWorldType::Editor,false,TEXT("Map"),CreatePackage(*(Root+TEXT("/Map"))));if(!W)return 1;WorldKeep.Reset(W);W->SetFlags(RF_Public|RF_Standalone);W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
+  A=W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);Manual=W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);if(!A || !Manual)return 1;A->Tags.Add(TEXT("ComputedDefault"));Manual->Tags.Add(TEXT("ComputedManual"));ComputedSet(Manual,TEXT("Score"),111);ComputedArrayManual(Manual,TEXT("Numbers"));ComputedManualHash(Manual);
   if(!Check(ComputedCall(A)==62 && A->LastDasError.IsEmpty(),TEXT("runtime_compilation_matches_computed_CDO")))return 1;
   const auto* Class=BP->GeneratedClass.Get();if(!Write(Path,Final))return 1;
   if(!Check(FDasDSLService::Reimport(BP,Error) && BP->GeneratedClass.Get()==Class && ComputedInt(CDO,TEXT("Score"))==40 && ComputedInt(CDO,TEXT("Manual"))==77 && ComputedInt(A,TEXT("Score"))==40 && ComputedInt(Manual,TEXT("Score"))==111,TEXT("computed_change_merges_preserving_manual_values")))return 1;
+  UE_LOG(LogTemp,Display,TEXT("Container merge values CDO=%d actor=%d manual=%d manualCDO=%d rich=%d hash=%d"),ComputedArrayLast(CDO,TEXT("Numbers")),ComputedArrayLast(A,TEXT("Numbers")),ComputedArrayLast(Manual,TEXT("Numbers")),ComputedArrayLast(CDO,TEXT("ManualNumbers")),ComputedContainers(CDO),ComputedManualHashMatches(Manual));
+  if(!Check(ComputedArrayLast(CDO,TEXT("Numbers"))==8 && ComputedArrayLast(A,TEXT("Numbers"))==8 && ComputedArrayLast(Manual,TEXT("Numbers"))==777 && ComputedArrayLast(CDO,TEXT("ManualNumbers"))==777 && ComputedContainers(CDO) && ComputedManualHashMatches(Manual),TEXT("container_defaults_merge_whole_manual_values_and_rich_types")))return 1;
   if(!Check(FDasDSLService::Reimport(BP,Error),TEXT("deterministic_unchanged_reimport")))return 1;
   const FString BadScript=TEXT("computed_bad_")+Id+TEXT(".das"),BadPath=R.ScriptPath(BadScript);
   ON_SCOPE_EXIT{IFileManager::Get().Delete(*BadPath);};
@@ -57,6 +63,7 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params){
    {TEXT("world"),TEXT("def bad():int { return ue_get_self_int(\"Score\") }\n")}
   };
   for(const auto& C:Cases){const FString Bad=Final.Replace(TEXT("[ue_class(module_id="),*(C.Value+TEXT("\n[ue_class(module_id="))).Replace(TEXT("self.Score=default_score(self.Seed*2)"),TEXT("self.Score=bad()"));if(!Write(BadPath,Bad) || !Check(!R.ReadAuthoringScript(BadPath,Model,Error) && !Error.IsEmpty(),*(TEXT("reject_")+C.Key)))return 1;}
+  for(const auto& Change:TArray<TPair<FString,FString>>{{TEXT("self.Numbers=[self.Seed,default_score(2)]"),TEXT("self.Numbers=[true]")},{TEXT("TagsDefault:table<string> = {\"red\",\"blue\",string(default_score(2))}"),TEXT("TagsDefault:table<string> = {\"red\",\"red\"}")},{TEXT("ue_name_value(\"Item_3\")=>self.Seed"),TEXT("ue_name_value(\"Item_3\")=>self.Seed,ue_name_value(\"ITEM_3\")=>4")},{TEXT("SpawnCollision.AlwaysSpawn=>default_score(2)"),TEXT("1=>default_score(2)")},{TEXT("self.Numbers=[self.Seed,default_score(2)]"),TEXT("self.Numbers=[1/0]")}}){const FString Bad=Final.Replace(*Change.Key,*Change.Value);if(!Write(BadPath,Bad) || !Check(Bad!=Final && !R.ReadAuthoringScript(BadPath,Model,Error),TEXT("container_invalid_type_duplicate_enum_or_calculation_rejected")))return 1;}
   const FString Cycle=Final.Replace(TEXT("Seed:int=2+3"),TEXT("Seed:int=self.Seed+1"));if(!Write(BadPath,Cycle) || !Check(!R.ReadAuthoringScript(BadPath,Model,Error) && Error.Contains(TEXT("Cyclic")),TEXT("cyclic_source_fields_reject")))return 1;
   const FString WrongType=Final.Replace(TEXT("self.Score=default_score(self.Seed*2)"),TEXT("self.Score=true"));if(!Write(BadPath,WrongType) || !Check(!R.ReadAuthoringScript(BadPath,Model,Error),TEXT("typed_default_mismatch_rejects")))return 1;
   const FString Division=Final.Replace(TEXT("self.Score=default_score(self.Seed*2)"),TEXT("self.Score=1/0"));if(!Write(BadPath,Division) || !Check(!R.ReadAuthoringScript(BadPath,Model,Error),TEXT("evaluation_error_before_asset_mutation")))return 1;
@@ -73,11 +80,14 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params){
   UBlueprint* Sibling=nullptr;if(!Check(FDasDSLService::Apply(TEXT("dsl_computed_child.das"),Root+TEXT("/BP_ComputedSibling"),TEXT("computeddefaults.ComputedSibling"),Sibling,Error),TEXT("computed_sibling_import")))return 1;
   auto* SiblingActor=W->SpawnActor<ADasProbeActor>(Sibling->GeneratedClass);if(!Check(SiblingActor && ComputedInt(SiblingActor,TEXT("Score"))==40 && ComputedInt(SiblingActor,TEXT("Derived"))==41 && ComputedCall(SiblingActor)==81 && SiblingActor->LastDasError.IsEmpty(),TEXT("sibling_does_not_inherit_other_child_source_override")))return 1;SiblingActor->Tags.Add(TEXT("ComputedSibling"));R.ReleaseObject(SiblingActor);
   UBlueprint* ComponentBP=nullptr;if(!Check(FDasDSLService::Apply(TEXT("dsl_computed_component.das"),Root+TEXT("/BP_ComputedComponent"),TEXT("computedcomponents.ComputedComponent"),ComponentBP,Error),TEXT("computed_component_class")))return 1;
+  // Blueprint compilation may collect/reinstance objects: retain the world and
+  // refresh actor references from its owned actor list before using an Outer.
+  for(const auto& Actor:W->PersistentLevel->Actors)if(auto* Live=Cast<ADasProbeActor>(Actor)){if(Live->Tags.Contains(TEXT("ComputedDefault")))A=Live;if(Live->Tags.Contains(TEXT("ComputedManual")))Manual=Live;}
   auto* Component=NewObject<UDasScriptComponent>(A,ComponentBP->GeneratedClass);A->AddInstanceComponent(Component);Component->RegisterComponent();Component->ComponentTags.Add(TEXT("ComputedComponent"));ComputedSet(Component,TEXT("Bonus"),55);
   if(!Check(ComputedInt(ComponentBP->GeneratedClass->GetDefaultObject(),TEXT("Bonus"))==42 && ComputedCall(Component)==55 && Component->LastDasError.IsEmpty(),TEXT("computed_component_runtime")))return 1;R.ReleaseObject(Component);
   if(!ComputedSave(Sibling) || !ComputedSave(ComponentBP) || !ComputedSave(Child) || !ComputedSave(BP) || !ComputedSave(W))return 1;
  }else{
-  BP=LoadObject<UBlueprint>(nullptr,*(Root+TEXT("/BP_ComputedDefaults.BP_ComputedDefaults")));W=LoadObject<UWorld>(nullptr,*(Root+TEXT("/Map.Map")));if(!BP || !W)return 1;W->WorldType=EWorldType::Editor;if(!W->IsInitialized())W->InitWorld();W->UpdateWorldComponents(true,false);
+  BP=LoadObject<UBlueprint>(nullptr,*(Root+TEXT("/BP_ComputedDefaults.BP_ComputedDefaults")));W=LoadObject<UWorld>(nullptr,*(Root+TEXT("/Map.Map")));if(!BP || !W)return 1;WorldKeep.Reset(W);W->WorldType=EWorldType::Editor;if(!W->IsInitialized())W->InitWorld();W->UpdateWorldComponents(true,false);
   for(const auto& Actor:W->PersistentLevel->Actors)if(auto* P=Cast<ADasProbeActor>(Actor)){if(P->Tags.Contains(TEXT("ComputedDefault")))A=P;if(P->Tags.Contains(TEXT("ComputedManual")))Manual=P;}
  }
  if(!A || !Manual)return 1;
@@ -91,6 +101,7 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params){
  if(!Check(ComputedInt(CDO,TEXT("Seed"))==5 && ComputedInt(CDO,TEXT("Score"))==40 && ComputedInt(CDO,TEXT("Manual"))==77 && ComputedInt(CDO,TEXT("Derived"))==42 && Position==FVector(10,8,7),TEXT("saved_CDO_values")))return 1;
  if(!Check(FindFProperty<FStrProperty>(CDO->GetClass(),TEXT("Label"))->GetPropertyValue_InContainer(CDO)==TEXT("computed defaults") && FindFProperty<FBoolProperty>(CDO->GetClass(),TEXT("Enabled"))->GetPropertyValue_InContainer(CDO) && FindFProperty<FDoubleProperty>(CDO->GetClass(),TEXT("Speed"))->GetPropertyValue_InContainer(CDO)==50.0,TEXT("computed_string_bool_and_double")))return 1;
  if(!Check(ComputedCall(A)==82 && A->LastDasError.IsEmpty() && ComputedInt(Manual,TEXT("Score"))==111,TEXT("saved_actor_runtime")))return 1;
+ if(!Check(ComputedContainers(CDO) && ComputedContainers(A) && ComputedManualHashMatches(Manual) && ComputedArrayLast(CDO,TEXT("Numbers"))==8 && ComputedArrayLast(Manual,TEXT("Numbers"))==777 && ComputedArrayLast(CDO,TEXT("ManualNumbers"))==777,TEXT("saved_container_defaults_and_manual_overrides")))return 1;
  auto* Pivot=FindObject<USceneComponent>(A,TEXT("Pivot"));if(!Check(Pivot && Pivot->GetRelativeLocation().Z==42,TEXT("computed_component_template")))return 1;
  UE_LOG(LogTemp,Display,TEXT("DAS_COMPUTED_DEFAULTS_RESULT=PASS phase=%s"),*Phase);return 0;
 }

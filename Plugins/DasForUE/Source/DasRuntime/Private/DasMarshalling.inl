@@ -26,6 +26,8 @@
         if (CastField<FArrayProperty>(Property)) return EMarshallingKind::Array;
         if(CastField<FDelegateProperty>(Property))return EMarshallingKind::Delegate;
         if (CallEnumType(Property)) return EMarshallingKind::Enum;
+        if (CastField<FByteProperty>(Property)) return EMarshallingKind::Byte;
+        if (CastField<FTextProperty>(Property)) return EMarshallingKind::Text;
         if (CastField<FNameProperty>(Property)) return EMarshallingKind::Name;
         if (CastField<FIntProperty>(Property)) return EMarshallingKind::Int;
         if (CastField<FFloatProperty>(Property)) return EMarshallingKind::Float;
@@ -109,6 +111,8 @@
     const TCHAR* CallKindName(EMarshallingKind Kind)
     {
         switch (Kind) {
+        case EMarshallingKind::Byte: return TEXT("byte");
+        case EMarshallingKind::Text: return TEXT("text");
         case EMarshallingKind::Int: return TEXT("int");
         case EMarshallingKind::Float: return TEXT("float");
         case EMarshallingKind::Double: return TEXT("double");
@@ -675,3 +679,6 @@
         virtual bool isPod() const override { return true; }
         virtual bool canBePlacedInContainer() const override { return true; }
     };
+
+void SetCallByte(const FDasCallHandle& H,const char* Path,int32 Value,das::Context* C){auto& Call=ResolveCall(H,C);auto Field=ResolveCallField(Call,Path,false,C);auto* P=CastField<FByteProperty>(Field.Property);if(!P || P->Enum || Value<0 || Value>255)C->throw_error("byte input must be a raw uint8 in range 0..255");P->SetPropertyValue(Field.Memory,uint8(Value));Call.Assigned.Add(Field.Path);}
+int32 GetCallByte(const FDasCallHandle& H,const char* Path,das::Context* C){auto& Call=ResolveCall(H,C);auto Field=ResolveCallField(Call,Path,true,C);auto* P=CastField<FByteProperty>(Field.Property);if(!P || P->Enum)C->throw_error("expected raw byte output");return P->GetPropertyValue(Field.Memory);}

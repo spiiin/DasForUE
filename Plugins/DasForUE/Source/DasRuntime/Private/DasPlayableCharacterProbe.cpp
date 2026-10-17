@@ -1,10 +1,12 @@
 #include "DasStaticLibraryProbe.h"
 #include "DasRuntime.h"
+#include "DasNativeHashProbeComponent.h"
 #include "DasScriptHosts.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/CameraComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputComponent.h"
@@ -21,6 +23,8 @@
 #include "UObject/UnrealType.h"
 #include "Modules/ModuleManager.h"
 #include "Misc/ScopeExit.h"
+#include "Internationalization/PolyglotTextData.h"
+#include "Internationalization/TextLocalizationManager.h"
 
 bool RunDasPlayableCharacterProbe(ADasStaticLibraryProbe* Carrier,FString& Report){
  bool Good=true;auto Check=[&](bool V,const TCHAR* N){Good &= V;Report+=FString(V?TEXT("PASS "):TEXT("FAIL "))+N+TEXT("\n");};
@@ -64,7 +68,15 @@ bool RunDasPlayableCharacterProbe(ADasStaticLibraryProbe* Carrier,FString& Repor
  Check(Int(TEXT("JumpEvents"))==2 && !C->bPressedJump,TEXT("playable_EnhancedInput_completed_DAS_stop_jump"));
  auto* Speed=C->FindFunction(TEXT("SetSpeed"));if(Speed){FStructOnScope Args(Speed);auto* P=FindFProperty<FFloatProperty>(Speed,TEXT("Input"));if(!P)P=FindFProperty<FFloatProperty>(Speed,TEXT("value"));if(P){P->SetPropertyValue_InContainer(Args.GetStructMemory(),320);C->ProcessEvent(Speed,Args.GetStructMemory());}}
  Check(C->GetCharacterMovement()->MaxWalkSpeed==320 && C->GetCapsuleComponent()==C->GetRootComponent() && C->GetMesh(),TEXT("playable_typed_native_components_and_movement_field"));
- const auto NativeAPI=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("native_gameplay_reference_probe.das")),TEXT("main"),{},EDasMethodSignature::Bool,C);Check(NativeAPI.bSucceeded && NativeAPI.BoolValue,TEXT("native_generated_fields_methods_objects_math_defaults_out_free_function_enum_parent_upcasts"));if(!NativeAPI.bSucceeded)Report+=NativeAPI.Error+TEXT("\n");
+ FTextLocalizationManager::Get().RegisterPolyglotTextData(FPolyglotTextData(ELocalizedTextSourceCategory::Game,TEXT("DasForUE"),TEXT("NativeProbe"),TEXT("Hello"),TEXT("en")),true);
+ const auto NativeAPI=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("native_gameplay_reference_probe.das")),TEXT("main"),{},EDasMethodSignature::Bool,C);Check(NativeAPI.bSucceeded && NativeAPI.BoolValue,TEXT("native_generated_fields_methods_objects_math_defaults_out_free_function_enum_parent_upcasts_byte_text_struct_array"));if(!NativeAPI.bSucceeded)Report+=NativeAPI.Error+TEXT("\n");
+ auto* Label=C->FindComponentByClass<UTextRenderComponent>();const auto Namespace=Label?FTextInspector::GetNamespace(Label->Text):TOptional<FString>();const auto TextKey=Label?FTextInspector::GetKey(Label->Text):TOptional<FString>();Check(Label && Namespace.IsSet() && Namespace.GetValue()==TEXT("DasForUE") && TextKey.IsSet() && TextKey.GetValue()==TEXT("NativeProbe") && !Label->Text.IsCultureInvariant(),TEXT("native_FText_preserves_localization_identity_in_Unreal"));
+ const auto ByteRejected=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("native_gameplay_byte_rejection.das")),TEXT("main"),{},EDasMethodSignature::Bool,C);Check(ByteRejected.bSucceeded && ByteRejected.BoolValue,TEXT("native_uint8_rejects_negative_and_overflow_before_invoke"));if(!ByteRejected.bSucceeded)Report+=ByteRejected.Error+TEXT("\n");
+   auto* HashProbe=NewObject<UDasNativeHashProbeComponent>(C,TEXT("NativeHashProbe"));C->AddInstanceComponent(HashProbe);HashProbe->RegisterComponent();HashProbe->ReadOnlyNames.Add(TEXT("locked"));
+   const auto HashAPI=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("native_gameplay_hash_probe.das")),TEXT("main"),{},EDasMethodSignature::Bool,C);Check(HashAPI.bSucceeded && HashAPI.BoolValue,TEXT("native_generated_map_set_fields_arguments_results_out_ref_enum_object_keys_nested"));if(!HashAPI.bSucceeded)Report+=HashAPI.Error+TEXT("\n");
+   Check(HashProbe->Counts.FindRef(TEXT("one"))==11 && HashProbe->Positions.FindRef(TEXT("point"))==FVector(1,2,3) && HashProbe->Weights.FindRef(EDasNativeHashKey::Second)==7 && HashProbe->ActorLabels.FindRef(C)==TEXT("owner") && HashProbe->Actors.Contains(C) && HashProbe->Modes.Num()==2 && HashProbe->Nested.Labels.FindRef(7)==TEXT("nested"),TEXT("native_hash_payload_confirmed_in_Cpp"));
+   auto* ExpiredHashActor=C->GetWorld()->SpawnActor<AActor>();HashProbe->Actors.Reset();HashProbe->Actors.Add(ExpiredHashActor);HashProbe->ActorLabels.Reset();HashProbe->ActorLabels.Add(ExpiredHashActor,TEXT("expired"));ExpiredHashActor->Destroy();
+   const auto StaleHash=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("native_gameplay_hash_probe.das")),TEXT("stale"),{},EDasMethodSignature::Bool,C);Check(StaleHash.bSucceeded && StaleHash.BoolValue,TEXT("native_hash_destroyed_keys_rejected_and_empty_replacement_allowed"));if(!StaleHash.bSucceeded)Report+=StaleHash.Error+TEXT("\n");HashProbe->DestroyComponent();
  const auto WrongReceiver=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("native_gameplay_wrong_receiver.das")),TEXT("main"),{},EDasMethodSignature::Bool,C);Check(!WrongReceiver.bSucceeded && WrongReceiver.Error.Contains(TEXT("receiver class mismatch")),TEXT("native_generated_receiver_class_enforced"));
  const auto Rejection=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("playable_character_negative_probe.das")),TEXT("main"),{},EDasMethodSignature::Bool,C);Check(Rejection.bSucceeded && Rejection.BoolValue && C->GetCharacterMovement()->MaxWalkSpeed==320,TEXT("playable_invalid_speed_rejected_without_write"));if(!Rejection.bSucceeded)Report+=Rejection.Error+TEXT("\n");
  PC->UnPossess();C->Tick(.016f);Check(!Subsystem->HasMappingContext(Context) && Runtime.SubscriptionCount(C)==0,TEXT("playable_unpossess_releases_owned_input"));

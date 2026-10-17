@@ -27,13 +27,16 @@ class PlayableCharacter : Character {
     }
     components=ue_components(VisibleAnywhere,BlueprintReadOnly) {
         var Camera:CameraComponentRef
+        var Label:TextRenderComponentRef
     }
     defaults=ue_defaults() {
         self.bUseControllerRotationYaw=true
         self.Camera.RelativeLocation=ue_vector(0.0lf,0.0lf,64.0lf)
         self.Camera.bUsePawnControlRotation=true
+        self.Label.RelativeLocation=ue_vector(0.0lf,0.0lf,130.0lf)
     }
     def BeginPlay():void {
+        self.Label.K2_SetText(ue_text("DasForUE","PlayerLabel","Player"))
         self.CharacterMovement.MaxWalkSpeed=450.0f
         self.CharacterMovement.JumpZVelocity=500.0f
     }

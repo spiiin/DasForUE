@@ -11,6 +11,28 @@ enum NativeMobility {
 [ue_class(module_id="nativearrays",Blueprintable)]
 class NativeArraySelf : Actor {
     [ue_function(BlueprintCallable)]
+    def EnumKeys():bool {
+        if (self.DasNativeArrayEnumKeys[SpawnCollision.AlwaysSpawn]!=321) { return false }
+        self.DasNativeArrayEnumKeys[SpawnCollision.AlwaysSpawn]+=1
+        self.DasNativeArrayEnumKeys[SpawnCollision.DontSpawnIfColliding]=42
+        self.DasNativeArrayByteKeys[NativeMobility.Movable]=ue_vector(1.0lf,2.0lf,3.0lf)
+        self.DasNativeArrayByteKeys[NativeMobility.Movable].x+=4.0lf
+        self.DasNativeArrayEnumKeyEnums[SpawnCollision.AlwaysSpawn]=SpawnCollision.DontSpawnIfColliding
+        self.DasNativeArrayEnumKeyObjects[SpawnCollision.AlwaysSpawn]=ue_ref(type<ActorRef>,ue_self_object())
+        var copy=clone(self.DasNativeArrayEnumKeys)
+        let removed=erase(copy,SpawnCollision.DontSpawnIfColliding)
+        let missing=erase(copy,SpawnCollision.DontSpawnIfColliding)
+        if (!removed || missing || length(copy)!=1 || length(self.DasNativeArrayEnumKeys)!=2 || length(self.DasNativeArrayLockedEnumKeys)!=0) { return false }
+        var invalid:table<SpawnCollision;int>
+        unsafe { invalid[reinterpret<SpawnCollision>(255)]=17 }
+        var rejected=false
+        try { self.DasNativeArrayEnumKeys := invalid } recover { rejected=true }
+        var wrong=false
+        try { __ue_struct_map_with_enum_int(ue_get_self_struct("DasNativeArrayEnumKeys"),"Values",ue_enum_from_number("/Script/Engine.EComponentMobility",2),5) } recover { wrong=true }
+        return rejected && wrong && length(self.DasNativeArrayEnumKeys)==2 && self.DasNativeArrayEnumKeys[SpawnCollision.AlwaysSpawn]==322 && self.DasNativeArrayByteKeys[NativeMobility.Movable].x==5.0lf && self.DasNativeArrayEnumKeyEnums[SpawnCollision.AlwaysSpawn]==SpawnCollision.DontSpawnIfColliding && ue_object_valid(self.DasNativeArrayEnumKeyObjects[SpawnCollision.AlwaysSpawn].handle)
+    }
+
+    [ue_function(BlueprintCallable)]
     def ObjectHashes():bool {
         let actor=ue_ref(type<ActorRef>,ue_self_object())
         let key=ue_key(actor)

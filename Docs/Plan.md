@@ -3112,3 +3112,132 @@ smoke-packaged.log and playable-map-runtime.log.
 See NativeGameplayGeneration.md. Rendering/physical devices/Shipping/network
 are not validated. Network work remains deferred by user; native text, custom
 structs and container generation remain separate follow-ups.
+
+
+### Enum keys in TMap (2026-10-17)
+
+Implemented native and authored enum keys in class ue_property, native self
+fields and ue_function parameters/results/ref/out. Source syntax is
+`table<EnumType; ValueType>` with exact UEnum identity; int or different-enum
+keys are rejected. Strong enum and TEnumAsByte byte storage remain distinct.
+Existing scalar/name/math/authored-struct/enum/object/interface value adapters
+are reused. Snapshots reject unknown, reserved and duplicate enum keys before
+commit; failed calls preserve ref/out values. IR/JSON schema versions are unchanged.
+
+See [DSLEnumMapKeys.md](DSLEnumMapKeys.md) for fixtures and validation evidence.
+The integration also restores a typed parameter boundary before native self
+reference setters extract `.handle`, and uses the runtime-available localized
+FText constructor instead of editor-only ChangeKey.
+
+Remaining container stages: nonempty/computed defaults with manual-edit
+preservation; deliberate structural hot-reload migration; native/authored struct
+keys and sets with explicit hash/equality; wider/nested containers and generated
+native API projections as separate contracts; reduce whole-snapshot copies.
+
+
+Enum-map validation completed: Editor/game builds; native Create/Reopen/Recompile;
+authored Create/Reopen; PIE 1 success/0 warnings/0 failures; combined Win64
+Development cook/stage/pak/archive and both packaged map runs passed. Evidence
+is under `logs/enum-key-*`; exact map IDs and the known pre-test PIE startup
+diagnostics are documented in DSLEnumMapKeys.md. Targeted diff checks passed.
+
+
+### 2026-10-17 — Native uint8, enum defaults and FText
+
+NativeGameplay manifest schema 3 supports raw byte/text kinds and selects
+TextRenderComponent in addition to Character, CharacterMovementComponent,
+PlayerController and CameraComponent: 323 fields, 606 methods, 35 enums. A
+canonical TextRenderComponentRef is imported from ue_text. Reflection filtering
+continues to require BlueprintCallable; UTextRenderComponent exposes K2_SetText,
+while its non-BlueprintCallable SetText stays excluded.
+
+Raw uint8 uses DAS int with 0..255 validation before writing/invoking; raw bytes
+and byte-backed enums have separate adapters. SetMovementMode now supports
+NewCustomMode=0. Trailing native enum defaults resolve validated native symbols
+to typed ExprConstEnumeration values; arbitrary C++ expressions remain excluded.
+
+UETextValue stores context-owned immutable native FText snapshots. FTextSnapshot
+identity includes data/history, revisions and flags; empty invariant text is not
+collapsed into ordinary empty text. Namespace/key/source creation uses the
+runtime-available FText::AsLocalizable_Advanced, not editor-only ChangeKey.
+Explicit invariant/display/identity helpers do not flatten native transport to
+strings. Context teardown releases snapshots; current capacity is 4096.
+The playable Character owns a Label TextRender component and initializes it
+with keyed text in BeginPlay. Authored reflected text fields/functions, text/byte
+containers, localization gathering and dedicated format/string-table APIs remain
+separate extensions. Native FText histories are retained when read from UE.
+
+Validation: 13 generator tests, reproducible -Check, strict RuntimePIE (1 pass,
+0 warnings/failures/notRun), Win64 Development build/cook/stage, packaged
+foundation (0 failures), gameplay and separate saved-map launch pass. Shared
+probes cover byte endpoints/default/range rejection before invocation, byte
+return, typed enum default, native text property/input/return/out, namespace/key
+inside Unreal, invariant and empty-invariant flags and snapshot ownership after
+call release. Sixteen compile-negative fixtures include byte float input, string
+in place of FText and readonly Text writes. PIE accepts an optional LogPrefix
+for isolated logs/reports during concurrent diagnostics.
+
+Logs: native-byte-text-pie.log, native-byte-text-pie-report.json,
+native-byte-text-check.log, native-byte-text-cooked.log,
+native-byte-text-cooked-runtime.log, native-byte-text-foundation.log,
+native-byte-text-map.log. See NativeGameplayValues.md. NullRHI/synthetic input
+only; rendered text, physical devices, Shipping and network remain untested.
+Network work remains deferred by user.
+
+
+## 2026-10-17 — Generated native USTRUCT and TArray
+
+Implementation added: recursive manifest schema 4, canonical generated native struct declarations with layout/identity checks, native struct/array field snapshots and shared typed method adapters. Export: 337 fields, 643 methods, 36 enums, 8 structs. TMap/TSet export and authored byte/text expansion remain deferred; networking and migration work remain postponed.
+
+Validation complete: 17 generator tests passed; GenerateNativeGameplay -Check passed; strict PIE reported exactly 1 success and 0 warnings/failures/skips, including 20 negative native fixtures. Win64 packaged Development build/cook/stage/archive passed; foundation, shared gameplay/native struct-array probe and separate saved playable-map launch all passed under NullRHI. Test map: `/Game/DasCookedGameplay/5f8adc4730bb45f692fea4504e19f9a9`. No Shipping/physical-device/rendering validation is claimed.
+
+Logs: `logs/native-struct-array-check.log`, `logs/native-struct-array-pie.log`, `logs/native-struct-array-pie-report.json`, `logs/native-struct-array-cooked.log`, `logs/native-struct-array-cooked-runtime.log`, `logs/native-struct-array-foundation.log`, `logs/native-struct-array-map.log`. See NativeGameplayContainers.md for supported shapes and limitations.
+
+
+### Container defaults with computed leaves (2026-10-17)
+
+Own class properties now accept daScript gen2 array/table literals inline and
+in ue_defaults, including scalar helper expressions in keys/elements/values.
+Scalar/name/enum/math families are supported. The existing bounded evaluator
+executes scalar leaves only; resolved JSON data uses the existing string
+default slot, without VM tokens or a schema-version change. Explicit inherited
+container override declarations, whole-container helper results and nonempty
+reference/object-key/opaque-struct defaults remain separate follow-ups.
+
+The native default parser checks types, finite values, enum identities, duplicate
+Unreal key identities and size limits before publication. Blueprint import,
+owner validation and defaults migration parse the same representation. Merge
+treats each container as one value: unchanged values follow source changes,
+manual CDO/template/instance values are preserved in full. A shared exact
+numeric property exporter prevents precision loss on Blueprint recompilation.
+Declaration-only collection erases the container initializer without evaluating
+it; test worlds are strongly retained across compilation/GC.
+
+The computed-defaults fixtures now cover arrays, sets, string/FName/enum-key maps,
+vectors, exact double values, computed element changes, preserved manual array/
+map/set values, wrong types/duplicates/enum keys/evaluation failures, persistence
+and recompile. Old container negative fixtures now reject invalid typed defaults
+instead of rejecting newly supported valid literals.
+
+See [DSLContainerDefaults.md](DSLContainerDefaults.md) for syntax and evidence.
+Next container stages: reference/struct default ownership, inherited overrides,
+deliberate declaration migration/hot reload, struct hashing/equality, and reducing
+whole-container snapshot copies. Network work remains deferred.
+
+
+Container-default validation completed: Editor/game builds; computed defaults
+Create/Reopen/Recompile; prior MethodValues Reopen; Win64 Development cook/stage/
+pak/archive; packaged default values/manual overrides/fresh Spawn and foundation
+(0 failures). Evidence is under logs/container-defaults-* and the exact map is
+documented in DSLContainerDefaults.md. Targeted diff checks passed.
+
+
+## 2026-10-17 — Generated native TMap and TSet
+
+Schema 5 adds map key/value and set element descriptors, dependency discovery and source type synthesis. Native accessors, calls, out/ref and native struct members reuse the checked container ABI. UObject keys use existing canonical UEObjectKey types. Exact carrier shape and native snapshot policies remain enforced.
+
+The five Engine receiver roots remain unchanged (337 fields/643 methods). Their native non-reflected overloads/private members remain excluded. A separate explicit `fixture: true` native component exercises ten hash properties/ten methods; combined registry including inherited fixture members has 352 fields/670 methods, 37 enums and 9 structs. This is not an additional authored parent. Networking and migration work remain postponed.
+
+Validation complete: 22 generator tests passed; GenerateNativeGameplay -Check passed; strict PIE reported 1 success, 0 warnings/failures/skips, including 27 negative native fixtures. Win64 packaged Development build/cook/stage/archive, foundation, shared gameplay and saved playable-map launch passed under NullRHI. The native hash markers confirmed typed fields/input/return/out/ref, C++ payload readback, destroyed-key rejection and empty replacement. Test root: `/Game/DasCookedGameplay/15428d9822944b71a3592b85788da778`. No Shipping, physical rendering or physical-device validation is claimed.
+
+Stable logs: `logs/native-hash-check.log`, `logs/native-hash-pie.log`, `logs/native-hash-pie-report.json`, `logs/native-hash-cooked.log`, `logs/native-hash-cooked-runtime.log`, `logs/native-hash-foundation.log`, `logs/native-hash-map.log`. See NativeGameplayHashContainers.md for syntax and limits.

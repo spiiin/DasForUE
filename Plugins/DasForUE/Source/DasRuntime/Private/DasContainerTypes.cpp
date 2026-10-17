@@ -224,9 +224,44 @@ UScriptStruct* ObjectMapForProperty(const FMapProperty* P){
     auto* Strong=CastField<FEnumProperty>(V);if(Strong && !Strong->GetUnderlyingProperty()->IsA<FByteProperty>())return nullptr;auto* S=ObjectMapCarrier(Type,Strong?1:0);auto* Values=S?S->FindPropertyByName(TEXT("Values")):nullptr;return Values && Values->SameType(P)?S:nullptr;
 }
 
+
+// Clone an int-key map's value and a validated enum array's byte/enum key.
+const FString EnumMapPrefix=TEXT("/Script/DasRuntime.DasEnumKeyMap_");
+TMap<FString,TWeakObjectPtr<UScriptStruct>> EnumMapCarriers;
+UScriptStruct* EnumMapFromBase(UEnum* Enum,bool Strong,FMapProperty* Base,const FString& BasePath){
+    auto* KeyCarrier=EnumArrayCarrier(Enum,Strong);if(!KeyCarrier || !Base || !Base->KeyProp->IsA<FIntProperty>())return nullptr;
+    auto* Element=CastFieldChecked<FArrayProperty>(KeyCarrier->FindPropertyByName(TEXT("Values")))->Inner;
+    const FString Path=EnumMapPrefix+(Strong?TEXT("N_"):TEXT("E_"))+ObjectHashEncode(Enum->GetPathName()+TEXT("|")+BasePath);if(Path.Len()>=NAME_SIZE)return nullptr;
+    if(const auto* Cached=EnumMapCarriers.Find(Path)){auto* S=Cached->Get();auto* Map=S?CastField<FMapProperty>(S->FindPropertyByName(TEXT("Values"))):nullptr;return Map && Map->KeyProp->SameType(Element) && Map->KeyProp->GetElementSize()==1 && Map->ValueProp->SameType(Base->ValueProp) && Map->ValueProp->GetElementSize()==Base->ValueProp->GetElementSize()?S:nullptr;}
+    if(EnumMapCarriers.Num()>=1024 || FindObject<UScriptStruct>(nullptr,*Path))return nullptr;
+    auto* S=NewObject<UScriptStruct>(CreatePackage(TEXT("/Script/DasRuntime")),*Path.RightChop(FString(TEXT("/Script/DasRuntime.")).Len()),RF_Transient);auto* Map=new FMapProperty(S,TEXT("Values"));
+    Map->KeyProp=CastFieldChecked<FProperty>(FField::Duplicate(Element,Map,TEXT("Key")));Map->KeyProp->SetPropertyFlags(CPF_HasGetValueTypeHash);Map->ValueProp=CastFieldChecked<FProperty>(FField::Duplicate(Base->ValueProp,Map,TEXT("Value")));
+    S->AddCppProperty(Map);S->Bind();S->StaticLink(true);S->AddToRoot();EnumMapCarriers.Add(Path,S);return S;
 }
-void ResetDasStructArrayCarriers(){for(auto& I:ObjectHashCarriers)if(auto* S=I.Value.Get())S->RemoveFromRoot();ObjectHashCarriers.Empty();for(auto& I:EnumSetCarriers)if(auto* S=I.Value.Get())S->RemoveFromRoot();EnumSetCarriers.Empty();for(auto& I:NameMapCarriers)if(auto* S=I.Value.Get())S->RemoveFromRoot();NameMapCarriers.Empty();for(auto& Item:ReflectedMapCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();ReflectedMapCarriers.Empty();ReflectedMapLayouts.Empty();for(auto& Item:StructMapCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();StructMapCarriers.Empty();StructMapLayouts.Empty();for(auto& Item:ReferenceArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();ReferenceArrayCarriers.Empty();for(auto& Item:EnumArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();EnumArrayCarriers.Empty();EnumArrayLayouts.Empty();for(auto& Item:StructArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();StructArrayCarriers.Empty();StructArrayLayouts.Empty();}
+UScriptStruct* EnumMapCarrier(const FDasDeclaredType& Type,int KeyStrong=-1,int ValueStrong=-1){
+    if(!Type.Key || !Type.Value)return nullptr;auto* E=FindObject<UEnum>(nullptr,*Type.Key->TypePath);if(!E)return nullptr;
+    bool Strong=KeyStrong>=0?KeyStrong!=0:!E->IsA<UDasDefinedEnum>() && E->GetCppForm()==UEnum::ECppForm::EnumClass;
+    FDasDeclaredType Proxy=Type;auto Key=MakeShared<FDasDeclaredType>();Key->Kind=TEXT("int");Proxy.Key=Key;UScriptStruct* Base=nullptr;
+    if(Type.Value->Kind==TEXT("enum")){auto* V=FindObject<UEnum>(nullptr,*Type.Value->TypePath);bool VS=ValueStrong>=0?ValueStrong!=0:V && !V->IsA<UDasDefinedEnum>() && V->GetCppForm()==UEnum::ECppForm::EnumClass;Base=ReflectedMapCarrier(V,false,VS);}else Base=DasContainerCarrier(Proxy);
+    return Base?EnumMapFromBase(E,Strong,CastField<FMapProperty>(Base->FindPropertyByName(TEXT("Values"))),Base->GetPathName()):nullptr;
+}
+UScriptStruct* ResolveEnumMapCarrier(const FString& Path){
+    if(!Path.StartsWith(EnumMapPrefix) || Path.Len()>=NAME_SIZE)return nullptr;FString Rest=Path.RightChop(EnumMapPrefix.Len());const bool Strong=Rest.StartsWith(TEXT("N_"));if(!Strong && !Rest.StartsWith(TEXT("E_")))return nullptr;
+    FString Text,EnumPath,BasePath;if(!ObjectHashDecode(Rest.RightChop(2),Text) || !Text.Split(TEXT("|"),&EnumPath,&BasePath) || (!EnumPath.StartsWith(TEXT("/Script/")) && !EnumPath.StartsWith(TEXT("/Game/"))) || BasePath.StartsWith(EnumMapPrefix) || BasePath.StartsWith(ObjectMapPrefix) || BasePath.StartsWith(NameMapPrefix))return nullptr;
+    auto* E=FindObject<UEnum>(nullptr,*EnumPath);if(!E)E=LoadObject<UEnum>(nullptr,*EnumPath,nullptr,LOAD_NoWarn);auto* S=EnumMapFromBase(E,Strong,CastField<FMapProperty>(DasContainerProperty(BasePath)),BasePath);return S && S->GetPathName()==Path?S:nullptr;
+}
+UScriptStruct* EnumMapForProperty(const FMapProperty* P){
+    auto* E=DasEnumPropertyType(P->KeyProp);if(!E || P->KeyProp->GetElementSize()!=1)return nullptr;if(auto* Strong=CastField<FEnumProperty>(P->KeyProp);Strong && !Strong->GetUnderlyingProperty()->IsA<FByteProperty>())return nullptr;
+    FDasDeclaredType Type;Type.Kind=TEXT("map");auto Key=MakeShared<FDasDeclaredType>();Key->Kind=TEXT("enum");Key->TypePath=E->GetPathName();Type.Key=Key;
+    auto Value=MakeShared<FDasDeclaredType>();auto* V=P->ValueProp;Value->Kind=V->IsA<FIntProperty>()?TEXT("int"):V->IsA<FFloatProperty>()?TEXT("float"):V->IsA<FDoubleProperty>()?TEXT("double"):V->IsA<FBoolProperty>()?TEXT("bool"):V->IsA<FStrProperty>()?TEXT("string"):V->IsA<FNameProperty>()?TEXT("name"):TEXT("");
+    if(auto* EV=DasEnumPropertyType(V)){Value->Kind=TEXT("enum");Value->TypePath=EV->GetPathName();}if(auto* S=CastField<FStructProperty>(V)){Value->Kind=TEXT("struct");Value->TypePath=S->Struct->GetPathName();}if(auto* C=DasReferencePropertyClass(V)){Value->Kind=TEXT("object");Value->TypePath=C->GetPathName();}if(Value->Kind.IsEmpty())return nullptr;Type.Value=Value;
+    auto* VS=CastField<FEnumProperty>(V);if(VS && !VS->GetUnderlyingProperty()->IsA<FByteProperty>())return nullptr;auto* S=EnumMapCarrier(Type,CastField<FEnumProperty>(P->KeyProp)?1:0,VS?1:0);auto* Values=S?S->FindPropertyByName(TEXT("Values")):nullptr;return Values && Values->SameType(P)?S:nullptr;
+}
+
+}
+void ResetDasStructArrayCarriers(){for(auto& I:EnumMapCarriers)if(auto* S=I.Value.Get())S->RemoveFromRoot();EnumMapCarriers.Empty();for(auto& I:ObjectHashCarriers)if(auto* S=I.Value.Get())S->RemoveFromRoot();ObjectHashCarriers.Empty();for(auto& I:EnumSetCarriers)if(auto* S=I.Value.Get())S->RemoveFromRoot();EnumSetCarriers.Empty();for(auto& I:NameMapCarriers)if(auto* S=I.Value.Get())S->RemoveFromRoot();NameMapCarriers.Empty();for(auto& Item:ReflectedMapCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();ReflectedMapCarriers.Empty();ReflectedMapLayouts.Empty();for(auto& Item:StructMapCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();StructMapCarriers.Empty();StructMapLayouts.Empty();for(auto& Item:ReferenceArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();ReferenceArrayCarriers.Empty();for(auto& Item:EnumArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();EnumArrayCarriers.Empty();EnumArrayLayouts.Empty();for(auto& Item:StructArrayCarriers)if(auto* S=Item.Value.Get())S->RemoveFromRoot();StructArrayCarriers.Empty();StructArrayLayouts.Empty();}
 UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type){
+    if(Type.Kind==TEXT("map") && Type.Key && Type.Key->Kind==TEXT("enum"))return EnumMapCarrier(Type);
     if(Type.Kind==TEXT("set") && Type.Element && Type.Element->Kind==TEXT("object"))return ObjectSetCarrier(FindObject<UClass>(nullptr,*Type.Element->TypePath));
     if(Type.Kind==TEXT("map") && Type.Key && Type.Key->Kind==TEXT("object"))return ObjectMapCarrier(Type);
     if(Type.Kind==TEXT("set") && Type.Element && Type.Element->Kind==TEXT("enum")){
@@ -265,6 +300,7 @@ UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type){
     return nullptr;
 }
 FProperty* DasContainerProperty(const FString& Path){
+    if(Path.StartsWith(EnumMapPrefix)){auto* S=ResolveEnumMapCarrier(Path);return S?S->FindPropertyByName(TEXT("Values")):nullptr;}
     if(Path.StartsWith(ObjectSetPrefix) || Path.StartsWith(ObjectMapPrefix)){auto* S=ResolveObjectHashCarrier(Path);return S?S->FindPropertyByName(TEXT("Values")):nullptr;}
     if(Path.StartsWith(EnumSetPrefix) || Path.StartsWith(StrongEnumSetPrefix)){auto* S=ResolveEnumSetCarrier(Path);return S?S->FindPropertyByName(TEXT("Values")):nullptr;}
     if(Path.StartsWith(NameMapPrefix)){auto* S=ResolveNameMap(Path);return S?S->FindPropertyByName(TEXT("Values")):nullptr;}
@@ -297,6 +333,7 @@ FProperty* DasContainerProperty(const FString& Path){
     return nullptr;
 }
 UScriptStruct* DasContainerCarrierForProperty(const FProperty* Property){
+    if(auto* Map=CastField<FMapProperty>(Property);Map && DasEnumPropertyType(Map->KeyProp))return EnumMapForProperty(Map);
     if(auto* Set=CastField<FSetProperty>(Property);Set && IsDasObjectHashProperty(Set->ElementProp))return ObjectSetCarrier(DasReferencePropertyClass(Set->ElementProp));
     if(auto* Map=CastField<FMapProperty>(Property);Map && IsDasObjectHashProperty(Map->KeyProp))return ObjectMapForProperty(Map);
     if(auto* Set=CastField<FSetProperty>(Property))if(auto* Enum=DasEnumPropertyType(Set->ElementProp)){

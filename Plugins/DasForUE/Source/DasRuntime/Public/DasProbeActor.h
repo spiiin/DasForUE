@@ -74,6 +74,11 @@ public:
     UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<ESpawnActorCollisionHandlingMethod> DasNativeArrayEnumSet;
     UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<TEnumAsByte<EComponentMobility::Type>> DasNativeArrayByteSet;
     UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TSet<ESpawnActorCollisionHandlingMethod> DasNativeArrayReadonlyEnumSet;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<ESpawnActorCollisionHandlingMethod,int32> DasNativeArrayEnumKeys;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<TEnumAsByte<EComponentMobility::Type>,FVector> DasNativeArrayByteKeys;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<ESpawnActorCollisionHandlingMethod,ESpawnActorCollisionHandlingMethod> DasNativeArrayEnumKeyEnums;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<ESpawnActorCollisionHandlingMethod,TObjectPtr<AActor>> DasNativeArrayEnumKeyObjects;
+    UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TMap<ESpawnActorCollisionHandlingMethod,int32> DasNativeArrayLockedEnumKeys;
     UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<TObjectPtr<AActor>> DasNativeArrayActorSet;
     UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<TObjectPtr<APawn>> DasNativeArrayPawnSet;
     UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<TObjectPtr<AActor>,int32> DasNativeArrayObjectKeys;

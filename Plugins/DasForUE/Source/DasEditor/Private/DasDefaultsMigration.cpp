@@ -70,7 +70,7 @@ bool DefaultFieldMatches(FProperty* P,const FDasFieldSchema& F){
  case EDasScalarKind::Enum:{auto* E=DasEnumPropertyType(P);return E && E->GetPathName()==F.EnumPath;}
  case EDasScalarKind::Class:{auto* C=CastField<FClassProperty>(P);return C && C->MetaClass && C->MetaClass->GetPathName()==F.ObjectClass;}
  case EDasScalarKind::Object:{auto* C=DasReferencePropertyClass(P);return !CastField<FClassProperty>(P) && C && C->GetPathName()==F.ObjectClass;}
- case EDasScalarKind::Struct:{auto* S=CastField<FStructProperty>(P);return S && S->Struct->GetPathName()==F.StructPath;}
+ case EDasScalarKind::Struct:{if(auto* C=DasContainerProperty(F.StructPath))return P->SameType(C);auto* S=CastField<FStructProperty>(P);return S && S->Struct->GetPathName()==F.StructPath;}
  default:return false;
  }
 }
@@ -85,7 +85,7 @@ bool OwnValue(FProperty* P,const FDasFieldSchema& F,void* Data,FString& Error){
  case EDasScalarKind::Enum:{auto* E=ResolveDasEnum(F.EnumPath,Error);if(!E)return false;SetDasEnumPropertyNumber(P,Data,E->GetValueByNameString(F.EnumDefault));break;}
  case EDasScalarKind::Class:case EDasScalarKind::Object:{UObject* V=nullptr;if(!ResolveDasReferenceDefault(F.Kind==EDasScalarKind::Class,F.ObjectClass,F.StringDefault,V,Error))return false;if(F.Kind==EDasScalarKind::Class)CastFieldChecked<FClassProperty>(P)->SetObjectPropertyValue(Data,V);else DasReferenceSet(P,Data,V);break;}
  case EDasScalarKind::Struct:{
-  if(DasContainerProperty(F.StructPath)){P->ClearValue(Data);break;}
+  if(auto* C=DasContainerProperty(F.StructPath)){FInstancedStruct V;if(!ParseDasStructDefault(F.StructPath,F.StructDefault,V,Error))return false;P->CopyCompleteValue(Data,C->ContainerPtrToValuePtr<void>(V.GetMemory()));break;}
   FInstancedStruct V;if(!ParseDasStructDefault(F.StructPath,F.StructDefault,V,Error))return false;
   if(V.GetScriptStruct()==TBaseStructure<FTransform>::Get()){
    const auto& T=V.Get<FTransform>();const FTransform Canonical(T.Rotator(),T.GetTranslation(),T.GetScale3D());CastFieldChecked<FStructProperty>(P)->Struct->CopyScriptStruct(Data,&Canonical);
@@ -105,6 +105,7 @@ FString StructText(const UScriptStruct* S,const void* Memory){
 }
 FString VariableText(FProperty* P,UObject* O){
  auto* Data=P->ContainerPtrToValuePtr<void>(O);
+ if(P->IsA<FArrayProperty>() || P->IsA<FSetProperty>() || P->IsA<FMapProperty>())return DasPropertyDefaultText(P,Data);
  if(auto* S=CastField<FStructProperty>(P)){
   if(S->Struct!=TBaseStructure<FTransform>::Get())return StructText(S->Struct,Data);
   const auto& V=*static_cast<const FTransform*>(Data);const auto T=V.GetTranslation(),Scale=V.GetScale3D();const auto R=V.Rotator();

@@ -88,3 +88,12 @@ fields, direct class properties and method inputs/results/out/inout; see
 Update 2026-10-17: UObject sets and object-key maps are supported through native
 self fields, direct properties and method inputs/results/out/inout using typed
 UEObjectKey values; see [DSLObjectHashContainers.md](DSLObjectHashContainers.md).
+
+
+Enum-key maps for native/authored enums: [DSLEnumMapKeys.md](DSLEnumMapKeys.md).
+
+
+Update 2026-10-17: nonempty class defaults with computed scalar leaves are now
+supported for scalar/name/enum/math container families, with whole-container
+manual override preservation. See [DSLContainerDefaults.md](DSLContainerDefaults.md).
+Nonempty object-reference/object-key/opaque-struct defaults remain deferred.

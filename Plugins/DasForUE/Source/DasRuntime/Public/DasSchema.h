@@ -91,3 +91,6 @@ DASRUNTIME_API bool DasReferenceSet(const FProperty* Property,void* Memory,UObje
 DASRUNTIME_API UEnum* DasEnumPropertyType(FProperty* Property);
 DASRUNTIME_API int64 DasEnumPropertyNumber(FProperty* Property,const void* Memory);
 DASRUNTIME_API bool SetDasEnumPropertyNumber(FProperty* Property,void* Memory,int64 Value);
+
+// Exact numeric text for native container defaults and Blueprint recompilation.
+DASRUNTIME_API FString DasPropertyDefaultText(const FProperty* Property,const void* Data);

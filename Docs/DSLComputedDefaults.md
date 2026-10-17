@@ -100,3 +100,9 @@ isolation, ActorComponent, runtime source contracts and fresh Spawn. Shipping an
 rendered gameplay were not exercised. Logs: computed-defaults-final-package-suite.log,
 computed-defaults-packaged.log, computed-defaults-foundation-editor.log and
 smoke-packaged.log under logs/.
+
+
+Update 2026-10-17: nonempty class defaults with computed scalar leaves are now
+supported for scalar/name/enum/math container families, with whole-container
+manual override preservation. See [DSLContainerDefaults.md](DSLContainerDefaults.md).
+Nonempty object-reference/object-key/opaque-struct defaults remain deferred.

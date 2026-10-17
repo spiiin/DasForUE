@@ -1,14 +1,14 @@
-param([string]$Engine = 'C:\src\unreal\UnrealEngine')
+param([string]$Engine = 'C:\src\unreal\UnrealEngine', [ValidatePattern('^[A-Za-z0-9_-]+$')][string]$LogPrefix='gameplay-runtime-pie')
 $ErrorActionPreference = 'Stop'
 $Repo = Split-Path -Parent $PSScriptRoot
 $Project = Join-Path $Repo 'Tests\DasForUESmoke\DasForUESmoke.uproject'
 $Logs = Join-Path $Repo 'logs'
 New-Item -ItemType Directory -Path $Logs -Force | Out-Null
 & (Join-Path $Engine 'Engine\Build\BatchFiles\Build.bat') DasForUESmokeEditor Win64 Development `
-    "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12 "-Log=$Logs\build-pie.log"
+    "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12 "-Log=$Logs\$LogPrefix-build.log"
 if ($LASTEXITCODE) { throw 'PIE probe build failed' }
-$Log = Join-Path $Logs 'gameplay-runtime-pie.log'
-$Report = Join-Path $Logs 'gameplay-runtime-pie-report'
+$Log = Join-Path $Logs "$LogPrefix.log"
+$Report = Join-Path $Logs "$LogPrefix-report"
 $Arguments = @(('"' + $Project + '"'), '-unattended', '-NullRHI', '-nosplash', '-nosound', '-RenderOffscreen',
     '-ExecCmds="Automation RunTests DasForUE.Gameplay.RuntimePIE"', '-TestExit="Automation Test Queue Empty"',
     ('-ReportExportPath="' + $Report + '"'), ('-abslog="' + $Log + '"'))

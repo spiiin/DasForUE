@@ -289,6 +289,31 @@ def exercise_values(api:ValueTargetRef):int {
 def exercise_names(api:ValueDriverRef):int {
     let actor=ue_ref(type<ActorRef>,ue_self_object())
     let key=ue_key(actor)
+    if (!api.SeedEnumMaps(actor)) { return -130 }
+    var enumMap=api.CopyEnumMap(api.EnumScores)
+    var nativeMap=api.CopyNativeEnumMap(api.NativeEnumScores)
+    var enumOld:table<MethodState;int>
+    var nativeOld:table<SpawnCollision;int>
+    api.RefEnumMap(enumMap,enumOld)
+    api.RefNativeEnumMap(nativeMap,nativeOld)
+    if (length(enumMap)!=2 || enumMap[MethodState.Active]!=99 || enumOld[MethodState.Idle]!=8 || length(api.EnumScores)!=1 || nativeMap[SpawnCollision.DontSpawnIfColliding]!=99 || nativeOld[SpawnCollision.AlwaysSpawn]!=42 || length(api.NativeEnumScores)!=1) { return -131 }
+    var rollback=false
+    try { api.FailEnumMap(enumMap) } recover { rollback=true }
+    if (!rollback || enumMap[MethodState.Active]!=99) { return -132 }
+    api.EnumScores := enumMap
+    api.NativeEnumScores := nativeMap
+    var enumVectors=api.CopyEnumVectors(api.EnumVectors)
+    enumVectors[MethodState.Active].x+=1.0lf
+    api.EnumVectors := enumVectors
+    let removedEnum=erase(api.EnumScores,MethodState.Idle)
+    let missingEnum=erase(api.EnumScores,MethodState.Idle)
+    if (!removedEnum || missingEnum || length(api.EnumScores)!=1 || length(api.LockedEnumScores)!=0 || api.EnumVectors[MethodState.Active].x!=6.0lf) { return -133 }
+    clear(enumMap)
+    if (length(api.CopyEnumMap(enumMap))!=0) { return -134 }
+    unsafe { enumMap[reinterpret<MethodState>(0)]=123 }
+    var enumRejected=false
+    try { api.CopyEnumMap(enumMap) } recover { enumRejected=true }
+    if (!enumRejected || api.EnumScores[MethodState.Active]!=99) { return -135 }
     api.SeedObjectHashes(actor)
     var objectSet=api.CopyObjectSet(api.ActorKeys)
     var objectMap=api.CopyObjectMap(api.ObjectScores)
@@ -358,6 +383,48 @@ def exercise_names(api:ValueDriverRef):int {
 }
 [ue_class(module_id="methodvalues", type_registry="REGISTRY", Blueprintable)]
 class ValueDriver {
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    EnumScores:table<MethodState;int>
+    @ue_property=(EditAnywhere,BlueprintReadOnly)
+    LockedEnumScores:table<MethodState;int>
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    NativeEnumScores:table<SpawnCollision;int>
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    EnumVectors:table<MethodState;UEVector>
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    EnumNames:table<MethodState;UENameValue>
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    EnumEnums:table<MethodState;MethodState>
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    EnumNativeEnums:table<SpawnCollision;SpawnCollision>
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    EnumObjects:table<MethodState;ActorRef>
+    [ue_function(BlueprintCallable)]
+    def CopyEnumMap(values:table<MethodState;int>):table<MethodState;int> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def CopyNativeEnumMap(values:table<SpawnCollision;int>):table<SpawnCollision;int> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def CopyEnumVectors(values:table<MethodState;UEVector>):table<MethodState;UEVector> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def RefEnumMap(var values:table<MethodState;int>&; @ue_out var previous:table<MethodState;int>&):void { previous := values; values[MethodState.Active]=99 }
+    [ue_function(BlueprintCallable)]
+    def RefNativeEnumMap(var values:table<SpawnCollision;int>&; @ue_out var previous:table<SpawnCollision;int>&):void { previous := values; values[SpawnCollision.DontSpawnIfColliding]=99 }
+    [ue_function(BlueprintCallable)]
+    def FailEnumMap(var values:table<MethodState;int>&):void { values[MethodState.Active]=1000; panic("enum map rollback") }
+    [ue_function(BlueprintCallable)]
+    def SeedEnumMaps(value:ActorRef):bool {
+        self.EnumScores[MethodState.Idle]=7
+        self.EnumScores[MethodState.Idle]+=1
+        self.NativeEnumScores[SpawnCollision.AlwaysSpawn]=42
+        self.EnumVectors[MethodState.Active]=ue_vector(1.0lf,2.0lf,3.0lf)
+        self.EnumVectors[MethodState.Active].x+=4.0lf
+        self.EnumNames[MethodState.Active]=ue_name_value("EnumName")
+        self.EnumEnums[MethodState.Active]=MethodState.Idle
+        self.EnumNativeEnums[SpawnCollision.AlwaysSpawn]=SpawnCollision.DontSpawnIfColliding
+        self.EnumObjects[MethodState.Active]=value
+        return ue_names_equal(self.EnumNames[MethodState.Active],ue_name_value("enumname")) && self.EnumEnums[MethodState.Active]==MethodState.Idle && self.EnumNativeEnums[SpawnCollision.AlwaysSpawn]==SpawnCollision.DontSpawnIfColliding && ue_object_valid(self.EnumObjects[MethodState.Active].handle)
+    }
+
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     AuthoredKeys:table<ValueTargetKey>
     [ue_function(BlueprintCallable)]

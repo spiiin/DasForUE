@@ -34,6 +34,13 @@ das::ExpressionPtr DSLComputeDefaultLeaf(const das::StructurePtr& St,das::Expres
 }
 das::ExpressionPtr DSLComputeDefaultExpression(const das::StructurePtr& St,das::ExpressionPtr E,const das::TypeDeclPtr& Type,const FString& Key,TMap<FString,das::ExpressionPtr>& Fields){
  if(!E || E->rtti_isConstant())return E;
+ if(Type && DSLContainer(Type)){
+  auto Copy=E->clone();auto* Items=DSLDefaultItems(Copy,Type);if(!Items)return Copy;
+  for(size_t I=0;I<Items->values.size();++I){auto& Item=Items->values[I];const FString ItemKey=Key+FString::Printf(TEXT("/item/%u"),uint32(I));
+   if(Type->baseType==das::Type::tTable && !DSLSet(Type)){if(Item->__rtti!=das::string("ExprMakeTuple"))DSLFail(TEXT("Map defaults require key => value entries"));auto* Pair=static_cast<das::ExprMakeTuple*>(Item);if(Pair->values.size()!=2)DSLFail(TEXT("Map default entry requires two values"));Pair->values[0]=DSLComputeDefaultExpression(St,Pair->values[0],Type->firstType,ItemKey+TEXT("/key"),Fields);Pair->values[1]=DSLComputeDefaultExpression(St,Pair->values[1],Type->secondType,ItemKey+TEXT("/value"),Fields);}
+   else Item=DSLComputeDefaultExpression(St,Item,Type->firstType,ItemKey,Fields);
+  }return Copy;
+ }
  if(E->rtti_isCall()){
   auto* C=static_cast<das::ExprCall*>(E);const auto N=C->name;
   const bool Math=N=="ue_vector" || N=="ue_rotator" || N=="ue_vector2d" || N=="ue_transform" || N=="ue_transform_identity";

@@ -137,3 +137,14 @@ bool FDasClassSchema::FromDeclaration(const FDasTypeDeclaration& Declaration, co
     Out = MoveTemp(Candidate);
     return true;
 }
+
+FString DasPropertyDefaultText(const FProperty* P,const void* Data){
+ if(auto* N=CastField<FNumericProperty>(P);N && N->IsFloatingPoint())return FString::Printf(TEXT("%.17g"),N->GetFloatingPointPropertyValue(Data));
+ FString Text=TEXT("(");bool First=true;auto Add=[&](const FString& Part){if(!First)Text+=TEXT(",");First=false;Text+=Part;};
+ if(auto* A=CastField<FArrayProperty>(P)){FScriptArrayHelper H(A,Data);for(int32 I=0;I<H.Num();++I)Add(DasPropertyDefaultText(A->Inner,H.GetRawPtr(I)));}
+ else if(auto* S=CastField<FSetProperty>(P)){FScriptSetHelper H(S,Data);for(int32 I=0;I<H.GetMaxIndex();++I)if(H.IsValidIndex(I))Add(DasPropertyDefaultText(S->ElementProp,H.GetElementPtr(I)));}
+ else if(auto* M=CastField<FMapProperty>(P)){FScriptMapHelper H(M,Data);for(int32 I=0;I<H.GetMaxIndex();++I)if(H.IsValidIndex(I))Add(TEXT("(")+DasPropertyDefaultText(M->KeyProp,H.GetKeyPtr(I))+TEXT(",")+DasPropertyDefaultText(M->ValueProp,H.GetValuePtr(I))+TEXT(")"));}
+ else if(auto* Struct=CastField<FStructProperty>(P)){for(TFieldIterator<FProperty> It(Struct->Struct);It;++It)Add(It->GetName()+TEXT("=")+DasPropertyDefaultText(*It,It->ContainerPtrToValuePtr<void>(Data)));}
+ else {Text.Reset();P->ExportTextItem_Direct(Text,Data,nullptr,nullptr,PPF_Delimited);return Text;}
+ return Text+TEXT(")");
+}

@@ -2,6 +2,7 @@ options gen2
 module dsl_computed_defaults public
 require ue_scene_components public
 require ue_object_types public
+require ue_native_engine_values public
 
 // Ordinary daScript functions; no separate expression interpreter.
 def default_score(value:int):int {
@@ -14,6 +15,23 @@ def default_asset():string { return "/Engine/BasicShapes/" + "Cube.Cube" }
 
 [ue_class(module_id="computeddefaults",Blueprintable)]
 class ComputedDefaults : Actor {
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    Numbers:array<int> = [self.Seed,default_score(2)]
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    Ratios:array<double> = [1.2345678901234567lf]
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    ManualNumbers:array<int> = [default_score(2)]
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    TagsDefault:table<string> = {"red","blue",string(default_score(2))}
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    ScoresDefault:table<string;int> = {"one"=>default_score(2),"two"=>self.Seed+1}
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    EnumDefault:table<SpawnCollision;int> = {SpawnCollision.AlwaysSpawn=>default_score(2)}
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    NamesDefault:table<UENameValue;int> = {ue_name_value("Item_3")=>self.Seed}
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    VectorsDefault:array<UEVector> = [ue_vector(double(self.Seed),double(default_score(2)),3.0lf)]
+
     properties=ue_properties(EditAnywhere,BlueprintReadWrite) {
         var Seed:int=2+3
         var Score:int=0
@@ -32,6 +50,7 @@ class ComputedDefaults : Actor {
         var Pivot:SceneComponentRef
     }
     defaults=ue_defaults() {
+        self.Numbers=[self.Seed,default_score(2)]
         self.Score=default_score(self.Seed*2)
         self.Manual=default_score(10)
         self.Derived=self.Score+2

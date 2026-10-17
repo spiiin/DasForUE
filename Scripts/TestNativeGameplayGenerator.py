@@ -39,4 +39,54 @@ class NativeGameplayGeneratorTests(unittest.TestCase):
     def test_enum_alias(self):
         self.ir['enums'][0]['entries'][1]['value']=self.ir['enums'][0]['entries'][0]['value']
         with self.assertRaises(ValueError): generate(self.ir)
+    def test_byte_and_text_exported(self):
+        kinds={v['kind'] for c in self.ir['classes'] for v in c['fields']}
+        self.assertTrue({'byte','text'}<=kinds)
+        header,module=generate(self.ir)
+        self.assertIn('TEXT("SetMovementMode")',header)
+        self.assertIn('ue_text::TextRenderComponentRef',header)
+        self.assertIn('require ue_text public',module)
+    def test_structs_and_arrays(self):
+        header,module=generate(self.ir)
+        self.assertIn('struct StreamingSourceShape {',module)
+        self.assertIn('struct NavAvoidanceMask {',module)
+        self.assertIn('DasNativeGameplayStructs',header)
+        arrays=[v for c in self.ir['classes'] for v in c['fields'] if v['kind']=='array']
+        self.assertTrue(any(v['name']=='Tags' and v['element']['kind']=='name' for v in arrays))
+        self.assertTrue(any(v['element']['kind']=='struct' for v in arrays))
+    def test_missing_struct(self):
+        self.ir['structs']=[]
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_bad_array_element(self):
+        field=next(v for c in self.ir['classes'] for v in c['fields'] if v['kind']=='array')
+        del field['element']
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_duplicate_struct_field(self):
+        self.ir['structs'][0]['fields'].append(copy.deepcopy(self.ir['structs'][0]['fields'][0]))
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_hash_container_generation(self):
+        header,module=generate(self.ir)
+        self.assertIn('Labels:table<int;string>',module)
+        self.assertIn('Names:table<string>',module)
+        self.assertIn('TEXT("EchoActors")',header)
+        fixture=next(c for c in self.ir['classes'] if c.get('fixture'))
+        self.assertEqual(fixture['path'],'/Script/DasRuntime.DasNativeHashProbeComponent')
+        self.assertTrue({'map','set'} <= {v['kind'] for v in fixture['fields']})
+    def hash_field(self,kind):
+        return next(v for c in self.ir['classes'] for v in c['fields'] if v['kind']==kind)
+    def test_reject_float_hash_key(self):
+        self.hash_field('map')['key']={'kind':'float','type_path':''}
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_reject_nested_hash_value(self):
+        self.hash_field('map')['value']={'kind':'set','type_path':'','element':{'kind':'int','type_path':''}}
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_reject_missing_map_value(self):
+        del self.hash_field('map')['value']
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_reject_struct_set(self):
+        self.hash_field('set')['element']={'kind':'struct','type_path':'/Script/CoreUObject.Vector'}
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_enum_default_preserved(self):
+        header,_=generate(self.ir)
+        self.assertIn('TEXT("TransformSpace"),TEXT("RTS_World")',header)
 if __name__=='__main__': unittest.main()

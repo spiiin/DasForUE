@@ -147,3 +147,9 @@ PIE used the same final fixture sources under probe 0366d5daf1e1460d89a654275e10
 Validation used Windows NullRHI; rendered gameplay, multiplayer, Shipping and
 other platforms were not tested. Repeat the standard suites using
 `Scripts/TestNativeDefaults.ps1` and `Scripts/TestMethodValues.ps1 -Cooked -SkipZenStore`.
+
+
+Update 2026-10-17: nonempty class defaults with computed scalar leaves are now
+supported for scalar/name/enum/math container families, with whole-container
+manual override preservation. See [DSLContainerDefaults.md](DSLContainerDefaults.md).
+Nonempty object-reference/object-key/opaque-struct defaults remain deferred.

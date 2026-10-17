@@ -1,7 +1,7 @@
 # Generated native gameplay members
 
 Selected native classes: Character, CharacterMovementComponent, PlayerController,
-CameraComponent. Their supported inherited fields/functions are included. Native
+CameraComponent and TextRenderComponent. Their supported inherited fields/functions are included. Native
 DSL roots and native object reference types remain distinct concepts: this does
 not make PlayerController/CameraComponent supported authored class parents.
 
@@ -48,9 +48,10 @@ there and regenerate to extend this registry.
 
 ## Contracts and boundaries
 
-Supported types: int32, float, double, bool/bitfields, FString, FName (UENameValue),
+Supported types: int32, raw uint8 (bounded DAS int), float, double, bool/bitfields,
+FString, FName (UENameValue), FText (UETextValue),
 strong UObject references, UClass handles, native enum, Vector2D, Vector, Rotator and Transform.
-Unsupported raw byte, text, delegate, container, custom struct and weak/soft fields
+Unsupported delegate, container, custom struct and weak/soft fields
 or function signatures are reported as skipped. Existing authored/native-self
 adapters for those types remain available; they are not generalized by this slice.
 
@@ -67,7 +68,7 @@ C++ methods and virtual overrides remain separate work. Reflected names are used
 
 Inputs, return values and native mutable out/ref parameters share the frame ABI.
 Output values are read before publishing ref/out changes; frames are released on
-normal/error paths. Only trailing supported scalar literal defaults become source
+normal/error paths. Only trailing supported scalar literals and native enum constants become source
 defaults. Other parameters must be supplied explicitly; metadata expressions are
 not evaluated as source code. Object value inputs accept automatic checked upcasts to a native parent view.
 Mutable out/ref arguments require the exact view type.
@@ -86,9 +87,10 @@ explicitly, rather than becoming raw reflection calls.
 invalid manifests, duplicate classes/members and unsupported kinds.
 The shared RuntimePIE/cooked gameplay probe exercises the same playable Character
 with native self methods, fields, object results, math, scalar defaults, out params
-and a free camera function. Thirteen invalid-source fixtures reject readonly/hidden/
+and a free camera function. Sixteen invalid-source fixtures reject readonly/hidden/
 missing-method/argument/RPC access, nested snapshot writes, enum identity/integer
-mismatches, downcasts, unrelated references, mutable ref upcasts and ambiguous overloads; a runtime fixture rejects a wrong receiver.
+mismatches, byte/text argument typing, readonly text, downcasts, unrelated references,
+mutable ref upcasts and ambiguous overloads; a runtime fixture rejects a wrong receiver.
 
 Validated 2026-10-17: reproducible -Check, eleven generator tests, strict PIE,
 Win64 Development packaged foundation/gameplay and a separate saved-map launch.
@@ -100,10 +102,10 @@ to write it; nested writes such as `movement.Velocity.x=1.0lf` are rejected.
 
 ## Native enum and reference upcasts
 
-Reflection manifest schema 2 includes native enum paths and explicit numeric
+Reflection manifest schema 3 includes native enum paths and explicit numeric
 layouts. The generator emits `[ue_native_enum]` declarations, reusing canonical
-imported enum declarations when available. Current selection: 21 enums,
-232 fields, 442 methods. Generated names are the native UEnum names.
+imported enum declarations when available. Current selection: 35 enums,
+323 fields, 606 methods. Generated names are the native UEnum names.
 
 ```das
 require ue_native_gameplay
@@ -137,10 +139,10 @@ Enum reads/writes, inputs and return values use the existing typed enum carrier
 and identity/number checks. An integer or a different enum is rejected by source
 typing. Current shared enum ABI supports unique values 0..254, excludes `_MAX`
 sentinels and rejects invalid values at runtime; larger/signed/aliased enum
-layouts remain skipped. Enum defaults remain explicit arguments, as do other
-defaults unsupported by the scalar literal adapter. Methods with raw byte or
-other unsupported parameters remain skipped even when their other parameters
-are enums (for example SetMovementMode with a raw uint8 custom-mode argument).
+layouts remain skipped. Trailing native enum defaults now use typed daScript enum constants; raw uint8
+inputs/results and fields use checked integer adapters. SetMovementMode is
+generated, including its NewCustomMode=0 default. Other unsupported default
+expressions remain explicit arguments. See [NativeGameplayValues.md](NativeGameplayValues.md).
 
 Enum/upcast verification: native camera enum input/property read/write, movement
 enum input/result and property roundtrip; Character-to-Pawn native Possess call,
@@ -151,3 +153,21 @@ source fixtures run during fixture preparation. Strict RuntimePIE reports exactl
 packaged foundation (0 failures), gameplay with the same enum/upcast probe and
 separate PlayableMap launch pass. Logs: native-enum-upcast-{check,pie,cooked}.log
 and native-enum-upcast-pie-report.json. NullRHI/synthetic input only.
+
+
+Native value extension validated 2026-10-17: 13 generator tests, reproducible
+schema-3 export/generation -Check, strict PIE (1 pass, no warnings), Win64
+Development build/cook/stage, packaged foundation (0 failures), gameplay and
+separate playable-map launch. This adds uint8 endpoints/default/range checks,
+typed enum defaults, text identity/flags and real Kismet text out/return tests.
+See NativeGameplayValues.md and the native-byte-text-* logs.
+
+
+## Native struct and array generation
+
+Manifest schema 4 adds recursive array element descriptors and validated native struct definitions. Current export: 337 fields, 643 methods, 36 enums and 8 value structs across the five existing receiver roots. See [NativeGameplayContainers.md](NativeGameplayContainers.md) for syntax, snapshot semantics, supported elements and limits.
+
+
+## Native hash containers (schema 5)
+
+Native map/set fields and methods now use recursive key/value/element descriptors and shared typed snapshot adapters. The original five Engine receivers retain 337 fields/643 methods; the additional explicitly marked ABI fixture contributes 15 fields/27 methods. Combined registry: 352 fields, 670 methods, 37 enums, 9 structs. The fixture is not an authored gameplay root. See [NativeGameplayHashContainers.md](NativeGameplayHashContainers.md) for supported forms and executable examples.

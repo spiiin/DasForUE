@@ -464,3 +464,6 @@ NativeGameplayGeneration.md for source syntax, regeneration, coverage and limits
 Update 2026-10-17: UObject sets and object-key maps are supported through native
 self fields, direct properties and method inputs/results/out/inout using typed
 UEObjectKey values; see [DSLObjectHashContainers.md](DSLObjectHashContainers.md).
+
+
+Enum-key maps for native/authored enums: [DSLEnumMapKeys.md](DSLEnumMapKeys.md).

@@ -69,7 +69,7 @@ namespace
     }
     bool DefaultValid(const FDasDeclaredProperty& P, FString& Error)
     {
-        const auto& D = P.Default;if(DasContainerCarrier(P.Type))return D.Kind.IsEmpty() || Fail(Error,TEXT("Container fields require implicit empty defaults")); if (D.Kind.IsEmpty()) return true;
+        const auto& D = P.Default;if(auto* Carrier=DasContainerCarrier(P.Type)){if(D.Kind.IsEmpty())return true;FInstancedStruct Value;return (D.Kind==TEXT("string") && ParseDasStructDefault(Carrier->GetPathName(),D.String,Value,Error)) || Fail(Error,TEXT("Invalid container default: ")+Error);} if (D.Kind.IsEmpty()) return true;
         const auto& K = P.Type.Kind;
         if (D.Kind == TEXT("number") && FMath::IsFinite(D.Number))
         {

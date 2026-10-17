@@ -66,3 +66,9 @@ The compiler's per-source descriptor now records both map key and value source
 types. This preserves math/enum/struct/reference identity when generating accessors
 and method wrappers through authored references. It is internal compilation
 metadata; the persisted declaration JSON format is unchanged.
+
+
+Update 2026-10-17: nonempty class defaults with computed scalar leaves are now
+supported for scalar/name/enum/math container families, with whole-container
+manual override preservation. See [DSLContainerDefaults.md](DSLContainerDefaults.md).
+Nonempty object-reference/object-key/opaque-struct defaults remain deferred.
