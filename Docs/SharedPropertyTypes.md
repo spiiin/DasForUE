@@ -747,6 +747,45 @@ logs/snapshot-moves-{native,foundation,gameplay,playable}-packaged.log.
 Archive: Build/SnapshotMovesPackaged.
 
 
+## 2026-10-17 — borrow snapshots during ordinary reads
+
+Snapshot queries now borrow the immutable context-table entry with `const auto&`
+instead of cloning the entire parent `FInstancedStruct`. This covers size,
+contains, map keys, set elements, scalar/text/object getters and nested lookup.
+The shared `DasSnapshotFields::Find` preserves constness through field and array
+paths; the mutable overload remains available only for locally owned modifiers.
+The 38 query sites borrow, while the 26 clone-and-modify sites retain ownership.
+
+A selected struct result still receives independent owned storage. Changing that
+child cannot change its parent. Native property capture also still copies its
+mutable source once; this change removes extra parent copies inside queries.
+No borrowed pointer is retained after the synchronous read.
+
+Foundation includes a reflected native probe with counted struct copies and a
+positive control that detects a real clone. It compares a baseline native
+property read against repeated size/contains/key/element/field queries, checks
+invalid-index recovery and verifies that child modification preserves the
+original. Validation evidence is recorded in logs/snapshot-reads-validation.json.
+
+Validation: Editor and Game Development builds passed. Foundation passed in
+Editor and in the packaged game, including the positive copy-counter control:
+`transport=1 queries=1` (zero extra parent copies). PropertyValues covered 106
+combinations; PropertyValues and RuntimePIE each reported one success and zero
+warnings/failures/skips. Native defaults Create/Reopen/Recompile and fresh
+gameplay export passed. Cook/stage/archive succeeded with zero errors and four
+existing ACL compression-asset warnings. Native defaults, Foundation, gameplay
+and playable-map packaged probes all passed and exited normally.
+
+The final fixture uses NSLOCTEXT in both targets; FText::ChangeKey was rejected
+by the Game compiler because it is Editor-only. Editor Foundation was repeated
+after this fixture correction. Scoped source hashes remained stable through the
+final Game/package pass. Evidence: logs/snapshot-reads-{editor-suite,
+foundation-final-suite,package-suite}.log, the PropertyValues/RuntimePIE report
+directories, logs/snapshot-reads-foundation-{editor,packaged}.log and the source
+manifest above. Archive: Build/SnapshotReadsPackaged. Validation used Win64
+Development / NullRHI; Shipping and visual rendering were not tested. No commit
+was created for this step.
+
 ## 2026-10-17 — combined commit validation and nullable getter fixes
 
 The combined b7da031 baseline plus nullable VM object getter and method-dispatch

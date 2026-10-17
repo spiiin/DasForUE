@@ -2,6 +2,8 @@
 #include "DasCallbackTypes.h"
 #include "DasRuntime.h"
 #include "DasPropertyTypes.h"
+#include "DasDefaultValueProbe.h"
+#include "DasSnapshotFields.h"
 #include "DasReflectedTypes.h"
 #include "DasNumericLibrary.h"
 #include "UObject/StructOnScope.h"

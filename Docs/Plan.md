@@ -3631,6 +3631,16 @@ isolation regressions accompany the change; route counts and validation are in
 SharedPropertyTypes.md. No commit was created.
 
 
+## 2026-10-17 — borrow snapshots during ordinary reads
+
+Size, contains, key, element and field reads now borrow immutable snapshot
+storage. Const-preserving field traversal is shared with owned modifiers;
+modification still clones, and selected struct results remain independent.
+A native copy-count regression compares repeated queries with a plain property
+capture and checks index errors and parent/child isolation. Scope and validation
+evidence are in SharedPropertyTypes.md and logs/snapshot-reads-validation.json.
+No commit was created for this step.
+
 ## 2026-10-17 — combined commit validation and nullable getter fixes
 
 The combined b7da031 baseline plus nullable VM object getter and method-dispatch

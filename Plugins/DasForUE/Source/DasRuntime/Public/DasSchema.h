@@ -6,7 +6,7 @@ struct FInstancedStruct;
 class UScriptStruct;class FProperty;class UEnum;
 DASRUNTIME_API UEnum* ResolveDasEnum(const FString& Path,FString& Error);
 DASRUNTIME_API bool ValidateDasEnumNumber(const FString& Path,int64 Value,FString& Error);
-DASRUNTIME_API FProperty* FindDasStructField(UScriptStruct* Type,const FString& Name);
+DASRUNTIME_API FProperty* FindDasStructField(const UScriptStruct* Type,const FString& Name);
 DASRUNTIME_API bool ValidateDasStructSnapshot(const FInstancedStruct& Value,FString& Error);
 class FJsonValue;
 // Applies atomically through temporary reflected storage; Data=nullptr validates.

@@ -12,7 +12,7 @@
 #include "UObject/StrProperty.h"
 #include "UObject/TextProperty.h"
 #include "Misc/OutputDevice.h"
-FProperty* FindDasStructField(UScriptStruct* Type,const FString& Name){if(auto* P=Type->FindPropertyByName(*Name))return P;if(Type->IsA<UUserDefinedStruct>())for(TFieldIterator<FProperty> It(Type);It;++It)if(Type->GetAuthoredNameForField(*It)==Name)return *It;return nullptr;}
+FProperty* FindDasStructField(const UScriptStruct* Type,const FString& Name){if(auto* P=Type->FindPropertyByName(*Name))return P;if(Type->IsA<UUserDefinedStruct>())for(TFieldIterator<FProperty> It(Type);It;++It)if(Type->GetAuthoredNameForField(*It)==Name)return *It;return nullptr;}
 bool ValidateDasValueStruct(const FString& Path,FString& Error){
     auto* Type=FindObject<UScriptStruct>(nullptr,*Path);if(!Type || (!Path.StartsWith(TEXT("/Script/")) && !(Path.StartsWith(TEXT("/Game/")) && Type->IsA<UUserDefinedStruct>()))){Error=TEXT("Expected loaded native or authored user struct path");return false;}
     TSet<UScriptStruct*> Active;int32 Leaves=0;TFunction<bool(UScriptStruct*,int32)> Visit;

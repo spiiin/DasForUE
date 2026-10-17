@@ -5,6 +5,7 @@
 #include "Dom/JsonValue.h"
 #include "UObject/UnrealType.h"
 #include "UObject/GarbageCollection.h"
+TAtomic<int32> FDasSnapshotReadProbe::CopyCount{0};
 bool CheckDasRecursiveDefaults(FString& Error){
  if(!CheckDasPropertyTypes(Error))return false;
  const FString Path=FDasDefaultBundleProbe::StaticStruct()->GetPathName();
