@@ -1,9 +1,12 @@
 options gen2
 options gc
+require ue_native_engine_values
 require ue_dsl
 require ue_method_values
 require ue_object_types
+require ue_object_keys
 require METHOD_REFS_MODULE
+require METHOD_KEYS_MODULE
 def exercise_values(api:ValueTargetRef):int {
     let state=api.EchoState(MethodState.Active)
     var input=MethodSettings()
@@ -284,6 +287,50 @@ def exercise_values(api:ValueTargetRef):int {
     return -15
 }
 def exercise_names(api:ValueDriverRef):int {
+    let actor=ue_ref(type<ActorRef>,ue_self_object())
+    let key=ue_key(actor)
+    api.SeedObjectHashes(actor)
+    var objectSet=api.CopyObjectSet(api.ActorKeys)
+    var objectMap=api.CopyObjectMap(api.ObjectScores)
+    var oldObjectSet:table<ActorKey>
+    var oldObjectMap:table<ActorKey;int>
+    api.RefObjectSet(objectSet,oldObjectSet)
+    api.RefObjectMap(objectMap,oldObjectMap)
+    if (length(objectSet)!=2 || length(oldObjectSet)!=1 || length(api.ActorKeys)!=1 || !key_exists(oldObjectSet,key) || length(objectMap)!=2 || length(oldObjectMap)!=1 || objectMap[default<ActorKey>]!=99 || api.ObjectScores[key]!=8 || !ue_key_valid(key) || !ue_object_valid(ue_key_ref(key).handle)) { return -120 }
+    api.ActorKeys := objectSet
+    api.ObjectScores := objectMap
+    var objectVectors=api.CopyObjectVectors(api.ObjectVectors)
+    objectVectors[key].x=6.0lf
+    api.ObjectVectors := objectVectors
+    if (api.ObjectVectors[key].x!=6.0lf || api.ObjectEnums[key]!=MethodState.Active || api.ObjectNativeEnums[key]!=SpawnCollision.AlwaysSpawn || !ue_object_valid(api.ObjectReferences[key].handle)) { return -121 }
+    let removedObject=erase(api.ActorKeys,default<ActorKey>)
+    let missingObject=erase(api.ActorKeys,default<ActorKey>)
+    if (!removedObject || missingObject || length(api.ActorKeys)!=1 || length(api.LockedActorKeys)!=0) { return -122 }
+    clear(objectSet)
+    clear(objectMap)
+    if (length(api.CopyObjectSet(objectSet))!=0 || length(api.CopyObjectMap(objectMap))!=0) { return -123 }
+
+    if (!api.SeedEnumSets()) { return -110 }
+    var states=api.CopyEnumSet(api.EnumStates)
+    var native=api.CopyNativeEnumSet(api.NativeStates)
+    var old:table<MethodState>
+    var oldNative:table<SpawnCollision>
+    api.RefEnumSet(states,old)
+    api.RefNativeEnumSet(native,oldNative)
+    if (length(states)!=2 || length(old)!=1 || length(api.EnumStates)!=1 || !key_exists(states,MethodState.Active) || !key_exists(old,MethodState.Idle) || length(native)!=2 || length(oldNative)!=1 || length(api.NativeStates)!=1) { return -111 }
+    api.EnumStates := states
+    api.NativeStates := native
+    let removed=erase(api.EnumStates,MethodState.Idle)
+    let missing=erase(api.EnumStates,MethodState.Idle)
+    if (!removed || missing || length(api.EnumStates)!=1 || !key_exists(api.EnumStates,MethodState.Active) || length(api.LockedEnumStates)!=0) { return -112 }
+    clear(states)
+    clear(native)
+    if (length(api.CopyEnumSet(states))!=0 || length(api.CopyNativeEnumSet(native))!=0) { return -113 }
+    unsafe { insert(states,reinterpret<MethodState>(0)) }
+    var rejected=false
+    try { api.CopyEnumSet(states) } recover { rejected=true }
+    if (!rejected || length(api.EnumStates)!=1) { return -114 }
+
     api.SeedNames()
     var names=api.CopyNameScores(api.NameScores)
     var tags=api.CopyNameTags(api.NameTags)
@@ -311,6 +358,91 @@ def exercise_names(api:ValueDriverRef):int {
 }
 [ue_class(module_id="methodvalues", type_registry="REGISTRY", Blueprintable)]
 class ValueDriver {
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    AuthoredKeys:table<ValueTargetKey>
+    [ue_function(BlueprintCallable)]
+    def CopyAuthoredKeys(values:table<ValueTargetKey>):table<ValueTargetKey> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def SeedAuthoredKeys(value:ValueTargetRef):void { insert(self.AuthoredKeys,ue_key(value)) }
+
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    ActorKeys:table<ActorKey>
+    @ue_property=(EditAnywhere, BlueprintReadOnly)
+    LockedActorKeys:table<ActorKey>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    ObjectScores:table<ActorKey;int>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    ObjectVectors:table<ActorKey;UEVector>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    ObjectEnums:table<ActorKey;MethodState>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    ObjectNativeEnums:table<ActorKey;SpawnCollision>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    ObjectReferences:table<ActorKey;ActorRef>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    GCHashSet:table<ObjectKey>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    GCHashMap:table<ObjectKey;int>
+    [ue_function(BlueprintCallable)]
+    def CopyObjectSet(values:table<ActorKey>):table<ActorKey> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def CopyObjectMap(values:table<ActorKey;int>):table<ActorKey;int> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def CopyObjectVectors(values:table<ActorKey;UEVector>):table<ActorKey;UEVector> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def RefObjectSet(var values:table<ActorKey>&; @ue_out var previous:table<ActorKey>&):void { previous := values; insert(values,default<ActorKey>) }
+    [ue_function(BlueprintCallable)]
+    def RefObjectMap(var values:table<ActorKey;int>&; @ue_out var previous:table<ActorKey;int>&):void { previous := values; values[default<ActorKey>]=99 }
+    [ue_function(BlueprintCallable)]
+    def SeedObjectHashes(value:ActorRef):void {
+        clear(self.ActorKeys)
+        insert(self.ActorKeys,ue_key(value))
+        insert(self.ActorKeys,ue_key(value))
+        self.ObjectScores[ue_key(value)]=8
+        self.ObjectVectors[ue_key(value)]=ue_vector(1.0lf,2.0lf,3.0lf)
+        self.ObjectEnums[ue_key(value)]=MethodState.Active
+        self.ObjectNativeEnums[ue_key(value)]=SpawnCollision.AlwaysSpawn
+        self.ObjectReferences[ue_key(value)]=value
+    }
+    [ue_function(BlueprintCallable)]
+    def HoldHashObject(value:ObjectRef):void { insert(self.GCHashSet,ue_key(value)); self.GCHashMap[ue_key(value)]=7 }
+    [ue_function(BlueprintCallable)]
+    def ClearHashObject():void { clear(self.GCHashSet); clear(self.GCHashMap) }
+
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    EnumStates:table<MethodState>
+    @ue_property=(EditAnywhere, BlueprintReadOnly)
+    LockedEnumStates:table<MethodState>
+    @ue_property=(EditAnywhere, BlueprintReadWrite)
+    NativeStates:table<SpawnCollision>
+    [ue_function(BlueprintCallable)]
+    def CopyEnumSet(values:table<MethodState>):table<MethodState> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def CopyNativeEnumSet(values:table<SpawnCollision>):table<SpawnCollision> { return <- clone(values) }
+    [ue_function(BlueprintCallable)]
+    def RefEnumSet(var values:table<MethodState>&; @ue_out var previous:table<MethodState>&):void {
+        previous := values
+        insert(values,MethodState.Active)
+    }
+    [ue_function(BlueprintCallable)]
+    def RefNativeEnumSet(var values:table<SpawnCollision>&; @ue_out var previous:table<SpawnCollision>&):void {
+        previous := values
+        insert(values,SpawnCollision.DontSpawnIfColliding)
+    }
+    [ue_function(BlueprintCallable)]
+    def SeedEnumSets():bool {
+        clear(self.EnumStates)
+        insert(self.EnumStates,MethodState.Idle)
+        insert(self.EnumStates,MethodState.Idle)
+        clear(self.NativeStates)
+        insert(self.NativeStates,SpawnCollision.AlwaysSpawn)
+        var invalid:table<MethodState>
+        unsafe { insert(invalid,reinterpret<MethodState>(0)) }
+        var rejected=false
+        try { self.EnumStates := invalid } recover { rejected=true }
+        return rejected && length(self.EnumStates)==1 && key_exists(self.EnumStates,MethodState.Idle)
+    }
+
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     NameScores:table<UENameValue;int>
     @ue_property=(EditAnywhere, BlueprintReadWrite)
@@ -376,6 +508,16 @@ class ValueDriver {
     }
     [ue_function(BlueprintCallable)]
     def Exercise(target:UObjectHandle):int {
+        let api=ue_ref(type<ValueDriverRef>,ue_self_object())
+        let authored=ue_ref(type<ValueTargetRef>,target)
+        api.SeedAuthoredKeys(authored)
+        let copied=api.CopyAuthoredKeys(api.AuthoredKeys)
+        if (length(copied)!=1 || !key_exists(copied,ue_key(authored))) { return -124 }
+        var forged:table<ValueTargetKey>
+        unsafe { insert(forged,reinterpret<ValueTargetKey>(ue_key(ue_ref(type<ActorRef>,ue_self_object())))) }
+        var refused=false
+        try { api.AuthoredKeys := forged } recover { refused=true }
+        if (!refused || length(api.AuthoredKeys)!=1) { return -125 }
         let status=exercise_names(ue_ref(type<ValueDriverRef>,ue_self_object()))
         if (status!=1) { return status }
         return exercise_values(ue_ref(type<ValueTargetRef>,target))

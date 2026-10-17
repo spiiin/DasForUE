@@ -1,6 +1,6 @@
 options gen2
 module dsl_playable_character public
-require ue_character_control public
+require ue_native_gameplay public
 
 // The same field operators work in ordinary functions and in authored methods.
 def set_movement_speed(movement:CharacterMovementRef; value:float):float {
@@ -65,12 +65,13 @@ class PlayableCharacter : Character {
     [ue_function(BlueprintCallable)]
     def OnLook(value:UEVector2D):void {
         self.LookEvents+=1
-        ue_character_look(ue_character_self(),float(value.x),float(value.y))
+        self.AddControllerYawInput(float(value.x))
+        self.AddControllerPitchInput(float(value.y))
     }
     [ue_function(BlueprintCallable)]
     def OnJump(value:bool):void {
         self.JumpEvents+=1
-        ue_character_jump(ue_character_self(),value)
+        if (value) { self.Jump() } else { self.StopJumping() }
     }
     [ue_function(BlueprintCallable)]
     def TakeControl(player:PlayerControllerRef):bool { return ue_pawn_possess(player,ue_character_self()) }

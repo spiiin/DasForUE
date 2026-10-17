@@ -21,7 +21,26 @@
         auto Loop=[&](das::ExpressionPtr Count,das::ExprBlock* Body){auto* L=new das::ExprFor(At);L->iterators.push_back("index");L->iteratorsAka.push_back("");L->iteratorsAt.push_back(At);L->iteratorsTags.push_back(nullptr);L->iteratorsTupleExpansion.push_back(0);L->sources.push_back(DSLCall(At,"range",{new das::ExprConstInt(At,0),Count}));L->body=Body;return L;};
         das::vector<das::Structure::FieldDeclaration> ContainerFields;if(Container){das::Structure::FieldDeclaration F;F.name="Values";F.type=Type;ContainerFields.push_back(F);}const auto& Fields=Container?ContainerFields:Type->structType->fields;
         for(const auto& Field:Fields){if(Field.generated || Field.classMethod)continue;const bool Array=Field.type->baseType==das::Type::tArray;const auto Child=Array?Field.type->firstType:Field.type;auto Access=[&](){return Container?static_cast<das::ExpressionPtr>(new das::ExprVar(At,"value")):static_cast<das::ExpressionPtr>(new das::ExprField(At,new das::ExprVar(At,"value"),Field.name));};auto Target=[&](){return Container?static_cast<das::ExpressionPtr>(new das::ExprVar(At,"result")):static_cast<das::ExpressionPtr>(new das::ExprField(At,new das::ExprVar(At,"result"),Field.name));};auto Name=[&](){return new das::ExprConstString(At,Field.name);};
-            if(DSLSet(Field.type)){
+            if(DSLSet(Field.type) && DSLObjectKey(Field.type->firstType)){
+                const auto Element=Field.type->firstType;auto* PLoop=new das::ExprBlock();PLoop->at=At;
+                PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"__ue_struct_set_with_object_key",{new das::ExprVar(At,"packed"),Name(),DSLKeyPack(At,Element,new das::ExprVar(At,"index")),new das::ExprConstBool(At,true)})));
+                auto* KeysLoop=Loop(new das::ExprConstInt(At,0),PLoop);KeysLoop->sources[0]=DSLCall(At,"keys",{Access()});PackBody->list.push_back(KeysLoop);
+                auto* ULoop=new das::ExprBlock();ULoop->at=At;ULoop->list.push_back(DSLCall(At,"insert",{Target(),DSLKeyUnpack(At,Element,DSLCall(At,"__ue_struct_set_element_object_key",{new das::ExprVar(At,"value"),Name(),new das::ExprVar(At,"index")}))}));
+                UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_set_size",{new das::ExprVar(At,"value"),Name()}),ULoop));
+            }
+            else if(DSLSet(Field.type) && DSLDirectEnum(Field.type->firstType)){
+                const auto Element=Field.type->firstType;
+                // Resolve the actual enum from the carrier (authored paths depend on registry scope).
+                auto* Native=FindObject<UScriptStruct>(nullptr,*Path);auto* Set=Native?CastField<FSetProperty>(FindDasStructField(Native,DSLText(Field.name))):nullptr;
+                auto* Enum=Set?DasEnumPropertyType(Set->ElementProp):nullptr;if(!Enum)DSLFail(TEXT("Expected enum set carrier"));
+                auto* PLoop=new das::ExprBlock();PLoop->at=At;
+                PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"__ue_struct_set_with_enum",{new das::ExprVar(At,"packed"),Name(),DSLDirectPack(At,Element,new das::ExprVar(At,"index"),Enum->GetPathName()),new das::ExprConstBool(At,true)})));
+                auto* KeysLoop=Loop(new das::ExprConstInt(At,0),PLoop);KeysLoop->sources[0]=DSLCall(At,"keys",{Access()});PackBody->list.push_back(KeysLoop);
+                auto* ULoop=new das::ExprBlock();ULoop->at=At;
+                ULoop->list.push_back(DSLCall(At,"insert",{Target(),DSLDirectUnpack(At,Element,DSLCall(At,"__ue_struct_set_element_enum",{new das::ExprVar(At,"value"),Name(),new das::ExprVar(At,"index")}),Enum->GetPathName())}));
+                UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_set_size",{new das::ExprVar(At,"value"),Name()}),ULoop));
+            }
+            else if(DSLSet(Field.type)){
                 const das::string Suffix=DSLTypeName(Field.type->firstType)==TEXT("name")?"name":DSLTypeName(Field.type->firstType)==TEXT("string")?"string":"int";
                 auto* PLoop=new das::ExprBlock();PLoop->at=At;
                 PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"ue_struct_set_with_"+Suffix,{new das::ExprVar(At,"packed"),Name(),new das::ExprVar(At,"index"),new das::ExprConstBool(At,true)})));
@@ -31,15 +50,15 @@
                 UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_set_size",{new das::ExprVar(At,"value"),Name()}),ULoop));
             }
             else if(Field.type->baseType==das::Type::tTable){
-                const das::string K=DSLTypeName(Field.type->firstType)==TEXT("name")?"name":DSLTypeName(Field.type->firstType)==TEXT("string")?"string":"int",V=DSLUtf8(DSLTypeName(Field.type->secondType));const bool StructValue=V=="struct",EnumValue=DSLDirectEnum(Field.type->secondType),ObjectValue=DSLTypedReference(Field.type->secondType),TypedValue=StructValue || EnumValue || ObjectValue;
+                const das::string K=DSLObjectKey(Field.type->firstType)?"object":DSLTypeName(Field.type->firstType)==TEXT("name")?"name":DSLTypeName(Field.type->firstType)==TEXT("string")?"string":"int",V=DSLUtf8(DSLTypeName(Field.type->secondType));const bool StructValue=V=="struct",EnumValue=DSLDirectEnum(Field.type->secondType),ObjectValue=DSLTypedReference(Field.type->secondType),TypedValue=StructValue || EnumValue || ObjectValue;
                 FString ValuePath;if(StructValue){auto* Native=FindObject<UScriptStruct>(nullptr,*Path);auto* Map=CastField<FMapProperty>(FindDasStructField(Native,DSLText(Field.name)));auto* Value=Map?CastField<FStructProperty>(Map->ValueProp):nullptr;if(!Value)DSLFail(TEXT("Expected map struct value"));ValuePath=Value->Struct->GetPathName();DSLEnsureStructHelpers(Field.type->secondType,ValuePath,Group,Module,Generated,Helpers);}
                 if(EnumValue || ObjectValue){auto* Native=FindObject<UScriptStruct>(nullptr,*Path);auto* Map=CastFieldChecked<FMapProperty>(FindDasStructField(Native,DSLText(Field.name)));ValuePath=EnumValue?DasEnumPropertyType(Map->ValueProp)->GetPathName():DasReferencePropertyClass(Map->ValueProp)->GetPathName();}
-                const das::string With=EnumValue?"__ue_struct_map_with_"+K+"_enum":ObjectValue?"__ue_struct_map_with_"+K+"_object":StructValue?"__ue_struct_map_with_"+K+"_struct":K=="int" && V=="int"?"ue_struct_map_with_int":"ue_struct_map_with_"+K+"_"+V;
-                const das::string Get=EnumValue?"__ue_struct_map_get_"+K+"_enum":ObjectValue?"__ue_struct_map_get_"+K+"_object":StructValue?"__ue_struct_map_get_"+K+"_struct":K=="int" && V=="int"?"ue_struct_map_get_int":"ue_struct_map_get_"+K+"_"+V;
-                auto* PLoop=new das::ExprBlock();PLoop->at=At;das::ExpressionPtr Mapped=new das::ExprVar(At,"mapped");if(TypedValue)Mapped=DSLDirectPack(At,Field.type->secondType,Mapped,ValuePath);
-                PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,With,{new das::ExprVar(At,"packed"),Name(),new das::ExprVar(At,"index"),Mapped})));
+                const das::string With=K=="object"?"__ue_struct_map_with_object_"+V:EnumValue?"__ue_struct_map_with_"+K+"_enum":ObjectValue?"__ue_struct_map_with_"+K+"_object":StructValue?"__ue_struct_map_with_"+K+"_struct":K=="int" && V=="int"?"ue_struct_map_with_int":"ue_struct_map_with_"+K+"_"+V;
+                const das::string Get=K=="object"?"__ue_struct_map_get_object_"+V:EnumValue?"__ue_struct_map_get_"+K+"_enum":ObjectValue?"__ue_struct_map_get_"+K+"_object":StructValue?"__ue_struct_map_get_"+K+"_struct":K=="int" && V=="int"?"ue_struct_map_get_int":"ue_struct_map_get_"+K+"_"+V;
+                auto* PLoop=new das::ExprBlock();PLoop->at=At;das::ExpressionPtr Mapped=new das::ExprVar(At,"mapped");das::ExpressionPtr PackedKey=new das::ExprVar(At,"index");if(K=="object")PackedKey=DSLKeyPack(At,Field.type->firstType,PackedKey);if(TypedValue)Mapped=DSLDirectPack(At,Field.type->secondType,Mapped,ValuePath);
+                PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,With,{new das::ExprVar(At,"packed"),Name(),PackedKey,Mapped})));
                 auto* KeysLoop=Loop(new das::ExprConstInt(At,0),PLoop);KeysLoop->sources[0]=DSLCall(At,"keys",{Access()});KeysLoop->iterators.push_back("mapped");KeysLoop->iteratorsAka.push_back("");KeysLoop->iteratorsAt.push_back(At);KeysLoop->iteratorsTags.push_back(nullptr);KeysLoop->iteratorsTupleExpansion.push_back(0);KeysLoop->sources.push_back(DSLCall(At,"values",{Access()}));PackBody->list.push_back(KeysLoop);
-                auto* ULoop=new das::ExprBlock();ULoop->at=At;auto Key=DSLCall(At,K=="name"?"ue_struct_map_key_name":K=="string"?"ue_struct_map_key_string":"ue_struct_map_key",{new das::ExprVar(At,"value"),Name(),new das::ExprVar(At,"index")});das::ExpressionPtr Result=DSLCall(At,Get,{new das::ExprVar(At,"value"),Name(),Key->clone()});if(TypedValue)Result=DSLDirectUnpack(At,Field.type->secondType,Result,ValuePath);
+                auto* ULoop=new das::ExprBlock();ULoop->at=At;das::ExpressionPtr Key=DSLCall(At,K=="object"?"__ue_struct_map_key_object":K=="name"?"ue_struct_map_key_name":K=="string"?"ue_struct_map_key_string":"ue_struct_map_key",{new das::ExprVar(At,"value"),Name(),new das::ExprVar(At,"index")});das::ExpressionPtr Result=DSLCall(At,Get,{new das::ExprVar(At,"value"),Name(),Key->clone()});if(TypedValue)Result=DSLDirectUnpack(At,Field.type->secondType,Result,ValuePath);if(K=="object")Key=DSLKeyUnpack(At,Field.type->firstType,Key);
                 if(StructValue){auto* Insert=DSLCall(At,"insert_clone",{Target(),Key,Result});ULoop->list.push_back(Insert);}else ULoop->list.push_back(new das::ExprCopy(At,new das::ExprAt(At,Target(),Key),Result));
                 UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_map_size",{new das::ExprVar(At,"value"),Name()}),ULoop));
             }

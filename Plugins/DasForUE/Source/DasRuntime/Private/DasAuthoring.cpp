@@ -56,7 +56,7 @@ namespace
         if (K == TEXT("map"))
         {
             if (!Type.Key || !Type.Value || Type.Element || !Type.TypePath.IsEmpty()) return Fail(Error, TEXT("Invalid map type shape"));
-            if (Type.Key->Kind != TEXT("int") && Type.Key->Kind != TEXT("float") && Type.Key->Kind != TEXT("double") && Type.Key->Kind != TEXT("bool") && Type.Key->Kind != TEXT("string") && Type.Key->Kind != TEXT("name") && Type.Key->Kind != TEXT("enum")) return Fail(Error, TEXT("Map key requires a supported scalar identity"));
+            if (Type.Key->Kind != TEXT("int") && Type.Key->Kind != TEXT("float") && Type.Key->Kind != TEXT("double") && Type.Key->Kind != TEXT("bool") && Type.Key->Kind != TEXT("string") && Type.Key->Kind != TEXT("name") && Type.Key->Kind != TEXT("enum") && Type.Key->Kind != TEXT("object")) return Fail(Error, TEXT("Map key requires a supported scalar identity"));
             return TypeValid(*Type.Key, Classes, false, Error, Depth + 1) && TypeValid(*Type.Value, Classes, false, Error, Depth + 1);
         }
         if(!Type.DelegateWire.IsEmpty() && (K!=TEXT("delegate") || Type.DelegateWire.Len()>131072 || Type.TypePath!=TEXT("/DasDelegates/")+FMD5::HashAnsiString(*Type.DelegateWire)+TEXT(".Type")))return Fail(Error,TEXT("Delegate type/signature identity mismatch"));

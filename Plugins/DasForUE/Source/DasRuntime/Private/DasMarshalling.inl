@@ -52,7 +52,7 @@
         {
             if (Property->ArrayDim != 1) Context->throw_error("fixed hash arrays require an adapter");
             const auto ValueKind = FieldKind(Map->ValueProp, Context);
-            if (!IsHashScalar(Map->KeyProp, Context) ||
+            if ((!IsHashScalar(Map->KeyProp, Context) && !IsDasObjectHashProperty(Map->KeyProp)) ||
                 (!IsHashScalar(Map->ValueProp, Context) && ValueKind != EMarshallingKind::Struct && ValueKind != EMarshallingKind::Object))
                 Context->throw_error("unsupported map key or value type");
             if (!Map->KeyProp->HasAllPropertyFlags(CPF_HasGetValueTypeHash)) Context->throw_error("map key requires UE value hashing");
@@ -64,7 +64,7 @@
         if (auto* Set = CastField<FSetProperty>(Property))
         {
             if (Property->ArrayDim != 1) Context->throw_error("fixed hash arrays require an adapter");
-            if (!IsHashScalar(Set->ElementProp, Context)) Context->throw_error("unsupported set element type");
+            if (!IsHashScalar(Set->ElementProp, Context) && !IsDasObjectHashProperty(Set->ElementProp)) Context->throw_error("unsupported set element type");
             if (!Set->ElementProp->HasAllPropertyFlags(CPF_HasGetValueTypeHash)) Context->throw_error("set element requires UE value hashing");
             Signature.Add({Path.ToLower(), EMarshallingKind::Set, bInput, bOutput, Set->ElementProp->GetClass()->GetName()});
             ValidateCallField(Set->ElementProp, Path + TEXT(".*"), bInput, bOutput, Signature, Context);
@@ -367,6 +367,7 @@
     }
     void ValidateHashNumber(FProperty* Property, void* Memory, bool bNormalizeZero, das::Context* Context)
     {
+        if(IsDasObjectHashProperty(Property)){auto* O=DasReferenceGet(Property,Memory);if(O && !LiveHashObject(O))Context->throw_error("object hash key is destroyed or expired");}
         if (auto* Float = CastField<FFloatProperty>(Property))
         {
             const float Value = Float->GetPropertyValue(Memory);

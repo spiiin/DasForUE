@@ -29,7 +29,7 @@ if($Cooked){
  & (Join-Path $Engine 'Engine\Build\BatchFiles\Build.bat') DasForUESmoke Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12 -NoUBTMakefiles -ForceRulesCompile
  if($LASTEXITCODE){throw 'Method value game build failed'}
  $Receipt=Get-Content -LiteralPath (Join-Path $Repo 'Tests\DasForUESmoke\Binaries\Win64\DasForUESmoke.target') -Raw | ConvertFrom-Json
- foreach($Suffix in @('_target.das','_driver.das','_refs.das')){if(!($Receipt.RuntimeDependencies | Where-Object { $_.Path.EndsWith('dsl_registered_methodvalues_'+$Id+$Suffix) })){throw 'Generated method source missing from fresh game receipt'}}
+ foreach($Suffix in @('_target.das','_driver.das','_refs.das','_keys.das')){if(!($Receipt.RuntimeDependencies | Where-Object { $_.Path.EndsWith('dsl_registered_methodvalues_'+$Id+$Suffix) })){throw 'Generated method source missing from fresh game receipt'}}
  $Archive=Join-Path $Repo 'Build\MethodValuesPackaged'
  $CookerArgs=@();if($SkipZenStore){$CookerArgs=@('-AdditionalCookerOptions=-SkipZenStore')}
  & (Join-Path $Engine 'Engine\Build\BatchFiles\RunUAT.bat') -WaitForUATMutex BuildCookRun "-project=$Project" -noP4 -platform=Win64 -clientconfig=Development -cook -stage -pak -archive "-archivedirectory=$Archive" "-map=$Base/Map" -unattended -utf8output -nullrhi -nocompileeditor -skipbuildeditor -nodebuginfo @CookerArgs

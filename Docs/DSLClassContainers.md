@@ -80,3 +80,7 @@ Update: native object/interface arrays are supported in DSLReferenceArrays.md.
 
 Update: FName map keys and sets in direct properties and method signatures are
 supported; see [DSLNameContainers.md](DSLNameContainers.md).
+
+Update 2026-10-17: native and authored enum sets are supported in native self
+fields, direct class properties and method inputs/results/out/inout; see
+[DSLEnumSets.md](DSLEnumSets.md).

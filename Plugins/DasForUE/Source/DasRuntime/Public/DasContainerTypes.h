@@ -113,3 +113,5 @@ DASRUNTIME_API void ResetDasStructArrayCarriers();
 DASRUNTIME_API UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type);
 DASRUNTIME_API UScriptStruct* DasContainerCarrierForProperty(const FProperty* Property);
 DASRUNTIME_API FProperty* DasContainerProperty(const FString& Path);
+
+DASRUNTIME_API bool IsDasObjectHashProperty(const FProperty* Property);

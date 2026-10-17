@@ -135,3 +135,9 @@ TArray скаляров реализован следующим этапом: Ar
 TArray структур, enum и UObject реализован в IR v4: ComplexArrays.md. Текущий выбор — 36 функций.
 
 Scalar TMap/TSet реализован в IR v5: HashContainers.md. Текущий выбор — 51 функция.
+
+
+Native gameplay generation was added for Character, CharacterMovementComponent,
+PlayerController and CameraComponent. It shares property/method compiler emitters,
+and bakes reflection access policy into the runtime for cooked parity. See
+NativeGameplayGeneration.md for source syntax, regeneration, coverage and limits.

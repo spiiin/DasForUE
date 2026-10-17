@@ -3014,3 +3014,44 @@ Editor Create/Reopen, natural PIE (1 pass, no warnings) and packaged Win64
 Development passed. See [DSLNameContainers.md](DSLNameContainers.md).
 Nonempty defaults, general container declaration migration and richer Set element
 families remain separate work.
+
+
+### 2026-10-17 — TSet of native and authored enum
+
+Completed table<Enum> in native self fields, direct ue_class properties and
+ue_function input/result/out/inout. Native enum-class and TEnumAsByte fields retain
+their actual reflected storage; authored Kismet declarations select the canonical
+form from native enum CppForm. Transient set carriers resolve enum identity after
+loading and share enum member fingerprint checks with enum-array carriers.
+Generated pack/unpack helpers and runtime adapters validate type, member values,
+readonly constraints and snapshot limits before publication. Native Create/Reopen/
+Recompile, authored Create/Reopen, PIE (1 pass, no warnings), game build/cook/stage
+and both packaged probes passed. See [DSLEnumSets.md](DSLEnumSets.md).
+Remaining work includes object/struct Set elements, richer map keys, nonempty
+defaults and container declaration migration.
+
+
+### Native gameplay field/method generation — 2026-10-17
+
+Network work remains deferred by user decision. Added reflection-driven generation
+for Character, CharacterMovementComponent, PlayerController and CameraComponent,
+including supported inherited members: 216 fields and 406 methods in the first
+manifest. Unsupported API is listed with reasons. The generated registry preserves
+editor metadata policy in cooked builds; property/method operators use the shared
+compiler emitters, checked weak refs, frame ABI, shape checks and ProcessEvent.
+Canonical imported reference types are reused; dependency views are generated.
+Playable Character input uses inherited native self calls. See
+NativeGameplayGeneration.md.
+
+Validated 2026-10-17: GenerateNativeGameplay.ps1 -Check, six Python generator
+tests, strict RuntimePIE (1 success, 0 failed, 0 warnings), Win64 Development
+build/cook/stage/Pak/archive, packaged foundation failures=0, packaged gameplay
+and separate saved-map auto-possession/movement/jump/camera checks. Six invalid
+source fixtures and runtime wrong-receiver checks passed. Math fields are whole
+snapshots; nested writes reject explicitly. Fixed raw annotation-pointer usage
+and an early dependency declaration in accumulated object-key helpers so the
+combined source tree builds. No claim of full object-key feature validation here.
+Logs: native-gameplay-check.log, native-gameplay-pie.log,
+native-gameplay-pie-report.json, native-gameplay-cooked.log,
+cooked-gameplay-runtime.log and playable-map-runtime.log. NullRHI/synthetic input
+only; physical devices, rendered output, Shipping and network remain untested.

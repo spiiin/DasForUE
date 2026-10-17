@@ -1,6 +1,7 @@
 options gen2
 module ue_native_self_refs public
 require ue_scene_components public
+require ue_object_keys public
 
 // Pawn is not yet in the small generated Engine catalog. A native wrapper
 // supplies exactly the same checked contract; ActorRef and SceneComponentRef
@@ -13,3 +14,5 @@ def NativePawnRef_from(value:UObjectHandle):NativePawnRef {
 def NativePawnRef_raw(value:NativePawnRef):UObjectHandle {
     return ue_cast_nullable_object(value.handle,"/Script/Engine.Pawn")
 }
+
+typedef NativePawnKey = $UEObjectKey<NativePawnRef>

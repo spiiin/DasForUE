@@ -11,6 +11,77 @@ enum NativeMobility {
 [ue_class(module_id="nativearrays",Blueprintable)]
 class NativeArraySelf : Actor {
     [ue_function(BlueprintCallable)]
+    def ObjectHashes():bool {
+        let actor=ue_ref(type<ActorRef>,ue_self_object())
+        let key=ue_key(actor)
+        let nil=default<ActorKey>
+        if (!key_exists(self.DasNativeArrayActorSet,key) || self.DasNativeArrayObjectKeys[key]!=321) { return false }
+        clear(self.DasNativeArrayActorSet)
+        insert(self.DasNativeArrayActorSet,key)
+        insert(self.DasNativeArrayActorSet,ue_key(type<ActorKey>,ue_self_object()))
+        insert(self.DasNativeArrayActorSet,nil)
+        let removed=erase(self.DasNativeArrayActorSet,nil)
+        let missing=erase(self.DasNativeArrayActorSet,nil)
+        var copy=clone(self.DasNativeArrayActorSet)
+        insert(copy,nil)
+        if (!removed || missing || length(self.DasNativeArrayActorSet)!=1 || length(copy)!=2 || !ue_key_valid(key) || ue_key_valid(nil)) { return false }
+        self.DasNativeArrayActorSet := copy
+        self.DasNativeArrayObjectKeys[key]=7
+        self.DasNativeArrayObjectKeys[ue_key(type<ActorKey>,ue_self_object())]+=1
+        self.DasNativeArrayObjectKeys[nil]=42
+        self.DasNativeArrayObjectVectors[key]=ue_vector(1.0lf,2.0lf,3.0lf)
+        self.DasNativeArrayObjectVectors[key].x+=4.0lf
+        self.DasNativeArrayObjectEnums[key]=SpawnCollision.AlwaysSpawn
+        let pawn=self.DasNativeArrayPawns[0]
+        let pawnKey=ue_key(pawn)
+        insert(self.DasNativeArrayPawnSet,pawnKey)
+        self.DasNativeArrayPawnKeys[pawnKey]=pawn
+        var invalid:table<NativePawnKey>
+        unsafe { insert(invalid,reinterpret<NativePawnKey>(key)) }
+        var rejected=false
+        try { self.DasNativeArrayPawnSet := invalid } recover { rejected=true }
+        var wrong=false
+        try { ue_key(type<NativePawnKey>,actor.handle) } recover { wrong=true }
+        return rejected && wrong && length(self.DasNativeArrayPawnSet)==1 && self.DasNativeArrayObjectKeys[key]==8 && self.DasNativeArrayObjectKeys[nil]==42 && self.DasNativeArrayObjectVectors[key].x==5.0lf && ue_object_valid(ue_key_ref(key).handle)
+    }
+    [ue_function(BlueprintCallable)]
+    def ExpiredObjectHashes():bool {
+        var rejectedSet=false
+        var rejectedMap=false
+        try { let values=self.DasNativeArrayPawnSet; length(values) } recover { rejectedSet=true }
+        try { let values=self.DasNativeArrayPawnKeys; length(values) } recover { rejectedMap=true }
+        var emptySet:table<NativePawnKey>
+        var emptyMap:table<NativePawnKey;NativePawnRef>
+        self.DasNativeArrayPawnSet := emptySet
+        self.DasNativeArrayPawnKeys := emptyMap
+        return rejectedSet && rejectedMap && length(self.DasNativeArrayPawnSet)==0 && length(self.DasNativeArrayPawnKeys)==0
+    }
+
+    [ue_function(BlueprintCallable)]
+    def EnumSets():bool {
+        if (!key_exists(self.DasNativeArrayEnumSet,SpawnCollision.AlwaysSpawn)) { return false }
+        clear(self.DasNativeArrayEnumSet)
+        insert(self.DasNativeArrayEnumSet,SpawnCollision.AlwaysSpawn)
+        insert(self.DasNativeArrayEnumSet,SpawnCollision.AlwaysSpawn)
+        insert(self.DasNativeArrayEnumSet,SpawnCollision.DontSpawnIfColliding)
+        let removed=erase(self.DasNativeArrayEnumSet,SpawnCollision.AlwaysSpawn)
+        let missing=erase(self.DasNativeArrayEnumSet,SpawnCollision.AlwaysSpawn)
+        var copy=clone(self.DasNativeArrayEnumSet)
+        insert(copy,SpawnCollision.AdjustIfPossibleButAlwaysSpawn)
+        if (!removed || missing || length(self.DasNativeArrayEnumSet)!=1 || length(copy)!=2) { return false }
+        self.DasNativeArrayEnumSet := copy
+        clear(self.DasNativeArrayByteSet)
+        insert(self.DasNativeArrayByteSet,NativeMobility.Movable)
+        insert(self.DasNativeArrayByteSet,NativeMobility.Stationary)
+        erase(self.DasNativeArrayByteSet,NativeMobility.Movable)
+        var invalid:table<SpawnCollision>
+        unsafe { insert(invalid,reinterpret<SpawnCollision>(255)) }
+        var rejected=false
+        try { self.DasNativeArrayEnumSet := invalid } recover { rejected=true }
+        return rejected && length(self.DasNativeArrayEnumSet)==2 && key_exists(self.DasNativeArrayEnumSet,SpawnCollision.DontSpawnIfColliding) && length(self.DasNativeArrayByteSet)==1 && key_exists(self.DasNativeArrayByteSet,NativeMobility.Stationary)
+    }
+
+    [ue_function(BlueprintCallable)]
     def Enums():bool {
         clear(self.DasNativeArrayEnums)
         push(self.DasNativeArrayEnums,SpawnCollision.AlwaysSpawn)

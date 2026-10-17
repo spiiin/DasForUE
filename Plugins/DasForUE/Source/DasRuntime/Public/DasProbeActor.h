@@ -71,6 +71,17 @@ public:
     UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<FName,TObjectPtr<APawn>> DasNativeArrayNameObjects;
     UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TSet<FName> DasNativeArrayReadonlyNameSet;
     UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TMap<FName,int32> DasNativeArrayReadonlyNameMap;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<ESpawnActorCollisionHandlingMethod> DasNativeArrayEnumSet;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<TEnumAsByte<EComponentMobility::Type>> DasNativeArrayByteSet;
+    UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TSet<ESpawnActorCollisionHandlingMethod> DasNativeArrayReadonlyEnumSet;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<TObjectPtr<AActor>> DasNativeArrayActorSet;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TSet<TObjectPtr<APawn>> DasNativeArrayPawnSet;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<TObjectPtr<AActor>,int32> DasNativeArrayObjectKeys;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<TObjectPtr<AActor>,FVector> DasNativeArrayObjectVectors;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<TObjectPtr<AActor>,ESpawnActorCollisionHandlingMethod> DasNativeArrayObjectEnums;
+    UPROPERTY(BlueprintReadWrite,Category="DasForUE|Tests") TMap<TObjectPtr<APawn>,TObjectPtr<APawn>> DasNativeArrayPawnKeys;
+    UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TSet<TObjectPtr<AActor>> DasNativeArrayReadonlyActorSet;
+    UPROPERTY(BlueprintReadOnly,Category="DasForUE|Tests") TMap<TObjectPtr<AActor>,int32> DasNativeArrayReadonlyObjectKeys;
     ADasProbeActor();
     // Keep the selected identity catalog and its reflected types as cook/GC dependencies.
     UPROPERTY(EditAnywhere, Category="daScript") TObjectPtr<UDasTypeRegistry> TypeRegistry;

@@ -22,10 +22,11 @@ construction, bind_events and EndPlay mutations. They do not expose raw pointers
 
 CharacterRef, CharacterMovementRef, CapsuleComponentRef, SkeletalMeshComponentRef
 and CameraComponentRef are checked weak native views. Native reflected properties
-reuse the existing property operator generator. The native-reference field policy
-currently exposes CharacterMovement MaxWalkSpeed/JumpZVelocity (finite, nonnegative);
-other native wrapper fields still require their adapters. The same field syntax
-works on these movement references in ordinary functions and authored methods.
+reuse the existing property/method operator generators. Native gameplay generation
+now exposes supported reflected members of Character, CharacterMovementComponent,
+PlayerController and CameraComponent. The same syntax works in ordinary functions
+and authored methods; the input example uses self.Jump()/StopJumping() and native
+controller-input calls. See NativeGameplayGeneration.md for generation and limits.
 This does not add animation, a skeletal mesh asset or arbitrary native methods.
 
 The example uses grouped property declarations and an authored Camera component.
@@ -73,7 +74,7 @@ jump, camera, no runtime error). Packaged foundation failures=0. See Docs/Plan.m
 for logs and limits.
 
 Current generated map:
-`/Game/DasCookedGameplay/724d7779bbb848ecae283a225d2be3f7/PlayableMap`.
+`/Game/DasCookedGameplay/94e91ee1d4414c4b8b5211844f8801f5/PlayableMap`.
 This is generated test content; rerunning the scripts creates another folder.
 
 

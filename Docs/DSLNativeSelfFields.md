@@ -450,3 +450,13 @@ The playable Character step adds an explicit native-reference field policy for C
 
 Update 2026-10-17: authored class properties and method signatures also support
 FName-key maps and FName sets; see [DSLNameContainers.md](DSLNameContainers.md).
+
+Update 2026-10-17: native and authored enum sets are supported in native self
+fields, direct class properties and method inputs/results/out/inout; see
+[DSLEnumSets.md](DSLEnumSets.md).
+
+
+Native gameplay generation was added for Character, CharacterMovementComponent,
+PlayerController and CameraComponent. It shares property/method compiler emitters,
+and bakes reflection access policy into the runtime for cooked parity. See
+NativeGameplayGeneration.md for source syntax, regeneration, coverage and limits.

@@ -1,3 +1,4 @@
+FDasDeclaredClass DSLReferenceDeclaration(const das::TypeDeclPtr&);
 bool DSLAuthoredView(const das::TypeDeclPtr&);
 FString DSLAuthoredReferencePath(const das::TypeDeclPtr&);
 das::ExpressionPtr DSLAuthoredUnpack(const das::LineInfo&,const das::TypeDeclPtr&,das::ExpressionPtr);
