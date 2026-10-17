@@ -14,8 +14,8 @@ manifest and ABI adapters; a type in the runtime does not expose every native AP
 | Typed object/interface reference | Yes | Yes | Yes | Yes | Yes, typed native object/interface ABI | Yes, typed class captures |
 | Class reference | Class fields; additional struct/container limits | Yes | No in authored interface DSL | No | No | No |
 | array of the eight primitive types in the first row | Yes | Yes | Yes | Yes | Yes, native const-reference array | Yes, authored class callbacks |
-| array of enum, struct or object reference | Yes, supported concrete elements | Yes | Yes | Yes, supported concrete elements | No | No |
-| set/map | Restricted shapes | Supported carrier shapes | Supported carrier shapes | No | No | No |
+| array of enum, struct or object reference | Yes, supported concrete elements | Yes | Yes | Yes, supported concrete elements | Yes, supported canonical carriers | Yes, authored class callbacks |
+| set/map | Restricted shapes | Supported carrier shapes | Supported carrier shapes | Supported carrier shapes | Supported carrier shapes | Supported carrier shapes |
 | Delegate/event value | Authored delegate fields; multicast event properties | Single delegate inputs/results; no delegate ref/out | No | No nested delegate signatures | Subscription API, not a payload type | No |
 | Nested containers, fixed C++ arrays, arbitrary pointers | No | No | No | No | No | No |
 
@@ -23,7 +23,9 @@ manifest and ABI adapters; a type in the runtime does not expose every native AP
 signatures. Methods and delegate frames have up to 16 parameters. Single delegates
 permit return/ref/out; multicast signatures return void and permit in/ref, not
 out-only. Authored interface stubs have no argument defaults. Queued callbacks
-return void and accept zero or one by-value argument, without ref/out or defaults.
+return void and accept zero through 16 by-value arguments in authored classes,
+without ref/out or defaults. Multiple arguments use private generated bridges.
+See [MultiArgumentCallbacks.md](MultiArgumentCallbacks.md).
 Scalar timer overloads also work with ordinary exported DAS callbacks; automatic
 array packing is performed for authored class callbacks.
 
@@ -61,10 +63,9 @@ object ownership differences and text limits.
 
 ## Remaining groups of work
 
-1. Standalone nonprimitive array/set/map callback signatures through the common
-   carrier service. Scalar object/interface captures and references nested in
-   registered snapshots now have shared GC ownership and identity checks; see
-   ManagedCallbackObjects.md.
+1. Keep standalone supported array/set/map callbacks and multiple arguments
+   aligned with the common carrier service. These are implemented; see
+   ManagedCallbackContainers.md and MultiArgumentCallbacks.md.
 2. Reconcile class references and delegate-valued signatures across authored
    interfaces/delegates; keep unsupported directions explicit.
 3. Expand containers only through the common descriptor/carrier services. Nested

@@ -613,10 +613,11 @@ namespace
     char* StructGetString(const FDasStructValue& H,const char* P,das::Context* C){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FStrProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");return CopyDSLString(ReadPropertyScalarValue(T,F.Memory,C),C);}
     FDasStructValue StructWithString(const FDasStructValue& H,const char* P,const char* X,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FStrProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X?UTF8_TO_TCHAR(X):TEXT(""),C);return StoreStructValue(V,C,At);}
     FDasObjectHandle MakeObjectHandle(UObject*,UClass*,das::Context*);
+    FDasObjectHandle ReadNullablePropertyObject(FProperty*,const void*,das::Context*);
     uint64 InternObjectKey(UObject*,das::Context*);
     UObject* ResolveObjectKey(uint64,das::Context*);
     UObject* ResolveObject(const FDasObjectHandle&,das::Context*);
-    FDasObjectHandle StructGetObject(const FDasStructValue& H,const char* P,das::Context* C){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=DasReferencePropertyClass(F.Property);if(!T)C->throw_error("struct field object type mismatch");return MakeObjectHandle(ReadNativePropertyValue(F.Property,F.Memory,C).ObjectValue.Get(),T,C);}
+    FDasObjectHandle StructGetObject(const FDasStructValue& H,const char* P,das::Context* C){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=DasReferencePropertyClass(F.Property);if(!T)C->throw_error("struct field object type mismatch");return ReadNullablePropertyObject(F.Property,F.Memory,C);}
     FDasStructValue StructWithObject(const FDasStructValue& H,const char* P,const FDasObjectHandle& X,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=DasReferencePropertyClass(F.Property);if(!T)C->throw_error("struct field object type mismatch");UObject* Object=X.Token?ResolveObject(X,C):nullptr;if(Object && !DasReferenceMatches(Object,T))C->throw_error("struct object field has an incompatible class");WriteNativePropertyValue(F.Property,F.Memory,SnapshotObjectValue(F.Property,Object,C),C);return StoreStructValue(V,C,At);}
     FDasNameValue StructGetName(const FDasStructValue& H,const char* P,das::Context* C){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FNameProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");return MakeDSLName(ReadPropertyScalarValue(T,F.Memory,C),C);}
     FDasStructValue StructWithName(const FDasStructValue& H,const char* P,FDasNameValue X,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FNameProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,ResolveDSLName(X,C),C);return StoreStructValue(V,C,At);}
@@ -640,7 +641,7 @@ namespace
     }
     template<typename KeyType> FDasEnumValue StructMapGetEnum(const FDasStructValue& H,const char* Path,const KeyType& Key,int32 StringKey,das::Context* C){return ReadReflectedMap(H,Path,Key,StringKey,true,C,[&](FProperty* P,const void* Memory){auto* E=DasEnumPropertyType(P);return MakeEnumValue(E->GetPathName(),ReadNativeEnumNumber(P,Memory,C),C);});}
     template<typename KeyType> FDasStructValue StructMapWithEnum(const FDasStructValue& H,const char* Path,const KeyType& Key,FDasEnumValue Value,int32 StringKey,das::Context* C,das::LineInfoArg* At){const auto& E=ResolveEnumValue(Value,C);return WriteReflectedMap(H,Path,Key,StringKey,true,C,At,[&](FProperty* P,void* Memory){WriteNativeEnumNumber(P,Memory,E.Type.Get(),E.Value,C);});}
-    template<typename KeyType> FDasObjectHandle StructMapGetObject(const FDasStructValue& H,const char* Path,const KeyType& Key,int32 StringKey,das::Context* C){return ReadReflectedMap(H,Path,Key,StringKey,false,C,[&](FProperty* P,const void* Memory){return MakeObjectHandle(ReadNativePropertyValue(P,Memory,C).ObjectValue.Get(),DasReferencePropertyClass(P),C);});}
+    template<typename KeyType> FDasObjectHandle StructMapGetObject(const FDasStructValue& H,const char* Path,const KeyType& Key,int32 StringKey,das::Context* C){return ReadReflectedMap(H,Path,Key,StringKey,false,C,[&](FProperty* P,const void* Memory){return ReadNullablePropertyObject(P,Memory,C);});}
     template<typename KeyType> FDasStructValue StructMapWithObject(const FDasStructValue& H,const char* Path,const KeyType& Key,const FDasObjectHandle& Value,int32 StringKey,das::Context* C,das::LineInfoArg* At){UObject* Object=Value.Token?ResolveObject(Value,C):nullptr;return WriteReflectedMap(H,Path,Key,StringKey,false,C,At,[&](FProperty* P,void* Memory){WriteNativePropertyValue(P,Memory,SnapshotObjectValue(P,Object,C),C);});}
     FDasEnumValue StructMapGetIntEnum(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructMapGetEnum(H,Path,Key,false,C);}
     FDasStructValue StructMapWithIntEnum(const FDasStructValue& H,const char* Path,int32 Key,FDasEnumValue V,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,Key,V,false,C,At);}
@@ -830,14 +831,21 @@ namespace
     }
     FDasObjectHandle ObjectValue(const char* Path,das::Context* C){const FString P=Path?UTF8_TO_TCHAR(Path):TEXT("");if(!P.StartsWith(TEXT("/Script/")))C->throw_error("Object field requires a native class path");ResolveClass(Path,C);return {};}
     FProperty* SelfObjectProperty(const char* N,bool Write,das::Context* C){auto* S=ResolveSelf(C);auto* P=S->GetClass()->FindPropertyByName(FName(UTF8_TO_TCHAR(N)));if(!P || P->ArrayDim!=1 || !DasReferencePropertyClass(P))C->throw_error("self reference property type mismatch");if(!P->HasAnyPropertyFlags(CPF_BlueprintVisible) || (Write && P->HasAnyPropertyFlags(CPF_BlueprintReadOnly)))C->throw_error("self property access is not permitted");return P;}
-    FDasObjectHandle ReadPropertyObject(FProperty* P,UObject* O,das::Context* C){
-        const auto V=ReadNativePropertyValue(P,P->ContainerPtrToValuePtr<void>(O),C);
+    FDasObjectHandle ReadNullablePropertyObject(FProperty* P,const void* Memory,das::Context* C){
+        // VM object getters expose destroyed references as null, including
+        // nested/array/map-value getters. Queued captures still use the strict
+        // value codec and their original-identity/lifetime checks.
+        auto* Object=DasReferenceGet(P,Memory);
+        if(Object && (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))return {};
+        const auto V=ReadNativePropertyValue(P,Memory,C);
         if(V.Kind!=int32(EDasMethodSignature::Object))C->throw_error("Expected object/interface property");
         return MakeObjectHandle(V.ObjectValue.Get(),DasReferencePropertyClass(P),C);
     }
+    FDasObjectHandle ReadPropertyObject(FProperty* P,UObject* O,das::Context* C){return ReadNullablePropertyObject(P,P->ContainerPtrToValuePtr<void>(O),C);}
     void WritePropertyObject(FProperty* P,UObject* O,const FDasObjectHandle& Input,das::Context* C){
         FDasScalarValue V;V.Kind=int32(EDasMethodSignature::Object);auto* Type=DasReferencePropertyClass(P);if(!Type)C->throw_error("Expected object/interface property");
         V.ObjectClass=Type->GetPathName();V.ObjectValue=Input.Token?ResolveObject(Input,C):nullptr;
+        if(V.ObjectValue && !DasReferenceMatches(V.ObjectValue,Type))C->throw_error("object field class mismatch");
         WriteNativePropertyValue(P,P->ContainerPtrToValuePtr<void>(O),V,C);
     }
     UClass* ReadPropertyClass(FClassProperty* P,UObject* O,das::Context* C){return ReadNativePropertyValue(P,P->ContainerPtrToValuePtr<void>(O),C).ClassValue.Get();}
@@ -1051,7 +1059,7 @@ void AuthoredSetobject(const FDasObjectHandle& H,const char* Id,const char* Name
         TStrongObjectPtr<UObject> KeepAlive(Object);
         Object->ProcessEvent(Call.Function, Frame.GetStructMemory());
         auto* Return = CastFieldChecked<FObjectProperty>(Call.Output);
-        return MakeObjectHandle(ReadNativePropertyValue(Return,Return->ContainerPtrToValuePtr<void>(Frame.GetStructMemory()),Context).ObjectValue.Get(), Return->PropertyClass, Context);
+        return ReadNullablePropertyObject(Return,Return->ContainerPtrToValuePtr<void>(Frame.GetStructMemory()),Context);
     }
     void CallVoidObject(const FDasObjectHandle& Handle, const char* Name, const FDasObjectHandle& Value, das::Context* Context)
     {

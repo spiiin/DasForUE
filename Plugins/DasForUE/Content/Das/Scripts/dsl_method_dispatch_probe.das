@@ -6,8 +6,8 @@ require ue_dsl
 class DispatchProbe {
     properties=ue_properties(EditAnywhere,BlueprintReadWrite) { var Score:int=0 }
 
-    def BeginPlay():void { self.Initialize() }
-    def Initialize():void { self.Score=3 }
+    def BeginPlay():void { self.ResetScore() }
+    def ResetScore():void { self.Score=3 }
     def Add(value:int):int { self.Score+=value; return self.Score }
     def Adjust(var value:int&):void { value+=5 }
     def Sum(values:array<int>):int {

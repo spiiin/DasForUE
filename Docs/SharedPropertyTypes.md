@@ -637,3 +637,13 @@ logs/value-walker-RuntimePIE-final-report/index.json (failed callback timeout).
 Gameplay map: /Game/DasCookedGameplay/19ee5396db8448b8b47149b83fbfb8e4/Map.
 Native map: /Game/DasNativeDefaults/10e45d1a77cb4220981b47c2b6d8b1d2/Map.
 Archive: Build/ValueWalkerPackaged. No commit was created.
+
+## 2026-10-17 — combined commit validation and nullable getter fixes
+
+The combined b7da031 baseline plus nullable VM object getter and method-dispatch
+fixture fixes passed all 35 Unreal Automation tests without warnings/failures/
+skips, 116 Python checks, Editor/Game Development, Foundation, saved fixture
+phases, cook/package and all five packaged map probes. Queued callback validation
+remains strict. The runner prepares the cross-process ClassReload/MethodValues
+dependencies explicitly. See CombinedValidation.md and logs/combined-validation.json
+for the source manifest, initial failures, fixes and validation scope. No commit.

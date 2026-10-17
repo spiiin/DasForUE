@@ -3607,3 +3607,13 @@ incremental GC semantics; it must not depend on validation succeeding. New
 PropertyValues regressions exercise nested budgets, invalid math, duplicate
 object identities, sparse holes and replacement-key lookup. Scope and validation
 evidence are recorded in SharedPropertyTypes.md. No commit was created.
+
+## 2026-10-17 — combined commit validation and nullable getter fixes
+
+The combined b7da031 baseline plus nullable VM object getter and method-dispatch
+fixture fixes passed all 35 Unreal Automation tests without warnings/failures/
+skips, 116 Python checks, Editor/Game Development, Foundation, saved fixture
+phases, cook/package and all five packaged map probes. Queued callback validation
+remains strict. The runner prepares the cross-process ClassReload/MethodValues
+dependencies explicitly. See CombinedValidation.md and logs/combined-validation.json
+for the source manifest, initial failures, fixes and validation scope. No commit.
