@@ -23,6 +23,9 @@ void StartDasCookedGameplayValidation();
 void StartDasPlayableMapValidation();
 void StartDasPickupValidation();
 void StartDasGameplayFeaturesValidation();
+void StartDasMontageValidation();
+void StartDasAIValidation();
+void StartDasEffectsValidation();
 void StartDasCookedCallsValidation();
 
 class FDasForUESmokeModule : public FDefaultGameModuleImpl
@@ -48,6 +51,9 @@ public:
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasDefaultsMerge"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld()){FString Report;Good=RunDasDefaultsMergeProbe(World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_DEFAULTS_MERGE_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasExtendedDefaults"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld())for(const auto& Actor:TArray<TObjectPtr<AActor>>(World->PersistentLevel->Actors))if(Actor && Actor->ActorHasTag(TEXT("ExtendedDefaultsFixture"))){FString Report;Good=RunDasExtendedDefaultsProbe(Actor->GetClass(),World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_EXTENDED_DEFAULTS_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasCookedCalls"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasCookedCallsValidation();});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasAI"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasAIValidation();});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasEffects"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasEffectsValidation();});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasMontage"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasMontageValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasGameplayFeatures"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasGameplayFeaturesValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasPickup"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasPickupValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasPlayableMap"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasPlayableMapValidation();});}

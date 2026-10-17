@@ -6,6 +6,43 @@
 поддержка UE 5.7. Старый DasForUE не используется как основа.
 
 
+
+## AIController и MoveTo — 2026-10-18
+
+Добавлен [управляемый AI API](AI.md): AIControllerRef, движение к Actor/позиции,
+MoveResult (Success/Blocked/OffPath/Aborted/Invalid), необязательный completion,
+проверка активности и отмена по имени. Cleanup учитывает UE request ID, сохраняет
+более новое внешнее движение и чужие listeners. Destroy/EndPlay и успешный reload
+отзывают движение и pending callback; отклонённый reload сохраняет рабочий запрос.
+Отдельный `CreateAIEnemy.ps1` экспортирует playable demo с противником, который
+обходит препятствие по сохранённому NavMesh и наносит урон игроку.
+`TestAI.ps1 -SkipBuild`: восемь целевых групп — PASS, включая настоящее движение
+и damage, queued completion/Destroy и принятый/отклонённый reload. Отчёт:
+`logs/ai-validation.json`. Rendering/audio, сеть, полный Foundation/PIE и packaged
+не проверялись. Без коммита. Behavior Tree/Perception/StateTree пока не добавлены.
+
+## Звук и Niagara — 2026-10-18
+
+Реализованы world-position sound/Niagara cues для подбора и получения урона,
+типизированные ассеты, необязательный completion и управление по имени.
+Общий managed subscription слой очищает компоненты и делегаты на завершении,
+замене, stop, Destroy/EndPlay и успешном reload; отклонённый reload сохраняет их.
+Семь целевых групп — PASS, offscreen RHI, без полной suite и packaged.
+Дальше при необходимости: attached effects, fade, attenuation, Niagara user
+parameters; см. Effects.md. Без коммита.
+
+## Montage — 2026-10-18
+
+Implemented managed Montage play/stop/cancel/query and typed completion,
+interruption, blend-out and Montage Notify/Notify Window events. Per-instance
+delegates use managed subscription IDs; cleanup revokes pending events on
+replacement, Destroy/EndPlay and accepted VM reload. Rejected reload preserves
+working playback. Canonical adapter payloads reuse native struct layout/type
+validation independently of the optional generated Engine catalog.
+Eight focused scenario groups passed; see Montage.md and montage-validation.json.
+Rendering/root motion, networking and full Foundation/PIE/packaged remain deferred.
+No commit created.
+
 ## Gameplay services — 2026-10-18
 
 Implemented the next functional slice in the same playable demo: single-hit

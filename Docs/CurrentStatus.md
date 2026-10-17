@@ -20,7 +20,7 @@
 
 Команда создаёт свежую папку `/Game/DasExamples/Playable/<id>` с Character,
 pickup, HealthComponent, Widget Blueprint HUD, шестью InputAction,
-MappingContext, отдельным mesh и картой (13 ассетов). Интерфейс взаимодействия
+MappingContext, отдельным mesh, двумя NiagaraSystem и картой (15 ассетов). Интерфейс взаимодействия
 хранится один раз в `/Game/DasExamples/Shared/Interactable`.
 Путь записан в `logs/playable-example.json`.
 Набор регрессионных Blueprint-ов при этом не создаётся. Повторный запуск создаёт
@@ -126,3 +126,57 @@ multi-hit/object queries, полный UMG API, point/radial damage, networking 
 Старые копии сохраняются. Ранее описанная блокировка основного smoke-проекта
 устранена для этого примера; см. SharedInteractionInterface.md и целевой отчёт
 logs/shared-interface-validation.json.
+
+
+## Montage и animation events — 2026-10-18
+
+Добавлен [managed Montage API](Montage.md), модуль `ue_animation.das` и пример
+`dsl_montage_actor.das`: Play со скоростью, позицией и секцией; Stop, Cancel,
+проверка активности; типизированный MontageEvent (Completed/Interrupted/BlendOut/
+NotifyBegin/NotifyEnd). Поддержаны Montage Notify и Montage Notify Window.
+ID подписки относится к конкретному native instance ID. Завершение, отмена,
+Destroy/EndPlay и успешный hot reload снимают собственные обработчики; отклонённый
+reload сохраняет рабочую версию. Успешный reload не перезапускает анимацию.
+
+`Scripts/TestMontage.ps1 -SkipBuild`: восемь групп целевых сценариев — PASS,
+включая настоящий Notify Window, отрицательные входы, повторный запуск,
+ожидающие события, сохранение стороннего listener, принятый/отклонённый reload
+и Destroy. Отчёт: `logs/montage-validation.json`.
+Это проверка Editor Development в game-процессе без рендера; полноценный AnimBP,
+видимые позы/root motion, сеть, полный Foundation/PIE/packaged не проверялись.
+Коммит не создавался.
+
+## Звук и Niagara — 2026-10-18
+
+Добавлен [управляемый API эффектов](Effects.md), `ue_effects.das`.
+Playable pickup и Character воспроизводят звук и Niagara при подборе и уроне.
+Завершение пары освобождает компоненты и вызывает необязательный callback один
+раз; stop, Destroy/EndPlay и успешный reload отзывают pending callbacks.
+Отклонённый reload сохраняет эффект. Чужие компоненты не затрагиваются.
+Семь целевых групп `TestEffects.ps1 -SkipBuild` — PASS, реальный RHI offscreen,
+AudioComponent и CPU Niagara. Визуальное/слуховое качество, networking, полные
+Foundation/PIE и packaged не проверялись. Без коммита.
+
+## Завершение точечной проверки montage — 2026-10-18
+
+Editor Development и TestMontage в основном smoke-проекте — PASS: десять игровых
+групп и одна отрицательная authoring-проверка. Дополнительно подтверждены повторный
+запуск с тем же именем из Completed и сохранение native playback другой группы
+после play/stop/replace/cancel. Неверный тип аргумента callback отклоняется до
+создания Blueprint. Базовые notify/stop/cancel/reload/Destroy проверки сохранены.
+Отчёт: logs/montage-validation.json; ограничения и пример: Montage.md.
+Полный Foundation/PIE/packaged и видимые позы/root motion не проверялись.
+
+## AIController и MoveTo — 2026-10-18
+
+Добавлен [управляемый AI API](AI.md): AIControllerRef, движение к Actor/позиции,
+MoveResult (Success/Blocked/OffPath/Aborted/Invalid), необязательный completion,
+проверка активности и отмена по имени. Cleanup учитывает UE request ID, сохраняет
+более новое внешнее движение и чужие listeners. Destroy/EndPlay и успешный reload
+отзывают движение и pending callback; отклонённый reload сохраняет рабочий запрос.
+Отдельный `CreateAIEnemy.ps1` экспортирует playable demo с противником, который
+обходит препятствие по сохранённому NavMesh и наносит урон игроку.
+`TestAI.ps1 -SkipBuild`: восемь целевых групп — PASS, включая настоящее движение
+и damage, queued completion/Destroy и принятый/отклонённый reload. Отчёт:
+`logs/ai-validation.json`. Rendering/audio, сеть, полный Foundation/PIE и packaged
+не проверялись. Без коммита. Behavior Tree/Perception/StateTree пока не добавлены.

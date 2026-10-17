@@ -11,6 +11,7 @@
 		],
 		"modules": [
 			"ue_character_control",
+			"ue_effects",
 			"ue_enhanced_input",
 			"ue_gameplay_services",
 			"ue_generated",
@@ -87,6 +88,11 @@
 				"name": "SkeletalMeshComponentRef"
 			},
 			{
+				"path": "/Script/Engine.SoundBase",
+				"module": "ue_effects",
+				"name": "SoundBaseRef"
+			},
+			{
 				"path": "/Script/Engine.SphereComponent",
 				"module": "ue_pickup_components",
 				"name": "SphereComponentRef"
@@ -115,6 +121,11 @@
 				"path": "/Script/EnhancedInput.InputMappingContext",
 				"module": "ue_enhanced_input",
 				"name": "InputMappingContextRef"
+			},
+			{
+				"path": "/Script/Niagara.NiagaraSystem",
+				"module": "ue_effects",
+				"name": "NiagaraSystemRef"
 			},
 			{
 				"path": "/Script/UMG.UserWidget",
@@ -685,6 +696,23 @@
 			]
 		},
 		{
+			"path": "/Script/Engine.EConcurrencyVolumeScaleMode",
+			"entries": [
+				{
+					"name": "Default",
+					"value": 0
+				},
+				{
+					"name": "Distance",
+					"value": 1
+				},
+				{
+					"name": "Priority",
+					"value": 2
+				}
+			]
+		},
+		{
 			"path": "/Script/Engine.EControllerAnalogStick",
 			"entries": [
 				{
@@ -896,6 +924,43 @@
 				{
 					"name": "SkipAllBones",
 					"value": 1
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EMaxConcurrentResolutionRule",
+			"entries": [
+				{
+					"name": "PreventNew",
+					"value": 0
+				},
+				{
+					"name": "StopOldest",
+					"value": 1
+				},
+				{
+					"name": "StopFarthestThenPreventNew",
+					"value": 2
+				},
+				{
+					"name": "StopFarthestThenOldest",
+					"value": 3
+				},
+				{
+					"name": "StopLowestPriority",
+					"value": 4
+				},
+				{
+					"name": "StopQuietest",
+					"value": 5
+				},
+				{
+					"name": "StopLowestPriorityThenPreventNew",
+					"value": 6
+				},
+				{
+					"name": "Count",
+					"value": 7
 				}
 			]
 		},
@@ -1359,6 +1424,27 @@
 				{
 					"name": "VTBlend_PreBlended",
 					"value": 5
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.EVirtualizationMode",
+			"entries": [
+				{
+					"name": "Disabled",
+					"value": 0
+				},
+				{
+					"name": "PlayWhenSilent",
+					"value": 1
+				},
+				{
+					"name": "Restart",
+					"value": 2
+				},
+				{
+					"name": "SeekRestart",
+					"value": 3
 				}
 			]
 		},
@@ -1906,6 +1992,32 @@
 			]
 		},
 		{
+			"path": "/Script/CoreUObject.PerPlatformInt",
+			"signature": "Default:IntProperty:0;PerPlatform:MapProperty:0[PerPlatform_Key:NameProperty:0;PerPlatform:IntProperty:0;];",
+			"fields": [
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "Default"
+				},
+				{
+					"kind": "map",
+					"type_path": "",
+					"key":
+					{
+						"kind": "name",
+						"type_path": ""
+					},
+					"value":
+					{
+						"kind": "int",
+						"type_path": ""
+					},
+					"name": "PerPlatform"
+				}
+			]
+		},
+		{
 			"path": "/Script/CoreUObject.PlatformUserId",
 			"signature": "InternalId:IntProperty:0;",
 			"fields": [
@@ -2437,6 +2549,72 @@
 					"kind": "float",
 					"type_path": "",
 					"name": "SavedPlayRate"
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.SoundConcurrencySettings",
+			"signature": "MaxCount:IntProperty:0;bLimitToOwner:BoolProperty:0;bVolumeScaleCanRelease:BoolProperty:0;bEnableMaxCountPlatformScaling:BoolProperty:0;ResolutionRule:ByteProperty:0:/Script/Engine.EMaxConcurrentResolutionRule;RetriggerTime:FloatProperty:0;PlatformMaxCount:StructProperty:0:/Script/CoreUObject.PerPlatformInt{Default:IntProperty:0;PerPlatform:MapProperty:0[PerPlatform_Key:NameProperty:0;PerPlatform:IntProperty:0;];};VolumeScale:FloatProperty:0;VolumeScaleMode:EnumProperty:0:/Script/Engine.EConcurrencyVolumeScaleMode;VolumeScaleAttackTime:FloatProperty:0;VolumeScaleReleaseTime:FloatProperty:0;VoiceStealReleaseTime:FloatProperty:0;",
+			"fields": [
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "MaxCount"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bLimitToOwner"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bVolumeScaleCanRelease"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bEnableMaxCountPlatformScaling"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/Engine.EMaxConcurrentResolutionRule",
+					"name": "ResolutionRule"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "RetriggerTime"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.PerPlatformInt",
+					"name": "PlatformMaxCount"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "VolumeScale"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/Engine.EConcurrencyVolumeScaleMode",
+					"name": "VolumeScaleMode"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "VolumeScaleAttackTime"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "VolumeScaleReleaseTime"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "VoiceStealReleaseTime"
 				}
 			]
 		},
@@ -43836,6 +44014,234 @@
 			]
 		},
 		{
+			"path": "/Script/Engine.SoundBase",
+			"fixture": false,
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bBypassVolumeScaleForPriority",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": false,
+					"signature": "bBypassVolumeScaleForPriority:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bEnableBusSends",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": false,
+					"signature": "bEnableBusSends:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bOverrideConcurrency",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": false,
+					"signature": "bOverrideConcurrency:BoolProperty:0;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/Engine.SoundConcurrencySettings",
+					"name": "ConcurrencyOverrides",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": false,
+					"signature": "ConcurrencyOverrides:StructProperty:0:/Script/Engine.SoundConcurrencySettings{MaxCount:IntProperty:0;bLimitToOwner:BoolProperty:0;bVolumeScaleCanRelease:BoolProperty:0;bEnableMaxCountPlatformScaling:BoolProperty:0;ResolutionRule:ByteProperty:0:/Script/Engine.EMaxConcurrentResolutionRule;RetriggerTime:FloatProperty:0;PlatformMaxCount:StructProperty:0:/Script/CoreUObject.PerPlatformInt{Default:IntProperty:0;PerPlatform:MapProperty:0[PerPlatform_Key:NameProperty:0;PerPlatform:IntProperty:0;];};VolumeScale:FloatProperty:0;VolumeScaleMode:EnumProperty:0:/Script/Engine.EConcurrencyVolumeScaleMode;VolumeScaleAttackTime:FloatProperty:0;VolumeScaleReleaseTime:FloatProperty:0;VoiceStealReleaseTime:FloatProperty:0;};"
+				},
+				{
+					"kind": "set",
+					"type_path": "",
+					"element":
+					{
+						"kind": "object",
+						"type_path": "/Script/Engine.SoundConcurrency"
+					},
+					"name": "ConcurrencySet",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": false,
+					"signature": "ConcurrencySet:SetProperty:0[ConcurrencySet:ObjectProperty:0:/Script/Engine.SoundConcurrency;];"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Duration",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": true,
+					"signature": "Duration:FloatProperty:0;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "MaxDistance",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": true,
+					"signature": "MaxDistance:FloatProperty:0;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Priority",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": false,
+					"signature": "Priority:FloatProperty:0;"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.SoundClass",
+					"name": "SoundClassObject",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": true,
+					"signature": "SoundClassObject:ObjectProperty:0:/Script/Engine.SoundClass;"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.SoundSubmixBase",
+					"name": "SoundSubmixObject",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": false,
+					"signature": "SoundSubmixObject:ObjectProperty:0:/Script/Engine.SoundSubmixBase;"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.SoundEffectSourcePresetChain",
+					"name": "SourceEffectChain",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": false,
+					"signature": "SourceEffectChain:ObjectProperty:0:/Script/Engine.SoundEffectSourcePresetChain;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "TotalSamples",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": true,
+					"signature": "TotalSamples:FloatProperty:0;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/Engine.EVirtualizationMode",
+					"name": "VirtualizationMode",
+					"declaring_class": "/Script/Engine.SoundBase",
+					"readonly": false,
+					"signature": "VirtualizationMode:EnumProperty:0:/Script/Engine.EVirtualizationMode;"
+				}
+			],
+			"methods": [],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "AssetUserData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AttenuationSettings",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AudioPropertiesSheet",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bDebug",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bEnableBaseSubmix",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bEnableSubmixSends",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bHasConcatenatorNode",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bHasDelayNode",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bHasVirtualizeWhenSilent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOutputToBusOnly",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "BusSends",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "EditorData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "LocalAudioProperties",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "MaxConcurrentPlayCount",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "MaxConcurrentResolutionRule",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "PostAttenuationBusSends",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "PreEffectBusSends",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "SoundConcurrencySettings",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SoundSubmixSends",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "TimecodeOffset",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "IsAttenuationSettingsEditable",
+					"reason": "not_public_local_native_instance_callable"
+				}
+			]
+		},
+		{
 			"path": "/Script/Engine.SphereComponent",
 			"fixture": false,
 			"fields": [
@@ -59261,6 +59667,451 @@
 					"domain": "method",
 					"name": "ShouldShowInputModeQuery",
 					"reason": "not_public_local_native_instance_callable"
+				}
+			]
+		},
+		{
+			"path": "/Script/Niagara.NiagaraSystem",
+			"fixture": false,
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bCastShadow",
+					"declaring_class": "/Script/Niagara.NiagaraSystem",
+					"readonly": true,
+					"signature": "bCastShadow:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bReceivesDecals",
+					"declaring_class": "/Script/Niagara.NiagaraSystem",
+					"readonly": true,
+					"signature": "bReceivesDecals:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bRenderCustomDepth",
+					"declaring_class": "/Script/Niagara.NiagaraSystem",
+					"readonly": true,
+					"signature": "bRenderCustomDepth:BoolProperty:0;"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "CustomDepthStencilValue",
+					"declaring_class": "/Script/Niagara.NiagaraSystem",
+					"readonly": true,
+					"signature": "CustomDepthStencilValue:IntProperty:0;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/Engine.ERendererStencilMask",
+					"name": "CustomDepthStencilWriteMask",
+					"declaring_class": "/Script/Niagara.NiagaraSystem",
+					"readonly": true,
+					"signature": "CustomDepthStencilWriteMask:EnumProperty:0:/Script/Engine.ERendererStencilMask;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "TranslucencySortDistanceOffset",
+					"declaring_class": "/Script/Niagara.NiagaraSystem",
+					"readonly": true,
+					"signature": "TranslucencySortDistanceOffset:FloatProperty:0;"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "TranslucencySortPriority",
+					"declaring_class": "/Script/Niagara.NiagaraSystem",
+					"readonly": true,
+					"signature": "TranslucencySortPriority:IntProperty:0;"
+				}
+			],
+			"methods": [],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "AssetTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "BakerGeneratedSettings",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "BakerSettings",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bAllowCullingForLocalPlayersOverride",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bAllowSystemStateFastPath",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bBakeOutRapidIteration",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bBakeOutRapidIterationOnCook",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCompressAttributes",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bDeterminism",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bDisableDebugSwitches",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bDisableDebugSwitchesOnCook",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bDumpDebugEmitterInfo",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bDumpDebugSystemInfo",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bExposeToLibrary",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bFixedBounds",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bFixedTickDelta",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIgnoreParticleReadsForAttributeTrim",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bInitialOwnerVelocityFromActor",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsTemplateAsset",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bNeedsGPUContextInitForDataInterfaces",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideAllowCullingForLocalPlayers",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideCastShadow",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideCustomDepthStencilValue",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideCustomDepthStencilWriteMask",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideReceivesDecals",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideRenderCustomDepth",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideScalabilitySettings",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideTranslucencySortDistanceOffset",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideTranslucencySortPriority",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bRequireCurrentFrameData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bSupportLargeWorldCoordinates",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bSystemStateFastPathEnabled",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bTrimAttributes",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bTrimAttributesOnCook",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bUseInitialStreamingBounds",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "Category",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "EditorData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "EditorOnlyAddedParameters",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "EditorParameters",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "EffectType",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "EmitterHandles",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ExposedParameters",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "FixedBounds",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "FixedTickDeltaTime",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "InitialStreamingBounds",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "LargeWorldCoordinateTileUpdateMode",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "LibraryVisibility",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "MaxEmitterImportance",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "MaxPoolSize",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "MessageKeyToMessageMap",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "MessageStore",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ParameterCollectionOverrides",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ParameterDefinitionsSubscriptions",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "Platforms",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "PoolPrimeSize",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "PreviewMoviePath",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "RandomSeed",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ScalabilityOverrides",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ScratchPadScripts",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ScriptRuntimeCompiledDataForEditor",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ScriptRuntimeCookedDataMap",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "StaleRuntimeCompiledDataForEditor",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SystemCompiledData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SystemScalabilityOverrides",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SystemSpawnScript",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SystemStateDataStruct",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SystemUpdateScript",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "TemplateAssetDescription",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "TemplateSpecification",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ThumbnailImage",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "TypeContainer",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "UpdateContext",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "WarmupTickCount",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "WarmupTickDelta",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "WarmupTime",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
 				}
 			]
 		},

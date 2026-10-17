@@ -12,9 +12,16 @@
     }
   ],
   "Plugins": [
-    {"Name":"EnhancedInput","Enabled":true},
+    {
+      "Name": "EnhancedInput",
+      "Enabled": true
+    },
     {
       "Name": "DasForUE",
+      "Enabled": true
+    },
+    {
+      "Name": "Niagara",
       "Enabled": true
     }
   ],

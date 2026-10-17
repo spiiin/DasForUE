@@ -1,7 +1,7 @@
+#include "DasSoftReferencesCommandlet.h"
 #include "DasRuntime.h"
 #include "DasSoftReferences.h"
 #include "DasNativeHashProbeComponent.h"
-#include "DasSoftReferencesCommandlet.h"
 #include "DasDSLService.h"
 #include "DasTypeService.h"
 #include "DasProbeActor.h"

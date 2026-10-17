@@ -1,3 +1,13 @@
+#include "DasAIMoveProxy.h"
+#include "AIController.h"
+#include "Navigation/PathFollowingComponent.h"
+#include "AISystem.h"
+#include "GameFramework/Pawn.h"
+#include "DasEffectProxy.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "DasMontageProxy.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
@@ -1520,6 +1530,14 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     int32 ScriptAssetCancelAll(das::Context*);
     bool ScriptAssetPending(const char*,das::Context*);
     void ScriptLatentDelay(const char*,float,const char*,das::Context*);
+    FDasObjectHandle ScriptAISelf(das::Context*);
+    bool ScriptAIMove(const char*,const FDasObjectHandle&,const FDasObjectHandle&,const FVector&,bool,const char*,float,bool,bool,das::Context*);
+    bool ScriptAICancel(const char*,das::Context*);
+    bool ScriptAIActive(const char*,das::Context*);
+    bool ScriptEffectPlay(const char*,const FDasObjectHandle&,const FDasObjectHandle&,const FTransform&,const char*,float,float,das::Context*);
+    bool ScriptEffectStop(const char*,das::Context*);
+    int32 ScriptEffectStopAll(das::Context*);
+    bool ScriptEffectActive(const char*,das::Context*);
     float ScriptMontagePlay(const char*,const FDasObjectHandle&,const FDasObjectHandle&,const char*,float,float,FDasNameValue,das::Context*);
     bool ScriptMontageStop(const char*,float,das::Context*);
     bool ScriptMontageCancel(const char*,das::Context*);
@@ -1741,6 +1759,14 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             das::addExtern<DAS_BIND_FUN(ScriptAssetCancel)>(*this,Library,"ue_asset_cancel",das::SideEffects::modifyExternal,"ScriptAssetCancel");
             das::addExtern<DAS_BIND_FUN(ScriptAssetCancelAll)>(*this,Library,"ue_asset_cancel_all",das::SideEffects::modifyExternal,"ScriptAssetCancelAll");
             das::addExtern<DAS_BIND_FUN(ScriptAssetPending)>(*this,Library,"ue_asset_is_pending",das::SideEffects::modifyExternal,"ScriptAssetPending");
+            das::addExtern<DAS_BIND_FUN(ScriptAISelf),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_ai_self",das::SideEffects::modifyExternal,"ScriptAISelf");
+            das::addExtern<DAS_BIND_FUN(ScriptAIMove)>(*this,Library,"__ue_ai_move",das::SideEffects::modifyExternal,"ScriptAIMove");
+            das::addExtern<DAS_BIND_FUN(ScriptAICancel)>(*this,Library,"__ue_ai_cancel",das::SideEffects::modifyExternal,"ScriptAICancel");
+            das::addExtern<DAS_BIND_FUN(ScriptAIActive)>(*this,Library,"__ue_ai_active",das::SideEffects::modifyExternal,"ScriptAIActive");
+            das::addExtern<DAS_BIND_FUN(ScriptEffectPlay)>(*this,Library,"__ue_effect_play",das::SideEffects::modifyExternal,"ScriptEffectPlay");
+            das::addExtern<DAS_BIND_FUN(ScriptEffectStop)>(*this,Library,"__ue_effect_stop",das::SideEffects::modifyExternal,"ScriptEffectStop");
+            das::addExtern<DAS_BIND_FUN(ScriptEffectStopAll)>(*this,Library,"__ue_effect_stop_all",das::SideEffects::modifyExternal,"ScriptEffectStopAll");
+            das::addExtern<DAS_BIND_FUN(ScriptEffectActive)>(*this,Library,"__ue_effect_active",das::SideEffects::modifyExternal,"ScriptEffectActive");
             das::addExtern<DAS_BIND_FUN(ScriptMontagePlay)>(*this,Library,"__ue_montage_play",das::SideEffects::modifyExternal,"ScriptMontagePlay");
             das::addExtern<DAS_BIND_FUN(ScriptMontageStop)>(*this,Library,"__ue_montage_stop",das::SideEffects::modifyExternal,"ScriptMontageStop");
             das::addExtern<DAS_BIND_FUN(ScriptMontageCancel)>(*this,Library,"__ue_montage_cancel",das::SideEffects::modifyExternal,"ScriptMontageCancel");
@@ -2269,9 +2295,13 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
         int32 LatentKind=0;FString LatentName;TWeakObjectPtr<UWorld> LatentWorld;TStrongObjectPtr<UDasLatentProxy> LatentProxy;
         bool InputConsume=true,InputPaused=false;int32 InputKind=0,InputHandle=INDEX_NONE;EInputEvent InputPhase=IE_Pressed;
         uint32 EnhancedHandle=0;ETriggerEvent EnhancedPhase=ETriggerEvent::Triggered;TStrongObjectPtr<UDasEnhancedInputProxy> EnhancedProxy;TStrongObjectPtr<UObject> InputAsset;
+        FString AIMoveName;TStrongObjectPtr<UDasAIMoveProxy> AIMoveProxy;
+        FString EffectName;TStrongObjectPtr<UDasEffectProxy> EffectProxy;
         FString MontageName;TStrongObjectPtr<UDasMontageProxy> MontageProxy;
         ~FManagedSubscription()
         {
+            if(AIMoveProxy.IsValid()){AIMoveProxy->Deactivate();return;}
+            if(EffectProxy.IsValid()){EffectProxy->Deactivate();return;}
             if(MontageProxy.IsValid()){MontageProxy->Deactivate();return;}
             if(AsyncKind){if(StreamHandle.IsValid()){if(!StreamHandle->HasLoadCompleted())StreamHandle->CancelHandle();else StreamHandle->ReleaseHandle();}return;}
             if(LatentKind){if(auto* W=LatentWorld.Get())if(LatentProxy.IsValid())W->GetLatentActionManager().RemoveActionsForObject(TWeakObjectPtr<UObject>(LatentProxy.Get()));return;}
@@ -2528,6 +2558,8 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
     bool ScriptAssetPending(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.ContainsByPredicate([&](const auto& B){return B->AsyncKind && B->AsyncName==N;});}
 
 #include "DasMontage.inl"
+#include "DasAI.inl"
+#include "DasEffects.inl"
 
     void RevokeSession(FPersistentSession& Session)
     {
@@ -2599,7 +2631,7 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
             auto& Context = *Session->Live->Context;
             const auto* MontagePayload=Payload.Kind==int32(EDasMethodSignature::Struct)?Payload.StructValue.GetPtr<FDasMontageEvent>():nullptr;
             const bool MontageTerminal=MontagePayload && (MontagePayload->Kind==EDasMontageEventKind::Completed || MontagePayload->Kind==EDasMontageEventKind::Interrupted);
-            Session->Bindings.RemoveAll([&](const auto& B){return B->Id==Event.Id && (B->LatentKind!=0 || B->AsyncKind!=0 || (B->MontageProxy.IsValid() && MontageTerminal));}); // Consume completion before user rearm.
+            Session->Bindings.RemoveAll([&](const auto& B){return B->Id==Event.Id && (B->LatentKind!=0 || B->AsyncKind!=0 || B->AIMoveProxy.IsValid() || B->EffectProxy.IsValid() || (B->MontageProxy.IsValid() && MontageTerminal));}); // Consume completion before user rearm.
             Context.restart();
             TGuardValue<int32> ExecutionScope(Context.ExecutionDepth,Context.ExecutionDepth+1);
             FActiveContextScope Scope(Context);

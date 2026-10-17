@@ -718,3 +718,9 @@ are available through `require ue_dsl`. See [DSLNativeBases](Docs/DSLNativeBases
 Native Blueprint-visible self fields in instance methods: [DSLNativeSelfFields](Docs/DSLNativeSelfFields.md).
 
 Gameplay traces, UMG HUD and authored health: [GameplayServices](Docs/GameplayServices.md). Focused check: `Scripts/TestGameplayFeatures.ps1`.
+
+Montage playback and managed animation events: [Montage](Docs/Montage.md). Example: `dsl_montage_actor.das`; focused check: `Scripts/TestMontage.ps1`.
+
+Managed sound and Niagara for pickup/damage: [Effects](Docs/Effects.md). Focused check: `Scripts/TestEffects.ps1` (offscreen RHI).
+
+Managed AIController/MoveTo and a pursuing enemy: [AI](Docs/AI.md). Create demo: `Scripts/CreateAIEnemy.ps1`; focused check: `Scripts/TestAI.ps1`.

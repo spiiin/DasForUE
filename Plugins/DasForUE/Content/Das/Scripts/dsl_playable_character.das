@@ -4,6 +4,7 @@ require ue_native_gameplay public
 require ue_gameplay_services public
 require ue_health_refs public
 require ue_interaction public
+require ue_effects public
 
 // The same field operators work in ordinary functions and in authored methods.
 def set_movement_speed(movement:CharacterMovementRef; value:float):float {
@@ -24,6 +25,8 @@ class PlayableCharacter : Character {
         var InteractAction:InputActionRef
         var HurtAction:InputActionRef
         var UIAction:InputActionRef
+        var HurtSound:SoundBaseRef
+        var HurtVFX:NiagaraSystemRef
         var HUDClass:UserWidgetClass
     }
     state=ue_properties(BlueprintReadWrite) {
@@ -32,6 +35,8 @@ class PlayableCharacter : Character {
         var UIOpen:bool=false
         var Interactions:int=0
         var HealthChanges:int=0
+        var HurtEffectsStarted:int=0
+        var HurtEffectsFinished:int=0
         var HUDClicks:int=0
         var ControlsBound:bool=false
         var MoveEvents:int=0
@@ -119,6 +124,16 @@ class PlayableCharacter : Character {
     }
     [ue_event(source="Health",name="Changed")]
     def OnHealthChanged(current:float; maximum:float):void { self.HealthChanges+=1;self.RefreshHUD() }
+    [ue_event(name="OnTakeAnyDamage")]
+    def OnDamageFeedback(damaged:ActorRef; amount:float; kind:ObjectRef; instigator:ObjectRef; source:ActorRef):void {
+        if(!(amount>0.0f && amount<=3.402823466e38f)) { return }
+        let start=self.Camera.K2_GetComponentLocation()
+        let forward=self.Camera.GetForwardVector()
+        let point=ue_vector(start.x+forward.x*100.0lf,start.y+forward.y*100.0lf,start.z+forward.z*100.0lf)
+        if(ue_effect_at("hurt",self.HurtSound,self.HurtVFX,point,"OnHurtEffectFinished",0.25f,0.7f,0.2f)) { self.HurtEffectsStarted+=1 }
+    }
+    [ue_function(BlueprintCallable)]
+    def OnHurtEffectFinished():void { self.HurtEffectsFinished+=1 }
     [ue_function(BlueprintCallable)]
     def HurtFromHUD():void { self.HUDClicks+=1;self.ReceiveDamage(25.0f) }
     [ue_function(BlueprintCallable)]

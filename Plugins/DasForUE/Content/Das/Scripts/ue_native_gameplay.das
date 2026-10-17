@@ -1,6 +1,7 @@
 options gen2
 module ue_native_gameplay public
 require ue_character_control public
+require ue_effects public
 require ue_enhanced_input public
 require ue_gameplay_services public
 require ue_generated public
@@ -127,6 +128,22 @@ def Native_SkinnedAssetRef_4bc30438_from(value:UObjectHandle):Native_SkinnedAsse
 [ue_native_object(path="/Script/Engine.SkinnedMeshComponent")]
 struct Native_SkinnedMeshComponentRef_86806378 { handle:UObjectHandle }
 def Native_SkinnedMeshComponentRef_86806378_from(value:UObjectHandle):Native_SkinnedMeshComponentRef_86806378 { return Native_SkinnedMeshComponentRef_86806378(handle=ue_cast_nullable_object(value,"/Script/Engine.SkinnedMeshComponent")) }
+
+[ue_native_object(path="/Script/Engine.SoundClass")]
+struct Native_SoundClassRef_dbf04ee6 { handle:UObjectHandle }
+def Native_SoundClassRef_dbf04ee6_from(value:UObjectHandle):Native_SoundClassRef_dbf04ee6 { return Native_SoundClassRef_dbf04ee6(handle=ue_cast_nullable_object(value,"/Script/Engine.SoundClass")) }
+
+[ue_native_object(path="/Script/Engine.SoundConcurrency")]
+struct Native_SoundConcurrencyRef_36fc67f9 { handle:UObjectHandle }
+def Native_SoundConcurrencyRef_36fc67f9_from(value:UObjectHandle):Native_SoundConcurrencyRef_36fc67f9 { return Native_SoundConcurrencyRef_36fc67f9(handle=ue_cast_nullable_object(value,"/Script/Engine.SoundConcurrency")) }
+
+[ue_native_object(path="/Script/Engine.SoundEffectSourcePresetChain")]
+struct Native_SoundEffectSourcePresetChainRef_1f5469bc { handle:UObjectHandle }
+def Native_SoundEffectSourcePresetChainRef_1f5469bc_from(value:UObjectHandle):Native_SoundEffectSourcePresetChainRef_1f5469bc { return Native_SoundEffectSourcePresetChainRef_1f5469bc(handle=ue_cast_nullable_object(value,"/Script/Engine.SoundEffectSourcePresetChain")) }
+
+[ue_native_object(path="/Script/Engine.SoundSubmixBase")]
+struct Native_SoundSubmixBaseRef_9443b147 { handle:UObjectHandle }
+def Native_SoundSubmixBaseRef_9443b147_from(value:UObjectHandle):Native_SoundSubmixBaseRef_9443b147 { return Native_SoundSubmixBaseRef_9443b147(handle=ue_cast_nullable_object(value,"/Script/Engine.SoundSubmixBase")) }
 
 [ue_native_object(path="/Script/Engine.SpectatorPawn")]
 struct Native_SpectatorPawnRef_c2962b49 { handle:UObjectHandle }
@@ -369,6 +386,13 @@ enum EComponentMobility {
     Movable=2
 }
 
+[ue_native_enum(path="/Script/Engine.EConcurrencyVolumeScaleMode")]
+enum EConcurrencyVolumeScaleMode {
+    Default=0
+    Distance=1
+    Priority=2
+}
+
 [ue_native_enum(path="/Script/Engine.EControllerAnalogStick")]
 enum EControllerAnalogStick {
     CAS_LeftStick=0
@@ -451,6 +475,18 @@ enum EIndirectLightingCacheQuality {
 enum EKinematicBonesUpdateToPhysics {
     SkipSimulatingBones=0
     SkipAllBones=1
+}
+
+[ue_native_enum(path="/Script/Engine.EMaxConcurrentResolutionRule")]
+enum EMaxConcurrentResolutionRule {
+    PreventNew=0
+    StopOldest=1
+    StopFarthestThenPreventNew=2
+    StopFarthestThenOldest=3
+    StopLowestPriority=4
+    StopQuietest=5
+    StopLowestPriorityThenPreventNew=6
+    Count=7
 }
 
 [ue_native_enum(path="/Script/Engine.EMovementMode")]
@@ -619,6 +655,14 @@ enum EViewTargetBlendFunction {
     VTBlend_EaseOut=3
     VTBlend_EaseInOut=4
     VTBlend_PreBlended=5
+}
+
+[ue_native_enum(path="/Script/Engine.EVirtualizationMode")]
+enum EVirtualizationMode {
+    Disabled=0
+    PlayWhenSilent=1
+    Restart=2
+    SeekRestart=3
 }
 
 [ue_native_enum(path="/Script/Engine.EVisibilityBasedAnimTickOption")]
@@ -815,6 +859,12 @@ struct LinearColor {
     A:float
 }
 
+[ue_native_struct(path="/Script/CoreUObject.PerPlatformInt")]
+struct PerPlatformInt {
+    Default:int
+    PerPlatform:table<UENameValue;int>
+}
+
 [ue_native_struct(path="/Script/CoreUObject.PlatformUserId")]
 struct PlatformUserId {
     InternalId:int
@@ -940,6 +990,22 @@ struct SingleAnimationPlayData {
     bSavedPlaying:bool
     SavedPosition:float
     SavedPlayRate:float
+}
+
+[ue_native_struct(path="/Script/Engine.SoundConcurrencySettings")]
+struct SoundConcurrencySettings {
+    MaxCount:int
+    bLimitToOwner:bool
+    bVolumeScaleCanRelease:bool
+    bEnableMaxCountPlatformScaling:bool
+    ResolutionRule:EMaxConcurrentResolutionRule
+    RetriggerTime:float
+    PlatformMaxCount:PerPlatformInt
+    VolumeScale:float
+    VolumeScaleMode:EConcurrencyVolumeScaleMode
+    VolumeScaleAttackTime:float
+    VolumeScaleReleaseTime:float
+    VoiceStealReleaseTime:float
 }
 
 [ue_native_struct(path="/Script/Engine.StreamingSourceShape")]

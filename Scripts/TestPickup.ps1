@@ -23,7 +23,7 @@ $Checks=@('pickup_real_non_recipient_overlap_ignored','pickup_real_overlap_score
 foreach($Check in $Checks){if(!(Select-String -LiteralPath $Log -SimpleMatch "PASS $Check")){throw "Missing pickup check: $Check"}}
 $Folder=Join-Path (Join-Path (Split-Path -Parent $Project) 'Content') ($Example.map -replace '^/Game/','' -replace '/PlayableMap$','')
 $Assets=@(Get-ChildItem -LiteralPath $Folder -File|ForEach-Object Name|Sort-Object)
-$Expected=@('BP_HealthComponent.uasset','BP_PlayableCharacter.uasset','BP_PlayablePickup.uasset','WBP_HUD.uasset','IA_Interact.uasset','IA_Hurt.uasset','IA_UI.uasset','IA_Jump.uasset','IA_Look.uasset','IA_Move.uasset','IMC_Character.uasset','PickupMesh.uasset','PlayableMap.umap')|Sort-Object
+$Expected=@('BP_HealthComponent.uasset','BP_PlayableCharacter.uasset','BP_PlayablePickup.uasset','WBP_HUD.uasset','IA_Interact.uasset','IA_Hurt.uasset','IA_UI.uasset','IA_Jump.uasset','IA_Look.uasset','IA_Move.uasset','IMC_Character.uasset','PickupMesh.uasset','NS_Pickup.uasset','NS_Hurt.uasset','PlayableMap.umap')|Sort-Object
 foreach($Asset in $Expected){if($Asset -notin $Assets){throw "Missing standalone pickup asset: $Asset"}}
 [ordered]@{result='PASS';project=$Project;map=$Example.map;assets=$Assets;checks=$Checks;generator_checks='TestNativeGameplayGenerator.py PASS';scope='Editor Development; saved map in a fresh -game process; NullRHI, cold async mesh load, empty/missing/replaced/destroyed requests, real overlaps, accelerated respawn timer';not_run=@('Foundation suite','full PIE suite','packaged build','physical devices/rendering');commit_created=$false}|ConvertTo-Json -Depth 4|Set-Content -LiteralPath "$Logs/pickup-validation.json" -Encoding utf8
 Write-Output "DAS_PICKUP_FOCUSED=PASS map=$($Example.map)"

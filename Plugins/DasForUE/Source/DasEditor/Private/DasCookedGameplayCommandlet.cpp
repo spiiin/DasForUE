@@ -2,6 +2,7 @@
 #include "DasLibraryTestTypes.h"
 #include "Misc/ScopeExit.h"
 #include "DasPlayableDemo.h"
+#include "DasMontageFixtures.h"
 #include "DasInstanceDefaultsGameFixtures.h"
 #include "DasPawnCharacterFixtures.h"
 #include "DasStaticLibraryProbe.h"
@@ -21,6 +22,8 @@
 UDasCookedGameplayCommandlet::UDasCookedGameplayCommandlet(){IsClient=false;IsServer=false;IsEditor=true;LogToConsole=true;}
 int32 UDasCookedGameplayCommandlet::Main(const FString& Params){
  FString Id;FParse::Value(*Params,TEXT("ProbeId="),Id);FGuid Guid;if(!FGuid::ParseExact(Id,EGuidFormats::Digits,Guid))return 1;
+ if(FParse::Param(*Params,TEXT("MontageOnly"))){FString Error;const FString Root=TEXT("/Game/DasMontage/")+Id;if(!CreateDasMontageFixture(Root,Error)){UE_LOG(LogTemp,Error,TEXT("DAS_MONTAGE_EXPORT=FAIL %s"),*Error);return 1;}UE_LOG(LogTemp,Display,TEXT("DAS_MONTAGE_EXPORT=PASS map=%s/MontageMap"),*Root);return 0;}
+ if(FParse::Param(*Params,TEXT("AIOnly"))){FString Error;const FString Root=TEXT("/Game/DasExamples/AI/")+Id;if(!CreateDasStandalonePlayableDemo(Root,Error,true)){UE_LOG(LogTemp,Error,TEXT("DAS_AI_EXPORT=FAIL %s"),*Error);return 1;}UE_LOG(LogTemp,Display,TEXT("DAS_AI_EXPORT=PASS map=%s/PlayableMap"),*Root);return 0;}
  const bool PlayableOnly=FParse::Param(*Params,TEXT("PlayableOnly"));
  const FString Root=(PlayableOnly?TEXT("/Game/DasExamples/Playable/"):TEXT("/Game/DasCookedGameplay/"))+Id;
  FString Error;
