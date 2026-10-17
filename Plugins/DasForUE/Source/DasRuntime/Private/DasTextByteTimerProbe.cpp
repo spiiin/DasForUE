@@ -9,15 +9,24 @@
 #include "EngineUtils.h"
 #include "Modules/ModuleManager.h"
 #include "UObject/TextProperty.h"
+#include <initializer_list>
 namespace {
 int32 TimerInt(UObject* O,const TCHAR* N){auto* P=O?FindFProperty<FIntProperty>(O->GetClass(),N):nullptr;return P?P->GetPropertyValue_InContainer(O):MIN_int32;}
 bool TimerBool(UObject* O,const TCHAR* N){auto* P=O?FindFProperty<FBoolProperty>(O->GetClass(),N):nullptr;return P && P->GetPropertyValue_InContainer(O);}
+void LogCallbackReadiness(UObject* Owner,const TCHAR* Label,std::initializer_list<const TCHAR*> Fields){
+ FString Values;for(const auto* Field:Fields)Values+=FString::Printf(TEXT(" %s=%d"),Field,TimerInt(Owner,Field));
+ auto* Host=Cast<ADasProbeActor>(Owner);
+ UE_LOG(LogTemp,Display,TEXT("Callback readiness %s: owner=%s ready=%d timers=%d%s error=%s"),Label,*GetNameSafe(Owner),TimerBool(Owner,TEXT("Ready")),FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).ScriptTimerCount(Owner),*Values,Host?*Host->LastDasError:TEXT("missing host"));
+}
 }
 bool DasTextByteTimersReady(UWorld* World){
  if(!World)return false;
  for(TActorIterator<ADasStaticLibraryProbe> It(World);It;++It)if(auto* A=It->TextByteTimerActor.Get()){
   if(TimerBool(A,TEXT("Ready")) && TimerBool(It->ContainerCallbackActor.Get(),TEXT("Ready")))return true;
-  static double Last=0;const double Now=FPlatformTime::Seconds();if(Now-Last>5){Last=Now;UE_LOG(LogTemp,Display,TEXT("Callback readiness: subscriptions=%d state=%d record=%d next=%d events=%d copy=%d errors=%d byte=%d floats=%d names=%d"),FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).SubscriptionCount(A),TimerInt(A,TEXT("StateRuns")),TimerInt(A,TEXT("RecordRuns")),TimerInt(A,TEXT("ValueNext")),TimerInt(A,TEXT("ValueEvents")),TimerBool(A,TEXT("EventCopyOK")),TimerInt(A,TEXT("Errors")),TimerInt(A,TEXT("ByteCalls")),TimerInt(A,TEXT("FloatRuns")),TimerInt(A,TEXT("NameRuns")));}
+  static double LastDetail=0;const double DetailNow=FPlatformTime::Seconds();if(DetailNow-LastDetail>5){LastDetail=DetailNow;
+   LogCallbackReadiness(A,TEXT("scalar"),{TEXT("StateRuns"),TEXT("RecordRuns"),TEXT("ValueNext"),TEXT("ValueEvents"),TEXT("FloatRuns"),TEXT("BoolRuns"),TEXT("NameRuns"),TEXT("ArrayNext"),TEXT("ByteCalls"),TEXT("ByteRuns"),TEXT("TextRuns"),TEXT("BytesRuns"),TEXT("TextsRuns"),TEXT("BytesNext"),TEXT("TextsNext"),TEXT("PausedCalls"),TEXT("InvariantCalls"),TEXT("Errors")});
+   LogCallbackReadiness(It->ContainerCallbackActor.Get(),TEXT("container"),{TEXT("PreservedRuns"),TEXT("RejectedReplacements"),TEXT("ShapesNext"),TEXT("ShapesEvents"),TEXT("MixedRuns"),TEXT("MixedNext"),TEXT("MixedEvents"),TEXT("MixedUnexpected"),TEXT("Next"),TEXT("Events"),TEXT("NativeStatesRuns"),TEXT("StatesRuns"),TEXT("RecordsRuns"),TEXT("MathRuns"),TEXT("RecordMapRuns"),TEXT("TextsRuns"),TEXT("StatesSetRuns"),TEXT("IntsRuns"),TEXT("Errors")});
+  }
   return false;
  }
  return false;

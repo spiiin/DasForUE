@@ -85,7 +85,12 @@ bool CheckDasCallbackTypes(FString& Error)
         UObject* Object=NewObject<UDasTypeRegistry>();TWeakObjectPtr<UObject> Weak(Object);
         FDasScalarValue Input;Input.Kind=12;Input.ObjectClass=FDasNestedObjectSnapshot::StaticStruct()->GetPathName();Input.StructValue.InitializeAs(FDasNestedObjectSnapshot::StaticStruct());
         auto& Native=Input.StructValue.GetMutable<FDasNestedObjectSnapshot>();Native.Details.Object=Object;Native.Items.AddDefaulted_GetRef().Object=Object;
-        TSharedPtr<FDasCallbackPayload> Capture=MakeShared<FDasCallbackPayload>(Input);Input={};
+        const uint8* SourceMemory=Input.StructValue.GetMemory();
+        TSharedPtr<FDasCallbackPayload> Capture=MakeShared<FDasCallbackPayload>(Input);
+        if(Capture->GetValue().StructValue.GetMemory()==SourceMemory)return Fail(TEXT("Borrowed callback capture aliased mutable source"));
+        Native.Details.Object=nullptr;Native.Items.Reset();
+        if(Capture->GetValue().StructValue.Get<FDasNestedObjectSnapshot>().Details.Object!=Object || Capture->GetValue().StructValue.Get<FDasNestedObjectSnapshot>().Items.Num()!=1)return Fail(TEXT("Borrowed callback capture lost isolation"));
+        Input={};
         CollectGarbage(RF_NoFlags);
         if(!Weak.IsValid() || !ValidateDasCallbackPayload(Capture->GetValue(),EDasCallbackUsage::Timer,Error))return Fail(TEXT("Nested queued object lost during GC"));
         Capture.Reset();CollectGarbage(RF_NoFlags);if(Weak.IsValid())return Fail(TEXT("Queued callback retained object after release"));

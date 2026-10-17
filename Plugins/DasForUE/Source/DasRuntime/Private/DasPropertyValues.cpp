@@ -32,6 +32,13 @@ UScriptStruct* SnapshotType(FProperty* P){
     if(auto* Struct=CastField<FStructProperty>(P))return Struct->Struct;
     return DasContainerCarrierForProperty(P);
 }
+bool WriteSnapshotMemory(FProperty* P,void* Memory,const FInstancedStruct& Snapshot,FString& Error){
+    auto* Struct=SnapshotType(P);
+    if(!Struct || Struct!=Snapshot.GetScriptStruct() || !ValidateDasStructSnapshot(Snapshot,Error)){if(Error.IsEmpty())Error=TEXT("Property snapshot type mismatch");return false;}
+    if(CastField<FStructProperty>(P))Struct->CopyScriptStruct(Memory,Snapshot.GetMemory());
+    else {auto* Values=Struct->FindPropertyByName(TEXT("Values"));P->CopyCompleteValue(Memory,Values->ContainerPtrToValuePtr<void>(Snapshot.GetMemory()));}
+    return true;
+}
 struct FRemapValues {
     const TMap<UObject*,UObject*>& Replacements;
     bool Struct(const UScriptStruct*,uint8*){return true;}
@@ -101,15 +108,16 @@ bool WriteDasPropertyValue(FProperty* P,void* Memory,const FDasScalarValue& Valu
     case EDasTypeKind::Enum:if(Type.TypePath!=Value.ObjectClass || !SetDasEnumPropertyNumber(P,Memory,Value.IntValue)){Error=TEXT("Property enum identity/member mismatch");return false;}break;
     case EDasTypeKind::Class:{auto* Target=Value.ClassValue.Get();auto* Class=CastFieldChecked<FClassProperty>(P);if(Type.TypePath!=Value.ObjectClass || (Target && (!IsValid(Target) || !Target->IsChildOf(Class->MetaClass)))){Error=TEXT("Property class identity/value mismatch");return false;}Class->SetObjectPropertyValue(Memory,Target);break;}
     case EDasTypeKind::Object:if(Type.TypePath!=Value.ObjectClass || (Value.ObjectValue && !IsValid(Value.ObjectValue)) || !DasReferenceSet(P,Memory,Value.ObjectValue)){Error=TEXT("Property object/interface identity/value mismatch");return false;}break;
-    default:{
-        auto* Struct=SnapshotType(P);
-        if(!Struct || Struct!=Value.StructValue.GetScriptStruct() || !ValidateDasStructSnapshot(Value.StructValue,Error)){if(Error.IsEmpty())Error=TEXT("Property snapshot type mismatch");return false;}
-        if(CastField<FStructProperty>(P))Struct->CopyScriptStruct(Memory,Value.StructValue.GetMemory());
-        else {auto* Values=Struct->FindPropertyByName(TEXT("Values"));P->CopyCompleteValue(Memory,Values->ContainerPtrToValuePtr<void>(Value.StructValue.GetMemory()));}
-        break;
-    }
+    default:return WriteSnapshotMemory(P,Memory,Value.StructValue,Error);
     }
     return true;
+}
+
+bool WriteDasPropertySnapshot(FProperty* P,void* Memory,const FInstancedStruct& Snapshot,FString& Error){
+    Error.Reset();FDasDeclaredType Type;
+    if(!ValueType(P,Type,Error))return false;
+    if(!Memory){Error=TEXT("Missing property value memory");return false;}
+    return WriteSnapshotMemory(P,Memory,Snapshot,Error);
 }
 
 void FDasPropertyValueRoots::AddReferencedObjects(FReferenceCollector& Collector){

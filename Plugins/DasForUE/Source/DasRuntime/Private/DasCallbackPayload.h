@@ -18,6 +18,7 @@ class FDasCallbackPayload final {
     FDasCallbackIdentities Identities;
 public:
     explicit FDasCallbackPayload(const FDasScalarValue& In){Roots.Keep(In);Roots.AddReferencedObjects(Identities);}
+    explicit FDasCallbackPayload(FDasScalarValue&& In){Roots.Keep(MoveTemp(In));Roots.AddReferencedObjects(Identities);}
     const FDasScalarValue& GetValue() const {return Roots.Values[0];}
     bool IsAlive() const {return Identities.IsAlive();}
 };

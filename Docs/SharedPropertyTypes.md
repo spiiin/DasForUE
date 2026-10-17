@@ -614,7 +614,9 @@ Traversal validation:
   Packaged native defaults, Foundation, gameplay and playable-map probes all
   passed and exited normally. These runs use NullRHI / Win64 Development;
   Shipping and visual rendering were not tested.
-- Full Editor RuntimePIE is **not green**. The first run stopped on a reserved
+- At this traversal-validation checkpoint, Editor RuntimePIE was **not green**.
+  This historical result is superseded by the callback follow-up below.
+  The first run stopped on a reserved
   `label` identifier in the concurrently added callback fixture, subsequently
   fixed by parallel work. The next run reported container-callback / native
   damage checks and timer cleanup failures. A final run after export/package
@@ -637,6 +639,113 @@ logs/value-walker-RuntimePIE-final-report/index.json (failed callback timeout).
 Gameplay map: /Game/DasCookedGameplay/19ee5396db8448b8b47149b83fbfb8e4/Map.
 Native map: /Game/DasNativeDefaults/10e45d1a77cb4220981b47c2b6d8b1d2/Map.
 Archive: Build/ValueWalkerPackaged. No commit was created.
+
+Callback timeout follow-up (2026-10-17):
+
+The main editor runtime DLL used by the failed runs predated the callback fixes
+already present in source. Rebuilding the main checkout included the strict
+`IdenticalDasStructSnapshot` comparison in `StoreStructValue`: Unreal's editor
+property equality can treat FText values with identical display strings as equal
+despite different localization namespace/key/history. Reusing such a snapshot
+changes callback arguments. The existing array/map FText regressions cover this;
+the Foundation probe now records the concrete collision:
+`DAS_SNAPSHOT_IDENTITY_REGRESSION legacy_equal=1 cache_equal=0`.
+
+The old timeout log printed only the scalar fixture even though readiness also
+depends on the container fixture. It cannot establish exactly which readiness
+predicate failed in that historical run. `DasTextByteTimersReady` now logs both
+actors, their handler counters, Ready flags, active timer counts and host errors.
+The PIE timeout no longer appends a blank automation error when LastDasError is
+empty. No timeout, count assertion or readiness predicate was relaxed.
+
+After rebuilding, all three fresh-process RuntimePIE runs passed, each reporting
+one success and zero warnings/failures/skips. The two final runs used the final
+diagnostics and both include the math/name/map/set FText-history, rejected timer
+replacement, callback cleanup and EndPIE cleanup checks. Foundation passed with
+failures=0. This follow-up did not introduce a second FText fix; it rebuilt and
+verified the existing fix in the main checkout and improved failure diagnostics.
+
+Evidence: logs/callback-timeout-{build,final-build}.log,
+logs/callback-timeout-foundation.log,
+logs/callback-timeout-diagnostic-report/index.json and
+logs/callback-timeout-final-{1,2}-report/index.json.
+Checks used Unreal 5.8.3, NullRHI and Development Editor. No commit was created.
+
+Snapshot ownership and copy reduction (2026-10-17):
+
+`StoreStructValue` now distinguishes borrowed snapshots from owned temporaries.
+Both routes validate and deduplicate with the same FText-aware comparison and
+share one token allocator. An owned candidate moves its native buffer into the
+context table on insertion; a borrowed value is copied on insertion. Snapshot
+modifiers still clone their source before changing it, then move the candidate.
+Property reads and reflected function results also transfer their temporary
+snapshot into the table. Context entries remain immutable through the VM API.
+
+`WriteDasPropertySnapshot` synchronously borrows an immutable snapshot and copies
+directly into the destination FProperty memory. It shares the existing codec's
+type/value checks and write implementation; validation finishes before writing.
+The borrowed reference does not escape. Reflected struct/container arguments and
+native snapshot property setters no longer build an intermediate FDasScalarValue
+with a second owned copy. Call assignment bookkeeping and object pins remain.
+
+Callback payloads and their common GC roots accept an owning rvalue. Dynamic
+event receivers transfer completed local captures into the queue; timer wrappers
+transfer their validated local captures into the timer. The const-reference
+event API still captures an independent copy. Repeated timers retain their
+capture, and delivery still copies borrowed values into the context when no
+matching immutable entry exists. Native GC and weak identity checks are intact.
+
+Representative deep-copy counts for a new, non-deduplicated snapshot:
+
+| Route | Before | After |
+| --- | ---: | ---: |
+| Native function result/property read to VM table | 2 | 1 |
+| VM snapshot to reflected argument/property memory | 2 | 1 |
+| VM snapshot to a timer capture (before delivery) | 2 | 1 |
+| Single native snapshot event through capture to VM table | 3 | 2 |
+| Clone/modify snapshot and insert changed value | 2 | 1 |
+
+These counts describe the ownership paths, not measured execution time. Native
+destination copies and copies that isolate mutable sources/deliveries remain.
+Multi-argument frame assembly still uses the checked per-field value codec.
+
+Regressions verify exact buffer transfer into an owning callback payload, moved
+capture GC retention/release, independent capture from a borrowed mutable source,
+direct borrowed writes and failed-write atomicity across supported snapshot
+types. Existing script tests cover unchanged originals, repeated delivery,
+event-handler mutation, FText localization identity and cancelled/released owners.
+
+Ownership validation:
+
+- Editor and Win64 Development Game builds passed. Final rebuilds explicitly
+  recompiled DasRuntime.cpp after the last event-dispatch gate/forwarding change.
+- Editor Foundation passed before and after that final rebuild (failures=0).
+  Callback regressions verify moved-buffer identity, borrowed-source isolation,
+  nested GC retention/release and FText-aware snapshot identity.
+- PropertyValues passed all 106 combinations plus borrowed-write regressions:
+  one success, zero warnings/failures/skips. Native defaults Create, Reopen and
+  Recompile passed, as did fresh gameplay export.
+- Initial and final RuntimePIE runs each report one success, zero warnings,
+  failures or skips. The final run includes the final dispatch implementation.
+- Final cook/stage/archive succeeded (zero errors, four known ACL asset
+  warnings). All four final packaged probes passed and exited normally: native
+  defaults, Foundation (failures=0), gameplay and playable map.
+- Scoped runtime/header/adapter/probe files and PropertyValues tests retained
+  their recorded hashes throughout the final rebuild-and-test pass. No commit
+  was created. Validation uses NullRHI / Development; Shipping and visual
+  rendering were not tested.
+
+Evidence: logs/snapshot-moves-validation.json,
+logs/snapshot-moves-editor-{build,final-build}.log,
+logs/snapshot-moves-game-{build,final-build}.log,
+logs/snapshot-moves-foundation-{editor,final-editor}.log,
+logs/snapshot-moves-PropertyValues-report/index.json,
+logs/snapshot-moves-final-PIE-report/index.json,
+logs/snapshot-moves-native-{Create,Reopen,Recompile}.log,
+logs/snapshot-moves-package{,-final-suite}.log and
+logs/snapshot-moves-{native,foundation,gameplay,playable}-packaged.log.
+Archive: Build/SnapshotMovesPackaged.
+
 
 ## 2026-10-17 — combined commit validation and nullable getter fixes
 

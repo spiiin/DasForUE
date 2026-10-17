@@ -73,6 +73,7 @@ public:
     // Internal reflected delegate bridge: IDs never contain a VM/function pointer.
     void DispatchIntEvent(uint64 SubscriptionId, int32 Value);
     void DispatchScalarEvent(uint64 SubscriptionId,const FDasScalarValue& Value);
+    void DispatchScalarEvent(uint64 SubscriptionId,FDasScalarValue&& Value);
     int32 ScriptTimerCount(const UObject* Owner = nullptr) const;
     int32 SubscriptionCount(const UObject* Owner = nullptr) const;
     void ReleaseObject(UObject* Object);

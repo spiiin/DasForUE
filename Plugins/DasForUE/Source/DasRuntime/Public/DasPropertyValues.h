@@ -8,12 +8,16 @@
 // descriptor are supported; delegates require their signature/lifetime service.
 DASRUNTIME_API bool ReadDasPropertyValue(FProperty* Property,const void* Memory,FDasScalarValue& Out,FString& Error);
 DASRUNTIME_API bool WriteDasPropertyValue(FProperty* Property,void* Memory,const FDasScalarValue& Value,FString& Error);
+// Synchronously borrow an immutable snapshot and copy directly to native memory.
+// No view escapes this call; type/value validation finishes before writing.
+DASRUNTIME_API bool WriteDasPropertySnapshot(FProperty* Property,void* Memory,const FInstancedStruct& Snapshot,FString& Error);
 
 // Owned native snapshots need an explicit GC scope outside UPROPERTY storage.
 // Includes references nested in structs, arrays, sets and map keys/values.
 struct DASRUNTIME_API FDasPropertyValueRoots final : FGCObject {
     TArray<FDasScalarValue> Values;
     void Keep(const FDasScalarValue& Value){Values.Add(Value);}
+    void Keep(FDasScalarValue&& Value){Values.Add(MoveTemp(Value));}
     void Keep(const TMap<FString,FDasScalarValue>& Items){for(const auto& Item:Items)Keep(Item.Value);}
     virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
     virtual FString GetReferencerName() const override {return TEXT("DasPropertyValueRoots");}

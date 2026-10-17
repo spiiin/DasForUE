@@ -61,6 +61,12 @@ bool FDasPropertyValuesTest::RunTest(const FString&){
   if(ReadDasPropertyValue(P,nullptr,Sentinel,Error) || Sentinel.Kind!=99 || Sentinel.StringValue!=TEXT("unchanged")){AddError(TEXT("Failed read changed output"));return false;}
   if(Type.GetKind()==EDasTypeKind::Enum || Type.GetKind()==EDasTypeKind::Object || Type.GetKind()==EDasTypeKind::Class){Wrong=Snapshot;Wrong.ObjectClass=TEXT("/Script/Missing.Type");if(WriteDasPropertyValue(P,B,Wrong,Error) || !P->Identical(B,E,PPF_DeepComparison)){AddError(TEXT("Wrong reference/enum identity accepted"));return false;}}
   P->ClearValue(B);if(!WriteDasPropertyValue(P,B,Snapshot,Error) || !P->Identical(B,E,PPF_DeepComparison)){AddError(TEXT("Snapshot not reusable"));return false;}
+  if(Snapshot.Kind==int32(EDasMethodSignature::Struct)){
+   const auto* SnapshotMemory=Snapshot.StructValue.GetMemory();P->ClearValue(B);
+   if(!WriteDasPropertySnapshot(P,B,Snapshot.StructValue,Error) || !P->Identical(B,E,PPF_DeepComparison) || Snapshot.StructValue.GetMemory()!=SnapshotMemory){AddError(TEXT("Borrowed snapshot write changed source or destination value"));return false;}
+   FInstancedStruct WrongType;WrongType.InitializeAs(TBaseStructure<FIntPoint>::Get());
+   if(WriteDasPropertySnapshot(P,B,WrongType,Error) || !P->Identical(B,E,PPF_DeepComparison)){AddError(TEXT("Rejected borrowed snapshot write changed destination"));return false;}
+  }
   ++Count;
  }
  // Values outside UPROPERTY memory remain alive only through the explicit root.

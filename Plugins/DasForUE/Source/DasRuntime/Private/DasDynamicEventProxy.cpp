@@ -78,7 +78,7 @@ DEFINE_FUNCTION(UDasIntDelegateProxy::execReceiveDynamic)
         else Stack.PropertyChainForCompiledIn=nullptr;
         P_FINISH;
         FDasScalarValue Value;FString Error;
-        if(IsInGameThread() && CaptureDasCallbackFrame(Stack.Node,NativeMemory,Frame,Value,Error))if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,Value);
+        if(IsInGameThread() && CaptureDasCallbackFrame(Stack.Node,NativeMemory,Frame,Value,Error))if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,MoveTemp(Value));
         return;
     }
     FProperty* Property=nullptr;const void* Memory=nullptr;
@@ -89,14 +89,14 @@ DEFINE_FUNCTION(UDasIntDelegateProxy::execReceiveDynamic)
     UE_LOG(LogTemp,VeryVerbose,TEXT("DYNAMIC_EVENT id=%llu kind=%d property=%s memory=%d code=%d"),P_THIS->SubscriptionId,P_THIS->DynamicKind,Property?*Property->GetName():TEXT("null"),Memory!=nullptr,Stack.Code!=nullptr);
     if(IsInGameThread() && Property && Memory){
         FDasScalarValue Value;Value.Kind=P_THIS->DynamicKind;Value.ObjectClass=P_THIS->DynamicPath;
-        if(Value.Kind==int32(EDasMethodSignature::Object)){Value.ObjectValue=DasReferenceGet(Property,Memory);if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,Value);}
+        if(Value.Kind==int32(EDasMethodSignature::Object)){Value.ObjectValue=DasReferenceGet(Property,Memory);if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,MoveTemp(Value));}
         else if(Value.Kind==int32(EDasMethodSignature::Enum)){
             auto* Enum=DasEnumPropertyType(Property);
-            if(Enum && Enum->GetPathName()==Value.ObjectClass){const int64 Number=DasEnumPropertyNumber(Property,Memory);if(Number>=0 && Number<=254){Value.IntValue=int32(Number);if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,Value);}}
+            if(Enum && Enum->GetPathName()==Value.ObjectClass){const int64 Number=DasEnumPropertyNumber(Property,Memory);if(Number>=0 && Number<=254){Value.IntValue=int32(Number);if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,MoveTemp(Value));}}
         }else if(Value.Kind==int32(EDasMethodSignature::Struct)){
             FString Error;FDasScalarValue Snapshot;
             if(ReadDasPropertyValue(Property,Memory,Snapshot,Error) && Snapshot.Kind==Value.Kind && Snapshot.ObjectClass==Value.ObjectClass)
-                if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,Snapshot);
+                if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,MoveTemp(Snapshot));
         }
     }
     P_NATIVE_END;

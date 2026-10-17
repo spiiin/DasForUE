@@ -3608,6 +3608,29 @@ PropertyValues regressions exercise nested budgets, invalid math, duplicate
 object identities, sparse holes and replacement-key lookup. Scope and validation
 evidence are recorded in SharedPropertyTypes.md. No commit was created.
 
+## 2026-10-17 — callback PIE timeout follow-up
+
+Rebuilt the main Editor runtime with the existing FText snapshot-identity fix;
+three fresh-process RuntimePIE runs passed (one success, no warnings/failures/skips
+each), including two runs after final diagnostic edits. Foundation passed and
+records the old editor equality collision (legacy_equal=1, cache_equal=0).
+Readiness diagnostics now cover both scalar and container callback fixtures;
+blank host errors are no longer added on timeout. No readiness condition or
+timeout was weakened. See SharedPropertyTypes.md for evidence and the limits of
+the historical failure diagnosis. No commit was created.
+
+## 2026-10-17 — reduce snapshot transport copies
+
+Owned snapshot temporaries now move into the VM table and callback GC roots.
+Dynamic event captures and validated timer captures transfer their ownership;
+borrowed sources still get independent storage. Reflected snapshot arguments
+and property writes use the common synchronous borrowed writer, avoiding an
+intermediate cloned transport. Type/limit/FText checks, object pins, rejected
+write atomicity and per-delivery isolation remain. Ownership, GC and source
+isolation regressions accompany the change; route counts and validation are in
+SharedPropertyTypes.md. No commit was created.
+
+
 ## 2026-10-17 — combined commit validation and nullable getter fixes
 
 The combined b7da031 baseline plus nullable VM object getter and method-dispatch

@@ -18,6 +18,7 @@ bool CheckDasCallbackFrames(FString& Error){
  TextA.GetMutable<FDasArrayTextCarrier>().Values.Add(FText::AsLocalizable_Advanced_LocText(TEXT("FrameA"),TEXT("A"),TEXT("Same")));
  TextB.GetMutable<FDasArrayTextCarrier>().Values.Add(FText::AsLocalizable_Advanced_LocText(TEXT("FrameB"),TEXT("B"),TEXT("Same")));
  if(IdenticalDasStructSnapshot(TextA,TextB) || !IdenticalDasStructSnapshot(TextA,TextA))return Fail(TEXT("Snapshot cache lost FText history"));
+ UE_LOG(LogTemp,Display,TEXT("DAS_SNAPSHOT_IDENTITY_REGRESSION legacy_equal=%d cache_equal=%d"),TextA.GetScriptStruct()->CompareScriptStruct(TextA.GetMemory(),TextB.GetMemory(),0),IdenticalDasStructSnapshot(TextA,TextB));
  FInstancedStruct MapA,MapB;MapA.InitializeAs(FDasMapIntTextCarrier::StaticStruct());MapB.InitializeAs(FDasMapIntTextCarrier::StaticStruct());
  auto& MA=MapA.GetMutable<FDasMapIntTextCarrier>().Values;auto& MB=MapB.GetMutable<FDasMapIntTextCarrier>().Values;
  const auto TA=TextA.Get<FDasArrayTextCarrier>().Values[0],TB=TextB.Get<FDasArrayTextCarrier>().Values[0];
@@ -48,7 +49,10 @@ bool CheckDasCallbackFrames(FString& Error){
  const FDasScalarValue Values[]={Number,Label,Reference};
  for(int I=0;I<3;++I)if(!WriteDasPropertyValue(Params[I],Params[I]->ContainerPtrToValuePtr<void>(Memory.GetStructMemory()),Values[I],Error))return false;
  FDasScalarValue Captured;if(!CaptureDasCallbackFrame(Signature.Get(),Memory.GetStructMemory(),Frame,Captured,Error))return false;
- TSharedPtr<FDasCallbackPayload> Owned=MakeShared<FDasCallbackPayload>(Captured);Captured={};Memory.Reset();Component.Reset();Reference={};
+ const uint8* CapturedMemory=Captured.StructValue.GetMemory();
+ TSharedPtr<FDasCallbackPayload> Owned=MakeShared<FDasCallbackPayload>(MoveTemp(Captured));
+ if(Captured.StructValue.IsValid() || Owned->GetValue().StructValue.GetMemory()!=CapturedMemory)return Fail(TEXT("Owned callback capture copied its snapshot buffer"));
+ Captured={};Memory.Reset();Component.Reset();Reference={};
  CollectGarbage(RF_NoFlags);if(!Weak.IsValid() || !Owned->IsAlive())return Fail(TEXT("Tuple object lost during GC"));
  auto* Field=Frame->FindPropertyByName(TEXT("arg_0"));FDasScalarValue Read;
  const auto& Snapshot=Owned->GetValue();if(!ReadDasPropertyValue(Field,Field->ContainerPtrToValuePtr<void>(Snapshot.StructValue.GetMemory()),Read,Error) || Read.IntValue!=42)return Fail(TEXT("Tuple snapshot content lost"));

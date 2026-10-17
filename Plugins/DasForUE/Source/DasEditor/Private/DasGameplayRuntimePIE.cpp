@@ -71,7 +71,7 @@ public:
             if(!Ready){
                 if(FPlatformTime::Seconds()-Started<30 && (!A || A->LastDasError.IsEmpty()))return false;
                 Check(false,TEXT("callbacks_finish_before_timeout"));
-                if(A)Test->AddError(A->LastDasError);
+                if(A && !A->LastDasError.IsEmpty())Test->AddError(A->LastDasError);
                 End();return false;
             }
             ADasProbeActor* Single=nullptr;
