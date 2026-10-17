@@ -37,8 +37,9 @@ FName UDasIntDelegateProxy::ConfigureDynamic(UFunction* Signature,const FString&
     {if(Error.IsEmpty())Error=TEXT("Unsupported dynamic event receiver signature");return NAME_None;}
     auto* Parameter=ReceiverParameter(Signature);
     if(Parameter->HasAnyPropertyFlags(CPF_OutParm|CPF_ReferenceParm) && !Parameter->HasAnyPropertyFlags(CPF_ConstParm)){Error=TEXT("Queued event receivers reject mutable ref/out parameters");return NAME_None;}
-    const FString Actual=Kind==EDasMethodSignature::Object?DasReferencePropertyClass(Parameter)->GetPathName():Kind==EDasMethodSignature::Enum?DasEnumPropertyType(Parameter)->GetPathName():DasCallbackSnapshotForProperty(Parameter)->GetPathName();
-    if(Actual!=Path){Error=TEXT("Dynamic event type identity mismatch");return NAME_None;}
+    const FString Actual=Kind==EDasMethodSignature::Class?CastFieldChecked<FClassProperty>(Parameter)->MetaClass->GetPathName():Kind==EDasMethodSignature::Object?DasReferencePropertyClass(Parameter)->GetPathName():Kind==EDasMethodSignature::Enum?DasEnumPropertyType(Parameter)->GetPathName():DasCallbackSnapshotForProperty(Parameter)->GetPathName();
+    const bool ClassWidening=Kind==EDasMethodSignature::Class && FindObject<UClass>(nullptr,*Actual)->IsChildOf(FindObject<UClass>(nullptr,*Path));
+    if(Actual!=Path && !ClassWidening){Error=TEXT("Dynamic event type identity mismatch");return NAME_None;}
     }
     auto* Parameter=ReceiverParameter(Signature);
     for(const auto& Existing:DynamicReceivers)if(Existing->IsSignatureCompatibleWith(Signature,0)){
@@ -90,6 +91,7 @@ DEFINE_FUNCTION(UDasIntDelegateProxy::execReceiveDynamic)
     if(IsInGameThread() && Property && Memory){
         FDasScalarValue Value;Value.Kind=P_THIS->DynamicKind;Value.ObjectClass=P_THIS->DynamicPath;
         if(Value.Kind==int32(EDasMethodSignature::Object)){Value.ObjectValue=DasReferenceGet(Property,Memory);if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,MoveTemp(Value));}
+        else if(Value.Kind==int32(EDasMethodSignature::Class)){if(auto* C=CastField<FClassProperty>(Property)){Value.ClassValue=Cast<UClass>(C->GetObjectPropertyValue(Memory));if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,MoveTemp(Value));}}
         else if(Value.Kind==int32(EDasMethodSignature::Enum)){
             auto* Enum=DasEnumPropertyType(Property);
             if(Enum && Enum->GetPathName()==Value.ObjectClass){const int64 Number=DasEnumPropertyNumber(Property,Memory);if(Number>=0 && Number<=254){Value.IntValue=int32(Number);if(auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))Runtime->DispatchScalarEvent(P_THIS->SubscriptionId,MoveTemp(Value));}}

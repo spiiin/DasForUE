@@ -45,8 +45,24 @@ bool CheckDasCallbackTypes(FString& Error)
         if(ValidateDasCallbackPayload(V,EDasCallbackUsage::Event,Error))return Fail(TEXT("Callback accepted oversized array"));
     }
     if(Arrays!=8)return Fail(TEXT("Queued callbacks must cover all eight primitive array types"));
-    for(const TCHAR* Unsupported:{TEXT("array_struct"),TEXT("array_object"),TEXT("class"),TEXT("map"),TEXT("set"),TEXT("unknown")})
+    for(const TCHAR* Unsupported:{TEXT("array_struct"),TEXT("array_object"),TEXT("map"),TEXT("set"),TEXT("unknown")})
         if(FindDasCallbackType(Unsupported))return Fail(TEXT("Unexpected callback capability"));
+    FDasScalarValue ClassValue;ClassValue.Kind=15;ClassValue.ObjectClass=AActor::StaticClass()->GetPathName();
+    for(auto Usage:{EDasCallbackUsage::Event,EDasCallbackUsage::Timer}){
+        if(!ValidateDasCallbackPayload(ClassValue,Usage,Error))return Fail(TEXT("Null class callback rejected"));
+        ClassValue.ClassValue=ADasProbeActor::StaticClass();if(!ValidateDasCallbackPayload(ClassValue,Usage,Error))return false;
+        ClassValue.ClassValue=USceneComponent::StaticClass();if(ValidateDasCallbackPayload(ClassValue,Usage,Error))return Fail(TEXT("Wrong class base accepted"));
+        ClassValue.ClassValue=nullptr;
+    }
+    {
+        auto* Class=NewObject<UClass>(GetTransientPackage());Class->SetSuperStruct(AActor::StaticClass());
+        TWeakObjectPtr<UClass> Weak(Class);ClassValue.ClassValue=Class;
+        TSharedPtr<FDasCallbackPayload> Capture=MakeShared<FDasCallbackPayload>(ClassValue);ClassValue.ClassValue=nullptr;
+        CollectGarbage(RF_NoFlags);if(!Weak.IsValid() || !Capture->IsAlive())return Fail(TEXT("Captured UClass lost during GC"));
+        Class->ClassFlags|=CLASS_NewerVersionExists;
+        if(Capture->IsAlive() || ValidateDasCallbackPayload(Capture->GetValue(),EDasCallbackUsage::Timer,Error))return Fail(TEXT("Obsolete class capture accepted"));
+        Capture.Reset();CollectGarbage(RF_NoFlags);if(Weak.IsValid())return Fail(TEXT("Class capture retained after release"));
+    }
     FDasScalarValue V;V.Kind=int32(EDasMethodSignature::Object);
     if(!ValidateDasCallbackPayload(V,EDasCallbackUsage::Timer,Error) || !ValidateDasCallbackPayload(V,EDasCallbackUsage::Event,Error))return Fail(TEXT("Callback object ownership policy changed"));
     V={};V.Kind=int32(EDasMethodSignature::Float);V.FloatValue=std::numeric_limits<float>::infinity();
@@ -67,19 +83,27 @@ bool CheckDasCallbackTypes(FString& Error)
     if(ValidateDasCallbackPayload(V,EDasCallbackUsage::Event,Error))return Fail(TEXT("Nonfinite nested callback field accepted"));
     if(!ValidateDasCallbackTypePath(TEXT("struct"),FDasObjectSnapshot::StaticStruct()->GetPathName(),Error))return false;
     if(ValidateDasCallbackTypePath(TEXT("enum"),TEXT("/Script/DasRuntime.DoesNotExist"),Error))return Fail(TEXT("Missing callback enum accepted"));
-    for(const auto Kind:{EDasMethodSignature::Enum,EDasMethodSignature::Struct,EDasMethodSignature::Object})for(const TCHAR* Direction:{TEXT("in"),TEXT("inout")}){
+    for(const auto Kind:{EDasMethodSignature::Class,EDasMethodSignature::Enum,EDasMethodSignature::Struct,EDasMethodSignature::Object})for(const TCHAR* Direction:{TEXT("in"),TEXT("inout")}){
         // Mutable ref callbacks are forbidden, but a const-ref native event uses
         // the same physical layout as a delegate ref parameter with ConstParm.
-        FDasDeclaredMethod M;M.Name=TEXT("Invoke");M.ReturnType.Kind=TEXT("void");FDasDeclaredParameter P;P.Name=TEXT("Value");P.Direction=Direction;P.Type.Kind=Kind==EDasMethodSignature::Object?TEXT("object"):Kind==EDasMethodSignature::Enum?TEXT("enum"):TEXT("struct");P.Type.TypePath=Kind==EDasMethodSignature::Object?UDasEventInterface::StaticClass()->GetPathName():Kind==EDasMethodSignature::Enum?StaticEnum<EDasCallMode>()->GetPathName():FDasCallPayload::StaticStruct()->GetPathName();M.Parameters.Add(P);
+        FDasDeclaredMethod M;M.Name=TEXT("Invoke");M.ReturnType.Kind=TEXT("void");FDasDeclaredParameter P;P.Name=TEXT("Value");P.Direction=Direction;P.Type.Kind=Kind==EDasMethodSignature::Class?TEXT("class"):Kind==EDasMethodSignature::Object?TEXT("object"):Kind==EDasMethodSignature::Enum?TEXT("enum"):TEXT("struct");P.Type.TypePath=Kind==EDasMethodSignature::Class?AActor::StaticClass()->GetPathName():Kind==EDasMethodSignature::Object?UDasEventInterface::StaticClass()->GetPathName():Kind==EDasMethodSignature::Enum?StaticEnum<EDasCallMode>()->GetPathName():FDasCallPayload::StaticStruct()->GetPathName();M.Parameters.Add(P);
         TStrongObjectPtr<UFunction> Sig(MakeDasDelegateSignature(M,true,GetTransientPackage(),NAME_None,Error));if(!Sig)return false;
         TStrongObjectPtr<UDasIntDelegateProxy> Negative(NewObject<UDasIntDelegateProxy>());
-        const FString WrongPath=Kind==EDasMethodSignature::Object?UObject::StaticClass()->GetPathName():Kind==EDasMethodSignature::Struct?FDasCallMetrics::StaticStruct()->GetPathName():StaticEnum<EDasCallbackMode>()->GetPathName();
+        const FString WrongPath=Kind==EDasMethodSignature::Class?USceneComponent::StaticClass()->GetPathName():Kind==EDasMethodSignature::Object?UObject::StaticClass()->GetPathName():Kind==EDasMethodSignature::Struct?FDasCallMetrics::StaticStruct()->GetPathName():StaticEnum<EDasCallbackMode>()->GetPathName();
         if(!Negative->ConfigureDynamic(Sig.Get(),WrongPath,Kind,Error).IsNone())return Fail(TEXT("Dynamic receiver accepted another concrete type"));
         if(P.Direction==TEXT("inout") && !Negative->ConfigureDynamic(Sig.Get(),P.Type.TypePath,Kind,Error).IsNone())return Fail(TEXT("Dynamic receiver accepted mutable ref source"));
         if(P.Direction==TEXT("inout"))for(TFieldIterator<FProperty> It(Sig.Get());It;++It)if(It->HasAnyPropertyFlags(CPF_Parm))It->SetPropertyFlags(CPF_ConstParm);
         TStrongObjectPtr<UDasIntDelegateProxy> Proxy(NewObject<UDasIntDelegateProxy>());
         const auto Name=Proxy->ConfigureDynamic(Sig.Get(),P.Type.TypePath,Kind,Error);if(Name.IsNone())return false;
         auto* Function=Proxy->FindFunction(Name);if(!Function || !Function->IsSignatureCompatibleWith(Sig.Get()) || Proxy->ConfigureDynamic(Sig.Get(),P.Type.TypePath,Kind,Error)!=Name)return Fail(TEXT("Dynamic native callback proxy layout/reuse mismatch"));
+    }
+    {
+        FDasDeclaredMethod M;M.Name=TEXT("ClassCovariance");M.ReturnType.Kind=TEXT("void");
+        FDasDeclaredParameter P;P.Name=TEXT("Value");P.Direction=TEXT("in");P.Type.Kind=TEXT("class");P.Type.TypePath=AActor::StaticClass()->GetPathName();M.Parameters.Add(P);
+        TStrongObjectPtr<UFunction> Sig(MakeDasDelegateSignature(M,true,GetTransientPackage(),NAME_None,Error));if(!Sig)return false;
+        TStrongObjectPtr<UDasIntDelegateProxy> Proxy(NewObject<UDasIntDelegateProxy>());
+        if(Proxy->ConfigureDynamic(Sig.Get(),UObject::StaticClass()->GetPathName(),EDasMethodSignature::Class,Error).IsNone())return Fail(TEXT("Safe class callback widening rejected"));
+        if(!Proxy->ConfigureDynamic(Sig.Get(),ADasProbeActor::StaticClass()->GetPathName(),EDasMethodSignature::Class,Error).IsNone())return Fail(TEXT("Unsafe class callback narrowing accepted"));
     }
     {
         UObject* Object=NewObject<UDasTypeRegistry>();TWeakObjectPtr<UObject> Weak(Object);

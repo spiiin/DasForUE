@@ -8,6 +8,7 @@
 namespace {
 bool InterfacePropertyMatches(FProperty* P,EDasMethodSignature K,const FString& Path){
  if(!P)return false;if(K==EDasMethodSignature::Struct){if(auto* C=DasContainerProperty(Path))return C->SameType(P);auto* S=CastField<FStructProperty>(P);return S && S->Struct->GetPathName()==Path;}
+ if(K==EDasMethodSignature::Class){auto* C=CastField<FClassProperty>(P);return C && C->MetaClass && C->MetaClass->GetPathName()==Path;}
  if(K==EDasMethodSignature::Object){auto* C=DasReferencePropertyClass(P);return C && C->GetPathName()==Path;}if(K==EDasMethodSignature::Enum){auto* E=DasEnumPropertyType(P);return E && E->GetPathName()==Path;}
  if(K==EDasMethodSignature::Vector || K==EDasMethodSignature::Rotator || K==EDasMethodSignature::Transform){auto* S=CastField<FStructProperty>(P);return S && S->Struct==(K==EDasMethodSignature::Vector?TBaseStructure<FVector>::Get():K==EDasMethodSignature::Rotator?TBaseStructure<FRotator>::Get():TBaseStructure<FTransform>::Get());}
  return K==EDasMethodSignature::Byte?(P->IsA<FByteProperty>() && !DasEnumPropertyType(P)):K==EDasMethodSignature::Text?P->IsA<FTextProperty>():K==EDasMethodSignature::Int?P->IsA<FIntProperty>():K==EDasMethodSignature::Float?P->IsA<FFloatProperty>():K==EDasMethodSignature::Double?P->IsA<FDoubleProperty>():K==EDasMethodSignature::Bool?P->IsA<FBoolProperty>():K==EDasMethodSignature::String?P->IsA<FStrProperty>():K==EDasMethodSignature::Name?P->IsA<FNameProperty>():false;

@@ -33,8 +33,9 @@ bool QueuedProperty(const FProperty* P,TSet<const UScriptStruct*>& Active,int32 
     if(!P || P->ArrayDim!=1 || Depth>16){Error=TEXT("Unsupported callback value nesting");return false;}
     switch(DasPropertyKind(P)){
     case EDasTypeKind::Object:return DasReferencePropertyClass(P)!=nullptr;
-    case EDasTypeKind::Class:case EDasTypeKind::Delegate:case EDasTypeKind::Event:case EDasTypeKind::Invalid:
-        Error=TEXT("Queued structs cannot contain class/delegate references or unsupported fields");return false;
+    case EDasTypeKind::Class:{FDasDeclaredType T;if(!DescribeDasProperty(P,T,Error))return false;return ValidateDasCallbackTypePath(TEXT("class"),T.TypePath,Error);}
+    case EDasTypeKind::Delegate:case EDasTypeKind::Event:case EDasTypeKind::Invalid:
+        Error=TEXT("Queued structs cannot contain delegate references or unsupported fields");return false;
     case EDasTypeKind::Struct:{auto* S=CastFieldChecked<FStructProperty>(P)->Struct.Get();if(Active.Contains(S)){Error=TEXT("Recursive callback struct");return false;}Active.Add(S);for(TFieldIterator<FProperty> It(S);It;++It)if(!QueuedProperty(*It,Active,Depth+1,Error))return false;Active.Remove(S);return true;}
     case EDasTypeKind::Array:return QueuedProperty(CastFieldChecked<FArrayProperty>(P)->Inner,Active,Depth+1,Error);
     case EDasTypeKind::Set:return QueuedProperty(CastFieldChecked<FSetProperty>(P)->ElementProp,Active,Depth+1,Error);
@@ -44,7 +45,8 @@ bool QueuedProperty(const FProperty* P,TSet<const UScriptStruct*>& Active,int32 
     }
 }
 bool ValueBudget(const FProperty* P,const void* Memory,int64& Characters,int32& Elements,FString& Error){
-    if(auto* C=DasReferencePropertyClass(P)){auto* O=DasReferenceGet(P,Memory);if(!DasCallbackObjectAlive(O) || !DasReferenceMatches(O,C)){Error=TEXT("Callback object is destroyed or has an incompatible class/interface");return false;}}
+    if(auto* C=CastField<FClassProperty>(P)){auto* Raw=C->GetObjectPropertyValue(Memory);auto* O=Cast<UClass>(Raw);if((Raw && !O) || !C->MetaClass || !DasCallbackObjectAlive(O) || (O && !O->IsChildOf(C->MetaClass))){Error=TEXT("Callback class is obsolete or has an incompatible base");return false;}}
+    else if(auto* ObjectClass=DasReferencePropertyClass(P)){auto* O=DasReferenceGet(P,Memory);if(!DasCallbackObjectAlive(O) || !DasReferenceMatches(O,ObjectClass)){Error=TEXT("Callback object is destroyed or has an incompatible class/interface");return false;}}
     else if(auto* S=CastField<FStructProperty>(P)){for(TFieldIterator<FProperty> It(S->Struct);It;++It)if(!ValueBudget(*It,It->ContainerPtrToValuePtr<void>(Memory),Characters,Elements,Error))return false;}
     else if(auto* A=CastField<FArrayProperty>(P)){FScriptArrayHelper V(A,Memory);Elements+=V.Num();if(Elements>4096){Error=TEXT("Callback collection exceeds element limit");return false;}for(int32 I=0;I<V.Num();++I)if(!ValueBudget(A->Inner,V.GetRawPtr(I),Characters,Elements,Error))return false;}
     else if(auto* Set=CastField<FSetProperty>(P)){FScriptSetHelper V(Set,Memory);Elements+=V.Num();if(Elements>4096){Error=TEXT("Callback collection exceeds element limit");return false;}for(int32 I=0;I<V.GetMaxIndex();++I)if(V.IsValidIndex(I) && !ValueBudget(Set->ElementProp,V.GetElementPtr(I),Characters,Elements,Error))return false;}
@@ -63,6 +65,7 @@ TConstArrayView<FDasCallbackType> DasCallbackTypes()
     using K=EDasMethodSignature;
 #define PROXY(Name) GET_FUNCTION_NAME_CHECKED(UDasIntDelegateProxy,Name)
     static const FDasCallbackType Types[]={
+        {TEXT("class"),K::Class,nullptr,true,NAME_None,NAME_None,true},
         {TEXT("enum"),K::Enum,nullptr,true,NAME_None,NAME_None,true},
         {TEXT("struct"),K::Struct,nullptr,true,NAME_None,NAME_None,true},
         {TEXT("void"),K::Void,nullptr,true,PROXY(ReceiveVoid),NAME_None},
@@ -117,6 +120,7 @@ const FDasCallbackType* DasCallbackTypeForProperty(const FProperty* Property)
         if(Type==TBaseStructure<FTransform>::Get())return FindDasCallbackType(TEXT("transform"));
         FString Error;if(!ValidateDasCallbackTypePath(TEXT("struct"),Type->GetPathName(),Error))return nullptr;
         return FindDasCallbackType(EDasMethodSignature::Struct,Type);}
+    case EDasTypeKind::Class:{auto* C=CastFieldChecked<FClassProperty>(Property);FString Error;return C->MetaClass && ValidateDasCallbackTypePath(TEXT("class"),C->MetaClass->GetPathName(),Error)?FindDasCallbackType(TEXT("class")):nullptr;}
     case EDasTypeKind::Object:return DasReferencePropertyClass(Property)?FindDasCallbackType(TEXT("object")):nullptr;
     default:return FindDasCallbackType(DasTypeKindName(DasPropertyKind(Property)));
     }
@@ -124,6 +128,7 @@ const FDasCallbackType* DasCallbackTypeForProperty(const FProperty* Property)
 bool ValidateDasCallbackTypePath(const FString& Kind,const FString& Path,FString& Error){
     Error.Reset();if(Path.IsEmpty() || Path.Len()>1024){Error=TEXT("Concrete loaded callback type identity is required");return false;}
     if(Kind==TEXT("object")){auto* C=FindObject<UClass>(nullptr,*Path);if(!C || C->HasAnyClassFlags(CLASS_NewerVersionExists)){Error=TEXT("Missing or obsolete callback object/interface type");return false;}return true;}
+    if(Kind==TEXT("class")){auto* C=FindObject<UClass>(nullptr,*Path);if(!C || C->HasAnyClassFlags(CLASS_Interface|CLASS_Deprecated|CLASS_NewerVersionExists)){Error=TEXT("Missing or obsolete callback class base");return false;}return true;}
     if(Kind==TEXT("enum")){FDasDeclaredType T;T.Kind=Kind;T.TypePath=Path;return ValidateDasPropertyType(T,EDasPropertyUsage::Value,Error);}
     if(Kind!=TEXT("struct")){Error=TEXT("Unexpected callback type identity");return false;}
     if(!ValidateDasValueStruct(Path,Error))return false;
@@ -150,6 +155,7 @@ bool ValidateDasCallbackPayload(const FDasScalarValue& Value,EDasCallbackUsage U
     if(K==EDasMethodSignature::Text)return CallbackText(Value.TextValue,Characters,Error);
     if(K==EDasMethodSignature::Enum)return ValidateDasCallbackTypePath(TEXT("enum"),Value.ObjectClass,Error) && ValidateDasEnumNumber(Value.ObjectClass,Value.IntValue,Error);
     if(K==EDasMethodSignature::Object){const FString Path=Value.ObjectClass.IsEmpty()?TEXT("/Script/CoreUObject.Object"):Value.ObjectClass;if(!ValidateDasCallbackTypePath(TEXT("object"),Path,Error))return false;if(!DasCallbackObjectAlive(Value.ObjectValue.Get()) || !DasReferenceMatches(Value.ObjectValue.Get(),FindObject<UClass>(nullptr,*Path))){Error=TEXT("Callback object is destroyed or has an incompatible class/interface");return false;}return true;}
+    if(K==EDasMethodSignature::Class){if(!ValidateDasCallbackTypePath(TEXT("class"),Value.ObjectClass,Error))return false;auto* C=Value.ClassValue.Get();if(!DasCallbackObjectAlive(C) || (C && !C->IsChildOf(FindObject<UClass>(nullptr,*Value.ObjectClass)))){Error=TEXT("Callback class is obsolete or has an incompatible base");return false;}return true;}
     if(K!=EDasMethodSignature::Struct)return true;
     auto* Snapshot=Value.StructValue.GetScriptStruct();
     if(!Value.StructValue.IsValid() || !Snapshot || Snapshot->GetPathName()!=Value.ObjectClass || (Type->Snapshot && Type->Snapshot()!=Snapshot))
@@ -163,6 +169,7 @@ bool ValidateDasCallbackPayload(const FDasScalarValue& Value,EDasCallbackUsage U
 bool DasCallbackObjectAlive(const UObject* Object){
     if(!Object)return true;
     if(!IsValid(Object))return false;
+    if(auto* C=Cast<UClass>(Object))return !C->HasAnyClassFlags(CLASS_Deprecated|CLASS_NewerVersionExists);
     if(auto* A=Cast<AActor>(Object))return !A->IsActorBeingDestroyed();
     if(auto* C=Cast<UActorComponent>(Object))return !C->IsBeingDestroyed() && (!C->GetOwner() || DasCallbackObjectAlive(C->GetOwner()));
     return true;

@@ -1,4 +1,5 @@
 #include "DasCallbackFrames.h"
+#include "GameFramework/Actor.h"
 #include "DasCallbackPayload.h"
 #include "DasCallbackTypes.h"
 #include "DasContainerTypes.h"
@@ -32,6 +33,27 @@ bool CheckDasCallbackFrames(FString& Error){
  TArray<FDasDeclaredType> Limit;for(int I=0;I<16;++I)Limit.Add(Int);
  auto* Maximum=DasCallbackFrame(Limit,Error);if(!Maximum || Maximum!=DasCallbackFrame(Limit,Error))return Fail(TEXT("16-field tuple/reuse failed"));
  Limit.Add(Int);if(DasCallbackFrame(Limit,Error))return Fail(TEXT("17-field tuple accepted"));
+ const auto Class=Leaf(TEXT("class"),AActor::StaticClass()->GetPathName());
+ auto* ClassFrame=DasCallbackFrame({Class,Int},Error);if(!ClassFrame)return false;
+ FDasDeclaredMethod ClassMethod;ClassMethod.Name=TEXT("ClassProbe");ClassMethod.ReturnType.Kind=TEXT("void");
+ for(const auto& T:{Class,Int}){FDasDeclaredParameter P;P.Name=FString::Printf(TEXT("p%d"),ClassMethod.Parameters.Num());P.Type=T;P.Direction=TEXT("in");ClassMethod.Parameters.Add(P);}
+ TStrongObjectPtr<UFunction> ClassSignature(MakeDasDelegateSignature(ClassMethod,true,GetTransientPackage(),NAME_None,Error));
+ if(!ClassSignature || !ValidateDasCallbackFrameSource(ClassSignature.Get(),ClassFrame,Error))return false;
+ FStructOnScope ClassMemory(ClassSignature.Get());auto* ClassProperty=FindFProperty<FClassProperty>(ClassSignature.Get(),TEXT("p0"));
+ ClassProperty->SetObjectPropertyValue_InContainer(ClassMemory.GetStructMemory(),AActor::StaticClass());
+ FDasScalarValue ClassCapture;if(!CaptureDasCallbackFrame(ClassSignature.Get(),ClassMemory.GetStructMemory(),ClassFrame,ClassCapture,Error))return false;
+ auto* CapturedProperty=FindFProperty<FClassProperty>(ClassFrame,TEXT("arg_0"));
+ if(!CapturedProperty || CapturedProperty->GetObjectPropertyValue_InContainer(ClassCapture.StructValue.GetMemory())!=AActor::StaticClass())return Fail(TEXT("Tuple class identity lost"));
+ auto* TransientClass=NewObject<UClass>(GetTransientPackage());TransientClass->SetSuperStruct(AActor::StaticClass());TWeakObjectPtr<UClass> ClassWeak(TransientClass);
+ ClassProperty->SetObjectPropertyValue_InContainer(ClassMemory.GetStructMemory(),TransientClass);
+ if(!CaptureDasCallbackFrame(ClassSignature.Get(),ClassMemory.GetStructMemory(),ClassFrame,ClassCapture,Error))return false;
+ TSharedPtr<FDasCallbackPayload> ClassOwned=MakeShared<FDasCallbackPayload>(MoveTemp(ClassCapture));ClassMemory.Reset();ClassCapture={};
+ CollectGarbage(RF_NoFlags);if(!ClassWeak.IsValid() || !ClassOwned->IsAlive())return Fail(TEXT("Mixed frame lost captured UClass during GC"));
+ TransientClass->ClassFlags|=CLASS_NewerVersionExists;if(ClassOwned->IsAlive())return Fail(TEXT("Mixed frame delivered obsolete class"));
+ ClassOwned.Reset();CollectGarbage(RF_NoFlags);if(ClassWeak.IsValid())return Fail(TEXT("Mixed frame retained class after release"));
+ ClassMethod.Parameters[0].Type.TypePath=UObject::StaticClass()->GetPathName();
+ TStrongObjectPtr<UFunction> Wider(MakeDasDelegateSignature(ClassMethod,true,GetTransientPackage(),NAME_None,Error));
+ if(!Wider || ValidateDasCallbackFrameSource(Wider.Get(),ClassFrame,Error))return Fail(TEXT("Unsafe class narrowing accepted"));
  auto* Frame=DasCallbackFrame({Int,Text,Object},Error);if(!Frame)return false;
  if(Frame==DasCallbackFrame({Text,Int,Object},Error) || !DasCallbackFrameBuilder(Frame))return Fail(TEXT("Tuple field order/builder lost"));
  FDasDeclaredMethod Method;Method.Name=TEXT("MultiProbe");Method.ReturnType.Kind=TEXT("void");

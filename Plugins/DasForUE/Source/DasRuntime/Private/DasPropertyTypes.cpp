@@ -24,7 +24,6 @@ bool Validate(const FDasDeclaredType& T,EDasPropertyUsage Usage,FString& Error,i
  if(K!=EDasTypeKind::Enum && T.EnumStorage!=EDasEnumStorage::Automatic)return Fail(TEXT("Enum storage on a non-enum type"));
  if(!T.AuthoredId.IsEmpty() && K!=EDasTypeKind::Object)return Fail(TEXT("Authored object identity on a non-object type"));
  if(!T.DelegateWire.IsEmpty())return Fail(TEXT("Unexpected delegate signature"));
- if(Usage==EDasPropertyUsage::DelegateParameter && K==EDasTypeKind::Class)return Fail(TEXT("Type is outside the current delegate parameter policy"));
  if(Container(K)){
   if(!T.TypePath.IsEmpty())return Fail(TEXT("Container type_path must be empty"));
   if(K==EDasTypeKind::Map){if(!T.Key || !T.Value || T.Element || !HashKey(T.Key->GetKind()) || Container(T.Value->GetKind()) || T.Value->GetKind()==EDasTypeKind::Class)return Fail(TEXT("Unsupported map shape"));

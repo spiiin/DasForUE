@@ -12,6 +12,7 @@ struct FFrameEntry {TWeakObjectPtr<UScriptStruct> Type;TWeakObjectPtr<UFunction>
 TMap<FString,FFrameEntry> Frames;
 TArray<FProperty*> Parameters(UFunction* F){TArray<FProperty*> R;if(F)for(TFieldIterator<FProperty> I(F);I;++I)if(I->HasAnyPropertyFlags(CPF_Parm))R.Add(*I);return R;}
 bool Compatible(FProperty* Source,FProperty* Target){
+ if(auto* Expected=CastField<FClassProperty>(Target)){auto* Actual=CastField<FClassProperty>(Source);return Actual && Actual->MetaClass && Expected->MetaClass && Actual->MetaClass->IsChildOf(Expected->MetaClass);}
  if(auto* Expected=DasReferencePropertyClass(Target)){auto* Actual=DasReferencePropertyClass(Source);return Actual && (Actual==Expected || (Expected->HasAnyClassFlags(CLASS_Interface)?Actual->ImplementsInterface(Expected):Actual->IsChildOf(Expected)));}
  if(auto* Expected=DasEnumPropertyType(Target))return DasEnumPropertyType(Source)==Expected;
  if(auto* Expected=CastField<FStructProperty>(Target))return DasCallbackSnapshotForProperty(Source)==Expected->Struct;
@@ -49,7 +50,8 @@ bool CaptureDasCallbackFrame(UFunction* Signature,const void* Memory,UScriptStru
  const auto Source=Parameters(Signature);FDasScalarValue Value;Value.Kind=12;Value.ObjectClass=Frame->GetPathName();Value.StructValue.InitializeAs(Frame);int32 I=0;
  for(TFieldIterator<FProperty> Target(Frame);Target;++Target,++I){FDasScalarValue Input;
   if(!ReadDasPropertyValue(Source[I],Source[I]->ContainerPtrToValuePtr<void>(Memory),Input,Error))return false;
-  if(auto* Class=DasReferencePropertyClass(*Target))Input.ObjectClass=Class->GetPathName();
+  if(auto* Class=CastField<FClassProperty>(*Target))Input.ObjectClass=Class->MetaClass->GetPathName();
+  else if(auto* ObjectClass=DasReferencePropertyClass(*Target))Input.ObjectClass=ObjectClass->GetPathName();
   if(!WriteDasPropertyValue(*Target,Target->ContainerPtrToValuePtr<void>(Value.StructValue.GetMutableMemory()),Input,Error))return false;
  }
  if(!ValidateDasCallbackPayload(Value,EDasCallbackUsage::Event,Error))return false;Out=MoveTemp(Value);return true;

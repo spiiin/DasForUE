@@ -3650,3 +3650,31 @@ phases, cook/package and all five packaged map probes. Queued callback validatio
 remains strict. The runner prepares the cross-process ClassReload/MethodValues
 dependencies explicitly. See CombinedValidation.md and logs/combined-validation.json
 for the source manifest, initial failures, fixes and validation scope. No commit.
+
+
+## 2026-10-17 — class references in interfaces, delegates, events and timers
+
+The existing `UEClass<T>` ABI now covers authored interface arguments/results/
+ref/out, single delegate arguments/results/ref/out and multicast arguments.
+Queued events and timers accept typed scalar class captures and class arguments
+in compiler-generated mixed frames. Common reflected GC roots hold captures;
+wrong-base/obsolete classes and unsafe native constraint narrowing are rejected.
+Null, native const-ref receivers, cancellation and rejected replacement semantics
+are preserved. No class container policy was opened.
+
+Editor Development, Foundation, 116 Python checks, the dedicated class reference
+PIE and existing gameplay RuntimePIE passed. Both PIE reports have zero warnings,
+failures and skips. See ClassCallbacks.md and logs/class-callbacks-validation.json.
+Packaged Win64 Development verification subsequently passed; see the entry below.
+
+
+## 2026-10-17 — packaged Development class reference validation
+
+Added a dedicated map exporter and game-side class callback checker, invoked by
+TestClassCallbacksPackaged.ps1. Win64 Development Game build, cook/stage/archive,
+packaged Foundation (zero failures) and the packaged class callback map passed.
+Checks include delegates, scalar/null/mixed events and timer captures, cancellation,
+rejected replacement preservation, cooked interface signatures and class pin bases,
+native/Blueprint/null class return/ref/out after GC, and owner cleanup.
+Evidence and frozen source/executable hashes are in
+logs/class-callbacks-packaged-validation.json.
