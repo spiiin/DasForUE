@@ -181,4 +181,10 @@ FString DasTextLiteral(const FString& Namespace,const FString& Key,const FString
  return Invariant?TEXT("INVTEXT(")+Quote(Source)+TEXT(")"):TEXT("NSLOCTEXT(")+Quote(Namespace)+TEXT(",")+Quote(Key)+TEXT(",")+Quote(Source)+TEXT(")");
 }
 
-bool DasTextDefaultsEqual(const FText& A,const FText& B){FString Left,Right;FTextStringHelper::WriteToBuffer(Left,A);FTextStringHelper::WriteToBuffer(Right,B);return Left==Right && A.IsCultureInvariant()==B.IsCultureInvariant();}
+bool DasTextDefaultsEqual(const FText& A,const FText& B){
+ // Blueprint CDO delta serialization may omit an empty invariant value as
+ // identical to the zero-initialized empty text. There is no localization
+ // identity to preserve in that case; never apply this to named texts.
+ auto UnnamedEmpty=[](const FText& V){const auto Namespace=FTextInspector::GetNamespace(V),Key=FTextInspector::GetKey(V);return V.IsEmpty() && (!Namespace.IsSet() || Namespace.GetValue().IsEmpty()) && (!Key.IsSet() || Key.GetValue().IsEmpty());};
+ if(UnnamedEmpty(A) && UnnamedEmpty(B))return true;
+ FString Left,Right;FTextStringHelper::WriteToBuffer(Left,A);FTextStringHelper::WriteToBuffer(Right,B);return Left==Right && A.IsCultureInvariant()==B.IsCultureInvariant();}

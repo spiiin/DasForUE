@@ -12,7 +12,7 @@ inline void RunDasGeneratedInterfaceProbe(FDasRuntimeModule& R,UObject* Actor,UO
  const TArray<int32> Expected={123,30,1,375,1,31,1,1};
  for(int32 Index=0;Index<Expected.Num();++Index){auto Result=R.RunFile(Path,Index,false,Receiver);if(!Result.bSucceeded)UE_LOG(LogTemp,Error,TEXT("Generated interface: %s"),*Result.Error);Check(Result.bSucceeded && Result.Value==Expected[Index],*(TEXT("generated_interface_case_")+FString::FromInt(Index)));if(Index==6 || Index==7){auto* Field=FindFProperty<FIntProperty>(Receiver->GetClass(),TEXT("EventCount"));Check(Field && Field->GetPropertyValue_InContainer(Receiver)==(Index==6?17:0),Index==6?TEXT("generated_interface_void_event_input"):TEXT("generated_interface_void_event_no_input"));}}
  auto Stale=R.RunFile(Path,12,false,Receiver);Check(!Stale.bSucceeded && Stale.Error.Contains(TEXT("signature changed")),TEXT("generated_interface_stale_declaration_rejected"));
- auto Reentry=R.RunFile(Path,0,false,Actor);Check(!Reentry.bSucceeded && Reentry.Error.Contains(TEXT("reentrant")),TEXT("generated_interface_VM_reentry_remains_rejected"));
+ auto Reentry=R.RunFile(Path,0,false,Actor);Check(Reentry.bSucceeded && Reentry.Value==12,TEXT("generated_interface_VM_reentry_scalar_dispatch"));
 }
 inline void RunDasTypedInterfaceProbe(FDasRuntimeModule& R,UObject* Actor,UObject* Receiver,const FString& Script,TFunctionRef<void(bool,const TCHAR*)> Check){
  RunDasGeneratedInterfaceProbe(R,Actor,Receiver,Check);

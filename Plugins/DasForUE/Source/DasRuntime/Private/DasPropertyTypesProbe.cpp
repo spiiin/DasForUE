@@ -54,7 +54,7 @@ bool CheckDasPropertyTypes(FString& Error){
  Invalid=Leaf(TEXT("int"),TEXT("/Script/Engine.Actor"));if(!Reject(Invalid,EDasPropertyUsage::Value))return false;
  Invalid=Shape(TEXT("array"),Shape(TEXT("array"),Leaf(TEXT("int"))));if(!Reject(Invalid,EDasPropertyUsage::Container))return false;
  if(!Reject(Shape(TEXT("set"),Interface),EDasPropertyUsage::Container) || !Reject(Shape(TEXT("map"),Interface,Object),EDasPropertyUsage::Container))return false;
- if(!Reject(Shape(TEXT("map"),Leaf(TEXT("int")),Object),EDasPropertyUsage::DelegateParameter) || !Reject(Leaf(TEXT("class"),AActor::StaticClass()->GetPathName()),EDasPropertyUsage::DelegateParameter))return false;
+ if(!Reject(Leaf(TEXT("class"),AActor::StaticClass()->GetPathName()),EDasPropertyUsage::DelegateParameter))return false;
  if(!Reject(Leaf(TEXT("object"),TEXT("/Script/Engine.MissingFactoryClass")),EDasPropertyUsage::Value))return false;
  for(const TCHAR* K:{TEXT("byte"),TEXT("text"),TEXT("int"),TEXT("float"),TEXT("double"),TEXT("bool"),TEXT("string"),TEXT("name")}){auto T=Leaf(K);FString Why;auto* P=CreateDasProperty(Owner.Get(),TEXT("Input"),T,EDasPropertyUsage::DelegateParameter,Why);if(!P){Error=Why;return false;}delete P;}
  // Malformed descriptors must not match a primitive catalog entry.

@@ -1,5 +1,13 @@
 # Named next-tick timers and schedule queries
 
+Current cross-surface support and shared callback policy:
+[TypeSupportMatrix.md](TypeSupportMatrix.md). All eight primitive array families
+are supported by authored class timers; the lists below describe earlier stages.
+
+Current FText/uint8 extension and integration evidence:
+[ManagedTextByteTimers.md](ManagedTextByteTimers.md). The initial validation notes
+below describe the earlier implementation stage.
+
 Added 2026-10-10. **Not built or tested**. No UHT/build, source import, scheduling,
 ABI/callback, pause/query, reentry, PIE or packaged execution was run.
 

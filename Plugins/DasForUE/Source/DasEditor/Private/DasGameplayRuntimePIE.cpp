@@ -26,6 +26,7 @@ struct FGameplayPIEState {
     TArray<TStrongObjectPtr<UBlueprint>> InstanceDefaultBlueprints;
     TStrongObjectPtr<UBlueprint> Blueprint,SingleBlueprint,InheritedBlueprint,LifeBlueprint,HelperBlueprint,ConstructionBlueprint,PureBlueprint,LibraryBlueprint,LibraryConsumerBlueprint,ValuesBlueprint,WorldConsumerBlueprint,DefaultConsumerBlueprint;
     TWeakObjectPtr<ADasProbeActor> First, Second;
+    TWeakObjectPtr<ADasStaticLibraryProbe> LibraryCarrier;
     TStrongObjectPtr<ADasProbeActor> DestroyedOwner;
     int32 DestroyedPulses=0;
     bool Passed=true;
@@ -66,7 +67,7 @@ public:
         }
         auto* A=State->First.Get();auto* B=State->Second.Get();
         if(Phase==0){
-            const bool Ready=World && World->HasBegunPlay() && A && B && ProbeInt(A,TEXT("Pulses"))>=2 && ProbeInt(A,TEXT("Loads"))>=1 && ProbeInt(A,TEXT("Delays"))>=1 && ProbeInt(A,TEXT("SnapshotSum"))!=0;
+            const bool Ready=World && World->HasBegunPlay() && A && B && ProbeInt(A,TEXT("Pulses"))>=2 && ProbeInt(A,TEXT("Loads"))>=1 && ProbeInt(A,TEXT("Delays"))>=1 && ProbeInt(A,TEXT("SnapshotSum"))!=0 && DasTextByteTimersReady(World);
             if(!Ready){
                 if(FPlatformTime::Seconds()-Started<30 && (!A || A->LastDasError.IsEmpty()))return false;
                 Check(false,TEXT("callbacks_finish_before_timeout"));
@@ -134,7 +135,7 @@ public:
             ADasProbeActor* LibraryCaller=nullptr;for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->ActorHasTag(TEXT("LibraryConsumer")))LibraryCaller=*It;int32 LibrarySum=0;if(LibraryCaller)if(auto* Fn=LibraryCaller->FindFunction(TEXT("EvaluatePure")))LibraryCaller->ProcessEvent(Fn,&LibrarySum);Check(LibraryCaller && LibrarySum==12,TEXT("static_library_Blueprint_consumer"));if(LibraryCaller)LibraryCaller->Destroy();
             ADasProbeActor* DefaultCaller=nullptr;for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->ActorHasTag(TEXT("DefaultLibraryConsumer")))DefaultCaller=*It;int32 DefaultSum=0;if(DefaultCaller)if(auto* Fn=DefaultCaller->FindFunction(TEXT("EvaluatePure")))DefaultCaller->ProcessEvent(Fn,&DefaultSum);Check(DefaultCaller && DefaultSum==5,TEXT("library_Blueprint_omitted_arguments_use_defaults"));if(DefaultCaller)DefaultCaller->Destroy();
             ADasProbeActor* WorldCaller=nullptr;for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->ActorHasTag(TEXT("WorldLibraryConsumer")))WorldCaller=*It;double WorldTime=-1;if(WorldCaller)if(auto* Fn=WorldCaller->FindFunction(TEXT("EvaluatePure")))WorldCaller->ProcessEvent(Fn,&WorldTime);Check(WorldCaller && WorldTime==World->GetTimeSeconds()+1.,TEXT("library_Blueprint_automatic_WorldContext"));if(WorldCaller){FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).ReleaseObject(WorldCaller);WorldCaller->Destroy();}
-            ADasStaticLibraryProbe* LibraryCarrier=nullptr;for(TActorIterator<ADasStaticLibraryProbe> It(World);It;++It)LibraryCarrier=*It;FString LibraryReport;Check(LibraryCarrier && RunDasStaticLibraryProbe(LibraryCarrier->LibraryClass,LibraryReport),TEXT("static_library_in_game"));UE_LOG(LogTemp,Display,TEXT("%s"),*LibraryReport);FString ValuesReport;Check(LibraryCarrier && RunDasLibraryValuesProbe(LibraryCarrier->ValuesClass,LibraryCarrier,ValuesReport),TEXT("library_complex_values_and_WorldContext"));UE_LOG(LogTemp,Display,TEXT("%s"),*ValuesReport);FString InstanceReport;Check(LibraryCarrier && RunDasInstanceDefaultsProbe(LibraryCarrier,InstanceReport),TEXT("instance_defaults_in_game"));UE_LOG(LogTemp,Display,TEXT("%s"),*InstanceReport);FString PawnReport;Check(LibraryCarrier && RunDasPawnCharacterProbe(LibraryCarrier,PawnReport),TEXT("pawn_character_in_game"));UE_LOG(LogTemp,Display,TEXT("%s"),*PawnReport);FString PlayableReport;Check(LibraryCarrier && RunDasPlayableCharacterProbe(LibraryCarrier,PlayableReport),TEXT("playable_character_in_game"));UE_LOG(LogTemp,Display,TEXT("%s"),*PlayableReport);if(LibraryCarrier)LibraryCarrier->Destroy();
+            ADasStaticLibraryProbe* LibraryCarrier=nullptr;for(TActorIterator<ADasStaticLibraryProbe> It(World);It;++It)LibraryCarrier=*It;FString LibraryReport;Check(LibraryCarrier && RunDasStaticLibraryProbe(LibraryCarrier->LibraryClass,LibraryReport),TEXT("static_library_in_game"));UE_LOG(LogTemp,Display,TEXT("%s"),*LibraryReport);FString ValuesReport;Check(LibraryCarrier && RunDasLibraryValuesProbe(LibraryCarrier->ValuesClass,LibraryCarrier,ValuesReport),TEXT("library_complex_values_and_WorldContext"));UE_LOG(LogTemp,Display,TEXT("%s"),*ValuesReport);FString InstanceReport;Check(LibraryCarrier && RunDasInstanceDefaultsProbe(LibraryCarrier,InstanceReport),TEXT("instance_defaults_in_game"));UE_LOG(LogTemp,Display,TEXT("%s"),*InstanceReport);FString PawnReport;Check(LibraryCarrier && RunDasPawnCharacterProbe(LibraryCarrier,PawnReport),TEXT("pawn_character_in_game"));UE_LOG(LogTemp,Display,TEXT("%s"),*PawnReport);FString PlayableReport;Check(LibraryCarrier && RunDasPlayableCharacterProbe(LibraryCarrier,PlayableReport),TEXT("playable_character_in_game"));UE_LOG(LogTemp,Display,TEXT("%s"),*PlayableReport);State->LibraryCarrier=LibraryCarrier;
             ADasProbeActor* PureOwner=nullptr;for(TActorIterator<ADasProbeActor> It(World);It;++It)if(It->ActorHasTag(TEXT("PureOwner")))PureOwner=*It;
             int32 PureResult=0;if(PureOwner)if(auto* Fn=PureOwner->FindFunction(TEXT("EvaluatePure")))PureOwner->ProcessEvent(Fn,&PureResult);
             Check(PureOwner && PureResult==15 && PureOwner->FindFunction(TEXT("Query"))->HasAnyFunctionFlags(FUNC_BlueprintPure) && PureOwner->LastDasError.IsEmpty(),TEXT("pure_Blueprint_data_node_override_Super_in_PIE"));if(PureOwner)PureOwner->Destroy();
@@ -161,11 +162,13 @@ public:
             if(auto* Fn=B->FindFunction(TEXT("ArmPending")))B->ProcessEvent(Fn,nullptr);
             State->DestroyedOwner.Reset(B);State->DestroyedPulses=ProbeInt(B,TEXT("Pulses"));
             B->Destroy();
-            Check(R.PersistentContextCount(World)==1 && R.SubscriptionCount(B)==0,TEXT("Destroy_revokes_second_owner"));
+            Check(R.PersistentContextCount(World)==1+(LibraryCarrier && LibraryCarrier->ObjectCallbackActor?1:0)+(LibraryCarrier && LibraryCarrier->DestroyedObjectCallbackActor?1:0)+(LibraryCarrier && LibraryCarrier->ContainerCallbackActor?1:0)+(LibraryCarrier && LibraryCarrier->DestroyedContainerCallbackActor?1:0) && R.SubscriptionCount(B)==0,TEXT("Destroy_revokes_second_owner"));
             Phase=1;return false;
         }
         if(!World || !A){Check(false,TEXT("surviving_owner_remains_valid"));End();return false;}
         if(World->GetTimeSeconds()-StopTime<0.15f && FPlatformTime::Seconds()-Started<30)return false;
+        Check(CheckDasTextByteTimerCleanup(World),TEXT("text_byte_timer_release_prevents_late_delivery"));
+        if(auto* Carrier=State->LibraryCarrier.Get())Carrier->Destroy();
         Check(ProbeInt(A,TEXT("Pulses"))==StoppedPulses && ProbeInt(A,TEXT("Delays"))==1 && ProbeInt(A,TEXT("Loads"))==1 && A->LastDasError.IsEmpty(),TEXT("cancelled_repeat_stays_stopped_and_completions_do_not_repeat"));
         Check(State->DestroyedOwner.IsValid() && ProbeInt(State->DestroyedOwner.Get(),TEXT("CancelledCalls"))==0 && ProbeInt(State->DestroyedOwner.Get(),TEXT("Pulses"))==State->DestroyedPulses,TEXT("Destroy_cancels_pending_timer_latent_and_repeat"));
         End();return false;

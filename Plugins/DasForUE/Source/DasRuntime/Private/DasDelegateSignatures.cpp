@@ -14,7 +14,9 @@ UFunction* MakeDasDelegateSignature(const FDasDeclaredMethod& M,bool Multicast,U
  F->FunctionFlags=FUNC_Public|FUNC_Delegate|(Multicast?FUNC_MulticastDelegate:FUNC_None);
  TArray<TPair<FName,FDasDeclaredType>> Params;for(const auto& P:M.Parameters)Params.Emplace(*P.Name,P.Type);
  if(M.ReturnType.Kind!=TEXT("void"))Params.Emplace(TEXT("ReturnValue"),M.ReturnType);
- for(int32 I=Params.Num()-1;I>=0;--I){auto* P=CreateDasProperty(F,Params[I].Key,Params[I].Value,EDasPropertyUsage::DelegateParameter,Error);if(!P)return nullptr;P->SetPropertyFlags(CPF_Parm);if(Params[I].Key==TEXT("ReturnValue"))P->SetPropertyFlags(CPF_ReturnParm|CPF_OutParm);else if(M.Parameters[I].Direction==TEXT("out"))P->SetPropertyFlags(CPF_OutParm);else if(M.Parameters[I].Direction==TEXT("inout"))P->SetPropertyFlags(CPF_OutParm|CPF_ReferenceParm);F->AddCppProperty(P);}
+ // Kismet compiles multicast array inputs as refs; mark input-only arrays
+ // const so queued listeners cannot mutate the broadcaster's data.
+ for(int32 I=Params.Num()-1;I>=0;--I){auto* P=CreateDasProperty(F,Params[I].Key,Params[I].Value,EDasPropertyUsage::DelegateParameter,Error);if(!P)return nullptr;P->SetPropertyFlags(CPF_Parm);if(Params[I].Key==TEXT("ReturnValue"))P->SetPropertyFlags(CPF_ReturnParm|CPF_OutParm);else if(M.Parameters[I].Direction==TEXT("out"))P->SetPropertyFlags(CPF_OutParm);else if(M.Parameters[I].Direction==TEXT("inout"))P->SetPropertyFlags(CPF_OutParm|CPF_ReferenceParm);else if(Multicast && Params[I].Value.GetKind()==EDasTypeKind::Array)P->SetPropertyFlags(CPF_ConstParm|CPF_OutParm|CPF_ReferenceParm);F->AddCppProperty(P);}
  F->Bind();F->StaticLink(true);F->InitializeDerivedMembers();return F;
 }
 

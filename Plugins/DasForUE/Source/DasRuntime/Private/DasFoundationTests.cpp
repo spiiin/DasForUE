@@ -1,3 +1,5 @@
+#include "DasCallbackFrames.h"
+#include "DasCallbackTypes.h"
 #include "DasRuntime.h"
 #include "DasPropertyTypes.h"
 #include "DasReflectedTypes.h"
@@ -26,6 +28,8 @@ bool RunDasFoundationTests(FString& Report)
     };
     FString PropertyTypeError;const bool PropertyTypesOK=CheckDasPropertyTypes(PropertyTypeError);
     Expect(PropertyTypesOK,TEXT("shared_type_descriptor_and_property_factory"),PropertyTypeError);
+    FString CallbackError;const bool CallbacksOK=CheckDasCallbackTypes(CallbackError) && CheckDasCallbackFrames(CallbackError);
+    Expect(CallbacksOK,TEXT("shared_callback_capabilities_and_payload_validation"),CallbackError);
     auto Run = [&](const TCHAR* Name) { return Runtime.RunFile(Runtime.ScriptPath(Name), 40); };
     const auto Good = Run(TEXT("smoke.das"));
     Expect(Good.bSucceeded && Good.Value == 42, TEXT("native_roundtrip"), Good.Error);
@@ -387,6 +391,9 @@ bool RunDasFoundationTests(FString& Report)
     Runtime.ReleaseObject(First.Get());
     const auto Marshalled = Runtime.RunFile(Runtime.ScriptPath(TEXT("marshalling.das")), 5, false, First.Get());
     Expect(Marshalled.bSucceeded && Marshalled.Value == 12 && First->MarshalledCalls == 1, TEXT("marshal_multiarg_constref_struct_unicode"), Marshalled.Error);
+    #include "DasReflectedValueTests.inl"
+#include "DasSelfValueTests.inl"
+#include "DasSnapshotValueTests.inl"
     {
         const int32 Before = First->MarshalledCalls;
         const auto M = ObjectRun(TEXT("let c = ue_begin_call(ue_self_object(), \"AcceptLabel\")\nue_arg_string(c, \"Label\", \"ok\")\nue_arg_bool(c, \"bAccept\", true)\nue_invoke_call(c)\nverify(ue_result_bool(c, \"ReturnValue\"))\nue_release_call(c)\nreturn 1"));

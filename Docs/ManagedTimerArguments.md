@@ -1,5 +1,13 @@
 # Captured timer arguments
 
+Current cross-surface support and shared callback policy:
+[TypeSupportMatrix.md](TypeSupportMatrix.md). All eight primitive array families
+are supported by authored class timers; the lists below describe earlier stages.
+
+Current FText/uint8 extension and integration evidence:
+[ManagedTextByteTimers.md](ManagedTextByteTimers.md). The initial validation notes
+below describe the earlier implementation stage.
+
 Added 2026-10-10. **Not built or tested**. No build, example import, timer dispatch,
 ABI/overload check, reload, PIE or packaged execution was run for this extension.
 
@@ -52,3 +60,7 @@ and rejected reload; owner/world teardown; PIE and packaged Development.
 Primitive array captures were added subsequently for annotated class methods,
 without build/tests; see ManagedTimerArrays.md. Earlier container exclusions
 above describe the first value-capture slice.
+
+
+Multiple typed arguments are supported by authored class timers/events; see
+[MultiArgumentCallbacks.md](MultiArgumentCallbacks.md).

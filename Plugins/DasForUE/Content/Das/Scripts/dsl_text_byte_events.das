@@ -1,5 +1,6 @@
 options gen2
 require ue_text_byte_delegates
+require ue_interface_reentry_values
 [ue_class(Blueprintable), ue_implements(interface="/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C")]
 class TextByteEvents {
     @ue_property=(BlueprintReadWrite)
@@ -32,7 +33,7 @@ class TextByteEvents {
     [ue_function(BlueprintCallable)]
     def ChangeArrays(var numbers:array<uint8>&; @ue_out var messages:array<FText>&):void {
         push(numbers,uint8(255))
-        messages <- [{ue_text("TextByteEvents","Array","Array text"); ue_text_invariant("Invariant")}]
+        messages <- [ue_text("TextByteEvents","Array","Array text"), ue_text_invariant("Invariant")]
     }
     [ue_function(BlueprintCallable)]
     def RunText(callback:TextQuery; value:FText):FText { return callback.Execute(value) }
@@ -62,6 +63,23 @@ class TextByteEvents {
         if(length(value)!=2 || ue_text_key(value[0])!="Source" || !ue_text_is_invariant(value[1])) { panic("text array event") }
         self.Seen+=1
     }
+    [ue_event(name="OnDasArrayFloatSignal")]
+    def NativeFloats(var value:array<float>):void {
+        if(length(value)!=2 || value[0]!=1.25f || value[1]!=-2.5f) { panic("Floats event payload") }
+        clear(value); self.Seen+=1
+    }
+    [ue_event(name="OnDasArrayBoolSignal")]
+    def NativeBools(var value:array<bool>):void {
+        if(length(value)!=2 || !value[0] || value[1]) { panic("Bools event payload") }
+        clear(value); self.Seen+=1
+    }
+    [ue_event(name="OnDasArrayNameSignal")]
+    def NativeNames(var value:array<UENameValue>):void {
+        if(length(value)!=2 || ue_name_text(value[0])!="First" || ue_name_text(value[1])!="Second") { panic("Names event payload") }
+        clear(value); self.Seen+=1
+    }
+    [ue_function(BlueprintCallable)]
+    def ProbeInterface():bool { return test_interface_values(ue_self_object()) }
     [ue_function(BlueprintCallable)]
     def Probe():bool {
         let original=ue_text("TextByteEvents","Source","Original text")
@@ -77,8 +95,7 @@ class TextByteEvents {
         let returned=mutation.Execute(number,title,previous,oldTitle)
         if(number!=uint8(255) || previous!=uint8(0) || ue_text_key(title)!="Changed" || ue_text_key(oldTitle)!="Source" || ue_text_key(returned)!="Source") { return false }
         var rejected=false
-        try { let wrong=ue_bind(type<ByteQuery>,ue_self_object(),"EchoText") }
-        recover { rejected=true }
+        try { let wrong=ue_bind(type<ByteQuery>,ue_self_object(),"EchoText") } recover { rejected=true }
         if(!rejected) { return false }
         // Multicast mutable references are shared across listeners.
         self.RefChanged.AddUFunction(ue_self_object(),"OnRefChanged")

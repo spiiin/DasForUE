@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
+#include "DasSchema.h"
 #include "DasIntDelegateProxy.generated.h"
 
 UCLASS(Transient)
@@ -9,11 +10,18 @@ class UDasIntDelegateProxy : public UObject
     GENERATED_BODY()
 public:
     uint64 SubscriptionId = 0;
+    int32 DynamicKind=-1;FString DynamicPath;
+    FName ConfigureDynamic(UFunction* Signature,const FString& Path,EDasMethodSignature Kind,FString& Error);
+    static void ResetDynamicReceivers();
+    DECLARE_FUNCTION(execReceiveDynamic);
     UFUNCTION()
     void Receive(int32 Value);
     UFUNCTION() void ReceiveByte(uint8 Value);
     UFUNCTION() void ReceiveText(FText Value);
     UFUNCTION() void ReceiveTextRef(const FText& Value);
+    UFUNCTION() void ReceiveArrayFloat(const TArray<float>& Value);
+    UFUNCTION() void ReceiveArrayBool(const TArray<bool>& Value);
+    UFUNCTION() void ReceiveArrayName(const TArray<FName>& Value);
     UFUNCTION() void ReceiveArrayByte(const TArray<uint8>& Value);
     UFUNCTION() void ReceiveArrayText(const TArray<FText>& Value);
     UFUNCTION() void ReceiveFloat(float Value);

@@ -24,7 +24,7 @@ bool Validate(const FDasDeclaredType& T,EDasPropertyUsage Usage,FString& Error,i
  if(K!=EDasTypeKind::Enum && T.EnumStorage!=EDasEnumStorage::Automatic)return Fail(TEXT("Enum storage on a non-enum type"));
  if(!T.AuthoredId.IsEmpty() && K!=EDasTypeKind::Object)return Fail(TEXT("Authored object identity on a non-object type"));
  if(!T.DelegateWire.IsEmpty())return Fail(TEXT("Unexpected delegate signature"));
- if(Usage==EDasPropertyUsage::DelegateParameter && (K==EDasTypeKind::Class || K==EDasTypeKind::Set || K==EDasTypeKind::Map))return Fail(TEXT("Type is outside the current delegate parameter policy"));
+ if(Usage==EDasPropertyUsage::DelegateParameter && K==EDasTypeKind::Class)return Fail(TEXT("Type is outside the current delegate parameter policy"));
  if(Container(K)){
   if(!T.TypePath.IsEmpty())return Fail(TEXT("Container type_path must be empty"));
   if(K==EDasTypeKind::Map){if(!T.Key || !T.Value || T.Element || !HashKey(T.Key->GetKind()) || Container(T.Value->GetKind()) || T.Value->GetKind()==EDasTypeKind::Class)return Fail(TEXT("Unsupported map shape"));
@@ -69,7 +69,7 @@ FProperty* Build(FFieldVariant Owner,FName Name,const FDasDeclaredType& T,EDasPr
  case EDasTypeKind::Struct:{auto* P=new FStructProperty(Owner,Name);P->Struct=FindObject<UScriptStruct>(nullptr,*T.TypePath);return P;}
  case EDasTypeKind::Object:{auto* C=FindObject<UClass>(nullptr,*T.TypePath);if(C->HasAnyClassFlags(CLASS_Interface)){auto* P=new FInterfaceProperty(Owner,Name);P->InterfaceClass=C;return P;}auto* P=new FObjectProperty(Owner,Name);P->PropertyClass=C;return P;}
  case EDasTypeKind::Class:{auto* P=new FClassProperty(Owner,Name);P->PropertyClass=UClass::StaticClass();P->MetaClass=FindObject<UClass>(nullptr,*T.TypePath);return P;}
- case EDasTypeKind::Enum:{auto* E=FindObject<UEnum>(nullptr,*T.TypePath);if(T.EnumStorage==EDasEnumStorage::Enum8 || (T.EnumStorage==EDasEnumStorage::Automatic && Usage!=EDasPropertyUsage::DelegateParameter && !E->IsA<UDasDefinedEnum>() && E->GetCppForm()==UEnum::ECppForm::EnumClass)){auto* P=new FEnumProperty(Owner,Name);P->SetEnum(E);P->AddCppProperty(new FByteProperty(P,TEXT("UnderlyingType")));return P;}auto* P=new FByteProperty(Owner,Name);P->Enum=E;return P;}
+ case EDasTypeKind::Enum:{auto* E=FindObject<UEnum>(nullptr,*T.TypePath);if(DasResolvedEnumStorage(T)==EDasEnumStorage::Enum8){auto* P=new FEnumProperty(Owner,Name);P->SetEnum(E);P->AddCppProperty(new FByteProperty(P,TEXT("UnderlyingType")));return P;}auto* P=new FByteProperty(Owner,Name);P->Enum=E;return P;}
  case EDasTypeKind::Array:{auto* P=new FArrayProperty(Owner,Name);P->Inner=Build(P,Usage==EDasPropertyUsage::DelegateParameter?TEXT("Inner"):TEXT("Values"),*T.Element,Usage);return P;}
  case EDasTypeKind::Set:{auto* P=new FSetProperty(Owner,Name);P->ElementProp=Build(P,TEXT("Element"),*T.Element,Usage);P->ElementProp->SetPropertyFlags(CPF_HasGetValueTypeHash);return P;}
  case EDasTypeKind::Map:{auto* P=new FMapProperty(Owner,Name);P->KeyProp=Build(P,TEXT("Key"),*T.Key,Usage);P->KeyProp->SetPropertyFlags(CPF_HasGetValueTypeHash);P->ValueProp=Build(P,TEXT("Value"),*T.Value,Usage);return P;}
@@ -78,6 +78,12 @@ FProperty* Build(FFieldVariant Owner,FName Name,const FDasDeclaredType& T,EDasPr
 }
 }
 EDasTypeKind DasTypeKind(const FString& Name){for(const auto& Entry:Names)if(Name==Entry.Name)return Entry.Kind;return EDasTypeKind::Invalid;}
+EDasEnumStorage DasResolvedEnumStorage(const FDasDeclaredType& Type){
+ if(Type.GetKind()!=EDasTypeKind::Enum)return EDasEnumStorage::Automatic;
+ if(Type.EnumStorage!=EDasEnumStorage::Automatic)return Type.EnumStorage;
+ const auto* Enum=FindObject<UEnum>(nullptr,*Type.TypePath);
+ return Enum && !Enum->IsA<UDasDefinedEnum>() && Enum->GetCppForm()==UEnum::ECppForm::EnumClass?EDasEnumStorage::Enum8:EDasEnumStorage::Byte;
+}
 FString DasTypeKindName(EDasTypeKind Kind){for(const auto& Entry:Names)if(Kind==Entry.Kind)return Entry.Name;return {};}
 FString FDasDeclaredType::StorageIdentity() const {
  TFunction<FString(const FDasDeclaredType&,int32)> StorageKey;

@@ -86,6 +86,8 @@ private:
 };
 }
 
+bool DasPropertyLayoutFingerprint(const FDasDeclaredType& Type,FString& Out){FLayoutFingerprint F;if(!F.Type(Type))return false;Out=MoveTemp(F.Text);return true;}
+
 FDasContainerRegistry::~FDasContainerRegistry() { Reset(); }
 
 UScriptStruct* FDasContainerRegistry::GetOrCreate(const FString& Path, const FDasDeclaredType& Type, FString& Error)

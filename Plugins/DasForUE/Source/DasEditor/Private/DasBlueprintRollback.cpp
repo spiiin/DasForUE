@@ -2,7 +2,7 @@
 #include "DasContainerTypes.h"
 #include "DasNumericGraphMigration.h"
 #include "DasProbeActor.h"
-#include "DasObjectReferencePins.h"
+#include "DasPropertyValues.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/World.h"
@@ -20,17 +20,24 @@
 #include "Modules/ModuleManager.h"
 namespace {
 TMap<FName,FString> RollbackMetadata(UObject* O){const auto* M=FMetaData::GetMapForObject(O);return M?*M:TMap<FName,FString>();}
-FDasScalarValue RollbackCapture(UObject* O,const FDasFieldSchema& F){FDasScalarValue V;V.Kind=int32(F.Kind);auto* P=O->GetClass()->FindPropertyByName(F.Name);
- switch(F.Kind){case EDasScalarKind::Int32:V.IntValue=CastFieldChecked<FIntProperty>(P)->GetPropertyValue_InContainer(O);break;case EDasScalarKind::Float32:V.FloatValue=CastFieldChecked<FFloatProperty>(P)->GetPropertyValue_InContainer(O);break;case EDasScalarKind::Double:V.DoubleValue=CastFieldChecked<FDoubleProperty>(P)->GetPropertyValue_InContainer(O);break;case EDasScalarKind::Bool:V.BoolValue=CastFieldChecked<FBoolProperty>(P)->GetPropertyValue_InContainer(O);break;case EDasScalarKind::String:V.StringValue=CastFieldChecked<FStrProperty>(P)->GetPropertyValue_InContainer(O);break;case EDasScalarKind::Name:V.NameValue=CastFieldChecked<FNameProperty>(P)->GetPropertyValue_InContainer(O);break;case EDasScalarKind::Enum:{auto* E=CastFieldChecked<FByteProperty>(P);V.IntValue=E->GetPropertyValue_InContainer(O);V.ObjectClass=E->Enum->GetPathName();break;}case EDasScalarKind::Class:{auto* ClassProperty=CastFieldChecked<FClassProperty>(P);V.ObjectValue=ClassProperty->GetObjectPropertyValue_InContainer(O);V.ObjectClass=ClassProperty->MetaClass->GetPathName();break;}case EDasScalarKind::Object:{auto* ObjProperty=CastFieldChecked<FObjectProperty>(P);V.ObjectValue=ObjProperty->GetObjectPropertyValue_InContainer(O);V.ObjectClass=ObjProperty->PropertyClass->GetPathName();break;}case EDasScalarKind::Struct:{auto* S=CastFieldChecked<FStructProperty>(P);V.StructValue.InitializeAs(S->Struct,S->ContainerPtrToValuePtr<uint8>(O));break;}}return V;}
-bool RollbackValue(UObject* O,FName Name,const FDasScalarValue& V){auto* P=O?O->GetClass()->FindPropertyByName(Name):nullptr;if(!P)return false;
- switch(EDasScalarKind(V.Kind)){case EDasScalarKind::Int32:if(auto* F=CastField<FIntProperty>(P)){F->SetPropertyValue_InContainer(O,V.IntValue);return true;}break;case EDasScalarKind::Float32:if(auto* F=CastField<FFloatProperty>(P)){F->SetPropertyValue_InContainer(O,V.FloatValue);return true;}break;case EDasScalarKind::Double:if(auto* F=CastField<FDoubleProperty>(P)){F->SetPropertyValue_InContainer(O,V.DoubleValue);return true;}break;case EDasScalarKind::Bool:if(auto* F=CastField<FBoolProperty>(P)){F->SetPropertyValue_InContainer(O,V.BoolValue);return true;}break;case EDasScalarKind::String:if(auto* F=CastField<FStrProperty>(P)){F->SetPropertyValue_InContainer(O,V.StringValue);return true;}break;case EDasScalarKind::Name:if(auto* F=CastField<FNameProperty>(P)){F->SetPropertyValue_InContainer(O,V.NameValue);return true;}break;case EDasScalarKind::Enum:if(auto* E=CastField<FByteProperty>(P)){FString Error;if(!E->Enum || E->Enum->GetPathName()!=V.ObjectClass || !ValidateDasEnumNumber(V.ObjectClass,V.IntValue,Error))return false;E->SetPropertyValue_InContainer(O,uint8(V.IntValue));return true;}break;case EDasScalarKind::Class:if(auto* F=CastField<FClassProperty>(P)){auto* Target=Cast<UClass>(V.ObjectValue.Get());if(!F->MetaClass || F->MetaClass->GetPathName()!=V.ObjectClass || (Target && !Target->IsChildOf(F->MetaClass)))return false;F->SetObjectPropertyValue_InContainer(O,Target);return true;}break;case EDasScalarKind::Object:if(auto* F=CastField<FObjectProperty>(P)){auto* Target=IsValid(V.ObjectValue.Get())?V.ObjectValue.Get():nullptr;if(F->PropertyClass->GetPathName()!=V.ObjectClass || (Target && !Target->IsA(F->PropertyClass)))return false;F->SetObjectPropertyValue_InContainer(O,Target);return true;}break;case EDasScalarKind::Struct:if(auto* F=CastField<FStructProperty>(P))if(V.StructValue.IsValid() && F->Struct==V.StructValue.GetScriptStruct()){F->Struct->CopyScriptStruct(F->ContainerPtrToValuePtr<void>(O),V.StructValue.GetMemory());return true;}break;}return false;}
+bool RollbackCapture(UObject* Object,const FDasFieldSchema& Field,FDasScalarValue& Out,FString& Error){
+ auto* P=IsValid(Object)?Object->GetClass()->FindPropertyByName(Field.Name):nullptr;
+ if(!P){Error=TEXT("Missing rollback field: ")+Field.Name.ToString();return false;}
+ FDasScalarValue Value;if(!ReadDasPropertyValue(P,P->ContainerPtrToValuePtr<void>(Object),Value,Error))return false;
+ if(Value.Kind!=int32(Field.Kind)){Error=TEXT("Rollback field kind differs from declaration");return false;}
+ Out=MoveTemp(Value);return true;
+}
+bool RollbackValue(UObject* Object,FName Name,const FDasScalarValue& Value){
+ auto* P=IsValid(Object)?Object->GetClass()->FindPropertyByName(Name):nullptr;FString Error;
+ return P && WriteDasPropertyValue(P,P->ContainerPtrToValuePtr<void>(Object),Value,Error);
+}
 }
 struct FDasBlueprintRollback::FImpl {
  struct FNode {TStrongObjectPtr<UK2Node> Node;FMemberReference Reference;decltype(UK2Node_FunctionEntry::MetaData) EntryMetadata;};
  struct FGraph {TStrongObjectPtr<UEdGraph> Graph;TMap<FName,FString> Metadata;};
  struct FBlueprint {TStrongObjectPtr<UBlueprint> BP;TStrongObjectPtr<UClass> OriginalClass;TArray<FBPVariableDescription> Variables;TArray<TObjectPtr<UEdGraph>> Functions,Uber,Delegates,Macros;FString Display,Description,Category;TMap<FName,FString> Metadata,ClassMetadata;TMap<FName,TMap<FName,FString>> FunctionMetadata;};
  struct FObject {TStrongObjectPtr<ADasProbeActor> Object;TArray<FDasScalarValue> Values;TMap<FString,FDasScalarValue> Archive;};
- TArray<FBlueprint> Blueprints;TArray<FGraph> Graphs;TArray<FNode> Nodes;TArray<FObject> Objects;TArray<FDasFieldSchema> Fields;TMap<UPackage*,bool> Dirty;TArray<TStrongObjectPtr<UObject>> Assets;FDasNumericGraphMigration Pins;FDasObjectReferencePins ObjectPins;FDelegateHandle Handle;
+ TArray<FBlueprint> Blueprints;TArray<FGraph> Graphs;TArray<FNode> Nodes;TArray<FObject> Objects;TArray<FDasFieldSchema> Fields;TMap<UPackage*,bool> Dirty;TArray<TStrongObjectPtr<UObject>> Assets;FDasNumericGraphMigration Pins;FDasPropertyValueRoots ObjectPins;FDelegateHandle Handle;
  ~FImpl(){if(Handle.IsValid())FCoreUObjectDelegates::OnObjectsReplaced.Remove(Handle);}
 };
 FDasBlueprintRollback::FDasBlueprintRollback():Impl(MakeUnique<FImpl>()){}
@@ -54,10 +61,10 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root,const FDasClassSchema& Sche
  }
  for(auto& A:Assets){S.Assets.Emplace(A.Get());Remember(A.Get());}
  for(const auto& F:Schema.Fields)if(Root->GeneratedClass->FindPropertyByName(F.Name))S.Fields.Add(F);
- TArray<UObject*> Objects;GetObjectsOfClass(Root->GeneratedClass,Objects,true,RF_NoFlags);for(auto* O:Objects)if(IsValid(O) && !O->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) && !O->GetClass()->GetName().StartsWith(TEXT("SKEL_")) && !O->GetClass()->GetName().StartsWith(TEXT("REINST_"))){auto* A=Cast<ADasProbeActor>(O);if(!A){Error=TEXT("Rollback supports Actor adapter instances");return false;}if(auto* W=A->GetWorld())if(W->IsPartitionedWorld() || !W->GetStreamingLevels().IsEmpty()){Error=TEXT("Unsupported loaded structural map scope");return false;}FImpl::FObject Image;Image.Object.Reset(A);for(const auto& F:S.Fields)Image.Values.Add(RollbackCapture(O,F));Image.Archive=A->RetiredDasValues;S.Objects.Add(MoveTemp(Image));Remember(O);}
+ TArray<UObject*> Objects;GetObjectsOfClass(Root->GeneratedClass,Objects,true,RF_NoFlags);for(auto* O:Objects)if(IsValid(O) && !O->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) && !O->GetClass()->GetName().StartsWith(TEXT("SKEL_")) && !O->GetClass()->GetName().StartsWith(TEXT("REINST_"))){auto* A=Cast<ADasProbeActor>(O);if(!A){Error=TEXT("Rollback supports Actor adapter instances");return false;}if(auto* W=A->GetWorld())if(W->IsPartitionedWorld() || !W->GetStreamingLevels().IsEmpty()){Error=TEXT("Unsupported loaded structural map scope");return false;}FImpl::FObject Image;Image.Object.Reset(A);for(const auto& F:S.Fields){FDasScalarValue Value;if(!RollbackCapture(O,F,Value,Error))return false;Image.Values.Add(MoveTemp(Value));}Image.Archive=A->RetiredDasValues;S.Objects.Add(MoveTemp(Image));Remember(O);}
  TMap<FName,FEdGraphPinType> NoChanges;if(!S.Pins.Prepare(BPs,Root->GeneratedClass,NoChanges,EDasIntegerRule::Exact,EDasFloatRule::Exact,Error))return false;
  for(const auto& O:S.Objects){for(const auto& V:O.Values)S.ObjectPins.Keep(V);S.ObjectPins.Keep(O.Archive);}
- S.Handle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([&S](const FCoreUObjectDelegates::FReplacementObjectMap& Map){for(auto& O:S.Objects){if(auto* New=Map.Find(O.Object.Get()))O.Object.Reset(Cast<ADasProbeActor>(*New));for(auto& V:O.Values)FDasObjectReferencePins::Remap(V,Map);FDasObjectReferencePins::Remap(O.Archive,Map);}S.ObjectPins.RemapPins(Map);});return true;
+ S.Handle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([&S](const FCoreUObjectDelegates::FReplacementObjectMap& Map){for(auto& O:S.Objects){if(auto* New=Map.Find(O.Object.Get()))O.Object.Reset(Cast<ADasProbeActor>(*New));for(auto& V:O.Values)FDasPropertyValueRoots::Remap(V,Map);FDasPropertyValueRoots::Remap(O.Archive,Map);}S.ObjectPins.RemapPins(Map);});return true;
 }
 bool FDasBlueprintRollback::Finish(FString& Error){
  auto& S=*Impl;for(int32 I=1;I<S.Blueprints.Num();++I){auto* B=S.Blueprints[I].BP.Get();FKismetEditorUtilities::CompileBlueprint(B);FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();if(!B->GeneratedClass || B->Status==BS_Error){Error=TEXT("Dependent Blueprint compilation failed");return false;}}

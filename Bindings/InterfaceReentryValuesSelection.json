@@ -1,0 +1,24 @@
+{
+  "functions": [
+    {
+      "class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+      "alias": "ue_textbyte_EchoByte",
+      "function": "EchoByte"
+    },
+    {
+      "class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+      "alias": "ue_textbyte_EchoText",
+      "function": "EchoText"
+    },
+    {
+      "class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+      "alias": "ue_textbyte_Change",
+      "function": "Change"
+    },
+    {
+      "class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+      "alias": "ue_textbyte_ChangeArrays",
+      "function": "ChangeArrays"
+    }
+  ]
+}

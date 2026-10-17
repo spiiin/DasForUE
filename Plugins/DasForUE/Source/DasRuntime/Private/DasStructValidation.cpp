@@ -1,3 +1,4 @@
+#include "DasValueTraversal.h"
 #include "DasContainerTypes.h"
 #include "DasDefaultRoots.h"
 #include "Serialization/JsonSerializer.h"
@@ -25,22 +26,57 @@ bool ValidateDasValueStruct(const FString& Path,FString& Error){
 }
 
 bool ValidateDasStructSnapshot(const FInstancedStruct& Value,FString& Error){
-    if(!Value.IsValid()){Error=TEXT("Missing struct snapshot");return false;}if(!ValidateDasValueStruct(Value.GetScriptStruct()->GetPathName(),Error))return false;
-    int64 ArrayBytes=0;int32 ArrayElements=0;TFunction<bool(const UScriptStruct*,const uint8*)> Visit;
-    Visit=[&](const UScriptStruct* Type,const uint8* Data){
-        if((Type==TBaseStructure<FVector2D>::Get() && reinterpret_cast<const FVector2D*>(Data)->ContainsNaN()) || (Type==TBaseStructure<FVector>::Get() && reinterpret_cast<const FVector*>(Data)->ContainsNaN()) || (Type==TBaseStructure<FRotator>::Get() && reinterpret_cast<const FRotator*>(Data)->ContainsNaN()) || (Type==TBaseStructure<FTransform>::Get() && (reinterpret_cast<const FTransform*>(Data)->ContainsNaN() || !reinterpret_cast<const FTransform*>(Data)->IsRotationNormalized()))){Error=TEXT("Invalid nested math snapshot value");return false;}
-        for(TFieldIterator<FProperty> It(Type);It;++It){const auto* P=*It;const uint8* Memory=P->ContainerPtrToValuePtr<uint8>(Data);
-        if(auto* S=CastField<FStructProperty>(P)){if(!Visit(S->Struct,Memory))return false;continue;}
-        if(auto* Array=CastField<FArrayProperty>(P)){FScriptArrayHelper Elements(Array,Memory);ArrayElements+=Elements.Num();ArrayBytes+=int64(Elements.Num())*Array->Inner->GetElementSize();if(ArrayElements>4096 || ArrayBytes>16*1024*1024){Error=TEXT("Struct array snapshot exceeds element/byte limit");return false;}if(auto* Element=CastField<FStructProperty>(Array->Inner))for(int32 I=0;I<Elements.Num();++I)if(!Visit(Element->Struct,Elements.GetRawPtr(I)))return false;if(auto* C=DasReferencePropertyClass(Array->Inner))for(int32 I=0;I<Elements.Num();++I){auto* O=DasReferenceGet(Array->Inner,Elements.GetRawPtr(I));if(O && IsValid(O) && !DasReferenceMatches(O,C)){Error=TEXT("Reference array element class/interface mismatch");return false;}}if(auto* E=DasEnumPropertyType(Array->Inner))for(int32 I=0;I<Elements.Num();++I){const int32 Index=E->GetIndexByValue(DasEnumPropertyNumber(Array->Inner,Elements.GetRawPtr(I)));if(Index==INDEX_NONE || E->GetNameStringByIndex(Index).EndsWith(TEXT("_MAX"))){Error=TEXT("Unknown or reserved enum array element");return false;}}continue;}
-        if(auto* Set=CastField<FSetProperty>(P)){FScriptSetHelper Values(Set,Memory);ArrayElements+=Values.Num();ArrayBytes+=int64(Values.Num())*Set->ElementProp->GetElementSize();if(ArrayElements>4096 || ArrayBytes>16*1024*1024){Error=TEXT("Snapshot container limit exceeded");return false;}
-            if(IsDasObjectHashProperty(Set->ElementProp)){TSet<UObject*> Seen;for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I)){auto* O=DasReferenceGet(Set->ElementProp,Values.GetElementPtr(I));if(Seen.Contains(O)){Error=TEXT("Duplicate object set identity");return false;}Seen.Add(O);if(O && (!IsValid(O) || (O->IsA<AActor>() && CastChecked<AActor>(O)->IsActorBeingDestroyed()) || !DasReferenceMatches(O,DasReferencePropertyClass(Set->ElementProp)))){Error=TEXT("Invalid or destroyed object set element");return false;}}}
-            if(auto* E=DasEnumPropertyType(Set->ElementProp))for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I)){const int32 Index=E->GetIndexByValue(DasEnumPropertyNumber(Set->ElementProp,Values.GetElementPtr(I)));if(Index==INDEX_NONE || E->GetNameStringByIndex(Index).EndsWith(TEXT("_MAX"))){Error=TEXT("Unknown or reserved enum set element");return false;}}
-            continue;}
-        if(auto* Map=CastField<FMapProperty>(P)){FScriptMapHelper Values(Map,Memory);ArrayElements+=Values.Num();ArrayBytes+=int64(Values.Num())*(Map->KeyProp->GetElementSize()+Map->ValueProp->GetElementSize());if(ArrayElements>4096 || ArrayBytes>16*1024*1024){Error=TEXT("Snapshot container limit exceeded");return false;}if(auto* E=DasEnumPropertyType(Map->KeyProp)){TSet<int64> Seen;for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I)){int64 N=DasEnumPropertyNumber(Map->KeyProp,Values.GetKeyPtr(I));const int32 Index=E->GetIndexByValue(N);if(Index==INDEX_NONE || E->GetNameStringByIndex(Index).EndsWith(TEXT("_MAX")) || Seen.Contains(N)){Error=TEXT("Unknown, reserved or duplicate enum map key");return false;}Seen.Add(N);}}if(IsDasObjectHashProperty(Map->KeyProp)){TSet<UObject*> Seen;for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I)){auto* O=DasReferenceGet(Map->KeyProp,Values.GetKeyPtr(I));if(Seen.Contains(O)){Error=TEXT("Duplicate map object identity");return false;}Seen.Add(O);if(O && (!IsValid(O) || (O->IsA<AActor>() && CastChecked<AActor>(O)->IsActorBeingDestroyed()) || !DasReferenceMatches(O,DasReferencePropertyClass(Map->KeyProp)))){Error=TEXT("Invalid or destroyed map object key");return false;}}}if(auto* V=CastField<FStructProperty>(Map->ValueProp))for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I) && !Visit(V->Struct,Values.GetValuePtr(I)))return false;if(auto* E=DasEnumPropertyType(Map->ValueProp))for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I)){const int32 Index=E->GetIndexByValue(DasEnumPropertyNumber(Map->ValueProp,Values.GetValuePtr(I)));if(Index==INDEX_NONE || E->GetNameStringByIndex(Index).EndsWith(TEXT("_MAX"))){Error=TEXT("Unknown or reserved enum map value");return false;}}if(auto* C=DasReferencePropertyClass(Map->ValueProp))for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I)){auto* O=DasReferenceGet(Map->ValueProp,Values.GetValuePtr(I));if(O && IsValid(O) && !DasReferenceMatches(O,C)){Error=TEXT("Reference map value class/interface mismatch");return false;}}continue;}
-        const UEnum* Enum=nullptr;const FNumericProperty* Storage=nullptr;
-        if(auto* E=CastField<FEnumProperty>(P)){Enum=E->GetEnum();Storage=E->GetUnderlyingProperty();}else if(auto* B=CastField<FByteProperty>(P)){Enum=B->Enum;Storage=B;}
-        if(Enum){int32 Index=Enum->GetIndexByValue(Storage->GetSignedIntPropertyValue(Memory));if(Index==INDEX_NONE || Enum->GetNameStringByIndex(Index).EndsWith(TEXT("_MAX"))){Error=TEXT("Unknown or reserved enum value in struct field: ")+P->GetName();return false;}}
-    }return true;};return Visit(Value.GetScriptStruct(),Value.GetMemory());
+    if(!Value.IsValid()){Error=TEXT("Missing struct snapshot");return false;}
+    if(!ValidateDasValueStruct(Value.GetScriptStruct()->GetPathName(),Error))return false;
+    struct FValidation {
+        FString& Error;
+        int64 Bytes=0, Elements=0;
+        struct FKeys {TSet<UObject*> Objects;TSet<int64> Enums;};
+        TArray<FKeys> Containers;
+        bool Struct(const UScriptStruct* Type,const uint8* Data){
+            if((Type==TBaseStructure<FVector2D>::Get() && reinterpret_cast<const FVector2D*>(Data)->ContainsNaN()) || (Type==TBaseStructure<FVector>::Get() && reinterpret_cast<const FVector*>(Data)->ContainsNaN()) || (Type==TBaseStructure<FRotator>::Get() && reinterpret_cast<const FRotator*>(Data)->ContainsNaN()) || (Type==TBaseStructure<FTransform>::Get() && (reinterpret_cast<const FTransform*>(Data)->ContainsNaN() || !reinterpret_cast<const FTransform*>(Data)->IsRotationNormalized()))){Error=TEXT("Invalid nested math snapshot value");return false;}
+            return true;
+        }
+        bool Begin(FProperty* P,const uint8*,int32 Count,int64 Size){
+            Elements+=Count;Bytes+=Size;
+            if(Elements>4096 || Bytes>16*1024*1024){Error=CastField<FArrayProperty>(P)?TEXT("Struct array snapshot exceeds element/byte limit"):TEXT("Snapshot container limit exceeded");return false;}
+            Containers.AddDefaulted();return true;
+        }
+        void End(FProperty*,const uint8*){Containers.Pop();}
+        bool Leaf(FProperty* P,const uint8* Data,DasValueTraversal::ERole Role){
+            using ERole=DasValueTraversal::ERole;
+            const bool Key=Role==ERole::MapKey, Set=Role==ERole::SetElement;
+            if((Key || Set) && IsDasObjectHashProperty(P)){
+                auto* O=DasReferenceGet(P,Data);auto& Seen=Containers.Last().Objects;
+                if(Seen.Contains(O)){Error=Set?TEXT("Duplicate object set identity"):TEXT("Duplicate map object identity");return false;}
+                Seen.Add(O);
+                if(O && (!IsValid(O) || (O->IsA<AActor>() && CastChecked<AActor>(O)->IsActorBeingDestroyed()) || !DasReferenceMatches(O,DasReferencePropertyClass(P)))){Error=Set?TEXT("Invalid or destroyed object set element"):TEXT("Invalid or destroyed map object key");return false;}
+            }else if(Role==ERole::ArrayElement || Role==ERole::MapValue){
+                if(auto* C=DasReferencePropertyClass(P)){
+                    auto* O=DasReferenceGet(P,Data);
+                    if(O && IsValid(O) && !DasReferenceMatches(O,C)){Error=Role==ERole::ArrayElement?TEXT("Reference array element class/interface mismatch"):TEXT("Reference map value class/interface mismatch");return false;}
+                }
+            }
+            if(auto* Enum=DasEnumPropertyType(P)){
+                const int64 Number=DasEnumPropertyNumber(P,Data);const int32 Index=Enum->GetIndexByValue(Number);
+                const bool Invalid=Index==INDEX_NONE || Enum->GetNameStringByIndex(Index).EndsWith(TEXT("_MAX"));
+                bool Duplicate=false;
+                if(Key){auto& Seen=Containers.Last().Enums;Duplicate=Seen.Contains(Number);Seen.Add(Number);}
+                if(Invalid || Duplicate){
+                    switch(Role){
+                    case ERole::ArrayElement:Error=TEXT("Unknown or reserved enum array element");break;
+                    case ERole::SetElement:Error=TEXT("Unknown or reserved enum set element");break;
+                    case ERole::MapKey:Error=TEXT("Unknown, reserved or duplicate enum map key");break;
+                    case ERole::MapValue:Error=TEXT("Unknown or reserved enum map value");break;
+                    default:Error=TEXT("Unknown or reserved enum value in struct field: ")+P->GetName();break;
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+    } Policy{Error};
+    return DasValueTraversal::Struct(Value.GetScriptStruct(),Value.GetMemory(),Policy);
 }
 
 namespace {

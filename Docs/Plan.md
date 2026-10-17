@@ -3330,6 +3330,22 @@ without owner mutation. Existing per-family carrier caches/layout fingerprints,
 static UHT carriers and Blueprint pin adapters remain follow-up work.
 See SharedPropertyTypes.md for scope and validation evidence.
 
+## 2026-10-17 — FText and uint8 delegates, events and interfaces
+
+Added raw-byte/text delegate signatures through the shared FProperty factory,
+single-cast returns and ref/out, multicast ref parameters, native event payloads
+(FText by value/const-ref, uint8 and const-ref arrays), authored interface
+declarations and IR-generated interface wrappers. Native snapshots retain text
+localization identity across delegate contexts and event queues. Existing
+interface dispatch reentry restrictions remain unchanged.
+
+Fixtures cover Blueprint/native -> DAS implementations, DAS -> plain Blueprint
+interface messages, both byte boundaries, localized/invariant text, arrays,
+delegate signature rejection, context release and subscription cleanup. See
+DSLTextByteEvents.md. Empty unnamed text defaults tolerate Blueprint CDO cook
+normalization while named localization identities stay distinct.
+
+
 ## 2026-10-17 — Shared dynamic container registry
 
 Replaced ten dynamic carrier caches with FDasContainerRegistry. Eleven carrier
@@ -3340,6 +3356,25 @@ registry. No live carrier is replaced when a referenced definition changes.
 Private probes cover cache reuse, collisions, capacity, GC/recreation, nested
 struct layout changes, enum changes and authored member IDs. See
 SharedPropertyTypes.md for validation and scope.
+
+## 2026-10-17 — Interface dispatch into DAS implementations
+
+Removed the blanket DAS-host interface-call rejection. Interface frames now use
+the existing authored dispatch depth/failure scope, so same-context, cross-object
+and ActorComponent calls share return/ref/out ownership and error propagation.
+Legacy int/string adapters use the checked interface frame path too. The shared
+depth limit remains 32; failed frames expose no outputs. Executing sessions
+cannot hot reload during reentry. Object side effects are not transactional.
+
+Added recursive/cyclic actor/component fixtures, failure/recovery cases and
+generated interface method tests for FText, uint8 and array ref/out. The old
+native-interface regression now expects successful DAS dispatch. See
+DSLInterfaceReentry.md. Networking and broad migration work remain deferred.
+
+Interface reentry validation complete: Editor/game builds, strict gameplay PIE,
+native-interface Create/Reopen, packaged foundation (0 failures), gameplay and
+playable-map smoke passed. Stable evidence: logs/interface-reentry-*; reproducible
+generated value-wrapper IR: Bindings/InterfaceReentryValues.json. No commit created.
 
 ## 2026-10-17 — Descriptor-based reflected container lookup
 
@@ -3356,6 +3391,43 @@ Replaced separate descriptor/path selection lists with one registration list of
 no primitive type table is duplicated. Added complete-descriptor validation before
 static matching and assertions preserving native struct operations and canonical
 UHT names across all static matrix cases. See SharedPropertyTypes.md.
+
+## 2026-10-17 — FText and uint8 timer captures
+
+Added scalar byte/text overloads for interval and next-tick timers, plus class DSL
+lowering for byte/text arrays. The existing timer record owns native FText and
+FInstancedStruct captures; no VM token storage or second dispatch backend was added.
+Text and aggregate array payload limits are checked before replacing a timer.
+Repeated delivery retains independent owned arrays and native localization history.
+
+Added a saved asynchronous fixture for byte boundaries, localized/invariant text,
+next-tick and repeat calls, caller/callback mutation isolation, replacement and invalid
+replacement, pause/resume, cancellation and session release. Native host ticking is
+disabled during release checks so it cannot recreate the released session. A read-only
+ScriptTimerCount diagnostic checks capture cleanup. See ManagedTextByteTimers.md.
+
+Timer capture validation completed: Editor/Game Development builds, strict real PIE
+(1 success, no warnings/failures/skips), saved fixture export and packaged foundation,
+gameplay and playable-map runs all passed under NullRHI. Both runners preserve the
+fixture carrier through the asynchronous cleanup observation. Evidence and remaining
+scope are documented in ManagedTextByteTimers.md; no commit was created for this step.
+
+
+## 2026-10-17 — shared callback capabilities and grouped type coverage
+
+Audited authored fields, methods, interfaces, delegates, native subscriptions and
+timer captures in TypeSupportMatrix.md. Added a shared queued-callback table used
+by the DSL, serialized callback validation, native signature/proxy lookup and
+event/timer payload validation. Existing property and carrier services remain the
+source for reflected storage. Added float/bool/FName arrays across subscriptions,
+interval and next-tick timers together, using existing canonical transports.
+Callback probes compare actual native proxy signatures with capabilities and check
+snapshot identity, payload budgets and ownership-policy exclusions. Gameplay probes
+exercise new arrays and repeated copy isolation. Validation passed: Editor and
+Win64 Development builds, strict real PIE (1 success, 0 warnings/failures/skips),
+saved fixture export, packaged foundation (0 failures), gameplay and playable map.
+All runs used NullRHI. Evidence and remaining grouped work: TypeSupportMatrix.md.
+No commit was created for this step.
 
 ## 2026-10-17 — Shared Blueprint pin adapter
 
@@ -3377,3 +3449,161 @@ grammar. Native container snapshots use the shared carrier registry rather than
 assuming every schema Struct is an FStructProperty. Expanded saved-asset coverage
 checks byte, localized text, arrays/sets/maps, inherited defaults, overrides,
 restoration, reopening and failure rollback. See DSLFieldArchiveValidation.md.
+
+
+## 2026-10-17 — enum and registered struct callbacks
+
+Added concrete enum and value-only struct policies to the shared callback table.
+Class DSL timers pack both types through existing adapters; subscription metadata
+retains exact parameter_type_path. A generic native thunk and cached reflected
+receiver signatures handle typed native events by value or const-ref, without a
+new C++ function for every source struct. Recursive payload budgets reject object,
+class and delegate-bearing layouts before retaining snapshots. Named timer
+replacement validates the complete payload/contract first. Fixtures cover authored
+and native enum/struct values, owned repeated deliveries, native const refs and
+release. Broader object capture and structural migration remain deferred.
+Validation completed: Editor/Game Development builds, strict real PIE (1 success,
+0 warnings/failures/skips), saved export and packaged foundation (0 failures),
+gameplay and playable map all passed under NullRHI, including forced GC and clean
+normal exit. Generic receiver functions are rooted for cooked permanent native
+class references; runtime cleanup runs once on OnPreExit before UObject teardown.
+Native enum delegate storage now matches Kismet's canonical enum-class storage.
+Evidence and scope: ManagedCallbackValues.md. No commit was created.
+
+
+## 2026-10-17 — Shared native property value read/write
+
+Added ReadDasPropertyValue/WriteDasPropertyValue over the shared descriptor and
+existing native value transport. Rename/archive, numeric migration capture and
+structural rollback now use the service. Replaced scalar-only object pins with a
+runtime FGCObject snapshot root scope that covers nested references and rehashes
+object sets/maps after reinstance replacement. Added a 106-case native value test,
+atomic-failure and forced-GC/remap assertions, plus Scripts/TestPropertyValues.ps1.
+See SharedPropertyTypes.md for contracts and limitations. Reflected call
+marshalling and self accessors remain the next integration steps.
+
+Property values validation passed: Editor/Game Development builds, final 106-case
+matrix, strict archive/rename/numeric PIE and saved-asset archive, rename, numeric
+conversion and structural rollback phases. All ran with NullRHI; no packaged run
+or Shipping build was repeated. Evidence: logs/property-values-* and
+SharedPropertyTypes.md. No commit was created.
+
+
+## 2026-10-17 — Shared values in reflected invocation
+
+Connected reflected frame arguments/results, whole struct/container/math values,
+typed enums, short ue_call_* helpers and automatic WorldContext to the shared
+native value service. Frame direction/signature validation, object ownership,
+class expiry and enum symbol policies remain explicit at the invocation boundary.
+Added foundation script regressions for failure recovery and byte/enum separation,
+including editor-only native hidden-symbol policy. See SharedPropertyTypes.md.
+Native/authored self property accessors remain the next integration area.
+
+
+## 2026-10-17 — owning object references in callbacks
+
+Implemented typed object/interface class timer captures (interval/repeat and
+next-tick) and native object/interface event receivers. Registered snapshots now
+accept reflected object references within supported structs/arrays/maps/sets.
+Timer slots and event queues share stable heap capture owners using the common
+FDasPropertyValueRoots service. Weak original identities prevent a destroyed
+object cleared by GC from becoming an accepted null payload. Lifecycle/class/
+interface checks repeat before delivery; stale events drop and stale timers stop.
+Existing cancellation, replacement, reload, release, EndPlay and PreExit cleanup
+own the captures through the same paths. No second field-reference walker or
+per-native-class receiver was added. Standalone nonprimitive collection callback
+signatures remain separate from references nested in registered snapshots.
+
+Editor/Game Development builds, strict real PIE and packaged foundation/gameplay/
+playable map passed with forced GC and clean process shutdown. The final validation
+compared source hashes to ensure no concurrent changes during the checked run.
+Scope, syntax and evidence: ManagedCallbackObjects.md. No commit was created.
+
+Reflected invocation validation passed: final Editor/Game target verification,
+Editor and packaged foundation (failures=0), strict 106-case value matrix and
+Gameplay.RuntimePIE, saved static libraries Create/Reopen, fixture export,
+Win64 Development cook/stage/archive and packaged gameplay/playable maps. Runs
+used NullRHI; Shipping/rendering were not tested. Evidence and the native enum
+policy distinction are documented in SharedPropertyTypes.md. No commit created.
+
+Shared field-value transport is implemented for self, authored references and
+generated native references. Scalar slot selection is shared with reflected
+calls; struct/container transfer uses the owned value codec. Access and write
+policies remain at the receiver boundary. Automatic enum storage is resolved by
+one shared rule in the property factory and carriers.
+
+Editor/Game builds, Editor and packaged Foundation, the 106-case value matrix,
+saved libraries and native defaults Create/Reopen/Recompile passed. Packaged
+native defaults and playable map passed. Full gameplay PIE/packaged validation
+remains red because dynamic callback receiver duplication loses the array
+parameter's CPF_ZeroConstructor flag, causing strict signature mismatch and a
+callback timeout. Resolve that callback issue before claiming the broad gameplay
+suite is green. Details and evidence: SharedPropertyTypes.md. No commit created.
+
+Callback receiver follow-up is validated: native computed property flags survive
+signature duplication with strict compatibility and mutable ref/out rejection
+preserved. The shared reader supplies concrete struct/carrier payload identity,
+preventing silently dropped callbacks. Regression coverage includes real UHT
+array/struct signatures and generated array/map/set signatures.
+
+The previous full gameplay failure is resolved. Editor/Game Development builds,
+Editor and packaged Foundation, the strict 106-case value matrix, strict gameplay
+PIE, fresh export/cook/stage/archive and packaged gameplay/playable-map probes
+passed. Evidence and test-environment details: SharedPropertyTypes.md. No commit
+created. The next shared-value refactoring surface is immutable snapshot leaf
+and container access, which still has dedicated per-type adapters.
+
+Snapshot leaf/container value transport is now consolidated: scalar memory
+adapters share the field/call slot table and codec; nested struct/container copies
+and map values share property-value transport; native enum number transport is
+shared with reflected calls while preserving symbolic native policy. Container
+topology, path/index checks, collision rules and limits remain explicit.
+
+Snapshot regressions, Editor/packaged Foundation, the strict 106-case matrix,
+strict gameplay PIE, native defaults Create/Reopen/Recompile, export/cook/archive
+and all four packaged probes passed. See SharedPropertyTypes.md for evidence and
+the validation boundary around concurrent callback-frame extensions. No commit
+was created.
+
+
+## 2026-10-17 — standalone container callback arguments
+
+Extended timer captures and queued events to canonical arrays of registered
+enum/struct/native object types and supported map/set shapes. All arrays use the
+generic native receiver for by-value/const-ref sources. The shared reflected
+reader, canonical carrier registry and common GC owner provide transport;
+no separate container copier or field-reference walker was added. Executable
+fixtures cover per-delivery copy isolation and object lifetime. Validation uses
+an isolated source snapshot while another chat edits the shared checkout.
+Scope and evidence: ManagedCallbackContainers.md. No commit was created.
+
+
+Standalone container callback validation passed in the isolated snapshot:
+Editor/Game Development, final Editor and packaged foundation (failures=0), strict
+real PIE (1 success, 0 warnings/failures/skips), saved export and packaged
+gameplay/playable map. Fixed native signature computed flags and Kismet input-array
+const-ref contracts; imported the shared enum-storage and snapshot-identity fixes.
+Source hashes were unchanged during the final validation. The main checkout
+continued changing in another chat. See ManagedCallbackContainers.md. No commit.
+
+
+## 2026-10-17 — multiple callback arguments
+
+Events and managed class timers now lower 2–16 ordinary typed arguments to one
+owned reflected tuple, reusing the existing marshalling, queue and GC services.
+Fixtures cover mixed scalar/text/byte/enum/struct/array arguments, typed object
+captures, cancellation and the native five-argument OnTakeAnyDamage event.
+Source/count/order/direction validation rejects incompatible handlers. See
+MultiArgumentCallbacks.md and logs/multi-callbacks-validation.json for scope and
+verification. No commit was created.
+
+## 2026-10-17 — shared reflected value traversal
+
+Snapshot validation and reference replacement now use one const-preserving
+traversal of struct fields, arrays, sparse sets and map keys/values. Policies
+retain their own limits, liveness/enum rules and post-mutation rehashing. GC stays
+with Unreal's native collectors to preserve struct ARO, metadata references and
+incremental GC semantics; it must not depend on validation succeeding. New
+PropertyValues regressions exercise nested budgets, invalid math, duplicate
+object identities, sparse holes and replacement-key lookup. Scope and validation
+evidence are recorded in SharedPropertyTypes.md. No commit was created.

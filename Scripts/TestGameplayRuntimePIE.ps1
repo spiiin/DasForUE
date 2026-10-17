@@ -10,6 +10,7 @@ if ($LASTEXITCODE) { throw 'PIE probe build failed' }
 $Log = Join-Path $Logs "$LogPrefix.log"
 $Report = Join-Path $Logs "$LogPrefix-report"
 $Arguments = @(('"' + $Project + '"'), '-unattended', '-NullRHI', '-nosplash', '-nosound', '-RenderOffscreen',
+    '-ini:Engine:[ConsoleVariables]:HomeScreen.EnableHomeScreen=0',
     '-ExecCmds="Automation RunTests DasForUE.Gameplay.RuntimePIE"', '-TestExit="Automation Test Queue Empty"',
     ('-ReportExportPath="' + $Report + '"'), ('-abslog="' + $Log + '"'))
 $Process = Start-Process -FilePath (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') `

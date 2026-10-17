@@ -265,7 +265,7 @@ UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type){
     FString Error;if(!ValidateDasPropertyType(Type,EDasPropertyUsage::Container,Error))return nullptr;
     const FString Identity=Type.StorageIdentity();
     for(const auto& Entry:StaticCarriers())if(Entry.StorageIdentity==Identity)return Entry.Struct;
-    auto Storage=[](const TSharedPtr<const FDasDeclaredType>& T){return !T || T->EnumStorage==EDasEnumStorage::Automatic?-1:T->EnumStorage==EDasEnumStorage::Enum8?1:0;};
+    auto Storage=[](const TSharedPtr<const FDasDeclaredType>& T){return !T || T->GetKind()!=EDasTypeKind::Enum?-1:DasResolvedEnumStorage(*T)==EDasEnumStorage::Enum8?1:0;};
     if(Type.Kind==TEXT("map") && Type.Key && Type.Key->Kind==TEXT("byte"))return ByteMapCarrier(Type);
 
     if(Type.Kind==TEXT("map") && Type.Key && Type.Key->Kind==TEXT("enum"))return EnumMapCarrier(Type,Storage(Type.Key),Storage(Type.Value));

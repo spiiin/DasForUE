@@ -6,11 +6,28 @@
         FString Path;
     };
 
+    // VM adapters choose the transport slot; native memory access belongs to
+    // the shared property-value service. Direction, assignment and GC ownership
+    // remain properties of this invocation-local frame.
+
+
+    FDasScalarValue ReadCallValue(const FCallField& Field,das::Context* C){
+        return ReadNativePropertyValue(Field.Property,Field.Memory,C);
+    }
+    void WriteCallValue(FMarshalledCall& Call,const FCallField& Field,const FDasScalarValue& Value,das::Context* C){
+        WriteNativePropertyValue(Field.Property,Field.Memory,Value,C);
+        Call.Assigned.Add(Field.Path);
+    }
+    void WriteCallEnum(FMarshalledCall& Call,const FCallField& Field,UEnum* Enum,int64 Number,das::Context* C){
+        WriteNativeEnumNumber(Field.Property,Field.Memory,Enum,Number,C);Call.Assigned.Add(Field.Path);
+    }
+    int64 ReadCallEnum(const FCallField& Field,das::Context* C){
+        return ReadNativeEnumNumber(Field.Property,Field.Memory,C);
+    }
+
     UEnum* CallEnumType(FProperty* Property)
     {
-        if (auto* Enum = CastField<FEnumProperty>(Property)) return Enum->GetEnum();
-        if (auto* Byte = CastField<FByteProperty>(Property)) return Byte->Enum;
-        return nullptr;
+        return DasEnumPropertyType(Property);
     }
     FNumericProperty* CallEnumStorage(FProperty* Property)
     {
@@ -190,7 +207,7 @@
         auto Signature=DescribeCall(Function,Context);
         if(ActiveContext->Calls.Num()>=256)Context->throw_error("call frame limit reached");
         auto Call=MakeShared<FMarshalledCall>();Call->Signature=MoveTemp(Signature);Call->SignatureKey=CallSignatureKey(Function);Call->Target=Class->GetDefaultObject();Call->Function.Reset(Function);Call->Frame=MakeUnique<FStructOnScope>(Function);
-        if(WorldProperty){WorldProperty->SetObjectPropertyValue_InContainer(Call->Frame->GetStructMemory(),WorldObject);Call->AutomaticWorldContext=WorldProperty->GetName().ToLower();Call->StaticWorld=World;Call->Assigned.Add(Call->AutomaticWorldContext);Call->ObjectPins.Add(Call->AutomaticWorldContext,TStrongObjectPtr<UObject>(WorldObject));}
+        if(WorldProperty){FDasScalarValue Native;Native.Kind=int32(EDasMethodSignature::Object);Native.ObjectClass=WorldProperty->PropertyClass->GetPathName();Native.ObjectValue=WorldObject;WriteNativePropertyValue(WorldProperty,WorldProperty->ContainerPtrToValuePtr<void>(Call->Frame->GetStructMemory()),Native,Context);Call->AutomaticWorldContext=WorldProperty->GetName().ToLower();Call->StaticWorld=World;Call->Assigned.Add(Call->AutomaticWorldContext);Call->ObjectPins.Add(Call->AutomaticWorldContext,TStrongObjectPtr<UObject>(WorldObject));}
         const uint64 Token=NextCallHandle++;ActiveContext->Calls.Add(Token,MoveTemp(Call));return {Token};
     }
 
@@ -228,7 +245,7 @@
 
     FDasCallHandle BeginInterfaceCall(const FDasObjectHandle& Target,const char* Path,const char* Name,das::Context* C){
         auto* Object=ResolveObject(Target,C);auto* Interface=CheckedInterface(Path,C);CheckedInterfaceFunction(Object,Path,Name,C);
-        auto Handle=BeginCall(Target,Name,C);auto& Call=ResolveCall(Handle,C);Call.RequiredInterface=Interface;Call.InterfaceSignatureKey=CallSignatureKey(Interface->FindFunctionByName(Call.Function->GetFName()));return Handle;
+        auto Handle=BeginCall(Target,Name,C);auto& Call=ResolveCall(Handle,C);Call.bAuthored=true;Call.RequiredInterface=Interface;Call.InterfaceSignatureKey=CallSignatureKey(Interface->FindFunctionByName(Call.Function->GetFName()));return Handle;
     }
     void ExpectInterfaceSignature(const FDasCallHandle& Handle,const char* Expected,das::Context* C){auto& Call=ResolveCall(Handle,C);if(Call.bExecuted || !Call.RequiredInterface.IsValid() || !Expected || Call.InterfaceSignatureKey!=UTF8_TO_TCHAR(Expected))C->throw_error("generated interface signature changed; regenerate bindings");}
     void ExpectCallSignature(const FDasCallHandle& Handle, const char* Expected, das::Context* Context)
@@ -469,8 +486,8 @@
         auto Field = ResolveCallField(Call, Path, false, Context);
         auto* Property = CastField<P>(Field.Property);
         if (!Property) Context->throw_error("argument scalar type mismatch");
-        Property->SetPropertyValue(Field.Memory, Value);
-        Call.Assigned.Add(Field.Path);
+        FDasScalarValue Native;Native.Kind=int32(TPropertyScalarSlot<P>::Kind);Native.*TPropertyScalarSlot<P>::Member=Value;
+        WriteCallValue(Call,Field,Native,Context);
     }
     void SetCallInt(const FDasCallHandle& H, const char* P, int32 V, das::Context* C) { SetCallScalar<FIntProperty>(H, P, V, C); }
     void SetCallFloat(const FDasCallHandle& H, const char* P, float V, das::Context* C) { SetCallScalar<FFloatProperty>(H, P, V, C); }
@@ -488,8 +505,8 @@
         auto Field = ResolveCallField(Call, Path, false, Context);
         auto* Property = CastField<FNameProperty>(Field.Property);
         if (!Property) Context->throw_error("argument FName type mismatch");
-        Property->SetPropertyValue(Field.Memory, FName(*Text));
-        Call.Assigned.Add(Field.Path);
+        FDasScalarValue Native;Native.Kind=int32(EDasMethodSignature::Name);Native.NameValue=FName(*Text);
+        WriteCallValue(Call,Field,Native,Context);
     }
     UEnum* RequireCallEnum(FProperty* Property, const char* TypePath, das::Context* Context)
     {
@@ -517,15 +534,14 @@
                 Symbol.Equals(Enum->GetNameByIndex(Candidate).ToString(), ESearchCase::IgnoreCase))
             { Index = Candidate; break; }
         if (!IsCallEnumMember(Enum, Index)) Context->throw_error("unknown or reserved enum member");
-        CallEnumStorage(Field.Property)->SetIntPropertyValue(Field.Memory, Enum->GetValueByIndex(Index));
-        Call.Assigned.Add(Field.Path);
+        WriteCallEnum(Call,Field,Enum,Enum->GetValueByIndex(Index),Context);
     }
     char* GetCallEnum(const FDasCallHandle& Handle, const char* Path, const char* TypePath, das::Context* Context)
     {
         auto& Call = ResolveCall(Handle, Context);
         auto Field = ResolveCallField(Call, Path, true, Context);
         UEnum* Enum = RequireCallEnum(Field.Property, TypePath, Context);
-        const int64 Value = CallEnumStorage(Field.Property)->GetSignedIntPropertyValue(Field.Memory);
+        const int64 Value = ReadCallEnum(Field,Context);
         const int32 Index = Enum->GetIndexByValue(Value);
         if (!IsCallEnumMember(Enum, Index)) Context->throw_error("UFunction returned an unknown or reserved enum value");
         const FString Name = Enum->GetNameStringByIndex(Index);
@@ -545,12 +561,12 @@
         auto& Call=ResolveCall(H,C);auto Field=ResolveCallField(Call,Path,false,C);auto* P=CastField<FClassProperty>(Field.Property);
         auto* Class=V.Token?Cast<UClass>(ResolveObject(FDasObjectHandle{V.Token},C)):nullptr;
         if(V.Token && !Class)C->throw_error("expected class handle");ValidateCallClass(P,Class,C);
-        P->SetObjectPropertyValue(Field.Memory,Class);Call.ObjectPins.Add(Field.Path,TStrongObjectPtr<UObject>(Class));Call.Assigned.Add(Field.Path);
+        FDasScalarValue Native;Native.Kind=int32(EDasMethodSignature::Class);Native.ObjectClass=P->MetaClass->GetPathName();Native.ClassValue=Class;WriteCallValue(Call,Field,Native,C);Call.ObjectPins.Add(Field.Path,TStrongObjectPtr<UObject>(Class));
     }
     FDasClassHandle GetCallClass(const FDasCallHandle& H,const char* Path,das::Context* C)
     {
         auto& Call=ResolveCall(H,C);auto Field=ResolveCallField(Call,Path,true,C);auto* P=CastField<FClassProperty>(Field.Property);
-        if(!P)C->throw_error("expected reflected class result");auto* Class=ValidateCallClass(P,Cast<UClass>(P->GetObjectPropertyValue(Field.Memory)),C);
+        if(!P)C->throw_error("expected reflected class result");auto* Class=ValidateCallClass(P,ReadCallValue(Field,C).ClassValue.Get(),C);
         return {MakeObjectHandle(Class,UClass::StaticClass(),C).Token};
     }
     void SetCallObject(const FDasCallHandle& Handle, const char* Path, const FDasObjectHandle& Value, das::Context* Context)
@@ -561,9 +577,9 @@
         if (!Property) Context->throw_error("argument object type mismatch");
         UObject* Object = Value.Token ? ResolveObject(Value, Context) : nullptr;
         if (Object && !DasReferenceMatches(Object,Property)) Context->throw_error("object argument has an incompatible class");
+        FDasScalarValue Native;Native.Kind=int32(EDasMethodSignature::Object);Native.ObjectClass=Property->GetPathName();Native.ObjectValue=Object;
+        WriteCallValue(Call,Field,Native,Context);
         Call.ObjectPins.Add(Field.Path, TStrongObjectPtr<UObject>(Object));
-        DasReferenceSet(Field.Property,Field.Memory,Object);
-        Call.Assigned.Add(Field.Path);
     }
     FDasObjectHandle GetCallObject(const FDasCallHandle& Handle, const char* Path, das::Context* Context)
     {
@@ -571,16 +587,17 @@
         auto Field = ResolveCallField(Call, Path, true, Context);
         auto* Property = DasReferencePropertyClass(Field.Property);
         if (!Property) Context->throw_error("result object type mismatch");
-        return MakeObjectHandle(DasReferenceGet(Field.Property,Field.Memory), Property, Context);
+        return MakeObjectHandle(ReadCallValue(Field,Context).ObjectValue.Get(), Property, Context);
     }
 
     void InvokeCall(const FDasCallHandle& Handle, das::Context* Context)
     {
         auto& Call = ResolveCall(Handle, Context);
+        if(!Call.CallbackFramePath.IsEmpty())Context->throw_error("callback builders cannot invoke a UFunction");
         if (ActiveContext->bCollectingSubscriptions) Context->throw_error("UFunction calls are forbidden in bind_events");
         if (Call.bExecuted) Context->throw_error("a call frame may only execute once");
         UObject* Object = Call.Target.Get();
-        if (!Call.DelegateInvoke && (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))
+        if (!Call.DelegateInvoke && (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed()) || (Cast<UActorComponent>(Object) && CastChecked<UActorComponent>(Object)->IsBeingDestroyed())))
             Context->throw_error("call target expired");
         if(!Call.InterfaceSignatureKey.IsEmpty()){auto* Interface=Call.RequiredInterface.Get();auto* Declared=Interface?Interface->FindFunctionByName(Call.Function->GetFName()):nullptr;if(!Interface || !Object->GetClass()->ImplementsInterface(Interface) || !Declared || CallSignatureKey(Declared)!=Call.InterfaceSignatureKey || !Call.Function->IsSignatureCompatibleWith(Declared))Context->throw_error("interface contract changed; create a new interface frame");}
         if (!Call.DelegateInvoke && (Call.FunctionScopeClass.IsValid()?Call.FunctionScopeClass->FindFunctionByName(Call.Function->GetFName()):Object->FindFunction(Call.Function->GetFName())) != Call.Function.Get()) Context->throw_error("UFunction changed; create a new call frame");
@@ -627,7 +644,7 @@
                 auto Pin = [&](const FString& Path)
                 {
                     auto Field = ResolveCallField(Call, TCHAR_TO_UTF8(*Path), true, Context);
-                    UObject* Output = CastField<FClassProperty>(Field.Property)?ValidateCallClass(CastFieldChecked<FClassProperty>(Field.Property),Cast<UClass>(CastFieldChecked<FClassProperty>(Field.Property)->GetObjectPropertyValue(Field.Memory)),Context):DasReferenceGet(Field.Property,Field.Memory);
+                    const auto Native=ReadCallValue(Field,Context);UObject* Output = CastField<FClassProperty>(Field.Property)?ValidateCallClass(CastFieldChecked<FClassProperty>(Field.Property),Native.ClassValue.Get(),Context):Native.ObjectValue.Get();
                     OutputPins.Add(Path, TStrongObjectPtr<UObject>(IsValid(Output) ? Output : nullptr));
                 };
                 VisitCallContainerPaths(Call,Parameter.Path,true,Context,Pin,OutputTraversalBudget);
@@ -647,7 +664,9 @@
         auto Field = ResolveCallField(Call, Path, true, Context);
         auto* Property = CastField<P>(Field.Property);
         if (!Property) Context->throw_error("result scalar type mismatch");
-        return Property->GetPropertyValue(Field.Memory);
+        auto Value=ReadCallValue(Field,Context);
+        if(Value.Kind!=int32(TPropertyScalarSlot<P>::Kind))Context->throw_error("result scalar type mismatch");
+        return Value.*TPropertyScalarSlot<P>::Member;
     }
     int32 GetCallInt(const FDasCallHandle& H, const char* P, das::Context* C) { return GetCallScalar<FIntProperty>(H, P, C); }
     float GetCallFloat(const FDasCallHandle& H, const char* P, das::Context* C) { return GetCallScalar<FFloatProperty>(H, P, C); }
@@ -682,5 +701,5 @@
         virtual bool canBePlacedInContainer() const override { return true; }
     };
 
-void SetCallByte(const FDasCallHandle& H,const char* Path,int32 Value,das::Context* C){auto& Call=ResolveCall(H,C);auto Field=ResolveCallField(Call,Path,false,C);auto* P=CastField<FByteProperty>(Field.Property);if(!P || P->Enum || Value<0 || Value>255)C->throw_error("byte input must be a raw uint8 in range 0..255");P->SetPropertyValue(Field.Memory,uint8(Value));Call.Assigned.Add(Field.Path);}
-int32 GetCallByte(const FDasCallHandle& H,const char* Path,das::Context* C){auto& Call=ResolveCall(H,C);auto Field=ResolveCallField(Call,Path,true,C);auto* P=CastField<FByteProperty>(Field.Property);if(!P || P->Enum)C->throw_error("expected raw byte output");return P->GetPropertyValue(Field.Memory);}
+void SetCallByte(const FDasCallHandle& H,const char* Path,int32 Value,das::Context* C){if(Value<0 || Value>255)C->throw_error("byte input must be a raw uint8 in range 0..255");SetCallScalar<FByteProperty>(H,Path,uint8(Value),C);}
+int32 GetCallByte(const FDasCallHandle& H,const char* Path,das::Context* C){return GetCallScalar<FByteProperty>(H,Path,C);}

@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DasCallFrame.h"
+#include "DasCallbackValueTypes.h"
 #include "DasProbeActor.generated.h"
 
 class UDasTypeRegistry;
@@ -9,6 +10,9 @@ class UDasTypeRegistry;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasByteSignal,uint8,Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasTextSignal,FText,Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasTextRefSignal,const FText&,Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasArrayFloatSignal,const TArray<float>&,Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasArrayBoolSignal,const TArray<bool>&,Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasArrayNameSignal,const TArray<FName>&,Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasArrayByteSignal,const TArray<uint8>&,Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasArrayTextSignal,const TArray<FText>&,Value);
 
@@ -26,6 +30,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasArrayStringSignal,const TArray<F
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasDoubleSignal,double,Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasObjectSignal,UObject*,Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasCallbackActorSignal,AActor*,Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasCallbackActorsSignal,const TArray<AActor*>&,Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasVectorSignal,FVector,Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasVectorRefSignal,const FVector&,Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasRotatorSignal,FRotator,Value);
@@ -43,8 +49,15 @@ public:
     UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasByteSignal OnDasByteSignal;
     UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasTextSignal OnDasTextSignal;
     UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasTextRefSignal OnDasTextRefSignal;
+    UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasArrayFloatSignal OnDasArrayFloatSignal;
+    UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasArrayBoolSignal OnDasArrayBoolSignal;
+    UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasArrayNameSignal OnDasArrayNameSignal;
     UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasArrayByteSignal OnDasArrayByteSignal;
     UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasArrayTextSignal OnDasArrayTextSignal;
+    UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasCallbackEnumRefSignal OnDasCallbackEnumRef;
+ UPROPERTY(BlueprintAssignable,Category="daScript Probe") FDasCallbackActorSignal OnDasCallbackActor;
+ UPROPERTY(BlueprintAssignable,Category="daScript Probe") FDasCallbackActorsSignal OnDasCallbackActors;
+    UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasCallbackRecordRefSignal OnDasCallbackRecordRef;
     // Cooked identity for checked authored references; not exposed as a script field.
     UPROPERTY() FString AuthoredTypeId;
     // Approved source default fingerprints; actual CDO values may be editor overrides.

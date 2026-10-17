@@ -12,7 +12,7 @@
 #include "DasRuntime.h"
 #include "DasProbeActor.h"
 #include "DasScriptComponent.h"
-#include "DasObjectReferencePins.h"
+#include "DasPropertyValues.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Modules/ModuleManager.h"
@@ -171,37 +171,16 @@ bool FDasDSLService::Reimport(UBlueprint* BP,FString& Error,EDasDefaultMigration
 }
 
 namespace {
-FDasScalarValue CaptureRenamedField(UObject* Object,FName Name,EDasScalarKind Kind){
-    FDasScalarValue V;V.Kind=static_cast<int32>(Kind);auto* P=Object->GetClass()->FindPropertyByName(Name);
-    switch(Kind){
-    case EDasScalarKind::Int32:V.IntValue=CastFieldChecked<FIntProperty>(P)->GetPropertyValue_InContainer(Object);break;
-    case EDasScalarKind::Float32:V.FloatValue=CastFieldChecked<FFloatProperty>(P)->GetPropertyValue_InContainer(Object);break;
-    case EDasScalarKind::Bool:V.BoolValue=CastFieldChecked<FBoolProperty>(P)->GetPropertyValue_InContainer(Object);break;
-    case EDasScalarKind::String:V.StringValue=CastFieldChecked<FStrProperty>(P)->GetPropertyValue_InContainer(Object);break;
-    case EDasScalarKind::Double:V.DoubleValue=CastFieldChecked<FDoubleProperty>(P)->GetPropertyValue_InContainer(Object);break;
-    case EDasScalarKind::Byte:V.ByteValue=CastFieldChecked<FByteProperty>(P)->GetPropertyValue_InContainer(Object);break;
-    case EDasScalarKind::Text:V.TextValue=CastFieldChecked<FTextProperty>(P)->GetPropertyValue_InContainer(Object);break;
-    case EDasScalarKind::Name:V.NameValue=CastFieldChecked<FNameProperty>(P)->GetPropertyValue_InContainer(Object);break;
-    case EDasScalarKind::Enum:{auto* E=CastFieldChecked<FByteProperty>(P);V.IntValue=E->GetPropertyValue_InContainer(Object);V.ObjectClass=E->Enum->GetPathName();break;}
-    case EDasScalarKind::Class:{auto* F=CastFieldChecked<FClassProperty>(P);V.ObjectValue=F->GetObjectPropertyValue_InContainer(Object);V.ObjectClass=F->MetaClass->GetPathName();break;}case EDasScalarKind::Object:{V.ObjectValue=DasReferenceGet(P,P->ContainerPtrToValuePtr<void>(Object));V.ObjectClass=DasReferencePropertyClass(P)->GetPathName();break;}
-    case EDasScalarKind::Struct:if(auto* Carrier=DasContainerCarrierForProperty(P)){V.StructValue.InitializeAs(Carrier);auto* Values=Carrier->FindPropertyByName(TEXT("Values"));Values->CopyCompleteValue(Values->ContainerPtrToValuePtr<void>(V.StructValue.GetMutableMemory()),P->ContainerPtrToValuePtr<void>(Object));}else V.StructValue.InitializeAs(CastFieldChecked<FStructProperty>(P)->Struct,P->ContainerPtrToValuePtr<uint8>(Object));break;
-    }return V;
+bool CaptureRenamedField(UObject* Object,FName Name,EDasScalarKind Kind,FDasScalarValue& Out,FString& Error){
+    auto* P=IsValid(Object)?Object->GetClass()->FindPropertyByName(Name):nullptr;
+    if(!P){Error=TEXT("Missing migration field: ")+Name.ToString();return false;}
+    FDasScalarValue Value;if(!ReadDasPropertyValue(P,P->ContainerPtrToValuePtr<void>(Object),Value,Error))return false;
+    if(Value.Kind!=int32(Kind)){Error=TEXT("Migration field kind differs from declaration: ")+Name.ToString();return false;}
+    Out=MoveTemp(Value);return true;
 }
-bool RestoreRenamedField(UObject* Object,FName Name,const FDasScalarValue& V){
-    auto* P=Object?Object->GetClass()->FindPropertyByName(Name):nullptr;if(!P)return false;
-    switch(static_cast<EDasScalarKind>(V.Kind)){
-    case EDasScalarKind::Int32:if(auto* F=CastField<FIntProperty>(P)){F->SetPropertyValue_InContainer(Object,V.IntValue);return true;}break;
-    case EDasScalarKind::Float32:if(auto* F=CastField<FFloatProperty>(P)){F->SetPropertyValue_InContainer(Object,V.FloatValue);return true;}break;
-    case EDasScalarKind::Bool:if(auto* F=CastField<FBoolProperty>(P)){F->SetPropertyValue_InContainer(Object,V.BoolValue);return true;}break;
-    case EDasScalarKind::String:if(auto* F=CastField<FStrProperty>(P)){F->SetPropertyValue_InContainer(Object,V.StringValue);return true;}break;
-    case EDasScalarKind::Double:if(auto* F=CastField<FDoubleProperty>(P)){F->SetPropertyValue_InContainer(Object,V.DoubleValue);return true;}break;
-    case EDasScalarKind::Byte:if(auto* F=CastField<FByteProperty>(P)){if(!F->Enum){F->SetPropertyValue_InContainer(Object,V.ByteValue);return true;}}break;
-    case EDasScalarKind::Text:if(auto* F=CastField<FTextProperty>(P)){F->SetPropertyValue_InContainer(Object,V.TextValue);return true;}break;
-    case EDasScalarKind::Name:if(auto* F=CastField<FNameProperty>(P)){F->SetPropertyValue_InContainer(Object,V.NameValue);return true;}break;
-    case EDasScalarKind::Enum:if(auto* E=CastField<FByteProperty>(P)){FString Error;if(!E->Enum || E->Enum->GetPathName()!=V.ObjectClass || !ValidateDasEnumNumber(V.ObjectClass,V.IntValue,Error))return false;E->SetPropertyValue_InContainer(Object,uint8(V.IntValue));return true;}break;
-    case EDasScalarKind::Class:if(auto* F=CastField<FClassProperty>(P)){auto* Target=Cast<UClass>(V.ObjectValue.Get());if(!F->MetaClass || F->MetaClass->GetPathName()!=V.ObjectClass || (Target && !Target->IsChildOf(F->MetaClass)))return false;F->SetObjectPropertyValue_InContainer(Object,Target);return true;}break;case EDasScalarKind::Object:if(auto* Class=DasReferencePropertyClass(P)){if(Class->GetPathName()!=V.ObjectClass)return false;return DasReferenceSet(P,P->ContainerPtrToValuePtr<void>(Object),V.ObjectValue.Get());}break;
-    case EDasScalarKind::Struct:if(auto* Carrier=DasContainerCarrierForProperty(P)){FString Error;if(V.StructValue.GetScriptStruct()!=Carrier || !ValidateDasStructSnapshot(V.StructValue,Error))return false;auto* Values=Carrier->FindPropertyByName(TEXT("Values"));P->CopyCompleteValue(P->ContainerPtrToValuePtr<void>(Object),Values->ContainerPtrToValuePtr<void>(V.StructValue.GetMemory()));return true;}if(auto* F=CastField<FStructProperty>(P))if(F->Struct==V.StructValue.GetScriptStruct()){F->Struct->CopyScriptStruct(P->ContainerPtrToValuePtr<void>(Object),V.StructValue.GetMemory());return true;}break;
-    }return false;
+bool RestoreRenamedField(UObject* Object,FName Name,const FDasScalarValue& Value){
+    auto* P=IsValid(Object)?Object->GetClass()->FindPropertyByName(Name):nullptr;FString Error;
+    return P && WriteDasPropertyValue(P,P->ContainerPtrToValuePtr<void>(Object),Value,Error);
 }
 }
 bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP,FString& Error,bool IncludeDependencies){
@@ -269,9 +248,9 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP,FString& Error,bool In
     struct FSnapshot {TStrongObjectPtr<UObject> Object;TArray<FDasScalarValue> Values;};TArray<FSnapshot> Snapshots;
     TArray<UObject*> Objects;GetObjectsOfClass(BP->GeneratedClass,Objects,IncludeDependencies,RF_NoFlags);
     if(IncludeDependencies)for(auto* Object:Objects)if(auto* Actor=Cast<AActor>(Object))if(auto* World=Actor->GetWorld())if(World->IsPartitionedWorld() || !World->GetStreamingLevels().IsEmpty()){Error=TEXT("Loaded World Partition/streaming instances require a separate migration scope");return false;}else if(!ScopePackages.Contains(World->GetOutermost()->GetFName())){ScopePackages.Add(World->GetOutermost()->GetFName());UE_LOG(LogTemp,Display,TEXT("DAS_RENAME_SCOPE live map %s"),*World->GetOutermost()->GetName());}
-    for(auto* Object:Objects)if(IsValid(Object) && !Object->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) && !Object->GetClass()->GetName().StartsWith(TEXT("SKEL_")) && !Object->GetClass()->GetName().StartsWith(TEXT("REINST_"))){FSnapshot S;S.Object.Reset(Object);for(const auto& R:Renames)S.Values.Add(CaptureRenamedField(Object,R.OldName,R.Kind));Snapshots.Add(MoveTemp(S));}
-    FDasObjectReferencePins ObjectPins;for(const auto& S:Snapshots)for(const auto& V:S.Values)ObjectPins.Keep(V);
-    const auto Handle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([&](const FCoreUObjectDelegates::FReplacementObjectMap& Map){for(auto& S:Snapshots){if(auto* Replacement=Map.Find(S.Object.Get()))S.Object.Reset(*Replacement);for(auto& V:S.Values)FDasObjectReferencePins::Remap(V,Map);}ObjectPins.RemapPins(Map);});
+    for(auto* Object:Objects)if(IsValid(Object) && !Object->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) && !Object->GetClass()->GetName().StartsWith(TEXT("SKEL_")) && !Object->GetClass()->GetName().StartsWith(TEXT("REINST_"))){FSnapshot S;S.Object.Reset(Object);for(const auto& R:Renames){FDasScalarValue Value;if(!CaptureRenamedField(Object,R.OldName,R.Kind,Value,Error))return false;S.Values.Add(MoveTemp(Value));}Snapshots.Add(MoveTemp(S));}
+    FDasPropertyValueRoots ObjectPins;for(const auto& S:Snapshots)for(const auto& V:S.Values)ObjectPins.Keep(V);
+    const auto Handle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([&](const FCoreUObjectDelegates::FReplacementObjectMap& Map){for(auto& S:Snapshots){if(auto* Replacement=Map.Find(S.Object.Get()))S.Object.Reset(*Replacement);for(auto& V:S.Values)FDasPropertyValueRoots::Remap(V,Map);}ObjectPins.RemapPins(Map);});
     ON_SCOPE_EXIT {FCoreUObjectDelegates::OnObjectsReplaced.Remove(Handle);};
     FDasBlueprintRollback Rollback;if(!Rollback.Prepare(BP,Previous,ScopeBlueprints,ScopeAssets,Error))return false;
     auto Restore=[&](const FString& Reason){FString E;const bool OK=Rollback.Restore(E);Error=(OK?TEXT("Rename migration rolled back: "):TEXT("Rename rollback incomplete: "))+Reason;if(!E.IsEmpty())Error+=TEXT("; ")+E;UE_LOG(LogTemp,Display,TEXT("DAS_RENAME_ROLLBACK=%s"),OK?TEXT("PASS"):TEXT("FAIL"));return false;};
@@ -325,7 +304,7 @@ bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP,const FDasNum
             if(!Numeric(Property.Type.Kind) || !Numeric(Before->Type.Kind) || (Options.WidenOnly && (Property.Type.Kind!=TEXT("double") || (Before->Type.Kind!=TEXT("int") && Before->Type.Kind!=TEXT("float"))))){Error=TEXT("Unsupported numeric field conversion");return false;}
             const auto* Field=Previous.Fields.FindByPredicate([&](const auto& F){return F.StableId==Property.Id;});const auto* Variable=BP->NewVariables.FindByPredicate([&](const auto& V){return V.VarName==FName(*Property.Name);});
             if(!Field || !Variable || !Variable->RepNotifyFunc.IsNone() || (Variable->PropertyFlags & CPF_Net)){Error=TEXT("Numeric widening requires an authored non-replicated field");return false;}
-            const auto* Target=Candidate.Fields.FindByPredicate([&](const auto& F){return F.StableId==Property.Id;});auto Default=CaptureRenamedField(BP->GeneratedClass->GetDefaultObject(),Field->Name,Field->Kind);FDasScalarValue Converted;
+            const auto* Target=Candidate.Fields.FindByPredicate([&](const auto& F){return F.StableId==Property.Id;});FDasScalarValue Default,Converted;if(!CaptureRenamedField(BP->GeneratedClass->GetDefaultObject(),Field->Name,Field->Kind,Default,Error))return false;
             if(!Target || !ConvertDasNumber(Default,int32(Target->Kind),Options.Integers,Options.Floats,Converted,Error))return false;
             const double Expected=Converted.Kind==0?double(Converted.IntValue):Converted.Kind==1?double(Converted.FloatValue):Converted.DoubleValue;
             const double Declared=Target->Kind==EDasScalarKind::Int32?double(Target->IntDefault):Target->Kind==EDasScalarKind::Float32?double(Target->FloatDefault):Target->DoubleDefault;
@@ -376,7 +355,7 @@ bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP,const FDasNum
     struct FSnapshot {TStrongObjectPtr<UObject> Object;TArray<FDasScalarValue> Values,Converted;};TArray<FSnapshot> Snapshots;
     TArray<UObject*> Objects;GetObjectsOfClass(BP->GeneratedClass,Objects,IncludeDependencies,RF_NoFlags);
     if(IncludeDependencies)for(auto* Object:Objects)if(auto* Actor=Cast<AActor>(Object))if(auto* World=Actor->GetWorld())if(World->IsPartitionedWorld() || !World->GetStreamingLevels().IsEmpty()){Error=TEXT("Loaded World Partition/streaming instances require a separate migration scope");return false;}else if(!ScopePackages.Contains(World->GetOutermost()->GetFName())){ScopePackages.Add(World->GetOutermost()->GetFName());UE_LOG(LogTemp,Display,TEXT("DAS_WIDEN_SCOPE live map %s"),*World->GetOutermost()->GetName());}
-    for(auto* Object:Objects)if(IsValid(Object) && !Object->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) && !Object->GetClass()->GetName().StartsWith(TEXT("SKEL_")) && !Object->GetClass()->GetName().StartsWith(TEXT("REINST_"))){FSnapshot S;S.Object.Reset(Object);for(const auto& R:Renames){auto V=CaptureRenamedField(Object,R.OldName,R.Kind);FDasScalarValue Converted;if(!ConvertDasNumber(V,int32(R.Target),Options.Integers,Options.Floats,Converted,Error)){Error+=TEXT(": ")+Object->GetPathName()+TEXT(".")+R.OldName.ToString();return false;}S.Values.Add(V);S.Converted.Add(MoveTemp(Converted));}Snapshots.Add(MoveTemp(S));}
+    for(auto* Object:Objects)if(IsValid(Object) && !Object->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) && !Object->GetClass()->GetName().StartsWith(TEXT("SKEL_")) && !Object->GetClass()->GetName().StartsWith(TEXT("REINST_"))){FSnapshot S;S.Object.Reset(Object);for(const auto& R:Renames){FDasScalarValue V,Converted;if(!CaptureRenamedField(Object,R.OldName,R.Kind,V,Error))return false;if(!ConvertDasNumber(V,int32(R.Target),Options.Integers,Options.Floats,Converted,Error)){Error+=TEXT(": ")+Object->GetPathName()+TEXT(".")+R.OldName.ToString();return false;}S.Values.Add(V);S.Converted.Add(MoveTemp(Converted));}Snapshots.Add(MoveTemp(S));}
     const auto Handle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([&](const FCoreUObjectDelegates::FReplacementObjectMap& Map){for(auto& S:Snapshots)if(auto* Replacement=Map.Find(S.Object.Get()))S.Object.Reset(*Replacement);});
     ON_SCOPE_EXIT {FCoreUObjectDelegates::OnObjectsReplaced.Remove(Handle);};
     for(auto* B:ScopeBlueprints)if(B->Status!=BS_UpToDate && B->Status!=BS_UpToDateWithWarnings){Error=TEXT("Compile scoped Blueprints before numeric widening: ")+B->GetPathName();return false;}
@@ -485,10 +464,10 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP,bool Restore,bool Inc
     FDasNumericGraphMigration Graphs;TMap<FName,FEdGraphPinType> NoChanges;if(!Graphs.Prepare(ScopeBlueprints,BP->GeneratedClass,NoChanges,EDasIntegerRule::Exact,EDasFloatRule::Exact,Error))return false;
     struct FSnapshot {TStrongObjectPtr<ADasProbeActor> Object;TArray<FDasScalarValue> Values;TMap<FString,FDasScalarValue> Archive;};TArray<FSnapshot> Snapshots;TArray<UObject*> Objects;GetObjectsOfClass(BP->GeneratedClass,Objects,IncludeDependencies,RF_NoFlags);
     for(auto* O:Objects)if(IsValid(O) && !O->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) && !O->GetClass()->GetName().StartsWith(TEXT("SKEL_")) && !O->GetClass()->GetName().StartsWith(TEXT("REINST_"))){auto* Actor=Cast<ADasProbeActor>(O);if(!Actor){Error=TEXT("Archive requires Actor adapter instances");return false;}if(auto* W=Actor->GetWorld())if(W->IsPartitionedWorld() || !W->GetStreamingLevels().IsEmpty()){Error=TEXT("Unsupported loaded partitioned/streaming archive scope");return false;}FSnapshot S;S.Object.Reset(Actor);S.Archive=Actor->RetiredDasValues;
-        for(const auto& A:Actions){const FString Key=ArchiveKey(Id,A.Field.StableId);if(!Restore){if(S.Archive.Contains(Key)){Error=TEXT("Existing retired instance value cannot be overwritten");return false;}S.Values.Add(CaptureRenamedField(Actor,A.Field.Name,A.Field.Kind));}else{const auto* V=S.Archive.Find(Key);if(!V || V->Kind!=int32(A.Field.Kind) || (A.Field.Kind==EDasScalarKind::Enum && (V->ObjectClass!=A.Field.EnumPath || !ValidateDasEnumNumber(V->ObjectClass,V->IntValue,Error))) || (A.Field.Kind==EDasScalarKind::Object && (V->ObjectClass!=A.Field.ObjectClass || (IsValid(V->ObjectValue.Get()) && !DasReferenceMatches(V->ObjectValue.Get(),FindObject<UClass>(nullptr,*A.Field.ObjectClass))))) || (A.Field.Kind==EDasScalarKind::Struct && (!V->StructValue.IsValid() || V->StructValue.GetScriptStruct()->GetPathName()!=A.Field.StructPath || !ValidateDasStructSnapshot(V->StructValue,Error)))){Error=TEXT("Missing or incompatible retained value: ")+Actor->GetPathName()+TEXT(".")+A.Field.StableId;return false;}S.Values.Add(*V);}}
+        for(const auto& A:Actions){const FString Key=ArchiveKey(Id,A.Field.StableId);if(!Restore){if(S.Archive.Contains(Key)){Error=TEXT("Existing retired instance value cannot be overwritten");return false;}FDasScalarValue Value;if(!CaptureRenamedField(Actor,A.Field.Name,A.Field.Kind,Value,Error))return false;S.Values.Add(MoveTemp(Value));}else{const auto* V=S.Archive.Find(Key);if(!V || V->Kind!=int32(A.Field.Kind) || (A.Field.Kind==EDasScalarKind::Enum && (V->ObjectClass!=A.Field.EnumPath || !ValidateDasEnumNumber(V->ObjectClass,V->IntValue,Error))) || (A.Field.Kind==EDasScalarKind::Object && (V->ObjectClass!=A.Field.ObjectClass || (IsValid(V->ObjectValue.Get()) && !DasReferenceMatches(V->ObjectValue.Get(),FindObject<UClass>(nullptr,*A.Field.ObjectClass))))) || (A.Field.Kind==EDasScalarKind::Struct && (!V->StructValue.IsValid() || V->StructValue.GetScriptStruct()->GetPathName()!=A.Field.StructPath || !ValidateDasStructSnapshot(V->StructValue,Error)))){Error=TEXT("Missing or incompatible retained value: ")+Actor->GetPathName()+TEXT(".")+A.Field.StableId;return false;}S.Values.Add(*V);}}
         Snapshots.Add(MoveTemp(S));}
-    FDasObjectReferencePins ObjectPins;for(const auto& S:Snapshots){for(const auto& V:S.Values)ObjectPins.Keep(V);ObjectPins.Keep(S.Archive);}
-    const auto Handle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([&](const FCoreUObjectDelegates::FReplacementObjectMap& Map){for(auto& S:Snapshots){if(auto* NewObject=Map.Find(S.Object.Get()))S.Object.Reset(Cast<ADasProbeActor>(*NewObject));for(auto& V:S.Values)FDasObjectReferencePins::Remap(V,Map);FDasObjectReferencePins::Remap(S.Archive,Map);}ObjectPins.RemapPins(Map);});ON_SCOPE_EXIT {FCoreUObjectDelegates::OnObjectsReplaced.Remove(Handle);};
+    FDasPropertyValueRoots ObjectPins;for(const auto& S:Snapshots){for(const auto& V:S.Values)ObjectPins.Keep(V);ObjectPins.Keep(S.Archive);}
+    const auto Handle=FCoreUObjectDelegates::OnObjectsReplaced.AddLambda([&](const FCoreUObjectDelegates::FReplacementObjectMap& Map){for(auto& S:Snapshots){if(auto* NewObject=Map.Find(S.Object.Get()))S.Object.Reset(Cast<ADasProbeActor>(*NewObject));for(auto& V:S.Values)FDasPropertyValueRoots::Remap(V,Map);FDasPropertyValueRoots::Remap(S.Archive,Map);}ObjectPins.RemapPins(Map);});ON_SCOPE_EXIT {FCoreUObjectDelegates::OnObjectsReplaced.Remove(Handle);};
     if(!Runtime.BeginPreserveContextsForReinstance(BP->GeneratedClass)){Error=TEXT("Archive operation requires idle runtime");return false;}FDasAuthoringModule Approval;Approval.Id=Next.Id;Approval.Classes.Add(*New);FString ApprovalWire;if(!Approval.ToJson(ApprovalWire,Error)){Runtime.EndPreserveContextsForReinstance();return false;}bool Succeeded=false;ON_SCOPE_EXIT {Runtime.EndPreserveContextsForReinstance(Succeeded?ApprovalWire:FString());};
     const auto OriginalVariables=BP->NewVariables;TMap<UPackage*,bool> Dirty;auto Remember=[&](UObject* O){if(!Dirty.Contains(O->GetOutermost()))Dirty.Add(O->GetOutermost(),O->GetOutermost()->IsDirty());};for(auto* B:ScopeBlueprints)Remember(B);for(auto& S:Snapshots)Remember(S.Object.Get());for(auto& A:ScopeAssets)Remember(A.Get());
     auto Compile=[&](){for(auto* B:ScopeBlueprints){FKismetEditorUtilities::CompileBlueprint(B);FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();if(B->Status==BS_Error || !B->GeneratedClass)return false;}return true;};

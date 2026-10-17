@@ -1,0 +1,324 @@
+{
+	"schema_version": 5,
+	"engine_version": "5.8.3-0+UE5",
+	"selection_policy_version": 1,
+	"policy":
+	{
+		"allow_deprecated": false,
+		"allow_internal": false
+	},
+	"functions": [
+		{
+			"class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+			"function": "EchoByte",
+			"alias": "ue_textbyte_EchoByte",
+			"signature": "v1;EchoByte;value:ByteProperty:128;ReturnValue:ByteProperty:1408;",
+			"metadata":
+			{
+			},
+			"declaring_class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "value",
+					"kind": "byte",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "byte",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "value",
+					"metadata":
+					{
+					},
+					"kind": "byte",
+					"type_path": "",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "byte",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+			"function": "EchoText",
+			"alias": "ue_textbyte_EchoText",
+			"signature": "v1;EchoText;value:TextProperty:128;ReturnValue:TextProperty:1408;",
+			"metadata":
+			{
+			},
+			"declaring_class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "value",
+					"kind": "text",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "text",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "value",
+					"metadata":
+					{
+					},
+					"kind": "text",
+					"type_path": "",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "text",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+			"function": "Change",
+			"alias": "ue_textbyte_Change",
+			"signature": "v1;Change;number:ByteProperty:134218112;title:TextProperty:134218112;previous:ByteProperty:384;oldTitle:TextProperty:384;ReturnValue:TextProperty:1408;",
+			"metadata":
+			{
+			},
+			"declaring_class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "number",
+					"kind": "byte",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "title",
+					"kind": "text",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "previous",
+					"kind": "byte",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "oldtitle",
+					"kind": "text",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "text",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "number",
+					"metadata":
+					{
+					},
+					"kind": "byte",
+					"type_path": "",
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "title",
+					"metadata":
+					{
+					},
+					"kind": "text",
+					"type_path": "",
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "previous",
+					"metadata":
+					{
+					},
+					"kind": "byte",
+					"type_path": "",
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "oldtitle",
+					"metadata":
+					{
+					},
+					"kind": "text",
+					"type_path": "",
+					"input": false,
+					"output": true
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "text",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+			"function": "ChangeArrays",
+			"alias": "ue_textbyte_ChangeArrays",
+			"signature": "v1;ChangeArrays;numbers:ArrayProperty:134218112[numbers:ByteProperty:0;];messages:ArrayProperty:384[messages:TextProperty:0;];",
+			"metadata":
+			{
+			},
+			"declaring_class": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "numbers",
+					"kind": "array",
+					"input": true,
+					"output": true,
+					"type_path": "ByteProperty"
+				},
+				{
+					"path": "numbers.*",
+					"kind": "byte",
+					"input": true,
+					"output": true,
+					"type_path": ""
+				},
+				{
+					"path": "messages",
+					"kind": "array",
+					"input": false,
+					"output": true,
+					"type_path": "TextProperty"
+				},
+				{
+					"path": "messages.*",
+					"kind": "text",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "numbers",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "ByteProperty",
+					"element":
+					{
+						"path": "numbers",
+						"metadata":
+						{
+						},
+						"kind": "byte",
+						"type_path": ""
+					},
+					"input": true,
+					"output": true
+				},
+				{
+					"path": "messages",
+					"metadata":
+					{
+					},
+					"kind": "array",
+					"type_path": "TextProperty",
+					"element":
+					{
+						"path": "messages",
+						"metadata":
+						{
+						},
+						"kind": "text",
+						"type_path": ""
+					},
+					"input": false,
+					"output": true
+				}
+			]
+		}
+	],
+	"diagnostics": [],
+	"structs": [],
+	"classes": [
+		{
+			"type_path": "/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C",
+			"interface": true,
+			"interface_id": "dsl_text_byte_interface.TextByteContract",
+			"metadata":
+			{
+			},
+			"parent": "/Script/CoreUObject.Interface"
+		},
+		{
+			"type_path": "/Script/CoreUObject.Interface",
+			"interface": true,
+			"metadata":
+			{
+			},
+			"parent": "/Script/CoreUObject.Object"
+		},
+		{
+			"type_path": "/Script/CoreUObject.Object",
+			"metadata":
+			{
+				"ToolTip": "The base class of all UE objects. The type of an object is defined by its UClass.\nThis provides support functions for creating and using objects, and virtual functions that should be overridden in child classes.\n\n@see https://docs.unrealengine.com/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/Objects"
+			},
+			"parent": ""
+		}
+	]
+}

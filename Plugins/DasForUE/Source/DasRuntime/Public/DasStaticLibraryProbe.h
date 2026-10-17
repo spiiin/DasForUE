@@ -16,6 +16,15 @@ public:
  UPROPERTY() TSubclassOf<AActor> TextByteClass;
  UPROPERTY() TSubclassOf<AActor> TextByteContainerClass;
  UPROPERTY() TSubclassOf<AActor> TextByteEventsClass;
+ UPROPERTY() TObjectPtr<AActor> TextByteTimerActor;
+ UPROPERTY() TObjectPtr<AActor> TextByteTimerReleasedActor;
+ UPROPERTY() TObjectPtr<AActor> ObjectCallbackActor;
+ UPROPERTY() TObjectPtr<AActor> DestroyedObjectCallbackActor;
+ UPROPERTY() TObjectPtr<AActor> ContainerCallbackActor;
+ UPROPERTY() TObjectPtr<AActor> DestroyedContainerCallbackActor;
+ UPROPERTY() TSubclassOf<AActor> InterfaceReentryActorClass;
+ UPROPERTY() TSubclassOf<UActorComponent> InterfaceReentryComponentClass;
+ UPROPERTY() TSubclassOf<AActor> TextByteInterfaceReceiverClass;
  UPROPERTY() TSubclassOf<AActor> DefaultActorClass;
  UPROPERTY() TSubclassOf<AActor> DefaultChildClass;
  UPROPERTY() TSubclassOf<UActorComponent> DefaultComponentClass;
@@ -37,3 +46,9 @@ DASRUNTIME_API bool RunDasTextByteProbe(ADasStaticLibraryProbe* Carrier,FString&
 DASRUNTIME_API bool RunDasTextByteContainerProbe(ADasStaticLibraryProbe* Carrier,FString& Report);
 
 DASRUNTIME_API bool RunDasTextByteEventsProbe(ADasStaticLibraryProbe* Carrier,FString& Report);
+
+DASRUNTIME_API bool RunDasInterfaceReentryProbe(ADasStaticLibraryProbe* Carrier,FString& Report);
+
+DASRUNTIME_API bool DasTextByteTimersReady(UWorld* World);
+DASRUNTIME_API bool RunDasTextByteTimerProbe(ADasStaticLibraryProbe* Carrier,FString& Report);
+DASRUNTIME_API bool CheckDasTextByteTimerCleanup(UWorld* World);

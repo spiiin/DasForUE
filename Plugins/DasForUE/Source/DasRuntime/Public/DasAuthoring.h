@@ -76,7 +76,8 @@ struct FDasComponentOverride {
 struct FDasDeclaredCallback {
     FString Name,Kind,Source,EventName;
     FString ParameterKind=TEXT("int");
-    bool operator==(const FDasDeclaredCallback& O)const{return Name==O.Name && Kind==O.Kind && Source==O.Source && EventName==O.EventName && (Kind!=TEXT("event") || ParameterKind==O.ParameterKind);}
+    FString ParameterTypePath;
+    bool operator==(const FDasDeclaredCallback& O)const{return Name==O.Name && Kind==O.Kind && Source==O.Source && EventName==O.EventName && (Kind!=TEXT("event") || (ParameterKind==O.ParameterKind && ParameterTypePath==O.ParameterTypePath));}
 };
 struct FDasPropertyDefaultOverride {
     FString Id,Name;

@@ -64,3 +64,10 @@ localization identity. Text defaults compare localization history rather than
 Editor display-string equality or cooked pointer identity. Stable evidence is
 stored in `logs/authored-values-*`; no Shipping or physical rendering test is
 claimed.
+
+Delegates, multicast events, event subscriptions and interfaces also support these
+types; see [DSLTextByteEvents.md](DSLTextByteEvents.md) for signatures, ref/out,
+array payloads and generated wrappers. Interface calls into DAS implementations
+also support reentry; see DSLInterfaceReentry.md for recursion and error rules.
+Unnamed empty text defaults accept Unreal's empty-value normalization during cook;
+named localization identities remain distinct.

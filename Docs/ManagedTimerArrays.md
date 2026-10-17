@@ -1,5 +1,13 @@
 # Captured primitive arrays in class timers
 
+Current cross-surface support and shared callback policy:
+[TypeSupportMatrix.md](TypeSupportMatrix.md). All eight primitive array families
+are supported by authored class timers; the lists below describe earlier stages.
+
+Current FText/uint8 extension and integration evidence:
+[ManagedTextByteTimers.md](ManagedTextByteTimers.md). The initial validation notes
+below describe the earlier implementation stage.
+
 Added 2026-10-10. **Not built or tested**. Source import, callback ABI, copying,
 timer execution, limits, reload, PIE and packaged behavior have not been run.
 
