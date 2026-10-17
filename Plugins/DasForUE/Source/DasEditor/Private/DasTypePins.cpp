@@ -21,12 +21,12 @@ bool ResolveType(const FDasDeclaredType& Input,FDasDeclaredType& Output,const FD
  auto Child=[&](const TSharedPtr<const FDasDeclaredType>& In,TSharedPtr<const FDasDeclaredType>& Out){if(!In)return true;auto Copy=MakeShared<FDasDeclaredType>();if(!ResolveType(*In,*Copy,Resolver,Error,Depth+1,Nodes))return false;Out=Copy;return true;};
  return Child(Input.Element,Output.Element) && Child(Input.Key,Output.Key) && Child(Input.Value,Output.Value);
 }
-bool ValueCategory(FName C){return C==UEdGraphSchema_K2::PC_Int || C==UEdGraphSchema_K2::PC_Byte || C==UEdGraphSchema_K2::PC_Text || C==UEdGraphSchema_K2::PC_Real || C==UEdGraphSchema_K2::PC_Boolean || C==UEdGraphSchema_K2::PC_String || C==UEdGraphSchema_K2::PC_Name || C==UEdGraphSchema_K2::PC_Object || C==UEdGraphSchema_K2::PC_Interface || C==UEdGraphSchema_K2::PC_Class || C==UEdGraphSchema_K2::PC_Struct;}
+bool ValueCategory(FName C){return C==UEdGraphSchema_K2::PC_SoftObject || C==UEdGraphSchema_K2::PC_SoftClass || C==UEdGraphSchema_K2::PC_Int || C==UEdGraphSchema_K2::PC_Byte || C==UEdGraphSchema_K2::PC_Text || C==UEdGraphSchema_K2::PC_Real || C==UEdGraphSchema_K2::PC_Boolean || C==UEdGraphSchema_K2::PC_String || C==UEdGraphSchema_K2::PC_Name || C==UEdGraphSchema_K2::PC_Object || C==UEdGraphSchema_K2::PC_Interface || C==UEdGraphSchema_K2::PC_Class || C==UEdGraphSchema_K2::PC_Struct;}
 bool ConcreteTerm(FName Category,FName Subcategory,UObject* Object){
  if(!ValueCategory(Category) || Subcategory==UEdGraphSchema_K2::PSC_Self)return false;
  if(Category==UEdGraphSchema_K2::PC_Real)return Subcategory==UEdGraphSchema_K2::PC_Float || Subcategory==UEdGraphSchema_K2::PC_Double;
  if(Category==UEdGraphSchema_K2::PC_Struct)return Cast<UScriptStruct>(Object)!=nullptr;
- if(Category==UEdGraphSchema_K2::PC_Object || Category==UEdGraphSchema_K2::PC_Interface || Category==UEdGraphSchema_K2::PC_Class){auto* Class=Cast<UClass>(Object);return Class && (Class->HasAnyClassFlags(CLASS_Interface)==(Category==UEdGraphSchema_K2::PC_Interface));}
+ if(Category==UEdGraphSchema_K2::PC_SoftObject || Category==UEdGraphSchema_K2::PC_SoftClass || Category==UEdGraphSchema_K2::PC_Object || Category==UEdGraphSchema_K2::PC_Interface || Category==UEdGraphSchema_K2::PC_Class){auto* Class=Cast<UClass>(Object);return Class && (Class->HasAnyClassFlags(CLASS_Interface)==(Category==UEdGraphSchema_K2::PC_Interface));}
  if(Category==UEdGraphSchema_K2::PC_Byte)return !Object || Cast<UEnum>(Object);
  return Object==nullptr;
 }

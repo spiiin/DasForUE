@@ -1,7 +1,8 @@
 # Generated native gameplay members
 
-Selected native classes: Character, CharacterMovementComponent, PlayerController,
-CameraComponent and TextRenderComponent. Their supported inherited fields/functions are included. Native
+Native receiver classes are discovered from DAS declarations and their imports;
+there is no C++ receiver class list. See [automatic discovery](NativeGameplayDiscovery.md).
+Their supported inherited fields/functions are included. Native
 DSL roots and native object reference types remain distinct concepts: this does
 not make PlayerController/CameraComponent supported authored class parents.
 
@@ -28,7 +29,8 @@ parameters (`player.GetPlayerViewPoint(location,view)`).
 `Scripts/GenerateNativeGameplay.ps1` builds the exporter, runs DasNativeGameplay,
 and stages the reflection manifest, generated C++ registry and dependency views.
 `-Check` regenerates and compares all three artifacts without replacing them.
-The next C++ build compiles an updated member registry into the runtime.
+The command also builds the updated member registry, unless `-SkipBuild` or
+`-Check` is specified.
 
 - `Bindings/NativeGameplay.json`: deterministic audit of selected/supported and
   skipped members with reasons, declaring class and marshaling shape signatures.
@@ -43,8 +45,9 @@ The next C++ build compiles an updated member registry into the runtime.
 
 No C++ source parser, Unreal memory-layout copying or vtable replacement is used.
 Generated native members do not become authored properties or authored IR methods.
-Native classes are selected explicitly in DasNativeGameplayClasses; add a class
-there and regenerate to extend this registry.
+Native classes are selected by `[ue_native_object]` declarations reachable from
+the configured DAS entry modules. Regenerate after adding/importing a declaration;
+no C++ registration is required.
 
 ## Contracts and boundaries
 
@@ -97,8 +100,11 @@ Win64 Development packaged foundation/gameplay and a separate saved-map launch.
 See Docs/Plan.md for exact scope and logs. Tests use NullRHI and synthetic input;
 rendering, physical devices, Shipping and networking are not validated.
 
-Native math property reads return snapshots. Replace the entire property value
-to write it; nested writes such as `movement.Velocity.x=1.0lf` are rejected.
+Native value-struct, array and map nested writes use the same owned root-snapshot
+mutation helper as authored properties and publish through the checked native
+setter. Readonly roots such as `movement.GravityDirection.x` remain rejected.
+Native math root properties still use whole-value writes; direct nested math-root
+writes such as `movement.Velocity.x=1.0lf` remain rejected.
 
 ## Native enum and reference upcasts
 
@@ -171,3 +177,17 @@ Manifest schema 4 adds recursive array element descriptors and validated native 
 ## Native hash containers (schema 5)
 
 Native map/set fields and methods now use recursive key/value/element descriptors and shared typed snapshot adapters. The original five Engine receivers retain 337 fields/643 methods; the additional explicitly marked ABI fixture contributes 15 fields/27 methods. Combined registry: 352 fields, 670 methods, 37 enums, 9 structs. The fixture is not an authored gameplay root. See [NativeGameplayHashContainers.md](NativeGameplayHashContainers.md) for supported forms and executable examples.
+
+See [generated native soft references](NativeGameplaySoftReferences.md) for typed soft fields, parameters and containers.
+
+## Mesh and collision receivers — 2026-10-17
+
+StaticMeshComponent and SphereComponent are now selected native receivers.
+Canonical StaticMeshRef, StaticMeshComponentRef and SphereComponentRef come from
+`ue_pickup_components.das`. Supported inherited primitive/scene component methods
+share the existing generated frame/property bridge. This does not make these
+classes authored class parents or expose unsupported physics signatures.
+The [pickup example](PlayablePickup.md) uses typed mesh, collision profile/radius,
+overlap events, visibility and timer restoration without manual call frames.
+Targeted validation: 31 generator tests, exact artifact reproduction, Editor
+Development and the saved-map pickup game probe; no full Foundation/PIE/package rerun.

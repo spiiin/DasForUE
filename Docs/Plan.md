@@ -6,18 +6,35 @@
 поддержка UE 5.7. Старый DasForUE не используется как основа.
 
 
-## Current priority — 2026-10-08
+## Gameplay services — 2026-10-18
 
-User decision: defer broader structural/data migration logic and continue binding
-functionality. Existing supported migration policies remain; unsupported transitions
-must reject explicitly. Deferred: outer nested/container definition changes,
-primitive/set/map state/key migration, nonempty defaults, split/custom graph repair,
-DataTables, multiple roots, base/components and active-PIE structural reload.
+Implemented the next functional slice in the same playable demo: single-hit
+line/sphere queries, typed checked hit references; basic owned UMG widgets,
+FText and deferred button handlers; native generic damage and a DAS-authored
+HealthComponent. Added named owned-component sources to ue_event. The demo uses
+a generated Widget Blueprint HUD and a Blueprint Interactable interface.
+See GameplayServices.md and the focused gameplay-features/pickup reports.
+Full Foundation/PIE/packaged validation remains deferred; no commit requested.
 
-Active sequence: container DSL and typed interop (primitive arrays, set/map and
-standalone signatures), then out/ref and interfaces; lifecycle/production/network
-work follows the relevant original stages. Universal migration is not a prerequisite.
-See DSLPrimitiveArrays.md for the current feature boundary.
+## Current priority — 2026-10-17
+
+Functional completeness and usability come before further snapshot/source-check
+optimizations. Start from the existing playable Character instead of creating
+another equivalent example. Its creation command now exports only the playable
+assets, independent of the large regression fixture set. See CurrentStatus.md.
+
+Implemented functional slice: selected native mesh/collision component API and a
+complete pickup/score/timer interaction using typed references and managed callbacks.
+The scenario added public weak-reference validity/identity helpers; see PlayablePickup.md. Shipping/AOT, networking,
+additional engine systems and universal structural migrations remain separate
+milestones; supported migrations continue to reject unsupported transitions.
+
+Native receivers are now discovered from DAS declarations/imports rather than a
+C++ class list; see NativeGameplayDiscovery.md. Entire supported APIs are emitted.
+
+Development validation policy: necessary builds and targeted checks per iteration.
+Run complete Foundation/PIE/packaged suites at milestone boundaries, on request,
+or when a change materially affects several systems. Report deferred checks.
 
 ## Что добавлено по результатам аудита
 
@@ -3631,6 +3648,32 @@ isolation regressions accompany the change; route counts and validation are in
 SharedPropertyTypes.md. No commit was created.
 
 
+## 2026-10-17 — prepared map/set key order
+
+Existing key/element-by-index calls now share bounded per-context traversal
+plans containing sparse slot numbers. Scanning and int/string sorting happen
+once while a plan is cached; subsequent indexed reads resolve the slot directly.
+Snapshot collection prunes plans, and immutable updates use independent tokens.
+No script API or ordering changed. Field path caching remains a separate step.
+See SharedPropertyTypes.md for scope, cache bounds and validation. No commit was
+created for this step.
+
+Packaged follow-up completed: soft-reference DSL compilation blockers were
+resolved, Editor/Game rebuilt, cook/stage/archive and all four packaged probes
+passed. Editor and packaged Foundation also pass soft-reference and snapshot
+order regressions. See logs/snapshot-order-validation.json for artifact scope
+and parallel source-edit limits.
+
+## 2026-10-17 — shared snapshot container access
+
+Map/set/array operations now use shared const or mutable borrowed views. Common
+type checks, sparse indexing, insertion, limits, string-key collision checks and
+set updates replace duplicated runtime implementations. The daScript API,
+ordering, native codecs and detached-copy publication contract are preserved.
+The property factory matrix exercises these views, including sparse holes and
+capacity/update semantics. Scope and validation are in SharedPropertyTypes.md.
+No commit was created for this step.
+
 ## 2026-10-17 — borrow snapshots during ordinary reads
 
 Size, contains, key, element and field reads now borrow immutable snapshot
@@ -3678,3 +3721,137 @@ rejected replacement preservation, cooked interface signatures and class pin bas
 native/Blueprint/null class return/ref/out after GC, and owner cleanup.
 Evidence and frozen source/executable hashes are in
 logs/class-callbacks-packaged-validation.json.
+
+
+## 2026-10-17 — typed soft object and class references
+
+Added `UESoftObject<T>` / `UESoftClass<T>` aliases, native soft fields and pins,
+method input/result/ref/out, path-only defaults, resolve/synchronous/asynchronous
+loading and managed owner cancellation. Transport reuses the owned snapshot ABI.
+Dedicated no-load/GC, negative DSL, PIE and packaged lazy-asset fixtures and
+runners passed. Editor/Game Development, both Foundation runs (zero failures),
+116 Python checks, real PIE (zero warnings/failures/skips), cook/stage/archive
+and packaged soft object/class callbacks, unloaded paths, return/ref/out and
+EndPlay revocation passed. See SoftReferences.md and
+logs/soft-references-validation.json. Soft containers, authored struct fields,
+native member generation and structural migrations remain separate work.
+Network support remains deferred. No commit.
+
+
+## 2026-10-17 — soft arrays, map values and authored records
+
+Extended the shared source/native property snapshot path to soft array elements,
+map values and authored record members. Native storage retains actual soft
+properties and source code uses normal field/index expressions. Soft record
+declaration defaults remain empty; standalone containers accept literal paths.
+Soft keys and sets remain rejected. Editor/Game Development, both Foundation
+runs (zero failures), 116 Python checks, real PIE (zero warnings/failures/skips),
+cook/stage/archive and packaged Development passed. C++ ProcessEvent checks
+include array return/ref/out, soft class map and authored record return without
+loading paths. Shared field lookup now rejects overlong names before FName and
+preserves the empty-path diagnostic. See SoftCollections.md and
+logs/soft-collections-validation.json. No commit.
+
+## 2026-10-17 — prepared snapshot field paths
+
+Added a bounded per-context cache for parsed field paths and weak reflected
+property handles, shared by const reads and detached mutable snapshots.
+Array bounds are checked against current storage on every access. Unreal field
+serials invalidate destroyed/retyped properties in Editor; no instance addresses
+or strong type references are retained. Empty and overlong field paths are
+rejected before unsafe reflection operations.
+
+Game/Editor Win64 Development, Foundation in Editor and packaged game,
+PropertyValues, RuntimePIE, native defaults Create/Reopen/Recompile, cook/stage/
+archive and all four packaged probes passed. The final frozen-source rebuild,
+package rerun and Editor Foundation also passed; source hashes remained stable.
+See SnapshotFieldPaths.md and logs/snapshot-paths-validation.json for the
+validation sequence and NullRHI limits. No commit.
+
+## 2026-10-17 — reproducible performance baseline
+
+Added the opt-in DasPerformance commandlet/game mode, shared benchmark implementation,
+script workloads and TestPerformance.ps1. Thirty cases cover cached/uncached native
+paths, snapshot reads/key iteration, one/four immutable edits, both invocation
+directions and a VM allocation positive control, across 16/256/1024 elements.
+Warmed batches report median/p95, raw samples, actual native fixture copies,
+scoped VM allocations and existing cache counters. Optional Unreal Insights memory
+tracing marks each measured region; no normal runtime allocator hook was added.
+
+Editor/Game Development, 30-case Editor and packaged probes, a separate traced
+Editor run, both Foundation regressions and cook/stage/archive passed. Benchmark
+source/integration hashes stayed stable. The measurements prioritize snapshot
+modification: 64 single edits of a 1024-element fixture take about 50.5 ms and 65
+root copies, while 64 four-edit groups take about 749.5 ms and 257 copies.
+Validation, copying and linear snapshot identity search are still combined in
+these timings. Next candidates: one-copy batch edits and cheaper identity lookup;
+source-check overhead in public dispatch needs separate measurement. See
+Performance.md and logs/performance-validation.json. No commit.
+
+## 2026-10-17 — generated native soft references
+
+- [x] Native object/class soft fields, arguments, returns, ref/out; soft arrays and map values.
+- [x] Native value structs containing soft values and containers; canonical typed aliases from reflection.
+- [x] Soft base constraints in signature checks; fixed physical soft leaf validation in native calls.
+- [x] Python, Editor Foundation, real PIE, packaged Development, and native C++ storage checks. See [native soft references](NativeGameplaySoftReferences.md).
+- [ ] Next: safe soft-reference conversions to a parent constraint. Networking and structural migrations remain deferred.
+
+## 2026-10-17 — one-copy scoped snapshot edits
+
+Added `ue_struct_edit(snapshot)` with a synchronous daScript block. All existing
+snapshot mutation codecs share one draft buffer; ordinary snapshots remain
+immutable. Full validation and deduplication occur at publication. Draft handles
+expire on success/error; caught write errors invalidate publication, including
+partial map inserts. Draft references participate in GC and immutable key-order
+caches are bypassed. Independent nested scopes are bounded to eight; arbitrary
+Unreal side effects are outside rollback.
+
+Editor/Game Development builds, both Foundation suites, 33-case Editor/packaged
+benchmarks (nine samples), Entry-map cook/stage/archive and frozen source checks
+passed. Four writes per iteration now make 65 root copies per 64 iterations
+including capture, versus 257 sequentially. See SnapshotBatchEdits.md,
+Performance.md and logs/batch-edit-validation.json. No commit.
+
+Next performance candidates remain the linear snapshot identity search and
+separately profiling source-change checks in public script dispatch.
+
+## 2026-10-17 — functional audit and standalone playable example
+
+Added CurrentStatus.md as a current feature/limitations index and linked it from
+README. Shifted priorities from snapshot optimizations to usable gameplay.
+CreatePlayableCharacter.ps1 now uses a -PlayableOnly exporter branch and accepts
+-SkipBuild. The standalone path saves only the Character Blueprint, three input
+actions, one mapping context and a playable map in a fresh DasExamples folder;
+the existing full cooked regression exporter remains available.
+
+Editor Development and a fresh-process saved-map game probe passed, including
+input readiness, movement, jumping, camera and no DAS runtime error. Checked the
+six generated assets. Foundation, full PIE and packaged were intentionally not
+run. See logs/playable-example-validation.json. No commit.
+
+## 2026-10-17 — safe soft parent conversions
+
+- [x] Object/class soft values widen along the native class hierarchy in typed initialization, assignment, concrete function arguments/returns and generated native fields/methods.
+- [x] Explicit `ue_soft_upcast(type<Parent>, value)`; null/path preservation without asset loading; runtime repeats constraint validation.
+- [x] Mutable ref/out remain invariant, including implicitly referenced DAS structs. Containers remain invariant.
+- [x] Editor build and focused native/compiler/runtime probe; eleven invalid cases rejected. See [soft parent conversions](SoftReferenceUpcasts.md).
+
+Current development workflow, per user request: validate each feature with a relevant focused check and build where necessary. Defer full Foundation, PIE and packaged runs to an explicit request or a broader verification checkpoint; do not run the entire suite after every iteration.
+
+## 2026-10-17 — playable pickup with real overlap and respawn
+
+Added a DSL Actor with sphere root and static mesh child, declared asset defaults,
+configured Character recipient, native sparse OnActorBeginOverlap (two actors),
+score/label update, cooldown guard and managed one-shot respawn. Restoring while
+occupied safely dispatches a new overlap. Destroy revokes timer/subscription.
+The playable-only exporter saves the pickup Blueprint and assigns its recipient;
+the standalone scene now has seven assets. Full cooked regression export is unchanged.
+
+StaticMeshComponent/SphereComponent now use the existing native member generator
+with canonical wrappers. Added ue_is_valid/ue_same_object for live typed UObject
+views, avoiding raw handles and opaque key comparisons in the example.
+
+Editor Development, 31 generator tests, exact generated artifact reproduction and
+seven focused saved-map game checks passed. Foundation, broad PIE and packaged
+build were intentionally not run. No commit. See PlayablePickup.md and
+logs/pickup-validation.json.

@@ -83,7 +83,7 @@ public:
     bool IsAuthoredMethodDispatchActive()const;
     bool CanMigrateAuthoredTypes()const;
     int32 PersistentContextCount(const UWorld* World = nullptr) const;
-    bool ExportNativeGameplay(const FString& OutputPath,FString& Error);
+    bool ExportNativeGameplay(const FString& OutputPath,const FString& RequestsPath,FString& Error);
     bool ExportBindings(const FString& SelectionPath, const FString& OutputPath, FString& Error);
     FString ScriptPath(const FString& Name) const;
 private:
@@ -98,3 +98,5 @@ private:
 
 // Shared by the editor commandlet and the packaged smoke game.
 DASRUNTIME_API bool RunDasFoundationTests(FString& Report);
+// Opt-in benchmark; reports scoped counters, never installs a process allocator hook.
+DASRUNTIME_API bool RunDasPerformanceProbe(FString& Report,FString& Json,int32 Iterations=64,int32 Samples=9);

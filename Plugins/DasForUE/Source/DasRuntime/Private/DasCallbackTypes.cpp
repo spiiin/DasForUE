@@ -1,4 +1,5 @@
 #include "DasCallbackTypes.h"
+#include "DasSoftReferences.h"
 #include "DasCallFrame.h"
 #include "GameFramework/Actor.h"
 #include "Components/ActorComponent.h"
@@ -31,6 +32,7 @@ bool CallbackString(const FString& Text, int64& Characters, FString& Error)
 }
 bool QueuedProperty(const FProperty* P,TSet<const UScriptStruct*>& Active,int32 Depth,FString& Error){
     if(!P || P->ArrayDim!=1 || Depth>16){Error=TEXT("Unsupported callback value nesting");return false;}
+    if(CastField<FSoftObjectProperty>(P))return DasSoftCarrierForProperty(P)!=nullptr;
     switch(DasPropertyKind(P)){
     case EDasTypeKind::Object:return DasReferencePropertyClass(P)!=nullptr;
     case EDasTypeKind::Class:{FDasDeclaredType T;if(!DescribeDasProperty(P,T,Error))return false;return ValidateDasCallbackTypePath(TEXT("class"),T.TypePath,Error);}
@@ -45,6 +47,7 @@ bool QueuedProperty(const FProperty* P,TSet<const UScriptStruct*>& Active,int32 
     }
 }
 bool ValueBudget(const FProperty* P,const void* Memory,int64& Characters,int32& Elements,FString& Error){
+    if(auto* Soft=CastField<FSoftObjectProperty>(P))return ValidateDasSoftValue(Soft,Memory,Error) && CallbackString(Soft->GetPropertyValue(Memory).ToSoftObjectPath().ToString(),Characters,Error);
     if(auto* C=CastField<FClassProperty>(P)){auto* Raw=C->GetObjectPropertyValue(Memory);auto* O=Cast<UClass>(Raw);if((Raw && !O) || !C->MetaClass || !DasCallbackObjectAlive(O) || (O && !O->IsChildOf(C->MetaClass))){Error=TEXT("Callback class is obsolete or has an incompatible base");return false;}}
     else if(auto* ObjectClass=DasReferencePropertyClass(P)){auto* O=DasReferenceGet(P,Memory);if(!DasCallbackObjectAlive(O) || !DasReferenceMatches(O,ObjectClass)){Error=TEXT("Callback object is destroyed or has an incompatible class/interface");return false;}}
     else if(auto* S=CastField<FStructProperty>(P)){for(TFieldIterator<FProperty> It(S->Struct);It;++It)if(!ValueBudget(*It,It->ContainerPtrToValuePtr<void>(Memory),Characters,Elements,Error))return false;}

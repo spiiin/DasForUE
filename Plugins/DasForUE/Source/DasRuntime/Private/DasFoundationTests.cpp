@@ -2,6 +2,7 @@
 #include "DasCallbackTypes.h"
 #include "DasRuntime.h"
 #include "DasPropertyTypes.h"
+#include "DasSoftReferences.h"
 #include "DasDefaultValueProbe.h"
 #include "DasSnapshotFields.h"
 #include "DasReflectedTypes.h"
@@ -30,11 +31,13 @@ bool RunDasFoundationTests(FString& Report)
     };
     FString PropertyTypeError;const bool PropertyTypesOK=CheckDasPropertyTypes(PropertyTypeError);
     Expect(PropertyTypesOK,TEXT("shared_type_descriptor_and_property_factory"),PropertyTypeError);
+    FString SoftError;const bool SoftOK=CheckDasSoftReferences(SoftError);Expect(SoftOK,TEXT("soft_reference_no_load_roundtrip_defaults_and_GC"),SoftError);
     FString CallbackError;const bool CallbacksOK=CheckDasCallbackTypes(CallbackError) && CheckDasCallbackFrames(CallbackError);
     Expect(CallbacksOK,TEXT("shared_callback_capabilities_and_payload_validation"),CallbackError);
     auto Run = [&](const TCHAR* Name) { return Runtime.RunFile(Runtime.ScriptPath(Name), 40); };
     const auto Good = Run(TEXT("smoke.das"));
     Expect(Good.bSucceeded && Good.Value == 42, TEXT("native_roundtrip"), Good.Error);
+    const auto SoftSmoke=Run(TEXT("soft_references_smoke.das"));Expect(SoftSmoke.bSucceeded && SoftSmoke.Value==42,TEXT("soft_source_aliases_default_path_and_resolve_without_load"),SoftSmoke.Error);
     const auto Again = Run(TEXT("smoke.das"));
     Expect(Again.bSucceeded && Again.Value == 42, TEXT("independent_context"), Again.Error);
     const auto Syntax = Run(TEXT("invalid.das"));

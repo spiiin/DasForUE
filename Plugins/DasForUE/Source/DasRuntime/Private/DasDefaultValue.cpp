@@ -2,6 +2,7 @@
 #include "DasSchema.h"
 #include "DasAuthoring.h"
 #include "DasDefaultRoots.h"
+#include "DasSoftReferences.h"
 #include "Dom/JsonValue.h"
 #include "Dom/JsonObject.h"
 #include "UObject/UnrealType.h"

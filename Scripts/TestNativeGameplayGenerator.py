@@ -17,10 +17,11 @@ class NativeGameplayGeneratorTests(unittest.TestCase):
         self.ir['classes'].append(copy.deepcopy(self.ir['classes'][0]))
         with self.assertRaises(ValueError): generate(self.ir)
     def test_reject_duplicate_member(self):
-        self.ir['classes'][0]['fields'].append(copy.deepcopy(self.ir['classes'][0]['fields'][0]))
+        cls=next(c for c in self.ir['classes'] if c['fields'])
+        cls['fields'].append(copy.deepcopy(cls['fields'][0]))
         with self.assertRaises(ValueError): generate(self.ir)
     def test_reject_unsupported_type(self):
-        self.ir['classes'][0]['fields'][0]['kind']='raw_pointer'
+        next(c for c in self.ir['classes'] if c['fields'])['fields'][0]['kind']='raw_pointer'
         with self.assertRaises(ValueError): generate(self.ir)
     def test_enum_layout(self):
         header,module=generate(self.ir)
@@ -89,4 +90,54 @@ class NativeGameplayGeneratorTests(unittest.TestCase):
     def test_enum_default_preserved(self):
         header,_=generate(self.ir)
         self.assertIn('TEXT("TransformSpace"),TEXT("RTS_World")',header)
+    def add_soft(self,cls=False):
+        import hashlib
+        base='/Script/Engine.Actor' if cls else '/Script/CoreUObject.Object'
+        field={'name':'SoftTest','kind':'struct','type_path':'/Script/DasRuntime.DasSoft'+('Class_' if cls else 'Object_')+hashlib.md5(base.encode()).hexdigest(),'soft_reference':{'base':base,'class_ref':cls},'signature':'fixture','declaring_class':self.ir['classes'][0]['path'],'readonly':False}
+        self.ir['classes'][0]['fields'].append(field)
+        return field
+    def test_soft_reference_generation(self):
+        field=self.add_soft();header,module=generate(self.ir)
+        self.assertIn('DasNativeGameplaySoftTypes',header)
+        self.assertIn(field['type_path'],header)
+        self.assertRegex(module,r'\$UESoftObject<C_Object_\w+>')
+        self.assertIn('require ue_soft_references public',module)
+    def test_soft_class_generation(self):
+        self.add_soft(True);header,module=generate(self.ir)
+        self.assertRegex(module,r'\$UESoftClass<C_Actor_\w+>')
+    def test_soft_array_and_map(self):
+        field=self.add_soft();leaf={k:v for k,v in field.items() if k in ('kind','type_path','soft_reference')}
+        field.update(kind='array',type_path='',element=leaf);del field['soft_reference']
+        header,module=generate(self.ir)
+        self.assertRegex(module,r'\$UESoftObject<C_Object_\w+>')
+        field.update(kind='map',key={'kind':'string','type_path':''},value=leaf);del field['element']
+        generate(self.ir)
+    def test_reject_soft_wrong_carrier(self):
+        self.add_soft()['type_path']+='bad'
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_reject_soft_missing_descriptor(self):
+        del self.add_soft()['soft_reference']
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_reject_soft_bad_base(self):
+        self.add_soft()['soft_reference']['base']='/Game/Example.Example_C'
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_reject_soft_wrong_kind(self):
+        self.add_soft()['kind']='object'
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_reject_soft_invalid_boolean(self):
+        self.add_soft()['soft_reference']['class_ref']=1
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_reject_soft_map_key(self):
+        field=self.add_soft();leaf={k:v for k,v in field.items() if k in ('kind','type_path','soft_reference')}
+        field.update(kind='map',type_path='',key=leaf,value={'kind':'int','type_path':''});del field['soft_reference']
+        with self.assertRaises(ValueError):generate(self.ir)
+    def test_requires_discovery(self):
+        del self.ir['discovery']
+        with self.assertRaisesRegex(ValueError,'discovery'):generate(self.ir)
+    def test_stale_discovery_rejected(self):
+        self.ir['discovery']['classes'][0]['name']='MissingView'
+        with self.assertRaisesRegex(ValueError,'Stale native declaration'):generate(self.ir)
+    def test_receiver_discovery_mismatch_rejected(self):
+        self.ir['classes'].pop()
+        with self.assertRaisesRegex(ValueError,'receiver/discovery mismatch'):generate(self.ir)
 if __name__=='__main__': unittest.main()

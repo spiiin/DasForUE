@@ -1,5 +1,6 @@
-param([string]$Engine = 'C:\src\unreal\UnrealEngine',[string[]]$AdditionalMaps=@(),[switch]$SkipZenStore)
+param([string]$Engine = 'C:\src\unreal\UnrealEngine',[string[]]$AdditionalMaps=@(),[switch]$SkipZenStore,[string]$DDC='')
 $ErrorActionPreference = 'Stop'
+$DDCArgs=@();if($DDC){$DDCArgs=@("-DDC=$DDC")}
 $Repo = Split-Path -Parent $PSScriptRoot
 $Project = Join-Path $Repo 'Tests\DasForUESmoke\DasForUESmoke.uproject'
 $Logs = Join-Path $Repo 'logs'
@@ -26,7 +27,7 @@ $CookerArgs=@();if($SkipZenStore){$CookerArgs=@('-AdditionalCookerOptions=-SkipZ
 & (Join-Path $Engine 'Engine\Build\BatchFiles\RunUAT.bat') -WaitForUATMutex BuildCookRun "-project=$Project" `
     -noP4 -platform=Win64 -clientconfig=Development -cook -stage -pak -archive `
     "-archivedirectory=$Archive" "-map=$Maps" -unattended -utf8output -nullrhi `
-    -nocompileeditor -skipbuildeditor -nodebuginfo @CookerArgs
+    -nocompileeditor -skipbuildeditor -nodebuginfo @CookerArgs @DDCArgs
 if ($LASTEXITCODE) { throw 'Packaging failed' }
 $Executable = Join-Path $Archive 'Windows\DasForUESmoke\Binaries\Win64\DasForUESmoke.exe'
 if (!(Test-Path -LiteralPath $Executable)) { throw "Packaged executable missing: $Executable" }

@@ -12,10 +12,32 @@ struct FDasNativeHashValue {
  UPROPERTY() TMap<int32,FString> Labels;
  UPROPERTY() TSet<FString> Names;
 };
+USTRUCT(BlueprintType)
+struct FDasNativeSoftValue {
+ GENERATED_BODY()
+ UPROPERTY() TSoftObjectPtr<UObject> Asset;
+ UPROPERTY() TSoftClassPtr<AActor> ActorType;
+ UPROPERTY() TArray<TSoftObjectPtr<UObject>> Items;
+ UPROPERTY() TMap<FString,TSoftClassPtr<AActor>> Classes;
+};
 UCLASS()
 class DASRUNTIME_API UDasNativeHashProbeComponent:public UActorComponent {
  GENERATED_BODY()
 public:
+ UPROPERTY(BlueprintReadWrite,Category="Das|NativeSoftProbe") TSoftObjectPtr<UObject> SoftAsset;
+ UPROPERTY(BlueprintReadWrite,Category="Das|NativeSoftProbe") TSoftClassPtr<AActor> SoftActorType;
+ UPROPERTY(BlueprintReadWrite,Category="Das|NativeSoftProbe") TArray<TSoftObjectPtr<UObject>> SoftAssets;
+ UPROPERTY(BlueprintReadWrite,Category="Das|NativeSoftProbe") TMap<FString,TSoftClassPtr<AActor>> SoftClasses;
+ UPROPERTY(BlueprintReadWrite,Category="Das|NativeSoftProbe") FDasNativeSoftValue SoftRecord;
+ UFUNCTION(BlueprintCallable,Category="Das|NativeSoftProbe") TSoftObjectPtr<UObject> EchoSoftAsset(TSoftObjectPtr<UObject> Value)const{return Value;}
+ UFUNCTION(BlueprintCallable,Category="Das|NativeSoftProbe") TSoftClassPtr<AActor> EchoSoftClass(TSoftClassPtr<AActor> Value)const{return Value;}
+ UFUNCTION(BlueprintCallable,Category="Das|NativeSoftProbe") void ChangeSoftAsset(UPARAM(ref) TSoftObjectPtr<UObject>& Value,TSoftObjectPtr<UObject>& Previous)const{Previous=Value;Value.Reset();}
+ UFUNCTION(BlueprintCallable,Category="Das|NativeSoftProbe") void ChangeSoftClass(UPARAM(ref) TSoftClassPtr<AActor>& Value,TSoftClassPtr<AActor>& Previous)const{Previous=Value;Value.Reset();}
+ UFUNCTION(BlueprintCallable,Category="Das|NativeSoftProbe") void ChangeSoftClasses(UPARAM(ref) TMap<FString,TSoftClassPtr<AActor>>& Value,TMap<FString,TSoftClassPtr<AActor>>& Previous)const{Previous=Value;Value.Reset();}
+ UFUNCTION(BlueprintCallable,Category="Das|NativeSoftProbe") TArray<TSoftObjectPtr<UObject>> EchoSoftAssets(const TArray<TSoftObjectPtr<UObject>>& Value)const{return Value;}
+ UFUNCTION(BlueprintCallable,Category="Das|NativeSoftProbe") void ChangeSoftAssets(UPARAM(ref) TArray<TSoftObjectPtr<UObject>>& Value,TArray<TSoftObjectPtr<UObject>>& Previous)const{Previous=Value;Value.Reset();}
+ UFUNCTION(BlueprintCallable,Category="Das|NativeSoftProbe") TMap<FString,TSoftClassPtr<AActor>> EchoSoftClasses(const TMap<FString,TSoftClassPtr<AActor>>& Value)const{return Value;}
+ UFUNCTION(BlueprintCallable,Category="Das|NativeSoftProbe") FDasNativeSoftValue EchoSoftRecord(const FDasNativeSoftValue& Value)const{return Value;}
  UPROPERTY(BlueprintReadWrite,Category="Das|NativeHashProbe") TMap<FString,int32> Counts;
  UPROPERTY(BlueprintReadWrite,Category="Das|NativeHashProbe") TMap<FName,FVector> Positions;
  UPROPERTY(BlueprintReadWrite,Category="Das|NativeHashProbe") TMap<EDasNativeHashKey,double> Weights;

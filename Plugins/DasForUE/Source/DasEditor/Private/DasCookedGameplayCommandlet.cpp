@@ -21,7 +21,14 @@
 UDasCookedGameplayCommandlet::UDasCookedGameplayCommandlet(){IsClient=false;IsServer=false;IsEditor=true;LogToConsole=true;}
 int32 UDasCookedGameplayCommandlet::Main(const FString& Params){
  FString Id;FParse::Value(*Params,TEXT("ProbeId="),Id);FGuid Guid;if(!FGuid::ParseExact(Id,EGuidFormats::Digits,Guid))return 1;
- const FString Root=TEXT("/Game/DasCookedGameplay/")+Id;FString Error;UBlueprint *Gameplay=nullptr,*Native=nullptr,*Delegate=nullptr,*Single=nullptr,*Inherited=nullptr,*Life=nullptr,*TickOnly=nullptr,*Helper=nullptr,*Standalone=nullptr;
+ const bool PlayableOnly=FParse::Param(*Params,TEXT("PlayableOnly"));
+ const FString Root=(PlayableOnly?TEXT("/Game/DasExamples/Playable/"):TEXT("/Game/DasCookedGameplay/"))+Id;
+ FString Error;
+ if(PlayableOnly){
+  if(!CreateDasStandalonePlayableDemo(Root,Error)){UE_LOG(LogTemp,Error,TEXT("DAS_PLAYABLE_EXAMPLE_EXPORT=FAIL %s"),*Error);return 1;}
+  UE_LOG(LogTemp,Display,TEXT("DAS_PLAYABLE_EXAMPLE_EXPORT=PASS map=%s/PlayableMap"),*Root);return 0;
+ }
+ UBlueprint *Gameplay=nullptr,*Native=nullptr,*Delegate=nullptr,*Single=nullptr,*Inherited=nullptr,*Life=nullptr,*TickOnly=nullptr,*Helper=nullptr,*Standalone=nullptr;
  if(!FDasDSLService::Apply(TEXT("dsl_gameplay_runtime_probe.das"),Root+TEXT("/BP_Gameplay"),TEXT("gameplayprobe.GameplayRuntimeProbe"),Gameplay,Error) || !FDasDSLService::Apply(TEXT("dsl_cooked_native_owner.das"),Root+TEXT("/BP_NativeOwner"),TEXT("cookednative.CookedNativeOwner"),Native,Error) || !FDasDSLService::Apply(TEXT("dsl_delegate_actor.das"),Root+TEXT("/BP_Delegate"),TEXT("delegateexample.DelegateExample"),Delegate,Error) || !FDasDSLService::Apply(TEXT("dsl_single_delegate_actor.das"),Root+TEXT("/BP_SingleDelegate"),TEXT("singledelegate.SingleDelegateActor"),Single,Error)){UE_LOG(LogTemp,Error,TEXT("Cooked fixtures: %s"),*Error);return 1;}
  if(!FDasDSLService::Apply(TEXT("dsl_inheritance_child.das"),Root+TEXT("/BP_ChildCounter"),TEXT("inheritance.ChildCounter"),Inherited,Error)){UE_LOG(LogTemp,Error,TEXT("Cooked inheritance: %s"),*Error);return 1;}
  if(!FDasDSLService::Apply(TEXT("dsl_life_actor_child.das"),Root+TEXT("/BP_ChildLifeActor"),TEXT("lifefamily.ChildLifeActor"),Life,Error)){UE_LOG(LogTemp,Error,TEXT("Cooked lifecycle: %s"),*Error);return 1;}

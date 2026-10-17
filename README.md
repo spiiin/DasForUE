@@ -1,5 +1,14 @@
 # DasForUE2
 
+## Current starting point
+
+See [current functionality and next steps](Docs/CurrentStatus.md) and the
+[playable Character guide](Docs/PlayableCharacter.md). Run
+`Scripts/CreatePlayableCharacter.ps1` to create just the playable example;
+use `-SkipBuild` when the Editor target is already built. The command prints
+the map path and writes `logs/playable-example.json`. Earlier sections below
+record historical implementation/validation stages, not the current feature limit.
+
 New, independent daScript integration for Unreal Engine. The old `C:\src\DasForUE`
 proof of concept is a reference only; none of its generated bindings are used here.
 
@@ -707,3 +716,5 @@ Native host inheritance: `class Counter : Actor` and `class Behavior : ActorComp
 are available through `require ue_dsl`. See [DSLNativeBases](Docs/DSLNativeBases.md).
 
 Native Blueprint-visible self fields in instance methods: [DSLNativeSelfFields](Docs/DSLNativeSelfFields.md).
+
+Gameplay traces, UMG HUD and authored health: [GameplayServices](Docs/GameplayServices.md). Focused check: `Scripts/TestGameplayFeatures.ps1`.

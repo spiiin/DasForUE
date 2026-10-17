@@ -1,4 +1,5 @@
 #include "DasPropertyTypes.h"
+#include "DasSoftReferences.h"
 #include "DasDefinedEnum.h"
 #include "UObject/UnrealType.h"
 #include "UObject/StrProperty.h"
@@ -49,6 +50,7 @@ bool Describe(const FProperty* P,FDasDeclaredType& Out,FString& Error,int32 Dept
  if(auto* M=CastField<FMapProperty>(P)){auto Key=MakeShared<FDasDeclaredType>(),Value=MakeShared<FDasDeclaredType>();Out.Key=Key;Out.Value=Value;return Describe(M->KeyProp,*Key,Error,Depth+1,Nodes) && Describe(M->ValueProp,*Value,Error,Depth+1,Nodes);}
  if(auto* E=CastField<FEnumProperty>(P)){if(!E->GetUnderlyingProperty() || !E->GetUnderlyingProperty()->IsA<FByteProperty>()){Error=TEXT("Only byte-sized enum storage is supported");return false;}Out.TypePath=E->GetEnum()->GetPathName();Out.EnumStorage=EDasEnumStorage::Enum8;}
  else if(auto* B=CastField<FByteProperty>(P);B && B->Enum){Out.TypePath=B->Enum->GetPathName();Out.EnumStorage=EDasEnumStorage::Byte;}
+ else if(auto* Soft=DasSoftCarrierForProperty(P))Out.TypePath=Soft->GetPathName();
  else if(auto* C=CastField<FClassProperty>(P))Out.TypePath=C->MetaClass->GetPathName();
  else if(auto* S=CastField<FStructProperty>(P))Out.TypePath=S->Struct->GetPathName();
  else if(auto* ReferenceClass=DasReferencePropertyClass(P))Out.TypePath=ReferenceClass->GetPathName();
@@ -65,7 +67,7 @@ FProperty* Build(FFieldVariant Owner,FName Name,const FDasDeclaredType& T,EDasPr
  case EDasTypeKind::Bool:{auto* P=new FBoolProperty(Owner,Name);P->SetBoolSize(sizeof(bool),true);return P;}
  case EDasTypeKind::String:return new FStrProperty(Owner,Name);
  case EDasTypeKind::Name:return new FNameProperty(Owner,Name);
- case EDasTypeKind::Struct:{auto* P=new FStructProperty(Owner,Name);P->Struct=FindObject<UScriptStruct>(nullptr,*T.TypePath);return P;}
+ case EDasTypeKind::Struct:{if(auto* Soft=DasSoftProperty(T.TypePath))return CreateDasSoftProperty(Owner,Name,Soft);auto* P=new FStructProperty(Owner,Name);P->Struct=FindObject<UScriptStruct>(nullptr,*T.TypePath);return P;}
  case EDasTypeKind::Object:{auto* C=FindObject<UClass>(nullptr,*T.TypePath);if(C->HasAnyClassFlags(CLASS_Interface)){auto* P=new FInterfaceProperty(Owner,Name);P->InterfaceClass=C;return P;}auto* P=new FObjectProperty(Owner,Name);P->PropertyClass=C;return P;}
  case EDasTypeKind::Class:{auto* P=new FClassProperty(Owner,Name);P->PropertyClass=UClass::StaticClass();P->MetaClass=FindObject<UClass>(nullptr,*T.TypePath);return P;}
  case EDasTypeKind::Enum:{auto* E=FindObject<UEnum>(nullptr,*T.TypePath);if(DasResolvedEnumStorage(T)==EDasEnumStorage::Enum8){auto* P=new FEnumProperty(Owner,Name);P->SetEnum(E);P->AddCppProperty(new FByteProperty(P,TEXT("UnderlyingType")));return P;}auto* P=new FByteProperty(Owner,Name);P->Enum=E;return P;}
@@ -95,6 +97,7 @@ EDasTypeKind DasPropertyKind(const FProperty* P){
  if(CastField<FEnumProperty>(P))return EDasTypeKind::Enum;if(CastField<FTextProperty>(P))return EDasTypeKind::Text;
  if(CastField<FIntProperty>(P))return EDasTypeKind::Int;if(CastField<FFloatProperty>(P))return EDasTypeKind::Float;if(CastField<FDoubleProperty>(P))return EDasTypeKind::Double;if(CastField<FBoolProperty>(P))return EDasTypeKind::Bool;
  if(CastField<FStrProperty>(P))return EDasTypeKind::String;if(CastField<FNameProperty>(P))return EDasTypeKind::Name;if(CastField<FClassProperty>(P))return EDasTypeKind::Class;
+ if(CastField<FSoftObjectProperty>(P))return EDasTypeKind::Struct;
  if(DasReferencePropertyClass(P))return EDasTypeKind::Object;if(CastField<FStructProperty>(P))return EDasTypeKind::Struct;if(CastField<FDelegateProperty>(P))return EDasTypeKind::Delegate;if(CastField<FMulticastDelegateProperty>(P))return EDasTypeKind::Event;return EDasTypeKind::Invalid;
 }
 bool DescribeDasProperty(const FProperty* P,FDasDeclaredType& Out,FString& Error){Error.Reset();FDasDeclaredType Result;int32 Nodes=0;if(!Describe(P,Result,Error,0,Nodes)){Out={};Out.Kind.Reset();return false;}Out=MoveTemp(Result);return true;}

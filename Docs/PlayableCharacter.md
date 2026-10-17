@@ -46,18 +46,25 @@ enforced by DAS accessors). Each grouped block needs a unique placeholder name.
 ## Create/open the demo
 
 Run `Scripts/CreatePlayableCharacter.ps1`. It builds the Editor target and creates
-a fresh generated folder under `/Game/DasCookedGameplay/<id>` with the Character
-Blueprint, saved InputActions, Mapping Context and `PlayableMap`. Existing generated
-test folders are not removed. Open the printed PlayableMap and press Play:
+a fresh generated folder under `/Game/DasExamples/Playable/<id>` with the Character
+Blueprint, pickup Blueprint, three saved InputActions, Mapping Context, a separately streamed pickup mesh and `PlayableMap`, plus the
+Character's gameplay dependencies.
+Use `-SkipBuild` when the Editor target is already built. The standalone export
+does not create the regression fixture Blueprints. Existing generated folders are
+preserved. The printed map/source paths are also saved in `logs/playable-example.json`.
+Open the printed PlayableMap and press Play:
 
 - WASD: movement relative to view yaw.
 - Mouse: view rotation.
 - Space: jump / release.
+- E: interact with the object under the camera trace.
+- H: receive 25 damage.
+- Tab: toggle mouse/UI interaction.
 
 The map has a floor and several cube obstacles. The Character auto-possesses
 Player 0 and uses its camera. No asset paths are needed in user callback bodies.
 The smoke project config already selects EnhancedPlayerInput/EnhancedInputComponent.
-For another project configure these classes and assign the four input assets.
+For another project configure these classes and assign the mapping context, six input actions and HUD class.
 
 `Scripts/TestGameplayRuntimePIE.ps1` and `Scripts/TestCookedGameplay.ps1` share a
 native probe of this exact authored Character. It verifies possession through DAS,
@@ -74,9 +81,23 @@ jump, camera, no runtime error). Packaged foundation failures=0. See Docs/Plan.m
 for logs and limits.
 
 Current generated map:
-`/Game/DasCookedGameplay/94e91ee1d4414c4b8b5211844f8801f5/PlayableMap`.
+`/Game/DasExamples/Playable/f11090b4a75e4fe79c1836d70c429fc4/PlayableMap`.
 This is generated test content; rerunning the scripts creates another folder.
 
 
 Intentional negative-speed rejection lives in the test-only
 `playable_character_negative_probe.das`, not in the playable Character API.
+
+Standalone export verification (2026-10-17): Editor Development, exactly six saved
+assets and a fresh Editor `-game -DasPlayableMap` launch passed. The focused probe
+checked input readiness, movement on the floor, jump, camera and empty DAS error.
+This iteration did not rerun Foundation, the PIE suite or packaged Development.
+See `logs/playable-example-validation.json`. The full cooked regression exporter
+still uses its existing `/Game/DasCookedGameplay/<id>` path.
+
+The standalone scene now includes a [respawning score pickup](PlayablePickup.md).
+Its mesh/collision/event/score/timer logic lives in `dsl_playable_pickup.das`.
+The focused `TestPickup.ps1` runner validates the saved scene without running the
+Foundation/PIE/packaged suites. Earlier six-asset validation above predates this addition.
+
+Traces, UMG HUD, native damage and HealthComponent: [GameplayServices](GameplayServices.md).

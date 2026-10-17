@@ -1,3 +1,35 @@
+// Drafts must keep their reflected references alive, and release them on rollback.
+{
+    const auto BatchGC=ObjectRun(TEXT(R"das(
+let original=ue_struct_value("/Script/DasRuntime.DasDefaultBundleProbe")
+let made=ue_begin_call(ue_self_object(),"NewFixture")
+ue_invoke_call(made)
+let object=ue_result_object(made,"ReturnValue")
+let changed=ue_struct_edit(original) $(var draft:UEStructValue) {
+    draft=__ue_struct_map_with_name_object(draft,"Nested.Lookup",ue_name_value("live"),object)
+    ue_release_call(made)
+    let gc=ue_begin_call(ue_self_object(),"ForceTestGC"); ue_invoke_call(gc); ue_release_call(gc)
+    verify(ue_object_valid(object))
+}
+verify(ue_object_valid(__ue_struct_map_get_name_object(changed,"Nested.Lookup",ue_name_value("live"))))
+verify(ue_struct_map_size(original,"Nested.Lookup")==0)
+let other=ue_begin_call(ue_self_object(),"NewFixture")
+ue_invoke_call(other)
+let discarded=ue_result_object(other,"ReturnValue")
+var rejected=false
+try {
+    let unused=ue_struct_edit(original) $(var draft:UEStructValue) {
+        draft=__ue_struct_map_with_name_object(draft,"Nested.Lookup",ue_name_value("discarded"),discarded)
+        ue_release_call(other)
+        panic("discard draft reference")
+    }
+} recover { rejected=true }
+let gc=ue_begin_call(ue_self_object(),"ForceTestGC"); ue_invoke_call(gc); ue_release_call(gc)
+verify(rejected && !ue_object_valid(discarded) && ue_object_valid(object))
+return 1
+)das"));
+    Expect(BatchGC.bSucceeded && BatchGC.Value==1,TEXT("snapshot_batch_GC_roots_draft_and_releases_rollback"),BatchGC.Error);
+}
 // Use the public snapshot adapters, including exception recovery in one context.
 {
     Runtime.ReleaseObject(First.Get());
@@ -13,6 +45,7 @@
     const bool Found=DasSnapshotFields::Find(Frozen.GetScriptStruct(),Frozen.GetMemory(),TEXT("Rows.0.Priority"),Borrowed,FieldError);
     static_assert(std::is_same_v<decltype(Borrowed.Memory),const uint8*>);
     Expect(Found && Borrowed.Memory==&Probe.Rows[0].Priority,TEXT("snapshot_read_field_aliases_const_source"),FieldError);
+    #include "DasSnapshotFieldsTests.inl"
     FDasSnapshotReadProbe::CopyCount.Store(0);
     { FInstancedStruct ControlCopy=Frozen;Expect(FDasSnapshotReadProbe::CopyCount.Load()>0,TEXT("snapshot_read_copy_counter_detects_real_clone")); }
     TStrongObjectPtr<UDasSnapshotReadOwner> ReadOwner(NewObject<UDasSnapshotReadOwner>());ReadOwner->Snapshot=Probe;
@@ -20,6 +53,78 @@
     const auto PreviousFlags=SnapshotField->GetPropertyFlags();SnapshotField->SetPropertyFlags(CPF_BlueprintVisible);
     const bool Written=Write(TEXT(R"das(options gen2
 require ue_foundation
+var escaped:UEStructValue
+[export]
+def batch(input:int):int {
+    let original=ue_get_self_struct("Snapshot")
+    let changed=ue_struct_edit(original) $(var draft:UEStructValue) {
+        escaped=draft
+        draft=ue_struct_map_with_int(draft,"IntMap",-3,44)
+        verify(ue_struct_map_key(draft,"IntMap",0)==-3)
+        draft=ue_struct_map_with_int(draft,"IntMap",-5,45)
+        verify(ue_struct_map_key(draft,"IntMap",0)==-5)
+        draft=ue_struct_set_with_int(draft,"IntSet",-2,true)
+        verify(ue_struct_set_element_int(draft,"IntSet",0)==-2)
+        draft=ue_struct_set_with_int(draft,"IntSet",-4,true)
+        verify(ue_struct_set_element_int(draft,"IntSet",0)==-4)
+        draft=ue_struct_with_byte(draft,"Nested.Priority",uint8(42))
+        draft=ue_struct_with_text(draft,"Nested.Caption",ue_text("Batch","Title","Changed"))
+        draft=ue_struct_array_resize(draft,"Rows",2)
+        draft=ue_struct_with_byte(draft,"Rows.1.Priority",uint8(43))
+        verify(ue_struct_get_byte(draft,"Rows.1.Priority")==uint8(43))
+    }
+    verify(ue_struct_map_size(changed,"IntMap")==4 && ue_struct_set_size(changed,"IntSet")==4)
+    verify(ue_struct_get_byte(changed,"Nested.Priority")==uint8(42))
+    verify(ue_text_key(ue_struct_get_text(changed,"Nested.Caption"))=="Title")
+    verify(ue_struct_array_size(changed,"Rows")==2 && ue_struct_get_byte(changed,"Rows.1.Priority")==uint8(43))
+    verify(ue_struct_map_size(original,"IntMap")==2 && ue_struct_set_size(original,"IntSet")==2)
+    verify(ue_struct_array_size(original,"Rows")==1 && ue_struct_get_byte(original,"Nested.Priority")==uint8(11))
+    var expired=false
+    try { ue_struct_map_size(escaped,"IntMap") } recover { expired=true }
+    verify(expired)
+    return 1
+}
+[export]
+def batch_failures(input:int):int {
+    let original=ue_get_self_struct("Snapshot")
+    var rejected=0
+    try {
+        let unused=ue_struct_edit(original) $(var draft:UEStructValue) {
+            escaped=draft
+            draft=ue_struct_map_with_int(draft,"IntMap",-7,99)
+            panic("batch rollback")
+        }
+    } recover { rejected+=1 }
+    try { ue_struct_map_size(escaped,"IntMap") } recover { rejected+=1 }
+    try {
+        let unused=ue_struct_edit(original) $(var draft:UEStructValue) {
+            escaped=draft
+            draft=ue_struct_map_with_int(draft,"IntMap",-9,100)
+            try { draft=ue_struct_with_string(draft,"Nested.Priority","wrong") } recover { rejected+=1 }
+        }
+    } recover { rejected+=1 }
+    try { ue_struct_map_size(escaped,"IntMap") } recover { rejected+=1 }
+    // A failed map value write may already have inserted the key in the draft.
+    let wrong=ue_struct_value("/Script/CoreUObject.IntPoint")
+    try {
+        let unused=ue_struct_edit(original) $(var draft:UEStructValue) {
+            escaped=draft
+            try { draft=__ue_struct_map_with_string_struct(draft,"Catalog","bad",wrong) } recover { rejected+=1 }
+        }
+    } recover { rejected+=1 }
+    // An inner independent edit is allowed, but re-editing the active draft is not.
+    let changed=ue_struct_edit(original) $(var draft:UEStructValue) {
+        try { let unused=ue_struct_edit(draft) $(var inner:UEStructValue) {} } recover { rejected+=1 }
+        let child=ue_struct_edit(original) $(var inner:UEStructValue) {
+            inner=ue_struct_with_byte(inner,"Nested.Priority",uint8(54))
+        }
+        verify(ue_struct_get_byte(child,"Nested.Priority")==uint8(54))
+        draft=ue_struct_with_byte(draft,"Nested.Priority",uint8(55))
+    }
+    verify(rejected==8 && ue_struct_map_size(original,"IntMap")==2 && ue_struct_map_size(original,"Catalog")==1)
+    verify(ue_struct_get_byte(changed,"Nested.Priority")==uint8(55))
+    return 1
+}
 [export]
 def noop(input:int):int {
     let value=ue_get_self_struct("Snapshot")
@@ -53,6 +158,18 @@ def queries(input:int):int {
     verify(failures==3)
     return 1
 }
+[export]
+def changed(input:int):int {
+    let original=ue_get_self_struct("Snapshot")
+    verify(ue_struct_map_key(original,"IntMap",0)==-1)
+    let extended=ue_struct_map_with_int(original,"IntMap",-3,44)
+    verify(ue_struct_map_key(extended,"IntMap",0)==-3 && ue_struct_map_key(extended,"IntMap",1)==-1 && ue_struct_map_key(extended,"IntMap",2)==2)
+    verify(ue_struct_map_size(original,"IntMap")==2 && ue_struct_map_key(original,"IntMap",0)==-1)
+    verify(ue_struct_set_element_int(original,"IntSet",0)==4)
+    let altered=ue_struct_set_with_int(original,"IntSet",-2,true)
+    verify(ue_struct_set_element_int(altered,"IntSet",0)==-2 && ue_struct_set_element_int(original,"IntSet",0)==4)
+    return 1
+}
 )das"));
     auto InvokeRead=[&](const TCHAR* Entry){return Runtime.RunNamedPersistent(Scratch,Entry,0,ReadOwner.Get());};
     auto Warm=InvokeRead(TEXT("noop"));auto WarmQueries=InvokeRead(TEXT("queries"));
@@ -61,6 +178,12 @@ def queries(input:int):int {
     Expect(Written && Warm.bSucceeded && WarmQueries.bSucceeded && Baseline.bSucceeded && Queries.bSucceeded && Queries.Value==1 && QueryCopies==TransportCopies,
         TEXT("snapshot_queries_add_zero_native_parent_copies"),FString::Printf(TEXT("transport=%d queries=%d %s %s"),TransportCopies,QueryCopies,*WarmQueries.Error,*Queries.Error));
     Expect(Probe.Rows[0].Priority==11 && Probe.IntMap.Num()==2 && Probe.IntSet.Num()==2,TEXT("snapshot_queries_and_child_changes_preserve_input"));
+    const auto Changed=InvokeRead(TEXT("changed"));Expect(Changed.bSucceeded && Changed.Value==1,TEXT("snapshot_key_orders_isolate_changed_snapshots"),Changed.Error);
+    FDasSnapshotReadProbe::CopyCount.Store(0);
+    const auto Batch=InvokeRead(TEXT("batch"));const int32 BatchCopies=FDasSnapshotReadProbe::CopyCount.Load();
+    Expect(Batch.bSucceeded && Batch.Value==1 && BatchCopies==TransportCopies+1,TEXT("snapshot_batch_mixed_writes_clone_once_and_expire_draft"),FString::Printf(TEXT("copies=%d transport=%d %s"),BatchCopies,TransportCopies,*Batch.Error));
+    const auto BatchFailures=InvokeRead(TEXT("batch_failures"));
+    Expect(BatchFailures.bSucceeded && BatchFailures.Value==1,TEXT("snapshot_batch_rollback_caught_write_poisoning_and_nested_scope"),BatchFailures.Error);
     Runtime.ReleaseObject(ReadOwner.Get());SnapshotField->ClearPropertyFlags(CPF_BlueprintVisible & ~PreviousFlags);
 }
 {

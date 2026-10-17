@@ -76,6 +76,8 @@ private:
         if (auto* A = CastField<FArrayProperty>(P)) return Property(A->Inner, Depth + 1);
         if (auto* M = CastField<FMapProperty>(P)) return Property(M->KeyProp, Depth + 1) && Property(M->ValueProp, Depth + 1);
         if (auto* Set = CastField<FSetProperty>(P)) return Property(Set->ElementProp, Depth + 1);
+        if (auto* C = CastField<FSoftClassProperty>(P)) return Reference(C->MetaClass);
+        if (auto* O = CastField<FSoftObjectProperty>(P)) return Reference(O->PropertyClass);
         if (auto* C = CastField<FClassProperty>(P)) return Reference(C->MetaClass);
         if (auto* C = DasReferencePropertyClass(P)) return Reference(C);
         if (auto* E = DasEnumPropertyType(const_cast<FProperty*>(P))) return Enum(E);

@@ -103,7 +103,8 @@
             return;
         }
         if (Depth > 16) Context->throw_error("call struct nesting limit exceeded");
-        if (FieldKind(Property, Context) == EMarshallingKind::Struct)
+        if(auto* Soft=DasSoftCarrierForProperty(Property))Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Soft->GetPathName()});
+        else if (FieldKind(Property, Context) == EMarshallingKind::Struct)
         {
             UScriptStruct* Type = CastFieldChecked<FStructProperty>(Property)->Struct;
             // Native opaque state cannot be described by reflection alone.
@@ -153,6 +154,8 @@
             FString::Printf(TEXT("%llu"), uint64(Property->GetPropertyFlags() & (CPF_Parm | CPF_ReturnParm | CPF_OutParm | CPF_ReferenceParm | CPF_ConstParm)));
         if(auto* D=CastField<FDelegateProperty>(Property)){Key+=TEXT(":")+(D->SignatureFunction?D->SignatureFunction->GetPathName():TEXT("missing"));if(D->SignatureFunction)for(TFieldIterator<FProperty> It(D->SignatureFunction);It;++It){if(CastField<FDelegateProperty>(*It))Key+=TEXT(":nested_delegate");else AppendCallShape(*It,Key);}}
         if (UEnum* Enum = CallEnumType(Property)) Key += TEXT(":") + Enum->GetPathName();
+        // Include the constraint even though soft properties share the struct ABI.
+        if(auto* Soft=CastField<FSoftObjectProperty>(Property)){auto* Class=CastField<FSoftClassProperty>(Soft);Key+=TEXT(":soft:")+(Class?Class->MetaClass->GetPathName():Soft->PropertyClass->GetPathName());}
         if(auto* Class=CastField<FClassProperty>(Property))Key+=TEXT(":meta:")+Class->MetaClass->GetPathName();
         if (auto* ReferenceClass = DasReferencePropertyClass(Property)) Key += TEXT(":") + ReferenceClass->GetPathName();
         if (auto* Array = CastField<FArrayProperty>(Property))

@@ -1,6 +1,7 @@
 // Only resolved, bounded values enter the persisted default wire.
-TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T,das::ExpressionPtr E){
+TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T,das::ExpressionPtr E,das::ModuleGroup& Group,das::Module* Module){
  if(!E)DSLFail(TEXT("Missing container default value"));
+ if(DSLSoft(T)){if(E->__rtti!=das::string("ExprCallMacro"))DSLFail(TEXT("Soft container defaults require ue_soft(type<SoftType>, literal_path)"));auto* Call=static_cast<das::ExprCallMacro*>(E);if(Call->name!="ue_soft" || Call->arguments.size()!=2 || !Call->arguments[0]->rtti_isTypeDecl() || Call->arguments[1]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Soft default requires type and literal path"));auto Input=DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(Call->arguments[0])->typeexpr,Group,Module);if(!DSLSoft(Input) || DSLSoftPath(Input)!=DSLSoftPath(T))DSLFail(TEXT("Soft default type differs from container element"));const FString Path=DSLText(static_cast<das::ExprConstString*>(Call->arguments[1])->text);FString Error;if(!ValidateDasSoftPath(Path,Error))DSLFail(Error);return MakeShared<FJsonValueString>(Path);}
  if(DSLTypedReference(T) || DSLObjectKey(T)){
   if((DSLTypedReference(T) && DSLAuthoredView(T)) || (DSLObjectKey(T) && !DSLKeyAnnotation(T)->AuthoredId.IsEmpty()))DSLFail(TEXT("Container asset defaults require native reference types"));
   auto* Call=E->rtti_isCall()?static_cast<das::ExprCall*>(E):nullptr;
@@ -9,7 +10,7 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T,das::Expres
  }
  if(DSLContainer(T)){
   auto* Items=DSLDefaultItems(E,T);TArray<TSharedPtr<FJsonValue>> Values;
-  if(Items)for(const auto& Item:Items->values){if(T->baseType==das::Type::tTable && !DSLSet(T)){if(Item->__rtti!=das::string("ExprMakeTuple"))DSLFail(TEXT("Map defaults require pairs"));auto* Pair=static_cast<das::ExprMakeTuple*>(Item);if(Pair->values.size()!=2)DSLFail(TEXT("Map defaults require pairs"));Values.Add(MakeShared<FJsonValueArray>(TArray<TSharedPtr<FJsonValue>>{DSLDefaultJsonValue(T->firstType,Pair->values[0]),DSLDefaultJsonValue(T->secondType,Pair->values[1])}));}else Values.Add(DSLDefaultJsonValue(T->firstType,Item));}
+  if(Items)for(const auto& Item:Items->values){if(T->baseType==das::Type::tTable && !DSLSet(T)){if(Item->__rtti!=das::string("ExprMakeTuple"))DSLFail(TEXT("Map defaults require pairs"));auto* Pair=static_cast<das::ExprMakeTuple*>(Item);if(Pair->values.size()!=2)DSLFail(TEXT("Map defaults require pairs"));Values.Add(MakeShared<FJsonValueArray>(TArray<TSharedPtr<FJsonValue>>{DSLDefaultJsonValue(T->firstType,Pair->values[0],Group,Module),DSLDefaultJsonValue(T->secondType,Pair->values[1],Group,Module)}));}else Values.Add(DSLDefaultJsonValue(T->firstType,Item,Group,Module));}
   return MakeShared<FJsonValueArray>(Values);
  }
  if(DSLDirectStruct(T)){
@@ -40,7 +41,7 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T,das::Expres
  if((K==TEXT("int") && E->__rtti==das::string("ExprConstInt")) || (K==TEXT("float") && (E->__rtti==das::string("ExprConstFloat") || E->__rtti==das::string("ExprConstInt"))) || (K==TEXT("double") && (E->__rtti==das::string("ExprConstDouble") || E->__rtti==das::string("ExprConstInt"))))return MakeShared<FJsonValueNumber>(DSLDefaultNumber(E));
  DSLFail(TEXT("Container default value type is unsupported or differs from its declaration: ")+K);return nullptr;
 }
-FString DSLContainerDefault(das::Structure::FieldDeclaration& F,const FString& Path){
- if(!F.init)return {};auto Value=DSLDefaultJsonValue(F.type,F.init);const auto& Values=Value->AsArray();
+FString DSLContainerDefault(das::Structure::FieldDeclaration& F,const FString& Path,das::ModuleGroup& Group,das::Module* Module){
+ if(!F.init)return {};auto Value=DSLDefaultJsonValue(F.type,F.init,Group,Module);const auto& Values=Value->AsArray();
  FString Wire;auto Writer=TJsonWriterFactory<TCHAR,TCondensedJsonPrintPolicy<TCHAR>>::Create(&Wire);FJsonSerializer::Serialize(Values,Writer);FInstancedStruct Parsed;FString Error;if(DSLComputedDefaults && !DSLComputedDefaults->Resolved && !DSLComputedDefaults->Pending.IsEmpty()){F.init=nullptr;return TEXT("[]");}if(!ParseDasStructDefault(Path,Wire,Parsed,Error))DSLFail(Error);F.init=nullptr;return Wire;
 }

@@ -1,10 +1,28 @@
+#include "DasMontageProxy.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/Skeleton.h"
+#include "Engine/SkeletalMesh.h"
+#include "DasWidgetLifetime.h"
+#include "Components/TextBlock.h"
+#include "Components/Button.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/DamageType.h"
 #include "DasCallbackTypes.h"
+#include "DasDefaultValueProbe.h"
+#include "DasObjectFixture.h"
+#include "Misc/EngineVersion.h"
+#include "Misc/App.h"
+#include "Misc/CommandLine.h"
+#include "ProfilingDebugging/CpuProfilerTrace.h"
 #include "DasCallbackFrames.h"
 #include "DasCallbackPayload.h"
 #include "Misc/CoreDelegates.h"
 #include "DasPropertyTypes.h"
 #include "DasPropertyValues.h"
 #include "DasSnapshotFields.h"
+#include "DasSnapshotContainers.h"
+#include "DasSoftReferences.h"
 #include "UObject/ObjectKey.h"
 #include "DasPawn.h"
 #include "DasCharacter.h"
@@ -44,6 +62,7 @@
 #include "DasDefinedEnum.h"
 #include "DasTypeRegistry.h"
 #include "DasRuntime.h"
+#include "DasSoftReferences.h"
 #include "DasBlueprintLibrary.h"
 #include "DasContainerTypes.h"
 #include "DasFrameLibrary.h"
@@ -137,6 +156,16 @@ MAKE_TYPE_FACTORY(UEVector2D,FVector2D);
 MAKE_TYPE_FACTORY(UEVector,FVector);
 MAKE_TYPE_FACTORY(UERotator,FRotator);
 MAKE_TYPE_FACTORY(UETransform,FTransform);
+// A source-side checked view of a native FHitResult. References are weak handles.
+struct FDasTraceHit {
+    uint64 Scope=0;
+    bool BlockingHit=false,StartPenetrating=false;
+    double Distance=0,Time=0;
+    FVector Location=FVector::ZeroVector,ImpactPoint=FVector::ZeroVector,Normal=FVector::ZeroVector,ImpactNormal=FVector::ZeroVector;
+    int32 FaceIndex=-1;
+    FDasObjectHandle Actor{},Component{};
+};
+MAKE_TYPE_FACTORY(UETraceHit,FDasTraceHit);
 struct FDasCallHandle { uint64 Token = 0; };
 MAKE_TYPE_FACTORY(UCallHandle, FDasCallHandle);
 
@@ -258,15 +287,23 @@ namespace
     };
     uint64 NextCallHandle = 1;
 
+    uint64 NextTraceScope=1;
     class FUnrealDasContext final : public das::Context, public FGCObject
     {
     public:
         explicit FUnrealDasContext(uint32 StackSize) : das::Context(StackSize) {}
         virtual void AddReferencedObjects(FReferenceCollector& Collector) override {
             for(auto& Value:StructValues)Value.Value.AddStructReferencedObjects(Collector);
+            for(auto& Edit:StructEdits)Edit.Value->Value.AddStructReferencedObjects(Collector);
         }
         virtual FString GetReferencerName() const override {return TEXT("FUnrealDasContext snapshots");}
+        uint64 TraceScope=NextTraceScope++;
+        FDasWidgetLifetime WidgetLifetime;
         TArray<FDasTypeDeclaration> Types;
+        DasSnapshotContainers::FKeyOrderCache SnapshotKeyOrders;
+        DasSnapshotFields::FPathCache SnapshotFieldPaths;
+        struct FStructEdit { FInstancedStruct Value; bool Poisoned=false; };
+        TMap<uint64,TUniquePtr<FStructEdit>> StructEdits;
         TMap<uint64,FInstancedStruct> StructValues;uint64 StructCollections=0,StructReclaimed=0;int32 StructNextCollection=256;
         TMap<uint64,FText> TextValues;
         struct FEnumValue {TWeakObjectPtr<UEnum> Type;int32 Value;};TMap<uint64,FEnumValue> EnumValues;
@@ -450,6 +487,7 @@ namespace
         }}
         if(!W.Complete)return false;
         const int32 Before=C.StructValues.Num();for(auto It=C.StructValues.CreateIterator();It;++It)if(!W.Tokens.Contains(It.Key()))It.RemoveCurrent();
+        C.SnapshotKeyOrders.Prune([&](uint64 Token){return C.StructValues.Contains(Token);});
         for(auto It=C.DelegateValues.CreateIterator();It;++It)if(!W.DelegateTokens.Contains(It.Key()))It.RemoveCurrent();
         ++C.StructCollections;C.StructReclaimed+=Before-C.StructValues.Num();C.StructNextCollection=FMath::Min(4096,FMath::Max(256,C.StructValues.Num()+256));return true;
     }
@@ -461,10 +499,12 @@ namespace
     bool MathSnapshotValid(const FInstancedStruct& Snapshot){const auto* Type=Snapshot.GetScriptStruct();if(Type==TBaseStructure<FVector2D>::Get())return !Snapshot.Get<FVector2D>().ContainsNaN();if(Type==TBaseStructure<FVector>::Get())return !Snapshot.Get<FVector>().ContainsNaN();if(Type==TBaseStructure<FRotator>::Get())return !Snapshot.Get<FRotator>().ContainsNaN();if(Type==TBaseStructure<FTransform>::Get())return !Snapshot.Get<FTransform>().ContainsNaN() && Snapshot.Get<FTransform>().IsRotationNormalized();return true;}
     // Borrowed snapshots copy only on insertion. Owned temporaries transfer their
     // buffer after validation/deduplication; all routes share one token counter.
-    FDasStructValue StoreStructValueImpl(const FInstancedStruct& V,FInstancedStruct* Owned,das::Context* C,das::LineInfoArg* At){if(C!=ActiveContext || !ActiveContext)C->throw_error("struct requires active context");FString Error;if(!ValidateDasStructSnapshot(V,Error))C->throw_error(TCHAR_TO_UTF8(*Error));if(!MathSnapshotValid(V))C->throw_error("invalid math snapshot value");for(const auto& P:ActiveContext->StructValues)if(IdenticalDasStructSnapshot(P.Value,V))return {P.Key};if(At && ActiveContext->StructValues.Num()>=ActiveContext->StructNextCollection)CollectStructValues(*ActiveContext,At);if(ActiveContext->StructValues.Num()>=4096)C->throw_error("struct value table limit exceeded");static uint64 Next=1;uint64 Token=Next++;if(Owned)ActiveContext->StructValues.Add(Token,MoveTemp(*Owned));else ActiveContext->StructValues.Add(Token,V);return {Token};}
+    uint64 NextStructValueToken=1;
+    FDasStructValue StoreStructValueImpl(const FInstancedStruct& V,FInstancedStruct* Owned,das::Context* C,das::LineInfoArg* At){if(C!=ActiveContext || !ActiveContext)C->throw_error("struct requires active context");FString Error;if(!ValidateDasStructSnapshot(V,Error))C->throw_error(TCHAR_TO_UTF8(*Error));if(!MathSnapshotValid(V))C->throw_error("invalid math snapshot value");for(const auto& P:ActiveContext->StructValues)if(IdenticalDasStructSnapshot(P.Value,V))return {P.Key};if(At && ActiveContext->StructValues.Num()>=ActiveContext->StructNextCollection)CollectStructValues(*ActiveContext,At);if(ActiveContext->StructValues.Num()>=4096)C->throw_error("struct value table limit exceeded");uint64 Token=NextStructValueToken++;if(Owned)ActiveContext->StructValues.Add(Token,MoveTemp(*Owned));else ActiveContext->StructValues.Add(Token,V);return {Token};}
     FDasStructValue StoreStructValue(const FInstancedStruct& V,das::Context* C,das::LineInfoArg* At=nullptr){return StoreStructValueImpl(V,nullptr,C,At);}
     FDasStructValue StoreStructValue(FInstancedStruct&& V,das::Context* C,das::LineInfoArg* At=nullptr){return StoreStructValueImpl(V,&V,C,At);}
-    const FInstancedStruct& ResolveStructValue(FDasStructValue V,das::Context* C){if(C!=ActiveContext || !ActiveContext)C->throw_error("struct requires active context");const auto* S=ActiveContext->StructValues.Find(V.Token);if(!S)C->throw_error("struct is null or belongs to another context");return *S;}
+    const FInstancedStruct& ResolveStructValue(FDasStructValue V,das::Context* C){if(C!=ActiveContext || !ActiveContext)C->throw_error("struct requires active context");if(const auto* Edit=ActiveContext->StructEdits.Find(V.Token)){if((*Edit)->Poisoned)C->throw_error("snapshot edit was invalidated by a failed write");return (*Edit)->Value;}const auto* S=ActiveContext->StructValues.Find(V.Token);if(!S)C->throw_error("struct is null or belongs to another context");return *S;}
+    #include "DasSnapshotEdits.inl"
     FDasStructValue NewStructDefault(const char* Path,const char* Text,das::Context* C,das::LineInfoArg* At){FInstancedStruct Value;FString Error;if(!ParseDasStructDefault(Path?UTF8_TO_TCHAR(Path):TEXT(""),Text?UTF8_TO_TCHAR(Text):TEXT(""),Value,Error))C->throw_error(TCHAR_TO_UTF8(*Error));return StoreStructValue(MoveTemp(Value),C,At);}
     FDasStructValue ReadPropertySnapshot(FProperty* P,const void* Memory,das::Context* C,das::LineInfoArg* At){
         auto V=ReadNativePropertyValue(P,Memory,C);
@@ -485,146 +525,135 @@ namespace
     using FConstStructLeaf=TStructLeaf<const uint8>;
     template<class Byte> TStructLeaf<Byte> StructLeafMemory(const UScriptStruct* Type,Byte* Memory,const char* Path,das::Context* C){
         TStructLeaf<Byte> Field{};FString Error;
-        if(!DasSnapshotFields::Find(Type,Memory,FString(Path?UTF8_TO_TCHAR(Path):TEXT("")),Field,Error))C->throw_error(TCHAR_TO_UTF8(*Error));
+        if(C!=ActiveContext || !ActiveContext)C->throw_error("struct field access requires active context");
+        if(!ActiveContext->SnapshotFieldPaths.Find(Type,Memory,FString(Path?UTF8_TO_TCHAR(Path):TEXT("")),Field,Error))C->throw_error(TCHAR_TO_UTF8(*Error));
         return Field;
     }
     FStructLeaf StructLeaf(FInstancedStruct& V,const char* Path,das::Context* C){return StructLeafMemory(V.GetScriptStruct(),V.GetMutableMemory(),Path,C);}
     FConstStructLeaf StructLeaf(const FInstancedStruct& V,const char* Path,das::Context* C){return StructLeafMemory(V.GetScriptStruct(),V.GetMemory(),Path,C);}
-    // This modifies only the caller's detached snapshot. Keys retain UE hash
-    // semantics; value decoding/validation is owned by the shared codec.
-    template<typename KeyType> void WriteSnapshotMapValue(FMapProperty* P,void* Memory,const KeyType& Key,const FDasScalarValue& Value,das::Context* C){
-        FScriptMapHelper Values(P,Memory);int32 I=Values.FindMapIndexWithKey(&Key);
-        if(I==INDEX_NONE){if(Values.Num()>=4096)C->throw_error("snapshot map size limit");I=Values.AddDefaultValue_Invalid_NeedsRehash();P->KeyProp->CopyCompleteValue(Values.GetKeyPtr(I),&Key);}
-        else if constexpr(std::is_same_v<KeyType,FString>){if(!ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(P->KeyProp),Values.GetKeyPtr(I),C).Equals(Key,ESearchCase::CaseSensitive))C->throw_error("string map key collision under Unreal equality");}
-        WriteNativePropertyValue(P->ValueProp,Values.GetValuePtr(I),Value,C);Values.Rehash();
+    using ESnapshotKind=EDasTypeKind;
+    template<class Byte> auto SnapshotMap(TStructLeaf<Byte> F,ESnapshotKind Key,ESnapshotKind Value,das::Context* C){
+        DasSnapshotContainers::TMapView<Byte> View;FString Error;
+        if(!DasSnapshotContainers::Map(F,Key,Value,View,Error))C->throw_error(TCHAR_TO_UTF8(*Error));return View;
+    }
+    template<class Byte> auto SnapshotSet(TStructLeaf<Byte> F,ESnapshotKind Element,das::Context* C){
+        DasSnapshotContainers::TSetView<Byte> View;FString Error;
+        if(!DasSnapshotContainers::Set(F,Element,View,Error))C->throw_error(TCHAR_TO_UTF8(*Error));return View;
+    }
+    template<class Byte> auto SnapshotArray(TStructLeaf<Byte> F,das::Context* C){
+        DasSnapshotContainers::TArrayView<Byte> View;FString Error;
+        if(!DasSnapshotContainers::Array(F,View,Error))C->throw_error(TCHAR_TO_UTF8(*Error));return View;
+    }
+    template<class Property> constexpr ESnapshotKind SnapshotValueKind(){
+        if constexpr(std::is_same_v<Property,FIntProperty>)return ESnapshotKind::Int;
+        else if constexpr(std::is_same_v<Property,FByteProperty>)return ESnapshotKind::Byte;
+        else if constexpr(std::is_same_v<Property,FTextProperty>)return ESnapshotKind::Text;
+        else if constexpr(std::is_same_v<Property,FFloatProperty>)return ESnapshotKind::Float;
+        else if constexpr(std::is_same_v<Property,FDoubleProperty>)return ESnapshotKind::Double;
+        else if constexpr(std::is_same_v<Property,FBoolProperty>)return ESnapshotKind::Bool;
+        else if constexpr(std::is_same_v<Property,FStrProperty>)return ESnapshotKind::String;
+        else if constexpr(std::is_same_v<Property,FNameProperty>)return ESnapshotKind::Name;
+        else {static_assert(std::is_same_v<Property,FStructProperty>);return ESnapshotKind::Struct;}
+    }
+    template<class KeyType,class Read> auto ReadSnapshotMap(const FDasStructValue& H,const char* Path,const KeyType& Key,ESnapshotKind KeyKind,ESnapshotKind ValueKind,das::Context* C,Read Reader){
+        const auto& V=ResolveStructValue(H,C);auto View=SnapshotMap(StructLeaf(V,Path,C),KeyKind,ValueKind,C);
+        FConstStructLeaf Value{};FString Error;if(!View.Find(&Key,Value,Error))C->throw_error(TCHAR_TO_UTF8(*Error));return Reader(Value.Property,Value.Memory);
+    }
+    template<class KeyType,class Write> FDasStructValue WriteSnapshotMap(const FDasStructValue& H,const char* Path,const KeyType& Key,ESnapshotKind KeyKind,ESnapshotKind ValueKind,das::Context* C,das::LineInfoArg* At,Write Writer){
+        FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto View=SnapshotMap(StructLeaf(V,Path,C),KeyKind,ValueKind,C);FString Error;
+        if(!View.Upsert(&Key,[&](FProperty* P,void* Memory,FString&){Writer(P,Memory);return true;},Error))C->throw_error(TCHAR_TO_UTF8(*Error));
+        return Mutation.Finish(C,At);
+    }
+    template<class ValueProperty,class KeyType> auto StructScalarMapGet(const FDasStructValue& H,const char* Path,const KeyType& Key,ESnapshotKind KeyKind,das::Context* C){
+        return ReadSnapshotMap(H,Path,Key,KeyKind,SnapshotValueKind<ValueProperty>(),C,[&](FProperty* P,const void* Memory){return ReadPropertyScalarValue(CastFieldChecked<ValueProperty>(P),Memory,C);});
+    }
+    template<class ValueProperty,class KeyType,class ValueType> FDasStructValue StructScalarMapWith(const FDasStructValue& H,const char* Path,const KeyType& Key,const ValueType& Value,ESnapshotKind KeyKind,das::Context* C,das::LineInfoArg* At){
+        return WriteSnapshotMap(H,Path,Key,KeyKind,SnapshotValueKind<ValueProperty>(),C,At,[&](FProperty* P,void* Memory){WriteNativePropertyValue(P,Memory,PropertyScalarValue<ValueProperty>(Value),C);});
+    }
+    template<class View> FConstStructLeaf SnapshotKeyAt(const FDasStructValue& H,const char* Path,const View& Values,int32 Index,das::Context* C){
+        if(Index<0 || Index>=Values.Num())C->throw_error(View::IsMap?"map key index out of range":"set element index out of range");
+        // Draft tokens retain identity while their contents change. Immutable key-order caches cannot apply.
+        TArray<int32> DraftOrder;
+        if(ActiveContext->StructEdits.Contains(H.Token))Values.PrepareKeyOrder(DraftOrder);
+        const auto& Order=ActiveContext->StructEdits.Contains(H.Token)?DraftOrder:ActiveContext->SnapshotKeyOrders.Get(H.Token,Path?UTF8_TO_TCHAR(Path):TEXT(""),Values);
+        FConstStructLeaf Field{};FString Error;if(!Values.KeyAtSlot(Order[Index],Field,Error))C->throw_error(TCHAR_TO_UTF8(*Error));return Field;
+    }
+    FDasStructValue SetSnapshotValue(const FDasStructValue& H,const char* Path,const void* Key,ESnapshotKind Kind,bool Present,das::Context* C,das::LineInfoArg* At){
+        FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto View=SnapshotSet(StructLeaf(V,Path,C),Kind,C);FString Error;
+        if(!View.Set(Key,Present,Error))C->throw_error(TCHAR_TO_UTF8(*Error));return Mutation.Finish(C,At);
     }
     FDasScalarValue SnapshotObjectValue(FProperty* P,UObject* Object,das::Context* C){
         auto* Type=DasReferencePropertyClass(P);if(!Type)C->throw_error("expected snapshot object/interface");
         FDasScalarValue Value;Value.Kind=int32(EDasMethodSignature::Object);Value.ObjectClass=Type->GetPathName();Value.ObjectValue=Object;return Value;
     }
-    FDasScalarValue SnapshotStructValue(const FInstancedStruct& Struct){
-        FDasScalarValue Value;Value.Kind=int32(EDasMethodSignature::Struct);Value.StructValue=Struct;Value.ObjectClass=Struct.GetScriptStruct()->GetPathName();return Value;
-    }
-    template<class Byte> FMapProperty* StructIntMap(TStructLeaf<Byte> F,das::Context* C){auto* P=CastField<FMapProperty>(F.Property);if(!P || !CastField<FIntProperty>(P->KeyProp) || !CastField<FIntProperty>(P->ValueProp))C->throw_error("expected int-int snapshot map");return P;}
-    template<class Byte> FSetProperty* StructTypedSet(const TStructLeaf<Byte>& F,bool StringElement,das::Context* C){
-        auto* P=CastField<FSetProperty>(F.Property);
-        if(!P || (StringElement?!P->ElementProp->IsA<FStrProperty>():!P->ElementProp->IsA<FIntProperty>()))C->throw_error("snapshot set element type mismatch");
-        return P;
-    }
-    int32 StructSetSize(const FDasStructValue& H,const char* Path,das::Context* C){
-        const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FSetProperty>(F.Property);
-        if(!P)C->throw_error("expected snapshot set");return FScriptSetHelper(P,F.Memory).Num();
-    }
-    int32 StructSetElementInt(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){
-        const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructTypedSet(F,false,C);FScriptSetHelper Values(P,F.Memory);
-        if(Index<0 || Index>=Values.Num())C->throw_error("set element index out of range");
-        TArray<int32> Elements;for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I))Elements.Add(ReadPropertyScalarValue(CastFieldChecked<FIntProperty>(P->ElementProp),Values.GetElementPtr(I),C));
-        Elements.Sort();return Elements[Index];
-    }
-    char* StructSetElementString(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){
-        const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructTypedSet(F,true,C);FScriptSetHelper Values(P,F.Memory);
-        if(Index<0 || Index>=Values.Num())C->throw_error("set element index out of range");
-        TArray<FString> Elements;for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I))Elements.Add(ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(P->ElementProp),Values.GetElementPtr(I),C));
-        Elements.Sort();return CopyDSLString(Elements[Index],C);
-    }
-    bool StructSetContainsInt(const FDasStructValue& H,const char* Path,int32 Element,das::Context* C){
-        const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructTypedSet(F,false,C);return FScriptSetHelper(P,F.Memory).FindElementIndex(&Element)!=INDEX_NONE;
-    }
-    bool StructSetContainsString(const FDasStructValue& H,const char* Path,const char* Element,das::Context* C){
-        const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructTypedSet(F,true,C);FString Native=Element?UTF8_TO_TCHAR(Element):TEXT("");return FScriptSetHelper(P,F.Memory).FindElementIndex(&Native)!=INDEX_NONE;
-    }
-    FDasStructValue StructSetWithInt(const FDasStructValue& H,const char* Path,int32 Element,bool Present,das::Context* C,das::LineInfoArg* At){
-        FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructTypedSet(F,false,C);FScriptSetHelper Values(P,F.Memory);const int32 Existing=Values.FindElementIndex(&Element);
-        if(Present){if(Existing==INDEX_NONE && Values.Num()>=4096)C->throw_error("snapshot set size limit");Values.AddElement(&Element);}else if(Existing!=INDEX_NONE)Values.RemoveAt(Existing);
-        return StoreStructValue(MoveTemp(V),C,At);
-    }
-    FDasStructValue StructSetWithString(const FDasStructValue& H,const char* Path,const char* Element,bool Present,das::Context* C,das::LineInfoArg* At){
-        FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructTypedSet(F,true,C);FString Native=Element?UTF8_TO_TCHAR(Element):TEXT("");FScriptSetHelper Values(P,F.Memory);const int32 Existing=Values.FindElementIndex(&Native);
-        if(Present){if(Existing==INDEX_NONE && Values.Num()>=4096)C->throw_error("snapshot set size limit");if(Existing!=INDEX_NONE && !ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(P->ElementProp),Values.GetElementPtr(Existing),C).Equals(Native,ESearchCase::CaseSensitive))C->throw_error("string set key collision under Unreal equality");Values.AddElement(&Native);}else if(Existing!=INDEX_NONE)Values.RemoveAt(Existing);
-        return StoreStructValue(MoveTemp(V),C,At);
-    }
-    int32 StructMapSize(const FDasStructValue& H,const char* Path,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FMapProperty>(F.Property);if(!P)C->throw_error("expected snapshot map");return FScriptMapHelper(P,F.Memory).Num();}
-    int32 StructMapKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FMapProperty>(F.Property);if(!P || !P->KeyProp->IsA<FIntProperty>())C->throw_error("expected int-key map");FScriptMapHelper Values(P,F.Memory);if(Index<0 || Index>=Values.Num())C->throw_error("map key index out of range");TArray<int32> Keys;for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I))Keys.Add(ReadPropertyScalarValue(CastFieldChecked<FIntProperty>(P->KeyProp),Values.GetKeyPtr(I),C));Keys.Sort();return Keys[Index];}
-    int32 StructMapGetInt(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructIntMap(F,C);FScriptMapHelper Values(P,F.Memory);const int32 I=Values.FindMapIndexWithKey(&Key);if(I==INDEX_NONE)C->throw_error("snapshot map key not found");return ReadPropertyScalarValue(CastFieldChecked<FIntProperty>(P->ValueProp),Values.GetValuePtr(I),C);}
-    FDasStructValue StructMapWithInt(const FDasStructValue& H,const char* Path,int32 Key,int32 Value,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructIntMap(F,C);FScriptMapHelper Values(P,F.Memory);if(Values.Num()>=4096 && Values.FindMapIndexWithKey(&Key)==INDEX_NONE)C->throw_error("snapshot map size limit");WriteSnapshotMapValue(P,F.Memory,Key,PropertyScalarValue<FIntProperty>(Value),C);return StoreStructValue(MoveTemp(V),C,At);}
-    template<class Byte> FMapProperty* StructTypedMap(TStructLeaf<Byte> F,int32 StringKey,bool StringValue,das::Context* C){auto* P=CastField<FMapProperty>(F.Property);if(!P || (StringKey==5?(!CastField<FByteProperty>(P->KeyProp) || DasEnumPropertyType(P->KeyProp)):StringKey==4?(!DasEnumPropertyType(P->KeyProp) || P->KeyProp->GetElementSize()!=1):StringKey==3?!IsDasObjectHashProperty(P->KeyProp):StringKey==2?!P->KeyProp->IsA<FNameProperty>():StringKey?!P->KeyProp->IsA<FStrProperty>():!P->KeyProp->IsA<FIntProperty>()) || (StringValue?!P->ValueProp->IsA<FStrProperty>():!P->ValueProp->IsA<FIntProperty>()))C->throw_error("snapshot map key/value type mismatch");return P;}
-    char* StructMapStringKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FMapProperty>(F.Property);if(!P || !P->KeyProp->IsA<FStrProperty>())C->throw_error("expected string-key map");FScriptMapHelper Values(P,F.Memory);if(Index<0 || Index>=Values.Num())C->throw_error("map key index out of range");TArray<FString> Keys;for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I))Keys.Add(ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(P->KeyProp),Values.GetKeyPtr(I),C));Keys.Sort();return CopyDSLString(Keys[Index],C);}
-    char* StructMapGetIntString(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructTypedMap(F,false,true,C);FScriptMapHelper Values(P,F.Memory);const int32 I=Values.FindMapIndexWithKey(&Key);if(I==INDEX_NONE)C->throw_error("snapshot map key not found");return CopyDSLString(ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(P->ValueProp),Values.GetValuePtr(I),C),C);}
-    FDasStructValue StructMapWithIntString(const FDasStructValue& H,const char* Path,int32 Key,const char* Value,das::Context* C,das::LineInfoArg* At){FInstancedStruct Snapshot=ResolveStructValue(H,C);auto F=StructLeaf(Snapshot,Path,C);auto* P=StructTypedMap(F,false,true,C);FString NativeValue=Value?UTF8_TO_TCHAR(Value):TEXT("");FScriptMapHelper Values(P,F.Memory);if(Values.Num()>=4096 && Values.FindMapIndexWithKey(&Key)==INDEX_NONE)C->throw_error("snapshot map size limit");WriteSnapshotMapValue(P,F.Memory,Key,PropertyScalarValue<FStrProperty>(NativeValue),C);return StoreStructValue(MoveTemp(Snapshot),C,At);}
-    int32 StructMapGetStringInt(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructTypedMap(F,true,false,C);FString NativeKey=Key?UTF8_TO_TCHAR(Key):TEXT("");FScriptMapHelper Values(P,F.Memory);const int32 I=Values.FindMapIndexWithKey(&NativeKey);if(I==INDEX_NONE)C->throw_error("snapshot map key not found");return ReadPropertyScalarValue(CastFieldChecked<FIntProperty>(P->ValueProp),Values.GetValuePtr(I),C);}
-    FDasStructValue StructMapWithStringInt(const FDasStructValue& H,const char* Path,const char* Key,int32 Value,das::Context* C,das::LineInfoArg* At){FInstancedStruct Snapshot=ResolveStructValue(H,C);auto F=StructLeaf(Snapshot,Path,C);auto* P=StructTypedMap(F,true,false,C);FString NativeKey=Key?UTF8_TO_TCHAR(Key):TEXT("");FScriptMapHelper Values(P,F.Memory);if(Values.Num()>=4096 && Values.FindMapIndexWithKey(&NativeKey)==INDEX_NONE)C->throw_error("snapshot map size limit");const int32 Existing=Values.FindMapIndexWithKey(&NativeKey);if(Existing!=INDEX_NONE && !ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(P->KeyProp),Values.GetKeyPtr(Existing),C).Equals(NativeKey,ESearchCase::CaseSensitive))C->throw_error("string map key collision under Unreal equality");WriteSnapshotMapValue(P,F.Memory,NativeKey,PropertyScalarValue<FIntProperty>(Value),C);return StoreStructValue(MoveTemp(Snapshot),C,At);}
-    char* StructMapGetStringString(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructTypedMap(F,true,true,C);FString NativeKey=Key?UTF8_TO_TCHAR(Key):TEXT("");FScriptMapHelper Values(P,F.Memory);const int32 I=Values.FindMapIndexWithKey(&NativeKey);if(I==INDEX_NONE)C->throw_error("snapshot map key not found");return CopyDSLString(ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(P->ValueProp),Values.GetValuePtr(I),C),C);}
-    FDasStructValue StructMapWithStringString(const FDasStructValue& H,const char* Path,const char* Key,const char* Value,das::Context* C,das::LineInfoArg* At){FInstancedStruct Snapshot=ResolveStructValue(H,C);auto F=StructLeaf(Snapshot,Path,C);auto* P=StructTypedMap(F,true,true,C);FString NativeKey=Key?UTF8_TO_TCHAR(Key):TEXT("");FString NativeValue=Value?UTF8_TO_TCHAR(Value):TEXT("");FScriptMapHelper Values(P,F.Memory);if(Values.Num()>=4096 && Values.FindMapIndexWithKey(&NativeKey)==INDEX_NONE)C->throw_error("snapshot map size limit");const int32 Existing=Values.FindMapIndexWithKey(&NativeKey);if(Existing!=INDEX_NONE && !ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(P->KeyProp),Values.GetKeyPtr(Existing),C).Equals(NativeKey,ESearchCase::CaseSensitive))C->throw_error("string map key collision under Unreal equality");WriteSnapshotMapValue(P,F.Memory,NativeKey,PropertyScalarValue<FStrProperty>(NativeValue),C);return StoreStructValue(MoveTemp(Snapshot),C,At);}
-    int32 StructArraySize(const FDasStructValue& H,const char* Path,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FArrayProperty>(F.Property);if(!P)C->throw_error("expected snapshot array");return FScriptArrayHelper(P,F.Memory).Num();}
-    FDasStructValue StructArrayResize(const FDasStructValue& H,const char* Path,int32 N,das::Context* C,das::LineInfoArg* At){if(N<0 || N>4096)C->throw_error("struct array size out of range");FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FArrayProperty>(F.Property);if(!P || int64(N)*P->Inner->GetElementSize()>16*1024*1024)C->throw_error("invalid struct array size/type");FScriptArrayHelper Items(P,F.Memory);const int32 OldNum=Items.Num();Items.Resize(N);if(auto* E=DasEnumPropertyType(P->Inner)){int32 First=INDEX_NONE;for(int32 I=0;I<E->NumEnums();++I)if(IsCallEnumMember(E,I)){First=I;break;}if(First==INDEX_NONE)C->throw_error("Enum array has no usable member");for(int32 I=OldNum;I<N;++I)if(!SetDasEnumPropertyNumber(P->Inner,Items.GetRawPtr(I),int32(E->GetValueByIndex(First))))C->throw_error("Enum array default is invalid");}return StoreStructValue(MoveTemp(V),C,At);}
-    template<typename ValueProperty,class Byte> FMapProperty* StructScalarValueMap(TStructLeaf<Byte> F,int32 StringKey,das::Context* C){
-        auto* P=CastField<FMapProperty>(F.Property);
-        if(!P || (StringKey==5?(!CastField<FByteProperty>(P->KeyProp) || DasEnumPropertyType(P->KeyProp)):StringKey==4?(!DasEnumPropertyType(P->KeyProp) || P->KeyProp->GetElementSize()!=1):StringKey==3?!IsDasObjectHashProperty(P->KeyProp):StringKey==2?!P->KeyProp->IsA<FNameProperty>():StringKey?!P->KeyProp->IsA<FStrProperty>():!P->KeyProp->IsA<FIntProperty>()) || !P->ValueProp->IsA<ValueProperty>())C->throw_error("snapshot map key/value type mismatch");
-        if constexpr(std::is_same_v<ValueProperty,FByteProperty>){if(DasEnumPropertyType(P->ValueProp))C->throw_error("expected raw byte map value");}
-        return P;
-    }
-    template<typename ValueProperty,typename KeyType> auto StructScalarMapGet(const FDasStructValue& H,const char* Path,const KeyType& Key,int32 StringKey,das::Context* C){
-        const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructScalarValueMap<ValueProperty>(F,StringKey,C);FScriptMapHelper Values(P,F.Memory);
-        const int32 I=Values.FindMapIndexWithKey(&Key);if(I==INDEX_NONE)C->throw_error("snapshot map key not found");
-        return ReadPropertyScalarValue(CastFieldChecked<ValueProperty>(P->ValueProp),Values.GetValuePtr(I),C);
-    }
-    template<typename ValueProperty,typename KeyType,typename ValueType> FDasStructValue StructScalarMapWith(const FDasStructValue& H,const char* Path,const KeyType& Key,const ValueType& Value,int32 StringKey,das::Context* C,das::LineInfoArg* At){
-        FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructScalarValueMap<ValueProperty>(F,StringKey,C);
-        WriteSnapshotMapValue(P,F.Memory,Key,PropertyScalarValue<ValueProperty>(Value),C);return StoreStructValue(MoveTemp(V),C,At);
-    }
 
-    template<typename KeyType> FDasStructValue StructMapGetStruct(const FDasStructValue& H,const char* Path,const KeyType& Key,int32 StringKey,das::Context* C,das::LineInfoArg* At){
-        const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructScalarValueMap<FStructProperty>(F,StringKey,C);FScriptMapHelper Values(P,F.Memory);
-        const int32 I=Values.FindMapIndexWithKey(&Key);if(I==INDEX_NONE)C->throw_error("snapshot map key not found");
-        return ReadPropertySnapshot(P->ValueProp,Values.GetValuePtr(I),C,At);
-    }
-    template<typename KeyType> FDasStructValue StructMapWithStruct(const FDasStructValue& H,const char* Path,const KeyType& Key,const FDasStructValue& Value,int32 StringKey,das::Context* C,das::LineInfoArg* At){
-        FInstancedStruct V=ResolveStructValue(H,C);const auto& Child=ResolveStructValue(Value,C);auto F=StructLeaf(V,Path,C);auto* P=StructScalarValueMap<FStructProperty>(F,StringKey,C);
-        WriteSnapshotMapValue(P,F.Memory,Key,SnapshotStructValue(Child),C);return StoreStructValue(MoveTemp(V),C,At);
-    }
-    FDasStructValue StructMapGetIntStruct(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,Key,false,C,At);}
-    FDasStructValue StructMapWithIntStruct(const FDasStructValue& H,const char* Path,int32 Key,const FDasStructValue& V,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,Key,V,false,C,At);}
-    FDasStructValue StructMapGetStringStruct(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),true,C,At);}
-    FDasStructValue StructMapWithStringStruct(const FDasStructValue& H,const char* Path,const char* Key,const FDasStructValue& V,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),V,true,C,At);}
 
-    float StructMapGetIntFloat(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,Key,false,C);}
-    FDasStructValue StructMapWithIntFloat(const FDasStructValue& H,const char* Path,int32 Key,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,Key,Value,false,C,At);}
-    double StructMapGetIntDouble(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,Key,false,C);}
-    FDasStructValue StructMapWithIntDouble(const FDasStructValue& H,const char* Path,int32 Key,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,Key,Value,false,C,At);}
-    bool StructMapGetIntBool(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,Key,false,C);}
-    FDasStructValue StructMapWithIntBool(const FDasStructValue& H,const char* Path,int32 Key,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,Key,Value,false,C,At);}
-    FDasNameValue StructMapGetIntName(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,Key,false,C),C);}
-    FDasStructValue StructMapWithIntName(const FDasStructValue& H,const char* Path,int32 Key,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,Key,ResolveDSLName(Value,C),false,C,At);}
-    float StructMapGetStringFloat(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),true,C);}
-    FDasStructValue StructMapWithStringFloat(const FDasStructValue& H,const char* Path,const char* Key,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),Value,true,C,At);}
-    double StructMapGetStringDouble(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),true,C);}
-    FDasStructValue StructMapWithStringDouble(const FDasStructValue& H,const char* Path,const char* Key,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),Value,true,C,At);}
-    bool StructMapGetStringBool(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),true,C);}
-    FDasStructValue StructMapWithStringBool(const FDasStructValue& H,const char* Path,const char* Key,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),Value,true,C,At);}
-    FDasNameValue StructMapGetStringName(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),true,C),C);}
-    FDasStructValue StructMapWithStringName(const FDasStructValue& H,const char* Path,const char* Key,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ResolveDSLName(Value,C),true,C,At);}
-    template<class Snapshot> auto StructNestedLeaf(Snapshot& V,const char* Path,int32 Index,das::Context* C){
-        auto F=StructLeaf(V,Path,C);if(Index==-1)return F;
-        auto* Array=CastField<FArrayProperty>(F.Property);if(!Array)C->throw_error("expected struct array");
-        FScriptArrayHelper Elements(Array,F.Memory);if(!Elements.IsValidIndex(Index))C->throw_error("struct array index out of range");
-        if(!Array->Inner->IsA<FStructProperty>())C->throw_error("expected nested struct");return decltype(F){Array->Inner,Elements.GetRawPtr(Index)};
-    }
+
+    int32 StructSetSize(const FDasStructValue& H,const char* Path,das::Context* C){return SnapshotSet(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Invalid,C).Num();}
+    int32 StructSetElementInt(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotSet(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Int,C),Index,C);return ReadPropertyScalarValue(CastFieldChecked<FIntProperty>(F.Property),F.Memory,C);}
+    char* StructSetElementString(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotSet(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::String,C),Index,C);return CopyDSLString(ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(F.Property),F.Memory,C),C);}
+    bool StructSetContainsInt(const FDasStructValue& H,const char* Path,int32 Element,das::Context* C){return SnapshotSet(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Int,C).Contains(&Element);}
+    bool StructSetContainsString(const FDasStructValue& H,const char* Path,const char* Element,das::Context* C){FString Key=Element?UTF8_TO_TCHAR(Element):TEXT("");return SnapshotSet(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::String,C).Contains(&Key);}
+    FDasStructValue StructSetWithInt(const FDasStructValue& H,const char* Path,int32 Element,bool Present,das::Context* C,das::LineInfoArg* At){return SetSnapshotValue(H,Path,&Element,ESnapshotKind::Int,Present,C,At);}
+    FDasStructValue StructSetWithString(const FDasStructValue& H,const char* Path,const char* Element,bool Present,das::Context* C,das::LineInfoArg* At){FString Key=Element?UTF8_TO_TCHAR(Element):TEXT("");return SetSnapshotValue(H,Path,&Key,ESnapshotKind::String,Present,C,At);}
+    int32 StructMapSize(const FDasStructValue& H,const char* Path,das::Context* C){return SnapshotMap(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Invalid,ESnapshotKind::Invalid,C).Num();}
+    int32 StructMapKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotMap(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Int,ESnapshotKind::Invalid,C),Index,C);return ReadPropertyScalarValue(CastFieldChecked<FIntProperty>(F.Property),F.Memory,C);}
+    int32 StructMapGetInt(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructScalarMapGet<FIntProperty>(H,Path,Key,ESnapshotKind::Int,C);}
+    FDasStructValue StructMapWithInt(const FDasStructValue& H,const char* Path,int32 Key,int32 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FIntProperty>(H,Path,Key,Value,ESnapshotKind::Int,C,At);}
+
+    char* StructMapStringKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotMap(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::String,ESnapshotKind::Invalid,C),Index,C);return CopyDSLString(ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(F.Property),F.Memory,C),C);}
+    char* StructMapGetIntString(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return CopyDSLString(StructScalarMapGet<FStrProperty>(H,Path,Key,ESnapshotKind::Int,C),C);}
+    FDasStructValue StructMapWithIntString(const FDasStructValue& H,const char* Path,int32 Key,const char* Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FStrProperty>(H,Path,Key,FString(Value?UTF8_TO_TCHAR(Value):TEXT("")),ESnapshotKind::Int,C,At);}
+    int32 StructMapGetStringInt(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructScalarMapGet<FIntProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C);}
+    FDasStructValue StructMapWithStringInt(const FDasStructValue& H,const char* Path,const char* Key,int32 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FIntProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),Value,ESnapshotKind::String,C,At);}
+    char* StructMapGetStringString(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return CopyDSLString(StructScalarMapGet<FStrProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C),C);}
+    FDasStructValue StructMapWithStringString(const FDasStructValue& H,const char* Path,const char* Key,const char* Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FStrProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),FString(Value?UTF8_TO_TCHAR(Value):TEXT("")),ESnapshotKind::String,C,At);}
+    int32 StructArraySize(const FDasStructValue& H,const char* Path,das::Context* C){return SnapshotArray(StructLeaf(ResolveStructValue(H,C),Path,C),C).Num();}
+    FDasStructValue StructArrayResize(const FDasStructValue& H,const char* Path,int32 N,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto View=SnapshotArray(StructLeaf(V,Path,C),C);FString Error;if(!View.Resize(N,Error))C->throw_error(TCHAR_TO_UTF8(*Error));return Mutation.Finish(C,At);}
+
+
+
+
+    template<typename KeyType> FDasStructValue StructMapGetStruct(const FDasStructValue& H,const char* Path,const KeyType& Key,ESnapshotKind KeyKind,das::Context* C,das::LineInfoArg* At){return ReadSnapshotMap(H,Path,Key,KeyKind,ESnapshotKind::Struct,C,[&](FProperty* P,const void* Memory){return ReadPropertySnapshot(P,Memory,C,At);});}
+    template<typename KeyType> FDasStructValue StructMapWithStruct(const FDasStructValue& H,const char* Path,const KeyType& Key,const FDasStructValue& Value,ESnapshotKind KeyKind,das::Context* C,das::LineInfoArg* At){return WriteSnapshotMap(H,Path,Key,KeyKind,ESnapshotKind::Struct,C,At,[&](FProperty* P,void* Memory){WritePropertySnapshot(P,Memory,Value,C);});}
+    FDasStructValue StructMapGetIntStruct(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,Key,ESnapshotKind::Int,C,At);}
+    FDasStructValue StructMapWithIntStruct(const FDasStructValue& H,const char* Path,int32 Key,const FDasStructValue& V,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,Key,V,ESnapshotKind::Int,C,At);}
+    FDasStructValue StructMapGetStringStruct(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C,At);}
+    FDasStructValue StructMapWithStringStruct(const FDasStructValue& H,const char* Path,const char* Key,const FDasStructValue& V,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),V,ESnapshotKind::String,C,At);}
+
+    float StructMapGetIntFloat(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,Key,ESnapshotKind::Int,C);}
+    FDasStructValue StructMapWithIntFloat(const FDasStructValue& H,const char* Path,int32 Key,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,Key,Value,ESnapshotKind::Int,C,At);}
+    double StructMapGetIntDouble(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,Key,ESnapshotKind::Int,C);}
+    FDasStructValue StructMapWithIntDouble(const FDasStructValue& H,const char* Path,int32 Key,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,Key,Value,ESnapshotKind::Int,C,At);}
+    bool StructMapGetIntBool(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,Key,ESnapshotKind::Int,C);}
+    FDasStructValue StructMapWithIntBool(const FDasStructValue& H,const char* Path,int32 Key,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,Key,Value,ESnapshotKind::Int,C,At);}
+    FDasNameValue StructMapGetIntName(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,Key,ESnapshotKind::Int,C),C);}
+    FDasStructValue StructMapWithIntName(const FDasStructValue& H,const char* Path,int32 Key,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,Key,ResolveDSLName(Value,C),ESnapshotKind::Int,C,At);}
+    float StructMapGetStringFloat(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C);}
+    FDasStructValue StructMapWithStringFloat(const FDasStructValue& H,const char* Path,const char* Key,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),Value,ESnapshotKind::String,C,At);}
+    double StructMapGetStringDouble(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C);}
+    FDasStructValue StructMapWithStringDouble(const FDasStructValue& H,const char* Path,const char* Key,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),Value,ESnapshotKind::String,C,At);}
+    bool StructMapGetStringBool(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C);}
+    FDasStructValue StructMapWithStringBool(const FDasStructValue& H,const char* Path,const char* Key,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),Value,ESnapshotKind::String,C,At);}
+    FDasNameValue StructMapGetStringName(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C),C);}
+    FDasStructValue StructMapWithStringName(const FDasStructValue& H,const char* Path,const char* Key,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ResolveDSLName(Value,C),ESnapshotKind::String,C,At);}
+    template<class Snapshot> auto StructNestedLeaf(Snapshot& V,const char* Path,int32 Index,das::Context* C){auto F=StructLeaf(V,Path,C);if(Index==-1)return F;auto View=SnapshotArray(F,C);FString Error;if(!View.ElementAt(Index,F,Error))C->throw_error(TCHAR_TO_UTF8(*Error));if(!F.Property->template IsA<FStructProperty>() && !F.Property->template IsA<FSoftObjectProperty>())C->throw_error("expected snapshot value");return F;}
     FDasStructValue StructNestedGet(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C,das::LineInfoArg* At){
         const auto& V=ResolveStructValue(H,C);auto F=StructNestedLeaf(V,Path,Index,C);return ReadPropertySnapshot(F.Property,F.Memory,C,At);
     }
     FDasStructValue StructNestedWith(const FDasStructValue& H,const char* Path,int32 Index,const FDasStructValue& Value,das::Context* C,das::LineInfoArg* At){
-        FInstancedStruct V=ResolveStructValue(H,C);auto F=StructNestedLeaf(V,Path,Index,C);WritePropertySnapshot(F.Property,F.Memory,Value,C);return StoreStructValue(MoveTemp(V),C,At);
+        FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructNestedLeaf(V,Path,Index,C);WritePropertySnapshot(F.Property,F.Memory,Value,C);return Mutation.Finish(C,At);
     }
     int32 StructGetInt(const FDasStructValue& H,const char* P,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FIntProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");return ReadPropertyScalarValue(T,F.Memory,C);}
-    FDasStructValue StructWithInt(const FDasStructValue& H,const char* P,int32 X,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FIntProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X,C);return StoreStructValue(MoveTemp(V),C,At);}
+    FDasStructValue StructWithInt(const FDasStructValue& H,const char* P,int32 X,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,P,C);auto* T=CastField<FIntProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X,C);return Mutation.Finish(C,At);}
     float StructGetFloat(const FDasStructValue& H,const char* P,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FFloatProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");return ReadPropertyScalarValue(T,F.Memory,C);}
-    FDasStructValue StructWithFloat(const FDasStructValue& H,const char* P,float X,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FFloatProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X,C);return StoreStructValue(MoveTemp(V),C,At);}
+    FDasStructValue StructWithFloat(const FDasStructValue& H,const char* P,float X,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,P,C);auto* T=CastField<FFloatProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X,C);return Mutation.Finish(C,At);}
     double StructGetDouble(const FDasStructValue& H,const char* P,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FDoubleProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");return ReadPropertyScalarValue(T,F.Memory,C);}
-    FDasStructValue StructWithDouble(const FDasStructValue& H,const char* P,double X,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FDoubleProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X,C);return StoreStructValue(MoveTemp(V),C,At);}
+    FDasStructValue StructWithDouble(const FDasStructValue& H,const char* P,double X,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,P,C);auto* T=CastField<FDoubleProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X,C);return Mutation.Finish(C,At);}
     bool StructGetBool(const FDasStructValue& H,const char* P,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FBoolProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");return ReadPropertyScalarValue(T,F.Memory,C);}
-    FDasStructValue StructWithBool(const FDasStructValue& H,const char* P,bool X,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FBoolProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X,C);return StoreStructValue(MoveTemp(V),C,At);}
+    FDasStructValue StructWithBool(const FDasStructValue& H,const char* P,bool X,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,P,C);auto* T=CastField<FBoolProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X,C);return Mutation.Finish(C,At);}
     char* StructGetString(const FDasStructValue& H,const char* P,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FStrProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");return CopyDSLString(ReadPropertyScalarValue(T,F.Memory,C),C);}
-    FDasStructValue StructWithString(const FDasStructValue& H,const char* P,const char* X,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FStrProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X?UTF8_TO_TCHAR(X):TEXT(""),C);return StoreStructValue(MoveTemp(V),C,At);}
+    FDasStructValue StructWithString(const FDasStructValue& H,const char* P,const char* X,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,P,C);auto* T=CastField<FStrProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,X?UTF8_TO_TCHAR(X):TEXT(""),C);return Mutation.Finish(C,At);}
     FDasObjectHandle MakeObjectHandle(UObject*,UClass*,das::Context*);
     FDasObjectHandle ReadNullablePropertyObject(FProperty*,const void*,das::Context*);
     uint64 InternObjectKey(UObject*,das::Context*);
@@ -632,11 +661,11 @@ namespace
     UObject* ResolveObject(const FDasObjectHandle&,das::Context*);
     FDasClassHandle StructGetClass(const FDasStructValue& H,const char* P,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FClassProperty>(F.Property);if(!T)C->throw_error("struct field class type mismatch");const auto Value=ReadNativePropertyValue(T,F.Memory,C);return {MakeObjectHandle(Value.ClassValue.Get(),UClass::StaticClass(),C).Token};}
     FDasObjectHandle StructGetObject(const FDasStructValue& H,const char* P,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=DasReferencePropertyClass(F.Property);if(!T)C->throw_error("struct field object type mismatch");return ReadNullablePropertyObject(F.Property,F.Memory,C);}
-    FDasStructValue StructWithObject(const FDasStructValue& H,const char* P,const FDasObjectHandle& X,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=DasReferencePropertyClass(F.Property);if(!T)C->throw_error("struct field object type mismatch");UObject* Object=X.Token?ResolveObject(X,C):nullptr;if(Object && !DasReferenceMatches(Object,T))C->throw_error("struct object field has an incompatible class");WriteNativePropertyValue(F.Property,F.Memory,SnapshotObjectValue(F.Property,Object,C),C);return StoreStructValue(MoveTemp(V),C,At);}
+    FDasStructValue StructWithObject(const FDasStructValue& H,const char* P,const FDasObjectHandle& X,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,P,C);auto* T=DasReferencePropertyClass(F.Property);if(!T)C->throw_error("struct field object type mismatch");UObject* Object=X.Token?ResolveObject(X,C):nullptr;if(Object && !DasReferenceMatches(Object,T))C->throw_error("struct object field has an incompatible class");WriteNativePropertyValue(F.Property,F.Memory,SnapshotObjectValue(F.Property,Object,C),C);return Mutation.Finish(C,At);}
     FDasNameValue StructGetName(const FDasStructValue& H,const char* P,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FNameProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");return MakeDSLName(ReadPropertyScalarValue(T,F.Memory,C),C);}
-    FDasStructValue StructWithName(const FDasStructValue& H,const char* P,FDasNameValue X,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,P,C);auto* T=CastField<FNameProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,ResolveDSLName(X,C),C);return StoreStructValue(MoveTemp(V),C,At);}
+    FDasStructValue StructWithName(const FDasStructValue& H,const char* P,FDasNameValue X,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,P,C);auto* T=CastField<FNameProperty>(F.Property);if(!T)C->throw_error("struct field scalar type mismatch");WritePropertyScalarValue(T,F.Memory,ResolveDSLName(X,C),C);return Mutation.Finish(C,At);}
     char* StructGetEnum(const FDasStructValue& H,const char* Path,const char* EnumPath,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);UEnum* E=RequireCallEnum(F.Property,EnumPath,C);int32 Index=E->GetIndexByValue(ReadNativeEnumNumber(F.Property,F.Memory,C));if(!IsCallEnumMember(E,Index))C->throw_error("unknown or reserved enum value in struct");return CopyDSLString(E->GetNameStringByIndex(Index),C);}
-    FDasStructValue StructWithEnum(const FDasStructValue& H,const char* Path,const char* EnumPath,const char* Member,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);UEnum* E=RequireCallEnum(F.Property,EnumPath,C);const FString Symbol=Member?UTF8_TO_TCHAR(Member):TEXT("");if(Symbol.Len()>=NAME_SIZE)C->throw_error("enum member is too long");int32 Index=INDEX_NONE;for(int32 I=0;I<E->NumEnums();++I)if(Symbol.Equals(E->GetNameStringByIndex(I),ESearchCase::IgnoreCase) || Symbol.Equals(E->GetNameByIndex(I).ToString(),ESearchCase::IgnoreCase)){Index=I;break;}if(!IsCallEnumMember(E,Index))C->throw_error("unknown or reserved enum member");WriteNativeEnumNumber(F.Property,F.Memory,E,E->GetValueByIndex(Index),C);return StoreStructValue(MoveTemp(V),C,At);}
+    FDasStructValue StructWithEnum(const FDasStructValue& H,const char* Path,const char* EnumPath,const char* Member,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,Path,C);UEnum* E=RequireCallEnum(F.Property,EnumPath,C);const FString Symbol=Member?UTF8_TO_TCHAR(Member):TEXT("");if(Symbol.Len()>=NAME_SIZE)C->throw_error("enum member is too long");int32 Index=INDEX_NONE;for(int32 I=0;I<E->NumEnums();++I)if(Symbol.Equals(E->GetNameStringByIndex(I),ESearchCase::IgnoreCase) || Symbol.Equals(E->GetNameByIndex(I).ToString(),ESearchCase::IgnoreCase)){Index=I;break;}if(!IsCallEnumMember(E,Index))C->throw_error("unknown or reserved enum member");WriteNativeEnumNumber(F.Property,F.Memory,E,E->GetValueByIndex(Index),C);return Mutation.Finish(C,At);}
     FDasEnumValue StructEnumGetValue(const FDasStructValue& H,const char* Path,const char* EnumPath,das::Context* C);
     FDasStructValue StructEnumWithValue(const FDasStructValue& H,const char* Path,FDasEnumValue Value,das::Context* C,das::LineInfoArg* At);
     FDasEnumValue MakeEnumValue(const FString& Path,int32 V,das::Context* C){if(!ActiveContext || ActiveContext!=C)C->throw_error("Enum values require active context");FString Error;auto* E=ResolveDasEnum(Path,Error);if(!E || !ValidateDasEnumNumber(Path,V,Error))C->throw_error(TCHAR_TO_UTF8(*Error));for(const auto& P:ActiveContext->EnumValues)if(P.Value.Type.Get()==E && P.Value.Value==V)return {P.Key};if(ActiveContext->EnumValues.Num()>=4096)C->throw_error("Enum value limit reached");static uint64 Next=1;const uint64 Token=Next++;ActiveContext->EnumValues.Add(Token,{E,V});return {Token};}
@@ -644,27 +673,23 @@ namespace
     FDasEnumValue EnumValue(const char* Path,const char* Member,das::Context* C){FString Error;auto* E=ResolveDasEnum(Path?UTF8_TO_TCHAR(Path):TEXT(""),Error);if(!E)C->throw_error(TCHAR_TO_UTF8(*Error));return MakeEnumValue(E->GetPathName(),int32(E->GetValueByNameString(Member?UTF8_TO_TCHAR(Member):TEXT(""))),C);}
     FDasEnumValue EnumFromNumber(const char* Path,int32 V,das::Context* C){return MakeEnumValue(Path?UTF8_TO_TCHAR(Path):TEXT(""),V,C);}
     FDasEnumValue StructEnumGetValue(const FDasStructValue& H,const char* Path,const char* EnumPath,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* E=RequireCallEnum(F.Property,EnumPath,C);return MakeEnumValue(E->GetPathName(),ReadNativeEnumNumber(F.Property,F.Memory,C),C);}
-    FDasStructValue StructEnumWithValue(const FDasStructValue& H,const char* Path,FDasEnumValue Value,das::Context* C,das::LineInfoArg* At){FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);const auto& E=ResolveEnumValue(Value,C);WriteNativeEnumNumber(F.Property,F.Memory,E.Type.Get(),E.Value,C);return StoreStructValue(MoveTemp(V),C,At);}
+    FDasStructValue StructEnumWithValue(const FDasStructValue& H,const char* Path,FDasEnumValue Value,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,Path,C);const auto& E=ResolveEnumValue(Value,C);WriteNativeEnumNumber(F.Property,F.Memory,E.Type.Get(),E.Value,C);return Mutation.Finish(C,At);}
 
-    template<class Byte> FMapProperty* StructReflectedMap(TStructLeaf<Byte> F,int32 StringKey,bool Enum,das::Context* C){auto* P=CastField<FMapProperty>(F.Property);if(!P || (StringKey==5?(!CastField<FByteProperty>(P->KeyProp) || DasEnumPropertyType(P->KeyProp)):StringKey==4?(!DasEnumPropertyType(P->KeyProp) || P->KeyProp->GetElementSize()!=1):StringKey==3?!IsDasObjectHashProperty(P->KeyProp):StringKey==2?!P->KeyProp->IsA<FNameProperty>():StringKey?!P->KeyProp->IsA<FStrProperty>():!P->KeyProp->IsA<FIntProperty>()) || (Enum?!DasEnumPropertyType(P->ValueProp):!DasReferencePropertyClass(P->ValueProp)))C->throw_error("snapshot reflected map key/value type mismatch");return P;}
-    template<typename KeyType,typename Read> auto ReadReflectedMap(const FDasStructValue& H,const char* Path,const KeyType& Key,int32 StringKey,bool Enum,das::Context* C,Read ReadValue){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructReflectedMap(F,StringKey,Enum,C);FScriptMapHelper Values(P,F.Memory);const int32 I=Values.FindMapIndexWithKey(&Key);if(I==INDEX_NONE)C->throw_error("snapshot map key not found");return ReadValue(P->ValueProp,Values.GetValuePtr(I));}
-    template<typename KeyType,typename Write> FDasStructValue WriteReflectedMap(const FDasStructValue& H,const char* Path,const KeyType& Key,int32 StringKey,bool Enum,das::Context* C,das::LineInfoArg* At,Write WriteValue){
-        FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=StructReflectedMap(F,StringKey,Enum,C);FScriptMapHelper Values(P,F.Memory);int32 I=Values.FindMapIndexWithKey(&Key);
-        if(I==INDEX_NONE){if(Values.Num()>=4096)C->throw_error("snapshot map size limit");I=Values.AddDefaultValue_Invalid_NeedsRehash();P->KeyProp->CopyCompleteValue(Values.GetKeyPtr(I),&Key);}else if constexpr(std::is_same_v<KeyType,FString>){if(!ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(P->KeyProp),Values.GetKeyPtr(I),C).Equals(Key,ESearchCase::CaseSensitive))C->throw_error("string map key collision under Unreal equality");}
-        WriteValue(P->ValueProp,Values.GetValuePtr(I));Values.Rehash();return StoreStructValue(MoveTemp(V),C,At);
-    }
-    template<typename KeyType> FDasEnumValue StructMapGetEnum(const FDasStructValue& H,const char* Path,const KeyType& Key,int32 StringKey,das::Context* C){return ReadReflectedMap(H,Path,Key,StringKey,true,C,[&](FProperty* P,const void* Memory){auto* E=DasEnumPropertyType(P);return MakeEnumValue(E->GetPathName(),ReadNativeEnumNumber(P,Memory,C),C);});}
-    template<typename KeyType> FDasStructValue StructMapWithEnum(const FDasStructValue& H,const char* Path,const KeyType& Key,FDasEnumValue Value,int32 StringKey,das::Context* C,das::LineInfoArg* At){const auto& E=ResolveEnumValue(Value,C);return WriteReflectedMap(H,Path,Key,StringKey,true,C,At,[&](FProperty* P,void* Memory){WriteNativeEnumNumber(P,Memory,E.Type.Get(),E.Value,C);});}
-    template<typename KeyType> FDasObjectHandle StructMapGetObject(const FDasStructValue& H,const char* Path,const KeyType& Key,int32 StringKey,das::Context* C){return ReadReflectedMap(H,Path,Key,StringKey,false,C,[&](FProperty* P,const void* Memory){return ReadNullablePropertyObject(P,Memory,C);});}
-    template<typename KeyType> FDasStructValue StructMapWithObject(const FDasStructValue& H,const char* Path,const KeyType& Key,const FDasObjectHandle& Value,int32 StringKey,das::Context* C,das::LineInfoArg* At){UObject* Object=Value.Token?ResolveObject(Value,C):nullptr;return WriteReflectedMap(H,Path,Key,StringKey,false,C,At,[&](FProperty* P,void* Memory){WriteNativePropertyValue(P,Memory,SnapshotObjectValue(P,Object,C),C);});}
-    FDasEnumValue StructMapGetIntEnum(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructMapGetEnum(H,Path,Key,false,C);}
-    FDasStructValue StructMapWithIntEnum(const FDasStructValue& H,const char* Path,int32 Key,FDasEnumValue V,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,Key,V,false,C,At);}
-    FDasObjectHandle StructMapGetIntObject(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructMapGetObject(H,Path,Key,false,C);}
-    FDasStructValue StructMapWithIntObject(const FDasStructValue& H,const char* Path,int32 Key,const FDasObjectHandle& V,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,Key,V,false,C,At);}
-    FDasEnumValue StructMapGetStringEnum(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructMapGetEnum(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),true,C);}
-    FDasStructValue StructMapWithStringEnum(const FDasStructValue& H,const char* Path,const char* Key,FDasEnumValue V,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),V,true,C,At);}
-    FDasObjectHandle StructMapGetStringObject(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructMapGetObject(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),true,C);}
-    FDasStructValue StructMapWithStringObject(const FDasStructValue& H,const char* Path,const char* Key,const FDasObjectHandle& V,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),V,true,C,At);}
+
+
+
+    template<typename KeyType> FDasEnumValue StructMapGetEnum(const FDasStructValue& H,const char* Path,const KeyType& Key,ESnapshotKind KeyKind,das::Context* C){return ReadSnapshotMap(H,Path,Key,KeyKind,ESnapshotKind::Enum,C,[&](FProperty* P,const void* Memory){auto* E=DasEnumPropertyType(P);return MakeEnumValue(E->GetPathName(),ReadNativeEnumNumber(P,Memory,C),C);});}
+    template<typename KeyType> FDasStructValue StructMapWithEnum(const FDasStructValue& H,const char* Path,const KeyType& Key,FDasEnumValue Value,ESnapshotKind KeyKind,das::Context* C,das::LineInfoArg* At){const auto& E=ResolveEnumValue(Value,C);return WriteSnapshotMap(H,Path,Key,KeyKind,ESnapshotKind::Enum,C,At,[&](FProperty* P,void* Memory){WriteNativeEnumNumber(P,Memory,E.Type.Get(),E.Value,C);});}
+    template<typename KeyType> FDasObjectHandle StructMapGetObject(const FDasStructValue& H,const char* Path,const KeyType& Key,ESnapshotKind KeyKind,das::Context* C){return ReadSnapshotMap(H,Path,Key,KeyKind,ESnapshotKind::Object,C,[&](FProperty* P,const void* Memory){return ReadNullablePropertyObject(P,Memory,C);});}
+    template<typename KeyType> FDasStructValue StructMapWithObject(const FDasStructValue& H,const char* Path,const KeyType& Key,const FDasObjectHandle& Value,ESnapshotKind KeyKind,das::Context* C,das::LineInfoArg* At){UObject* Object=Value.Token?ResolveObject(Value,C):nullptr;return WriteSnapshotMap(H,Path,Key,KeyKind,ESnapshotKind::Object,C,At,[&](FProperty* P,void* Memory){WriteNativePropertyValue(P,Memory,SnapshotObjectValue(P,Object,C),C);});}
+    FDasEnumValue StructMapGetIntEnum(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructMapGetEnum(H,Path,Key,ESnapshotKind::Int,C);}
+    FDasStructValue StructMapWithIntEnum(const FDasStructValue& H,const char* Path,int32 Key,FDasEnumValue V,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,Key,V,ESnapshotKind::Int,C,At);}
+    FDasObjectHandle StructMapGetIntObject(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructMapGetObject(H,Path,Key,ESnapshotKind::Int,C);}
+    FDasStructValue StructMapWithIntObject(const FDasStructValue& H,const char* Path,int32 Key,const FDasObjectHandle& V,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,Key,V,ESnapshotKind::Int,C,At);}
+    FDasEnumValue StructMapGetStringEnum(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructMapGetEnum(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C);}
+    FDasStructValue StructMapWithStringEnum(const FDasStructValue& H,const char* Path,const char* Key,FDasEnumValue V,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),V,ESnapshotKind::String,C,At);}
+    FDasObjectHandle StructMapGetStringObject(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructMapGetObject(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C);}
+    FDasStructValue StructMapWithStringObject(const FDasStructValue& H,const char* Path,const char* Key,const FDasObjectHandle& V,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),V,ESnapshotKind::String,C,At);}
 
     int32 EnumNumber(FDasEnumValue V,das::Context* C){return ResolveEnumValue(V,C).Value;}
     int32 CheckedEnumNumber(FDasEnumValue V,const char* Path,das::Context* C){const auto& Value=ResolveEnumValue(V,C);if(!Path || Value.Type->GetPathName()!=UTF8_TO_TCHAR(Path))C->throw_error("Source enum snapshot identity mismatch");return Value.Value;}
@@ -700,40 +725,29 @@ namespace
     void PublishFrameString(int32 I,const char* X,das::Context* C){FDasScalarValue V;V.Kind=5;V.StringValue=X?UTF8_TO_TCHAR(X):TEXT("");PublishFrameValue(I,MoveTemp(V),C);}
     void PublishFrameDouble(int32 I,double X,das::Context* C){FDasScalarValue V;V.Kind=6;V.DoubleValue=X;PublishFrameValue(I,MoveTemp(V),C);}
     // Name table keys are canonical context-owned tokens; never stringify FName keys.
-    FDasEnumValue StructSetElementEnum(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){
-        const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FSetProperty>(F.Property);auto* E=P?DasEnumPropertyType(P->ElementProp):nullptr;if(!E)C->throw_error("expected enum set");
-        FScriptSetHelper Values(P,F.Memory);if(Index<0 || Index>=Values.Num())C->throw_error("set element index out of range");
-        for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I) && Index--==0)return MakeEnumValue(E->GetPathName(),ReadNativeEnumNumber(P->ElementProp,Values.GetElementPtr(I),C),C);
-        C->throw_error("set element index out of range");return {};
-    }
-    FDasStructValue StructSetWithEnum(const FDasStructValue& H,const char* Path,FDasEnumValue Key,bool Present,das::Context* C,das::LineInfoArg* At){
-        const auto& E=ResolveEnumValue(Key,C);FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FSetProperty>(F.Property);
-        if(!P || DasEnumPropertyType(P->ElementProp)!=E.Type.Get() || P->ElementProp->GetElementSize()!=1)C->throw_error("snapshot set enum identity/storage mismatch");
-        uint8 Value=0;WriteNativeEnumNumber(P->ElementProp,&Value,E.Type.Get(),E.Value,C);
-        FScriptSetHelper Values(P,F.Memory);if(Present){if(Values.Num()>=4096 && Values.FindElementIndex(&Value)==INDEX_NONE)C->throw_error("snapshot set size limit");Values.AddElement(&Value);}else Values.RemoveElement(&Value);
-        return StoreStructValue(MoveTemp(V),C,At);
-    }
-    FDasNameValue StructSetElementName(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FSetProperty>(F.Property);if(!P || !P->ElementProp->IsA<FNameProperty>())C->throw_error("expected FName set");FScriptSetHelper Values(P,F.Memory);if(Index<0 || Index>=Values.Num())C->throw_error("set element index out of range");for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I) && Index--==0)return MakeDSLName(ReadPropertyScalarValue(CastFieldChecked<FNameProperty>(P->ElementProp),Values.GetElementPtr(I),C),C);C->throw_error("set element index out of range");return {};}
-    FDasStructValue StructSetWithName(const FDasStructValue& H,const char* Path,FDasNameValue Key,bool Present,das::Context* C,das::LineInfoArg* At){const FName Name=ResolveDSLName(Key,C);FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FSetProperty>(F.Property);if(!P || !P->ElementProp->IsA<FNameProperty>())C->throw_error("expected FName set");FScriptSetHelper Values(P,F.Memory);if(Present){if(Values.Num()>=4096 && Values.FindElementIndex(&Name)==INDEX_NONE)C->throw_error("snapshot set size limit");Values.AddElement(&Name);}else Values.RemoveElement(&Name);return StoreStructValue(MoveTemp(V),C,At);}
-    FDasNameValue StructMapNameKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FMapProperty>(F.Property);if(!P || !P->KeyProp->IsA<FNameProperty>())C->throw_error("expected FName-key map");FScriptMapHelper Values(P,F.Memory);if(Index<0 || Index>=Values.Num())C->throw_error("map key index out of range");for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I) && Index--==0)return MakeDSLName(ReadPropertyScalarValue(CastFieldChecked<FNameProperty>(P->KeyProp),Values.GetKeyPtr(I),C),C);C->throw_error("map key index out of range");return {};}
-    int32 StructMapGetNameInt(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructScalarMapGet<FIntProperty>(H,Path,ResolveDSLName(Key,C),2,C);}
-    FDasStructValue StructMapWithNameInt(const FDasStructValue& H,const char* Path,FDasNameValue Key,int32 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FIntProperty>(H,Path,ResolveDSLName(Key,C),Value,2,C,At);}
-    float StructMapGetNameFloat(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,ResolveDSLName(Key,C),2,C);}
-    FDasStructValue StructMapWithNameFloat(const FDasStructValue& H,const char* Path,FDasNameValue Key,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,ResolveDSLName(Key,C),Value,2,C,At);}
-    double StructMapGetNameDouble(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,ResolveDSLName(Key,C),2,C);}
-    FDasStructValue StructMapWithNameDouble(const FDasStructValue& H,const char* Path,FDasNameValue Key,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,ResolveDSLName(Key,C),Value,2,C,At);}
-    bool StructMapGetNameBool(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,ResolveDSLName(Key,C),2,C);}
-    FDasStructValue StructMapWithNameBool(const FDasStructValue& H,const char* Path,FDasNameValue Key,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,ResolveDSLName(Key,C),Value,2,C,At);}
-    char* StructMapGetNameString(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return CopyDSLString(StructScalarMapGet<FStrProperty>(H,Path,ResolveDSLName(Key,C),2,C),C);}
-    FDasStructValue StructMapWithNameString(const FDasStructValue& H,const char* Path,FDasNameValue Key,const char* Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FStrProperty>(H,Path,ResolveDSLName(Key,C),FString(Value?UTF8_TO_TCHAR(Value):TEXT("")),2,C,At);}
-    FDasNameValue StructMapGetNameName(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,ResolveDSLName(Key,C),2,C),C);}
-    FDasStructValue StructMapWithNameName(const FDasStructValue& H,const char* Path,FDasNameValue Key,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,ResolveDSLName(Key,C),ResolveDSLName(Value,C),2,C,At);}
-    FDasStructValue StructMapGetNameStruct(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,ResolveDSLName(Key,C),2,C,At);}
-    FDasStructValue StructMapWithNameStruct(const FDasStructValue& H,const char* Path,FDasNameValue Key,const FDasStructValue& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,ResolveDSLName(Key,C),Value,2,C,At);}
-    FDasEnumValue StructMapGetNameEnum(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructMapGetEnum(H,Path,ResolveDSLName(Key,C),2,C);}
-    FDasStructValue StructMapWithNameEnum(const FDasStructValue& H,const char* Path,FDasNameValue Key,FDasEnumValue Value,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,ResolveDSLName(Key,C),Value,2,C,At);}
-    FDasObjectHandle StructMapGetNameObject(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructMapGetObject(H,Path,ResolveDSLName(Key,C),2,C);}
-    FDasStructValue StructMapWithNameObject(const FDasStructValue& H,const char* Path,FDasNameValue Key,const FDasObjectHandle& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,ResolveDSLName(Key,C),Value,2,C,At);}
+    FDasEnumValue StructSetElementEnum(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotSet(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Enum,C),Index,C);auto* E=DasEnumPropertyType(F.Property);return MakeEnumValue(E->GetPathName(),ReadNativeEnumNumber(F.Property,F.Memory,C),C);}
+    FDasStructValue StructSetWithEnum(const FDasStructValue& H,const char* Path,FDasEnumValue Key,bool Present,das::Context* C,das::LineInfoArg* At){const auto& E=ResolveEnumValue(Key,C);const auto& Source=ResolveStructValue(H,C);auto View=SnapshotSet(StructLeaf(Source,Path,C),ESnapshotKind::Enum,C);if(DasEnumPropertyType(View.Property->ElementProp)!=E.Type.Get())C->throw_error("snapshot set enum identity/storage mismatch");uint8 Value=0;WriteNativeEnumNumber(View.Property->ElementProp,&Value,E.Type.Get(),E.Value,C);return SetSnapshotValue(H,Path,&Value,ESnapshotKind::Enum,Present,C,At);}
+    FDasNameValue StructSetElementName(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotSet(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Name,C),Index,C);return MakeDSLName(ReadPropertyScalarValue(CastFieldChecked<FNameProperty>(F.Property),F.Memory,C),C);}
+    FDasStructValue StructSetWithName(const FDasStructValue& H,const char* Path,FDasNameValue Key,bool Present,das::Context* C,das::LineInfoArg* At){const FName Name=ResolveDSLName(Key,C);return SetSnapshotValue(H,Path,&Name,ESnapshotKind::Name,Present,C,At);}
+    FDasNameValue StructMapNameKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotMap(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Name,ESnapshotKind::Invalid,C),Index,C);return MakeDSLName(ReadPropertyScalarValue(CastFieldChecked<FNameProperty>(F.Property),F.Memory,C),C);}
+    int32 StructMapGetNameInt(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructScalarMapGet<FIntProperty>(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C);}
+    FDasStructValue StructMapWithNameInt(const FDasStructValue& H,const char* Path,FDasNameValue Key,int32 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FIntProperty>(H,Path,ResolveDSLName(Key,C),Value,ESnapshotKind::Name,C,At);}
+    float StructMapGetNameFloat(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C);}
+    FDasStructValue StructMapWithNameFloat(const FDasStructValue& H,const char* Path,FDasNameValue Key,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,ResolveDSLName(Key,C),Value,ESnapshotKind::Name,C,At);}
+    double StructMapGetNameDouble(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C);}
+    FDasStructValue StructMapWithNameDouble(const FDasStructValue& H,const char* Path,FDasNameValue Key,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,ResolveDSLName(Key,C),Value,ESnapshotKind::Name,C,At);}
+    bool StructMapGetNameBool(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C);}
+    FDasStructValue StructMapWithNameBool(const FDasStructValue& H,const char* Path,FDasNameValue Key,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,ResolveDSLName(Key,C),Value,ESnapshotKind::Name,C,At);}
+    char* StructMapGetNameString(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return CopyDSLString(StructScalarMapGet<FStrProperty>(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C),C);}
+    FDasStructValue StructMapWithNameString(const FDasStructValue& H,const char* Path,FDasNameValue Key,const char* Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FStrProperty>(H,Path,ResolveDSLName(Key,C),FString(Value?UTF8_TO_TCHAR(Value):TEXT("")),ESnapshotKind::Name,C,At);}
+    FDasNameValue StructMapGetNameName(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C),C);}
+    FDasStructValue StructMapWithNameName(const FDasStructValue& H,const char* Path,FDasNameValue Key,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,ResolveDSLName(Key,C),ResolveDSLName(Value,C),ESnapshotKind::Name,C,At);}
+    FDasStructValue StructMapGetNameStruct(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C,At);}
+    FDasStructValue StructMapWithNameStruct(const FDasStructValue& H,const char* Path,FDasNameValue Key,const FDasStructValue& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,ResolveDSLName(Key,C),Value,ESnapshotKind::Name,C,At);}
+    FDasEnumValue StructMapGetNameEnum(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructMapGetEnum(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C);}
+    FDasStructValue StructMapWithNameEnum(const FDasStructValue& H,const char* Path,FDasNameValue Key,FDasEnumValue Value,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,ResolveDSLName(Key,C),Value,ESnapshotKind::Name,C,At);}
+    FDasObjectHandle StructMapGetNameObject(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructMapGetObject(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C);}
+    FDasStructValue StructMapWithNameObject(const FDasStructValue& H,const char* Path,FDasNameValue Key,const FDasObjectHandle& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,ResolveDSLName(Key,C),Value,ESnapshotKind::Name,C,At);}
 
     void PublishFrameName(int32 I,FDasNameValue X,das::Context* C){FDasScalarValue V;V.Kind=7;V.NameValue=ResolveDSLName(X,C);PublishFrameValue(I,MoveTemp(V),C);}
     void PublishFrameStruct(int32 I,const FDasStructValue& X,das::Context* C){FDasScalarValue V;V.Kind=12;V.StructValue=ResolveStructValue(X,C);PublishFrameValue(I,MoveTemp(V),C);}
@@ -869,6 +883,7 @@ namespace
     }
     FDasObjectHandle GetSelfObject(const char* N,das::Context* C){auto* P=SelfObjectProperty(N,false,C);return ReadPropertyObject(P,ResolveSelf(C),C);}
     void SetSelfObject(const char* N,const FDasObjectHandle& V,das::Context* C){ResolveSelf(C);if(ActiveContext->bCollectingSubscriptions)C->throw_error("self writes are forbidden in bind_events");auto* P=SelfObjectProperty(N,true,C);WritePropertyObject(P,ResolveSelf(C),V,C);}
+    bool ObjectsEqual(const FDasObjectHandle& Left,const FDasObjectHandle& Right,das::Context* C){RequireObjectContext(C);auto* A=TryObject(Left,C);auto* B=TryObject(Right,C);return A && B && A==B;}
     bool ObjectIsA(const FDasObjectHandle& Handle, const char* ClassPath, das::Context* Context)
     {
         UClass* Class = ResolveClass(ClassPath, Context);
@@ -914,48 +929,48 @@ UObject* ResolveAuthoredObject(const FDasObjectHandle& Handle,const char* Id,das
     uint64 ObjectKeyFromReference(const FDasObjectHandle& H,const char* Path,const char* Id,das::Context* C){return CheckedObjectKey(InternObjectKey(H.Token?ResolveObject(H,C):nullptr,C),Path,Id,C);}
     FDasObjectHandle ObjectKeyReference(uint64 Token,const char* Path,const char* Id,das::Context* C){CheckedObjectKey(Token,Path,Id,C);return MakeObjectHandle(ResolveObjectKey(Token,C),FindObject<UClass>(nullptr,UTF8_TO_TCHAR(Path)),C);}
     bool ObjectKeyValid(uint64 Token,das::Context* C){RequireObjectContext(C);const auto* Entry=ActiveContext->ObjectKeys.Find(Token);return Entry && LiveHashObject(Entry->Get());}
-    uint64 StructSetElementObjectKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FSetProperty>(F.Property);if(!P || !IsDasObjectHashProperty(P->ElementProp))C->throw_error("expected object set");FScriptSetHelper Values(P,F.Memory);if(Index<0 || Index>=Values.Num())C->throw_error("set element index out of range");for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I) && Index--==0)return InternObjectKey(ReadNativePropertyValue(P->ElementProp,Values.GetElementPtr(I),C).ObjectValue.Get(),C);C->throw_error("set element index out of range");return 0;}
-    FDasStructValue StructSetWithObjectKey(const FDasStructValue& H,const char* Path,uint64 Token,bool Present,das::Context* C,das::LineInfoArg* At){UObject* O=ResolveObjectKey(Token,C);FInstancedStruct V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FSetProperty>(F.Property);if(!P || !IsDasObjectHashProperty(P->ElementProp) || (O && !DasReferenceMatches(O,DasReferencePropertyClass(P->ElementProp))))C->throw_error("snapshot object set class mismatch");FScriptSetHelper Values(P,F.Memory);TObjectPtr<UObject> Key=O;if(Present){if(Values.Num()>=4096 && Values.FindElementIndex(&Key)==INDEX_NONE)C->throw_error("snapshot set size limit");Values.AddElement(&Key);}else Values.RemoveElement(&Key);return StoreStructValue(MoveTemp(V),C,At);}
+    uint64 StructSetElementObjectKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotSet(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Object,C),Index,C);return InternObjectKey(ReadNativePropertyValue(F.Property,F.Memory,C).ObjectValue.Get(),C);}
+    FDasStructValue StructSetWithObjectKey(const FDasStructValue& H,const char* Path,uint64 Token,bool Present,das::Context* C,das::LineInfoArg* At){UObject* O=ResolveObjectKey(Token,C);auto View=SnapshotSet(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Object,C);if(O && !DasReferenceMatches(O,DasReferencePropertyClass(View.Property->ElementProp)))C->throw_error("snapshot object set class mismatch");TObjectPtr<UObject> Key=O;return SetSnapshotValue(H,Path,&Key,ESnapshotKind::Object,Present,C,At);}
     TObjectPtr<UObject> ObjectMapKey(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){UObject* O=ResolveObjectKey(Token,C);const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FMapProperty>(F.Property);if(!P || !IsDasObjectHashProperty(P->KeyProp) || (O && !DasReferenceMatches(O,DasReferencePropertyClass(P->KeyProp))))C->throw_error("snapshot map object key class mismatch");return O;}
-    uint64 StructMapObjectKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FMapProperty>(F.Property);if(!P || !IsDasObjectHashProperty(P->KeyProp))C->throw_error("expected object-key map");FScriptMapHelper Values(P,F.Memory);if(Index<0 || Index>=Values.Num())C->throw_error("map key index out of range");for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I) && Index--==0)return InternObjectKey(ReadNativePropertyValue(P->KeyProp,Values.GetKeyPtr(I),C).ObjectValue.Get(),C);C->throw_error("map key index out of range");return 0;}
-    int32 StructMapGetObjectKeyInt(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructScalarMapGet<FIntProperty>(H,Path,ObjectMapKey(H,Path,Token,C),3,C);}
-    FDasStructValue StructMapWithObjectKeyInt(const FDasStructValue& H,const char* Path,uint64 Token,int32 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FIntProperty>(H,Path,ObjectMapKey(H,Path,Token,C),Value,3,C,At);}
-    float StructMapGetObjectKeyFloat(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,ObjectMapKey(H,Path,Token,C),3,C);}
-    FDasStructValue StructMapWithObjectKeyFloat(const FDasStructValue& H,const char* Path,uint64 Token,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,ObjectMapKey(H,Path,Token,C),Value,3,C,At);}
-    double StructMapGetObjectKeyDouble(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,ObjectMapKey(H,Path,Token,C),3,C);}
-    FDasStructValue StructMapWithObjectKeyDouble(const FDasStructValue& H,const char* Path,uint64 Token,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,ObjectMapKey(H,Path,Token,C),Value,3,C,At);}
-    bool StructMapGetObjectKeyBool(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,ObjectMapKey(H,Path,Token,C),3,C);}
-    FDasStructValue StructMapWithObjectKeyBool(const FDasStructValue& H,const char* Path,uint64 Token,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,ObjectMapKey(H,Path,Token,C),Value,3,C,At);}
-    char* StructMapGetObjectKeyString(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return CopyDSLString(StructScalarMapGet<FStrProperty>(H,Path,ObjectMapKey(H,Path,Token,C),3,C),C);}
-    FDasStructValue StructMapWithObjectKeyString(const FDasStructValue& H,const char* Path,uint64 Token,const char* Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FStrProperty>(H,Path,ObjectMapKey(H,Path,Token,C),FString(Value?UTF8_TO_TCHAR(Value):TEXT("")),3,C,At);}
-    FDasNameValue StructMapGetObjectKeyName(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,ObjectMapKey(H,Path,Token,C),3,C),C);}
-    FDasStructValue StructMapWithObjectKeyName(const FDasStructValue& H,const char* Path,uint64 Token,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,ObjectMapKey(H,Path,Token,C),ResolveDSLName(Value,C),3,C,At);}
-    FDasEnumValue StructMapGetObjectKeyEnum(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructMapGetEnum(H,Path,ObjectMapKey(H,Path,Token,C),3,C);}
-    FDasStructValue StructMapWithObjectKeyEnum(const FDasStructValue& H,const char* Path,uint64 Token,FDasEnumValue Value,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,ObjectMapKey(H,Path,Token,C),Value,3,C,At);}
-    FDasObjectHandle StructMapGetObjectKeyObject(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructMapGetObject(H,Path,ObjectMapKey(H,Path,Token,C),3,C);}
-    FDasStructValue StructMapWithObjectKeyObject(const FDasStructValue& H,const char* Path,uint64 Token,const FDasObjectHandle& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,ObjectMapKey(H,Path,Token,C),Value,3,C,At);}
-    FDasStructValue StructMapGetObjectKeyStruct(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,ObjectMapKey(H,Path,Token,C),3,C,At);}
-    FDasStructValue StructMapWithObjectKeyStruct(const FDasStructValue& H,const char* Path,uint64 Token,const FDasStructValue& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,ObjectMapKey(H,Path,Token,C),Value,3,C,At);}
+    uint64 StructMapObjectKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotMap(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Object,ESnapshotKind::Invalid,C),Index,C);return InternObjectKey(ReadNativePropertyValue(F.Property,F.Memory,C).ObjectValue.Get(),C);}
+    int32 StructMapGetObjectKeyInt(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructScalarMapGet<FIntProperty>(H,Path,ObjectMapKey(H,Path,Token,C),ESnapshotKind::Object,C);}
+    FDasStructValue StructMapWithObjectKeyInt(const FDasStructValue& H,const char* Path,uint64 Token,int32 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FIntProperty>(H,Path,ObjectMapKey(H,Path,Token,C),Value,ESnapshotKind::Object,C,At);}
+    float StructMapGetObjectKeyFloat(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,ObjectMapKey(H,Path,Token,C),ESnapshotKind::Object,C);}
+    FDasStructValue StructMapWithObjectKeyFloat(const FDasStructValue& H,const char* Path,uint64 Token,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,ObjectMapKey(H,Path,Token,C),Value,ESnapshotKind::Object,C,At);}
+    double StructMapGetObjectKeyDouble(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,ObjectMapKey(H,Path,Token,C),ESnapshotKind::Object,C);}
+    FDasStructValue StructMapWithObjectKeyDouble(const FDasStructValue& H,const char* Path,uint64 Token,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,ObjectMapKey(H,Path,Token,C),Value,ESnapshotKind::Object,C,At);}
+    bool StructMapGetObjectKeyBool(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,ObjectMapKey(H,Path,Token,C),ESnapshotKind::Object,C);}
+    FDasStructValue StructMapWithObjectKeyBool(const FDasStructValue& H,const char* Path,uint64 Token,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,ObjectMapKey(H,Path,Token,C),Value,ESnapshotKind::Object,C,At);}
+    char* StructMapGetObjectKeyString(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return CopyDSLString(StructScalarMapGet<FStrProperty>(H,Path,ObjectMapKey(H,Path,Token,C),ESnapshotKind::Object,C),C);}
+    FDasStructValue StructMapWithObjectKeyString(const FDasStructValue& H,const char* Path,uint64 Token,const char* Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FStrProperty>(H,Path,ObjectMapKey(H,Path,Token,C),FString(Value?UTF8_TO_TCHAR(Value):TEXT("")),ESnapshotKind::Object,C,At);}
+    FDasNameValue StructMapGetObjectKeyName(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,ObjectMapKey(H,Path,Token,C),ESnapshotKind::Object,C),C);}
+    FDasStructValue StructMapWithObjectKeyName(const FDasStructValue& H,const char* Path,uint64 Token,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,ObjectMapKey(H,Path,Token,C),ResolveDSLName(Value,C),ESnapshotKind::Object,C,At);}
+    FDasEnumValue StructMapGetObjectKeyEnum(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructMapGetEnum(H,Path,ObjectMapKey(H,Path,Token,C),ESnapshotKind::Object,C);}
+    FDasStructValue StructMapWithObjectKeyEnum(const FDasStructValue& H,const char* Path,uint64 Token,FDasEnumValue Value,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,ObjectMapKey(H,Path,Token,C),Value,ESnapshotKind::Object,C,At);}
+    FDasObjectHandle StructMapGetObjectKeyObject(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C){return StructMapGetObject(H,Path,ObjectMapKey(H,Path,Token,C),ESnapshotKind::Object,C);}
+    FDasStructValue StructMapWithObjectKeyObject(const FDasStructValue& H,const char* Path,uint64 Token,const FDasObjectHandle& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,ObjectMapKey(H,Path,Token,C),Value,ESnapshotKind::Object,C,At);}
+    FDasStructValue StructMapGetObjectKeyStruct(const FDasStructValue& H,const char* Path,uint64 Token,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,ObjectMapKey(H,Path,Token,C),ESnapshotKind::Object,C,At);}
+    FDasStructValue StructMapWithObjectKeyStruct(const FDasStructValue& H,const char* Path,uint64 Token,const FDasStructValue& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,ObjectMapKey(H,Path,Token,C),Value,ESnapshotKind::Object,C,At);}
     uint8 EnumMapKey(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){const auto& E=ResolveEnumValue(Token,C);const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FMapProperty>(F.Property);if(!P || DasEnumPropertyType(P->KeyProp)!=E.Type.Get() || P->KeyProp->GetElementSize()!=1 || E.Value<0 || E.Value>255)C->throw_error("snapshot map enum key identity/storage mismatch");return uint8(E.Value);}
-    FDasEnumValue StructMapEnumKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FMapProperty>(F.Property);auto* E=P?DasEnumPropertyType(P->KeyProp):nullptr;if(!E || P->KeyProp->GetElementSize()!=1)C->throw_error("expected byte-sized enum-key map");FScriptMapHelper Values(P,F.Memory);if(Index<0 || Index>=Values.Num())C->throw_error("map key index out of range");for(int32 I=0;I<Values.GetMaxIndex();++I)if(Values.IsValidIndex(I) && Index--==0)return MakeEnumValue(E->GetPathName(),ReadNativeEnumNumber(P->KeyProp,Values.GetKeyPtr(I),C),C);C->throw_error("map key index out of range");return {};}
-    int32 StructMapGetEnumKeyInt(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructScalarMapGet<FIntProperty>(H,Path,EnumMapKey(H,Path,Token,C),4,C);}
-    FDasStructValue StructMapWithEnumKeyInt(const FDasStructValue& H,const char* Path,FDasEnumValue Token,int32 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FIntProperty>(H,Path,EnumMapKey(H,Path,Token,C),Value,4,C,At);}
-    float StructMapGetEnumKeyFloat(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,EnumMapKey(H,Path,Token,C),4,C);}
-    FDasStructValue StructMapWithEnumKeyFloat(const FDasStructValue& H,const char* Path,FDasEnumValue Token,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,EnumMapKey(H,Path,Token,C),Value,4,C,At);}
-    double StructMapGetEnumKeyDouble(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,EnumMapKey(H,Path,Token,C),4,C);}
-    FDasStructValue StructMapWithEnumKeyDouble(const FDasStructValue& H,const char* Path,FDasEnumValue Token,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,EnumMapKey(H,Path,Token,C),Value,4,C,At);}
-    bool StructMapGetEnumKeyBool(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,EnumMapKey(H,Path,Token,C),4,C);}
-    FDasStructValue StructMapWithEnumKeyBool(const FDasStructValue& H,const char* Path,FDasEnumValue Token,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,EnumMapKey(H,Path,Token,C),Value,4,C,At);}
-    char* StructMapGetEnumKeyString(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return CopyDSLString(StructScalarMapGet<FStrProperty>(H,Path,EnumMapKey(H,Path,Token,C),4,C),C);}
-    FDasStructValue StructMapWithEnumKeyString(const FDasStructValue& H,const char* Path,FDasEnumValue Token,const char* Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FStrProperty>(H,Path,EnumMapKey(H,Path,Token,C),FString(Value?UTF8_TO_TCHAR(Value):TEXT("")),4,C,At);}
-    FDasNameValue StructMapGetEnumKeyName(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,EnumMapKey(H,Path,Token,C),4,C),C);}
-    FDasStructValue StructMapWithEnumKeyName(const FDasStructValue& H,const char* Path,FDasEnumValue Token,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,EnumMapKey(H,Path,Token,C),ResolveDSLName(Value,C),4,C,At);}
-    FDasEnumValue StructMapGetEnumKeyEnum(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructMapGetEnum(H,Path,EnumMapKey(H,Path,Token,C),4,C);}
-    FDasStructValue StructMapWithEnumKeyEnum(const FDasStructValue& H,const char* Path,FDasEnumValue Token,FDasEnumValue Value,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,EnumMapKey(H,Path,Token,C),Value,4,C,At);}
-    FDasObjectHandle StructMapGetEnumKeyObject(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructMapGetObject(H,Path,EnumMapKey(H,Path,Token,C),4,C);}
-    FDasStructValue StructMapWithEnumKeyObject(const FDasStructValue& H,const char* Path,FDasEnumValue Token,const FDasObjectHandle& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,EnumMapKey(H,Path,Token,C),Value,4,C,At);}
-    FDasStructValue StructMapGetEnumKeyStruct(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,EnumMapKey(H,Path,Token,C),4,C,At);}
-    FDasStructValue StructMapWithEnumKeyStruct(const FDasStructValue& H,const char* Path,FDasEnumValue Token,const FDasStructValue& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,EnumMapKey(H,Path,Token,C),Value,4,C,At);}
+    FDasEnumValue StructMapEnumKey(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotMap(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Enum,ESnapshotKind::Invalid,C),Index,C);auto* E=DasEnumPropertyType(F.Property);return MakeEnumValue(E->GetPathName(),ReadNativeEnumNumber(F.Property,F.Memory,C),C);}
+    int32 StructMapGetEnumKeyInt(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructScalarMapGet<FIntProperty>(H,Path,EnumMapKey(H,Path,Token,C),ESnapshotKind::Enum,C);}
+    FDasStructValue StructMapWithEnumKeyInt(const FDasStructValue& H,const char* Path,FDasEnumValue Token,int32 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FIntProperty>(H,Path,EnumMapKey(H,Path,Token,C),Value,ESnapshotKind::Enum,C,At);}
+    float StructMapGetEnumKeyFloat(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,EnumMapKey(H,Path,Token,C),ESnapshotKind::Enum,C);}
+    FDasStructValue StructMapWithEnumKeyFloat(const FDasStructValue& H,const char* Path,FDasEnumValue Token,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,EnumMapKey(H,Path,Token,C),Value,ESnapshotKind::Enum,C,At);}
+    double StructMapGetEnumKeyDouble(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,EnumMapKey(H,Path,Token,C),ESnapshotKind::Enum,C);}
+    FDasStructValue StructMapWithEnumKeyDouble(const FDasStructValue& H,const char* Path,FDasEnumValue Token,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,EnumMapKey(H,Path,Token,C),Value,ESnapshotKind::Enum,C,At);}
+    bool StructMapGetEnumKeyBool(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,EnumMapKey(H,Path,Token,C),ESnapshotKind::Enum,C);}
+    FDasStructValue StructMapWithEnumKeyBool(const FDasStructValue& H,const char* Path,FDasEnumValue Token,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,EnumMapKey(H,Path,Token,C),Value,ESnapshotKind::Enum,C,At);}
+    char* StructMapGetEnumKeyString(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return CopyDSLString(StructScalarMapGet<FStrProperty>(H,Path,EnumMapKey(H,Path,Token,C),ESnapshotKind::Enum,C),C);}
+    FDasStructValue StructMapWithEnumKeyString(const FDasStructValue& H,const char* Path,FDasEnumValue Token,const char* Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FStrProperty>(H,Path,EnumMapKey(H,Path,Token,C),FString(Value?UTF8_TO_TCHAR(Value):TEXT("")),ESnapshotKind::Enum,C,At);}
+    FDasNameValue StructMapGetEnumKeyName(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,EnumMapKey(H,Path,Token,C),ESnapshotKind::Enum,C),C);}
+    FDasStructValue StructMapWithEnumKeyName(const FDasStructValue& H,const char* Path,FDasEnumValue Token,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,EnumMapKey(H,Path,Token,C),ResolveDSLName(Value,C),ESnapshotKind::Enum,C,At);}
+    FDasEnumValue StructMapGetEnumKeyEnum(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructMapGetEnum(H,Path,EnumMapKey(H,Path,Token,C),ESnapshotKind::Enum,C);}
+    FDasStructValue StructMapWithEnumKeyEnum(const FDasStructValue& H,const char* Path,FDasEnumValue Token,FDasEnumValue Value,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,EnumMapKey(H,Path,Token,C),Value,ESnapshotKind::Enum,C,At);}
+    FDasObjectHandle StructMapGetEnumKeyObject(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C){return StructMapGetObject(H,Path,EnumMapKey(H,Path,Token,C),ESnapshotKind::Enum,C);}
+    FDasStructValue StructMapWithEnumKeyObject(const FDasStructValue& H,const char* Path,FDasEnumValue Token,const FDasObjectHandle& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,EnumMapKey(H,Path,Token,C),Value,ESnapshotKind::Enum,C,At);}
+    FDasStructValue StructMapGetEnumKeyStruct(const FDasStructValue& H,const char* Path,FDasEnumValue Token,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,EnumMapKey(H,Path,Token,C),ESnapshotKind::Enum,C,At);}
+    FDasStructValue StructMapWithEnumKeyStruct(const FDasStructValue& H,const char* Path,FDasEnumValue Token,const FDasStructValue& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,EnumMapKey(H,Path,Token,C),Value,ESnapshotKind::Enum,C,At);}
 
 
 FDasObjectHandle AuthoredObjectCheck(const FDasObjectHandle& H,const char* Id,das::Context* C){ResolveAuthoredObject(H,Id,C);return H;}
@@ -1505,6 +1520,10 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     int32 ScriptAssetCancelAll(das::Context*);
     bool ScriptAssetPending(const char*,das::Context*);
     void ScriptLatentDelay(const char*,float,const char*,das::Context*);
+    float ScriptMontagePlay(const char*,const FDasObjectHandle&,const FDasObjectHandle&,const char*,float,float,FDasNameValue,das::Context*);
+    bool ScriptMontageStop(const char*,float,das::Context*);
+    bool ScriptMontageCancel(const char*,das::Context*);
+    bool ScriptMontagePlaying(const char*,das::Context*);
     bool ScriptLatentCancel(const char*,das::Context*);
     int32 ScriptLatentCancelAll(das::Context*);
     bool ScriptLatentPending(const char*,das::Context*);
@@ -1601,11 +1620,21 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     struct FDSLVector2DAnnotation:FMathValueAnnotation<FVector2D>{FDSLVector2DAnnotation(das::ModuleLibrary& L):FMathValueAnnotation("UEVector2D",L,"FVector2D"){addField<DAS_BIND_MANAGED_FIELD(X)>("x");addField<DAS_BIND_MANAGED_FIELD(Y)>("y");}};
     struct FDSLVectorAnnotation:FMathValueAnnotation<FVector>{FDSLVectorAnnotation(das::ModuleLibrary& L):FMathValueAnnotation("UEVector",L,"FVector"){addField<DAS_BIND_MANAGED_FIELD(X)>("x");addField<DAS_BIND_MANAGED_FIELD(Y)>("y");addField<DAS_BIND_MANAGED_FIELD(Z)>("z");}};
     struct FDSLRotatorAnnotation:FMathValueAnnotation<FRotator>{FDSLRotatorAnnotation(das::ModuleLibrary& L):FMathValueAnnotation("UERotator",L,"FRotator"){addField<DAS_BIND_MANAGED_FIELD(Pitch)>("pitch");addField<DAS_BIND_MANAGED_FIELD(Yaw)>("yaw");addField<DAS_BIND_MANAGED_FIELD(Roll)>("roll");}};
+    struct FTraceHitAnnotation:FMathValueAnnotation<FDasTraceHit>{
+        FTraceHitAnnotation(das::ModuleLibrary& L):FMathValueAnnotation("UETraceHit",L,"FDasTraceHit"){
+            addField<DAS_BIND_MANAGED_FIELD(BlockingHit)>("blocking_hit");addField<DAS_BIND_MANAGED_FIELD(StartPenetrating)>("start_penetrating");
+            addField<DAS_BIND_MANAGED_FIELD(Distance)>("distance");addField<DAS_BIND_MANAGED_FIELD(Time)>("time");
+            addField<DAS_BIND_MANAGED_FIELD(Location)>("location");addField<DAS_BIND_MANAGED_FIELD(ImpactPoint)>("impact_point");
+            addField<DAS_BIND_MANAGED_FIELD(Normal)>("normal");addField<DAS_BIND_MANAGED_FIELD(ImpactNormal)>("impact_normal");addField<DAS_BIND_MANAGED_FIELD(FaceIndex)>("face_index");
+        }
+    };
     struct FReflectedValueAnnotation:FMathValueAnnotation<FDasStructValue>{FReflectedValueAnnotation(das::ModuleLibrary& L):FMathValueAnnotation("UEStructValue",L,"FDasStructValue"){}virtual bool isPod()const override{return true;}};
     FDasCallHandle BeginCallbackFrame(const char*,das::Context*);
     void StartCallbackFrameTimer(const char*,float,const char*,bool,const FDasCallHandle&,das::Context*);
     void NextCallbackFrameTimer(const char*,const char*,const FDasCallHandle&,das::Context*);
+    #include "DasSoftRuntime.inl"
     #include "DasDSL.inl"
+    #include "DasGameplayServices.inl"
 
     class FUnrealFoundationModule final : public das::Module
     {
@@ -1614,7 +1643,9 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
         {
             addCommentReader(new FUECommentReader());
             addAnnotation(new FUENativeBaseAnnotation());addAnnotation(new FUEClassAnnotation());addAnnotation(new FUELibraryAnnotation());addAnnotation(new FUEEnumAnnotation());addAnnotation(new FUENativeEnumAnnotation());addAnnotation(new FUENativeStructAnnotation());addAnnotation(new FUEStructAnnotation());
-            addAnnotation(new FUENativeInterfaceAnnotation());addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));addAnnotation(new FUESourceValueBinding());addAnnotation(new FUEObjectTypeAnnotation());addAnnotation(new FUEAuthoredRefAnnotation());addTypeMacro(new FUEObjectTypeMacro());addTypeMacro(new FUEObjectKeyTypeMacro());addAnnotation(new FUEClassTypeAnnotation());addTypeMacro(new FUEClassTypeMacro());
+            addAnnotation(new FUENativeInterfaceAnnotation());addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));addAnnotation(new FUESourceValueBinding());addAnnotation(new FUEObjectTypeAnnotation());addAnnotation(new FUEAuthoredRefAnnotation());addTypeMacro(new FUEObjectTypeMacro());addTypeMacro(new FUEObjectKeyTypeMacro());addAnnotation(new FUEClassTypeAnnotation());addTypeMacro(new FUEClassTypeMacro());addAnnotation(new FUESoftAnnotation());addTypeMacro(new FUESoftTypeMacro(false));addTypeMacro(new FUESoftTypeMacro(true));
+            for(const auto& Pair:{std::pair<const char*,int>{"ue_soft",0},{"ue_soft_value",1},{"ue_soft_get",2},{"ue_soft_load",3}}){auto* Macro=new FUESoftCallMacro(Pair.first,Pair.second);ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
+            {auto* Macro=new FUESoftUpcastMacro();ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
             for(bool Raw:{false,true}){auto* Macro=new FUEClassCastFactory(Raw);ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
             addAnnotation(new FUEDelegateAnnotation(false));addAnnotation(new FUEDelegateAnnotation(true));
             addAnnotation(new FUECallbackFrameAnnotation());
@@ -1631,7 +1662,22 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             addAnnotation(new FDSLTextAnnotation(Library));addAnnotation(new FDSLNameAnnotation(Library));addAnnotation(new FDSLEnumAnnotation(Library));
             addAnnotation(new FReflectedValueAnnotation(Library));
             addAnnotation(new FDSLVector2DAnnotation(Library));addAnnotation(new FDSLVectorAnnotation(Library));addAnnotation(new FDSLRotatorAnnotation(Library));addAnnotation(new FMathValueAnnotation<FTransform>("UETransform",Library,"FTransform"));
+
             addAnnotation(new FObjectHandleAnnotation(Library));addAnnotation(new FClassHandleAnnotation(Library));
+            addAnnotation(new FTraceHitAnnotation(Library));
+            das::addExtern<DAS_BIND_FUN(TraceWorld),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_trace_world",das::SideEffects::modifyExternal,"TraceWorld");
+            das::addExtern<DAS_BIND_FUN(TraceActor),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_trace_actor",das::SideEffects::accessExternal,"TraceActor");
+            das::addExtern<DAS_BIND_FUN(TraceComponent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_trace_component",das::SideEffects::accessExternal,"TraceComponent");
+            das::addExtern<DAS_BIND_FUN(ApplyGameplayDamage)>(*this,Library,"__ue_apply_damage",das::SideEffects::modifyExternal,"ApplyGameplayDamage");
+            das::addExtern<DAS_BIND_FUN(CreateGameplayWidget),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_create",das::SideEffects::modifyExternal,"CreateGameplayWidget");
+            das::addExtern<DAS_BIND_FUN(GameplayWidgetVisible)>(*this,Library,"__ue_widget_visible",das::SideEffects::accessExternal,"GameplayWidgetVisible");
+            das::addExtern<DAS_BIND_FUN(ShowGameplayWidget)>(*this,Library,"__ue_widget_show",das::SideEffects::modifyExternal,"ShowGameplayWidget");
+            das::addExtern<DAS_BIND_FUN(RemoveGameplayWidget)>(*this,Library,"__ue_widget_remove",das::SideEffects::modifyExternal,"RemoveGameplayWidget");
+            das::addExtern<DAS_BIND_FUN(GameplayWidgetText)>(*this,Library,"__ue_widget_text",das::SideEffects::modifyExternal,"GameplayWidgetText");
+            das::addExtern<DAS_BIND_FUN(GameplayWidgetClick)>(*this,Library,"__ue_widget_click",das::SideEffects::modifyExternal,"GameplayWidgetClick");
+            das::addExtern<DAS_BIND_FUN(GameplayWidgetInput)>(*this,Library,"__ue_widget_input",das::SideEffects::modifyExternal,"GameplayWidgetInput");
+
+
             das::addExtern<DAS_BIND_FUN(CharacterController),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_pawn_controller",das::SideEffects::modifyExternal,"CharacterController");
             das::addExtern<DAS_BIND_FUN(CharacterControlsReady)>(*this,Library,"__ue_character_controls_ready",das::SideEffects::modifyExternal,"CharacterControlsReady");
             das::addExtern<DAS_BIND_FUN(CharacterPossess)>(*this,Library,"__ue_pawn_possess",das::SideEffects::modifyExternal,"CharacterPossess");
@@ -1682,10 +1728,23 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             das::addExtern<DAS_BIND_FUN(ScriptInputUnbindAxis)>(*this,Library,"ue_input_unbind_axis",das::SideEffects::modifyExternal,"ScriptInputUnbindAxis");
             das::addExtern<DAS_BIND_FUN(ScriptInputUnbindAll)>(*this,Library,"ue_input_unbind_all",das::SideEffects::modifyExternal,"ScriptInputUnbindAll");
             das::addExtern<DAS_BIND_FUN(ScriptAssetLoad)>(*this,Library,"__ue_asset_load_async",das::SideEffects::modifyExternal,"ScriptAssetLoad");
+            das::addExtern<DAS_BIND_FUN(SoftMake),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_soft_make",das::SideEffects::modifyExternal,"SoftMake");
+            das::addExtern<DAS_BIND_FUN(SoftUpcast),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_soft_upcast",das::SideEffects::modifyExternal,"SoftUpcast");
+            das::addExtern<DAS_BIND_FUN(SoftCheck),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_soft_check",das::SideEffects::modifyExternal,"SoftCheck");
+            das::addExtern<DAS_BIND_FUN(SoftGetObject),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_soft_get_object",das::SideEffects::modifyExternal,"SoftGetObject");
+            das::addExtern<DAS_BIND_FUN(SoftGetClass)>(*this,Library,"__ue_soft_get_class",das::SideEffects::modifyExternal,"SoftGetClass");
+            das::addExtern<DAS_BIND_FUN(SoftPath)>(*this,Library,"__ue_soft_path",das::SideEffects::modifyExternal,"SoftPath");
+            das::addExtern<DAS_BIND_FUN(SoftNull)>(*this,Library,"__ue_soft_null",das::SideEffects::modifyExternal,"SoftNull");
+            das::addExtern<DAS_BIND_FUN(SoftLoaded)>(*this,Library,"__ue_soft_loaded",das::SideEffects::modifyExternal,"SoftLoaded");
+            das::addExtern<DAS_BIND_FUN(ScriptSoftAssetLoad)>(*this,Library,"__ue_soft_load_async",das::SideEffects::modifyExternal,"ScriptSoftAssetLoad");
             das::addExtern<DAS_BIND_FUN(ScriptAssetLoadGeneric)>(*this,Library,"ue_asset_load_async",das::SideEffects::modifyExternal,"ScriptAssetLoadGeneric");
             das::addExtern<DAS_BIND_FUN(ScriptAssetCancel)>(*this,Library,"ue_asset_cancel",das::SideEffects::modifyExternal,"ScriptAssetCancel");
             das::addExtern<DAS_BIND_FUN(ScriptAssetCancelAll)>(*this,Library,"ue_asset_cancel_all",das::SideEffects::modifyExternal,"ScriptAssetCancelAll");
             das::addExtern<DAS_BIND_FUN(ScriptAssetPending)>(*this,Library,"ue_asset_is_pending",das::SideEffects::modifyExternal,"ScriptAssetPending");
+            das::addExtern<DAS_BIND_FUN(ScriptMontagePlay)>(*this,Library,"__ue_montage_play",das::SideEffects::modifyExternal,"ScriptMontagePlay");
+            das::addExtern<DAS_BIND_FUN(ScriptMontageStop)>(*this,Library,"__ue_montage_stop",das::SideEffects::modifyExternal,"ScriptMontageStop");
+            das::addExtern<DAS_BIND_FUN(ScriptMontageCancel)>(*this,Library,"__ue_montage_cancel",das::SideEffects::modifyExternal,"ScriptMontageCancel");
+            das::addExtern<DAS_BIND_FUN(ScriptMontagePlaying)>(*this,Library,"__ue_montage_playing",das::SideEffects::modifyExternal,"ScriptMontagePlaying");
             das::addExtern<DAS_BIND_FUN(ScriptLatentDelay)>(*this,Library,"ue_latent_delay",das::SideEffects::modifyExternal,"ScriptLatentDelay");
             das::addExtern<DAS_BIND_FUN(ScriptLatentCancel)>(*this,Library,"ue_latent_cancel",das::SideEffects::modifyExternal,"ScriptLatentCancel");
             das::addExtern<DAS_BIND_FUN(ScriptLatentCancelAll)>(*this,Library,"ue_latent_cancel_all",das::SideEffects::modifyExternal,"ScriptLatentCancelAll");
@@ -1832,6 +1891,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             das::addExtern<DAS_BIND_FUN(ObjectProperty), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_get_object", das::SideEffects::modifyExternal, "ObjectProperty");
             das::addExtern<DAS_BIND_FUN(ObjectCast), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_cast_object", das::SideEffects::modifyExternal, "ObjectCast");
             das::addExtern<DAS_BIND_FUN(ObjectValid)>(*this, Library, "ue_object_valid", das::SideEffects::accessExternal, "ObjectValid");
+            das::addExtern<DAS_BIND_FUN(ObjectsEqual)>(*this,Library,"__ue_same_object",das::SideEffects::accessExternal,"ObjectsEqual");
             das::addExtern<DAS_BIND_FUN(ObjectIsA)>(*this, Library, "ue_object_is_a", das::SideEffects::accessExternal, "ObjectIsA");
             das::addExtern<DAS_BIND_FUN(AuthoredNullableCheck),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_authored_nullable_check",das::SideEffects::accessExternal,"AuthoredNullableCheck");
             das::addExtern<DAS_BIND_FUN(AuthoredObjectCheck),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_authored_object_check",das::SideEffects::accessExternal,"AuthoredObjectCheck");
@@ -1938,6 +1998,7 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
             das::addExtern<DAS_BIND_FUN(DSLRotation),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"ue_transform_rotation",das::SideEffects::none,"DSLRotation");
             das::addExtern<DAS_BIND_FUN(ExplicitStructCollect)>(*this,Library,"ue_struct_collect",das::SideEffects::modifyExternal,"ExplicitStructCollect")->needCallerStackFrame=true;
             das::addExtern<DAS_BIND_FUN(StructValueCount)>(*this,Library,"ue_struct_value_count",das::SideEffects::accessExternal,"StructValueCount");
+            das::addExtern<DAS_BIND_FUN(EditStructValue),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"ue_struct_edit",das::SideEffects::modifyExternal,"EditStructValue")->needCallerStackFrame=true;
             das::addExtern<DAS_BIND_FUN(NewStructDefault),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"ue_struct_default",das::SideEffects::modifyExternal,"NewStructDefault")->needCallerStackFrame=true;
             das::addExtern<DAS_BIND_FUN(GetSelfStruct),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"ue_get_self_struct",das::SideEffects::modifyExternal,"GetSelfStruct")->needCallerStackFrame=true;
             das::addExtern<DAS_BIND_FUN(SetSelfStruct)>(*this,Library,"ue_set_self_struct",das::SideEffects::modifyExternal,"SetSelfStruct");
@@ -2208,8 +2269,10 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
         int32 LatentKind=0;FString LatentName;TWeakObjectPtr<UWorld> LatentWorld;TStrongObjectPtr<UDasLatentProxy> LatentProxy;
         bool InputConsume=true,InputPaused=false;int32 InputKind=0,InputHandle=INDEX_NONE;EInputEvent InputPhase=IE_Pressed;
         uint32 EnhancedHandle=0;ETriggerEvent EnhancedPhase=ETriggerEvent::Triggered;TStrongObjectPtr<UDasEnhancedInputProxy> EnhancedProxy;TStrongObjectPtr<UObject> InputAsset;
+        FString MontageName;TStrongObjectPtr<UDasMontageProxy> MontageProxy;
         ~FManagedSubscription()
         {
+            if(MontageProxy.IsValid()){MontageProxy->Deactivate();return;}
             if(AsyncKind){if(StreamHandle.IsValid()){if(!StreamHandle->HasLoadCompleted())StreamHandle->CancelHandle();else StreamHandle->ReleaseHandle();}return;}
             if(LatentKind){if(auto* W=LatentWorld.Get())if(LatentProxy.IsValid())W->GetLatentActionManager().RemoveActionsForObject(TWeakObjectPtr<UObject>(LatentProxy.Get()));return;}
             if(InputKind==3){if(auto* Input=Cast<UEnhancedInputComponent>(Source.Get()))Input->RemoveBindingByHandle(EnhancedHandle);return;}
@@ -2453,14 +2516,18 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
     bool ScriptLatentPending(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.ContainsByPredicate([&](const auto& B){return B->LatentKind==1 && B->LatentName==N;});}
 
 
-    void ScriptAssetLoad(const char* Name,const char* Asset,const char* Handler,const char* Class,das::Context* C){auto* S=ManagedOwnerSession(C);if(ActiveContext->bEnding)C->throw_error("cannot start asset loading during EndPlay");if(!S->World.IsValid() || !S->World->IsGameWorld())C->throw_error("async asset loading requires owner's game world");const FString N=TimerName(Name,C),PathText=Asset?UTF8_TO_TCHAR(Asset):TEXT(""),Entry=Handler?UTF8_TO_TCHAR(Handler):TEXT(""),ClassPath=Class?UTF8_TO_TCHAR(Class):TEXT("");if(PathText.Len()>1024 || !FPackageName::IsValidObjectPath(PathText))C->throw_error("async asset load requires a valid Unreal object path");auto* Expected=FindObject<UClass>(nullptr,*ClassPath);if(!Expected || !ClassPath.StartsWith(TEXT("/Script/")) || Expected->HasAnyClassFlags(CLASS_Interface))C->throw_error("async asset callback requires a loaded native object class");FDasCallContract Contract=FDasCallContract::Scalar(EDasMethodSignature::Void);Contract.Inputs.Add(EDasMethodSignature::Object);Contract.InputClasses.Add(ClassPath);if(!VerifyContract(S->Live->Program,Entry,Contract))C->throw_error("async asset handler must return void with matching object input");int32 Old=INDEX_NONE,Count=0;for(int32 I=0;I<S->Bindings.Num();++I){const auto& B=*S->Bindings[I];if(B.AsyncKind)++Count;if(B.AsyncKind && B.AsyncName==N)Old=I;}if(Old==INDEX_NONE && Count>=64)C->throw_error("async asset request count limit exceeded");
-        auto B=MakeUnique<FManagedSubscription>();B->Id=NextSubscriptionId++;B->Handler=Entry;B->Kind=EDasMethodSignature::Object;B->AsyncKind=1;B->AsyncName=N;B->AsyncProxy.Reset(NewObject<UDasAsyncAssetProxy>());B->AsyncProxy->SubscriptionId=B->Id;B->AsyncProxy->Path=FSoftObjectPath(PathText);B->AsyncProxy->ExpectedClass=ClassPath;B->Source=B->AsyncProxy.Get();const TWeakObjectPtr<UDasAsyncAssetProxy> Target(B->AsyncProxy.Get());
-        B->StreamHandle=UAssetManager::GetStreamableManager().RequestAsyncLoad(B->AsyncProxy->Path,FStreamableDelegate::CreateLambda([Target](){if(auto* P=Target.Get())P->Complete();}),FStreamableManager::DefaultAsyncLoadPriority,false,true,TEXT("DasForUE:")+N);if(!B->StreamHandle.IsValid())C->throw_error("async asset request could not be created");auto Handle=B->StreamHandle;if(Old!=INDEX_NONE)S->Bindings.RemoveAt(Old);S->Bindings.Add(MoveTemp(B));S->RequiredEntries.Add(Entry,Contract);Handle->StartStalledHandle();
+    void ScriptAssetLoadImpl(const char* Name,const char* Asset,const char* Handler,const char* Class,bool ClassReference,bool AllowNull,das::Context* C){auto* S=ManagedOwnerSession(C);if(ActiveContext->bEnding)C->throw_error("cannot start asset loading during EndPlay");if(!S->World.IsValid() || !S->World->IsGameWorld())C->throw_error("async asset loading requires owner's game world");const FString N=TimerName(Name,C),PathText=Asset?UTF8_TO_TCHAR(Asset):TEXT(""),Entry=Handler?UTF8_TO_TCHAR(Handler):TEXT(""),ClassPath=Class?UTF8_TO_TCHAR(Class):TEXT("");if((PathText.IsEmpty() && !AllowNull) || PathText.Len()>1024 || (!PathText.IsEmpty() && !FPackageName::IsValidObjectPath(PathText)))C->throw_error("async asset load requires a valid Unreal object path");auto* Expected=FindObject<UClass>(nullptr,*ClassPath);if(!Expected || !ClassPath.StartsWith(TEXT("/Script/")) || Expected->HasAnyClassFlags(CLASS_Interface))C->throw_error("async asset callback requires a loaded native object class");FDasCallContract Contract=FDasCallContract::Scalar(EDasMethodSignature::Void);Contract.Inputs.Add(ClassReference?EDasMethodSignature::Class:EDasMethodSignature::Object);Contract.InputClasses.Add(ClassPath);if(!VerifyContract(S->Live->Program,Entry,Contract))C->throw_error("async asset handler must return void with matching object input");int32 Old=INDEX_NONE,Count=0;for(int32 I=0;I<S->Bindings.Num();++I){const auto& B=*S->Bindings[I];if(B.AsyncKind)++Count;if(B.AsyncKind && B.AsyncName==N)Old=I;}if(Old==INDEX_NONE && Count>=64)C->throw_error("async asset request count limit exceeded");
+        auto B=MakeUnique<FManagedSubscription>();B->Id=NextSubscriptionId++;B->Handler=Entry;B->Kind=ClassReference?EDasMethodSignature::Class:EDasMethodSignature::Object;B->PayloadPath=ClassPath;B->AsyncKind=1;B->AsyncName=N;B->AsyncProxy.Reset(NewObject<UDasAsyncAssetProxy>());B->AsyncProxy->SubscriptionId=B->Id;B->AsyncProxy->Path=FSoftObjectPath(PathText);B->AsyncProxy->ExpectedClass=ClassPath;B->AsyncProxy->ClassReference=ClassReference;B->Source=B->AsyncProxy.Get();const TWeakObjectPtr<UDasAsyncAssetProxy> Target(B->AsyncProxy.Get());
+        if(!PathText.IsEmpty())B->StreamHandle=UAssetManager::GetStreamableManager().RequestAsyncLoad(B->AsyncProxy->Path,FStreamableDelegate::CreateLambda([Target](){if(auto* P=Target.Get())P->Complete();}),FStreamableManager::DefaultAsyncLoadPriority,false,true,TEXT("DasForUE:")+N);if(!PathText.IsEmpty() && !B->StreamHandle.IsValid())C->throw_error("async asset request could not be created");auto Handle=B->StreamHandle;if(Old!=INDEX_NONE)S->Bindings.RemoveAt(Old);S->Bindings.Add(MoveTemp(B));S->RequiredEntries.Add(Entry,Contract);if(Handle.IsValid())Handle->StartStalledHandle();else if(auto* Proxy=Target.Get())Proxy->Complete();
     }
+    void ScriptAssetLoad(const char* N,const char* Path,const char* Handler,const char* Class,das::Context* C){ScriptAssetLoadImpl(N,Path,Handler,Class,false,false,C);}
+    void ScriptSoftAssetLoad(const char* N,const FDasStructValue& H,const char* Handler,das::Context* C){const auto& V=SoftValue(H,C);auto* P=DasSoftProperty(V.GetScriptStruct()->GetPathName());auto* Class=CastField<FSoftClassProperty>(P);const FTCHARToUTF8 Path(*SoftAssetPath(V).ToString()),Base(*(Class?Class->MetaClass.Get():P->PropertyClass.Get())->GetPathName());ScriptAssetLoadImpl(N,Path.Get(),Handler,Base.Get(),Class!=nullptr,true,C);}
     void ScriptAssetLoadGeneric(const char* N,const char* Path,const char* Handler,das::Context* C){ScriptAssetLoad(N,Path,Handler,"/Script/CoreUObject.Object",C);}
     bool ScriptAssetCancel(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.RemoveAll([&](const auto& B){return B->AsyncKind && B->AsyncName==N;})>0;}
     int32 ScriptAssetCancelAll(das::Context* C){auto* S=ManagedOwnerSession(C);return S->Bindings.RemoveAll([](const auto& B){return B->AsyncKind!=0;});}
     bool ScriptAssetPending(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.ContainsByPredicate([&](const auto& B){return B->AsyncKind && B->AsyncName==N;});}
+
+#include "DasMontage.inl"
 
     void RevokeSession(FPersistentSession& Session)
     {
@@ -2530,7 +2597,9 @@ das::addExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set
             if (!Session || !Session->Live || !Session->Owner.IsValid() || Session->bEndDelivered || Session->bReleaseRequested) continue;
             if (auto* Actor = Cast<AActor>(Session->Owner.Get()); Actor && Actor->IsActorBeingDestroyed()) continue;
             auto& Context = *Session->Live->Context;
-            Session->Bindings.RemoveAll([&](const auto& B){return B->Id==Event.Id && (B->LatentKind!=0 || B->AsyncKind!=0);}); // Consume completion before user rearm.
+            const auto* MontagePayload=Payload.Kind==int32(EDasMethodSignature::Struct)?Payload.StructValue.GetPtr<FDasMontageEvent>():nullptr;
+            const bool MontageTerminal=MontagePayload && (MontagePayload->Kind==EDasMontageEventKind::Completed || MontagePayload->Kind==EDasMontageEventKind::Interrupted);
+            Session->Bindings.RemoveAll([&](const auto& B){return B->Id==Event.Id && (B->LatentKind!=0 || B->AsyncKind!=0 || (B->MontageProxy.IsValid() && MontageTerminal));}); // Consume completion before user rearm.
             Context.restart();
             TGuardValue<int32> ExecutionScope(Context.ExecutionDepth,Context.ExecutionDepth+1);
             FActiveContextScope Scope(Context);
@@ -3274,3 +3343,4 @@ FDasExecutionResult FDasRuntimeModule::RunLibraryFrame(const FString& Contract,c
  TGuardValue<FString> ScriptScope(LibraryInvocationScript,Script);TGuardValue<const FString*> Scope(LibraryInvocationContract,&Contract);
  return RunNamedFramePersistent(ScriptPath(Script),Entry,Arguments,Kind,Owner,ReturnClass);
 }
+#include "DasPerformanceProbe.inl"

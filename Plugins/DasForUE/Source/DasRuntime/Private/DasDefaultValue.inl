@@ -1,7 +1,7 @@
 // The persisted JSON is decoded against FProperty into a compilation-local,
 // typed value tree. No VM values or UObject pointers enter this tree.
 namespace {
-enum class EDasDefaultNode : uint8 { Boolean,Number,String,Text,Name,Enum,Asset,Class,Struct,Array,Set,Map };
+enum class EDasDefaultNode : uint8 { Boolean,Number,String,Text,Name,Enum,Asset,Class,Soft,Struct,Array,Set,Map };
 struct FDasDefaultValue {
  EDasDefaultNode Kind=EDasDefaultNode::Struct;
  FProperty* Property=nullptr;
@@ -61,7 +61,9 @@ bool ReadDefault(FProperty* P,const TSharedPtr<FJsonValue>& Json,FDasDefaultValu
   if(Json->TryGetObject(Object))return ReadStructDefault(Struct->Struct,*Object,Out,Budget,Depth,Error);
   return Fail();
  }
- if(auto* Class=CastField<FClassProperty>(P)){
+ if(auto* Soft=CastField<FSoftObjectProperty>(P)){
+  Out.Kind=EDasDefaultNode::Soft;if(!Json->TryGetString(Out.Text) || !ValidateDasSoftPath(Out.Text,Error))return Fail();
+ }else if(auto* Class=CastField<FClassProperty>(P)){
   if(!DefaultTaggedString(Json,TEXT("class"),Out.Text))return Fail();Out.Kind=EDasDefaultNode::Class;
  }else if(DasReferencePropertyClass(P)){
   if(!DefaultTaggedString(Json,TEXT("asset"),Out.Text))return Fail();Out.Kind=EDasDefaultNode::Asset;
@@ -90,6 +92,7 @@ bool WriteDefault(const FDasDefaultValue& Value,void* Data,FDasDefaultRoots& Roo
  auto* P=Value.Property;
  auto Fail=[&](const FString& Reason){Error=Reason+TEXT(" at ")+Value.Location;return false;};
  switch(Value.Kind){
+ case EDasDefaultNode::Soft:{auto* SoftProperty=CastFieldChecked<FSoftObjectProperty>(Value.Property);FSoftObjectPtr Ref(FSoftObjectPath(Value.Text));if(!ValidateDasSoftValue(SoftProperty,&Ref,Error))return false;SoftProperty->SetPropertyValue(Data,Ref);return true;}
  case EDasDefaultNode::Boolean:CastFieldChecked<FBoolProperty>(P)->SetPropertyValue(Data,Value.Boolean);return true;
  case EDasDefaultNode::Number:{auto* N=CastFieldChecked<FNumericProperty>(P);if(N->IsInteger())N->SetIntPropertyValue(Data,int64(Value.Number));else N->SetFloatingPointPropertyValue(Data,Value.Number);return true;}
  case EDasDefaultNode::String:CastFieldChecked<FStrProperty>(P)->SetPropertyValue(Data,Value.Text);return true;
@@ -110,6 +113,7 @@ bool ParseDasTypedDefault(const FString& Path,const FString& Text,FInstancedStru
  if(!Text.IsEmpty()){
   TSharedPtr<FJsonValue> Json;if(!DefaultJson(Text,Json,Error))return false;
   FDasDefaultBudget Budget;FDasDefaultValue Value;Value.Location=TEXT("default");
+  if(Property && CastField<FSoftObjectProperty>(Property)){const TSharedPtr<FJsonObject>* Object=nullptr;if(!Json->TryGetObject(Object) || (*Object)->Values.Num()!=1 || !(*Object)->HasField(TEXT("Values"))){Error=TEXT("Soft default requires a single Values path");return false;}Json=(*Object)->TryGetField(TEXT("Values"));}
   if(Property){if(!ReadDefault(Property,Json,Value,Budget,0,Value.Location,Error) || !WriteDefault(Value,Property->ContainerPtrToValuePtr<void>(Candidate.GetMutableMemory()),Roots,Error))return false;}
   else {const TSharedPtr<FJsonObject>* Object=nullptr;if(!Json->TryGetObject(Object)){Error=TEXT("Struct default requires JSON fields");return false;}if(!ReadStructDefault(Type,*Object,Value,Budget,0,Error) || !WriteDefault(Value,Candidate.GetMutableMemory(),Roots,Error))return false;}
  }
@@ -138,6 +142,7 @@ bool ParseDasPropertyDefault(FProperty* Property,const TSharedPtr<FJsonValue>& J
  if(Data)Property->CopyCompleteValue(Data,Storage.Memory);return true;
 }
 TSharedPtr<FJsonValue> ExportDasPropertyDefault(FProperty* P,const void* Data){
+ if(auto* Soft=CastField<FSoftObjectProperty>(P))return MakeShared<FJsonValueString>(Soft->GetPropertyValue(Data).ToSoftObjectPath().ToString());
  if(auto* A=CastField<FArrayProperty>(P)){TArray<TSharedPtr<FJsonValue>> Items;FScriptArrayHelper H(A,Data);for(int32 I=0;I<H.Num();++I)Items.Add(ExportDasPropertyDefault(A->Inner,H.GetRawPtr(I)));return MakeShared<FJsonValueArray>(Items);}
  if(auto* S=CastField<FSetProperty>(P)){TArray<TSharedPtr<FJsonValue>> Items;FScriptSetHelper H(S,Data);for(int32 I=0;I<H.GetMaxIndex();++I)if(H.IsValidIndex(I))Items.Add(ExportDasPropertyDefault(S->ElementProp,H.GetElementPtr(I)));return MakeShared<FJsonValueArray>(Items);}
  if(auto* M=CastField<FMapProperty>(P)){TArray<TSharedPtr<FJsonValue>> Items;FScriptMapHelper H(M,Data);for(int32 I=0;I<H.GetMaxIndex();++I)if(H.IsValidIndex(I))Items.Add(MakeShared<FJsonValueArray>(TArray<TSharedPtr<FJsonValue>>{ExportDasPropertyDefault(M->KeyProp,H.GetKeyPtr(I)),ExportDasPropertyDefault(M->ValueProp,H.GetValuePtr(I))}));return MakeShared<FJsonValueArray>(Items);}

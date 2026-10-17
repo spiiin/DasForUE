@@ -10,5 +10,6 @@ public:
     uint64 SubscriptionId=0;
     FSoftObjectPath Path;
     FString ExpectedClass;
+    bool ClassReference=false;
     void Complete();
 };

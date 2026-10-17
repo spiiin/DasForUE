@@ -3,6 +3,7 @@
 #include "Misc/CoreDelegates.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "Misc/FileHelper.h"
 #include "DasRuntime.h"
 #include "DasExtendedDefaultsProbe.h"
 #include "DasDefaultsMergeProbe.h"
@@ -17,8 +18,11 @@
 
 bool RunDasRegisteredCooked(FString& Report);
 void StartDasClassCallbacksValidation();
+void StartDasSoftReferencesValidation();
 void StartDasCookedGameplayValidation();
 void StartDasPlayableMapValidation();
+void StartDasPickupValidation();
+void StartDasGameplayFeaturesValidation();
 void StartDasCookedCallsValidation();
 
 class FDasForUESmokeModule : public FDefaultGameModuleImpl
@@ -27,13 +31,27 @@ class FDasForUESmokeModule : public FDefaultGameModuleImpl
 public:
     virtual void StartupModule() override
     {
+        if(FParse::Param(FCommandLine::Get(),TEXT("DasPerformance"))){
+            InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{
+                int32 Iterations=64,Samples=9;FString Output,Report,Json;
+                FParse::Value(FCommandLine::Get(),TEXT("PerfIterations="),Iterations);FParse::Value(FCommandLine::Get(),TEXT("PerfSamples="),Samples);
+                FParse::Value(FCommandLine::Get(),TEXT("PerfOutput="),Output);
+                bool Passed=RunDasPerformanceProbe(Report,Json,Iterations,Samples);
+                if(!Output.IsEmpty())Passed &= FFileHelper::SaveStringToFile(Json,*Output,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+                UE_LOG(LogTemp,Display,TEXT("%s"),*Report);UE_LOG(LogTemp,Display,TEXT("DAS_PERFORMANCE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));
+                FPlatformMisc::RequestExitWithStatus(false,Passed?0:1);
+            });return;
+        }
         if(FParse::Param(FCommandLine::Get(),TEXT("DasNativeDefaults"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld()){FString Report;Good=RunDasNativeDefaultsProbe(World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_NATIVE_DEFAULTS_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});return;}
         if(FParse::Param(FCommandLine::Get(),TEXT("DasComputedDefaults"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld()){FString Report;Good=RunDasComputedDefaultsProbe(World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_COMPUTED_DEFAULTS_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasInheritedDefaults"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld()){FString Report;Good=RunDasInheritedDefaultsProbe(World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_INHERITED_DEFAULTS_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasDefaultsMerge"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld()){FString Report;Good=RunDasDefaultsMergeProbe(World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_DEFAULTS_MERGE_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasExtendedDefaults"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{bool Good=false;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld())for(const auto& Actor:TArray<TObjectPtr<AActor>>(World->PersistentLevel->Actors))if(Actor && Actor->ActorHasTag(TEXT("ExtendedDefaultsFixture"))){FString Report;Good=RunDasExtendedDefaultsProbe(Actor->GetClass(),World,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);}UE_LOG(LogTemp,Display,TEXT("DAS_EXTENDED_DEFAULTS_PACKAGED=%s"),Good?TEXT("PASS"):TEXT("FAIL"));FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasCookedCalls"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasCookedCallsValidation();});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasGameplayFeatures"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasGameplayFeaturesValidation();});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasPickup"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasPickupValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasPlayableMap"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasPlayableMapValidation();});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasSoftReferences"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasSoftReferencesValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasClassCallbacks"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasClassCallbacksValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasCookedGameplay"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasCookedGameplayValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasMethodValues"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{UClass* Driver=nullptr;UClass* Target=nullptr;for(const auto& Context:GEngine->GetWorldContexts())if(auto* World=Context.World())if(World->IsGameWorld())for(const auto& Actor:World->PersistentLevel->Actors)if(auto* Probe=Cast<ADasProbeActor>(Actor)){if(Probe->Peer){Driver=Probe->GetClass();Target=Probe->Peer->GetClass();}}FString Report;const bool Good=Driver && Target && RunDasMethodValuesProbe(Driver,Target,Report);UE_LOG(LogTemp,Display,TEXT("%s"),*Report);FPlatformMisc::RequestExitWithStatus(false,Good?0:1);});}

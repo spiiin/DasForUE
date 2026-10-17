@@ -1,4 +1,6 @@
 #include "DasPropertyTypes.h"
+#include "DasSnapshotContainers.h"
+#include "UObject/StructOnScope.h"
 #include "DasContainerRegistry.h"
 #include "DasContainerTypes.h"
 #include "DasDefaultValueProbe.h"
@@ -21,6 +23,7 @@ bool CheckDasPropertyTypes(FString& Error){
  auto Roundtrip=[&](const FDasDeclaredType& Type){
   TStrongObjectPtr<UScriptStruct> A(NewObject<UScriptStruct>(GetTransientPackage())),B(NewObject<UScriptStruct>(GetTransientPackage()));
   auto* P=CreateDasProperty(A.Get(),TEXT("Value"),Type,EDasPropertyUsage::Value,Error);if(!P)return false;A->AddCppProperty(P);A->Bind();A->StaticLink(true);
+  {FStructOnScope Storage(A.Get());if(!DasSnapshotContainers::CheckProperty(P,P->ContainerPtrToValuePtr<void>(Storage.GetStructMemory()),Error))return false;}
   FDasDeclaredType Description;if(!DescribeDasProperty(P,Description,Error))return false;
   auto* Copy=CreateDasProperty(B.Get(),TEXT("Value"),Description,EDasPropertyUsage::Value,Error);if(!Copy)return false;B->AddCppProperty(Copy);B->Bind();B->StaticLink(true);
   FDasDeclaredType Again;if(!DescribeDasProperty(Copy,Again,Error) || Description.StorageIdentity()!=Again.StorageIdentity() || !P->SameType(Copy) || P->GetElementSize()!=Copy->GetElementSize() || A->GetMinAlignment()!=B->GetMinAlignment()){Error=TEXT("Property description/build roundtrip mismatch: ")+Type.Kind;return false;}

@@ -747,6 +747,109 @@ logs/snapshot-moves-{native,foundation,gameplay,playable}-packaged.log.
 Archive: Build/SnapshotMovesPackaged.
 
 
+## 2026-10-17 — prepared map/set key order
+
+All existing key/element-by-index adapters now use a context-owned
+`FKeyOrderCache`. A plan contains sparse slot numbers only, identified by the
+immutable snapshot token, case-sensitive field path and map/set kind. The first
+indexed read scans the container once and sorts int/string slots once; later
+reads use direct slot access. FName, byte, enum and object keys preserve the
+previous sparse order. No API changes or new script iterator handles are needed,
+so existing generated conversion loops benefit automatically. Field path
+resolution still runs on each call; this is not a resolved-field cache.
+
+Plans hold no native pointers, property pointers, copied keys or object roots.
+Each read resolves the current snapshot memory and validates its type/index.
+Immutable changes get their own snapshot token/order. Snapshot collection
+prunes corresponding plans; destroying the context releases the entire cache.
+Plans are bounded to 128 entries and 65536 slots per context. Reaching a budget
+clears cached plans; paths longer than 1024 characters use temporary scratch
+storage. An evicted plan can be rebuilt on the next read.
+
+Native regressions check repeated reads against the plan build counter, sorted
+and sparse ordering, separate snapshot/field identities, pruning, entry/slot
+budgets and long-path fallback. The property matrix exercises these checks for
+all supported key storage kinds. Script regressions verify that changing a map
+or set does not reuse the original snapshot's order. The existing copy counter
+continues to guard against whole-parent copies during ordinary queries.
+
+Validation: Editor build and Foundation passed, including the native cache
+checks, changed-snapshot isolation and `transport=1 queries=1`. PropertyValues
+(106 combinations), RuntimePIE, fresh gameplay export and native defaults
+Create/Reopen/Recompile passed. Automation reports each have one success and
+zero warnings/failures/skips.
+
+Packaged follow-up completed successfully. The incompatible
+Expression::rtti_isCallMacro check was replaced with daScript's existing AST
+type tag; the string-literal tag is checked before its cast. FUESoftAnnotation
+retains one implementation of the required StructureAnnotation::look method.
+Editor and Game builds passed. Runtime module receipts were refreshed after
+new scripts were added. Final builds and cook ran under the shared Build.bat
+wrapper lock, retaining UBT's own mutex, to prevent concurrent Editor builds
+from replacing module BuildIds during cooking. No module manifest was patched.
+
+Cook/stage/archive passed with zero errors and four existing ACL asset warnings.
+All four packaged probes passed and exited normally: native defaults,
+Foundation, gameplay and playable map. Packaged Foundation reports failures=0,
+including soft-reference no-load/default/GC checks, source aliases and unresolved
+path resolution, changed-snapshot order isolation and `transport=1 queries=1`.
+Final Editor Foundation passed the same checks. Archive:
+Build/SnapshotOrderPackaged.
+
+Snapshot implementation, header, adapter and regression hashes stayed stable.
+Concurrent changes in the soft-reference integration files (DasDefaultValue.inl,
+DasDSL.inl and DasSoftTypes.inl) are recorded separately in the evidence; results
+verify the built artifacts, not every later edit in the shared working tree.
+
+Evidence: logs/snapshot-order-validation.json records scope hashes and limits;
+logs/snapshot-order-editor-suite.log, logs/snapshot-order-final-foundation-suite.log,
+the PropertyValues/RuntimePIE reports and logs/snapshot-order-game-build.log hold
+the results. logs/snapshot-order-final-suite.log and
+logs/snapshot-order-package-suite.log summarize final completion. Validation
+used Win64 Development / NullRHI; Shipping and visual rendering were not tested.
+No commit was created.
+
+## 2026-10-17 — shared snapshot container access
+
+`DasSnapshotContainers.h` provides synchronous borrowed map/set/array views.
+Views share const-preserving field resolution, the existing `EDasTypeKind`
+classifier, map lookup/upsert, sparse key/element indexing, set membership and
+updates, and bounded array resize. Mutable operations require detached storage;
+the VM publishes the owned snapshot only after the operation succeeds. Native
+views do not retain pointers or perform VM-specific conversions.
+
+The runtime adapters now share one map read path, one map write path and one set
+update path. Scalar, text, enum, object/interface and struct map values use these
+paths with their existing codecs. Struct map writes borrow the selected child
+directly rather than cloning it into an intermediate scalar transport. Enum and
+object key identity constraints remain at the typed boundary. Magic integer key
+codes and the parallel StructIntMap/StructTypedMap/StructScalarValueMap/
+StructReflectedMap validators are removed. No daScript API or ordering changed:
+int/string keys and set elements remain sorted, other types retain sparse order.
+
+The property factory matrix now exercises the shared views for every generated
+map, set and array shape. It checks insert/update/read/remove, aliasing of const
+reads, rejected type/bounds checks, sparse holes and capacity semantics (updates
+at 4096 entries succeed; insertion of a new key fails before writing its value).
+Existing Foundation script checks cover immutable parents, typed conversion and
+error recovery; the native parent copy counter remains in place.
+
+Validation passed in Editor and Win64 Development Game builds. Editor and
+packaged Foundation report failures=0, including the shared container factory
+matrix and `transport=1 queries=1` (zero extra parent copies). PropertyValues
+(106 combinations) and RuntimePIE each report one success, zero warnings,
+failures and skips. Fresh gameplay export and native defaults Create/Reopen/
+Recompile passed. Cook/stage/archive succeeded with zero errors and the four
+existing ACL compression-asset warnings. All four packaged probes (native
+defaults, Foundation, gameplay and playable map) passed with normal exits.
+
+Evidence: logs/snapshot-containers-validation.json includes scoped source hashes
+verified after testing; logs/snapshot-containers-editor-suite.log and
+logs/snapshot-containers-package-suite.log summarize the runs. The individual
+build, automation report, Foundation, native-defaults and packaged logs use the
+same prefix. Archive: Build/SnapshotContainersPackaged. Validation used NullRHI;
+Shipping and visual rendering were not tested. No commit was created.
+
 ## 2026-10-17 — borrow snapshots during ordinary reads
 
 Snapshot queries now borrow the immutable context-table entry with `const auto&`
@@ -795,3 +898,12 @@ phases, cook/package and all five packaged map probes. Queued callback validatio
 remains strict. The runner prepares the cross-process ClassReload/MethodValues
 dependencies explicitly. See CombinedValidation.md and logs/combined-validation.json
 for the source manifest, initial failures, fixes and validation scope. No commit.
+
+## 2026-10-17 — prepared snapshot field paths
+
+Snapshot field access now reuses parsed paths and weak reflected property handles
+per context. Current array bounds and field validity are checked on every access;
+const and mutable storage share one resolver. See [SnapshotFieldPaths.md](SnapshotFieldPaths.md)
+for lifetime, invalidation, bounds and validation details. Game/Editor, Foundation,
+PropertyValues, RuntimePIE, native defaults phases and all four packaged probes
+passed. Evidence: logs/snapshot-paths-validation.json. No commit.

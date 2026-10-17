@@ -1,10 +1,21 @@
 options gen2
 module ue_native_gameplay public
 require ue_character_control public
-require ue_text public
+require ue_enhanced_input public
+require ue_gameplay_services public
+require ue_generated public
 require ue_native_hash_probe public
+require ue_native_self_refs public
+require ue_pickup_components public
+require ue_scene_components public
+require ue_soft_references public
+require ue_text public
 
 // Generated dependency views; methods/fields are synthesized from the compiled manifest.
+[ue_native_object(path="/Script/ClothingSystemRuntimeInterface.ClothingSimulationInteractor")]
+struct Native_ClothingSimulationInteractorRef_75d9e2c1 { handle:UObjectHandle }
+def Native_ClothingSimulationInteractorRef_75d9e2c1_from(value:UObjectHandle):Native_ClothingSimulationInteractorRef_75d9e2c1 { return Native_ClothingSimulationInteractorRef_75d9e2c1(handle=ue_cast_nullable_object(value,"/Script/ClothingSystemRuntimeInterface.ClothingSimulationInteractor")) }
+
 [ue_native_object(path="/Script/Engine.ActorComponent")]
 struct Native_ActorComponentRef_97441d45 { handle:UObjectHandle }
 def Native_ActorComponentRef_97441d45_from(value:UObjectHandle):Native_ActorComponentRef_97441d45 { return Native_ActorComponentRef_97441d45(handle=ue_cast_nullable_object(value,"/Script/Engine.ActorComponent")) }
@@ -12,6 +23,10 @@ def Native_ActorComponentRef_97441d45_from(value:UObjectHandle):Native_ActorComp
 [ue_native_object(path="/Script/Engine.AnimMontage")]
 struct Native_AnimMontageRef_e25467ee { handle:UObjectHandle }
 def Native_AnimMontageRef_e25467ee_from(value:UObjectHandle):Native_AnimMontageRef_e25467ee { return Native_AnimMontageRef_e25467ee(handle=ue_cast_nullable_object(value,"/Script/Engine.AnimMontage")) }
+
+[ue_native_object(path="/Script/Engine.AnimationAsset")]
+struct Native_AnimationAssetRef_c8dec86d { handle:UObjectHandle }
+def Native_AnimationAssetRef_c8dec86d_from(value:UObjectHandle):Native_AnimationAssetRef_c8dec86d { return Native_AnimationAssetRef_c8dec86d(handle=ue_cast_nullable_object(value,"/Script/Engine.AnimationAsset")) }
 
 [ue_native_object(path="/Script/Engine.CameraShakeSourceComponent")]
 struct Native_CameraShakeSourceComponentRef_cf819c92 { handle:UObjectHandle }
@@ -37,6 +52,10 @@ def Native_FontRef_684a8ec8_from(value:UObjectHandle):Native_FontRef_684a8ec8 { 
 struct Native_ForceFeedbackEffectRef_551fc643 { handle:UObjectHandle }
 def Native_ForceFeedbackEffectRef_551fc643_from(value:UObjectHandle):Native_ForceFeedbackEffectRef_551fc643 { return Native_ForceFeedbackEffectRef_551fc643(handle=ue_cast_nullable_object(value,"/Script/Engine.ForceFeedbackEffect")) }
 
+[ue_native_object(path="/Script/Engine.GameInstance")]
+struct Native_GameInstanceRef_c6fa677d { handle:UObjectHandle }
+def Native_GameInstanceRef_c6fa677d_from(value:UObjectHandle):Native_GameInstanceRef_c6fa677d { return Native_GameInstanceRef_c6fa677d(handle=ue_cast_nullable_object(value,"/Script/Engine.GameInstance")) }
+
 [ue_native_object(path="/Script/Engine.HUD")]
 struct Native_HUDRef_239f3d7c { handle:UObjectHandle }
 def Native_HUDRef_239f3d7c_from(value:UObjectHandle):Native_HUDRef_239f3d7c { return Native_HUDRef_239f3d7c(handle=ue_cast_nullable_object(value,"/Script/Engine.HUD")) }
@@ -49,6 +68,10 @@ def Native_HapticFeedbackEffect_BaseRef_ab5298cf_from(value:UObjectHandle):Nativ
 struct Native_LevelRef_d84e35d3 { handle:UObjectHandle }
 def Native_LevelRef_d84e35d3_from(value:UObjectHandle):Native_LevelRef_d84e35d3 { return Native_LevelRef_d84e35d3(handle=ue_cast_nullable_object(value,"/Script/Engine.Level")) }
 
+[ue_native_object(path="/Script/Engine.LocalPlayer")]
+struct Native_LocalPlayerRef_bcc672be { handle:UObjectHandle }
+def Native_LocalPlayerRef_bcc672be_from(value:UObjectHandle):Native_LocalPlayerRef_bcc672be { return Native_LocalPlayerRef_bcc672be(handle=ue_cast_nullable_object(value,"/Script/Engine.LocalPlayer")) }
+
 [ue_native_object(path="/Script/Engine.MaterialInstanceDynamic")]
 struct Native_MaterialInstanceDynamicRef_65b20eca { handle:UObjectHandle }
 def Native_MaterialInstanceDynamicRef_65b20eca_from(value:UObjectHandle):Native_MaterialInstanceDynamicRef_65b20eca { return Native_MaterialInstanceDynamicRef_65b20eca(handle=ue_cast_nullable_object(value,"/Script/Engine.MaterialInstanceDynamic")) }
@@ -57,9 +80,25 @@ def Native_MaterialInstanceDynamicRef_65b20eca_from(value:UObjectHandle):Native_
 struct Native_MaterialInterfaceRef_d64f3063 { handle:UObjectHandle }
 def Native_MaterialInterfaceRef_d64f3063_from(value:UObjectHandle):Native_MaterialInterfaceRef_d64f3063 { return Native_MaterialInterfaceRef_d64f3063(handle=ue_cast_nullable_object(value,"/Script/Engine.MaterialInterface")) }
 
+[ue_native_object(path="/Script/Engine.MeshDeformer")]
+struct Native_MeshDeformerRef_3a940416 { handle:UObjectHandle }
+def Native_MeshDeformerRef_3a940416_from(value:UObjectHandle):Native_MeshDeformerRef_3a940416 { return Native_MeshDeformerRef_3a940416(handle=ue_cast_nullable_object(value,"/Script/Engine.MeshDeformer")) }
+
+[ue_native_object(path="/Script/Engine.MeshDeformerInstance")]
+struct Native_MeshDeformerInstanceRef_1f839542 { handle:UObjectHandle }
+def Native_MeshDeformerInstanceRef_1f839542_from(value:UObjectHandle):Native_MeshDeformerInstanceRef_1f839542 { return Native_MeshDeformerInstanceRef_1f839542(handle=ue_cast_nullable_object(value,"/Script/Engine.MeshDeformerInstance")) }
+
+[ue_native_object(path="/Script/Engine.MeshDeformerInstanceSettings")]
+struct Native_MeshDeformerInstanceSettingsRef_14d5c797 { handle:UObjectHandle }
+def Native_MeshDeformerInstanceSettingsRef_14d5c797_from(value:UObjectHandle):Native_MeshDeformerInstanceSettingsRef_14d5c797 { return Native_MeshDeformerInstanceSettingsRef_14d5c797(handle=ue_cast_nullable_object(value,"/Script/Engine.MeshDeformerInstanceSettings")) }
+
 [ue_native_object(path="/Script/Engine.PawnMovementComponent")]
 struct Native_PawnMovementComponentRef_653cf1d0 { handle:UObjectHandle }
 def Native_PawnMovementComponentRef_653cf1d0_from(value:UObjectHandle):Native_PawnMovementComponentRef_653cf1d0 { return Native_PawnMovementComponentRef_653cf1d0(handle=ue_cast_nullable_object(value,"/Script/Engine.PawnMovementComponent")) }
+
+[ue_native_object(path="/Script/Engine.PhysicsAsset")]
+struct Native_PhysicsAssetRef_1c443d0e { handle:UObjectHandle }
+def Native_PhysicsAssetRef_1c443d0e_from(value:UObjectHandle):Native_PhysicsAssetRef_1c443d0e { return Native_PhysicsAssetRef_1c443d0e(handle=ue_cast_nullable_object(value,"/Script/Engine.PhysicsAsset")) }
 
 [ue_native_object(path="/Script/Engine.PhysicsVolume")]
 struct Native_PhysicsVolumeRef_d3600a0c { handle:UObjectHandle }
@@ -73,29 +112,89 @@ def Native_PlayerCameraManagerRef_7d85a11d_from(value:UObjectHandle):Native_Play
 struct Native_PlayerStateRef_bd340396 { handle:UObjectHandle }
 def Native_PlayerStateRef_bd340396_from(value:UObjectHandle):Native_PlayerStateRef_bd340396 { return Native_PlayerStateRef_bd340396(handle=ue_cast_nullable_object(value,"/Script/Engine.PlayerState")) }
 
-[ue_native_object(path="/Script/Engine.PrimitiveComponent")]
-struct Native_PrimitiveComponentRef_5efdd477 { handle:UObjectHandle }
-def Native_PrimitiveComponentRef_5efdd477_from(value:UObjectHandle):Native_PrimitiveComponentRef_5efdd477 { return Native_PrimitiveComponentRef_5efdd477(handle=ue_cast_nullable_object(value,"/Script/Engine.PrimitiveComponent")) }
-
 [ue_native_object(path="/Script/Engine.RuntimeVirtualTexture")]
 struct Native_RuntimeVirtualTextureRef_e53bf8a2 { handle:UObjectHandle }
 def Native_RuntimeVirtualTextureRef_e53bf8a2_from(value:UObjectHandle):Native_RuntimeVirtualTextureRef_e53bf8a2 { return Native_RuntimeVirtualTextureRef_e53bf8a2(handle=ue_cast_nullable_object(value,"/Script/Engine.RuntimeVirtualTexture")) }
+
+[ue_native_object(path="/Script/Engine.SkeletalMesh")]
+struct Native_SkeletalMeshRef_3e70a4ab { handle:UObjectHandle }
+def Native_SkeletalMeshRef_3e70a4ab_from(value:UObjectHandle):Native_SkeletalMeshRef_3e70a4ab { return Native_SkeletalMeshRef_3e70a4ab(handle=ue_cast_nullable_object(value,"/Script/Engine.SkeletalMesh")) }
+
+[ue_native_object(path="/Script/Engine.SkinnedAsset")]
+struct Native_SkinnedAssetRef_4bc30438 { handle:UObjectHandle }
+def Native_SkinnedAssetRef_4bc30438_from(value:UObjectHandle):Native_SkinnedAssetRef_4bc30438 { return Native_SkinnedAssetRef_4bc30438(handle=ue_cast_nullable_object(value,"/Script/Engine.SkinnedAsset")) }
+
+[ue_native_object(path="/Script/Engine.SkinnedMeshComponent")]
+struct Native_SkinnedMeshComponentRef_86806378 { handle:UObjectHandle }
+def Native_SkinnedMeshComponentRef_86806378_from(value:UObjectHandle):Native_SkinnedMeshComponentRef_86806378 { return Native_SkinnedMeshComponentRef_86806378(handle=ue_cast_nullable_object(value,"/Script/Engine.SkinnedMeshComponent")) }
 
 [ue_native_object(path="/Script/Engine.SpectatorPawn")]
 struct Native_SpectatorPawnRef_c2962b49 { handle:UObjectHandle }
 def Native_SpectatorPawnRef_c2962b49_from(value:UObjectHandle):Native_SpectatorPawnRef_c2962b49 { return Native_SpectatorPawnRef_c2962b49(handle=ue_cast_nullable_object(value,"/Script/Engine.SpectatorPawn")) }
 
+[ue_native_object(path="/Script/Engine.StaticMeshSocket")]
+struct Native_StaticMeshSocketRef_d3e8fe65 { handle:UObjectHandle }
+def Native_StaticMeshSocketRef_d3e8fe65_from(value:UObjectHandle):Native_StaticMeshSocketRef_d3e8fe65 { return Native_StaticMeshSocketRef_d3e8fe65(handle=ue_cast_nullable_object(value,"/Script/Engine.StaticMeshSocket")) }
+
 [ue_native_object(path="/Script/Engine.TouchInterface")]
 struct Native_TouchInterfaceRef_ae05e058 { handle:UObjectHandle }
 def Native_TouchInterfaceRef_ae05e058_from(value:UObjectHandle):Native_TouchInterfaceRef_ae05e058 { return Native_TouchInterfaceRef_ae05e058(handle=ue_cast_nullable_object(value,"/Script/Engine.TouchInterface")) }
+
+[ue_native_object(path="/Script/EnhancedInput.InputModifier")]
+struct Native_InputModifierRef_de1d97c5 { handle:UObjectHandle }
+def Native_InputModifierRef_de1d97c5_from(value:UObjectHandle):Native_InputModifierRef_de1d97c5 { return Native_InputModifierRef_de1d97c5(handle=ue_cast_nullable_object(value,"/Script/EnhancedInput.InputModifier")) }
+
+[ue_native_object(path="/Script/EnhancedInput.InputTrigger")]
+struct Native_InputTriggerRef_9095301f { handle:UObjectHandle }
+def Native_InputTriggerRef_9095301f_from(value:UObjectHandle):Native_InputTriggerRef_9095301f { return Native_InputTriggerRef_9095301f(handle=ue_cast_nullable_object(value,"/Script/EnhancedInput.InputTrigger")) }
+
+[ue_native_object(path="/Script/EnhancedInput.PlayerMappableKeySettings")]
+struct Native_PlayerMappableKeySettingsRef_585857fd { handle:UObjectHandle }
+def Native_PlayerMappableKeySettingsRef_585857fd_from(value:UObjectHandle):Native_PlayerMappableKeySettingsRef_585857fd { return Native_PlayerMappableKeySettingsRef_585857fd(handle=ue_cast_nullable_object(value,"/Script/EnhancedInput.PlayerMappableKeySettings")) }
 
 [ue_native_object(path="/Script/PhysicsCore.PhysicalMaterial")]
 struct Native_PhysicalMaterialRef_b3257fa1 { handle:UObjectHandle }
 def Native_PhysicalMaterialRef_b3257fa1_from(value:UObjectHandle):Native_PhysicalMaterialRef_b3257fa1 { return Native_PhysicalMaterialRef_b3257fa1(handle=ue_cast_nullable_object(value,"/Script/PhysicsCore.PhysicalMaterial")) }
 
-[ue_native_object(path="/Script/UMG.UserWidget")]
-struct Native_UserWidgetRef_a3d12281 { handle:UObjectHandle }
-def Native_UserWidgetRef_a3d12281_from(value:UObjectHandle):Native_UserWidgetRef_a3d12281 { return Native_UserWidgetRef_a3d12281(handle=ue_cast_nullable_object(value,"/Script/UMG.UserWidget")) }
+[ue_native_object(path="/Script/StaticMeshDescription.StaticMeshDescription")]
+struct Native_StaticMeshDescriptionRef_26792a74 { handle:UObjectHandle }
+def Native_StaticMeshDescriptionRef_26792a74_from(value:UObjectHandle):Native_StaticMeshDescriptionRef_26792a74 { return Native_StaticMeshDescriptionRef_26792a74(handle=ue_cast_nullable_object(value,"/Script/StaticMeshDescription.StaticMeshDescription")) }
+
+[ue_native_object(path="/Script/UMG.PanelSlot")]
+struct Native_PanelSlotRef_ee99b2a9 { handle:UObjectHandle }
+def Native_PanelSlotRef_ee99b2a9_from(value:UObjectHandle):Native_PanelSlotRef_ee99b2a9 { return Native_PanelSlotRef_ee99b2a9(handle=ue_cast_nullable_object(value,"/Script/UMG.PanelSlot")) }
+
+[ue_native_object(path="/Script/UMG.PanelWidget")]
+struct Native_PanelWidgetRef_7bd308a3 { handle:UObjectHandle }
+def Native_PanelWidgetRef_7bd308a3_from(value:UObjectHandle):Native_PanelWidgetRef_7bd308a3 { return Native_PanelWidgetRef_7bd308a3(handle=ue_cast_nullable_object(value,"/Script/UMG.PanelWidget")) }
+
+[ue_native_object(path="/Script/UMG.UserWidgetExtension")]
+struct Native_UserWidgetExtensionRef_d851f6f2 { handle:UObjectHandle }
+def Native_UserWidgetExtensionRef_d851f6f2_from(value:UObjectHandle):Native_UserWidgetExtensionRef_d851f6f2 { return Native_UserWidgetExtensionRef_d851f6f2(handle=ue_cast_nullable_object(value,"/Script/UMG.UserWidgetExtension")) }
+
+[ue_native_object(path="/Script/UMG.Widget")]
+struct Native_WidgetRef_f2421369 { handle:UObjectHandle }
+def Native_WidgetRef_f2421369_from(value:UObjectHandle):Native_WidgetRef_f2421369 { return Native_WidgetRef_f2421369(handle=ue_cast_nullable_object(value,"/Script/UMG.Widget")) }
+
+[ue_native_object(path="/Script/UMG.WidgetAnimation")]
+struct Native_WidgetAnimationRef_462f92b4 { handle:UObjectHandle }
+def Native_WidgetAnimationRef_462f92b4_from(value:UObjectHandle):Native_WidgetAnimationRef_462f92b4 { return Native_WidgetAnimationRef_462f92b4(handle=ue_cast_nullable_object(value,"/Script/UMG.WidgetAnimation")) }
+
+[ue_native_object(path="/Script/UMG.WidgetNavigation")]
+struct Native_WidgetNavigationRef_8de38c28 { handle:UObjectHandle }
+def Native_WidgetNavigationRef_8de38c28_from(value:UObjectHandle):Native_WidgetNavigationRef_8de38c28 { return Native_WidgetNavigationRef_8de38c28(handle=ue_cast_nullable_object(value,"/Script/UMG.WidgetNavigation")) }
+
+typedef NativeSoftClass_Actor_ed297b28 = $UESoftClass<C_Actor_adf65d5b>
+
+typedef NativeSoftObject_Object_f325c329 = $UESoftObject<C_Object_55c3753a>
+
+[ue_native_enum(path="/Script/ClothingSystemRuntimeInterface.EClothingTeleportMode")]
+enum EClothingTeleportMode {
+    None=0
+    Teleport=1
+    TeleportAndReset=2
+    HardReset=3
+}
 
 [ue_native_enum(path="/Script/CoreUObject.EMouseCursor")]
 enum EMouseCursor {
@@ -116,10 +215,30 @@ enum EMouseCursor {
     Custom=14
 }
 
+[ue_native_enum(path="/Script/DasRuntime.EDasCallMode")]
+enum EDasCallMode {
+    Idle=0
+    Active=7
+    Paused=42
+}
+
+[ue_native_enum(path="/Script/DasRuntime.EDasLegacyMode")]
+enum EDasLegacyMode {
+    DasLegacyIdle=0
+    DasLegacyActive=9
+}
+
 [ue_native_enum(path="/Script/DasRuntime.EDasNativeHashKey")]
 enum EDasNativeHashKey {
     First=0
     Second=1
+}
+
+[ue_native_enum(path="/Script/Engine.EAnimationMode")]
+enum EAnimationMode {
+    AnimationBlueprint=0
+    AnimationSingleNode=1
+    AnimationCustomMode=2
 }
 
 [ue_native_enum(path="/Script/Engine.EAspectRatioAxisConstraint")]
@@ -256,6 +375,13 @@ enum EControllerAnalogStick {
     CAS_RightStick=1
 }
 
+[ue_native_enum(path="/Script/Engine.ECustomBoneAttributeLookup")]
+enum ECustomBoneAttributeLookup {
+    BoneOnly=0
+    ImmediateParent=1
+    ParentHierarchy=2
+}
+
 [ue_native_enum(path="/Script/Engine.EDetachmentRule")]
 enum EDetachmentRule {
     KeepRelative=0
@@ -321,6 +447,12 @@ enum EIndirectLightingCacheQuality {
     ILCQ_Volume=2
 }
 
+[ue_native_enum(path="/Script/Engine.EKinematicBonesUpdateToPhysics")]
+enum EKinematicBonesUpdateToPhysics {
+    SkipSimulatingBones=0
+    SkipAllBones=1
+}
+
 [ue_native_enum(path="/Script/Engine.EMovementMode")]
 enum EMovementMode {
     MOVE_None=0
@@ -354,6 +486,28 @@ enum ENetworkSmoothingMode {
     Disabled=0
     Linear=1
     Exponential=2
+}
+
+[ue_native_enum(path="/Script/Engine.EPerQualityLevels")]
+enum EPerQualityLevels {
+    Low=0
+    Medium=1
+    High=2
+    Epic=3
+    Cinematic=4
+    Num=5
+}
+
+[ue_native_enum(path="/Script/Engine.EPhysBodyOp")]
+enum EPhysBodyOp {
+    PBO_None=0
+    PBO_Term=1
+}
+
+[ue_native_enum(path="/Script/Engine.EPhysicsTransformUpdateMode")]
+enum EPhysicsTransformUpdateMode {
+    SimulationUpatesComponentTransform=0
+    ComponentTransformIsKinematic=1
 }
 
 [ue_native_enum(path="/Script/Engine.EPlaneConstraintAxisSetting")]
@@ -415,6 +569,12 @@ enum EShadowCacheInvalidationBehavior {
     Static=3
 }
 
+[ue_native_enum(path="/Script/Engine.ESkinWeightProfileLayer")]
+enum ESkinWeightProfileLayer {
+    Primary=0
+    Secondary=1
+}
+
 [ue_native_enum(path="/Script/Engine.ESpawnActorCollisionHandlingMethod")]
 enum ESpawnActorCollisionHandlingMethod {
     Undefined=0
@@ -422,6 +582,13 @@ enum ESpawnActorCollisionHandlingMethod {
     AdjustIfPossibleButAlwaysSpawn=2
     AdjustIfPossibleButDontSpawnIfColliding=3
     DontSpawnIfColliding=4
+}
+
+[ue_native_enum(path="/Script/Engine.EStaticMeshPaintSupport")]
+enum EStaticMeshPaintSupport {
+    Default=0
+    Enabled=1
+    Disabled=2
 }
 
 [ue_native_enum(path="/Script/Engine.ETickingGroup")]
@@ -454,12 +621,55 @@ enum EViewTargetBlendFunction {
     VTBlend_PreBlended=5
 }
 
+[ue_native_enum(path="/Script/Engine.EVisibilityBasedAnimTickOption")]
+enum EVisibilityBasedAnimTickOption {
+    AlwaysTickPoseAndRefreshBones=0
+    AlwaysTickPose=1
+    OnlyTickMontagesAndRefreshBonesWhenPlayingMontages=2
+    OnlyTickMontagesWhenNotRendered=3
+    OnlyTickPoseWhenRendered=4
+}
+
 [ue_native_enum(path="/Script/Engine.EWalkableSlopeBehavior")]
 enum EWalkableSlopeBehavior {
     WalkableSlope_Default=0
     WalkableSlope_Increase=1
     WalkableSlope_Decrease=2
     WalkableSlope_Unwalkable=3
+}
+
+[ue_native_enum(path="/Script/EnhancedInput.EInputActionAccumulationBehavior")]
+enum EInputActionAccumulationBehavior {
+    TakeHighestAbsoluteValue=0
+    Cumulative=1
+}
+
+[ue_native_enum(path="/Script/EnhancedInput.EInputActionValueType")]
+enum EInputActionValueType {
+    Boolean=0
+    Axis1D=1
+    Axis2D=2
+    Axis3D=3
+}
+
+[ue_native_enum(path="/Script/EnhancedInput.EMappingContextInputModeFilterOptions")]
+enum EMappingContextInputModeFilterOptions {
+    UseProjectDefaultQuery=0
+    UseCustomQuery=1
+    DoNotFilter=2
+}
+
+[ue_native_enum(path="/Script/EnhancedInput.EMappingContextRegistrationTrackingMode")]
+enum EMappingContextRegistrationTrackingMode {
+    Untracked=0
+    CountRegistrations=1
+}
+
+[ue_native_enum(path="/Script/EnhancedInput.EPlayerMappableKeySettingBehaviors")]
+enum EPlayerMappableKeySettingBehaviors {
+    InheritSettingsFromAction=0
+    OverrideSettings=1
+    IgnoreSettings=2
 }
 
 [ue_native_enum(path="/Script/InputCore.EControllerHand")]
@@ -501,6 +711,110 @@ enum ETouchIndex {
     MAX_TOUCHES=11
 }
 
+[ue_native_enum(path="/Script/SlateCore.ESlateColorStylingMode")]
+enum ESlateColorStylingMode {
+    UseColor_Specified=0
+    UseColor_ColorTable=1
+    UseColor_Foreground=2
+    UseColor_Foreground_Subdued=3
+    UseColor_UseStyle=4
+}
+
+[ue_native_enum(path="/Script/SlateCore.EUINavigation")]
+enum EUINavigation {
+    Left=0
+    Right=1
+    Up=2
+    Down=3
+    Next=4
+    Previous=5
+    Num=6
+    Invalid=7
+}
+
+[ue_native_enum(path="/Script/SlateCore.EUINavigationRule")]
+enum EUINavigationRule {
+    Escape=0
+    Explicit=1
+    Wrap=2
+    Stop=3
+    Custom=4
+    CustomBoundary=5
+    Invalid=6
+}
+
+[ue_native_enum(path="/Script/SlateCore.EWidgetClipping")]
+enum EWidgetClipping {
+    Inherit=0
+    ClipToBounds=1
+    ClipToBoundsWithoutIntersecting=2
+    ClipToBoundsAlways=3
+    OnDemand=4
+}
+
+[ue_native_enum(path="/Script/UMG.ESlateVisibility")]
+enum ESlateVisibility {
+    Visible=0
+    Collapsed=1
+    Hidden=2
+    HitTestInvisible=3
+    SelfHitTestInvisible=4
+}
+
+[ue_native_enum(path="/Script/UMG.EUMGSequencePlayMode")]
+enum EUMGSequencePlayMode {
+    Forward=0
+    Reverse=1
+    PingPong=2
+}
+
+[ue_native_enum(path="/Script/UMG.EWidgetTickFrequency")]
+enum EWidgetTickFrequency {
+    Never=0
+    Auto=1
+}
+
+[ue_native_struct(path="/Script/CoreUObject.Box")]
+struct Box {
+    Min:UEVector
+    Max:UEVector
+    IsValid:bool
+}
+
+[ue_native_struct(path="/Script/CoreUObject.Vector2f")]
+struct Vector2f {
+    X:float
+    Y:float
+}
+
+[ue_native_struct(path="/Script/CoreUObject.Box2f")]
+struct Box2f {
+    Min:Vector2f
+    Max:Vector2f
+    bIsValid:bool
+}
+
+[ue_native_struct(path="/Script/CoreUObject.BoxSphereBounds")]
+struct BoxSphereBounds {
+    Origin:UEVector
+    BoxExtent:UEVector
+    SphereRadius:double
+}
+
+[ue_native_struct(path="/Script/CoreUObject.IntPoint")]
+struct IntPoint {
+    X:int
+    Y:int
+}
+
+[ue_native_struct(path="/Script/CoreUObject.LinearColor")]
+struct LinearColor {
+    R:float
+    G:float
+    B:float
+    A:float
+}
+
 [ue_native_struct(path="/Script/CoreUObject.PlatformUserId")]
 struct PlatformUserId {
     InternalId:int
@@ -522,10 +836,49 @@ struct Vector4 {
     W:double
 }
 
+[ue_native_struct(path="/Script/DasRuntime.DasCallMetrics")]
+struct DasCallMetrics {
+    Ratio:float
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasCallPayload")]
+struct DasCallPayload {
+    Metrics:DasCallMetrics
+    Count:int
+    Label:string
+    bEnabled:bool
+    Weight:double
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasHashSnapshot")]
+struct DasHashSnapshot {
+    Values:table<int;string>
+    Tags:table<string>
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasHashContainerSnapshot")]
+struct DasHashContainerSnapshot {
+    Items:array<DasHashSnapshot>
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasNamedMode")]
+struct DasNamedMode {
+    Mode:EDasCallMode
+    Key:UENameValue
+}
+
 [ue_native_struct(path="/Script/DasRuntime.DasNativeHashValue")]
 struct DasNativeHashValue {
     Labels:table<int;string>
     Names:table<string>
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasNativeSoftValue")]
+struct DasNativeSoftValue {
+    Asset:NativeSoftObject_Object_f325c329
+    ActorType:NativeSoftClass_Actor_ed297b28
+    Items:array<NativeSoftObject_Object_f325c329>
+    Classes:table<string;NativeSoftClass_Actor_ed297b28>
 }
 
 [ue_native_struct(path="/Script/Engine.LightingChannels")]
@@ -571,6 +924,24 @@ struct NavAvoidanceMask {
     bGroup31:bool
 }
 
+[ue_native_struct(path="/Script/Engine.PoseSnapshot")]
+struct PoseSnapshot {
+    LocalTransforms:array<UETransform>
+    BoneNames:array<UENameValue>
+    SkeletalMeshName:UENameValue
+    SnapshotName:UENameValue
+    bIsValid:bool
+}
+
+[ue_native_struct(path="/Script/Engine.SingleAnimationPlayData")]
+struct SingleAnimationPlayData {
+    AnimToPlay:Native_AnimationAssetRef_c8dec86d
+    bSavedLooping:bool
+    bSavedPlaying:bool
+    SavedPosition:float
+    SavedPlayRate:float
+}
+
 [ue_native_struct(path="/Script/Engine.StreamingSourceShape")]
 struct StreamingSourceShape {
     bUseGridLoadingRange:bool
@@ -591,4 +962,49 @@ struct WalkableSlopeOverride {
 [ue_native_struct(path="/Script/InputCore.Key")]
 struct Key {
     KeyName:UENameValue
+}
+
+[ue_native_struct(path="/Script/EnhancedInput.EnhancedActionKeyMapping")]
+struct EnhancedActionKeyMapping {
+    Triggers:array<Native_InputTriggerRef_9095301f>
+    Modifiers:array<Native_InputModifierRef_de1d97c5>
+    Action:InputActionRef
+    Key:Key
+    bShouldBeIgnored:bool
+    bHasAlwaysTickTrigger:bool
+    SettingBehavior:EPlayerMappableKeySettingBehaviors
+    PlayerMappableKeySettings:Native_PlayerMappableKeySettingsRef_585857fd
+}
+
+[ue_native_struct(path="/Script/EnhancedInput.InputMappingContextMappingData")]
+struct InputMappingContextMappingData {
+    Mappings:array<EnhancedActionKeyMapping>
+}
+
+[ue_native_struct(path="/Script/Slate.Anchors")]
+struct Anchors {
+    Minimum:UEVector2D
+    Maximum:UEVector2D
+}
+
+[ue_native_struct(path="/Script/SlateCore.Margin")]
+struct Margin {
+    Left:float
+    Top:float
+    Right:float
+    Bottom:float
+}
+
+[ue_native_struct(path="/Script/SlateCore.SlateColor")]
+struct SlateColor {
+    SpecifiedColor:LinearColor
+    ColorUseRule:ESlateColorStylingMode
+}
+
+[ue_native_struct(path="/Script/UMG.WidgetTransform")]
+struct WidgetTransform {
+    Translation:UEVector2D
+    Scale:UEVector2D
+    Shear:UEVector2D
+    Angle:float
 }

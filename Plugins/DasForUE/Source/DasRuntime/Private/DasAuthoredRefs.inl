@@ -212,15 +212,20 @@ struct FUEReferenceMutationVisitor:das::Visitor {
  das::ExpressionPtr Rewrite(das::Expression* Original,das::Expression* Target,das::ExprOp2* Assignment,das::ExprCall* OperationCall){
   const auto R=Root(Target);if(!R.Expr)return Original;
   try{
-   if(!DSLAuthoredView(R.OwnerType)){if(!OperationCall && R.Expr==Target)return Original;DSLFail(TEXT("Native snapshot nested writes require whole-value assignment"));}
-   const auto C=DSLReferenceDeclaration(R.OwnerType);const auto* Property=C.Properties.FindByPredicate([&](const auto& V){return V.Name==DSLText(R.Name);});
+   const bool Native=!DSLAuthoredView(R.OwnerType);if(!OperationCall && R.Expr==Target)return Original;
+   FDasDeclaredClass C;FDasDeclaredProperty NativeProperty;
+   if(Native){C.Id=DSLTypedReferencePath(R.OwnerType);NativeProperty=DSLNativeReferenceProperty(R.OwnerType,R.Name);}else C=DSLReferenceDeclaration(R.OwnerType);
+   const auto* Property=Native?&NativeProperty:C.Properties.FindByPredicate([&](const auto& V){return V.Name==DSLText(R.Name);});
    if(!Property || (Property->Type.Kind!=TEXT("struct") && !DasContainerCarrier(Property->Type)))return Original;
    if(Property->bReadOnly)DSLFail(TEXT("Cannot mutate readonly authored property"));if(!OperationCall && R.Expr==Target)return Original;
-   const auto* A=DSLAnnotation(R.OwnerType->structType->annotations,"ue_object_ref");
-   const FString Key=DSLString(A->arguments,"script")+TEXT("::")+DSLString(A->arguments,"type")+TEXT("::")+DSLText(R.Name);
-   const auto* Descriptor=DSLPropertySourceSignatures.Find(Key);if(!Descriptor)return Original;
-   auto RootType=DSLMethodValueType(Program,Module,Property->Type,Descriptor->Name,Descriptor->Scope,Original->at);
-   if(!DSLDirectStruct(RootType) && !DSLContainer(RootType))return Original;const FString RootPath=DasContainerCarrier(Property->Type)?DasContainerCarrier(Property->Type)->GetPathName():Property->Type.TypePath;
+   das::TypeDeclPtr RootType;
+   if(Native)RootType=DSLNativeValueType(Program,Module,Property->Type,Original->at);
+   else {const auto* A=DSLAnnotation(R.OwnerType->structType->annotations,"ue_object_ref");
+    const FString Key=DSLString(A->arguments,"script")+TEXT("::")+DSLString(A->arguments,"type")+TEXT("::")+DSLText(R.Name);
+    const auto* Descriptor=DSLPropertySourceSignatures.Find(Key);if(!Descriptor)return Original;
+    RootType=DSLMethodValueType(Program,Module,Property->Type,Descriptor->Name,Descriptor->Scope,Original->at);}
+
+   if(!DSLDirectStruct(RootType) && !DSLContainer(RootType)){if(Native)DSLFail(TEXT("Native nested writes require a supported value struct or container"));return Original;}const FString RootPath=DasContainerCarrier(Property->Type)?DasContainerCarrier(Property->Type)->GetPathName():Property->Type.TypePath;
    das::vector<das::Expression*> Steps;for(auto* E=Target;E!=R.Expr;){Steps.push_back(E);if(E->rtti_isField())E=static_cast<das::ExprField*>(E)->value;else if(E->rtti_isAt())E=static_cast<das::ExprAt*>(E)->subexpr;else DSLFail(TEXT("Unsupported authored mutation path"));}
    auto* Fn=new das::Function();Fn->at=Original->at;Fn->name="__ue_reference_mutation_"+das::to_string(Module->functions.unlocked_size())+"_"+das::to_string(Helpers.size());Fn->generated=true;Fn->privateFunction=false;
    auto* Call=DSLCall(Original->at,Fn->name,{R.Owner});
@@ -243,9 +248,9 @@ struct FUEReferenceMutationVisitor:das::Visitor {
    Fn->result=new das::TypeDecl(Result?das::Type::tBool:das::Type::tVoid,Original->at);auto* Body=new das::ExprBlock();Body->at=Original->at;
    auto Local=[&](const das::string& N,const das::TypeDeclPtr& T,das::ExpressionPtr Init,bool Move){auto* V=new das::Variable();V->at=Original->at;V->name=N;V->type=DSLObjectCopyType(T);V->type->ref=false;V->type->constant=false;V->init=Init;V->init_via_move=Move;auto* Let=new das::ExprLet();Let->at=Original->at;Let->variables.push_back(V);Body->list.push_back(Let);};
    auto Handle=[&](){return new das::ExprField(Original->at,new das::ExprVar(Original->at,"receiver"),"handle");};
-   Local("snapshot",RootType,DSLDirectUnpack(Original->at,RootType,DSLCall(Original->at,"__ue_authored_get_struct",{Handle(),new das::ExprConstString(Original->at,DSLUtf8(C.Id)),new das::ExprConstString(Original->at,R.Name)}),RootPath),true);
+   Local("snapshot",RootType,DSLDirectUnpack(Original->at,RootType,DSLCall(Original->at,Native?"__ue_native_get_struct":"__ue_authored_get_struct",{Handle(),new das::ExprConstString(Original->at,DSLUtf8(C.Id)),new das::ExprConstString(Original->at,R.Name)}),RootPath),true);
    if(Result)Local("result",Fn->result,Mutation,false);else Body->list.push_back(Mutation);
-   Body->list.push_back(DSLCall(Original->at,"__ue_authored_set_struct",{Handle(),new das::ExprConstString(Original->at,DSLUtf8(C.Id)),new das::ExprConstString(Original->at,R.Name),DSLDirectPack(Original->at,RootType,new das::ExprVar(Original->at,"snapshot"),RootPath)}));
+   Body->list.push_back(DSLCall(Original->at,Native?"__ue_native_set_struct":"__ue_authored_set_struct",{Handle(),new das::ExprConstString(Original->at,DSLUtf8(C.Id)),new das::ExprConstString(Original->at,R.Name),DSLDirectPack(Original->at,RootType,new das::ExprVar(Original->at,"snapshot"),RootPath)}));
    if(Result)Body->list.push_back(new das::ExprReturn(Original->at,new das::ExprVar(Original->at,"result")));Fn->body=Body;Helpers.push_back(Fn);Changed=true;return Call;
   }catch(const std::exception& X){Program->error("Authored nested mutation failed",X.what(),"",Original->at,das::CompilationError::invalid_type);Changed=true;return DSLCall(Original->at,"__ue_invalid_authored_mutation",{new das::ExprConstString(Original->at,X.what())});}
  }

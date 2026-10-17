@@ -2,6 +2,7 @@
 #include "DasDefinedEnum.h"
 #include "DasReflectedTypes.h"
 #include "DasContainerTypes.h"
+#include "DasSoftReferences.h"
 #include "DasAuthoring.h"
 #include "DasPropertyTypes.h"
 #include "DasContainerRegistry.h"
@@ -260,8 +261,9 @@ UScriptStruct* ResolveByteMap(const FString& Path){
 
 
 }
-void ResetDasContainerCarriers(){CarrierRegistry.Reset();}
+void ResetDasContainerCarriers(){CarrierRegistry.Reset();ResetDasSoftCarriers();}
 UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type){
+    if(Type.Kind==TEXT("struct") && DasSoftProperty(Type.TypePath))return FindObject<UScriptStruct>(nullptr,*Type.TypePath);
     FString Error;if(!ValidateDasPropertyType(Type,EDasPropertyUsage::Container,Error))return nullptr;
     const FString Identity=Type.StorageIdentity();
     for(const auto& Entry:StaticCarriers())if(Entry.StorageIdentity==Identity)return Entry.Struct;
@@ -286,6 +288,7 @@ UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type){
     return nullptr;
 }
 FProperty* DasContainerProperty(const FString& Path){
+    if(auto* Soft=DasSoftProperty(Path))return Soft;
     for(const auto& Entry:StaticCarriers())if(Entry.Path==Path)return Entry.Values;
     if(Path.StartsWith(ByteMapPrefix)){auto* S=ResolveByteMap(Path);return S?S->FindPropertyByName(TEXT("Values")):nullptr;}
 
@@ -301,6 +304,7 @@ FProperty* DasContainerProperty(const FString& Path){
     return nullptr;
 }
 UScriptStruct* DasContainerCarrierForProperty(const FProperty* Property){
+    if(auto* Soft=DasSoftCarrierForProperty(Property))return Soft;
     FDasDeclaredType Type;FString Error;
     if(!DescribeDasProperty(Property,Type,Error) || !ValidateDasPropertyType(Type,EDasPropertyUsage::Container,Error))return nullptr;
     auto* Carrier=DasContainerCarrier(Type);

@@ -1,6 +1,9 @@
 options gen2
 module dsl_playable_character public
 require ue_native_gameplay public
+require ue_gameplay_services public
+require ue_health_refs public
+require ue_interaction public
 
 // The same field operators work in ordinary functions and in authored methods.
 def set_movement_speed(movement:CharacterMovementRef; value:float):float {
@@ -8,7 +11,7 @@ def set_movement_speed(movement:CharacterMovementRef; value:float):float {
     return movement.MaxWalkSpeed
 }
 
-// Assign the four input assets in Blueprint. Possess this Character with a local
+// Assign the mapping context, six input actions and HUD class in Blueprint. Possess this Character with a local
 // PlayerController (or set Auto Possess Player in the level). Tick waits for input.
 [ue_class(Blueprintable)]
 class PlayableCharacter : Character {
@@ -18,8 +21,18 @@ class PlayableCharacter : Character {
         var MoveAction:InputActionRef
         var LookAction:InputActionRef
         var JumpAction:InputActionRef
+        var InteractAction:InputActionRef
+        var HurtAction:InputActionRef
+        var UIAction:InputActionRef
+        var HUDClass:UserWidgetClass
     }
     state=ue_properties(BlueprintReadWrite) {
+        var Score:int=0
+        var HUD:UserWidgetRef
+        var UIOpen:bool=false
+        var Interactions:int=0
+        var HealthChanges:int=0
+        var HUDClicks:int=0
         var ControlsBound:bool=false
         var MoveEvents:int=0
         var LookEvents:int=0
@@ -28,8 +41,10 @@ class PlayableCharacter : Character {
     components=ue_components(VisibleAnywhere,BlueprintReadOnly) {
         var Camera:CameraComponentRef
         var Label:TextRenderComponentRef
+        var Health:HealthComponentRef
     }
     defaults=ue_defaults() {
+        self.HUDClass=ue_class_default("/Script/DasRuntime.DasGameplayHUD")
         self.bUseControllerRotationYaw=true
         self.Camera.RelativeLocation=ue_vector(0.0lf,0.0lf,64.0lf)
         self.Camera.bUsePawnControlRotation=true
@@ -44,10 +59,18 @@ class PlayableCharacter : Character {
         let pawn=ue_character_self()
         if (!ue_character_controls_ready(pawn)) {
             if (self.ControlsBound) { ue_input_unbind_all(); ue_enhanced_clear_contexts() }
+            if(ue_widget_visible(self.HUD)) { ue_widget_remove(self.HUD);self.HUD=default<UserWidgetRef>;self.UIOpen=false }
             self.ControlsBound=false
             return
         }
         if (!self.ControlsBound) { self.BindControls() }
+        if(!ue_widget_visible(self.HUD)) { self.SetupHUD() }
+    }
+    [ue_function(BlueprintCallable)]
+    def AddScore(amount:int):void {
+        self.Score+=amount
+        self.Label.K2_SetText(ue_text_invariant("Score: {self.Score}"))
+        self.RefreshHUD()
     }
     [ue_function(BlueprintCallable)]
     def BindControls():void {
@@ -58,6 +81,9 @@ class PlayableCharacter : Character {
         ue_enhanced_bind(self.JumpAction,"Started","OnJump")
         ue_enhanced_bind(self.JumpAction,"Completed","OnJump")
         ue_enhanced_bind(self.JumpAction,"Canceled","OnJump")
+        if(ue_is_valid(self.InteractAction)) { ue_enhanced_bind(self.InteractAction,"Started","OnInteract") }
+        if(ue_is_valid(self.HurtAction)) { ue_enhanced_bind(self.HurtAction,"Started","OnHurt") }
+        if(ue_is_valid(self.UIAction)) { ue_enhanced_bind(self.UIAction,"Started","OnToggleUI") }
         self.ControlsBound=true
     }
     [ue_function(BlueprintCallable)]
@@ -75,6 +101,47 @@ class PlayableCharacter : Character {
     def OnJump(value:bool):void {
         self.JumpEvents+=1
         if (value) { self.Jump() } else { self.StopJumping() }
+    }
+    [ue_function(BlueprintCallable)]
+    def SetupHUD():void {
+        if(ue_widget_visible(self.HUD)) { return }
+        if(!ue_class_valid(self.HUDClass)) { return }
+        self.UIOpen=false
+        self.HUD=ue_widget_create(self.HUDClass,ue_pawn_controller(ue_character_self()))
+        verify(ue_widget_show(self.HUD),"Cannot add HUD to local player screen")
+        ue_widget_bind_click(self.HUD,"Damage","HurtFromHUD")
+        self.RefreshHUD()
+    }
+    def RefreshHUD():void {
+        if(!ue_widget_visible(self.HUD)) { return }
+        ue_widget_set_text(self.HUD,"Score",ue_text_invariant("Score: {self.Score}"))
+        ue_widget_set_text(self.HUD,"Health",ue_text_invariant("Health: {self.Health.Current} / {self.Health.Maximum}"))
+    }
+    [ue_event(source="Health",name="Changed")]
+    def OnHealthChanged(current:float; maximum:float):void { self.HealthChanges+=1;self.RefreshHUD() }
+    [ue_function(BlueprintCallable)]
+    def HurtFromHUD():void { self.HUDClicks+=1;self.ReceiveDamage(25.0f) }
+    [ue_function(BlueprintCallable)]
+    def ReceiveDamage(amount:float):void {
+        ue_apply_damage(ue_self_actor(),amount,ue_self_actor(),ue_pawn_controller(ue_character_self()))
+    }
+    [ue_function(BlueprintCallable)]
+    def OnHurt(pressed:bool):void { if(pressed) { self.ReceiveDamage(25.0f) } }
+    [ue_function(BlueprintCallable)]
+    def OnToggleUI(pressed:bool):void {
+        if(!pressed || !ue_widget_visible(self.HUD)) { return }
+        self.UIOpen=!self.UIOpen
+        ue_widget_input(self.HUD,self.UIOpen)
+    }
+    [ue_function(BlueprintCallable)]
+    def OnInteract(pressed:bool):void {
+        if(!pressed) { return }
+        let start=self.Camera.K2_GetComponentLocation()
+        let forward=self.Camera.GetForwardVector()
+        let finish=ue_vector(start.x+forward.x*500.0lf,start.y+forward.y*500.0lf,start.z+forward.z*500.0lf)
+        let hit=ue_line_trace(start,finish)
+        let target=ue_hit_actor(hit)
+        if(hit.blocking_hit && ue_interact(target,ue_self_actor())) { self.Interactions+=1 }
     }
     [ue_function(BlueprintCallable)]
     def TakeControl(player:PlayerControllerRef):bool { return ue_pawn_possess(player,ue_character_self()) }

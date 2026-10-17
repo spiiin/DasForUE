@@ -1,0 +1,13 @@
+{
+  "entries": [
+    "dsl_playable_character",
+    "dsl_playable_pickup",
+    "ue_native_hash_probe"
+  ],
+  "script_dirs": [
+    "../Plugins/DasForUE/Content/Das/Scripts"
+  ],
+  "external_modules": [
+    "ue_foundation"
+  ]
+}

@@ -1,4 +1,4 @@
-bool FDasRuntimeModule::ExportNativeGameplay(const FString& OutputPath,FString& Error){
+bool FDasRuntimeModule::ExportNativeGameplay(const FString& OutputPath,const FString& RequestsPath,FString& Error){
 #if !WITH_EDITOR
  Error=TEXT("Native gameplay export requires editor metadata");return false;
 #else
@@ -8,13 +8,41 @@ bool FDasRuntimeModule::ExportNativeGameplay(const FString& OutputPath,FString& 
  TMap<FString,UScriptStruct*> Structs;TMap<FString,UEnum*> UsedEnums;
  TFunction<TSharedPtr<FJsonObject>(FProperty*)> TypeJson;
  TypeJson=[&](FProperty* P){FDasDeclaredType T;DasNativeGameplayType(P,T);auto D=MakeShared<FJsonObject>();D->SetStringField(TEXT("kind"),T.Kind);D->SetStringField(TEXT("type_path"),T.TypePath);
+  if(auto* Soft=CastField<FSoftObjectProperty>(P)){auto* Class=CastField<FSoftClassProperty>(Soft);auto Info=MakeShared<FJsonObject>();Info->SetStringField(TEXT("base"),Class?Class->MetaClass->GetPathName():Soft->PropertyClass->GetPathName());Info->SetBoolField(TEXT("class_ref"),Class!=nullptr);D->SetObjectField(TEXT("soft_reference"),Info);}
   if(T.Kind==TEXT("enum"))UsedEnums.Add(T.TypePath,DasEnumPropertyType(P));
   if(T.Kind==TEXT("map")){auto* M=CastFieldChecked<FMapProperty>(P);D->SetObjectField(TEXT("key"),TypeJson(M->KeyProp));D->SetObjectField(TEXT("value"),TypeJson(M->ValueProp));}
   if(T.Kind==TEXT("set"))D->SetObjectField(TEXT("element"),TypeJson(CastFieldChecked<FSetProperty>(P)->ElementProp));
   if(T.Kind==TEXT("array"))D->SetObjectField(TEXT("element"),TypeJson(CastFieldChecked<FArrayProperty>(P)->Inner));
-  if(T.Kind==TEXT("struct") && !IsDasMathStructPath(T.TypePath)){UScriptStruct* S=CastFieldChecked<FStructProperty>(P)->Struct;if(!Structs.Contains(T.TypePath)){Structs.Add(T.TypePath,S);for(TFieldIterator<FProperty> I(S);I;++I)TypeJson(*I);}}
+  if(T.Kind==TEXT("struct") && !CastField<FSoftObjectProperty>(P) && !IsDasMathStructPath(T.TypePath)){UScriptStruct* S=CastFieldChecked<FStructProperty>(P)->Struct;if(!Structs.Contains(T.TypePath)){Structs.Add(T.TypePath,S);for(TFieldIterator<FProperty> I(S);I;++I)TypeJson(*I);}}
   return D;};
- TArray<TSharedPtr<FJsonValue>> Classes;auto Types=DasNativeGameplayClasses();Types.Sort([](const UClass& A,const UClass& B){return A.GetPathName()<B.GetPathName();});
+ // Receiver classes come from pre-inference DAS discovery, never a C++ allowlist.
+ FString RequestsText;TSharedPtr<FJsonObject> Requests;
+ if(!FFileHelper::LoadFileToString(RequestsText,*RequestsPath) || !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(RequestsText),Requests) || !Requests.IsValid()){
+  Error=TEXT("Cannot read native declaration requests: ")+RequestsPath;return false;
+ }
+ double Schema=0;const TArray<TSharedPtr<FJsonValue>>* Requested=nullptr;
+ if(!Requests->TryGetNumberField(TEXT("schema_version"),Schema) || Schema!=1 || !Requests->TryGetArrayField(TEXT("classes"),Requested) || Requested->IsEmpty()){
+  Error=TEXT("Invalid native declaration requests");return false;
+ }
+ TArray<UClass*> Types;TSet<FString> SeenPaths;
+ for(const auto& Item:*Requested){
+  const auto Object=Item->Type==EJson::Object?Item->AsObject():TSharedPtr<FJsonObject>();FString Path;
+  if(!Object.IsValid() || !Object->TryGetStringField(TEXT("path"),Path) || !Path.StartsWith(TEXT("/Script/"))){Error=TEXT("Invalid native receiver path");return false;}
+  FString Package,Name;if(!Path.Split(TEXT("."),&Package,&Name) || Package.Len()<=8 || Name.IsEmpty() || SeenPaths.Contains(Path)){
+   Error=TEXT("Invalid or duplicate native receiver: ")+Path;return false;
+  }
+  const FString ModuleName=Package.Mid(8);
+  if(!FModuleManager::Get().IsModuleLoaded(*ModuleName)){
+   if(!FModuleManager::Get().LoadModule(*ModuleName)){Error=TEXT("Cannot load native module: ")+ModuleName;return false;}
+  }
+  auto* Class=FindObject<UClass>(nullptr,*Path);
+  if(!Class || Class->GetPathName()!=Path || !Class->HasAnyClassFlags(CLASS_Native) || Class->HasAnyClassFlags(CLASS_Interface|CLASS_Deprecated|CLASS_NewerVersionExists)){
+   Error=TEXT("Not a supported native UObject class: ")+Path;return false;
+  }
+  SeenPaths.Add(Path);Types.Add(Class);
+ }
+ Manifest->SetObjectField(TEXT("discovery"),Requests);
+ TArray<TSharedPtr<FJsonValue>> Classes;Types.Sort([](const UClass& A,const UClass& B){return A.GetPathName()<B.GetPathName();});
  for(auto* Class:Types){auto Def=MakeShared<FJsonObject>();Def->SetStringField(TEXT("path"),Class->GetPathName());Def->SetBoolField(TEXT("fixture"),Class==UDasNativeHashProbeComponent::StaticClass());TArray<TSharedPtr<FJsonValue>> Fields,Methods,Skipped;
   auto Reject=[&](const TCHAR* Domain,const FString& Name,const FString& Reason){auto D=MakeShared<FJsonObject>();D->SetStringField(TEXT("domain"),Domain);D->SetStringField(TEXT("name"),Name);D->SetStringField(TEXT("reason"),Reason);Skipped.Add(MakeShared<FJsonValueObject>(D));};
   TArray<FProperty*> Props;for(TFieldIterator<FProperty> It(Class);It;++It)Props.Add(*It);Props.Sort([](const FProperty& A,const FProperty& B){return A.GetName()<B.GetName();});
