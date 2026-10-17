@@ -2445,7 +2445,7 @@ void FDasRuntimeModule::ShutdownModule()
         Sessions.Empty();
         PendingEvents.Empty();
         CreatedScriptScenes.Empty();
-        ResetDasStructArrayCarriers();
+        ResetDasContainerCarriers();
         das::Module::Shutdown();
         bInitialized = false;
     }

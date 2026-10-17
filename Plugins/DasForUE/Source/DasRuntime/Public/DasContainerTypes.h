@@ -124,7 +124,7 @@ struct DASRUNTIME_API FDasMapStringTextCarrier { GENERATED_BODY() UPROPERTY() TM
 
 struct FDasDeclaredType;
 class UScriptStruct;class FProperty;
-DASRUNTIME_API void ResetDasStructArrayCarriers();
+DASRUNTIME_API void ResetDasContainerCarriers();
 DASRUNTIME_API UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type);
 DASRUNTIME_API UScriptStruct* DasContainerCarrierForProperty(const FProperty* Property);
 DASRUNTIME_API FProperty* DasContainerProperty(const FString& Path);

@@ -31,8 +31,9 @@ copies values into replacement objects and consumes the archive only after succe
 Save changed Blueprint and map packages to persist the operation. Reimport marks
 packages dirty; it does not save them or rewrite source files.
 
-Supported fields: int32, float32, double, bool, string, name and supported native
-reflected structs. Replicated/RepNotify properties are refused. Existing archive
+Supported fields: int32, float32, double, byte, bool, string, localized FText,
+name, enum, typed object references, supported native reflected structs and
+containers accepted by the shared type descriptor. Replicated/RepNotify properties are refused. Existing archive
 entries cannot be overwritten. Missing values, incompatible kinds/struct snapshots,
 changed restoration declarations and occupied destination names are refused.
 
@@ -61,3 +62,10 @@ Unreal transactions remain separate work.
 
 Typed UObject fields are now supported too. Native snapshots pin referenced
 objects during migration and remap them through replacements; see DSLObjectFields.md.
+
+Restoration now uses the common Blueprint pin adapter and the same default-literal
+builder as ordinary class import. Container pins are native array/set/map pins,
+while retained values use the existing owned carrier. Pin/default conversion
+finishes before variables or instance data are changed. Parsed defaults remain
+GC-rooted through the operation. Delegate/event classes, class reference fields,
+authored class hierarchies and component migrations retain their existing guards.

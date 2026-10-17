@@ -3329,3 +3329,51 @@ SameType, size/alignment, hash flags, native carrier identity and invalid input
 without owner mutation. Existing per-family carrier caches/layout fingerprints,
 static UHT carriers and Blueprint pin adapters remain follow-up work.
 See SharedPropertyTypes.md for scope and validation evidence.
+
+## 2026-10-17 — Shared dynamic container registry
+
+Replaced ten dynamic carrier caches with FDasContainerRegistry. Eleven carrier
+construction paths share creation, capacity, GC ownership and definition
+fingerprints. Existing canonical carrier names and resolvers remain unchanged;
+static UHT carriers remain native. ResetDasContainerCarriers now releases one
+registry. No live carrier is replaced when a referenced definition changes.
+Private probes cover cache reuse, collisions, capacity, GC/recreation, nested
+struct layout changes, enum changes and authored member IDs. See
+SharedPropertyTypes.md for validation and scope.
+
+## 2026-10-17 — Descriptor-based reflected container lookup
+
+DasContainerCarrierForProperty now uses the shared descriptor, container policy,
+common declared-type selector and exact SameType/size/alignment checks. Removed
+four family-specific native map adapters and the parallel native-property
+selection table. Extended the matrix with descriptor/native/path/repeat lookup
+identity and explicit unsupported-native-shape rejection. See SharedPropertyTypes.md.
+
+## 2026-10-17 — Static UHT carrier catalog
+
+Replaced separate descriptor/path selection lists with one registration list of
+28 native UHT carriers. Their descriptors are inferred from native Values fields;
+no primitive type table is duplicated. Added complete-descriptor validation before
+static matching and assertions preserving native struct operations and canonical
+UHT names across all static matrix cases. See SharedPropertyTypes.md.
+
+## 2026-10-17 — Shared Blueprint pin adapter
+
+Added DasTypeToPin/DescribeDasPin and the legacy schema bridge in DasTypePins.
+Pin categories derive from shared FProperty creation and Unreal's Kismet schema;
+reverse conversion uses Kismet's property builder and common descriptor. Integrated
+class fields/method graphs, authored interfaces, reflected type import and numeric
+migrations, with an explicit symbolic-type resolver for /DasTypes identities.
+Delegate signature ownership and specialized graph construction remain
+separate. Added a 134-type real Blueprint compilation/roundtrip automation test
+and Scripts/TestTypePins.ps1. See SharedPropertyTypes.md for scope and evidence.
+
+## 2026-10-17 — Shared archive pins and Blueprint default literals
+
+Archive restoration now uses the common pin adapter, with all conversion completed
+before mutation. Ordinary Blueprint import and archive restoration share
+DasBlueprintFieldDefault, including native container Values and Transform pin
+grammar. Native container snapshots use the shared carrier registry rather than
+assuming every schema Struct is an FStructProperty. Expanded saved-asset coverage
+checks byte, localized text, arrays/sets/maps, inherited defaults, overrides,
+restoration, reopening and failure rollback. See DSLFieldArchiveValidation.md.

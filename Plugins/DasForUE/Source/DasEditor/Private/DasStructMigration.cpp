@@ -1,3 +1,4 @@
+#include "DasTypePins.h"
 #include "DasTypeService.h"
 #include "DasTypeRegistry.h"
 #include "DasReflectedTypes.h"
@@ -36,7 +37,7 @@
 #include "Misc/ScopeExit.h"
 namespace {
 int32 StructFailStage=0;
-FEdGraphPinType ScalarPin(const FString& K){FEdGraphPinType P;P.PinCategory=K==TEXT("int")?UEdGraphSchema_K2::PC_Int:K==TEXT("bool")?UEdGraphSchema_K2::PC_Boolean:K==TEXT("string")?UEdGraphSchema_K2::PC_String:K==TEXT("name")?UEdGraphSchema_K2::PC_Name:UEdGraphSchema_K2::PC_Real;if(K==TEXT("float") || K==TEXT("double"))P.PinSubCategory=K==TEXT("float")?UEdGraphSchema_K2::PC_Float:UEdGraphSchema_K2::PC_Double;return P;}
+FEdGraphPinType ScalarPin(const FString& Kind){FDasDeclaredType Type;Type.Kind=Kind;return DasTypePinChecked(Type);}
 FString ScalarDefault(const FDasDeclaredProperty& P){if(P.Type.Kind==TEXT("string") || P.Type.Kind==TEXT("name"))return P.Default.String;if(P.Type.Kind==TEXT("bool"))return P.Default.Boolean?TEXT("true"):TEXT("false");return P.Type.Kind==TEXT("int")?FString::FromInt(int32(P.Default.Number)):FString::Printf(TEXT("%.17g"),P.Default.Number);}
 void Canonical(FDasReflectedTypes& M){M.Enums.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});M.Structs.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});}
 bool HasStruct(FProperty* P,UScriptStruct* Type,int32 Depth=0){if(Depth>16)return true;if(auto* S=CastField<FStructProperty>(P)){if(S->Struct==Type)return true;for(TFieldIterator<FProperty> It(S->Struct);It;++It)if(HasStruct(*It,Type,Depth+1))return true;}else if(auto* A=CastField<FArrayProperty>(P))return HasStruct(A->Inner,Type,Depth+1);else if(auto* M=CastField<FMapProperty>(P))return HasStruct(M->KeyProp,Type,Depth+1) || HasStruct(M->ValueProp,Type,Depth+1);else if(auto* Set=CastField<FSetProperty>(P))return HasStruct(Set->ElementProp,Type,Depth+1);return false;}

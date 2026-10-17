@@ -28,3 +28,26 @@ to DasFrameAssetProbe in the smoke project. No user project assets were migrated
 Archive migration is editor functionality; packaged tests validate runtime
 compatibility, not editor migration commands. General rollback, lifecycle/delegate
 contexts and World Partition/streaming/other asset scopes remain future work.
+
+## Shared pin/default conversion validation — 2026-10-17
+
+Editor build and final up-to-date build passed. Expanded archive asset phases
+Create / Remove / ReopenRemoved / Restore / ReopenRestored passed. In addition to
+previous fields, the fixture checks byte 255, localized FText namespace/key/source,
+native int arrays and sets, and string-to-int maps. Parent/child CDOs, actor
+manual values and actors spawned while retired survive restore and reopening.
+Injected failures on removal/restoration still roll back; GUID and repeat checks
+also pass. The fixture keeps test marker comments separate from tooltip comments.
+
+ArchivePIE and Types.PinAdapter each report exactly 1 success, 0 warnings,
+failures or skipped tests. The pin adapter compiles a 134-type Blueprint matrix.
+Computed defaults Create / Reopen / Recompile passed after extracting the shared
+Blueprint literal builder. Runs used NullRHI. No packaged build was repeated for
+this editor migration change.
+
+Evidence: logs/archive-pins-editor-build.log,
+logs/archive-pins-editor-final-build.log, logs/archive-pins-suite.log,
+logs/archive-pins-{Create,Remove,ReopenRemoved,Restore,ReopenRestored}.log,
+logs/archive-pins-pie-report/index.json, logs/archive-pins-matrix-report/index.json
+and logs/archive-pins-defaults-{Create,Reopen,Recompile}.log.
+No commit was created.

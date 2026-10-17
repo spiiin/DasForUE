@@ -6,6 +6,7 @@ class RetireFields {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Marker : int = 1
     //RetireBegin
+
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Score : int = 5
     @ue_property=(EditAnywhere,BlueprintReadWrite)
@@ -21,6 +22,7 @@ class RetireFields {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Rate : float = 1.5
     //RetireEnd
+
     [ue_function(BlueprintCallable)]
     def Read():int { return self.Marker }
 }
