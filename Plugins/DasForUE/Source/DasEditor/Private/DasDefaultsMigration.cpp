@@ -66,6 +66,8 @@ bool DefaultFieldMatches(FProperty* P,const FDasFieldSchema& F){
  case EDasScalarKind::Double:return CastField<FDoubleProperty>(P)!=nullptr;
  case EDasScalarKind::Bool:return CastField<FBoolProperty>(P)!=nullptr;
  case EDasScalarKind::String:return CastField<FStrProperty>(P)!=nullptr;
+ case EDasScalarKind::Byte:return CastField<FByteProperty>(P)!=nullptr;
+ case EDasScalarKind::Text:return CastField<FTextProperty>(P)!=nullptr;
  case EDasScalarKind::Name:return CastField<FNameProperty>(P)!=nullptr;
  case EDasScalarKind::Enum:{auto* E=DasEnumPropertyType(P);return E && E->GetPathName()==F.EnumPath;}
  case EDasScalarKind::Class:{auto* C=CastField<FClassProperty>(P);return C && C->MetaClass && C->MetaClass->GetPathName()==F.ObjectClass;}

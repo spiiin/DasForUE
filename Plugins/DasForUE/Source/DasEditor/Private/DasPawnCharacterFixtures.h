@@ -1,4 +1,5 @@
 #pragma once
+#include "DasTextByteFixtures.h"
 #include "DasScriptHosts.h"
 #include "DasPlayableFixtures.h"
 #include "DasAuthoring.h"
@@ -24,5 +25,5 @@ inline bool PrepareDasPawnCharacterFixtures(const FString& Root,ADasStaticLibrar
  if(!PrepareDasPlayableInputAssets(Root,Playable,Error,SaveAssets))return false;
  Assets.Add(Playable);Carrier->PlayableCharacterClass=Playable->GeneratedClass;
  if(SaveAssets){FSavePackageArgs Save;Save.TopLevelFlags=RF_Public|RF_Standalone;const FString File=FPackageName::LongPackageNameToFilename(Playable->GetOutermost()->GetName(),FPackageName::GetAssetPackageExtension());if(!UPackage::SavePackage(Playable->GetOutermost(),Playable,*File,Save)){Error=TEXT("Cannot save playable Character");return false;}}
- return true;
+ return PrepareDasTextByteFixtures(Root,Carrier,Assets,Error,SaveAssets);
 }

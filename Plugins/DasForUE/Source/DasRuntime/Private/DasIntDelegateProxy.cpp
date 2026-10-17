@@ -46,3 +46,13 @@ void UDasIntDelegateProxy::ReceiveArrayString(const TArray<FString>& Value){if(!
 void UDasIntDelegateProxy::ReceiveVector2D(FVector2D Value){if(!IsInGameThread() || Value.ContainsNaN())return;if(auto* R=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"))){FDasScalarValue V;V.Kind=12;V.ObjectClass=TEXT("/Script/CoreUObject.Vector2D");V.StructValue.InitializeAs(TBaseStructure<FVector2D>::Get(),reinterpret_cast<const uint8*>(&Value));R->DispatchScalarEvent(SubscriptionId,V);}}
 
 void UDasIntDelegateProxy::ReceiveVector2DRef(const FVector2D& Value){if(!IsInGameThread() || Value.ContainsNaN())return;if(auto* R=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"))){FDasScalarValue V;V.Kind=12;V.ObjectClass=TEXT("/Script/CoreUObject.Vector2D");V.StructValue.InitializeAs(TBaseStructure<FVector2D>::Get(),reinterpret_cast<const uint8*>(&Value));R->DispatchScalarEvent(SubscriptionId,V);}}
+
+void UDasIntDelegateProxy::ReceiveByte(uint8 Value){if(!IsInGameThread())return;if(auto* R=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"))){FDasScalarValue V;V.Kind=17;V.ByteValue=Value;R->DispatchScalarEvent(SubscriptionId,V);}}
+
+void UDasIntDelegateProxy::ReceiveText(FText Value){if(!IsInGameThread())return;if(auto* R=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"))){FDasScalarValue V;V.Kind=18;V.TextValue=Value;R->DispatchScalarEvent(SubscriptionId,V);}}
+
+void UDasIntDelegateProxy::ReceiveTextRef(const FText& Value){if(!IsInGameThread())return;if(auto* R=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"))){FDasScalarValue V;V.Kind=18;V.TextValue=Value;R->DispatchScalarEvent(SubscriptionId,V);}}
+
+void UDasIntDelegateProxy::ReceiveArrayByte(const TArray<uint8>& Value){if(!IsInGameThread() || Value.Num()>4096)return;if(auto* R=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"))){FDasScalarValue V;V.Kind=12;V.ObjectClass=FDasArrayByteCarrier::StaticStruct()->GetPathName();V.StructValue.InitializeAs(FDasArrayByteCarrier::StaticStruct());V.StructValue.GetMutable<FDasArrayByteCarrier>().Values=Value;R->DispatchScalarEvent(SubscriptionId,V);}}
+
+void UDasIntDelegateProxy::ReceiveArrayText(const TArray<FText>& Value){if(!IsInGameThread() || Value.Num()>4096)return;if(auto* R=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"))){FDasScalarValue V;V.Kind=12;V.ObjectClass=FDasArrayTextCarrier::StaticStruct()->GetPathName();V.StructValue.InitializeAs(FDasArrayTextCarrier::StaticStruct());V.StructValue.GetMutable<FDasArrayTextCarrier>().Values=Value;R->DispatchScalarEvent(SubscriptionId,V);}}

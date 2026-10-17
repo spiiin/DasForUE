@@ -6,6 +6,12 @@
 
 class UDasTypeRegistry;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasByteSignal,uint8,Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasTextSignal,FText,Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasTextRefSignal,const FText&,Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasArrayByteSignal,const TArray<uint8>&,Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasArrayTextSignal,const TArray<FText>&,Value);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasIntSignal, int32, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasFloatSignal,float,Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasBoolSignal,bool,Value);
@@ -34,6 +40,11 @@ class DASRUNTIME_API ADasProbeActor : public AActor
 {
     GENERATED_BODY()
 public:
+    UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasByteSignal OnDasByteSignal;
+    UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasTextSignal OnDasTextSignal;
+    UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasTextRefSignal OnDasTextRefSignal;
+    UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasArrayByteSignal OnDasArrayByteSignal;
+    UPROPERTY(BlueprintAssignable,Category="DasForUE|Tests") FDasArrayTextSignal OnDasArrayTextSignal;
     // Cooked identity for checked authored references; not exposed as a script field.
     UPROPERTY() FString AuthoredTypeId;
     // Approved source default fingerprints; actual CDO values may be editor overrides.

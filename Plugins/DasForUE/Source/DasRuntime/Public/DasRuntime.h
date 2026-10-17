@@ -25,6 +25,7 @@ struct FDasExecutionResult
     float FloatValue = 0;
     bool BoolValue = false;
     FString StringValue;double DoubleValue=0;FName NameValue;TWeakObjectPtr<UObject> ObjectValue;
+    uint8 ByteValue=0;FText TextValue;
     FInstancedStruct StructValue;
     FScriptDelegate DelegateValue;
     TArray<FDasScalarValue> OutputValues;

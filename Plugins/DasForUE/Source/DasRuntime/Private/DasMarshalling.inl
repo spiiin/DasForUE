@@ -20,30 +20,32 @@
 
     EMarshallingKind FieldKind(FProperty* Property, das::Context* Context)
     {
-        if (Property->ArrayDim != 1) Context->throw_error("fixed arrays are not supported by call marshalling");
-        if (CastField<FMapProperty>(Property)) return EMarshallingKind::Map;
-        if (CastField<FSetProperty>(Property)) return EMarshallingKind::Set;
-        if (CastField<FArrayProperty>(Property)) return EMarshallingKind::Array;
-        if(CastField<FDelegateProperty>(Property))return EMarshallingKind::Delegate;
-        if (CallEnumType(Property)) return EMarshallingKind::Enum;
-        if (CastField<FByteProperty>(Property)) return EMarshallingKind::Byte;
-        if (CastField<FTextProperty>(Property)) return EMarshallingKind::Text;
-        if (CastField<FNameProperty>(Property)) return EMarshallingKind::Name;
-        if (CastField<FIntProperty>(Property)) return EMarshallingKind::Int;
-        if (CastField<FFloatProperty>(Property)) return EMarshallingKind::Float;
-        if (CastField<FDoubleProperty>(Property)) return EMarshallingKind::Double;
-        if (CastField<FBoolProperty>(Property)) return EMarshallingKind::Bool;
-        if (CastField<FStrProperty>(Property)) return EMarshallingKind::String;
-        if (CastField<FClassProperty>(Property)) return EMarshallingKind::Class;
-        if (DasReferencePropertyClass(Property)) return EMarshallingKind::Object;
-        if (CastField<FStructProperty>(Property)) return EMarshallingKind::Struct;
+        switch(DasPropertyKind(Property)){
+        case EDasTypeKind::Map:return EMarshallingKind::Map;
+        case EDasTypeKind::Set:return EMarshallingKind::Set;
+        case EDasTypeKind::Array:return EMarshallingKind::Array;
+        case EDasTypeKind::Delegate:return EMarshallingKind::Delegate;
+        case EDasTypeKind::Enum:return EMarshallingKind::Enum;
+        case EDasTypeKind::Byte:return EMarshallingKind::Byte;
+        case EDasTypeKind::Text:return EMarshallingKind::Text;
+        case EDasTypeKind::Name:return EMarshallingKind::Name;
+        case EDasTypeKind::Int:return EMarshallingKind::Int;
+        case EDasTypeKind::Float:return EMarshallingKind::Float;
+        case EDasTypeKind::Double:return EMarshallingKind::Double;
+        case EDasTypeKind::Bool:return EMarshallingKind::Bool;
+        case EDasTypeKind::String:return EMarshallingKind::String;
+        case EDasTypeKind::Class:return EMarshallingKind::Class;
+        case EDasTypeKind::Object:return EMarshallingKind::Object;
+        case EDasTypeKind::Struct:return EMarshallingKind::Struct;
+        default:break;
+        }
         Context->throw_error("unsupported UFunction or struct field type");
     }
 
     bool IsHashScalar(FProperty* Property, das::Context* Context)
     {
         const auto Kind = FieldKind(Property, Context);
-        return Kind == EMarshallingKind::Int || Kind == EMarshallingKind::Float || Kind == EMarshallingKind::Double || Kind == EMarshallingKind::Bool || Kind == EMarshallingKind::String || Kind == EMarshallingKind::Name || Kind == EMarshallingKind::Enum;
+        return Kind == EMarshallingKind::Byte || Kind == EMarshallingKind::Int || Kind == EMarshallingKind::Float || Kind == EMarshallingKind::Double || Kind == EMarshallingKind::Bool || Kind == EMarshallingKind::String || Kind == EMarshallingKind::Name || Kind == EMarshallingKind::Enum;
     }
 
     // Recursively validate the entire signature, including outputs, before allocating a frame.
@@ -55,7 +57,7 @@
             if (Property->ArrayDim != 1) Context->throw_error("fixed hash arrays require an adapter");
             const auto ValueKind = FieldKind(Map->ValueProp, Context);
             if ((!IsHashScalar(Map->KeyProp, Context) && !IsDasObjectHashProperty(Map->KeyProp)) ||
-                (!IsHashScalar(Map->ValueProp, Context) && ValueKind != EMarshallingKind::Struct && ValueKind != EMarshallingKind::Object))
+                (!IsHashScalar(Map->ValueProp, Context) && ValueKind != EMarshallingKind::Text && ValueKind != EMarshallingKind::Struct && ValueKind != EMarshallingKind::Object))
                 Context->throw_error("unsupported map key or value type");
             if (!Map->KeyProp->HasAllPropertyFlags(CPF_HasGetValueTypeHash)) Context->throw_error("map key requires UE value hashing");
             Signature.Add({Path.ToLower(), EMarshallingKind::Map, bInput, bOutput, Map->KeyProp->GetClass()->GetName() + TEXT(";") + Map->ValueProp->GetClass()->GetName()});

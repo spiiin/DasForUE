@@ -107,6 +107,21 @@ struct DASRUNTIME_API FDasMapStringNameCarrier {
 USTRUCT()
 struct DASRUNTIME_API FDasSetNameCarrier { GENERATED_BODY() UPROPERTY() TSet<FName> Values; };
 
+USTRUCT()
+struct DASRUNTIME_API FDasArrayByteCarrier { GENERATED_BODY() UPROPERTY() TArray<uint8> Values; };
+USTRUCT()
+struct DASRUNTIME_API FDasArrayTextCarrier { GENERATED_BODY() UPROPERTY() TArray<FText> Values; };
+USTRUCT()
+struct DASRUNTIME_API FDasSetByteCarrier { GENERATED_BODY() UPROPERTY() TSet<uint8> Values; };
+USTRUCT()
+struct DASRUNTIME_API FDasMapIntByteCarrier { GENERATED_BODY() UPROPERTY() TMap<int32,uint8> Values; };
+USTRUCT()
+struct DASRUNTIME_API FDasMapIntTextCarrier { GENERATED_BODY() UPROPERTY() TMap<int32,FText> Values; };
+USTRUCT()
+struct DASRUNTIME_API FDasMapStringByteCarrier { GENERATED_BODY() UPROPERTY() TMap<FString,uint8> Values; };
+USTRUCT()
+struct DASRUNTIME_API FDasMapStringTextCarrier { GENERATED_BODY() UPROPERTY() TMap<FString,FText> Values; };
+
 struct FDasDeclaredType;
 class UScriptStruct;class FProperty;
 DASRUNTIME_API void ResetDasStructArrayCarriers();

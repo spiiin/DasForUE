@@ -13,6 +13,9 @@ public:
  // Reflected references retain the complete Blueprint hierarchy during cook/GC.
  UPROPERTY() TArray<TSubclassOf<AActor>> PawnCharacterClasses;
  UPROPERTY() TSubclassOf<AActor> PlayableCharacterClass;
+ UPROPERTY() TSubclassOf<AActor> TextByteClass;
+ UPROPERTY() TSubclassOf<AActor> TextByteContainerClass;
+ UPROPERTY() TSubclassOf<AActor> TextByteEventsClass;
  UPROPERTY() TSubclassOf<AActor> DefaultActorClass;
  UPROPERTY() TSubclassOf<AActor> DefaultChildClass;
  UPROPERTY() TSubclassOf<UActorComponent> DefaultComponentClass;
@@ -28,3 +31,9 @@ DASRUNTIME_API bool RunDasPlayableMapProbe(UWorld* World,FString& Report);
 DASRUNTIME_API bool RunDasPlayableCharacterProbe(ADasStaticLibraryProbe* Carrier,FString& Report);
 
 DASRUNTIME_API bool RunDasPawnCharacterProbe(ADasStaticLibraryProbe* Carrier,FString& Report);
+
+DASRUNTIME_API bool RunDasTextByteProbe(ADasStaticLibraryProbe* Carrier,FString& Report);
+
+DASRUNTIME_API bool RunDasTextByteContainerProbe(ADasStaticLibraryProbe* Carrier,FString& Report);
+
+DASRUNTIME_API bool RunDasTextByteEventsProbe(ADasStaticLibraryProbe* Carrier,FString& Report);

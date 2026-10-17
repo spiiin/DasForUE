@@ -3241,3 +3241,91 @@ The five Engine receiver roots remain unchanged (337 fields/643 methods). Their 
 Validation complete: 22 generator tests passed; GenerateNativeGameplay -Check passed; strict PIE reported 1 success, 0 warnings/failures/skips, including 27 negative native fixtures. Win64 packaged Development build/cook/stage/archive, foundation, shared gameplay and saved playable-map launch passed under NullRHI. The native hash markers confirmed typed fields/input/return/out/ref, C++ payload readback, destroyed-key rejection and empty replacement. Test root: `/Game/DasCookedGameplay/15428d9822944b71a3592b85788da778`. No Shipping, physical rendering or physical-device validation is claimed.
 
 Stable logs: `logs/native-hash-check.log`, `logs/native-hash-pie.log`, `logs/native-hash-pie-report.json`, `logs/native-hash-cooked.log`, `logs/native-hash-cooked-runtime.log`, `logs/native-hash-foundation.log`, `logs/native-hash-map.log`. See NativeGameplayHashContainers.md for syntax and limits.
+
+
+### Asset array and FName object-map defaults (2026-10-17)
+
+Native object arrays and FName-to-object maps accept ue_asset_default(path),
+including null and audited computed paths. Reflected class constraints and
+top-level asset checks run before publication. Temporary parser/import snapshots
+are GC-referenced; published containers use normal Unreal ownership and cook
+dependencies. Manual edits retain the entire container during defaults merge.
+See DSLContainerDefaults.md for syntax, scope and validation evidence.
+Further stages: nonempty struct defaults, inherited explicit container overrides,
+asset sets and other asset map key types. Network work remains deferred.
+
+Validation complete: Editor/game builds, Create/Reopen/Recompile, snapshot retain/release GC, packaged defaults and foundation (0 failures). IoStore contains both container-only assets and excludes GCOnly. Evidence: logs/asset-container-defaults-*; map and archive documented in DSLContainerDefaults.md.
+
+## 2026-10-17 — Authored FText and uint8
+
+Authored class properties, ue_struct leaves and class method input/return/ref/out
+now support uint8 (raw byte) and FText (UETextValue alias). Literal byte defaults
+are checked before narrowing; localized/invariant text defaults preserve native
+FText history through Blueprint frames and saved/cooked assets. Struct default
+comparison checks text identity consistently in Editor and game, including
+nested structs, while retaining existing comparisons for structures without text.
+Generated native byte APIs keep their checked int ABI. Containers of these new
+primitive types, additional callback/delegate payloads, networking and broad
+migration extensions remain separate work. See DSLTextAndByte.md and
+dsl_text_byte.das / ue_text_byte_types.das / dsl_text_byte_calls.das.
+
+Validation: Editor and Win64 Development builds; strict gameplay PIE (1 pass,
+0 warnings/failures/skips); four negative DSL defaults; native generator -Check
+without artifact drift; packaged build/cook/stage/archive, foundation, gameplay
+and saved playable-map launch under NullRHI all passed. Checks include native
+byte/text property identity, uint8 0/255, typed fields and struct replacement,
+both combinations of byte/text ref/out, repeated calls after context release,
+ProcessEvent, serialized defaults and rejecting same display/different text key.
+Packaged test map: `/Game/DasCookedGameplay/fefbb7869acb43958e7241f419ef8417/Map`. Evidence: `logs/authored-values-*`.
+
+
+### Shared reflected defaults backend (2026-10-17)
+
+Replaced the container-specific decoder with a temporary typed value tree and
+recursive FProperty materializer. Struct fields and array/set/map positions use
+the same leaf handlers, budget, reference resolver and GC ownership. Native and
+component editable defaults also adapt into the shared atomic property API.
+Math containers lower to JSON struct fields; old saved container-default migration
+is intentionally omitted. Existing test assets are recreated/reimported.
+New cross-product checks cover asset sets, int/string object maps and object map
+keys. Recursive native struct, GC, atomic-failure, byte and localized text checks
+run with both Editor and packaged probes. See DSLDefaultValues.md.
+
+Shared-defaults validation complete: final Editor/game builds; Create/Reopen/Recompile; recursive GC, atomic failure, byte/FText checks; packaged defaults and foundation PASS (0 failures). Evidence and map: Docs/DSLDefaultValues.md. No saved-wire migration layer was added.
+
+## 2026-10-17 — Authored FText and uint8 containers
+
+Added arrays of byte/text, byte sets and byte keys, plus byte/text map values
+for all existing class key families. Authored structs keep int/string/byte map
+keys. Exact reflection/carrier identity, native ownership and context checks
+remain enforced. Default history comparison now handles arrays and map values.
+FText keys/sets and nested containers are rejected. Source defaults use the
+shared typed decoder; no second parser or compatibility layer was added.
+
+Validation 2026-10-17: final checks ran in C:/src/DasForUE2 after merging the
+completed shared-default decoder work. Editor and Win64 Development builds,
+strict gameplay PIE (1 pass, 0 warnings/failures/skips), packaged build/cook/stage/
+archive, foundation (0 failures), gameplay and saved playable-map launch passed
+under NullRHI. This includes new container shapes and existing gameplay APIs.
+Byte arrays, maps and sets preserve 0/255; localized/invariant text and nonempty
+array/set/map defaults survive serialization; typed fields, struct snapshots,
+method input/return/ref/out, direct index/push/insert/erase operations and repeated
+calls after context release pass. Three negative DSL declarations reject text
+keys, text sets and nested containers. Native generated APIs were not expanded.
+Packaged map: `/Game/DasCookedGameplay/6d1b431974cf4ec588d3764d3e73aee1/Map`. See DSLTextByteContainers.md. No commit was created.
+
+## 2026-10-17 — Shared type descriptor and FProperty factory
+
+Extended FDasDeclaredType with typed EDasTypeKind classification and transient
+physical enum storage, rather than introducing another type model. Added
+DescribeDasProperty, ValidateDasPropertyType and CreateDasProperty. The factory
+validates the complete tree before allocation; callers attach and link it.
+Dynamic container carriers and delegate signatures use this common path.
+DSL matching and runtime marshalling share the reflected-kind classifier.
+
+The descriptor keeps FByteProperty-enum versus FEnumProperty storage explicit.
+Matrix probes check scalar/class/array/set/map creation, descriptor round trips,
+SameType, size/alignment, hash flags, native carrier identity and invalid input
+without owner mutation. Existing per-family carrier caches/layout fingerprints,
+static UHT carriers and Blueprint pin adapters remain follow-up work.
+See SharedPropertyTypes.md for scope and validation evidence.

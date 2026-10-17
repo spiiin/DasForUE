@@ -1,4 +1,5 @@
 #include "DasContainerTypes.h"
+#include "DasDefaultRoots.h"
 #include "Serialization/JsonSerializer.h"
 #include "GameFramework/Actor.h"
 #include "DasSchema.h"
@@ -8,6 +9,7 @@
 #include "UObject/Class.h"
 #include "UObject/UnrealType.h"
 #include "UObject/StrProperty.h"
+#include "UObject/TextProperty.h"
 #include "Misc/OutputDevice.h"
 FProperty* FindDasStructField(UScriptStruct* Type,const FString& Name){if(auto* P=Type->FindPropertyByName(*Name))return P;if(Type->IsA<UUserDefinedStruct>())for(TFieldIterator<FProperty> It(Type);It;++It)if(Type->GetAuthoredNameForField(*It)==Name)return *It;return nullptr;}
 bool ValidateDasValueStruct(const FString& Path,FString& Error){
@@ -15,10 +17,10 @@ bool ValidateDasValueStruct(const FString& Path,FString& Error){
     TSet<UScriptStruct*> Active;int32 Leaves=0;TFunction<bool(UScriptStruct*,int32)> Visit;
     Visit=[&](UScriptStruct* S,int32 Depth){if(Depth>16 || Active.Contains(S) || S->GetStructureSize()>1048576 || (S->GetCppStructOps() && S->GetCppStructOps()->HasAddStructReferencedObjects())){Error=TEXT("Unsupported recursive/opaque/native-reference struct");return false;}Active.Add(S);
         for(TFieldIterator<FProperty> It(S);It;++It){auto* P=*It;if(P->ArrayDim!=1){Error=TEXT("Fixed array struct fields unsupported");return false;}if(auto* N=CastField<FStructProperty>(P)){if(!Visit(N->Struct,Depth+1))return false;}
-            else if(auto* Set=CastField<FSetProperty>(P)){if(auto* Enum=CastField<FEnumProperty>(Set->ElementProp);Enum && !Enum->GetUnderlyingProperty()->IsA<FByteProperty>()){Error=TEXT("Enum sets require byte-sized reflected storage");return false;}if((!CastField<FIntProperty>(Set->ElementProp) && !CastField<FStrProperty>(Set->ElementProp) && !CastField<FNameProperty>(Set->ElementProp) && !DasEnumPropertyType(Set->ElementProp) && !IsDasObjectHashProperty(Set->ElementProp)) || ++Leaves>1024){Error=TEXT("Snapshot sets require int/string/name/enum/object elements");return false;}}
-            else if(auto* Map=CastField<FMapProperty>(P)){if((DasEnumPropertyType(Map->KeyProp) && Map->KeyProp->GetElementSize()!=1) || (CastField<FEnumProperty>(Map->KeyProp) && !CastFieldChecked<FEnumProperty>(Map->KeyProp)->GetUnderlyingProperty()->IsA<FByteProperty>())){Error=TEXT("Enum map keys require byte-sized reflected storage");return false;}auto* V=CastField<FStructProperty>(Map->ValueProp);if(V && !Visit(V->Struct,Depth+1))return false;if((!CastField<FIntProperty>(Map->KeyProp) && !CastField<FStrProperty>(Map->KeyProp) && !CastField<FNameProperty>(Map->KeyProp) && !DasEnumPropertyType(Map->KeyProp) && !IsDasObjectHashProperty(Map->KeyProp)) || (!CastField<FIntProperty>(Map->ValueProp) && !CastField<FStrProperty>(Map->ValueProp) && !CastField<FFloatProperty>(Map->ValueProp) && !CastField<FDoubleProperty>(Map->ValueProp) && !CastField<FBoolProperty>(Map->ValueProp) && !CastField<FNameProperty>(Map->ValueProp) && !V && !DasEnumPropertyType(Map->ValueProp) && !DasReferencePropertyClass(Map->ValueProp)) || ++Leaves>1024){Error=TEXT("Snapshot maps require int/string/name/enum/object keys and scalar/name/struct/enum/reference values");return false;}}
-            else if(auto* Array=CastField<FArrayProperty>(P)){auto* Element=CastField<FStructProperty>(Array->Inner);if(Element){if(!Visit(Element->Struct,Depth+1))return false;}else if(!(CastField<FIntProperty>(Array->Inner) || CastField<FFloatProperty>(Array->Inner) || CastField<FDoubleProperty>(Array->Inner) || CastField<FBoolProperty>(Array->Inner) || CastField<FStrProperty>(Array->Inner) || CastField<FNameProperty>(Array->Inner) || DasEnumPropertyType(Array->Inner) || DasReferencePropertyClass(Array->Inner)) || ++Leaves>1024){Error=TEXT("Unsupported snapshot array element");return false;}}
-            else {if(!(CastField<FIntProperty>(P) || CastField<FFloatProperty>(P) || CastField<FDoubleProperty>(P) || CastField<FBoolProperty>(P) || CastField<FStrProperty>(P) || CastField<FNameProperty>(P) || DasReferencePropertyClass(P) || CastField<FEnumProperty>(P) || (CastField<FByteProperty>(P) && CastField<FByteProperty>(P)->Enum)) || ++Leaves>1024){Error=TEXT("Struct supports scalar leaves; object/container/other fields unsupported");return false;}}}
+            else if(auto* Set=CastField<FSetProperty>(P)){if(auto* Enum=CastField<FEnumProperty>(Set->ElementProp);Enum && !Enum->GetUnderlyingProperty()->IsA<FByteProperty>()){Error=TEXT("Enum sets require byte-sized reflected storage");return false;}if((!(CastField<FByteProperty>(Set->ElementProp) && !DasEnumPropertyType(Set->ElementProp)) && !CastField<FIntProperty>(Set->ElementProp) && !CastField<FStrProperty>(Set->ElementProp) && !CastField<FNameProperty>(Set->ElementProp) && !DasEnumPropertyType(Set->ElementProp) && !IsDasObjectHashProperty(Set->ElementProp)) || ++Leaves>1024){Error=TEXT("Snapshot sets require int/string/name/enum/object elements");return false;}}
+            else if(auto* Map=CastField<FMapProperty>(P)){if((DasEnumPropertyType(Map->KeyProp) && Map->KeyProp->GetElementSize()!=1) || (CastField<FEnumProperty>(Map->KeyProp) && !CastFieldChecked<FEnumProperty>(Map->KeyProp)->GetUnderlyingProperty()->IsA<FByteProperty>())){Error=TEXT("Enum map keys require byte-sized reflected storage");return false;}auto* V=CastField<FStructProperty>(Map->ValueProp);if(V && !Visit(V->Struct,Depth+1))return false;if((!(CastField<FByteProperty>(Map->KeyProp) && !DasEnumPropertyType(Map->KeyProp)) && !CastField<FIntProperty>(Map->KeyProp) && !CastField<FStrProperty>(Map->KeyProp) && !CastField<FNameProperty>(Map->KeyProp) && !DasEnumPropertyType(Map->KeyProp) && !IsDasObjectHashProperty(Map->KeyProp)) || (!CastField<FTextProperty>(Map->ValueProp) && !(CastField<FByteProperty>(Map->ValueProp) && !DasEnumPropertyType(Map->ValueProp)) && !CastField<FIntProperty>(Map->ValueProp) && !CastField<FStrProperty>(Map->ValueProp) && !CastField<FFloatProperty>(Map->ValueProp) && !CastField<FDoubleProperty>(Map->ValueProp) && !CastField<FBoolProperty>(Map->ValueProp) && !CastField<FNameProperty>(Map->ValueProp) && !V && !DasEnumPropertyType(Map->ValueProp) && !DasReferencePropertyClass(Map->ValueProp)) || ++Leaves>1024){Error=TEXT("Snapshot maps require int/string/name/enum/object keys and scalar/name/struct/enum/reference values");return false;}}
+            else if(auto* Array=CastField<FArrayProperty>(P)){auto* Element=CastField<FStructProperty>(Array->Inner);if(Element){if(!Visit(Element->Struct,Depth+1))return false;}else if(!(CastField<FTextProperty>(Array->Inner) || (CastField<FByteProperty>(Array->Inner) && !DasEnumPropertyType(Array->Inner)) || CastField<FIntProperty>(Array->Inner) || CastField<FFloatProperty>(Array->Inner) || CastField<FDoubleProperty>(Array->Inner) || CastField<FBoolProperty>(Array->Inner) || CastField<FStrProperty>(Array->Inner) || CastField<FNameProperty>(Array->Inner) || DasEnumPropertyType(Array->Inner) || DasReferencePropertyClass(Array->Inner)) || ++Leaves>1024){Error=TEXT("Unsupported snapshot array element");return false;}}
+            else {if(!((CastField<FByteProperty>(P) && !CastField<FByteProperty>(P)->Enum) || CastField<FTextProperty>(P) || CastField<FIntProperty>(P) || CastField<FFloatProperty>(P) || CastField<FDoubleProperty>(P) || CastField<FBoolProperty>(P) || CastField<FStrProperty>(P) || CastField<FNameProperty>(P) || DasReferencePropertyClass(P) || CastField<FEnumProperty>(P) || (CastField<FByteProperty>(P) && CastField<FByteProperty>(P)->Enum)) || ++Leaves>1024){Error=TEXT("Struct supports scalar leaves; object/container/other fields unsupported");return false;}}}
         Active.Remove(S);return true;};return Visit(Type,0);
 }
 
@@ -64,12 +66,12 @@ bool ValidateStructDefaultFields(const UScriptStruct* Type,const FString& Text,F
 }
 }
 
-#include "DasContainerDefaultsParse.inl"
+#include "DasDefaultValue.inl"
 
 bool ParseDasStructDefault(const FString& Path,const FString& Text,FInstancedStruct& Out,FString& Error){
-    if(DasContainerProperty(Path))return ParseContainerDefault(Path,Text,Out,Error);
+    if(DasContainerProperty(Path) || Text.TrimStart().StartsWith(TEXT("{")))return ParseDasTypedDefault(Path,Text,Out,Error);
     Out.Reset();if(!ValidateDasValueStruct(Path,Error))return false;
-    FInstancedStruct Candidate;Candidate.InitializeAs(FindObject<UScriptStruct>(nullptr,*Path));
+    FDasDefaultRoots Roots;auto& Candidate=Roots.Values.AddDefaulted_GetRef();Candidate.InitializeAs(FindObject<UScriptStruct>(nullptr,*Path));
     if(!Text.IsEmpty()){
         if(Text.Len()>1048576){Error=TEXT("Struct default exceeds text limit");return false;}
         FString NativeText;if(!ValidateStructDefaultFields(Candidate.GetScriptStruct(),Text,Error,NativeText))return false;

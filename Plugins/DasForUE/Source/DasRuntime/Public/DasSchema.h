@@ -8,11 +8,19 @@ DASRUNTIME_API UEnum* ResolveDasEnum(const FString& Path,FString& Error);
 DASRUNTIME_API bool ValidateDasEnumNumber(const FString& Path,int64 Value,FString& Error);
 DASRUNTIME_API FProperty* FindDasStructField(UScriptStruct* Type,const FString& Name);
 DASRUNTIME_API bool ValidateDasStructSnapshot(const FInstancedStruct& Value,FString& Error);
+class FJsonValue;
+// Applies atomically through temporary reflected storage; Data=nullptr validates.
+DASRUNTIME_API bool ParseDasPropertyDefault(FProperty* Property,const TSharedPtr<FJsonValue>& Value,void* Data,FString& Error);
+DASRUNTIME_API TSharedPtr<FJsonValue> ExportDasPropertyDefault(FProperty* Property,const void* Data);
+DASRUNTIME_API bool ParseDasDefaultJson(const FString& Text,TSharedPtr<FJsonValue>& Out,FString& Error);
 DASRUNTIME_API bool ParseDasStructDefault(const FString& Path,const FString& Text,FInstancedStruct& Out,FString& Error);
 DASRUNTIME_API bool MatchesDasStructDefault(UScriptStruct* Type,const void* Actual,const void* Expected);
+DASRUNTIME_API bool ParseDasTextDefault(const FString& Wire,FText& Out,FString& Error);
+DASRUNTIME_API bool DasTextDefaultsEqual(const FText& A,const FText& B);
+DASRUNTIME_API FString DasTextLiteral(const FString& Namespace,const FString& Key,const FString& Source,bool Invariant);
 DASRUNTIME_API bool ValidateDasValueStruct(const FString& Path,FString& Error);
 DASRUNTIME_API bool ResolveDasReferenceDefault(bool IsClass,const FString& BasePath,const FString& Path,UObject*& Out,FString& Error);
-enum class EDasScalarKind : uint8 { Int32, Float32, Bool, String=5, Double=6, Name=7, Object=8, Struct=12, Enum=13, Event=14, Class=15, Delegate=16 };
+enum class EDasScalarKind : uint8 { Int32, Float32, Bool, String=5, Double=6, Name=7, Object=8, Struct=12, Enum=13, Event=14, Class=15, Delegate=16, Byte=17, Text=18 };
 
 struct FDasFieldSchema
 {
@@ -22,6 +30,7 @@ struct FDasFieldSchema
     float FloatDefault = 0;
     bool BoolDefault = false;
     double DoubleDefault=0;FString StringDefault;FName NameDefault;
+    FText TextDefault;
     FString StructPath;FString StructDefault;FString ObjectClass;FString EnumPath,EnumDefault;
     bool bInstanceEditable = true;
     FString StableId;
@@ -30,7 +39,7 @@ struct FDasFieldSchema
     TMap<FString,FString> Metadata;
 };
 
-enum class EDasMethodSignature : uint8 { Int, Float, Bool, Void, Frame, String, Double, Name, Object, Vector, Rotator, Transform, Struct, Enum, Class=15, Delegate=16 };
+enum class EDasMethodSignature : uint8 { Int, Float, Bool, Void, Frame, String, Double, Name, Object, Vector, Rotator, Transform, Struct, Enum, Class=15, Delegate=16, Byte=17, Text=18 };
 struct FDasCallContract {
     EDasMethodSignature ReturnKind=EDasMethodSignature::Int;
     TArray<EDasMethodSignature> Inputs;
@@ -94,3 +103,5 @@ DASRUNTIME_API bool SetDasEnumPropertyNumber(FProperty* Property,void* Memory,in
 
 // Exact numeric text for native container defaults and Blueprint recompilation.
 DASRUNTIME_API FString DasPropertyDefaultText(const FProperty* Property,const void* Data);
+
+DASRUNTIME_API bool MatchesDasPropertyDefault(const FProperty* Property,const void* Actual,const void* Expected);

@@ -22,10 +22,7 @@ for(const auto& Pair:C.Defaults){FDasDeclaredProperty* Property=nullptr;FString 
  if(Property->Type.Kind==TEXT("struct")){
   const FString Expected=Property->Type.TypePath==TEXT("/Script/CoreUObject.Vector")?TEXT("vector"):Property->Type.TypePath==TEXT("/Script/CoreUObject.Rotator")?TEXT("rotator"):Property->Type.TypePath==TEXT("/Script/CoreUObject.Vector2D")?TEXT("vector2d"):Property->Type.TypePath==TEXT("/Script/CoreUObject.Transform")?TEXT("transform"):FString();
   if(Pair.Value.Kind!=TEXT("struct") && (Expected.IsEmpty() || Pair.Value.Kind!=Expected)){Error=TEXT("Authored component math default type mismatch");return false;}Property->Default.Kind=TEXT("string");
-  FVector Legacy;if((Pair.Value.Kind==TEXT("vector") || Pair.Value.Kind==TEXT("rotator")) && Legacy.InitFromString(Pair.Value.String)){
-   FRotator Rotation(Legacy.X,Legacy.Y,Legacy.Z);auto* Struct=FindObject<UScriptStruct>(nullptr,*Property->Type.TypePath);Property->Default.String.Reset();
-   Struct->ExportText(Property->Default.String,Pair.Value.Kind==TEXT("vector")?static_cast<const void*>(&Legacy):static_cast<const void*>(&Rotation),nullptr,nullptr,PPF_None,nullptr);
-  }
+
  }else if(Property->Type.Kind==TEXT("object") || Property->Type.Kind==TEXT("class")){
   if(Pair.Value.Kind!=(Property->Type.Kind==TEXT("class")?TEXT("class"):TEXT("asset"))){Error=TEXT("Authored component reference default type mismatch");return false;}Property->Default.Kind=TEXT("string");
  }}

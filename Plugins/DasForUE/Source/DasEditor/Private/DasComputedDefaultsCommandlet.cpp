@@ -1,5 +1,10 @@
 #include "DasComputedDefaultsCommandlet.h"
 #include "DasContainerDefaultsProbe.h"
+#include "DasDefaultRoots.h"
+#include "DasDefaultValueProbe.h"
+#include "DasContainerTypes.h"
+#include "DasSchema.h"
+#include "Curves/CurveFloat.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "DasAuthoring.h"
@@ -37,11 +42,13 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params){
  UBlueprint* BP=nullptr;UWorld* W=nullptr;ADasProbeActor* A=nullptr;ADasProbeActor* Manual=nullptr;
  ON_SCOPE_EXIT{if(W){if(A)R.ReleaseObject(A);if(Manual)R.ReleaseObject(Manual);if(W->IsInitialized())W->DestroyWorld(false);}};
  if(Phase==TEXT("Create")){
+  // These test assets have no reference outside the two default containers.
+  for(const auto& Entry:TArray<TPair<FString,float>>{{TEXT("ArrayAsset"),17},{TEXT("MapAsset"),23},{TEXT("GCOnly"),31}}){const FString Package=TEXT("/Game/DasAssetDefaults/")+Entry.Key;auto* Asset=LoadObject<UCurveFloat>(nullptr,*(Package+TEXT(".")+Entry.Key),nullptr,LOAD_NoWarn);if(!Asset)Asset=NewObject<UCurveFloat>(CreatePackage(*Package),*Entry.Key,RF_Public|RF_Standalone);Asset->FloatCurve.UpdateOrAddKey(0,Entry.Value);if(!ComputedSave(Asset))return 1;}
   FDasAuthoringModule Model;FString Wire;
   if(!Check(R.ReadAuthoringScript(Path,Model,Error) && Model.ToJson(Wire,Error),TEXT("compile_real_das_expressions_and_helpers")))return 1;
   FDasDeclaredClass Effective;if(!Model.ResolveClass(TEXT("computeddefaults.ComputedDefaults"),Effective,Error))return 1;
   if(!Check(Effective.Properties.FindByPredicate([](const auto& P){return P.Name==TEXT("Score");})->Default.Number==40 && !Wire.Contains(TEXT("__ue_computed")),TEXT("IR_contains_only_resolved_values")))return 1;
-  const FString Old=Final.Replace(TEXT("value * 4"),TEXT("value * 3"));if(!Write(Path,Old))return 1;
+  const FString Old=Final.Replace(TEXT("value * 4"),TEXT("value * 3")).Replace(TEXT("\"MapAsset.MapAsset\""),TEXT("\"ArrayAsset.ArrayAsset\""));if(!Write(Path,Old))return 1;
   if(!Check(FDasDSLService::Apply(Script,Root+TEXT("/BP_ComputedDefaults"),TEXT("computeddefaults.ComputedDefaults"),BP,Error),TEXT("initial_import")))return 1;
   FKismetEditorUtilities::CompileBlueprint(BP);auto* CDO=BP->GeneratedClass->GetDefaultObject();ComputedSet(CDO,TEXT("Manual"),77);ComputedArrayManual(CDO,TEXT("ManualNumbers"));
   if(!Check(FDasDSLService::Reimport(BP,Error),TEXT("record_manual_CDO_source_contract")))return 1;
@@ -64,6 +71,14 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params){
   };
   for(const auto& C:Cases){const FString Bad=Final.Replace(TEXT("[ue_class(module_id="),*(C.Value+TEXT("\n[ue_class(module_id="))).Replace(TEXT("self.Score=default_score(self.Seed*2)"),TEXT("self.Score=bad()"));if(!Write(BadPath,Bad) || !Check(!R.ReadAuthoringScript(BadPath,Model,Error) && !Error.IsEmpty(),*(TEXT("reject_")+C.Key)))return 1;}
   for(const auto& Change:TArray<TPair<FString,FString>>{{TEXT("self.Numbers=[self.Seed,default_score(2)]"),TEXT("self.Numbers=[true]")},{TEXT("TagsDefault:table<string> = {\"red\",\"blue\",string(default_score(2))}"),TEXT("TagsDefault:table<string> = {\"red\",\"red\"}")},{TEXT("ue_name_value(\"Item_3\")=>self.Seed"),TEXT("ue_name_value(\"Item_3\")=>self.Seed,ue_name_value(\"ITEM_3\")=>4")},{TEXT("SpawnCollision.AlwaysSpawn=>default_score(2)"),TEXT("1=>default_score(2)")},{TEXT("self.Numbers=[self.Seed,default_score(2)]"),TEXT("self.Numbers=[1/0]")}}){const FString Bad=Final.Replace(*Change.Key,*Change.Value);if(!Write(BadPath,Bad) || !Check(Bad!=Final && !R.ReadAuthoringScript(BadPath,Model,Error),TEXT("container_invalid_type_duplicate_enum_or_calculation_rejected")))return 1;}
+  for(const auto& Change:TArray<TPair<FString,FString>>{
+   {TEXT("ue_asset_default(default_array_asset())"),TEXT("ue_asset_default(\"/Engine/BasicShapes/Cube.Cube\")")},
+   {TEXT("ue_asset_default(default_array_asset())"),TEXT("ue_asset_default(\"/Game/DasAssetDefaults/Missing.Missing\")")},
+   {TEXT("ue_asset_default(default_array_asset())"),TEXT("ue_class_default(\"/Script/Engine.Actor\")")},
+   {TEXT("ue_asset_default(default_array_asset())"),TEXT("ue_asset_default(\"/Game/DasAssetDefaults/ArrayAsset.ArrayAsset:Subobject\")")},
+   {TEXT("ue_asset_default(default_array_asset())"),TEXT("ue_asset_default(\"/Script/Engine.Default__Actor\")")},
+   {TEXT("ue_name_value(\"NoneValue\")=>ue_asset_default(\"\")"),TEXT("ue_name_value(\"MAIN\")=>ue_asset_default(\"\")")}
+  }){const FString Bad=Final.Replace(*Change.Key,*Change.Value);if(!Write(BadPath,Bad) || !Check(Bad!=Final && !R.ReadAuthoringScript(BadPath,Model,Error),TEXT("reject_invalid_container_asset_class_path_marker_or_duplicate")))return 1;}
   const FString Cycle=Final.Replace(TEXT("Seed:int=2+3"),TEXT("Seed:int=self.Seed+1"));if(!Write(BadPath,Cycle) || !Check(!R.ReadAuthoringScript(BadPath,Model,Error) && Error.Contains(TEXT("Cyclic")),TEXT("cyclic_source_fields_reject")))return 1;
   const FString WrongType=Final.Replace(TEXT("self.Score=default_score(self.Seed*2)"),TEXT("self.Score=true"));if(!Write(BadPath,WrongType) || !Check(!R.ReadAuthoringScript(BadPath,Model,Error),TEXT("typed_default_mismatch_rejects")))return 1;
   const FString Division=Final.Replace(TEXT("self.Score=default_score(self.Seed*2)"),TEXT("self.Score=1/0"));if(!Write(BadPath,Division) || !Check(!R.ReadAuthoringScript(BadPath,Model,Error),TEXT("evaluation_error_before_asset_mutation")))return 1;
@@ -97,6 +112,19 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params){
   auto* Fresh=W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);const bool Good=Fresh && ComputedCall(Fresh)==82 && Fresh->LastDasError.IsEmpty();if(Fresh){R.ReleaseObject(Fresh);Fresh->Destroy();}if(!Check(Good,TEXT("fresh_spawn_after_Blueprint_compile")))return 1;
   if(!A || !Manual)return 1;
  }
+ // Prove a default snapshot alone retains an asset, then releases it.
+ if(Phase==TEXT("Create")){
+  FDasAuthoringModule Model;FDasDeclaredClass Decl;if(!R.ReadAuthoringScript(Path,Model,Error) || !Model.ResolveClass(TEXT("computeddefaults.ComputedDefaults"),Decl,Error))return 1;
+  const auto* Field=Decl.Properties.FindByPredicate([](const auto& P){return P.Name==TEXT("Assets");});if(!Field)return 1;
+  const FString Carrier=DasContainerCarrier(Field->Type)->GetPathName();FDasDefaultRoots Roots;auto& Snapshot=Roots.Values.AddDefaulted_GetRef();
+  if(!ParseDasStructDefault(Carrier,TEXT("[{\"asset\":\"/Game/DasAssetDefaults/GCOnly.GCOnly\"}]"),Snapshot,Error))return 1;
+  auto* Asset=FindObject<UCurveFloat>(nullptr,TEXT("/Game/DasAssetDefaults/GCOnly.GCOnly"));if(!Asset)return 1;Asset->ClearFlags(RF_Standalone);TWeakObjectPtr<UObject> Weak(Asset);Asset=nullptr;
+  CollectGarbage(RF_NoFlags,true);if(!Check(Weak.IsValid(),TEXT("default_snapshot_retains_asset_through_GC")))return 1;
+  Roots.Values.Reset();CollectGarbage(RF_NoFlags,true);if(!Check(!Weak.IsValid(),TEXT("default_snapshot_releases_asset_without_leaking")))return 1;
+ }
+ if(!Check(CheckDasRecursiveDefaults(Error),TEXT("recursive_struct_array_map_defaults_and_GC")))return 1;
+ CollectGarbage(RF_NoFlags,true);
+ if(!Check(ComputedAssetContainers(BP->GeneratedClass->GetDefaultObject()) && ComputedAssetContainers(A) && ComputedManualAssetsMatch(Manual),TEXT("asset_container_CDO_and_instances_survive_GC")))return 1;
  auto* CDO=BP->GeneratedClass->GetDefaultObject();const auto& Position=*FindFProperty<FStructProperty>(CDO->GetClass(),TEXT("Position"))->ContainerPtrToValuePtr<FVector>(CDO);
  if(!Check(ComputedInt(CDO,TEXT("Seed"))==5 && ComputedInt(CDO,TEXT("Score"))==40 && ComputedInt(CDO,TEXT("Manual"))==77 && ComputedInt(CDO,TEXT("Derived"))==42 && Position==FVector(10,8,7),TEXT("saved_CDO_values")))return 1;
  if(!Check(FindFProperty<FStrProperty>(CDO->GetClass(),TEXT("Label"))->GetPropertyValue_InContainer(CDO)==TEXT("computed defaults") && FindFProperty<FBoolProperty>(CDO->GetClass(),TEXT("Enabled"))->GetPropertyValue_InContainer(CDO) && FindFProperty<FDoubleProperty>(CDO->GetClass(),TEXT("Speed"))->GetPropertyValue_InContainer(CDO)==50.0,TEXT("computed_string_bool_and_double")))return 1;

@@ -11,6 +11,11 @@ public:
     uint64 SubscriptionId = 0;
     UFUNCTION()
     void Receive(int32 Value);
+    UFUNCTION() void ReceiveByte(uint8 Value);
+    UFUNCTION() void ReceiveText(FText Value);
+    UFUNCTION() void ReceiveTextRef(const FText& Value);
+    UFUNCTION() void ReceiveArrayByte(const TArray<uint8>& Value);
+    UFUNCTION() void ReceiveArrayText(const TArray<FText>& Value);
     UFUNCTION() void ReceiveFloat(float Value);
     UFUNCTION() void ReceiveBool(bool Value);
     UFUNCTION() void ReceiveString(const FString& Value);

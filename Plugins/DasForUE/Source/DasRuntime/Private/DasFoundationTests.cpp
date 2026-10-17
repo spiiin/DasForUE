@@ -1,4 +1,5 @@
 #include "DasRuntime.h"
+#include "DasPropertyTypes.h"
 #include "DasReflectedTypes.h"
 #include "DasNumericLibrary.h"
 #include "UObject/StructOnScope.h"
@@ -23,6 +24,8 @@ bool RunDasFoundationTests(FString& Report)
         Report += FString::Printf(TEXT("%s %s %s\n"), Condition ? TEXT("PASS") : TEXT("FAIL"), Name, *Detail);
         if (!Condition) ++Failures;
     };
+    FString PropertyTypeError;const bool PropertyTypesOK=CheckDasPropertyTypes(PropertyTypeError);
+    Expect(PropertyTypesOK,TEXT("shared_type_descriptor_and_property_factory"),PropertyTypeError);
     auto Run = [&](const TCHAR* Name) { return Runtime.RunFile(Runtime.ScriptPath(Name), 40); };
     const auto Good = Run(TEXT("smoke.das"));
     Expect(Good.bSucceeded && Good.Value == 42, TEXT("native_roundtrip"), Good.Error);

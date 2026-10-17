@@ -34,5 +34,5 @@ bool RunDasPawnCharacterProbe(ADasStaticLibraryProbe* Carrier,FString& Report){
   A->Destroy();Check(Int(A,TEXT("Ends"))==1,TEXT("pawn_character_EndPlay_once"));R.ReleaseObject(A);
  }
  for(int32 I=6;I<8;++I){auto* Class=Carrier->PawnCharacterClasses[I].Get();FActorSpawnParameters Spawn;Spawn.SpawnCollisionHandlingOverride=ESpawnActorCollisionHandlingMethod::AlwaysSpawn;auto* A=Class?Carrier->GetWorld()->SpawnActor<APawn>(Class,FTransform::Identity,Spawn):nullptr;if(!A){Check(false,TEXT("pawn_character_explicit_parent_spawn"));continue;}TStrongObjectPtr<APawn> Keep(A);auto* CDO=CastChecked<APawn>(Class->GetDefaultObject());Check(A->IsActorTickEnabled()==CDO->PrimaryActorTick.bStartWithTickEnabled,TEXT("pawn_character_native_tick_without_DAS_lifecycle"));int32 Value=0;auto* Function=A->FindFunction(TEXT("Value"));if(Function)A->ProcessEvent(Function,&Value);Check(Function && Value==(I==6?7:9),TEXT("pawn_character_explicit_parent_frame_call"));if(I==6)Check(A->BaseEyeHeight==54.f,TEXT("pawn_short_parent_computed_native_defaults"));else {auto* C=Cast<ACharacter>(A);Check(C && C->GetRootComponent()==C->GetCapsuleComponent(),TEXT("character_explicit_parent_capsule"));}A->Destroy();R.ReleaseObject(A);}
- return Good;
+ return RunDasTextByteProbe(Carrier,Report) && Good;
 }

@@ -2,6 +2,8 @@ options gen2
 module ue_text public
 require ue_dsl public
 
+typedef FText = UETextValue
+
 // A real text renderer; FText values remain opaque UETextValue snapshots.
 [ue_native_object(path="/Script/Engine.TextRenderComponent")]
 struct TextRenderComponentRef { handle:UObjectHandle }

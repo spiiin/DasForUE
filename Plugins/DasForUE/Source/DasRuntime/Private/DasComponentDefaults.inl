@@ -77,8 +77,7 @@ TArray<FDSLComponentDefault> DSLCollectComponentDefaults(const das::StructurePtr
      D.Value.Kind=CallValue->name=="ue_class_default"?TEXT("class"):CallValue->name=="ue_default_text"?TEXT("struct"):TEXT("asset");D.Value.String=DSLText(static_cast<das::ExprConstString*>(CallValue->arguments[0])->text);
     }else{
      D.Value=DSLDefaultMath(V);
-     // Preserve the established wire spelling so unchanged source remains body-only.
-     if(D.Value.Kind==TEXT("vector") || D.Value.Kind==TEXT("rotator"))D.Value.String=FString::Printf(TEXT("X=%.17g Y=%.17g Z=%.17g"),DSLDefaultNumber(CallValue->arguments[0]),DSLDefaultNumber(CallValue->arguments[1]),DSLDefaultNumber(CallValue->arguments[2]));
+
     }
    }else{D.Value.Kind=TEXT("number");D.Value.Number=DSLDefaultNumber(V);}
    Result.Add(MoveTemp(D));

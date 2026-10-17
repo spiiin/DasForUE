@@ -50,3 +50,10 @@ def ue_delegate_target(target:UObjectHandle):UObjectHandle { return target }
 def ue_delegate_target(target:auto):UObjectHandle { return target.handle }
 def ue_delegate_name(method:string):string { return method }
 def ue_delegate_name(method:UENameValue):string { return ue_name_text(method) }
+
+def ue_dsl_commit_struct_member_byte(property:string; member:string; value:uint8):void {
+ ue_set_self_struct(property,ue_struct_with_byte(ue_get_self_struct(property),member,value))
+}
+def ue_dsl_commit_struct_member_text(property:string; member:string; value:UETextValue):void {
+ ue_set_self_struct(property,ue_struct_with_text(ue_get_self_struct(property),member,value))
+}

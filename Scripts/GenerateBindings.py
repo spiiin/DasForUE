@@ -120,7 +120,7 @@ def generate(ir, module="ue_generated", source_types=None):
                 raise ValueError('Missing object class')
     aliases = set()
     enums = {}
-    kinds = {'int', 'float', 'double', 'bool', 'string', 'object', 'class', 'name', 'enum', 'array', 'map', 'set'}
+    kinds = {'byte', 'text', 'int', 'float', 'double', 'bool', 'string', 'object', 'class', 'name', 'enum', 'array', 'map', 'set'}
     for fn in ir['functions']:
         alias = fn['alias']
         if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', alias) or alias in aliases or not alias.startswith(('actor_', 'fixture_', 'ue_')):
@@ -163,8 +163,9 @@ def generate(ir, module="ue_generated", source_types=None):
                 enums[path] = members
 
     hash_containers = {}
-    scalar_properties = {'int':'IntProperty','float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty','string':'StrProperty','name':'NameProperty','enum':'EnumProperty'}
+    scalar_properties = {'byte':'ByteProperty','text':'TextProperty','int':'IntProperty','float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty','string':'StrProperty','name':'NameProperty','enum':'EnumProperty'}
     def register_hash(field):
+        if (field.get('key',{}) if field['kind']=='map' else field.get('element',{})).get('kind') == 'text': raise ValueError('FText hash keys/elements are unsupported')
         children = [field.get('key',{}),field.get('value',{})] if field['kind']=='map' else [field.get('element',{})]
         markers=field['type_path'].split(';')
         if len(markers)!=len(children): raise ValueError('Invalid hash container type markers')
@@ -202,7 +203,7 @@ def generate(ir, module="ue_generated", source_types=None):
                 if member['kind'] == 'struct': visit(member['type_path'])
                 elif member['kind'] == 'array':
                     element = member.get('element', {})
-                    properties = {'int':'IntProperty','float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty','string':'StrProperty','name':'NameProperty','struct':'StructProperty','enum':'EnumProperty'}
+                    properties = {'byte':'ByteProperty','text':'TextProperty','int':'IntProperty','float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty','string':'StrProperty','name':'NameProperty','struct':'StructProperty','enum':'EnumProperty'}
                     kind = element.get('kind')
                     if kind not in properties or (member['type_path'] not in ('EnumProperty','ByteProperty') if kind == 'enum' else member['type_path'] != properties[kind]): raise ValueError('Unsupported struct array member')
                     validate_member(element)
@@ -240,7 +241,7 @@ def generate(ir, module="ue_generated", source_types=None):
             if param['kind'] in ('map', 'set'): register_hash(param)
             if param['kind'] == 'array':
                 element = param.get('element', {})
-                property_types = {'int':'IntProperty', 'float':'FloatProperty', 'double':'DoubleProperty', 'bool':'BoolProperty', 'string':'StrProperty', 'name':'NameProperty', 'object':'ObjectProperty', 'class':'ClassProperty', 'struct':'StructProperty', 'enum':'EnumProperty'}
+                property_types = {'byte':'ByteProperty','text':'TextProperty','int':'IntProperty', 'float':'FloatProperty', 'double':'DoubleProperty', 'bool':'BoolProperty', 'string':'StrProperty', 'name':'NameProperty', 'object':'ObjectProperty', 'class':'ClassProperty', 'struct':'StructProperty', 'enum':'EnumProperty'}
                 kind = element.get('kind')
                 if kind not in property_types or (param['type_path'] not in ('EnumProperty', 'ByteProperty') if kind == 'enum' else param['type_path'] != property_types[kind]):
                     raise ValueError('Unsupported or inconsistent array element')
@@ -289,7 +290,7 @@ def generate(ir, module="ue_generated", source_types=None):
     def check_source_field(field, depth=0):
         if depth > 16: raise ValueError('Source mapping nesting limit exceeded')
         kind = field['kind']
-        if kind in ('int', 'float', 'double', 'bool', 'string', 'name', 'object', 'class'): return
+        if kind in ('byte', 'text', 'int', 'float', 'double', 'bool', 'string', 'name', 'object', 'class'): return
         if kind in ('struct', 'enum'):
             mapped = source_mappings.get(field['type_path'])
             if not mapped or mapped['kind'] != kind: raise ValueError('Nested source identity requires an explicit matching mapping')
@@ -298,8 +299,8 @@ def generate(ir, module="ue_generated", source_types=None):
             return
         if kind in ('map','set'):
             key=field['key'] if kind=='map' else field['element']
-            if key['kind'] not in ('int','string'): raise ValueError('Source hash keys/elements require int/string')
-            if kind=='map' and field['value']['kind'] not in ('int','float','double','bool','string','name'): raise ValueError('Unsupported source hash value')
+            if key['kind'] not in ('byte','int','string'): raise ValueError('Source hash keys/elements require int/string')
+            if kind=='map' and field['value']['kind'] not in ('byte','text','int','float','double','bool','string','name'): raise ValueError('Unsupported source hash value')
             return
         if kind == 'array': check_source_field(field['element'], depth + 1); return
         raise ValueError('Unsupported source mapping field kind: ' + kind)
@@ -349,7 +350,7 @@ def generate(ir, module="ue_generated", source_types=None):
     def typ(field):
         if field['kind'] in ('map', 'set'): return hash_container_name(field)
         if field['kind'] == 'array': return 'array<' + typ(field['element']) + '>'
-        return {'class': 'UEClassHandle', 'object': class_name(field['type_path']), 'name': 'UEName', 'enum': enum_name(field['type_path']), 'struct': struct_name(field['type_path'])}.get(field['kind'], field['kind'])
+        return {'byte':'uint8', 'text':'UETextValue', 'class': 'UEClassHandle', 'object': class_name(field['type_path']), 'name': 'UEName', 'enum': enum_name(field['type_path']), 'struct': struct_name(field['type_path'])}.get(field['kind'], field['kind'])
 
     lines = ['options gen2', 'module ' + module + ' public', 'require ue_foundation', '',
              '// Generated by Scripts/GenerateBindings.py. Do not edit.',
@@ -553,12 +554,16 @@ def generate(ir, module="ue_generated", source_types=None):
         if field['kind'] == 'object': val = class_name(field['type_path']) + '_raw(' + val + ')'
         if field['kind'] == 'name': val += '.value'
         if field['kind'] == 'enum': val = quote(field['type_path']) + ', ' + enum_name(field['type_path']) + '_to_symbol(' + val + ')'
-        lines.append(f'{indent}ue_arg_{field["kind"]}(call, {path_expr(path)}, {val})')
+        if field['kind'] == 'byte': val = 'int(' + val + ')'
+        bridge = '__ue_method_arg_text' if field['kind'] == 'text' else 'ue_arg_' + field['kind']
+        lines.append(f'{indent}{bridge}(call, {path_expr(path)}, {val})')
 
     def read_output(field, path):
         if field['kind'] == 'struct':
             return struct_name(field['type_path']) + '(' + ', '.join('f_' + ident(p['path']) + ' = ' + read_output(p, path + '.' + p['path']) for p in structures[field['type_path']]['fields']) + ')'
-        expr = f'ue_result_{field["kind"]}(call, {path_expr(path)}' + (', ' + quote(field['type_path']) if field['kind'] == 'enum' else '') + ')'
+        bridge = '__ue_method_result_text' if field['kind'] == 'text' else 'ue_result_' + field['kind']
+        expr = f'{bridge}(call, {path_expr(path)}' + (', ' + quote(field['type_path']) if field['kind'] == 'enum' else '') + ')'
+        if field['kind'] == 'byte': expr = 'uint8(' + expr + ')'
         if field['kind'] == 'object': expr = class_name(field['type_path']) + '_from(' + expr + ')'
         if field['kind'] == 'name': expr = 'UEName(value = ' + expr + ')'
         if field['kind'] == 'enum': expr = enum_name(field['type_path']) + '_from_symbol(' + expr + ')'

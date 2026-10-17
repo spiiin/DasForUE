@@ -2,6 +2,11 @@
 #include "CoreMinimal.h"
 #include "DasSchema.h"
 
+enum class EDasTypeKind : uint8 { Invalid,Void,Byte,Text,Int,Float,Double,Bool,String,Name,Object,Class,Struct,Enum,Array,Set,Map,Delegate,Event };
+enum class EDasEnumStorage : uint8 { Automatic,Byte,Enum8 };
+DASRUNTIME_API EDasTypeKind DasTypeKind(const FString& Name);
+DASRUNTIME_API FString DasTypeKindName(EDasTypeKind Kind);
+
 // Syntax-neutral class declarations. JSON is a transport; future daScript macros produce the same model.
 struct DASRUNTIME_API FDasDeclaredType
 {
@@ -11,6 +16,11 @@ struct DASRUNTIME_API FDasDeclaredType
     FString AuthoredId; // Optional authored object identity, separate from host storage.
     TSharedPtr<const FDasDeclaredType> Element, Key, Value;
     FString Identity() const;
+    EDasTypeKind GetKind() const { return DasTypeKind(Kind); }
+    // Physical reflection detail, not authored syntax/JSON. Describe preserves
+    // it so native byte enums and enum-class fields roundtrip without guessing.
+    EDasEnumStorage EnumStorage = EDasEnumStorage::Automatic;
+    FString StorageIdentity() const;
 };
 struct FDasDeclaredLiteral
 {

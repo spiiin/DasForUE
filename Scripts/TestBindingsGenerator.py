@@ -285,6 +285,24 @@ class GeneratorTests(unittest.TestCase):
         self.assertIn('var arg_values : array<ue_values::Child>&',body)
         self.assertIn('arg_values <- source_out_values',body)
         self.assertLess(body.index('resize(source_out_values'),body.index('arg_values <- source_out_values'))
+    def test_interface_byte_text_ref_out_and_arrays(self):
+        fn=copy.deepcopy(next(f for f in self.ir['functions'] if f['alias']=='ue_probe_Query'))
+        fn.update(function='TextByteValues',alias='ue_probe_TextByteValues')
+        fn['parameters']=[dict(path='number',kind='byte',type_path='',input=True,output=True),dict(path='title',kind='text',type_path='',input=True,output=True),dict(path='ReturnValue',kind='text',type_path='',input=False,output=True),dict(path='messages',kind='array',type_path='TextProperty',element=dict(kind='text',type_path=''),input=True,output=True)]
+        fn['fields']=[]
+        for p in fn['parameters']:
+            fn['fields'].append({k:p[k] for k in ('path','kind','type_path','input','output')})
+            if p['kind']=='array':fn['fields'].append(dict(path=p['path']+'.*',kind='text',type_path='',input=True,output=True))
+        self.ir['functions'].append(fn)
+        body=generate(self.ir)
+        self.assertIn('var arg_number : uint8&',body)
+        self.assertIn('var arg_title : UETextValue&',body)
+        self.assertIn('ue_arg_byte(call, "number", int(arg_number))',body)
+        self.assertIn('__ue_method_arg_text(call, "title", arg_title)',body)
+        self.assertIn('uint8(ue_result_byte(call, "number"))',body)
+        self.assertIn('__ue_method_result_text(call, "ReturnValue")',body)
+        self.assertIn('array<UETextValue>',body)
+
     def test_schema_version(self):
         self.ir['schema_version'] = 9
         with self.assertRaises(ValueError): generate(self.ir)

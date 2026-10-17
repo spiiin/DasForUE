@@ -7,8 +7,6 @@ static bool ValidateComponentDefaults(const FDasDeclaredComponent& C,FString& Er
   else if(V.Kind==TEXT("string")){if(V.String.Len()>4096)return Fail(Error,TEXT("Default string too long"));}
   else if(V.Kind==TEXT("vector") || V.Kind==TEXT("rotator") || V.Kind==TEXT("vector2d") || V.Kind==TEXT("transform")){
    FInstancedStruct Value;const FString Path=V.Kind==TEXT("vector")?TEXT("/Script/CoreUObject.Vector"):V.Kind==TEXT("rotator")?TEXT("/Script/CoreUObject.Rotator"):V.Kind==TEXT("vector2d")?TEXT("/Script/CoreUObject.Vector2D"):TEXT("/Script/CoreUObject.Transform");
-   // Legacy vector/rotator defaults used X/Y/Z text, kept for wire compatibility.
-   FVector Legacy;if((V.Kind==TEXT("vector") || V.Kind==TEXT("rotator")) && Legacy.InitFromString(V.String) && !Legacy.ContainsNaN())continue;
    if(!ParseDasStructDefault(Path,V.String,Value,Error))return false;
   }else if(V.Kind==TEXT("asset") || V.Kind==TEXT("class")){if(V.String.IsEmpty() || V.String.Len()>4096 || !V.String.StartsWith(TEXT("/")))return Fail(Error,TEXT("Invalid reference default path"));}
   else if(V.Kind==TEXT("struct")){if(V.String.Len()>4096)return Fail(Error,TEXT("Struct default text too long"));}
