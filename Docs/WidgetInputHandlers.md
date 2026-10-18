@@ -97,8 +97,8 @@ Default reply, reply из предыдущего вызова и создани�
 обработчика отклоняются. Сохранение токена в global не продлевает его жизнь.
 Синхронный повторный вход в VM из Slate не разрешён.
 
-Это отдельный scoped bridge: generic reflected transport для `/Script/UMG.EventReply`
-не открыт. focus/motion events, paint, drag/drop operation payloads,
+К этому scoped bridge подключены [11 сгенерированных EventReply wrappers](EventReply.md).
+Это вызовы только внутри текущего синхронного callback; persistent reflected storage закрыт. Motion events, paint, drag/drop operation payloads,
 авторские `ue_class`-виджеты и `[ue_event]`-аннотации требуют следующих этапов.
 Число функций в generated UMG-пакете этим bridge не меняется.
 
@@ -129,3 +129,9 @@ null renderer используются только в test harness. Исход�
 DLL, исходники и Engine BuildId стабильны во время проверки.
 `logs/widget-events-validation.json` фиксирует `(UEGeometry, typed input event)`;
 прогон использует уже собранные DLL (`-SkipBuild`). Полные PIE/packaged не запускались.
+
+
+События `OnFocusReceived` и `OnFocusLost` доступны через ту же InputHandlers map;
+их разные сигнатуры, owned FocusEvent snapshot и lifecycle описаны в
+[FocusEvents.md](FocusEvents.md). Это расширение native callbacks, без добавления
+generated API-функций.

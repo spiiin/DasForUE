@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "implemented_weak_capability",
+  "transport_id": "weak_widget_animation_v1",
+  "native_type": "/Script/UMG.WidgetAnimationHandle",
+  "functions": [
+    "/Script/UMG.UserWidget.PlayAnimation",
+    "/Script/UMG.UserWidget.PlayAnimationForward",
+    "/Script/UMG.UserWidget.PlayAnimationReverse",
+    "/Script/UMG.UserWidget.PlayAnimationTimeRange"
+  ],
+  "ownership": "context rooted token; native weak handle and weak widget; never pins state, widget, animation, legacy player",
+  "lifetime": "finish or NativeDestruct revokes lease permanently, including later replay/reconstruction; expired/torn-down weak state also invalid",
+  "reload": "context destruction removes native callbacks without capturing VM or DAS closures; new VM globals reset",
+  "queries": "is_valid and is_playing return false for default/expired/revoked handles",
+  "storage": "DAS globals/arrays/clone allowed; native input, ue_property/defaults and native containers closed",
+  "validation": "constructed widget in current game world; valid animation asset; finite nonnegative time, positive speed, nonnegative loops; normal enum/signature/direction guards",
+  "capacity": "shared snapshot table bounded to 4096; GC prunes leases and unsubscribes native hooks"
+}

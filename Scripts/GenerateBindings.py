@@ -93,6 +93,9 @@ def is_hit_result(value):
 CONSTRAINT_PATH = '/Script/Engine.ConstraintInstanceAccessor'
 INPUT_ACTION_VALUE_PATH = '/Script/EnhancedInput.InputActionValue'
 OPAQUE_TRANSPORTS = {
+    '/Script/UMG.PaintContext': ('scoped_paint_context_v1','UEPaintContext','__ue_arg_paint_context','__ue_result_paint_context'),
+    '/Script/UMG.WidgetAnimationHandle': ('weak_widget_animation_v1','UEWidgetAnimationHandle','__ue_arg_widget_animation','__ue_result_widget_animation'),
+    '/Script/UMG.EventReply': ('scoped_event_reply_v1','UEEventReply','__ue_arg_event_reply','__ue_result_event_reply'),
     '/Script/SlateCore.Geometry': ('slate_geometry_snapshot_v1','UEGeometry','__ue_arg_geometry','__ue_result_geometry'),
     INPUT_ACTION_VALUE_PATH: ('input_action_value_v1','InputActionValue','__ue_arg_input_value','__ue_result_input_value'),
     HIT_RESULT_PATH: (HIT_RESULT_TRANSPORT,'UEHitResult','__ue_arg_hit_result','__ue_result_hit_result'),
@@ -121,6 +124,9 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
         raise ValueError('Unsupported IR schema version')
     def validate_weak_marker(value, depth=0):
         if depth>16: raise ValueError('Weak type descriptor nesting limit')
+        if value.get('transport')=='weak_widget_animation_v1' and (depth or value.get('input') or not value.get('output') or value.get('path','').lower()!='returnvalue'): raise ValueError('WidgetAnimation transport requires scalar producer result')
+        if value.get('transport')=='scoped_paint_context_v1' and (depth or value.get('path','').lower()!='context'): raise ValueError('PaintContext transport requires scalar context parameter')
+        if depth and value.get('transport')=='scoped_event_reply_v1': raise ValueError('EventReply transport requires scalar parameters')
         if depth and value.get('transport')=='slate_geometry_snapshot_v1': raise ValueError('Geometry transport requires scalar parameters')
         if depth and value.get('transport')=='slate_input_event_snapshot_v1': raise ValueError('Input event transport requires scalar parameters')
         transport=value.get('transport')
@@ -131,9 +137,16 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
             raise ValueError('Invalid weak reference marker')
         for key in ('element','key','value'):
             if key in value: validate_weak_marker(value[key],depth+1)
+    def navigation_adapter(fn):
+        events={'Key_GetNavigationActionFromKey':('inkeyevent','/Script/SlateCore.KeyEvent'), 'Key_GetNavigationDirectionFromKey':('inkeyevent','/Script/SlateCore.KeyEvent'), 'Key_GetNavigationDirectionFromAnalog':('inanalogevent','/Script/SlateCore.AnalogInputEvent')}
+        expected=events.get(fn.get('function'))
+        return fn.get('call_adapter')=='live_input_navigation_v1' and fn.get('class')=='/Script/Engine.KismetInputLibrary' and expected and all(v.get('path','').lower()==expected[0] and v.get('type_path')==expected[1] and v.get('input') and not v.get('output') for v in [*fn['parameters'],*fn['fields']] if v.get('transport')=='slate_input_event_snapshot_v1')
     for fn in ir['functions']:
+        if any(v.get('transport')=='scoped_paint_context_v1' for v in [*fn['parameters'],*fn['fields']]) and fn.get('call_adapter')!='scoped_paint_context_v1': raise ValueError('PaintContext requires attested synchronous function adapter')
+        if any(v.get('transport')=='weak_widget_animation_v1' for v in [*fn['parameters'],*fn['fields']]) and fn.get('call_adapter')!='weak_widget_animation_v1': raise ValueError('WidgetAnimation requires attested producer function adapter')
+        if any(v.get('transport')=='scoped_event_reply_v1' for v in [*fn['parameters'],*fn['fields']]) and fn.get('call_adapter')!='scoped_event_reply_v1': raise ValueError('EventReply requires attested synchronous function adapter')
         if any(v.get('transport')=='slate_geometry_snapshot_v1' for v in [*fn['parameters'],*fn['fields']]) and fn.get('call_adapter')!='slate_geometry_snapshot_v1': raise ValueError('Geometry requires attested snapshot function adapter')
-        if any(v.get('transport')=='slate_input_event_snapshot_v1' for v in [*fn['parameters'],*fn['fields']]) and fn.get('call_adapter')!='slate_input_event_snapshot_v1': raise ValueError('Input event requires attested snapshot function adapter')
+        if any(v.get('transport')=='slate_input_event_snapshot_v1' for v in [*fn['parameters'],*fn['fields']]) and fn.get('call_adapter')!='slate_input_event_snapshot_v1' and not navigation_adapter(fn) and not (fn.get('call_adapter')=='scoped_event_reply_v1' and fn.get('class')=='/Script/UMG.WidgetBlueprintLibrary' and fn.get('function')=='DetectDragIfPressed' and all(v.get('type_path')=='/Script/SlateCore.PointerEvent' and v.get('path','').lower()=='pointerevent' and v.get('input') and not v.get('output') for v in [*fn['parameters'],*fn['fields']] if v.get('transport')=='slate_input_event_snapshot_v1')): raise ValueError('Input event requires attested snapshot function adapter')
         for value in [*fn['parameters'],*fn['fields']]: validate_weak_marker(value)
     for definition in ir['structs']:
         for value in definition['fields']: validate_weak_marker(value)
@@ -441,6 +454,9 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
              '// Generated by Scripts/GenerateBindings.py. Do not edit.',
              'struct UEName { value : string }',
              'def ue_name(value : string) : UEName { return UEName(value = value) }', '']
+    if '/Script/UMG.WidgetAnimationHandle' in structures: lines += ['require ue_widget_animation public', '']
+    if '/Script/UMG.PaintContext' in structures: lines += ['require ue_paint public', '']
+    if '/Script/UMG.EventReply' in structures: lines += ['require ue_widget_events public', '']
     if '/Script/SlateCore.Geometry' in structures: lines += ['require ue_geometry public', '']
     if any(p.startswith('/Script/SlateCore.') and p!='/Script/SlateCore.Geometry' and p in OPAQUE_TRANSPORTS for p in structures): lines += ['require ue_input_events public', '']
     if INPUT_ACTION_VALUE_PATH in structures: lines += ['require ue_input_value public', '']

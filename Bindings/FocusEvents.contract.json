@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "engine_version": "5.8.3",
+  "status": "implemented_callback_bridge",
+  "require": "ue_widget_events",
+  "widget_class": "/Script/DasRuntime.DasScriptUserWidget",
+  "binding": "ue_widget_bind_input",
+  "events": {
+    "OnFocusReceived": {
+      "arguments": [
+        "UEGeometry",
+        "UEFocusEvent"
+      ],
+      "return": "UEEventReply",
+      "authority": "existing synchronous EventReply epoch"
+    },
+    "OnFocusLost": {
+      "arguments": [
+        "UEFocusEvent"
+      ],
+      "return": "void",
+      "authority": "notification only; no EventReply commands"
+    }
+  },
+  "snapshot": {
+    "native_type": "/Script/SlateCore.FocusEvent",
+    "handle": "UEFocusEvent",
+    "storage": "existing bounded VM snapshot table with nominal handle roots",
+    "fields": [
+      "user:uint",
+      "cause:string"
+    ],
+    "causes": [
+      "Mouse",
+      "Navigation",
+      "SetDirectly",
+      "Cleared",
+      "OtherWidgetLostFocus",
+      "WindowActivate"
+    ],
+    "borrowed_paths": false,
+    "live_slate_user_authority": false,
+    "reflected_functions": false,
+    "ue_property": false
+  },
+  "lifecycle": {
+    "Destroy": "ReleaseObject; active eval finishes before VM reclamation; pending reply discarded",
+    "reload": "revalidate required callback contracts; reject incompatible candidate; keep working VM",
+    "configuration": "handler names survive reconstruction; VM and tokens do not",
+    "reentry": "reject synchronous nested VM entry"
+  },
+  "not_included": [
+    "OnFocusChanging",
+    "OnAddedToFocusPath",
+    "OnRemovedFromFocusPath",
+    "physical focus traversal",
+    "packaged checks"
+  ]
+}

@@ -4,18 +4,13 @@
   "package": "ue_api_umg_input",
   "engine_version": "5.8.3-0+UE5",
   "counts": {
-    "generation_ready": 366,
-    "export_blocked": 114,
-    "generation_blocked": 37,
+    "generation_ready": 407,
+    "export_blocked": 110,
+    "generation_blocked": 0,
     "policy_excluded": 0
   },
-  "generation_failures": 37,
-  "partition": {
-    "event_reply": 11,
-    "geometry": 17,
-    "paint_context": 5,
-    "widget_animation_handle": 4
-  },
+  "generation_failures": 0,
+  "partition": {},
   "ready_functions": [
     "/Script/Engine.InputSettings.AddActionMapping",
     "/Script/Engine.InputSettings.AddAxisMapping",
@@ -50,6 +45,9 @@
     "/Script/Engine.KismetInputLibrary.InputEvent_IsRightShiftDown",
     "/Script/Engine.KismetInputLibrary.InputEvent_IsShiftDown",
     "/Script/Engine.KismetInputLibrary.Key_GetDisplayName",
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationActionFromKey",
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationDirectionFromAnalog",
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationDirectionFromKey",
     "/Script/Engine.KismetInputLibrary.Key_IsAnalog",
     "/Script/Engine.KismetInputLibrary.Key_IsAxis1D",
     "/Script/Engine.KismetInputLibrary.Key_IsAxis2D",
@@ -194,10 +192,22 @@
     "/Script/UMG.ScrollBox.SetScrollbarPadding",
     "/Script/UMG.ScrollBox.SetScrollbarThickness",
     "/Script/UMG.ScrollBox.SetWheelScrollMultiplier",
+    "/Script/UMG.SlateBlueprintLibrary.AbsoluteToLocal",
     "/Script/UMG.SlateBlueprintLibrary.AbsoluteToViewport",
     "/Script/UMG.SlateBlueprintLibrary.EqualEqual_SlateBrush",
+    "/Script/UMG.SlateBlueprintLibrary.GetAbsoluteSize",
+    "/Script/UMG.SlateBlueprintLibrary.GetLocalSize",
+    "/Script/UMG.SlateBlueprintLibrary.GetLocalTopLeft",
+    "/Script/UMG.SlateBlueprintLibrary.IsUnderLocation",
+    "/Script/UMG.SlateBlueprintLibrary.LocalToAbsolute",
+    "/Script/UMG.SlateBlueprintLibrary.LocalToViewport",
+    "/Script/UMG.SlateBlueprintLibrary.Scalar_AbsoluteToLocal",
+    "/Script/UMG.SlateBlueprintLibrary.Scalar_LocalToAbsolute",
     "/Script/UMG.SlateBlueprintLibrary.ScreenToViewport",
     "/Script/UMG.SlateBlueprintLibrary.ScreenToWidgetAbsolute",
+    "/Script/UMG.SlateBlueprintLibrary.ScreenToWidgetLocal",
+    "/Script/UMG.SlateBlueprintLibrary.Vector_AbsoluteToLocal",
+    "/Script/UMG.SlateBlueprintLibrary.Vector_LocalToAbsolute",
     "/Script/UMG.Slider.GetNormalizedValue",
     "/Script/UMG.Slider.GetValue",
     "/Script/UMG.Slider.SetIndentHandle",
@@ -247,6 +257,10 @@
     "/Script/UMG.UserWidget.IsAnyAnimationPlaying",
     "/Script/UMG.UserWidget.IsPlayingAnimation",
     "/Script/UMG.UserWidget.PauseAnimation",
+    "/Script/UMG.UserWidget.PlayAnimation",
+    "/Script/UMG.UserWidget.PlayAnimationForward",
+    "/Script/UMG.UserWidget.PlayAnimationReverse",
+    "/Script/UMG.UserWidget.PlayAnimationTimeRange",
     "/Script/UMG.UserWidget.QueuePauseAnimation",
     "/Script/UMG.UserWidget.QueuePlayAnimation",
     "/Script/UMG.UserWidget.QueuePlayAnimationForward",
@@ -280,15 +294,18 @@
     "/Script/UMG.Widget.ForceVolatile",
     "/Script/UMG.Widget.GetAccessibleSummaryText",
     "/Script/UMG.Widget.GetAccessibleText",
+    "/Script/UMG.Widget.GetCachedGeometry",
     "/Script/UMG.Widget.GetClipping",
     "/Script/UMG.Widget.GetDesiredSize",
     "/Script/UMG.Widget.GetGameInstance",
     "/Script/UMG.Widget.GetIsEnabled",
     "/Script/UMG.Widget.GetOwningLocalPlayer",
     "/Script/UMG.Widget.GetOwningPlayer",
+    "/Script/UMG.Widget.GetPaintSpaceGeometry",
     "/Script/UMG.Widget.GetParent",
     "/Script/UMG.Widget.GetRenderOpacity",
     "/Script/UMG.Widget.GetRenderTransformAngle",
+    "/Script/UMG.Widget.GetTickSpaceGeometry",
     "/Script/UMG.Widget.GetVisibility",
     "/Script/UMG.Widget.HasAnyUserFocus",
     "/Script/UMG.Widget.HasFocusedDescendants",
@@ -330,7 +347,17 @@
     "/Script/UMG.Widget.SetVisibility",
     "/Script/UMG.Widget.SupportsKeyboardFocus",
     "/Script/UMG.WidgetBlueprintLibrary.CancelDragDrop",
+    "/Script/UMG.WidgetBlueprintLibrary.CaptureMouse",
+    "/Script/UMG.WidgetBlueprintLibrary.ClearUserFocus",
+    "/Script/UMG.WidgetBlueprintLibrary.DetectDrag",
+    "/Script/UMG.WidgetBlueprintLibrary.DetectDragIfPressed",
     "/Script/UMG.WidgetBlueprintLibrary.DismissAllMenus",
+    "/Script/UMG.WidgetBlueprintLibrary.DrawBox",
+    "/Script/UMG.WidgetBlueprintLibrary.DrawLine",
+    "/Script/UMG.WidgetBlueprintLibrary.DrawLines",
+    "/Script/UMG.WidgetBlueprintLibrary.DrawSpline",
+    "/Script/UMG.WidgetBlueprintLibrary.DrawTextFormatted",
+    "/Script/UMG.WidgetBlueprintLibrary.EndDragDrop",
     "/Script/UMG.WidgetBlueprintLibrary.GetAllWidgetsOfClass",
     "/Script/UMG.WidgetBlueprintLibrary.GetAllWidgetsWithInterface",
     "/Script/UMG.WidgetBlueprintLibrary.GetBrushResource",
@@ -344,11 +371,14 @@
     "/Script/UMG.WidgetBlueprintLibrary.GetInputEventFromPointerEvent",
     "/Script/UMG.WidgetBlueprintLibrary.GetKeyEventFromAnalogInputEvent",
     "/Script/UMG.WidgetBlueprintLibrary.GetSafeZonePadding",
+    "/Script/UMG.WidgetBlueprintLibrary.Handled",
     "/Script/UMG.WidgetBlueprintLibrary.IsDragDropping",
+    "/Script/UMG.WidgetBlueprintLibrary.LockMouse",
     "/Script/UMG.WidgetBlueprintLibrary.MakeBrushFromAsset",
     "/Script/UMG.WidgetBlueprintLibrary.MakeBrushFromMaterial",
     "/Script/UMG.WidgetBlueprintLibrary.MakeBrushFromTexture",
     "/Script/UMG.WidgetBlueprintLibrary.NoResourceBrush",
+    "/Script/UMG.WidgetBlueprintLibrary.ReleaseMouseCapture",
     "/Script/UMG.WidgetBlueprintLibrary.RestorePreviousWindowTitleBarState",
     "/Script/UMG.WidgetBlueprintLibrary.SetBrushResourceToMaterial",
     "/Script/UMG.WidgetBlueprintLibrary.SetBrushResourceToTexture",
@@ -358,15 +388,21 @@
     "/Script/UMG.WidgetBlueprintLibrary.SetInputMode_GameAndUIEx",
     "/Script/UMG.WidgetBlueprintLibrary.SetInputMode_GameOnly",
     "/Script/UMG.WidgetBlueprintLibrary.SetInputMode_UIOnlyEx",
+    "/Script/UMG.WidgetBlueprintLibrary.SetMousePosition",
+    "/Script/UMG.WidgetBlueprintLibrary.SetUserFocus",
     "/Script/UMG.WidgetBlueprintLibrary.SetWindowTitleBarCloseButtonActive",
     "/Script/UMG.WidgetBlueprintLibrary.SetWindowTitleBarOnCloseClickedDelegate",
     "/Script/UMG.WidgetBlueprintLibrary.SetWindowTitleBarState",
+    "/Script/UMG.WidgetBlueprintLibrary.Unhandled",
+    "/Script/UMG.WidgetBlueprintLibrary.UnlockMouse",
     "/Script/UMG.WidgetLayoutLibrary.GetDesignTimeInfo",
     "/Script/UMG.WidgetLayoutLibrary.GetMousePositionOnPlatform",
     "/Script/UMG.WidgetLayoutLibrary.GetMousePositionOnViewport",
     "/Script/UMG.WidgetLayoutLibrary.GetMousePositionScaledByDPI",
+    "/Script/UMG.WidgetLayoutLibrary.GetPlayerScreenWidgetGeometry",
     "/Script/UMG.WidgetLayoutLibrary.GetViewportScale",
     "/Script/UMG.WidgetLayoutLibrary.GetViewportSize",
+    "/Script/UMG.WidgetLayoutLibrary.GetViewportWidgetGeometry",
     "/Script/UMG.WidgetLayoutLibrary.ProjectWorldLocationToWidgetPosition",
     "/Script/UMG.WidgetLayoutLibrary.RemoveAllWidgets",
     "/Script/UMG.WidgetLayoutLibrary.SlotAsBorderSlot",
@@ -384,1199 +420,65 @@
     "/Script/UMG.WidgetLayoutLibrary.SlotAsWidgetSwitcherSlot",
     "/Script/UMG.WidgetLayoutLibrary.SlotAsWrapBoxSlot"
   ],
-  "scoped_rejections": [
-    {
-      "class": "/Script/Engine.KismetInputLibrary",
-      "function": "Key_GetNavigationActionFromKey",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/Engine.KismetInputLibrary",
-      "status": "export_blocked",
-      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
-    },
-    {
-      "class": "/Script/Engine.KismetInputLibrary",
-      "function": "Key_GetNavigationDirectionFromAnalog",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/Engine.KismetInputLibrary",
-      "status": "export_blocked",
-      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
-    },
-    {
-      "class": "/Script/Engine.KismetInputLibrary",
-      "function": "Key_GetNavigationDirectionFromKey",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/Engine.KismetInputLibrary",
-      "status": "export_blocked",
-      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "DetectDragIfPressed",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "status": "export_blocked",
-      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
-    }
-  ],
-  "opaque_types": [
-    {
-      "type_path": "/Script/SlateCore.Geometry",
-      "affected_functions": 17
-    },
-    {
-      "type_path": "/Script/UMG.EventReply",
-      "affected_functions": 11
-    },
-    {
-      "type_path": "/Script/UMG.PaintContext",
-      "affected_functions": 5
-    },
-    {
-      "type_path": "/Script/UMG.WidgetAnimationHandle",
-      "affected_functions": 4
-    }
-  ],
+  "scoped_rejections": [],
+  "opaque_types": [],
   "input_scope": {
     "standalone_functions": 0,
     "detached_snapshot_candidates": 0,
     "navigation_context_candidates": 0,
     "cross_group_functions": []
   },
-  "source_sha256": "e0ba053e565a13616ab6b502c13f8d47e0b2c7ded62cd6c4e0a7346eec1a3723",
-  "members": [
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "AbsoluteToLocal",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_AbsoluteToLocal",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "GetAbsoluteSize",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_GetAbsoluteSize",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "GetLocalSize",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_GetLocalSize",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "GetLocalTopLeft",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_GetLocalTopLeft",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "IsUnderLocation",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_IsUnderLocation",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "LocalToAbsolute",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_LocalToAbsolute",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "LocalToViewport",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_LocalToViewport",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "Scalar_AbsoluteToLocal",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_Scalar_AbsoluteToLocal",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "Scalar_LocalToAbsolute",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_Scalar_LocalToAbsolute",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "ScreenToWidgetLocal",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_ScreenToWidgetLocal",
-      "explicit_defaults": [
-        {
-          "parameter": "bincludewindowposition",
-          "value": "false"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "Vector_AbsoluteToLocal",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_Vector_AbsoluteToLocal",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.SlateBlueprintLibrary",
-      "function": "Vector_LocalToAbsolute",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
-      "alias": "ue_ui_geometry_Vector_LocalToAbsolute",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "geometry",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": true,
-          "output": false,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.UserWidget",
-      "function": "PlayAnimation",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.UserWidget",
-      "alias": "ue_user_widget_PlayAnimation",
-      "explicit_defaults": [
-        {
-          "parameter": "startattime",
-          "value": "0.000000"
-        },
-        {
-          "parameter": "numloopstoplay",
-          "value": "1"
-        },
-        {
-          "parameter": "playmode",
-          "value": "Forward"
-        },
-        {
-          "parameter": "playbackspeed",
-          "value": "1.000000"
-        },
-        {
-          "parameter": "brestorestate",
-          "value": "false"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "widget_animation_handle",
-      "required_groups": [
-        "widget_animation_handle"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.WidgetAnimationHandle",
-          "input": false,
-          "output": true,
-          "group": "widget_animation_handle"
-        }
-      ],
-      "planned_barrier": "separate_widget_animation_handle_contract"
-    },
-    {
-      "class": "/Script/UMG.UserWidget",
-      "function": "PlayAnimationForward",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.UserWidget",
-      "alias": "ue_user_widget_PlayAnimationForward",
-      "explicit_defaults": [
-        {
-          "parameter": "playbackspeed",
-          "value": "1.000000"
-        },
-        {
-          "parameter": "brestorestate",
-          "value": "false"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "widget_animation_handle",
-      "required_groups": [
-        "widget_animation_handle"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.WidgetAnimationHandle",
-          "input": false,
-          "output": true,
-          "group": "widget_animation_handle"
-        }
-      ],
-      "planned_barrier": "separate_widget_animation_handle_contract"
-    },
-    {
-      "class": "/Script/UMG.UserWidget",
-      "function": "PlayAnimationReverse",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.UserWidget",
-      "alias": "ue_user_widget_PlayAnimationReverse",
-      "explicit_defaults": [
-        {
-          "parameter": "playbackspeed",
-          "value": "1.000000"
-        },
-        {
-          "parameter": "brestorestate",
-          "value": "false"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "widget_animation_handle",
-      "required_groups": [
-        "widget_animation_handle"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.WidgetAnimationHandle",
-          "input": false,
-          "output": true,
-          "group": "widget_animation_handle"
-        }
-      ],
-      "planned_barrier": "separate_widget_animation_handle_contract"
-    },
-    {
-      "class": "/Script/UMG.UserWidget",
-      "function": "PlayAnimationTimeRange",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.UserWidget",
-      "alias": "ue_user_widget_PlayAnimationTimeRange",
-      "explicit_defaults": [
-        {
-          "parameter": "startattime",
-          "value": "0.000000"
-        },
-        {
-          "parameter": "endattime",
-          "value": "0.000000"
-        },
-        {
-          "parameter": "numloopstoplay",
-          "value": "1"
-        },
-        {
-          "parameter": "playmode",
-          "value": "Forward"
-        },
-        {
-          "parameter": "playbackspeed",
-          "value": "1.000000"
-        },
-        {
-          "parameter": "brestorestate",
-          "value": "false"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "widget_animation_handle",
-      "required_groups": [
-        "widget_animation_handle"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.WidgetAnimationHandle",
-          "input": false,
-          "output": true,
-          "group": "widget_animation_handle"
-        }
-      ],
-      "planned_barrier": "separate_widget_animation_handle_contract"
-    },
-    {
-      "class": "/Script/UMG.Widget",
-      "function": "GetCachedGeometry",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.Widget",
-      "alias": "ue_widget_GetCachedGeometry",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": false,
-          "output": true,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.Widget",
-      "function": "GetPaintSpaceGeometry",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.Widget",
-      "alias": "ue_widget_GetPaintSpaceGeometry",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": false,
-          "output": true,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.Widget",
-      "function": "GetTickSpaceGeometry",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.Widget",
-      "alias": "ue_widget_GetTickSpaceGeometry",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": false,
-          "output": true,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "CaptureMouse",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_CaptureMouse",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "reply",
-          "type_path": "/Script/UMG.EventReply",
-          "input": true,
-          "output": true,
-          "group": "event_reply"
-        },
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "ClearUserFocus",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_ClearUserFocus",
-      "explicit_defaults": [
-        {
-          "parameter": "binallusers",
-          "value": "false"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "reply",
-          "type_path": "/Script/UMG.EventReply",
-          "input": true,
-          "output": true,
-          "group": "event_reply"
-        },
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "DetectDrag",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_DetectDrag",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "reply",
-          "type_path": "/Script/UMG.EventReply",
-          "input": true,
-          "output": true,
-          "group": "event_reply"
-        },
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "DrawBox",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_DrawBox",
-      "explicit_defaults": [
-        {
-          "parameter": "tint",
-          "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "paint_context",
-      "required_groups": [
-        "paint_context"
-      ],
-      "fields": [
-        {
-          "path": "context",
-          "type_path": "/Script/UMG.PaintContext",
-          "input": true,
-          "output": true,
-          "group": "paint_context"
-        }
-      ],
-      "planned_barrier": "separate_paint_context_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "DrawLine",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_DrawLine",
-      "explicit_defaults": [
-        {
-          "parameter": "tint",
-          "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
-        },
-        {
-          "parameter": "bantialias",
-          "value": "true"
-        },
-        {
-          "parameter": "thickness",
-          "value": "1.000000"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "paint_context",
-      "required_groups": [
-        "paint_context"
-      ],
-      "fields": [
-        {
-          "path": "context",
-          "type_path": "/Script/UMG.PaintContext",
-          "input": true,
-          "output": true,
-          "group": "paint_context"
-        }
-      ],
-      "planned_barrier": "separate_paint_context_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "DrawLines",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_DrawLines",
-      "explicit_defaults": [
-        {
-          "parameter": "tint",
-          "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
-        },
-        {
-          "parameter": "bantialias",
-          "value": "true"
-        },
-        {
-          "parameter": "thickness",
-          "value": "1.000000"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "paint_context",
-      "required_groups": [
-        "paint_context"
-      ],
-      "fields": [
-        {
-          "path": "context",
-          "type_path": "/Script/UMG.PaintContext",
-          "input": true,
-          "output": true,
-          "group": "paint_context"
-        }
-      ],
-      "planned_barrier": "separate_paint_context_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "DrawSpline",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_DrawSpline",
-      "explicit_defaults": [
-        {
-          "parameter": "tint",
-          "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
-        },
-        {
-          "parameter": "thickness",
-          "value": "1.000000"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "paint_context",
-      "required_groups": [
-        "paint_context"
-      ],
-      "fields": [
-        {
-          "path": "context",
-          "type_path": "/Script/UMG.PaintContext",
-          "input": true,
-          "output": true,
-          "group": "paint_context"
-        }
-      ],
-      "planned_barrier": "separate_paint_context_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "DrawTextFormatted",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_DrawTextFormatted",
-      "explicit_defaults": [
-        {
-          "parameter": "fontsize",
-          "value": "16.000000"
-        },
-        {
-          "parameter": "fonttypeface",
-          "value": "Regular"
-        },
-        {
-          "parameter": "tint",
-          "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "paint_context",
-      "required_groups": [
-        "paint_context"
-      ],
-      "fields": [
-        {
-          "path": "context",
-          "type_path": "/Script/UMG.PaintContext",
-          "input": true,
-          "output": true,
-          "group": "paint_context"
-        }
-      ],
-      "planned_barrier": "separate_paint_context_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "EndDragDrop",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_EndDragDrop",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "reply",
-          "type_path": "/Script/UMG.EventReply",
-          "input": true,
-          "output": true,
-          "group": "event_reply"
-        },
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "Handled",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_Handled",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "LockMouse",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_LockMouse",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "reply",
-          "type_path": "/Script/UMG.EventReply",
-          "input": true,
-          "output": true,
-          "group": "event_reply"
-        },
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "ReleaseMouseCapture",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_ReleaseMouseCapture",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "reply",
-          "type_path": "/Script/UMG.EventReply",
-          "input": true,
-          "output": true,
-          "group": "event_reply"
-        },
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "SetMousePosition",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_SetMousePosition",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "reply",
-          "type_path": "/Script/UMG.EventReply",
-          "input": true,
-          "output": true,
-          "group": "event_reply"
-        },
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "SetUserFocus",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_SetUserFocus",
-      "explicit_defaults": [
-        {
-          "parameter": "binallusers",
-          "value": "false"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "reply",
-          "type_path": "/Script/UMG.EventReply",
-          "input": true,
-          "output": true,
-          "group": "event_reply"
-        },
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "Unhandled",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_Unhandled",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "UnlockMouse",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_UnlockMouse",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "event_reply",
-      "required_groups": [
-        "event_reply"
-      ],
-      "fields": [
-        {
-          "path": "reply",
-          "type_path": "/Script/UMG.EventReply",
-          "input": true,
-          "output": true,
-          "group": "event_reply"
-        },
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/UMG.EventReply",
-          "input": false,
-          "output": true,
-          "group": "event_reply"
-        }
-      ],
-      "planned_barrier": "separate_event_reply_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetLayoutLibrary",
-      "function": "GetPlayerScreenWidgetGeometry",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
-      "alias": "ue_ui_layout_GetPlayerScreenWidgetGeometry",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": false,
-          "output": true,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    },
-    {
-      "class": "/Script/UMG.WidgetLayoutLibrary",
-      "function": "GetViewportWidgetGeometry",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
-      "alias": "ue_ui_layout_GetViewportWidgetGeometry",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter",
-      "primary_group": "geometry",
-      "required_groups": [
-        "geometry"
-      ],
-      "fields": [
-        {
-          "path": "returnvalue",
-          "type_path": "/Script/SlateCore.Geometry",
-          "input": false,
-          "output": true,
-          "group": "geometry"
-        }
-      ],
-      "planned_barrier": "separate_geometry_contract"
-    }
-  ],
+  "source_sha256": "a32bd12bebfe30dec7ed1f8377f7f4062d3af789648afd658aa3616f929e55d3",
+  "members": [],
   "runtime_transport_implemented": true,
   "coverage_changed": false,
+  "implemented_snapshot_functions": 33,
+  "scoped_rejection_count": 0,
   "implementation_evidence": {
-    "Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp": "9cf52b7adfd8ba61ca46aec7662a8ffb8572bdc73cf0ec06d02b75f11d052217",
-    "Plugins/DasForUE/Source/DasRuntime/Private/DasInputEventsRuntime.inl": "de4e0eec8d5bbaeea5f5d246d56019cf90fdaee3e1043a96e40f0e907321b740",
-    "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp": "26963f7ff69a71b942f596a0b9ea35cc3d715226c7a5b6c4a33c993e0efe788c",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp": "a07c8ab76cec9a1bfe48d85fd490b5bffbfcd337c9f987b911d53eb2c6f1446b",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasInputEventsRuntime.inl": "3edd3d8559b1f8b5af7c510977259936de8f9e7f0b365f53178be457b1b957e9",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp": "5c94a6682d76851eccbca57efa3a66a53f7de1815cbc5f3688c77e2c5f0123a6",
     "Plugins/DasForUE/Content/Das/Scripts/ue_input_events.das": "6ecfb94b57679c7019f1cfb05d93a28e71b0b90cb94fbb41c1783192067081de",
-    "Scripts/GenerateBindings.py": "ceaea6bc65a8be9140a53ac4989f0b53f90e388182eb956567e509fc88670791"
+    "Scripts/GenerateBindings.py": "e2ad21c7c386c5836553f00a926f362f89284a5d83e76f4492a44abfde878deb"
+  },
+  "implemented_geometry_functions": 17,
+  "geometry_contract_sha256": "de45d9846129201eaf7ea93002347439a7d0fb0ed275cb9ff50269cd5c6dee61",
+  "implemented_event_reply_functions": 12,
+  "event_reply_contract_sha256": "9c62ec3540b57de439bac8693be2d599c5e8b257abf3a708fffe6071923245ee",
+  "event_reply_implementation_evidence": {
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyTransport.cpp": "35c5b71b65a341e1029c4c46ab605d0bb73d5d24a6f4ae2a75dee866b07d6f28",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyCalls.inl": "0be9303f6edc08255f09c96ab1496c95641275eb9b5c62e9cda8ee941660908f",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetEventsRuntime.inl": "a8a8048467c8c258baa4ec5f37a7a516b375811fdee7fca33eb3dd52a198418e"
+  },
+  "implemented_navigation_functions": 3,
+  "navigation_contract_sha256": "c53a2e69d094b4fc65078a29c4f64c2e5cb2ce1d027db98b65fbdb90287601c8",
+  "navigation_implementation_evidence": {
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasInputNavigation.inl": "26e8251fa9ad6de775ef38c3d14727974434d2893008caa1da2bde05fb074571",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp": "5c94a6682d76851eccbca57efa3a66a53f7de1815cbc5f3688c77e2c5f0123a6",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp": "a07c8ab76cec9a1bfe48d85fd490b5bffbfcd337c9f987b911d53eb2c6f1446b"
+  },
+  "implemented_drag_events": 6,
+  "drag_contract_sha256": "7289242f0297be5b8b7ad572d76aecdeb1eced4d118ba23cdf714bf65a16a6a8",
+  "drag_implementation_evidence": {
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasDragDropOperation.cpp": "2a1a907d8adb220916977efea01c573153f66fdba873c71b55f349c218019bac",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasDragRuntime.inl": "3891e3cf0bd27481b70581ea51babab8f45f4942cd52d10a8d52b0526527aabf",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp": "d4caa62784e90ecd39a102f4b65c4e753e5a7bdf6e9650c70e6abfd34982f615",
+    "Plugins/DasForUE/Content/Das/Scripts/ue_drag_drop.das": "b93dabd582c50935580c03a732887938fd71785aec1712e9b8d889e201c29aea"
+  },
+  "implemented_widget_animation_functions": 4,
+  "widget_animation_contract_sha256": "1c8536ff23b8ac70d1a32cf85cce35977cb720283fae21247883d7f96bacb3cb",
+  "widget_animation_implementation_evidence": {
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetAnimationTransport.cpp": "4b962964836ff8c5f3587b80fa561834d19327b318926a1f6b54579cfd87d9a4",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetAnimationRuntime.inl": "52fccd2dd3c5b34966b4fdba9eba0ea1b37a51a05523c19a5477e9e340c39477",
+    "Plugins/DasForUE/Content/Das/Scripts/ue_widget_animation.das": "e1897ec409b6be8c0a5d9e6c9c201af0c94e524592d2191f7e85478a7f9c02b8"
+  },
+  "implemented_paint_functions": 5,
+  "paint_contract_sha256": "74adbb020d7b5cde747ef059483edfc75302bee082379f6728256ae5b5506f64",
+  "paint_implementation_evidence": {
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasPaintTransport.cpp": "6627d1020e62a3d2bce7f7e8802eda3bc02a6fb5398f2ab2beaf675db571387a",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasPaintRuntime.inl": "d9c147f1f652c2c6a4c0d15c4e78400762f2c07804c0e939a55e66d965bdf4bc",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp": "d4caa62784e90ecd39a102f4b65c4e753e5a7bdf6e9650c70e6abfd34982f615",
+    "Plugins/DasForUE/Content/Das/Scripts/ue_paint.das": "b9c0ca6f5e2688c7c11841af429731c880dfe2ad9e5ad680f8edd931ae028a96"
   },
   "native_evidence": {
     "input_storage": {
@@ -1784,24 +686,24 @@
   },
   "evidence": {
     "profile": {
-      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\4d0575e4bbfa44a38b3881c8c76359ce\\profile.json",
+      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\6d0db4eebaaf4c0d8e01d70cd02bfbc4\\profile.json",
       "sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa"
     },
     "reflection": {
-      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\4d0575e4bbfa44a38b3881c8c76359ce\\reflection.json",
-      "sha256": "cb6aa07c0ec51a9f1a66fa6950cc57e349b8c57ded56b25916384e307753f581"
+      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\6d0db4eebaaf4c0d8e01d70cd02bfbc4\\reflection.json",
+      "sha256": "48bb3630159fe69ed53d2751a670e4f791deab110acb2dd2c679b774011aad57"
     },
     "report": {
-      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\4d0575e4bbfa44a38b3881c8c76359ce\\report.json",
-      "sha256": "4c3251c8367db158a3d1032a7997e8d618291ec395498266354ccf5612baea6d"
+      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\6d0db4eebaaf4c0d8e01d70cd02bfbc4\\report.json",
+      "sha256": "fa225b19895171ab5f2bd14290582a5a598a7859e0adec6dad7511f698644b24"
     },
     "summary": {
-      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\4d0575e4bbfa44a38b3881c8c76359ce\\summary.json",
-      "sha256": "4c3251c8367db158a3d1032a7997e8d618291ec395498266354ccf5612baea6d"
+      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\6d0db4eebaaf4c0d8e01d70cd02bfbc4\\summary.json",
+      "sha256": "fa225b19895171ab5f2bd14290582a5a598a7859e0adec6dad7511f698644b24"
     },
     "contract": {
       "path": "C:\\src\\DasForUE2\\Bindings\\InputEvents.contract.json",
-      "sha256": "a55446e9f2a4addabb86a0e4fa5c411ef1287f6783238317e01cbb00e5c8bf94"
+      "sha256": "8b8900bae1055d622c098d288b07a5d405f2bc1076a7238d39f384e192115a8e"
     }
   }
 }

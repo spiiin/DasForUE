@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "status": "implemented_scoped_paint",
+  "transport_id": "scoped_paint_context_v1",
+  "native_type": "/Script/UMG.PaintContext",
+  "functions": [
+    "/Script/UMG.WidgetBlueprintLibrary.DrawBox",
+    "/Script/UMG.WidgetBlueprintLibrary.DrawLine",
+    "/Script/UMG.WidgetBlueprintLibrary.DrawLines",
+    "/Script/UMG.WidgetBlueprintLibrary.DrawSpline",
+    "/Script/UMG.WidgetBlueprintLibrary.DrawTextFormatted"
+  ],
+  "handler": "[export] def handler(context:UEPaintContext):void; PaintHandler on DasScriptUserWidget",
+  "ownership": "epoch token only; native references remain on NativePaint stack; no reflected storage, snapshots or native containers",
+  "commands": "owned native argument copies staged; real context used only after successful DAS return; errors/destroy discard entire batch; Super paint preserved",
+  "lifetime": "current synchronous callback and VM; frames revoked at exit; saved/default tokens rejected; reentrant paint falls back without entering VM",
+  "limits": {
+    "commands": 1024,
+    "points_per_call": 4096,
+    "total_points": 65536,
+    "text_per_call": 32768,
+    "total_text_chars": 131072,
+    "coordinate_absolute": 10000000,
+    "font_size_max": 4096,
+    "thickness_max": 10000
+  },
+  "validation": "exact scalar allowlist; game-thread gameplay role; finite bounded scalar/color/coordinates; geometry float overflow and layer overflow guards; assets pinned only until commit"
+}

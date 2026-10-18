@@ -1,27 +1,20 @@
-# UMG: аудит 37 generation failures
+# UMG: аудит 0 generation failures
 
-UE `5.8.3-0+UE5`. Снимок: **366 ready, 114 export blocked, 37 generation blocked**.
+UE `5.8.3-0+UE5`. Снимок: **407 ready, 110 export blocked, 0 generation blocked**.
 
 Этот отчёт не меняет coverage; состояние реализации указано отдельно в контракте.
+Классификация export refusals ведётся отдельно: [UMGExportBlockers](UMGExportBlockers.md).
 
 | Группа | Уникальных функций |
 | --- | ---: |
-| event_reply | 11 |
-| geometry | 17 |
-| paint_context | 5 |
-| widget_animation_handle | 4 |
 
-Input events: 0 отдельных функций; 0 кандидата на detached snapshot, 0 требуют отдельной navigation policy.
-Cross-group: .
+33 input snapshot functions реализованы; непрозрачные input-event shapes больше не входят в этот backlog.
+Navigation и DetectDragIfPressed открыты через scoped live adapters; отдельных execution-contract отказов нет.
 
 ## Непрозрачные типы
 
 | Native type | Затронутых функций |
 | --- | ---: |
-| `/Script/SlateCore.Geometry` | 17 |
-| `/Script/UMG.EventReply` | 11 |
-| `/Script/UMG.PaintContext` | 5 |
-| `/Script/UMG.WidgetAnimationHandle` | 4 |
 
 Числа типов пересекаются; таблица групп выше — непересекающееся разбиение функций.
 
@@ -29,54 +22,6 @@ Cross-group: .
 
 | Функция | Группа | Поля и направления | Следующий барьер |
 | --- | --- | --- | --- |
-| SlateBlueprintLibrary.AbsoluteToLocal | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.GetAbsoluteSize | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.GetLocalSize | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.GetLocalTopLeft | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.IsUnderLocation | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.LocalToAbsolute | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.LocalToViewport | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.Scalar_AbsoluteToLocal | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.Scalar_LocalToAbsolute | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.ScreenToWidgetLocal | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.Vector_AbsoluteToLocal | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| SlateBlueprintLibrary.Vector_LocalToAbsolute | geometry | `geometry`: Geometry (in) | separate_geometry_contract |
-| UserWidget.PlayAnimation | widget_animation_handle | `returnvalue`: WidgetAnimationHandle (out) | separate_widget_animation_handle_contract |
-| UserWidget.PlayAnimationForward | widget_animation_handle | `returnvalue`: WidgetAnimationHandle (out) | separate_widget_animation_handle_contract |
-| UserWidget.PlayAnimationReverse | widget_animation_handle | `returnvalue`: WidgetAnimationHandle (out) | separate_widget_animation_handle_contract |
-| UserWidget.PlayAnimationTimeRange | widget_animation_handle | `returnvalue`: WidgetAnimationHandle (out) | separate_widget_animation_handle_contract |
-| Widget.GetCachedGeometry | geometry | `returnvalue`: Geometry (out) | separate_geometry_contract |
-| Widget.GetPaintSpaceGeometry | geometry | `returnvalue`: Geometry (out) | separate_geometry_contract |
-| Widget.GetTickSpaceGeometry | geometry | `returnvalue`: Geometry (out) | separate_geometry_contract |
-| WidgetBlueprintLibrary.CaptureMouse | event_reply | `reply`: EventReply (inout), `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetBlueprintLibrary.ClearUserFocus | event_reply | `reply`: EventReply (inout), `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetBlueprintLibrary.DetectDrag | event_reply | `reply`: EventReply (inout), `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetBlueprintLibrary.DrawBox | paint_context | `context`: PaintContext (inout) | separate_paint_context_contract |
-| WidgetBlueprintLibrary.DrawLine | paint_context | `context`: PaintContext (inout) | separate_paint_context_contract |
-| WidgetBlueprintLibrary.DrawLines | paint_context | `context`: PaintContext (inout) | separate_paint_context_contract |
-| WidgetBlueprintLibrary.DrawSpline | paint_context | `context`: PaintContext (inout) | separate_paint_context_contract |
-| WidgetBlueprintLibrary.DrawTextFormatted | paint_context | `context`: PaintContext (inout) | separate_paint_context_contract |
-| WidgetBlueprintLibrary.EndDragDrop | event_reply | `reply`: EventReply (inout), `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetBlueprintLibrary.Handled | event_reply | `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetBlueprintLibrary.LockMouse | event_reply | `reply`: EventReply (inout), `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetBlueprintLibrary.ReleaseMouseCapture | event_reply | `reply`: EventReply (inout), `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetBlueprintLibrary.SetMousePosition | event_reply | `reply`: EventReply (inout), `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetBlueprintLibrary.SetUserFocus | event_reply | `reply`: EventReply (inout), `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetBlueprintLibrary.Unhandled | event_reply | `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetBlueprintLibrary.UnlockMouse | event_reply | `reply`: EventReply (inout), `returnvalue`: EventReply (out) | separate_event_reply_contract |
-| WidgetLayoutLibrary.GetPlayerScreenWidgetGeometry | geometry | `returnvalue`: Geometry (out) | separate_geometry_contract |
-| WidgetLayoutLibrary.GetViewportWidgetGeometry | geometry | `returnvalue`: Geometry (out) | separate_geometry_contract |
-
-## Явные execution-contract отказы
-
-33 input snapshot functions реализованы. Эти четыре функции остаются закрытыми:
-
-| Функция | Причина |
-| --- | --- |
-| KismetInputLibrary.Key_GetNavigationActionFromKey | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters |
-| KismetInputLibrary.Key_GetNavigationDirectionFromAnalog | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters |
-| KismetInputLibrary.Key_GetNavigationDirectionFromKey | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters |
-| WidgetBlueprintLibrary.DetectDragIfPressed | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters |
 
 ## Native source evidence
 
@@ -89,6 +34,18 @@ Cross-group: .
 - reply: `Engine/Source/Runtime/UMG/Public/Components/SlateWrapperTypes.h` (SHA256 `60dc1f49b7444a113f2e4d3818cd335453fd0b98068542f67fb435a9982c7162`); строки 128, 141.
 - geometry: `Engine/Source/Runtime/SlateCore/Public/Layout/Geometry.h` (SHA256 `b857272e3567da9fce115710ff9f2e09abcba1e6ef781c8647ab15df4e9fa347`); строки 39, 636.
 - animation_handle: `Engine/Source/Runtime/UMG/Public/Animation/WidgetAnimationHandle.h` (SHA256 `fef4af705282d66d9ba8f3a46c997cc5d008128f8cf5e3073a780d256ac09c7f`); строки 21, 72, 46.
+
+Три navigation queries открыты через [live input adapter](InputNavigation.md), current native event и weak Slate user. Analog query потребляет событие и обновляет repeat state не более одного раза на callback.
+
+DetectDragIfPressed и шесть native drag/drop callbacks реализованы через [managed DragDropOperation](DragDrop.md); source/participating target Destroy и committed reload отзывают операцию.
+
+5 PaintContext draw functions открыты через [синхронный OnPaint bridge](PaintContext.md); script-команды публикуются только после успешного callback.
+
+4 WidgetAnimation producers открыты через [weak WidgetAnimation transport](WidgetAnimation.md); finish, NativeDestruct и смена VM отзывают доступ.
+
+12 EventReply functions открыты через [scoped callback transport](EventReply.md). Reply и call frames действуют только внутри текущего синхронного callback.
+
+17 Geometry functions реализованы через [owned Geometry snapshots](Geometry.md); эта группа больше не входит в backlog.
 
 Контракт и порядок реализации: [InputEventTransportContract](InputEventTransportContract.md).
 Input snapshots не реализуют UserWidget overrides, EventReply или paint callbacks автоматически.

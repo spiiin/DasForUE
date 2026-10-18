@@ -128,10 +128,11 @@ def audit(profile, reflection, report, summary):
 def markdown(r):
     lines=[f"# UMG: аудит {r['generation_failures']} generation failures",'',f"UE `{r['engine_version']}`. Снимок: **{r['counts']['generation_ready']} ready, {r['counts']['export_blocked']} export blocked, {r['generation_failures']} generation blocked**.",
         '', 'Этот отчёт не меняет coverage; состояние реализации указано отдельно в контракте.',
+        'Классификация export refusals ведётся отдельно: [UMGExportBlockers](UMGExportBlockers.md).',
         '', '| Группа | Уникальных функций |', '| --- | ---: |']
     lines += [f'| {g} | {n} |' for g,n in r['partition'].items()]
-    i=r['input_scope'];lines += ['',f"Input events: {i['standalone_functions']} отдельных функций; {i['detached_snapshot_candidates']} кандидата на detached snapshot, {i['navigation_context_candidates']} требуют отдельной navigation policy.",
-        'Cross-group: '+', '.join(i['cross_group_functions'])+'.',
+    i=r['input_scope'];lines += ['',('33 input snapshot functions реализованы; непрозрачные input-event shapes больше не входят в этот backlog.' if r.get('runtime_transport_implemented') else f"Input events: {i['standalone_functions']} отдельных функций; {i['detached_snapshot_candidates']} кандидата на detached snapshot, {i['navigation_context_candidates']} требуют отдельной navigation policy."),
+        (('Оставшиеся execution-contract отказы перечислены ниже.' if r.get('scoped_rejections') else 'Navigation и DetectDragIfPressed открыты через scoped live adapters; отдельных execution-contract отказов нет.') if r.get('runtime_transport_implemented') else 'Cross-group: '+', '.join(i['cross_group_functions'])+'.'),
         '', '## Непрозрачные типы', '', '| Native type | Затронутых функций |', '| --- | ---: |']
     lines += [f"| `{t['type_path']}` | {t['affected_functions']} |" for t in r['opaque_types']]
     lines += ['', 'Числа типов пересекаются; таблица групп выше — непересекающееся разбиение функций.',
@@ -140,12 +141,18 @@ def markdown(r):
         fields=', '.join(f"`{f['path']}`: {f['type_path'].split('.')[-1]} ({'inout' if f['input'] and f['output'] else 'in' if f['input'] else 'out'})" for f in m['fields'])
         lines.append(f"| {m['class'].split('.')[-1]}.{m['function']} | {m['primary_group']} | {fields} | {m['planned_barrier']} |")
     if r.get('scoped_rejections'):
-        lines += ['', '## Явные execution-contract отказы', '', '33 input snapshot functions реализованы. Эти четыре функции остаются закрытыми:', '', '| Функция | Причина |', '| --- | --- |']
+        lines += ['', '## Явные execution-contract отказы', '', '33 input snapshot functions реализованы. Оставшиеся функции требуют отдельного live navigation adapter:', '', '| Функция | Причина |', '| --- | --- |']
         for m in r['scoped_rejections']:
             lines.append('| '+m['class'].split('.')[-1]+'.'+m['function']+' | '+m['reason'].strip().replace('\n',' ').replace('|','\\|')+' |')
     lines += ['', '## Native source evidence', '']
     for name,e in r.get('native_evidence',{}).items():
         lines.append(f"- {name}: `{e['path']}` (SHA256 `{e['sha256']}`); строки "+', '.join(str(a['line']) for a in e['anchors'])+'.')
+    if r.get('implemented_navigation_functions'): lines += ['', 'Три navigation queries открыты через [live input adapter](InputNavigation.md), current native event и weak Slate user. Analog query потребляет событие и обновляет repeat state не более одного раза на callback.']
+    if r.get('implemented_drag_events'): lines += ['', 'DetectDragIfPressed и шесть native drag/drop callbacks реализованы через [managed DragDropOperation](DragDrop.md); source/participating target Destroy и committed reload отзывают операцию.']
+    if r.get('implemented_paint_functions'): lines += ['', '5 PaintContext draw functions открыты через [синхронный OnPaint bridge](PaintContext.md); script-команды публикуются только после успешного callback.']
+    if r.get('implemented_widget_animation_functions'): lines += ['', '4 WidgetAnimation producers открыты через [weak WidgetAnimation transport](WidgetAnimation.md); finish, NativeDestruct и смена VM отзывают доступ.']
+    if r.get('implemented_event_reply_functions'): lines += ['', '12 EventReply functions открыты через [scoped callback transport](EventReply.md). Reply и call frames действуют только внутри текущего синхронного callback.']
+    if r.get('implemented_geometry_functions'): lines += ['', '17 Geometry functions реализованы через [owned Geometry snapshots](Geometry.md); эта группа больше не входит в backlog.']
     lines += ['', 'Контракт и порядок реализации: [InputEventTransportContract](InputEventTransportContract.md).',
         'Input snapshots не реализуют UserWidget overrides, EventReply или paint callbacks автоматически.',
         'Проверки: реальный повтор генерации на свежей reflection + unit tests аудита; без PIE/packaged/physical input.']
@@ -182,6 +189,8 @@ def main():
     validate_contract(read(a.contract),result)
     if read(a.contract)['status']=='implemented_detached_snapshots':
         result['runtime_transport_implemented']=True
+        result['implemented_snapshot_functions']=33
+        result['scoped_rejection_count']=len(result['scoped_rejections'])
         root=a.contract.parent.parent
         files=['Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp','Plugins/DasForUE/Content/Das/Scripts/ue_input_events.das','Scripts/GenerateBindings.py']
         result['implementation_evidence']={file:digest(root/file) for file in files}
@@ -189,6 +198,73 @@ def main():
         native=(root/files[0]).read_text(encoding='utf-8-sig').split('static const TCHAR* Allowed[]={',1)[1].split('};',1)[0]
         names=re.findall(r'TEXT\("([^\"]+)"\)',native)
         if len(names)!=33 or set(names)!=set(read(a.contract)['snapshot_function_allowlist']): raise ValueError('Native allowlist differs from contract')
+    geometry_contract=a.contract.parent/'Geometry.contract.json'
+    if geometry_contract.exists() and read(geometry_contract).get('status')=='implemented_owned_snapshot':
+        geometry=read(geometry_contract)
+        if len(geometry['functions'])!=17 or not set(geometry['functions'])<=set(result['ready_functions']) or result['partition'].get('geometry',0): raise ValueError('Implemented Geometry coverage differs from contract')
+        import re
+        native=(a.contract.parent.parent/'Plugins/DasForUE/Source/DasRuntime/Private/DasGeometry.cpp').read_text(encoding='utf-8-sig').split('static const TCHAR* Allowed[]={',1)[1].split('};',1)[0]
+        names=re.findall(r'TEXT\("([^\"]+)"\)',native)
+        if len(names)!=17 or set(names)!=set(geometry['functions']): raise ValueError('Native Geometry allowlist differs from contract')
+        result['implemented_geometry_functions']=17
+        result['geometry_contract_sha256']=digest(geometry_contract)
+    reply_contract=a.contract.parent/'EventReply.contract.json'
+    if reply_contract.exists() and read(reply_contract).get('status')=='implemented_scoped_callback':
+        reply=read(reply_contract)
+        if len(reply['functions'])!=12 or not set(reply['functions'])<=set(result['ready_functions']) or result['partition'].get('event_reply',0): raise ValueError('Implemented EventReply coverage differs from contract')
+        import re
+        root=a.contract.parent.parent
+        native=(root/'Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyTransport.cpp').read_text(encoding='utf-8-sig').split('static const TCHAR* Allowed[]={',1)[1].split('};',1)[0]
+        names=['/Script/UMG.WidgetBlueprintLibrary.'+n for n in re.findall(r'TEXT\("([^\"]+)"\)',native)]
+        if len(names)!=12 or set(names)!=set(reply['functions']): raise ValueError('Native EventReply allowlist differs from contract')
+        result['implemented_event_reply_functions']=12
+        result['event_reply_contract_sha256']=digest(reply_contract)
+        result['event_reply_implementation_evidence']={file:digest(root/file) for file in ['Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyTransport.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyCalls.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetEventsRuntime.inl']}
+    navigation_contract=a.contract.parent/'InputNavigation.contract.json'
+    if navigation_contract.exists() and read(navigation_contract).get('status')=='implemented_live_navigation':
+        navigation=read(navigation_contract)
+        if len(navigation['functions'])!=3 or not set(navigation['functions'])<=set(result['ready_functions']): raise ValueError('Navigation contract coverage mismatch')
+        if navigation['ordinary_snapshot_dispatch'] is not False: raise ValueError('Navigation cannot be ordinary detached snapshot dispatch')
+        import re
+        root=a.contract.parent.parent
+        native=(root/'Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp').read_text(encoding='utf-8-sig').split('bool DasInputNavigationFunctionAllowed(',1)[1].split('static const TCHAR* Names[]={',1)[1].split('};',1)[0]
+        names=['/Script/Engine.KismetInputLibrary.'+n for n in re.findall(r'TEXT\("([^\"]+)"\)',native)]
+        if set(names)!=set(navigation['functions']): raise ValueError('Native navigation allowlist mismatch')
+        result['implemented_navigation_functions']=3
+        result['navigation_contract_sha256']=digest(navigation_contract)
+        result['navigation_implementation_evidence']={file:digest(root/file) for file in ['Plugins/DasForUE/Source/DasRuntime/Private/DasInputNavigation.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp']}
+    drag_contract=a.contract.parent/'DragDrop.contract.json'
+    if drag_contract.exists() and read(drag_contract).get('status')=='implemented_managed_drag':
+        drag=read(drag_contract)
+        if drag['generated_function'] not in result['ready_functions'] or len(drag['events'])!=6: raise ValueError('DragDrop contract coverage mismatch')
+        result['implemented_drag_events']=6
+        result['drag_contract_sha256']=digest(drag_contract)
+        root=a.contract.parent.parent
+        result['drag_implementation_evidence']={file:digest(root/file) for file in ['Plugins/DasForUE/Source/DasRuntime/Private/DasDragDropOperation.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasDragRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp','Plugins/DasForUE/Content/Das/Scripts/ue_drag_drop.das']}
+    animation_contract=a.contract.parent/'WidgetAnimation.contract.json'
+    if animation_contract.exists() and read(animation_contract).get('status')=='implemented_weak_capability':
+        animation=read(animation_contract)
+        if len(animation['functions'])!=4 or not set(animation['functions'])<=set(result['ready_functions']) or result['partition'].get('widget_animation_handle',0): raise ValueError('Implemented WidgetAnimation coverage differs from contract')
+        import re
+        root=a.contract.parent.parent
+        native=(root/'Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetAnimationTransport.cpp').read_text(encoding='utf-8-sig').split('static const TCHAR* Allowed[]={',1)[1].split('};',1)[0]
+        names=['/Script/UMG.UserWidget.'+n for n in re.findall(r'TEXT\("([^\"]+)"\)',native)]
+        if len(names)!=4 or set(names)!=set(animation['functions']): raise ValueError('Native WidgetAnimation allowlist differs from contract')
+        result['implemented_widget_animation_functions']=4
+        result['widget_animation_contract_sha256']=digest(animation_contract)
+        result['widget_animation_implementation_evidence']={file:digest(root/file) for file in ['Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetAnimationTransport.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetAnimationRuntime.inl','Plugins/DasForUE/Content/Das/Scripts/ue_widget_animation.das']}
+    paint_contract=a.contract.parent/'PaintContext.contract.json'
+    if paint_contract.exists() and read(paint_contract).get('status')=='implemented_scoped_paint':
+        paint=read(paint_contract)
+        if len(paint['functions'])!=5 or not set(paint['functions'])<=set(result['ready_functions']) or result['partition'].get('paint_context',0): raise ValueError('Implemented PaintContext coverage differs from contract')
+        import re
+        root=a.contract.parent.parent
+        native=(root/'Plugins/DasForUE/Source/DasRuntime/Private/DasPaintTransport.cpp').read_text(encoding='utf-8-sig').split('static const TCHAR* Allowed[]={',1)[1].split('};',1)[0]
+        names=['/Script/UMG.WidgetBlueprintLibrary.'+n for n in re.findall(r'TEXT\("([^\"]+)"\)',native)]
+        if len(names)!=5 or set(names)!=set(paint['functions']): raise ValueError('Native PaintContext allowlist differs from contract')
+        result['implemented_paint_functions']=5
+        result['paint_contract_sha256']=digest(paint_contract)
+        result['paint_implementation_evidence']={file:digest(root/file) for file in ['Plugins/DasForUE/Source/DasRuntime/Private/DasPaintTransport.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasPaintRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp','Plugins/DasForUE/Content/Das/Scripts/ue_paint.das']}
     result['native_evidence']=source_evidence(a.engine)
     result['evidence']={n:dict(path=str(getattr(a,n)),sha256=digest(getattr(a,n))) for n in ('profile','reflection','report','summary','contract')}
     a.output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

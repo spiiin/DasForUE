@@ -3,6 +3,10 @@ module ue_widget_events public
 require ue_input_events public
 require ue_geometry public
 
+// Focus snapshots are immutable owned values; cause is an Unreal EFocusCause name.
+def ue_focus_user(event:UEFocusEvent):uint { return __ue_focus_user(event) }
+def ue_focus_cause(event:UEFocusEvent):string { return __ue_focus_cause(event) }
+
 // Replies can only be created/used inside a synchronous DasScriptUserWidget input handler.
 def ue_handled():UEEventReply { return __ue_widget_handled() }
 def ue_unhandled():UEEventReply { return __ue_widget_unhandled() }

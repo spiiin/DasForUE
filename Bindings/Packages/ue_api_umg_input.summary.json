@@ -6,9 +6,9 @@
   "value_types": "canonical_math",
   "default_arguments": "explicit",
   "counts": {
-    "generation_ready": 383,
-    "export_blocked": 114,
-    "generation_blocked": 20,
+    "generation_ready": 407,
+    "export_blocked": 110,
+    "generation_blocked": 0,
     "policy_excluded": 0
   },
   "candidate_count": 517,
@@ -17,26 +17,29 @@
   "unknown_declaration_occurrences": 0,
   "surfaces": {
     "receiver": {
-      "generation_ready": 253,
+      "generation_ready": 257,
       "export_blocked": 94,
-      "generation_blocked": 4,
+      "generation_blocked": 0,
       "policy_excluded": 0
     },
     "library": {
-      "generation_ready": 130,
-      "export_blocked": 20,
-      "generation_blocked": 16,
+      "generation_ready": 150,
+      "export_blocked": 16,
+      "generation_blocked": 0,
       "policy_excluded": 0
     }
   },
-  "source_sha256": "9a61e4c322df20eb217faacbafd2b443bd85127d8a7e9155012ebba1c2e833ba",
+  "source_sha256": "a32bd12bebfe30dec7ed1f8377f7f4062d3af789648afd658aa3616f929e55d3",
   "dependencies": {
     "das_modules": [
       "ue_foundation",
       "ue_geometry",
       "ue_input_events",
       "ue_input_value",
-      "ue_native_delegate"
+      "ue_native_delegate",
+      "ue_paint",
+      "ue_widget_animation",
+      "ue_widget_events"
     ],
     "ue_modules": [
       "Engine",
@@ -47,7 +50,7 @@
       "EnhancedInput"
     ]
   },
-  "staged_module": "ue_api_umg_input_preflight_9a61e4c322df20eb",
+  "staged_module": "ue_api_umg_input_preflight_a32bd12bebfe30de",
   "members": [
     {
       "class": "/Script/Engine.InputComponent",
@@ -518,8 +521,9 @@
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/Engine.KismetInputLibrary",
-      "status": "export_blocked",
-      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
+      "alias": "ue_input_key_Key_GetNavigationActionFromKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -527,8 +531,9 @@
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/Engine.KismetInputLibrary",
-      "status": "export_blocked",
-      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
+      "alias": "ue_input_key_Key_GetNavigationDirectionFromAnalog",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -536,8 +541,9 @@
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/Engine.KismetInputLibrary",
-      "status": "export_blocked",
-      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
+      "alias": "ue_input_key_Key_GetNavigationDirectionFromKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -3310,8 +3316,7 @@
           "value": "false"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.UserWidget",
@@ -3330,8 +3335,7 @@
           "value": "false"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.UserWidget",
@@ -3350,8 +3354,7 @@
           "value": "false"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.UserWidget",
@@ -3386,8 +3389,7 @@
           "value": "false"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.UserWidget",
@@ -4579,8 +4581,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_CaptureMouse",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4595,8 +4596,7 @@
           "value": "false"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4624,8 +4624,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_DetectDrag",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4633,8 +4632,9 @@
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "status": "export_blocked",
-      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
+      "alias": "ue_ui_DetectDragIfPressed",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4659,8 +4659,7 @@
           "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4683,8 +4682,7 @@
           "value": "1.000000"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4707,8 +4705,7 @@
           "value": "1.000000"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4727,8 +4724,7 @@
           "value": "1.000000"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4760,8 +4756,7 @@
           "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4771,8 +4766,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_EndDragDrop",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4917,8 +4911,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_Handled",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -4938,8 +4931,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_LockMouse",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -5025,8 +5017,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_ReleaseMouseCapture",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -5161,8 +5152,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_SetMousePosition",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -5177,8 +5167,7 @@
           "value": "false"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -5218,8 +5207,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_Unhandled",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -5229,8 +5217,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_UnlockMouse",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetLayoutLibrary",
@@ -5474,11 +5461,11 @@
     }
   ],
   "preflight": {
+    "runtime_probe": "passed",
     "build_mode": "Editor NullRHI",
     "packaged": "not_run",
     "game_world": true,
     "compile": "passed",
-    "profile_sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa",
-    "runtime_probe": "passed"
+    "profile_sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa"
   }
 }

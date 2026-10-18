@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "status": "implemented_scoped_callback",
+  "transport_id": "scoped_event_reply_v1",
+  "native_type": "/Script/UMG.EventReply",
+  "functions": [
+    "/Script/UMG.WidgetBlueprintLibrary.Handled",
+    "/Script/UMG.WidgetBlueprintLibrary.Unhandled",
+    "/Script/UMG.WidgetBlueprintLibrary.CaptureMouse",
+    "/Script/UMG.WidgetBlueprintLibrary.ReleaseMouseCapture",
+    "/Script/UMG.WidgetBlueprintLibrary.LockMouse",
+    "/Script/UMG.WidgetBlueprintLibrary.UnlockMouse",
+    "/Script/UMG.WidgetBlueprintLibrary.SetUserFocus",
+    "/Script/UMG.WidgetBlueprintLibrary.ClearUserFocus",
+    "/Script/UMG.WidgetBlueprintLibrary.SetMousePosition",
+    "/Script/UMG.WidgetBlueprintLibrary.DetectDrag",
+    "/Script/UMG.WidgetBlueprintLibrary.EndDragDrop",
+    "/Script/UMG.WidgetBlueprintLibrary.DetectDragIfPressed"
+  ],
+  "lifetime": "current synchronous widget callback, current VM context and unique callback epoch",
+  "frames": "tokens only; all reply frames revoked at callback exit including failure; no native FReply in persistent frames",
+  "inout": "publish new reply token to inout and return slots; original token remains immutable",
+  "ownership": "native FReply lives only in callback scope, no persistent snapshot, reflection storage/defaults or native containers",
+  "targets": "constructed non-template live widget in callback world; weak targets revalidated at final publication",
+  "validation": "handled reply required for commands; mouse position finite and int32 range before native cast; drag key mouse/touch only",
+  "outside_callback": "frame creation and all reply operations rejected",
+  "failure": "native parent fallback; partially built commands not published",
+  "pointer_provenance": "DetectDragIfPressed accepts only current native input callback pointer token; stored snapshots are read-only values"
+}

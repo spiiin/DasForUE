@@ -21,7 +21,7 @@ class AuditTests(unittest.TestCase):
         # implemented codec has independent TestInputEventsGenerator coverage.
         from GenerateBindings import OPAQUE_TRANSPORTS
         self.transports=dict(OPAQUE_TRANSPORTS)
-        for path in INPUT_TYPES: OPAQUE_TRANSPORTS.pop(path,None)
+        for path in INPUT_TYPES | {"/Script/SlateCore.Geometry","/Script/UMG.EventReply","/Script/UMG.WidgetAnimationHandle","/Script/UMG.PaintContext"}: OPAQUE_TRANSPORTS.pop(path,None)
     def tearDown(self):
         from GenerateBindings import OPAQUE_TRANSPORTS
         OPAQUE_TRANSPORTS.clear();OPAQUE_TRANSPORTS.update(self.transports)

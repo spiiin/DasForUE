@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "status": "implemented_live_navigation",
+  "transport_id": "live_input_navigation_v1",
+  "functions": [
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationActionFromKey",
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationDirectionFromKey",
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationDirectionFromAnalog"
+  ],
+  "authority": "exact current native input snapshot token, callback epoch, weak widget and original registered Slate user; no detached replay",
+  "cache": "once per function per native callback; fresh callback is a new native query",
+  "analog": "consumes native repeat state once; always handled after query including panic, unhandled reply or Destroy; failed reply commands discarded; no rollback of native navigation state",
+  "lifecycle": "Destroy revokes capability before subsequent queries; frames released at callback exit; hot reload uses new VM and native input token; detached data remains readable",
+  "ordinary_snapshot_dispatch": false
+}

@@ -16,6 +16,7 @@ const FInputEvent* BaseEvent(const UScriptStruct* Type,const void* Data){
  return nullptr;
 }
 bool ValidateSource(const UScriptStruct* Type,const void* Data,FString& Error){
+ if(Type==FFocusEvent::StaticStruct() && Data){if(uint8(static_cast<const FFocusEvent*>(Data)->GetCause())>uint8(EFocusCause::WindowActivate)){Error=TEXT("invalid focus cause");return false;}return true;}
  if(!BaseEvent(Type,Data)){Error=TEXT("unsupported input event identity");return false;}
  if(Type==FAnalogInputEvent::StaticStruct() && !FMath::IsFinite(static_cast<const FAnalogInputEvent*>(Data)->GetAnalogValue())){Error=TEXT("nonfinite analog input event");return false;}
  if(Type==FPointerEvent::StaticStruct()){
@@ -28,19 +29,20 @@ bool ValidateSource(const UScriptStruct* Type,const void* Data,FString& Error){
 }
 }
 bool DasIsInputEventType(const UScriptStruct* Type){
- return Type && (Type==FInputEvent::StaticStruct() || Type==FKeyEvent::StaticStruct() || Type==FAnalogInputEvent::StaticStruct() || Type==FCharacterEvent::StaticStruct() || Type==FPointerEvent::StaticStruct() || Type==FNavigationEvent::StaticStruct());
+ return Type && (Type==FInputEvent::StaticStruct() || Type==FKeyEvent::StaticStruct() || Type==FAnalogInputEvent::StaticStruct() || Type==FCharacterEvent::StaticStruct() || Type==FPointerEvent::StaticStruct() || Type==FNavigationEvent::StaticStruct() || Type==FFocusEvent::StaticStruct());
 }
 bool ValidateDasInputEventSnapshot(const FInstancedStruct& Value,FString& Error){return ValidateDasInputEventData(Value.GetScriptStruct(),Value.GetMemory(),Error);}
 bool ValidateDasInputEventData(const UScriptStruct* Type,const void* Data,FString& Error){
  Error.Reset();if(!IsInGameThread() || GetDasExecutionRole()!=EDasExecutionRole::Gameplay || IsDasFrozenPhysicsWorld(nullptr)){Error=TEXT("input events require gameplay game thread");return false;}
  if(!ValidateSource(Type,Data,Error))return false;
- if(BaseEvent(Type,Data)->GetEventPath()!=nullptr){Error=TEXT("input event snapshot has a borrowed EventPath");return false;}
+ if(Type!=FFocusEvent::StaticStruct() && BaseEvent(Type,Data)->GetEventPath()!=nullptr){Error=TEXT("input event snapshot has a borrowed EventPath");return false;}
  return true;
 }
 bool CaptureDasInputEvent(const UScriptStruct* Type,const void* Source,FInstancedStruct& Out,FString& Error){
  Error.Reset();if(!IsInGameThread() || GetDasExecutionRole()!=EDasExecutionRole::Gameplay || IsDasFrozenPhysicsWorld(nullptr)){Error=TEXT("input capture requires gameplay game thread");return false;}
  if(!ValidateSource(Type,Source,Error))return false;
  FInstancedStruct Candidate;
+ if(Type==FFocusEvent::StaticStruct())Candidate.InitializeAs(Type,reinterpret_cast<const uint8*>(Source));
 #define CAPTURE_KIND(T) if(Type==T::StaticStruct()){TDetachedInputEvent<T> Copy(*static_cast<const T*>(Source));Candidate.InitializeAs(T::StaticStruct(),reinterpret_cast<const uint8*>(static_cast<const T*>(&Copy)));}
  CAPTURE_KIND(FInputEvent) CAPTURE_KIND(FKeyEvent) CAPTURE_KIND(FAnalogInputEvent)
  CAPTURE_KIND(FCharacterEvent) CAPTURE_KIND(FPointerEvent) CAPTURE_KIND(FNavigationEvent)
@@ -49,7 +51,9 @@ bool CaptureDasInputEvent(const UScriptStruct* Type,const void* Source,FInstance
 }
 bool DasInputEventFunctionAllowed(const UFunction* Function){
  if(!Function || !Function->HasAllFunctionFlags(FUNC_Native|FUNC_Static))return false;
+ if(DasInputNavigationFunctionAllowed(Function))return true;
  const FString Path=Function->GetOuterUClass()->GetPathName()+TEXT(".")+Function->GetName();
+ if(Function->GetOuterUClass()->GetPathName()==TEXT("/Script/UMG.WidgetBlueprintLibrary") && Function->GetFName()==TEXT("DetectDragIfPressed"))return true;
  static const TCHAR* Allowed[]={
   TEXT("/Script/Engine.KismetInputLibrary.GetAnalogValue"),
  TEXT("/Script/Engine.KismetInputLibrary.GetKey"),
@@ -86,4 +90,10 @@ bool DasInputEventFunctionAllowed(const UFunction* Function){
  TEXT("/Script/UMG.WidgetBlueprintLibrary.GetKeyEventFromAnalogInputEvent"),
  };
  for(const TCHAR* Name:Allowed)if(Path==Name)return true;return false;
+}
+
+bool DasInputNavigationFunctionAllowed(const UFunction* F){
+ if(!F || !F->HasAllFunctionFlags(FUNC_Native|FUNC_Static) || F->GetOuterUClass()->GetPathName()!=TEXT("/Script/Engine.KismetInputLibrary"))return false;
+ static const TCHAR* Names[]={TEXT("Key_GetNavigationActionFromKey"),TEXT("Key_GetNavigationDirectionFromKey"),TEXT("Key_GetNavigationDirectionFromAnalog")};
+ for(const TCHAR* Name:Names)if(F->GetFName()==Name)return true;return false;
 }

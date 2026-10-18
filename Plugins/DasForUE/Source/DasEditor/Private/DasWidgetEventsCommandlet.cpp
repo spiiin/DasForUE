@@ -13,6 +13,7 @@
 #include "UObject/StrongObjectPtr.h"
 #include "UObject/GarbageCollection.h"
 #include "Misc/ScopeExit.h"
+#include "Misc/FileHelper.h"
 
 UDasWidgetEventsCommandlet::UDasWidgetEventsCommandlet(){IsClient=false;IsServer=false;IsEditor=true;LogToConsole=true;}
 int32 UDasWidgetEventsCommandlet::Main(const FString& Params)
@@ -76,6 +77,35 @@ int32 UDasWidgetEventsCommandlet::Main(const FString& Params)
  }
  const auto Outside=Runtime.RunNamedPersistent(Runtime.ScriptPath(Script),TEXT("outside"),0,Widget.Get());
  Check(!Outside.bSucceeded && Outside.Error.Contains(TEXT("active synchronous widget callback")),TEXT("reply_creation_outside_callback_rejected"));
+ if(FParse::Param(*Params,TEXT("GeneratedReply"))){
+  for(const auto& Case:TArray<TPair<FName,FString>>{
+   {TEXT("stale_argument"),TEXT("expired")},{TEXT("stale_frame"),TEXT("call handle is released")},{TEXT("stale_result"),TEXT("call handle is released")},
+   {TEXT("result_before_invoke"),TEXT("results require an executed call")},{TEXT("unassigned"),TEXT("missing input argument")},
+   {TEXT("bad_position"),TEXT("finite int32")},{TEXT("bad_drag_key"),TEXT("mouse or touch key")},{TEXT("unhandled_command"),TEXT("handled reply")},
+   {TEXT("null_target"),TEXT("object handle is null")},{TEXT("scope_limit"),TEXT("command limit")}}){
+   Widget->BindInputHandler(TEXT("OnKeyDown"),Case.Key);const auto Reply=Slate->OnKeyDown(Geometry,Key);
+   UE_LOG(LogTemp,Display,TEXT("Expected generated rejection %s: %s"),*Case.Key.ToString(),*Widget->LastInputError);
+   Check(!Reply.IsEventHandled() && !Reply.GetMouseCaptor().IsValid() && Widget->LastInputError.Contains(Case.Value),TEXT("generated_reply_rejected_for_expected_reason"));
+  }
+  Widget->BindInputHandler(TEXT("OnKeyDown"),TEXT("immutable_reply"));const auto Immutable=Slate->OnKeyDown(Geometry,Key);
+  Check(Immutable.IsEventHandled() && !Immutable.GetMouseCaptor().IsValid() && Immutable.ShouldReleaseMouse(),TEXT("generated_inout_does_not_mutate_input_token"));
+  const auto StaleOutside=Runtime.RunNamedPersistent(Runtime.ScriptPath(Script),TEXT("old_result_outside"),0,Widget.Get());
+  Check(!StaleOutside.bSucceeded && StaleOutside.Error.Contains(TEXT("call handle is released")),TEXT("reply_frames_revoked_when_callback_returns"));
+  TStrongObjectPtr<UWorld> OtherWorld(UWorld::CreateWorld(EWorldType::Game,false));
+  TStrongObjectPtr<UDasScriptUserWidget> Foreign(NewObject<UDasScriptUserWidget>(OtherWorld.Get()));Foreign->Initialize();TSharedPtr<SWidget> ForeignSlate=Foreign->TakeWidget();
+  FDasScalarValue Arg;Arg.Kind=8;Arg.ObjectClass=TEXT("/Script/CoreUObject.Object");Arg.ObjectValue=Foreign.Get();
+  auto Set=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(Script),TEXT("set_foreign"),{Arg},EDasMethodSignature::Int,Widget.Get());
+  Widget->BindInputHandler(TEXT("OnKeyDown"),TEXT("foreign_target"));auto Rejected=Slate->OnKeyDown(Geometry,Key);
+  Check(Set.bSucceeded && !Rejected.IsEventHandled() && Widget->LastInputError.Contains(TEXT("callback world")),TEXT("generated_target_from_other_world_rejected"));
+  ForeignSlate.Reset();Foreign->ReleaseSlateResources(true);OtherWorld->DestroyWorld(false);
+  FString Original;const FString Path=Runtime.ScriptPath(Script);FFileHelper::LoadFileToString(Original,*Path);ON_SCOPE_EXIT{FFileHelper::SaveStringToFile(Original,*Path);};
+  FFileHelper::SaveStringToFile(Original+TEXT("\n// EventReply reload revision\n"),*Path);
+  Widget->BindInputHandler(TEXT("OnKeyDown"),TEXT("stale"));const auto ReloadReply=Slate->OnKeyDown(Geometry,Key);
+  Check(!ReloadReply.IsEventHandled() && Widget->LastInputError.Contains(TEXT("null")),TEXT("reload_does_not_restore_reply_from_old_callback"));
+  Widget->BindInputHandler(TEXT("OnKeyDown"),TEXT("key_down"));Check(Slate->OnKeyDown(Geometry,Key).IsEventHandled() && Widget->LastInputError.IsEmpty(),TEXT("generated_wrappers_work_after_reload"));
+  Widget->BindInputHandler(TEXT("OnKeyDown"),TEXT("stale_argument"));const auto AfterReload=Slate->OnKeyDown(Geometry,Key);
+  Check(!AfterReload.IsEventHandled() && Widget->LastInputError.Contains(TEXT("expired")),TEXT("reply_created_after_reload_expires_at_next_callback"));
+ }
  Widget->BindInputHandler(TEXT("OnKeyDown"),TEXT("key_down"));
  Check(Slate->OnKeyDown(Geometry,Key).IsEventHandled() && Widget->LastInputError.IsEmpty(),TEXT("callback_recovers_after_failures"));
  Slate.Reset();Widget->ReleaseSlateResources(true);

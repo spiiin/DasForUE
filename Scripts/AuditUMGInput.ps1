@@ -25,7 +25,7 @@ if($LASTEXITCODE -or (Select-String "$Stage/export.log" -Pattern 'Ensure conditi
 & $Python "$PSScriptRoot/AuditUMGInput.py" --profile "$Stage/profile.json" --report "$Stage/report.json" --summary "$Stage/summary.json" --reflection "$Stage/reflection.json" --engine $Engine --contract "$Repo/Bindings/InputEvents.contract.json" --output "$Stage/audit.json" --markdown "$Stage/audit.md"
 if($LASTEXITCODE){throw 'UMG source/type/contract audit failed'}
 $Audit=Get-Content "$Stage/audit.json" -Raw|ConvertFrom-Json
-if($Audit.runtime_transport_implemented){if($Audit.generation_failures -ne 37 -or $Audit.scoped_rejections.Count -ne 4){throw 'Implemented UMG snapshot scope changed'}}
+if($Audit.runtime_transport_implemented){if($Audit.generation_failures -ne 0 -or $Audit.scoped_rejections.Count -ne 0){throw 'Implemented UMG snapshot scope changed'}}
 elseif($Audit.generation_failures -ne 74 -or $Audit.input_scope.detached_snapshot_candidates -ne 33 -or $Audit.input_scope.navigation_context_candidates -ne 3){throw 'UMG 74-failure snapshot has changed; review the scope'}
 foreach($Path in $DllHashes.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $DllHashes[$Path]){throw 'DLL changed during audit'}}
 if((Get-Content $EngineManifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during audit'}

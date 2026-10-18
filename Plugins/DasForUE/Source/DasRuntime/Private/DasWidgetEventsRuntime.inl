@@ -47,6 +47,6 @@ void BindWidgetInput(const FDasObjectHandle& H,const char* Script,const char* Ev
  auto* Widget=Cast<UDasScriptUserWidget>(OwnedWidget(H,C));
  const FString File=Script?UTF8_TO_TCHAR(Script):TEXT("");
  if(!Widget || File.IsEmpty() || File!=FPaths::GetCleanFilename(File) || FPaths::GetExtension(File)!=TEXT("das") || !Event || !Handler || FCStringAnsi::Strlen(Event)>=NAME_SIZE || FCStringAnsi::Strlen(Handler)>=NAME_SIZE || !UDasScriptUserWidget::IsSupportedInputEvent(FName(UTF8_TO_TCHAR(Event))))C->throw_error("invalid script widget input binding");
- if(Widget->ScriptFile!=File){FModuleManager::GetModuleChecked<FDasRuntimeModule>("DasRuntime").ReleaseObject(Widget);Widget->InputHandlers.Empty();Widget->ScriptFile=File;}
+ if(Widget->ScriptFile!=File){FModuleManager::GetModuleChecked<FDasRuntimeModule>("DasRuntime").ReleaseObject(Widget);Widget->InputHandlers.Empty();Widget->DragHandlers.Empty();Widget->ScriptFile=File;}
  Widget->BindInputHandler(FName(UTF8_TO_TCHAR(Event)),FName(UTF8_TO_TCHAR(Handler)));
 }

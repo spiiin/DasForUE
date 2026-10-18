@@ -7,14 +7,27 @@ API каждого класса, без inherited копий. Это пакет 
 автоматические overrides событий и подключение любых input delegates из этого
 факта не следуют.
 
-## Актуальное расширение: owned input events
+## Классификация оставшихся отказов
 
-**366 ready, 114 export blocked, 37 generation blocked**. Реализованы 33
+[Поимённый export-аудит](UMGExportBlockers.md): **60 исключений, 32 готовых
+адаптера, 18 технических блокеров**. Сохранены все 110 исходных export statuses;
+это дополнительная классификация, без изменения генератора или runtime.
+Воспроизведение: `Scripts/AuditUMGExports.ps1`. Полные проверки не требуются.
+
+## Актуальное покрытие: PaintContext, WidgetAnimation, EventReply, Geometry и input events
+
+**407 ready, 110 export blocked, 0 generation blocked**. Открыты три
+[live navigation queries](InputNavigation.md). Открыт DetectDragIfPressed
+и добавлены шесть [Drag & Drop callbacks](DragDrop.md). Открыты 5 draw-функций
+через [синхронный OnPaint bridge](PaintContext.md), ещё 4 функции
+через [weak WidgetAnimation transport](WidgetAnimation.md), ещё 12 функций
+через [scoped EventReply](EventReply.md), ещё 17 функций
+через [owned Geometry](Geometry.md). Также реализованы 33
 functions через [owned input events](InputEvents.md), пакет установлен и
-проверен обычным require. Четыре прежних generation failures перенесены в
-явные execution-contract отказы: три navigation calls и DetectDragIfPressed.
-Поимённый текущий [backlog](UMGInputBlockers.md). Ниже сохранён снимок до
-этого расширения и его отдельные предыдущие проверки.
+проверен обычным require. Navigation queries доступны только с текущим native input event и Slate user;
+DetectDragIfPressed — с текущим синхронным pointer callback.
+Поимённый текущий [backlog](UMGInputBlockers.md). Ниже сохранён исторический снимок до
+этих расширений и его отдельные предыдущие проверки.
 
 ## Результат до input-event transport — UE 5.8.3, 2026-10-18
 
@@ -84,13 +97,13 @@ managed input callback suite не запускались. Остальные wra
 
 ## Backlog
 
-Машинный список всех 184 отказов с классом/методом/причиной:
+Текущий список 110 отказов экспорта с классом/методом/причиной:
 `Bindings/Packages/ue_api_umg_input.summary.json`. Отказы не скрыты ручными
 exclusions и не посчитаны готовыми функциями.
 
-- 74 generation failures: opaque/empty structs; сюда попадают формы Slate
-  geometry/input events/event replies/paint state, для которых
-  нельзя выдумывать native layout из пустого reflection-описания.
+- Generation failures отсутствуют. PaintContext и WidgetAnimationHandle открыты.
+  Geometry и detached input snapshots открыты. 12 EventReply wrappers
+  доступны только в текущем синхронном callback.
 - Все 10 прежних delegate-parameter failures теперь генерируются через
   UEFunctionDelegate и проверяемый UFunction endpoint. Native weak lifetime и
   явный Unbind сохраняются; это не автоматическая managed-подписка на DAS closure.
@@ -142,13 +155,13 @@ DLL/исходники стабильны, Error/ensure нет. Отчёт `logs
 полные PIE/packaged, физический ввод, rendering и reload suites не запускались.
 
 
-## Аудит оставшихся 74 opaque failures
+## Исторический аудит 74 opaque failures (до реализации)
 
 Свежий reflection/generator/source audit: 36 input events, 17 Geometry,
 12 EventReply, 5 PaintContext и 4 WidgetAnimationHandle. Для input events
 выделены 33 detached snapshot candidates и три live navigation calls;
-DetectDragIfPressed также требует EventReply. Transport пока не реализован,
-coverage не увеличен. [Поимённый аудит](UMGInputBlockers.md),
+DetectDragIfPressed также требует EventReply. На момент этого аудита transport ещё не был реализован,
+coverage не увеличивался. [Поимённый аудит](UMGInputBlockers.md),
 [контракт](InputEventTransportContract.md); воспроизведение Scripts/AuditUMGInput.ps1.
 16 unit tests и fresh export — PASS, без сборки/PIE/packaged и коммита.
 

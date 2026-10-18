@@ -8,3 +8,5 @@ DASRUNTIME_API bool DasInputEventFunctionAllowed(const UFunction* Function);
 DASRUNTIME_API bool CaptureDasInputEvent(const UScriptStruct* Type,const void* Source,FInstancedStruct& Out,FString& Error);
 DASRUNTIME_API bool ValidateDasInputEventData(const UScriptStruct* Type,const void* Data,FString& Error);
 DASRUNTIME_API bool ValidateDasInputEventSnapshot(const FInstancedStruct& Value,FString& Error);
+
+DASRUNTIME_API bool DasInputNavigationFunctionAllowed(const UFunction* Function);

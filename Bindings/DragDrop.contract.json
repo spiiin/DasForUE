@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "status": "implemented_managed_drag",
+  "generated_function": "/Script/UMG.WidgetBlueprintLibrary.DetectDragIfPressed",
+  "events": [
+    "OnDragDetected",
+    "OnDragEnter",
+    "OnDragLeave",
+    "OnDragOver",
+    "OnDrop",
+    "OnDragCancelled"
+  ],
+  "operation_class": "/Script/DasRuntime.DasDragDropOperation",
+  "operation_reference": "UObjectHandle weak native reference, not VM closure",
+  "factory": "one new operation only during successful OnDragDetected; payload, separate constructed visual, tag<=1024, pivot0..9, offset finite -1..1",
+  "pointer_provenance": "DetectDragIfPressed only current input callback pointer snapshot token; detached copies remain readable but cannot request live drag in another callback",
+  "event_data": "owned Geometry and PointerEvent snapshots, no FDragDropEvent shared operation or EventPath transported",
+  "lifecycle": "drop/cancel revoke and clear payload/visual/delegates; source and participating target Destroy/committed hot reload revoke; rejected reload retains old version",
+  "native_cancellation": "next core ticker cancels only matching revoked FUMGDragDropOp, weak capture, no VM pointer or closures",
+  "limits": {
+    "operations_per_vm": 64,
+    "created_per_callback": 1
+  },
+  "boundaries": "managed operation factory only; arbitrary Blueprint/native operation subclasses and custom authored operation classes are not accepted by managed callbacks"
+}

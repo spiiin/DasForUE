@@ -783,6 +783,19 @@ PASS: 17 проверок, чистый exit 0, без Error/ensure, source/DLL/
 Docs/WidgetInputHandlers.md; Scripts/TestWidgetEvents.ps1;
 logs/widget-events-validation.json; Tests/WidgetEvents/probe.das.
 
+### Geometry в синхронных UserWidget handlers — 2026-10-18
+
+Все 17 NativeOn-входов передают owned Geometry первым параметром и typed input
+event вторым. Exact verifier требует `(UEGeometry, event):UEEventReply`;
+прежняя одноаргументная форма отклоняется. Используются готовые CaptureDasGeometry
+и общий rooted snapshot transport, без повторного чтения cached geometry.
+Обновлены WidgetEvents/EventReply fixtures и примеры. Общая Editor-сборка — PASS;
+один короткий SObjectWidget runtime-сценарий — PASS, 21 проверка, exit 0.
+Проверены local/absolute, pointer coordinates, clone/array/GC и сохранность после
+замены native Geometry, независимость callback revisions и неверные сигнатуры.
+Source/DLL/BuildId стабильны; без Error/ensure. PIE/packaged не запускались.
+Без коммита. Docs/WidgetInputHandlers.md; logs/widget-events-validation.json.
+
 ### Owned Geometry transport — 2026-10-18
 
 `UEGeometry` хранит точную native-копию FGeometry в общей VM snapshot-таблице,
@@ -802,18 +815,72 @@ Error/ensure; предыдущий прогон отклонён из-за па�
 Полные Foundation/PIE/packaged не запускались. Без коммита.
 Docs/Geometry.md; Scripts/TestGeometry.ps1; logs/geometry-validation.json.
 
-### Geometry в синхронных UserWidget handlers — 2026-10-18
+### Сгенерированные EventReply wrappers — 2026-10-18
 
-Все 17 NativeOn-входов передают owned Geometry первым параметром и typed input
-event вторым. Exact verifier требует `(UEGeometry, event):UEEventReply`;
-прежняя одноаргументная форма отклоняется. Используются готовые CaptureDasGeometry
-и общий rooted snapshot transport, без повторного чтения cached geometry.
-Обновлены WidgetEvents/EventReply fixtures и примеры. Общая Editor-сборка — PASS;
-один короткий SObjectWidget runtime-сценарий — PASS, 21 проверка, exit 0.
-Проверены local/absolute, pointer coordinates, clone/array/GC и сохранность после
-замены native Geometry, независимость callback revisions и неверные сигнатуры.
-Source/DLL/BuildId стабильны; без Error/ensure. PIE/packaged не запускались.
-Без коммита. Docs/WidgetInputHandlers.md; logs/widget-events-validation.json.
+К синхронному UserWidget bridge подключены 11 generated UMG функций через
+scoped_event_reply_v1 и прежние managed adapters. UEEventReply остаётся token
+текущего VM/callback epoch; persistent native FReply в call frames не хранится.
+Pending/executed reply frames и их object pins удаляются при выходе из callback,
+включая error. Inout и return slots публикуют новый token без изменения входного.
+Targets проверяются по callback world/lifetime; SetMousePosition отклоняет
+nonfinite/out-of-int32 координаты. Storage/defaults/native containers закрыты.
+UMG: 394 ready (+11), 114 export blocked, 9 generation blocked — PaintContext 5,
+WidgetAnimationHandle 4. Три navigation calls и DetectDragIfPressed закрыты.
+Целевые проверки: Editor build, whole-module compile, 33 runtime checks,
+3 compile-time token refusals, 8 new generator tests — PASS. Регрессии:
+17 managed widget и 25 Geometry runtime, 97 shared/8 Geometry/9 input generator
+и 16 audit tests — PASS. Guard audit: 630 extern sites. Source/DLL/BuildId
+стабильны; Error/ensure нет. Без full Foundation/PIE/packaged, physical input
+и коммита. Docs/EventReply.md; Scripts/TestEventReply.ps1;
+logs/event-reply-validation.json; Tests/EventReply/probe.das.
+
+### Weak WidgetAnimationHandle transport — 2026-10-18
+
+Открыты четыре PlayAnimation/Forward/Reverse/TimeRange через native weak
+UEWidgetAnimationHandle. Capability хранится в rooted VM table без strong widget,
+asset, state или legacy player; доступны is_valid/is_playing. Native finish и
+NativeDestruct отзывают lease навсегда. Наблюдение начинается до Play, результат
+закрепляется сразу после dispatch, повторное чтение frame не создаёт новую lease.
+Call-frame results учитываются общим root walker; после завершения входа в VM
+обычные frames освобождаются. GC/reload/release снимают weak native callbacks,
+не сохраняя VM/DAS closures и не останавливая принадлежащую UE анимацию.
+UMG: 398 ready (+4), 114 export blocked, 5 generation blocked — только PaintContext.
+Native input/reflected storage/defaults/native containers handle пока закрыты.
+Editor build, whole-module compile, 28 native/runtime checks (настоящая короткая
+MovieScene-анимация и advancement времени), 3 token compile refusals, 9 new
+generator tests — PASS. Проверены finish с pinned native state, replay,
+NativeDestruct/реконструкция, позднее чтение result, clone/arrays/GC, hot reload,
+снятие native callbacks и отсутствие pinning widget/asset при живой DAS VM.
+Регрессии: 33 EventReply runtime, 97 shared generator, 8 EventReply generator,
+16 audit tests — PASS. Guard audit: 633 extern sites. Source/DLL/BuildId стабильны,
+engine Error/ensure нет. Без full Foundation/PIE/packaged, visible window и коммита.
+Docs/WidgetAnimation.md; Scripts/TestWidgetAnimation.ps1;
+logs/widget-animation-validation.json; Tests/WidgetAnimation/probe.template.das.
+
+
+### Scoped PaintContext / synchronous OnPaint — 2026-10-18
+
+Открыты DrawBox, DrawLine, DrawLines, DrawSpline, DrawTextFormatted через
+непрозрачный UEPaintContext и PaintHandler на DasScriptUserWidget.
+NativePaint синхронно вызывает exported void handler после Super; native
+Geometry/style/culling/draw-list остаются на stack. В VM передаётся только epoch
+token, действующий в текущем callback. Реальные draw-команды публикуются после
+успешного возврата handler; ошибка/Destroy отменяет всю script-порцию, сохраняя
+родительскую отрисовку. Brush/font pin-ятся до конца callback; frames удаляются
+на выходе. Есть finite/bounds/layer/data guards; reentrant paint отклоняется.
+UMG: 403 ready (+5), 114 export blocked, 0 generation blocked. Оставшиеся
+export/execution-policy отказы не считаются реализованными.
+Editor build, whole-module compile, 28 SObjectWidget.Paint runtime checks,
+3 token compile refusals, 8 Paint generator tests — PASS. Проверены реальные
+Slate draw elements/layers, no partial draw on error, GC, NativeDestruct,
+reconstruction, hot reload, stale/default tokens и frames, reentrant guard.
+Регрессии: 33 EventReply runtime, 28 WidgetAnimation runtime, 97 shared generator,
+8 EventReply generator, 9 WidgetAnimation generator, 16 audit tests — PASS.
+Fresh reflection/coverage audit и UE extern guard audit — PASS. Source/DLL/BuildId
+проверены после прогонов. Без full Foundation/PIE/packaged, GPU/visible-window
+проверок и коммита. Docs/PaintContext.md; Scripts/TestPaint.ps1;
+logs/paint-validation.json; Tests/Paint/probe.template.das.
+
 
 ### AssetManager / Primary Assets — 2026-10-18
 
@@ -837,6 +904,40 @@ null failure, cancel delivery и session release. Финальный прого�
 не проверялись. Изменения без коммита.
 Docs/PrimaryAssets.md; Scripts/TestPrimaryAssets.ps1;
 logs/primary-assets-validation.json; Tests/PrimaryAssets/probe.das.
+
+
+### Managed Drag & Drop — 2026-10-18
+
+Открыт generated DetectDragIfPressed через scoped EventReply и provenance
+текущего native pointer callback. Добавлен ue_drag_drop: одна новая native
+UDasDragDropOperation в OnDragDetected, weak UObjectHandle, payload/visual/tag/
+pivot/offset, synchronous enter/over/leave/drop/cancel на DasScriptUserWidget.
+FDragDropEvent shared operation и EventPath не передаются в VM: Geometry и
+pointer-часть — owned snapshots, operation передаётся отдельно.
+Фабрика и чтение данных ограничены текущим drag callback; foreign операции,
+неверные world/user/pointer, старый pointer snapshot и повторный factory вызов
+отклоняются. Drop/cancel, source/participating target NativeDestruct и committed
+hot reload отзывают операции, очищают payload/visual/delegates. Rejected reload
+оставляет рабочую VM/операцию. Активный Slate drag отменяется на следующем
+core ticker только при совпадении user и native operation. VM pointers/DAS
+closures в native operation/ticker не сохраняются. Очередь обычных callbacks
+не дренируется внутри synchronous drag scope.
+Editor build, whole-module preflight, 47 SObjectWidget/FUMGDragDropOp runtime
+checks, 8 новых generator checks — PASS. Проверены mouse/touch detection,
+current-event provenance, GC, все шесть callbacks, native Slate cancellation,
+защита чужого drag от устаревшей отмены, ошибки/parent fallback, source/target
+Destroy/reconstruction и accepted/rejected reload. Engine Error/ensure нет.
+Регрессии: EventReply 33, OnPaint 28; Python: shared 97, EventReply 8,
+input events 9, Paint 8, audit 16 — PASS. Fresh coverage и guard audit — PASS;
+Source/DLL/BuildId проверены после прогонов.
+UMG/Input: 404 ready (+1), 113 export blocked, 0 generation blocked.
+Остаются три live navigation queries; raw internal CreateDragDropOperation
+не открыт, используется managed factory. Произвольные native/Blueprint operation
+subclasses и авторские operation classes этим шагом не поддержаны.
+Без physical input/rendering, full Foundation/PIE/packaged и коммита.
+Docs/DragDrop.md; Scripts/TestDragDrop.ps1; Tests/DragDrop/probe.das;
+logs/drag-validation.json; Bindings/DragDrop.contract.json.
+
 
 ### Авторские DataAsset / PrimaryDataAsset — 2026-10-18
 
@@ -874,6 +975,37 @@ Editor Development build и один объединённый короткий r
 несохранённые изменения, отсутствующий источник, устаревшие bundles и NeverCook.
 Полный Foundation/PIE/packaged не запускался. Изменения не закоммичены.
 
+
+### Live input navigation — 2026-10-18
+
+Открыты Key_GetNavigationActionFromKey, Key_GetNavigationDirectionFromKey и
+Key_GetNavigationDirectionFromAnalog через exact live_input_navigation_v1.
+Нужны текущий native input token, callback epoch, живой widget/world и исходный
+зарегистрированный Slate user (weak identity). Старые snapshots остаются
+читаемыми, но не дают authority для live query. Frames освобождаются на выходе;
+NativeDestruct отзывает input capability до последующих запросов.
+Результат кэшируется один раз на функцию/callback. Analog query изменяет
+native repeat state и потребляет input: unhandled/error/Destroy после запроса
+возвращают bare handled, исключая повторную обработку в UE. Reply-команды
+ошибочного callback не публикуются; native repeat state не откатывается.
+Без query и при отказе до query сохраняется обычный parent fallback.
+Queued callbacks не дренируются внутри synchronous input scope.
+Editor build, whole-module preflight, 24 SObjectWidget native checks и 8 новых
+generator tests — PASS. Проверены персональный custom NavigationConfig
+виртуального Slate user, caching, repeat suppression/time/neutral reset,
+stale snapshots/frames, неизвестный user, panic, Destroy/reconstruction, reload.
+Регрессии: EventReply 33, Drag 47, InputEvents 38; shared generator 97,
+input-event generator 9, drag generator 8, audit 16 — PASS. Fresh reflection/
+coverage и execution-role guard audit — PASS. Source/DLL/BuildId стабильны,
+engine Error/ensure нет. UMG/Input: 407 ready (+3), 110 export blocked,
+0 generation blocked; отдельного navigation export backlog больше нет.
+Остальные policy/event/delegate/soft-reference export отказы остаются явными.
+Без physical input, visible focus traversal, full Foundation/PIE/packaged и
+коммита. Docs/InputNavigation.md; Tests/InputNavigation/probe.das;
+Scripts/TestInputNavigation.ps1; logs/navigation-validation.json;
+Bindings/InputNavigation.contract.json.
+
+
 ### Типизированное чтение DataTable — 2026-10-18
 
 Добавлен ue_data_tables: ue_data_table_row(type<Row>, loaded_table, name [, scope]),
@@ -897,6 +1029,27 @@ Source/DLL hashes и engine BuildId стабильны, engine Error/ensure не
 Docs/DataTables.md; Scripts/TestDataTables.ps1; Tests/DataTables/probe.das;
 logs/data-tables-validation.json.
 
+
+## UMG: получение и потеря фокуса — 2026-10-18
+
+Добавлены OnFocusReceived(UEGeometry, UEFocusEvent):UEEventReply и
+OnFocusLost(UEFocusEvent):void через существующий ue_widget_bind_input.
+Owned FocusEvent snapshot предоставляет uint user и имя EFocusCause, без
+WidgetPath/SlateUser authority. Используется общая bounded/rooted snapshot table.
+Received использует scoped reply; Lost не получает reply authority. NativeDestruct
+освобождает VM, Destroy внутри callback отзывает результат, reentry отклоняется.
+Hot reload проверяет использованные сигнатуры и сохраняет рабочую VM при отказе.
+
+Editor build, 35 focus checks, 33 related EventReply checks, 8 generator checks
+и execution-role guards — PASS; source/DLL/BuildId стабильны, Error/ensure нет.
+Generated API coverage этим callback bridge не изменяется. Focus-path callbacks
+и physical focus traversal остаются вне этого этапа. Только целевые проверки,
+без полного Foundation/PIE/packaged и без коммита.
+Docs/FocusEvents.md; Bindings/FocusEvents.contract.json;
+Tests/FocusEvents/probe.das; Scripts/TestFocusEvents.ps1;
+logs/focus-validation.json.
+
+
 ### Чтение CurveTable и вычисление значений — 2026-10-18
 
 Добавлен ue_curve_tables: ue_curve_table_has_row, ue_curve_table_names и
@@ -919,6 +1072,37 @@ Source/DLL hashes и engine BuildId стабильны, engine Error/ensure не
 Полный Foundation/PIE/packaged не запускался, коммит не создан.
 Docs/CurveTables.md; Scripts/TestCurveTables.ps1; Tests/CurveTables/probe.das;
 logs/curve-tables-validation.json.
+
+
+## Поимённая классификация 110 UMG export refusals — 2026-10-18
+
+[Аудит оставшихся отказов](UMGExportBlockers.md): 60 policy exclusions,
+32 декларации с существующими ограниченными адаптерами, 18 technical blockers.
+Ни один отказ не скрыт: raw status/reason и published coverage сохраняются.
+32 адаптированных объявления не добавлены к 407 generated wrappers.
+25 delegate signatures классифицированы как определения типов, а не готовые
+подписки. Из 60 исключений: 21 deprecated, 25 signatures, 8 protected legacy
+input, 3 non-callable accessor entrypoints, 2 editor helpers, 1 engine lifecycle
+helper. Общий accessor backend не доказывает проверенность каждого UMG свойства.
+
+18 blockers: 5 widget lifecycle, 1 interactability query override, 2 focus-path
+notifications, 3 pointer notifications, 1 motion event, 2 animation callbacks,
+2 soft brush setters и 2 GetBoundActionValue entrypoints одной polling-возможности.
+NativeDestruct cleanup не равен пользовательскому Destruct callback; animation
+lease invalidation не равен пользовательскому OnAnimationFinished.
+Следующий рекомендуемый этап — typed soft brush adapter; затем grouped pointer/
+focus-path notifications и общий widget lifecycle/override bridge.
+
+20 mutation/unit checks, свежий UE reflection export и реальный повтор package
+generator — PASS. Проверены native/source anchors и соответствие adapters
+конкретным callback/factory/conversion объявлениям. Source/native/DLL/BuildId
+стабильны, engine Error/ensure нет. Coverage: 407 ready / 110 export blocked /
+0 generation blocked. Это статический аудит существующей реализации; новые
+runtime-сценарии, build, Foundation/PIE/packaged не запускались. Без коммита.
+Bindings/UMGExportAudit.rules.json;
+Bindings/Packages/ue_api_umg_input.export-audit.json;
+Scripts/AuditUMGExports.ps1; logs/umg-export-audit-validation.json.
+
 
 ### Создание авторского DataTable из JSON — 2026-10-18
 

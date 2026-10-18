@@ -11,6 +11,10 @@ class USaveGame;
 class UDasScriptUserWidget;
 class FReply;
 struct FGeometry;
+struct FPaintContext;
+struct FPointerEvent;
+struct FFocusEvent;
+class UDragDropOperation;
 struct FDasAuthoringModule;
 struct FDasSourceCatalog;
 
@@ -46,6 +50,9 @@ struct FDasReflectedTypes;
 class DASRUNTIME_API FDasRuntimeModule final : public IModuleInterface
 {
 public:
+    bool DispatchWidgetPaint(const FString& Path,const FString& Entry,UDasScriptUserWidget* Widget,FPaintContext& Context,FString& Error);
+    bool DispatchWidgetDrag(const FString& Path,const FString& Entry,FName Event,const FGeometry* Geometry,const FPointerEvent& Pointer,UDragDropOperation* Operation,UDasScriptUserWidget* Widget,UDragDropOperation*& OutOperation,bool& Handled,FString& Error);
+    bool DispatchWidgetFocusLost(const FString& Path,const FString& Entry,const FFocusEvent& Event,UDasScriptUserWidget* Widget,FString& Error);
     bool DispatchWidgetInput(const FString& Path,const FString& Entry,const FGeometry& Geometry,const UScriptStruct* Type,const void* Source,UDasScriptUserWidget* Widget,FReply& Out,FString& Error);
     // Trusted native Geometry observer: owned value only, no reflection-storage exemption.
     FDasExecutionResult DispatchGeometrySnapshot(const FString& Path,const FString& Entry,const FInstancedStruct& Value,TWeakObjectPtr<UObject> Self);

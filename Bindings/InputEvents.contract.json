@@ -70,7 +70,7 @@
   "navigation": {
     "ordinary_snapshot_dispatch": false,
     "reason": "live Slate navigation config; analog query mutates per-user repeat timing",
-    "next_contract": "separate synchronous live-event adapter, initialized Slate, current weak widget/user, session/revision and callback epoch; define replay/repeat semantics before enabling",
+    "next_contract": "Implemented separately by InputNavigation.contract.json; still forbidden as ordinary detached snapshot dispatch",
     "frozen_or_expired": "reject before native dispatch; no manual debug flag authorization"
   },
   "ui_callbacks": {
@@ -141,11 +141,7 @@
     "/Script/UMG.WidgetBlueprintLibrary.GetInputEventFromPointerEvent",
     "/Script/UMG.WidgetBlueprintLibrary.GetKeyEventFromAnalogInputEvent"
   ],
-  "deferred_navigation_functions": [
-    "/Script/Engine.KismetInputLibrary.Key_GetNavigationActionFromKey",
-    "/Script/Engine.KismetInputLibrary.Key_GetNavigationDirectionFromAnalog",
-    "/Script/Engine.KismetInputLibrary.Key_GetNavigationDirectionFromKey"
-  ],
+  "deferred_navigation_functions": [],
   "evidence": "Bindings/Packages/ue_api_umg_input.audit.json",
   "note": "Implemented owned data transport and exact ordinary function allowlist; this file documents the implementation and deferred contracts, it is not runtime configuration.",
   "native_observer": "FDasRuntimeModule.DispatchInputEventSnapshots: detached trusted native values only, UEStructValue inputs and int observer result; not Slate replay or UserWidget override",
@@ -179,5 +175,14 @@
     "packaged": "not_run",
     "physical_input": "not_run",
     "UserWidget_reply_routing": "not_implemented"
-  }
+  },
+  "live_navigation_functions": [
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationActionFromKey",
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationDirectionFromAnalog",
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationDirectionFromKey"
+  ],
+  "additional_callback_only_native_types": [
+    "/Script/SlateCore.FocusEvent"
+  ],
+  "additional_callback_contract": "FocusEvents.contract.json"
 }

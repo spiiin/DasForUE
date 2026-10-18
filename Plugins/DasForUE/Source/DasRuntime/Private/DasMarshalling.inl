@@ -109,6 +109,21 @@
         else if (FieldKind(Property, Context) == EMarshallingKind::Struct)
         {
             UScriptStruct* Type = CastFieldChecked<FStructProperty>(Property)->Struct;
+            if(DasIsWidgetAnimationType(Type)){
+                auto* Function=Cast<UFunction>(Property->GetOwnerStruct());
+                if(Depth!=0 || Property->ArrayDim!=1 || !Property->HasAnyPropertyFlags(CPF_ReturnParm) || bInput || !bOutput || !DasWidgetAnimationFunctionAllowed(Function))Context->throw_error("WidgetAnimation requires exact scalar producer result");
+                Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Type->GetPathName()});return;
+            }
+            if(DasIsPaintContextType(Type)){
+                auto* Function=Cast<UFunction>(Property->GetOwnerStruct());
+                if(Depth!=0 || Property->ArrayDim!=1 || !Property->HasAnyPropertyFlags(CPF_Parm) || Property->HasAnyPropertyFlags(CPF_ReturnParm) || !DasPaintFunctionAllowed(Function))Context->throw_error("PaintContext requires exact scalar synchronous OnPaint adapter");
+                Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Type->GetPathName()});return;
+            }
+            if(DasIsEventReplyType(Type)){
+                auto* Function=Cast<UFunction>(Property->GetOwnerStruct());
+                if(Depth!=0 || Property->ArrayDim!=1 || !Property->HasAnyPropertyFlags(CPF_Parm) || !DasEventReplyFunctionAllowed(Function))Context->throw_error("EventReply requires exact scalar synchronous callback adapter");
+                Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Type->GetPathName()});return;
+            }
             if(DasIsGeometryType(Type)){
                 auto* Function=Cast<UFunction>(Property->GetOwnerStruct());
                 if(Depth!=0 || Property->ArrayDim!=1 || !Property->HasAnyPropertyFlags(CPF_Parm) || !DasGeometryFunctionAllowed(Function))Context->throw_error("Geometry requires exact scalar snapshot function allowlist");
@@ -254,7 +269,7 @@
         if(ActiveContext->Calls.Num()>=256)Context->throw_error("call frame limit reached");
         auto Call=MakeShared<FMarshalledCall>();Call->Signature=MoveTemp(Signature);Call->SignatureKey=CallSignatureKey(Function);Call->Target=Class->GetDefaultObject();Call->Function.Reset(Function);Call->Frame=MakeUnique<FStructOnScope>(Function);
         if(WorldProperty){FDasScalarValue Native;Native.Kind=int32(EDasMethodSignature::Object);Native.ObjectClass=WorldProperty->PropertyClass->GetPathName();Native.ObjectValue=WorldObject;WriteNativePropertyValue(WorldProperty,WorldProperty->ContainerPtrToValuePtr<void>(Call->Frame->GetStructMemory()),Native,Context);Call->AutomaticWorldContext=WorldProperty->GetName().ToLower();Call->StaticWorld=World;Call->Assigned.Add(Call->AutomaticWorldContext);Call->ObjectPins.Add(Call->AutomaticWorldContext,TStrongObjectPtr<UObject>(WorldObject));}
-        SetCallConstructionPolicy(*Call,Context);const uint64 Token=NextCallHandle++;ActiveContext->Calls.Add(Token,MoveTemp(Call));return {Token};
+        SetCallConstructionPolicy(*Call,Context);BindEventReplyCall(*Call,Context);BindPaintCall(*Call,Context);const uint64 Token=NextCallHandle++;ActiveContext->Calls.Add(Token,MoveTemp(Call));return {Token};
     }
 
     FDasCallHandle BeginCallSelected(const FDasObjectHandle& Target, const char* Name, das::Context* Context,UFunction* Selected=nullptr)
@@ -665,6 +680,7 @@
         ValidateConstraintCallInputs(Call,Context);
         ValidateInputEventCallInputs(Call,Context);
         ValidateGeometryCall(Call,Context,false);
+        ValidateWidgetAnimationCall(Call,Context);
         CommitPendingHashes(Call, Context);
         for (const auto& Pin : Call.ObjectPins)
             if (UObject* Argument = Pin.Value.Get(); Argument && (!IsValid(Argument) || (Cast<AActor>(Argument) && CastChecked<AActor>(Argument)->IsActorBeingDestroyed())))
@@ -679,10 +695,11 @@
             TGuardValue<int32> Depth(AuthoredDispatchDepth,AuthoredDispatchDepth+1);
             TGuardValue<FString*> Failure(AuthoredDispatchFailure,&DispatchFailure);
             if(Call.DelegateInvoke)Call.DelegateInvoke(Call.Frame->GetStructMemory());else Object->ProcessEvent(Call.Function.Get(),Call.Frame->GetStructMemory());
-        }else if(!DispatchCollisionProfileProperty(Call,Context))Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
+        }else if(!DispatchInputNavigationCall(Call,Context) && !StagePaintCall(Call,Context) && !DispatchEventReplyCall(Call,Context) && !DispatchCollisionProfileProperty(Call,Context))Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
         if(!DispatchFailure.IsEmpty())Context->throw_error(TCHAR_TO_UTF8(*DispatchFailure));
-        ValidateGeometryCall(Call,Context,true);
         CaptureConstraintCallOutput(Call,Context);
+        CaptureWidgetAnimationOutput(Call,Context);
+        ValidateGeometryCall(Call,Context,true);
         int32 OutputTraversalBudget=1048576;
         for (const auto& Parameter : Call.Signature)
             if (Parameter.bOutput && Parameter.Kind == EMarshallingKind::Array)

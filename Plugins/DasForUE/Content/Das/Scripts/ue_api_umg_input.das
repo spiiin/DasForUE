@@ -6,6 +6,12 @@ require ue_foundation public
 struct UEName { value : string }
 def ue_name(value : string) : UEName { return UEName(value = value) }
 
+require ue_widget_animation public
+
+require ue_paint public
+
+require ue_widget_events public
+
 require ue_geometry public
 
 require ue_input_events public
@@ -31,6 +37,9 @@ struct C_Controller_78a9db5e { handle : UObjectHandle }
 
 [ue_native_object(path="/Script/Engine.DataAsset")]
 struct C_DataAsset_66497030 { handle : UObjectHandle }
+
+[ue_native_object(path="/Script/Engine.Font")]
+struct C_Font_684a8ec8 { handle : UObjectHandle }
 
 [ue_native_object(path="/Script/Engine.GameInstance")]
 struct C_GameInstance_c6fa677d { handle : UObjectHandle }
@@ -250,6 +259,8 @@ typedef EnhancedInputLibrary = C_EnhancedInputLibrary_77f56dae
 
 typedef EnhancedInputWorldSubsystem = C_EnhancedInputWorldSubsystem_a8c99c7a
 
+typedef Font = C_Font_684a8ec8
+
 typedef GameInstance = C_GameInstance_c6fa677d
 
 typedef GridSlot = C_GridSlot_50f32788
@@ -403,6 +414,13 @@ def C_DataAsset_66497030_null() : C_DataAsset_66497030 { return C_DataAsset_6649
 def C_DataAsset_66497030_valid(value : C_DataAsset_66497030) : bool { return ue_object_is_a(value.handle, "/Script/Engine.DataAsset") }
 
 def C_DataAsset_66497030_as_C_Object_55c3753a(value : C_DataAsset_66497030) : C_Object_55c3753a { return C_Object_55c3753a_from(C_DataAsset_66497030_raw(value)) }
+
+def C_Font_684a8ec8_from(value : UObjectHandle) : C_Font_684a8ec8 { return C_Font_684a8ec8(handle = ue_cast_nullable_object(value, "/Script/Engine.Font")) }
+def C_Font_684a8ec8_raw(value : C_Font_684a8ec8) : UObjectHandle { return ue_cast_nullable_object(value.handle, "/Script/Engine.Font") }
+def C_Font_684a8ec8_null() : C_Font_684a8ec8 { return C_Font_684a8ec8(handle = ue_null_object()) }
+def C_Font_684a8ec8_valid(value : C_Font_684a8ec8) : bool { return ue_object_is_a(value.handle, "/Script/Engine.Font") }
+
+def C_Font_684a8ec8_as_C_Object_55c3753a(value : C_Font_684a8ec8) : C_Object_55c3753a { return C_Object_55c3753a_from(C_Font_684a8ec8_raw(value)) }
 
 def C_GameInstance_c6fa677d_from(value : UObjectHandle) : C_GameInstance_c6fa677d { return C_GameInstance_c6fa677d(handle = ue_cast_nullable_object(value, "/Script/Engine.GameInstance")) }
 def C_GameInstance_c6fa677d_raw(value : C_GameInstance_c6fa677d) : UObjectHandle { return ue_cast_nullable_object(value.handle, "/Script/Engine.GameInstance") }
@@ -1730,6 +1748,31 @@ def E_EUINavigation_e4554eeb_from_symbol(value : string) : E_EUINavigation_e4554
     if (value == "Invalid") { return E_EUINavigation_e4554eeb.v_Invalid }
     panic("unknown enum result; regenerate bindings")
     return E_EUINavigation_e4554eeb.v_Left
+}
+
+enum E_EUINavigationAction_4a0ae499 {
+    v_Accept
+    v_Back
+    v_Num
+    v_Invalid
+}
+
+def E_EUINavigationAction_4a0ae499_to_symbol(value : E_EUINavigationAction_4a0ae499) : string {
+    if (value == E_EUINavigationAction_4a0ae499.v_Accept) { return "Accept" }
+    if (value == E_EUINavigationAction_4a0ae499.v_Back) { return "Back" }
+    if (value == E_EUINavigationAction_4a0ae499.v_Num) { return "Num" }
+    if (value == E_EUINavigationAction_4a0ae499.v_Invalid) { return "Invalid" }
+    panic("invalid generated enum value")
+    return ""
+}
+
+def E_EUINavigationAction_4a0ae499_from_symbol(value : string) : E_EUINavigationAction_4a0ae499 {
+    if (value == "Accept") { return E_EUINavigationAction_4a0ae499.v_Accept }
+    if (value == "Back") { return E_EUINavigationAction_4a0ae499.v_Back }
+    if (value == "Num") { return E_EUINavigationAction_4a0ae499.v_Num }
+    if (value == "Invalid") { return E_EUINavigationAction_4a0ae499.v_Invalid }
+    panic("unknown enum result; regenerate bindings")
+    return E_EUINavigationAction_4a0ae499.v_Accept
 }
 
 enum E_EUINavigationRule_8e1f4a6f {
@@ -3230,6 +3273,39 @@ def ue_input_key_Key_GetDisplayName(arg_key : S_Key_a8a0a14c; arg_blongdisplayna
     return result
 }
 
+def ue_input_key_Key_GetNavigationActionFromKey(arg_inkeyevent : UEKeyEvent) : E_EUINavigationAction_4a0ae499 {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_GetNavigationActionFromKey", "")
+    ue_expect_signature(call, "v1;Key_GetNavigationActionFromKey;InKeyEvent:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:EnumProperty:1408:/Script/SlateCore.EUINavigationAction;")
+    ue_require_call_context(call, false)
+    __ue_arg_keyevent(call, "inkeyevent", arg_inkeyevent)
+    ue_invoke_call(call)
+    let result = E_EUINavigationAction_4a0ae499_from_symbol(ue_result_enum(call, "returnvalue", "/Script/SlateCore.EUINavigationAction"))
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_Key_GetNavigationDirectionFromAnalog(arg_inanalogevent : UEAnalogInputEvent) : E_EUINavigation_e4554eeb {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_GetNavigationDirectionFromAnalog", "")
+    ue_expect_signature(call, "v1;Key_GetNavigationDirectionFromAnalog;InAnalogEvent:StructProperty:134218114:/Script/SlateCore.AnalogInputEvent\{\};ReturnValue:EnumProperty:1408:/Script/SlateCore.EUINavigation;")
+    ue_require_call_context(call, false)
+    __ue_arg_analoginputevent(call, "inanalogevent", arg_inanalogevent)
+    ue_invoke_call(call)
+    let result = E_EUINavigation_e4554eeb_from_symbol(ue_result_enum(call, "returnvalue", "/Script/SlateCore.EUINavigation"))
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_Key_GetNavigationDirectionFromKey(arg_inkeyevent : UEKeyEvent) : E_EUINavigation_e4554eeb {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_GetNavigationDirectionFromKey", "")
+    ue_expect_signature(call, "v1;Key_GetNavigationDirectionFromKey;InKeyEvent:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:EnumProperty:1408:/Script/SlateCore.EUINavigation;")
+    ue_require_call_context(call, false)
+    __ue_arg_keyevent(call, "inkeyevent", arg_inkeyevent)
+    ue_invoke_call(call)
+    let result = E_EUINavigation_e4554eeb_from_symbol(ue_result_enum(call, "returnvalue", "/Script/SlateCore.EUINavigation"))
+    ue_release_call(call)
+    return result
+}
+
 def ue_input_key_Key_IsAnalog(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsAnalog", "")
     ue_expect_signature(call, "v1;Key_IsAnalog;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4672,12 +4748,191 @@ def ue_ui_CancelDragDrop() {
     ue_release_call(call)
 }
 
+struct ue_ui_CaptureMouse_Result {
+    out_reply : UEEventReply
+    out_returnvalue : UEEventReply
+}
+
+def ue_ui_CaptureMouse(arg_reply : UEEventReply; arg_capturingwidget : C_Widget_f2421369) : ue_ui_CaptureMouse_Result {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "CaptureMouse", "")
+    ue_expect_signature(call, "v1;CaptureMouse;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};CapturingWidget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_event_reply(call, "reply", arg_reply)
+    ue_arg_object(call, "capturingwidget", C_Widget_f2421369_raw(arg_capturingwidget))
+    ue_invoke_call(call)
+    let result = ue_ui_CaptureMouse_Result(out_reply = __ue_result_event_reply(call, "reply"), out_returnvalue = __ue_result_event_reply(call, "returnvalue"))
+    ue_release_call(call)
+    return result
+}
+
+struct ue_ui_ClearUserFocus_Result {
+    out_reply : UEEventReply
+    out_returnvalue : UEEventReply
+}
+
+def ue_ui_ClearUserFocus(arg_reply : UEEventReply; arg_binallusers : bool) : ue_ui_ClearUserFocus_Result {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "ClearUserFocus", "")
+    ue_expect_signature(call, "v1;ClearUserFocus;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};bInAllUsers:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_event_reply(call, "reply", arg_reply)
+    ue_arg_bool(call, "binallusers", arg_binallusers)
+    ue_invoke_call(call)
+    let result = ue_ui_ClearUserFocus_Result(out_reply = __ue_result_event_reply(call, "reply"), out_returnvalue = __ue_result_event_reply(call, "returnvalue"))
+    ue_release_call(call)
+    return result
+}
+
+struct ue_ui_DetectDrag_Result {
+    out_reply : UEEventReply
+    out_returnvalue : UEEventReply
+}
+
+def ue_ui_DetectDrag(arg_reply : UEEventReply; arg_widgetdetectingdrag : C_Widget_f2421369; arg_dragkey : S_Key_a8a0a14c) : ue_ui_DetectDrag_Result {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DetectDrag", "")
+    ue_expect_signature(call, "v1;DetectDrag;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};WidgetDetectingDrag:ObjectProperty:128:/Script/UMG.Widget;DragKey:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_event_reply(call, "reply", arg_reply)
+    ue_arg_object(call, "widgetdetectingdrag", C_Widget_f2421369_raw(arg_widgetdetectingdrag))
+    ue_arg_name(call, "dragkey.keyname", arg_dragkey.f_keyname.value)
+    ue_invoke_call(call)
+    let result = ue_ui_DetectDrag_Result(out_reply = __ue_result_event_reply(call, "reply"), out_returnvalue = __ue_result_event_reply(call, "returnvalue"))
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_DetectDragIfPressed(arg_pointerevent : UEPointerEvent; arg_widgetdetectingdrag : C_Widget_f2421369; arg_dragkey : S_Key_a8a0a14c) : UEEventReply {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DetectDragIfPressed", "")
+    ue_expect_signature(call, "v1;DetectDragIfPressed;PointerEvent:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};WidgetDetectingDrag:ObjectProperty:128:/Script/UMG.Widget;DragKey:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "pointerevent", arg_pointerevent)
+    ue_arg_object(call, "widgetdetectingdrag", C_Widget_f2421369_raw(arg_widgetdetectingdrag))
+    ue_arg_name(call, "dragkey.keyname", arg_dragkey.f_keyname.value)
+    ue_invoke_call(call)
+    let result = __ue_result_event_reply(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
 def ue_ui_DismissAllMenus() {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DismissAllMenus", "")
     ue_expect_signature(call, "v1;DismissAllMenus;")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
     ue_release_call(call)
+}
+
+def ue_ui_DrawBox(arg_context : UEPaintContext; arg_position : UEVector2D; arg_size : UEVector2D; arg_brush : C_SlateBrushAsset_c9451dbb; arg_tint : S_LinearColor_f4abb14b) : UEPaintContext {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawBox", "")
+    ue_expect_signature(call, "v1;DrawBox;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Position:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Size:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Brush:ObjectProperty:128:/Script/Engine.SlateBrushAsset;Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_paint_context(call, "context", arg_context)
+    __ue_method_arg_vector2d(call, "position", arg_position)
+    __ue_method_arg_vector2d(call, "size", arg_size)
+    ue_arg_object(call, "brush", C_SlateBrushAsset_c9451dbb_raw(arg_brush))
+    ue_arg_float(call, "tint.r", arg_tint.f_r)
+    ue_arg_float(call, "tint.g", arg_tint.f_g)
+    ue_arg_float(call, "tint.b", arg_tint.f_b)
+    ue_arg_float(call, "tint.a", arg_tint.f_a)
+    ue_invoke_call(call)
+    let result = __ue_result_paint_context(call, "context")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_DrawLine(arg_context : UEPaintContext; arg_positiona : UEVector2D; arg_positionb : UEVector2D; arg_tint : S_LinearColor_f4abb14b; arg_bantialias : bool; arg_thickness : float) : UEPaintContext {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawLine", "")
+    ue_expect_signature(call, "v1;DrawLine;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};PositionA:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};PositionB:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bAntiAlias:BoolProperty:128;Thickness:FloatProperty:128;")
+    ue_require_call_context(call, false)
+    __ue_arg_paint_context(call, "context", arg_context)
+    __ue_method_arg_vector2d(call, "positiona", arg_positiona)
+    __ue_method_arg_vector2d(call, "positionb", arg_positionb)
+    ue_arg_float(call, "tint.r", arg_tint.f_r)
+    ue_arg_float(call, "tint.g", arg_tint.f_g)
+    ue_arg_float(call, "tint.b", arg_tint.f_b)
+    ue_arg_float(call, "tint.a", arg_tint.f_a)
+    ue_arg_bool(call, "bantialias", arg_bantialias)
+    ue_arg_float(call, "thickness", arg_thickness)
+    ue_invoke_call(call)
+    let result = __ue_result_paint_context(call, "context")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_DrawLines(arg_context : UEPaintContext; arg_points : array<UEVector2D>; arg_tint : S_LinearColor_f4abb14b; arg_bantialias : bool; arg_thickness : float) : UEPaintContext {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawLines", "")
+    ue_expect_signature(call, "v1;DrawLines;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Points:ArrayProperty:134218114[Points:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};];Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bAntiAlias:BoolProperty:128;Thickness:FloatProperty:128;")
+    ue_require_call_context(call, false)
+    __ue_arg_paint_context(call, "context", arg_context)
+    ue_arg_array(call, "points", int(length(arg_points)))
+    for (index in range(length(arg_points))) {
+        __ue_method_arg_vector2d(call, "points.{index}", arg_points[index])
+    }
+    ue_arg_float(call, "tint.r", arg_tint.f_r)
+    ue_arg_float(call, "tint.g", arg_tint.f_g)
+    ue_arg_float(call, "tint.b", arg_tint.f_b)
+    ue_arg_float(call, "tint.a", arg_tint.f_a)
+    ue_arg_bool(call, "bantialias", arg_bantialias)
+    ue_arg_float(call, "thickness", arg_thickness)
+    ue_invoke_call(call)
+    let result = __ue_result_paint_context(call, "context")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_DrawSpline(arg_context : UEPaintContext; arg_start : UEVector2D; arg_startdir : UEVector2D; arg_end : UEVector2D; arg_enddir : UEVector2D; arg_tint : S_LinearColor_f4abb14b; arg_thickness : float) : UEPaintContext {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawSpline", "")
+    ue_expect_signature(call, "v1;DrawSpline;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Start:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};StartDir:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};End:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};EndDir:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Thickness:FloatProperty:128;")
+    ue_require_call_context(call, false)
+    __ue_arg_paint_context(call, "context", arg_context)
+    __ue_method_arg_vector2d(call, "start", arg_start)
+    __ue_method_arg_vector2d(call, "startdir", arg_startdir)
+    __ue_method_arg_vector2d(call, "end", arg_end)
+    __ue_method_arg_vector2d(call, "enddir", arg_enddir)
+    ue_arg_float(call, "tint.r", arg_tint.f_r)
+    ue_arg_float(call, "tint.g", arg_tint.f_g)
+    ue_arg_float(call, "tint.b", arg_tint.f_b)
+    ue_arg_float(call, "tint.a", arg_tint.f_a)
+    ue_arg_float(call, "thickness", arg_thickness)
+    ue_invoke_call(call)
+    let result = __ue_result_paint_context(call, "context")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_DrawTextFormatted(arg_context : UEPaintContext; arg_text : UETextValue; arg_position : UEVector2D; arg_font : C_Font_684a8ec8; arg_fontsize : float; arg_fonttypeface : UEName; arg_tint : S_LinearColor_f4abb14b) : UEPaintContext {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawTextFormatted", "")
+    ue_expect_signature(call, "v1;DrawTextFormatted;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Text:TextProperty:134218114;Position:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Font:ObjectProperty:128:/Script/Engine.Font;FontSize:FloatProperty:128;FontTypeFace:NameProperty:128;Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_paint_context(call, "context", arg_context)
+    __ue_method_arg_text(call, "text", arg_text)
+    __ue_method_arg_vector2d(call, "position", arg_position)
+    ue_arg_object(call, "font", C_Font_684a8ec8_raw(arg_font))
+    ue_arg_float(call, "fontsize", arg_fontsize)
+    ue_arg_name(call, "fonttypeface", arg_fonttypeface.value)
+    ue_arg_float(call, "tint.r", arg_tint.f_r)
+    ue_arg_float(call, "tint.g", arg_tint.f_g)
+    ue_arg_float(call, "tint.b", arg_tint.f_b)
+    ue_arg_float(call, "tint.a", arg_tint.f_a)
+    ue_invoke_call(call)
+    let result = __ue_result_paint_context(call, "context")
+    ue_release_call(call)
+    return result
+}
+
+struct ue_ui_EndDragDrop_Result {
+    out_reply : UEEventReply
+    out_returnvalue : UEEventReply
+}
+
+def ue_ui_EndDragDrop(arg_reply : UEEventReply) : ue_ui_EndDragDrop_Result {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "EndDragDrop", "")
+    ue_expect_signature(call, "v1;EndDragDrop;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_event_reply(call, "reply", arg_reply)
+    ue_invoke_call(call)
+    let result = ue_ui_EndDragDrop_Result(out_reply = __ue_result_event_reply(call, "reply"), out_returnvalue = __ue_result_event_reply(call, "returnvalue"))
+    ue_release_call(call)
+    return result
 }
 
 def ue_ui_GetAllWidgetsOfClass(arg_widgetclass : UEClassHandle; arg_toplevelonly : bool) : array<C_UserWidget_a3d12281> {
@@ -4998,12 +5253,39 @@ def ue_ui_GetSafeZonePadding() : ue_ui_GetSafeZonePadding_Result {
     return result
 }
 
+def ue_ui_Handled() : UEEventReply {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "Handled", "")
+    ue_expect_signature(call, "v1;Handled;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    ue_invoke_call(call)
+    let result = __ue_result_event_reply(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
 def ue_ui_IsDragDropping() : bool {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "IsDragDropping", "")
     ue_expect_signature(call, "v1;IsDragDropping;ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+struct ue_ui_LockMouse_Result {
+    out_reply : UEEventReply
+    out_returnvalue : UEEventReply
+}
+
+def ue_ui_LockMouse(arg_reply : UEEventReply; arg_capturingwidget : C_Widget_f2421369) : ue_ui_LockMouse_Result {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "LockMouse", "")
+    ue_expect_signature(call, "v1;LockMouse;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};CapturingWidget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_event_reply(call, "reply", arg_reply)
+    ue_arg_object(call, "capturingwidget", C_Widget_f2421369_raw(arg_capturingwidget))
+    ue_invoke_call(call)
+    let result = ue_ui_LockMouse_Result(out_reply = __ue_result_event_reply(call, "reply"), out_returnvalue = __ue_result_event_reply(call, "returnvalue"))
     ue_release_call(call)
     return result
 }
@@ -5051,6 +5333,22 @@ def ue_ui_NoResourceBrush() : S_SlateBrush_e5037ad8 {
     ue_require_call_context(call, false)
     ue_invoke_call(call)
     let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.r"), f_g = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.g"), f_b = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.b"), f_a = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "returnvalue.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "returnvalue.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "returnvalue.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "returnvalue.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "returnvalue.imagesize.x"), f_y = ue_result_float(call, "returnvalue.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "returnvalue.margin.left"), f_top = ue_result_float(call, "returnvalue.margin.top"), f_right = ue_result_float(call, "returnvalue.margin.right"), f_bottom = ue_result_float(call, "returnvalue.margin.bottom")), f_tint = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.tint.r"), f_g = ue_result_float(call, "returnvalue.tint.g"), f_b = ue_result_float(call, "returnvalue.tint.b"), f_a = ue_result_float(call, "returnvalue.tint.a")), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "returnvalue.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.r"), f_g = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.g"), f_b = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.b"), f_a = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "returnvalue.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "returnvalue.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.min.x"), f_y = ue_result_float(call, "returnvalue.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.max.x"), f_y = ue_result_float(call, "returnvalue.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "returnvalue.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "returnvalue.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "returnvalue.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "returnvalue.resourcename")))
+    ue_release_call(call)
+    return result
+}
+
+struct ue_ui_ReleaseMouseCapture_Result {
+    out_reply : UEEventReply
+    out_returnvalue : UEEventReply
+}
+
+def ue_ui_ReleaseMouseCapture(arg_reply : UEEventReply) : ue_ui_ReleaseMouseCapture_Result {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "ReleaseMouseCapture", "")
+    ue_expect_signature(call, "v1;ReleaseMouseCapture;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_event_reply(call, "reply", arg_reply)
+    ue_invoke_call(call)
+    let result = ue_ui_ReleaseMouseCapture_Result(out_reply = __ue_result_event_reply(call, "reply"), out_returnvalue = __ue_result_event_reply(call, "returnvalue"))
     ue_release_call(call)
     return result
 }
@@ -5233,6 +5531,41 @@ def ue_ui_SetInputMode_UIOnlyEx(arg_playercontroller : C_PlayerController_fb3d88
     ue_release_call(call)
 }
 
+struct ue_ui_SetMousePosition_Result {
+    out_reply : UEEventReply
+    out_returnvalue : UEEventReply
+}
+
+def ue_ui_SetMousePosition(arg_reply : UEEventReply; arg_newmouseposition : UEVector2D) : ue_ui_SetMousePosition_Result {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetMousePosition", "")
+    ue_expect_signature(call, "v1;SetMousePosition;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};NewMousePosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_event_reply(call, "reply", arg_reply)
+    __ue_method_arg_vector2d(call, "newmouseposition", arg_newmouseposition)
+    ue_invoke_call(call)
+    let result = ue_ui_SetMousePosition_Result(out_reply = __ue_result_event_reply(call, "reply"), out_returnvalue = __ue_result_event_reply(call, "returnvalue"))
+    ue_release_call(call)
+    return result
+}
+
+struct ue_ui_SetUserFocus_Result {
+    out_reply : UEEventReply
+    out_returnvalue : UEEventReply
+}
+
+def ue_ui_SetUserFocus(arg_reply : UEEventReply; arg_focuswidget : C_Widget_f2421369; arg_binallusers : bool) : ue_ui_SetUserFocus_Result {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetUserFocus", "")
+    ue_expect_signature(call, "v1;SetUserFocus;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};FocusWidget:ObjectProperty:128:/Script/UMG.Widget;bInAllUsers:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_event_reply(call, "reply", arg_reply)
+    ue_arg_object(call, "focuswidget", C_Widget_f2421369_raw(arg_focuswidget))
+    ue_arg_bool(call, "binallusers", arg_binallusers)
+    ue_invoke_call(call)
+    let result = ue_ui_SetUserFocus_Result(out_reply = __ue_result_event_reply(call, "reply"), out_returnvalue = __ue_result_event_reply(call, "returnvalue"))
+    ue_release_call(call)
+    return result
+}
+
 def ue_ui_SetWindowTitleBarCloseButtonActive(arg_bactive : bool) {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetWindowTitleBarCloseButtonActive", "")
     ue_expect_signature(call, "v1;SetWindowTitleBarCloseButtonActive;bActive:BoolProperty:128;")
@@ -5262,6 +5595,32 @@ def ue_ui_SetWindowTitleBarState(arg_titlebarcontent : C_Widget_f2421369; arg_mo
     ue_arg_bool(call, "btitlebarvisible", arg_btitlebarvisible)
     ue_invoke_call(call)
     ue_release_call(call)
+}
+
+def ue_ui_Unhandled() : UEEventReply {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "Unhandled", "")
+    ue_expect_signature(call, "v1;Unhandled;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    ue_invoke_call(call)
+    let result = __ue_result_event_reply(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+struct ue_ui_UnlockMouse_Result {
+    out_reply : UEEventReply
+    out_returnvalue : UEEventReply
+}
+
+def ue_ui_UnlockMouse(arg_reply : UEEventReply) : ue_ui_UnlockMouse_Result {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "UnlockMouse", "")
+    ue_expect_signature(call, "v1;UnlockMouse;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_event_reply(call, "reply", arg_reply)
+    ue_invoke_call(call)
+    let result = ue_ui_UnlockMouse_Result(out_reply = __ue_result_event_reply(call, "reply"), out_returnvalue = __ue_result_event_reply(call, "returnvalue"))
+    ue_release_call(call)
+    return result
 }
 
 def ue_ui_geometry_AbsoluteToLocal(arg_geometry : UEGeometry; arg_absolutecoordinate : UEVector2D) : UEVector2D {
@@ -6046,6 +6405,69 @@ def ue_user_widget_PauseAnimation(target : C_UserWidget_a3d12281; arg_inanimatio
     ue_arg_object(call, "inanimation", C_WidgetAnimation_462f92b4_raw(arg_inanimation))
     ue_invoke_call(call)
     let result = ue_result_float(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_user_widget_PlayAnimation(target : C_UserWidget_a3d12281; arg_inanimation : C_WidgetAnimation_462f92b4; arg_startattime : float; arg_numloopstoplay : int; arg_playmode : E_EUMGSequencePlayMode_6cd7cbee; arg_playbackspeed : float; arg_brestorestate : bool) : UEWidgetAnimationHandle {
+    let receiver = ue_cast_object(C_UserWidget_a3d12281_raw(target), "/Script/UMG.UserWidget")
+    let call = ue_begin_call(receiver, "PlayAnimation")
+    ue_expect_signature(call, "v1;PlayAnimation;InAnimation:ObjectProperty:128:/Script/UMG.WidgetAnimation;StartAtTime:FloatProperty:128;NumLoopsToPlay:IntProperty:128;PlayMode:ByteProperty:128:/Script/UMG.EUMGSequencePlayMode;PlaybackSpeed:FloatProperty:128;bRestoreState:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/UMG.WidgetAnimationHandle\{\};")
+    ue_require_call_context(call, false)
+    ue_arg_object(call, "inanimation", C_WidgetAnimation_462f92b4_raw(arg_inanimation))
+    ue_arg_float(call, "startattime", arg_startattime)
+    ue_arg_int(call, "numloopstoplay", arg_numloopstoplay)
+    ue_arg_enum(call, "playmode", "/Script/UMG.EUMGSequencePlayMode", E_EUMGSequencePlayMode_6cd7cbee_to_symbol(arg_playmode))
+    ue_arg_float(call, "playbackspeed", arg_playbackspeed)
+    ue_arg_bool(call, "brestorestate", arg_brestorestate)
+    ue_invoke_call(call)
+    let result = __ue_result_widget_animation(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_user_widget_PlayAnimationForward(target : C_UserWidget_a3d12281; arg_inanimation : C_WidgetAnimation_462f92b4; arg_playbackspeed : float; arg_brestorestate : bool) : UEWidgetAnimationHandle {
+    let receiver = ue_cast_object(C_UserWidget_a3d12281_raw(target), "/Script/UMG.UserWidget")
+    let call = ue_begin_call(receiver, "PlayAnimationForward")
+    ue_expect_signature(call, "v1;PlayAnimationForward;InAnimation:ObjectProperty:128:/Script/UMG.WidgetAnimation;PlaybackSpeed:FloatProperty:128;bRestoreState:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/UMG.WidgetAnimationHandle\{\};")
+    ue_require_call_context(call, false)
+    ue_arg_object(call, "inanimation", C_WidgetAnimation_462f92b4_raw(arg_inanimation))
+    ue_arg_float(call, "playbackspeed", arg_playbackspeed)
+    ue_arg_bool(call, "brestorestate", arg_brestorestate)
+    ue_invoke_call(call)
+    let result = __ue_result_widget_animation(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_user_widget_PlayAnimationReverse(target : C_UserWidget_a3d12281; arg_inanimation : C_WidgetAnimation_462f92b4; arg_playbackspeed : float; arg_brestorestate : bool) : UEWidgetAnimationHandle {
+    let receiver = ue_cast_object(C_UserWidget_a3d12281_raw(target), "/Script/UMG.UserWidget")
+    let call = ue_begin_call(receiver, "PlayAnimationReverse")
+    ue_expect_signature(call, "v1;PlayAnimationReverse;InAnimation:ObjectProperty:128:/Script/UMG.WidgetAnimation;PlaybackSpeed:FloatProperty:128;bRestoreState:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/UMG.WidgetAnimationHandle\{\};")
+    ue_require_call_context(call, false)
+    ue_arg_object(call, "inanimation", C_WidgetAnimation_462f92b4_raw(arg_inanimation))
+    ue_arg_float(call, "playbackspeed", arg_playbackspeed)
+    ue_arg_bool(call, "brestorestate", arg_brestorestate)
+    ue_invoke_call(call)
+    let result = __ue_result_widget_animation(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_user_widget_PlayAnimationTimeRange(target : C_UserWidget_a3d12281; arg_inanimation : C_WidgetAnimation_462f92b4; arg_startattime : float; arg_endattime : float; arg_numloopstoplay : int; arg_playmode : E_EUMGSequencePlayMode_6cd7cbee; arg_playbackspeed : float; arg_brestorestate : bool) : UEWidgetAnimationHandle {
+    let receiver = ue_cast_object(C_UserWidget_a3d12281_raw(target), "/Script/UMG.UserWidget")
+    let call = ue_begin_call(receiver, "PlayAnimationTimeRange")
+    ue_expect_signature(call, "v1;PlayAnimationTimeRange;InAnimation:ObjectProperty:128:/Script/UMG.WidgetAnimation;StartAtTime:FloatProperty:128;EndAtTime:FloatProperty:128;NumLoopsToPlay:IntProperty:128;PlayMode:ByteProperty:128:/Script/UMG.EUMGSequencePlayMode;PlaybackSpeed:FloatProperty:128;bRestoreState:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/UMG.WidgetAnimationHandle\{\};")
+    ue_require_call_context(call, false)
+    ue_arg_object(call, "inanimation", C_WidgetAnimation_462f92b4_raw(arg_inanimation))
+    ue_arg_float(call, "startattime", arg_startattime)
+    ue_arg_float(call, "endattime", arg_endattime)
+    ue_arg_int(call, "numloopstoplay", arg_numloopstoplay)
+    ue_arg_enum(call, "playmode", "/Script/UMG.EUMGSequencePlayMode", E_EUMGSequencePlayMode_6cd7cbee_to_symbol(arg_playmode))
+    ue_arg_float(call, "playbackspeed", arg_playbackspeed)
+    ue_arg_bool(call, "brestorestate", arg_brestorestate)
+    ue_invoke_call(call)
+    let result = __ue_result_widget_animation(call, "returnvalue")
     ue_release_call(call)
     return result
 }
