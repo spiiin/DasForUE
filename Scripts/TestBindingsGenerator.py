@@ -61,9 +61,18 @@ class GeneratorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'MetaClass'): generate(self.ir)
     def test_null_class_default(self):
         self.assertEqual(default_expr(dict(kind='class',default_text='None',input=True,output=False),{}),'ue_class_null()')
-    def test_static_on_nonlibrary_rejected(self):
-        self.ir['functions'][0]['static'] = True
-        with self.assertRaisesRegex(ValueError, 'BlueprintFunctionLibrary'): generate(self.ir)
+    def test_native_static_on_nonlibrary_has_no_receiver(self):
+        fn = self.ir['functions'][0]
+        fn['static'] = True
+        body = generate(self.ir).split('def ' + fn['alias'] + '(', 1)[1].split('\n}\n', 1)[0]
+        self.assertNotIn('target :', body)
+        self.assertIn('ue_begin_static_call(', body)
+        self.assertIn('ue_expect_signature(', body)
+    def test_authored_static_rejected(self):
+        fn = self.static_fixture()
+        fn['class'] = '/Game/Generated.Test'
+        self.ir['classes'].append(dict(type_path=fn['class'],parent='/Script/CoreUObject.Object'))
+        with self.assertRaisesRegex(ValueError, 'native /Script/'): generate(self.ir)
     def test_invalid_world_context_rejected(self):
         fn = self.static_fixture()
         fn['world_context'] = 'missing'

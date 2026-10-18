@@ -42,7 +42,7 @@ if($LASTEXITCODE){throw "Pawn AI runtime failed: $Validation/runtime.log"}
 $Text=Get-Content -LiteralPath "$Validation/runtime.log" -Raw
 if(!$Text.Contains('DAS_PAWN_AI_RUNTIME=PASS')){throw 'Missing Pawn AI runtime success marker'}
 $Passed=@([regex]::Matches($Text,'DAS_PAWN_AI_PASS ([A-Za-z0-9_]+)')|ForEach-Object {$_.Groups[1].Value}|Sort-Object -Unique)
-if($Passed.Count -ne 5){throw "Expected five native runtime groups, got $($Passed.Count)"}
+if($Passed.Count -ne 7){throw "Expected seven native runtime groups, got $($Passed.Count)"}
 if($Text.Contains('Ensure condition failed') -or $Text -match 'Log[^\r\n]*: Error:'){throw 'Engine error/ensure in Pawn AI runtime'}
 # Compile this package together with installed Math/World using explicit namespaces.
 $Combined="options gen2`nrequire $($Definition.staged_module)`nrequire ue_api_world`nrequire ue_api_math`n[export]`ndef main(input:int):int {`nlet pawn=$($Definition.staged_module)::C_Pawn_ba3732bb_null()`nif($($Definition.staged_module)::C_Pawn_ba3732bb_valid(pawn)) { return -1 }`nlet actor=ue_api_world::C_Actor_adf65d5b_null()`nif(ue_api_world::C_Actor_adf65d5b_valid(actor)) { return -2 }`nreturn 42`n}"

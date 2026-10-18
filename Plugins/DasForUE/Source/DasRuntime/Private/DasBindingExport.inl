@@ -216,7 +216,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
 #endif
             if(Class->HasAnyClassFlags(CLASS_Interface) && (!Function->GetOuterUClass()->HasAnyClassFlags(CLASS_Interface) || !Function->HasAnyFunctionFlags(FUNC_BlueprintEvent)))ExportPolicyError(TEXT("requires_reflected_interface_method"));
             const bool bStatic=Function->HasAnyFunctionFlags(FUNC_Static);
-            if(bStatic && (!Class->IsChildOf(UBlueprintFunctionLibrary::StaticClass()) || !Function->HasAnyFunctionFlags(FUNC_Native)))ExportPolicyError(TEXT("requires_native_function_library"));
+            if(bStatic && (!ClassPath.StartsWith(TEXT("/Script/")) || !Class->HasAnyClassFlags(CLASS_Native) || !Function->HasAnyFunctionFlags(FUNC_Native)))ExportPolicyError(TEXT("requires_native_static_function"));
             FString WorldContext;
 #if WITH_EDITOR
             WorldContext=Function->GetMetaData(TEXT("WorldContext")).ToLower();

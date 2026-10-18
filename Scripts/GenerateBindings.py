@@ -144,9 +144,7 @@ def generate(ir, module="ue_generated", source_types=None):
         if not isinstance(world_context, str) or (world_context and not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', world_context)): raise ValueError('Invalid WorldContext name')
         if world_context and not fn.get('static', False): raise ValueError('WorldContext requires static function')
         if fn.get('static', False):
-            library = fn['class']
-            while library and library != '/Script/Engine.BlueprintFunctionLibrary': library = classes.get(library, '')
-            if not library: raise ValueError('Static call requires BlueprintFunctionLibrary class')
+            if not fn['class'].startswith('/Script/'): raise ValueError('Static call requires native /Script/ class')
         if world_context:
             contexts = [p for p in fn['parameters'] if p['path'] == world_context]
             if len(contexts) != 1 or contexts[0]['kind'] != 'object' or not contexts[0]['input'] or contexts[0]['output']: raise ValueError('WorldContext must name one input object parameter')

@@ -309,3 +309,28 @@ Visibility/deprecation даёт ещё 148 отказов. Collision / Physics �
 Описание Docs/PawnAINavigation.md; backlog Docs/PawnAINavigationBlockers.md;
 runner Scripts/TestPawnAIPackage.ps1; logs/pawn-ai-package-validation.json.
 Пакет не опубликован; полные Foundation/PIE/packaged не запускались.
+
+### Native static NavigationSystemV1 — 2026-10-18
+
+Общий backend теперь поддерживает native static BlueprintCallable вне BFL,
+без ручных wrappers. Повторно сгенерирован Pawn/AI пакет: 254 ready (+13),
+155 export blocked, 0 generation blocked, 1 policy excluded. Все 11 NavigationSystemV1
+static APIs и два Pawn helpers выполнены в transient мире без NavigationSystem.
+Сохранены WorldContext, signature, construction и RPC policy. Сборка Editor,
+115 Python tests, whole-module, семь runtime groups и совместные World/Math imports — PASS.
+Следующее: успешные query/path результаты на настоящем NavMesh. Полный PIE/packaged
+не запускались, пакет остаётся staged. Docs/PawnAINavigation.md и
+logs/pawn-ai-package-validation.json содержат границы проверки.
+
+
+### Navigation queries на настоящем Recast NavMesh — 2026-10-18
+
+Сборка Editor, свежий Pawn/AI package preflight и шесть точечных групп — PASS.
+Проекция и random/reachable, blocked/clear raycast, полные location/Actor paths,
+Success cost/length, partial path к изолированной площадке и отказ проекции вне
+NavMesh проверены через сгенерированный static backend. Transient сцена не
+сохраняется; маршрут 1410.962 см обходит препятствие при прямой 1200 см.
+Engine errors/ensure нет, DLL/source/module hashes стабильны. Методика:
+Docs/NavigationQueries.md; runner Scripts/TestNavigationQueries.ps1;
+отчёт logs/navigation-validation.json. Полный PIE/packaged и movement ticks
+не запускались. Дальше по AI — sight/hearing perception stimuli и callbacks.

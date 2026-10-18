@@ -198,10 +198,10 @@
         if(ActiveContext->bCollectingSubscriptions)Context->throw_error("UFunction calls are forbidden in bind_events");
         const FString ClassPath=Path?UTF8_TO_TCHAR(Path):TEXT("");
         auto* Class=FindObject<UClass>(nullptr,*ClassPath);
-        if(!ClassPath.StartsWith(TEXT("/Script/")) || !Class || !Class->IsChildOf(UBlueprintFunctionLibrary::StaticClass()))Context->throw_error("expected loaded native BlueprintFunctionLibrary");
+        if(!ClassPath.StartsWith(TEXT("/Script/")) || !Class || !Class->HasAnyClassFlags(CLASS_Native))Context->throw_error("expected loaded native static owner class");
         if(!Name || !*Name || FCStringAnsi::Strlen(Name)>=NAME_SIZE)Context->throw_error("invalid static function name");
         auto* Function=Class->FindFunctionByName(FName(UTF8_TO_TCHAR(Name)));
-        if(!Function || !Function->HasAllFunctionFlags(FUNC_Static|FUNC_Native|FUNC_BlueprintCallable) || Function->HasAnyFunctionFlags(FUNC_Net|FUNC_Delegate|FUNC_MulticastDelegate))Context->throw_error("expected local native static BlueprintCallable library function");
+        if(!Function || !Function->HasAllFunctionFlags(FUNC_Static|FUNC_Native|FUNC_BlueprintCallable) || Function->HasAnyFunctionFlags(FUNC_Net|FUNC_Delegate|FUNC_MulticastDelegate))Context->throw_error("expected native static BlueprintCallable function");
         const FString WorldName=WorldParameter?UTF8_TO_TCHAR(WorldParameter):TEXT("");
 #if WITH_EDITOR
         if(Function->HasMetaData(TEXT("Latent")) || Function->HasMetaData(TEXT("CustomThunk")))Context->throw_error("static function needs a special call adapter");

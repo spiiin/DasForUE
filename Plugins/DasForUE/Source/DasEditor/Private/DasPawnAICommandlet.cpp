@@ -8,6 +8,7 @@
 #include "AIController.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "NavigationPath.h"
+#include "NavigationSystem.h"
 #include "NavigationData.h"
 #include "UObject/StrongObjectPtr.h"
 #include "Misc/ScopeExit.h"
@@ -40,5 +41,8 @@ int32 UDasPawnAICommandlet::Main(const FString& Params){
  if(!Check(RoutePath->IsValid() && RoutePath->IsPartial() && FMath::IsNearlyEqual(RoutePath->GetPathLength(),200.0),TEXT("constructed_navigation_path_length_and_partial")))return 1;
  if(!Run(4,Perception,TEXT("perception")))return 1;
  if(!Check(Perception->IsRegistered() && Perception->GetOwner()==Controller,TEXT("perception_arrays_and_receiver_guards")))return 1;
+ if(!Check(UNavigationSystemV1::GetNavigationSystem(Character)==nullptr,TEXT("navigation_fixture_has_no_system")))return 1;
+ if(!Run(5,Character,TEXT("native_navigation_statics")))return 1;
+ if(!Check(!UNavigationSystemV1::IsNavigationBeingBuilt(Character) && !UNavigationSystemV1::IsNavigationBeingBuiltOrLocked(Character),TEXT("native_navigation_static_queries")))return 1;
  UE_LOG(LogTemp,Display,TEXT("DAS_PAWN_AI_RUNTIME=PASS"));return 0;
 }

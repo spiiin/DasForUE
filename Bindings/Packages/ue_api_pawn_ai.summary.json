@@ -6,8 +6,8 @@
   "value_types": "canonical_math",
   "default_arguments": "explicit",
   "counts": {
-    "generation_ready": 241,
-    "export_blocked": 168,
+    "generation_ready": 254,
+    "export_blocked": 155,
     "generation_blocked": 0,
     "policy_excluded": 1
   },
@@ -17,8 +17,8 @@
   "unknown_declaration_occurrences": 0,
   "surfaces": {
     "receiver": {
-      "generation_ready": 226,
-      "export_blocked": 168,
+      "generation_ready": 239,
+      "export_blocked": 155,
       "generation_blocked": 0,
       "policy_excluded": 0
     },
@@ -29,14 +29,14 @@
       "policy_excluded": 1
     }
   },
-  "source_sha256": "07048b26f46ebda366b48f97a43b0443f08b8fd9535834acf985f9ac9febdfab",
-  "staged_module": "ue_api_pawn_ai_preflight_07048b26f46ebda3",
+  "source_sha256": "b51da81665446be4a06f3c2750b747f1206070de0fc7bcead56c7d5b3060e59e",
+  "staged_module": "ue_api_pawn_ai_preflight_b51da81665446be4",
   "preflight": {
-    "compile": "passed",
-    "packaged": "not_run",
-    "profile_sha256": "25685476bda3f369fb6e9a2e06bbaaf36630f9a1cbbae4ae70164b53bda1a4d3",
     "runtime_probe": "passed",
     "game_world": true,
+    "packaged": "not_run",
+    "profile_sha256": "25685476bda3f369fb6e9a2e06bbaaf36630f9a1cbbae4ae70164b53bda1a4d3",
+    "compile": "passed",
     "build_mode": "Editor NullRHI"
   },
   "members": [
@@ -2639,16 +2639,9 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/Engine.Pawn",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_pawn_GetMovementBaseActor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.Pawn",
@@ -2656,16 +2649,9 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/Engine.Pawn",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_pawn_GetMovementBaseOwner",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.Pawn",
@@ -5699,17 +5685,22 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_FindPathToActorSynchronously",
+      "explicit_defaults": [
+        {
+          "parameter": "tetherdistance",
+          "value": "50.000000"
+        },
+        {
+          "parameter": "pathfindingcontext",
+          "value": "None"
+        },
+        {
+          "parameter": "filterclass",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -5717,17 +5708,18 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_FindPathToLocationSynchronously",
+      "explicit_defaults": [
+        {
+          "parameter": "pathfindingcontext",
+          "value": "None"
+        },
+        {
+          "parameter": "filterclass",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -5735,17 +5727,9 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_GetNavigationSystem",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -5753,17 +5737,18 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_GetPathCost",
+      "explicit_defaults": [
+        {
+          "parameter": "navdata",
+          "value": "None"
+        },
+        {
+          "parameter": "filterclass",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -5771,17 +5756,18 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_GetPathLength",
+      "explicit_defaults": [
+        {
+          "parameter": "navdata",
+          "value": "None"
+        },
+        {
+          "parameter": "filterclass",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -5789,17 +5775,9 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_IsNavigationBeingBuilt",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -5807,17 +5785,9 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_IsNavigationBeingBuiltOrLocked",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -5825,17 +5795,18 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_K2_GetRandomLocationInNavigableRadius",
+      "explicit_defaults": [
+        {
+          "parameter": "navdata",
+          "value": "None"
+        },
+        {
+          "parameter": "filterclass",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -5862,17 +5833,18 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_K2_GetRandomReachablePointInRadius",
+      "explicit_defaults": [
+        {
+          "parameter": "navdata",
+          "value": "None"
+        },
+        {
+          "parameter": "filterclass",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -5880,17 +5852,14 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_K2_ProjectPointToNavigation",
+      "explicit_defaults": [
+        {
+          "parameter": "queryextent",
+          "value": ""
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -5908,17 +5877,18 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
+      "alias": "ue_navigation_NavigationRaycast",
+      "explicit_defaults": [
+        {
+          "parameter": "filterclass",
+          "value": "None"
+        },
+        {
+          "parameter": "querier",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
@@ -7079,40 +7049,6 @@
         "marshalling_error": ""
       },
       "blocker_group": "visibility_or_deprecation_policy"
-    },
-    {
-      "class": "/Script/Engine.Pawn",
-      "function": "GetMovementBaseActor",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/Engine.Pawn",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/Engine.Pawn",
-      "function": "GetMovementBaseOwner",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/Engine.Pawn",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
     },
     {
       "class": "/Script/Engine.Pawn",
@@ -9122,150 +9058,6 @@
     },
     {
       "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "FindPathToActorSynchronously",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "FindPathToLocationSynchronously",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "GetNavigationSystem",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "GetPathCost",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "GetPathLength",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "IsNavigationBeingBuilt",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "IsNavigationBeingBuiltOrLocked",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "K2_GetRandomLocationInNavigableRadius",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
       "function": "K2_GetRandomPointInNavigableRadius",
       "surface": "receiver",
       "construction_unsafe": false,
@@ -9282,60 +9074,6 @@
         "marshalling_error": ""
       },
       "blocker_group": "visibility_or_deprecation_policy"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "K2_GetRandomReachablePointInRadius",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "K2_ProjectPointToNavigation",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
-    },
-    {
-      "class": "/Script/NavigationSystem.NavigationSystemV1",
-      "function": "NavigationRaycast",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
-      "status": "export_blocked",
-      "reason": "requires_native_function_library",
-      "native_policy_evidence": {
-        "reasons": [
-          "static",
-          "metadata:WorldContext"
-        ],
-        "type_issues": [],
-        "marshalling_error": ""
-      },
-      "blocker_group": "other"
     }
   ],
   "by_class": {
@@ -9370,8 +9108,8 @@
       "generation_ready": 6
     },
     "/Script/Engine.Pawn": {
-      "generation_ready": 26,
-      "export_blocked": 8
+      "generation_ready": 28,
+      "export_blocked": 6
     },
     "/Script/Engine.PawnMovementComponent": {
       "generation_ready": 6,
@@ -9385,12 +9123,12 @@
       "generation_ready": 9
     },
     "/Script/NavigationSystem.NavigationSystemV1": {
-      "export_blocked": 12,
-      "generation_ready": 7
+      "generation_ready": 18,
+      "export_blocked": 1
     }
   },
   "blocker_groups": {
-    "other": 20,
+    "other": 7,
     "special_call_adapter": 1,
     "visibility_or_deprecation_policy": 148
   },
@@ -9460,12 +9198,12 @@
       "source_sha256": "7ae94442f1c8496920ea5df7ccdaf2a7bb4295d185eac152deb2117fcd6259f4"
     }
   ],
-  "generated_unique_declarations": 241,
+  "generated_unique_declarations": 254,
   "shared_generated_declarations": 21,
-  "additional_generated_declarations": 220,
+  "additional_generated_declarations": 233,
   "evidence_scope": "Fresh native-policy type hints; not exhaustive generic-ABI diagnosis. Counts per declaration, not per field. Baseline overlap measures generated packages only, not all existing adapters/native API.",
   "evidence_sha256": {
-    "report": "a010bf4db43f0aaaa4fd850c56dd7c88f5f984afb024aa9dcedbc473dfffe812",
+    "report": "a78742b6e45807aaac1565f29ff9b7123a6b0ebb508a47aadaa53c58cf044857",
     "inventory": "adc2c3f2aeafb2bb5e12fc4a65d9625b38b1d41ef6fd84476d0af2908edfcf20"
   }
 }

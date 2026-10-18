@@ -12,21 +12,21 @@
 | CharacterMovementComponent | 39 | 5 | 0 | 0 |
 | Controller | 21 | 7 | 0 | 0 |
 | NavMovementComponent | 6 | 0 | 0 | 0 |
-| Pawn | 26 | 8 | 0 | 0 |
+| Pawn | 28 | 6 | 0 | 0 |
 | PawnMovementComponent | 6 | 2 | 0 | 0 |
 | PlayerController | 66 | 96 | 0 | 0 |
 | NavigationPath | 9 | 0 | 0 | 0 |
-| NavigationSystemV1 | 7 | 12 | 0 | 0 |
+| NavigationSystemV1 | 18 | 1 | 0 | 0 |
 
 Всего 410 кандидатов, 410 уникальных объявлений. Construction guarded: 6.
-Из 241 готовых объявлений 21 уже сгенерированы в baseline-пакетах; 220 отсутствуют в них. Это не число новых возможностей всей привязки.
+Из 254 готовых объявлений 21 уже сгенерированы в baseline-пакетах; 233 отсутствуют в них. Это не число новых возможностей всей привязки.
 Baseline: ue_api_world, ue_api_math, ue_api_collision.
 
 ## Группы блокеров
 
 | Группа | Уникальных объявлений |
 | --- | ---: |
-| other | 20 |
+| other | 7 |
 | special_call_adapter | 1 |
 | visibility_or_deprecation_policy | 148 |
 
@@ -104,8 +104,6 @@ Baseline: ue_api_world, ue_api_math, ue_api_collision.
 | Controller.ReceiveInstigatedAnyDamage | export_blocked: Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Controller.ReceiveInstigatedAnyDamage | — |
 | Controller.ReceivePossess | export_blocked: Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Controller.ReceivePossess | — |
 | Controller.ReceiveUnPossess | export_blocked: Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Controller.ReceiveUnPossess | — |
-| Pawn.GetMovementBaseActor | export_blocked: requires_native_function_library | — |
-| Pawn.GetMovementBaseOwner | export_blocked: requires_native_function_library | — |
 | Pawn.OnRep_Controller | export_blocked: Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Pawn.OnRep_Controller | — |
 | Pawn.OnRep_PlayerState | export_blocked: Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Pawn.OnRep_PlayerState | — |
 | Pawn.ReceiveControllerChanged | export_blocked: Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Pawn.ReceiveControllerChanged | — |
@@ -210,15 +208,4 @@ Baseline: ue_api_world, ue_api_math, ue_api_collision.
 | PlayerController.SwitchLevel | export_blocked: Expected loaded class and local BlueprintCallable instance function: /Script/Engine.PlayerController.SwitchLevel | — |
 | PlayerController.TestServerLevelVisibilityChange | export_blocked: Expected loaded class and local BlueprintCallable instance function: /Script/Engine.PlayerController.TestServerLevelVisibilityChange | — |
 | PlayerController.ToggleSpeaking | export_blocked: Expected loaded class and local BlueprintCallable instance function: /Script/Engine.PlayerController.ToggleSpeaking | — |
-| NavigationSystemV1.FindPathToActorSynchronously | export_blocked: requires_native_function_library | — |
-| NavigationSystemV1.FindPathToLocationSynchronously | export_blocked: requires_native_function_library | — |
-| NavigationSystemV1.GetNavigationSystem | export_blocked: requires_native_function_library | — |
-| NavigationSystemV1.GetPathCost | export_blocked: requires_native_function_library | — |
-| NavigationSystemV1.GetPathLength | export_blocked: requires_native_function_library | — |
-| NavigationSystemV1.IsNavigationBeingBuilt | export_blocked: requires_native_function_library | — |
-| NavigationSystemV1.IsNavigationBeingBuiltOrLocked | export_blocked: requires_native_function_library | — |
-| NavigationSystemV1.K2_GetRandomLocationInNavigableRadius | export_blocked: requires_native_function_library | — |
 | NavigationSystemV1.K2_GetRandomPointInNavigableRadius | export_blocked: deprecated_function | — |
-| NavigationSystemV1.K2_GetRandomReachablePointInRadius | export_blocked: requires_native_function_library | — |
-| NavigationSystemV1.K2_ProjectPointToNavigation | export_blocked: requires_native_function_library | — |
-| NavigationSystemV1.NavigationRaycast | export_blocked: requires_native_function_library | — |
