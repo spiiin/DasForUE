@@ -42,6 +42,8 @@ struct FDasReflectedTypes;
 class DASRUNTIME_API FDasRuntimeModule final : public IModuleInterface
 {
 public:
+    // Trusted native observer entry: detached event values only, no Slate reply/routing.
+    FDasExecutionResult DispatchInputEventSnapshots(const FString& Path,const FString& Entry,const TArray<FInstancedStruct>& Values,TWeakObjectPtr<UObject> Self);
 #if WITH_EDITOR
     bool BeginDefaultUpdate();
     void EndDefaultUpdate(UClass* RootClass,bool Applied);

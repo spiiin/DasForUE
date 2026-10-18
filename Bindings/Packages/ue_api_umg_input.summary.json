@@ -1,18 +1,20 @@
 {
+  "schema_version": 1,
   "package": "ue_api_umg_input",
   "engine_version": "5.8.3-0+UE5",
   "state": "published",
   "value_types": "canonical_math",
   "default_arguments": "explicit",
-  "candidate_count": 517,
   "counts": {
-    "generation_ready": 333,
-    "export_blocked": 110,
-    "generation_blocked": 74,
+    "generation_ready": 366,
+    "export_blocked": 114,
+    "generation_blocked": 37,
     "policy_excluded": 0
   },
+  "candidate_count": 517,
   "construction_guarded_count": 0,
-  "source_sha256": "2e781fe3b6e005379e2eae4d811931535f109589c82c7edbc06d7206ce1ae79f",
+  "unique_declaration_count": 517,
+  "unknown_declaration_occurrences": 0,
   "surfaces": {
     "receiver": {
       "generation_ready": 250,
@@ -21,14 +23,31 @@
       "policy_excluded": 0
     },
     "library": {
-      "generation_ready": 83,
-      "export_blocked": 16,
-      "generation_blocked": 67,
+      "generation_ready": 116,
+      "export_blocked": 20,
+      "generation_blocked": 30,
       "policy_excluded": 0
     }
   },
-  "schema_version": 1,
-  "blockers": [
+  "source_sha256": "e0ba053e565a13616ab6b502c13f8d47e0b2c7ded62cd6c4e0a7346eec1a3723",
+  "dependencies": {
+    "das_modules": [
+      "ue_foundation",
+      "ue_input_events",
+      "ue_input_value",
+      "ue_native_delegate"
+    ],
+    "ue_modules": [
+      "Engine",
+      "InputCore",
+      "SlateCore",
+      "Slate",
+      "UMG",
+      "EnhancedInput"
+    ]
+  },
+  "staged_module": "ue_api_umg_input_preflight_e0ba053e565a1361",
+  "members": [
     {
       "class": "/Script/Engine.InputComponent",
       "function": "GetControllerAnalogKeyState",
@@ -121,12 +140,172 @@
     },
     {
       "class": "/Script/Engine.InputSettings",
+      "function": "AddActionMapping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_AddActionMapping",
+      "explicit_defaults": [
+        {
+          "parameter": "bforcerebuildkeymaps",
+          "value": "true"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "function": "AddAxisMapping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_AddAxisMapping",
+      "explicit_defaults": [
+        {
+          "parameter": "bforcerebuildkeymaps",
+          "value": "true"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "function": "ForceRebuildKeymaps",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_ForceRebuildKeymaps",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "function": "GetActionMappingByName",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_GetActionMappingByName",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "function": "GetActionNames",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_GetActionNames",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
       "function": "GetAllActionAndAxisNames",
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/Engine.InputSettings",
       "status": "export_blocked",
       "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.InputSettings.GetAllActionAndAxisNames"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "function": "GetAxisMappingByName",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_GetAxisMappingByName",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "function": "GetAxisNames",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_GetAxisNames",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "function": "GetInputSettings",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_GetInputSettings",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "function": "RemoveActionMapping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_RemoveActionMapping",
+      "explicit_defaults": [
+        {
+          "parameter": "bforcerebuildkeymaps",
+          "value": "true"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "function": "RemoveAxisMapping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_RemoveAxisMapping",
+      "explicit_defaults": [
+        {
+          "parameter": "bforcerebuildkeymaps",
+          "value": "true"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "function": "SaveKeyMappings",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.InputSettings",
+      "alias": "ue_input_settings_SaveKeyMappings",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "CalibrateTilt",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_CalibrateTilt",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "EqualEqual_InputChordInputChord",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_EqualEqual_InputChordInputChord",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "EqualEqual_KeyKey",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_EqualEqual_KeyKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -136,8 +315,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_GetAnalogValue",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -147,8 +325,17 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_GetKey",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "GetModifierKeysState",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_GetModifierKeysState",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -158,8 +345,17 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_GetUserIndex",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "InputChord_GetDisplayName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_InputChord_GetDisplayName",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -169,8 +365,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsAltDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -180,8 +375,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsCommandDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -191,8 +385,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsControlDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -202,8 +395,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsLeftAltDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -213,8 +405,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsLeftCommandDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -224,8 +415,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsLeftControlDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -235,8 +425,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsLeftShiftDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -246,8 +435,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsRepeat",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -257,8 +445,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsRightAltDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -268,8 +455,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsRightCommandDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -279,8 +465,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsRightControlDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -290,8 +475,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsRightShiftDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -301,8 +485,22 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_InputEvent_IsShiftDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_GetDisplayName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_GetDisplayName",
+      "explicit_defaults": [
+        {
+          "parameter": "blongdisplayname",
+          "value": "true"
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -319,10 +517,8 @@
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/Engine.KismetInputLibrary",
-      "alias": "ue_input_key_Key_GetNavigationActionFromKey",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "export_blocked",
+      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -330,10 +526,8 @@
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/Engine.KismetInputLibrary",
-      "alias": "ue_input_key_Key_GetNavigationDirectionFromAnalog",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "export_blocked",
+      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -341,10 +535,158 @@
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/Engine.KismetInputLibrary",
-      "alias": "ue_input_key_Key_GetNavigationDirectionFromKey",
+      "status": "export_blocked",
+      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsAnalog",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsAnalog",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsAxis1D",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsAxis1D",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsAxis2D",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsAxis2D",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsAxis3D",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsAxis3D",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsButtonAxis",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsButtonAxis",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsDigital",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsDigital",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsGamepadKey",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsGamepadKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsKeyboardKey",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsKeyboardKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsModifierKey",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsModifierKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsMouseButton",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsMouseButton",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_IsValid",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_Key_IsValid",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "ModifierKeysState_IsAltDown",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_ModifierKeysState_IsAltDown",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "ModifierKeysState_IsCommandDown",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_ModifierKeysState_IsCommandDown",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "ModifierKeysState_IsControlDown",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_ModifierKeysState_IsControlDown",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "ModifierKeysState_IsShiftDown",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "alias": "ue_input_key_ModifierKeysState_IsShiftDown",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -354,8 +696,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_GetCursorDelta",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -365,8 +706,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_GetEffectingButton",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -376,8 +716,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_GetGestureDelta",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -387,8 +726,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_GetGestureType",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -398,8 +736,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_GetLastScreenSpacePosition",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -409,8 +746,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_GetPointerIndex",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -420,8 +756,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_GetScreenSpacePosition",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -431,8 +766,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_GetTouchpadIndex",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -442,8 +776,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_GetUserIndex",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -453,8 +786,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_GetWheelDelta",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -464,8 +796,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_IsMouseButtonDown",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/Engine.KismetInputLibrary",
@@ -475,8 +806,7 @@
       "declaring_class": "/Script/Engine.KismetInputLibrary",
       "alias": "ue_input_key_PointerEvent_IsTouchEvent",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/EnhancedInput.EnhancedInputComponent",
@@ -486,6 +816,16 @@
       "declaring_class": "/Script/EnhancedInput.EnhancedInputComponent",
       "status": "export_blocked",
       "reason": "internal_function"
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "function": "BreakInputActionValue",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "alias": "ue_enhanced_api_BreakInputActionValue",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/EnhancedInput.EnhancedInputLibrary",
@@ -525,12 +865,97 @@
     },
     {
       "class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "function": "Conv_InputActionValueToString",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "alias": "ue_enhanced_api_Conv_InputActionValueToString",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "function": "Conv_TriggerEventValueToString",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "alias": "ue_enhanced_api_Conv_TriggerEventValueToString",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "function": "FlushPlayerInput",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "alias": "ue_enhanced_api_FlushPlayerInput",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
       "function": "GetBoundActionValue",
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
       "status": "export_blocked",
       "reason": "internal_function"
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "function": "GetMappingName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "alias": "ue_enhanced_api_GetMappingName",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "function": "GetPlayerMappableKeySettings",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "alias": "ue_enhanced_api_GetPlayerMappableKeySettings",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "function": "IsActionKeyMappingPlayerMappable",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "alias": "ue_enhanced_api_IsActionKeyMappingPlayerMappable",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "function": "MakeInputActionValueOfType",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "alias": "ue_enhanced_api_MakeInputActionValueOfType",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "function": "RequestRebuildControlMappingsUsingContext",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "alias": "ue_enhanced_api_RequestRebuildControlMappingsUsingContext",
+      "explicit_defaults": [
+        {
+          "parameter": "bforceimmediately",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/EnhancedInput.EnhancedInputLocalPlayerSubsystem",
@@ -569,6 +994,36 @@
       "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/EnhancedInput.EnhancedInputLocalPlayerSubsystem.OnUserSettingsPostInitialized__DelegateSignature"
     },
     {
+      "class": "/Script/EnhancedInput.EnhancedInputWorldSubsystem",
+      "function": "AddActorInputComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputWorldSubsystem",
+      "alias": "ue_input_world_AddActorInputComponent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputWorldSubsystem",
+      "function": "RemoveActorInputComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.EnhancedInputWorldSubsystem",
+      "alias": "ue_input_world_RemoveActorInputComponent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.InputMappingContext",
+      "function": "MapKey",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.InputMappingContext",
+      "alias": "ue_mapping_context_MapKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
       "class": "/Script/EnhancedInput.InputMappingContext",
       "function": "ShouldShowInputModeQuery",
       "surface": "receiver",
@@ -576,6 +1031,246 @@
       "declaring_class": "/Script/EnhancedInput.InputMappingContext",
       "status": "export_blocked",
       "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/EnhancedInput.InputMappingContext.ShouldShowInputModeQuery"
+    },
+    {
+      "class": "/Script/EnhancedInput.InputMappingContext",
+      "function": "UnmapAll",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.InputMappingContext",
+      "alias": "ue_mapping_context_UnmapAll",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.InputMappingContext",
+      "function": "UnmapAllKeysFromAction",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.InputMappingContext",
+      "alias": "ue_mapping_context_UnmapAllKeysFromAction",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/EnhancedInput.InputMappingContext",
+      "function": "UnmapKey",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/EnhancedInput.InputMappingContext",
+      "alias": "ue_mapping_context_UnmapKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Button",
+      "function": "IsPressed",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Button",
+      "alias": "ue_button_IsPressed",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Button",
+      "function": "SetAllowDragDrop",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Button",
+      "alias": "ue_button_SetAllowDragDrop",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Button",
+      "function": "SetBackgroundColor",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Button",
+      "alias": "ue_button_SetBackgroundColor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Button",
+      "function": "SetClickMethod",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Button",
+      "alias": "ue_button_SetClickMethod",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Button",
+      "function": "SetColorAndOpacity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Button",
+      "alias": "ue_button_SetColorAndOpacity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Button",
+      "function": "SetPressMethod",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Button",
+      "alias": "ue_button_SetPressMethod",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Button",
+      "function": "SetStyle",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Button",
+      "alias": "ue_button_SetStyle",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Button",
+      "function": "SetTouchMethod",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Button",
+      "alias": "ue_button_SetTouchMethod",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanel",
+      "function": "AddChildToCanvas",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanel",
+      "alias": "ue_canvas_AddChildToCanvas",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "GetAlignment",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_GetAlignment",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "GetAnchors",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_GetAnchors",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "GetAutoSize",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_GetAutoSize",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "GetLayout",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_GetLayout",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "GetOffsets",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_GetOffsets",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "GetPosition",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_GetPosition",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "GetSize",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_GetSize",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "GetZOrder",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_GetZOrder",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "SetAlignment",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_SetAlignment",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "SetAnchors",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_SetAnchors",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "SetAutoSize",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_SetAutoSize",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "SetLayout",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_SetLayout",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.CanvasPanelSlot",
@@ -594,6 +1289,106 @@
       "declaring_class": "/Script/UMG.CanvasPanelSlot",
       "status": "export_blocked",
       "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/UMG.CanvasPanelSlot.SetMinimum"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "SetOffsets",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_SetOffsets",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "SetPosition",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_SetPosition",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "SetSize",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_SetSize",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "function": "SetZOrder",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.CanvasPanelSlot",
+      "alias": "ue_canvas_slot_SetZOrder",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ContentWidget",
+      "function": "GetContent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ContentWidget",
+      "alias": "ue_content_widget_GetContent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ContentWidget",
+      "function": "GetContentSlot",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ContentWidget",
+      "alias": "ue_content_widget_GetContentSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ContentWidget",
+      "function": "SetContent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ContentWidget",
+      "alias": "ue_content_widget_SetContent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "ClearError",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_ClearError",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "GetText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_GetText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "HasError",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_HasError",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.EditableTextBox",
@@ -623,6 +1418,141 @@
       "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/UMG.EditableTextBox.OnEditableTextBoxCommittedEvent__DelegateSignature"
     },
     {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "SetError",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_SetError",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "SetForegroundColor",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_SetForegroundColor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "SetHintText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_SetHintText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "SetIsPassword",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_SetIsPassword",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "SetIsReadOnly",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_SetIsReadOnly",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "SetJustification",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_SetJustification",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "SetText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_SetText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "function": "SetTextOverflowPolicy",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.EditableTextBox",
+      "alias": "ue_editable_text_SetTextOverflowPolicy",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "GetDynamicMaterial",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_GetDynamicMaterial",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetBrush",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetBrush",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetBrushFromAsset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetBrushFromAsset",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetBrushFromAtlasInterface",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetBrushFromAtlasInterface",
+      "explicit_defaults": [
+        {
+          "parameter": "bmatchsize",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetBrushFromMaterial",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetBrushFromMaterial",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
       "class": "/Script/UMG.Image",
       "function": "SetBrushFromSoftMaterial",
       "surface": "receiver",
@@ -639,6 +1569,96 @@
       "declaring_class": "/Script/UMG.Image",
       "status": "export_blocked",
       "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetBrushFromTexture",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetBrushFromTexture",
+      "explicit_defaults": [
+        {
+          "parameter": "bmatchsize",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetBrushFromTextureDynamic",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetBrushFromTextureDynamic",
+      "explicit_defaults": [
+        {
+          "parameter": "bmatchsize",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetBrushResourceObject",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetBrushResourceObject",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetBrushTintColor",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetBrushTintColor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetColorAndOpacity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetColorAndOpacity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetDesiredSizeOverride",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetDesiredSizeOverride",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "function": "SetOpacity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Image",
+      "alias": "ue_image_SetOpacity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.InputKeySelector",
+      "function": "GetIsSelectingKey",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.InputKeySelector",
+      "alias": "ue_key_selector_GetIsSelectingKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.InputKeySelector",
@@ -659,6 +1679,429 @@
       "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/UMG.InputKeySelector.OnKeySelected__DelegateSignature"
     },
     {
+      "class": "/Script/UMG.InputKeySelector",
+      "function": "SetAllowGamepadKeys",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.InputKeySelector",
+      "alias": "ue_key_selector_SetAllowGamepadKeys",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.InputKeySelector",
+      "function": "SetAllowModifierKeys",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.InputKeySelector",
+      "alias": "ue_key_selector_SetAllowModifierKeys",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.InputKeySelector",
+      "function": "SetEscapeKeys",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.InputKeySelector",
+      "alias": "ue_key_selector_SetEscapeKeys",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.InputKeySelector",
+      "function": "SetKeySelectionText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.InputKeySelector",
+      "alias": "ue_key_selector_SetKeySelectionText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.InputKeySelector",
+      "function": "SetNoKeySpecifiedText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.InputKeySelector",
+      "alias": "ue_key_selector_SetNoKeySpecifiedText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.InputKeySelector",
+      "function": "SetSelectedKey",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.InputKeySelector",
+      "alias": "ue_key_selector_SetSelectedKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.InputKeySelector",
+      "function": "SetTextBlockVisibility",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.InputKeySelector",
+      "alias": "ue_key_selector_SetTextBlockVisibility",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "function": "AddChild",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.PanelWidget",
+      "alias": "ue_panel_AddChild",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "function": "ClearChildren",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.PanelWidget",
+      "alias": "ue_panel_ClearChildren",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "function": "GetAllChildren",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.PanelWidget",
+      "alias": "ue_panel_GetAllChildren",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "function": "GetChildAt",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.PanelWidget",
+      "alias": "ue_panel_GetChildAt",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "function": "GetChildIndex",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.PanelWidget",
+      "alias": "ue_panel_GetChildIndex",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "function": "GetChildrenCount",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.PanelWidget",
+      "alias": "ue_panel_GetChildrenCount",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "function": "HasAnyChildren",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.PanelWidget",
+      "alias": "ue_panel_HasAnyChildren",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "function": "HasChild",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.PanelWidget",
+      "alias": "ue_panel_HasChild",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "function": "RemoveChild",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.PanelWidget",
+      "alias": "ue_panel_RemoveChild",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "function": "RemoveChildAt",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.PanelWidget",
+      "alias": "ue_panel_RemoveChildAt",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ProgressBar",
+      "function": "SetFillColorAndOpacity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ProgressBar",
+      "alias": "ue_progress_SetFillColorAndOpacity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ProgressBar",
+      "function": "SetIsMarquee",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ProgressBar",
+      "alias": "ue_progress_SetIsMarquee",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ProgressBar",
+      "function": "SetPercent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ProgressBar",
+      "alias": "ue_progress_SetPercent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "EndInertialScrolling",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_EndInertialScrolling",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "GetAnalogMouseWheelKey",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_GetAnalogMouseWheelKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "GetConsumePointerInput",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_GetConsumePointerInput",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "GetIsFocusable",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_GetIsFocusable",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "GetIsScrolling",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_GetIsScrolling",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "GetOverscrollOffset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_GetOverscrollOffset",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "GetOverscrollPercentage",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_GetOverscrollPercentage",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "GetScrollOffset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_GetScrollOffset",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "GetScrollOffsetOfEnd",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_GetScrollOffsetOfEnd",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "GetViewFraction",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_GetViewFraction",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "GetViewOffsetFraction",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_GetViewOffsetFraction",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "ScrollToEnd",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_ScrollToEnd",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "ScrollToStart",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_ScrollToStart",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "ScrollWidgetIntoView",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_ScrollWidgetIntoView",
+      "explicit_defaults": [
+        {
+          "parameter": "animatescroll",
+          "value": "true"
+        },
+        {
+          "parameter": "scrolldestination",
+          "value": "IntoView"
+        },
+        {
+          "parameter": "padding",
+          "value": "0.000000"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetAllowOverscroll",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetAllowOverscroll",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetAlwaysShowScrollbar",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetAlwaysShowScrollbar",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetAnalogMouseWheelKey",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetAnalogMouseWheelKey",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetAnimateWheelScrolling",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetAnimateWheelScrolling",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetConsumeMouseWheel",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetConsumeMouseWheel",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetConsumePointerInput",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetConsumePointerInput",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetIsFocusable",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetIsFocusable",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
       "class": "/Script/UMG.ScrollBox",
       "function": "SetIsTouchScrollingEnabled",
       "surface": "receiver",
@@ -666,6 +2109,96 @@
       "declaring_class": "/Script/UMG.ScrollBox",
       "status": "export_blocked",
       "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/UMG.ScrollBox.SetIsTouchScrollingEnabled"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetNavigationDestination",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetNavigationDestination",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetOrientation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetOrientation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetScrollAnimationInterpolationSpeed",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetScrollAnimationInterpolationSpeed",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetScrollBarVisibility",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetScrollBarVisibility",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetScrollOffset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetScrollOffset",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetScrollWhenFocusChanges",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetScrollWhenFocusChanges",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetScrollbarPadding",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetScrollbarPadding",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetScrollbarThickness",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetScrollbarThickness",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "function": "SetWheelScrollMultiplier",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.ScrollBox",
+      "alias": "ue_scroll_SetWheelScrollMultiplier",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -677,6 +2210,26 @@
       "explicit_defaults": [],
       "status": "generation_blocked",
       "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "AbsoluteToViewport",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_AbsoluteToViewport",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "EqualEqual_SlateBrush",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_EqualEqual_SlateBrush",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -768,6 +2321,31 @@
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "ScreenToViewport",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_ScreenToViewport",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "ScreenToWidgetAbsolute",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_ScreenToWidgetAbsolute",
+      "explicit_defaults": [
+        {
+          "parameter": "bincludewindowposition",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
       "function": "ScreenToWidgetLocal",
       "surface": "library",
       "construction_unsafe": false,
@@ -841,6 +2419,371 @@
       "reason": "Opaque/empty structs need an adapter"
     },
     {
+      "class": "/Script/UMG.Slider",
+      "function": "GetNormalizedValue",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Slider",
+      "alias": "ue_slider_GetNormalizedValue",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Slider",
+      "function": "GetValue",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Slider",
+      "alias": "ue_slider_GetValue",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Slider",
+      "function": "SetIndentHandle",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Slider",
+      "alias": "ue_slider_SetIndentHandle",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Slider",
+      "function": "SetLocked",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Slider",
+      "alias": "ue_slider_SetLocked",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Slider",
+      "function": "SetMaxValue",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Slider",
+      "alias": "ue_slider_SetMaxValue",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Slider",
+      "function": "SetMinValue",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Slider",
+      "alias": "ue_slider_SetMinValue",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Slider",
+      "function": "SetSliderBarColor",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Slider",
+      "alias": "ue_slider_SetSliderBarColor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Slider",
+      "function": "SetSliderHandleColor",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Slider",
+      "alias": "ue_slider_SetSliderHandleColor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Slider",
+      "function": "SetStepSize",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Slider",
+      "alias": "ue_slider_SetStepSize",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Slider",
+      "function": "SetValue",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Slider",
+      "alias": "ue_slider_SetValue",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "GetDynamicFontMaterial",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_GetDynamicFontMaterial",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "GetDynamicOutlineMaterial",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_GetDynamicOutlineMaterial",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "GetFontSize",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_GetFontSize",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "GetText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_GetText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetAutoWrapText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetAutoWrapText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetColorAndOpacity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetColorAndOpacity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetFont",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetFont",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetFontMaterial",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetFontMaterial",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetFontOutlineMaterial",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetFontOutlineMaterial",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetFontSize",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetFontSize",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetMinDesiredWidth",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetMinDesiredWidth",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetOpacity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetOpacity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetShadowColorAndOpacity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetShadowColorAndOpacity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetShadowOffset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetShadowOffset",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetStrikeBrush",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetStrikeBrush",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetTextOverflowPolicy",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetTextOverflowPolicy",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "function": "SetTextTransformPolicy",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.TextBlock",
+      "alias": "ue_text_block_SetTextTransformPolicy",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "AddExtension",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_AddExtension",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "AddToPlayerScreen",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_AddToPlayerScreen",
+      "explicit_defaults": [
+        {
+          "parameter": "zorder",
+          "value": "0"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "AddToViewport",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_AddToViewport",
+      "explicit_defaults": [
+        {
+          "parameter": "zorder",
+          "value": "0"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "BindToAnimationEvent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_BindToAnimationEvent",
+      "explicit_defaults": [
+        {
+          "parameter": "usertag",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "BindToAnimationFinished",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_BindToAnimationFinished",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "BindToAnimationStarted",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_BindToAnimationStarted",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "CancelLatentActions",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_CancelLatentActions",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
       "class": "/Script/UMG.UserWidget",
       "function": "Construct",
       "surface": "receiver",
@@ -860,12 +2803,132 @@
     },
     {
       "class": "/Script/UMG.UserWidget",
+      "function": "FlushAnimations",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_FlushAnimations",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "GetAlignmentInViewport",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_GetAlignmentInViewport",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "GetAnchorsInViewport",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_GetAnchorsInViewport",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "GetAnimationCurrentTime",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_GetAnimationCurrentTime",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "GetExtension",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_GetExtension",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "GetExtensions",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_GetExtensions",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
       "function": "GetIsVisible",
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.UserWidget",
       "status": "export_blocked",
       "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "GetOrAddExtension",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_GetOrAddExtension",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "GetOwningPlayerCameraManager",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_GetOwningPlayerCameraManager",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "GetOwningPlayerPawn",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_GetOwningPlayerPawn",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "IsAnimationPlaying",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_IsAnimationPlaying",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "IsAnimationPlayingForward",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_IsAnimationPlayingForward",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "IsAnyAnimationPlaying",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_IsAnyAnimationPlaying",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.UserWidget",
@@ -884,6 +2947,16 @@
       "declaring_class": "/Script/UMG.UserWidget",
       "status": "export_blocked",
       "reason": "protected_function"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "IsPlayingAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_IsPlayingAnimation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.UserWidget",
@@ -1211,6 +3284,16 @@
     },
     {
       "class": "/Script/UMG.UserWidget",
+      "function": "PauseAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_PauseAnimation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
       "function": "PlayAnimation",
       "surface": "receiver",
       "construction_unsafe": false,
@@ -1337,6 +3420,140 @@
     },
     {
       "class": "/Script/UMG.UserWidget",
+      "function": "QueuePauseAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_QueuePauseAnimation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "QueuePlayAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_QueuePlayAnimation",
+      "explicit_defaults": [
+        {
+          "parameter": "startattime",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "numloopstoplay",
+          "value": "1"
+        },
+        {
+          "parameter": "playmode",
+          "value": "Forward"
+        },
+        {
+          "parameter": "playbackspeed",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "brestorestate",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "QueuePlayAnimationForward",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_QueuePlayAnimationForward",
+      "explicit_defaults": [
+        {
+          "parameter": "playbackspeed",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "brestorestate",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "QueuePlayAnimationReverse",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_QueuePlayAnimationReverse",
+      "explicit_defaults": [
+        {
+          "parameter": "playbackspeed",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "brestorestate",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "QueuePlayAnimationTimeRange",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_QueuePlayAnimationTimeRange",
+      "explicit_defaults": [
+        {
+          "parameter": "startattime",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "endattime",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "numloopstoplay",
+          "value": "1"
+        },
+        {
+          "parameter": "playmode",
+          "value": "Forward"
+        },
+        {
+          "parameter": "playbackspeed",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "brestorestate",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "QueueStopAllAnimations",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_QueueStopAllAnimations",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "QueueStopAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_QueueStopAnimation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
       "function": "RegisterInputComponent",
       "surface": "receiver",
       "construction_unsafe": false,
@@ -1346,12 +3563,112 @@
     },
     {
       "class": "/Script/UMG.UserWidget",
+      "function": "RemoveExtension",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_RemoveExtension",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "RemoveExtensions",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_RemoveExtensions",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
       "function": "RemoveFromViewport",
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.UserWidget",
       "status": "export_blocked",
       "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "ReverseAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_ReverseAnimation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetAlignmentInViewport",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetAlignmentInViewport",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetAnchorsInViewport",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetAnchorsInViewport",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetAnimationCurrentTime",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetAnimationCurrentTime",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetColorAndOpacity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetColorAndOpacity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetDesiredFocusWidget",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetDesiredFocusWidget",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetDesiredSizeInViewport",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetDesiredSizeInViewport",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetForegroundColor",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetForegroundColor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.UserWidget",
@@ -1370,6 +3687,96 @@
       "declaring_class": "/Script/UMG.UserWidget",
       "status": "export_blocked",
       "reason": "protected_function"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetNumLoopsToPlay",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetNumLoopsToPlay",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetOwningPlayer",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetOwningPlayer",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetPadding",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetPadding",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetPlaybackSpeed",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetPlaybackSpeed",
+      "explicit_defaults": [
+        {
+          "parameter": "playbackspeed",
+          "value": "1.000000"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "SetPositionInViewport",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_SetPositionInViewport",
+      "explicit_defaults": [
+        {
+          "parameter": "bremovedpiscale",
+          "value": "true"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "StopAllAnimations",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_StopAllAnimations",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "StopAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_StopAnimation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "StopAnimationsAndLatentActions",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_StopAnimationsAndLatentActions",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.UserWidget",
@@ -1400,12 +3807,72 @@
     },
     {
       "class": "/Script/UMG.UserWidget",
+      "function": "UnbindAllFromAnimationFinished",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_UnbindAllFromAnimationFinished",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "UnbindAllFromAnimationStarted",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_UnbindAllFromAnimationStarted",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "UnbindFromAnimationFinished",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_UnbindFromAnimationFinished",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "UnbindFromAnimationStarted",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_UnbindFromAnimationStarted",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
       "function": "UnregisterInputComponent",
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.UserWidget",
       "status": "export_blocked",
       "reason": "protected_function"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "ForceLayoutPrepass",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_ForceLayoutPrepass",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "ForceVolatile",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_ForceVolatile",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Widget",
@@ -1424,6 +3891,26 @@
       "declaring_class": "/Script/UMG.Widget",
       "status": "export_blocked",
       "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/UMG.Widget.GenerateWidgetForString__DelegateSignature"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetAccessibleSummaryText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetAccessibleSummaryText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetAccessibleText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetAccessibleText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Widget",
@@ -1456,6 +3943,26 @@
     },
     {
       "class": "/Script/UMG.Widget",
+      "function": "GetClipping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetClipping",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetDesiredSize",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetDesiredSize",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
       "function": "GetFloat__DelegateSignature",
       "surface": "receiver",
       "construction_unsafe": false,
@@ -1465,12 +3972,32 @@
     },
     {
       "class": "/Script/UMG.Widget",
+      "function": "GetGameInstance",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetGameInstance",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
       "function": "GetInt32__DelegateSignature",
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.Widget",
       "status": "export_blocked",
       "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/UMG.Widget.GetInt32__DelegateSignature"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetIsEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetIsEnabled",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Widget",
@@ -1492,6 +4019,26 @@
     },
     {
       "class": "/Script/UMG.Widget",
+      "function": "GetOwningLocalPlayer",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetOwningLocalPlayer",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetOwningPlayer",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetOwningPlayer",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
       "function": "GetPaintSpaceGeometry",
       "surface": "receiver",
       "construction_unsafe": false,
@@ -1500,6 +4047,36 @@
       "explicit_defaults": [],
       "status": "generation_blocked",
       "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetParent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetParent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetRenderOpacity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetRenderOpacity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetRenderTransformAngle",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetRenderTransformAngle",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Widget",
@@ -1550,12 +4127,177 @@
     },
     {
       "class": "/Script/UMG.Widget",
+      "function": "GetVisibility",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetVisibility",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
       "function": "GetWidget__DelegateSignature",
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.Widget",
       "status": "export_blocked",
       "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/UMG.Widget.GetWidget__DelegateSignature"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "HasAnyUserFocus",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_HasAnyUserFocus",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "HasFocusedDescendants",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_HasFocusedDescendants",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "HasKeyboardFocus",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_HasKeyboardFocus",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "HasMouseCapture",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_HasMouseCapture",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "HasMouseCaptureByUser",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_HasMouseCaptureByUser",
+      "explicit_defaults": [
+        {
+          "parameter": "pointerindex",
+          "value": "-1"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "HasUserFocus",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_HasUserFocus",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "HasUserFocusedDescendants",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_HasUserFocusedDescendants",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "InvalidateLayoutAndVolatility",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_InvalidateLayoutAndVolatility",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "IsHovered",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_IsHovered",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "IsInViewport",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_IsInViewport",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "IsRendered",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_IsRendered",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "IsVisible",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_IsVisible",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "K2_AddFieldValueChangedDelegate",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_K2_AddFieldValueChangedDelegate",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "K2_BroadcastFieldValueChanged",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_K2_BroadcastFieldValueChanged",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "K2_RemoveFieldValueChangedDelegate",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_K2_RemoveFieldValueChangedDelegate",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Widget",
@@ -1577,12 +4319,262 @@
     },
     {
       "class": "/Script/UMG.Widget",
+      "function": "RemoveFromParent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_RemoveFromParent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "ResetCursor",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_ResetCursor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetAllNavigationRules",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetAllNavigationRules",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetClipping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetClipping",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetCursor",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetCursor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetFocus",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetFocus",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetIsEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetIsEnabled",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetKeyboardFocus",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetKeyboardFocus",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
       "function": "SetNavigationRule",
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.Widget",
       "status": "export_blocked",
       "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetNavigationRuleBase",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetNavigationRuleBase",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetNavigationRuleCustom",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetNavigationRuleCustom",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetNavigationRuleCustomBoundary",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetNavigationRuleCustomBoundary",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetNavigationRuleExplicit",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetNavigationRuleExplicit",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetRenderOpacity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetRenderOpacity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetRenderScale",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetRenderScale",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetRenderShear",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetRenderShear",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetRenderTransform",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetRenderTransform",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetRenderTransformAngle",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetRenderTransformAngle",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetRenderTransformPivot",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetRenderTransformPivot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetRenderTranslation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetRenderTranslation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetToolTip",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetToolTip",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetToolTipText",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetToolTipText",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetUserFocus",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetUserFocus",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SetVisibility",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SetVisibility",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "SupportsKeyboardFocus",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_SupportsKeyboardFocus",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "CancelDragDrop",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_CancelDragDrop",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -1655,10 +4647,18 @@
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_DetectDragIfPressed",
+      "status": "export_blocked",
+      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "DismissAllMenus",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_DismissAllMenus",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -1790,14 +4790,88 @@
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "GetAllWidgetsOfClass",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_GetAllWidgetsOfClass",
+      "explicit_defaults": [
+        {
+          "parameter": "toplevelonly",
+          "value": "true"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "GetAllWidgetsWithInterface",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_GetAllWidgetsWithInterface",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "GetBrushResource",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_GetBrushResource",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "GetBrushResourceAsMaterial",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_GetBrushResourceAsMaterial",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "GetBrushResourceAsTexture2D",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_GetBrushResourceAsTexture2D",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "GetDragDroppingContent",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_GetDragDroppingContent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "GetDynamicMaterial",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_GetDynamicMaterial",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
       "function": "GetInputEventFromCharacterEvent",
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_GetInputEventFromCharacterEvent",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -1807,8 +4881,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_GetInputEventFromKeyEvent",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -1818,8 +4891,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_GetInputEventFromNavigationEvent",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -1829,8 +4901,7 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_GetInputEventFromPointerEvent",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -1840,8 +4911,17 @@
       "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
       "alias": "ue_ui_GetKeyEventFromAnalogInputEvent",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "GetSafeZonePadding",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_GetSafeZonePadding",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -1856,6 +4936,16 @@
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "IsDragDropping",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_IsDragDropping",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
       "function": "LockMouse",
       "surface": "library",
       "construction_unsafe": false,
@@ -1864,6 +4954,64 @@
       "explicit_defaults": [],
       "status": "generation_blocked",
       "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "MakeBrushFromAsset",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_MakeBrushFromAsset",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "MakeBrushFromMaterial",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_MakeBrushFromMaterial",
+      "explicit_defaults": [
+        {
+          "parameter": "width",
+          "value": "32"
+        },
+        {
+          "parameter": "height",
+          "value": "32"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "MakeBrushFromTexture",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_MakeBrushFromTexture",
+      "explicit_defaults": [
+        {
+          "parameter": "width",
+          "value": "0"
+        },
+        {
+          "parameter": "height",
+          "value": "0"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "NoResourceBrush",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_NoResourceBrush",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -1896,6 +5044,131 @@
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "RestorePreviousWindowTitleBarState",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_RestorePreviousWindowTitleBarState",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetBrushResourceToMaterial",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetBrushResourceToMaterial",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetBrushResourceToTexture",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetBrushResourceToTexture",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetColorVisionDeficiencyType",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetColorVisionDeficiencyType",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetFocusToGameViewport",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetFocusToGameViewport",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetHardwareCursor",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetHardwareCursor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetInputMode_GameAndUIEx",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetInputMode_GameAndUIEx",
+      "explicit_defaults": [
+        {
+          "parameter": "inwidgettofocus",
+          "value": "None"
+        },
+        {
+          "parameter": "inmouselockmode",
+          "value": "DoNotLock"
+        },
+        {
+          "parameter": "bhidecursorduringcapture",
+          "value": "true"
+        },
+        {
+          "parameter": "bflushinput",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetInputMode_GameOnly",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetInputMode_GameOnly",
+      "explicit_defaults": [
+        {
+          "parameter": "bflushinput",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetInputMode_UIOnlyEx",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetInputMode_UIOnlyEx",
+      "explicit_defaults": [
+        {
+          "parameter": "inwidgettofocus",
+          "value": "None"
+        },
+        {
+          "parameter": "inmouselockmode",
+          "value": "DoNotLock"
+        },
+        {
+          "parameter": "bflushinput",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
       "function": "SetMousePosition",
       "surface": "library",
       "construction_unsafe": false,
@@ -1923,6 +5196,36 @@
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetWindowTitleBarCloseButtonActive",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetWindowTitleBarCloseButtonActive",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetWindowTitleBarOnCloseClickedDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetWindowTitleBarOnCloseClickedDelegate",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetWindowTitleBarState",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetWindowTitleBarState",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
       "function": "Unhandled",
       "surface": "library",
       "construction_unsafe": false,
@@ -1945,6 +5248,46 @@
     },
     {
       "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "GetDesignTimeInfo",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_GetDesignTimeInfo",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "GetMousePositionOnPlatform",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_GetMousePositionOnPlatform",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "GetMousePositionOnViewport",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_GetMousePositionOnViewport",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "GetMousePositionScaledByDPI",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_GetMousePositionScaledByDPI",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
       "function": "GetPlayerScreenWidgetGeometry",
       "surface": "library",
       "construction_unsafe": false,
@@ -1956,6 +5299,26 @@
     },
     {
       "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "GetViewportScale",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_GetViewportScale",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "GetViewportSize",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_GetViewportSize",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
       "function": "GetViewportWidgetGeometry",
       "surface": "library",
       "construction_unsafe": false,
@@ -1964,6 +5327,174 @@
       "explicit_defaults": [],
       "status": "generation_blocked",
       "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "ProjectWorldLocationToWidgetPosition",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_ProjectWorldLocationToWidgetPosition",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "RemoveAllWidgets",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_RemoveAllWidgets",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsBorderSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsBorderSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsCanvasSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsCanvasSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsGridSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsGridSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsHorizontalBoxSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsHorizontalBoxSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsOverlaySlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsOverlaySlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsSafeBoxSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsSafeBoxSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsScaleBoxSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsScaleBoxSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsScrollBoxSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsScrollBoxSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsSizeBoxSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsSizeBoxSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsStackBoxSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsStackBoxSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsUniformGridSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsUniformGridSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsVerticalBoxSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsVerticalBoxSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsWidgetSwitcherSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsWidgetSwitcherSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "SlotAsWrapBoxSlot",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_SlotAsWrapBoxSlot",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     }
-  ]
+  ],
+  "preflight": {
+    "runtime_probe": "passed",
+    "build_mode": "Editor NullRHI",
+    "packaged": "not_run",
+    "game_world": true,
+    "compile": "passed",
+    "profile_sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa"
+  }
 }

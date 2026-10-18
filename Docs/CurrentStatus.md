@@ -746,3 +746,21 @@ InputEvent содержит borrowed EventPath; PointerEvent pressed keys — ow
 fresh export и anchors/hash checks — PASS; build/PIE/packaged не запускались.
 Docs/InputEventTransportContract.md, Docs/UMGInputBlockers.md; runner
 Scripts/AuditUMGInput.ps1, logs/umg-input-audit-validation.json. Без коммита.
+
+
+### Реализованы owned input events и 33 функции
+
+Шесть opaque типов UEInputEvent/KeyEvent/AnalogInputEvent/CharacterEvent/
+PointerEvent/NavigationEvent подключены к existing rooted snapshot table и
+checked scalar call frames. Capture обнуляет собственный EventPath и сохраняет
+native данные/owned pressed keys; generic reflected storage/defaults закрыты.
+Exact allowlist и exporter/generator attestation открывают 33 ordinary функции.
+Три navigation calls и DetectDragIfPressed теперь explicit execution-contract
+отказы. UMG: 366 ready (+33), 114 export blocked, 37 generation blocked.
+Пакет установлен и проверен обычным require. 38 native/runtime checks,
+33 exercised functions, 3 compile-time token refusals и 122 Python checks — PASS.
+Подтверждены реальные path widget release, globals/arrays/clone/GC, reload и
+context cleanup; DLL hashes стабильны, engine errors/ensure нет. Без полного
+Foundation/PIE/packaged и коммита. Docs/InputEvents.md; runner
+Scripts/TestInputEvents.ps1; logs/input-events-validation.json.
+Следующее: Geometry/EventReply и отдельный synchronous UserWidget bridge.

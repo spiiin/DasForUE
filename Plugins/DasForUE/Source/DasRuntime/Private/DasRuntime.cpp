@@ -53,6 +53,8 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "InputActionValue.h"
+#include "DasInputEvents.h"
+#include "Input/Events.h"
 #include "DasEnhancedInputProxy.h"
 #include "Components/SceneComponent.h"
 #include "Components/InputComponent.h"
@@ -200,6 +202,24 @@ struct FDasStructValue {uint64 Token=0;};
 MAKE_TYPE_FACTORY(UEStructValue,FDasStructValue);
 namespace das{template<>struct cast<FDasStructValue>{static vec4f from(FDasStructValue V){return cast<uint64_t>::from(V.Token);}static FDasStructValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
 // Owned numeric snapshot, not the unreflected native layout and not a context token.
+struct FDasInputEventValue { uint64 Token=0; };
+MAKE_TYPE_FACTORY(UEInputEvent,FDasInputEventValue);
+namespace das{template<>struct cast<FDasInputEventValue>{static vec4f from(FDasInputEventValue V){return cast<uint64_t>::from(V.Token);}static FDasInputEventValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
+struct FDasKeyEventValue { uint64 Token=0; };
+MAKE_TYPE_FACTORY(UEKeyEvent,FDasKeyEventValue);
+namespace das{template<>struct cast<FDasKeyEventValue>{static vec4f from(FDasKeyEventValue V){return cast<uint64_t>::from(V.Token);}static FDasKeyEventValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
+struct FDasAnalogInputEventValue { uint64 Token=0; };
+MAKE_TYPE_FACTORY(UEAnalogInputEvent,FDasAnalogInputEventValue);
+namespace das{template<>struct cast<FDasAnalogInputEventValue>{static vec4f from(FDasAnalogInputEventValue V){return cast<uint64_t>::from(V.Token);}static FDasAnalogInputEventValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
+struct FDasCharacterEventValue { uint64 Token=0; };
+MAKE_TYPE_FACTORY(UECharacterEvent,FDasCharacterEventValue);
+namespace das{template<>struct cast<FDasCharacterEventValue>{static vec4f from(FDasCharacterEventValue V){return cast<uint64_t>::from(V.Token);}static FDasCharacterEventValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
+struct FDasPointerEventValue { uint64 Token=0; };
+MAKE_TYPE_FACTORY(UEPointerEvent,FDasPointerEventValue);
+namespace das{template<>struct cast<FDasPointerEventValue>{static vec4f from(FDasPointerEventValue V){return cast<uint64_t>::from(V.Token);}static FDasPointerEventValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
+struct FDasNavigationEventValue { uint64 Token=0; };
+MAKE_TYPE_FACTORY(UENavigationEvent,FDasNavigationEventValue);
+namespace das{template<>struct cast<FDasNavigationEventValue>{static vec4f from(FDasNavigationEventValue V){return cast<uint64_t>::from(V.Token);}static FDasNavigationEventValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
 struct FDasInputActionValue { double X=0,Y=0,Z=0; int32 Kind=0; };
 MAKE_TYPE_FACTORY(InputActionValue,FDasInputActionValue);
 MAKE_TYPE_FACTORY(UEVector2D,FVector2D);
@@ -562,7 +582,7 @@ namespace
     struct FStructRootWalker:das::DataWalker {
         TSet<uint64> Tokens,DelegateTokens;bool Complete=true;
         virtual void beforeStructureField(char*,das::StructInfo*,char* Data,das::VarInfo* Info,bool)override{if(Info && Info->name && das::string(Info->name)=="__delegate_token" && Info->type==das::Type::tUInt64)DelegateTokens.Add(*reinterpret_cast<uint64*>(Data));}
-        virtual bool canVisitHandle(char* Data,das::TypeInfo* Info) override {auto* A=Info->getAnnotation();if(A && (A->name=="UEStructValue" || A->name=="UEHitResult" || A->name=="UEConstraintHandle"))Tokens.Add(*reinterpret_cast<const uint64*>(Data));return false;}
+        virtual bool canVisitHandle(char* Data,das::TypeInfo* Info) override {auto* A=Info->getAnnotation();if(A && (A->name=="UEStructValue" || A->name=="UEHitResult" || A->name=="UEConstraintHandle" || A->name=="UEInputEvent" || A->name=="UEKeyEvent" || A->name=="UEAnalogInputEvent" || A->name=="UECharacterEvent" || A->name=="UEPointerEvent" || A->name=="UENavigationEvent"))Tokens.Add(*reinterpret_cast<const uint64*>(Data));return false;}
     };
     bool CollectStructValues(FUnrealDasContext& C,const das::LineInfo* At,bool Boundary=false)
     {
@@ -596,7 +616,8 @@ namespace
     // Borrowed snapshots copy only on insertion. Owned temporaries transfer their
     // buffer after validation/deduplication; all routes share one token counter.
     uint64 NextStructValueToken=1;
-    FDasStructValue StoreStructValueImpl(const FInstancedStruct& V,FInstancedStruct* Owned,das::Context* C,das::LineInfoArg* At){if(C!=ActiveContext || !ActiveContext)C->throw_error("struct requires active context");FString Error;if(!ValidateDasStructSnapshot(V,Error))C->throw_error(TCHAR_TO_UTF8(*Error));if(!MathSnapshotValid(V))C->throw_error("invalid math snapshot value");for(const auto& P:ActiveContext->StructValues)if(IdenticalDasStructSnapshot(P.Value,V))return {P.Key};if(At && ActiveContext->StructValues.Num()>=ActiveContext->StructNextCollection)CollectStructValues(*ActiveContext,At);if(ActiveContext->StructValues.Num()>=4096)C->throw_error("struct value table limit exceeded");uint64 Token=NextStructValueToken++;if(Owned)ActiveContext->StructValues.Add(Token,MoveTemp(*Owned));else ActiveContext->StructValues.Add(Token,V);return {Token};}
+    FDasStructValue StoreInputEvent(const UScriptStruct*,const void*,das::Context*,das::LineInfoArg*);
+    FDasStructValue StoreStructValueImpl(const FInstancedStruct& V,FInstancedStruct* Owned,das::Context* C,das::LineInfoArg* At){if(C!=ActiveContext || !ActiveContext)C->throw_error("struct requires active context");if(DasIsInputEventType(V.GetScriptStruct()))return StoreInputEvent(V.GetScriptStruct(),V.GetMemory(),C,At);FString Error;if(!ValidateDasStructSnapshot(V,Error))C->throw_error(TCHAR_TO_UTF8(*Error));if(!MathSnapshotValid(V))C->throw_error("invalid math snapshot value");for(const auto& P:ActiveContext->StructValues)if(IdenticalDasStructSnapshot(P.Value,V))return {P.Key};if(At && ActiveContext->StructValues.Num()>=ActiveContext->StructNextCollection)CollectStructValues(*ActiveContext,At);if(ActiveContext->StructValues.Num()>=4096)C->throw_error("struct value table limit exceeded");uint64 Token=NextStructValueToken++;if(Owned)ActiveContext->StructValues.Add(Token,MoveTemp(*Owned));else ActiveContext->StructValues.Add(Token,V);return {Token};}
     FDasStructValue StoreStructValue(const FInstancedStruct& V,das::Context* C,das::LineInfoArg* At=nullptr){return StoreStructValueImpl(V,nullptr,C,At);}
     FDasStructValue StoreStructValue(FInstancedStruct&& V,das::Context* C,das::LineInfoArg* At=nullptr){return StoreStructValueImpl(V,&V,C,At);}
     const FInstancedStruct& ResolveStructValue(FDasStructValue V,das::Context* C){if(C!=ActiveContext || !ActiveContext)C->throw_error("struct requires active context");if(const auto* Edit=ActiveContext->StructEdits.Find(V.Token)){if((*Edit)->Poisoned)C->throw_error("snapshot edit was invalidated by a failed write");return (*Edit)->Value;}const auto* S=ActiveContext->StructValues.Find(V.Token);if(!S)C->throw_error("struct is null or belongs to another context");return *S;}
@@ -854,6 +875,7 @@ namespace
     void PublishFrameRotator(int32 I,const FRotator& X,das::Context* C){FDasScalarValue V;V.Kind=10;V.RotatorValue=X;PublishFrameValue(I,MoveTemp(V),C);}
     void PublishFrameTransform(int32 I,const FTransform& X,das::Context* C){FDasScalarValue V;V.Kind=11;V.TransformValue=X;PublishFrameValue(I,MoveTemp(V),C);}
     FDelegateHandle RuntimePreExitHandle;
+    thread_local bool InputSnapshotDispatch=false;
     bool VerifyContract(const das::ProgramPtr& Program,const FString& Entry,const FDasCallContract& C,bool AllowNativeInputValue=false)
     {
         if(C.Inputs.Num()>16 || ((static_cast<uint8>(C.ReturnKind)>13 && C.ReturnKind!=EDasMethodSignature::Class && C.ReturnKind!=EDasMethodSignature::Delegate && C.ReturnKind!=EDasMethodSignature::Byte && C.ReturnKind!=EDasMethodSignature::Text) || C.ReturnKind==EDasMethodSignature::Frame)) return false;
@@ -868,7 +890,9 @@ namespace
             auto* P=A->arguments.find("path",das::Type::tString);return P && C.ReturnKind==EDasMethodSignature::Void && C.Inputs.Num()==1 && C.Inputs[0]==EDasMethodSignature::Struct && C.InputClasses.Num()==1 && C.InputClasses[0]==UTF8_TO_TCHAR(P->sValue.c_str()) && FindDasCallbackFrame(C.InputClasses[0]);
         }
         bool Objects=C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Object || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum;for(auto K:C.Inputs)Objects |= K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Object || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum;
-        {bool Found=false,Valid=true;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St){for(auto* A:St->annotations)if(A->annotation->name=="ue_class" || A->annotation->name=="ue_library"){auto* Wire=A->arguments.find("_ue_model_json",das::Type::tString);FDasAuthoringModule M;FString Error;if(!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire->sValue.c_str()),M,Error)){Valid=false;continue;}for(const auto& Cl:M.Classes)for(const auto& Method:Cl.Methods)if(Method.EntryPoint==Entry){FDasClassSchema Schema;if(!M.ToActorSchema(Cl.Id,Schema,Error)){Valid=false;continue;}for(const auto& S:Schema.Methods)if(S.EntryPoint==Entry){Found=true;Valid &= S.Contract()==C;}}}});if(!Valid)return false;if(!Found){if(!C.InputDirections.IsEmpty())return false;if(C.ReturnKind==EDasMethodSignature::Class || C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum)return false;for(auto K:C.Inputs)if(K==EDasMethodSignature::Class || K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum)return false;if(C.ReturnKind==EDasMethodSignature::Object && C.ReturnClass!=TEXT("/Script/CoreUObject.Object"))return false;for(int32 I=0;I<C.Inputs.Num();++I)if(C.Inputs[I]==EDasMethodSignature::Object && (!C.InputClasses.IsValidIndex(I) || C.InputClasses[I]!=TEXT("/Script/CoreUObject.Object")))return false;}}
+        {bool Found=false,Valid=true;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St){for(auto* A:St->annotations)if(A->annotation->name=="ue_class" || A->annotation->name=="ue_library"){auto* Wire=A->arguments.find("_ue_model_json",das::Type::tString);FDasAuthoringModule M;FString Error;if(!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire->sValue.c_str()),M,Error)){Valid=false;continue;}for(const auto& Cl:M.Classes)for(const auto& Method:Cl.Methods)if(Method.EntryPoint==Entry){FDasClassSchema Schema;if(!M.ToActorSchema(Cl.Id,Schema,Error)){Valid=false;continue;}for(const auto& S:Schema.Methods)if(S.EntryPoint==Entry){Found=true;Valid &= S.Contract()==C;}}}});if(!Valid)return false;if(!Found){if(InputSnapshotDispatch && (C.ReturnKind==EDasMethodSignature::Int || C.ReturnKind==EDasMethodSignature::Void) && C.InputDirections.IsEmpty() && !C.Inputs.IsEmpty() && C.Inputs.Num()==C.InputClasses.Num()){
+                bool Safe=true;for(int32 I=0;I<C.Inputs.Num();++I)Safe &= C.Inputs[I]==EDasMethodSignature::Struct && DasIsInputEventType(FindObject<UScriptStruct>(nullptr,*C.InputClasses[I]));if(Safe)return true;
+            }if(!C.InputDirections.IsEmpty())return false;if(C.ReturnKind==EDasMethodSignature::Class || C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum)return false;for(auto K:C.Inputs)if(K==EDasMethodSignature::Class || K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum)return false;if(C.ReturnKind==EDasMethodSignature::Object && C.ReturnClass!=TEXT("/Script/CoreUObject.Object"))return false;for(int32 I=0;I<C.Inputs.Num();++I)if(C.Inputs[I]==EDasMethodSignature::Object && (!C.InputClasses.IsValidIndex(I) || C.InputClasses[I]!=TEXT("/Script/CoreUObject.Object")))return false;}}
         return true;
     }
     int32 GetSelfInt(const char* Name, das::Context* Context)
@@ -1204,6 +1228,7 @@ void AuthoredSetobject(const FDasObjectHandle& H,const char* Id,const char* Name
     }
 
     void ValidateConstraintCallInputs(FMarshalledCall&,das::Context*);
+    void ValidateInputEventCallInputs(FMarshalledCall&,das::Context*);
     void CaptureConstraintCallOutput(FMarshalledCall&,das::Context*);
     #include "DasMarshalling.inl"
     // Legacy scalar adapters use the same checked frame and dispatch scope as
@@ -1760,6 +1785,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     #include "DasDSL.inl"
     #include "DasGameplayServices.inl"
     #include "DasInputActionValue.inl"
+    #include "DasInputEventsRuntime.inl"
     #include "DasHitResultTransport.inl"
     #include "DasConstraintTransport.inl"
     struct FHitResultValueAnnotation:FMathValueAnnotation<FDasHitResultValue>{
@@ -1809,6 +1835,30 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             addAnnotation(new FObjectHandleAnnotation(Library));addAnnotation(new FClassHandleAnnotation(Library));
             addAnnotation(new FTraceHitAnnotation(Library));
             addAnnotation(new FCallHandleAnnotation(Library));
+            addAnnotation(new TInputEventAnnotation<FDasInputEventValue>("UEInputEvent",Library,"FDasInputEventValue"));
+            AddUEExtern<DAS_BIND_FUN(ArgumentInputEvent)>(*this,Library,"__ue_arg_inputevent",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(ResultInputEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_result_inputevent",das::SideEffects::modifyExternal)->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(InputFromInputEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_unpack_inputevent",das::SideEffects::accessExternal);
+            addAnnotation(new TInputEventAnnotation<FDasKeyEventValue>("UEKeyEvent",Library,"FDasKeyEventValue"));
+            AddUEExtern<DAS_BIND_FUN(ArgumentKeyEvent)>(*this,Library,"__ue_arg_keyevent",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(ResultKeyEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_result_keyevent",das::SideEffects::modifyExternal)->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(InputFromKeyEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_unpack_keyevent",das::SideEffects::accessExternal);
+            addAnnotation(new TInputEventAnnotation<FDasAnalogInputEventValue>("UEAnalogInputEvent",Library,"FDasAnalogInputEventValue"));
+            AddUEExtern<DAS_BIND_FUN(ArgumentAnalogInputEvent)>(*this,Library,"__ue_arg_analoginputevent",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(ResultAnalogInputEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_result_analoginputevent",das::SideEffects::modifyExternal)->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(InputFromAnalogInputEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_unpack_analoginputevent",das::SideEffects::accessExternal);
+            addAnnotation(new TInputEventAnnotation<FDasCharacterEventValue>("UECharacterEvent",Library,"FDasCharacterEventValue"));
+            AddUEExtern<DAS_BIND_FUN(ArgumentCharacterEvent)>(*this,Library,"__ue_arg_characterevent",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(ResultCharacterEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_result_characterevent",das::SideEffects::modifyExternal)->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(InputFromCharacterEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_unpack_characterevent",das::SideEffects::accessExternal);
+            addAnnotation(new TInputEventAnnotation<FDasPointerEventValue>("UEPointerEvent",Library,"FDasPointerEventValue"));
+            AddUEExtern<DAS_BIND_FUN(ArgumentPointerEvent)>(*this,Library,"__ue_arg_pointerevent",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(ResultPointerEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_result_pointerevent",das::SideEffects::modifyExternal)->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(InputFromPointerEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_unpack_pointerevent",das::SideEffects::accessExternal);
+            addAnnotation(new TInputEventAnnotation<FDasNavigationEventValue>("UENavigationEvent",Library,"FDasNavigationEventValue"));
+            AddUEExtern<DAS_BIND_FUN(ArgumentNavigationEvent)>(*this,Library,"__ue_arg_navigationevent",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(ResultNavigationEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_result_navigationevent",das::SideEffects::modifyExternal)->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(InputFromNavigationEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_unpack_navigationevent",das::SideEffects::accessExternal);
             addAnnotation(new FInputActionValueAnnotation(Library));
             AddUEExtern<DAS_BIND_FUN(PackInputValue),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_math_pack_input_value",das::SideEffects::modifyExternal,"PackInputValue")->needCallerStackFrame=true;
             AddUEExtern<DAS_BIND_FUN(UnpackInputValue),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_math_unpack_input_value",das::SideEffects::accessExternal,"UnpackInputValue");
@@ -2493,7 +2543,7 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
         TWeakObjectPtr<UWorld> World;
         FString Path;
         FSourceSet AttemptedSources;
-        TMap<FString,FDasCallContract> RequiredEntries;TSet<FString> NativeInputEntries;
+        TMap<FString,FDasCallContract> RequiredEntries;TSet<FString> NativeInputEntries,InputSnapshotEntries;
         FString ApprovedDSLDeclaration;
         bool bDefaultsUpdateApproved=false;FString AttemptedEntry;FDasCallContract AttemptedContract;
         TUniquePtr<FCompiledContext> Live;
@@ -3122,6 +3172,12 @@ int32 FDasRuntimeModule::PersistentContextCount(const UWorld* World) const
     return Count;
 }
 
+FDasExecutionResult FDasRuntimeModule::DispatchInputEventSnapshots(const FString& Path,const FString& Entry,const TArray<FInstancedStruct>& Values,TWeakObjectPtr<UObject> Self){
+ FDasExecutionResult Rejected;if(Values.IsEmpty() || Values.Num()>16){Rejected.Error=TEXT("input snapshot dispatch requires 1..16 detached values");return Rejected;}
+ TArray<FDasScalarValue> Args;for(const auto& V:Values){FString Error;if(!ValidateDasInputEventSnapshot(V,Error)){Rejected.Error=Error;return Rejected;}FDasScalarValue A;A.Kind=12;A.ObjectClass=V.GetScriptStruct()->GetPathName();A.StructValue=V;Args.Add(MoveTemp(A));}
+ TGuardValue<bool> Scope(InputSnapshotDispatch,true);return RunNamedFramePersistent(Path,Entry,Args,EDasMethodSignature::Int,Self);
+}
+
 FDasExecutionResult FDasRuntimeModule::RunNamedFramePersistent(const FString& Path,const FString& Entry,const TArray<FDasScalarValue>& Args,EDasMethodSignature ResultKind,TWeakObjectPtr<UObject> Self,const FString& ReturnClass)
 {return RunCallback(Path,EDasCallback::Main,0,0.f,Self,Entry,ResultKind,&Args,ReturnClass);}
 FDasExecutionResult FDasRuntimeModule::RunNamedFloatPersistent(const FString& Path,const FString& Entry,float Input,TWeakObjectPtr<UObject> Self)
@@ -3224,7 +3280,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     if(Frame){bool Objects=false;for(const auto& V:*Frame)Objects |= V.Kind==15 || V.Kind==8 || V.Kind==12 || V.Kind==13 || V.Kind==16;
         if(Objects)for(const auto& V:*Frame){const FString PathClass=(V.Kind==12 || V.Kind==13 || V.Kind==15 || V.Kind==16)?V.ObjectClass:V.Kind==8?(V.ObjectClass.IsEmpty()?TEXT("/Script/CoreUObject.Object"):V.ObjectClass):FString();Expected.InputClasses.Add(PathClass);if(V.Kind==15){if(!FrameClassMatches(V.ClassValue.Get(),PathClass)){Result.Error=TEXT("Class argument has wrong base or is obsolete");return Result;}if(V.ClassValue)ObjectPins.Emplace(V.ClassValue.Get());}if(V.Kind==8){UClass* Class=FindObject<UClass>(nullptr,*PathClass);UObject* Object=V.ObjectValue.Get();if(!Class || (Object && (!IsValid(Object) || !DasReferenceMatches(Object,Class) || (Object->IsA<AActor>() && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))){Result.Error=TEXT("Object argument is expired or has wrong class");return Result;}if(Object)ObjectPins.Emplace(Object);}}
     }
-    if(Frame)for(const auto& V:*Frame)if(V.Kind==12){FString E;if(!V.StructValue.IsValid() || V.StructValue.GetScriptStruct()->GetPathName()!=V.ObjectClass || !ValidateDasStructSnapshot(V.StructValue,E)){Result.Error=TEXT("Invalid reflected struct input: ")+E;return Result;}}
+    if(Frame)for(const auto& V:*Frame)if(V.Kind==12){FString E;if(!V.StructValue.IsValid() || V.StructValue.GetScriptStruct()->GetPathName()!=V.ObjectClass || !(DasIsInputEventType(V.StructValue.GetScriptStruct())?ValidateDasInputEventSnapshot(V.StructValue,E):ValidateDasStructSnapshot(V.StructValue,E))){Result.Error=TEXT("Invalid reflected struct input: ")+E;return Result;}}
     if(Signature==EDasMethodSignature::Delegate){Expected.ReturnClass=ReturnClass;FString E;TStrongObjectPtr<UFunction> Sig(MakeDasSingleDelegateSignature(ReturnClass,E));if(!Sig){Result.Error=E;return Result;}}
     if(Signature==EDasMethodSignature::Enum){Expected.ReturnClass=ReturnClass;FString E;if(!ResolveDasEnum(ReturnClass,E)){Result.Error=E;return Result;}}
     if(Frame)for(const auto& V:*Frame)if(V.Kind==13){FString E;if(!ValidateDasEnumNumber(V.ObjectClass,V.IntValue,E)){Result.Error=E;return Result;}}
@@ -3333,6 +3389,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     if (CandidateError.IsEmpty())
                         for (const auto& Required:Session->RequiredEntries)
                         {
+                            TGuardValue<bool> SnapshotContractScope(InputSnapshotDispatch,InputSnapshotDispatch || Session->InputSnapshotEntries.Contains(Required.Key));
                             const FTCHARToUTF8 RequiredUtf8(*Required.Key);
                             auto* RequiredFunction=Candidate->Context->findFunction(RequiredUtf8.Get());
                             if (!RequiredFunction || !VerifyContract(Candidate->Program,Required.Key,Required.Value,Session->NativeInputEntries.Contains(Required.Key)))
@@ -3458,7 +3515,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             Function=Context.findFunction(EntryUtf8.Get());
             if (!Function || !VerifyContract(Session->Live->Program,EntryPoint,Expected))
             { Result.Error=TEXT("Expected exported ")+EntryPoint+TEXT(" with requested scalar signature.");return Result; }
-            Session->RequiredEntries.Add(EntryPoint,Expected);
+            Session->RequiredEntries.Add(EntryPoint,Expected);if(InputSnapshotDispatch)Session->InputSnapshotEntries.Add(EntryPoint);
         }
         else if (Event == EDasCallback::Tick) Function = Session->Live->Tick;
         else if (Event == EDasCallback::EndPlay)

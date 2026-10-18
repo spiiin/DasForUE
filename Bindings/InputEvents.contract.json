@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "status": "implemented_detached_snapshots",
+  "engine_version": "5.8.3-0+UE5",
+  "transport_id": "slate_input_event_snapshot_v1",
+  "native_types": [
+    "/Script/SlateCore.AnalogInputEvent",
+    "/Script/SlateCore.CharacterEvent",
+    "/Script/SlateCore.InputEvent",
+    "/Script/SlateCore.KeyEvent",
+    "/Script/SlateCore.NavigationEvent",
+    "/Script/SlateCore.PointerEvent"
+  ],
+  "implementation_changes_coverage": true,
+  "ownership": {
+    "representation": "immutable host-owned tagged native snapshot; no native addresses or layout in DAS",
+    "capture": "copy exact supported native event type; detach before original callback returns",
+    "detach_strategy": "native type-preserving derived copy clears its own protected EventPath, then UE CopyScriptStruct stores the native value; original remains unchanged",
+    "event_path": "always_null_in_detached_native_copy",
+    "memcpy_native_layout": false,
+    "pressed_buttons": "native TSet<FKey> deep value copy, not a borrowed view",
+    "copy": "copy/clone and base projections retain detached ownership; no pointers into caller stack",
+    "storage": "DAS local/global/array handles share an immutable owned value in the existing per-context rooted snapshot table; callback/path/widget may expire, context must remain alive",
+    "reflection_storage": "ue_property, defaults and JSON serialization deferred until separately implemented",
+    "identity": "exact UScriptStruct paths and payload kind; no structural lookalikes, pointer or integer constructors",
+    "default": "invalid snapshot; native dispatch must reject uninitialized or wrong-kind input"
+  },
+  "preserved_data": {
+    "common": [
+      "modifier state including left/right and caps lock",
+      "repeat",
+      "original UserIndex",
+      "InputDeviceId identity",
+      "uint64 native event timestamp"
+    ],
+    "key": [
+      "FKey",
+      "character code",
+      "key code"
+    ],
+    "analog": [
+      "key payload",
+      "analog value"
+    ],
+    "character": [
+      "native TCHAR code unit (not assumed to be a full Unicode scalar)"
+    ],
+    "pointer": [
+      "screen/last/cursor vectors",
+      "owned pressed keys",
+      "effecting key",
+      "pointer index",
+      "touchpad index if available",
+      "touch force and flags",
+      "wheel/gesture vector, type, phase, inversion"
+    ],
+    "navigation": [
+      "navigation type",
+      "navigation genesis"
+    ]
+  },
+  "validation": {
+    "capture": "game thread, outside frozen physics; trusted native capture or validated call-frame result",
+    "finite": "reject nonfinite analog, positions, cursor/gesture/wheel deltas and touch force; do not silently clamp",
+    "precision": "capture/storage/reconstruction preserve uint32 indices and uint64 timestamp; existing reflected legacy getters keep their declared int32 result semantics",
+    "bounds": "maximum 256 pressed keys per snapshot; reject overflow before allocation and publication",
+    "transaction": "validate and stage result before publishing; no partial snapshot/call outputs on failure",
+    "native_calls": "exact function allowlist + kind/direction checks + existing execution-role/context guards"
+  },
+  "navigation": {
+    "ordinary_snapshot_dispatch": false,
+    "reason": "live Slate navigation config; analog query mutates per-user repeat timing",
+    "next_contract": "separate synchronous live-event adapter, initialized Slate, current weak widget/user, session/revision and callback epoch; define replay/repeat semantics before enabling",
+    "frozen_or_expired": "reject before native dispatch; no manual debug flag authorization"
+  },
+  "ui_callbacks": {
+    "implemented_by_this_contract": false,
+    "queue_reply_callbacks": false,
+    "reply": "UserWidget reply-returning overrides need a synchronous bridge; observing a detached event may be queued but cannot decide original event routing later",
+    "lifecycle": "live capability invalid at callback exit/error/reload/destroy; owned detached data remains readable",
+    "missing_reply": "when future bridge is implemented, failure/missing handler returns native Unhandled, never an old reply"
+  },
+  "forbidden": [
+    "GetWindow",
+    "FindGeometry",
+    "GetEventPath",
+    "SetEventPath",
+    "SWidget/SWindow/FWidgetPath exposure",
+    "replay event injection from stored snapshot",
+    "arbitrary native event methods",
+    "generic untyped native blob transport"
+  ],
+  "projections": {
+    "allowed": [
+      "KeyEvent -> InputEvent",
+      "AnalogInputEvent -> KeyEvent",
+      "CharacterEvent -> InputEvent",
+      "PointerEvent -> InputEvent",
+      "NavigationEvent -> InputEvent"
+    ],
+    "semantics": "explicit native-compatible value slicing, detached output, no implicit downcast"
+  },
+  "separate_contracts": {
+    "geometry": "owned native transform value, finite/invertibility checks and stale layout semantics; separate from events",
+    "event_reply": "routing commands with weak widget targets, same synchronous callback epoch; cannot serialize or reuse across events",
+    "paint_context": "borrows draw list, geometry/style and layer state; scope-only paint capability, not a value snapshot",
+    "widget_animation_handle": "weak animation state, may expire even when handle IsValid; owner/revision-aware adapter required"
+  },
+  "snapshot_function_allowlist": [
+    "/Script/Engine.KismetInputLibrary.GetAnalogValue",
+    "/Script/Engine.KismetInputLibrary.GetKey",
+    "/Script/Engine.KismetInputLibrary.GetUserIndex",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsAltDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsCommandDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsControlDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsLeftAltDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsLeftCommandDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsLeftControlDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsLeftShiftDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsRepeat",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsRightAltDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsRightCommandDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsRightControlDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsRightShiftDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsShiftDown",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetCursorDelta",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetEffectingButton",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetGestureDelta",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetGestureType",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetLastScreenSpacePosition",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetPointerIndex",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetScreenSpacePosition",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetTouchpadIndex",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetUserIndex",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetWheelDelta",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_IsMouseButtonDown",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_IsTouchEvent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetInputEventFromCharacterEvent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetInputEventFromKeyEvent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetInputEventFromNavigationEvent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetInputEventFromPointerEvent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetKeyEventFromAnalogInputEvent"
+  ],
+  "deferred_navigation_functions": [
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationActionFromKey",
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationDirectionFromAnalog",
+    "/Script/Engine.KismetInputLibrary.Key_GetNavigationDirectionFromKey"
+  ],
+  "evidence": "Bindings/Packages/ue_api_umg_input.audit.json",
+  "note": "Implemented owned data transport and exact ordinary function allowlist; this file documents the implementation and deferred contracts, it is not runtime configuration.",
+  "native_observer": "FDasRuntimeModule.DispatchInputEventSnapshots: detached trusted native values only, UEStructValue inputs and int observer result; not Slate replay or UserWidget override",
+  "coverage": {
+    "previous_ready": 333,
+    "current_ready": 366,
+    "opened": 33,
+    "export_blocked": 114,
+    "generation_blocked": 37,
+    "moved_to_execution_contract_rejection": 4
+  },
+  "safety_requirements": [
+    "native copy detaches EventPath without modifying source",
+    "all six kinds retain original metadata and owned pressed keys",
+    "destroy original path/widget, then read clone/array/base projection under GC",
+    "wrong kind/default/foreign context fail before dispatch",
+    "nonfinite data and excessive pressed keys reject atomically",
+    "navigation queries remain blocked outside live contract",
+    "generated input/out/return directions, conversion functions and result ownership",
+    "ordinary detached functions agree with native getters",
+    "reload/Destroy invalidates live capabilities but not already detached data"
+  ],
+  "validation_evidence": {
+    "report": "logs/input-events-validation.json",
+    "runtime_checks": 38,
+    "generated_functions_exercised": 33,
+    "compile_time_token_rejections": 3,
+    "python_tests": 122,
+    "full_suites": "not_run",
+    "PIE": "not_run",
+    "packaged": "not_run",
+    "physical_input": "not_run",
+    "UserWidget_reply_routing": "not_implemented"
+  }
+}

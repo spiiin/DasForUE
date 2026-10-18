@@ -6,6 +6,8 @@ require ue_foundation public
 struct UEName { value : string }
 def ue_name(value : string) : UEName { return UEName(value = value) }
 
+require ue_input_events public
+
 require ue_input_value public
 
 require ue_native_delegate public
@@ -1117,6 +1119,46 @@ def E_EMouseLockMode_2cbaa146_from_symbol(value : string) : E_EMouseLockMode_2cb
     if (value == "LockInFullscreen") { return E_EMouseLockMode_2cbaa146.v_LockInFullscreen }
     panic("unknown enum result; regenerate bindings")
     return E_EMouseLockMode_2cbaa146.v_DoNotLock
+}
+
+enum E_ESlateGesture_2bc39bcf {
+    v_None
+    v_Scroll
+    v_Magnify
+    v_Swipe
+    v_Rotate
+    v_LongPress
+    v_Pan
+    v_Tap
+    v_Flick
+}
+
+def E_ESlateGesture_2bc39bcf_to_symbol(value : E_ESlateGesture_2bc39bcf) : string {
+    if (value == E_ESlateGesture_2bc39bcf.v_None) { return "None" }
+    if (value == E_ESlateGesture_2bc39bcf.v_Scroll) { return "Scroll" }
+    if (value == E_ESlateGesture_2bc39bcf.v_Magnify) { return "Magnify" }
+    if (value == E_ESlateGesture_2bc39bcf.v_Swipe) { return "Swipe" }
+    if (value == E_ESlateGesture_2bc39bcf.v_Rotate) { return "Rotate" }
+    if (value == E_ESlateGesture_2bc39bcf.v_LongPress) { return "LongPress" }
+    if (value == E_ESlateGesture_2bc39bcf.v_Pan) { return "Pan" }
+    if (value == E_ESlateGesture_2bc39bcf.v_Tap) { return "Tap" }
+    if (value == E_ESlateGesture_2bc39bcf.v_Flick) { return "Flick" }
+    panic("invalid generated enum value")
+    return ""
+}
+
+def E_ESlateGesture_2bc39bcf_from_symbol(value : string) : E_ESlateGesture_2bc39bcf {
+    if (value == "None") { return E_ESlateGesture_2bc39bcf.v_None }
+    if (value == "Scroll") { return E_ESlateGesture_2bc39bcf.v_Scroll }
+    if (value == "Magnify") { return E_ESlateGesture_2bc39bcf.v_Magnify }
+    if (value == "Swipe") { return E_ESlateGesture_2bc39bcf.v_Swipe }
+    if (value == "Rotate") { return E_ESlateGesture_2bc39bcf.v_Rotate }
+    if (value == "LongPress") { return E_ESlateGesture_2bc39bcf.v_LongPress }
+    if (value == "Pan") { return E_ESlateGesture_2bc39bcf.v_Pan }
+    if (value == "Tap") { return E_ESlateGesture_2bc39bcf.v_Tap }
+    if (value == "Flick") { return E_ESlateGesture_2bc39bcf.v_Flick }
+    panic("unknown enum result; regenerate bindings")
+    return E_ESlateGesture_2bc39bcf.v_None
 }
 
 enum E_EWindowTitleBarMode_694e7f5d {
@@ -2973,12 +3015,45 @@ def ue_input_key_EqualEqual_KeyKey(arg_a : S_Key_a8a0a14c; arg_b : S_Key_a8a0a14
     return result
 }
 
+def ue_input_key_GetAnalogValue(arg_input : UEAnalogInputEvent) : float {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "GetAnalogValue", "")
+    ue_expect_signature(call, "v1;GetAnalogValue;Input:StructProperty:134218114:/Script/SlateCore.AnalogInputEvent\{\};ReturnValue:FloatProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_analoginputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_float(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_GetKey(arg_input : UEKeyEvent) : S_Key_a8a0a14c {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "GetKey", "")
+    ue_expect_signature(call, "v1;GetKey;Input:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:StructProperty:1408:/Script/InputCore.Key\{KeyName:NameProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_keyevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = S_Key_a8a0a14c(f_keyname = UEName(value = ue_result_name(call, "returnvalue.keyname")))
+    ue_release_call(call)
+    return result
+}
+
 def ue_input_key_GetModifierKeysState() : S_SlateModifierKeysState_586c3eb8 {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "GetModifierKeysState", "")
     ue_expect_signature(call, "v1;GetModifierKeysState;ReturnValue:StructProperty:1408:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
     let result = S_SlateModifierKeysState_586c3eb8(f_modifierkeysstatemask = uint8(ue_result_byte(call, "returnvalue.modifierkeysstatemask")))
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_GetUserIndex(arg_input : UEKeyEvent) : int {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "GetUserIndex", "")
+    ue_expect_signature(call, "v1;GetUserIndex;Input:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:IntProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_keyevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_int(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -2994,6 +3069,149 @@ def ue_input_key_InputChord_GetDisplayName(arg_key : S_InputChord_72a2a539) : UE
     ue_arg_bool(call, "key.bcmd", arg_key.f_bcmd)
     ue_invoke_call(call)
     let result = __ue_method_result_text(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsAltDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsAltDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsAltDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsCommandDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsCommandDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsCommandDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsControlDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsControlDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsControlDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsLeftAltDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsLeftAltDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsLeftAltDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsLeftCommandDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsLeftCommandDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsLeftCommandDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsLeftControlDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsLeftControlDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsLeftControlDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsLeftShiftDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsLeftShiftDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsLeftShiftDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsRepeat(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsRepeat", "")
+    ue_expect_signature(call, "v1;InputEvent_IsRepeat;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsRightAltDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsRightAltDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsRightAltDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsRightCommandDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsRightCommandDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsRightCommandDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsRightControlDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsRightControlDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsRightControlDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsRightShiftDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsRightShiftDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsRightShiftDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_InputEvent_IsShiftDown(arg_input : UEInputEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsShiftDown", "")
+    ue_expect_signature(call, "v1;InputEvent_IsShiftDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_inputevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -3169,6 +3387,139 @@ def ue_input_key_ModifierKeysState_IsShiftDown(arg_keysstate : S_SlateModifierKe
     ue_expect_signature(call, "v1;ModifierKeysState_IsShiftDown;KeysState:StructProperty:134218114:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
     ue_arg_byte(call, "keysstate.modifierkeysstatemask", int(arg_keysstate.f_modifierkeysstatemask))
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_GetCursorDelta(arg_input : UEPointerEvent) : UEVector2D {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetCursorDelta", "")
+    ue_expect_signature(call, "v1;PointerEvent_GetCursorDelta;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_GetEffectingButton(arg_input : UEPointerEvent) : S_Key_a8a0a14c {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetEffectingButton", "")
+    ue_expect_signature(call, "v1;PointerEvent_GetEffectingButton;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/InputCore.Key\{KeyName:NameProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = S_Key_a8a0a14c(f_keyname = UEName(value = ue_result_name(call, "returnvalue.keyname")))
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_GetGestureDelta(arg_input : UEPointerEvent) : UEVector2D {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetGestureDelta", "")
+    ue_expect_signature(call, "v1;PointerEvent_GetGestureDelta;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_GetGestureType(arg_input : UEPointerEvent) : E_ESlateGesture_2bc39bcf {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetGestureType", "")
+    ue_expect_signature(call, "v1;PointerEvent_GetGestureType;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:EnumProperty:1408:/Script/Engine.ESlateGesture;")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = E_ESlateGesture_2bc39bcf_from_symbol(ue_result_enum(call, "returnvalue", "/Script/Engine.ESlateGesture"))
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_GetLastScreenSpacePosition(arg_input : UEPointerEvent) : UEVector2D {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetLastScreenSpacePosition", "")
+    ue_expect_signature(call, "v1;PointerEvent_GetLastScreenSpacePosition;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_GetPointerIndex(arg_input : UEPointerEvent) : int {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetPointerIndex", "")
+    ue_expect_signature(call, "v1;PointerEvent_GetPointerIndex;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:IntProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_int(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_GetScreenSpacePosition(arg_input : UEPointerEvent) : UEVector2D {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetScreenSpacePosition", "")
+    ue_expect_signature(call, "v1;PointerEvent_GetScreenSpacePosition;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_GetTouchpadIndex(arg_input : UEPointerEvent) : int {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetTouchpadIndex", "")
+    ue_expect_signature(call, "v1;PointerEvent_GetTouchpadIndex;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:IntProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_int(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_GetUserIndex(arg_input : UEPointerEvent) : int {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetUserIndex", "")
+    ue_expect_signature(call, "v1;PointerEvent_GetUserIndex;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:IntProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_int(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_GetWheelDelta(arg_input : UEPointerEvent) : float {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetWheelDelta", "")
+    ue_expect_signature(call, "v1;PointerEvent_GetWheelDelta;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:FloatProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_invoke_call(call)
+    let result = ue_result_float(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_IsMouseButtonDown(arg_input : UEPointerEvent; arg_mousebutton : S_Key_a8a0a14c) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_IsMouseButtonDown", "")
+    ue_expect_signature(call, "v1;PointerEvent_IsMouseButtonDown;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};MouseButton:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
+    ue_arg_name(call, "mousebutton.keyname", arg_mousebutton.f_keyname.value)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_input_key_PointerEvent_IsTouchEvent(arg_input : UEPointerEvent) : bool {
+    let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_IsTouchEvent", "")
+    ue_expect_signature(call, "v1;PointerEvent_IsTouchEvent;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "input", arg_input)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
     ue_release_call(call)
@@ -4570,6 +4921,61 @@ def ue_ui_GetDynamicMaterial(arg_brush : S_SlateBrush_e5037ad8) : ue_ui_GetDynam
     ue_arg_name(call, "brush.resourcename", arg_brush.f_resourcename.value)
     ue_invoke_call(call)
     let result = ue_ui_GetDynamicMaterial_Result(out_brush = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.tintcolor.specifiedcolor.r"), f_g = ue_result_float(call, "brush.tintcolor.specifiedcolor.g"), f_b = ue_result_float(call, "brush.tintcolor.specifiedcolor.b"), f_a = ue_result_float(call, "brush.tintcolor.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "brush.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "brush.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "brush.imagesize.x"), f_y = ue_result_float(call, "brush.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "brush.margin.left"), f_top = ue_result_float(call, "brush.margin.top"), f_right = ue_result_float(call, "brush.margin.right"), f_bottom = ue_result_float(call, "brush.margin.bottom")), f_tint = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.tint.r"), f_g = ue_result_float(call, "brush.tint.g"), f_b = ue_result_float(call, "brush.tint.b"), f_a = ue_result_float(call, "brush.tint.a")), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "brush.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "brush.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "brush.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "brush.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "brush.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.r"), f_g = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.g"), f_b = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.b"), f_a = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "brush.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "brush.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.min.x"), f_y = ue_result_float(call, "brush.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.max.x"), f_y = ue_result_float(call, "brush.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "brush.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "brush.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "brush.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "brush.resourcename"))), out_returnvalue = C_MaterialInstanceDynamic_65b20eca_from(ue_result_object(call, "returnvalue")))
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_GetInputEventFromCharacterEvent(arg_event : UECharacterEvent) : UEInputEvent {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetInputEventFromCharacterEvent", "")
+    ue_expect_signature(call, "v1;GetInputEventFromCharacterEvent;Event:StructProperty:134218114:/Script/SlateCore.CharacterEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_characterevent(call, "event", arg_event)
+    ue_invoke_call(call)
+    let result = __ue_result_inputevent(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_GetInputEventFromKeyEvent(arg_event : UEKeyEvent) : UEInputEvent {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetInputEventFromKeyEvent", "")
+    ue_expect_signature(call, "v1;GetInputEventFromKeyEvent;Event:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_keyevent(call, "event", arg_event)
+    ue_invoke_call(call)
+    let result = __ue_result_inputevent(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_GetInputEventFromNavigationEvent(arg_event : UENavigationEvent) : UEInputEvent {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetInputEventFromNavigationEvent", "")
+    ue_expect_signature(call, "v1;GetInputEventFromNavigationEvent;Event:StructProperty:134218114:/Script/SlateCore.NavigationEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_navigationevent(call, "event", arg_event)
+    ue_invoke_call(call)
+    let result = __ue_result_inputevent(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_GetInputEventFromPointerEvent(arg_event : UEPointerEvent) : UEInputEvent {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetInputEventFromPointerEvent", "")
+    ue_expect_signature(call, "v1;GetInputEventFromPointerEvent;Event:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_pointerevent(call, "event", arg_event)
+    ue_invoke_call(call)
+    let result = __ue_result_inputevent(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_GetKeyEventFromAnalogInputEvent(arg_event : UEAnalogInputEvent) : UEKeyEvent {
+    let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetKeyEventFromAnalogInputEvent", "")
+    ue_expect_signature(call, "v1;GetKeyEventFromAnalogInputEvent;Event:StructProperty:134218114:/Script/SlateCore.AnalogInputEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.KeyEvent\{\};")
+    ue_require_call_context(call, false)
+    __ue_arg_analoginputevent(call, "event", arg_event)
+    ue_invoke_call(call)
+    let result = __ue_result_keyevent(call, "returnvalue")
     ue_release_call(call)
     return result
 }

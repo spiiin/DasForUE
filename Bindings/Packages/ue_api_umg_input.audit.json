@@ -1,0 +1,1807 @@
+{
+  "schema_version": 1,
+  "state": "audit_passed_contract_only",
+  "package": "ue_api_umg_input",
+  "engine_version": "5.8.3-0+UE5",
+  "counts": {
+    "generation_ready": 366,
+    "export_blocked": 114,
+    "generation_blocked": 37,
+    "policy_excluded": 0
+  },
+  "generation_failures": 37,
+  "partition": {
+    "event_reply": 11,
+    "geometry": 17,
+    "paint_context": 5,
+    "widget_animation_handle": 4
+  },
+  "ready_functions": [
+    "/Script/Engine.InputSettings.AddActionMapping",
+    "/Script/Engine.InputSettings.AddAxisMapping",
+    "/Script/Engine.InputSettings.ForceRebuildKeymaps",
+    "/Script/Engine.InputSettings.GetActionMappingByName",
+    "/Script/Engine.InputSettings.GetActionNames",
+    "/Script/Engine.InputSettings.GetAxisMappingByName",
+    "/Script/Engine.InputSettings.GetAxisNames",
+    "/Script/Engine.InputSettings.GetInputSettings",
+    "/Script/Engine.InputSettings.RemoveActionMapping",
+    "/Script/Engine.InputSettings.RemoveAxisMapping",
+    "/Script/Engine.InputSettings.SaveKeyMappings",
+    "/Script/Engine.KismetInputLibrary.CalibrateTilt",
+    "/Script/Engine.KismetInputLibrary.EqualEqual_InputChordInputChord",
+    "/Script/Engine.KismetInputLibrary.EqualEqual_KeyKey",
+    "/Script/Engine.KismetInputLibrary.GetAnalogValue",
+    "/Script/Engine.KismetInputLibrary.GetKey",
+    "/Script/Engine.KismetInputLibrary.GetModifierKeysState",
+    "/Script/Engine.KismetInputLibrary.GetUserIndex",
+    "/Script/Engine.KismetInputLibrary.InputChord_GetDisplayName",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsAltDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsCommandDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsControlDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsLeftAltDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsLeftCommandDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsLeftControlDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsLeftShiftDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsRepeat",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsRightAltDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsRightCommandDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsRightControlDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsRightShiftDown",
+    "/Script/Engine.KismetInputLibrary.InputEvent_IsShiftDown",
+    "/Script/Engine.KismetInputLibrary.Key_GetDisplayName",
+    "/Script/Engine.KismetInputLibrary.Key_IsAnalog",
+    "/Script/Engine.KismetInputLibrary.Key_IsAxis1D",
+    "/Script/Engine.KismetInputLibrary.Key_IsAxis2D",
+    "/Script/Engine.KismetInputLibrary.Key_IsAxis3D",
+    "/Script/Engine.KismetInputLibrary.Key_IsButtonAxis",
+    "/Script/Engine.KismetInputLibrary.Key_IsDigital",
+    "/Script/Engine.KismetInputLibrary.Key_IsGamepadKey",
+    "/Script/Engine.KismetInputLibrary.Key_IsKeyboardKey",
+    "/Script/Engine.KismetInputLibrary.Key_IsModifierKey",
+    "/Script/Engine.KismetInputLibrary.Key_IsMouseButton",
+    "/Script/Engine.KismetInputLibrary.Key_IsValid",
+    "/Script/Engine.KismetInputLibrary.ModifierKeysState_IsAltDown",
+    "/Script/Engine.KismetInputLibrary.ModifierKeysState_IsCommandDown",
+    "/Script/Engine.KismetInputLibrary.ModifierKeysState_IsControlDown",
+    "/Script/Engine.KismetInputLibrary.ModifierKeysState_IsShiftDown",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetCursorDelta",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetEffectingButton",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetGestureDelta",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetGestureType",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetLastScreenSpacePosition",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetPointerIndex",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetScreenSpacePosition",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetTouchpadIndex",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetUserIndex",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_GetWheelDelta",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_IsMouseButtonDown",
+    "/Script/Engine.KismetInputLibrary.PointerEvent_IsTouchEvent",
+    "/Script/EnhancedInput.EnhancedInputLibrary.BreakInputActionValue",
+    "/Script/EnhancedInput.EnhancedInputLibrary.Conv_InputActionValueToString",
+    "/Script/EnhancedInput.EnhancedInputLibrary.Conv_TriggerEventValueToString",
+    "/Script/EnhancedInput.EnhancedInputLibrary.FlushPlayerInput",
+    "/Script/EnhancedInput.EnhancedInputLibrary.GetMappingName",
+    "/Script/EnhancedInput.EnhancedInputLibrary.GetPlayerMappableKeySettings",
+    "/Script/EnhancedInput.EnhancedInputLibrary.IsActionKeyMappingPlayerMappable",
+    "/Script/EnhancedInput.EnhancedInputLibrary.MakeInputActionValueOfType",
+    "/Script/EnhancedInput.EnhancedInputLibrary.RequestRebuildControlMappingsUsingContext",
+    "/Script/EnhancedInput.EnhancedInputWorldSubsystem.AddActorInputComponent",
+    "/Script/EnhancedInput.EnhancedInputWorldSubsystem.RemoveActorInputComponent",
+    "/Script/EnhancedInput.InputMappingContext.MapKey",
+    "/Script/EnhancedInput.InputMappingContext.UnmapAll",
+    "/Script/EnhancedInput.InputMappingContext.UnmapAllKeysFromAction",
+    "/Script/EnhancedInput.InputMappingContext.UnmapKey",
+    "/Script/UMG.Button.IsPressed",
+    "/Script/UMG.Button.SetAllowDragDrop",
+    "/Script/UMG.Button.SetBackgroundColor",
+    "/Script/UMG.Button.SetClickMethod",
+    "/Script/UMG.Button.SetColorAndOpacity",
+    "/Script/UMG.Button.SetPressMethod",
+    "/Script/UMG.Button.SetStyle",
+    "/Script/UMG.Button.SetTouchMethod",
+    "/Script/UMG.CanvasPanel.AddChildToCanvas",
+    "/Script/UMG.CanvasPanelSlot.GetAlignment",
+    "/Script/UMG.CanvasPanelSlot.GetAnchors",
+    "/Script/UMG.CanvasPanelSlot.GetAutoSize",
+    "/Script/UMG.CanvasPanelSlot.GetLayout",
+    "/Script/UMG.CanvasPanelSlot.GetOffsets",
+    "/Script/UMG.CanvasPanelSlot.GetPosition",
+    "/Script/UMG.CanvasPanelSlot.GetSize",
+    "/Script/UMG.CanvasPanelSlot.GetZOrder",
+    "/Script/UMG.CanvasPanelSlot.SetAlignment",
+    "/Script/UMG.CanvasPanelSlot.SetAnchors",
+    "/Script/UMG.CanvasPanelSlot.SetAutoSize",
+    "/Script/UMG.CanvasPanelSlot.SetLayout",
+    "/Script/UMG.CanvasPanelSlot.SetOffsets",
+    "/Script/UMG.CanvasPanelSlot.SetPosition",
+    "/Script/UMG.CanvasPanelSlot.SetSize",
+    "/Script/UMG.CanvasPanelSlot.SetZOrder",
+    "/Script/UMG.ContentWidget.GetContent",
+    "/Script/UMG.ContentWidget.GetContentSlot",
+    "/Script/UMG.ContentWidget.SetContent",
+    "/Script/UMG.EditableTextBox.ClearError",
+    "/Script/UMG.EditableTextBox.GetText",
+    "/Script/UMG.EditableTextBox.HasError",
+    "/Script/UMG.EditableTextBox.SetError",
+    "/Script/UMG.EditableTextBox.SetForegroundColor",
+    "/Script/UMG.EditableTextBox.SetHintText",
+    "/Script/UMG.EditableTextBox.SetIsPassword",
+    "/Script/UMG.EditableTextBox.SetIsReadOnly",
+    "/Script/UMG.EditableTextBox.SetJustification",
+    "/Script/UMG.EditableTextBox.SetText",
+    "/Script/UMG.EditableTextBox.SetTextOverflowPolicy",
+    "/Script/UMG.Image.GetDynamicMaterial",
+    "/Script/UMG.Image.SetBrush",
+    "/Script/UMG.Image.SetBrushFromAsset",
+    "/Script/UMG.Image.SetBrushFromAtlasInterface",
+    "/Script/UMG.Image.SetBrushFromMaterial",
+    "/Script/UMG.Image.SetBrushFromTexture",
+    "/Script/UMG.Image.SetBrushFromTextureDynamic",
+    "/Script/UMG.Image.SetBrushResourceObject",
+    "/Script/UMG.Image.SetBrushTintColor",
+    "/Script/UMG.Image.SetColorAndOpacity",
+    "/Script/UMG.Image.SetDesiredSizeOverride",
+    "/Script/UMG.Image.SetOpacity",
+    "/Script/UMG.InputKeySelector.GetIsSelectingKey",
+    "/Script/UMG.InputKeySelector.SetAllowGamepadKeys",
+    "/Script/UMG.InputKeySelector.SetAllowModifierKeys",
+    "/Script/UMG.InputKeySelector.SetEscapeKeys",
+    "/Script/UMG.InputKeySelector.SetKeySelectionText",
+    "/Script/UMG.InputKeySelector.SetNoKeySpecifiedText",
+    "/Script/UMG.InputKeySelector.SetSelectedKey",
+    "/Script/UMG.InputKeySelector.SetTextBlockVisibility",
+    "/Script/UMG.PanelWidget.AddChild",
+    "/Script/UMG.PanelWidget.ClearChildren",
+    "/Script/UMG.PanelWidget.GetAllChildren",
+    "/Script/UMG.PanelWidget.GetChildAt",
+    "/Script/UMG.PanelWidget.GetChildIndex",
+    "/Script/UMG.PanelWidget.GetChildrenCount",
+    "/Script/UMG.PanelWidget.HasAnyChildren",
+    "/Script/UMG.PanelWidget.HasChild",
+    "/Script/UMG.PanelWidget.RemoveChild",
+    "/Script/UMG.PanelWidget.RemoveChildAt",
+    "/Script/UMG.ProgressBar.SetFillColorAndOpacity",
+    "/Script/UMG.ProgressBar.SetIsMarquee",
+    "/Script/UMG.ProgressBar.SetPercent",
+    "/Script/UMG.ScrollBox.EndInertialScrolling",
+    "/Script/UMG.ScrollBox.GetAnalogMouseWheelKey",
+    "/Script/UMG.ScrollBox.GetConsumePointerInput",
+    "/Script/UMG.ScrollBox.GetIsFocusable",
+    "/Script/UMG.ScrollBox.GetIsScrolling",
+    "/Script/UMG.ScrollBox.GetOverscrollOffset",
+    "/Script/UMG.ScrollBox.GetOverscrollPercentage",
+    "/Script/UMG.ScrollBox.GetScrollOffset",
+    "/Script/UMG.ScrollBox.GetScrollOffsetOfEnd",
+    "/Script/UMG.ScrollBox.GetViewFraction",
+    "/Script/UMG.ScrollBox.GetViewOffsetFraction",
+    "/Script/UMG.ScrollBox.ScrollToEnd",
+    "/Script/UMG.ScrollBox.ScrollToStart",
+    "/Script/UMG.ScrollBox.ScrollWidgetIntoView",
+    "/Script/UMG.ScrollBox.SetAllowOverscroll",
+    "/Script/UMG.ScrollBox.SetAlwaysShowScrollbar",
+    "/Script/UMG.ScrollBox.SetAnalogMouseWheelKey",
+    "/Script/UMG.ScrollBox.SetAnimateWheelScrolling",
+    "/Script/UMG.ScrollBox.SetConsumeMouseWheel",
+    "/Script/UMG.ScrollBox.SetConsumePointerInput",
+    "/Script/UMG.ScrollBox.SetIsFocusable",
+    "/Script/UMG.ScrollBox.SetNavigationDestination",
+    "/Script/UMG.ScrollBox.SetOrientation",
+    "/Script/UMG.ScrollBox.SetScrollAnimationInterpolationSpeed",
+    "/Script/UMG.ScrollBox.SetScrollBarVisibility",
+    "/Script/UMG.ScrollBox.SetScrollOffset",
+    "/Script/UMG.ScrollBox.SetScrollWhenFocusChanges",
+    "/Script/UMG.ScrollBox.SetScrollbarPadding",
+    "/Script/UMG.ScrollBox.SetScrollbarThickness",
+    "/Script/UMG.ScrollBox.SetWheelScrollMultiplier",
+    "/Script/UMG.SlateBlueprintLibrary.AbsoluteToViewport",
+    "/Script/UMG.SlateBlueprintLibrary.EqualEqual_SlateBrush",
+    "/Script/UMG.SlateBlueprintLibrary.ScreenToViewport",
+    "/Script/UMG.SlateBlueprintLibrary.ScreenToWidgetAbsolute",
+    "/Script/UMG.Slider.GetNormalizedValue",
+    "/Script/UMG.Slider.GetValue",
+    "/Script/UMG.Slider.SetIndentHandle",
+    "/Script/UMG.Slider.SetLocked",
+    "/Script/UMG.Slider.SetMaxValue",
+    "/Script/UMG.Slider.SetMinValue",
+    "/Script/UMG.Slider.SetSliderBarColor",
+    "/Script/UMG.Slider.SetSliderHandleColor",
+    "/Script/UMG.Slider.SetStepSize",
+    "/Script/UMG.Slider.SetValue",
+    "/Script/UMG.TextBlock.GetDynamicFontMaterial",
+    "/Script/UMG.TextBlock.GetDynamicOutlineMaterial",
+    "/Script/UMG.TextBlock.GetFontSize",
+    "/Script/UMG.TextBlock.GetText",
+    "/Script/UMG.TextBlock.SetAutoWrapText",
+    "/Script/UMG.TextBlock.SetColorAndOpacity",
+    "/Script/UMG.TextBlock.SetFont",
+    "/Script/UMG.TextBlock.SetFontMaterial",
+    "/Script/UMG.TextBlock.SetFontOutlineMaterial",
+    "/Script/UMG.TextBlock.SetFontSize",
+    "/Script/UMG.TextBlock.SetMinDesiredWidth",
+    "/Script/UMG.TextBlock.SetOpacity",
+    "/Script/UMG.TextBlock.SetShadowColorAndOpacity",
+    "/Script/UMG.TextBlock.SetShadowOffset",
+    "/Script/UMG.TextBlock.SetStrikeBrush",
+    "/Script/UMG.TextBlock.SetText",
+    "/Script/UMG.TextBlock.SetTextOverflowPolicy",
+    "/Script/UMG.TextBlock.SetTextTransformPolicy",
+    "/Script/UMG.UserWidget.AddExtension",
+    "/Script/UMG.UserWidget.AddToPlayerScreen",
+    "/Script/UMG.UserWidget.AddToViewport",
+    "/Script/UMG.UserWidget.BindToAnimationEvent",
+    "/Script/UMG.UserWidget.BindToAnimationFinished",
+    "/Script/UMG.UserWidget.BindToAnimationStarted",
+    "/Script/UMG.UserWidget.CancelLatentActions",
+    "/Script/UMG.UserWidget.FlushAnimations",
+    "/Script/UMG.UserWidget.GetAlignmentInViewport",
+    "/Script/UMG.UserWidget.GetAnchorsInViewport",
+    "/Script/UMG.UserWidget.GetAnimationCurrentTime",
+    "/Script/UMG.UserWidget.GetExtension",
+    "/Script/UMG.UserWidget.GetExtensions",
+    "/Script/UMG.UserWidget.GetOrAddExtension",
+    "/Script/UMG.UserWidget.GetOwningPlayerCameraManager",
+    "/Script/UMG.UserWidget.GetOwningPlayerPawn",
+    "/Script/UMG.UserWidget.IsAnimationPlaying",
+    "/Script/UMG.UserWidget.IsAnimationPlayingForward",
+    "/Script/UMG.UserWidget.IsAnyAnimationPlaying",
+    "/Script/UMG.UserWidget.IsPlayingAnimation",
+    "/Script/UMG.UserWidget.PauseAnimation",
+    "/Script/UMG.UserWidget.QueuePauseAnimation",
+    "/Script/UMG.UserWidget.QueuePlayAnimation",
+    "/Script/UMG.UserWidget.QueuePlayAnimationForward",
+    "/Script/UMG.UserWidget.QueuePlayAnimationReverse",
+    "/Script/UMG.UserWidget.QueuePlayAnimationTimeRange",
+    "/Script/UMG.UserWidget.QueueStopAllAnimations",
+    "/Script/UMG.UserWidget.QueueStopAnimation",
+    "/Script/UMG.UserWidget.RemoveExtension",
+    "/Script/UMG.UserWidget.RemoveExtensions",
+    "/Script/UMG.UserWidget.ReverseAnimation",
+    "/Script/UMG.UserWidget.SetAlignmentInViewport",
+    "/Script/UMG.UserWidget.SetAnchorsInViewport",
+    "/Script/UMG.UserWidget.SetAnimationCurrentTime",
+    "/Script/UMG.UserWidget.SetColorAndOpacity",
+    "/Script/UMG.UserWidget.SetDesiredFocusWidget",
+    "/Script/UMG.UserWidget.SetDesiredSizeInViewport",
+    "/Script/UMG.UserWidget.SetForegroundColor",
+    "/Script/UMG.UserWidget.SetNumLoopsToPlay",
+    "/Script/UMG.UserWidget.SetOwningPlayer",
+    "/Script/UMG.UserWidget.SetPadding",
+    "/Script/UMG.UserWidget.SetPlaybackSpeed",
+    "/Script/UMG.UserWidget.SetPositionInViewport",
+    "/Script/UMG.UserWidget.StopAllAnimations",
+    "/Script/UMG.UserWidget.StopAnimation",
+    "/Script/UMG.UserWidget.StopAnimationsAndLatentActions",
+    "/Script/UMG.UserWidget.UnbindAllFromAnimationFinished",
+    "/Script/UMG.UserWidget.UnbindAllFromAnimationStarted",
+    "/Script/UMG.UserWidget.UnbindFromAnimationFinished",
+    "/Script/UMG.UserWidget.UnbindFromAnimationStarted",
+    "/Script/UMG.Widget.ForceLayoutPrepass",
+    "/Script/UMG.Widget.ForceVolatile",
+    "/Script/UMG.Widget.GetAccessibleSummaryText",
+    "/Script/UMG.Widget.GetAccessibleText",
+    "/Script/UMG.Widget.GetClipping",
+    "/Script/UMG.Widget.GetDesiredSize",
+    "/Script/UMG.Widget.GetGameInstance",
+    "/Script/UMG.Widget.GetIsEnabled",
+    "/Script/UMG.Widget.GetOwningLocalPlayer",
+    "/Script/UMG.Widget.GetOwningPlayer",
+    "/Script/UMG.Widget.GetParent",
+    "/Script/UMG.Widget.GetRenderOpacity",
+    "/Script/UMG.Widget.GetRenderTransformAngle",
+    "/Script/UMG.Widget.GetVisibility",
+    "/Script/UMG.Widget.HasAnyUserFocus",
+    "/Script/UMG.Widget.HasFocusedDescendants",
+    "/Script/UMG.Widget.HasKeyboardFocus",
+    "/Script/UMG.Widget.HasMouseCapture",
+    "/Script/UMG.Widget.HasMouseCaptureByUser",
+    "/Script/UMG.Widget.HasUserFocus",
+    "/Script/UMG.Widget.HasUserFocusedDescendants",
+    "/Script/UMG.Widget.InvalidateLayoutAndVolatility",
+    "/Script/UMG.Widget.IsHovered",
+    "/Script/UMG.Widget.IsInViewport",
+    "/Script/UMG.Widget.IsRendered",
+    "/Script/UMG.Widget.IsVisible",
+    "/Script/UMG.Widget.K2_AddFieldValueChangedDelegate",
+    "/Script/UMG.Widget.K2_BroadcastFieldValueChanged",
+    "/Script/UMG.Widget.K2_RemoveFieldValueChangedDelegate",
+    "/Script/UMG.Widget.RemoveFromParent",
+    "/Script/UMG.Widget.ResetCursor",
+    "/Script/UMG.Widget.SetAllNavigationRules",
+    "/Script/UMG.Widget.SetClipping",
+    "/Script/UMG.Widget.SetCursor",
+    "/Script/UMG.Widget.SetFocus",
+    "/Script/UMG.Widget.SetIsEnabled",
+    "/Script/UMG.Widget.SetKeyboardFocus",
+    "/Script/UMG.Widget.SetNavigationRuleBase",
+    "/Script/UMG.Widget.SetNavigationRuleCustom",
+    "/Script/UMG.Widget.SetNavigationRuleCustomBoundary",
+    "/Script/UMG.Widget.SetNavigationRuleExplicit",
+    "/Script/UMG.Widget.SetRenderOpacity",
+    "/Script/UMG.Widget.SetRenderScale",
+    "/Script/UMG.Widget.SetRenderShear",
+    "/Script/UMG.Widget.SetRenderTransform",
+    "/Script/UMG.Widget.SetRenderTransformAngle",
+    "/Script/UMG.Widget.SetRenderTransformPivot",
+    "/Script/UMG.Widget.SetRenderTranslation",
+    "/Script/UMG.Widget.SetToolTip",
+    "/Script/UMG.Widget.SetToolTipText",
+    "/Script/UMG.Widget.SetUserFocus",
+    "/Script/UMG.Widget.SetVisibility",
+    "/Script/UMG.Widget.SupportsKeyboardFocus",
+    "/Script/UMG.WidgetBlueprintLibrary.CancelDragDrop",
+    "/Script/UMG.WidgetBlueprintLibrary.DismissAllMenus",
+    "/Script/UMG.WidgetBlueprintLibrary.GetAllWidgetsOfClass",
+    "/Script/UMG.WidgetBlueprintLibrary.GetAllWidgetsWithInterface",
+    "/Script/UMG.WidgetBlueprintLibrary.GetBrushResource",
+    "/Script/UMG.WidgetBlueprintLibrary.GetBrushResourceAsMaterial",
+    "/Script/UMG.WidgetBlueprintLibrary.GetBrushResourceAsTexture2D",
+    "/Script/UMG.WidgetBlueprintLibrary.GetDragDroppingContent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetDynamicMaterial",
+    "/Script/UMG.WidgetBlueprintLibrary.GetInputEventFromCharacterEvent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetInputEventFromKeyEvent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetInputEventFromNavigationEvent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetInputEventFromPointerEvent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetKeyEventFromAnalogInputEvent",
+    "/Script/UMG.WidgetBlueprintLibrary.GetSafeZonePadding",
+    "/Script/UMG.WidgetBlueprintLibrary.IsDragDropping",
+    "/Script/UMG.WidgetBlueprintLibrary.MakeBrushFromAsset",
+    "/Script/UMG.WidgetBlueprintLibrary.MakeBrushFromMaterial",
+    "/Script/UMG.WidgetBlueprintLibrary.MakeBrushFromTexture",
+    "/Script/UMG.WidgetBlueprintLibrary.NoResourceBrush",
+    "/Script/UMG.WidgetBlueprintLibrary.RestorePreviousWindowTitleBarState",
+    "/Script/UMG.WidgetBlueprintLibrary.SetBrushResourceToMaterial",
+    "/Script/UMG.WidgetBlueprintLibrary.SetBrushResourceToTexture",
+    "/Script/UMG.WidgetBlueprintLibrary.SetColorVisionDeficiencyType",
+    "/Script/UMG.WidgetBlueprintLibrary.SetFocusToGameViewport",
+    "/Script/UMG.WidgetBlueprintLibrary.SetHardwareCursor",
+    "/Script/UMG.WidgetBlueprintLibrary.SetInputMode_GameAndUIEx",
+    "/Script/UMG.WidgetBlueprintLibrary.SetInputMode_GameOnly",
+    "/Script/UMG.WidgetBlueprintLibrary.SetInputMode_UIOnlyEx",
+    "/Script/UMG.WidgetBlueprintLibrary.SetWindowTitleBarCloseButtonActive",
+    "/Script/UMG.WidgetBlueprintLibrary.SetWindowTitleBarOnCloseClickedDelegate",
+    "/Script/UMG.WidgetBlueprintLibrary.SetWindowTitleBarState",
+    "/Script/UMG.WidgetLayoutLibrary.GetDesignTimeInfo",
+    "/Script/UMG.WidgetLayoutLibrary.GetMousePositionOnPlatform",
+    "/Script/UMG.WidgetLayoutLibrary.GetMousePositionOnViewport",
+    "/Script/UMG.WidgetLayoutLibrary.GetMousePositionScaledByDPI",
+    "/Script/UMG.WidgetLayoutLibrary.GetViewportScale",
+    "/Script/UMG.WidgetLayoutLibrary.GetViewportSize",
+    "/Script/UMG.WidgetLayoutLibrary.ProjectWorldLocationToWidgetPosition",
+    "/Script/UMG.WidgetLayoutLibrary.RemoveAllWidgets",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsBorderSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsCanvasSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsGridSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsHorizontalBoxSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsOverlaySlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsSafeBoxSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsScaleBoxSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsScrollBoxSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsSizeBoxSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsStackBoxSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsUniformGridSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsVerticalBoxSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsWidgetSwitcherSlot",
+    "/Script/UMG.WidgetLayoutLibrary.SlotAsWrapBoxSlot"
+  ],
+  "scoped_rejections": [
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_GetNavigationActionFromKey",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "status": "export_blocked",
+      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_GetNavigationDirectionFromAnalog",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "status": "export_blocked",
+      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "function": "Key_GetNavigationDirectionFromKey",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetInputLibrary",
+      "status": "export_blocked",
+      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "DetectDragIfPressed",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "status": "export_blocked",
+      "reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters\n"
+    }
+  ],
+  "opaque_types": [
+    {
+      "type_path": "/Script/SlateCore.Geometry",
+      "affected_functions": 17
+    },
+    {
+      "type_path": "/Script/UMG.EventReply",
+      "affected_functions": 11
+    },
+    {
+      "type_path": "/Script/UMG.PaintContext",
+      "affected_functions": 5
+    },
+    {
+      "type_path": "/Script/UMG.WidgetAnimationHandle",
+      "affected_functions": 4
+    }
+  ],
+  "input_scope": {
+    "standalone_functions": 0,
+    "detached_snapshot_candidates": 0,
+    "navigation_context_candidates": 0,
+    "cross_group_functions": []
+  },
+  "source_sha256": "e0ba053e565a13616ab6b502c13f8d47e0b2c7ded62cd6c4e0a7346eec1a3723",
+  "members": [
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "AbsoluteToLocal",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_AbsoluteToLocal",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "GetAbsoluteSize",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_GetAbsoluteSize",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "GetLocalSize",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_GetLocalSize",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "GetLocalTopLeft",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_GetLocalTopLeft",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "IsUnderLocation",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_IsUnderLocation",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "LocalToAbsolute",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_LocalToAbsolute",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "LocalToViewport",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_LocalToViewport",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "Scalar_AbsoluteToLocal",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_Scalar_AbsoluteToLocal",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "Scalar_LocalToAbsolute",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_Scalar_LocalToAbsolute",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "ScreenToWidgetLocal",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_ScreenToWidgetLocal",
+      "explicit_defaults": [
+        {
+          "parameter": "bincludewindowposition",
+          "value": "false"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "Vector_AbsoluteToLocal",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_Vector_AbsoluteToLocal",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "function": "Vector_LocalToAbsolute",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
+      "alias": "ue_ui_geometry_Vector_LocalToAbsolute",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "geometry",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": true,
+          "output": false,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "PlayAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_PlayAnimation",
+      "explicit_defaults": [
+        {
+          "parameter": "startattime",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "numloopstoplay",
+          "value": "1"
+        },
+        {
+          "parameter": "playmode",
+          "value": "Forward"
+        },
+        {
+          "parameter": "playbackspeed",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "brestorestate",
+          "value": "false"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "widget_animation_handle",
+      "required_groups": [
+        "widget_animation_handle"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.WidgetAnimationHandle",
+          "input": false,
+          "output": true,
+          "group": "widget_animation_handle"
+        }
+      ],
+      "planned_barrier": "separate_widget_animation_handle_contract"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "PlayAnimationForward",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_PlayAnimationForward",
+      "explicit_defaults": [
+        {
+          "parameter": "playbackspeed",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "brestorestate",
+          "value": "false"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "widget_animation_handle",
+      "required_groups": [
+        "widget_animation_handle"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.WidgetAnimationHandle",
+          "input": false,
+          "output": true,
+          "group": "widget_animation_handle"
+        }
+      ],
+      "planned_barrier": "separate_widget_animation_handle_contract"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "PlayAnimationReverse",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_PlayAnimationReverse",
+      "explicit_defaults": [
+        {
+          "parameter": "playbackspeed",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "brestorestate",
+          "value": "false"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "widget_animation_handle",
+      "required_groups": [
+        "widget_animation_handle"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.WidgetAnimationHandle",
+          "input": false,
+          "output": true,
+          "group": "widget_animation_handle"
+        }
+      ],
+      "planned_barrier": "separate_widget_animation_handle_contract"
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "function": "PlayAnimationTimeRange",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.UserWidget",
+      "alias": "ue_user_widget_PlayAnimationTimeRange",
+      "explicit_defaults": [
+        {
+          "parameter": "startattime",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "endattime",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "numloopstoplay",
+          "value": "1"
+        },
+        {
+          "parameter": "playmode",
+          "value": "Forward"
+        },
+        {
+          "parameter": "playbackspeed",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "brestorestate",
+          "value": "false"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "widget_animation_handle",
+      "required_groups": [
+        "widget_animation_handle"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.WidgetAnimationHandle",
+          "input": false,
+          "output": true,
+          "group": "widget_animation_handle"
+        }
+      ],
+      "planned_barrier": "separate_widget_animation_handle_contract"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetCachedGeometry",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetCachedGeometry",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": false,
+          "output": true,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetPaintSpaceGeometry",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetPaintSpaceGeometry",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": false,
+          "output": true,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.Widget",
+      "function": "GetTickSpaceGeometry",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.Widget",
+      "alias": "ue_widget_GetTickSpaceGeometry",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": false,
+          "output": true,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "CaptureMouse",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_CaptureMouse",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "reply",
+          "type_path": "/Script/UMG.EventReply",
+          "input": true,
+          "output": true,
+          "group": "event_reply"
+        },
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "ClearUserFocus",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_ClearUserFocus",
+      "explicit_defaults": [
+        {
+          "parameter": "binallusers",
+          "value": "false"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "reply",
+          "type_path": "/Script/UMG.EventReply",
+          "input": true,
+          "output": true,
+          "group": "event_reply"
+        },
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "DetectDrag",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_DetectDrag",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "reply",
+          "type_path": "/Script/UMG.EventReply",
+          "input": true,
+          "output": true,
+          "group": "event_reply"
+        },
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "DrawBox",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_DrawBox",
+      "explicit_defaults": [
+        {
+          "parameter": "tint",
+          "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "paint_context",
+      "required_groups": [
+        "paint_context"
+      ],
+      "fields": [
+        {
+          "path": "context",
+          "type_path": "/Script/UMG.PaintContext",
+          "input": true,
+          "output": true,
+          "group": "paint_context"
+        }
+      ],
+      "planned_barrier": "separate_paint_context_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "DrawLine",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_DrawLine",
+      "explicit_defaults": [
+        {
+          "parameter": "tint",
+          "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
+        },
+        {
+          "parameter": "bantialias",
+          "value": "true"
+        },
+        {
+          "parameter": "thickness",
+          "value": "1.000000"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "paint_context",
+      "required_groups": [
+        "paint_context"
+      ],
+      "fields": [
+        {
+          "path": "context",
+          "type_path": "/Script/UMG.PaintContext",
+          "input": true,
+          "output": true,
+          "group": "paint_context"
+        }
+      ],
+      "planned_barrier": "separate_paint_context_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "DrawLines",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_DrawLines",
+      "explicit_defaults": [
+        {
+          "parameter": "tint",
+          "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
+        },
+        {
+          "parameter": "bantialias",
+          "value": "true"
+        },
+        {
+          "parameter": "thickness",
+          "value": "1.000000"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "paint_context",
+      "required_groups": [
+        "paint_context"
+      ],
+      "fields": [
+        {
+          "path": "context",
+          "type_path": "/Script/UMG.PaintContext",
+          "input": true,
+          "output": true,
+          "group": "paint_context"
+        }
+      ],
+      "planned_barrier": "separate_paint_context_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "DrawSpline",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_DrawSpline",
+      "explicit_defaults": [
+        {
+          "parameter": "tint",
+          "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
+        },
+        {
+          "parameter": "thickness",
+          "value": "1.000000"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "paint_context",
+      "required_groups": [
+        "paint_context"
+      ],
+      "fields": [
+        {
+          "path": "context",
+          "type_path": "/Script/UMG.PaintContext",
+          "input": true,
+          "output": true,
+          "group": "paint_context"
+        }
+      ],
+      "planned_barrier": "separate_paint_context_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "DrawTextFormatted",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_DrawTextFormatted",
+      "explicit_defaults": [
+        {
+          "parameter": "fontsize",
+          "value": "16.000000"
+        },
+        {
+          "parameter": "fonttypeface",
+          "value": "Regular"
+        },
+        {
+          "parameter": "tint",
+          "value": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "paint_context",
+      "required_groups": [
+        "paint_context"
+      ],
+      "fields": [
+        {
+          "path": "context",
+          "type_path": "/Script/UMG.PaintContext",
+          "input": true,
+          "output": true,
+          "group": "paint_context"
+        }
+      ],
+      "planned_barrier": "separate_paint_context_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "EndDragDrop",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_EndDragDrop",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "reply",
+          "type_path": "/Script/UMG.EventReply",
+          "input": true,
+          "output": true,
+          "group": "event_reply"
+        },
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "Handled",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_Handled",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "LockMouse",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_LockMouse",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "reply",
+          "type_path": "/Script/UMG.EventReply",
+          "input": true,
+          "output": true,
+          "group": "event_reply"
+        },
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "ReleaseMouseCapture",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_ReleaseMouseCapture",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "reply",
+          "type_path": "/Script/UMG.EventReply",
+          "input": true,
+          "output": true,
+          "group": "event_reply"
+        },
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetMousePosition",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetMousePosition",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "reply",
+          "type_path": "/Script/UMG.EventReply",
+          "input": true,
+          "output": true,
+          "group": "event_reply"
+        },
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "SetUserFocus",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_SetUserFocus",
+      "explicit_defaults": [
+        {
+          "parameter": "binallusers",
+          "value": "false"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "reply",
+          "type_path": "/Script/UMG.EventReply",
+          "input": true,
+          "output": true,
+          "group": "event_reply"
+        },
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "Unhandled",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_Unhandled",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "function": "UnlockMouse",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
+      "alias": "ue_ui_UnlockMouse",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "event_reply",
+      "required_groups": [
+        "event_reply"
+      ],
+      "fields": [
+        {
+          "path": "reply",
+          "type_path": "/Script/UMG.EventReply",
+          "input": true,
+          "output": true,
+          "group": "event_reply"
+        },
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/UMG.EventReply",
+          "input": false,
+          "output": true,
+          "group": "event_reply"
+        }
+      ],
+      "planned_barrier": "separate_event_reply_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "GetPlayerScreenWidgetGeometry",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_GetPlayerScreenWidgetGeometry",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": false,
+          "output": true,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "function": "GetViewportWidgetGeometry",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
+      "alias": "ue_ui_layout_GetViewportWidgetGeometry",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "primary_group": "geometry",
+      "required_groups": [
+        "geometry"
+      ],
+      "fields": [
+        {
+          "path": "returnvalue",
+          "type_path": "/Script/SlateCore.Geometry",
+          "input": false,
+          "output": true,
+          "group": "geometry"
+        }
+      ],
+      "planned_barrier": "separate_geometry_contract"
+    }
+  ],
+  "runtime_transport_implemented": true,
+  "coverage_changed": false,
+  "implementation_evidence": {
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp": "9cf52b7adfd8ba61ca46aec7662a8ffb8572bdc73cf0ec06d02b75f11d052217",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasInputEventsRuntime.inl": "de4e0eec8d5bbaeea5f5d246d56019cf90fdaee3e1043a96e40f0e907321b740",
+    "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp": "26963f7ff69a71b942f596a0b9ea35cc3d715226c7a5b6c4a33c993e0efe788c",
+    "Plugins/DasForUE/Content/Das/Scripts/ue_input_events.das": "6ecfb94b57679c7019f1cfb05d93a28e71b0b90cb94fbb41c1783192067081de",
+    "Scripts/GenerateBindings.py": "ceaea6bc65a8be9140a53ac4989f0b53f90e388182eb956567e509fc88670791"
+  },
+  "native_evidence": {
+    "input_storage": {
+      "path": "Engine/Source/Runtime/SlateCore/Public/Input/Events.h",
+      "sha256": "7e534ed8373258f515d9f634741f8de9808b11bb7940ab662bcf6c41fe1147c1",
+      "anchors": [
+        {
+          "marker": "struct FInputEvent",
+          "line": 154
+        },
+        {
+          "marker": "const FWidgetPath* EventPath;",
+          "line": 408
+        },
+        {
+          "marker": "uint64 EventTimestamp;",
+          "line": 413
+        },
+        {
+          "marker": "TSet<FKey> PressedButtons;",
+          "line": 1135
+        },
+        {
+          "marker": "const TSet<FKey>& GetPressedButtons() const",
+          "line": 1114
+        },
+        {
+          "marker": "struct FKeyEvent : public FInputEvent",
+          "line": 430
+        },
+        {
+          "marker": "struct FAnalogInputEvent",
+          "line": 526
+        },
+        {
+          "marker": "struct FCharacterEvent",
+          "line": 604
+        },
+        {
+          "marker": "struct FPointerEvent",
+          "line": 693
+        },
+        {
+          "marker": "struct FNavigationEvent",
+          "line": 1254
+        }
+      ]
+    },
+    "path_dereference": {
+      "path": "Engine/Source/Runtime/SlateCore/Private/Input/Events.cpp",
+      "sha256": "39955fa911629718f0d572d970be8f4d5b244dd55f18b35abef4150156aa6598",
+      "anchors": [
+        {
+          "marker": "return EventPath->FindArrangedWidget",
+          "line": 22
+        },
+        {
+          "marker": "return EventPath->GetWindow();",
+          "line": 27
+        }
+      ]
+    },
+    "event_projections": {
+      "path": "Engine/Source/Runtime/UMG/Private/WidgetBlueprintLibrary.cpp",
+      "sha256": "6229bb54e725de53dcbec54c471c51af78a2951fac3dfae0c38b519f467dffe4",
+      "anchors": [
+        {
+          "marker": "FInputEvent UWidgetBlueprintLibrary::GetInputEventFromKeyEvent",
+          "line": 631
+        },
+        {
+          "marker": "FKeyEvent UWidgetBlueprintLibrary::GetKeyEventFromAnalogInputEvent",
+          "line": 636
+        },
+        {
+          "marker": "FInputEvent UWidgetBlueprintLibrary::GetInputEventFromCharacterEvent",
+          "line": 641
+        },
+        {
+          "marker": "FInputEvent UWidgetBlueprintLibrary::GetInputEventFromPointerEvent",
+          "line": 646
+        },
+        {
+          "marker": "FInputEvent UWidgetBlueprintLibrary::GetInputEventFromNavigationEvent",
+          "line": 651
+        }
+      ]
+    },
+    "navigation_policy": {
+      "path": "Engine/Source/Runtime/Slate/Private/Framework/Application/NavigationConfig.cpp",
+      "sha256": "2e5abc6be1b899c98ede483e5fca07a91959d4caa9d09dae0e4ea20dfa2a46c9",
+      "anchors": [
+        {
+          "marker": "EUINavigation FNavigationConfig::GetNavigationDirectionFromAnalog(",
+          "line": 83
+        },
+        {
+          "marker": "UserNavigationState.FindOrAdd",
+          "line": 90
+        },
+        {
+          "marker": "AnalogState.LastNavigationTime = CurrentTime;",
+          "line": 97
+        },
+        {
+          "marker": "AnalogState.Repeats++;",
+          "line": 98
+        }
+      ]
+    },
+    "navigation_dispatch": {
+      "path": "Engine/Source/Runtime/Engine/Private/KismetInputLibrary.cpp",
+      "sha256": "ef39802ad963412e742a94e0f3af532b4f1ef1a3ab023d191d0148756f14b90c",
+      "anchors": [
+        {
+          "marker": "EUINavigationAction UKismetInputLibrary::Key_GetNavigationActionFromKey",
+          "line": 114
+        },
+        {
+          "marker": "EUINavigation UKismetInputLibrary::Key_GetNavigationDirectionFromKey",
+          "line": 124
+        },
+        {
+          "marker": "EUINavigation UKismetInputLibrary::Key_GetNavigationDirectionFromAnalog",
+          "line": 134
+        },
+        {
+          "marker": "FSlateApplication::IsInitialized()",
+          "line": 105
+        }
+      ]
+    },
+    "paint_and_callbacks": {
+      "path": "Engine/Source/Runtime/UMG/Public/Blueprint/UserWidget.h",
+      "sha256": "4dc746ee00c41f01304b03a159cfd0693d3e30719c5697afb30f1a4ff819d636",
+      "anchors": [
+        {
+          "marker": "struct FPaintContext",
+          "line": 177
+        },
+        {
+          "marker": "FSlateWindowElementList& OutDrawElements;",
+          "line": 210
+        },
+        {
+          "marker": "const FWidgetStyle& WidgetStyle;",
+          "line": 212
+        },
+        {
+          "marker": "FEventReply OnKeyDown(",
+          "line": 629
+        },
+        {
+          "marker": "FEventReply OnMouseMove(",
+          "line": 693
+        }
+      ]
+    },
+    "reply": {
+      "path": "Engine/Source/Runtime/UMG/Public/Components/SlateWrapperTypes.h",
+      "sha256": "60dc1f49b7444a113f2e4d3818cd335453fd0b98068542f67fb435a9982c7162",
+      "anchors": [
+        {
+          "marker": "struct FEventReply",
+          "line": 128
+        },
+        {
+          "marker": "FReply NativeReply;",
+          "line": 141
+        }
+      ]
+    },
+    "geometry": {
+      "path": "Engine/Source/Runtime/SlateCore/Public/Layout/Geometry.h",
+      "sha256": "b857272e3567da9fce115710ff9f2e09abcba1e6ef781c8647ab15df4e9fa347",
+      "anchors": [
+        {
+          "marker": "struct FGeometry",
+          "line": 39
+        },
+        {
+          "marker": "FSlateRenderTransform AccumulatedRenderTransform;",
+          "line": 636
+        }
+      ]
+    },
+    "animation_handle": {
+      "path": "Engine/Source/Runtime/UMG/Public/Animation/WidgetAnimationHandle.h",
+      "sha256": "fef4af705282d66d9ba8f3a46c997cc5d008128f8cf5e3073a780d256ac09c7f",
+      "anchors": [
+        {
+          "marker": "struct FWidgetAnimationHandle",
+          "line": 21
+        },
+        {
+          "marker": "TWeakPtr<FWidgetAnimationState> WeakState;",
+          "line": 72
+        },
+        {
+          "marker": "A valid handle may still return a null animation state",
+          "line": 46
+        }
+      ]
+    }
+  },
+  "evidence": {
+    "profile": {
+      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\4d0575e4bbfa44a38b3881c8c76359ce\\profile.json",
+      "sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa"
+    },
+    "reflection": {
+      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\4d0575e4bbfa44a38b3881c8c76359ce\\reflection.json",
+      "sha256": "cb6aa07c0ec51a9f1a66fa6950cc57e349b8c57ded56b25916384e307753f581"
+    },
+    "report": {
+      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\4d0575e4bbfa44a38b3881c8c76359ce\\report.json",
+      "sha256": "4c3251c8367db158a3d1032a7997e8d618291ec395498266354ccf5612baea6d"
+    },
+    "summary": {
+      "path": "C:\\src\\DasForUE2\\Build\\UMGInputAudit\\4d0575e4bbfa44a38b3881c8c76359ce\\summary.json",
+      "sha256": "4c3251c8367db158a3d1032a7997e8d618291ec395498266354ccf5612baea6d"
+    },
+    "contract": {
+      "path": "C:\\src\\DasForUE2\\Bindings\\InputEvents.contract.json",
+      "sha256": "a55446e9f2a4addabb86a0e4fa5c411ef1287f6783238317e01cbb00e5c8bf94"
+    }
+  }
+}

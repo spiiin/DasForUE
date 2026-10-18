@@ -7,7 +7,16 @@ API каждого класса, без inherited копий. Это пакет 
 автоматические overrides событий и подключение любых input delegates из этого
 факта не следуют.
 
-## Результат — UE 5.8.3, 2026-10-18
+## Актуальное расширение: owned input events
+
+**366 ready, 114 export blocked, 37 generation blocked**. Реализованы 33
+functions через [owned input events](InputEvents.md), пакет установлен и
+проверен обычным require. Четыре прежних generation failures перенесены в
+явные execution-contract отказы: три navigation calls и DetectDragIfPressed.
+Поимённый текущий [backlog](UMGInputBlockers.md). Ниже сохранён снимок до
+этого расширения и его отдельные предыдущие проверки.
+
+## Результат до input-event transport — UE 5.8.3, 2026-10-18
 
 Из **517** кандидатов: **333** generation_ready, **110** export_blocked,
 **74** generation_blocked, 0 policy_excluded. Весь staged DAS-модуль успешно
@@ -142,3 +151,8 @@ DetectDragIfPressed также требует EventReply. Transport пока н�
 coverage не увеличен. [Поимённый аудит](UMGInputBlockers.md),
 [контракт](InputEventTransportContract.md); воспроизведение Scripts/AuditUMGInput.ps1.
 16 unit tests и fresh export — PASS, без сборки/PIE/packaged и коммита.
+
+
+Текущий input-event этап: 38 native/runtime checks + 3 compile refusals, 33
+functions exercised и 122 Python checks — PASS. Scope и воспроизведение:
+[InputEvents](InputEvents.md), Scripts/TestInputEvents.ps1 -Publish.

@@ -109,6 +109,11 @@
         else if (FieldKind(Property, Context) == EMarshallingKind::Struct)
         {
             UScriptStruct* Type = CastFieldChecked<FStructProperty>(Property)->Struct;
+            if(DasIsInputEventType(Type)){
+                auto* Function=Cast<UFunction>(Property->GetOwnerStruct());
+                if(Depth!=0 || Property->ArrayDim!=1 || !Property->HasAnyPropertyFlags(CPF_Parm) || !DasInputEventFunctionAllowed(Function))Context->throw_error("input events require exact scalar snapshot function allowlist; navigation/reply need live adapters");
+                Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Type->GetPathName()});return;
+            }
             if(Type==FInputActionValue::StaticStruct()){
                 if(Property->ArrayDim!=1)Context->throw_error("fixed InputActionValue arrays need an adapter");
                 Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Type->GetPathName()});return;
@@ -653,6 +658,7 @@
         for(const auto& Parameter:Call.Signature)if(Parameter.bInput && !WholeInput(Parameter.Path) && Parameter.Path.Contains(TEXT(".*")))VisitCallContainerPaths(Call,Parameter.Path,false,Context,[&](const FString& Concrete){if(!Call.Assigned.Contains(Concrete))Context->throw_error("missing array element or struct field; missing map key/value or set element");},InputTraversalBudget);
         SetCallConstructionPolicy(Call,Context,true);
         ValidateConstraintCallInputs(Call,Context);
+        ValidateInputEventCallInputs(Call,Context);
         CommitPendingHashes(Call, Context);
         for (const auto& Pin : Call.ObjectPins)
             if (UObject* Argument = Pin.Value.Get(); Argument && (!IsValid(Argument) || (Cast<AActor>(Argument) && CastChecked<AActor>(Argument)->IsActorBeingDestroyed())))
