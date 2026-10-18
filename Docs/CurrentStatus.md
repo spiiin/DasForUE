@@ -284,3 +284,28 @@ Runner Scripts/TestConstraintSimulation.ps1; template
 Tests/ConstraintSimulation/probe.template.das; Docs/ConstraintSimulation.md.
 Отчёт logs/constraint-simulation-validation.json. Полные Foundation/PIE/packaged
 не запускались. Новых ручных production wrappers не добавлено.
+
+## Pawn / Character / AI / Navigation: первый пакет — 2026-10-18
+
+Добавлен декларативный PawnCharacterAINavigation.profile.json: одна library,
+12 receivers, полные local reflected declarations. 410 кандидатов: 241 ready,
+168 export blockers, 0 generation blockers, один явный managed-ownership exclusion.
+Все 241 wrappers скомпилированы; construction guards сохранены для шести функций.
+Baseline World/Math/Collision разделяет 21 ready declaration, ещё 220 отсутствуют
+в этих трёх пакетах (не счётчик новых возможностей всей привязки).
+
+Smoke Editor build, whole module, пять native runtime groups и combined World/Math
+imports — PASS: Pawn input, Character movement mode/pending launch, possession/focus,
+empty/constructed NavigationPath, empty perception arrays и receiver/MetaClass guards.
+Реальный NavMesh, movement ticks, perception stimuli и managed MoveTo suite не
+запускались; существующий managed AI adapter сохранён. DLL/source hashes стабильны.
+
+Следующий общий blocker: static BlueprintCallable вне BlueprintFunctionLibrary
+(11 NavigationSystemV1 queries и два Pawn helpers). Шесть Client* RPC, latent
+force feedback и raw MoveTo proxy имеют отдельные policy/adapter решения.
+Visibility/deprecation даёт ещё 148 отказов. Collision / Physics продолжает
+свой отдельный план и не блокирует этот пакет.
+
+Описание Docs/PawnAINavigation.md; backlog Docs/PawnAINavigationBlockers.md;
+runner Scripts/TestPawnAIPackage.ps1; logs/pawn-ai-package-validation.json.
+Пакет не опубликован; полные Foundation/PIE/packaged не запускались.

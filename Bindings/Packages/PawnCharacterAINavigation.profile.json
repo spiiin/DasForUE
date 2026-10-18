@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "module": "ue_api_pawn_ai",
+  "ue_modules": [
+    "Engine",
+    "AIModule",
+    "NavigationSystem"
+  ],
+  "value_types": "canonical_math",
+  "default_arguments": "explicit",
+  "libraries": [
+    {
+      "class": "/Script/AIModule.AIBlueprintHelperLibrary",
+      "prefix": "ue_ai_helpers_",
+      "include": [
+        "*"
+      ]
+    }
+  ],
+  "receivers": [
+    {
+      "class": "/Script/Engine.Pawn",
+      "prefix": "ue_pawn_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.Character",
+      "prefix": "ue_character_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.Controller",
+      "prefix": "ue_controller_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.PlayerController",
+      "prefix": "ue_player_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.PawnMovementComponent",
+      "prefix": "ue_pawn_move_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.NavMovementComponent",
+      "prefix": "ue_nav_move_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.CharacterMovementComponent",
+      "prefix": "ue_character_move_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/AIModule.AIController",
+      "prefix": "ue_ai_controller_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/AIModule.PathFollowingComponent",
+      "prefix": "ue_path_following_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/AIModule.AIPerceptionComponent",
+      "prefix": "ue_perception_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/NavigationSystem.NavigationSystemV1",
+      "prefix": "ue_navigation_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/NavigationSystem.NavigationPath",
+      "prefix": "ue_path_",
+      "include": [
+        "*"
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "class": "/Script/AIModule.AIBlueprintHelperLibrary",
+      "function": "CreateMoveToProxyObject",
+      "reason": "Use the lifecycle-managed ue_ai MoveTo adapter; raw async proxy callbacks and ownership are outside the generic call contract."
+    }
+  ],
+  "probe_world": true,
+  "probe": "[export]\ndef main(input:int):int {\n    verify(ue_ai_helpers_IsValidAILocation(ue_vector(0.0lf,0.0lf,0.0lf)),\"valid AI location\")\n    verify(ue_ai_helpers_IsValidAIDirection(ue_vector(1.0lf,0.0lf,0.0lf)),\"valid AI direction\")\n    verify(!ue_ai_helpers_IsValidAIDirection(ue_vector(0.0lf,0.0lf,0.0lf)),\"zero AI direction\")\n    return 42\n}"
+}
