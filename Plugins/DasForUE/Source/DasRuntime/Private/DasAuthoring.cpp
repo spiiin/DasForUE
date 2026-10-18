@@ -1,3 +1,4 @@
+#include "DasDataAssets.h"
 #include "DasCallbackTypes.h"
 #include "DasScriptHosts.h"
 #include "DasAuthoring.h"
@@ -32,10 +33,10 @@ namespace
         for (TCHAR Ch : Text) if (!FChar::IsAlnum(Ch) && Ch != '_' && Ch != '/' && Ch != '.') return false;
         return true;
     }
-    bool MetadataValid(const TMap<FString,FString>& Metadata, FString& Error)
+    bool MetadataValid(const TMap<FString,FString>& Metadata, FString& Error,bool Class=false,bool Property=false)
     {
         for (const auto& Pair : Metadata)
-            if ((Pair.Key != TEXT("Category") && Pair.Key != TEXT("DisplayName") && Pair.Key != TEXT("ToolTip")) || Pair.Value.Len() > 4096)
+            if ((Pair.Key != TEXT("Category") && Pair.Key != TEXT("DisplayName") && Pair.Key != TEXT("ToolTip") && !(Class && Pair.Key==TEXT("PrimaryAssetType")) && !(Property && Pair.Key==TEXT("AssetBundles"))) || Pair.Value.Len() > 4096)
                 return Fail(Error, TEXT("Unsupported metadata key/value: ") + Pair.Key);
         return true;
     }
@@ -183,7 +184,7 @@ bool FDasAuthoringModule::Validate(FString& Error) const
         if(!C.LibraryTypeRegistry.IsEmpty() && (C.NativeParent!=TEXT("/Script/Engine.BlueprintFunctionLibrary") || !NativePath(C.LibraryTypeRegistry)))return Fail(Error,TEXT("Invalid library type registry"));
         if(!C.SourceScript.IsEmpty() && (FPaths::GetCleanFilename(C.SourceScript)!=C.SourceScript || !C.SourceScript.EndsWith(TEXT(".das")) || C.SourceScript.Contains(TEXT(":"))))return Fail(Error,TEXT("Invalid authored source filename"));
         if(C.Interfaces.Num()>16)return Fail(Error,TEXT("Interface count limit exceeded"));TSet<FString> SeenInterfaces;for(const auto& I:C.Interfaces){if((!I.StartsWith(TEXT("/Script/")) && !I.StartsWith(TEXT("/Game/"))) || !NativePath(I) || SeenInterfaces.Contains(I))return Fail(Error,TEXT("Invalid/duplicate native interface path"));SeenInterfaces.Add(I);}
-        if (!MetadataValid(C.Metadata,Error)) return false;
+        if (!MetadataValid(C.Metadata,Error,true)) return false;
         if (C.Properties.Num() > 1024 || C.Methods.Num() > 1024) return Fail(Error,TEXT("Declaration count limit exceeded"));
         TSet<FString> Names;
         if(C.Components.Num()>32 || (!C.Components.IsEmpty() && !C.NativeParent.IsEmpty() && !DasActorNativeParent(C.NativeParent)))return Fail(Error,TEXT("Components require native Actor parent and at most 32 declarations"));
@@ -193,7 +194,7 @@ bool FDasAuthoringModule::Validate(FString& Error) const
         {
             if (!AddId(P.Id) || !Identifier(P.Name) || Names.Contains(P.Name.ToLower())) return Fail(Error,TEXT("Invalid or duplicate property: ")+P.Name);
             if(P.Type.Kind==TEXT("event") || P.Type.Kind==TEXT("delegate")){if(P.DelegateWire.IsEmpty() || P.DelegateWire.Len()>131072 || P.Type.TypePath!=TEXT("/DasDelegates/")+FMD5::HashAnsiString(*P.DelegateWire)+TEXT(".Type") || !P.Default.Kind.IsEmpty() || (P.Type.Kind==TEXT("event") && (P.bEditable || P.bReadOnly)))return Fail(Error,TEXT("Invalid authored delegate signature/default/flags"));}else if(!P.DelegateWire.IsEmpty())return Fail(Error,TEXT("Delegate signature is only valid on event fields"));
-            Names.Add(P.Name.ToLower()); if (!TypeValid(P.Type,ClassIds,false,Error) || !DefaultValid(P,Error) || !MetadataValid(P.Metadata,Error)) return false;
+            Names.Add(P.Name.ToLower()); if (!TypeValid(P.Type,ClassIds,false,Error) || !DefaultValid(P,Error) || !MetadataValid(P.Metadata,Error,false,true)) return false;
         }
         if(C.AsyncPhysics){
             const auto& A=*C.AsyncPhysics;
@@ -348,6 +349,7 @@ bool FDasAuthoringModule::ResolveClass(const FString& ClassId,FDasDeclaredClass&
     auto SameSignature=[](const FDasDeclaredMethod& A,const FDasDeclaredMethod& B){if(A.ReturnType.Identity()!=B.ReturnType.Identity() || A.Parameters.Num()!=B.Parameters.Num() || A.bPure!=B.bPure || A.bConst!=B.bConst || A.bStatic!=B.bStatic || A.WorldContext!=B.WorldContext)return false;for(int32 I=0;I<A.Parameters.Num();++I)if(A.Parameters[I].Name!=B.Parameters[I].Name || A.Parameters[I].Type.Identity()!=B.Parameters[I].Type.Identity() || A.Parameters[I].Direction!=B.Parameters[I].Direction)return false;return true;};
     for(int32 I=Chain.Num()-1;I>=0;--I){const auto& C=*Chain[I];
         if(C.AsyncPhysics)Effective.AsyncPhysics=C.AsyncPhysics;
+        if(const auto* Type=C.Metadata.Find(TEXT("PrimaryAssetType")))Effective.Metadata.Add(TEXT("PrimaryAssetType"),*Type);
         for(const auto& Interface:C.Interfaces)Effective.Interfaces.AddUnique(Interface);
         if(C.NativeDefaults.Num()>32)return Fail(Error,TEXT("At most 32 native default targets"));TSet<FString> NativeTargets;
         for(const auto& G:C.NativeDefaults){if((!G.Component.IsEmpty() && !Identifier(G.Component)) || NativeTargets.Contains(G.Component.ToLower()) || G.Defaults.IsEmpty())return Fail(Error,TEXT("Invalid/duplicate native defaults target"));NativeTargets.Add(G.Component.ToLower());FDasDeclaredComponent Check;Check.Defaults=G.Defaults;if(!ValidateComponentDefaults(Check,Error))return false;
@@ -398,10 +400,13 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
     FDasDeclaredClass Effective;if(!ResolveClass(ClassId,Effective,Error))return false;const auto* Declared=C;C=&Effective;
     const bool Library=C->NativeParent==TEXT("/Script/Engine.BlueprintFunctionLibrary");
     const bool SaveGame=C->NativeParent==TEXT("/Script/Engine.SaveGame");
-    if(SaveGame && (!C->Callbacks.IsEmpty() || C->AsyncPhysics || !C->Components.IsEmpty()))return Fail(Error,TEXT("SaveGame supports data and methods, without world lifecycle/components"));
-    if (!Library && !SaveGame && (!DasActorNativeParent(C->NativeParent) && C->NativeParent != TEXT("/Script/Engine.ActorComponent"))) return Fail(Error,TEXT("Class adapter requires an Actor, Pawn, Character, ActorComponent or SaveGame root"));
-    if ((!SaveGame && C->Methods.IsEmpty() && C->Callbacks.IsEmpty() && !C->AsyncPhysics) || C->Methods.Num()>64) return Fail(Error,TEXT("Actor adapter requires 1..64 methods"));
-    FDasClassSchema Result;Result.ParentStableId=Declared->ParentId;Result.StableId=C->Id;Result.Name=*C->Name;Result.Parent=Library?TEXT("FunctionLibrary"):SaveGame?TEXT("SaveGame"):C->NativeParent==TEXT("/Script/Engine.ActorComponent")?TEXT("ActorComponent"):C->NativeParent==TEXT("/Script/Engine.Pawn")?TEXT("Pawn"):C->NativeParent==TEXT("/Script/Engine.Character")?TEXT("Character"):TEXT("Actor");Result.Interfaces=C->Interfaces;Result.Metadata=C->Metadata;
+    const bool DataAsset=C->NativeParent==TEXT("/Script/Engine.DataAsset") || C->NativeParent==TEXT("/Script/Engine.PrimaryDataAsset");
+    if(C->Metadata.Contains(TEXT("PrimaryAssetType")) && (C->NativeParent!=TEXT("/Script/Engine.PrimaryDataAsset") || !Identifier(C->Metadata.FindRef(TEXT("PrimaryAssetType"))) || C->Metadata.FindRef(TEXT("PrimaryAssetType")).Len()>128))return Fail(Error,TEXT("primary_asset_type requires a PrimaryDataAsset root and a valid type name"));
+    for(const auto& P:C->Properties)if(const auto* Bundles=P.Metadata.Find(TEXT("AssetBundles"))){TArray<FName> Names;if(!DataAsset || C->NativeParent!=TEXT("/Script/Engine.PrimaryDataAsset"))return Fail(Error,TEXT("AssetBundles requires a PrimaryDataAsset property"));if(!ParseDasAssetBundleNames(*Bundles,Names,Error))return false;}
+    if((SaveGame || DataAsset) && (!C->Callbacks.IsEmpty() || C->AsyncPhysics || !C->Components.IsEmpty()))return Fail(Error,TEXT("SaveGame/DataAsset supports data and methods, without world lifecycle/components"));
+    if (!Library && !SaveGame && !DataAsset && (!DasActorNativeParent(C->NativeParent) && C->NativeParent != TEXT("/Script/Engine.ActorComponent"))) return Fail(Error,TEXT("Class adapter requires an Actor, Pawn, Character, ActorComponent or SaveGame root"));
+    if ((!SaveGame && !DataAsset && C->Methods.IsEmpty() && C->Callbacks.IsEmpty() && !C->AsyncPhysics) || C->Methods.Num()>64) return Fail(Error,TEXT("Actor adapter requires 1..64 methods"));
+    FDasClassSchema Result;Result.ParentStableId=Declared->ParentId;Result.StableId=C->Id;Result.Name=*C->Name;Result.Parent=Library?TEXT("FunctionLibrary"):DataAsset?(C->NativeParent==TEXT("/Script/Engine.DataAsset")?TEXT("DataAsset"):TEXT("PrimaryDataAsset")):SaveGame?TEXT("SaveGame"):C->NativeParent==TEXT("/Script/Engine.ActorComponent")?TEXT("ActorComponent"):C->NativeParent==TEXT("/Script/Engine.Pawn")?TEXT("Pawn"):C->NativeParent==TEXT("/Script/Engine.Character")?TEXT("Character"):TEXT("Actor");Result.Interfaces=C->Interfaces;Result.Metadata=C->Metadata;
     TArray<const FDasDeclaredMethod*> Methods;for (const auto& M:Declared->Methods) Methods.Add(&M);
     Methods.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});
     for (const auto* Ptr:Methods)
@@ -415,7 +420,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         if(ValueKind(M.ReturnType)==EDasMethodSignature::Frame || M.Parameters.Num()>16 || !M.bCallable || M.bStatic!=Library) return Fail(Error,TEXT("Actor adapter requires callable scalar/void methods with up to 16 by-value inputs, without static: ")+M.Id);
         FDasMethodSchema Method;Method.Name=*M.Name;Method.ScriptFile=M.ScriptFile;Method.EntryPoint=M.EntryPoint;Method.StableId=M.Id;Method.InputStableId=M.Parameters.Num()==1?M.Parameters[0].Id:FString();Method.Metadata=M.Metadata;Method.bBlueprintEvent=M.bBlueprintEvent;Method.bPure=M.bPure;Method.bConst=M.bConst;Method.bStatic=M.bStatic;Method.WorldContext=M.WorldContext;if(Library && !ToJson(Method.LibraryContract,Error))return false;Method.Metadata.Add(TEXT("DasFunctionKind"),(M.bBlueprintEvent || C->Interfaces.ContainsByPredicate([&](const FString& Path){auto* I=FindObject<UClass>(nullptr,*Path);return I && I->FindFunctionByName(*M.Name);}))?TEXT("Event"):TEXT("Callable"));Method.ReturnKind=ValueKind(M.ReturnType);Method.ReturnClass=K==TEXT("delegate")?M.ReturnType.DelegateWire:DasContainerCarrier(M.ReturnType)?DasContainerCarrier(M.ReturnType)->GetPathName():(K==TEXT("class") || K==TEXT("enum") || K==TEXT("object") || (K==TEXT("struct") && Method.ReturnKind==EDasMethodSignature::Struct))?M.ReturnType.TypePath:FString();
         for(const auto& P:M.Parameters){if((ValueKind(P.Type)==EDasMethodSignature::Frame || ValueKind(P.Type)==EDasMethodSignature::Void) || (P.Direction!=TEXT("in") && P.Direction!=TEXT("out") && P.Direction!=TEXT("inout"))) return Fail(Error,TEXT("Actor adapter parameter capability missing: ")+P.Id);Method.Parameters.Add({*P.Name,P.Id,ValueKind(P.Type),P.Type.Kind==TEXT("delegate")?P.Type.DelegateWire:DasContainerCarrier(P.Type)?DasContainerCarrier(P.Type)->GetPathName():(P.Type.Kind==TEXT("class") || P.Type.Kind==TEXT("enum") || P.Type.Kind==TEXT("object") || (P.Type.Kind==TEXT("struct") && ValueKind(P.Type)==EDasMethodSignature::Struct))?P.Type.TypePath:FString(),P.Direction});auto& Parameter=Method.Parameters.Last();Parameter.bHasDefault=!P.Default.Kind.IsEmpty();Parameter.DefaultValue=P.Default.Kind==TEXT("string")?P.Default.String:P.Default.Kind==TEXT("bool")?(P.Default.Boolean?TEXT("true"):TEXT("false")):P.Type.Kind==TEXT("int")?FString::Printf(TEXT("%.0f"),P.Default.Number):(P.Type.Kind==TEXT("float")?FString::Printf(TEXT("%.9g"),P.Default.Number):FString::Printf(TEXT("%.17g"),P.Default.Number));}
-        Method.Signature=(Result.Parent==TEXT("Pawn") || Result.Parent==TEXT("Character")) || Library || SaveGame || M.bConst || Result.Parent==TEXT("ActorComponent") || !C->Interfaces.IsEmpty()?EDasMethodSignature::Frame:Action?EDasMethodSignature::Void:Scalar?Kind(K):EDasMethodSignature::Frame;
+        Method.Signature=(Result.Parent==TEXT("Pawn") || Result.Parent==TEXT("Character")) || Library || SaveGame || DataAsset || M.bConst || Result.Parent==TEXT("ActorComponent") || !C->Interfaces.IsEmpty()?EDasMethodSignature::Frame:Action?EDasMethodSignature::Void:Scalar?Kind(K):EDasMethodSignature::Frame;
         Result.Methods.Add(MoveTemp(Method));
     }
     if(!Result.Methods.IsEmpty())Result.Method=Result.Methods[0];

@@ -32,7 +32,7 @@ void DSLExpandDeclarationGroups(const das::StructurePtr& S,bool ComponentsAllowe
             SharedKeys.Add(DSLText(Flag));Shared.push_back(das::AnnotationArgument("ue_property",Flag));
         }
         if(Named)for(const auto* Arg:*Named){
-            if(!DSLIsMetadata(Arg->name) || !Arg->value || Arg->value->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Declaration group metadata requires Category/DisplayName/ToolTip string literals"));
+            if(!(DSLIsMetadata(Arg->name) || (!Components && Arg->name=="AssetBundles")) || !Arg->value || Arg->value->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Declaration group metadata requires Category/DisplayName/ToolTip string literals"));
             if(SharedKeys.Contains(DSLText(Arg->name)))DSLFail(TEXT("Repeated declaration group metadata: ")+DSLText(Arg->name));
             SharedKeys.Add(DSLText(Arg->name));Shared.push_back(das::AnnotationArgument(Arg->name,static_cast<das::ExprConstString*>(Arg->value)->text));
         }
@@ -53,7 +53,7 @@ void DSLExpandDeclarationGroups(const das::StructurePtr& S,bool ComponentsAllowe
                 // Per-member metadata overrides the shared value; flags accumulate
                 // and are validated by the same collector as individual annotations.
                 for(const auto& A:V->annotation){
-                    if(DSLIsMetadata(A.name))Annotations.erase(std::remove_if(Annotations.begin(),Annotations.end(),[&](const auto& Prior){return Prior.name==A.name;}),Annotations.end());
+                    if(DSLIsMetadata(A.name) || A.name=="AssetBundles")Annotations.erase(std::remove_if(Annotations.begin(),Annotations.end(),[&](const auto& Prior){return Prior.name==A.name;}),Annotations.end());
                     Annotations.push_back(A);
                 }
                 Annotations.push_back(das::AnnotationArgument("ue_property",true));

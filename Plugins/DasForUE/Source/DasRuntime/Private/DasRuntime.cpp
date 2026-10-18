@@ -1,3 +1,4 @@
+#include "DasDataAssets.h"
 #include "DasPrimaryAssets.h"
 #include "DasSaveGame.h"
 #include "DasSaveGameProxy.h"

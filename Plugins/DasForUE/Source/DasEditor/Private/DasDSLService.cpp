@@ -1,3 +1,4 @@
+#include "DasDataAssets.h"
 #include "DasDSLService.h"
 #include "DasTypePins.h"
 #include "DasBlueprintDefaults.h"
@@ -69,6 +70,7 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     const bool Created=!BP;
     if(!Created && BP->GeneratedClass){const UObject* CDO=BP->GeneratedClass->GetDefaultObject();const FString ExistingIdentity=DasHostIdentity(CDO);if(!ExistingIdentity.IsEmpty() && ExistingIdentity!=Id){Error=TEXT("Cooked authored identity differs from import declaration");return false;}}
     const auto& Declaration=*Model.Classes.FindByPredicate([&](const auto& C){return C.Id==Id;});
+    if(!Created && (Schema.Parent==TEXT("DataAsset") || Schema.Parent==TEXT("PrimaryDataAsset")) && BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"))!=Json){Error=TEXT("DataAsset declaration migration is deferred; create a new Blueprint or reimport method bodies only");return false;}
     if(DefaultPolicy==EDasDefaultMigrationPolicy::Automatic){
         DefaultPolicy=EDasDefaultMigrationPolicy::Refuse;
         if(!Created){FDasAuthoringModule Prior;FString Reason;const FString Wire=BP->GetOutermost()->GetMetaData().GetValue(BP,TEXT("DasDSLModel"));
@@ -164,6 +166,10 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     }
     if(Created && Schema.Parent==TEXT("ActorComponent")){auto* Component=CastChecked<UDasScriptComponent>(BP->GeneratedClass->GetDefaultObject());Component->LifecycleScript=Script;Component->bDasConstructionScript=EffectiveDeclaration.Callbacks.ContainsByPredicate([](const auto& C){return C.Kind==TEXT("ConstructionScript");});CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
     {auto* CDO=BP->GeneratedClass->GetDefaultObject();auto* Identity=DasHostString(CDO,TEXT("AuthoredTypeId"));if(Identity && (Created || Identity->IsEmpty())){CDO->Modify();*Identity=Id;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}}
+    if(auto* Data=Cast<UDasPrimaryDataAsset>(BP->GeneratedClass->GetDefaultObject())){
+        const FString Type=Schema.Metadata.Contains(TEXT("PrimaryAssetType"))?Schema.Metadata.FindRef(TEXT("PrimaryAssetType")):Schema.Name.ToString();
+        if(Data->DasPrimaryAssetType!=FName(*Type)){Data->Modify();Data->DasPrimaryAssetType=FName(*Type);CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
+    }
     Out=BP;Applied=true;
     UE_LOG(LogTemp,Display,TEXT("DAS_DSL_APPLY PASS %s (%s)"),*ObjectPath,BodyOnly?TEXT("body-only; no Blueprint recompile"):TEXT("declaration applied"));return true;
 }

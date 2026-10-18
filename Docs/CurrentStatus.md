@@ -837,3 +837,39 @@ null failure, cancel delivery и session release. Финальный прого�
 не проверялись. Изменения без коммита.
 Docs/PrimaryAssets.md; Scripts/TestPrimaryAssets.ps1;
 logs/primary-assets-validation.json; Tests/PrimaryAssets/probe.das.
+
+### Авторские DataAsset / PrimaryDataAsset — 2026-10-18
+
+Добавлены DSL roots DataAsset и PrimaryDataAsset, native frame-hosts и data-only
+классы. primary_asset_type хранится в сериализованном native свойстве и даёт ID
+Type:InstanceName; по умолчанию тип равен имени авторского класса. AssetBundles
+поддерживается в метаданных поля и общей группы свойств; native UE builder/PreSave
+собирает soft dependencies и сохраняет registry bundle data. Новый редакторский
+сервис и Das.DSL.Asset.Create создают dirty asset instances без перезаписи пакетов
+и без автоматического изменения AssetManager/cook settings. Изменения деклараций
+для новых asset roots отклоняются до defaults migration; body-only reimport доступен.
+
+Editor Development build и один короткий DasAuthoredAssets-сценарий — PASS,
+16 проверок: public DSL, два класса/экземпляра, Primary ID, отказ перезаписи и
+изменения декларации, native bundle metadata, сохранение, AssetRegistry scan,
+реальная async disk load с bundle, типизированные поля/метод, GC и unload.
+Source/DLL hashes и engine BuildId стабильны, engine Error/ensure нет.
+Удалены только собственные временные scripts и точные уникальные asset files.
+Без полного Foundation/PIE/packaged и cross-process/cooked проверки, без коммита.
+Docs/AuthoredDataAssets.md; Scripts/TestAuthoredAssets.ps1;
+logs/authored-assets-validation.json; Tests/AuthoredDataAssets/probe.das.
+
+
+### Диагностика authored assets перед cook/staging — 2026-10-18
+
+Добавлены редакторская команда `Das.DSL.Asset.Check` и CI-commandlet
+`DasAssetCheck` с JSON-отчётом. Проверяются сохранность класса и экземпляра,
+DAS-источники и соответствие декларации, регистрация Primary Asset, bundles
+и эффективное правило cook. Диагностика не сохраняет ассеты и не меняет настройки.
+Предупреждения о недоказанном включении в cook не являются подтверждением доставки;
+`packaged_verified` всегда false. См. Docs/AssetPreflight.md.
+
+Editor Development build и один объединённый короткий runtime-сценарий — PASS,
+21 проверка. Source/DLL hashes и engine BuildId стабильны. Контрольные случаи:
+несохранённые изменения, отсутствующий источник, устаревшие bundles и NeverCook.
+Полный Foundation/PIE/packaged не запускался. Изменения не закоммичены.

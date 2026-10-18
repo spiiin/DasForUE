@@ -550,7 +550,7 @@
         virtual bool touch(const das::StructurePtr& St,das::ModuleGroup&,das::AnnotationArgumentList& Args,das::string& Error)override{try{
             DSLAnnotationArguments(Args);if(Args.size()!=1 || Args[0].name!="path")DSLFail(TEXT("Expected ue_native_base(path=NativeClassPath)"));
             const FString Path=DSLString(Args,"path");
-            if(!DasActorNativeParent(Path) && Path!=TEXT("/Script/Engine.ActorComponent") && Path!=TEXT("/Script/Engine.SaveGame"))DSLFail(TEXT("Unsupported native DSL base; expected Actor, Pawn, Character, ActorComponent or SaveGame"));
+            if(!DasActorNativeParent(Path) && Path!=TEXT("/Script/Engine.ActorComponent") && Path!=TEXT("/Script/Engine.SaveGame") && Path!=TEXT("/Script/Engine.DataAsset") && Path!=TEXT("/Script/Engine.PrimaryDataAsset"))DSLFail(TEXT("Unsupported native DSL base; expected Actor, Pawn, Character, ActorComponent, SaveGame, DataAsset or PrimaryDataAsset"));
             auto* Native=FindObject<UClass>(nullptr,*Path);if(!Native || !Native->HasAnyClassFlags(CLASS_Native) || Native->HasAnyClassFlags(CLASS_Interface))DSLFail(TEXT("Native DSL base class is not loaded"));
             if(!St->isClass || St->parent)DSLFail(TEXT("Native DSL base requires an empty root class"));
             for(const auto& F:St->fields)if(!F.generated && F.name!="__rtti")DSLFail(TEXT("Native DSL base cannot declare fields or methods"));
@@ -660,6 +660,7 @@
                 {
                     if(A.name=="module_id" || A.name=="id" || A.name=="parent" || A.name=="type_folder" || A.name=="type_registry") continue;if(A.name=="implements"){TArray<FString> Items;DSLString(Args,"implements").ParseIntoArray(Items,TEXT(","),false);for(auto I:Items){I=I.TrimStartAndEnd();I=DSLResolveType(EDSLTypeKind::Interface,I,TypeScope);if(C.Interfaces.Contains(I))DSLFail(TEXT("Empty/duplicate interface path"));C.Interfaces.Add(I);}if(C.Interfaces.IsEmpty())DSLFail(TEXT("Expected interface paths"));continue;}
                     if(A.name=="Blueprintable"){if(!DSLBool(A)) DSLFail(TEXT("Adapter requires Blueprintable"));continue;}
+                    if(A.name=="primary_asset_type"){if(A.type!=das::Type::tString)DSLFail(TEXT("primary_asset_type must be a string"));C.Metadata.Add(TEXT("PrimaryAssetType"),DSLText(A.sValue));continue;}
                     if(DSLIsMetadata(A.name)) DSLMetadata(A,C.Metadata);else DSLFail(TEXT("Unknown ue_class annotation: ")+DSLText(A.name));
                 }
 
@@ -692,7 +693,7 @@
                         }
                         else if(A.name=="ue_class_base"){if(A.type!=das::Type::tString || DSLTypeName(F.type)!=TEXT("class"))DSLFail(TEXT("ue_class_base requires a UEClassHandle field and native base path"));P.Type.TypePath=DSLText(A.sValue);}
                         else if(A.name=="ue_id"){if(A.type!=das::Type::tString) DSLFail(TEXT("ue_id must be string"));P.Id=DSLText(A.sValue);}
-                        else if(DSLIsMetadata(A.name)) DSLMetadata(A,P.Metadata);else DSLFail(TEXT("Unknown field metadata: ")+DSLText(A.name));
+                        else if(DSLIsMetadata(A.name) || A.name=="AssetBundles") DSLMetadata(A,P.Metadata);else DSLFail(TEXT("Unknown field metadata: ")+DSLText(A.name));
                     }
                     if(ReadWrite && ReadOnly) DSLFail(TEXT("Conflicting BlueprintReadOnly/BlueprintReadWrite specifiers"));
                     if(!Marked) DSLFail(TEXT("Script-private fields unsupported; add @ue_property: ")+P.Name);
@@ -1024,7 +1025,7 @@
             {
                 Wire=DSLText(J->sValue);
                 if(!IsValid(Self)){Error=TEXT("DSL entry requires live self");OK=false;return;}
-                const bool ActorAdapter=Self->IsA<ADasProbeActor>() || Self->IsA<UDasScriptComponent>() || Self->IsA<UDasSaveGame>();
+                const bool ActorAdapter=Self->IsA<ADasProbeActor>() || Self->IsA<UDasScriptComponent>() || Self->IsA<UDasSaveGame>() || Self->IsA<UDasDataAsset>() || Self->IsA<UDasPrimaryDataAsset>();
                 FDasDeclaredClass EffectiveDefaults;if(!Model.ResolveClass(C.Id,EffectiveDefaults,Error)){OK=false;return;}
                 if(!DasCheckNativeDefaultOwner(Model,C.Id,Self,Error)){OK=false;return;}
                 for(const auto& P:EffectiveDefaults.Properties)

@@ -1,3 +1,6 @@
+#include "DasAssetPreflight.h"
+#include "DasDataAssetService.h"
+#include "Engine/DataAsset.h"
 #include "Modules/ModuleManager.h"
 #include "DasComponentCompilerExtension.h"
 #include "BlueprintCompilationManager.h"
@@ -8,9 +11,24 @@
 #include "Engine/Blueprint.h"
 #include "Misc/PackageName.h"
 class FDasEditorModule final : public IModuleInterface {
+    IConsoleObject* AssetCheckCommand=nullptr;
+    IConsoleObject* AssetCreateCommand=nullptr;
     IConsoleObject* InterfacesCommand=nullptr;IConsoleObject* StructFieldsCommand=nullptr;IConsoleObject* EnumValuesCommand=nullptr;IConsoleObject* EnumRenameCommand=nullptr;IConsoleObject* EnumAppendCommand=nullptr;IConsoleObject* TypesCommand=nullptr;IConsoleObject* ApplyCommand=nullptr;IConsoleObject* ReimportCommand=nullptr;
 public:
     virtual void StartupModule() override {
+        AssetCheckCommand=IConsoleManager::Get().RegisterConsoleCommand(TEXT("Das.DSL.Asset.Check"),TEXT("Das.DSL.Asset.Check /Game/Items/Potion (read-only preflight, not packaged verification)"),FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args){
+            FString Path=Args.Num()==1?Args[0]:FString();if(!Path.Contains(TEXT(".")) && FPackageName::IsValidLongPackageName(Path))Path+=TEXT(".")+FPackageName::GetLongPackageAssetName(Path);
+            auto Report=FDasAssetPreflight::Inspect(FPackageName::IsValidObjectPath(Path)?LoadObject<UDataAsset>(nullptr,*Path,nullptr,LOAD_NoWarn):nullptr);
+            for(const auto& I:Report.Issues){UE_LOG(LogTemp,Display,TEXT("DAS_ASSET_CHECK %s %s %s: %s"),*I.Severity,*I.Code,*I.Resource,*I.Message);}
+            UE_LOG(LogTemp,Display,TEXT("DAS_ASSET_CHECK_RESULT=%s packaged_verified=false"),Report.HasErrors()?TEXT("FAIL"):TEXT("PASS"));
+        }),ECVF_Default);
+
+        AssetCreateCommand=IConsoleManager::Get().RegisterConsoleCommand(TEXT("Das.DSL.Asset.Create"),TEXT("Das.DSL.Asset.Create /Game/Classes/BP_Item /Game/Items/Potion (creates dirty asset; save in editor)"),FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args){
+            FString Error;UDataAsset* Asset=nullptr;UBlueprint* BP=Args.Num()==2?LoadObject<UBlueprint>(nullptr,*(Args[0]+TEXT(".")+FPackageName::GetLongPackageAssetName(Args[0])),nullptr,LOAD_NoWarn):nullptr;
+            if(Args.Num()!=2 || !FDasDataAssetService::Create(BP,Args[1],Asset,Error)){UE_LOG(LogTemp,Warning,TEXT("DAS_ASSET_CREATE rejected: %s"),Args.Num()!=2?TEXT("Expected Blueprint package and new asset package"):*Error);}
+            else {UE_LOG(LogTemp,Display,TEXT("DAS_ASSET_CREATE PASS %s (dirty; save in editor)"),*Asset->GetPathName());}
+        }),ECVF_Default);
+
         FDasInterfaceService::RegisterCompiler();
         FBlueprintCompilationManager::RegisterCompilerExtension(UBlueprint::StaticClass(),NewObject<UDasComponentCompilerExtension>());
         InterfacesCommand=IConsoleManager::Get().RegisterConsoleCommand(TEXT("Das.DSL.Interfaces.Apply"),TEXT("Das.DSL.Interfaces.Apply Definition.das /Game/Interfaces"),FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args){FString Error;TArray<UBlueprint*> Types;if(Args.Num()!=2 || !FDasInterfaceService::Apply(Args[0],Args[1],Types,Error)){UE_LOG(LogTemp,Warning,TEXT("DAS_INTERFACE_APPLY rejected: %s"),*Error);}else{UE_LOG(LogTemp,Display,TEXT("DAS_INTERFACE_APPLY PASS %d"),Types.Num());}}),ECVF_Default);
@@ -46,6 +64,6 @@ public:
             if(!Valid || !(Args.Num()==2 && (Args[1]==TEXT("fields=rename_by_id") || Args[1]==TEXT("fields=rename_with_dependencies"))?FDasDSLService::ReimportRenamedFields(BP,Error,Args[1]==TEXT("fields=rename_with_dependencies")):FDasDSLService::Reimport(BP,Error,DefaultPolicy))) UE_LOG(LogTemp,Warning,TEXT("DAS_DSL_REIMPORT rejected: %s"),!Valid?TEXT("Expected asset package and optional defaults=preserve_overrides, defaults=preserve_instances, defaults=refuse or field migration policy"):*Error);
         }),ECVF_Default);
     }
-    virtual void ShutdownModule() override {if(InterfacesCommand)IConsoleManager::Get().UnregisterConsoleObject(InterfacesCommand);if(StructFieldsCommand)IConsoleManager::Get().UnregisterConsoleObject(StructFieldsCommand);if(EnumValuesCommand)IConsoleManager::Get().UnregisterConsoleObject(EnumValuesCommand);if(EnumRenameCommand)IConsoleManager::Get().UnregisterConsoleObject(EnumRenameCommand);if(EnumAppendCommand)IConsoleManager::Get().UnregisterConsoleObject(EnumAppendCommand);if(TypesCommand)IConsoleManager::Get().UnregisterConsoleObject(TypesCommand);if(ApplyCommand) IConsoleManager::Get().UnregisterConsoleObject(ApplyCommand);if(ReimportCommand) IConsoleManager::Get().UnregisterConsoleObject(ReimportCommand);}
+    virtual void ShutdownModule() override {if(AssetCheckCommand)IConsoleManager::Get().UnregisterConsoleObject(AssetCheckCommand);if(AssetCreateCommand)IConsoleManager::Get().UnregisterConsoleObject(AssetCreateCommand);if(InterfacesCommand)IConsoleManager::Get().UnregisterConsoleObject(InterfacesCommand);if(StructFieldsCommand)IConsoleManager::Get().UnregisterConsoleObject(StructFieldsCommand);if(EnumValuesCommand)IConsoleManager::Get().UnregisterConsoleObject(EnumValuesCommand);if(EnumRenameCommand)IConsoleManager::Get().UnregisterConsoleObject(EnumRenameCommand);if(EnumAppendCommand)IConsoleManager::Get().UnregisterConsoleObject(EnumAppendCommand);if(TypesCommand)IConsoleManager::Get().UnregisterConsoleObject(TypesCommand);if(ApplyCommand) IConsoleManager::Get().UnregisterConsoleObject(ApplyCommand);if(ReimportCommand) IConsoleManager::Get().UnregisterConsoleObject(ReimportCommand);}
 };
 IMPLEMENT_MODULE(FDasEditorModule,DasEditor)

@@ -1,3 +1,4 @@
+#include "DasDataAssets.h"
 #include "UObject/TextProperty.h"
 #include "Internationalization/Text.h"
 #include "DasScriptHosts.h"
@@ -71,19 +72,19 @@ TArray<FDasMethodSchema> FDasClassSchema::EffectiveMethods() const
 bool FDasClassSchema::Validate(FString& Error) const
 {
     Error.Reset();
-    if (!Identifier(Name.ToString()) || Name.IsNone() || (Parent != TEXT("Actor") && Parent != TEXT("Pawn") && Parent != TEXT("Character") && Parent != TEXT("ActorComponent") && Parent != TEXT("SaveGame") && Parent != TEXT("FunctionLibrary")))
+    if (!Identifier(Name.ToString()) || Name.IsNone() || (Parent != TEXT("Actor") && Parent != TEXT("Pawn") && Parent != TEXT("Character") && Parent != TEXT("ActorComponent") && Parent != TEXT("SaveGame") && Parent != TEXT("DataAsset") && Parent != TEXT("PrimaryDataAsset") && Parent != TEXT("FunctionLibrary")))
     { Error = TEXT("Expected a named Actor, Pawn, Character, ActorComponent or function-library schema"); return false; }
-    auto ValidMeta=[&](const TMap<FString,FString>& Values,bool Method=false)
+    auto ValidMeta=[&](const TMap<FString,FString>& Values,bool Method=false,bool Field=false)
     {
         for (const auto& Pair:Values)
-            if ((Pair.Key!=TEXT("Category") && Pair.Key!=TEXT("DisplayName") && Pair.Key!=TEXT("ToolTip") && !(Method && Pair.Key==TEXT("DasFunctionKind") && (Pair.Value==TEXT("Event") || Pair.Value==TEXT("Callable")))) || Pair.Value.Len()>4096)
+            if ((Pair.Key!=TEXT("Category") && Pair.Key!=TEXT("DisplayName") && Pair.Key!=TEXT("ToolTip") && !(Field && Pair.Key==TEXT("AssetBundles") && Parent==TEXT("PrimaryDataAsset")) && !(!Field && !Method && Pair.Key==TEXT("PrimaryAssetType") && Parent==TEXT("PrimaryDataAsset")) && !(Method && Pair.Key==TEXT("DasFunctionKind") && (Pair.Value==TEXT("Event") || Pair.Value==TEXT("Callable")))) || Pair.Value.Len()>4096)
             {Error=TEXT("Unsupported adapter metadata");return false;}
         return true;
     };
     if (!ValidMeta(Metadata)) return false;
     TSet<FName> Names;
     const auto AllMethods=EffectiveMethods();
-    if((Parent==TEXT("SaveGame") || Parent==TEXT("Pawn") || Parent==TEXT("Character")) && AllMethods.ContainsByPredicate([](const auto& M){return M.Signature!=EDasMethodSignature::Frame;})){Error=TEXT("Pawn/Character hosts require the frame method ABI");return false;}
+    if((Parent==TEXT("DataAsset") || Parent==TEXT("PrimaryDataAsset") || Parent==TEXT("SaveGame") || Parent==TEXT("Pawn") || Parent==TEXT("Character")) && AllMethods.ContainsByPredicate([](const auto& M){return M.Signature!=EDasMethodSignature::Frame;})){Error=TEXT("Pawn/Character hosts require the frame method ABI");return false;}
     if(Parent==TEXT("FunctionLibrary") && (!Fields.IsEmpty() || !ParentStableId.IsEmpty())){Error=TEXT("Function library cannot have fields or authored parent");return false;}
     if (AllMethods.Num()>64) {Error=TEXT("Adapter method count exceeds 64");return false;}
     for (const auto& M:AllMethods)
@@ -124,7 +125,7 @@ bool FDasClassSchema::Validate(FString& Error) const
         if(Field.Kind==EDasScalarKind::Class){auto* Base=FindObject<UClass>(nullptr,*Field.ObjectClass);if(!Field.ObjectClass.StartsWith(TEXT("/Script/")) || !Base || Base->HasAnyClassFlags(CLASS_Interface)){Error=TEXT("Class field requires loaded native base class");return false;}}
         if((Field.Kind==EDasScalarKind::Class || Field.Kind==EDasScalarKind::Object) && !Field.StringDefault.IsEmpty()){UObject* Value=nullptr;if(!ResolveDasReferenceDefault(Field.Kind==EDasScalarKind::Class,Field.ObjectClass,Field.StringDefault,Value,Error))return false;}
         if(Field.Kind==EDasScalarKind::Struct){FInstancedStruct Value;if(!ParseDasStructDefault(Field.StructPath,Field.StructDefault,Value,Error))return false;}
-        if (!ValidMeta(Field.Metadata)) return false;
+        if (!ValidMeta(Field.Metadata,false,true)) return false;
         Names.Add(Field.Name);
     }
     return ValidateDasInterfaceContracts(*this,Error);

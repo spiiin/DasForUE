@@ -5,6 +5,7 @@
 #include "DasDefaultRoots.h"
 #include "DasScriptHosts.h"
 #include "DasSaveGame.h"
+#include "DasDataAssets.h"
 #include "DasBlueprintLibrary.h"
 #include "DasAuthoring.h"
 #include "DasContainerTypes.h"
@@ -69,7 +70,7 @@ namespace
     bool ScalarProperty(FProperty* P,EDasMethodSignature K){FDasDeclaredType Type;FString Error;if(!DasSchemaType(K,FString(),Type,Error) || DasPropertyKind(P)!=Type.GetKind())return false;if(K==EDasMethodSignature::Vector || K==EDasMethodSignature::Rotator || K==EDasMethodSignature::Transform){auto* S=CastField<FStructProperty>(P);return S && S->Struct->GetPathName()==Type.TypePath;}return true;}
     FName FrameField(EDasMethodSignature K){return K==EDasMethodSignature::Byte?TEXT("ByteValue"):K==EDasMethodSignature::Text?TEXT("TextValue"):K==EDasMethodSignature::Class?TEXT("ClassValue"):K==EDasMethodSignature::Int?TEXT("IntValue"):K==EDasMethodSignature::Float?TEXT("FloatValue"):K==EDasMethodSignature::Bool?TEXT("BoolValue"):K==EDasMethodSignature::String?TEXT("StringValue"):K==EDasMethodSignature::Double?TEXT("DoubleValue"):K==EDasMethodSignature::Name?TEXT("NameValue"):K==EDasMethodSignature::Object?TEXT("ObjectValue"):K==EDasMethodSignature::Vector?TEXT("VectorValue"):K==EDasMethodSignature::Rotator?TEXT("RotatorValue"):K==EDasMethodSignature::Transform?TEXT("TransformValue"):TEXT("StructValue");}
     bool AdapterCall(const UK2Node_CallFunction* Call)
-    {const auto* T=Call->GetTargetFunction();if(!T)return false;for(const auto Name:{GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasConstFrame),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasConstFrameOutputs),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDas),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasNamed),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasFloat),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasBool),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasVoid),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasFrame),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasFrameOutputs)}) if(T==ADasProbeActor::StaticClass()->FindFunctionByName(Name) || T==UDasScriptComponent::StaticClass()->FindFunctionByName(Name) || T==DasNativeScriptHost(TEXT("Pawn"))->FindFunctionByName(Name) || T==DasNativeScriptHost(TEXT("Character"))->FindFunctionByName(Name) || T==UDasSaveGame::StaticClass()->FindFunctionByName(Name)) return true;return false;}
+    {const auto* T=Call->GetTargetFunction();if(!T)return false;for(const auto Name:{GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasConstFrame),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasConstFrameOutputs),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDas),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasNamed),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasFloat),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasBool),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasVoid),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasFrame),GET_FUNCTION_NAME_CHECKED(ADasProbeActor,ExecuteDasFrameOutputs)}) if(T==ADasProbeActor::StaticClass()->FindFunctionByName(Name) || T==UDasScriptComponent::StaticClass()->FindFunctionByName(Name) || T==DasNativeScriptHost(TEXT("Pawn"))->FindFunctionByName(Name) || T==DasNativeScriptHost(TEXT("Character"))->FindFunctionByName(Name) || T==UDasSaveGame::StaticClass()->FindFunctionByName(Name) || T==UDasDataAsset::StaticClass()->FindFunctionByName(Name) || T==UDasPrimaryDataAsset::StaticClass()->FindFunctionByName(Name)) return true;return false;}
     bool MethodShape(UFunction* F,const FDasMethodSchema& M)
     {
         if(!F || F->HasAnyFunctionFlags(FUNC_BlueprintPure)!=M.bPure || F->HasAnyFunctionFlags(FUNC_Const)!=M.bConst || F->HasAnyFunctionFlags(FUNC_Static)!=M.bStatic) return false;const auto C=M.Contract();const auto Inputs=M.EffectiveParameters();
@@ -239,7 +240,7 @@ bool FDasBlueprintService::ApplyAuthoring(UBlueprint* BP, const FDasAuthoringMod
 bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, FString& Error, bool bValidateOnly, EDasDefaultMigrationPolicy DefaultPolicy)
 {
     Error.Reset();
-    if (!IsInGameThread() || !IsValid(BP) || !BP->GeneratedClass || !BP->ParentClass || (!DasActorHostClass(BP->ParentClass) && !BP->ParentClass->IsChildOf(UDasScriptComponent::StaticClass()) && !BP->ParentClass->IsChildOf(UDasSaveGame::StaticClass())))
+    if (!IsInGameThread() || !IsValid(BP) || !BP->GeneratedClass || !BP->ParentClass || (!DasActorHostClass(BP->ParentClass) && !BP->ParentClass->IsChildOf(UDasScriptComponent::StaticClass()) && !BP->ParentClass->IsChildOf(UDasSaveGame::StaticClass()) && !BP->ParentClass->IsChildOf(UDasDataAsset::StaticClass()) && !BP->ParentClass->IsChildOf(UDasPrimaryDataAsset::StaticClass())))
     { Error = TEXT("Expected an Actor or Component adapter Blueprint on the game thread"); return false; }
     if (!Schema.Validate(Error)) return false;
     if(!Schema.ParentStableId.IsEmpty()){const auto* CDO=BP->ParentClass->GetDefaultObject();const FString Id=DasHostIdentity(CDO);if(Id!=Schema.ParentStableId){Error=TEXT("Authored parent identity differs from declaration");return false;}}
@@ -384,7 +385,7 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     {
         FBlueprintEditorUtils::SetBlueprintPropertyReadOnlyFlag(BP,Field.Name,Field.bReadOnly);
         if(Schema.Parent==TEXT("SaveGame"))FBlueprintEditorUtils::SetVariableSaveGameFlag(BP,Field.Name,true);
-        for (const auto* Key:{TEXT("Category"),TEXT("DisplayName"),TEXT("ToolTip")}) FBlueprintEditorUtils::RemoveBlueprintVariableMetaData(BP,Field.Name,nullptr,Key);
+        for (const auto* Key:{TEXT("Category"),TEXT("DisplayName"),TEXT("ToolTip"),TEXT("AssetBundles")}) FBlueprintEditorUtils::RemoveBlueprintVariableMetaData(BP,Field.Name,nullptr,Key);
         FBlueprintEditorUtils::SetBlueprintVariableCategory(BP,Field.Name,nullptr,FText::FromString(Field.Metadata.FindRef(TEXT("Category"))),true);
         for (const auto& Pair:Field.Metadata) FBlueprintEditorUtils::SetBlueprintVariableMetaData(BP,Field.Name,nullptr,*Pair.Key,Pair.Value);
     }

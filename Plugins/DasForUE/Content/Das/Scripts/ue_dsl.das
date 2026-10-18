@@ -14,6 +14,10 @@ class Character {}
 class ActorComponent {}
 [ue_native_base(path="/Script/Engine.SaveGame")]
 class SaveGame {}
+[ue_native_base(path="/Script/Engine.DataAsset")]
+class DataAsset {}
+[ue_native_base(path="/Script/Engine.PrimaryDataAsset")]
+class PrimaryDataAsset {}
 
 // Read the latest native snapshot after evaluating the assigned value.
 def ue_dsl_commit_struct_member_int(property:string; member:string; value:int):void {
