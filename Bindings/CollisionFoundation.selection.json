@@ -1,0 +1,12 @@
+{
+  "class_rules": [
+    {
+      "class": "/Script/DasRuntime.DasWeakCollisionFixture",
+      "prefix": "ue_collision_fixture_",
+      "include": [
+        "MakeWeakSnapshot",
+        "CollectWeakSnapshot"
+      ]
+    }
+  ]
+}

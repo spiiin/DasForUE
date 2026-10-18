@@ -21,11 +21,13 @@ bool Validate(const FDasDeclaredType& T,EDasPropertyUsage Usage,FString& Error,i
  auto Fail=[&](const TCHAR* Why){Error=FString(Why)+TEXT(": ")+T.Kind+TEXT(" ")+T.TypePath;return false;};
  if(Depth>16 || ++Nodes>1024)return Fail(TEXT("Property type exceeds depth/node limit"));
  const auto K=T.GetKind();
+ if(T.WeakReference && (K!=EDasTypeKind::Object || (FindObject<UClass>(nullptr,*T.TypePath) && FindObject<UClass>(nullptr,*T.TypePath)->HasAnyClassFlags(CLASS_Interface))))return Fail(TEXT("Weak storage requires a concrete object class"));
  if(K==EDasTypeKind::Invalid || K==EDasTypeKind::Void || K==EDasTypeKind::Delegate || K==EDasTypeKind::Event)return Fail(TEXT("Unsupported property kind"));
  if(K!=EDasTypeKind::Enum && T.EnumStorage!=EDasEnumStorage::Automatic)return Fail(TEXT("Enum storage on a non-enum type"));
  if(!T.AuthoredId.IsEmpty() && K!=EDasTypeKind::Object)return Fail(TEXT("Authored object identity on a non-object type"));
  if(!T.DelegateWire.IsEmpty())return Fail(TEXT("Unexpected delegate signature"));
  if(Container(K)){
+  if((T.Element && T.Element->WeakReference) || (T.Key && T.Key->WeakReference) || (T.Value && T.Value->WeakReference))return Fail(TEXT("Direct weak-reference containers need a storage-preserving carrier"));
   if(!T.TypePath.IsEmpty())return Fail(TEXT("Container type_path must be empty"));
   if(K==EDasTypeKind::Map){if(!T.Key || !T.Value || T.Element || !HashKey(T.Key->GetKind()) || Container(T.Value->GetKind()) || T.Value->GetKind()==EDasTypeKind::Class)return Fail(TEXT("Unsupported map shape"));
    if(!Validate(*T.Key,Usage,Error,Depth+1,Nodes) || !Validate(*T.Value,Usage,Error,Depth+1,Nodes))return false;
@@ -43,7 +45,8 @@ bool Validate(const FDasDeclaredType& T,EDasPropertyUsage Usage,FString& Error,i
 }
 bool Describe(const FProperty* P,FDasDeclaredType& Out,FString& Error,int32 Depth,int32& Nodes){
  if(!P || P->ArrayDim!=1 || Depth>16 || ++Nodes>1024){Error=TEXT("Unsupported fixed array or property nesting");return false;}
- Out={};const auto K=DasPropertyKind(P);Out.Kind=DasTypeKindName(K);
+ if(DasHasDirectWeakContainer(P)){Error=TEXT("Direct weak-reference containers need a storage-preserving carrier");return false;}
+ Out={};Out.WeakReference=CastField<FWeakObjectProperty>(P)!=nullptr;const auto K=DasPropertyKind(P);Out.Kind=DasTypeKindName(K);
  if(K==EDasTypeKind::Invalid){Error=TEXT("Unsupported reflected property: ")+P->GetClass()->GetName();return false;}
  if(auto* A=CastField<FArrayProperty>(P)){auto Child=MakeShared<FDasDeclaredType>();Out.Element=Child;return Describe(A->Inner,*Child,Error,Depth+1,Nodes);}
  if(auto* S=CastField<FSetProperty>(P)){auto Child=MakeShared<FDasDeclaredType>();Out.Element=Child;return Describe(S->ElementProp,*Child,Error,Depth+1,Nodes);}
@@ -68,7 +71,7 @@ FProperty* Build(FFieldVariant Owner,FName Name,const FDasDeclaredType& T,EDasPr
  case EDasTypeKind::String:return new FStrProperty(Owner,Name);
  case EDasTypeKind::Name:return new FNameProperty(Owner,Name);
  case EDasTypeKind::Struct:{if(auto* Soft=DasSoftProperty(T.TypePath))return CreateDasSoftProperty(Owner,Name,Soft);auto* P=new FStructProperty(Owner,Name);P->Struct=FindObject<UScriptStruct>(nullptr,*T.TypePath);return P;}
- case EDasTypeKind::Object:{auto* C=FindObject<UClass>(nullptr,*T.TypePath);if(C->HasAnyClassFlags(CLASS_Interface)){auto* P=new FInterfaceProperty(Owner,Name);P->InterfaceClass=C;return P;}auto* P=new FObjectProperty(Owner,Name);P->PropertyClass=C;return P;}
+ case EDasTypeKind::Object:{auto* C=FindObject<UClass>(nullptr,*T.TypePath);if(T.WeakReference){auto* P=new FWeakObjectProperty(Owner,Name);P->PropertyClass=C;return P;}if(C->HasAnyClassFlags(CLASS_Interface)){auto* P=new FInterfaceProperty(Owner,Name);P->InterfaceClass=C;return P;}auto* P=new FObjectProperty(Owner,Name);P->PropertyClass=C;return P;}
  case EDasTypeKind::Class:{auto* P=new FClassProperty(Owner,Name);P->PropertyClass=UClass::StaticClass();P->MetaClass=FindObject<UClass>(nullptr,*T.TypePath);return P;}
  case EDasTypeKind::Enum:{auto* E=FindObject<UEnum>(nullptr,*T.TypePath);if(DasResolvedEnumStorage(T)==EDasEnumStorage::Enum8){auto* P=new FEnumProperty(Owner,Name);P->SetEnum(E);P->AddCppProperty(new FByteProperty(P,TEXT("UnderlyingType")));return P;}auto* P=new FByteProperty(Owner,Name);P->Enum=E;return P;}
  case EDasTypeKind::Array:{auto* P=new FArrayProperty(Owner,Name);P->Inner=Build(P,Usage==EDasPropertyUsage::DelegateParameter?TEXT("Inner"):TEXT("Values"),*T.Element,Usage);return P;}
@@ -88,7 +91,7 @@ EDasEnumStorage DasResolvedEnumStorage(const FDasDeclaredType& Type){
 FString DasTypeKindName(EDasTypeKind Kind){for(const auto& Entry:Names)if(Kind==Entry.Kind)return Entry.Name;return {};}
 FString FDasDeclaredType::StorageIdentity() const {
  TFunction<FString(const FDasDeclaredType&,int32)> StorageKey;
- StorageKey=[&](const FDasDeclaredType& T,int32 Depth){if(Depth>16)return FString(TEXT("invalid-depth"));FString S=T.Kind+FString::Printf(TEXT("[%d]:%d:"),int32(T.EnumStorage),T.TypePath.Len())+T.TypePath;if(T.Element)S+=TEXT("<")+StorageKey(*T.Element,Depth+1)+TEXT(">");if(T.Key)S+=TEXT("{")+StorageKey(*T.Key,Depth+1)+TEXT(";")+(T.Value?StorageKey(*T.Value,Depth+1):TEXT("missing"))+TEXT("}");return S;};return StorageKey(*this,0);
+ StorageKey=[&](const FDasDeclaredType& T,int32 Depth){if(Depth>16)return FString(TEXT("invalid-depth"));FString S=T.Kind+FString::Printf(TEXT("[%d]:%d:"),int32(T.EnumStorage),T.TypePath.Len())+T.TypePath;if(T.WeakReference)S+=TEXT("#weak");if(T.Element)S+=TEXT("<")+StorageKey(*T.Element,Depth+1)+TEXT(">");if(T.Key)S+=TEXT("{")+StorageKey(*T.Key,Depth+1)+TEXT(";")+(T.Value?StorageKey(*T.Value,Depth+1):TEXT("missing"))+TEXT("}");return S;};return StorageKey(*this,0);
 }
 EDasTypeKind DasPropertyKind(const FProperty* P){
  if(!P || P->ArrayDim!=1)return EDasTypeKind::Invalid;

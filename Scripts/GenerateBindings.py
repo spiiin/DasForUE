@@ -87,6 +87,16 @@ def generate(ir, module="ue_generated", source_types=None):
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", module): raise ValueError("Invalid module name")
     if ir.get('schema_version') != 5:
         raise ValueError('Unsupported IR schema version')
+    def validate_weak_marker(value, depth=0):
+        if depth>16: raise ValueError('Weak type descriptor nesting limit')
+        if 'weak_reference' in value and (type(value['weak_reference']) is not bool or value.get('kind')!='object'):
+            raise ValueError('Invalid weak reference marker')
+        for key in ('element','key','value'):
+            if key in value: validate_weak_marker(value[key],depth+1)
+    for fn in ir['functions']:
+        for value in [*fn['parameters'],*fn['fields']]: validate_weak_marker(value)
+    for definition in ir['structs']:
+        for value in definition['fields']: validate_weak_marker(value)
     classes = {}
     interfaces = set()
     interface_ids = {}

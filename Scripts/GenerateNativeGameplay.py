@@ -16,6 +16,7 @@ def generate(ir,script_dirs=None):
  def visit(value,depth=0):
   if depth>16:raise ValueError('Recursive native type')
   if value['kind'] not in ('int','float','double','bool','string','name','object','class','struct','enum','byte','text','array','map','set'):raise ValueError('Unsupported type')
+  if 'weak_reference' in value and (type(value['weak_reference'])!=bool or value['kind']!='object'):raise ValueError('Invalid weak reference marker')
   used.append(value)
   soft=value.get('soft_reference')
   if soft is not None:

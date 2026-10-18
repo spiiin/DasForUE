@@ -49,6 +49,7 @@ namespace
         auto Field = MakeShared<FJsonObject>();
         Field->SetStringField(TEXT("path"), Property->GetName().ToLower());
         Field->SetObjectField(TEXT("metadata"), ExportMetadata(Property));
+        if(CastField<FWeakObjectProperty>(Property))Field->SetBoolField(TEXT("weak_reference"),true);
         if (auto* Map = CastField<FMapProperty>(Property))
         {
             Field->SetStringField(TEXT("kind"), TEXT("map"));

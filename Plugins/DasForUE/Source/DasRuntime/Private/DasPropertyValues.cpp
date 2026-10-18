@@ -46,7 +46,7 @@ struct FRemapValues {
     bool Leaf(FProperty* P,uint8* Memory,DasValueTraversal::ERole){
         if(auto* Object=CastField<FObjectProperty>(P)){
             if(auto* Replacement=Replacements.Find(Object->GetObjectPropertyValue(Memory)))Object->SetObjectPropertyValue(Memory,*Replacement);
-        }else if(CastField<FInterfaceProperty>(P)){
+        }else if(CastField<FInterfaceProperty>(P) || CastField<FWeakObjectProperty>(P)){
             if(auto* Replacement=Replacements.Find(DasReferenceGet(P,Memory)))DasReferenceSet(P,Memory,*Replacement);
         }
         return true;

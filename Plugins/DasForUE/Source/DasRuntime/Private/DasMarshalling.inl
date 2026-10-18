@@ -69,6 +69,7 @@
     void ValidateCallField(FProperty* Property, const FString& Path, bool bInput, bool bOutput, TArray<FMarshalledParameter>& Signature, das::Context* Context, int32 Depth = 0)
     {
         if (Depth > 16) Context->throw_error("call struct nesting limit exceeded");
+        if(DasHasDirectWeakContainer(Property))Context->throw_error("Direct weak-reference containers need a storage-preserving carrier");
         if (auto* Map = CastField<FMapProperty>(Property))
         {
             if (Property->ArrayDim != 1) Context->throw_error("fixed hash arrays require an adapter");
@@ -103,10 +104,12 @@
             return;
         }
         if (Depth > 16) Context->throw_error("call struct nesting limit exceeded");
+        if(DasHasDirectWeakContainer(Property))Context->throw_error("Direct weak-reference containers need a storage-preserving carrier");
         if(auto* Soft=DasSoftCarrierForProperty(Property))Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Soft->GetPathName()});
         else if (FieldKind(Property, Context) == EMarshallingKind::Struct)
         {
             UScriptStruct* Type = CastFieldChecked<FStructProperty>(Property)->Struct;
+            if(Type->GetPathName()==TEXT("/Script/Engine.ActorInstanceHandle"))Context->throw_error("Actor instance handles require the collision result adapter");
             // Native opaque state cannot be described by reflection alone.
             if (Type->GetCppStructOps() && Type->GetCppStructOps()->HasAddStructReferencedObjects())
                 Context->throw_error("structs with native object references are unsupported");
@@ -582,7 +585,7 @@
         if (Object && !DasReferenceMatches(Object,Property)) Context->throw_error("object argument has an incompatible class");
         FDasScalarValue Native;Native.Kind=int32(EDasMethodSignature::Object);Native.ObjectClass=Property->GetPathName();Native.ObjectValue=Object;
         WriteCallValue(Call,Field,Native,Context);
-        Call.ObjectPins.Add(Field.Path, TStrongObjectPtr<UObject>(Object));
+        if(!CastField<FWeakObjectProperty>(Field.Property))Call.ObjectPins.Add(Field.Path, TStrongObjectPtr<UObject>(Object));
     }
     FDasObjectHandle GetCallObject(const FDasCallHandle& Handle, const char* Path, das::Context* Context)
     {
@@ -647,6 +650,7 @@
                 auto Pin = [&](const FString& Path)
                 {
                     auto Field = ResolveCallField(Call, TCHAR_TO_UTF8(*Path), true, Context);
+                    if(CastField<FWeakObjectProperty>(Field.Property))return;
                     const auto Native=ReadCallValue(Field,Context);UObject* Output = CastField<FClassProperty>(Field.Property)?ValidateCallClass(CastFieldChecked<FClassProperty>(Field.Property),Native.ClassValue.Get(),Context):Native.ObjectValue.Get();
                     OutputPins.Add(Path, TStrongObjectPtr<UObject>(IsValid(Output) ? Output : nullptr));
                 };

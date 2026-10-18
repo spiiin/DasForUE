@@ -728,3 +728,5 @@ Managed AIController/MoveTo and a pursuing enemy: [AI](Docs/AI.md). Create demo:
 Standalone new-project integration and focused validation: [DasStarter](Examples/Standalone/README.md).
 
 Collision / Physics: [профиль и целевые проверки](Docs/CollisionPhysicsApi.md), [отчёт блокеров](Docs/CollisionPhysicsBlockers.md).
+
+Weak native references and checked HitResult/OverlapResult views: [Collision foundation](Docs/CollisionFoundation.md). Focused check: `Scripts/TestCollisionFoundation.ps1`.

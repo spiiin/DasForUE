@@ -20,6 +20,7 @@ struct DASRUNTIME_API FDasDeclaredType
     // Physical reflection detail, not authored syntax/JSON. Describe preserves
     // it so native byte enums and enum-class fields roundtrip without guessing.
     EDasEnumStorage EnumStorage = EDasEnumStorage::Automatic;
+    bool WeakReference = false; // Physical native storage; nominal DSL object type is unchanged.
     FString StorageIdentity() const;
 };
 struct FDasDeclaredLiteral

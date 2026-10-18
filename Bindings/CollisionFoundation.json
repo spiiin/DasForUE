@@ -1,0 +1,163 @@
+{
+	"schema_version": 5,
+	"engine_version": "5.8.3-0+UE5",
+	"selection_policy_version": 1,
+	"policy":
+	{
+		"allow_deprecated": false,
+		"allow_internal": false
+	},
+	"functions": [
+		{
+			"class": "/Script/DasRuntime.DasWeakCollisionFixture",
+			"function": "CollectWeakSnapshot",
+			"alias": "ue_collision_fixture_CollectWeakSnapshot",
+			"signature": "v1;CollectWeakSnapshot;Value:StructProperty:134218114:/Script/DasRuntime.DasWeakCollisionSnapshot{Target:WeakObjectProperty:0:/Script/CoreUObject.Object;Marker:IntProperty:0;};ReturnValue:BoolProperty:1408;",
+			"metadata":
+			{
+			},
+			"declaring_class": "/Script/DasRuntime.DasWeakCollisionFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "value.target",
+					"kind": "object",
+					"input": true,
+					"output": false,
+					"type_path": "/Script/CoreUObject.Object"
+				},
+				{
+					"path": "value.marker",
+					"kind": "int",
+					"input": true,
+					"output": false,
+					"type_path": ""
+				},
+				{
+					"path": "returnvalue",
+					"kind": "bool",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "value",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasWeakCollisionSnapshot",
+					"input": true,
+					"output": false
+				},
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "bool",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasWeakCollisionFixture",
+			"function": "MakeWeakSnapshot",
+			"alias": "ue_collision_fixture_MakeWeakSnapshot",
+			"signature": "v1;MakeWeakSnapshot;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasWeakCollisionSnapshot{Target:WeakObjectProperty:0:/Script/CoreUObject.Object;Marker:IntProperty:0;};",
+			"metadata":
+			{
+			},
+			"declaring_class": "/Script/DasRuntime.DasWeakCollisionFixture",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "returnvalue.target",
+					"kind": "object",
+					"input": false,
+					"output": true,
+					"type_path": "/Script/CoreUObject.Object"
+				},
+				{
+					"path": "returnvalue.marker",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasWeakCollisionSnapshot",
+					"input": false,
+					"output": true
+				}
+			]
+		}
+	],
+	"diagnostics": [],
+	"structs": [
+		{
+			"type_path": "/Script/DasRuntime.DasWeakCollisionSnapshot",
+			"cpp_type": "FDasWeakCollisionSnapshot",
+			"metadata":
+			{
+			},
+			"fields": [
+				{
+					"path": "target",
+					"metadata":
+					{
+					},
+					"weak_reference": true,
+					"kind": "object",
+					"type_path": "/Script/CoreUObject.Object"
+				},
+				{
+					"path": "marker",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": ""
+				}
+			]
+		}
+	],
+	"classes": [
+		{
+			"type_path": "/Script/CoreUObject.Object",
+			"metadata":
+			{
+				"ToolTip": "The base class of all UE objects. The type of an object is defined by its UClass.\nThis provides support functions for creating and using objects, and virtual functions that should be overridden in child classes.\n\n@see https://docs.unrealengine.com/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/Objects"
+			},
+			"parent": ""
+		},
+		{
+			"type_path": "/Script/DasRuntime.DasWeakCollisionFixture",
+			"metadata":
+			{
+			},
+			"parent": "/Script/Engine.ActorComponent"
+		},
+		{
+			"type_path": "/Script/Engine.ActorComponent",
+			"metadata":
+			{
+				"ToolTip": "ActorComponent is the base class for components that define reusable behavior that can be added to different types of Actors.\nActorComponents that have a transform are known as SceneComponents and those that can be rendered are PrimitiveComponents.\n\n@see [ActorComponent](https://docs.unrealengine.com/latest/INT/Programming/UnrealArchitecture/Actors/Components/index.html#actorcomponents)\n@see USceneComponent\n@see UPrimitiveComponent"
+			},
+			"parent": "/Script/CoreUObject.Object"
+		}
+	]
+}

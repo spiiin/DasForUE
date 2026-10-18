@@ -7,7 +7,7 @@ bool FDasRuntimeModule::ExportNativeGameplay(const FString& OutputPath,const FSt
 
  TMap<FString,UScriptStruct*> Structs;TMap<FString,UEnum*> UsedEnums;
  TFunction<TSharedPtr<FJsonObject>(FProperty*)> TypeJson;
- TypeJson=[&](FProperty* P){FDasDeclaredType T;DasNativeGameplayType(P,T);auto D=MakeShared<FJsonObject>();D->SetStringField(TEXT("kind"),T.Kind);D->SetStringField(TEXT("type_path"),T.TypePath);
+ TypeJson=[&](FProperty* P){FDasDeclaredType T;DasNativeGameplayType(P,T);auto D=MakeShared<FJsonObject>();D->SetStringField(TEXT("kind"),T.Kind);D->SetStringField(TEXT("type_path"),T.TypePath);if(CastField<FWeakObjectProperty>(P))D->SetBoolField(TEXT("weak_reference"),true);
   if(auto* Soft=CastField<FSoftObjectProperty>(P)){auto* Class=CastField<FSoftClassProperty>(Soft);auto Info=MakeShared<FJsonObject>();Info->SetStringField(TEXT("base"),Class?Class->MetaClass->GetPathName():Soft->PropertyClass->GetPathName());Info->SetBoolField(TEXT("class_ref"),Class!=nullptr);D->SetObjectField(TEXT("soft_reference"),Info);}
   if(T.Kind==TEXT("enum"))UsedEnums.Add(T.TypePath,DasEnumPropertyType(P));
   if(T.Kind==TEXT("map")){auto* M=CastFieldChecked<FMapProperty>(P);D->SetObjectField(TEXT("key"),TypeJson(M->KeyProp));D->SetObjectField(TEXT("value"),TypeJson(M->ValueProp));}

@@ -77,3 +77,26 @@ def ue_widget_remove(widget:UserWidgetRef):void { __ue_widget_remove(widget.hand
 def ue_widget_set_text(widget:UserWidgetRef; name:string; text:UETextValue):void { __ue_widget_text(widget.handle,name,text) }
 def ue_widget_bind_click(widget:UserWidgetRef; name:string; handler:string):void { __ue_widget_click(widget.handle,name,handler) }
 def ue_widget_input(widget:UserWidgetRef; enabled:bool):void { __ue_widget_input(widget.handle,enabled) }
+
+// Collision results are snapshots; object getters return nullable checked weak views.
+[ue_native_object(path="/Script/PhysicsCore.PhysicalMaterial")]
+struct PhysicalMaterialRef { handle:UObjectHandle }
+def PhysicalMaterialRef_from(value:UObjectHandle):PhysicalMaterialRef { return PhysicalMaterialRef(handle=ue_cast_nullable_object(value,"/Script/PhysicsCore.PhysicalMaterial")) }
+def ue_hit_physical_material(hit:UETraceHit):PhysicalMaterialRef { return ue_ref(type<PhysicalMaterialRef>,__ue_trace_material(hit)) }
+def ue_hit_physics_owner(hit:UETraceHit):Object { return ue_ref(type<Object>,__ue_trace_physics_owner(hit)) }
+def ue_hit_bone_name(hit:UETraceHit):UENameValue { return ue_name_value(__ue_trace_bone(hit,false)) }
+def ue_hit_my_bone_name(hit:UETraceHit):UENameValue { return ue_name_value(__ue_trace_bone(hit,true)) }
+def ue_sphere_overlap(position:UEVector; radius:double; var ignored:array<ActorRef>; channel:TraceChannel=TraceChannel.Visibility; ignore_self:bool=true):array<UEOverlapResult> {
+    var handles:array<UObjectHandle>
+    for(actor in ignored) { push(handles,actor.handle) }
+    var results:array<UEOverlapResult>
+    __ue_overlap_world(position,radius,int(channel),handles,ignore_self,results)
+    return <- results
+}
+def ue_sphere_overlap(position:UEVector; radius:double; channel:TraceChannel=TraceChannel.Visibility; ignore_self:bool=true):array<UEOverlapResult> {
+    var ignored:array<ActorRef>
+    return <- ue_sphere_overlap(position,radius,ignored,channel,ignore_self)
+}
+def ue_overlap_actor(hit:UEOverlapResult):ActorRef { return ue_ref(type<ActorRef>,__ue_overlap_reference(hit,0)) }
+def ue_overlap_component(hit:UEOverlapResult):TraceComponentRef { return TraceComponentRef_from(__ue_overlap_reference(hit,1)) }
+def ue_overlap_physics_owner(hit:UEOverlapResult):Object { return ue_ref(type<Object>,__ue_overlap_reference(hit,2)) }

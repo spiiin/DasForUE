@@ -222,3 +222,27 @@ overlap hit/miss/ignore, Actor/Component identity, collision/damping/gravity,
 WorldContext и receiver rejections, совместный импорт с World/Math.
 Модуль не публикуется; итог выполнения — logs/collision-api-package-validation.json.
 Дальше — общий collision-result transport, затем повторный экспорт выбранного API.
+
+## Collision / Physics foundation — 2026-10-18
+
+Добавлены FWeakObjectProperty в общий reference/value backend, физический weak
+descriptor/factory/storage identity, nullable expired/destroying reads и отказ
+от strong pins для weak input/output/snapshot leaves. Reflection IR сохраняет
+weak_reference marker; оба генератора проверяют его тип/применимость.
+Прямые weak-container carriers пока явно запрещены, без подмены на strong.
+
+UETraceHit расширен trace endpoints, penetration depth, item/my_item/element
+indices, bone names, physical material и physics owner. Добавлены UEOverlapResult
+и sphere overlap с native item indices и checked Actor/Component/Owner getters.
+Actor instances читаются через GetCachedActor без неявной материализации.
+Private ActorInstanceHandle и raw Chaos state не flatten'ятся: полная интеграция
+native collision structs в пакетные reflected signatures остаётся отдельным
+adapter этапом. Это safe views, не обещание полного Physics API.
+
+Editor Development, шесть generator cases и семь transient Game-world групп —
+PASS: descriptor/factory, weak GC, класс/shape отказы, generated weak struct
+frames, GC при удерживаемом weak output frame, настоящие trace/penetration/
+overlap, invalid radius/scope и Destroy. Native marker и стабильность DLL
+проверены. Полные Foundation/PIE/packaged не запускались.
+Описание: [CollisionFoundation](CollisionFoundation.md); воспроизведение:
+Scripts/TestCollisionFoundation.ps1; отчёт logs/collision-foundation-validation.json.

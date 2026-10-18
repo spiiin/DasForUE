@@ -92,6 +92,7 @@ struct DASRUNTIME_API FDasClassSchema
 };
 
 // Object and interface references share checked object capabilities in the VM.
+DASRUNTIME_API bool DasHasDirectWeakContainer(const FProperty* Property);
 DASRUNTIME_API UClass* DasReferencePropertyClass(const FProperty* Property);
 DASRUNTIME_API bool DasReferenceMatches(const UObject* Object,const UClass* Class);
 DASRUNTIME_API UObject* DasReferenceGet(const FProperty* Property,const void* Memory);

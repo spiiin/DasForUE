@@ -61,6 +61,8 @@
 #include "Engine/LatentActionManager.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
+#include "Engine/OverlapResult.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Engine/Engine.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "EngineUtils.h"
@@ -95,6 +97,8 @@
 #include "GameFramework/Actor.h"
 #include "Components/ActorComponent.h"
 #include "Engine/World.h"
+#include "Engine/OverlapResult.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "UObject/UObjectGlobals.h"
 #include "UObject/UnrealType.h"
 #include "UObject/Script.h"
@@ -172,10 +176,18 @@ struct FDasTraceHit {
     bool BlockingHit=false,StartPenetrating=false;
     double Distance=0,Time=0;
     FVector Location=FVector::ZeroVector,ImpactPoint=FVector::ZeroVector,Normal=FVector::ZeroVector,ImpactNormal=FVector::ZeroVector;
-    int32 FaceIndex=-1;
-    FDasObjectHandle Actor{},Component{};
+    FVector TraceStart=FVector::ZeroVector,TraceEnd=FVector::ZeroVector;
+    double PenetrationDepth=0;
+    int32 FaceIndex=-1,Item=-1,MyItem=-1,ElementIndex=0;
+    FName BoneName,MyBoneName;
+    FDasObjectHandle Actor{},Component{},PhysMaterial{},PhysicsObjectOwner{};
 };
 MAKE_TYPE_FACTORY(UETraceHit,FDasTraceHit);
+struct FDasOverlapResult {
+ uint64 Scope=0;bool BlockingHit=false;int32 ItemIndex=-1,MyItemIndex=-1;
+ FDasObjectHandle Actor{},Component{},PhysicsObjectOwner{};
+};
+MAKE_TYPE_FACTORY(UEOverlapResult,FDasOverlapResult);
 struct FDasCallHandle { uint64 Token = 0; };
 MAKE_TYPE_FACTORY(UCallHandle, FDasCallHandle);
 
@@ -1176,6 +1188,7 @@ FDasCallHandle BeginAuthoredSuperCall(const FDasObjectHandle& Target,const char*
 void InvokeParentLifecycle(const char* Id,int32 Kind,float Delta,int32 Reason,das::Context* C){RequireObjectContext(C);if(Kind<0 || Kind>4 || !FMath::IsFinite(Delta) || Delta<0)C->throw_error("invalid parent lifecycle call");if(Kind==3 && !ActiveContext->bInitializingObject)C->throw_error("Super.Initialize is only allowed during Initialize");if(Kind==4 && !ConstructingObject)C->throw_error("Super.ConstructionScript is only allowed during ConstructionScript");if(ConstructingObject && Kind!=4)C->throw_error("gameplay lifecycle is forbidden during ConstructionScript");auto* Object=ResolveSelf(C);auto Identity=[](UClass* Class){const auto* D=Class?Class->GetDefaultObject():nullptr;return DasHostIdentity(D);};UClass* Owner=nullptr;for(auto* Class=Object->GetClass();Class;Class=Class->GetSuperClass())if(Identity(Class)==UTF8_TO_TCHAR(Id) && Identity(Class->GetSuperClass())!=UTF8_TO_TCHAR(Id)){Owner=Class;break;}if(!Owner || !Owner->GetSuperClass())C->throw_error("authored lifecycle parent is missing");const auto* Default=Owner->GetSuperClass()->GetDefaultObject();const FString File=DasHostLifecycle(Default);if(File.IsEmpty())return;TGuardValue<bool> TickScope(ExplicitParentTick,Kind==1);TGuardValue<UObject*> ParentScope(ParentLifecycleTarget,Object);auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));const auto Result=R.RunLifecycle(R.ScriptPath(File),Kind==0?EDasCallback::BeginPlay:Kind==1?EDasCallback::Tick:Kind==2?EDasCallback::EndPlay:Kind==3?EDasCallback::Initialize:EDasCallback::Construction,Object,Delta,Reason);if(!Result.bSucceeded)C->throw_error(TCHAR_TO_UTF8(*Result.Error));}
 void PinMethodSnapshot(FProperty* Property,void* Memory,FMarshalledCall& Call,const FString& Path,das::Context* C,int32& Budget,int32 Depth=0){
  if(Depth>16 || --Budget<0)C->throw_error("method snapshot traversal limit exceeded");
+ if(CastField<FWeakObjectProperty>(Property))return;
  if(DasReferencePropertyClass(Property)){auto* Object=DasReferenceGet(Property,Memory);if(Object && (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))C->throw_error("method snapshot object is expired");Call.ObjectPins.Add(Path,TStrongObjectPtr<UObject>(Object));}
  else if(auto* Struct=CastField<FStructProperty>(Property)){for(TFieldIterator<FProperty> It(Struct->Struct);It;++It)PinMethodSnapshot(*It,It->ContainerPtrToValuePtr<void>(Memory),Call,Path+TEXT(".")+It->GetName().ToLower(),C,Budget,Depth+1);}
  else if(auto* Array=CastField<FArrayProperty>(Property)){FScriptArrayHelper Values(Array,Memory);if(Values.Num()>MaxCallArrayElements)C->throw_error("method array size limit exceeded");for(int32 Index=0;Index<Values.Num();++Index)PinMethodSnapshot(Array->Inner,Values.GetRawPtr(Index),Call,Path+TEXT(".")+FString::FromInt(Index),C,Budget,Depth+1);}
@@ -1661,6 +1674,13 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             addField<DAS_BIND_MANAGED_FIELD(Distance)>("distance");addField<DAS_BIND_MANAGED_FIELD(Time)>("time");
             addField<DAS_BIND_MANAGED_FIELD(Location)>("location");addField<DAS_BIND_MANAGED_FIELD(ImpactPoint)>("impact_point");
             addField<DAS_BIND_MANAGED_FIELD(Normal)>("normal");addField<DAS_BIND_MANAGED_FIELD(ImpactNormal)>("impact_normal");addField<DAS_BIND_MANAGED_FIELD(FaceIndex)>("face_index");
+            addField<DAS_BIND_MANAGED_FIELD(TraceStart)>("trace_start");addField<DAS_BIND_MANAGED_FIELD(TraceEnd)>("trace_end");addField<DAS_BIND_MANAGED_FIELD(PenetrationDepth)>("penetration_depth");
+            addField<DAS_BIND_MANAGED_FIELD(Item)>("item");addField<DAS_BIND_MANAGED_FIELD(MyItem)>("my_item");addField<DAS_BIND_MANAGED_FIELD(ElementIndex)>("element_index");
+        }
+    };
+    struct FOverlapResultAnnotation:FMathValueAnnotation<FDasOverlapResult>{
+        FOverlapResultAnnotation(das::ModuleLibrary& L):FMathValueAnnotation("UEOverlapResult",L,"FDasOverlapResult"){
+            addField<DAS_BIND_MANAGED_FIELD(BlockingHit)>("blocking_hit");addField<DAS_BIND_MANAGED_FIELD(ItemIndex)>("item_index");addField<DAS_BIND_MANAGED_FIELD(MyItemIndex)>("my_item_index");
         }
     };
     struct FReflectedValueAnnotation:FMathValueAnnotation<FDasStructValue>{FReflectedValueAnnotation(das::ModuleLibrary& L):FMathValueAnnotation("UEStructValue",L,"FDasStructValue"){}virtual bool isPod()const override{return true;}};
@@ -1700,6 +1720,12 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
 
             addAnnotation(new FObjectHandleAnnotation(Library));addAnnotation(new FClassHandleAnnotation(Library));
             addAnnotation(new FTraceHitAnnotation(Library));
+            addAnnotation(new FOverlapResultAnnotation(Library));
+            das::addExtern<DAS_BIND_FUN(TraceMaterial),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_trace_material",das::SideEffects::accessExternal,"TraceMaterial");
+            das::addExtern<DAS_BIND_FUN(TracePhysicsOwner),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_trace_physics_owner",das::SideEffects::accessExternal,"TracePhysicsOwner");
+            das::addExtern<DAS_BIND_FUN(TraceBone)>(*this,Library,"__ue_trace_bone",das::SideEffects::accessExternal,"TraceBone")->needCallerStackFrame=true;
+            das::addExtern<DAS_BIND_FUN(OverlapWorld)>(*this,Library,"__ue_overlap_world",das::SideEffects::modifyExternal,"OverlapWorld")->needCallerStackFrame=true;
+            das::addExtern<DAS_BIND_FUN(OverlapReference),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_overlap_reference",das::SideEffects::accessExternal,"OverlapReference");
             das::addExtern<DAS_BIND_FUN(TraceWorld),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_trace_world",das::SideEffects::modifyExternal,"TraceWorld");
             das::addExtern<DAS_BIND_FUN(TraceActor),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_trace_actor",das::SideEffects::accessExternal,"TraceActor");
             das::addExtern<DAS_BIND_FUN(TraceComponent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_trace_component",das::SideEffects::accessExternal,"TraceComponent");
