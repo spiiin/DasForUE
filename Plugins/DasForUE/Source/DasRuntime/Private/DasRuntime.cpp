@@ -1,3 +1,4 @@
+#include "DasPrimaryAssets.h"
 #include "DasSaveGame.h"
 #include "DasSaveGameProxy.h"
 #include "DasAIMoveProxy.h"
@@ -417,6 +418,8 @@ namespace
         uint64 TraceScope=NextTraceScope++;
         FDasWidgetLifetime WidgetLifetime;
         TArray<TStrongObjectPtr<USaveGame>> SaveGames;
+        TMap<FPrimaryAssetId,TSharedPtr<FDasPrimaryAssetLease>> PrimaryAssets;
+        TMap<uint64,TArray<FPrimaryAssetId>> PrimaryQueries;
         TArray<FDasTypeDeclaration> Types;
         DasSnapshotContainers::FKeyOrderCache SnapshotKeyOrders;
         DasSnapshotFields::FPathCache SnapshotFieldPaths;
@@ -1687,6 +1690,17 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     bool ScriptInputUnbindAction(const char*,const char*,das::Context*);
     bool ScriptInputUnbindAxis(const char*,das::Context*);
     int32 ScriptInputUnbindAll(das::Context*);
+    uint64 ScriptPrimaryFind(const char*,das::Context*);
+    int32 ScriptPrimaryQueryCount(uint64,das::Context*);
+    const char* ScriptPrimaryQueryName(uint64,int32,das::Context*);
+    void ScriptPrimaryQueryRelease(uint64,das::Context*);
+    bool ScriptPrimaryExists(const char*,const char*,das::Context*);
+    const char* ScriptPrimaryPath(const char*,const char*,das::Context*);
+    FDasObjectHandle ScriptPrimaryObject(const char*,const char*,das::Context*);
+    void ScriptPrimaryLoad(const char*,const char*,const char*,const das::TArray<char*>&,const char*,das::Context*);
+    bool ScriptPrimaryPending(const char*,das::Context*);
+    bool ScriptPrimaryCancel(const char*,das::Context*);
+    bool ScriptPrimaryUnload(const char*,const char*,das::Context*);
     FDasObjectHandle ScriptSaveGameCreate(const FDasClassHandle&,das::Context*);
     FDasObjectHandle ScriptSaveGameCreatePath(const char*,das::Context*);
     bool ScriptSaveGameSave(const FDasObjectHandle&,const char*,int32,das::Context*);
@@ -2017,6 +2031,17 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAction)>(*this,Library,"ue_input_unbind_action",das::SideEffects::modifyExternal,"ScriptInputUnbindAction");
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAxis)>(*this,Library,"ue_input_unbind_axis",das::SideEffects::modifyExternal,"ScriptInputUnbindAxis");
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAll)>(*this,Library,"ue_input_unbind_all",das::SideEffects::modifyExternal,"ScriptInputUnbindAll");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryFind)>(*this,Library,"__ue_primary_find",das::SideEffects::modifyExternal,"ScriptPrimaryFind");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryQueryCount)>(*this,Library,"__ue_primary_query_count",das::SideEffects::modifyExternal,"ScriptPrimaryQueryCount");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryQueryName)>(*this,Library,"__ue_primary_query_name",das::SideEffects::modifyExternal,"ScriptPrimaryQueryName");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryQueryRelease)>(*this,Library,"__ue_primary_query_release",das::SideEffects::modifyExternal,"ScriptPrimaryQueryRelease");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryExists)>(*this,Library,"__ue_primary_exists",das::SideEffects::modifyExternal,"ScriptPrimaryExists");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryPath)>(*this,Library,"__ue_primary_path",das::SideEffects::modifyExternal,"ScriptPrimaryPath");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryObject),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_primary_object",das::SideEffects::modifyExternal,"ScriptPrimaryObject");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryLoad)>(*this,Library,"__ue_primary_load_async",das::SideEffects::modifyExternal,"ScriptPrimaryLoad");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryPending)>(*this,Library,"__ue_primary_pending",das::SideEffects::modifyExternal,"ScriptPrimaryPending");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryCancel)>(*this,Library,"__ue_primary_cancel",das::SideEffects::modifyExternal,"ScriptPrimaryCancel");
+            AddUEExtern<DAS_BIND_FUN(ScriptPrimaryUnload)>(*this,Library,"__ue_primary_unload",das::SideEffects::modifyExternal,"ScriptPrimaryUnload");
             AddUEExtern<DAS_BIND_FUN(ScriptSaveGameCreate),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_savegame_create",das::SideEffects::modifyExternal,"ScriptSaveGameCreate");
             AddUEExtern<DAS_BIND_FUN(ScriptSaveGameCreatePath),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_savegame_create_path",das::SideEffects::modifyExternal,"ScriptSaveGameCreatePath");
             AddUEExtern<DAS_BIND_FUN(ScriptSaveGameSave)>(*this,Library,"__ue_savegame_save",das::SideEffects::modifyExternal,"ScriptSaveGameSave");
@@ -2584,6 +2609,7 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
         FString PayloadPath;
         TStrongObjectPtr<UDasIntDelegateProxy> Proxy;FName ProxyFunction;
         int32 SaveGameKind=0;FString SaveGameName;TStrongObjectPtr<UDasSaveGameProxy> SaveGameProxy;
+        FPrimaryAssetId PrimaryAsset;
         int32 AsyncKind=0;FString AsyncName;TStrongObjectPtr<UDasAsyncAssetProxy> AsyncProxy;TSharedPtr<FStreamableHandle> StreamHandle;
         int32 LatentKind=0;FString LatentName;TWeakObjectPtr<UWorld> LatentWorld;TStrongObjectPtr<UDasLatentProxy> LatentProxy;
         bool InputConsume=true,InputPaused=false;int32 InputKind=0,InputHandle=INDEX_NONE;EInputEvent InputPhase=IE_Pressed;
@@ -2596,7 +2622,8 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
             if(AIMoveProxy.IsValid()){AIMoveProxy->Deactivate();return;}
             if(EffectProxy.IsValid()){EffectProxy->Deactivate();return;}
             if(MontageProxy.IsValid()){MontageProxy->Deactivate();return;}
-            if(AsyncKind){if(StreamHandle.IsValid()){if(!StreamHandle->HasLoadCompleted())StreamHandle->CancelHandle();else StreamHandle->ReleaseHandle();}return;}
+            if(AsyncKind==2)return; // AssetManager load state is owned by VM leases, not callback registrations.
+            if(AsyncKind==1){if(StreamHandle.IsValid()){if(!StreamHandle->HasLoadCompleted())StreamHandle->CancelHandle();else StreamHandle->ReleaseHandle();}return;}
             if(LatentKind){if(auto* W=LatentWorld.Get())if(LatentProxy.IsValid())W->GetLatentActionManager().RemoveActionsForObject(TWeakObjectPtr<UObject>(LatentProxy.Get()));return;}
             if(InputKind==3){if(auto* Input=Cast<UEnhancedInputComponent>(Source.Get()))Input->RemoveBindingByHandle(EnhancedHandle);return;}
             if(InputKind){if(auto* Input=Cast<UInputComponent>(Source.Get())){if(InputKind==1)Input->RemoveActionBindingForHandle(InputHandle);else Input->AxisBindings.RemoveAll([&](const FInputAxisBinding& B){return B.AxisDelegate.IsBoundToObject(Proxy.Get());});}return;}
@@ -2839,17 +2866,18 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
     bool ScriptLatentPending(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.ContainsByPredicate([&](const auto& B){return B->LatentKind==1 && B->LatentName==N;});}
 
 
-    void ScriptAssetLoadImpl(const char* Name,const char* Asset,const char* Handler,const char* Class,bool ClassReference,bool AllowNull,das::Context* C){auto* S=ManagedOwnerSession(C);if(ActiveContext->bEnding)C->throw_error("cannot start asset loading during EndPlay");if(!S->World.IsValid() || !S->World->IsGameWorld())C->throw_error("async asset loading requires owner's game world");const FString N=TimerName(Name,C),PathText=Asset?UTF8_TO_TCHAR(Asset):TEXT(""),Entry=Handler?UTF8_TO_TCHAR(Handler):TEXT(""),ClassPath=Class?UTF8_TO_TCHAR(Class):TEXT("");if((PathText.IsEmpty() && !AllowNull) || PathText.Len()>1024 || (!PathText.IsEmpty() && !FPackageName::IsValidObjectPath(PathText)))C->throw_error("async asset load requires a valid Unreal object path");auto* Expected=FindObject<UClass>(nullptr,*ClassPath);if(!Expected || !ClassPath.StartsWith(TEXT("/Script/")) || Expected->HasAnyClassFlags(CLASS_Interface))C->throw_error("async asset callback requires a loaded native object class");FDasCallContract Contract=FDasCallContract::Scalar(EDasMethodSignature::Void);Contract.Inputs.Add(ClassReference?EDasMethodSignature::Class:EDasMethodSignature::Object);Contract.InputClasses.Add(ClassPath);if(!VerifyContract(S->Live->Program,Entry,Contract))C->throw_error("async asset handler must return void with matching object input");int32 Old=INDEX_NONE,Count=0;for(int32 I=0;I<S->Bindings.Num();++I){const auto& B=*S->Bindings[I];if(B.AsyncKind)++Count;if(B.AsyncKind && B.AsyncName==N)Old=I;}if(Old==INDEX_NONE && Count>=64)C->throw_error("async asset request count limit exceeded");
+    void ScriptAssetLoadImpl(const char* Name,const char* Asset,const char* Handler,const char* Class,bool ClassReference,bool AllowNull,das::Context* C){auto* S=ManagedOwnerSession(C);if(ActiveContext->bEnding)C->throw_error("cannot start asset loading during EndPlay");if(!S->World.IsValid() || !S->World->IsGameWorld())C->throw_error("async asset loading requires owner's game world");const FString N=TimerName(Name,C),PathText=Asset?UTF8_TO_TCHAR(Asset):TEXT(""),Entry=Handler?UTF8_TO_TCHAR(Handler):TEXT(""),ClassPath=Class?UTF8_TO_TCHAR(Class):TEXT("");if((PathText.IsEmpty() && !AllowNull) || PathText.Len()>1024 || (!PathText.IsEmpty() && !FPackageName::IsValidObjectPath(PathText)))C->throw_error("async asset load requires a valid Unreal object path");auto* Expected=FindObject<UClass>(nullptr,*ClassPath);if(!Expected || !ClassPath.StartsWith(TEXT("/Script/")) || Expected->HasAnyClassFlags(CLASS_Interface))C->throw_error("async asset callback requires a loaded native object class");FDasCallContract Contract=FDasCallContract::Scalar(EDasMethodSignature::Void);Contract.Inputs.Add(ClassReference?EDasMethodSignature::Class:EDasMethodSignature::Object);Contract.InputClasses.Add(ClassPath);if(!VerifyContract(S->Live->Program,Entry,Contract))C->throw_error("async asset handler must return void with matching object input");int32 Old=INDEX_NONE,Count=0;for(int32 I=0;I<S->Bindings.Num();++I){const auto& B=*S->Bindings[I];if(B.AsyncKind==1)++Count;if(B.AsyncKind==1 && B.AsyncName==N)Old=I;}if(Old==INDEX_NONE && Count>=64)C->throw_error("async asset request count limit exceeded");
         auto B=MakeUnique<FManagedSubscription>();B->Id=NextSubscriptionId++;B->Handler=Entry;B->Kind=ClassReference?EDasMethodSignature::Class:EDasMethodSignature::Object;B->PayloadPath=ClassPath;B->AsyncKind=1;B->AsyncName=N;B->AsyncProxy.Reset(NewObject<UDasAsyncAssetProxy>());B->AsyncProxy->SubscriptionId=B->Id;B->AsyncProxy->Path=FSoftObjectPath(PathText);B->AsyncProxy->ExpectedClass=ClassPath;B->AsyncProxy->ClassReference=ClassReference;B->Source=B->AsyncProxy.Get();const TWeakObjectPtr<UDasAsyncAssetProxy> Target(B->AsyncProxy.Get());
         if(!PathText.IsEmpty())B->StreamHandle=UAssetManager::GetStreamableManager().RequestAsyncLoad(B->AsyncProxy->Path,FStreamableDelegate::CreateLambda([Target](){if(auto* P=Target.Get())P->Complete();}),FStreamableManager::DefaultAsyncLoadPriority,false,true,TEXT("DasForUE:")+N);if(!PathText.IsEmpty() && !B->StreamHandle.IsValid())C->throw_error("async asset request could not be created");auto Handle=B->StreamHandle;if(Old!=INDEX_NONE)S->Bindings.RemoveAt(Old);S->Bindings.Add(MoveTemp(B));S->RequiredEntries.Add(Entry,Contract);if(Handle.IsValid())Handle->StartStalledHandle();else if(auto* Proxy=Target.Get())Proxy->Complete();
     }
     void ScriptAssetLoad(const char* N,const char* Path,const char* Handler,const char* Class,das::Context* C){ScriptAssetLoadImpl(N,Path,Handler,Class,false,false,C);}
     void ScriptSoftAssetLoad(const char* N,const FDasStructValue& H,const char* Handler,das::Context* C){const auto& V=SoftValue(H,C);auto* P=DasSoftProperty(V.GetScriptStruct()->GetPathName());auto* Class=CastField<FSoftClassProperty>(P);const FTCHARToUTF8 Path(*SoftAssetPath(V).ToString()),Base(*(Class?Class->MetaClass.Get():P->PropertyClass.Get())->GetPathName());ScriptAssetLoadImpl(N,Path.Get(),Handler,Base.Get(),Class!=nullptr,true,C);}
     void ScriptAssetLoadGeneric(const char* N,const char* Path,const char* Handler,das::Context* C){ScriptAssetLoad(N,Path,Handler,"/Script/CoreUObject.Object",C);}
-    bool ScriptAssetCancel(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.RemoveAll([&](const auto& B){return B->AsyncKind && B->AsyncName==N;})>0;}
-    int32 ScriptAssetCancelAll(das::Context* C){auto* S=ManagedOwnerSession(C);return S->Bindings.RemoveAll([](const auto& B){return B->AsyncKind!=0;});}
-    bool ScriptAssetPending(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.ContainsByPredicate([&](const auto& B){return B->AsyncKind && B->AsyncName==N;});}
+    bool ScriptAssetCancel(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.RemoveAll([&](const auto& B){return B->AsyncKind==1 && B->AsyncName==N;})>0;}
+    int32 ScriptAssetCancelAll(das::Context* C){auto* S=ManagedOwnerSession(C);return S->Bindings.RemoveAll([](const auto& B){return B->AsyncKind==1;});}
+    bool ScriptAssetPending(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.ContainsByPredicate([&](const auto& B){return B->AsyncKind==1 && B->AsyncName==N;});}
 #include "DasSaveGameRuntime.inl"
+#include "DasPrimaryAssetsRuntime.inl"
 
 
 #include "DasMontage.inl"
@@ -3218,6 +3246,18 @@ void DispatchScalarEventImpl(uint64 SubscriptionId,ValueType&& Value,bool Initia
 }
 void FDasRuntimeModule::DispatchScalarEvent(uint64 SubscriptionId,const FDasScalarValue& Value){if(IsInGameThread())DispatchScalarEventImpl(SubscriptionId,Value,bInitialized);}
 void FDasRuntimeModule::DispatchScalarEvent(uint64 SubscriptionId,FDasScalarValue&& Value){if(IsInGameThread())DispatchScalarEventImpl(SubscriptionId,MoveTemp(Value),bInitialized);}
+
+void FDasRuntimeModule::CompletePrimaryAssetRequest(uint64 Id,bool Success)
+{
+ if(!IsInGameThread() || !bInitialized)return;
+ for(const auto& S:Sessions){
+  auto* B=S->Bindings.FindByPredicate([&](const auto& X){return X->Id==Id && X->AsyncKind==2;});if(!B)continue;
+  if(!S->Live || S->bReleaseRequested || S->bEndDelivered || !S->Owner.IsValid() || !S->World.IsValid() || S->World->bIsTearingDown)return;
+  FDasScalarValue V;V.Kind=8;V.ObjectClass=TEXT("/Script/CoreUObject.Object");
+  if(Success && S->Live->Context->PrimaryAssets.Contains((*B)->PrimaryAsset))if(auto* M=UAssetManager::GetIfInitialized())V.ObjectValue=M->GetPrimaryAssetObject((*B)->PrimaryAsset);
+  DispatchScalarEvent(Id,MoveTemp(V));return;
+ }
+}
 
 void FDasRuntimeModule::CompleteSaveGameRequest(uint64 Id,USaveGame* Loaded,bool Success)
 {

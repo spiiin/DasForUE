@@ -80,6 +80,7 @@ public:
     FDasExecutionResult RunLifecycle(const FString& Path, EDasCallback Event, TWeakObjectPtr<UObject> Self, float DeltaSeconds = 0.f, int32 EndReason = 0);
     FDasExecutionResult RunConstruction(const FString& Path, TWeakObjectPtr<UObject> Self);
     // Internal reflected delegate bridge: IDs never contain a VM/function pointer.
+    void CompletePrimaryAssetRequest(uint64 Id,bool Success);
     void CompleteSaveGameRequest(uint64 Id,USaveGame* Loaded,bool Success);
     void DispatchIntEvent(uint64 SubscriptionId, int32 Value);
     void DispatchScalarEvent(uint64 SubscriptionId,const FDasScalarValue& Value);

@@ -814,3 +814,26 @@ event вторым. Exact verifier требует `(UEGeometry, event):UEEventRe
 замены native Geometry, независимость callback revisions и неверные сигнатуры.
 Source/DLL/BuildId стабильны; без Error/ensure. PIE/packaged не запускались.
 Без коммита. Docs/WidgetInputHandlers.md; logs/widget-events-validation.json.
+
+### AssetManager / Primary Assets — 2026-10-18
+
+Добавлен managed API `ue_primary_assets`: value IDs, поиск зарегистрированных ID
+по типу без загрузки, exists/path/object, async load с nullable object callback,
+bundles, pending/cancel и unload. Primary-запросы отделены от обычных streamable
+request names. Владение load state разделяется между VM; последняя lease вызывает
+UnloadPrimaryAsset. VM release/reload/world cleanup снимают владение и callbacks.
+Разные наборы bundles у одновременных владельцев и захват уже занятого native
+load state отклоняются. Смена внешнего native state не вызывает его выгрузку.
+
+Сборка Editor Development и один короткий DasPrimaryAssets-сценарий — PASS,
+15 проверок: компиляция примера, настоящие временные .uasset и UI bundle,
+no-load discovery, callbacks/data, GC, два владельца, last-owner unload,
+null failure, cancel delivery и session release. Финальный прогон имеет
+стабильные source/DLL hashes и engine BuildId, без engine Error/ensure.
+Временные файлы и уникальный test type/mount удалены. Первые прогоны выявили
+ошибки тестового pump/fixture и были повторены после исправления; прогоны с
+параллельными изменениями исходников не приняты как финальная верификация.
+Полные Foundation/PIE/packaged и cook/scan-настройки пользовательского проекта
+не проверялись. Изменения без коммита.
+Docs/PrimaryAssets.md; Scripts/TestPrimaryAssets.ps1;
+logs/primary-assets-validation.json; Tests/PrimaryAssets/probe.das.
