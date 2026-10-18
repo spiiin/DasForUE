@@ -1,0 +1,4910 @@
+{
+  "schema_version": 1,
+  "package": "ue_api_collision",
+  "engine_version": "5.8.3-0+UE5",
+  "state": "ue_preflight_passed",
+  "value_types": "canonical_math",
+  "default_arguments": "explicit",
+  "counts": {
+    "generation_ready": 143,
+    "export_blocked": 41,
+    "generation_blocked": 1,
+    "policy_excluded": 0
+  },
+  "candidate_count": 185,
+  "construction_guarded_count": 41,
+  "unique_declaration_count": 185,
+  "unknown_declaration_occurrences": 0,
+  "surfaces": {
+    "receiver": {
+      "generation_ready": 128,
+      "export_blocked": 8,
+      "generation_blocked": 1,
+      "policy_excluded": 0
+    },
+    "library": {
+      "generation_ready": 15,
+      "export_blocked": 33,
+      "generation_blocked": 0,
+      "policy_excluded": 0
+    }
+  },
+  "source_sha256": "d4e03b621a5c99d0d5408df80e0783db8002cfef38eaa01e9ce3a475933dcb2e",
+  "staged_module": "ue_api_collision_preflight_d4e03b621a5c99d0",
+  "preflight": {
+    "game_world": true,
+    "packaged": "not_run",
+    "profile_sha256": "8da61869bde1f4993468883cf819977f25dd48046ab2777c3bbb91889ba59d72",
+    "build_mode": "Editor NullRHI",
+    "runtime_probe": "passed",
+    "compile": "passed"
+  },
+  "members": [
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "BlueprintSuggestProjectileVelocity",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "alias": "ue_collision_gameplay_BlueprintSuggestProjectileVelocity",
+      "explicit_defaults": [
+        {
+          "parameter": "bacceptclosestonnosolutions",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "Blueprint_PredictProjectilePath_Advanced",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "PredictResult.HitResult.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "PredictResult.HitResult.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "PredictResult.HitResult.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "Blueprint_PredictProjectilePath_ByObjectType",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "Blueprint_PredictProjectilePath_ByTraceChannel",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "BreakHitResult",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "Hit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "FindCollisionUV",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "Hit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "GetSurfaceType",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "Hit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "MakeHitResult",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "ReturnValue.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "ReturnValue.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "ReturnValue.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "SuggestProjectileVelocity_CustomArc",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "alias": "ue_collision_gameplay_SuggestProjectileVelocity_CustomArc",
+      "explicit_defaults": [
+        {
+          "parameter": "overridegravityz",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "arcparam",
+          "value": "0.500000"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "SuggestProjectileVelocity_MovingTarget",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "alias": "ue_collision_gameplay_SuggestProjectileVelocity_MovingTarget",
+      "explicit_defaults": [
+        {
+          "parameter": "targetlocationoffset",
+          "value": ""
+        },
+        {
+          "parameter": "gravityzoverride",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "timetotarget",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "drawdebugtype",
+          "value": "Type::None"
+        },
+        {
+          "parameter": "drawdebugtime",
+          "value": "3.000000"
+        },
+        {
+          "parameter": "drawdebugcolor",
+          "value": "(R=1.000000,G=0.000000,B=0.000000,A=1.000000)"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxOverlapActors",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_BoxOverlapActors",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxOverlapActorsWithOrientation",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_BoxOverlapActorsWithOrientation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxOverlapComponents",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_BoxOverlapComponents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxOverlapComponentsWithOrientation",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_BoxOverlapComponentsWithOrientation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleOverlapActors",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_CapsuleOverlapActors",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleOverlapActorsWithOrientation",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_CapsuleOverlapActorsWithOrientation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleOverlapComponents",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_CapsuleOverlapComponents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleOverlapComponentsWithOrientation",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_CapsuleOverlapComponentsWithOrientation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "ComponentOverlapActors",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_ComponentOverlapActors",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "ComponentOverlapComponents",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_ComponentOverlapComponents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetCollisionProfileNames",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.KismetSystemLibrary.GetCollisionProfileNames",
+      "native_policy_evidence": {
+        "reasons": [
+          "not_blueprint_callable",
+          "static",
+          "editor_only"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetCollisionProfileNameProperty",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:CustomThunk",
+          "metadata:BlueprintInternalUseOnly"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereOverlapActors",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_SphereOverlapActors",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereOverlapComponents",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "alias": "ue_collision_SphereOverlapComponents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "BreakConstraint",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_BreakConstraint",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "GetConstrainedComponents",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_GetConstrainedComponents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "GetConstraint",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "ReturnValue.Owner",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "ReturnValue.Index",
+            "cpp_type": "uint32",
+            "property_kind": "UInt32Property",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "GetConstraintForce",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_GetConstraintForce",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "GetCurrentSwing1",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_GetCurrentSwing1",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "GetCurrentSwing2",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_GetCurrentSwing2",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "GetCurrentTwist",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_GetCurrentTwist",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "IsBroken",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_IsBroken",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "IsProjectionEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_IsProjectionEnabled",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "ReInitConstraintAndApplyPhysicsState",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.PhysicsConstraintComponent.ReInitConstraintAndApplyPhysicsState",
+      "native_policy_evidence": {
+        "reasons": [
+          "not_blueprint_callable"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularBreakable",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularBreakable",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularDriveAccelerationMode",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularDriveAccelerationMode",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularDriveMode",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularDriveMode",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularDriveParams",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularDriveParams",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularOrientationDrive",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function",
+      "native_policy_evidence": {
+        "reasons": [
+          "metadata:DeprecatedFunction"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularOrientationTarget",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularOrientationTarget",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularPlasticity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularPlasticity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularSwing1Limit",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularSwing1Limit",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularSwing2Limit",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularSwing2Limit",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularTwistLimit",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularTwistLimit",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularVelocityDrive",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function",
+      "native_policy_evidence": {
+        "reasons": [
+          "metadata:DeprecatedFunction"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularVelocityDriveSLERP",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularVelocityDriveSLERP",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularVelocityDriveTwistAndSwing",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularVelocityDriveTwistAndSwing",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularVelocityTarget",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetAngularVelocityTarget",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetConstrainedComponents",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetConstrainedComponents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetConstraintReferenceFrame",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetConstraintReferenceFrame",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetConstraintReferenceOrientation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetConstraintReferenceOrientation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetConstraintReferencePosition",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetConstraintReferencePosition",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetContactTransferScale",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetContactTransferScale",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetDisableCollision",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetDisableCollision",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearBreakable",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearBreakable",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearDriveAccelerationMode",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearDriveAccelerationMode",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearDriveParams",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearDriveParams",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearPlasticity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearPlasticity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearPositionDrive",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearPositionDrive",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearPositionTarget",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearPositionTarget",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearVelocityDrive",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearVelocityDrive",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearVelocityTarget",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearVelocityTarget",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearXLimit",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearXLimit",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearYLimit",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearYLimit",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetLinearZLimit",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetLinearZLimit",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetOrientationDriveSLERP",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetOrientationDriveSLERP",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetOrientationDriveTwistAndSwing",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetOrientationDriveTwistAndSwing",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetProjectionEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetProjectionEnabled",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetProjectionParams",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "alias": "ue_constraint_SetProjectionParams",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "GetGrabbedComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_GetGrabbedComponent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "GetTargetLocationAndRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_GetTargetLocationAndRotation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "GrabComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function",
+      "native_policy_evidence": {
+        "reasons": [
+          "metadata:DeprecatedFunction"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "GrabComponentAtLocation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_GrabComponentAtLocation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "GrabComponentAtLocationWithRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_GrabComponentAtLocationWithRotation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "ReleaseComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_ReleaseComponent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "SetAngularDamping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_SetAngularDamping",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "SetAngularStiffness",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_SetAngularStiffness",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "SetInterpolationSpeed",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_SetInterpolationSpeed",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "SetLinearDamping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_SetLinearDamping",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "SetLinearStiffness",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_SetLinearStiffness",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "SetTargetLocation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_SetTargetLocation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "SetTargetLocationAndRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_SetTargetLocationAndRotation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "SetTargetRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "alias": "ue_handle_SetTargetRotation",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AddAngularImpulseInDegrees",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_AddAngularImpulseInDegrees",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        },
+        {
+          "parameter": "bvelchange",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AddAngularImpulseInRadians",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_AddAngularImpulseInRadians",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        },
+        {
+          "parameter": "bvelchange",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AddForce",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_AddForce",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        },
+        {
+          "parameter": "baccelchange",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AddForceAtLocation",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_AddForceAtLocation",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AddForceAtLocationLocal",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_AddForceAtLocationLocal",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AddImpulse",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_AddImpulse",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        },
+        {
+          "parameter": "bvelchange",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AddImpulseAtLocation",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_AddImpulseAtLocation",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AddRadialForce",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_AddRadialForce",
+      "explicit_defaults": [
+        {
+          "parameter": "baccelchange",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AddRadialImpulse",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_AddRadialImpulse",
+      "explicit_defaults": [
+        {
+          "parameter": "bvelchange",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AddVelocityChangeImpulseAtLocation",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_AddVelocityChangeImpulseAtLocation",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "CanCharacterStepUp",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_CanCharacterStepUp",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "ClearMoveIgnoreActors",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_ClearMoveIgnoreActors",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "ClearMoveIgnoreComponents",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_ClearMoveIgnoreComponents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "CopyArrayOfMoveIgnoreActors",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_CopyArrayOfMoveIgnoreActors",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "CopyArrayOfMoveIgnoreComponents",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_CopyArrayOfMoveIgnoreComponents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetAngularDamping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetAngularDamping",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetBodyInstanceAsyncPhysicsTickHandle",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetBodyInstanceAsyncPhysicsTickHandle",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        },
+        {
+          "parameter": "bgetwelded",
+          "value": "true"
+        },
+        {
+          "parameter": "index",
+          "value": "-1"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "native_policy_evidence": {
+        "reasons": [
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "ReturnValue",
+            "cpp_type": "FBodyInstanceAsyncPhysicsTickHandle",
+            "property_kind": "StructProperty",
+            "array_dim": 1,
+            "partial_kind": "",
+            "type_path": "/Script/Engine.BodyInstanceAsyncPhysicsTickHandle"
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "generation_shape"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetCenterOfMass",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetCenterOfMass",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetClosestPointOnCollision",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetClosestPointOnCollision",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetCollisionEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetCollisionEnabled",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetCollisionObjectType",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetCollisionObjectType",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetCollisionProfileName",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetCollisionProfileName",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetCollisionResponseToChannel",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetCollisionResponseToChannel",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetGenerateOverlapEvents",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetGenerateOverlapEvents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetInertiaTensor",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetInertiaTensor",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetLinearDamping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetLinearDamping",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetMass",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetMass",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetMassScale",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetMassScale",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetMaterialFromCollisionFaceIndex",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetMaterialFromCollisionFaceIndex",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetMaxDepenetrationVelocity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetMaxDepenetrationVelocity",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetOverlappingActors",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetOverlappingActors",
+      "explicit_defaults": [
+        {
+          "parameter": "classfilter",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetOverlappingComponents",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetOverlappingComponents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetPhysicsAngularVelocityInDegrees",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetPhysicsAngularVelocityInDegrees",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetPhysicsAngularVelocityInRadians",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetPhysicsAngularVelocityInRadians",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetPhysicsLinearVelocity",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetPhysicsLinearVelocity",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetPhysicsLinearVelocityAtPoint",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetPhysicsLinearVelocityAtPoint",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "HandlePostMigrationPhysicsStateChanged",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.PrimitiveComponent.HandlePostMigrationPhysicsStateChanged",
+      "native_policy_evidence": {
+        "reasons": [
+          "not_blueprint_callable",
+          "not_public"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "IgnoreActorWhenMoving",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_IgnoreActorWhenMoving",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "IgnoreComponentWhenMoving",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_IgnoreComponentWhenMoving",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "IsAnyRigidBodyAwake",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_IsAnyRigidBodyAwake",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "IsGravityEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_IsGravityEnabled",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "IsOverlappingActor",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_IsOverlappingActor",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "IsOverlappingComponent",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_IsOverlappingComponent",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_BoxOverlapComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_IsCollisionEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_K2_IsCollisionEnabled",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_IsPhysicsCollisionEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_K2_IsPhysicsCollisionEnabled",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_IsQueryCollisionEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_K2_IsQueryCollisionEnabled",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_SphereOverlapComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "PutRigidBodyToSleep",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_PutRigidBodyToSleep",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "RegisterAsFocalPointInPhysicsReplicationLOD",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_RegisterAsFocalPointInPhysicsReplicationLOD",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "ScaleByMomentOfInertia",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_ScaleByMomentOfInertia",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetAllMassScale",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetAllMassScale",
+      "explicit_defaults": [
+        {
+          "parameter": "inmassscale",
+          "value": "1.000000"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetAllPhysicsAngularVelocityInDegrees",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetAllPhysicsAngularVelocityInDegrees",
+      "explicit_defaults": [
+        {
+          "parameter": "baddtocurrent",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetAllPhysicsAngularVelocityInRadians",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetAllPhysicsAngularVelocityInRadians",
+      "explicit_defaults": [
+        {
+          "parameter": "baddtocurrent",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetAllPhysicsLinearVelocity",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetAllPhysicsLinearVelocity",
+      "explicit_defaults": [
+        {
+          "parameter": "baddtocurrent",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetAngularDamping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetAngularDamping",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetCenterOfMass",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetCenterOfMass",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetCollisionEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetCollisionEnabled",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetCollisionObjectType",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetCollisionObjectType",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetCollisionProfileName",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetCollisionProfileName",
+      "explicit_defaults": [
+        {
+          "parameter": "bupdateoverlaps",
+          "value": "true"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetCollisionResponseToAllChannels",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetCollisionResponseToAllChannels",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetCollisionResponseToChannel",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetCollisionResponseToChannel",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetEnableGravity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetEnableGravity",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetGenerateOverlapEvents",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetGenerateOverlapEvents",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetLinearDamping",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetLinearDamping",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetMassOverrideInKg",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetMassOverrideInKg",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        },
+        {
+          "parameter": "massinkg",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "boverridemass",
+          "value": "true"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetMassScale",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetMassScale",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        },
+        {
+          "parameter": "inmassscale",
+          "value": "1.000000"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetMaxDepenetrationVelocity",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetMaxDepenetrationVelocity",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        },
+        {
+          "parameter": "inmaxdepenetrationvelocity",
+          "value": "-1.000000"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetNotifyRigidBodyCollision",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetNotifyRigidBodyCollision",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetPhysMaterialOverride",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetPhysMaterialOverride",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetPhysicsAngularVelocityInDegrees",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetPhysicsAngularVelocityInDegrees",
+      "explicit_defaults": [
+        {
+          "parameter": "baddtocurrent",
+          "value": "false"
+        },
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetPhysicsAngularVelocityInRadians",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetPhysicsAngularVelocityInRadians",
+      "explicit_defaults": [
+        {
+          "parameter": "baddtocurrent",
+          "value": "false"
+        },
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetPhysicsLinearVelocity",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetPhysicsLinearVelocity",
+      "explicit_defaults": [
+        {
+          "parameter": "baddtocurrent",
+          "value": "false"
+        },
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetPhysicsMaxAngularVelocityInDegrees",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetPhysicsMaxAngularVelocityInDegrees",
+      "explicit_defaults": [
+        {
+          "parameter": "baddtocurrent",
+          "value": "false"
+        },
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetPhysicsMaxAngularVelocityInRadians",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetPhysicsMaxAngularVelocityInRadians",
+      "explicit_defaults": [
+        {
+          "parameter": "baddtocurrent",
+          "value": "false"
+        },
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetSimulatePhysics",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_SetSimulatePhysics",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "UnregisterAsFocalPointInPhysicsReplicationLOD",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_UnregisterAsFocalPointInPhysicsReplicationLOD",
+      "explicit_defaults": [],
+      "status": "generation_ready"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "WakeRigidBody",
+      "surface": "receiver",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_WakeRigidBody",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        }
+      ],
+      "status": "generation_ready"
+    }
+  ],
+  "blockers": [
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "Blueprint_PredictProjectilePath_Advanced",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "PredictResult.HitResult.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "PredictResult.HitResult.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "PredictResult.HitResult.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "Blueprint_PredictProjectilePath_ByObjectType",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "Blueprint_PredictProjectilePath_ByTraceChannel",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "BreakHitResult",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "Hit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "FindCollisionUV",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "Hit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "GetSurfaceType",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "Hit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "Hit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "MakeHitResult",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "ReturnValue.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "ReturnValue.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "ReturnValue.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetCollisionProfileNames",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.KismetSystemLibrary.GetCollisionProfileNames",
+      "native_policy_evidence": {
+        "reasons": [
+          "not_blueprint_callable",
+          "static",
+          "editor_only"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetCollisionProfileNameProperty",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:CustomThunk",
+          "metadata:BlueprintInternalUseOnly"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHits[].PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHits[].Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "static",
+          "metadata:WorldContext",
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "GetConstraint",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "ReturnValue.Owner",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "ReturnValue.Index",
+            "cpp_type": "uint32",
+            "property_kind": "UInt32Property",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "ReInitConstraintAndApplyPhysicsState",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.PhysicsConstraintComponent.ReInitConstraintAndApplyPhysicsState",
+      "native_policy_evidence": {
+        "reasons": [
+          "not_blueprint_callable"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularOrientationDrive",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function",
+      "native_policy_evidence": {
+        "reasons": [
+          "metadata:DeprecatedFunction"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.PhysicsConstraintComponent",
+      "function": "SetAngularVelocityDrive",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsConstraintComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function",
+      "native_policy_evidence": {
+        "reasons": [
+          "metadata:DeprecatedFunction"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.PhysicsHandleComponent",
+      "function": "GrabComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PhysicsHandleComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function",
+      "native_policy_evidence": {
+        "reasons": [
+          "metadata:DeprecatedFunction"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetBodyInstanceAsyncPhysicsTickHandle",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_body_GetBodyInstanceAsyncPhysicsTickHandle",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        },
+        {
+          "parameter": "bgetwelded",
+          "value": "true"
+        },
+        {
+          "parameter": "index",
+          "value": "-1"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter",
+      "native_policy_evidence": {
+        "reasons": [
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "ReturnValue",
+            "cpp_type": "FBodyInstanceAsyncPhysicsTickHandle",
+            "property_kind": "StructProperty",
+            "array_dim": 1,
+            "partial_kind": "",
+            "type_path": "/Script/Engine.BodyInstanceAsyncPhysicsTickHandle"
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "generation_shape"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "HandlePostMigrationPhysicsStateChanged",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.PrimitiveComponent.HandlePostMigrationPhysicsStateChanged",
+      "native_policy_evidence": {
+        "reasons": [
+          "not_blueprint_callable",
+          "not_public"
+        ],
+        "type_issues": [],
+        "marshalling_error": ""
+      },
+      "blocker_group": "visibility_or_deprecation_policy"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_BoxOverlapComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_SphereOverlapComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "Actor instance handles require the collision result adapter\n",
+      "native_policy_evidence": {
+        "reasons": [
+          "unsupported_parameter_type"
+        ],
+        "type_issues": [
+          {
+            "path": "OutHit.PhysMaterial",
+            "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.HitObjectHandle.ReferenceObject",
+            "cpp_type": "TWeakObjectPtr<UObject>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          },
+          {
+            "path": "OutHit.Component",
+            "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+            "property_kind": "WeakObjectProperty",
+            "array_dim": 1,
+            "partial_kind": ""
+          }
+        ],
+        "marshalling_error": ""
+      },
+      "blocker_group": "type_or_abi"
+    }
+  ],
+  "by_class": {
+    "/Script/Engine.GameplayStatics": {
+      "generation_ready": 3,
+      "export_blocked": 7
+    },
+    "/Script/Engine.KismetSystemLibrary": {
+      "generation_ready": 12,
+      "export_blocked": 26
+    },
+    "/Script/Engine.PhysicsConstraintComponent": {
+      "generation_ready": 41,
+      "export_blocked": 4
+    },
+    "/Script/Engine.PhysicsHandleComponent": {
+      "generation_ready": 13,
+      "export_blocked": 1
+    },
+    "/Script/Engine.PrimitiveComponent": {
+      "generation_ready": 74,
+      "generation_blocked": 1,
+      "export_blocked": 3
+    }
+  },
+  "blocker_groups": {
+    "generation_shape": 1,
+    "special_call_adapter": 1,
+    "type_or_abi": 34,
+    "visibility_or_deprecation_policy": 6
+  },
+  "type_issue_counts": [
+    {
+      "property_kind": "StructProperty",
+      "cpp_type": "FBodyInstanceAsyncPhysicsTickHandle",
+      "unique_declarations": 1
+    },
+    {
+      "property_kind": "UInt32Property",
+      "cpp_type": "uint32",
+      "unique_declarations": 1
+    },
+    {
+      "property_kind": "WeakObjectProperty",
+      "cpp_type": "TWeakObjectPtr<UObject>",
+      "unique_declarations": 34
+    },
+    {
+      "property_kind": "WeakObjectProperty",
+      "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+      "unique_declarations": 33
+    },
+    {
+      "property_kind": "WeakObjectProperty",
+      "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+      "unique_declarations": 33
+    }
+  ],
+  "baseline_packages": [
+    {
+      "package": "ue_api_world",
+      "source_sha256": "499aea217b364343f251b8f7f6befb6d061de7bfb993abc31acba5f0cfa12b33"
+    },
+    {
+      "package": "ue_api_math",
+      "source_sha256": "6e451484f204d5670a617902c4d46edf6bdaf124f4569cdc5f8eddc6c0cd4cf6"
+    }
+  ],
+  "generated_unique_declarations": 143,
+  "shared_generated_declarations": 89,
+  "additional_generated_declarations": 54,
+  "evidence_scope": "Fresh native-policy type hints; not exhaustive generic-ABI diagnosis. Counts per declaration, not per field. Baseline overlap measures generated packages only, not all existing adapters/native API.",
+  "evidence_sha256": {
+    "report": "75ce9666d5af72ee4cf5d118ce46c8998320c71f99f20f2d339478072d95805f",
+    "inventory": "a44406f5237496fdfd335b8ddb4c3f47aa44cb5fa649705f43f9eeea682e94ec"
+  }
+}

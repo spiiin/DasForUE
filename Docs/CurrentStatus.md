@@ -202,3 +202,23 @@ C:/src/DasStarter/Saved/DasValidation. Полные Foundation/PIE/packaged не
 Освещение переведено в Movable; точечный offscreen D3D12/SM5 запуск подтвердил
 ноль незапечённых объектов. LightingOnly обновляет свет существующей карты
 без пересоздания сцены; отчёт — Saved/DasValidation/lighting-validation.json.
+
+## Collision / Physics: профиль и backlog — 2026-10-18
+
+Добавлен [профиль Collision / Physics](CollisionPhysicsApi.md) и свежий
+[поимённый отчёт блокеров](CollisionPhysicsBlockers.md). 185 кандидатов:
+143 готовых wrapper, 41 export blocker, один generation blocker. Из готовых
+89 уже есть в Math/World, 54 отсутствуют в этих двух пакетах (constraint/handle).
+Это не подсчёт новых возможностей всей привязки. 41 функция сохраняет construction guard.
+
+Главный общий blocker — transport HitResult (33 объявления, включая 24 traces):
+weak references и ActorInstanceHandle требуют сохранения collision/lifetime
+семантики, одного разрешения weak-полей недостаточно. GetConstraint дополнительно
+требует uint32/weak-owner handle; opaque async physics handle и CustomThunk
+остаются адаптерами. Шесть отказов — deprecated/служебная policy.
+
+Целевой runner TestCollisionApiPackage.ps1 проверяет весь staged-модуль,
+overlap hit/miss/ignore, Actor/Component identity, collision/damping/gravity,
+WorldContext и receiver rejections, совместный импорт с World/Math.
+Модуль не публикуется; итог выполнения — logs/collision-api-package-validation.json.
+Дальше — общий collision-result transport, затем повторный экспорт выбранного API.

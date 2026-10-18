@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "module": "ue_api_collision",
+  "ue_modules": [
+    "Engine"
+  ],
+  "value_types": "canonical_math",
+  "default_arguments": "explicit",
+  "libraries": [
+    {
+      "prefix": "ue_collision_",
+      "include": [
+        "LineTrace*",
+        "SphereTrace*",
+        "BoxTrace*",
+        "CapsuleTrace*",
+        "*Overlap*",
+        "*Collision*"
+      ],
+      "class": "/Script/Engine.KismetSystemLibrary"
+    },
+    {
+      "prefix": "ue_collision_gameplay_",
+      "include": [
+        "*HitResult*",
+        "GetSurfaceType",
+        "*Projectile*",
+        "*Collision*"
+      ],
+      "class": "/Script/Engine.GameplayStatics"
+    }
+  ],
+  "receivers": [
+    {
+      "prefix": "ue_body_",
+      "include": [
+        "*Collision*",
+        "*Overlap*",
+        "*Physics*",
+        "*Mass*",
+        "*Damping*",
+        "*Gravity*",
+        "*Force*",
+        "*Impulse*",
+        "*Velocity*",
+        "*CenterOfMass*",
+        "*RigidBody*",
+        "*PhysicalMaterial*",
+        "*PhysMaterial*",
+        "*ClosestPoint*",
+        "*Inertia*",
+        "*MoveIgnore*",
+        "IgnoreActorWhenMoving",
+        "IgnoreComponentWhenMoving",
+        "CanCharacterStepUp"
+      ],
+      "class": "/Script/Engine.PrimitiveComponent"
+    },
+    {
+      "prefix": "ue_constraint_",
+      "include": [
+        "*"
+      ],
+      "class": "/Script/Engine.PhysicsConstraintComponent"
+    },
+    {
+      "prefix": "ue_handle_",
+      "include": [
+        "*"
+      ],
+      "class": "/Script/Engine.PhysicsHandleComponent"
+    }
+  ],
+  "exclusions": [],
+  "probe_world": true,
+  "probe": "[export]\ndef main(input:int):int {\n    let actor=C_Actor_adf65d5b_from(ue_self_object())\n    // The fixture owns a registered UBoxComponent; these operations do not need simulation.\n    let call=ue_begin_call(C_Actor_adf65d5b_raw(actor),\"K2_GetRootComponent\")\n    ue_require_call_context(call,false)\n    ue_invoke_call(call)\n    let body=C_PrimitiveComponent_5efdd477_from(ue_result_object(call,\"returnvalue\"))\n    ue_release_call(call)\n    if (!C_PrimitiveComponent_5efdd477_valid(body)) { return -1 }\n    ue_body_SetLinearDamping(body,0.375)\n    if (ue_body_GetLinearDamping(body)!=0.375) { return -2 }\n    ue_body_SetEnableGravity(body,false)\n    if (ue_body_IsGravityEnabled(body)) { return -3 }\n    ue_body_SetEnableGravity(body,true)\n    if (!ue_body_IsGravityEnabled(body)) { return -4 }\n    ue_body_SetCollisionEnabled(body,E_ECollisionEnabled_52584e7c.v_QueryOnly)\n    ue_body_SetCollisionObjectType(body,E_ECollisionChannel_30305169.v_ECC_WorldStatic)\n    if (ue_body_GetCollisionEnabled(body)!=E_ECollisionEnabled_52584e7c.v_QueryOnly) { return -5 }\n    var types : array<E_EObjectTypeQuery_e6df5ae8>\n    push(types,E_EObjectTypeQuery_e6df5ae8.v_ObjectTypeQuery1)\n    var ignored : array<C_Actor_adf65d5b>\n    let actor_class=__ue_class_loaded(\"/Script/Engine.Actor\",\"/Script/CoreUObject.Object\",\"\")\n    let hit <- ue_collision_SphereOverlapActors(ue_vector(0.0lf,0.0lf,0.0lf),100.0,types,actor_class,ignored)\n    if (!hit.out_returnvalue || length(hit.out_outactors)!=1) { return -6 }\n    if (!__ue_same_object(C_Actor_adf65d5b_raw(hit.out_outactors[0]),ue_self_object())) { return -7 }\n    let miss <- ue_collision_SphereOverlapActors(ue_vector(10000.0lf,0.0lf,0.0lf),10.0,types,actor_class,ignored)\n    if (miss.out_returnvalue || length(miss.out_outactors)!=0) { return -8 }\n    push(ignored,actor)\n    let excluded <- ue_collision_SphereOverlapActors(ue_vector(0.0lf,0.0lf,0.0lf),100.0,types,actor_class,ignored)\n    if (excluded.out_returnvalue || length(excluded.out_outactors)!=0) { return -9 }\n    clear(ignored)\n    let component_class=__ue_class_loaded(\"/Script/Engine.PrimitiveComponent\",\"/Script/CoreUObject.Object\",\"\")\n    let components <- ue_collision_BoxOverlapComponents(ue_vector(0.0lf,0.0lf,0.0lf),ue_vector(100.0lf,100.0lf,100.0lf),types,component_class,ignored)\n    if (!components.out_returnvalue || length(components.out_outcomponents)!=1) { return -10 }\n    if (!__ue_same_object(C_PrimitiveComponent_5efdd477_raw(components.out_outcomponents[0]),C_PrimitiveComponent_5efdd477_raw(body))) { return -11 }\n    return 42\n}"
+}

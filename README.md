@@ -726,3 +726,5 @@ Managed sound and Niagara for pickup/damage: [Effects](Docs/Effects.md). Focused
 Managed AIController/MoveTo and a pursuing enemy: [AI](Docs/AI.md). Create demo: `Scripts/CreateAIEnemy.ps1`; focused check: `Scripts/TestAI.ps1`.
 
 Standalone new-project integration and focused validation: [DasStarter](Examples/Standalone/README.md).
+
+Collision / Physics: [профиль и целевые проверки](Docs/CollisionPhysicsApi.md), [отчёт блокеров](Docs/CollisionPhysicsBlockers.md).
