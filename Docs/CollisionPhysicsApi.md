@@ -97,3 +97,8 @@ packaged/Shipping и полный Foundation здесь не проверяют�
 [PhysicsSimulation](PhysicsSimulation.md), runner Scripts/TestPhysicsSimulation.ps1.
 Восемь native measurements и null receiver — PASS; 450 Chaos steps.
 Это дополняет query probes, не меняя их прежнюю область проверки.
+
+Реальная симуляция двух тел и режимов constraint теперь проверена отдельно:
+[ConstraintSimulation](ConstraintSimulation.md), Scripts/TestConstraintSimulation.ps1.
+12 этапов и 516 Chaos steps — PASS; включая изменение лимитов, break/recreate
+и отказ stale snapshot/pending setter без побочного эффекта. Без полного PIE/packaged.

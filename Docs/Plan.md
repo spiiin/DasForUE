@@ -3957,3 +3957,22 @@ Tests/PhysicsSimulation/probe.template.das; описание: Docs/PhysicsSimula
 Отчёт logs/physics-simulation-validation.json. Contact/friction, ragdoll,
 отдельные constraints, async/network physics и полные Foundation/PIE/packaged
 этот этап не проверяет. Новых ручных wrappers не добавлено.
+
+## Симуляция двух тел с PhysicsConstraint — 2026-10-18
+
+Добавлен DasConstraintSimulation commandlet и phased DAS probe для двух dynamic
+Chaos bodies. Generated ue_joint_*/ue_constraint_* управляют linear Locked/Free/
+Limited и angular Locked/Free/Limited twist; native assertions измеряют рамки
+constraint после реальных World ticks. Лимиты также меняются на движущейся связи.
+
+Editor build, whole Collision module preflight и 12 runtime этапов — PASS.
+Break освобождает тела; recreation инвалидирует старые snapshot и pending setter
+без побочного эффекта, fresh handle и новая физическая связь работают.
+516 шагов (8,6 с). Нет engine errors/ensure; DLL/fixture/module hashes стабильны.
+Fixture без gravity/contacts; swings, drives/motors, force-threshold breaking,
+network/async physics и долгий stress не входят в эти проверки.
+
+Runner Scripts/TestConstraintSimulation.ps1; template
+Tests/ConstraintSimulation/probe.template.das; Docs/ConstraintSimulation.md.
+Отчёт logs/constraint-simulation-validation.json. Полные Foundation/PIE/packaged
+не запускались. Новых ручных production wrappers не добавлено.
