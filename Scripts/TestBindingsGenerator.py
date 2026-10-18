@@ -528,4 +528,13 @@ class HashTests(unittest.TestCase):
         with mock.patch('GenerateBindings.hash_container_name',return_value='H_Collision'):
             with self.assertRaisesRegex(ValueError,'symbol collision'): generate(self.ir)
 
+    def test_safe_function_carries_explicit_cooked_context_policy(self):
+        text=generate(self.ir)
+        self.assertIn('ue_require_call_context(call, false)',text)
+    def test_unsafe_function_keeps_construction_guard(self):
+        fn=self.ir['functions'][0];fn.setdefault('metadata',{})['UnsafeDuringActorConstruction']=''
+        body=generate(self.ir).split('def '+fn['alias']+'(',1)[1].split('\n}',1)[0]
+        self.assertIn('ue_require_call_context(call, true)',body)
+        self.assertLess(body.index('ue_require_call_context'),body.index('ue_invoke_call'))
+
 if __name__ == '__main__': unittest.main()

@@ -4,7 +4,7 @@ namespace
     {
         auto Result = MakeShared<FJsonObject>();
 #if WITH_EDITOR
-        for (const TCHAR* Key : {TEXT("Category"), TEXT("DisplayName"), TEXT("ToolTip"), TEXT("Units"), TEXT("ClampMin"), TEXT("ClampMax"), TEXT("UIMin"), TEXT("UIMax"), TEXT("DeprecatedFunction"), TEXT("DeprecationMessage"), TEXT("BlueprintInternalUseOnly")})
+        for (const TCHAR* Key : {TEXT("Category"), TEXT("DisplayName"), TEXT("ToolTip"), TEXT("Units"), TEXT("ClampMin"), TEXT("ClampMax"), TEXT("UIMin"), TEXT("UIMax"), TEXT("DeprecatedFunction"), TEXT("DeprecationMessage"), TEXT("BlueprintInternalUseOnly"), TEXT("UnsafeDuringActorConstruction")})
             if (Field->HasMetaData(Key)) Result->SetStringField(Key, Field->GetMetaData(Key));
 #endif
         return Result;
@@ -46,6 +46,8 @@ namespace
     }
     TSharedPtr<FJsonObject> ExportParameterType(FProperty* Property, TMap<FString, TSharedPtr<FJsonObject>>& Structs)
     {
+        // Soft references have a snapshot representation, but no generic wrapper ABI yet.
+        if (CastField<FSoftObjectProperty>(Property)) ExportPolicyError(TEXT("soft_reference_requires_binding_adapter"));
         auto Field = MakeShared<FJsonObject>();
         Field->SetStringField(TEXT("path"), Property->GetName().ToLower());
         Field->SetObjectField(TEXT("metadata"), ExportMetadata(Property));
@@ -75,6 +77,32 @@ namespace
             const FString Path = Type->GetPathName();
             Field->SetStringField(TEXT("kind"), TEXT("struct"));
             Field->SetStringField(TEXT("type_path"), Path);
+            if(Type==FInputActionValue::StaticStruct()){
+                Field->SetStringField(TEXT("transport"),TEXT("input_action_value_v1"));
+                if(!Structs.Contains(Path)){
+                    auto Definition=MakeShared<FJsonObject>();Definition->SetStringField(TEXT("type_path"),Path);
+                    Definition->SetStringField(TEXT("cpp_type"),TEXT("FInputActionValue"));
+                    Definition->SetStringField(TEXT("transport"),TEXT("input_action_value_v1"));
+                    Definition->SetArrayField(TEXT("fields"),{});Structs.Add(Path,Definition);
+                }return Field;
+            }
+            if(Type==FConstraintInstanceAccessor::StaticStruct()){
+                Field->SetStringField(TEXT("transport"),TEXT("constraint_component_v1"));
+                if(!Structs.Contains(Path)){
+                    auto Definition=MakeShared<FJsonObject>();Definition->SetStringField(TEXT("type_path"),Path);Definition->SetStringField(TEXT("cpp_type"),TEXT("FConstraintInstanceAccessor"));
+                    Definition->SetStringField(TEXT("transport"),TEXT("constraint_component_v1"));Definition->SetArrayField(TEXT("fields"),{});Structs.Add(Path,Definition);
+                }return Field;
+            }
+            if(Type==FHitResult::StaticStruct()){
+                Field->SetStringField(TEXT("transport"),TEXT("hit_result_v1"));
+                if(!Structs.Contains(Path)){
+                    auto Definition=MakeShared<FJsonObject>();Definition->SetStringField(TEXT("type_path"),Path);
+                    Definition->SetStringField(TEXT("cpp_type"),TEXT("FHitResult"));
+                    Definition->SetStringField(TEXT("transport"),TEXT("hit_result_v1"));
+                    Definition->SetArrayField(TEXT("fields"),{});Structs.Add(Path,Definition);
+                }
+                return Field;
+            }
             if (!Structs.Contains(Path))
             {
                 auto Definition = MakeShared<FJsonObject>();
@@ -94,7 +122,8 @@ namespace
             FUnrealDasContext Context(4096);
             Field->SetStringField(TEXT("kind"), CallKindName(FieldKind(Property, &Context)));
             FString Path;
-            if(auto* Class=CastField<FClassProperty>(Property))Path=Class->MetaClass->GetPathName();
+            if(auto* Delegate=CastField<FDelegateProperty>(Property))Path=Delegate->SignatureFunction->GetPathName();
+            else if(auto* Class=CastField<FClassProperty>(Property))Path=Class->MetaClass->GetPathName();
             else if (UEnum* Enum = CallEnumType(Property)) Path = Enum->GetPathName();
             else if (auto* ReferenceClass = DasReferencePropertyClass(Property)) Path = ReferenceClass->GetPathName();
             Field->SetStringField(TEXT("type_path"), Path);
@@ -208,11 +237,14 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
             if (!Function || (!Function->HasAnyFunctionFlags(FUNC_BlueprintCallable) && !(Cast<UDasAuthoredInterfaceClass>(Class) && Function->HasAnyFunctionFlags(FUNC_BlueprintEvent))) ||
                 Function->HasAnyFunctionFlags(FUNC_Net | FUNC_Delegate | FUNC_MulticastDelegate))
             { ExportPolicyError(TEXT("Expected loaded class and local BlueprintCallable instance function: ") + ClassPath + TEXT(".") + FunctionName); }
+            const bool ProfileAdapter=IsCollisionProfilePropertyAdapter(Function);
+            if(ProfileAdapter)ValidateCollisionProfileAdapterSignature(Function,&Context);
 #if WITH_EDITOR
-            if (Function->HasMetaData(TEXT("Latent")) || Function->HasMetaData(TEXT("CustomThunk"))) ExportPolicyError(TEXT("requires_special_call_adapter"));
+            if (Function->HasMetaData(TEXT("Latent")) || (Function->HasMetaData(TEXT("CustomThunk")) && !ProfileAdapter)) ExportPolicyError(TEXT("requires_special_call_adapter"));
             if (Function->HasMetaData(TEXT("BlueprintProtected"))) ExportPolicyError(TEXT("protected_function"));
             if (!bAllowDeprecated && Function->HasMetaData(TEXT("DeprecatedFunction"))) ExportPolicyError(TEXT("deprecated_function"));
-            if (!bAllowInternal && Function->HasMetaData(TEXT("BlueprintInternalUseOnly"))) ExportPolicyError(TEXT("internal_function"));
+            if (!bAllowInternal && !ProfileAdapter && Function->HasMetaData(TEXT("BlueprintInternalUseOnly"))) ExportPolicyError(TEXT("internal_function"));
+            // Construction restrictions are retained in generated wrappers and checked by the frame.
 #endif
             if(Class->HasAnyClassFlags(CLASS_Interface) && (!Function->GetOuterUClass()->HasAnyClassFlags(CLASS_Interface) || !Function->HasAnyFunctionFlags(FUNC_BlueprintEvent)))ExportPolicyError(TEXT("requires_reflected_interface_method"));
             const bool bStatic=Function->HasAnyFunctionFlags(FUNC_Static);
@@ -229,7 +261,9 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
             Item->SetStringField(TEXT("function"), FunctionName);
             Item->SetStringField(TEXT("alias"), Alias);
             Item->SetStringField(TEXT("signature"), CallSignatureKey(Function));
-            Item->SetObjectField(TEXT("metadata"), ExportMetadata(Function));
+            auto Metadata=ExportMetadata(Function);
+            if(ProfileAdapter){Metadata->SetStringField(TEXT("UnsafeDuringActorConstruction"),TEXT("true"));Item->SetStringField(TEXT("call_adapter"),TEXT("collision_profile_property_v1"));}
+            Item->SetObjectField(TEXT("metadata"), Metadata);
             Item->SetStringField(TEXT("declaring_class"), Function->GetOuterUClass()->GetPathName());
             if(bStatic){Item->SetBoolField(TEXT("static"),true);Item->SetStringField(TEXT("world_context"),WorldContext);}
             Item->SetBoolField(TEXT("pure"), Function->HasAnyFunctionFlags(FUNC_BlueprintPure));
@@ -244,6 +278,9 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
                 Field->SetBoolField(TEXT("input"), Parameter.bInput);
                 Field->SetBoolField(TEXT("output"), Parameter.bOutput);
                 Field->SetStringField(TEXT("type_path"), Parameter.TypePath);
+                if(Parameter.Kind==EMarshallingKind::Struct && Parameter.TypePath==FConstraintInstanceAccessor::StaticStruct()->GetPathName())Field->SetStringField(TEXT("transport"),TEXT("constraint_component_v1"));
+                if(Parameter.Kind==EMarshallingKind::Struct && Parameter.TypePath==FHitResult::StaticStruct()->GetPathName())Field->SetStringField(TEXT("transport"),TEXT("hit_result_v1"));
+                if(Parameter.Kind==EMarshallingKind::Struct && Parameter.TypePath==FInputActionValue::StaticStruct()->GetPathName())Field->SetStringField(TEXT("transport"),TEXT("input_action_value_v1"));
                 if (Parameter.Kind == EMarshallingKind::Enum)
                 {
                     UEnum* Enum = FindObject<UEnum>(nullptr, *Parameter.TypePath);

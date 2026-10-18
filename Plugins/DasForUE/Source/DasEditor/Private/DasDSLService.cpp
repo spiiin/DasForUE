@@ -10,6 +10,7 @@
 #include "DasAuthoring.h"
 #include "DasBlueprintService.h"
 #include "DasRuntime.h"
+#include "DasAsyncPhysicsVM.h"
 #include "DasProbeActor.h"
 #include "DasScriptComponent.h"
 #include "DasPropertyValues.h"
@@ -55,6 +56,8 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     FDasAuthoringModule Model;FDasClassSchema Schema;FString Json;
     if(!Runtime.ReadAuthoringScript(Runtime.ScriptPath(Script),Model,Error) || !Model.ToActorSchema(Id,Schema,Error) || !Model.ToJson(Json,Error)) return false;
+    FDasDeclaredClass PhysicsDeclaration;if(!Model.ResolveClass(Id,PhysicsDeclaration,Error))return false;
+    if(PhysicsDeclaration.AsyncPhysics){auto Prepared=PrepareDasAsyncPhysicsVM(Runtime.ScriptPath(PhysicsDeclaration.AsyncPhysics->ScriptFile),nullptr,Error);if(!Prepared){Error=TEXT("Async Physics preflight: ")+Error;return false;}}
     for(const auto& Method:Schema.EffectiveMethods()) if(!Runtime.ValidateFrameMethod(Runtime.ScriptPath(Method.ScriptFile),Error,Method.EntryPoint,Method.Contract())) return false;
     if(Schema.Parent==TEXT("FunctionLibrary"))return ApplyDasLibrary(Model,Package,Id,Out,Error);
     const FString ObjectPath=Package+TEXT(".")+FPackageName::GetLongPackageAssetName(Package);
@@ -155,7 +158,10 @@ bool FDasDSLService::Apply(const FString& Script,const FString& Package,const FS
     if(Rollback && GDasFailStructuralStage==2)return Restore(TEXT("Injected post-metadata development failure"));
 #endif
     if(Rollback && !Rollback->Finish(Error)){const FString Reason=Error;return Restore(Reason);}
-    if(Created && DasActorNativeParent(EffectiveDeclaration.NativeParent) && !EffectiveDeclaration.Callbacks.IsEmpty()){*DasHostString(BP->GeneratedClass->GetDefaultObject(),TEXT("LifecycleScript"))=Script;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
+    if(DasActorNativeParent(EffectiveDeclaration.NativeParent)){
+        auto* Lifecycle=DasHostString(BP->GeneratedClass->GetDefaultObject(),TEXT("LifecycleScript"));const bool Needed=!EffectiveDeclaration.Callbacks.IsEmpty() || EffectiveDeclaration.AsyncPhysics.IsSet();
+        if(Lifecycle && (Needed || *Lifecycle==Script)){*Lifecycle=Needed?Script:FString();CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
+    }
     if(Created && Schema.Parent==TEXT("ActorComponent")){auto* Component=CastChecked<UDasScriptComponent>(BP->GeneratedClass->GetDefaultObject());Component->LifecycleScript=Script;Component->bDasConstructionScript=EffectiveDeclaration.Callbacks.ContainsByPredicate([](const auto& C){return C.Kind==TEXT("ConstructionScript");});CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}
     {auto* CDO=BP->GeneratedClass->GetDefaultObject();auto* Identity=DasHostString(CDO,TEXT("AuthoredTypeId"));if(Identity && (Created || Identity->IsEmpty())){CDO->Modify();*Identity=Id;CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();}}
     Out=BP;Applied=true;

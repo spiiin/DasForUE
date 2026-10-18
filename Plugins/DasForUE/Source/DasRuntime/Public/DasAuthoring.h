@@ -90,10 +90,16 @@ struct FDasNativeDefaultGroup {
     TMap<FString,FDasDeclaredLiteral> Defaults;
     bool operator==(const FDasNativeDefaultGroup& O)const{return Component==O.Component && Defaults.OrderIndependentCompareEqual(O.Defaults);}
 };
+struct FDasDeclaredAsyncPhysics {
+    FString ScriptFile;
+    TMap<int32,FString> Bodies;
+    bool operator==(const FDasDeclaredAsyncPhysics& O)const{return ScriptFile==O.ScriptFile && Bodies.OrderIndependentCompareEqual(O.Bodies);}
+};
 struct FDasDeclaredClass
 {
     FString Id, Name, NativeParent, ParentId, SourceScript;
     FString LibraryTypeRegistry;
+    TOptional<FDasDeclaredAsyncPhysics> AsyncPhysics;
     TArray<FString> Interfaces;
     TArray<FDasDeclaredComponent> Components;
     TArray<FDasComponentOverride> ComponentOverrides;

@@ -92,15 +92,17 @@ class PlayableCharacter : Character {
         self.ControlsBound=true
     }
     [ue_function(BlueprintCallable)]
-    def OnMove(value:UEVector2D):void {
+    def OnMove(value:InputActionValue):void {
+        let axis=ue_input_axis2d(value)
         self.MoveEvents+=1
-        ue_character_move(ue_character_self(),float(value.y),float(value.x))
+        ue_character_move(ue_character_self(),float(axis.y),float(axis.x))
     }
     [ue_function(BlueprintCallable)]
-    def OnLook(value:UEVector2D):void {
+    def OnLook(value:InputActionValue):void {
+        let axis=ue_input_axis2d(value)
         self.LookEvents+=1
-        self.AddControllerYawInput(float(value.x))
-        self.AddControllerPitchInput(float(value.y))
+        self.AddControllerYawInput(float(axis.x))
+        self.AddControllerPitchInput(float(axis.y))
     }
     [ue_function(BlueprintCallable)]
     def OnJump(value:bool):void {

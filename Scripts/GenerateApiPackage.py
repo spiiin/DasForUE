@@ -97,7 +97,7 @@ def stage(profile, ir):
         rule = rules.get(item['class'])
         return rule and any(fnmatch.fnmatchcase(item['function'], p) for p in rule['include'])
     def excluded(item):
-        return next((e['reason'] for e in profile.get('exclusions', [])
+        return next((e for e in profile.get('exclusions', [])
                      if e['class'] == item['class'] and fnmatch.fnmatchcase(item['function'], e['function'])), None)
     seen = set()
     for item, exported in [(f, True) for f in ir['functions']] + [(d, False) for d in ir.get('diagnostics', [])]:
@@ -113,7 +113,9 @@ def stage(profile, ir):
         record['declaring_class'] = item.get('declaring_class') or (None if rules[item['class']].get('include_inherited', False) else item['class'])
         reason = excluded(item)
         if reason:
-            record.update(status='policy_excluded', reason=reason)
+            record.update(status='policy_excluded', reason=reason['reason'])
+            if reason.get('alternative'): record['alternative'] = reason['alternative']
+            if not exported: record['export_reason'] = item['reason']
         elif exported and not item.get('static', False) and item['class'] not in receiver_classes:
             record.update(status='policy_excluded', reason='function static/instance mode does not match profile surface')
         elif not exported:
@@ -155,6 +157,7 @@ def stage(profile, ir):
               'unique_declaration_count': len({(r['declaring_class'], r['function']) for r in records if r['declaring_class']}),
               'unknown_declaration_occurrences': sum(r['declaring_class'] is None for r in records),
               'surfaces': {surface: {state: sum(r['surface']==surface and r['status']==state for r in records) for state in counts} for surface in ('receiver','library')}, 'source_sha256': hashlib.sha256(public.encode()).hexdigest(),
+              'dependencies': dict(das_modules=sorted(set(re.findall(r'^require ([A-Za-z_][A-Za-z0-9_]*)', public, re.MULTILINE))), ue_modules=profile['ue_modules']),
               'staged_module': staged_module, 'members': sorted(records, key=lambda r: (r['class'], r['function']))}
     return package_ir, public, staged, report
 

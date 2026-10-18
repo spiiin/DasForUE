@@ -56,10 +56,14 @@ def explain(report, inventory, baselines=()):
             raise ValueError('Blocked member missing from inventory: ' + str(key))
         m['native_policy_evidence'] = dict(reasons=evidence['reasons'], type_issues=evidence['type_issues'], marshalling_error=evidence.get('marshalling_error', ''))
         reason = m['reason'].strip()
-        if m['status'] == 'generation_blocked':
+        if m['status'] == 'policy_excluded':
+            group = 'documented_policy_exclusion'
+        elif m['status'] == 'generation_blocked':
             group = 'generation_shape'
         elif reason == 'deprecated_function' or 'not_blueprint_callable' in evidence['reasons']:
             group = 'visibility_or_deprecation_policy'
+        elif reason.startswith('async physics handles require'):
+            group = 'execution_context'
         elif reason == 'requires_special_call_adapter':
             group = 'special_call_adapter'
         elif reason.startswith('unsupported UFunction or struct field type') or reason.startswith('Actor instance handles require'):
@@ -71,9 +75,11 @@ def explain(report, inventory, baselines=()):
         for issue in evidence['type_issues']:
             kinds[(issue['property_kind'], issue.get('cpp_type', ''))].add(key)
     output = {k: copy.deepcopy(v) for k, v in report.items() if k != 'members'}
-    output.update(members=members, blockers=[m for m in members if m['status'] != 'generation_ready'],
+    output.update(members=members, blockers=[m for m in members if m['status'] in ('export_blocked','generation_blocked')],
+        exclusions=[m for m in members if m['status']=='policy_excluded'],
         by_class={k: dict(v) for k, v in sorted(class_counts.items())},
-        blocker_groups={k: len(v) for k, v in sorted(groups.items())},
+        blocker_groups={k: len(v) for k, v in sorted(groups.items()) if k!='documented_policy_exclusion'},
+        exclusion_groups={k: len(v) for k,v in sorted(groups.items()) if k=='documented_policy_exclusion'},
         type_issue_counts=[dict(property_kind=k[0], cpp_type=k[1], unique_declarations=len(v)) for k, v in sorted(kinds.items())],
         baseline_packages=sources, generated_unique_declarations=len(ready),
         shared_generated_declarations=len(ready & baseline_keys), additional_generated_declarations=len(ready - baseline_keys),
@@ -104,6 +110,13 @@ def markdown(report):
         paths = paths or m['native_policy_evidence']['marshalling_error'].strip().replace('|', '\\|').replace('\n', ' ') or '—'
         reason = m['reason'].strip().replace('|', '\\|').replace('\n', ' ')
         lines.append(f"| {m['class'].split('.')[-1]}.{m['function']} | {m['status']}: {reason} | {paths} |")
+    if not report['blockers']: lines += ['| — | Активных технических блокеров в выбранном профиле нет | — |']
+    lines += ['', '## Документированные исключения', '', '| Функция | Причина политики | Альтернатива | Исходный export diagnostic |', '| --- | --- | --- | --- |']
+    for m in report.get('exclusions', []):
+        cells = [m['class'].split('.')[-1]+'.'+m['function'], m['reason'], m.get('alternative','—'), m.get('export_reason','—')]
+        lines.append('| '+' | '.join(c.replace('|','\\|').replace('\n',' ') for c in cells)+' |')
+    deps=report.get('dependencies',{})
+    lines += ['', '## Подключение и зависимости', '', '```dascript', 'require '+report['package'], '```', '', 'daScript: '+', '.join(deps.get('das_modules',[]))+'. UE modules: '+', '.join(deps.get('ue_modules',[]))+'.', '', 'Готовность генерации не означает проверку каждой функции во всех режимах; packaged/Shipping имеют отдельную проверку.']
     return '\n'.join(lines)+'\n'
 
 

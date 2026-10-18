@@ -1,0 +1,126 @@
+{
+	"schema_version": 5,
+	"engine_version": "5.8.3-0+UE5",
+	"selection_policy_version": 1,
+	"policy":
+	{
+		"allow_deprecated": false,
+		"allow_internal": false
+	},
+	"functions": [
+		{
+			"class": "/Script/DasRuntime.DasNativeHashProbeComponent",
+			"function": "UnsafeContextBump",
+			"alias": "ue_context_UnsafeContextBump",
+			"signature": "v1;UnsafeContextBump;ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "Das|Access",
+				"UnsafeDuringActorConstruction": "true"
+			},
+			"declaring_class": "/Script/DasRuntime.DasNativeHashProbeComponent",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		},
+		{
+			"class": "/Script/DasRuntime.DasFunctionLibraryFixture",
+			"function": "UnsafeContextProbe",
+			"alias": "ue_context_static_UnsafeContextProbe",
+			"signature": "v1;UnsafeContextProbe;ReturnValue:IntProperty:1408;",
+			"metadata":
+			{
+				"Category": "daScript Test",
+				"UnsafeDuringActorConstruction": "true"
+			},
+			"declaring_class": "/Script/DasRuntime.DasFunctionLibraryFixture",
+			"static": true,
+			"world_context": "",
+			"pure": false,
+			"const": false,
+			"fields": [
+				{
+					"path": "returnvalue",
+					"kind": "int",
+					"input": false,
+					"output": true,
+					"type_path": ""
+				}
+			],
+			"parameters": [
+				{
+					"path": "returnvalue",
+					"metadata":
+					{
+					},
+					"kind": "int",
+					"type_path": "",
+					"input": false,
+					"output": true
+				}
+			]
+		}
+	],
+	"diagnostics": [],
+	"structs": [],
+	"classes": [
+		{
+			"type_path": "/Script/CoreUObject.Object",
+			"metadata":
+			{
+				"ToolTip": "The base class of all UE objects. The type of an object is defined by its UClass.\nThis provides support functions for creating and using objects, and virtual functions that should be overridden in child classes.\n\n@see https://docs.unrealengine.com/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/Objects"
+			},
+			"parent": ""
+		},
+		{
+			"type_path": "/Script/DasRuntime.DasFunctionLibraryFixture",
+			"metadata":
+			{
+			},
+			"parent": "/Script/Engine.BlueprintFunctionLibrary"
+		},
+		{
+			"type_path": "/Script/DasRuntime.DasNativeHashProbeComponent",
+			"metadata":
+			{
+			},
+			"parent": "/Script/Engine.ActorComponent"
+		},
+		{
+			"type_path": "/Script/Engine.ActorComponent",
+			"metadata":
+			{
+				"ToolTip": "ActorComponent is the base class for components that define reusable behavior that can be added to different types of Actors.\nActorComponents that have a transform are known as SceneComponents and those that can be rendered are PrimitiveComponents.\n\n@see [ActorComponent](https://docs.unrealengine.com/latest/INT/Programming/UnrealArchitecture/Actors/Components/index.html#actorcomponents)\n@see USceneComponent\n@see UPrimitiveComponent"
+			},
+			"parent": "/Script/CoreUObject.Object"
+		},
+		{
+			"type_path": "/Script/Engine.BlueprintFunctionLibrary",
+			"metadata":
+			{
+				"ToolTip": "This class is a base class for any function libraries exposed to blueprints.\nMethods in subclasses are expected to be static, and no methods should be added to this base class."
+			},
+			"parent": "/Script/CoreUObject.Object"
+		}
+	]
+}

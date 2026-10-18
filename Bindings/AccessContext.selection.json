@@ -1,0 +1,18 @@
+{
+  "class_rules": [
+    {
+      "class": "/Script/DasRuntime.DasNativeHashProbeComponent",
+      "prefix": "ue_context_",
+      "include": [
+        "UnsafeContextBump"
+      ]
+    },
+    {
+      "class": "/Script/DasRuntime.DasFunctionLibraryFixture",
+      "prefix": "ue_context_static_",
+      "include": [
+        "UnsafeContextProbe"
+      ]
+    }
+  ]
+}

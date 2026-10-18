@@ -113,3 +113,11 @@ Editor Development — PASS. Шесть generator cases и семь runtime-гр
 Экспорт сохранил weak marker; DLL не менялась во время проверки. В финальном
 runtime log нет ошибок/ensure. Полные Foundation/PIE/packaged не запускались.
 Проверенная версия сохранена в Git.
+
+
+## Подключение generated API
+
+Следующий этап [HitResult transport](HitResultTransport.md) выполнен: native
+FHitResult переносится как opaque UEHitResult через checked call frames,
+включая arrays/ref/out/nested. Поля ActorInstanceHandle всё ещё не flatten'ятся;
+вместо этого сохраняется полная native copy и используется GetCachedActor view.

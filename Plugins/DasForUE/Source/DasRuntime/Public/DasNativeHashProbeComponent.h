@@ -24,6 +24,35 @@ UCLASS()
 class DASRUNTIME_API UDasNativeHashProbeComponent:public UActorComponent {
  GENERATED_BODY()
 public:
+ // Native accessor fixtures deliberately expose values different from backing storage.
+ UPROPERTY(BlueprintReadWrite,Getter=GetSemanticScore,Setter=SetSemanticScore,Category="Das|Access") int32 SemanticScore=0;
+ int32 GetSemanticScore()const{++GetterCalls;return SemanticScore+1;}
+ void SetSemanticScore(int32 Value){++SetterCalls;SemanticScore=FMath::Clamp(Value,0,100)*2;}
+ uint8 bAccessorPadding:1;
+ UPROPERTY(BlueprintReadWrite,Getter=GetSemanticEnabled,Setter=SetSemanticEnabled,Category="Das|Access") uint8 bSemanticEnabled:1;
+ bool GetSemanticEnabled()const{return bSemanticEnabled;}
+ void SetSemanticEnabled(bool Value){++SetterCalls;bSemanticEnabled=Value;}
+ UPROPERTY(BlueprintReadWrite,Getter=GetSemanticNumbers,Setter=SetSemanticNumbers,Category="Das|Access") TArray<int32> SemanticNumbers;
+ TArray<int32> GetSemanticNumbers()const{auto V=SemanticNumbers;V.Add(999);return V;}
+ void SetSemanticNumbers(const TArray<int32>& Value){++SetterCalls;SemanticNumbers=Value;SemanticNumbers.Add(42);}
+ UPROPERTY(BlueprintReadWrite,Getter=GetSemanticDirection,Setter=SetSemanticDirection,Category="Das|Access") FVector SemanticDirection=FVector::ZeroVector;
+ FVector GetSemanticDirection()const{return SemanticDirection+FVector(1,0,0);}
+ void SetSemanticDirection(const FVector& Value){++SetterCalls;SemanticDirection=Value*2;}
+ UPROPERTY(BlueprintReadWrite,Getter=GetSemanticObject,Setter=SetSemanticObject,Category="Das|Access") UObject* SemanticObject=nullptr;
+ UObject* GetSemanticObject()const{return SemanticObject;}
+ void SetSemanticObject(UObject* Value);
+ bool CollectOnSet=false;
+ UPROPERTY(BlueprintReadOnly,Getter=GetReadonlyScore,Setter=SetReadonlyScore,Category="Das|Access") int32 ReadonlyScore=7;
+ int32 GetReadonlyScore()const{return ReadonlyScore+1;}
+ void SetReadonlyScore(int32 Value){++SetterCalls;ReadonlyScore=Value;}
+ UPROPERTY(BlueprintGetter=ReadBlueprintLevel,BlueprintSetter=WriteBlueprintLevel,Category="Das|Access") float BlueprintLevel=0;
+ UFUNCTION(BlueprintGetter) float ReadBlueprintLevel()const{++GetterCalls;return BlueprintLevel+0.25f;}
+ UFUNCTION(BlueprintSetter,meta=(UnsafeDuringActorConstruction="true")) void WriteBlueprintLevel(float Value){++BlueprintSetterCalls;BlueprintLevel=FMath::Clamp(Value,0.f,10.f);}
+ UFUNCTION(BlueprintCallable,Category="Das|Access") int32 SafeContextBump(){return ++SafeCalls;}
+ UFUNCTION(BlueprintCallable,Category="Das|Access",meta=(UnsafeDuringActorConstruction="true")) int32 UnsafeContextBump(){return ++UnsafeCalls;}
+ mutable int32 GetterCalls=0;
+ int32 SetterCalls=0,BlueprintSetterCalls=0,SafeCalls=0,UnsafeCalls=0;
+
  UPROPERTY(BlueprintReadWrite,Category="Das|NativeSoftProbe") TSoftObjectPtr<UObject> SoftAsset;
  UPROPERTY(BlueprintReadWrite,Category="Das|NativeSoftProbe") TSoftClassPtr<AActor> SoftActorType;
  UPROPERTY(BlueprintReadWrite,Category="Das|NativeSoftProbe") TArray<TSoftObjectPtr<UObject>> SoftAssets;

@@ -9,7 +9,7 @@ if(!$SkipBuild){
 }
 function GetPackageHashes {
  $Hashes=[ordered]@{}
- foreach($Name in @('Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-DasRuntime.dll','Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-DasEditor.dll','Bindings/Packages/UMGInput.profile.json','Scripts/GenerateBindings.py','Scripts/GenerateApiPackage.py')){
+ foreach($Name in @('Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-DasRuntime.dll','Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-DasEditor.dll','Bindings/Packages/UMGInput.profile.json','Scripts/GenerateBindings.py','Scripts/GenerateApiPackage.py','Plugins/DasForUE/Content/Das/Scripts/ue_input_value.das','Plugins/DasForUE/Source/DasRuntime/Private/DasInputActionValue.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasBindingExport.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasMarshalling.inl')){
   $Hashes[$Name]=(Get-FileHash -LiteralPath "$Repo/$Name" -Algorithm SHA256).Hash
  }
  return ($Hashes|ConvertTo-Json -Compress)
@@ -31,6 +31,6 @@ foreach($Log in @('export.log','preflight.log')){
 if((GetPackageHashes) -ne $Before){throw 'DLL, profile or generator changed during validation'}
 $Summary=[ordered]@{schema_version=1;package=$Definition.package;engine_version=$Definition.engine_version;state=$Definition.state;value_types=$Definition.value_types;default_arguments=$Definition.default_arguments;candidate_count=$Definition.candidate_count;counts=$Definition.counts;construction_guarded_count=$Definition.construction_guarded_count;source_sha256=$Definition.source_sha256;surfaces=$Definition.surfaces;blockers=@($Definition.members|Where-Object {$_.status -ne 'generation_ready'})}
 $Summary|ConvertTo-Json -Depth 100|Set-Content -LiteralPath "$Repo/Bindings/Packages/ue_api_umg_input.summary.json" -Encoding utf8
-[ordered]@{state='PASS';report=$Report;runtime_probe='KismetInputLibrary.Key_IsKeyboardKey: SpaceBar FKey round-trip';runtime_probe_count=1;whole_module_compile='PASS';counts=$Definition.counts;candidate_count=$Definition.candidate_count;hashes=($Before|ConvertFrom-Json);published=$false;widget_rendering='not_run';physical_input='not_run';enhanced_input_callbacks='existing_managed_adapter_not_rerun';PIE='not_run';packaged='not_run';full_suites='not_run';commit='not_created'}|ConvertTo-Json -Depth 6|Set-Content -LiteralPath "$Run/validation.json" -Encoding utf8
+[ordered]@{state='PASS';report=$Report;runtime_probe='InputActionValue: Bool/Axis1D/2D/3D, owned copy, native Make/Break/ToString';runtime_probe_count=1;whole_module_compile='PASS';counts=$Definition.counts;candidate_count=$Definition.candidate_count;hashes=($Before|ConvertFrom-Json);published=$false;widget_rendering='not_run';physical_input='not_run';enhanced_input_callbacks='existing_managed_adapter_not_rerun';PIE='not_run';packaged='not_run';full_suites='not_run';commit='not_created'}|ConvertTo-Json -Depth 6|Set-Content -LiteralPath "$Run/validation.json" -Encoding utf8
 Copy-Item -LiteralPath "$Run/validation.json" -Destination "$Repo/logs/umg-input-validation.json" -Force
 Write-Output "DAS_UMG_INPUT_PACKAGE=PASS report=$Run/validation.json"

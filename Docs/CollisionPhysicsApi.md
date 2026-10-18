@@ -1,104 +1,91 @@
-# Профиль Collision / Physics
+# Collision / Physics API
 
-Первый проход систематической генерации для UE 5.8.3. Профиль:
-`Bindings/Packages/CollisionPhysics.profile.json`, staged module `ue_api_collision`.
-На этом этапе модуль проверяется в Build/ApiPackages, но не устанавливается
-в Content/Das/Scripts. Действующие World/Math и native registry не заменяются.
+Модуль `ue_api_collision` установлен в `Plugins/DasForUE/Content/Das/Scripts`.
+Профиль UE 5.8.3: `Bindings/Packages/CollisionPhysics.profile.json`.
 
-## Область
-
-- KismetSystemLibrary: Line/Sphere/Box/Capsule Trace, overlap и collision API.
-- GameplayStatics: HitResult, projectile prediction и collision helpers.
-- PrimitiveComponent: collision/overlap, physics, force/impulse, mass, damping,
-  gravity, velocity, physical materials, rigid body, move-ignore и closest point.
-- PhysicsConstraintComponent и PhysicsHandleComponent: все локальные отражённые
-  объявления, включая диагностируемые deprecated/служебные методы.
-
-Унаследованные копии не включаются. Методы Actor/SceneComponent не дублируются
-на constraint/handle receiver; они остаются в World. Неотражённый C++, Chaos
-solver API, async callbacks, delegates и расширения дополнительных плагинов
-не являются областью этого первого профиля. Рендерные materials и StackTrace
-не включены. Профиль не является обещанием покрытия всей физики Unreal.
-
-## Результат первого прохода
-
-185 кандидатов, 143 обёртки прошли генерацию и совместную компиляцию модуля;
-41 export blocker и один generation blocker. Construction guard сохранён
-для 41 готовой функции. Из 143 объявлений 89 уже есть в Math/World,
-54 отсутствуют в этих пакетах: 41 constraint и 13 handle. Наличие альтернативных
-native/managed helpers не проверяется этим числом.
-
-Поимённый [отчёт блокеров](CollisionPhysicsBlockers.md) воспроизводится из
-свежего generic export и отдельного native reflection inventory. Машинный
-снимок: `Bindings/Packages/ue_api_collision.summary.json`. В нём сохранены
-объявления, стадии, причины, пути type issues, хеши evidence и baseline-пакетов.
-Native-policy hints уточняют диагностику, но не заменяют generic backend.
-
-## Что снимать дальше
-
-1. **Общий transport collision results.** 33 выбранных объявления используют
-   HitResult: 24 trace/sweep, семь GameplayStatics helpers и два component overlap.
-   Reflected поля PhysMaterial/Component и вложенный ReferenceObject являются
-   weak references. Их нельзя бездумно сделать сильными: результат попадания
-   не должен удерживать уничтоженный Actor/Component.
-2. **ActorInstanceHandle.** Простого разрешения weak-полей недостаточно:
-   generic validator отдельно отклоняет этот тип, поскольку отражённые поля
-   не описывают всю его native-семантику. Нужен проверенный codec/adapter
-   для HitResult с разрешением Actor через UE, включая invalid/expired cases.
-   Это ограничение видно в DasMarshalling.inl и не является новым runtime-тестом.
-3. **Constraint handle.** GetConstraint дополнительно требует weak owner,
-   uint32 index и отдельного решения о lifetime/допустимых операциях handle.
-4. **Async physics tick handle.** GetBodyInstanceAsyncPhysicsTickHandle
-   экспортируется, но непрозрачная структура требует адаптера; отражения
-   недостаточно. SetCollisionProfileNameProperty — отдельный CustomThunk.
-
-Ещё шесть отказов относятся к deprecated или служебным, не BlueprintCallable
-объявлениям. Они не являются шестью недостающими кодеками и не требуют
-ослабления visibility policy.
-
-В привязке уже есть managed `ue_line_trace`, `ue_sphere_trace`, `UETraceHit`
-и overlap helpers. Отказ generic wrappers не означает отсутствия trace вообще.
-Следующий этап должен использовать существующий collision-result подход
-и общие type descriptors, а не добавлять ручную обёртку для каждой из 33 функций.
-После добавления transport нужен повторный экспорт: устранение первого
-блокера может обнаружить последующие ограничения структуры/массива.
-
-## Целевые проверки
-
-```powershell
-.\Scripts\TestCollisionApiPackage.ps1 -SkipBuild
+```dascript
+options gen2
+require ue_api_collision
 ```
 
-Без SkipBuild сначала собирается тестовый Editor target. Для сравнения нужны
-успешные полные отчёты World и Math в Build/ApiPackages/*/latest-report.json.
+Прямые зависимости: daScript `ue_foundation` (экспортируется public), UE `Engine`.
+Для самостоятельного импорта World/Math не требуются: closure пакета содержит
+нужные object views, enum и структуры, а canonical math берётся из foundation.
+Зависимости и их компиляция проверяются генератором на всём модуле.
 
-Runner выполняет 17 тестов пакетного генератора и шесть тестов отчёта;
-проверяет компиляцию всего staged-модуля, damping/gravity и collision settings
-на зарегистрированном BoxComponent в transient Game world. SphereOverlapActors
-проверяется на попадание, промах и исключение владельца. BoxOverlapComponents
-проверяет массив объектов и identity root-компонента. Затем проверяются
-отсутствующий WorldContext, null и неправильный receiver, совместный импорт
-Collision/World/Math с квалифицированными именами.
+World/Math можно подключить дополнительно. Общие generated object views и
+функции могут иметь совпадающие имена; выбирайте модуль явно:
 
-Миры уничтожаются после probe; ассеты и открытый редактор не затрагиваются.
-Это Editor NullRHI: физическая симуляция/импульс, trace/sweep runtime, PIE,
-packaged/Shipping и полный Foundation здесь не проверяются. Generated означает
-проверенную компиляцию, а не выполнение каждой функции пакета.
+```dascript
+require ue_api_collision
+require ue_api_world
+require ue_api_math
 
-Последний результат: `logs/collision-api-package-validation.json`.
-Общий отчёт: `Build/ApiPackages/ue_api_collision/latest-report.json`.
-Каждый запуск хранит reflection.json, inventory.json и отдельные probe logs.
+// В gameplay-контексте с self:
+let actor=ue_api_world::C_Actor_adf65d5b_from(ue_self_object())
+let scale=ue_api_world::ue_actor_GetActorScale3D(actor)
+```
 
-Последний целевой прогон: PASS — 23 Python-теста, весь модуль, overlap/settings,
-три ожидаемых отказа и совместный импорт World/Math. Сборка тестового проекта
-согласована после параллельного изменения FDasDeclaredType. Коммит не создавался.
+Project `Content/Das/Scripts` имеет приоритет над plugin scripts. Копия
+`ue_api_collision.das` в проекте намеренно переопределяет установленную версию;
+для обновления используйте единый источник. В данном smoke-проекте такой копии нет.
+Установка инвалидирует UBT rules cache: новый файл должен попасть в перечень
+plugin DAS scripts при следующей сборке. Runner с `-Publish` без `-SkipBuild`
+обновляет только target metadata после установки и проверяет наличие модуля
+в UFS runtime dependencies. Это проверка build receipt; cooked/Shipping build
+в этой итерации не запускается.
 
-Реальная body simulation и PhysicsHandle теперь проверяются отдельно:
-[PhysicsSimulation](PhysicsSimulation.md), runner Scripts/TestPhysicsSimulation.ps1.
-Восемь native measurements и null receiver — PASS; 450 Chaos steps.
-Это дополняет query probes, не меняя их прежнюю область проверки.
+## Покрытие выбранного профиля
 
-Реальная симуляция двух тел и режимов constraint теперь проверена отдельно:
-[ConstraintSimulation](ConstraintSimulation.md), Scripts/TestConstraintSimulation.ps1.
-12 этапов и 516 Chaos steps — PASS; включая изменение лимитов, break/recreate
-и отказ stale snapshot/pending setter без побочного эффекта. Без полного PIE/packaged.
+241 уникальное объявление: **234 generated, 0 export blockers, 0 generation
+blockers, 7 documented policy exclusions**. Construction guards сохранены
+у 44 функций. 89 готовых объявлений пересекаются с Math/World, 145 отсутствуют
+в этих baseline-пакетах; это не число новых возможностей всей привязки.
+
+Включены Line/Sphere/Box/Capsule Trace и sweep (24 объявления), overlap,
+HitResult/projectile helpers, выбранный PrimitiveComponent physics/collision
+API, ConstraintInstanceBlueprintLibrary, PhysicsConstraintComponent и
+PhysicsHandleComponent. Native поля и унаследованные копии методов этим
+профилем не добавляются; список не обещает всю физику Unreal.
+
+Семь исключений заданы явно в профиле. Три deprecated-функции имеют современные
+замены; три служебных/non-BlueprintCallable объявления остаются закрытыми.
+Raw `GetBodyInstanceAsyncPhysicsTickHandle` не разрешён generic transport:
+поддерживаемая альтернатива — `ue_async_physics`, `ue_physics_body` и
+`ue_physics_add_force` в отдельной VM. Это реализованный
+[Async Physics DSL](AsyncPhysicsDSL.md), а не ожидающий реализации codec.
+Сложные/welded/skeletal тела, worker-thread VM и network resimulation остаются
+отдельными расширениями вне этой области.
+
+Поимённые причины, альтернативы, исходные export diagnostics и native-policy
+evidence: [отчёт покрытия](CollisionPhysicsBlockers.md), машинный снимок
+`Bindings/Packages/ue_api_collision.summary.json`. Технический backlog и
+документированные исключения в отчёте разделены.
+
+## Воспроизведение и границы проверки
+
+```powershell
+.\Scripts\TestCollisionApiPackage.ps1 -Publish
+# При уже актуальной сборке:
+.\Scripts\TestCollisionApiPackage.ps1 -SkipBuild -Publish
+```
+
+`-Publish` устанавливает сгенерированный модуль локально после успешного
+staged preflight. Это не Git-коммит и не внешняя публикация. Без флага runner
+проверяет staged-кандидат. Свежие успешные baseline reports World/Math нужны
+только для отчёта пересечения покрытия.
+
+Целевые проверки: 27 Python-тестов генератора/отчёта; fresh reflection и native
+inventory; компиляция всего пакета; runtime damping/gravity/collision settings;
+actor overlap hit/miss/ignore и component identity; три ожидаемых отказа
+(null/wrong receiver и missing WorldContext); staged combined World/Math;
+обычный installed `require ue_api_collision` отдельно и вместе с World/Math.
+Runner сверяет SHA256 установленного модуля и стабильность Runtime/Editor DLL,
+не принимает engine errors/ensure в положительных probes.
+
+Результат: `logs/collision-api-package-validation.json`, исходные evidence в
+`Build/ApiPackages/ue_api_collision/<run>/`. Generated означает проверенную
+компиляцию, а не выполнение каждой функции. Полный Foundation, PIE, packaged,
+повторные trace/constraint/async simulation suites здесь не запускаются.
+Отдельные предыдущие сценарии: [HitResult](HitResultTransport.md),
+[Constraint](ConstraintSimulation.md), [Async Physics DSL](AsyncPhysicsDSL.md).

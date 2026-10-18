@@ -181,6 +181,18 @@ MoveResult (Success/Blocked/OffPath/Aborted/Invalid), необязательны
 `logs/ai-validation.json`. Rendering/audio, сеть, полный Foundation/PIE и packaged
 не проверялись. Без коммита. Behavior Tree/Perception/StateTree пока не добавлены.
 
+## Аудит покрытия API — 2026-10-18
+
+Добавлен воспроизводимый [отчёт](ApiCoverage.md) и
+[план системного расширения](ApiExpansionPlan.md). Шесть модулей, 1 938 классов,
+16 401 уникальное объявление; 4 546 проходят native-фильтр, из них 3 315 пока
+нигде не зарегистрированы. У library exporter 1 762 eligible-функции без
+статических обёрток в проверенных generated-модулях. Числа не являются общим
+процентом готовности UE binding и не учитывают всю доступность через adapters.
+Генератор и аудит используют общую политику; native artifacts -Check — PASS.
+14 тестов отчёта и 34 теста генератора — PASS. Полные runtime/PIE/packaged в
+аудите не запускались; существующий набор generated API не расширялся.
+
 ## Самостоятельный проект — 2026-10-18
 
 Добавлен [DasStarter](../Examples/Standalone/README.md): шаблон нового проекта,
@@ -202,6 +214,49 @@ C:/src/DasStarter/Saved/DasValidation. Полные Foundation/PIE/packaged не
 Освещение переведено в Movable; точечный offscreen D3D12/SM5 запуск подтвердил
 ноль незапечённых объектов. LightingOnly обновляет свет существующей карты
 без пересоздания сцены; отчёт — Saved/DasValidation/lighting-validation.json.
+
+## Первый пакет API Math — 2026-10-18
+
+Добавлены декларативный профиль, замыкание зависимостей, поимённые причины
+пропусков и UE preflight всего модуля. Из 741 функции KismetMathLibrary
+619 сгенерированы и скомпилированы вместе, 112 блокирует экспортёр, 10 —
+непрозрачные структуры в генераторе. Целевой NullRHI probe проверил scalar,
+Vector, Transform, LinearColor, массивы и ref/out. Модуль ue_api_math установлен;
+Vector2D, Vector, Rotator и Transform используют canonical foundation-типы,
+включая вложенные значения и массивы. Остальные structs пока используют
+generated transport. Все аргументы явные по политике профиля. Подробнее: [ApiPackages](ApiPackages.md).
+Полные Foundation/PIE/packaged на этом этапе не запускались.
+
+## Пакет World / Actor / Components — 2026-10-18
+
+Реализованы receiver profiles и отдельные counts для library/instance surfaces;
+унаследованные occurrences не смешиваются с уникальными declarations.
+WorldActorComponents: 311 instance wrappers и 253 library wrappers (564 вместе).
+339 экспортных blocker'ов и один opaque-struct generation blocker сохранены
+поимённо. Экспортёр явно отклоняет soft-reference transport без адаптера и
+UnsafeDuringActorConstruction до общего context guard. Ни native registry,
+ни native fields/accessors этим пакетом не расширяются.
+Подробности, примеры и целевые проверки: [WorldApiPackage](WorldApiPackage.md).
+Далее — общий accessor/construction-policy этап, затем Collision/Physics.
+
+## Native accessors и construction guard — 2026-10-18
+
+[Общий object-property слой](NativeAccessAndConstruction.md) поддерживает native
+FProperty Getter/Setter и BlueprintGetter/Setter, сохраняет readonly и проверяет
+значение до вызова setter. Используются существующие value descriptors/carriers
+и GC roots; bitfield bool ABI нормализуется отдельно. Контракты сериализованы
+в native manifest/header; FProperty/UFunction pointers не кэшируются между reload.
+UnsafeDuringActorConstruction больше не исключает методы целиком: native registry
+и generic wrappers сохраняют guard, runtime проверяет фазу до dispatch.
+
+160 Python-тестов, native artifacts check, Game/Editor ConstructionScript,
+metadata-removed guards, getter/setter semantics, readonly/stale/type/infinity,
+GC в setter и настоящий Engine accessor example — PASS. World пакет повторно
+проверен: 652 wrappers, 88 guarded, blockers 246 export + 6 generation; Math 619.
+Без полного Foundation/PIE/packaged прогона и без собственного коммита.
+Далее — Collision/Physics/type blockers; унификация object/enum/UEName views
+между пакетами остаётся отдельной задачей.
+
 
 ## Collision / Physics: профиль и backlog — 2026-10-18
 
@@ -247,6 +302,75 @@ overlap, invalid radius/scope и Destroy. Native marker и стабильнос�
 Описание: [CollisionFoundation](CollisionFoundation.md); воспроизведение:
 Scripts/TestCollisionFoundation.ps1; отчёт logs/collision-foundation-validation.json.
 
+
+## Generated HitResult transport — 2026-10-18
+
+Добавлен [общий native HitResult transport](HitResultTransport.md): opaque
+UEHitResult в generic frames/IR/generator, native copy с private ActorInstanceHandle,
+checked UETraceHit view и настоящими weak-ссылками. Используется существующая
+bounded snapshot table/root collection. Scalar/ref/out, array и nested forms
+проверены; native private state не flatten'ится и не строится из JSON.
+
+Collision: 175 wrappers вместо 143, 8 export + 2 generation blockers вместо
+41 + 1. Все 24 generated trace/sweep declarations компилируются. Дополнительно
+открыты шесть GameplayStatics HitResult consumers/prediction helpers и два
+component overlap метода. Advanced projectile params по-прежнему блокирует
+struct array object shape, GetConstraint — отдельный weak/uint32 handle,
+async physics handle — opaque adapter, ещё семь отказов — policy/CustomThunk.
+
+127 Python tests и transient Game-world probes — PASS: generated line/sphere/
+box/capsule, miss/penetration, multi sweep, native consumer и ActorInstanceHandle
+roundtrip, scalar/array/nested/ref, GC с snapshot/output/pending input frame,
+Destroy, type/direction/missing/private-path rejections, snapshot root collection.
+Collision overlap/WorldContext/receiver/combined World-Math checks — PASS.
+Отчёт logs/hit-transport-validation.json. Пакет остаётся staged; полные
+Foundation/PIE/packaged не запускались, коммит не создавался.
+Далее — struct arrays с object elements для Advanced projectile params либо
+отдельный проверенный constraint-handle contract; это независимые задачи.
+
+## PredictProjectilePath_Advanced: blocker закрыт — 2026-10-18
+
+Генератор разрешает ObjectProperty/ClassProperty arrays в полях struct так же,
+как в параметрах UFunction. Сохраняются проверка native storage marker и класса,
+nullable object reads, контроль направления и существующий frame marshalling.
+WeakObjectProperty arrays по-прежнему не подменяются сильными ссылками.
+Новый native ABI или ручной wrapper для Advanced не понадобился.
+
+Повторная генерация и весь Collision module preflight — PASS: 176 wrappers,
+все 33/33 объявления HitResult. Пять новых regression tests, 96 существующих
+generator tests и восемь HitResult generator tests — PASS (109 суммарно).
+
+Целевой runtime probe: hit, nested HitResult/PathData, ignored Actor внутри
+PredictParams, clear массива, null element, дубликаты и spatial miss — PASS.
+Две загруженные DLL стабильны. Native rebuild, full Foundation/PIE/packaged
+не запускались. Collision package остаётся staged; новый коммит не создавался.
+
+Воспроизведение: Scripts/TestStructReferenceArraysGenerator.py;
+Scripts/GenerateApiPackage.ps1 -Profile Bindings/Packages/CollisionPhysics.profile.json -SkipBuild;
+Scripts/TestProjectileAdvanced.ps1 -Report <fresh-run/report.json>.
+Probe: Tests/ProjectileAdvanced/probe.template.das.
+Отчёт: logs/projectile-advanced-validation.json;
+coverage: logs/collision-hitresult-coverage-after.json.
+
+
+## Общие reference arrays в struct — 2026-10-18
+
+[Object/class arrays](StructReferenceArrays.md) поддержаны в generic struct members.
+Объединён storage validator для struct arrays и параметров UFunction; неверный
+marker/класс/MetaClass и подмена weak storage отклоняются. Проба охватывает input/
+output, struct arrays с вложенными object/class arrays, nullable/duplicate/empty
+значения, resize и detached output. Native ABI общего runtime не менялся;
+собрана расширенная тестовая fixture.
+
+113 Python tests, весь Collision module, Advanced projectile prediction и
+reflected nested array roundtrip/negative checks — PASS. Collision 176 wrappers,
+8 export + 1 generation blockers, HitResult declarations 33/33 generation ready.
+Полные Foundation/PIE/packaged не запускались, staged only, без коммита.
+Отчёт logs/struct-reference-arrays-validation.json.
+Далее — отдельный checked constraint-handle contract либо следующий пакет
+Pawn/Character/AI/Navigation с документированными исключениями Physics.
+
+
 ## Симуляция тела и PhysicsHandle — 2026-10-18
 
 Добавлен DasPhysicsSimulation commandlet и phased DAS probe, использующие
@@ -266,6 +390,26 @@ Tests/PhysicsSimulation/probe.template.das; описание: Docs/PhysicsSimula
 отдельные constraints, async/network physics и полные Foundation/PIE/packaged
 этот этап не проверяет. Новых ручных wrappers не добавлено.
 
+
+## Checked GetConstraint transport — 2026-10-18
+
+Добавлен [безопасный UEConstraintHandle](ConstraintTransport.md): component-owned
+getter и ref/out transport ConstraintInstanceBlueprintLibrary. Weak owner/bodies,
+Game world/lifecycle и поколение Chaos proxy проверяются перед dispatch;
+пересоздание constraint, Destroy и смена VM-контекста инвалидируют токен.
+Native private index/editor callback не становятся частью DAS snapshot.
+
+CollisionPhysics расширен 56 методами библиотеки: 233/241 ready, 7 export +
+1 generation blockers. GetConstraint закрыт; остаются CustomThunk, opaque async
+physics tick handle и шесть deprecated/служебных объявлений. Все функции пакета
+скомпилированы; runtime проверяет выбранный getter/setter и lifecycle guards.
+
+Smoke Editor build, 112 Python tests, whole module и целевые runtime generation/
+pending/delayed result/weak GC/foreign context probes — PASS. Отчёт:
+logs/constraint-transport-validation.json. Пакет staged; полный Foundation,
+PIE и packaged не запускались, без коммита.
+
+
 ## Симуляция двух тел с PhysicsConstraint — 2026-10-18
 
 Добавлен DasConstraintSimulation commandlet и phased DAS probe для двух dynamic
@@ -284,6 +428,33 @@ Runner Scripts/TestConstraintSimulation.ps1; template
 Tests/ConstraintSimulation/probe.template.das; Docs/ConstraintSimulation.md.
 Отчёт logs/constraint-simulation-validation.json. Полные Foundation/PIE/packaged
 не запускались. Новых ручных production wrappers не добавлено.
+
+
+## Checked collision-profile property adapter — 2026-10-18
+
+[SetCollisionProfileNameProperty](CollisionProfilePropertyAdapter.md) открыт
+узким native dispatch adapter: точная native function/parameter signature,
+scalar FCollisionProfileName, writable BlueprintVisible property, живой
+non-template target в том же Game world. Запись использует общий property
+access layer и сохраняет setter semantics. Это присваивание struct-поля,
+а не применение collision profile к PrimitiveComponent.
+
+CustomThunk stub не вызывается; исключение internal/thunk policy действует
+только для этого известного адаптера. В runtime встроен construction guard;
+bind_events/EndPlay и editor/чужие миры запрещены. Generated IR содержит
+call_adapter=collision_profile_property_v1 и construction-unsafe contract.
+
+Collision: 234/241 ready, 6 export + 1 generation blockers. Остались opaque
+async physics tick handle и шесть deprecated/служебных объявлений. Smoke Editor
+build, 113 Python tests, whole staged module и 22 целевых native/runtime checks
+— PASS, включая inherited field, setter, wrong type/source и incomplete input,
+missing/readonly/hidden/array/name errors, CDO/null/foreign world, pending Destroy
+и lifecycle guards без CustomThunk metadata. Отчёт:
+logs/collision-profile-adapter-validation.json. Пакет staged; Foundation/PIE/
+packaged не запускались, коммит не создавался. Далее — исследовать consumers
+async physics tick handle и определить безопасный контракт; остальные шесть
+отказов могут остаться документированными исключениями.
+
 
 ## Pawn / Character / AI / Navigation: первый пакет — 2026-10-18
 
@@ -309,6 +480,42 @@ Visibility/deprecation даёт ещё 148 отказов. Collision / Physics �
 Описание Docs/PawnAINavigation.md; backlog Docs/PawnAINavigationBlockers.md;
 runner Scripts/TestPawnAIPackage.ps1; logs/pawn-ai-package-validation.json.
 Пакет не опубликован; полные Foundation/PIE/packaged не запускались.
+
+
+## Async physics body handle: контракт и явный execution gate — 2026-10-18
+
+Исследован [GetBodyInstanceAsyncPhysicsTickHandle](AsyncPhysicsHandleContract.md).
+Это raw Chaos proxy, не owning/weak snapshot. В доступных C++ исходниках
+Engine/Source + Engine/Plugins найден один consumer — PhysicsThreadLibrary.AddForce;
+loaded reflection подтверждает один getter и один consumer. Engine callback
+идёт на frozen GameThread в internal physics context; обычного IsInGameThread
+недостаточно. Debug thread flags не заменяют shipping capability.
+
+Выбран будущий контракт: precompiled isolated PhysicsPreSim VM, whitelist UE
+operations, weak owner/body selector + generation marker, session/revision +
+callback epoch, запрет токена вне текущего callback. Первый body scope — unwelded
+single-body primitives; первая операция — finite AddForce/accel-change. До
+поддержки execution roles нельзя открывать raw getter/consumer общей VM.
+Design record: Bindings/AsyncPhysics.contract.json; это не runtime-конфигурация.
+
+В generic call marshalling добавлен явный отказ до создания frame. Collision
+остаётся 234/241 ready; теперь 7 export + 0 generation blockers, один в группе
+execution_context и шесть deprecated/служебных. Это уточнение причины, а не
+реализация async handle transport или новый рабочий DAS API.
+
+Build, 7 Python report tests, whole staged Collision preflight и 24 целевых
+native/runtime checks (sync + fixed async 1/60) — PASS: native consumer force/
+accel-change, presim thread context, recreate/generation, unregister/Destroy/GC,
+два ordinary DAS rejection paths в каждом режиме. Стабильность DLL подтверждена
+финальным прогоном. Отчёт logs/async-physics-audit-validation.json; source hashes
+и anchors — logs/async-physics-source-audit.json. Foundation/PIE/packaged и
+skeletal/welding/network/resim не запускались. Пакет staged, без коммита.
+
+Далее по этой теме: execution-role guards всех UE externs и authored callbacks,
+безопасный native lifecycle bridge, затем отдельный PhysicsPreSim context и
+scoped body/AddForce adapter. Синтаксис DSL не фиксировался. Обычные GT force/
+impulse уже доступны и не требуют открытия async handle.
+
 
 ### Native static NavigationSystemV1 — 2026-10-18
 
@@ -352,6 +559,46 @@ dispatcher и новых externs нет. User-facing typed stimulus DSL не п�
 дополнительные perception delegates/reload lifecycle по отдельным сценариям.
 
 
+## Execution-role guards и native physics bridge — 2026-10-18
+
+[ExecutionRolesAndAsyncBridge](ExecutionRolesAndAsyncBridge.md): все 579 UE
+extern registration sites используют общую checked factory, включая scalar,
+CMRES, low-level и функции без self/context. PhysicsPreSim запрещает все UE
+externs до появления явного physics allowlist; builtin-математика DAS работает.
+Frozen solver detection присутствует без debug-флагов и закрывает обход через
+другой WorldContext/static no-self callback. Gameplay VM entry из этой фазы
+отклоняется до компиляции/сессии; AOT raw cppName bypass закрыт noAot для UE externs.
+
+Native-only UDasAsyncPhysicsBridge использует обычный component lifecycle,
+weak owner/world, callback epoch и binding revision. Revoke/Deactivate немедленно
+отзывают scope; штатный DeferRemoveAsyncPhysicsTick и последующая GT finalization
+снимают регистрацию, не изменяя callback set во время обхода. Callback error,
+nested scope, script/native EndPlay, unregister, Destroy, ReleaseObject, accepted
+reload и world cleanup безопасно завершают binding; rejected reload сохраняет его.
+Class migration/default-update консервативно отзывает bindings без auto-rebind.
+
+Build, 102 целевых native/runtime checks (51 sync + 51 fixed async 1/60), source
+coverage audit и ordinary whole Collision preflight — PASS. Engine errors/ensure
+отсутствуют, обе DLL стабильны. Отчёт logs/execution-role-validation.json.
+Collision остаётся 234/241 ready. Foundation/PIE/packaged не запускались;
+коммит не создавался.
+
+Публичный DAS AsyncPhysicsTick/DSL, isolated production physics VM и scoped
+body/AddForce transport ещё не реализованы. Далее — dedicated precompiled VM
+с bounded value IO, затем body token и первый explicitly allowed physics adapter.
+
+
+### Dedicated Async Physics VM
+
+Добавлена отдельная заранее подготовленная interpreter VM, native API
+`CreateDasAsyncPhysicsVM`, value-only mailbox 16 finite double в каждую сторону,
+scoped physics IO и транзакционная публикация выхода. Gameplay Context не
+переиспользуется; stop/reload/Destroy проходят через native bridge. Проверки и
+точные ограничения: [AsyncPhysicsVM](AsyncPhysicsVM.md),
+`logs/physics-vm-validation.json`. Следующий слой: scoped body token/AddForce;
+generic async handle transport остаётся запрещён. Без коммита.
+
+
 ### Типизированный AIStimulus и ue_event — 2026-10-18
 
 Добавлен модуль ue_perception: AIStimulus с Sense, SuccessfullySensed, Expired,
@@ -386,6 +633,17 @@ logs/animation-audio-vfx-validation.json. Пакет staged, без публик
 Следующий основной пакет — UMG / Input; сеть и структурные миграции остаются отложены.
 
 
+### Scoped Async Physics body / AddForce
+
+Реализованы native BindBody/ClearBody, opaque UEPhysicsBodyToken и
+physics-only ue_physics_body/ue_physics_add_force. Разрешения ограничены восемью
+собственными single unwelded телами Actor; лимит 64 AddForce за callback.
+Силы commit в том же preSim после успешного скрипта, с проверкой weak lifecycle,
+World/solver и generation. Контракт/ограничения и целевые проверки:
+[ScopedPhysicsBody](ScopedPhysicsBody.md), `logs/scoped-body-validation.json`.
+Обычный reflected raw async handle по-прежнему закрыт. Без коммита.
+
+
 ### Первый пакет UMG / Input — 2026-10-18
 
 Профиль UMGInput: 5 libraries и 20 receivers, modules Engine/InputCore/SlateCore/
@@ -400,3 +658,91 @@ non-callable события и delegate signatures не объявляются o
 backlog Bindings/Packages/ue_api_umg_input.summary.json. Новых C++ dispatchers нет.
 Пакет staged, без публикации и коммита. Следующий функциональный шаг выбирается
 из общих value/callback barriers под нужный сценарий; сеть и миграции отложены.
+
+### Типизированный InputActionValue — 2026-10-18
+
+Добавлен ue_input_value: owned InputActionValue, InputValueType и перегруженный
+ue_input_value(bool/float/double/UEVector2D/UEVector), ue_input_type и getters
+ue_input_bool/axis1d/axis2d/axis3d. Native layout не копируется в DAS; отдельный
+numeric carrier преобразуется через UE constructors/Get. Exact-path transport
+input_action_value_v1 подключён к общим exporter/generator/call frames.
+Сгенерированы MakeInputActionValueOfType, BreakInputActionValue и ToString;
+UMG/Input: 323 ready (+3), 110 export blocked, 84 generation blocked.
+Editor build + whole-module compile + один короткий runtime main — PASS:
+четыре типа, native Make/Break/ToString, нулевые лишние оси, array copy.
+Исправлен порядок регистрации FFI: UCallHandle регистрируется до transport externs.
+DLL/profile/generator/adapter source hashes стабильны, Error/ensure в принятом
+прогоне нет. Полный PIE/packaged и physical input не запускались.
+Existing bool/float/vector Enhanced Input callbacks сохранены; typed callback
+payload и авторские поля этим шагом не расширялись. Документация
+Docs/InputActionValue.md; пример input_action_values.das; отчёт
+logs/umg-input-validation.json. Пакет staged; изменения без коммита.
+Следующее: managed callback/delegate-параметры и UI-сценарий по потребности;
+сеть и миграции остаются отложены.
+
+
+### Async Physics registration DSL
+
+Добавлена class annotation ue_async_physics(script, body_0..body_7), typed
+recipe в authoring IR/JSON, автоматическая подготовка/регистрация отдельной VM
+после lifecycle и gameplay mailbox. Physics dependencies участвуют в безопасном
+runtime reload; Blueprint import выполняет compile-only physics preflight.
+Пример и точные ограничения: [AsyncPhysicsDSL](AsyncPhysicsDSL.md).
+Целевой отчёт: `logs/async-dsl-validation.json`. Без коммита.
+
+Итоговый целевой прогон: **298 PASS** — 50 DSL, 80 scoped body, 66 VM и 102
+execution-role/lifecycle checks, в sync и fixed async (1/60). Runtime/Editor DLL
+SHA256 стабильны, engine errors/ensure отсутствуют. Проверены наследование,
+ActorComponent owner binding, отказ до модификации Blueprint, сохранение старой
+VM при ошибке reload, отсутствие повторного BeginPlay, ошибка BeginPlay и GC.
+Foundation, полный PIE и packaged не запускались. Коммит не создавался.
+
+
+### Collision package: обычный require и завершённый coverage report
+
+Установлен `Content/Das/Scripts/ue_api_collision.das`: 234 ready из 241,
+0 export/generation blockers и 7 явных policy exclusions. Сохранены исходные
+export diagnostics, native-policy evidence и альтернативы; raw async handle
+закрыт с указанием реализованного safe DSL. Прямые зависимости — ue_foundation
+(public) и UE Engine; standalone импорт не требует World/Math. Совместный импорт
+World/Math проверен с namespaces. Свежий report/inventory, 27 Python tests,
+whole-module и installed standalone/combined runtime probes, overlap/settings,
+три ожидаемых отказа — PASS. DLL hashes стабильны; engine errors/ensure нет.
+Отчёт logs/collision-api-package-validation.json. Полные Foundation/PIE/packaged
+и повторные simulation suites не запускались; без коммита.
+
+### Typed Enhanced Input callbacks и UMG delegate-параметры — 2026-10-18
+
+ue_enhanced_bind принимает InputActionValue в plain exported handlers и в
+авторских ue_function методах. Добавлен общий native struct pack/unpack bridge;
+direct numeric ABI ограничен Enhanced Input и соответствующими reload requirements.
+Native proxy проверяет SourceAction и finite values, передаёт owned snapshot.
+Старые bool/float/Vector2D/Vector handlers и managed recipes сохранены.
+Native scalar input-only single-cast delegate параметры генерируются как
+UEFunctionDelegate: checked UFunction endpoint, exact native signature identity,
+общий call frame/DelegateHandler и weak semantics. Unbind остаётся явным native
+контрактом; managed HUD/input cleanup сохраняется. Все 10 delegate blockers сняты.
+UMG/Input опубликован: 333 ready, 110 export blocked, 74 generation blocked.
+PlayableCharacter OnMove/OnLook переведены на InputActionValue; существующий HUD
+использует managed кнопку и Tab → GameOnly/GameAndUI без второй реализации UI.
+Editor build, generation/preflight, обновление example assets и один короткий
+совместный -game/NullRHI сценарий — PASS: четыре native payload shapes и копии,
+native navigation delegate/отказ неверной сигнатуры, real LocalPlayer injection
+в авторский OnMove, HUD click, UI/game cursor, ReleaseObject снимает input handles.
+DLL/source hashes стабильны; Error/ensure в принятом прогоне нет.
+Полные PIE/packaged, физические устройства/rendering и reload suites не запускались.
+Docs/InputUICallbacks.md; Scripts/TestInputUI.ps1; logs/input-ui-validation.json.
+Изменения без коммита. Сеть и структурные миграции остаются отложены.
+
+
+### Аудит 74 UMG failures и контракт input events
+
+Свежая reflection + реальный generator + 9 native source files подтверждают
+36 input events, 17 Geometry, 12 EventReply, 5 PaintContext, 4 animation handles.
+InputEvent содержит borrowed EventPath; PointerEvent pressed keys — owned TSet.
+Запланированы detached owned snapshots шести видов и 33 ordinary functions;
+три navigation calls требуют отдельного live contract (analog меняет repeat state).
+Это design-only этап: coverage 333/110/74 не менялся. 16 audit/contract unit tests,
+fresh export и anchors/hash checks — PASS; build/PIE/packaged не запускались.
+Docs/InputEventTransportContract.md, Docs/UMGInputBlockers.md; runner
+Scripts/AuditUMGInput.ps1, logs/umg-input-audit-validation.json. Без коммита.

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "modules": ["Engine", "AIModule", "NavigationSystem", "UMG", "Niagara", "EnhancedInput"],
+  "subsystems": [
+    {"id":"ai_navigation","modules":["AIModule","NavigationSystem"],"roots":[]},
+    {"id":"niagara","modules":["Niagara"],"roots":[]},
+    {"id":"ui","modules":["UMG"],"roots":[]},
+    {"id":"input","modules":["EnhancedInput"],"roots":["/Script/Engine.InputComponent"]},
+    {"id":"animation","modules":[],"roots":["/Script/Engine.AnimInstance","/Script/Engine.AnimationAsset","/Script/Engine.SkinnedMeshComponent","/Script/Engine.Skeleton"]},
+    {"id":"audio","modules":[],"roots":["/Script/Engine.SoundBase","/Script/Engine.AudioComponent","/Script/Engine.SoundClass","/Script/Engine.SoundMix","/Script/Engine.SoundSubmixBase","/Script/Engine.SoundEffectPreset"]},
+    {"id":"pawn_controller_movement","modules":[],"roots":["/Script/Engine.Pawn","/Script/Engine.Controller","/Script/Engine.MovementComponent"]},
+    {"id":"scene_collision_physics","modules":[],"roots":["/Script/Engine.SceneComponent"]},
+    {"id":"world_actor_components","modules":[],"roots":["/Script/Engine.World","/Script/Engine.Actor","/Script/Engine.ActorComponent","/Script/Engine.Subsystem"]},
+    {"id":"function_libraries","modules":[],"roots":["/Script/Engine.BlueprintFunctionLibrary"]},
+    {"id":"assets_and_engine_other","modules":["Engine"],"roots":[]}
+  ]
+}

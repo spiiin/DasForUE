@@ -83,12 +83,41 @@ def default_expr(field, enums):
     raise ValueError('unsupported default kind or representation: ' + kind)
 
 
-def generate(ir, module="ue_generated", source_types=None):
+# Identity mappings are explicit: lookalike structs must never become native math.
+HIT_RESULT_PATH = '/Script/Engine.HitResult'
+HIT_RESULT_TRANSPORT = 'hit_result_v1'
+
+def is_hit_result(value):
+    return value.get('kind') == 'struct' and value.get('type_path') == HIT_RESULT_PATH
+
+CONSTRAINT_PATH = '/Script/Engine.ConstraintInstanceAccessor'
+INPUT_ACTION_VALUE_PATH = '/Script/EnhancedInput.InputActionValue'
+OPAQUE_TRANSPORTS = {
+    INPUT_ACTION_VALUE_PATH: ('input_action_value_v1','InputActionValue','__ue_arg_input_value','__ue_result_input_value'),
+    HIT_RESULT_PATH: (HIT_RESULT_TRANSPORT,'UEHitResult','__ue_arg_hit_result','__ue_result_hit_result'),
+    CONSTRAINT_PATH: ('constraint_component_v1','UEConstraintHandle','__ue_arg_constraint','__ue_result_constraint'),
+}
+def is_opaque_native(value):
+    return value.get('kind')=='struct' and value.get('type_path') in OPAQUE_TRANSPORTS
+
+CANONICAL_MATH = {
+    '/Script/CoreUObject.Vector2D': ('UEVector2D', 'vector2d', {'x':'double', 'y':'double'}),
+    '/Script/CoreUObject.Vector': ('UEVector', 'vector', {'x':'double', 'y':'double', 'z':'double'}),
+    '/Script/CoreUObject.Rotator': ('UERotator', 'rotator', {'pitch':'double', 'yaw':'double', 'roll':'double'}),
+    '/Script/CoreUObject.Transform': ('UETransform', 'transform', {'rotation':'/Script/CoreUObject.Quat', 'translation':'/Script/CoreUObject.Vector', 'scale3d':'/Script/CoreUObject.Vector'}),
+}
+
+
+def generate(ir, module="ue_generated", source_types=None, canonical_math=False):
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", module): raise ValueError("Invalid module name")
     if ir.get('schema_version') != 5:
         raise ValueError('Unsupported IR schema version')
     def validate_weak_marker(value, depth=0):
         if depth>16: raise ValueError('Weak type descriptor nesting limit')
+        transport=value.get('transport')
+        expected=OPAQUE_TRANSPORTS.get(value.get('type_path')) if value.get('kind')=='struct' else None
+        if (transport is not None and (not expected or transport!=expected[0])) or (expected and transport!=expected[0]):
+            raise ValueError('Invalid or missing native HitResult transport')
         if 'weak_reference' in value and (type(value['weak_reference']) is not bool or value.get('kind')!='object'):
             raise ValueError('Invalid weak reference marker')
         for key in ('element','key','value'):
@@ -97,6 +126,12 @@ def generate(ir, module="ue_generated", source_types=None):
         for value in [*fn['parameters'],*fn['fields']]: validate_weak_marker(value)
     for definition in ir['structs']:
         for value in definition['fields']: validate_weak_marker(value)
+    for fn in ir['functions']:
+        for leaf in fn['fields']:
+            if leaf.get('type_path')!=CONSTRAINT_PATH:continue
+            getter=fn['class']=='/Script/Engine.PhysicsConstraintComponent' and fn['function']=='GetConstraint' and leaf['path']=='returnvalue' and leaf['output'] and not leaf['input'] and not fn.get('static',False)
+            consumer=fn['class']=='/Script/Engine.ConstraintInstanceBlueprintLibrary' and fn.get('static',False) and leaf['input'] and '.' not in leaf['path']
+            if not (getter or consumer):raise ValueError('Constraint transport requires scalar component getter/library contract')
     classes = {}
     interfaces = set()
     interface_ids = {}
@@ -130,7 +165,7 @@ def generate(ir, module="ue_generated", source_types=None):
                 raise ValueError('Missing object class')
     aliases = set()
     enums = {}
-    kinds = {'byte', 'text', 'int', 'float', 'double', 'bool', 'string', 'object', 'class', 'name', 'enum', 'array', 'map', 'set'}
+    kinds = {'delegate', 'byte', 'text', 'int', 'float', 'double', 'bool', 'string', 'object', 'class', 'name', 'enum', 'array', 'map', 'set', 'struct'}
     for fn in ir['functions']:
         alias = fn['alias']
         if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', alias) or alias in aliases or not alias.startswith(('actor_', 'fixture_', 'ue_')):
@@ -154,6 +189,8 @@ def generate(ir, module="ue_generated", source_types=None):
             if name in names or field['kind'] not in kinds:
                 raise ValueError('Unsupported or colliding field: ' + field['path'])
             names.add(name)
+            if field['kind']=='delegate' and (not field['input'] or field['output'] or '.' in field['path'] or not field['type_path'].startswith('/Script/')): raise ValueError('Native delegates require scalar input-only signatures')
+            if field['kind']=='struct' and not is_opaque_native(field): raise ValueError('Unsupported opaque call struct')
             if field['kind'] == 'class' and field['type_path'] not in classes: raise ValueError('Missing class MetaClass identity')
             if type(field['input']) is not bool or type(field['output']) is not bool or not (field['input'] or field['output']):
                 raise ValueError('Invalid field direction')
@@ -185,6 +222,18 @@ def generate(ir, module="ue_generated", source_types=None):
         name=hash_container_name(field)
         if name in hash_containers and hash_container_identity(hash_containers[name])!=hash_container_identity(field): raise ValueError('Hash container generated symbol collision')
         hash_containers[name]=field
+    def validate_array_storage(field, message):
+        element = field.get('element', {})
+        storage = {'byte':'ByteProperty','text':'TextProperty','int':'IntProperty',
+                   'float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty',
+                   'string':'StrProperty','name':'NameProperty','object':'ObjectProperty',
+                   'class':'ClassProperty','struct':'StructProperty','enum':'EnumProperty'}
+        kind = element.get('kind')
+        expected = ('EnumProperty', 'ByteProperty') if kind == 'enum' else (storage.get(kind),)
+        if kind not in storage or field.get('type_path') not in expected or element.get('weak_reference', False):
+            raise ValueError(message)
+        return element
+
     structures = {}
     for item in ir['structs']:
         path = item['type_path']
@@ -199,6 +248,11 @@ def generate(ir, module="ue_generated", source_types=None):
             raise ValueError('Recursive value struct: ' + path)
         if path in visited: return
         if len(visiting) >= 16: raise ValueError('Struct nesting limit exceeded')
+        definition=structures[path]
+        if path in OPAQUE_TRANSPORTS:
+            if definition.get('transport')!=OPAQUE_TRANSPORTS[path][0] or definition['fields']: raise ValueError('HitResult must use opaque native transport')
+            visited.add(path);order.append(path);return
+        if 'transport' in definition: raise ValueError('Unknown native struct transport')
         visiting.add(path)
         seen = set()
         if not structures[path]['fields']: raise ValueError('Opaque/empty structs need an adapter')
@@ -210,10 +264,7 @@ def generate(ir, module="ue_generated", source_types=None):
             def validate_member(member):
                 if member['kind'] == 'struct': visit(member['type_path'])
                 elif member['kind'] == 'array':
-                    element = member.get('element', {})
-                    properties = {'byte':'ByteProperty','text':'TextProperty','int':'IntProperty','float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty','string':'StrProperty','name':'NameProperty','object':'ObjectProperty','class':'ClassProperty','struct':'StructProperty','enum':'EnumProperty'}
-                    kind = element.get('kind')
-                    if kind not in properties or (member['type_path'] not in ('EnumProperty','ByteProperty') if kind == 'enum' else member['type_path'] != properties[kind]): raise ValueError('Unsupported struct array member')
+                    element = validate_array_storage(member, 'Unsupported struct array member')
                     validate_member(element)
                 elif member['kind'] in ('map','set'): register_hash(member)
                 elif member['kind'] in ('object', 'class'):
@@ -227,6 +278,10 @@ def generate(ir, module="ue_generated", source_types=None):
     for path in sorted(structures): visit(path)
 
     def leaves(field, path):
+        if is_opaque_native(field):
+            if field['type_path'] not in structures: raise ValueError('Missing HitResult definition')
+            yield dict(path=path,kind='struct',type_path=field['type_path'])
+            return
         if field['kind'] in ('map', 'set'):
             yield dict(path=path, kind=field['kind'], type_path=field['type_path'])
             if field['kind'] == 'map':
@@ -248,11 +303,8 @@ def generate(ir, module="ue_generated", source_types=None):
         for param in fn['parameters']:
             if param['kind'] in ('map', 'set'): register_hash(param)
             if param['kind'] == 'array':
-                element = param.get('element', {})
-                property_types = {'byte':'ByteProperty','text':'TextProperty','int':'IntProperty', 'float':'FloatProperty', 'double':'DoubleProperty', 'bool':'BoolProperty', 'string':'StrProperty', 'name':'NameProperty', 'object':'ObjectProperty', 'class':'ClassProperty', 'struct':'StructProperty', 'enum':'EnumProperty'}
+                element = validate_array_storage(param, 'Unsupported or inconsistent array element')
                 kind = element.get('kind')
-                if kind not in property_types or (param['type_path'] not in ('EnumProperty', 'ByteProperty') if kind == 'enum' else param['type_path'] != property_types[kind]):
-                    raise ValueError('Unsupported or inconsistent array element')
                 path = element.get('type_path')
                 if kind in ('object', 'class') and path not in classes: raise ValueError('Missing object class for array element')
                 if kind == 'struct' and path not in structures: raise ValueError('Missing struct definition for array element')
@@ -270,6 +322,14 @@ def generate(ir, module="ue_generated", source_types=None):
         expected = [{key: p[key] for key in ('path', 'kind', 'type_path', 'input', 'output')} for p in fn['fields']]
         if flattened != expected:
             raise ValueError('Struct tree does not match validated leaf signature')
+
+    math_types = CANONICAL_MATH if canonical_math else {}
+    for path, (_, _, layout) in math_types.items():
+        if path not in structures: continue
+        fields = structures[path]['fields']
+        actual = {f['path']: f['type_path'] if f['kind']=='struct' else f['kind'] for f in fields}
+        if actual != layout or any(f.get('type_path', '') for f in fields if f['kind']!='struct'):
+            raise ValueError('Canonical math layout changed: ' + path)
 
     source_mappings = {}
     source_module = None
@@ -299,6 +359,7 @@ def generate(ir, module="ue_generated", source_types=None):
         if depth > 16: raise ValueError('Source mapping nesting limit exceeded')
         kind = field['kind']
         if kind in ('byte', 'text', 'int', 'float', 'double', 'bool', 'string', 'name', 'object', 'class'): return
+        if is_opaque_native(field) or (kind == 'struct' and field['type_path'] in math_types): return
         if kind in ('struct', 'enum'):
             mapped = source_mappings.get(field['type_path'])
             if not mapped or mapped['kind'] != kind: raise ValueError('Nested source identity requires an explicit matching mapping')
@@ -317,6 +378,7 @@ def generate(ir, module="ue_generated", source_types=None):
             for field in structures[path]['fields']: check_source_field(field)
     def owns_container(field):
         if field['kind'] in ('array', 'map', 'set'): return True
+        if is_opaque_native(field): return False
         if field['kind'] == 'struct': return any(owns_container(child) for child in structures[field['type_path']]['fields'])
         return False
     defaults = {}
@@ -331,7 +393,7 @@ def generate(ir, module="ue_generated", source_types=None):
             elif param['input'] and seen_default:
                 raise ValueError(f"Required input after default in {fn['alias']}: {param['path']}")
 
-    symbols = {'UEName', 'ue_name'}
+    symbols = {'UEName', 'ue_name', 'UEHitResult', 'UEConstraintHandle', 'InputActionValue', 'InputValueType', 'UEFunctionDelegate', 'ue_function_delegate', 'ue_function_delegate_null'} | {t[0] for t in math_types.values()}
     def register(name):
         if name in symbols:
             raise ValueError('Generated symbol collision: ' + name)
@@ -346,7 +408,8 @@ def generate(ir, module="ue_generated", source_types=None):
         name = enum_name(path)
         for symbol in (name, name + '_to_symbol', name + '_from_symbol'):
             register(symbol)
-    for path in order: register(struct_name(path))
+    for path in order:
+        if path not in math_types and path not in OPAQUE_TRANSPORTS: register(struct_name(path))
     for name, field in hash_containers.items():
         register(name)
         if field['kind'] == 'map': register(name + '_Entry')
@@ -356,14 +419,19 @@ def generate(ir, module="ue_generated", source_types=None):
             register(fn['alias'] + '_Result')
 
     def typ(field):
+        if is_opaque_native(field): return OPAQUE_TRANSPORTS[field['type_path']][1]
+        if field['kind'] == 'struct' and field['type_path'] in math_types: return math_types[field['type_path']][0]
         if field['kind'] in ('map', 'set'): return hash_container_name(field)
         if field['kind'] == 'array': return 'array<' + typ(field['element']) + '>'
+        if field['kind'] == 'delegate': return 'UEFunctionDelegate'
         return {'byte':'uint8', 'text':'UETextValue', 'class': 'UEClassHandle', 'object': class_name(field['type_path']), 'name': 'UEName', 'enum': enum_name(field['type_path']), 'struct': struct_name(field['type_path'])}.get(field['kind'], field['kind'])
 
-    lines = ['options gen2', 'module ' + module + ' public', 'require ue_foundation', '',
+    lines = ['options gen2', 'module ' + module + ' public', 'require ue_foundation' + (' public' if canonical_math else ''), '',
              '// Generated by Scripts/GenerateBindings.py. Do not edit.',
              'struct UEName { value : string }',
              'def ue_name(value : string) : UEName { return UEName(value = value) }', '']
+    if INPUT_ACTION_VALUE_PATH in structures: lines += ['require ue_input_value public', '']
+    if any(f['kind']=='delegate' for fn in ir['functions'] for f in fn['fields']): lines += ['require ue_native_delegate public', '']
     if source_module: lines += ['require ' + source_module + ' public', '']
     for path in sorted(classes):
         annotation = 'ue_native_interface' if path in interfaces else 'ue_native_object'
@@ -432,6 +500,7 @@ def generate(ir, module="ue_generated", source_types=None):
         if field['kind']=='map': lines += [f'struct {name}_Entry {{ key : {typ(field["key"])}; value : {typ(field["value"])} }}',f'struct {name} {{ entries : array<{name}_Entry> }}','']
         else: lines += [f'struct {name} {{ values : array<{typ(field["element"])}> }}','']
     for path in order:
+        if path in math_types or path in OPAQUE_TRANSPORTS: continue
         lines += [f'struct {struct_name(path)} {{'] + [f'    f_{ident(p["path"])} : {typ(p)}' for p in structures[path]['fields']] + ['}', '']
 
     for name, field in sorted(hash_containers.items()):
@@ -536,6 +605,16 @@ def generate(ir, module="ue_generated", source_types=None):
             lines += ['    return <- result' if owns_container(dict(kind='struct',type_path=path)) else '    return result']
         lines += ['}', '']
     def write_input(field, path, val, indent='    ', depth=0):
+        if field['kind']=='delegate':
+            lines.append(f"{indent}__ue_arg_native_delegate(call, {path_expr(path)}, {quote(field['type_path'])}, {val}.target, {val}.method)")
+            return
+        if is_opaque_native(field):
+            lines.append(f"{indent}{OPAQUE_TRANSPORTS[field['type_path']][2]}(call, {path_expr(path)}, {val})")
+            return
+        if field['kind'] == 'struct' and field['type_path'] in math_types:
+            bridge = math_types[field['type_path']][1]
+            lines.append(f'{indent}__ue_method_arg_{bridge}(call, {path_expr(path)}, {val})')
+            return
         if field['kind'] in ('map', 'set'):
             items = val + ('.entries' if field['kind'] == 'map' else '.values')
             index='index' if depth==0 else 'input_index_'+str(depth)
@@ -567,6 +646,10 @@ def generate(ir, module="ue_generated", source_types=None):
         lines.append(f'{indent}{bridge}(call, {path_expr(path)}, {val})')
 
     def read_output(field, path):
+        if is_opaque_native(field): return f"{OPAQUE_TRANSPORTS[field['type_path']][3]}(call, {path_expr(path)})"
+        if field['kind'] == 'struct' and field['type_path'] in math_types:
+            bridge = math_types[field['type_path']][1]
+            return f'__ue_method_result_{bridge}(call, {path_expr(path)})'
         if field['kind'] == 'struct':
             return struct_name(field['type_path']) + '(' + ', '.join('f_' + ident(p['path']) + ' = ' + read_output(p, path + '.' + p['path']) for p in structures[field['type_path']]['fields']) + ')'
         bridge = '__ue_method_result_text' if field['kind'] == 'text' else 'ue_result_' + field['kind']
@@ -578,7 +661,7 @@ def generate(ir, module="ue_generated", source_types=None):
         return expr
 
     def read_owned_output(field, path, target, depth=0, indent='    '):
-        if field['kind'] == 'struct':
+        if field['kind'] == 'struct' and field['type_path'] not in math_types and not is_opaque_native(field):
             for child in structures[field['type_path']]['fields']: read_owned_output(child, path + '.' + child['path'], target + '.f_' + ident(child['path']), depth, indent)
         elif field['kind'] in ('map','set'):
             index='output_index_'+str(depth)
@@ -623,6 +706,7 @@ def generate(ir, module="ue_generated", source_types=None):
             lines += [f'    let receiver = ue_cast_object({class_name(fn["class"])}_raw(target), {quote(fn["class"])})',
                       f'    let call = ue_begin_call(receiver, {quote(fn["function"])})',
                       f'    ue_expect_signature(call, {quote(fn["signature"])})']
+        lines += ['    ue_require_call_context(call, ' + ('true' if 'UnsafeDuringActorConstruction' in fn.get('metadata', {}) else 'false') + ')']
         for p in inputs: write_input(p, p['path'], 'arg_' + ident(p['path']))
         lines += ['    ue_invoke_call(call)']
         has_arrays = any(owns_container(p) for p in outputs)
@@ -747,10 +831,11 @@ def main():
     parser.add_argument('output', type=Path)
     parser.add_argument('--module', default='ue_generated')
     parser.add_argument('--source-types', type=Path)
+    parser.add_argument('--canonical-math', action='store_true', help='Reuse foundation UEVector2D/UEVector/UERotator/UETransform')
     parser.add_argument('--check', action='store_true', help='Fail if the checked-in module differs')
     args = parser.parse_args()
     source_types = json.loads(args.source_types.read_text(encoding='utf-8-sig')) if args.source_types else None
-    text = generate(json.loads(args.ir.read_text(encoding='utf-8-sig')), args.module, source_types)
+    text = generate(json.loads(args.ir.read_text(encoding='utf-8-sig')), args.module, source_types, canonical_math=args.canonical_math)
     if args.check:
         if not args.output.exists() or args.output.read_text(encoding='utf-8') != text:
             parser.exit(1, 'Generated bindings are stale\n')

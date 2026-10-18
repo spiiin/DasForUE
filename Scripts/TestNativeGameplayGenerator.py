@@ -140,4 +140,27 @@ class NativeGameplayGeneratorTests(unittest.TestCase):
     def test_receiver_discovery_mismatch_rejected(self):
         self.ir['classes'].pop()
         with self.assertRaisesRegex(ValueError,'receiver/discovery mismatch'):generate(self.ir)
+    def test_accessor_contract_in_cooked_header(self):
+        field=next(c for c in self.ir['classes'] if c['fields'])['fields'][0]
+        field['access']=dict(native_getter=True,native_setter=True,getter='ReadValue',setter='WriteValue',setter_unsafe=True)
+        header,_=generate(self.ir)
+        self.assertIn('NativeGetter,NativeSetter,GetterUnsafe,SetterUnsafe',header)
+        self.assertIn('true,true,false,true,TEXT("ReadValue"),TEXT("WriteValue")',header)
+    def test_accessor_function_name_rejected(self):
+        next(c for c in self.ir['classes'] if c['fields'])['fields'][0]['access']={'getter':'unsafe.name'}
+        with self.assertRaisesRegex(ValueError,'accessor function'):generate(self.ir)
+    def test_unknown_accessor_key_rejected(self):
+        next(c for c in self.ir['classes'] if c['fields'])['fields'][0]['access']={'native_getterr':True}
+        with self.assertRaisesRegex(ValueError,'accessor contract'):generate(self.ir)
+    def test_accessor_policy_needs_identity(self):
+        next(c for c in self.ir['classes'] if c['fields'])['fields'][0]['access']={'setter_unsafe':True}
+        with self.assertRaisesRegex(ValueError,'policy requires'):generate(self.ir)
+    def test_construction_flag_cooked(self):
+        method=next(c for c in self.ir['classes'] if c['methods'])['methods'][0];method['construction_unsafe']=True
+        header,_=generate(self.ir)
+        self.assertIn('bool ConstructionUnsafe;',header)
+        self.assertIn('TEXT('+__import__('json').dumps(method['signature'])+'),true}',header)
+    def test_construction_flag_must_be_boolean(self):
+        next(c for c in self.ir['classes'] if c['methods'])['methods'][0]['construction_unsafe']=1
+        with self.assertRaisesRegex(ValueError,'construction flag'):generate(self.ir)
 if __name__=='__main__': unittest.main()

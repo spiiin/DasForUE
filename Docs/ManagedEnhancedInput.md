@@ -93,3 +93,14 @@ The separate saved-map run verifies auto-possession and working native movement,
 jump and camera after cook/load. This does not validate every trigger/value shape,
 multi-player ownership scenario or hot reload combination listed above.
 See PlayableCharacter.md for reproduction and the exact scope.
+
+
+## InputActionValue callback — 2026-10-18
+
+Текущий binder поддерживает `InputActionValue` и в обычных exported функциях,
+и в `[ue_function]` методах; старые scalar/vector handlers совместимы.
+Playable OnMove/OnLook переведены на новый тип. Одним коротким игровым сценарием
+проверены native proxy payload четырёх видов, owned copies, actual LocalPlayer
+injection → authored OnMove и снятие bindings при ReleaseObject. Это не новый
+полный PIE/packaged или reload прогон. См. InputUICallbacks.md и
+logs/input-ui-validation.json. Исторические ограничения выше относятся к ранним этапам.

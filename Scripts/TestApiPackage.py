@@ -46,6 +46,15 @@ class Packages(unittest.TestCase):
         source=ir();source['diagnostics']=[{'class':'/Script/Engine.TestLibrary','function':'Latent','reason':'latent'}]
         report=stage(p,source)[3]
         self.assertEqual(report['counts']['policy_excluded'],1)
+    def test_exclusion_keeps_original_export_diagnostic_and_alternative(self):
+        p=profile();p['exclusions']=[dict(function='Latent',reason='unsafe raw capability',alternative='scoped DSL',**{'class':'/Script/Engine.TestLibrary'})]
+        source=ir();source['diagnostics']=[dict(function='Latent',reason='requires physics context',**{'class':'/Script/Engine.TestLibrary'})]
+        report=stage(p,source)[3]
+        m=next(m for m in report['members'] if m['function']=='Latent')
+        self.assertEqual(m['export_reason'],'requires physics context')
+        self.assertEqual(m['alternative'],'scoped DSL')
+        self.assertEqual(report['dependencies']['das_modules'],['ue_foundation'])
+
     def test_duplicate_identity_fails_package(self):
         source=ir();source['functions']*=2
         with self.assertRaisesRegex(ValueError,'Duplicate function'):stage(profile(),source)

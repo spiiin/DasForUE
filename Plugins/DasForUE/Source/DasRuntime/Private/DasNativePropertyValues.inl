@@ -55,9 +55,15 @@
     template<class P,class T> void WritePropertyScalarValue(P* Property,void* Memory,const T& Input,das::Context* C){
         WriteNativePropertyValue(Property,Memory,PropertyScalarValue<P>(Input),C);
     }
+    FDasPropertyAccess ObjectPropertyAccess(FProperty* P,das::Context* C){
+        for(const auto& Row:DasNativeGameplayFields)if(P->GetName()==Row.Name && P->GetOwnerClass() && P->GetOwnerClass()->GetPathName()==Row.Declaring)return DasNativeAccessContract(Row);
+        FDasPropertyAccess Access;FString Error;if(!DescribeDasPropertyAccess(P,Access,Error))C->throw_error(TCHAR_TO_UTF8(*Error));return Access;
+    }
+    FDasScalarValue ReadOwnerProperty(FProperty* P,UObject* O,das::Context* C){FDasScalarValue V;FString Error;if(!ReadDasObjectProperty(P,O,ObjectPropertyAccess(P,C),ConstructingObject,V,Error))C->throw_error(TCHAR_TO_UTF8(*Error));return V;}
+    void WriteOwnerProperty(FProperty* P,UObject* O,const FDasScalarValue& V,das::Context* C){FString Error;if(!WriteDasObjectProperty(P,O,ObjectPropertyAccess(P,C),ConstructingObject,V,Error))C->throw_error(TCHAR_TO_UTF8(*Error));}
     template<class P> auto ReadPropertyScalar(P* Property,UObject* Owner,das::Context* C){
-        return ReadPropertyScalarValue(Property,Property->template ContainerPtrToValuePtr<void>(Owner),C);
+        const auto V=ReadOwnerProperty(Property,Owner,C);if(V.Kind!=int32(TPropertyScalarSlot<P>::Kind))C->throw_error("property scalar type mismatch");return V.*TPropertyScalarSlot<P>::Member;
     }
     template<class P,class T> void WritePropertyScalar(P* Property,UObject* Owner,const T& Input,das::Context* C){
-        WritePropertyScalarValue(Property,Property->template ContainerPtrToValuePtr<void>(Owner),Input,C);
+        WriteOwnerProperty(Property,Owner,PropertyScalarValue<P>(Input),C);
     }

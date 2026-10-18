@@ -1,4 +1,5 @@
 #include "DasCallbackTypes.h"
+#include "InputActionValue.h"
 #include "DasSoftReferences.h"
 #include "DasCallFrame.h"
 #include "GameFramework/Actor.h"
@@ -164,6 +165,10 @@ bool ValidateDasCallbackPayload(const FDasScalarValue& Value,EDasCallbackUsage U
     if(!Value.StructValue.IsValid() || !Snapshot || Snapshot->GetPathName()!=Value.ObjectClass || (Type->Snapshot && Type->Snapshot()!=Snapshot))
     {Error=TEXT("Callback snapshot identity mismatch");return false;}
     if(!ValidateDasCallbackTypePath(TEXT("struct"),Value.ObjectClass,Error) || !ValidateDasStructSnapshot(Value.StructValue,Error))return false;
+    if(Snapshot==FInputActionValue::StaticStruct()){
+        const auto& V=Value.StructValue.Get<FInputActionValue>();const int32 Kind=int32(V.GetValueType());
+        if(Kind<0 || Kind>3 || V.Get<FVector>().ContainsNaN()){Error=TEXT("Invalid InputActionValue callback snapshot");return false;}
+    }
     int32 Elements=0;
     for(TFieldIterator<FProperty> It(Snapshot);It;++It)if(!ValueBudget(*It,It->ContainerPtrToValuePtr<void>(Value.StructValue.GetMemory()),Characters,Elements,Error))return false;
     return true;

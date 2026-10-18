@@ -17,7 +17,7 @@ das::TypeDeclPtr DSLNativeValueType(das::Program* Program,das::Module* Module,co
 }
 FDasDeclaredProperty DSLNativeReferenceProperty(const das::TypeDeclPtr& Receiver,const das::string& Name){
  if(Name.empty() || Name.length()>=NAME_SIZE)DSLFail(TEXT("Invalid native reference field name"));const FString Path=DSLTypedReferencePath(Receiver),Field=DSLText(Name);const auto* Row=DasNativeGameplayField(Path,Field);auto* Class=FindObject<UClass>(nullptr,*Path);auto* P=Row && Class?Class->FindPropertyByName(*Field):nullptr;
- FString Shape;if(P)AppendCallShape(P,Shape);if(!P || P->GetName()!=Field || Shape!=Row->Signature || P->GetOwnerClass()->GetPathName()!=Row->Declaring || !P->HasAnyPropertyFlags(CPF_BlueprintVisible) || P->HasAnyPropertyFlags(CPF_Deprecated|CPF_EditorOnly) || P->HasSetterOrGetter() || P->HasAnyPropertyFlags(CPF_BlueprintReadOnly)!=Row->ReadOnly)DSLFail(TEXT("Native field not generated or stale: ")+Path+TEXT(".")+Field);
+ FString Shape;if(P)AppendCallShape(P,Shape);if(!P || P->GetName()!=Field || Shape!=Row->Signature || P->GetOwnerClass()->GetPathName()!=Row->Declaring || !P->HasAnyPropertyFlags(CPF_BlueprintVisible) || P->HasAnyPropertyFlags(CPF_Deprecated|CPF_EditorOnly) || P->HasAnyPropertyFlags(CPF_BlueprintReadOnly)!=Row->ReadOnly)DSLFail(TEXT("Native field not generated or stale: ")+Path+TEXT(".")+Field);FString AccessError;if(!ValidateDasPropertyAccess(P,DasNativeAccessContract(*Row),AccessError))DSLFail(AccessError);
  FDasDeclaredProperty D;D.Name=Field;if(!DasNativeGameplayType(P,D.Type))DSLFail(TEXT("Unsupported generated native property shape"));D.bReadOnly=Row->ReadOnly;return D;
 }
 FDasDeclaredLiteral DSLNativeDefault(const FString& Class,const FString& Method,const FString& Name,const FDasDeclaredType& Type){

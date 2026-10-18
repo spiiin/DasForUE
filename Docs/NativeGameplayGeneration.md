@@ -1,5 +1,8 @@
 # Generated native gameplay members
 
+Current systematic coverage and exclusions: [API audit](ApiCoverage.md).
+Subsystem package roadmap: [expansion plan](ApiExpansionPlan.md).
+
 Native receiver classes are discovered from DAS declarations and their imports;
 there is no C++ receiver class list. See [automatic discovery](NativeGameplayDiscovery.md).
 Their supported inherited fields/functions are included. Native
@@ -51,12 +54,15 @@ no C++ registration is required.
 
 ## Contracts and boundaries
 
-Supported types: int32, raw uint8 (bounded DAS int), float, double, bool/bitfields,
-FString, FName (UENameValue), FText (UETextValue),
-strong UObject references, UClass handles, native enum, Vector2D, Vector, Rotator and Transform.
-Unsupported delegate, container, custom struct and weak/soft fields
-or function signatures are reported as skipped. Existing authored/native-self
-adapters for those types remain available; they are not generalized by this slice.
+Supported types currently include int32, raw uint8 (bounded DAS int), float,
+double, bool/bitfields, FString, FName, FText, UObject and class references,
+validated native enum/struct values, typed soft references and supported arrays,
+maps and sets. The exact recursive policy is shared with the coverage audit in
+DasNativeGameplayTypes.h. Enum values must be unique and within 0..254 (excluding
+_MAX). Containers restrict element/key/value kinds; structs restrict their
+members. Weak/interface references, fixed arrays and additional numeric/opaque
+types still have explicit limitations. These are not all-UE type guarantees.
+Detailed rejected shapes are in Build/ApiCoverage/report.json and members.csv.
 
 Fields require BlueprintVisible and preserve BlueprintReadOnly. Hidden, editor,
 deprecated and accessor-backed fields are excluded. Accessor functions can be
@@ -191,3 +197,21 @@ The [pickup example](PlayablePickup.md) uses typed mesh, collision profile/radiu
 overlap events, visibility and timer restoration without manual call frames.
 Targeted validation: 31 generator tests, exact artifact reproduction, Editor
 Development and the saved-map pickup game probe; no full Foundation/PIE/package rerun.
+
+## Native accessors и construction guard — 2026-10-18
+
+[Общий object-property слой](NativeAccessAndConstruction.md) поддерживает native
+FProperty Getter/Setter и BlueprintGetter/Setter, сохраняет readonly и проверяет
+значение до вызова setter. Используются существующие value descriptors/carriers
+и GC roots; bitfield bool ABI нормализуется отдельно. Контракты сериализованы
+в native manifest/header; FProperty/UFunction pointers не кэшируются между reload.
+UnsafeDuringActorConstruction больше не исключает методы целиком: native registry
+и generic wrappers сохраняют guard, runtime проверяет фазу до dispatch.
+
+160 Python-тестов, native artifacts check, Game/Editor ConstructionScript,
+metadata-removed guards, getter/setter semantics, readonly/stale/type/infinity,
+GC в setter и настоящий Engine accessor example — PASS. World пакет повторно
+проверен: 652 wrappers, 88 guarded, blockers 246 export + 6 generation; Math 619.
+Без полного Foundation/PIE/packaged прогона и без собственного коммита.
+Далее — Collision/Physics/type blockers; унификация object/enum/UEName views
+между пакетами остаётся отдельной задачей.

@@ -1,0 +1,2449 @@
+{
+  "schema_version": 1,
+  "package": "ue_api_world",
+  "engine_version": "5.8.3-0+UE5",
+  "source_sha256": "499aea217b364343f251b8f7f6befb6d061de7bfb993abc31acba5f0cfa12b33",
+  "state": "published",
+  "preflight": {
+    "build_mode": "Editor NullRHI",
+    "game_world": true,
+    "profile_sha256": "283620cbbd8674adfc3090f20fe329cdf6be82e3381e260e9f2acbae3a95291f",
+    "runtime_probe": "passed",
+    "compile": "passed",
+    "packaged": "not_run"
+  },
+  "value_types": "canonical_math",
+  "default_arguments": "explicit",
+  "candidate_count": 904,
+  "construction_guarded_count": 88,
+  "unique_declaration_count": 904,
+  "unknown_declaration_occurrences": 0,
+  "surfaces": {
+    "receiver": {
+      "generation_ready": 364,
+      "export_blocked": 99,
+      "generation_blocked": 1,
+      "policy_excluded": 0
+    },
+    "library": {
+      "generation_ready": 288,
+      "export_blocked": 147,
+      "generation_blocked": 5,
+      "policy_excluded": 0
+    }
+  },
+  "counts": {
+    "generation_ready": 652,
+    "export_blocked": 246,
+    "generation_blocked": 6,
+    "policy_excluded": 0
+  },
+  "blockers": [
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "AddComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "AddComponentByClass",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "FinishAddComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "GetInputAxisKeyValue",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "GetInputAxisValue",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "GetInputVectorAxisValue",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "GetInstigator",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "protected_function"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "GetInstigatorController",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "protected_function"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_AddActorLocalOffset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_AddActorLocalRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_AddActorLocalTransform",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_AddActorWorldOffset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_AddActorWorldRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_AddActorWorldTransform",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_AddActorWorldTransformKeepScale",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_OnBecomeViewTarget",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.K2_OnBecomeViewTarget"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_OnEndViewTarget",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.K2_OnEndViewTarget"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_OnReset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.K2_OnReset"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_SetActorLocation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_SetActorLocationAndRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_SetActorRelativeLocation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_SetActorRelativeRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_SetActorRelativeTransform",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "K2_SetActorTransform",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "MakeNoise",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "protected_function"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "OnRep_AttachmentReplication",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.OnRep_AttachmentReplication"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "OnRep_Instigator",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.OnRep_Instigator"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "OnRep_Owner",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.OnRep_Owner"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "OnRep_ReplicateMovement",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.OnRep_ReplicateMovement"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "OnRep_ReplicatedMovement",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.OnRep_ReplicatedMovement"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveActorBeginCursorOver",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveActorBeginCursorOver"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveActorBeginOverlap",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveActorBeginOverlap"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveActorEndCursorOver",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveActorEndCursorOver"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveActorEndOverlap",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveActorEndOverlap"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveActorOnClicked",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveActorOnClicked"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveActorOnInputTouchBegin",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveActorOnInputTouchBegin"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveActorOnInputTouchEnd",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveActorOnInputTouchEnd"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveActorOnInputTouchEnter",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveActorOnInputTouchEnter"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveActorOnInputTouchLeave",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveActorOnInputTouchLeave"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveActorOnReleased",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveActorOnReleased"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveAnyDamage",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveAnyDamage"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveAsyncPhysicsTick",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveAsyncPhysicsTick"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveBeginPlay",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveBeginPlay"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveDestroyed",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveDestroyed"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveEndPlay",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveEndPlay"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveHit",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveHit"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceivePointDamage",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceivePointDamage"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveRadialDamage",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveRadialDamage"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "ReceiveTick",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.ReceiveTick"
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "function": "UserConstructionScript",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Actor",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Actor.UserConstructionScript"
+    },
+    {
+      "class": "/Script/Engine.ActorComponent",
+      "function": "OnRep_IsActive",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.ActorComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.ActorComponent.OnRep_IsActive"
+    },
+    {
+      "class": "/Script/Engine.ActorComponent",
+      "function": "ReceiveAsyncPhysicsTick",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.ActorComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.ActorComponent.ReceiveAsyncPhysicsTick"
+    },
+    {
+      "class": "/Script/Engine.ActorComponent",
+      "function": "ReceiveBeginPlay",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.ActorComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.ActorComponent.ReceiveBeginPlay"
+    },
+    {
+      "class": "/Script/Engine.ActorComponent",
+      "function": "ReceiveEndPlay",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.ActorComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.ActorComponent.ReceiveEndPlay"
+    },
+    {
+      "class": "/Script/Engine.ActorComponent",
+      "function": "ReceiveTick",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.ActorComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.ActorComponent.ReceiveTick"
+    },
+    {
+      "class": "/Script/Engine.Controller",
+      "function": "ClientSetLocation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Controller",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Controller.ClientSetLocation"
+    },
+    {
+      "class": "/Script/Engine.Controller",
+      "function": "ClientSetRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Controller",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Controller.ClientSetRotation"
+    },
+    {
+      "class": "/Script/Engine.Controller",
+      "function": "OnRep_Pawn",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Controller",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Controller.OnRep_Pawn"
+    },
+    {
+      "class": "/Script/Engine.Controller",
+      "function": "OnRep_PlayerState",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Controller",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Controller.OnRep_PlayerState"
+    },
+    {
+      "class": "/Script/Engine.Controller",
+      "function": "ReceiveInstigatedAnyDamage",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Controller",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Controller.ReceiveInstigatedAnyDamage"
+    },
+    {
+      "class": "/Script/Engine.Controller",
+      "function": "ReceivePossess",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Controller",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Controller.ReceivePossess"
+    },
+    {
+      "class": "/Script/Engine.Controller",
+      "function": "ReceiveUnPossess",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.Controller",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.Controller.ReceiveUnPossess"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "ApplyPointDamage",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "BeginDeferredActorSpawnFromClass",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "BeginSpawningActorFromBlueprint",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "Blueprint_PredictProjectilePath_Advanced",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "Blueprint_PredictProjectilePath_ByObjectType",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "Blueprint_PredictProjectilePath_ByTraceChannel",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "BreakHitResult",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "CancelAsyncLoading",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "FindCollisionUV",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "FinishSpawningActor",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "GetSurfaceType",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "GetViewProjectionMatrix",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "LoadStreamLevel",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "LoadStreamLevelBySoftObjectPtr",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "MakeHitResult",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "OpenLevelBySoftObjectPtr",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "PlayDialogue2D",
+      "surface": "library",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "alias": "ue_gameplay_PlayDialogue2D",
+      "explicit_defaults": [
+        {
+          "parameter": "volumemultiplier",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "pitchmultiplier",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "starttime",
+          "value": "0.000000"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Unsupported struct array member"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "PlayDialogueAtLocation",
+      "surface": "library",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "alias": "ue_gameplay_PlayDialogueAtLocation",
+      "explicit_defaults": [
+        {
+          "parameter": "volumemultiplier",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "pitchmultiplier",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "starttime",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "attenuationsettings",
+          "value": "None"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Unsupported struct array member"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "SpawnDialogue2D",
+      "surface": "library",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "alias": "ue_gameplay_SpawnDialogue2D",
+      "explicit_defaults": [
+        {
+          "parameter": "volumemultiplier",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "pitchmultiplier",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "starttime",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "bautodestroy",
+          "value": "true"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Unsupported struct array member"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "SpawnDialogueAtLocation",
+      "surface": "library",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "alias": "ue_gameplay_SpawnDialogueAtLocation",
+      "explicit_defaults": [
+        {
+          "parameter": "rotation",
+          "value": ""
+        },
+        {
+          "parameter": "volumemultiplier",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "pitchmultiplier",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "starttime",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "attenuationsettings",
+          "value": "None"
+        },
+        {
+          "parameter": "bautodestroy",
+          "value": "true"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Unsupported struct array member"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "SpawnDialogueAttached",
+      "surface": "library",
+      "construction_unsafe": true,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "alias": "ue_gameplay_SpawnDialogueAttached",
+      "explicit_defaults": [
+        {
+          "parameter": "attachpointname",
+          "value": "None"
+        },
+        {
+          "parameter": "location",
+          "value": ""
+        },
+        {
+          "parameter": "rotation",
+          "value": ""
+        },
+        {
+          "parameter": "locationtype",
+          "value": "KeepRelativeOffset"
+        },
+        {
+          "parameter": "bstopwhenattachedtodestroyed",
+          "value": "false"
+        },
+        {
+          "parameter": "volumemultiplier",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "pitchmultiplier",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "starttime",
+          "value": "0.000000"
+        },
+        {
+          "parameter": "attenuationsettings",
+          "value": "None"
+        },
+        {
+          "parameter": "bautodestroy",
+          "value": "true"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Unsupported struct array member"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "SpawnObject",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "TransformFirstPersonToWorld",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "TransformWorldToFirstPerson",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "UnloadStreamLevel",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "function": "UnloadStreamLevelBySoftObjectPtr",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.GameplayStatics",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BoxTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BreakARFilter",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BreakSoftClassPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "BreakSoftObjectPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "CapsuleTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_ClassToSoftClassReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_ComponentReferenceToSoftComponentReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_ObjectToSoftObjectReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_SoftClassPathToSoftClassRef",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_SoftClassReferenceToClass",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_SoftClassReferenceToString",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_SoftObjPathToSoftObjRef",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_SoftObjRefToSoftClassPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_SoftObjRefToSoftObjPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_SoftObjectReferenceToObject",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Conv_SoftObjectReferenceToString",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "Delay",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "DelayUntilNextFrame",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "DelayUntilNextTick",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "DrawDebugCone",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "EqualEqual_SoftClassReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "EqualEqual_SoftObjectReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetActorBounds",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetClassFromSoftPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetCollisionProfileNames",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.KismetSystemLibrary.GetCollisionProfileNames"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetEditorProperty",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetFrameCount",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetObjectFromSoftPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetPrimaryAssetIdFromSoftClassReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetPrimaryAssetIdFromSoftObjectReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetSoftClassPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetSoftClassReferenceFromPrimaryAssetId",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetSoftClassTopLevelAssetPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetSoftObjectPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetSoftObjectReferenceFromPrimaryAssetId",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "GetUniqueDeviceId",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "IsObjectOfSoftClass",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "IsSplitScreen",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "IsValidSoftClassReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "IsValidSoftObjectReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_ClearAndInvalidateTimerHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_ClearTimerDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_ClearTimerHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_GetTimerElapsedTimeDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_GetTimerElapsedTimeHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_GetTimerRemainingTimeDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_GetTimerRemainingTimeHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_InvalidateTimerHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_IsTimerActiveDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_IsTimerActiveHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_IsTimerPausedDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_IsTimerPausedHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_IsValidTimerHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_PauseTimerDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_PauseTimerHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_SetTimer",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_SetTimerDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_SetTimerForNextTick",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_SetTimerForNextTickDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_TimerExistsDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_TimerExistsHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_UnPauseTimerDelegate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "K2_UnPauseTimerHandle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LineTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LoadAsset",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LoadAssetClass",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LoadAsset_Blocking",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LoadAssets",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "LoadClassAsset_Blocking",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "MakeARFilter",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "MakeLiteralInt64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "MakeSoftClassPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "MakeSoftObjectPath",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "MoveComponentTo",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "NotEqual_SoftClassReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "NotEqual_SoftObjectReference",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "OnAssetClassLoaded__DelegateSignature",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.KismetSystemLibrary.OnAssetClassLoaded__DelegateSignature"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "OnAssetLoaded__DelegateSignature",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.KismetSystemLibrary.OnAssetLoaded__DelegateSignature"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "OnAssetsLoaded__DelegateSignature",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.KismetSystemLibrary.OnAssetsLoaded__DelegateSignature"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "PrintWarning",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "RetriggerableDelay",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetBoolPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetBytePropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetClassPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetCollisionProfileNameProperty",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetColorPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetDoublePropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetEditorProperty",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetFieldPathPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetInt64PropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetIntPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetInterfacePropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetLinearColorPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetNamePropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetObjectPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetRotatorPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetSoftClassPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetSoftObjectPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetStringPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetStructurePropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetTextPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetTransformPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetVector3fPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SetVectorPropertyByName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceMulti",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceMultiByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceMultiForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceSingle",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceSingleByProfile",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "SphereTraceSingleForObjects",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "function": "StackTrace",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetSystemLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.MovementComponent",
+      "function": "K2_MoveUpdatedComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.MovementComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.MovementComponent",
+      "function": "PhysicsVolumeChanged",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.MovementComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.MovementComponent.PhysicsVolumeChanged"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "AllowHLODLevelsExclusion",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.PrimitiveComponent.AllowHLODLevelsExclusion"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "CreateAndSetMaterialInstanceDynamic",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "CreateAndSetMaterialInstanceDynamicFromMaterial",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetBodyInstanceAsyncPhysicsTickHandle",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "alias": "ue_primitive_GetBodyInstanceAsyncPhysicsTickHandle",
+      "explicit_defaults": [
+        {
+          "parameter": "bonename",
+          "value": "None"
+        },
+        {
+          "parameter": "bgetwelded",
+          "value": "true"
+        },
+        {
+          "parameter": "index",
+          "value": "-1"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "GetExcludeForSpecificHLODLevels",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "HandlePostMigrationPhysicsStateChanged",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.PrimitiveComponent.HandlePostMigrationPhysicsStateChanged"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_BoxOverlapComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_LineTraceComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_SphereOverlapComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "K2_SphereTraceComponent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "function": "SetExcludeForSpecificHLODLevels",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.PrimitiveComponent",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "GetSocketQuaternion",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "IsGroupedComponentMovementEnabled",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.SceneComponent.IsGroupedComponentMovementEnabled"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_AddLocalOffset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_AddLocalRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_AddLocalTransform",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_AddRelativeLocation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_AddRelativeRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_AddWorldOffset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_AddWorldRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_AddWorldTransform",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_AddWorldTransformKeepScale",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_SetRelativeLocation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_SetRelativeLocationAndRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_SetRelativeRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_SetRelativeTransform",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_SetWorldLocation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_SetWorldLocationAndRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_SetWorldRotation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "K2_SetWorldTransform",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "OnRep_AttachChildren",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.SceneComponent.OnRep_AttachChildren"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "OnRep_AttachParent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.SceneComponent.OnRep_AttachParent"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "OnRep_AttachSocketName",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.SceneComponent.OnRep_AttachSocketName"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "OnRep_Transform",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.SceneComponent.OnRep_Transform"
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "function": "OnRep_Visibility",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SceneComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.SceneComponent.OnRep_Visibility"
+    },
+    {
+      "class": "/Script/Engine.World",
+      "function": "HandleTimelineScrubbed",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.World",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.World.HandleTimelineScrubbed"
+    }
+  ]
+}

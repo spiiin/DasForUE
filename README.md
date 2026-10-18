@@ -727,6 +727,18 @@ Managed AIController/MoveTo and a pursuing enemy: [AI](Docs/AI.md). Create demo:
 
 Standalone new-project integration and focused validation: [DasStarter](Examples/Standalone/README.md).
 
-Collision / Physics: [профиль и целевые проверки](Docs/CollisionPhysicsApi.md), [отчёт блокеров](Docs/CollisionPhysicsBlockers.md).
+Systematic API coverage: [audit](Docs/ApiCoverage.md), [subsystem expansion plan](Docs/ApiExpansionPlan.md). Reproduce with `Scripts/AuditApiCoverage.ps1`.
+
+Declarative API packages and the first Math module (619 wrappers): [ApiPackages](Docs/ApiPackages.md). Generate and verify with `Scripts/GenerateApiPackage.ps1`; publication requires `-Publish`.
+
+World / Actor / Components API package: [WorldApiPackage](Docs/WorldApiPackage.md), `Scripts/TestWorldApiPackage.ps1`.
+
+Native getter/setter semantics and construction guards: [NativeAccessAndConstruction](Docs/NativeAccessAndConstruction.md). Example: `native_accessors_example.das`; focused runner: `Scripts/TestAccessContext.ps1`.
+
+Collision / Physics: `require ue_api_collision` — 234 generated wrappers, 7 documented policy exclusions, no active package blockers. [Подключение и целевые проверки](Docs/CollisionPhysicsApi.md), [отчёт покрытия](Docs/CollisionPhysicsBlockers.md).
 
 Weak native references and checked HitResult/OverlapResult views: [Collision foundation](Docs/CollisionFoundation.md). Focused check: `Scripts/TestCollisionFoundation.ps1`.
+
+Generated trace/sweep native HitResult transport: [HitResultTransport](Docs/HitResultTransport.md). Focused runner: `Scripts/TestHitResultTransport.ps1`.
+
+Object/class arrays in reflected structs and Advanced projectile prediction: [StructReferenceArrays](Docs/StructReferenceArrays.md). Focused check: `Scripts/TestStructReferenceArrays.ps1`.

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "module": "ue_api_math",
+  "ue_modules": [
+    "Engine"
+  ],
+  "value_types": "canonical_math",
+  "default_arguments": "explicit",
+  "libraries": [
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "prefix": "ue_math_",
+      "include": [
+        "*"
+      ]
+    }
+  ],
+  "exclusions": [],
+  "probe": "[export]\ndef main(input:int):int {\n    if (ue_math_Add_IntInt(20,22) != 42) { return -1 }\n    if (ue_math_Multiply_IntInt(6,7) != 42) { return -2 }\n    if (ue_math_BooleanAND(true,false)) { return -3 }\n    let a = ue_math_MakeVector(1.0lf,2.0lf,3.0lf)\n    let b = ue_math_Add_VectorVector(a,a)\n    let split = ue_math_BreakVector(b)\n    if (split.out_x != 2.0lf || split.out_y != 4.0lf || split.out_z != 6.0lf) { return -4 }\n    let unit = ue_math_Vector_Normalize(ue_math_MakeVector(3.0lf,0.0lf,0.0lf),0.0001)\n    if (unit.x != 1.0lf) { return -5 }\n    let transform = ue_math_MakeTransform(a,ue_math_MakeRotator(0.0,0.0,0.0),ue_math_MakeVector(1.0lf,1.0lf,1.0lf))\n    let parts = ue_math_BreakTransform(transform)\n    if (parts.out_location.z != 3.0lf || parts.out_scale.y != 1.0lf) { return -6 }\n    var values : array<int>\n    push(values,3)\n    push(values,42)\n    push(values,7)\n    let maximum = ue_math_MaxOfIntArray(values)\n    if (maximum.out_indexofmaxvalue != 1 || maximum.out_maxvalue != 42) { return -7 }\n    let color = ue_math_MakeColor(0.25,0.5,0.75,1.0)\n    if (color.f_r != 0.25 || color.f_a != 1.0) { return -8 }\n    let canonical : UEVector = ue_math_Add_VectorVector(ue_vector(1.0lf,2.0lf,3.0lf),ue_vector(4.0lf,5.0lf,6.0lf))\n    if (canonical.z != 9.0lf) { return -9 }\n    let rotation : UERotator = ue_math_MakeRotator(1.0,2.0,3.0)\n    let pose : UETransform = ue_math_MakeTransform(canonical,rotation,ue_vector(1.0lf,1.0lf,1.0lf))\n    if (ue_transform_translation(pose).z != 9.0lf) { return -10 }\n    let point : UEVector2D = ue_math_MakeVector2D(2.0lf,4.0lf)\n    if (point.y != 4.0lf) { return -11 }\n    var vectors : array<UEVector>\n    push(vectors,ue_vector(2.0lf,4.0lf,6.0lf))\n    push(vectors,ue_vector(4.0lf,8.0lf,12.0lf))\n    let average : UEVector = ue_math_GetVectorArrayAverage(vectors)\n    if (average.x != 3.0lf || average.z != 9.0lf) { return -12 }\n    return 42\n}"
+}

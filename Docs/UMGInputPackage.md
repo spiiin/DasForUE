@@ -9,8 +9,8 @@ API каждого класса, без inherited копий. Это пакет 
 
 ## Результат — UE 5.8.3, 2026-10-18
 
-Из **517** кандидатов: **320** generation_ready, **110** export_blocked,
-**87** generation_blocked, 0 policy_excluded. Весь staged DAS-модуль успешно
+Из **517** кандидатов: **333** generation_ready, **110** export_blocked,
+**74** generation_blocked, 0 policy_excluded. Весь staged DAS-модуль успешно
 компилируется в UE. В этом снимке нет функций с UnsafeDuringActorConstruction;
 общие construction/signature/world/receiver guards сохраняются.
 
@@ -20,7 +20,7 @@ API каждого класса, без inherited копий. Это пакет 
 | InputSettings | 11 | 1 | 0 |
 | KismetInputLibrary | 21 | 1 | 31 |
 | EnhancedInputComponent | 0 | 1 | 0 |
-| EnhancedInputLibrary | 6 | 5 | 3 |
+| EnhancedInputLibrary | 9 | 5 | 0 |
 | EnhancedInputLocalPlayerSubsystem | 0 | 4 | 0 |
 | EnhancedInputWorldSubsystem | 2 | 0 | 0 |
 | InputMappingContext | 4 | 1 | 0 |
@@ -37,9 +37,9 @@ API каждого класса, без inherited копий. Это пакет 
 | SlateBlueprintLibrary | 4 | 4 | 12 |
 | Slider | 10 | 0 | 0 |
 | TextBlock | 18 | 0 | 0 |
-| UserWidget | 45 | 51 | 9 |
-| Widget | 49 | 16 | 7 |
-| WidgetBlueprintLibrary | 26 | 6 | 23 |
+| UserWidget | 50 | 51 | 4 |
+| Widget | 53 | 16 | 3 |
+| WidgetBlueprintLibrary | 27 | 6 | 22 |
 | WidgetLayoutLibrary | 22 | 0 | 2 |
 
 Ready включает обычные Widget setters/getters, панели и canvas slots, TextBlock,
@@ -62,28 +62,30 @@ raw vtable вызовов и отдельного Input event loop нет.
 ```
 
 Runner вызывает Editor build, экспортирует reflection, генерирует пакет и
-компилирует весь модуль. **Единственный runtime probe** создаёт reflected FKey
-с KeyName=SpaceBar, передаёт его в `KismetInputLibrary.Key_IsKeyboardKey` через
-сгенерированный wrapper и проверяет true. Это короткая проверка Name → FKey →
-native call → bool, а не симуляция нажатия клавиши или rendering-тест.
+компилирует весь модуль. **Единственный runtime probe** проверяет типизированный
+InputActionValue: Bool/Axis1D/2D/3D, native Make/Break/ToString, обнуление лишних
+осей и owned copy в array. Это не симуляция нажатия клавиши или rendering-тест.
+Первый пакет проверял FKey(SpaceBar); текущий runner заменил этот probe новым.
 
-Сборка успешна (target up to date), probe — PASS. Ошибок/ensure нет; DLL, профиль
-и генераторы не менялись во время проверки. Отчёт: `logs/umg-input-validation.json`.
+Сборка успешна, probe — PASS. Ошибок/ensure нет; DLL, профиль, генераторы и
+adapter sources не менялись во время проверки. Отчёт: `logs/umg-input-validation.json`.
 Полные Foundation/PIE/packaged, physical input, widget rendering и существующий
-managed input callback suite не запускались. Выполнение остальных 319 wrappers
-этим шагом не подтверждается.
+managed input callback suite не запускались. Остальные wrappers этим шагом
+в runtime не проверялись. Синтаксис и границы: [InputActionValue](InputActionValue.md).
 
 ## Backlog
 
-Машинный список всех 197 отказов с классом/методом/причиной:
+Машинный список всех 184 отказов с классом/методом/причиной:
 `Bindings/Packages/ue_api_umg_input.summary.json`. Отказы не скрыты ручными
 exclusions и не посчитаны готовыми функциями.
 
-- 77 generation failures: opaque/empty structs; сюда попадают формы Slate
-  geometry/input events/event replies/paint state и InputActionValue, для которых
+- 74 generation failures: opaque/empty structs; сюда попадают формы Slate
+  geometry/input events/event replies/paint state, для которых
   нельзя выдумывать native layout из пустого reflection-описания.
-- 10 generation failures: delegate-параметры. Нужен явный managed callback
-  contract с владением и снятием; простая передача VM/function pointer не добавлена.
+- Все 10 прежних delegate-parameter failures теперь генерируются через
+  UEFunctionDelegate и проверяемый UFunction endpoint. Native weak lifetime и
+  явный Unbind сохраняются; это не автоматическая managed-подписка на DAS closure.
+  См. [Input/UI callbacks](InputUICallbacks.md).
 - 110 export failures: internal/protected/deprecated policy, soft references,
   non-callable объявления, Blueprint events и delegate signatures.
 
@@ -94,7 +96,8 @@ backend перестал работать. Overrides событий UserWidget �
 
 ## Использование и публикация
 
-Пакет пока staged в `Build/ApiPackages/ue_api_umg_input/<run>/`.
+Пакет опубликован в plugin scripts после preflight; staged snapshots сохраняются
+в `Build/ApiPackages/ue_api_umg_input/<run>/`.
 Для установки обычного модуля существующий конвейер поддерживает:
 
 ```powershell
@@ -108,11 +111,34 @@ options gen2
 require ue_api_umg_input
 [export]
 def main(input:int):int {
-    let key=S_Key_a8a0a14c(f_keyname=ue_name("SpaceBar"))
-    return ue_input_key_Key_IsKeyboardKey(key) ? 42 : -1
+    let move=ue_input_value(ue_vector2d(1.0lf,0.0lf))
+    let parts=ue_enhanced_api_BreakInputActionValue(move)
+    return parts.out_x==1.0lf ? 42 : -1
 }
 ```
 
-Это generated transport имени FKey; отдельный удобный пользовательский key DSL
-этим пакетом не добавлялся. Поля/классы для project-based native discovery
-по-прежнему генерируются существующим путём.
+Сам `ue_input_value` доступен без публикации generated-пакета.
+Поля/классы для project-based native discovery по-прежнему генерируются
+существующим путём.
+
+## Typed callbacks и UI-сценарий — 2026-10-18
+
+После Editor build один короткий `-game -NullRHI -DasInputUI` сценарий — PASS:
+четыре InputActionValue payload через native proxy и owned копии, navigation
+delegate с return UWidget и отказом несовместимого handler, настоящая LocalPlayer
+action injection → авторский OnMove, managed HUD click, UI/Game input и release.
+Полный generated-модуль компилируется также при импорте в этом сценарии.
+DLL/исходники стабильны, Error/ensure нет. Отчёт `logs/input-ui-validation.json`.
+Остальные native delegate setters/animation/FieldNotify здесь не выполнялись;
+полные PIE/packaged, физический ввод, rendering и reload suites не запускались.
+
+
+## Аудит оставшихся 74 opaque failures
+
+Свежий reflection/generator/source audit: 36 input events, 17 Geometry,
+12 EventReply, 5 PaintContext и 4 WidgetAnimationHandle. Для input events
+выделены 33 detached snapshot candidates и три live navigation calls;
+DetectDragIfPressed также требует EventReply. Transport пока не реализован,
+coverage не увеличен. [Поимённый аудит](UMGInputBlockers.md),
+[контракт](InputEventTransportContract.md); воспроизведение Scripts/AuditUMGInput.ps1.
+16 unit tests и fresh export — PASS, без сборки/PIE/packaged и коммита.

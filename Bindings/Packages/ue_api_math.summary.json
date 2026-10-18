@@ -1,0 +1,1229 @@
+{
+  "schema_version": 1,
+  "package": "ue_api_math",
+  "engine_version": "5.8.3-0+UE5",
+  "source_sha256": "6e451484f204d5670a617902c4d46edf6bdaf124f4569cdc5f8eddc6c0cd4cf6",
+  "state": "published",
+  "preflight": {
+    "build_mode": "Editor NullRHI",
+    "game_world": false,
+    "profile_sha256": "4b3a6b379f0399b5c2d7d29d4a7bbc7241fdb6217384e4795337e57d8c31fd13",
+    "runtime_probe": "passed",
+    "compile": "passed",
+    "packaged": "not_run"
+  },
+  "value_types": "canonical_math",
+  "default_arguments": "explicit",
+  "candidate_count": 741,
+  "construction_guarded_count": 0,
+  "unique_declaration_count": 741,
+  "unknown_declaration_occurrences": 0,
+  "surfaces": {
+    "receiver": {
+      "generation_ready": 0,
+      "export_blocked": 0,
+      "generation_blocked": 0,
+      "policy_excluded": 0
+    },
+    "library": {
+      "generation_ready": 619,
+      "export_blocked": 112,
+      "generation_blocked": 10,
+      "policy_excluded": 0
+    }
+  },
+  "counts": {
+    "generation_ready": 619,
+    "export_blocked": 112,
+    "generation_blocked": 10,
+    "policy_excluded": 0
+  },
+  "blockers": [
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Abs_Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Add_DateTimeDateTime",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Add_DateTimeTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Add_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Add_TimespanTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "And_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "BreakDateTime",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "BreakTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "BreakTimespan2",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "ClampInt64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Conv_ByteToInt64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Conv_DoubleToFloat",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Conv_DoubleToInt64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Conv_FloatToDouble",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Conv_Int64ToByte",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Conv_Int64ToDouble",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Conv_Int64ToInt",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Conv_IntToInt64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "DateTimeFromIsoString",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "DateTimeFromString",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "DateTimeMaxValue",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "DateTimeMinValue",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Divide_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Divide_TimespanFloat",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Ease",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "EqualEqual_DateTimeDateTime",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "EqualEqual_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "EqualEqual_TimespanTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FCeil64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FFloor64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FMod64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FTrunc64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FloatSpringInterp",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "alias": "ue_math_FloatSpringInterp",
+      "explicit_defaults": [
+        {
+          "parameter": "mass",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "targetvelocityamount",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "bclamp",
+          "value": "false"
+        },
+        {
+          "parameter": "minvalue",
+          "value": "-1.000000"
+        },
+        {
+          "parameter": "maxvalue",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "binitializefromtarget",
+          "value": "false"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FromDays",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FromHours",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FromMilliseconds",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FromMinutes",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FromSeconds",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "FromUnixTimestamp",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetDate",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetDay",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetDayOfYear",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetDays",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetDuration",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetHour",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetHour12",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetHours",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetMillisecond",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetMilliseconds",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetMinute",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetMinutes",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetMonth",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetRuntimeFloatCurveValue",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "alias": "ue_math_GetRuntimeFloatCurveValue",
+      "explicit_defaults": [
+        {
+          "parameter": "indefaultvalue",
+          "value": "0.000000"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetSecond",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetSeconds",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetTimeOfDay",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetTotalDays",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetTotalHours",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetTotalMilliseconds",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetTotalMinutes",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetTotalSeconds",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GetYear",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GreaterEqual_DateTimeDateTime",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GreaterEqual_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "GreaterEqual_TimespanTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Greater_DateTimeDateTime",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Greater_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Greater_TimespanTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "InRange_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "IsAfternoon",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "IsMorning",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "LessEqual_DateTimeDateTime",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "LessEqual_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "LessEqual_TimespanTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Less_DateTimeDateTime",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Less_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Less_TimespanTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "LinearColor_Quantize",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "MakeDateTime",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "MakeTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "MakeTimespan2",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "MaxInt64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "MinInt64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Multiply_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Multiply_TimespanFloat",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "NotEqual_DateTimeDateTime",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "NotEqual_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "NotEqual_TimespanTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Not_Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Now",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Or_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Percent_FloatFloat",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "requires_special_call_adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Percent_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "QuaternionSpringInterp",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "alias": "ue_math_QuaternionSpringInterp",
+      "explicit_defaults": [
+        {
+          "parameter": "mass",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "targetvelocityamount",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "binitializefromtarget",
+          "value": "false"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "REase",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "RandomInteger64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "RandomInteger64InRange",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "ResetFloatSpringState",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "alias": "ue_math_ResetFloatSpringState",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "ResetQuaternionSpringState",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "alias": "ue_math_ResetQuaternionSpringState",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "ResetVectorSpringState",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "alias": "ue_math_ResetVectorSpringState",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Round64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "SetFloatSpringStateVelocity",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "alias": "ue_math_SetFloatSpringStateVelocity",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "SetQuaternionSpringStateAngularVelocity",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "alias": "ue_math_SetQuaternionSpringStateAngularVelocity",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "SetVectorSpringStateVelocity",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "alias": "ue_math_SetVectorSpringStateVelocity",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "SignOfInteger64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Subtract_DateTimeDateTime",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Subtract_DateTimeTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Subtract_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Subtract_TimespanTimespan",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "TEase",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "TimespanFromString",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "TimespanMaxValue",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "TimespanMinValue",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "TimespanRatio",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "TimespanZeroValue",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "ToUnixTimestamp",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "ToUnixTimestampDouble",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Today",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "UtcNow",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "VEase",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "VectorSpringInterp",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "alias": "ue_math_VectorSpringInterp",
+      "explicit_defaults": [
+        {
+          "parameter": "mass",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "targetvelocityamount",
+          "value": "1.000000"
+        },
+        {
+          "parameter": "bclamp",
+          "value": "false"
+        },
+        {
+          "parameter": "minvalue",
+          "value": "-1.000000,-1.000000,-1.000000"
+        },
+        {
+          "parameter": "maxvalue",
+          "value": "1.000000,1.000000,1.000000"
+        },
+        {
+          "parameter": "binitializefromtarget",
+          "value": "false"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/Engine.KismetMathLibrary",
+      "function": "Xor_Int64Int64",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.KismetMathLibrary",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    }
+  ]
+}

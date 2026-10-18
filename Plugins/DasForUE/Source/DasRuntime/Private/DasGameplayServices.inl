@@ -5,6 +5,15 @@ UWorld* GameplayWorld(das::Context* C){
  auto* Object=ResolveWorldContextObject(C);auto* World=Object?Object->GetWorld():nullptr;
  if(!World || !World->IsGameWorld() || World->bIsTearingDown)C->throw_error("gameplay service requires a live game world");return World;
 }
+FDasTraceHit ProjectHitResult(const FHitResult& Hit,das::Context* C){
+ FDasTraceHit R{};R.Scope=ActiveContext->TraceScope;R.BlockingHit=Hit.bBlockingHit;R.StartPenetrating=Hit.bStartPenetrating;R.Distance=Hit.Distance;R.Time=Hit.Time;R.Location=Hit.Location;R.ImpactPoint=Hit.ImpactPoint;R.Normal=Hit.Normal;R.ImpactNormal=Hit.ImpactNormal;R.FaceIndex=Hit.FaceIndex;
+ R.TraceStart=Hit.TraceStart;R.TraceEnd=Hit.TraceEnd;R.PenetrationDepth=Hit.PenetrationDepth;R.Item=Hit.Item;R.MyItem=Hit.MyItem;R.ElementIndex=Hit.ElementIndex;R.BoneName=Hit.BoneName;R.MyBoneName=Hit.MyBoneName;
+ if(auto* Material=Hit.PhysMaterial.Get())R.PhysMaterial=MakeObjectHandle(Material,Material->GetClass(),C);
+ if(auto* Owner=Hit.PhysicsObjectOwner.Get())R.PhysicsObjectOwner=MakeObjectHandle(Owner,UObject::StaticClass(),C);
+ if(auto* A=Hit.HitObjectHandle.GetCachedActor())R.Actor=MakeObjectHandle(A,AActor::StaticClass(),C);
+ if(auto* P=Hit.GetComponent())R.Component=MakeObjectHandle(P,UPrimitiveComponent::StaticClass(),C);
+ return R;
+}
 FDasTraceHit TraceWorld(const FVector& Start,const FVector& End,double Radius,int32 Channel,const das::TArray<FDasObjectHandle>& Ignored,bool Complex,bool IgnoreSelf,das::Context* C){
  auto* World=GameplayWorld(C);
  if(Start.ContainsNaN() || End.ContainsNaN() || !FMath::IsFinite((End-Start).SizeSquared()) || !FMath::IsFinite(Radius) || Radius<0 || Radius>1000000 || Channel<0 || Channel>=int32(ECC_OverlapAll_Deprecated) || Ignored.size>4096)C->throw_error("invalid trace vectors/radius/channel/ignore count");
@@ -15,14 +24,9 @@ FDasTraceHit TraceWorld(const FVector& Start,const FVector& End,double Radius,in
  FHitResult Hit;
  if(Radius==0)World->LineTraceSingleByChannel(Hit,Start,End,ECollisionChannel(Channel),Params);
  else World->SweepSingleByChannel(Hit,Start,End,FQuat::Identity,ECollisionChannel(Channel),FCollisionShape::MakeSphere(float(Radius)),Params);
- FDasTraceHit R{};R.Scope=ActiveContext->TraceScope;R.BlockingHit=Hit.bBlockingHit;R.StartPenetrating=Hit.bStartPenetrating;R.Distance=Hit.Distance;R.Time=Hit.Time;R.Location=Hit.Location;R.ImpactPoint=Hit.ImpactPoint;R.Normal=Hit.Normal;R.ImpactNormal=Hit.ImpactNormal;R.FaceIndex=Hit.FaceIndex;
- R.TraceStart=Hit.TraceStart;R.TraceEnd=Hit.TraceEnd;R.PenetrationDepth=Hit.PenetrationDepth;R.Item=Hit.Item;R.MyItem=Hit.MyItem;R.ElementIndex=Hit.ElementIndex;R.BoneName=Hit.BoneName;R.MyBoneName=Hit.MyBoneName;
- if(auto* Material=Hit.PhysMaterial.Get())R.PhysMaterial=MakeObjectHandle(Material,Material->GetClass(),C);
- if(auto* Owner=Hit.PhysicsObjectOwner.Get())R.PhysicsObjectOwner=MakeObjectHandle(Owner,UObject::StaticClass(),C);
- if(auto* A=Hit.HitObjectHandle.GetCachedActor())R.Actor=MakeObjectHandle(A,AActor::StaticClass(),C);
- if(auto* P=Hit.GetComponent())R.Component=MakeObjectHandle(P,UPrimitiveComponent::StaticClass(),C);
- return R;
+ return ProjectHitResult(Hit,C);
 }
+
 FDasObjectHandle TraceActor(const FDasTraceHit& H,das::Context* C){RequireObjectContext(C);if(H.Scope!=ActiveContext->TraceScope)C->throw_error("trace result belongs to another context or is uninitialized");return TryObject(H.Actor,C)?H.Actor:FDasObjectHandle{};}
 FDasObjectHandle TraceComponent(const FDasTraceHit& H,das::Context* C){RequireObjectContext(C);if(H.Scope!=ActiveContext->TraceScope)C->throw_error("trace result belongs to another context or is uninitialized");auto* P=Cast<UActorComponent>(TryObject(H.Component,C));return P && IsValid(P->GetOwner()) && !P->GetOwner()->IsActorBeingDestroyed()?H.Component:FDasObjectHandle{};}
 void RequireCollisionScope(uint64 Scope,das::Context* C){RequireObjectContext(C);if(Scope!=ActiveContext->TraceScope)C->throw_error("collision result belongs to another context or is uninitialized");}

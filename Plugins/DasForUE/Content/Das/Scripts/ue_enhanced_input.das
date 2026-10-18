@@ -1,6 +1,7 @@
 options gen2
 module ue_enhanced_input public
 require ue_dsl public
+require ue_input_value public
 
 [ue_native_object(path="/Script/EnhancedInput.InputAction")]
 struct InputActionRef { handle:UObjectHandle }

@@ -6,6 +6,9 @@ UCLASS()
 class DASRUNTIME_API UDasFunctionLibraryFixture:public UBlueprintFunctionLibrary {
  GENERATED_BODY()
 public:
+ inline static int32 ContextMutations=0;
+ UFUNCTION(BlueprintCallable,Category="daScript Test",meta=(UnsafeDuringActorConstruction="true")) static int32 UnsafeContextProbe(){return ++ContextMutations;}
+
  UFUNCTION(BlueprintPure,Category="daScript Test") static int32 Add(int32 A,int32 B);
  UFUNCTION(BlueprintPure,Category="daScript Test",meta=(WorldContext="Context")) static bool IsContextActor(const UObject* Context);
  UFUNCTION(BlueprintPure,Category="daScript Test",meta=(WorldContext="Context")) static int32 ContextWorldId(const UObject* Context);

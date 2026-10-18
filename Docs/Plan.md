@@ -7,6 +7,17 @@
 
 
 
+## Системное покрытие API — 2026-10-18
+
+Выполнен [аудит шести модулей](ApiCoverage.md): 1 938 native-классов,
+16 401 уникальное объявление. Переходим к [пакетам подсистем](ApiExpansionPlan.md)
+вместо выбора API только по игровым примерам. Следующий этап — декларативные
+профили генерации, preflight зависимостей/имён и первый пакет Core/Math + World.
+Общие приоритеты: native accessors, construction-context policy, weak refs и
+struct/container shapes; closed/deprecated/internal API автоматически не открывать.
+Аудит не меняет runtime registrations. Сборка, native -Check, 14 report tests и
+34 generator tests — PASS; полные Foundation/PIE/packaged не запускались.
+
 ## AIController и MoveTo — 2026-10-18
 
 Добавлен [управляемый AI API](AI.md): AIControllerRef, движение к Actor/позиции,
@@ -3915,6 +3926,62 @@ C:/src/DasStarter/Saved/DasValidation. Полные Foundation/PIE/packaged не
 ноль незапечённых объектов. LightingOnly обновляет свет существующей карты
 без пересоздания сцены; отчёт — Saved/DasValidation/lighting-validation.json.
 
+## Профили пакетов API и Math — 2026-10-18
+
+Реализованы selection из декларативного профиля, pruning зависимостей,
+раздельные export/generation diagnostics, явная политика default arguments,
+проверка общей генерации, импорт уникального staged-модуля и runtime probe
+до публикации. Math: 619 из 741 функций, 112 export blockers, 10 opaque-struct
+generation blockers. Editor Development build, 10 package tests, 94 существующих
+bindings generator tests и целевые Math runtime shapes — PASS. Нет новых
+per-method C++ helpers и изменений native gameplay registry.
+Далее — canonical math views вместо generated transport, затем пакет
+World/Actor/Components и общий accessor/construction-policy этап.
+Описание и воспроизведение: [ApiPackages](ApiPackages.md). Без коммита.
+
+## Canonical Math — 2026-10-18
+
+Пакет Math теперь использует foundation UEVector2D, UEVector, UERotator,
+UETransform вместо копий этих типов. Общий frame resolver поддерживает
+проверенные aggregate paths, включая array elements. Конкретные leaf assignments
+не обходят проверку заполнения других элементов. Структурная сигнатура IR
+сохраняется и проверяется до canonical mapping; дрейф native layout — ошибка
+генерации. Исходный режим существующих модулей не изменён.
+Покрытие Math осталось 619/741, блокеры 112 export + 10 generation.
+Далее: пакет World/Actor/Components, общий accessor/construction-policy этап;
+расширение canonical views для остальных типов — по измеренным потребностям.
+Целевые проверки: [ApiPackages](ApiPackages.md), TestCanonicalMath.ps1.
+
+## Пакет World / Actor / Components — 2026-10-18
+
+Реализованы receiver profiles и отдельные counts для library/instance surfaces;
+унаследованные occurrences не смешиваются с уникальными declarations.
+WorldActorComponents: 311 instance wrappers и 253 library wrappers (564 вместе).
+339 экспортных blocker'ов и один opaque-struct generation blocker сохранены
+поимённо. Экспортёр явно отклоняет soft-reference transport без адаптера и
+UnsafeDuringActorConstruction до общего context guard. Ни native registry,
+ни native fields/accessors этим пакетом не расширяются.
+Подробности, примеры и целевые проверки: [WorldApiPackage](WorldApiPackage.md).
+Далее — общий accessor/construction-policy этап, затем Collision/Physics.
+
+## Native accessors и construction guard — 2026-10-18
+
+[Общий object-property слой](NativeAccessAndConstruction.md) поддерживает native
+FProperty Getter/Setter и BlueprintGetter/Setter, сохраняет readonly и проверяет
+значение до вызова setter. Используются существующие value descriptors/carriers
+и GC roots; bitfield bool ABI нормализуется отдельно. Контракты сериализованы
+в native manifest/header; FProperty/UFunction pointers не кэшируются между reload.
+UnsafeDuringActorConstruction больше не исключает методы целиком: native registry
+и generic wrappers сохраняют guard, runtime проверяет фазу до dispatch.
+
+160 Python-тестов, native artifacts check, Game/Editor ConstructionScript,
+metadata-removed guards, getter/setter semantics, readonly/stale/type/infinity,
+GC в setter и настоящий Engine accessor example — PASS. World пакет повторно
+проверен: 652 wrappers, 88 guarded, blockers 246 export + 6 generation; Math 619.
+Без полного Foundation/PIE/packaged прогона и без собственного коммита.
+Далее — Collision/Physics/type blockers; унификация object/enum/UEName views
+между пакетами остаётся отдельной задачей.
+
 ## Collision / Physics foundation — 2026-10-18
 
 Добавлены FWeakObjectProperty в общий reference/value backend, физический weak
@@ -3939,6 +4006,7 @@ overlap, invalid radius/scope и Destroy. Native marker и стабильнос�
 Описание: [CollisionFoundation](CollisionFoundation.md); воспроизведение:
 Scripts/TestCollisionFoundation.ps1; отчёт logs/collision-foundation-validation.json.
 
+
 ## Симуляция тела и PhysicsHandle — 2026-10-18
 
 Добавлен DasPhysicsSimulation commandlet и phased DAS probe, использующие
@@ -3958,6 +4026,7 @@ Tests/PhysicsSimulation/probe.template.das; описание: Docs/PhysicsSimula
 отдельные constraints, async/network physics и полные Foundation/PIE/packaged
 этот этап не проверяет. Новых ручных wrappers не добавлено.
 
+
 ## Симуляция двух тел с PhysicsConstraint — 2026-10-18
 
 Добавлен DasConstraintSimulation commandlet и phased DAS probe для двух dynamic
@@ -3976,6 +4045,7 @@ Runner Scripts/TestConstraintSimulation.ps1; template
 Tests/ConstraintSimulation/probe.template.das; Docs/ConstraintSimulation.md.
 Отчёт logs/constraint-simulation-validation.json. Полные Foundation/PIE/packaged
 не запускались. Новых ручных production wrappers не добавлено.
+
 
 ## Pawn / Character / AI / Navigation: первый пакет — 2026-10-18
 
@@ -4001,6 +4071,7 @@ Visibility/deprecation даёт ещё 148 отказов. Collision / Physics �
 Описание Docs/PawnAINavigation.md; backlog Docs/PawnAINavigationBlockers.md;
 runner Scripts/TestPawnAIPackage.ps1; logs/pawn-ai-package-validation.json.
 Пакет не опубликован; полные Foundation/PIE/packaged не запускались.
+
 
 ### Native static NavigationSystemV1 — 2026-10-18
 
@@ -4092,3 +4163,47 @@ non-callable события и delegate signatures не объявляются o
 backlog Bindings/Packages/ue_api_umg_input.summary.json. Новых C++ dispatchers нет.
 Пакет staged, без публикации и коммита. Следующий функциональный шаг выбирается
 из общих value/callback barriers под нужный сценарий; сеть и миграции отложены.
+
+### Типизированный InputActionValue — 2026-10-18
+
+Добавлен ue_input_value: owned InputActionValue, InputValueType и перегруженный
+ue_input_value(bool/float/double/UEVector2D/UEVector), ue_input_type и getters
+ue_input_bool/axis1d/axis2d/axis3d. Native layout не копируется в DAS; отдельный
+numeric carrier преобразуется через UE constructors/Get. Exact-path transport
+input_action_value_v1 подключён к общим exporter/generator/call frames.
+Сгенерированы MakeInputActionValueOfType, BreakInputActionValue и ToString;
+UMG/Input: 323 ready (+3), 110 export blocked, 84 generation blocked.
+Editor build + whole-module compile + один короткий runtime main — PASS:
+четыре типа, native Make/Break/ToString, нулевые лишние оси, array copy.
+Исправлен порядок регистрации FFI: UCallHandle регистрируется до transport externs.
+DLL/profile/generator/adapter source hashes стабильны, Error/ensure в принятом
+прогоне нет. Полный PIE/packaged и physical input не запускались.
+Existing bool/float/vector Enhanced Input callbacks сохранены; typed callback
+payload и авторские поля этим шагом не расширялись. Документация
+Docs/InputActionValue.md; пример input_action_values.das; отчёт
+logs/umg-input-validation.json. Пакет staged; изменения без коммита.
+Следующее: managed callback/delegate-параметры и UI-сценарий по потребности;
+сеть и миграции остаются отложены.
+
+### Typed Enhanced Input callbacks и UMG delegate-параметры — 2026-10-18
+
+ue_enhanced_bind принимает InputActionValue в plain exported handlers и в
+авторских ue_function методах. Добавлен общий native struct pack/unpack bridge;
+direct numeric ABI ограничен Enhanced Input и соответствующими reload requirements.
+Native proxy проверяет SourceAction и finite values, передаёт owned snapshot.
+Старые bool/float/Vector2D/Vector handlers и managed recipes сохранены.
+Native scalar input-only single-cast delegate параметры генерируются как
+UEFunctionDelegate: checked UFunction endpoint, exact native signature identity,
+общий call frame/DelegateHandler и weak semantics. Unbind остаётся явным native
+контрактом; managed HUD/input cleanup сохраняется. Все 10 delegate blockers сняты.
+UMG/Input опубликован: 333 ready, 110 export blocked, 74 generation blocked.
+PlayableCharacter OnMove/OnLook переведены на InputActionValue; существующий HUD
+использует managed кнопку и Tab → GameOnly/GameAndUI без второй реализации UI.
+Editor build, generation/preflight, обновление example assets и один короткий
+совместный -game/NullRHI сценарий — PASS: четыре native payload shapes и копии,
+native navigation delegate/отказ неверной сигнатуры, real LocalPlayer injection
+в авторский OnMove, HUD click, UI/game cursor, ReleaseObject снимает input handles.
+DLL/source hashes стабильны; Error/ensure в принятом прогоне нет.
+Полные PIE/packaged, физические устройства/rendering и reload suites не запускались.
+Docs/InputUICallbacks.md; Scripts/TestInputUI.ps1; logs/input-ui-validation.json.
+Изменения без коммита. Сеть и структурные миграции остаются отложены.

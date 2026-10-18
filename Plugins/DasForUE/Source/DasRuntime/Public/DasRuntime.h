@@ -83,6 +83,7 @@ public:
     bool IsAuthoredMethodDispatchActive()const;
     bool CanMigrateAuthoredTypes()const;
     int32 PersistentContextCount(const UWorld* World = nullptr) const;
+    bool ExportNativeGameplayCoverage(const FString& OutputPath,const FString& ProfilePath,FString& Error);
     bool ExportNativeGameplay(const FString& OutputPath,const FString& RequestsPath,FString& Error);
     bool ExportBindings(const FString& SelectionPath, const FString& OutputPath, FString& Error);
     FString ScriptPath(const FString& Name) const;

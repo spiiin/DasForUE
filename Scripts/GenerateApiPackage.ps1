@@ -48,11 +48,14 @@ if($Publish){
  $Pending=$Destination+'.'+[guid]::NewGuid().ToString('N')+'.pending'
  Copy-Item -LiteralPath $Source -Destination $Pending -Force
  Move-Item -LiteralPath $Pending -Destination $Destination -Force
+ # New script names are not in an existing UBT makefile's enumerated dependencies.
+ # Invalidate the rules cache so the next build regenerates its UFS receipt.
+ (Get-Item -LiteralPath (Join-Path $Repo 'Plugins/DasForUE/Source/DasRuntime/DasRuntime.Build.cs')).LastWriteTimeUtc=[DateTime]::UtcNow
  $Report.state='published'
  $Summary=[ordered]@{
   schema_version=1;package=$Report.package;engine_version=$Report.engine_version
   source_sha256=$Report.source_sha256;state=$Report.state;preflight=$Report.preflight
-  value_types=$Report.value_types;default_arguments=$Report.default_arguments
+  value_types=$Report.value_types;default_arguments=$Report.default_arguments;dependencies=$Report.dependencies
   candidate_count=$Report.candidate_count;construction_guarded_count=$Report.construction_guarded_count;unique_declaration_count=$Report.unique_declaration_count;unknown_declaration_occurrences=$Report.unknown_declaration_occurrences;surfaces=$Report.surfaces;counts=$Report.counts
   blockers=@($Report.members|Where-Object {$_.status -ne 'generation_ready'})
  }

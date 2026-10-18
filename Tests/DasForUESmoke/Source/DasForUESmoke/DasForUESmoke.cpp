@@ -23,6 +23,7 @@ void StartDasCookedGameplayValidation();
 void StartDasPlayableMapValidation();
 void StartDasPickupValidation();
 void StartDasGameplayFeaturesValidation();
+void StartDasInputUIValidation();
 void StartDasMontageValidation();
 void StartDasAIValidation();
 void StartDasEffectsValidation();
@@ -54,6 +55,7 @@ public:
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasAI"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasAIValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasEffects"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasEffectsValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasMontage"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasMontageValidation();});}
+        else if(FParse::Param(FCommandLine::Get(),TEXT("DasInputUI"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasInputUIValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasGameplayFeatures"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasGameplayFeaturesValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasPickup"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasPickupValidation();});}
         else if(FParse::Param(FCommandLine::Get(),TEXT("DasPlayableMap"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasPlayableMapValidation();});}

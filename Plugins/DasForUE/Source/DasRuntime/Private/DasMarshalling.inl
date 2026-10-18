@@ -109,13 +109,30 @@
         else if (FieldKind(Property, Context) == EMarshallingKind::Struct)
         {
             UScriptStruct* Type = CastFieldChecked<FStructProperty>(Property)->Struct;
+            if(Type==FInputActionValue::StaticStruct()){
+                if(Property->ArrayDim!=1)Context->throw_error("fixed InputActionValue arrays need an adapter");
+                Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Type->GetPathName()});return;
+            }
+            // Native collision state is an opaque leaf; never flatten ActorInstanceHandle.
+            if(Type==FHitResult::StaticStruct()){
+                if(Property->ArrayDim!=1)Context->throw_error("fixed hit result arrays need an adapter");
+                Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Type->GetPathName()});return;
+            }
+            if(Type==FConstraintInstanceAccessor::StaticStruct()){
+                auto* Function=Cast<UFunction>(Property->GetOwnerStruct());
+                const bool Getter=Function && Function->GetOuterUClass()==UPhysicsConstraintComponent::StaticClass() && Function->GetFName()==TEXT("GetConstraint") && Property->HasAnyPropertyFlags(CPF_ReturnParm);
+                const bool Consumer=Function && Function->GetOuterUClass()==UConstraintInstanceBlueprintLibrary::StaticClass() && !Property->HasAnyPropertyFlags(CPF_ReturnParm) && bInput;
+                if(Property->ArrayDim!=1 || !Property->HasAnyPropertyFlags(CPF_Parm) || (!Getter && !Consumer))Context->throw_error("constraint accessors require scalar component-owned getter/library contract");
+                Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Type->GetPathName()});return;
+            }
+            if(Type->GetPathName()==TEXT("/Script/Engine.BodyInstanceAsyncPhysicsTickHandle"))Context->throw_error("async physics handles require a scoped frozen-game-thread physics callback adapter");
             if(Type->GetPathName()==TEXT("/Script/Engine.ActorInstanceHandle"))Context->throw_error("Actor instance handles require the collision result adapter");
             // Native opaque state cannot be described by reflection alone.
             if (Type->GetCppStructOps() && Type->GetCppStructOps()->HasAddStructReferencedObjects())
                 Context->throw_error("structs with native object references are unsupported");
             for (TFieldIterator<FProperty> It(Type); It; ++It) ValidateCallField(*It, Path + TEXT(".") + It->GetName(), bInput, bOutput, Signature, Context, Depth + 1);
         }
-        else Signature.Add({Path.ToLower(), FieldKind(Property, Context), bInput, bOutput, CastField<FClassProperty>(Property)?CastFieldChecked<FClassProperty>(Property)->MetaClass->GetPathName(): CallEnumType(Property) ? CallEnumType(Property)->GetPathName() : (DasReferencePropertyClass(Property) ? DasReferencePropertyClass(Property)->GetPathName() : FString())});
+        else Signature.Add({Path.ToLower(), FieldKind(Property, Context), bInput, bOutput, CastField<FDelegateProperty>(Property)?CastFieldChecked<FDelegateProperty>(Property)->SignatureFunction->GetPathName(): CastField<FClassProperty>(Property)?CastFieldChecked<FClassProperty>(Property)->MetaClass->GetPathName(): CallEnumType(Property) ? CallEnumType(Property)->GetPathName() : (DasReferencePropertyClass(Property) ? DasReferencePropertyClass(Property)->GetPathName() : FString())});
     }
 
     TArray<FMarshalledParameter> DescribeCall(UFunction* Function, das::Context* Context)
@@ -192,6 +209,17 @@
         if(!P || CastField<FClassProperty>(P) || P->ArrayDim!=1 || !P->HasAnyPropertyFlags(CPF_Parm) || P->HasAnyPropertyFlags(CPF_ReturnParm) || (P->HasAnyPropertyFlags(CPF_OutParm|CPF_ReferenceParm) && !P->HasAnyPropertyFlags(CPF_ConstParm)))Context->throw_error("WorldContext must name an input object parameter");
         return P;
     }
+    #include "DasCollisionProfileAdapter.inl"
+
+    void SetCallConstructionPolicy(FMarshalledCall& Call,das::Context* Context,bool Dispatch=false){
+#if WITH_EDITOR
+        Call.bConstructionPolicyKnown=true;
+        Call.bConstructionUnsafe |= Call.Function->HasMetaData(TEXT("UnsafeDuringActorConstruction"));
+#endif
+        if(Dispatch && ConstructingObject && !Call.bConstructionPolicyKnown && !Call.bAuthored)Context->throw_error("ConstructionScript requires a generated call context policy");
+        Call.bConstructionUnsafe |= IsCollisionProfilePropertyAdapter(Call.Function.Get());
+        CheckConstructionCall(Call.bConstructionUnsafe,Context);
+    }
     FDasCallHandle BeginStaticCall(const char* Path,const char* Name,const char* WorldParameter,das::Context* Context)
     {
         RequireObjectContext(Context);
@@ -202,9 +230,11 @@
         if(!Name || !*Name || FCStringAnsi::Strlen(Name)>=NAME_SIZE)Context->throw_error("invalid static function name");
         auto* Function=Class->FindFunctionByName(FName(UTF8_TO_TCHAR(Name)));
         if(!Function || !Function->HasAllFunctionFlags(FUNC_Static|FUNC_Native|FUNC_BlueprintCallable) || Function->HasAnyFunctionFlags(FUNC_Net|FUNC_Delegate|FUNC_MulticastDelegate))Context->throw_error("expected native static BlueprintCallable function");
+        const bool ProfileAdapter=IsCollisionProfilePropertyAdapter(Function);
+        if(ProfileAdapter)ValidateCollisionProfileAdapterSignature(Function,Context);
         const FString WorldName=WorldParameter?UTF8_TO_TCHAR(WorldParameter):TEXT("");
 #if WITH_EDITOR
-        if(Function->HasMetaData(TEXT("Latent")) || Function->HasMetaData(TEXT("CustomThunk")))Context->throw_error("static function needs a special call adapter");
+        if(Function->HasMetaData(TEXT("Latent")) || (Function->HasMetaData(TEXT("CustomThunk")) && !ProfileAdapter))Context->throw_error("static function needs a special call adapter");
         if(Function->GetMetaData(TEXT("WorldContext")).ToLower()!=WorldName.ToLower())Context->throw_error("WorldContext contract changed; regenerate bindings");
 #endif
         auto* WorldProperty=StaticWorldParameter(Function,WorldName,Context);
@@ -214,7 +244,7 @@
         if(ActiveContext->Calls.Num()>=256)Context->throw_error("call frame limit reached");
         auto Call=MakeShared<FMarshalledCall>();Call->Signature=MoveTemp(Signature);Call->SignatureKey=CallSignatureKey(Function);Call->Target=Class->GetDefaultObject();Call->Function.Reset(Function);Call->Frame=MakeUnique<FStructOnScope>(Function);
         if(WorldProperty){FDasScalarValue Native;Native.Kind=int32(EDasMethodSignature::Object);Native.ObjectClass=WorldProperty->PropertyClass->GetPathName();Native.ObjectValue=WorldObject;WriteNativePropertyValue(WorldProperty,WorldProperty->ContainerPtrToValuePtr<void>(Call->Frame->GetStructMemory()),Native,Context);Call->AutomaticWorldContext=WorldProperty->GetName().ToLower();Call->StaticWorld=World;Call->Assigned.Add(Call->AutomaticWorldContext);Call->ObjectPins.Add(Call->AutomaticWorldContext,TStrongObjectPtr<UObject>(WorldObject));}
-        const uint64 Token=NextCallHandle++;ActiveContext->Calls.Add(Token,MoveTemp(Call));return {Token};
+        SetCallConstructionPolicy(*Call,Context);const uint64 Token=NextCallHandle++;ActiveContext->Calls.Add(Token,MoveTemp(Call));return {Token};
     }
 
     FDasCallHandle BeginCallSelected(const FDasObjectHandle& Target, const char* Name, das::Context* Context,UFunction* Selected=nullptr)
@@ -234,6 +264,7 @@
         Call->Target = Object;
         Call->Function.Reset(Function);
         Call->Frame = MakeUnique<FStructOnScope>(Function);
+        SetCallConstructionPolicy(*Call,Context);
         const uint64 Token = NextCallHandle++;
         ActiveContext->Calls.Add(Token, MoveTemp(Call));
         return {Token};
@@ -254,6 +285,7 @@
         auto Handle=BeginCall(Target,Name,C);auto& Call=ResolveCall(Handle,C);Call.bAuthored=true;Call.RequiredInterface=Interface;Call.InterfaceSignatureKey=CallSignatureKey(Interface->FindFunctionByName(Call.Function->GetFName()));return Handle;
     }
     void ExpectInterfaceSignature(const FDasCallHandle& Handle,const char* Expected,das::Context* C){auto& Call=ResolveCall(Handle,C);if(Call.bExecuted || !Call.RequiredInterface.IsValid() || !Expected || Call.InterfaceSignatureKey!=UTF8_TO_TCHAR(Expected))C->throw_error("generated interface signature changed; regenerate bindings");}
+    void RequireCallContext(const FDasCallHandle& Handle,bool ConstructionUnsafe,das::Context* Context){auto& Call=ResolveCall(Handle,Context);if(Call.bExecuted)Context->throw_error("call context policy requires a pending frame");Call.bConstructionPolicyKnown=true;Call.bConstructionUnsafe |= ConstructionUnsafe;CheckConstructionCall(Call.bConstructionUnsafe,Context);}
     void ExpectCallSignature(const FDasCallHandle& Handle, const char* Expected, das::Context* Context)
     {
         auto& Call = ResolveCall(Handle, Context);
@@ -261,7 +293,7 @@
             Context->throw_error("generated binding signature changed; regenerate bindings");
     }
 
-    FCallField ResolveCallField(FMarshalledCall& Call, const char* Path, bool bOutput, das::Context* Context)
+    FCallField ResolveCallField(FMarshalledCall& Call, const char* Path, bool bOutput, das::Context* Context, bool bAllowStruct = false)
     {
         if (Call.bFailed) Context->throw_error("call failed; results are unavailable");
         if (Call.bExecuted != bOutput) Context->throw_error("arguments require a pending call; results require an executed call");
@@ -344,7 +376,8 @@
             }
             if (Index == Parts.Num() - 1)
             {
-                const auto* Description = Call.Signature.FindByPredicate([&](const auto& Item) { return Item.Path == DescriptionPath; });
+                // An aggregate still derives its access direction from the validated leaf contract.
+                const auto* Description = Call.Signature.FindByPredicate([&](const auto& Item) { return Item.Path == DescriptionPath || (bAllowStruct && CastField<FStructProperty>(Property) && Item.Path.StartsWith(DescriptionPath + TEXT("."))); });
                 if (!Description || !(bOutput ? Description->bOutput : Description->bInput)) Context->throw_error("unknown parameter or wrong parameter direction");
                 return {Property, Memory, Canonical};
             }
@@ -618,6 +651,8 @@
                 Context->throw_error("missing input argument or struct field");
         int32 InputTraversalBudget=1048576;
         for(const auto& Parameter:Call.Signature)if(Parameter.bInput && !WholeInput(Parameter.Path) && Parameter.Path.Contains(TEXT(".*")))VisitCallContainerPaths(Call,Parameter.Path,false,Context,[&](const FString& Concrete){if(!Call.Assigned.Contains(Concrete))Context->throw_error("missing array element or struct field; missing map key/value or set element");},InputTraversalBudget);
+        SetCallConstructionPolicy(Call,Context,true);
+        ValidateConstraintCallInputs(Call,Context);
         CommitPendingHashes(Call, Context);
         for (const auto& Pin : Call.ObjectPins)
             if (UObject* Argument = Pin.Value.Get(); Argument && (!IsValid(Argument) || (Cast<AActor>(Argument) && CastChecked<AActor>(Argument)->IsActorBeingDestroyed())))
@@ -632,8 +667,9 @@
             TGuardValue<int32> Depth(AuthoredDispatchDepth,AuthoredDispatchDepth+1);
             TGuardValue<FString*> Failure(AuthoredDispatchFailure,&DispatchFailure);
             if(Call.DelegateInvoke)Call.DelegateInvoke(Call.Frame->GetStructMemory());else Object->ProcessEvent(Call.Function.Get(),Call.Frame->GetStructMemory());
-        }else Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
+        }else if(!DispatchCollisionProfileProperty(Call,Context))Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
         if(!DispatchFailure.IsEmpty())Context->throw_error(TCHAR_TO_UTF8(*DispatchFailure));
+        CaptureConstraintCallOutput(Call,Context);
         int32 OutputTraversalBudget=1048576;
         for (const auto& Parameter : Call.Signature)
             if (Parameter.bOutput && Parameter.Kind == EMarshallingKind::Array)

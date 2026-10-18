@@ -1,33 +1,33 @@
 {
-  "schema_version": 1,
   "package": "ue_api_umg_input",
   "engine_version": "5.8.3-0+UE5",
-  "state": "ue_preflight_passed",
+  "state": "published",
   "value_types": "canonical_math",
   "default_arguments": "explicit",
   "candidate_count": 517,
   "counts": {
-    "generation_ready": 320,
+    "generation_ready": 333,
     "export_blocked": 110,
-    "generation_blocked": 87,
+    "generation_blocked": 74,
     "policy_excluded": 0
   },
   "construction_guarded_count": 0,
-  "source_sha256": "14d3b9b3c80cf6ad9a5d01f43aa55b5ab0ab62fcf992aefde7692f5e134d2f99",
+  "source_sha256": "2e781fe3b6e005379e2eae4d811931535f109589c82c7edbc06d7206ce1ae79f",
   "surfaces": {
     "receiver": {
-      "generation_ready": 241,
+      "generation_ready": 250,
       "export_blocked": 94,
-      "generation_blocked": 16,
+      "generation_blocked": 7,
       "policy_excluded": 0
     },
     "library": {
-      "generation_ready": 79,
+      "generation_ready": 83,
       "export_blocked": 16,
-      "generation_blocked": 71,
+      "generation_blocked": 67,
       "policy_excluded": 0
     }
   },
+  "schema_version": 1,
   "blockers": [
     {
       "class": "/Script/Engine.InputComponent",
@@ -489,17 +489,6 @@
     },
     {
       "class": "/Script/EnhancedInput.EnhancedInputLibrary",
-      "function": "BreakInputActionValue",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
-      "alias": "ue_enhanced_api_BreakInputActionValue",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
-    },
-    {
-      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
       "function": "Conv_InputActionValueToAxis1D",
       "surface": "library",
       "construction_unsafe": false,
@@ -536,34 +525,12 @@
     },
     {
       "class": "/Script/EnhancedInput.EnhancedInputLibrary",
-      "function": "Conv_InputActionValueToString",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
-      "alias": "ue_enhanced_api_Conv_InputActionValueToString",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
-    },
-    {
-      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
       "function": "GetBoundActionValue",
       "surface": "library",
       "construction_unsafe": false,
       "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
       "status": "export_blocked",
       "reason": "internal_function"
-    },
-    {
-      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
-      "function": "MakeInputActionValueOfType",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/EnhancedInput.EnhancedInputLibrary",
-      "alias": "ue_enhanced_api_MakeInputActionValueOfType",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
     },
     {
       "class": "/Script/EnhancedInput.EnhancedInputLocalPlayerSubsystem",
@@ -872,44 +839,6 @@
       "explicit_defaults": [],
       "status": "generation_blocked",
       "reason": "Opaque/empty structs need an adapter"
-    },
-    {
-      "class": "/Script/UMG.UserWidget",
-      "function": "BindToAnimationEvent",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.UserWidget",
-      "alias": "ue_user_widget_BindToAnimationEvent",
-      "explicit_defaults": [
-        {
-          "parameter": "usertag",
-          "value": "None"
-        }
-      ],
-      "status": "generation_blocked",
-      "reason": "Unsupported or colliding field: delegate"
-    },
-    {
-      "class": "/Script/UMG.UserWidget",
-      "function": "BindToAnimationFinished",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.UserWidget",
-      "alias": "ue_user_widget_BindToAnimationFinished",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Unsupported or colliding field: delegate"
-    },
-    {
-      "class": "/Script/UMG.UserWidget",
-      "function": "BindToAnimationStarted",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.UserWidget",
-      "alias": "ue_user_widget_BindToAnimationStarted",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Unsupported or colliding field: delegate"
     },
     {
       "class": "/Script/UMG.UserWidget",
@@ -1471,28 +1400,6 @@
     },
     {
       "class": "/Script/UMG.UserWidget",
-      "function": "UnbindFromAnimationFinished",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.UserWidget",
-      "alias": "ue_user_widget_UnbindFromAnimationFinished",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Unsupported or colliding field: delegate"
-    },
-    {
-      "class": "/Script/UMG.UserWidget",
-      "function": "UnbindFromAnimationStarted",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.UserWidget",
-      "alias": "ue_user_widget_UnbindFromAnimationStarted",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Unsupported or colliding field: delegate"
-    },
-    {
-      "class": "/Script/UMG.UserWidget",
       "function": "UnregisterInputComponent",
       "surface": "receiver",
       "construction_unsafe": false,
@@ -1652,28 +1559,6 @@
     },
     {
       "class": "/Script/UMG.Widget",
-      "function": "K2_AddFieldValueChangedDelegate",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.Widget",
-      "alias": "ue_widget_K2_AddFieldValueChangedDelegate",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Unsupported or colliding field: delegate"
-    },
-    {
-      "class": "/Script/UMG.Widget",
-      "function": "K2_RemoveFieldValueChangedDelegate",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.Widget",
-      "alias": "ue_widget_K2_RemoveFieldValueChangedDelegate",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Unsupported or colliding field: delegate"
-    },
-    {
-      "class": "/Script/UMG.Widget",
       "function": "OnPointerEvent__DelegateSignature",
       "surface": "receiver",
       "construction_unsafe": false,
@@ -1698,28 +1583,6 @@
       "declaring_class": "/Script/UMG.Widget",
       "status": "export_blocked",
       "reason": "deprecated_function"
-    },
-    {
-      "class": "/Script/UMG.Widget",
-      "function": "SetNavigationRuleCustom",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.Widget",
-      "alias": "ue_widget_SetNavigationRuleCustom",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Unsupported or colliding field: incustomdelegate"
-    },
-    {
-      "class": "/Script/UMG.Widget",
-      "function": "SetNavigationRuleCustomBoundary",
-      "surface": "receiver",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.Widget",
-      "alias": "ue_widget_SetNavigationRuleCustomBoundary",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Unsupported or colliding field: incustomdelegate"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",
@@ -2057,17 +1920,6 @@
       ],
       "status": "generation_blocked",
       "reason": "Opaque/empty structs need an adapter"
-    },
-    {
-      "class": "/Script/UMG.WidgetBlueprintLibrary",
-      "function": "SetWindowTitleBarOnCloseClickedDelegate",
-      "surface": "library",
-      "construction_unsafe": false,
-      "declaring_class": "/Script/UMG.WidgetBlueprintLibrary",
-      "alias": "ue_ui_SetWindowTitleBarOnCloseClickedDelegate",
-      "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Unsupported or colliding field: delegate"
     },
     {
       "class": "/Script/UMG.WidgetBlueprintLibrary",

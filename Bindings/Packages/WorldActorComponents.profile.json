@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "module": "ue_api_world",
+  "ue_modules": [
+    "Engine"
+  ],
+  "value_types": "canonical_math",
+  "default_arguments": "explicit",
+  "libraries": [
+    {
+      "class": "/Script/Engine.GameplayStatics",
+      "prefix": "ue_gameplay_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.KismetSystemLibrary",
+      "prefix": "ue_system_",
+      "include": [
+        "*"
+      ]
+    }
+  ],
+  "receivers": [
+    {
+      "class": "/Script/Engine.World",
+      "prefix": "ue_world_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.Actor",
+      "prefix": "ue_actor_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.ActorComponent",
+      "prefix": "ue_component_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.SceneComponent",
+      "prefix": "ue_scene_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.PrimitiveComponent",
+      "prefix": "ue_primitive_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.Controller",
+      "prefix": "ue_controller_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.MovementComponent",
+      "prefix": "ue_movement_",
+      "include": [
+        "*"
+      ]
+    }
+  ],
+  "exclusions": [],
+  "probe_world": true,
+  "probe": "[export]\ndef main(input:int):int {\n    let actor=C_Actor_adf65d5b_from(ue_self_object())\n    if (!C_Actor_adf65d5b_valid(actor)) { return -1 }\n    ue_actor_SetActorScale3D(actor,ue_vector(2.0lf,3.0lf,4.0lf))\n    if (ue_actor_GetActorScale3D(actor).z!=4.0lf) { return -2 }\n    let root=ue_actor_K2_GetRootComponent(actor)\n    if (!C_SceneComponent_6f0751c1_valid(root)) { return -3 }\n    let component=C_ActorComponent_97441d45_from(C_SceneComponent_6f0751c1_raw(root))\n    if (!__ue_same_object(C_Actor_adf65d5b_raw(ue_component_GetOwner(component)),C_Actor_adf65d5b_raw(actor))) { return -4 }\n    ue_scene_SetVisibility(root,false,true)\n    if (ue_scene_IsVisible(root)) { return -5 }\n    ue_scene_SetVisibility(root,true,true)\n    let children <- ue_scene_GetChildrenComponents(root,true)\n    if (length(children)!=1 || !ue_scene_IsVisible(children[0])) { return -6 }\n    let actors <- ue_gameplay_GetAllActorsWithTag(ue_name(\"PackageWorldProbe\"))\n    if (length(actors)!=1 || !__ue_same_object(C_Actor_adf65d5b_raw(actors[0]),C_Actor_adf65d5b_raw(actor))) { return -7 }\n    if (ue_gameplay_GetWorldDeltaSeconds()<0.0lf) { return -8 }\n    let display_name=ue_system_GetDisplayName(C_Object_55c3753a_from(C_Actor_adf65d5b_raw(actor)))\n    if (length(display_name)==0) { return -9 }\n    let shape=ue_actor_GetComponentByClass(actor,__ue_class_loaded(\"/Script/Engine.PrimitiveComponent\",\"/Script/Engine.ActorComponent\",\"\"))\n    if (!C_ActorComponent_97441d45_valid(shape)) { return -10 }\n    let origin=ue_gameplay_GetWorldOriginLocation()\n    if (origin.f_x!=0 || origin.f_y!=0 || origin.f_z!=0) { return -11 }\n    return 42\n}",
+  "world_probe": "[export]\ndef main(input:int):int {\n    let world=C_World_585eb25e_from(ue_self_object())\n    let settings=ue_world_K2_GetWorldSettings(world)\n    if (!C_WorldSettings_5d995f30_valid(settings)) { return -1 }\n    if (ue_gameplay_GetWorldDeltaSeconds()<0.0lf) { return -2 }\n    return 42\n}"
+}

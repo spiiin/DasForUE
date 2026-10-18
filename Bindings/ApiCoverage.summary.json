@@ -1,0 +1,1049 @@
+{
+  "blockers": [
+    {
+      "reason": "not_blueprint_visible",
+      "unique_declarations": 7781
+    },
+    {
+      "reason": "unsupported_property_type",
+      "unique_declarations": 1533
+    },
+    {
+      "reason": "editor_only",
+      "unique_declarations": 1343
+    },
+    {
+      "reason": "not_blueprint_callable",
+      "unique_declarations": 665
+    },
+    {
+      "reason": "native_accessor",
+      "unique_declarations": 421
+    },
+    {
+      "reason": "deprecated",
+      "unique_declarations": 402
+    },
+    {
+      "reason": "unsupported_parameter_type",
+      "unique_declarations": 269
+    },
+    {
+      "reason": "not_native",
+      "unique_declarations": 243
+    },
+    {
+      "reason": "not_public",
+      "unique_declarations": 188
+    },
+    {
+      "reason": "static",
+      "unique_declarations": 128
+    },
+    {
+      "reason": "metadata:DeprecatedFunction",
+      "unique_declarations": 126
+    },
+    {
+      "reason": "net",
+      "unique_declarations": 117
+    },
+    {
+      "reason": "metadata:UnsafeDuringActorConstruction",
+      "unique_declarations": 97
+    },
+    {
+      "reason": "metadata:BlueprintInternalUseOnly",
+      "unique_declarations": 95
+    },
+    {
+      "reason": "delegate_function",
+      "unique_declarations": 76
+    },
+    {
+      "reason": "metadata:WorldContext",
+      "unique_declarations": 60
+    },
+    {
+      "reason": "metadata:CustomThunk",
+      "unique_declarations": 21
+    },
+    {
+      "reason": "metadata:BlueprintProtected",
+      "unique_declarations": 13
+    },
+    {
+      "reason": "metadata:Latent",
+      "unique_declarations": 1
+    }
+  ],
+  "engine_version": "5.8.3-0+UE5",
+  "library_blockers": [
+    {
+      "reason": "unsupported UFunction or struct field type\n",
+      "receiver_functions": 254
+    },
+    {
+      "reason": "requires_special_call_adapter",
+      "receiver_functions": 84
+    },
+    {
+      "reason": "internal_function",
+      "receiver_functions": 69
+    },
+    {
+      "reason": "deprecated_function",
+      "receiver_functions": 33
+    },
+    {
+      "reason": "structs with native object references are unsupported\n",
+      "receiver_functions": 14
+    },
+    {
+      "reason": "WorldContext must name an input object parameter\n",
+      "receiver_functions": 1
+    }
+  ],
+  "marshalling_blockers": [],
+  "modules": [
+    "AIModule",
+    "Engine",
+    "EnhancedInput",
+    "NavigationSystem",
+    "Niagara",
+    "UMG"
+  ],
+  "schema_version": 1,
+  "scope": "Loaded reflected native classes in explicitly loaded modules; no C++ headers or non-reflected API inventory",
+  "single_policy_opportunities": [
+    {
+      "examples": [
+        "field:/Script/Engine.Actor.MinNetUpdateFrequency",
+        "field:/Script/Engine.Actor.NetCullDistanceSquared",
+        "field:/Script/Engine.Actor.NetUpdateFrequency",
+        "field:/Script/Engine.Actor.RootComponent",
+        "field:/Script/Engine.Actor.bAutoDestroyWhenFinished",
+        "field:/Script/Engine.ArrowComponent.ArrowLength",
+        "field:/Script/Engine.ArrowComponent.ArrowSize",
+        "field:/Script/Engine.ArrowComponent.ScreenSize"
+      ],
+      "reason": "native_accessor",
+      "unique_declarations": 401
+    },
+    {
+      "examples": [
+        "method:/Script/Engine.Actor.GetOverlappingActors",
+        "method:/Script/Engine.Actor.GetOverlappingComponents",
+        "method:/Script/Engine.Actor.IsOverlappingActor",
+        "method:/Script/Engine.ActorComponent.Activate",
+        "method:/Script/Engine.ActorComponent.Deactivate",
+        "method:/Script/Engine.ActorComponent.IsActive",
+        "method:/Script/Engine.ActorComponent.SetActive",
+        "method:/Script/Engine.ActorComponent.ToggleActive"
+      ],
+      "reason": "metadata:UnsafeDuringActorConstruction",
+      "unique_declarations": 84
+    }
+  ],
+  "sources": {
+    "code_files": {
+      "Plugins/DasForUE/Source/DasRuntime/Private/DasBindingExport.inl": "3b9c5b34e45c02cb84a57d113e201ffb0942c2acf4b59e03a6bdfbb2e36ef010",
+      "Plugins/DasForUE/Source/DasRuntime/Private/DasMarshalling.inl": "5463679c76a4155f07129183cd5ac1078da97fb1b203eda1441560cc0702da58",
+      "Plugins/DasForUE/Source/DasRuntime/Private/DasNativeGameplayCoverage.inl": "90861a51e6fc60a50177d0154f7c538daf082d1d87baa6632ea46488de118616",
+      "Plugins/DasForUE/Source/DasRuntime/Private/DasNativeGameplayExport.inl": "6103b3dc7402fc758fdd9246e80e3d666480427a33cbb900389df2e1affb57f3",
+      "Plugins/DasForUE/Source/DasRuntime/Private/DasNativeGameplayPolicy.inl": "414988c745a04a0a006fc706b5ea05d6d500a98212bab20f9ab926837393c5c7",
+      "Plugins/DasForUE/Source/DasRuntime/Private/DasNativeGameplayTypes.h": "e46247bbaa702f17e12508da5e9973b2c651735b78e464276a968ab52812b49a",
+      "Scripts/AuditApiCoverage.py": "3cb59efe3bd0b4cc58fbffa1064f1a720c3fe2a4506b601fb8b7808b1e993ec8",
+      "Scripts/GenerateBindings.py": "b4eddb3c45757ee6f3634126ad49020b52b8018c1d7fcdbe7bf82cff1e0719f8",
+      "Scripts/GenerateNativeGameplay.py": "fe10d00346e98a235e8dd7db237fd6939434d598afdce49d618d5af058d839b9"
+    },
+    "native_manifest_sha256": "1b71f5e730f488fef09e4475ee7f87ac13a271eed618a8b0b96680bffae5da4d",
+    "profile_sha256": "7fc6d8fef01174c3463dbffd44882073eb7d8d1789c5ce61271d9b81c5642ecf",
+    "reflection_sha256": "0e8537fbd9c20dc6e514df8cee55180fe89a37b8c384f4dd3cfb707105a954eb",
+    "wrapper_files": {
+      "Plugins/DasForUE/Content/Das/Scripts/ue_generated.das": "6b559f8b774650bd1bce691dfabac1ceb2e4e2501787cbf6cfb82c55e523ff0b",
+      "Plugins/DasForUE/Content/Das/Scripts/ue_library_generated.das": "455a63f93e7b58c2043b80a2b066b33de69a44226f70e54dc4d44bdd4152be9d"
+    }
+  },
+  "subsystems": [
+    {
+      "classes": 212,
+      "id": "ai_navigation",
+      "library_export_blocked": 5,
+      "library_export_eligible": 49,
+      "native_eligible_unselected": 3637,
+      "policy_excluded": 5182,
+      "policy_review": 388,
+      "requires_adapter": 115,
+      "type_blocked": 337
+    },
+    {
+      "classes": 21,
+      "id": "animation",
+      "native_eligible_unselected": 1634,
+      "native_generated": 462,
+      "policy_excluded": 1242,
+      "policy_review": 295,
+      "requires_adapter": 30,
+      "type_blocked": 149
+    },
+    {
+      "classes": 977,
+      "id": "assets_and_engine_other",
+      "native_eligible_unselected": 2152,
+      "native_generated": 32,
+      "policy_excluded": 16249,
+      "requires_adapter": 71,
+      "type_blocked": 93
+    },
+    {
+      "classes": 18,
+      "id": "audio",
+      "native_eligible_unselected": 267,
+      "native_generated": 13,
+      "policy_excluded": 385,
+      "policy_review": 6,
+      "requires_adapter": 39,
+      "type_blocked": 55
+    },
+    {
+      "classes": 56,
+      "id": "function_libraries",
+      "library_export_blocked": 422,
+      "library_export_eligible": 1532,
+      "library_generated": 3,
+      "policy_excluded": 76
+    },
+    {
+      "classes": 43,
+      "id": "input",
+      "library_export_blocked": 5,
+      "library_export_eligible": 9,
+      "native_eligible_unselected": 181,
+      "native_generated": 21,
+      "policy_excluded": 217,
+      "policy_review": 10,
+      "type_blocked": 60
+    },
+    {
+      "classes": 221,
+      "id": "niagara",
+      "library_export_blocked": 13,
+      "library_export_eligible": 73,
+      "native_eligible_unselected": 1545,
+      "native_generated": 7,
+      "policy_excluded": 3161,
+      "policy_review": 126,
+      "requires_adapter": 43,
+      "type_blocked": 143
+    },
+    {
+      "classes": 17,
+      "id": "pawn_controller_movement",
+      "native_eligible_unselected": 1412,
+      "native_generated": 741,
+      "policy_excluded": 2059,
+      "policy_review": 70,
+      "requires_adapter": 76,
+      "type_blocked": 165
+    },
+    {
+      "classes": 71,
+      "id": "scene_collision_physics",
+      "native_eligible_unselected": 10872,
+      "native_generated": 1515,
+      "policy_excluded": 5799,
+      "policy_review": 1866,
+      "requires_adapter": 146,
+      "type_blocked": 1329
+    },
+    {
+      "classes": 141,
+      "id": "ui",
+      "library_export_blocked": 10,
+      "library_export_eligible": 99,
+      "native_eligible_unselected": 4169,
+      "native_generated": 97,
+      "policy_excluded": 3449,
+      "policy_review": 61,
+      "requires_adapter": 996,
+      "type_blocked": 449
+    },
+    {
+      "classes": 161,
+      "id": "world_actor_components",
+      "native_eligible_unselected": 13326,
+      "native_generated": 110,
+      "policy_excluded": 18017,
+      "policy_review": 429,
+      "requires_adapter": 581,
+      "type_blocked": 1748
+    }
+  ],
+  "summary": {
+    "classes": 1938,
+    "declaration_counts": {
+      "native_eligible": 4546,
+      "native_generated_somewhere": 1231,
+      "native_ineligible": 11855
+    },
+    "eligible_declarations_never_registered": 3315,
+    "excluded_classes": 96,
+    "receiver_member_occurrences": 110125,
+    "selected_receivers_in_scope": 19,
+    "selected_receivers_outside_scope": [
+      "/Script/CoreUObject.Object",
+      "/Script/DasRuntime.DasNativeHashProbeComponent",
+      "/Script/DasRuntime.DasObjectFixture"
+    ],
+    "states": {
+      "library_export_blocked": 455,
+      "library_export_eligible": 1762,
+      "library_generated": 3,
+      "native_eligible_unselected": 39195,
+      "native_generated": 2998,
+      "policy_excluded": 55836,
+      "policy_review": 3251,
+      "requires_adapter": 2097,
+      "type_blocked": 4528
+    },
+    "unique_declarations": 16401
+  },
+  "type_only_opportunities": [
+    {
+      "affected_unique_declarations": 47,
+      "array_dim": 1,
+      "cpp_type": "TWeakObjectPtr<UObject>",
+      "examples": [
+        "field:/Script/Engine.CharacterMovementComponent.CurrentFloor",
+        "method:/Script/Engine.Actor.K2_AddActorLocalOffset",
+        "method:/Script/Engine.Actor.K2_AddActorLocalRotation",
+        "method:/Script/Engine.Actor.K2_AddActorLocalTransform",
+        "method:/Script/Engine.Actor.K2_AddActorWorldOffset",
+        "method:/Script/Engine.Actor.K2_AddActorWorldRotation"
+      ],
+      "property_kind": "WeakObjectProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 43,
+      "array_dim": 1,
+      "cpp_type": "TWeakObjectPtr<UPhysicalMaterial>",
+      "examples": [
+        "field:/Script/Engine.CharacterMovementComponent.CurrentFloor",
+        "method:/Script/Engine.Actor.K2_AddActorLocalOffset",
+        "method:/Script/Engine.Actor.K2_AddActorLocalRotation",
+        "method:/Script/Engine.Actor.K2_AddActorLocalTransform",
+        "method:/Script/Engine.Actor.K2_AddActorWorldOffset",
+        "method:/Script/Engine.Actor.K2_AddActorWorldRotation"
+      ],
+      "property_kind": "WeakObjectProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 43,
+      "array_dim": 1,
+      "cpp_type": "TWeakObjectPtr<UPrimitiveComponent>",
+      "examples": [
+        "field:/Script/Engine.CharacterMovementComponent.CurrentFloor",
+        "method:/Script/Engine.Actor.K2_AddActorLocalOffset",
+        "method:/Script/Engine.Actor.K2_AddActorLocalRotation",
+        "method:/Script/Engine.Actor.K2_AddActorLocalTransform",
+        "method:/Script/Engine.Actor.K2_AddActorWorldOffset",
+        "method:/Script/Engine.Actor.K2_AddActorWorldRotation"
+      ],
+      "property_kind": "WeakObjectProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 28,
+      "array_dim": 1,
+      "cpp_type": "FColor",
+      "examples": [
+        "field:/Script/AIModule.AISenseConfig.DebugColor",
+        "field:/Script/Engine.ColorInputDeviceProperty.ColorData",
+        "field:/Script/Engine.ColorInputDeviceProperty.DeviceOverrideData",
+        "field:/Script/Engine.DirectionalLightComponent.ModulatedShadowColor",
+        "field:/Script/Engine.DrawFrustumComponent.FrustumColor",
+        "field:/Script/Engine.ExponentialHeightFogComponent.VolumetricFogAlbedo"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 28
+    },
+    {
+      "affected_unique_declarations": 18,
+      "array_dim": 1,
+      "cpp_type": "FPrimitiveInstanceId",
+      "examples": [
+        "method:/Script/Engine.InstancedSkinnedMeshComponent.AddInstance",
+        "method:/Script/Engine.InstancedSkinnedMeshComponent.AddInstances",
+        "method:/Script/Engine.InstancedSkinnedMeshComponent.ClearInstanceBoneAttachment",
+        "method:/Script/Engine.InstancedSkinnedMeshComponent.GetCustomData",
+        "method:/Script/Engine.InstancedSkinnedMeshComponent.GetInstanceAnimationIndex",
+        "method:/Script/Engine.InstancedSkinnedMeshComponent.GetInstanceId"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 18
+    },
+    {
+      "affected_unique_declarations": 17,
+      "array_dim": 1,
+      "cpp_type": "FKeyHandleMap",
+      "examples": [
+        "field:/Script/Engine.AnimDataModel.AnimatedBoneAttributes",
+        "field:/Script/Engine.AnimDataModel.CurveData",
+        "field:/Script/Engine.AudioVolume.SubmixSendSettings",
+        "field:/Script/Engine.ForceFeedbackAttenuation.Attenuation",
+        "field:/Script/Engine.ForceFeedbackComponent.AttenuationOverrides",
+        "field:/Script/Engine.SoundAttenuation.Attenuation"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 5
+    },
+    {
+      "affected_unique_declarations": 11,
+      "array_dim": 1,
+      "cpp_type": "TOptional<float>",
+      "examples": [
+        "field:/Script/Engine.AudioVolume.SubmixSendSettings",
+        "field:/Script/Engine.SoundAttenuation.Attenuation",
+        "field:/Script/Engine.SoundBase.BusSends",
+        "field:/Script/Engine.SoundBase.PostAttenuationBusSends",
+        "field:/Script/Engine.SoundBase.PreEffectBusSends",
+        "field:/Script/Engine.SoundBase.SoundSubmixSends"
+      ],
+      "property_kind": "OptionalProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 9,
+      "array_dim": 1,
+      "cpp_type": "uint32",
+      "examples": [
+        "method:/Script/Engine.InputDeviceSubsystem.ActivateDevicePropertyOfClass",
+        "method:/Script/Engine.InputDeviceSubsystem.GetActiveDeviceProperty",
+        "method:/Script/Engine.InputDeviceSubsystem.IsPropertyActive",
+        "method:/Script/Engine.InputDeviceSubsystem.RemoveDevicePropertyByHandle",
+        "method:/Script/Engine.InputDeviceSubsystem.RemoveDevicePropertyHandles",
+        "method:/Script/Engine.PhysicsConstraintComponent.GetConstraint"
+      ],
+      "property_kind": "UInt32Property",
+      "single_shape_candidates": 5
+    },
+    {
+      "affected_unique_declarations": 8,
+      "array_dim": 1,
+      "cpp_type": "FCustomWidgetNavigationDelegate",
+      "examples": [
+        "field:/Script/UMG.WidgetNavigation.Down",
+        "field:/Script/UMG.WidgetNavigation.Left",
+        "field:/Script/UMG.WidgetNavigation.Next",
+        "field:/Script/UMG.WidgetNavigation.Previous",
+        "field:/Script/UMG.WidgetNavigation.Right",
+        "field:/Script/UMG.WidgetNavigation.Up"
+      ],
+      "property_kind": "DelegateProperty",
+      "single_shape_candidates": 2
+    },
+    {
+      "affected_unique_declarations": 6,
+      "array_dim": 1,
+      "cpp_type": "ETranslucencyType",
+      "examples": [
+        "field:/Script/Engine.CameraComponent.PostProcessSettings",
+        "field:/Script/Engine.PostProcessComponent.Settings",
+        "field:/Script/Engine.PostProcessVolume.Settings",
+        "field:/Script/Engine.SceneCaptureComponent2D.PostProcessSettings",
+        "field:/Script/Engine.SceneCaptureComponentCube.PostProcessSettings",
+        "method:/Script/Engine.CameraComponent.GetCameraView"
+      ],
+      "property_kind": "EnumProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 6,
+      "array_dim": 1,
+      "cpp_type": "TScriptInterface<IBlendableInterface>",
+      "examples": [
+        "method:/Script/Engine.CameraComponent.AddOrUpdateBlendable",
+        "method:/Script/Engine.CameraComponent.RemoveBlendable",
+        "method:/Script/Engine.PostProcessComponent.AddOrUpdateBlendable",
+        "method:/Script/Engine.PostProcessVolume.AddOrUpdateBlendable",
+        "method:/Script/Engine.SceneCaptureComponent2D.AddOrUpdateBlendable",
+        "method:/Script/Engine.SceneCaptureComponent2D.RemoveBlendable"
+      ],
+      "property_kind": "InterfaceProperty",
+      "single_shape_candidates": 6
+    },
+    {
+      "affected_unique_declarations": 6,
+      "array_dim": 8,
+      "cpp_type": "FLinearColor",
+      "examples": [
+        "field:/Script/Engine.CameraComponent.PostProcessSettings",
+        "field:/Script/Engine.PostProcessComponent.Settings",
+        "field:/Script/Engine.PostProcessVolume.Settings",
+        "field:/Script/Engine.SceneCaptureComponent2D.PostProcessSettings",
+        "field:/Script/Engine.SceneCaptureComponentCube.PostProcessSettings",
+        "method:/Script/Engine.CameraComponent.GetCameraView"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 6,
+      "array_dim": 3,
+      "cpp_type": "FMatteBoxFlag",
+      "examples": [
+        "field:/Script/Engine.CameraComponent.PostProcessSettings",
+        "field:/Script/Engine.PostProcessComponent.Settings",
+        "field:/Script/Engine.PostProcessVolume.Settings",
+        "field:/Script/Engine.SceneCaptureComponent2D.PostProcessSettings",
+        "field:/Script/Engine.SceneCaptureComponentCube.PostProcessSettings",
+        "method:/Script/Engine.CameraComponent.GetCameraView"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 6,
+      "array_dim": 1,
+      "cpp_type": "FScriptTypedElementHandle",
+      "examples": [
+        "method:/Script/Engine.TypedElementCommonActions.DuplicateNormalizedElements",
+        "method:/Script/Engine.TypedElementCommonActions.K2_DuplicateSelectedElements",
+        "method:/Script/Engine.TypedElementCommonActions.K2_PasteElements",
+        "method:/Script/Engine.TypedElementCommonActions.K2_PasteNormalizedElements",
+        "method:/Script/Engine.TypedElementCommonActions.PasteElementsFromString",
+        "method:/Script/Engine.TypedElementCommonActions.PasteNormalizedElementsFromString"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 3
+    },
+    {
+      "affected_unique_declarations": 6,
+      "array_dim": 1,
+      "cpp_type": "FScriptTypedElementListProxy",
+      "examples": [
+        "method:/Script/Engine.TypedElementCommonActions.CopyNormalizedElements",
+        "method:/Script/Engine.TypedElementCommonActions.CopyNormalizedElementsToString",
+        "method:/Script/Engine.TypedElementCommonActions.DeleteNormalizedElements",
+        "method:/Script/Engine.TypedElementCommonActions.DuplicateNormalizedElements",
+        "method:/Script/Engine.TypedElementCommonActions.K2_PasteNormalizedElements",
+        "method:/Script/Engine.TypedElementCommonActions.PasteNormalizedElementsFromString"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 3
+    },
+    {
+      "affected_unique_declarations": 6,
+      "array_dim": 1,
+      "cpp_type": "TWeakObjectPtr<UWidget>",
+      "examples": [
+        "field:/Script/UMG.WidgetNavigation.Down",
+        "field:/Script/UMG.WidgetNavigation.Left",
+        "field:/Script/UMG.WidgetNavigation.Next",
+        "field:/Script/UMG.WidgetNavigation.Previous",
+        "field:/Script/UMG.WidgetNavigation.Right",
+        "field:/Script/UMG.WidgetNavigation.Up"
+      ],
+      "property_kind": "WeakObjectProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 5,
+      "array_dim": 1,
+      "cpp_type": "FWidgetAnimationDynamicEvent",
+      "examples": [
+        "method:/Script/UMG.UserWidget.BindToAnimationEvent",
+        "method:/Script/UMG.UserWidget.BindToAnimationFinished",
+        "method:/Script/UMG.UserWidget.BindToAnimationStarted",
+        "method:/Script/UMG.UserWidget.UnbindFromAnimationFinished",
+        "method:/Script/UMG.UserWidget.UnbindFromAnimationStarted"
+      ],
+      "property_kind": "DelegateProperty",
+      "single_shape_candidates": 5
+    },
+    {
+      "affected_unique_declarations": 5,
+      "array_dim": 1,
+      "cpp_type": "FPlayerKeyMapping",
+      "examples": [
+        "field:/Script/EnhancedInput.EnhancedPlayerMappableKeyProfile.PlayerMappedKeys",
+        "method:/Script/EnhancedInput.EnhancedInputUserSettings.FindMappingsInRow",
+        "method:/Script/EnhancedInput.EnhancedPlayerMappableKeyProfile.DoesMappingPassQueryOptions",
+        "method:/Script/EnhancedInput.EnhancedPlayerMappableKeyProfile.GetPlayerMappingRows",
+        "method:/Script/EnhancedInput.EnhancedPlayerMappableKeyProfile.K2_FindKeyMapping"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 5
+    },
+    {
+      "affected_unique_declarations": 5,
+      "array_dim": 1,
+      "cpp_type": "FSoundAttenuationPluginSettings",
+      "examples": [
+        "field:/Script/Engine.SoundAttenuation.Attenuation",
+        "field:/Script/Niagara.NiagaraDataInterfaceAudioPlayerSettings.AttenuationSettings",
+        "method:/Script/Engine.AudioComponent.AdjustAttenuation",
+        "method:/Script/Engine.AudioComponent.BP_GetAttenuationSettingsToApply",
+        "method:/Script/Engine.AudioComponent.SetAttenuationOverrides"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 4,
+      "array_dim": 1,
+      "cpp_type": "TEnumAsByte<EBlendMode>",
+      "examples": [
+        "field:/Script/Engine.Material.BlendMode",
+        "method:/Script/Engine.Canvas.K2_DrawTexture",
+        "method:/Script/Engine.HUD.DrawTexture",
+        "method:/Script/Engine.MaterialInterface.GetBlendMode"
+      ],
+      "property_kind": "ByteProperty",
+      "single_shape_candidates": 4
+    },
+    {
+      "affected_unique_declarations": 4,
+      "array_dim": 4,
+      "cpp_type": "float",
+      "examples": [
+        "method:/Script/Engine.SkeletalMesh.GetMaterials",
+        "method:/Script/Engine.SkeletalMesh.SetMaterials",
+        "method:/Script/Engine.StaticMesh.GetStaticMaterials",
+        "method:/Script/Engine.StaticMesh.SetStaticMaterials"
+      ],
+      "property_kind": "FloatProperty",
+      "single_shape_candidates": 4
+    },
+    {
+      "affected_unique_declarations": 4,
+      "array_dim": 1,
+      "cpp_type": "int64",
+      "examples": [
+        "method:/Script/Engine.SoundWave.GetCuePoints",
+        "method:/Script/Engine.SoundWave.GetLoopRegions",
+        "method:/Script/Engine.Texture.Blueprint_GetMemorySize",
+        "method:/Script/Engine.Texture.Blueprint_GetTextureSourceDiskAndMemorySize"
+      ],
+      "property_kind": "Int64Property",
+      "single_shape_candidates": 4
+    },
+    {
+      "affected_unique_declarations": 4,
+      "array_dim": 1,
+      "cpp_type": "FInputActionValue",
+      "examples": [
+        "field:/Script/EnhancedInput.InputTrigger.LastValue",
+        "method:/Script/EnhancedInput.InputModifier.ModifyRaw",
+        "method:/Script/EnhancedInput.InputTrigger.IsActuated",
+        "method:/Script/EnhancedInput.InputTrigger.UpdateState"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 4
+    },
+    {
+      "affected_unique_declarations": 4,
+      "array_dim": 1,
+      "cpp_type": "FWidgetAnimationHandle",
+      "examples": [
+        "method:/Script/UMG.UserWidget.PlayAnimation",
+        "method:/Script/UMG.UserWidget.PlayAnimationForward",
+        "method:/Script/UMG.UserWidget.PlayAnimationReverse",
+        "method:/Script/UMG.UserWidget.PlayAnimationTimeRange"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 4
+    },
+    {
+      "affected_unique_declarations": 4,
+      "array_dim": 1,
+      "cpp_type": "TWeakObjectPtr<USceneComponent>",
+      "examples": [
+        "field:/Script/Engine.AudioComponent.AutoAttachParent",
+        "field:/Script/Engine.ParticleSystemComponent.AutoAttachParent",
+        "field:/Script/Engine.ProjectileMovementComponent.HomingTargetComponent",
+        "field:/Script/Niagara.NiagaraComponent.AutoAttachParent"
+      ],
+      "property_kind": "WeakObjectProperty",
+      "single_shape_candidates": 4
+    },
+    {
+      "affected_unique_declarations": 3,
+      "array_dim": 1,
+      "cpp_type": "FOnTimelineEvent",
+      "examples": [
+        "method:/Script/Engine.TimelineComponent.AddEvent",
+        "method:/Script/Engine.TimelineComponent.SetTimelineFinishedFunc",
+        "method:/Script/Engine.TimelineComponent.SetTimelinePostUpdateFunc"
+      ],
+      "property_kind": "DelegateProperty",
+      "single_shape_candidates": 3
+    },
+    {
+      "affected_unique_declarations": 3,
+      "array_dim": 1,
+      "cpp_type": "EStreamingSourcePriority",
+      "examples": [
+        "field:/Script/Engine.PlayerController.StreamingSourcePriority",
+        "field:/Script/Engine.WorldPartitionStreamingSourceComponent.Priority",
+        "method:/Script/Engine.PlayerController.GetStreamingSourcePriority"
+      ],
+      "property_kind": "EnumProperty",
+      "single_shape_candidates": 3
+    },
+    {
+      "affected_unique_declarations": 3,
+      "array_dim": 1,
+      "cpp_type": "FGeometry",
+      "examples": [
+        "method:/Script/UMG.Widget.GetCachedGeometry",
+        "method:/Script/UMG.Widget.GetPaintSpaceGeometry",
+        "method:/Script/UMG.Widget.GetTickSpaceGeometry"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 3
+    },
+    {
+      "affected_unique_declarations": 2,
+      "array_dim": 1,
+      "cpp_type": "TArray<uint8>",
+      "examples": [
+        "field:/Script/EnhancedInput.InputMappingContext.InputModeQueryOverride",
+        "method:/Script/Engine.PlayerState.BP_GetUniqueId"
+      ],
+      "property_kind": "ArrayProperty",
+      "single_shape_candidates": 2
+    },
+    {
+      "affected_unique_declarations": 2,
+      "array_dim": 1,
+      "cpp_type": "TEnumAsByte<EBlendableLocation>",
+      "examples": [
+        "field:/Script/Engine.Material.BlendableLocation",
+        "field:/Script/Engine.MaterialInstance.BlendableLocationOverride"
+      ],
+      "property_kind": "ByteProperty",
+      "single_shape_candidates": 2
+    },
+    {
+      "affected_unique_declarations": 2,
+      "array_dim": 1,
+      "cpp_type": "FFieldValueChangedDynamicDelegate",
+      "examples": [
+        "method:/Script/UMG.Widget.K2_AddFieldValueChangedDelegate",
+        "method:/Script/UMG.Widget.K2_RemoveFieldValueChangedDelegate"
+      ],
+      "property_kind": "DelegateProperty",
+      "single_shape_candidates": 2
+    },
+    {
+      "affected_unique_declarations": 2,
+      "array_dim": 1,
+      "cpp_type": "FOnNewNiagaraDataChannelPublish",
+      "examples": [
+        "method:/Script/Niagara.NiagaraDataChannelHandler.SubscribeToDataChannelUpdates",
+        "method:/Script/Niagara.NiagaraDataChannelHandler.SubscribeToDataChannelUpdates_WithContext"
+      ],
+      "property_kind": "DelegateProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 2,
+      "array_dim": 1,
+      "cpp_type": "EPhysicsReplicationMode",
+      "examples": [
+        "method:/Script/Engine.Actor.GetPhysicsReplicationMode",
+        "method:/Script/Engine.Actor.SetPhysicsReplicationMode"
+      ],
+      "property_kind": "EnumProperty",
+      "single_shape_candidates": 2
+    },
+    {
+      "affected_unique_declarations": 2,
+      "array_dim": 1,
+      "cpp_type": "TScriptInterface<ICameraLensEffectInterface>",
+      "examples": [
+        "method:/Script/Engine.PlayerCameraManager.AddGenericCameraLensEffect",
+        "method:/Script/Engine.PlayerCameraManager.RemoveGenericCameraLensEffect"
+      ],
+      "property_kind": "InterfaceProperty",
+      "single_shape_candidates": 2
+    },
+    {
+      "affected_unique_declarations": 2,
+      "array_dim": 1,
+      "cpp_type": "FInstancedStruct",
+      "examples": [
+        "field:/Script/UMG.WidgetNavigation.NavigationMethod",
+        "method:/Script/Niagara.NiagaraDataChannelHandler.SubscribeToDataChannelUpdates_WithContext"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 2,
+      "array_dim": 1,
+      "cpp_type": "FNavigationLink",
+      "examples": [
+        "field:/Script/AIModule.NavLinkProxy.PointLinks",
+        "field:/Script/NavigationSystem.NavLinkComponent.Links"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 2
+    },
+    {
+      "affected_unique_declarations": 2,
+      "array_dim": 1,
+      "cpp_type": "FUtf8String",
+      "examples": [
+        "field:/Script/Engine.AnimDataModel.AnimatedBoneAttributes",
+        "field:/Script/Engine.NavMovementComponent.NavAgentProps"
+      ],
+      "property_kind": "Utf8StrProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "TArray<TSubclassOf<UAISense> >",
+      "examples": [
+        "field:/Script/AIModule.AIPerceptionStimuliSourceComponent.RegisterAsSourceForSenses"
+      ],
+      "property_kind": "ArrayProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "TArray<TSubclassOf<UCameraModifier> >",
+      "examples": [
+        "field:/Script/Engine.PlayerCameraManager.DefaultModifiers"
+      ],
+      "property_kind": "ArrayProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "TArray<TSubclassOf<URichTextBlockDecorator> >",
+      "examples": [
+        "method:/Script/UMG.RichTextBlock.SetDecorators"
+      ],
+      "property_kind": "ArrayProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 12,
+      "cpp_type": "uint8",
+      "examples": [
+        "method:/Script/Engine.SkinnedMeshComponent.SetSkinWeightOverride"
+      ],
+      "property_kind": "ByteProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FOnIsItemSelectableOrNavigableDynamic",
+      "examples": [
+        "field:/Script/UMG.ListView.BP_OnIsItemSelectableOrNavigable"
+      ],
+      "property_kind": "DelegateProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FOnTimelineFloat",
+      "examples": [
+        "method:/Script/Engine.TimelineComponent.AddInterpFloat"
+      ],
+      "property_kind": "DelegateProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FOnTimelineLinearColor",
+      "examples": [
+        "method:/Script/Engine.TimelineComponent.AddInterpLinearColor"
+      ],
+      "property_kind": "DelegateProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FOnTimelineVector",
+      "examples": [
+        "method:/Script/Engine.TimelineComponent.AddInterpVector"
+      ],
+      "property_kind": "DelegateProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FViewportDisplayCallback",
+      "examples": [
+        "method:/Script/Engine.ViewportStatsSubsystem.AddDisplayDelegate"
+      ],
+      "property_kind": "DelegateProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "ESkinCacheUsage",
+      "examples": [
+        "field:/Script/Engine.SkinnedMeshComponent.SkinCacheUsage"
+      ],
+      "property_kind": "EnumProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "ESoundWaveLoadingBehavior",
+      "examples": [
+        "field:/Script/Engine.SoundClass.Properties"
+      ],
+      "property_kind": "EnumProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "EWidgetNavigationRoutingPolicy",
+      "examples": [
+        "field:/Script/UMG.WidgetNavigation.RoutingPolicy"
+      ],
+      "property_kind": "EnumProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 12,
+      "cpp_type": "int32",
+      "examples": [
+        "method:/Script/Engine.SkinnedMeshComponent.SetSkinWeightOverride"
+      ],
+      "property_kind": "IntProperty",
+      "single_shape_candidates": 0
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "TScriptInterface<ISlateTextureAtlasInterface>",
+      "examples": [
+        "method:/Script/UMG.Image.SetBrushFromAtlasInterface"
+      ],
+      "property_kind": "InterfaceProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FBodyInstance",
+      "examples": [
+        "field:/Script/Engine.PrimitiveComponent.BodyInstance"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FBodyInstanceAsyncPhysicsTickHandle",
+      "examples": [
+        "method:/Script/Engine.PrimitiveComponent.GetBodyInstanceAsyncPhysicsTickHandle"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FInputCancelAction",
+      "examples": [
+        "field:/Script/EnhancedInput.InputTriggerCombo.InputCancelActions"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FInputComboStepData",
+      "examples": [
+        "field:/Script/EnhancedInput.InputTriggerCombo.ComboActions"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FPlayerMappableKeyProfileCreationArgs",
+      "examples": [
+        "method:/Script/EnhancedInput.EnhancedInputUserSettings.CreateNewKeyProfile"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FSharedImageConstRefBlueprint",
+      "examples": [
+        "method:/Script/Engine.Texture2D.Blueprint_GetCPUCopy"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FSubtitleAssetData",
+      "examples": [
+        "field:/Script/Engine.SubtitleAssetUserData.Subtitles"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "FSubtitleCue",
+      "examples": [
+        "field:/Script/Engine.SoundWave.Subtitles"
+      ],
+      "property_kind": "StructProperty",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "uint16",
+      "examples": [
+        "field:/Script/AIModule.BTCompositeNode.Children"
+      ],
+      "property_kind": "UInt16Property",
+      "single_shape_candidates": 1
+    },
+    {
+      "affected_unique_declarations": 1,
+      "array_dim": 1,
+      "cpp_type": "TWeakObjectPtr<USkinnedMeshComponent>",
+      "examples": [
+        "field:/Script/Engine.SkinnedMeshComponent.LeaderPoseComponent"
+      ],
+      "property_kind": "WeakObjectProperty",
+      "single_shape_candidates": 1
+    }
+  ]
+}

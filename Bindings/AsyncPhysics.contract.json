@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "status": "async_physics_registration_DSL_implemented_validated",
+  "engine_version": "5.8.3",
+  "native_type": "/Script/Engine.BodyInstanceAsyncPhysicsTickHandle",
+  "producer": "/Script/Engine.PrimitiveComponent.GetBodyInstanceAsyncPhysicsTickHandle",
+  "consumers_found": [
+    "/Script/Engine.PhysicsThreadLibrary.AddForce"
+  ],
+  "current_runtime_policy": "reject_in_generic_call_marshalling_before_frame_allocation",
+  "planned_execution_role": "engine_owned_frozen_game_thread_presim",
+  "planned_identity": [
+    "weak_component",
+    "weak_owner",
+    "world_solver",
+    "body_selector",
+    "proxy_generation_marker",
+    "VM_session_binding_revision",
+    "callback_epoch"
+  ],
+  "planned_validity": "current_callback_only_re_resolve_before_each_use",
+  "planned_first_body_scope": "unwelded_single_body_primitives_only",
+  "planned_initial_operations": [
+    "AddForce_finite_vector_dynamic_or_sleeping_body_with_checked_accel_change"
+  ],
+  "forbidden_storage": [
+    "raw_proxy_pointer_in_DAS",
+    "FBodyInstance_pointer_in_DAS",
+    "JSON_IR_value_serialization",
+    "ue_property",
+    "ue_function_parameter_or_result",
+    "cross_callback_or_VM_token_reuse"
+  ],
+  "planned_VM": "precompiled_dedicated_context_no_gameplay_VM_reentry_bounded_value_IO",
+  "planned_lifecycle": "revoke_epoch_on_exit_or_error_revoke_binding_on_destroy_unregister_teardown_reload_defer_registry_mutation_outside_callback_iteration",
+  "not_supported_initially": [
+    "welding",
+    "skeletal_ragdoll",
+    "instance_index_bodies",
+    "geometry_collection_cluster_union",
+    "network_prediction",
+    "rewind_resimulation",
+    "worker_thread_DAS",
+    "arbitrary_UObject_or_Chaos_API"
+  ],
+  "evidence": "logs/async-dsl-validation.json",
+  "note": "Design record; not a runtime configuration or an exported DAS API. Native thread debug flags cannot authorize a shipping call.",
+  "implemented_execution_roles": [
+    "Gameplay",
+    "PhysicsPreSim"
+  ],
+  "implemented_native_bridge": "private_UDasAsyncPhysicsBridge_used_by_prepared_VM_and_DSL",
+  "current_physics_UE_extern_allowlist": [
+    "ue_physics_body",
+    "ue_physics_add_force"
+  ],
+  "current_VM_entry_policy": "ordinary_gameplay_entry_rejected_during_any_frozen_world_phase",
+  "implemented_VM": "dedicated_interpreter_Program_Context_compiled_initialized_resolved_before_binding",
+  "implemented_VM_API": "CreateDasAsyncPhysicsVM_native_only",
+  "implemented_value_IO": {
+    "capacity": 16,
+    "type": "finite_double",
+    "semantics": "latest_input_whole_packet_transactional_output",
+    "DAS_externs": [
+      "ue_physics_input",
+      "ue_physics_output"
+    ],
+    "gate": "current_engine_step_and_exact_isolated_Context"
+  },
+  "resource_caps": {
+    "stack_bytes": 65536,
+    "static_globals_bytes": 65536,
+    "heap_bytes": 1048576,
+    "string_heap_bytes": 1048576,
+    "execution_deadline": "not_enforced"
+  },
+  "implemented_body_type": "UEPhysicsBodyToken",
+  "implemented_body_API": {
+    "authorize": "IDasAsyncPhysicsVM.BindBody",
+    "revoke_slot": "IDasAsyncPhysicsVM.ClearBody",
+    "acquire": "ue_physics_body",
+    "force": "ue_physics_add_force",
+    "slots": 8,
+    "calls_per_step": 64,
+    "scope": "same_owner_actor_single_unwelded_Box_Sphere_Capsule_StaticMesh",
+    "identity": "weak_component_world_generation_timestamp_current_VM_step_table",
+    "numeric_checks": [
+      "finite_XYZ",
+      "positive_finite_mass_inverse_mass",
+      "finite_force_mass_product",
+      "finite_accumulated_force_acceleration_velocity"
+    ],
+    "commit": "same_presim_step_after_successful_script_and_revalidation"
+  },
+  "validation": {
+    "state": "PASS",
+    "body_checks": 80,
+    "VM_checks": 66,
+    "execution_role_lifecycle_regression_checks": 102,
+    "total_checks": 298,
+    "modes": [
+      "sync",
+      "fixed_async_1_60"
+    ],
+    "stable_DLL_hashes": true,
+    "full_suite": "not_run",
+    "DSL_checks": 50
+  },
+  "implemented_registration_DSL": {
+    "annotation": "ue_async_physics",
+    "arguments": [
+      "script",
+      "body_0..body_7"
+    ],
+    "authoring_field": "async_physics",
+    "activation": "after_Initialize_BeginPlay_and_owner_readiness",
+    "gameplay_externs": [
+      "ue_async_physics_set_input",
+      "ue_async_physics_has_output",
+      "ue_async_physics_output",
+      "ue_async_physics_running",
+      "ue_async_physics_error"
+    ],
+    "reload": "prepare_and_bind_candidate_before_revoking_old_callbacks",
+    "evidence": "logs/async-dsl-validation.json"
+  }
+}

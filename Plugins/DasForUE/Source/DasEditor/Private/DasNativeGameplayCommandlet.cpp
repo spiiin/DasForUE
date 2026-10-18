@@ -6,6 +6,7 @@
 #include "UObject/StrongObjectPtr.h"
 UDasNativeGameplayCommandlet::UDasNativeGameplayCommandlet(){IsClient=false;IsServer=false;IsEditor=true;LogToConsole=true;}
 int32 UDasNativeGameplayCommandlet::Main(const FString& Params){
+ if(FParse::Param(*Params,TEXT("Coverage"))){FString Output,Profile,Error;if(!FParse::Value(*Params,TEXT("Output="),Output) || !FParse::Value(*Params,TEXT("Profile="),Profile) || !FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).ExportNativeGameplayCoverage(Output,Profile,Error)){UE_LOG(LogTemp,Error,TEXT("DAS_API_COVERAGE_EXPORT=FAIL %s"),*Error);return 1;}UE_LOG(LogTemp,Display,TEXT("DAS_API_COVERAGE_EXPORT=PASS"));return 0;}
  if(FParse::Param(*Params,TEXT("Probe"))){
   auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
   auto* World=UWorld::CreateWorld(EWorldType::Game,false);if(!World)return 1;TStrongObjectPtr<UWorld> Keep(World);

@@ -21,6 +21,10 @@ def Native_ClothingSimulationInteractorRef_75d9e2c1_from(value:UObjectHandle):Na
 struct Native_ActorComponentRef_97441d45 { handle:UObjectHandle }
 def Native_ActorComponentRef_97441d45_from(value:UObjectHandle):Native_ActorComponentRef_97441d45 { return Native_ActorComponentRef_97441d45(handle=ue_cast_nullable_object(value,"/Script/Engine.ActorComponent")) }
 
+[ue_native_object(path="/Script/Engine.AnimInstance")]
+struct Native_AnimInstanceRef_b5f8c607 { handle:UObjectHandle }
+def Native_AnimInstanceRef_b5f8c607_from(value:UObjectHandle):Native_AnimInstanceRef_b5f8c607 { return Native_AnimInstanceRef_b5f8c607(handle=ue_cast_nullable_object(value,"/Script/Engine.AnimInstance")) }
+
 [ue_native_object(path="/Script/Engine.AnimMontage")]
 struct Native_AnimMontageRef_e25467ee { handle:UObjectHandle }
 def Native_AnimMontageRef_e25467ee_from(value:UObjectHandle):Native_AnimMontageRef_e25467ee { return Native_AnimMontageRef_e25467ee(handle=ue_cast_nullable_object(value,"/Script/Engine.AnimMontage")) }
@@ -477,6 +481,13 @@ enum EKinematicBonesUpdateToPhysics {
     SkipAllBones=1
 }
 
+[ue_native_enum(path="/Script/Engine.ELightmapType")]
+enum ELightmapType {
+    Default=0
+    ForceSurface=1
+    ForceVolumetric=2
+}
+
 [ue_native_enum(path="/Script/Engine.EMaxConcurrentResolutionRule")]
 enum EMaxConcurrentResolutionRule {
     PreventNew=0
@@ -627,6 +638,13 @@ enum EStaticMeshPaintSupport {
     Disabled=2
 }
 
+[ue_native_enum(path="/Script/Engine.ETeleportType")]
+enum ETeleportType {
+    None=0
+    TeleportPhysics=1
+    ResetPhysics=2
+}
+
 [ue_native_enum(path="/Script/Engine.ETickingGroup")]
 enum ETickingGroup {
     TG_PrePhysics=0
@@ -755,6 +773,20 @@ enum ETouchIndex {
     MAX_TOUCHES=11
 }
 
+[ue_native_enum(path="/Script/PhysicsCore.ERadialImpulseFalloff")]
+enum ERadialImpulseFalloff {
+    RIF_Constant=0
+    RIF_Linear=1
+}
+
+[ue_native_enum(path="/Script/SlateCore.EFlowDirectionPreference")]
+enum EFlowDirectionPreference {
+    Inherit=0
+    Culture=1
+    LeftToRight=2
+    RightToLeft=3
+}
+
 [ue_native_enum(path="/Script/SlateCore.ESlateColorStylingMode")]
 enum ESlateColorStylingMode {
     UseColor_Specified=0
@@ -794,6 +826,13 @@ enum EWidgetClipping {
     ClipToBoundsWithoutIntersecting=2
     ClipToBoundsAlways=3
     OnDemand=4
+}
+
+[ue_native_enum(path="/Script/SlateCore.EWidgetPixelSnapping")]
+enum EWidgetPixelSnapping {
+    Inherit=0
+    Disabled=1
+    SnapToPixel=2
 }
 
 [ue_native_enum(path="/Script/UMG.ESlateVisibility")]
