@@ -213,7 +213,7 @@ def generate(ir, module="ue_generated", source_types=None):
                 if member['kind'] == 'struct': visit(member['type_path'])
                 elif member['kind'] == 'array':
                     element = member.get('element', {})
-                    properties = {'byte':'ByteProperty','text':'TextProperty','int':'IntProperty','float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty','string':'StrProperty','name':'NameProperty','struct':'StructProperty','enum':'EnumProperty'}
+                    properties = {'byte':'ByteProperty','text':'TextProperty','int':'IntProperty','float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty','string':'StrProperty','name':'NameProperty','object':'ObjectProperty','class':'ClassProperty','struct':'StructProperty','enum':'EnumProperty'}
                     kind = element.get('kind')
                     if kind not in properties or (member['type_path'] not in ('EnumProperty','ByteProperty') if kind == 'enum' else member['type_path'] != properties[kind]): raise ValueError('Unsupported struct array member')
                     validate_member(element)
