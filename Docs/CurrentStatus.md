@@ -919,3 +919,27 @@ Source/DLL hashes и engine BuildId стабильны, engine Error/ensure не
 Полный Foundation/PIE/packaged не запускался, коммит не создан.
 Docs/CurveTables.md; Scripts/TestCurveTables.ps1; Tests/CurveTables/probe.das;
 logs/curve-tables-validation.json.
+
+### Создание авторского DataTable из JSON — 2026-10-18
+
+Добавлен FDasDataTableService::CreateFromJson и editor-команда Das.DSL.Table.Create:
+compiled authored DSL row struct + JSON -> новый обычный dirty UDataTable.
+JSON сначала импортируется native UE importer во transient candidate; проблемы
+импорта/валидации отклоняются до создания destination package. Проверяются saved
+authored identity/model, member IDs/names/pin types, Name-ключи, duplicate rows,
+колонки, диапазоны прямых numeric fields и общий snapshot contract. Existing
+packages не перезаписываются; auto-save/reimport и настройки проекта не меняются.
+Публичный пример Examples/DataTables/Items.json использует Label/Price/Weight.
+
+Editor Development build и один расширенный короткий DasDataTables-сценарий —
+PASS, 17 проверок: реальные authored struct/table из JSON, malformed/nonobject/
+non-string key, wrong scalar, integer overflow/fraction, missing/extra columns,
+duplicate row names, отсутствие destination package при отказе, existing-package
+refusal, empty JSON array, типизированное чтение и row-removal/GC/empty checks.
+Source/DLL hashes и engine BuildId стабильны, engine Error/ensure нет. Исправлены
+недостающий include editor field descriptions и неявное приведение числового Name
+UE JSON accessor-ом; финальный прогон принят. Временные файлы удалены, только
+собственные in-memory assets сняты с регистрации. Никакие user assets не сохранены.
+Без full Foundation/PIE/packaged, коммит не создан.
+Docs/DataTableAuthoring.md; Docs/DataTables.md; Scripts/TestDataTables.ps1;
+logs/data-tables-validation.json; Examples/DataTables/Items.json.

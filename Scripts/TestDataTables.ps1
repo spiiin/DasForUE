@@ -2,13 +2,14 @@ param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild)
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
-[ordered]@{state='pending';feature='Typed DataTable rows'}|ConvertTo-Json|Set-Content "$Repo/logs/data-tables-validation.json" -Encoding utf8
+[ordered]@{state='pending';feature='Authored DataTable JSON creation and typed rows'}|ConvertTo-Json|Set-Content "$Repo/logs/data-tables-validation.json" -Encoding utf8
 function Read-DataTablesSourceHashes {
  $Result=@{}
  foreach($File in Get-ChildItem "$Repo/Plugins/DasForUE/Source" -Recurse -File){$Result[$File.FullName]=(Get-FileHash -LiteralPath $File.FullName -Algorithm SHA256).Hash}
  # Hash versioned scripts and this feature's new modules; ignore unrelated ephemeral probes.
  $Scripts=@(& git -C $Repo ls-files -- 'Plugins/DasForUE/Content/Das/Scripts/*.das')+@('Plugins/DasForUE/Content/Das/Scripts/ue_data_tables.das','Plugins/DasForUE/Content/Das/Scripts/datatable_item_types.das','Plugins/DasForUE/Content/Das/Scripts/datatable_items.das')
  foreach($Relative in $Scripts|Select-Object -Unique){$Path=Join-Path $Repo $Relative;$Result[$Path]=(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+ $Result["$Repo/Examples/DataTables/Items.json"]=(Get-FileHash "$Repo/Examples/DataTables/Items.json" -Algorithm SHA256).Hash
  $Result["$Repo/Tests/DataTables/probe.das"]=(Get-FileHash "$Repo/Tests/DataTables/probe.das" -Algorithm SHA256).Hash
  return $Result
 }
@@ -29,7 +30,7 @@ $Manifest="$Engine/Engine/Binaries/Win64/UnrealEditor.modules"
 $BuildId=(Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId
 $Log="$Repo/logs/data-tables-runtime.log"
 try {
- & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasDataTables "-Fixture=$Repo/Tests/DataTables/probe.das" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Log" *> "$Repo/logs/data-tables-runtime-stdout.log"
+ & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasDataTables "-Fixture=$Repo/Tests/DataTables/probe.das" "-ItemsJson=$Repo/Examples/DataTables/Items.json" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Log" *> "$Repo/logs/data-tables-runtime-stdout.log"
  $Code=$LASTEXITCODE;$Text=Get-Content $Log -Raw
  $Result=[regex]::Match($Text,'DAS_DATA_TABLES_RESULT=PASS checks=(\d+)')
  if($Code -or !$Result.Success){throw "DataTables runtime probe failed: $Log"}

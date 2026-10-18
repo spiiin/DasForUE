@@ -1,0 +1,4 @@
+[
+  {"Name":"Potion", "Label":"Health Potion", "Price":25, "Weight":0.5},
+  {"Name":"Sword", "Label":"Iron Sword", "Price":125, "Weight":3.0}
+]

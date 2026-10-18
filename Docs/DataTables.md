@@ -62,17 +62,26 @@ that row struct and add, for example:
 | Potion | Health Potion | 25 | 0.5 |
 | Sword | Iron Sword | 125 | 3.0 |
 
-Save the table and pass its loaded object handle to `item_price`. Loading can use
-an existing authored asset reference or the existing asset-loading API. This step
-adds reading; it does not add a new general table authoring/import service,
-CurveTable support, schema migration or automatic cook settings.
+Alternatively, create the table directly from the checked-in JSON example:
+
+```text
+Das.DSL.Table.Create /Game/ItemTypes/ItemRow.ItemRow /Game/Items/DT_Items C:/src/DasForUE2/Examples/DataTables/Items.json
+```
+
+This creates a new dirty DataTable asset in Content Browser. Save both the authored
+row struct and the table in the editor, then pass the loaded table handle to
+`item_price`. Loading can use an existing authored asset reference or the existing
+asset-loading API. See [DataTable authoring/import](DataTableAuthoring.md) for
+validation rules. Existing tables are never overwritten. Schema migration,
+automatic reimport and cook settings are separate work. CurveTable reading is
+covered in [CurveTables](CurveTables.md).
 
 ## Focused validation
 
 `Scripts/TestDataTables.ps1` builds the Editor and runs one `DasDataTables`
-commandlet scenario. It creates a unique in-memory authored row struct and real
-UDataTable with two item rows, then compiles/runs a temporary copy of the public
-example against that type folder. It checks names, case-insensitive lookup,
+commandlet scenario. It creates a unique authored row struct and a new DataTable asset from the public
+`Examples/DataTables/Items.json`, checks import refusals before asset creation,
+then compiles/runs a temporary copy of the public example against that type folder. It checks names, case-insensitive lookup,
 missing rows, exact-type refusal, typed values and a retained copy after native
 row removal/GC, then an empty table. Only its own temporary DAS files are removed;
 no user assets/settings are saved or modified.
@@ -84,3 +93,8 @@ Accepted on 2026-10-18: Editor Development build PASS, one combined runtime
 scenario PASS (5 grouped checks); stable source/DLL hashes and engine BuildId,
 no engine Error/ensure. Initial fixture syntax/import issues were corrected before
 this accepted run. No full Foundation/PIE/packaged execution and no commit.
+
+Accepted JSON-creation validation on 2026-10-18: Editor Development build PASS
+and one combined runtime scenario PASS (17 checks), stable source/DLL hashes and
+engine BuildId, no engine Error/ensure. Temporary fixture files removed; no full
+Foundation/PIE/packaged run and no commit.
