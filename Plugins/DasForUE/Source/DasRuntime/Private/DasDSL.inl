@@ -550,7 +550,7 @@
         virtual bool touch(const das::StructurePtr& St,das::ModuleGroup&,das::AnnotationArgumentList& Args,das::string& Error)override{try{
             DSLAnnotationArguments(Args);if(Args.size()!=1 || Args[0].name!="path")DSLFail(TEXT("Expected ue_native_base(path=NativeClassPath)"));
             const FString Path=DSLString(Args,"path");
-            if(!DasActorNativeParent(Path) && Path!=TEXT("/Script/Engine.ActorComponent"))DSLFail(TEXT("Unsupported native DSL base; expected Actor, Pawn, Character or ActorComponent"));
+            if(!DasActorNativeParent(Path) && Path!=TEXT("/Script/Engine.ActorComponent") && Path!=TEXT("/Script/Engine.SaveGame"))DSLFail(TEXT("Unsupported native DSL base; expected Actor, Pawn, Character, ActorComponent or SaveGame"));
             auto* Native=FindObject<UClass>(nullptr,*Path);if(!Native || !Native->HasAnyClassFlags(CLASS_Native) || Native->HasAnyClassFlags(CLASS_Interface))DSLFail(TEXT("Native DSL base class is not loaded"));
             if(!St->isClass || St->parent)DSLFail(TEXT("Native DSL base requires an empty root class"));
             for(const auto& F:St->fields)if(!F.generated && F.name!="__rtti")DSLFail(TEXT("Native DSL base cannot declare fields or methods"));
@@ -1024,7 +1024,7 @@
             {
                 Wire=DSLText(J->sValue);
                 if(!IsValid(Self)){Error=TEXT("DSL entry requires live self");OK=false;return;}
-                const bool ActorAdapter=Self->IsA<ADasProbeActor>() || Self->IsA<UDasScriptComponent>();
+                const bool ActorAdapter=Self->IsA<ADasProbeActor>() || Self->IsA<UDasScriptComponent>() || Self->IsA<UDasSaveGame>();
                 FDasDeclaredClass EffectiveDefaults;if(!Model.ResolveClass(C.Id,EffectiveDefaults,Error)){OK=false;return;}
                 if(!DasCheckNativeDefaultOwner(Model,C.Id,Self,Error)){OK=false;return;}
                 for(const auto& P:EffectiveDefaults.Properties)

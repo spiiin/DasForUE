@@ -1,3 +1,5 @@
+#include "DasSaveGame.h"
+#include "DasSaveGameProxy.h"
 #include "DasAIMoveProxy.h"
 #include "AIController.h"
 #include "Navigation/PathFollowingComponent.h"
@@ -414,6 +416,7 @@ namespace
         virtual FString GetReferencerName() const override {return TEXT("FUnrealDasContext snapshots");}
         uint64 TraceScope=NextTraceScope++;
         FDasWidgetLifetime WidgetLifetime;
+        TArray<TStrongObjectPtr<USaveGame>> SaveGames;
         TArray<FDasTypeDeclaration> Types;
         DasSnapshotContainers::FKeyOrderCache SnapshotKeyOrders;
         DasSnapshotFields::FPathCache SnapshotFieldPaths;
@@ -1684,6 +1687,18 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     bool ScriptInputUnbindAction(const char*,const char*,das::Context*);
     bool ScriptInputUnbindAxis(const char*,das::Context*);
     int32 ScriptInputUnbindAll(das::Context*);
+    FDasObjectHandle ScriptSaveGameCreate(const FDasClassHandle&,das::Context*);
+    FDasObjectHandle ScriptSaveGameCreatePath(const char*,das::Context*);
+    bool ScriptSaveGameSave(const FDasObjectHandle&,const char*,int32,das::Context*);
+    FDasObjectHandle ScriptSaveGameLoad(const char*,int32,das::Context*);
+    bool ScriptSaveGameExists(const char*,int32,das::Context*);
+    bool ScriptSaveGameDelete(const char*,int32,das::Context*);
+    bool ScriptSaveGameRelease(const FDasObjectHandle&,das::Context*);
+    bool ScriptSaveGameValid(const FDasObjectHandle&,das::Context*);
+    void ScriptSaveGameSaveAsync(const char*,const FDasObjectHandle&,const char*,int32,const char*,das::Context*);
+    void ScriptSaveGameLoadAsync(const char*,const char*,int32,const char*,das::Context*);
+    bool ScriptSaveGameCancel(const char*,das::Context*);
+    bool ScriptSaveGamePending(const char*,das::Context*);
     void ScriptAssetLoad(const char*,const char*,const char*,const char*,das::Context*);
     void ScriptAssetLoadGeneric(const char*,const char*,const char*,das::Context*);
     bool ScriptAssetCancel(const char*,das::Context*);
@@ -2002,6 +2017,18 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAction)>(*this,Library,"ue_input_unbind_action",das::SideEffects::modifyExternal,"ScriptInputUnbindAction");
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAxis)>(*this,Library,"ue_input_unbind_axis",das::SideEffects::modifyExternal,"ScriptInputUnbindAxis");
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAll)>(*this,Library,"ue_input_unbind_all",das::SideEffects::modifyExternal,"ScriptInputUnbindAll");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameCreate),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_savegame_create",das::SideEffects::modifyExternal,"ScriptSaveGameCreate");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameCreatePath),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_savegame_create_path",das::SideEffects::modifyExternal,"ScriptSaveGameCreatePath");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameSave)>(*this,Library,"__ue_savegame_save",das::SideEffects::modifyExternal,"ScriptSaveGameSave");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameLoad),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_savegame_load",das::SideEffects::modifyExternal,"ScriptSaveGameLoad");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameExists)>(*this,Library,"__ue_savegame_exists",das::SideEffects::modifyExternal,"ScriptSaveGameExists");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameDelete)>(*this,Library,"__ue_savegame_delete",das::SideEffects::modifyExternal,"ScriptSaveGameDelete");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameRelease)>(*this,Library,"__ue_savegame_release",das::SideEffects::modifyExternal,"ScriptSaveGameRelease");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameValid)>(*this,Library,"__ue_savegame_valid",das::SideEffects::modifyExternal,"ScriptSaveGameValid");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameSaveAsync)>(*this,Library,"__ue_savegame_save_async",das::SideEffects::modifyExternal,"ScriptSaveGameSaveAsync");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameLoadAsync)>(*this,Library,"__ue_savegame_load_async",das::SideEffects::modifyExternal,"ScriptSaveGameLoadAsync");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGameCancel)>(*this,Library,"__ue_savegame_cancel",das::SideEffects::modifyExternal,"ScriptSaveGameCancel");
+            AddUEExtern<DAS_BIND_FUN(ScriptSaveGamePending)>(*this,Library,"__ue_savegame_pending",das::SideEffects::modifyExternal,"ScriptSaveGamePending");
             AddUEExtern<DAS_BIND_FUN(ScriptAssetLoad)>(*this,Library,"__ue_asset_load_async",das::SideEffects::modifyExternal,"ScriptAssetLoad");
             AddUEExtern<DAS_BIND_FUN(SoftMake),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_soft_make",das::SideEffects::modifyExternal,"SoftMake");
             AddUEExtern<DAS_BIND_FUN(SoftUpcast),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_soft_upcast",das::SideEffects::modifyExternal,"SoftUpcast");
@@ -2556,6 +2583,7 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
         EDasMethodSignature Kind=EDasMethodSignature::Int;
         FString PayloadPath;
         TStrongObjectPtr<UDasIntDelegateProxy> Proxy;FName ProxyFunction;
+        int32 SaveGameKind=0;FString SaveGameName;TStrongObjectPtr<UDasSaveGameProxy> SaveGameProxy;
         int32 AsyncKind=0;FString AsyncName;TStrongObjectPtr<UDasAsyncAssetProxy> AsyncProxy;TSharedPtr<FStreamableHandle> StreamHandle;
         int32 LatentKind=0;FString LatentName;TWeakObjectPtr<UWorld> LatentWorld;TStrongObjectPtr<UDasLatentProxy> LatentProxy;
         bool InputConsume=true,InputPaused=false;int32 InputKind=0,InputHandle=INDEX_NONE;EInputEvent InputPhase=IE_Pressed;
@@ -2821,6 +2849,8 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
     bool ScriptAssetCancel(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.RemoveAll([&](const auto& B){return B->AsyncKind && B->AsyncName==N;})>0;}
     int32 ScriptAssetCancelAll(das::Context* C){auto* S=ManagedOwnerSession(C);return S->Bindings.RemoveAll([](const auto& B){return B->AsyncKind!=0;});}
     bool ScriptAssetPending(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.ContainsByPredicate([&](const auto& B){return B->AsyncKind && B->AsyncName==N;});}
+#include "DasSaveGameRuntime.inl"
+
 
 #include "DasMontage.inl"
 #include "DasAI.inl"
@@ -2897,7 +2927,7 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
             auto& Context = *Session->Live->Context;
             const auto* MontagePayload=Payload.Kind==int32(EDasMethodSignature::Struct)?Payload.StructValue.GetPtr<FDasMontageEvent>():nullptr;
             const bool MontageTerminal=MontagePayload && (MontagePayload->Kind==EDasMontageEventKind::Completed || MontagePayload->Kind==EDasMontageEventKind::Interrupted);
-            Session->Bindings.RemoveAll([&](const auto& B){return B->Id==Event.Id && (B->LatentKind!=0 || B->AsyncKind!=0 || B->AIMoveProxy.IsValid() || B->EffectProxy.IsValid() || (B->MontageProxy.IsValid() && MontageTerminal));}); // Consume completion before user rearm.
+            Session->Bindings.RemoveAll([&](const auto& B){return B->Id==Event.Id && (B->LatentKind!=0 || B->AsyncKind!=0 || B->SaveGameKind!=0 || B->AIMoveProxy.IsValid() || B->EffectProxy.IsValid() || (B->MontageProxy.IsValid() && MontageTerminal));}); // Consume completion before user rearm.
             Context.restart();
             TGuardValue<int32> ExecutionScope(Context.ExecutionDepth,Context.ExecutionDepth+1);
             FActiveContextScope Scope(Context);
@@ -3188,6 +3218,26 @@ void DispatchScalarEventImpl(uint64 SubscriptionId,ValueType&& Value,bool Initia
 }
 void FDasRuntimeModule::DispatchScalarEvent(uint64 SubscriptionId,const FDasScalarValue& Value){if(IsInGameThread())DispatchScalarEventImpl(SubscriptionId,Value,bInitialized);}
 void FDasRuntimeModule::DispatchScalarEvent(uint64 SubscriptionId,FDasScalarValue&& Value){if(IsInGameThread())DispatchScalarEventImpl(SubscriptionId,MoveTemp(Value),bInitialized);}
+
+void FDasRuntimeModule::CompleteSaveGameRequest(uint64 Id,USaveGame* Loaded,bool Success)
+{
+ check(IsInGameThread());
+ FString Key;if(!SaveGameIO.RemoveAndCopyValue(Id,Key))return;
+ SaveGameSlotLeases.Remove(Key);
+ if(!bInitialized)return;
+ for(auto& S:Sessions){
+  auto* Found=S->Bindings.FindByPredicate([&](const auto& B){return B->Id==Id && B->SaveGameKind;});
+  if(!Found)continue;
+  if(!S->Live || !S->Owner.IsValid() || !S->World.IsValid() || S->World->bIsTearingDown)return;
+  FDasScalarValue Value;Value.Kind=int32((*Found)->Kind);
+  if((*Found)->SaveGameKind==1)Value.BoolValue=Success;
+  else {
+   Value.ObjectClass=TEXT("/Script/CoreUObject.Object");
+   if(IsValid(Loaded) && !Loaded->GetClass()->HasAnyClassFlags(CLASS_Deprecated|CLASS_NewerVersionExists) && S->Live->Context->SaveGames.Num()<32){S->Live->Context->SaveGames.Emplace(Loaded);Value.ObjectValue=Loaded;}
+  }
+  DispatchScalarEvent(Id,MoveTemp(Value));return;
+ }
+}
 
 int32 FDasRuntimeModule::ScriptTimerCount(const UObject* Owner) const {check(IsInGameThread());int32 Count=0;for(const auto& Timer:ScriptTimers)if(!Owner || Timer.Value->Owner.Get()==Owner)++Count;return Count;}
 
