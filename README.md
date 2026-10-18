@@ -744,3 +744,5 @@ Generated trace/sweep native HitResult transport: [HitResultTransport](Docs/HitR
 Object/class arrays in reflected structs and Advanced projectile prediction: [StructReferenceArrays](Docs/StructReferenceArrays.md). Focused check: `Scripts/TestStructReferenceArrays.ps1`.
 
 Owned Slate input-event snapshots and 33 generated functions: [InputEvents](Docs/InputEvents.md). Targeted check: `Scripts/TestInputEvents.ps1 -Publish`.
+
+Synchronous UserWidget input handlers returning scoped EventReply commands: [WidgetInputHandlers](Docs/WidgetInputHandlers.md). Targeted build and one runtime scenario: `Scripts/TestWidgetEvents.ps1`.

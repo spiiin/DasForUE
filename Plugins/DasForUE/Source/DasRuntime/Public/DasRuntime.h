@@ -7,6 +7,8 @@
 #include "UObject/WeakObjectPtr.h"
 #include "UObject/WeakObjectPtrTemplates.h"
 
+class UDasScriptUserWidget;
+class FReply;
 struct FDasAuthoringModule;
 struct FDasSourceCatalog;
 
@@ -42,6 +44,7 @@ struct FDasReflectedTypes;
 class DASRUNTIME_API FDasRuntimeModule final : public IModuleInterface
 {
 public:
+    bool DispatchWidgetInput(const FString& Path,const FString& Entry,const UScriptStruct* Type,const void* Source,UDasScriptUserWidget* Widget,FReply& Out,FString& Error);
     // Trusted native observer entry: detached event values only, no Slate reply/routing.
     FDasExecutionResult DispatchInputEventSnapshots(const FString& Path,const FString& Entry,const TArray<FInstancedStruct>& Values,TWeakObjectPtr<UObject> Self);
 #if WITH_EDITOR

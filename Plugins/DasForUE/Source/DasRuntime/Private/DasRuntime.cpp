@@ -54,6 +54,8 @@
 #include "InputAction.h"
 #include "InputActionValue.h"
 #include "DasInputEvents.h"
+#include "DasScriptUserWidget.h"
+#include "Input/Reply.h"
 #include "Input/Events.h"
 #include "DasEnhancedInputProxy.h"
 #include "Components/SceneComponent.h"
@@ -202,6 +204,8 @@ struct FDasStructValue {uint64 Token=0;};
 MAKE_TYPE_FACTORY(UEStructValue,FDasStructValue);
 namespace das{template<>struct cast<FDasStructValue>{static vec4f from(FDasStructValue V){return cast<uint64_t>::from(V.Token);}static FDasStructValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
 // Owned numeric snapshot, not the unreflected native layout and not a context token.
+struct FDasEventReplyValue { uint64 Token=0; };
+MAKE_TYPE_FACTORY(UEEventReply,FDasEventReplyValue);
 struct FDasInputEventValue { uint64 Token=0; };
 MAKE_TYPE_FACTORY(UEInputEvent,FDasInputEventValue);
 namespace das{template<>struct cast<FDasInputEventValue>{static vec4f from(FDasInputEventValue V){return cast<uint64_t>::from(V.Token);}static FDasInputEventValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
@@ -876,10 +880,32 @@ namespace
     void PublishFrameTransform(int32 I,const FTransform& X,das::Context* C){FDasScalarValue V;V.Kind=11;V.TransformValue=X;PublishFrameValue(I,MoveTemp(V),C);}
     FDelegateHandle RuntimePreExitHandle;
     thread_local bool InputSnapshotDispatch=false;
+    struct FWidgetReplyScope {
+        das::Context* Context=nullptr;
+        TWeakObjectPtr<UDasScriptUserWidget> Widget;
+        TMap<uint64,FReply> Replies;
+        TArray<TWeakObjectPtr<UWidget>> Targets;
+        FReply Result=FReply::Unhandled();
+        bool Produced=false;
+    };
+    thread_local FWidgetReplyScope* ActiveWidgetReply=nullptr;
+    thread_local bool WidgetReplyContract=false;
+    uint64 NextWidgetReplyToken=1;
+    const char* WidgetEventHandleName(const FString& Path){
+        if(Path==TEXT("/Script/SlateCore.KeyEvent"))return "UEKeyEvent";
+        if(Path==TEXT("/Script/SlateCore.AnalogInputEvent"))return "UEAnalogInputEvent";
+        if(Path==TEXT("/Script/SlateCore.CharacterEvent"))return "UECharacterEvent";
+        if(Path==TEXT("/Script/SlateCore.PointerEvent"))return "UEPointerEvent";
+        return nullptr;
+    }
     bool VerifyContract(const das::ProgramPtr& Program,const FString& Entry,const FDasCallContract& C,bool AllowNativeInputValue=false)
     {
         if(C.Inputs.Num()>16 || ((static_cast<uint8>(C.ReturnKind)>13 && C.ReturnKind!=EDasMethodSignature::Class && C.ReturnKind!=EDasMethodSignature::Delegate && C.ReturnKind!=EDasMethodSignature::Byte && C.ReturnKind!=EDasMethodSignature::Text) || C.ReturnKind==EDasMethodSignature::Frame)) return false;
         const FTCHARToUTF8 N(*Entry);auto* F=Program->getThisModule()->findUniqueFunction(N.Get());
+        if(WidgetReplyContract && C.ReturnKind==EDasMethodSignature::Struct && C.ReturnClass==TEXT("/Script/UMG.EventReply")){
+            auto Handle=[](const das::TypeDeclPtr& T,const char* Name){return Name && T && !T->ref && T->baseType==das::Type::tHandle && T->annotation && T->annotation->name==Name;};
+            return F && F->exports && C.InputDirections.IsEmpty() && C.Inputs.Num()==1 && C.Inputs[0]==EDasMethodSignature::Struct && C.InputClasses.Num()==1 && F->arguments.size()==1 && Handle(F->result,"UEEventReply") && Handle(F->arguments[0]->type,WidgetEventHandleName(C.InputClasses[0]));
+        }
         if(AllowNativeInputValue && F && F->exports && C.ReturnKind==EDasMethodSignature::Void && C.Inputs.Num()==1 && C.Inputs[0]==EDasMethodSignature::Struct && C.InputClasses.Num()==1 && C.InputClasses[0]==TEXT("/Script/EnhancedInput.InputActionValue") && C.InputDirections.IsEmpty() && F->arguments.size()==1 && F->result && !F->result->ref && F->result->baseType==das::Type::tVoid){
             const auto& T=F->arguments[0]->type;if(T && !T->ref && T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="InputActionValue")return true;
         }
@@ -892,7 +918,8 @@ namespace
         bool Objects=C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Object || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum;for(auto K:C.Inputs)Objects |= K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Object || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum;
         {bool Found=false,Valid=true;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St){for(auto* A:St->annotations)if(A->annotation->name=="ue_class" || A->annotation->name=="ue_library"){auto* Wire=A->arguments.find("_ue_model_json",das::Type::tString);FDasAuthoringModule M;FString Error;if(!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire->sValue.c_str()),M,Error)){Valid=false;continue;}for(const auto& Cl:M.Classes)for(const auto& Method:Cl.Methods)if(Method.EntryPoint==Entry){FDasClassSchema Schema;if(!M.ToActorSchema(Cl.Id,Schema,Error)){Valid=false;continue;}for(const auto& S:Schema.Methods)if(S.EntryPoint==Entry){Found=true;Valid &= S.Contract()==C;}}}});if(!Valid)return false;if(!Found){if(InputSnapshotDispatch && (C.ReturnKind==EDasMethodSignature::Int || C.ReturnKind==EDasMethodSignature::Void) && C.InputDirections.IsEmpty() && !C.Inputs.IsEmpty() && C.Inputs.Num()==C.InputClasses.Num()){
                 bool Safe=true;for(int32 I=0;I<C.Inputs.Num();++I)Safe &= C.Inputs[I]==EDasMethodSignature::Struct && DasIsInputEventType(FindObject<UScriptStruct>(nullptr,*C.InputClasses[I]));if(Safe)return true;
-            }if(!C.InputDirections.IsEmpty())return false;if(C.ReturnKind==EDasMethodSignature::Class || C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum)return false;for(auto K:C.Inputs)if(K==EDasMethodSignature::Class || K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum)return false;if(C.ReturnKind==EDasMethodSignature::Object && C.ReturnClass!=TEXT("/Script/CoreUObject.Object"))return false;for(int32 I=0;I<C.Inputs.Num();++I)if(C.Inputs[I]==EDasMethodSignature::Object && (!C.InputClasses.IsValidIndex(I) || C.InputClasses[I]!=TEXT("/Script/CoreUObject.Object")))return false;}}
+            }
+            if(!C.InputDirections.IsEmpty())return false;if(C.ReturnKind==EDasMethodSignature::Class || C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum)return false;for(auto K:C.Inputs)if(K==EDasMethodSignature::Class || K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum)return false;if(C.ReturnKind==EDasMethodSignature::Object && C.ReturnClass!=TEXT("/Script/CoreUObject.Object"))return false;for(int32 I=0;I<C.Inputs.Num();++I)if(C.Inputs[I]==EDasMethodSignature::Object && (!C.InputClasses.IsValidIndex(I) || C.InputClasses[I]!=TEXT("/Script/CoreUObject.Object")))return false;}}
         return true;
     }
     int32 GetSelfInt(const char* Name, das::Context* Context)
@@ -1786,6 +1813,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     #include "DasGameplayServices.inl"
     #include "DasInputActionValue.inl"
     #include "DasInputEventsRuntime.inl"
+    #include "DasWidgetEventsRuntime.inl"
     #include "DasHitResultTransport.inl"
     #include "DasConstraintTransport.inl"
     struct FHitResultValueAnnotation:FMathValueAnnotation<FDasHitResultValue>{
@@ -1835,6 +1863,19 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             addAnnotation(new FObjectHandleAnnotation(Library));addAnnotation(new FClassHandleAnnotation(Library));
             addAnnotation(new FTraceHitAnnotation(Library));
             addAnnotation(new FCallHandleAnnotation(Library));
+            addAnnotation(new TInputEventAnnotation<FDasEventReplyValue>("UEEventReply",Library,"FDasEventReplyValue"));
+            AddUEExtern<DAS_BIND_FUN(WidgetHandled),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_handled",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(WidgetUnhandled),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_unhandled",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(WidgetReplyCapture),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_capture",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(WidgetReplyRelease),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_release",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(WidgetReplyFocus),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_focus",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(WidgetReplyClearFocus),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_clear_focus",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(WidgetReplyLock),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_lock",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(WidgetReplyUnlock),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_unlock",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(WidgetReplyPosition),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_position",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(WidgetReplyDrag),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_drag",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(WidgetReplyEndDrag),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_end_drag",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(BindWidgetInput)>(*this,Library,"__ue_widget_bind_input",das::SideEffects::modifyExternal);
             addAnnotation(new TInputEventAnnotation<FDasInputEventValue>("UEInputEvent",Library,"FDasInputEventValue"));
             AddUEExtern<DAS_BIND_FUN(ArgumentInputEvent)>(*this,Library,"__ue_arg_inputevent",das::SideEffects::modifyExternal);
             AddUEExtern<DAS_BIND_FUN(ResultInputEvent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_result_inputevent",das::SideEffects::modifyExternal)->needCallerStackFrame=true;
@@ -2543,7 +2584,7 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
         TWeakObjectPtr<UWorld> World;
         FString Path;
         FSourceSet AttemptedSources;
-        TMap<FString,FDasCallContract> RequiredEntries;TSet<FString> NativeInputEntries,InputSnapshotEntries;
+        TMap<FString,FDasCallContract> RequiredEntries;TSet<FString> NativeInputEntries,InputSnapshotEntries,WidgetReplyEntries;
         FString ApprovedDSLDeclaration;
         bool bDefaultsUpdateApproved=false;FString AttemptedEntry;FDasCallContract AttemptedContract;
         TUniquePtr<FCompiledContext> Live;
@@ -3172,6 +3213,17 @@ int32 FDasRuntimeModule::PersistentContextCount(const UWorld* World) const
     return Count;
 }
 
+bool FDasRuntimeModule::DispatchWidgetInput(const FString& Path,const FString& Entry,const UScriptStruct* Type,const void* Source,UDasScriptUserWidget* Widget,FReply& Out,FString& Error){
+ if(!IsInGameThread() || !bInitialized || ActiveContext || ActiveWidgetReply || !IsValid(Widget) || Widget->IsTemplate() || !Widget->GetWorld() || !Widget->GetWorld()->IsGameWorld() || Widget->GetWorld()->bIsTearingDown || !Type || !WidgetEventHandleName(Type->GetPathName())){Error=TEXT("Synchronous widget input requires an idle game-thread runtime and supported live widget event");return false;}
+ FInstancedStruct Snapshot;if(!CaptureDasInputEvent(Type,Source,Snapshot,Error))return false;
+ FDasScalarValue Arg;Arg.Kind=12;Arg.ObjectClass=Type->GetPathName();Arg.StructValue=MoveTemp(Snapshot);
+ FWidgetReplyScope Scope;Scope.Widget=Widget;
+ TGuardValue<FWidgetReplyScope*> ReplyScope(ActiveWidgetReply,&Scope);TGuardValue<bool> ContractScope(WidgetReplyContract,true);
+ const auto Result=RunNamedFramePersistent(Path,Entry,{Arg},EDasMethodSignature::Struct,Widget,TEXT("/Script/UMG.EventReply"));
+ if(!Result.bSucceeded || !Scope.Produced){Error=Result.Error.IsEmpty()?TEXT("Widget handler did not produce an EventReply"):Result.Error;return false;}
+ Out=Scope.Result;Error.Empty();return true;
+}
+
 FDasExecutionResult FDasRuntimeModule::DispatchInputEventSnapshots(const FString& Path,const FString& Entry,const TArray<FInstancedStruct>& Values,TWeakObjectPtr<UObject> Self){
  FDasExecutionResult Rejected;if(Values.IsEmpty() || Values.Num()>16){Rejected.Error=TEXT("input snapshot dispatch requires 1..16 detached values");return Rejected;}
  TArray<FDasScalarValue> Args;for(const auto& V:Values){FString Error;if(!ValidateDasInputEventSnapshot(V,Error)){Rejected.Error=Error;return Rejected;}FDasScalarValue A;A.Kind=12;A.ObjectClass=V.GetScriptStruct()->GetPathName();A.StructValue=V;Args.Add(MoveTemp(A));}
@@ -3284,7 +3336,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     if(Signature==EDasMethodSignature::Delegate){Expected.ReturnClass=ReturnClass;FString E;TStrongObjectPtr<UFunction> Sig(MakeDasSingleDelegateSignature(ReturnClass,E));if(!Sig){Result.Error=E;return Result;}}
     if(Signature==EDasMethodSignature::Enum){Expected.ReturnClass=ReturnClass;FString E;if(!ResolveDasEnum(ReturnClass,E)){Result.Error=E;return Result;}}
     if(Frame)for(const auto& V:*Frame)if(V.Kind==13){FString E;if(!ValidateDasEnumNumber(V.ObjectClass,V.IntValue,E)){Result.Error=E;return Result;}}
-    if(Signature==EDasMethodSignature::Struct){DasContainerProperty(ReturnClass);Expected.ReturnClass=ReturnClass;FString E;if(!ValidateDasValueStruct(ReturnClass,E)){Result.Error=E;return Result;}}
+    const bool WidgetReplyEntry=WidgetReplyContract && ActiveWidgetReply && Signature==EDasMethodSignature::Struct && ReturnClass==TEXT("/Script/UMG.EventReply");
+    if(Signature==EDasMethodSignature::Struct){Expected.ReturnClass=ReturnClass;if(!WidgetReplyEntry){DasContainerProperty(ReturnClass);FString E;if(!ValidateDasValueStruct(ReturnClass,E)){Result.Error=E;return Result;}}}
     if(Signature==EDasMethodSignature::Class){Expected.ReturnClass=ReturnClass;if(!FrameClassMatches(nullptr,ReturnClass)){Result.Error=TEXT("Class result requires a loaded native base");return Result;}}
     if(Signature==EDasMethodSignature::Object){Expected.ReturnClass=ReturnClass.IsEmpty()?TEXT("/Script/CoreUObject.Object"):ReturnClass;if(!FindObject<UClass>(nullptr,*Expected.ReturnClass)){Result.Error=TEXT("Object result class is not loaded");return Result;}}
     FDrainEventsOnExit DrainOnExit;
@@ -3390,6 +3443,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                         for (const auto& Required:Session->RequiredEntries)
                         {
                             TGuardValue<bool> SnapshotContractScope(InputSnapshotDispatch,InputSnapshotDispatch || Session->InputSnapshotEntries.Contains(Required.Key));
+                            TGuardValue<bool> ReplyContractScope(WidgetReplyContract,WidgetReplyContract || Session->WidgetReplyEntries.Contains(Required.Key));
                             const FTCHARToUTF8 RequiredUtf8(*Required.Key);
                             auto* RequiredFunction=Candidate->Context->findFunction(RequiredUtf8.Get());
                             if (!RequiredFunction || !VerifyContract(Candidate->Program,Required.Key,Required.Value,Session->NativeInputEntries.Contains(Required.Key)))
@@ -3515,7 +3569,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             Function=Context.findFunction(EntryUtf8.Get());
             if (!Function || !VerifyContract(Session->Live->Program,EntryPoint,Expected))
             { Result.Error=TEXT("Expected exported ")+EntryPoint+TEXT(" with requested scalar signature.");return Result; }
-            Session->RequiredEntries.Add(EntryPoint,Expected);if(InputSnapshotDispatch)Session->InputSnapshotEntries.Add(EntryPoint);
+            Session->RequiredEntries.Add(EntryPoint,Expected);if(InputSnapshotDispatch)Session->InputSnapshotEntries.Add(EntryPoint);if(WidgetReplyEntry)Session->WidgetReplyEntries.Add(EntryPoint);
         }
         else if (Event == EDasCallback::Tick) Function = Session->Live->Tick;
         else if (Event == EDasCallback::EndPlay)
@@ -3533,9 +3587,16 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 else if(V.Kind==5)Packed.push_back(das::cast<char*>::from(CopyDSLString(V.StringValue,&Context)));else if(V.Kind==6)Packed.push_back(das::cast<double>::from(V.DoubleValue));else if(V.Kind==13)Packed.push_back(das::cast<FDasEnumValue>::from(MakeEnumValue(V.ObjectClass,V.IntValue,&Context)));else if(V.Kind==7)Packed.push_back(das::cast<FDasNameValue>::from(MakeDSLName(V.NameValue,&Context)));else if(V.Kind==9){VectorArgs.Add(V.VectorValue);Packed.push_back(das::cast<void*>::from(&VectorArgs.Last()));}else if(V.Kind==10){RotatorArgs.Add(V.RotatorValue);Packed.push_back(das::cast<void*>::from(&RotatorArgs.Last()));}else if(V.Kind==12){StructArgs.Add(StoreStructValue(V.StructValue,&Context));Packed.push_back(das::cast<void*>::from(&StructArgs.Last()));}else if(V.Kind==11){TransformArgs.Add(V.TransformValue);Packed.push_back(das::cast<void*>::from(&TransformArgs.Last()));}else{const FString ClassPath=V.ObjectClass.IsEmpty()?TEXT("/Script/CoreUObject.Object"):V.ObjectClass;ObjectArgs.Add(MakeObjectHandle(V.ObjectValue.Get(),FindObject<UClass>(nullptr,*ClassPath),&Context));Packed.push_back(das::cast<void*>::from(&ObjectArgs.Last()));}
             }
             FOutputFrame OutFrame;OutFrame.Arguments=Frame;TGuardValue<FOutputFrame*> OutScope(ActiveOutputFrame,&OutFrame);
+            das::Context* NoReplyContext=nullptr;
+            TGuardValue<das::Context*> ReplyContextScope(WidgetReplyEntry?ActiveWidgetReply->Context:NoReplyContext,WidgetReplyEntry?&Context:nullptr);
             const auto Value = Context.evalWithCatch(Function,Frame?(Packed.empty()?nullptr:Packed.data()):Event==EDasCallback::Main && Signature==EDasMethodSignature::Void?nullptr:Arguments,Signature==EDasMethodSignature::Struct?static_cast<void*>(&ReturnedStructToken):Signature==EDasMethodSignature::Object?static_cast<void*>(&ReturnedObject):Signature==EDasMethodSignature::Vector?static_cast<void*>(&ReturnedVector):Signature==EDasMethodSignature::Rotator?static_cast<void*>(&ReturnedRotator):Signature==EDasMethodSignature::Transform?static_cast<void*>(&ReturnedTransform):nullptr);
             if(Event==EDasCallback::Main){
-                if(Signature==EDasMethodSignature::Byte && !Context.getException()){Result.ByteValue=das::cast<uint8_t>::to(Value);}else if(Signature==EDasMethodSignature::Text && !Context.getException()){Result.TextValue=ResolveDSLText(das::cast<FDasTextValue>::to(Value),&Context);}else if(Signature==EDasMethodSignature::Class && !Context.getException()){auto H=das::cast<FDasClassHandle>::to(Value);UObject* O=H.Token?TryObject(FDasObjectHandle{H.Token},&Context):nullptr;auto* K=Cast<UClass>(O);if((H.Token && !K) || !FrameClassMatches(K,Expected.ReturnClass)){Result.Error=TEXT("Class result is expired, belongs to another context or has wrong base");return Result;}Result.ObjectValue=K;}else if(Signature==EDasMethodSignature::Delegate && !Context.getException()){Result.DelegateValue=ResolveDelegateValue(das::cast<uint64>::to(Value),TCHAR_TO_UTF8(*Expected.ReturnClass),false,&Context).Single;}else if(Signature==EDasMethodSignature::Enum && !Context.getException()){const auto& E=ResolveEnumValue(das::cast<FDasEnumValue>::to(Value),&Context);if(E.Type->GetPathName()!=Expected.ReturnClass){Result.Error=TEXT("Enum result type mismatch");return Result;}Result.Value=E.Value;}else if(Signature==EDasMethodSignature::Struct && !Context.getException()){const auto& S=ResolveStructValue(ReturnedStructToken,&Context);if(S.GetScriptStruct()->GetPathName()!=Expected.ReturnClass){Result.Error=TEXT("Reflected struct result type mismatch");return Result;}Result.StructValue=S;}else if(Signature==EDasMethodSignature::Vector)Result.VectorValue=ReturnedVector;else if(Signature==EDasMethodSignature::Rotator)Result.RotatorValue=ReturnedRotator;else if(Signature==EDasMethodSignature::Transform)Result.TransformValue=ReturnedTransform;else if(Signature==EDasMethodSignature::Int) Result.Value=das::cast<int32>::to(Value);
+                if(Signature==EDasMethodSignature::Byte && !Context.getException()){Result.ByteValue=das::cast<uint8_t>::to(Value);}else if(Signature==EDasMethodSignature::Text && !Context.getException()){Result.TextValue=ResolveDSLText(das::cast<FDasTextValue>::to(Value),&Context);}else if(Signature==EDasMethodSignature::Class && !Context.getException()){auto H=das::cast<FDasClassHandle>::to(Value);UObject* O=H.Token?TryObject(FDasObjectHandle{H.Token},&Context):nullptr;auto* K=Cast<UClass>(O);if((H.Token && !K) || !FrameClassMatches(K,Expected.ReturnClass)){Result.Error=TEXT("Class result is expired, belongs to another context or has wrong base");return Result;}Result.ObjectValue=K;}else if(Signature==EDasMethodSignature::Delegate && !Context.getException()){Result.DelegateValue=ResolveDelegateValue(das::cast<uint64>::to(Value),TCHAR_TO_UTF8(*Expected.ReturnClass),false,&Context).Single;}else if(Signature==EDasMethodSignature::Enum && !Context.getException()){const auto& E=ResolveEnumValue(das::cast<FDasEnumValue>::to(Value),&Context);if(E.Type->GetPathName()!=Expected.ReturnClass){Result.Error=TEXT("Enum result type mismatch");return Result;}Result.Value=E.Value;}else if(WidgetReplyEntry && !Context.getException()){
+                    auto Reply=ReadWidgetReply({ReturnedStructToken.Token},&Context);
+                    for(const auto& Target:ActiveWidgetReply->Targets)if(!Target.IsValid() || Target->GetWorld()!=Owner->GetWorld()){Result.Error=TEXT("EventReply target expired during callback");return Result;}
+                    if(Session->bReleaseRequested || !ActiveWidgetReply->Widget.IsValid() || !ActiveWidgetReply->Widget->GetCachedWidget().IsValid() || !Owner->GetWorld() || Owner->GetWorld()->bIsTearingDown){Result.Error=TEXT("Widget expired during callback");return Result;}
+                    ActiveWidgetReply->Result=Reply;ActiveWidgetReply->Produced=true;
+                }else if(Signature==EDasMethodSignature::Struct && !Context.getException()){const auto& S=ResolveStructValue(ReturnedStructToken,&Context);if(S.GetScriptStruct()->GetPathName()!=Expected.ReturnClass){Result.Error=TEXT("Reflected struct result type mismatch");return Result;}Result.StructValue=S;}else if(Signature==EDasMethodSignature::Vector)Result.VectorValue=ReturnedVector;else if(Signature==EDasMethodSignature::Rotator)Result.RotatorValue=ReturnedRotator;else if(Signature==EDasMethodSignature::Transform)Result.TransformValue=ReturnedTransform;else if(Signature==EDasMethodSignature::Int) Result.Value=das::cast<int32>::to(Value);
                 else if(Signature==EDasMethodSignature::Float) Result.FloatValue=das::cast<float>::to(Value);
                 else if(Signature==EDasMethodSignature::Bool) Result.BoolValue=das::cast<bool>::to(Value);
                 else if(!Context.getException() && Signature==EDasMethodSignature::String){const auto* Text=das::cast<char*>::to(Value);Result.StringValue=Text?UTF8_TO_TCHAR(Text):TEXT("");}

@@ -1,0 +1,73 @@
+#include "DasWidgetEventsCommandlet.h"
+#include "DasScriptUserWidget.h"
+#include "DasRuntime.h"
+#include "Input/Events.h"
+#include "Input/Reply.h"
+#include "Widgets/SWidget.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Interfaces/ISlateNullRendererModule.h"
+#include "Null/NullApplication.h"
+#include "Layout/WidgetPath.h"
+#include "Engine/World.h"
+#include "Engine/Engine.h"
+#include "UObject/StrongObjectPtr.h"
+#include "UObject/GarbageCollection.h"
+#include "Misc/ScopeExit.h"
+
+UDasWidgetEventsCommandlet::UDasWidgetEventsCommandlet(){IsClient=false;IsServer=false;IsEditor=true;LogToConsole=true;}
+int32 UDasWidgetEventsCommandlet::Main(const FString& Params)
+{
+ FString Script;if(!FParse::Value(*Params,TEXT("Script="),Script))return 2;
+ const bool OwnSlate=!FSlateApplication::IsInitialized();
+ if(OwnSlate){FSlateApplication::Create(MakeShareable(FNullApplication::CreateNullApplication()));FSlateApplication::Get().InitializeRenderer(FModuleManager::LoadModuleChecked<ISlateNullRendererModule>(TEXT("SlateNullRenderer")).CreateSlateNullRenderer());}
+ ON_SCOPE_EXIT{if(OwnSlate)FSlateApplication::Shutdown();};
+ auto& Runtime=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+ int32 Checks=0,Failures=0;
+ auto Check=[&](bool Ok,const TCHAR* Label){++Checks;if(!Ok)++Failures;UE_LOG(LogTemp,Display,TEXT("DAS_WIDGET_EVENTS_%s %s"),Ok?TEXT("PASS"):TEXT("FAIL"),Label);};
+ TStrongObjectPtr<UWorld> World(UWorld::CreateWorld(EWorldType::Game,false));
+ GEngine->CreateNewWorldContext(EWorldType::Game).SetCurrentWorld(World.Get());
+ ON_SCOPE_EXIT{GEngine->DestroyWorldContext(World.Get());World->DestroyWorld(false);};
+ TStrongObjectPtr<UDasScriptUserWidget> Widget(NewObject<UDasScriptUserWidget>(World.Get()));
+ Widget->ScriptFile=Script;Widget->SetIsFocusable(true);Widget->Initialize();
+ TSharedPtr<SWidget> Slate=Widget->TakeWidget();
+ const FGeometry Geometry=FGeometry::MakeRoot(FVector2D(100,50),FSlateLayoutTransform());
+ const FKeyEvent Key(EKeys::SpaceBar,FModifierKeysState(),0,false,32,32);
+ Check(!Slate->OnKeyDown(Geometry,Key).IsEventHandled(),TEXT("missing_handler_uses_native_parent"));
+ Check(!Widget->BindInputHandler(TEXT("InventedEvent"),TEXT("key_down")),TEXT("unknown_event_binding_rejected"));
+ Widget->BindInputHandler(TEXT("OnKeyDown"),TEXT("key_down"));
+ const auto KeyReply=Slate->OnKeyDown(Geometry,Key);
+ if(!Widget->LastInputError.IsEmpty())UE_LOG(LogTemp,Display,TEXT("Widget issue: %s"),*Widget->LastInputError);
+ Check(KeyReply.IsEventHandled() && KeyReply.ShouldSetUserFocus() && KeyReply.GetUserFocusRecepient()==Slate,TEXT("key_reply_returns_synchronously_to_slate"));
+ CollectGarbage(RF_NoFlags);
+ const auto Read=Runtime.RunNamedPersistent(Runtime.ScriptPath(Script),TEXT("read_saved"),0,Widget.Get());
+ Check(Read.bSucceeded && Read.Value==1,TEXT("typed_event_snapshot_survives_callback_and_gc"));
+ Widget->BindInputHandler(TEXT("OnKeyUp"),TEXT("key_up"));
+ Check(!Slate->OnKeyUp(Geometry,Key).IsEventHandled() && Widget->LastInputError.IsEmpty(),TEXT("explicit_unhandled_reply"));
+ Widget->BindInputHandler(TEXT("OnKeyChar"),TEXT("character"));
+ Check(Slate->OnKeyChar(Geometry,FCharacterEvent('A',FModifierKeysState(),0,false)).IsEventHandled(),TEXT("typed_character_callback"));
+ Widget->BindInputHandler(TEXT("OnAnalogValueChanged"),TEXT("analog"));
+ Check(Slate->OnAnalogValueChanged(Geometry,FAnalogInputEvent(EKeys::Gamepad_LeftX,FModifierKeysState(),0,false,0,0,0.5f)).IsEventHandled(),TEXT("typed_analog_callback"));
+ const TSet<FKey> Buttons={EKeys::LeftMouseButton};
+ const FPointerEvent Pointer(0,FVector2D(12,20),FVector2D(10,19),Buttons,EKeys::LeftMouseButton,0,FModifierKeysState());
+ Widget->BindInputHandler(TEXT("OnMouseButtonDown"),TEXT("mouse_down"));
+ const auto Mouse=Slate->OnMouseButtonDown(Geometry,Pointer);
+ if(!Widget->LastInputError.IsEmpty())UE_LOG(LogTemp,Display,TEXT("Mouse issue: %s"),*Widget->LastInputError);
+ Check(Mouse.IsEventHandled() && Mouse.GetMouseCaptor()==Slate && Mouse.GetMouseLockWidget()==Slate && Mouse.GetDetectDragRequest()==Slate && Mouse.GetDetectDragRequestButton()==EKeys::LeftMouseButton && Mouse.GetRequestedMousePos().IsSet() && Mouse.GetRequestedMousePos().GetValue()==FIntPoint(40,50),TEXT("pointer_reply_capture_lock_drag_position"));
+ Widget->BindInputHandler(TEXT("OnMouseButtonUp"),TEXT("mouse_up"));
+ const auto Release=Slate->OnMouseButtonUp(Geometry,Pointer);
+ Check(Release.IsEventHandled() && Release.ShouldReleaseMouse() && Release.ShouldReleaseMouseLock() && Release.ShouldReleaseUserFocus() && Release.ShouldEndDragDrop(),TEXT("reply_release_unlock_focus_end_drag"));
+ Widget->BindInputHandler(TEXT("OnTouchStarted"),TEXT("pointer"));
+ Check(Slate->OnTouchStarted(Geometry,Pointer).IsEventHandled(),TEXT("touch_uses_pointer_snapshot"));
+ for(const auto& Case:TArray<TPair<FName,FString>>{{TEXT("stale"),TEXT("expired")},{TEXT("invalid_default"),TEXT("null")},{TEXT("failing"),TEXT("deliberate widget failure")},{TEXT("wrong_signature"),TEXT("Expected exported")}}){
+  Widget->BindInputHandler(TEXT("OnKeyDown"),Case.Key);const auto Rejected=Slate->OnKeyDown(Geometry,Key);
+  Check(!Rejected.IsEventHandled() && !Rejected.GetMouseCaptor().IsValid() && Widget->LastInputError.Contains(Case.Value),TEXT("invalid_reply_falls_back_without_partial_commands"));
+ }
+ const auto Outside=Runtime.RunNamedPersistent(Runtime.ScriptPath(Script),TEXT("outside"),0,Widget.Get());
+ Check(!Outside.bSucceeded && Outside.Error.Contains(TEXT("active synchronous widget callback")),TEXT("reply_creation_outside_callback_rejected"));
+ Widget->BindInputHandler(TEXT("OnKeyDown"),TEXT("key_down"));
+ Check(Slate->OnKeyDown(Geometry,Key).IsEventHandled() && Widget->LastInputError.IsEmpty(),TEXT("callback_recovers_after_failures"));
+ Slate.Reset();Widget->ReleaseSlateResources(true);
+ Check(Runtime.PersistentContextCount(World.Get())==0 && Runtime.StructSnapshotCount(Widget.Get())==0,TEXT("native_destruct_releases_widget_context"));
+ UE_LOG(LogTemp,Display,TEXT("DAS_WIDGET_EVENTS_RESULT=%s checks=%d"),Failures?TEXT("FAIL"):TEXT("PASS"),Checks);
+ return Failures?1:0;
+}

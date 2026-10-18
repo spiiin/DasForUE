@@ -764,3 +764,21 @@ context cleanup; DLL hashes стабильны, engine errors/ensure нет. Б�
 Foundation/PIE/packaged и коммита. Docs/InputEvents.md; runner
 Scripts/TestInputEvents.ps1; logs/input-events-validation.json.
 Следующее: Geometry/EventReply и отдельный synchronous UserWidget bridge.
+
+### Синхронный UserWidget input bridge — 2026-10-18
+
+Добавлен Blueprintable UDasScriptUserWidget: 17 NativeOn-событий клавиатуры,
+мыши и touch вызывают exported DAS handlers с точным типом input snapshot и
+возвратом UEEventReply. ScriptFile/InputHandlers задаются в Widget Blueprint
+или через ue_widget_bind_input для owned widget. Снимки сохраняются после
+callback; reply commands действуют только в текущем синхронном вызове.
+Handled/Unhandled, focus, capture/release, lock/unlock, cursor position и
+detect/end drag формируют native FReply без раннего изменения Slate.
+Default/stale reply, неверная сигнатура и panic дают native parent fallback;
+NativeDestruct освобождает контекст. Общий reflected EventReply transport
+не открыт, Geometry не передаётся в handler. Generated API coverage не менялся.
+Editor build и один короткий SObjectWidget/NullApplication runtime-сценарий —
+PASS: 17 проверок, чистый exit 0, без Error/ensure, source/DLL/BuildId стабильны.
+Полные PIE/packaged и physical input не запускались. Изменения без коммита.
+Docs/WidgetInputHandlers.md; Scripts/TestWidgetEvents.ps1;
+logs/widget-events-validation.json; Tests/WidgetEvents/probe.das.

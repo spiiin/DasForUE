@@ -156,3 +156,10 @@ coverage не увеличен. [Поимённый аудит](UMGInputBlockers
 Текущий input-event этап: 38 native/runtime checks + 3 compile refusals, 33
 functions exercised и 122 Python checks — PASS. Scope и воспроизведение:
 [InputEvents](InputEvents.md), Scripts/TestInputEvents.ps1 -Publish.
+
+Синхронные NativeOn callbacks реализованы отдельным native родителем
+[DasScriptUserWidget](WidgetInputHandlers.md) с typed snapshot → UEEventReply:
+17 native событий, scoped focus/capture/lock/drag commands, parent fallback.
+Это не generic EventReply codec и не дополнительные функции generated-пакета.
+Editor build + один runtime-сценарий через SObjectWidget: 17 проверок — PASS,
+без полного PIE/packaged. Runner: Scripts/TestWidgetEvents.ps1.
