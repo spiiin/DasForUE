@@ -896,3 +896,26 @@ Source/DLL hashes и engine BuildId стабильны, engine Error/ensure не
 Без полного Foundation/PIE/packaged и без коммита.
 Docs/DataTables.md; Scripts/TestDataTables.ps1; Tests/DataTables/probe.das;
 logs/data-tables-validation.json.
+
+### Чтение CurveTable и вычисление значений — 2026-10-18
+
+Добавлен ue_curve_tables: ue_curve_table_has_row, ue_curve_table_names и
+ue_curve_table_eval(curves, name, time, default_value=0.0). Загруженный CurveTable
+проверяется в активном game-thread контексте; вычисление делегировано FRealCurve::Eval
+для simple/rich curves с native interpolation/tangents/extrapolation. Native curve
+pointers не выдаются. Missing row отличается от пустой кривой; fallback применяется
+по правилам UE (stored default имеет приоритет). Nonfinite inputs/results отклоняются.
+Имена возвращаются detached массивом в FName lexical order, максимум 4096 строк.
+Пример curvetable_items.das: item_damage по кривой Damage и заданному level/time.
+
+Editor Development build и один короткий DasCurveTables runtime-сценарий — PASS,
+5 групп: native fixtures, simple linear/linear extrapolation, rich cubic/constant
+extrapolation, пустые curves и stored/fallback defaults, missing/invalid names,
+wrong-owner refusal, empty tables и сохранность имён после EmptyTable/GC.
+Source/DLL hashes и engine BuildId стабильны, engine Error/ensure нет. Начальные
+прогоны задерживались параллельными UMG-изменениями; исправлены math-зависимость
+тестовой фикстуры и abstract-UObject negative fixture. Также исправлен порядок
+первых заголовков в DasDSLService.cpp и DasAuthoredAssetsCommandlet.cpp.
+Полный Foundation/PIE/packaged не запускался, коммит не создан.
+Docs/CurveTables.md; Scripts/TestCurveTables.ps1; Tests/CurveTables/probe.das;
+logs/curve-tables-validation.json.

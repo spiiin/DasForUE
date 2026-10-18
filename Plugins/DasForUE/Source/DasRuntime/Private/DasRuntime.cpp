@@ -1,3 +1,4 @@
+#include "Engine/CurveTable.h"
 #include "Engine/DataTable.h"
 #include "DasDataAssets.h"
 #include "DasPrimaryAssets.h"
@@ -1692,6 +1693,9 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     bool ScriptInputUnbindAction(const char*,const char*,das::Context*);
     bool ScriptInputUnbindAxis(const char*,das::Context*);
     int32 ScriptInputUnbindAll(das::Context*);
+    bool ScriptCurveTableHas(const FDasObjectHandle&,const char*,das::Context*);
+    FDasStructValue ScriptCurveTableNames(const FDasObjectHandle&,das::Context*,das::LineInfoArg*);
+    float ScriptCurveTableEval(const FDasObjectHandle&,const char*,float,float,das::Context*);
     bool ScriptDataTableHas(const FDasObjectHandle&,const char*,das::Context*);
     FDasStructValue ScriptDataTableNames(const FDasObjectHandle&,das::Context*,das::LineInfoArg*);
     FDasStructValue ScriptDataTableRow(const FDasObjectHandle&,const char*,const char*,das::Context*,das::LineInfoArg*);
@@ -2037,6 +2041,9 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAction)>(*this,Library,"ue_input_unbind_action",das::SideEffects::modifyExternal,"ScriptInputUnbindAction");
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAxis)>(*this,Library,"ue_input_unbind_axis",das::SideEffects::modifyExternal,"ScriptInputUnbindAxis");
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAll)>(*this,Library,"ue_input_unbind_all",das::SideEffects::modifyExternal,"ScriptInputUnbindAll");
+            AddUEExtern<DAS_BIND_FUN(ScriptCurveTableHas)>(*this,Library,"__ue_curve_table_has",das::SideEffects::accessExternal,"ScriptCurveTableHas");
+            AddUEExtern<DAS_BIND_FUN(ScriptCurveTableNames),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_curve_table_names",das::SideEffects::modifyExternal,"ScriptCurveTableNames")->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(ScriptCurveTableEval)>(*this,Library,"__ue_curve_table_eval",das::SideEffects::accessExternal,"ScriptCurveTableEval");
             AddUEExtern<DAS_BIND_FUN(ScriptDataTableHas)>(*this,Library,"__ue_data_table_has",das::SideEffects::accessExternal,"ScriptDataTableHas");
             AddUEExtern<DAS_BIND_FUN(ScriptDataTableNames),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_data_table_names",das::SideEffects::modifyExternal,"ScriptDataTableNames")->needCallerStackFrame=true;
             AddUEExtern<DAS_BIND_FUN(ScriptDataTableRow),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_data_table_row",das::SideEffects::modifyExternal,"ScriptDataTableRow")->needCallerStackFrame=true;
@@ -2886,6 +2893,7 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
     int32 ScriptAssetCancelAll(das::Context* C){auto* S=ManagedOwnerSession(C);return S->Bindings.RemoveAll([](const auto& B){return B->AsyncKind==1;});}
     bool ScriptAssetPending(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.ContainsByPredicate([&](const auto& B){return B->AsyncKind==1 && B->AsyncName==N;});}
 #include "DasSaveGameRuntime.inl"
+#include "DasCurveTableRuntime.inl"
 #include "DasDataTableRuntime.inl"
 #include "DasPrimaryAssetsRuntime.inl"
 
