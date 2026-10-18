@@ -246,3 +246,22 @@ overlap, invalid radius/scope и Destroy. Native marker и стабильнос�
 проверены. Полные Foundation/PIE/packaged не запускались.
 Описание: [CollisionFoundation](CollisionFoundation.md); воспроизведение:
 Scripts/TestCollisionFoundation.ps1; отчёт logs/collision-foundation-validation.json.
+
+## Симуляция тела и PhysicsHandle — 2026-10-18
+
+Добавлен DasPhysicsSimulation commandlet и phased DAS probe, использующие
+generated ue_body_*/ue_handle_* API в transient Chaos Game world с фиксированным
+шагом 1/60 с. Без GameMode fixture явно маршрутизирует NotifyBeginPlay,
+чтобы PhysicsHandle участвовал в обычном component tick.
+
+Editor build, whole-module preflight, восемь независимых native measurements
+и null receiver rejection — PASS: масса/linear/angular velocity, impulse,
+force, damping, gravity, grab/translate, target rotation и release/free motion.
+450 шагов соответствуют 7,5 с симуляции. Фактические DLL и fixture/module
+не менялись во время проверки; engine errors/ensure отсутствуют.
+
+Runner: Scripts/TestPhysicsSimulation.ps1; DAS template:
+Tests/PhysicsSimulation/probe.template.das; описание: Docs/PhysicsSimulation.md.
+Отчёт logs/physics-simulation-validation.json. Contact/friction, ragdoll,
+отдельные constraints, async/network physics и полные Foundation/PIE/packaged
+этот этап не проверяет. Новых ручных wrappers не добавлено.

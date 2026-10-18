@@ -92,3 +92,8 @@ packaged/Shipping и полный Foundation здесь не проверяют�
 Последний целевой прогон: PASS — 23 Python-теста, весь модуль, overlap/settings,
 три ожидаемых отказа и совместный импорт World/Math. Сборка тестового проекта
 согласована после параллельного изменения FDasDeclaredType. Коммит не создавался.
+
+Реальная body simulation и PhysicsHandle теперь проверяются отдельно:
+[PhysicsSimulation](PhysicsSimulation.md), runner Scripts/TestPhysicsSimulation.ps1.
+Восемь native measurements и null receiver — PASS; 450 Chaos steps.
+Это дополняет query probes, не меняя их прежнюю область проверки.
