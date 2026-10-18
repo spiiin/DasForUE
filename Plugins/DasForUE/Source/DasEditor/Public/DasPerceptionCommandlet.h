@@ -1,7 +1,15 @@
 #pragma once
 #include "Commandlets/Commandlet.h"
+#include "AIController.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "DasPerceptionCommandlet.generated.h"
+class UAIPerceptionComponent;
+UCLASS()
+class ADasPerceptionHost : public AAIController {
+ GENERATED_BODY()
+public:
+ UPROPERTY(BlueprintReadOnly) TObjectPtr<UAIPerceptionComponent> Perception;
+};
 UCLASS()
 class UDasPerceptionObserver : public UObject {
  GENERATED_BODY()

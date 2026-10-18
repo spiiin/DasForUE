@@ -350,3 +350,22 @@ dispatcher и новых externs нет. User-facing typed stimulus DSL не п�
 Карты не сохранялись, полный PIE/packaged и сеть не запускались.
 Далее: удобный typed stimulus/sense view, затем occlusion/team-policy и
 дополнительные perception delegates/reload lifecycle по отдельным сценариям.
+
+
+### Типизированный AIStimulus и ue_event — 2026-10-18
+
+Добавлен модуль ue_perception: AIStimulus с Sense, SuccessfullySensed, Expired,
+Valid, Age, ExpirationAge, Strength, позициями и Tag; AISense=Invalid/Sight/Hearing/Other.
+FAISenseID классифицируется native-кодом при capture, не по Tag и не по raw ID.
+Точный callback adapter FAIStimulus → FDasAIStimulus создаёт owned value snapshot;
+канонический модуль и layout проверяются существующим adapter value registry.
+Пример переведён на Actor + PerceptionComponentRef и обычный
+ue_event(source="Perception",name="OnTargetPerceptionUpdated"). Ручного binder,
+@FRAME@ и строкового чтения stimulus в пользовательском обработчике больше нет.
+Build и 15 целевых проверок — PASS: реальные sight/hearing и lifecycle, Invalid/Other,
+отказ несовместимого struct и совместимость raw callback contract. Error/ensure нет,
+DLL/backend/module/fixture hashes стабильны. Docs/Perception.md,
+Tests/Perception/probe.template.das и logs/perception-validation.json.
+Прямое наследование от AIPerceptionComponent и single-parameter projection не
+расширялись. Blueprint/maps не создавались, полный PIE/packaged не запускались.
+Далее — sight occlusion, team filters, дополнительные delegates и reload lifecycle.

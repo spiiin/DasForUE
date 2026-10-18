@@ -1,4 +1,5 @@
 #include "DasCallbackFrames.h"
+#include "DasPerceptionTypes.h"
 #include "DasCallbackTypes.h"
 #include "DasContainerRegistry.h"
 #include "DasPropertyTypes.h"
@@ -15,7 +16,7 @@ bool Compatible(FProperty* Source,FProperty* Target){
  if(auto* Expected=CastField<FClassProperty>(Target)){auto* Actual=CastField<FClassProperty>(Source);return Actual && Actual->MetaClass && Expected->MetaClass && Actual->MetaClass->IsChildOf(Expected->MetaClass);}
  if(auto* Expected=DasReferencePropertyClass(Target)){auto* Actual=DasReferencePropertyClass(Source);return Actual && (Actual==Expected || (Expected->HasAnyClassFlags(CLASS_Interface)?Actual->ImplementsInterface(Expected):Actual->IsChildOf(Expected)));}
  if(auto* Expected=DasEnumPropertyType(Target))return DasEnumPropertyType(Source)==Expected;
- if(auto* Expected=CastField<FStructProperty>(Target))return DasCallbackSnapshotForProperty(Source)==Expected->Struct;
+ if(auto* Expected=CastField<FStructProperty>(Target))return DasCallbackSnapshotForProperty(Source)==Expected->Struct || CanProjectDasAIStimulus(Source,Expected->Struct);
  return DasPropertyKind(Source)==DasPropertyKind(Target) && Source->SameType(Target);
 }
 }
@@ -49,7 +50,10 @@ bool CaptureDasCallbackFrame(UFunction* Signature,const void* Memory,UScriptStru
  if(!Memory || !ValidateDasCallbackFrameSource(Signature,Frame,Error))return false;
  const auto Source=Parameters(Signature);FDasScalarValue Value;Value.Kind=12;Value.ObjectClass=Frame->GetPathName();Value.StructValue.InitializeAs(Frame);int32 I=0;
  for(TFieldIterator<FProperty> Target(Frame);Target;++Target,++I){FDasScalarValue Input;
-  if(!ReadDasPropertyValue(Source[I],Source[I]->ContainerPtrToValuePtr<void>(Memory),Input,Error))return false;
+  const auto* Expected=CastField<FStructProperty>(*Target);
+  if(Expected && CanProjectDasAIStimulus(Source[I],Expected->Struct)){
+   if(!ReadDasAIStimulusCallback(Source[I],Source[I]->ContainerPtrToValuePtr<void>(Memory),Expected->Struct,Input,Error))return false;
+  }else if(!ReadDasPropertyValue(Source[I],Source[I]->ContainerPtrToValuePtr<void>(Memory),Input,Error))return false;
   if(auto* Class=CastField<FClassProperty>(*Target))Input.ObjectClass=Class->MetaClass->GetPathName();
   else if(auto* ObjectClass=DasReferencePropertyClass(*Target))Input.ObjectClass=ObjectClass->GetPathName();
   if(!WriteDasPropertyValue(*Target,Target->ContainerPtrToValuePtr<void>(Value.StructValue.GetMutableMemory()),Input,Error))return false;

@@ -38,27 +38,74 @@ Tick мира идёт по 0.05 сек с увеличением GFrameCounter:
 Стимулы обрабатывает UE: fixture не вызывает RegisterStimulus и не делает
 ручной Broadcast делегата. Native observer независимо проверяет Actor identity,
 sense ID и hearing payload. Результат: sight_on=2, sight_off=1, hearing_on=1.
+Дополнительно проверены Invalid для native default stimulus, Other для зарегистрированного
+AISense_Damage, отказ при несовместимом struct и совместимость исходного raw tuple.
 
-Использован существующий общий multi-argument callback backend:
-`OnTargetPerceptionUpdated(Actor, FAIStimulus)` → owned callback tuple → DAS.
-Тест регистрирует внутренний tuple через DasCallbackFrame и подставляет его
-identity в `ue_subscribe_object_struct`. Обработчик принимает UEStructValue,
-читает arg_0/arg_1 и обновляет persistent counters. Запросы current/known actors
-выполняются сгенерированными `ue_perception_*` функциями из staged пакета.
-Новых UE externs и отдельного perception dispatcher не добавлялось.
+Использован общий multi-argument callback backend с узкой проекцией:
+`OnTargetPerceptionUpdated(Actor, FAIStimulus)` → owned `AIStimulus` → DAS.
+Компилятор обычного `[ue_event]` создаёт tuple и `bind_events` автоматически.
+В примере больше нет `@FRAME@`, ручного binder, `arg_0`/`arg_1` и строкового
+чтения полей стимула. Сгенерированные `ue_perception_*` запросы сохранены.
+
+## Типизированный AIStimulus
+
+`require ue_perception` импортирует `AIStimulus`, `AISense` и обычный `ActorRef`.
+Это owned snapshot, не указатель на память AIPerceptionComponent. Поля:
+
+| Поле | Тип / значение |
+| --- | --- |
+| Sense | AISense.Invalid, Sight, Hearing или Other |
+| SuccessfullySensed | native WasSuccessfullySensed() |
+| Expired | native IsExpired() |
+| Valid | native IsValid(); это не синоним активного восприятия |
+| Age | native GetAge() на момент callback |
+| ExpirationAge | отражённый UE ExpirationAge |
+| Strength | float |
+| StimulusLocation, ReceiverLocation | UEVector |
+| Tag | UENameValue |
+
+Возраст snapshot не увеличивается сам по себе. Изменение локального значения
+не меняет native perception. FAISenseID не UPROPERTY и имеет process-local ID:
+проектор определяет Sight/Hearing по native sense ID, не по Tag, имени актора
+или фиксированному числу. Невалидный ID → Invalid, другой валидный sense → Other.
+
+```das
+require ue_perception
+
+[ue_class]
+class PerceptionProbe : Actor {
+    @ue_component
+    Perception:PerceptionComponentRef
+
+    [ue_event(source="Perception",name="OnTargetPerceptionUpdated")]
+    def OnTarget(actor:ActorRef; stimulus:AIStimulus):void {
+        if(stimulus.Sense==AISense.Sight && stimulus.SuccessfullySensed) {
+            ue_state_set_int("seen",ue_state_get_int("seen",0)+1)
+        }
+    }
+}
+```
+
+В fixture DSL descriptor проверяется через ReadAuthoringScript, затем сгенерированный
+binder исполняется на ADasPerceptionHost (native AIController с BlueprintReadOnly
+полем Perception); Blueprint не создаётся. Права доступа к полям UE не меняются.
+Прямое наследование DSL от AIPerceptionComponent не расширялось: пример использует
+поддерживаемую композицию Actor + native component.
+Проекция разрешена только для точной пары native FAIStimulus → FDasAIStimulus
+в multi-argument callback frame. Совпадение полей другого struct не разрешает
+подмену типа. Обычный raw FAIStimulus snapshot остаётся допустимым, а generic
+property/call ABI и запись обратно в FAIStimulus не менялись. Новых UE externs
+и отдельного perception dispatcher нет.
 
 ## Результат и границы
 
-Editor Development build, whole-module preflight и 11 targeted checks — PASS.
+Editor Development build, компиляция всего импортированного модуля и 15 targeted checks — PASS.
 Engine Error/ensure нет; SHA256 DLL, fixture/template и staged module не менялись
 во время проверки. Отчёт: `logs/perception-validation.json`; подробный runtime.log
 сохраняется в указанном в нём staged run. Коммит автоматически не создаётся.
 
-Здесь проверен snapshot-handler, а не новый пользовательский typed perception
-DSL. `FAIStimulus.Type` не является UPROPERTY; sense identity в native baseline
-проверяется непосредственно, DAS отличает используемые stimulus по Tag.
-Отдельный удобный typed stimulus/sense view этим шагом не добавлялся.
 Не покрыты sight occlusion, team-policy combinations, hearing LOS, forgotten/info
 delegates, уничтожение source во время queued delivery, perception reload,
-BehaviorTree/EQS, полный PIE, packaged и сеть. Это следующие независимые задачи,
-а не заявление о завершении всей AI-подсистемы.
+BehaviorTree/EQS, полный PIE, packaged и сеть. Типизированная проекция на этом
+этапе проверяется для OnTargetPerceptionUpdated; single-parameter и другие
+формы native perception events отдельно не расширялись.

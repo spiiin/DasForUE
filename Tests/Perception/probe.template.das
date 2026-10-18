@@ -1,32 +1,34 @@
 options gen2
 require @PAWN_AI@
-[export]
-def bind_events() {
-    ue_subscribe_object_struct(ue_self_object(),"OnTargetPerceptionUpdated","on_target","@FRAME@")
-}
-[export]
-def on_target(payload:UEStructValue) {
-    let actor=ue_struct_get_object(payload,"arg_0")
-    verify(ue_object_valid(actor),"callback Actor is live")
-    let stimulus=ue_struct_nested_get(payload,"arg_1",-1)
-    let sensed=ue_struct_get_bool(stimulus,"bSuccessfullySensed")
-    let tag=ue_name_text(ue_struct_get_name(stimulus,"Tag"))
-    if(tag=="DasNoise") {
-        if(sensed) {
-            verify(ue_struct_get_float(stimulus,"Strength")==2.0,"hearing strength")
-            let location=ue_struct_nested_get(stimulus,"StimulusLocation",-1)
-            verify(ue_struct_get_double(location,"X")==2000.0lf,"hearing location snapshot")
-            ue_state_set_int("hearing_on",ue_state_get_int("hearing_on",0)+1)
+require ue_perception
+
+[ue_class]
+class PerceptionProbe : ue_dsl::Actor {
+    @ue_component
+    Perception:PerceptionComponentRef
+
+    [ue_event(source="Perception",name="OnTargetPerceptionUpdated")]
+    def OnTarget(actor:ActorRef; stimulus:AIStimulus):void {
+        verify(ue_object_valid(actor.handle),"typed callback Actor is live")
+        verify(stimulus.ExpirationAge==0.5f && stimulus.Age>=0.0f,"typed stimulus age/expiration")
+        if(stimulus.Sense==AISense.Hearing) {
+            if(stimulus.SuccessfullySensed) {
+                verify(stimulus.Valid && !stimulus.Expired,"active hearing flags")
+                verify(ue_name_text(stimulus.Tag)=="DasNoise","hearing tag")
+                verify(stimulus.Strength==2.0f,"hearing strength")
+                verify(stimulus.StimulusLocation.x==2000.0lf,"hearing location snapshot")
+                ue_state_set_int("hearing_on",ue_state_get_int("hearing_on",0)+1)
+            }
+        } else {
+            verify(stimulus.Sense==AISense.Sight,"native sense identity")
+            let key=stimulus.SuccessfullySensed ? "sight_on" : "sight_off"
+            ue_state_set_int(key,ue_state_get_int(key,0)+1)
         }
-    } else {
-        verify(tag=="None","unexpected stimulus tag")
-        let key=sensed ? "sight_on" : "sight_off"
-        ue_state_set_int(key,ue_state_get_int(key,0)+1)
     }
 }
 [export]
 def main(phase:int):int {
-    let perception=C_AIPerceptionComponent_e0f15310_from(ue_self_object())
+    let perception=C_AIPerceptionComponent_e0f15310_from(ue_get_self_object("Perception"))
     let sight=__ue_class_loaded("/Script/AIModule.AISense_Sight","/Script/CoreUObject.Object","")
     let hearing=__ue_class_loaded("/Script/AIModule.AISense_Hearing","/Script/CoreUObject.Object","")
     if(phase==0 || phase==5) {
