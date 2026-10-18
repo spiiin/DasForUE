@@ -4266,3 +4266,26 @@ Editor Development build и один объединённый короткий r
 21 проверка. Source/DLL hashes и engine BuildId стабильны. Контрольные случаи:
 несохранённые изменения, отсутствующий источник, устаревшие bundles и NeverCook.
 Полный Foundation/PIE/packaged не запускался. Изменения не закоммичены.
+
+### Типизированное чтение DataTable — 2026-10-18
+
+Добавлен ue_data_tables: ue_data_table_row(type<Row>, loaded_table, name [, scope]),
+ue_data_table_has_row и отсортированный список ue_data_table_names. Macro использует
+существующую проверку canonical native/author-authored struct и общие field-by-field
+unpack helpers; native row копируется в owned VM snapshot, указатель строки не
+выдаётся. Runtime требует точное совпадение row struct identity; missing row —
+script error, has_row позволяет обычную проверку наличия. Для author-authored rows
+сохраняется явный type folder/registry. Список ограничен 4096 строками.
+
+Пример предметов: datatable_item_types.das (Label/Price/Weight) и datatable_items.das
+(item_price с обычным доступом к полям). Создание/редактирование таблицы — штатный
+редактор UE; новый универсальный table authoring/import service не добавлялся.
+
+Editor Development build и один короткий DasDataTables runtime-сценарий — PASS,
+5 групп проверок: создание reflected схемы, поля, имена/значения/missing/wrong type,
+сохранность прочитанной копии после native RemoveRow и GC, пустая таблица.
+Source/DLL hashes и engine BuildId стабильны, engine Error/ensure нет. Исправлены
+ошибки синтаксиса и импортов первой тестовой фикстуры; финальный прогон принят.
+Без полного Foundation/PIE/packaged и без коммита.
+Docs/DataTables.md; Scripts/TestDataTables.ps1; Tests/DataTables/probe.das;
+logs/data-tables-validation.json.

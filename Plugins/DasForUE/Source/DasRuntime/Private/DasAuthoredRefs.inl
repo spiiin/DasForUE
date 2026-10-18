@@ -74,6 +74,7 @@ struct FUEClassLoadedFactory:das::CallMacro {
  }
 };
 #include "DasObjectQueryMacros.inl"
+#include "DasDataTableDSL.inl"
 struct FUEActorSpawnFactory:das::CallMacro {
  FUEActorSpawnFactory():CallMacro("ue_actor_spawn"){}
  virtual bool canVisitArguments(das::ExprCallMacro*,int Index)override{return Index!=0;}

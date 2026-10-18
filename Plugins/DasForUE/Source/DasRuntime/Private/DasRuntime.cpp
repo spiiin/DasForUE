@@ -1,3 +1,4 @@
+#include "Engine/DataTable.h"
 #include "DasDataAssets.h"
 #include "DasPrimaryAssets.h"
 #include "DasSaveGame.h"
@@ -1691,6 +1692,9 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     bool ScriptInputUnbindAction(const char*,const char*,das::Context*);
     bool ScriptInputUnbindAxis(const char*,das::Context*);
     int32 ScriptInputUnbindAll(das::Context*);
+    bool ScriptDataTableHas(const FDasObjectHandle&,const char*,das::Context*);
+    FDasStructValue ScriptDataTableNames(const FDasObjectHandle&,das::Context*,das::LineInfoArg*);
+    FDasStructValue ScriptDataTableRow(const FDasObjectHandle&,const char*,const char*,das::Context*,das::LineInfoArg*);
     uint64 ScriptPrimaryFind(const char*,das::Context*);
     int32 ScriptPrimaryQueryCount(uint64,das::Context*);
     const char* ScriptPrimaryQueryName(uint64,int32,das::Context*);
@@ -1878,6 +1882,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             addAnnotation(new FUECallbackFrameAnnotation());
             addAnnotation(new FUEFunctionAnnotation());addAnnotation(new FUECallbackAnnotation(false));addAnnotation(new FUECallbackAnnotation(true));addAnnotation(new FUEInterfaceAnnotation());addAnnotation(new FUEImplementsAnnotation());addAnnotation(new FUEComponentAnnotation());
             {auto* Macro=new FUEBoundDelegateFactory();ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
+            {auto* Macro=new FUEDataTableRowFactory();ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
             for(bool Component:{false,true})for(bool All:{false,true}){auto* Macro=new FUEObjectQueryFactory(Component,All);ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
             {auto* Macro=new FUEActorSpawnFactory();ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
             {auto* Macro=new FUEClassLoadedFactory();ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
@@ -2032,6 +2037,9 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAction)>(*this,Library,"ue_input_unbind_action",das::SideEffects::modifyExternal,"ScriptInputUnbindAction");
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAxis)>(*this,Library,"ue_input_unbind_axis",das::SideEffects::modifyExternal,"ScriptInputUnbindAxis");
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAll)>(*this,Library,"ue_input_unbind_all",das::SideEffects::modifyExternal,"ScriptInputUnbindAll");
+            AddUEExtern<DAS_BIND_FUN(ScriptDataTableHas)>(*this,Library,"__ue_data_table_has",das::SideEffects::accessExternal,"ScriptDataTableHas");
+            AddUEExtern<DAS_BIND_FUN(ScriptDataTableNames),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_data_table_names",das::SideEffects::modifyExternal,"ScriptDataTableNames")->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(ScriptDataTableRow),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_data_table_row",das::SideEffects::modifyExternal,"ScriptDataTableRow")->needCallerStackFrame=true;
             AddUEExtern<DAS_BIND_FUN(ScriptPrimaryFind)>(*this,Library,"__ue_primary_find",das::SideEffects::modifyExternal,"ScriptPrimaryFind");
             AddUEExtern<DAS_BIND_FUN(ScriptPrimaryQueryCount)>(*this,Library,"__ue_primary_query_count",das::SideEffects::modifyExternal,"ScriptPrimaryQueryCount");
             AddUEExtern<DAS_BIND_FUN(ScriptPrimaryQueryName)>(*this,Library,"__ue_primary_query_name",das::SideEffects::modifyExternal,"ScriptPrimaryQueryName");
@@ -2878,6 +2886,7 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
     int32 ScriptAssetCancelAll(das::Context* C){auto* S=ManagedOwnerSession(C);return S->Bindings.RemoveAll([](const auto& B){return B->AsyncKind==1;});}
     bool ScriptAssetPending(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.ContainsByPredicate([&](const auto& B){return B->AsyncKind==1 && B->AsyncName==N;});}
 #include "DasSaveGameRuntime.inl"
+#include "DasDataTableRuntime.inl"
 #include "DasPrimaryAssetsRuntime.inl"
 
 
