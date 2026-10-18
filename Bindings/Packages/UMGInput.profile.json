@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "module": "ue_api_umg_input",
+  "ue_modules": [
+    "Engine",
+    "InputCore",
+    "SlateCore",
+    "Slate",
+    "UMG",
+    "EnhancedInput"
+  ],
+  "value_types": "canonical_math",
+  "default_arguments": "explicit",
+  "libraries": [
+    {
+      "class": "/Script/UMG.WidgetBlueprintLibrary",
+      "prefix": "ue_ui_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.WidgetLayoutLibrary",
+      "prefix": "ue_ui_layout_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.SlateBlueprintLibrary",
+      "prefix": "ue_ui_geometry_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.KismetInputLibrary",
+      "prefix": "ue_input_key_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLibrary",
+      "prefix": "ue_enhanced_api_",
+      "include": [
+        "*"
+      ]
+    }
+  ],
+  "receivers": [
+    {
+      "class": "/Script/UMG.Widget",
+      "prefix": "ue_widget_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.UserWidget",
+      "prefix": "ue_user_widget_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.PanelWidget",
+      "prefix": "ue_panel_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.ContentWidget",
+      "prefix": "ue_content_widget_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.Button",
+      "prefix": "ue_button_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.TextBlock",
+      "prefix": "ue_text_block_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.EditableTextBox",
+      "prefix": "ue_editable_text_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.Image",
+      "prefix": "ue_image_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.ProgressBar",
+      "prefix": "ue_progress_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.Slider",
+      "prefix": "ue_slider_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.ScrollBox",
+      "prefix": "ue_scroll_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.CanvasPanel",
+      "prefix": "ue_canvas_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.CanvasPanelSlot",
+      "prefix": "ue_canvas_slot_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/UMG.InputKeySelector",
+      "prefix": "ue_key_selector_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.InputComponent",
+      "prefix": "ue_input_component_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.InputSettings",
+      "prefix": "ue_input_settings_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputComponent",
+      "prefix": "ue_enhanced_component_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/EnhancedInput.InputMappingContext",
+      "prefix": "ue_mapping_context_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputLocalPlayerSubsystem",
+      "prefix": "ue_input_local_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/EnhancedInput.EnhancedInputWorldSubsystem",
+      "prefix": "ue_input_world_",
+      "include": [
+        "*"
+      ]
+    }
+  ],
+  "exclusions": [],
+  "probe_world": true,
+  "probe": "[export]\ndef main(input:int):int {\n    let key=S_Key_a8a0a14c(f_keyname=ue_name(\"SpaceBar\"))\n    verify(ue_input_key_Key_IsKeyboardKey(key),\"SpaceBar is a keyboard key\")\n    return 42\n}"
+}

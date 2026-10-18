@@ -4076,3 +4076,19 @@ sets остаются явными blockers. Документация Docs/Anima
 backlog Bindings/Packages/ue_api_animation_audio_vfx.summary.json, результат
 logs/animation-audio-vfx-validation.json. Пакет staged, без публикации/коммита.
 Следующий основной пакет — UMG / Input; сеть и структурные миграции остаются отложены.
+
+
+### Первый пакет UMG / Input — 2026-10-18
+
+Профиль UMGInput: 5 libraries и 20 receivers, modules Engine/InputCore/SlateCore/
+Slate/UMG/EnhancedInput. Из 517 кандидатов 320 generation_ready, 110 export_blocked,
+87 generation_blocked. Весь staged модуль скомпилирован. В принятом сокращённом
+режиме Editor build + один FKey(SpaceBar) → Key_IsKeyboardKey probe — PASS.
+Error/ensure нет, DLL/profile/generator hashes стабильны. Widget rendering,
+physical input, managed input suite, полный PIE/packaged не запускались.
+77 opaque-struct и 10 delegate-parameter generation failures оставлены в backlog;
+non-callable события и delegate signatures не объявляются ordinary call API.
+Документация Docs/UMGInputPackage.md; отчёт logs/umg-input-validation.json;
+backlog Bindings/Packages/ue_api_umg_input.summary.json. Новых C++ dispatchers нет.
+Пакет staged, без публикации и коммита. Следующий функциональный шаг выбирается
+из общих value/callback barriers под нужный сценарий; сеть и миграции отложены.
