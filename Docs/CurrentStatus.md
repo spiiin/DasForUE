@@ -369,3 +369,18 @@ Tests/Perception/probe.template.das и logs/perception-validation.json.
 Прямое наследование от AIPerceptionComponent и single-parameter projection не
 расширялись. Blueprint/maps не создавались, полный PIE/packaged не запускались.
 Далее — sight occlusion, team filters, дополнительные delegates и reload lifecycle.
+
+
+### Первый пакет Animation / Audio / Niagara — 2026-10-18
+
+Профиль AnimationAudioVFX: 4 libraries, 9 receivers, modules Engine/AnimGraphRuntime/
+AudioMixer/Niagara. Из 580 кандидатов 514 generation_ready, 57 export_blocked,
+9 generation_blocked; 30 construction guards. Весь staged DAS module компилируется.
+Принят сокращённый режим: Editor build + один CalculateDirection runtime probe
+(90 градусов для движения вправо) — PASS, без full suites и новых commandlets.
+Error/ensure нет, DLL/profile/generator hashes стабильны. Playback/audio output/
+Niagara simulation отдельно не запускались. Async callbacks и modulation object
+sets остаются явными blockers. Документация Docs/AnimationAudioVFXPackage.md,
+backlog Bindings/Packages/ue_api_animation_audio_vfx.summary.json, результат
+logs/animation-audio-vfx-validation.json. Пакет staged, без публикации/коммита.
+Следующий основной пакет — UMG / Input; сеть и структурные миграции остаются отложены.

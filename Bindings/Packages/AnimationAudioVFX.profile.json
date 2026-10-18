@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "module": "ue_api_animation_audio_vfx",
+  "ue_modules": [
+    "Engine",
+    "AnimGraphRuntime",
+    "AudioMixer",
+    "Niagara"
+  ],
+  "value_types": "canonical_math",
+  "default_arguments": "explicit",
+  "libraries": [
+    {
+      "class": "/Script/AnimGraphRuntime.KismetAnimationLibrary",
+      "prefix": "ue_anim_math_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "prefix": "ue_audio_mixer_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Niagara.NiagaraFunctionLibrary",
+      "prefix": "ue_vfx_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Niagara.NiagaraDataInterfaceArrayFunctionLibrary",
+      "prefix": "ue_vfx_array_",
+      "include": [
+        "*"
+      ]
+    }
+  ],
+  "receivers": [
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "prefix": "ue_anim_instance_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.SkeletalMeshComponent",
+      "prefix": "ue_skeletal_mesh_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.SkinnedMeshComponent",
+      "prefix": "ue_skinned_mesh_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.AnimSequence",
+      "prefix": "ue_anim_sequence_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.AnimMontage",
+      "prefix": "ue_anim_montage_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.AudioComponent",
+      "prefix": "ue_audio_component_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Engine.SoundBase",
+      "prefix": "ue_sound_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Niagara.NiagaraComponent",
+      "prefix": "ue_vfx_component_",
+      "include": [
+        "*"
+      ]
+    },
+    {
+      "class": "/Script/Niagara.NiagaraParameterCollectionInstance",
+      "prefix": "ue_vfx_parameters_",
+      "include": [
+        "*"
+      ]
+    }
+  ],
+  "exclusions": [],
+  "probe_world": true,
+  "probe": "[export]\ndef main(input:int):int {\n    let direction=ue_anim_math_CalculateDirection(ue_vector(0.0lf,100.0lf,0.0lf),ue_rotator(0.0lf,0.0lf,0.0lf))\n    verify(direction>89.99f && direction<90.01f,\"movement right of forward is 90 degrees\")\n    return 42\n}"
+}

@@ -1,0 +1,650 @@
+{
+  "schema_version": 1,
+  "package": "ue_api_animation_audio_vfx",
+  "engine_version": "5.8.3-0+UE5",
+  "state": "ue_preflight_passed",
+  "value_types": "canonical_math",
+  "default_arguments": "explicit",
+  "candidate_count": 580,
+  "counts": {
+    "generation_ready": 514,
+    "export_blocked": 57,
+    "generation_blocked": 9,
+    "policy_excluded": 0
+  },
+  "construction_guarded_count": 30,
+  "source_sha256": "a263e880ee8712adbfd9879f6b3458c403b2a9e53109ada2453e42406d39823d",
+  "surfaces": {
+    "receiver": {
+      "generation_ready": 406,
+      "export_blocked": 53,
+      "generation_blocked": 4,
+      "policy_excluded": 0
+    },
+    "library": {
+      "generation_ready": 108,
+      "export_blocked": 4,
+      "generation_blocked": 5,
+      "policy_excluded": 0
+    }
+  },
+  "blockers": [
+    {
+      "class": "/Script/AnimGraphRuntime.KismetAnimationLibrary",
+      "function": "K2_CalculateVelocityFromSockets",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/AnimGraphRuntime.KismetAnimationLibrary",
+      "alias": "ue_anim_math_K2_CalculateVelocityFromSockets",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Opaque/empty structs need an adapter"
+    },
+    {
+      "class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "function": "GetAvailableAudioOutputDevices",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "alias": "ue_audio_mixer_GetAvailableAudioOutputDevices",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Unsupported or colliding field: onobtaindevicesevent"
+    },
+    {
+      "class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "function": "GetCurrentAudioOutputDeviceName",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "alias": "ue_audio_mixer_GetCurrentAudioOutputDeviceName",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Unsupported or colliding field: onobtaincurrentdeviceevent"
+    },
+    {
+      "class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "function": "PrimeSoundForPlayback",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "alias": "ue_audio_mixer_PrimeSoundForPlayback",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Unsupported or colliding field: onloadcompletion"
+    },
+    {
+      "class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "function": "RemoveSubmixEffectPreset",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "function": "RemoveSubmixEffectPresetAtIndex",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "function": "ReplaceSoundEffectSubmix",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "function": "SwapAudioOutputDevice",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/AudioMixer.AudioMixerBlueprintLibrary",
+      "alias": "ue_audio_mixer_SwapAudioOutputDevice",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Unsupported or colliding field: oncompleteddeviceswap"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "BlueprintBeginPlay",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.AnimInstance.BlueprintBeginPlay"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "BlueprintInitializeAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.AnimInstance.BlueprintInitializeAnimation"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "BlueprintLinkedAnimationLayersInitialized",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.AnimInstance.BlueprintLinkedAnimationLayersInitialized"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "BlueprintPostEvaluateAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.AnimInstance.BlueprintPostEvaluateAnimation"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "BlueprintThreadSafeUpdateAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.AnimInstance.BlueprintThreadSafeUpdateAnimation"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "BlueprintUpdateAnimation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.AnimInstance.BlueprintUpdateAnimation"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetCurrentStateName",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceAssetPlayerLength",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceAssetPlayerTime",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceAssetPlayerTimeFraction",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceAssetPlayerTimeFromEnd",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceAssetPlayerTimeFromEndFraction",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceCurrentStateElapsedTime",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceMachineWeight",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceStateWeight",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceTransitionCrossfadeDuration",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceTransitionTimeElapsed",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetInstanceTransitionTimeElapsedFraction",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetLinkedAnimGraphInstancesByTag",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetRelevantAnimLength",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetRelevantAnimTime",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetRelevantAnimTimeFraction",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetRelevantAnimTimeRemaining",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "GetRelevantAnimTimeRemainingFraction",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "LockAIResources",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "QueryAndMarkTransitionEvent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "QueryTransitionEvent",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "UnlockAIResources",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "WasAnimNotifyNameTriggeredInAnyState",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "WasAnimNotifyNameTriggeredInSourceState",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "WasAnimNotifyNameTriggeredInStateMachine",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "WasAnimNotifyStateActiveInSourceState",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "WasAnimNotifyStateActiveInStateMachine",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "WasAnimNotifyTriggeredInAnyState",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "WasAnimNotifyTriggeredInSourceState",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimInstance",
+      "function": "WasAnimNotifyTriggeredInStateMachine",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimInstance",
+      "status": "export_blocked",
+      "reason": "internal_function"
+    },
+    {
+      "class": "/Script/Engine.AnimSequence",
+      "function": "GetRetargetSourceAsset",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AnimSequence",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.AudioComponent",
+      "function": "AddModulationRouting",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AudioComponent",
+      "alias": "ue_audio_component_AddModulationRouting",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Unsupported hash container member"
+    },
+    {
+      "class": "/Script/Engine.AudioComponent",
+      "function": "AdjustAttenuation",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AudioComponent",
+      "status": "export_blocked",
+      "reason": "structs with native object references are unsupported\n"
+    },
+    {
+      "class": "/Script/Engine.AudioComponent",
+      "function": "BP_GetAttenuationSettingsToApply",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AudioComponent",
+      "status": "export_blocked",
+      "reason": "structs with native object references are unsupported\n"
+    },
+    {
+      "class": "/Script/Engine.AudioComponent",
+      "function": "GetModulators",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AudioComponent",
+      "alias": "ue_audio_component_GetModulators",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Unsupported hash container member"
+    },
+    {
+      "class": "/Script/Engine.AudioComponent",
+      "function": "PlayQuantized",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AudioComponent",
+      "status": "export_blocked",
+      "reason": "instance_world_context_requires_adapter"
+    },
+    {
+      "class": "/Script/Engine.AudioComponent",
+      "function": "RemoveModulationRouting",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AudioComponent",
+      "alias": "ue_audio_component_RemoveModulationRouting",
+      "explicit_defaults": [],
+      "status": "generation_blocked",
+      "reason": "Unsupported hash container member"
+    },
+    {
+      "class": "/Script/Engine.AudioComponent",
+      "function": "SetAttenuationOverrides",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AudioComponent",
+      "status": "export_blocked",
+      "reason": "structs with native object references are unsupported\n"
+    },
+    {
+      "class": "/Script/Engine.AudioComponent",
+      "function": "SetModulationRouting",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.AudioComponent",
+      "alias": "ue_audio_component_SetModulationRouting",
+      "explicit_defaults": [
+        {
+          "parameter": "routingmethod",
+          "value": "Inherit"
+        }
+      ],
+      "status": "generation_blocked",
+      "reason": "Unsupported hash container member"
+    },
+    {
+      "class": "/Script/Engine.SkeletalMeshComponent",
+      "function": "GetAnimClass",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkeletalMeshComponent",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.SkeletalMeshComponent.GetAnimClass"
+    },
+    {
+      "class": "/Script/Engine.SkeletalMeshComponent",
+      "function": "GetConstraintByName",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkeletalMeshComponent",
+      "status": "export_blocked",
+      "reason": "constraint accessors require scalar component-owned getter/library contract\n"
+    },
+    {
+      "class": "/Script/Engine.SkeletalMeshComponent",
+      "function": "GetConstraints",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkeletalMeshComponent",
+      "status": "export_blocked",
+      "reason": "constraint accessors require scalar component-owned getter/library contract\n"
+    },
+    {
+      "class": "/Script/Engine.SkeletalMeshComponent",
+      "function": "GetConstraintsFromBody",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkeletalMeshComponent",
+      "status": "export_blocked",
+      "reason": "constraint accessors require scalar component-owned getter/library contract\n"
+    },
+    {
+      "class": "/Script/Engine.SkeletalMeshComponent",
+      "function": "GetDefaultAnimatingRig",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkeletalMeshComponent",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.SkeletalMeshComponent",
+      "function": "GetDefaultAnimatingRigOverride",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkeletalMeshComponent",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.SkeletalMeshComponent",
+      "function": "GetLinkedAnimGraphInstancesByTag",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkeletalMeshComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.SkeletalMeshComponent",
+      "function": "SetDefaultAnimatingRigOverride",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkeletalMeshComponent",
+      "status": "export_blocked",
+      "reason": "soft_reference_requires_binding_adapter"
+    },
+    {
+      "class": "/Script/Engine.SkinnedMeshComponent",
+      "function": "GetSkeletalMesh_DEPRECATED",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkinnedMeshComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.SkinnedMeshComponent",
+      "function": "SetMinLOD",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkinnedMeshComponent",
+      "status": "export_blocked",
+      "reason": "deprecated_function"
+    },
+    {
+      "class": "/Script/Engine.SkinnedMeshComponent",
+      "function": "SetSkinWeightOverride",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SkinnedMeshComponent",
+      "status": "export_blocked",
+      "reason": "unsupported UFunction or struct field type\n"
+    },
+    {
+      "class": "/Script/Engine.SoundBase",
+      "function": "IsAttenuationSettingsEditable",
+      "surface": "receiver",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Engine.SoundBase",
+      "status": "export_blocked",
+      "reason": "Expected loaded class and local BlueprintCallable instance function: /Script/Engine.SoundBase.IsAttenuationSettingsEditable"
+    },
+    {
+      "class": "/Script/Niagara.NiagaraFunctionLibrary",
+      "function": "SpawnSystemAtLocationWithParams",
+      "surface": "library",
+      "construction_unsafe": false,
+      "declaring_class": "/Script/Niagara.NiagaraFunctionLibrary",
+      "status": "export_blocked",
+      "reason": "WorldContext must name an input object parameter\n"
+    }
+  ]
+}
