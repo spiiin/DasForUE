@@ -6,9 +6,9 @@
   "value_types": "canonical_math",
   "default_arguments": "explicit",
   "counts": {
-    "generation_ready": 366,
+    "generation_ready": 383,
     "export_blocked": 114,
-    "generation_blocked": 37,
+    "generation_blocked": 20,
     "policy_excluded": 0
   },
   "candidate_count": 517,
@@ -17,22 +17,23 @@
   "unknown_declaration_occurrences": 0,
   "surfaces": {
     "receiver": {
-      "generation_ready": 250,
+      "generation_ready": 253,
       "export_blocked": 94,
-      "generation_blocked": 7,
+      "generation_blocked": 4,
       "policy_excluded": 0
     },
     "library": {
-      "generation_ready": 116,
+      "generation_ready": 130,
       "export_blocked": 20,
-      "generation_blocked": 30,
+      "generation_blocked": 16,
       "policy_excluded": 0
     }
   },
-  "source_sha256": "e0ba053e565a13616ab6b502c13f8d47e0b2c7ded62cd6c4e0a7346eec1a3723",
+  "source_sha256": "9a61e4c322df20eb217faacbafd2b443bd85127d8a7e9155012ebba1c2e833ba",
   "dependencies": {
     "das_modules": [
       "ue_foundation",
+      "ue_geometry",
       "ue_input_events",
       "ue_input_value",
       "ue_native_delegate"
@@ -46,7 +47,7 @@
       "EnhancedInput"
     ]
   },
-  "staged_module": "ue_api_umg_input_preflight_e0ba053e565a1361",
+  "staged_module": "ue_api_umg_input_preflight_9a61e4c322df20eb",
   "members": [
     {
       "class": "/Script/Engine.InputComponent",
@@ -2208,8 +2209,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_AbsoluteToLocal",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2239,8 +2239,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_GetAbsoluteSize",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2250,8 +2249,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_GetLocalSize",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2261,8 +2259,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_GetLocalTopLeft",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2272,8 +2269,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_IsUnderLocation",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2283,8 +2279,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_LocalToAbsolute",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2294,8 +2289,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_LocalToViewport",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2305,8 +2299,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_Scalar_AbsoluteToLocal",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2316,8 +2309,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_Scalar_LocalToAbsolute",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2357,8 +2349,7 @@
           "value": "false"
         }
       ],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2404,8 +2395,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_Vector_AbsoluteToLocal",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.SlateBlueprintLibrary",
@@ -2415,8 +2405,7 @@
       "declaring_class": "/Script/UMG.SlateBlueprintLibrary",
       "alias": "ue_ui_geometry_Vector_LocalToAbsolute",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Slider",
@@ -3929,8 +3918,7 @@
       "declaring_class": "/Script/UMG.Widget",
       "alias": "ue_widget_GetCachedGeometry",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Widget",
@@ -4045,8 +4033,7 @@
       "declaring_class": "/Script/UMG.Widget",
       "alias": "ue_widget_GetPaintSpaceGeometry",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Widget",
@@ -4122,8 +4109,7 @@
       "declaring_class": "/Script/UMG.Widget",
       "alias": "ue_widget_GetTickSpaceGeometry",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Widget",
@@ -5294,8 +5280,7 @@
       "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
       "alias": "ue_ui_layout_GetPlayerScreenWidgetGeometry",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetLayoutLibrary",
@@ -5325,8 +5310,7 @@
       "declaring_class": "/Script/UMG.WidgetLayoutLibrary",
       "alias": "ue_ui_layout_GetViewportWidgetGeometry",
       "explicit_defaults": [],
-      "status": "generation_blocked",
-      "reason": "Opaque/empty structs need an adapter"
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.WidgetLayoutLibrary",
@@ -5490,11 +5474,11 @@
     }
   ],
   "preflight": {
-    "runtime_probe": "passed",
     "build_mode": "Editor NullRHI",
     "packaged": "not_run",
     "game_world": true,
     "compile": "passed",
-    "profile_sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa"
+    "profile_sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa",
+    "runtime_probe": "passed"
   }
 }

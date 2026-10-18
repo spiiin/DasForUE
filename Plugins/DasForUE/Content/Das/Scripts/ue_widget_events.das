@@ -1,6 +1,7 @@
 options gen2
 module ue_widget_events public
 require ue_input_events public
+require ue_geometry public
 
 // Replies can only be created/used inside a synchronous DasScriptUserWidget input handler.
 def ue_handled():UEEventReply { return __ue_widget_handled() }

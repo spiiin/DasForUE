@@ -6,6 +6,8 @@ require ue_foundation public
 struct UEName { value : string }
 def ue_name(value : string) : UEName { return UEName(value = value) }
 
+require ue_geometry public
+
 require ue_input_events public
 
 require ue_input_value public
@@ -5262,6 +5264,18 @@ def ue_ui_SetWindowTitleBarState(arg_titlebarcontent : C_Widget_f2421369; arg_mo
     ue_release_call(call)
 }
 
+def ue_ui_geometry_AbsoluteToLocal(arg_geometry : UEGeometry; arg_absolutecoordinate : UEVector2D) : UEVector2D {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "AbsoluteToLocal", "")
+    ue_expect_signature(call, "v1;AbsoluteToLocal;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    __ue_method_arg_vector2d(call, "absolutecoordinate", arg_absolutecoordinate)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
 struct ue_ui_geometry_AbsoluteToViewport_Result {
     out_pixelposition : UEVector2D
     out_viewportposition : UEVector2D
@@ -5368,6 +5382,104 @@ def ue_ui_geometry_EqualEqual_SlateBrush(arg_a : S_SlateBrush_e5037ad8; arg_b : 
     return result
 }
 
+def ue_ui_geometry_GetAbsoluteSize(arg_geometry : UEGeometry) : UEVector2D {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "GetAbsoluteSize", "")
+    ue_expect_signature(call, "v1;GetAbsoluteSize;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_geometry_GetLocalSize(arg_geometry : UEGeometry) : UEVector2D {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "GetLocalSize", "")
+    ue_expect_signature(call, "v1;GetLocalSize;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_geometry_GetLocalTopLeft(arg_geometry : UEGeometry) : UEVector2D {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "GetLocalTopLeft", "")
+    ue_expect_signature(call, "v1;GetLocalTopLeft;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_geometry_IsUnderLocation(arg_geometry : UEGeometry; arg_absolutecoordinate : UEVector2D) : bool {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "IsUnderLocation", "")
+    ue_expect_signature(call, "v1;IsUnderLocation;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteCoordinate:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    __ue_method_arg_vector2d(call, "absolutecoordinate", arg_absolutecoordinate)
+    ue_invoke_call(call)
+    let result = ue_result_bool(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_geometry_LocalToAbsolute(arg_geometry : UEGeometry; arg_localcoordinate : UEVector2D) : UEVector2D {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "LocalToAbsolute", "")
+    ue_expect_signature(call, "v1;LocalToAbsolute;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    __ue_method_arg_vector2d(call, "localcoordinate", arg_localcoordinate)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+struct ue_ui_geometry_LocalToViewport_Result {
+    out_pixelposition : UEVector2D
+    out_viewportposition : UEVector2D
+}
+
+def ue_ui_geometry_LocalToViewport(arg_geometry : UEGeometry; arg_localcoordinate : UEVector2D) : ue_ui_geometry_LocalToViewport_Result {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "LocalToViewport", "worldcontextobject")
+    ue_expect_signature(call, "v1;LocalToViewport;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};PixelPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ViewportPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    __ue_method_arg_vector2d(call, "localcoordinate", arg_localcoordinate)
+    ue_invoke_call(call)
+    let result = ue_ui_geometry_LocalToViewport_Result(out_pixelposition = __ue_method_result_vector2d(call, "pixelposition"), out_viewportposition = __ue_method_result_vector2d(call, "viewportposition"))
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_geometry_Scalar_AbsoluteToLocal(arg_geometry : UEGeometry; arg_absolutescalar : float) : float {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "Scalar_AbsoluteToLocal", "")
+    ue_expect_signature(call, "v1;Scalar_AbsoluteToLocal;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteScalar:FloatProperty:128;ReturnValue:FloatProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    ue_arg_float(call, "absolutescalar", arg_absolutescalar)
+    ue_invoke_call(call)
+    let result = ue_result_float(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_geometry_Scalar_LocalToAbsolute(arg_geometry : UEGeometry; arg_localscalar : float) : float {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "Scalar_LocalToAbsolute", "")
+    ue_expect_signature(call, "v1;Scalar_LocalToAbsolute;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalScalar:FloatProperty:128;ReturnValue:FloatProperty:1408;")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    ue_arg_float(call, "localscalar", arg_localscalar)
+    ue_invoke_call(call)
+    let result = ue_result_float(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
 def ue_ui_geometry_ScreenToViewport(arg_screenposition : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "ScreenToViewport", "worldcontextobject")
     ue_expect_signature(call, "v1;ScreenToViewport;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ScreenPosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ViewportPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5387,6 +5499,43 @@ def ue_ui_geometry_ScreenToWidgetAbsolute(arg_screenposition : UEVector2D; arg_b
     ue_arg_bool(call, "bincludewindowposition", arg_bincludewindowposition)
     ue_invoke_call(call)
     let result = __ue_method_result_vector2d(call, "absolutecoordinate")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_geometry_ScreenToWidgetLocal(arg_geometry : UEGeometry; arg_screenposition : UEVector2D; arg_bincludewindowposition : bool) : UEVector2D {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "ScreenToWidgetLocal", "worldcontextobject")
+    ue_expect_signature(call, "v1;ScreenToWidgetLocal;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ScreenPosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};LocalCoordinate:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bIncludeWindowPosition:BoolProperty:128;")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    __ue_method_arg_vector2d(call, "screenposition", arg_screenposition)
+    ue_arg_bool(call, "bincludewindowposition", arg_bincludewindowposition)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "localcoordinate")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_geometry_Vector_AbsoluteToLocal(arg_geometry : UEGeometry; arg_absolutevector : UEVector2D) : UEVector2D {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "Vector_AbsoluteToLocal", "")
+    ue_expect_signature(call, "v1;Vector_AbsoluteToLocal;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteVector:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    __ue_method_arg_vector2d(call, "absolutevector", arg_absolutevector)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_geometry_Vector_LocalToAbsolute(arg_geometry : UEGeometry; arg_localvector : UEVector2D) : UEVector2D {
+    let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "Vector_LocalToAbsolute", "")
+    ue_expect_signature(call, "v1;Vector_LocalToAbsolute;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalVector:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
+    ue_require_call_context(call, false)
+    __ue_arg_geometry(call, "geometry", arg_geometry)
+    __ue_method_arg_vector2d(call, "localvector", arg_localvector)
+    ue_invoke_call(call)
+    let result = __ue_method_result_vector2d(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -5439,6 +5588,17 @@ def ue_ui_layout_GetMousePositionScaledByDPI(arg_player : C_PlayerController_fb3
     return result
 }
 
+def ue_ui_layout_GetPlayerScreenWidgetGeometry(arg_playercontroller : C_PlayerController_fb3d8846) : UEGeometry {
+    let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetPlayerScreenWidgetGeometry", "")
+    ue_expect_signature(call, "v1;GetPlayerScreenWidgetGeometry;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;ReturnValue:StructProperty:1408:/Script/SlateCore.Geometry\{\};")
+    ue_require_call_context(call, false)
+    ue_arg_object(call, "playercontroller", C_PlayerController_fb3d8846_raw(arg_playercontroller))
+    ue_invoke_call(call)
+    let result = __ue_result_geometry(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
 def ue_ui_layout_GetViewportScale() : float {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetViewportScale", "worldcontextobject")
     ue_expect_signature(call, "v1;GetViewportScale;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:FloatProperty:1408;")
@@ -5455,6 +5615,16 @@ def ue_ui_layout_GetViewportSize() : UEVector2D {
     ue_require_call_context(call, false)
     ue_invoke_call(call)
     let result = __ue_method_result_vector2d(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_ui_layout_GetViewportWidgetGeometry() : UEGeometry {
+    let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetViewportWidgetGeometry", "worldcontextobject")
+    ue_expect_signature(call, "v1;GetViewportWidgetGeometry;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/SlateCore.Geometry\{\};")
+    ue_require_call_context(call, false)
+    ue_invoke_call(call)
+    let result = __ue_result_geometry(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -6244,6 +6414,17 @@ def ue_widget_GetAccessibleText(target : C_Widget_f2421369) : UETextValue {
     return result
 }
 
+def ue_widget_GetCachedGeometry(target : C_Widget_f2421369) : UEGeometry {
+    let receiver = ue_cast_object(C_Widget_f2421369_raw(target), "/Script/UMG.Widget")
+    let call = ue_begin_call(receiver, "GetCachedGeometry")
+    ue_expect_signature(call, "v1;GetCachedGeometry;ReturnValue:StructProperty:134219138:/Script/SlateCore.Geometry\{\};")
+    ue_require_call_context(call, false)
+    ue_invoke_call(call)
+    let result = __ue_result_geometry(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
 def ue_widget_GetClipping(target : C_Widget_f2421369) : E_EWidgetClipping_0ba8fd2d {
     let receiver = ue_cast_object(C_Widget_f2421369_raw(target), "/Script/UMG.Widget")
     let call = ue_begin_call(receiver, "GetClipping")
@@ -6310,6 +6491,17 @@ def ue_widget_GetOwningPlayer(target : C_Widget_f2421369) : C_PlayerController_f
     return result
 }
 
+def ue_widget_GetPaintSpaceGeometry(target : C_Widget_f2421369) : UEGeometry {
+    let receiver = ue_cast_object(C_Widget_f2421369_raw(target), "/Script/UMG.Widget")
+    let call = ue_begin_call(receiver, "GetPaintSpaceGeometry")
+    ue_expect_signature(call, "v1;GetPaintSpaceGeometry;ReturnValue:StructProperty:134219138:/Script/SlateCore.Geometry\{\};")
+    ue_require_call_context(call, false)
+    ue_invoke_call(call)
+    let result = __ue_result_geometry(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
 def ue_widget_GetParent(target : C_Widget_f2421369) : C_PanelWidget_7bd308a3 {
     let receiver = ue_cast_object(C_Widget_f2421369_raw(target), "/Script/UMG.Widget")
     let call = ue_begin_call(receiver, "GetParent")
@@ -6339,6 +6531,17 @@ def ue_widget_GetRenderTransformAngle(target : C_Widget_f2421369) : float {
     ue_require_call_context(call, false)
     ue_invoke_call(call)
     let result = ue_result_float(call, "returnvalue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_widget_GetTickSpaceGeometry(target : C_Widget_f2421369) : UEGeometry {
+    let receiver = ue_cast_object(C_Widget_f2421369_raw(target), "/Script/UMG.Widget")
+    let call = ue_begin_call(receiver, "GetTickSpaceGeometry")
+    ue_expect_signature(call, "v1;GetTickSpaceGeometry;ReturnValue:StructProperty:134219138:/Script/SlateCore.Geometry\{\};")
+    ue_require_call_context(call, false)
+    ue_invoke_call(call)
+    let result = __ue_result_geometry(call, "returnvalue")
     ue_release_call(call)
     return result
 }

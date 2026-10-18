@@ -77,6 +77,13 @@ namespace
             const FString Path = Type->GetPathName();
             Field->SetStringField(TEXT("kind"), TEXT("struct"));
             Field->SetStringField(TEXT("type_path"), Path);
+            if(DasIsGeometryType(Type)){
+                Field->SetStringField(TEXT("transport"),TEXT("slate_geometry_snapshot_v1"));
+                if(!Structs.Contains(Path)){
+                    auto Definition=MakeShared<FJsonObject>();Definition->SetStringField(TEXT("type_path"),Path);Definition->SetStringField(TEXT("cpp_type"),Type->GetStructCPPName());
+                    Definition->SetStringField(TEXT("transport"),TEXT("slate_geometry_snapshot_v1"));Definition->SetArrayField(TEXT("fields"),{});Structs.Add(Path,Definition);
+                }return Field;
+            }
             if(DasIsInputEventType(Type)){
                 Field->SetStringField(TEXT("transport"),TEXT("slate_input_event_snapshot_v1"));
                 if(!Structs.Contains(Path)){
@@ -271,6 +278,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
             auto Metadata=ExportMetadata(Function);
             if(ProfileAdapter){Metadata->SetStringField(TEXT("UnsafeDuringActorConstruction"),TEXT("true"));Item->SetStringField(TEXT("call_adapter"),TEXT("collision_profile_property_v1"));}
             Item->SetObjectField(TEXT("metadata"), Metadata);
+            if(DasGeometryFunctionAllowed(Function))Item->SetStringField(TEXT("call_adapter"),TEXT("slate_geometry_snapshot_v1"));
             if(DasInputEventFunctionAllowed(Function))Item->SetStringField(TEXT("call_adapter"),TEXT("slate_input_event_snapshot_v1"));
             Item->SetStringField(TEXT("declaring_class"), Function->GetOuterUClass()->GetPathName());
             if(bStatic){Item->SetBoolField(TEXT("static"),true);Item->SetStringField(TEXT("world_context"),WorldContext);}
@@ -288,6 +296,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
                 Field->SetStringField(TEXT("type_path"), Parameter.TypePath);
                 if(Parameter.Kind==EMarshallingKind::Struct && Parameter.TypePath==FConstraintInstanceAccessor::StaticStruct()->GetPathName())Field->SetStringField(TEXT("transport"),TEXT("constraint_component_v1"));
                 if(Parameter.Kind==EMarshallingKind::Struct && Parameter.TypePath==FHitResult::StaticStruct()->GetPathName())Field->SetStringField(TEXT("transport"),TEXT("hit_result_v1"));
+                if(Parameter.Kind==EMarshallingKind::Struct && DasIsGeometryType(FindObject<UScriptStruct>(nullptr,*Parameter.TypePath)))Field->SetStringField(TEXT("transport"),TEXT("slate_geometry_snapshot_v1"));
                 if(Parameter.Kind==EMarshallingKind::Struct && DasIsInputEventType(FindObject<UScriptStruct>(nullptr,*Parameter.TypePath)))Field->SetStringField(TEXT("transport"),TEXT("slate_input_event_snapshot_v1"));
                 if(Parameter.Kind==EMarshallingKind::Struct && Parameter.TypePath==FInputActionValue::StaticStruct()->GetPathName())Field->SetStringField(TEXT("transport"),TEXT("input_action_value_v1"));
                 if (Parameter.Kind == EMarshallingKind::Enum)

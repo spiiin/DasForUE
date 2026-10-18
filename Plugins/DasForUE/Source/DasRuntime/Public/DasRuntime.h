@@ -9,6 +9,7 @@
 
 class UDasScriptUserWidget;
 class FReply;
+struct FGeometry;
 struct FDasAuthoringModule;
 struct FDasSourceCatalog;
 
@@ -44,7 +45,9 @@ struct FDasReflectedTypes;
 class DASRUNTIME_API FDasRuntimeModule final : public IModuleInterface
 {
 public:
-    bool DispatchWidgetInput(const FString& Path,const FString& Entry,const UScriptStruct* Type,const void* Source,UDasScriptUserWidget* Widget,FReply& Out,FString& Error);
+    bool DispatchWidgetInput(const FString& Path,const FString& Entry,const FGeometry& Geometry,const UScriptStruct* Type,const void* Source,UDasScriptUserWidget* Widget,FReply& Out,FString& Error);
+    // Trusted native Geometry observer: owned value only, no reflection-storage exemption.
+    FDasExecutionResult DispatchGeometrySnapshot(const FString& Path,const FString& Entry,const FInstancedStruct& Value,TWeakObjectPtr<UObject> Self);
     // Trusted native observer entry: detached event values only, no Slate reply/routing.
     FDasExecutionResult DispatchInputEventSnapshots(const FString& Path,const FString& Entry,const TArray<FInstancedStruct>& Values,TWeakObjectPtr<UObject> Self);
 #if WITH_EDITOR

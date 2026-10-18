@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "implemented_owned_snapshot",
+  "transport_id": "slate_geometry_snapshot_v1",
+  "native_type": "/Script/SlateCore.Geometry",
+  "functions": [
+    "/Script/UMG.SlateBlueprintLibrary.AbsoluteToLocal",
+    "/Script/UMG.SlateBlueprintLibrary.GetAbsoluteSize",
+    "/Script/UMG.SlateBlueprintLibrary.GetLocalSize",
+    "/Script/UMG.SlateBlueprintLibrary.GetLocalTopLeft",
+    "/Script/UMG.SlateBlueprintLibrary.IsUnderLocation",
+    "/Script/UMG.SlateBlueprintLibrary.LocalToAbsolute",
+    "/Script/UMG.SlateBlueprintLibrary.LocalToViewport",
+    "/Script/UMG.SlateBlueprintLibrary.Scalar_AbsoluteToLocal",
+    "/Script/UMG.SlateBlueprintLibrary.Scalar_LocalToAbsolute",
+    "/Script/UMG.SlateBlueprintLibrary.ScreenToWidgetLocal",
+    "/Script/UMG.SlateBlueprintLibrary.Vector_AbsoluteToLocal",
+    "/Script/UMG.SlateBlueprintLibrary.Vector_LocalToAbsolute",
+    "/Script/UMG.Widget.GetCachedGeometry",
+    "/Script/UMG.Widget.GetPaintSpaceGeometry",
+    "/Script/UMG.Widget.GetTickSpaceGeometry",
+    "/Script/UMG.WidgetLayoutLibrary.GetPlayerScreenWidgetGeometry",
+    "/Script/UMG.WidgetLayoutLibrary.GetViewportWidgetGeometry"
+  ],
+  "ownership": "exact native value copy in context-owned rooted snapshot table; no widget, path, window or viewport pointers",
+  "default_handle": "invalid",
+  "singular_geometry": "finite singular values may be captured; inverse operations reject before dispatch",
+  "storage": "DAS globals/locals/arrays only; reflected storage/defaults and native containers remain closed",
+  "viewport": "game world; absent viewport follows native fallback; zero-sized active viewport rejected",
+  "validation": "finite float representable geometry and coordinates; inverse determinant and transform overflow checked; outputs revalidated",
+  "reload": "context scoped; old tokens cannot enter a new context"
+}

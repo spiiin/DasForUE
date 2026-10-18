@@ -13,7 +13,7 @@ $Contract=Get-Content "$Repo/Bindings/InputEvents.contract.json" -Raw|ConvertFro
 $Open=@($Report.members|Where-Object {$_.status -eq 'generation_ready'}|ForEach-Object {$_.class+'.'+$_.function})
 foreach($Name in $Contract.snapshot_function_allowlist){if($Name -notin $Open){throw "Contract function not opened: $Name"}}
 foreach($Name in $Contract.deferred_navigation_functions){if($Name -in $Open){throw "Navigation policy bypass: $Name"}}
-if($Report.counts.generation_ready -ne 366 -or $Report.counts.export_blocked -ne 114 -or $Report.counts.generation_blocked -ne 37){throw 'Unexpected UMG input-event coverage'}
+if($Report.counts.generation_ready -ne 383 -or $Report.counts.export_blocked -ne 114 -or $Report.counts.generation_blocked -ne 20){throw 'Unexpected UMG input-event coverage'}
 $Probe="$Stage/input-events.das";(Get-Content "$Repo/Tests/InputEvents/probe.template.das" -Raw).Replace('_MODULE_',$(if($Publish){'ue_api_umg_input'}else{$Report.staged_module}))|Set-Content $Probe -Encoding utf8
 $Log="$Stage/input-events.log"
 & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasInputEvents "-Script=$Probe" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Log" *> "$Stage/input-events-stdout.log"

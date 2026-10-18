@@ -30,7 +30,8 @@ int32 UDasWidgetEventsCommandlet::Main(const FString& Params)
  TStrongObjectPtr<UDasScriptUserWidget> Widget(NewObject<UDasScriptUserWidget>(World.Get()));
  Widget->ScriptFile=Script;Widget->SetIsFocusable(true);Widget->Initialize();
  TSharedPtr<SWidget> Slate=Widget->TakeWidget();
- const FGeometry Geometry=FGeometry::MakeRoot(FVector2D(100,50),FSlateLayoutTransform());
+ const bool GeometryProbe=FParse::Param(*Params,TEXT("Geometry"));
+ FGeometry Geometry=FGeometry::MakeRoot(FVector2D(100,50),GeometryProbe?FSlateLayoutTransform(2.f,FVector2D(10,20)):FSlateLayoutTransform());
  const FKeyEvent Key(EKeys::SpaceBar,FModifierKeysState(),0,false,32,32);
  Check(!Slate->OnKeyDown(Geometry,Key).IsEventHandled(),TEXT("missing_handler_uses_native_parent"));
  Check(!Widget->BindInputHandler(TEXT("InventedEvent"),TEXT("key_down")),TEXT("unknown_event_binding_rejected"));
@@ -38,9 +39,20 @@ int32 UDasWidgetEventsCommandlet::Main(const FString& Params)
  const auto KeyReply=Slate->OnKeyDown(Geometry,Key);
  if(!Widget->LastInputError.IsEmpty())UE_LOG(LogTemp,Display,TEXT("Widget issue: %s"),*Widget->LastInputError);
  Check(KeyReply.IsEventHandled() && KeyReply.ShouldSetUserFocus() && KeyReply.GetUserFocusRecepient()==Slate,TEXT("key_reply_returns_synchronously_to_slate"));
+ if(GeometryProbe)Geometry=FGeometry::MakeRoot(FVector2D(7,9),FSlateLayoutTransform(3.f,FVector2D(200,300)));
  CollectGarbage(RF_NoFlags);
  const auto Read=Runtime.RunNamedPersistent(Runtime.ScriptPath(Script),TEXT("read_saved"),0,Widget.Get());
  Check(Read.bSucceeded && Read.Value==1,TEXT("typed_event_snapshot_survives_callback_and_gc"));
+ if(GeometryProbe){
+  Check(Read.bSucceeded && Read.Value==1,TEXT("geometry_snapshot_clone_survives_native_change_callback_and_gc"));
+  Widget->BindInputHandler(TEXT("OnKeyDown"),TEXT("inspect_geometry"));
+  Check(Slate->OnKeyDown(Geometry,Key).IsEventHandled() && Widget->LastInputError.IsEmpty(),TEXT("new_callback_geometry_is_independent_of_saved_revision"));
+  for(const FName Handler:{FName(TEXT("old_signature")),FName(TEXT("wrong_geometry"))}){
+   Widget->BindInputHandler(TEXT("OnKeyDown"),Handler);
+   Check(!Slate->OnKeyDown(Geometry,Key).IsEventHandled() && Widget->LastInputError.Contains(TEXT("Expected exported")),TEXT("geometry_callback_requires_exact_two_parameter_signature"));
+  }
+  Geometry=FGeometry::MakeRoot(FVector2D(100,50),FSlateLayoutTransform(2.f,FVector2D(10,20)));
+ }
  Widget->BindInputHandler(TEXT("OnKeyUp"),TEXT("key_up"));
  Check(!Slate->OnKeyUp(Geometry,Key).IsEventHandled() && Widget->LastInputError.IsEmpty(),TEXT("explicit_unhandled_reply"));
  Widget->BindInputHandler(TEXT("OnKeyChar"),TEXT("character"));

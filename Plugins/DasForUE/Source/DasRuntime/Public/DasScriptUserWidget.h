@@ -37,5 +37,5 @@ protected:
  virtual FReply NativeOnTouchFirstMove(const FGeometry& Geometry,const FPointerEvent& Event) override;
 private:
  FString ActiveScript;
- bool DispatchInput(FName EventName,const UScriptStruct* Type,const void* Source,FReply& Reply);
+ bool DispatchInput(FName EventName,const FGeometry& Geometry,const UScriptStruct* Type,const void* Source,FReply& Reply);
 };

@@ -782,3 +782,35 @@ PASS: 17 проверок, чистый exit 0, без Error/ensure, source/DLL/
 Полные PIE/packaged и physical input не запускались. Изменения без коммита.
 Docs/WidgetInputHandlers.md; Scripts/TestWidgetEvents.ps1;
 logs/widget-events-validation.json; Tests/WidgetEvents/probe.das.
+
+### Owned Geometry transport — 2026-10-18
+
+`UEGeometry` хранит точную native-копию FGeometry в общей VM snapshot-таблице,
+без widget/window/path pointers. Открыты 17 ordinary UMG functions: координаты,
+векторы, scalar conversion, размеры, hit-test, Widget/viewport/player getters.
+Finite/overflow/inverse, scalar allowlist, call-frame direction и gameplay role
+проверяются до dispatch; outputs проверяются перед публикацией.
+UMG: 383 ready (+17), 114 export blocked, 20 generation blocked. Остались
+EventReply 11, PaintContext 5, WidgetAnimationHandle 4 и прежние scoped отказы.
+Editor build, 25 native/runtime проверок, 3 token compile-time отказа,
+8 Geometry generator tests — PASS. Связанные проверки: 38 input runtime,
+9 input generator, 97 shared generator и 16 audit tests — PASS.
+Подтверждены globals/arrays/clone/GC, widget release и hot reload; native
+viewport branches проверены в headless fallback, видимое окно не проверялось.
+Целевой окончательный прогон имеет стабильные DLL hashes/BuildId, без
+Error/ensure; предыдущий прогон отклонён из-за параллельного изменения DLL.
+Полные Foundation/PIE/packaged не запускались. Без коммита.
+Docs/Geometry.md; Scripts/TestGeometry.ps1; logs/geometry-validation.json.
+
+### Geometry в синхронных UserWidget handlers — 2026-10-18
+
+Все 17 NativeOn-входов передают owned Geometry первым параметром и typed input
+event вторым. Exact verifier требует `(UEGeometry, event):UEEventReply`;
+прежняя одноаргументная форма отклоняется. Используются готовые CaptureDasGeometry
+и общий rooted snapshot transport, без повторного чтения cached geometry.
+Обновлены WidgetEvents/EventReply fixtures и примеры. Общая Editor-сборка — PASS;
+один короткий SObjectWidget runtime-сценарий — PASS, 21 проверка, exit 0.
+Проверены local/absolute, pointer coordinates, clone/array/GC и сохранность после
+замены native Geometry, независимость callback revisions и неверные сигнатуры.
+Source/DLL/BuildId стабильны; без Error/ensure. PIE/packaged не запускались.
+Без коммита. Docs/WidgetInputHandlers.md; logs/widget-events-validation.json.

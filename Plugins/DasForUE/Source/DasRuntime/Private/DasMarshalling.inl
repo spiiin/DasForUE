@@ -109,6 +109,11 @@
         else if (FieldKind(Property, Context) == EMarshallingKind::Struct)
         {
             UScriptStruct* Type = CastFieldChecked<FStructProperty>(Property)->Struct;
+            if(DasIsGeometryType(Type)){
+                auto* Function=Cast<UFunction>(Property->GetOwnerStruct());
+                if(Depth!=0 || Property->ArrayDim!=1 || !Property->HasAnyPropertyFlags(CPF_Parm) || !DasGeometryFunctionAllowed(Function))Context->throw_error("Geometry requires exact scalar snapshot function allowlist");
+                Signature.Add({Path.ToLower(),EMarshallingKind::Struct,bInput,bOutput,Type->GetPathName()});return;
+            }
             if(DasIsInputEventType(Type)){
                 auto* Function=Cast<UFunction>(Property->GetOwnerStruct());
                 if(Depth!=0 || Property->ArrayDim!=1 || !Property->HasAnyPropertyFlags(CPF_Parm) || !DasInputEventFunctionAllowed(Function))Context->throw_error("input events require exact scalar snapshot function allowlist; navigation/reply need live adapters");
@@ -659,6 +664,7 @@
         SetCallConstructionPolicy(Call,Context,true);
         ValidateConstraintCallInputs(Call,Context);
         ValidateInputEventCallInputs(Call,Context);
+        ValidateGeometryCall(Call,Context,false);
         CommitPendingHashes(Call, Context);
         for (const auto& Pin : Call.ObjectPins)
             if (UObject* Argument = Pin.Value.Get(); Argument && (!IsValid(Argument) || (Cast<AActor>(Argument) && CastChecked<AActor>(Argument)->IsActorBeingDestroyed())))
@@ -675,6 +681,7 @@
             if(Call.DelegateInvoke)Call.DelegateInvoke(Call.Frame->GetStructMemory());else Object->ProcessEvent(Call.Function.Get(),Call.Frame->GetStructMemory());
         }else if(!DispatchCollisionProfileProperty(Call,Context))Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
         if(!DispatchFailure.IsEmpty())Context->throw_error(TCHAR_TO_UTF8(*DispatchFailure));
+        ValidateGeometryCall(Call,Context,true);
         CaptureConstraintCallOutput(Call,Context);
         int32 OutputTraversalBudget=1048576;
         for (const auto& Parameter : Call.Signature)

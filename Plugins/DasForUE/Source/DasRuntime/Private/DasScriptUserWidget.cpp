@@ -17,7 +17,7 @@ bool UDasScriptUserWidget::BindInputHandler(FName Event,FName Handler)
  if(Handler.IsNone())InputHandlers.Remove(Event);else InputHandlers.Add(Event,Handler);
  return true;
 }
-bool UDasScriptUserWidget::DispatchInput(FName EventName,const UScriptStruct* Type,const void* Source,FReply& Reply)
+bool UDasScriptUserWidget::DispatchInput(FName EventName,const FGeometry& Geometry,const UScriptStruct* Type,const void* Source,FReply& Reply)
 {
  auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"));
  if(IsInGameThread() && Runtime && ActiveScript!=ScriptFile){Runtime->ReleaseObject(this);ActiveScript=ScriptFile;}
@@ -27,7 +27,7 @@ bool UDasScriptUserWidget::DispatchInput(FName EventName,const UScriptStruct* Ty
  if(!IsInGameThread() || !Runtime || IsTemplate() || !World || !World->IsGameWorld() || World->bIsTearingDown || ScriptFile!=FPaths::GetCleanFilename(ScriptFile) || FPaths::GetExtension(ScriptFile)!=TEXT("das")){
   LastInputError=TEXT("Widget input requires a live game-world widget and a script filename");return false;
  }
- return Runtime->DispatchWidgetInput(Runtime->ScriptPath(ScriptFile),Handler->ToString(),Type,Source,this,Reply,LastInputError);
+ return Runtime->DispatchWidgetInput(Runtime->ScriptPath(ScriptFile),Handler->ToString(),Geometry,Type,Source,this,Reply,LastInputError);
 }
 void UDasScriptUserWidget::NativeDestruct()
 {
@@ -37,7 +37,7 @@ void UDasScriptUserWidget::NativeDestruct()
 }
 #define DAS_WIDGET_INPUT(Name,Type) \
  FReply UDasScriptUserWidget::Native##Name(const FGeometry& Geometry,const Type& Event){ \
-  FReply Reply=FReply::Unhandled();if(DispatchInput(TEXT(#Name),Type::StaticStruct(),&Event,Reply))return Reply; \
+  FReply Reply=FReply::Unhandled();if(DispatchInput(TEXT(#Name),Geometry,Type::StaticStruct(),&Event,Reply))return Reply; \
   return Super::Native##Name(Geometry,Event); \
  }
 DAS_WIDGET_INPUT(OnKeyChar,FCharacterEvent)

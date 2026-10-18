@@ -54,6 +54,8 @@
 #include "InputAction.h"
 #include "InputActionValue.h"
 #include "DasInputEvents.h"
+#include "DasGeometry.h"
+#include "Layout/Geometry.h"
 #include "DasScriptUserWidget.h"
 #include "Input/Reply.h"
 #include "Input/Events.h"
@@ -206,6 +208,9 @@ namespace das{template<>struct cast<FDasStructValue>{static vec4f from(FDasStruc
 // Owned numeric snapshot, not the unreflected native layout and not a context token.
 struct FDasEventReplyValue { uint64 Token=0; };
 MAKE_TYPE_FACTORY(UEEventReply,FDasEventReplyValue);
+struct FDasGeometryValue { uint64 Token=0; };
+MAKE_TYPE_FACTORY(UEGeometry,FDasGeometryValue);
+namespace das{template<>struct cast<FDasGeometryValue>{static vec4f from(FDasGeometryValue V){return cast<uint64_t>::from(V.Token);}static FDasGeometryValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
 struct FDasInputEventValue { uint64 Token=0; };
 MAKE_TYPE_FACTORY(UEInputEvent,FDasInputEventValue);
 namespace das{template<>struct cast<FDasInputEventValue>{static vec4f from(FDasInputEventValue V){return cast<uint64_t>::from(V.Token);}static FDasInputEventValue to(vec4f V){return {cast<uint64_t>::to(V)};}};}
@@ -586,7 +591,7 @@ namespace
     struct FStructRootWalker:das::DataWalker {
         TSet<uint64> Tokens,DelegateTokens;bool Complete=true;
         virtual void beforeStructureField(char*,das::StructInfo*,char* Data,das::VarInfo* Info,bool)override{if(Info && Info->name && das::string(Info->name)=="__delegate_token" && Info->type==das::Type::tUInt64)DelegateTokens.Add(*reinterpret_cast<uint64*>(Data));}
-        virtual bool canVisitHandle(char* Data,das::TypeInfo* Info) override {auto* A=Info->getAnnotation();if(A && (A->name=="UEStructValue" || A->name=="UEHitResult" || A->name=="UEConstraintHandle" || A->name=="UEInputEvent" || A->name=="UEKeyEvent" || A->name=="UEAnalogInputEvent" || A->name=="UECharacterEvent" || A->name=="UEPointerEvent" || A->name=="UENavigationEvent"))Tokens.Add(*reinterpret_cast<const uint64*>(Data));return false;}
+        virtual bool canVisitHandle(char* Data,das::TypeInfo* Info) override {auto* A=Info->getAnnotation();if(A && (A->name=="UEGeometry" || A->name=="UEStructValue" || A->name=="UEHitResult" || A->name=="UEConstraintHandle" || A->name=="UEInputEvent" || A->name=="UEKeyEvent" || A->name=="UEAnalogInputEvent" || A->name=="UECharacterEvent" || A->name=="UEPointerEvent" || A->name=="UENavigationEvent"))Tokens.Add(*reinterpret_cast<const uint64*>(Data));return false;}
     };
     bool CollectStructValues(FUnrealDasContext& C,const das::LineInfo* At,bool Boundary=false)
     {
@@ -620,8 +625,9 @@ namespace
     // Borrowed snapshots copy only on insertion. Owned temporaries transfer their
     // buffer after validation/deduplication; all routes share one token counter.
     uint64 NextStructValueToken=1;
+    FDasStructValue StoreGeometry(const UScriptStruct*,const void*,das::Context*,das::LineInfoArg*);
     FDasStructValue StoreInputEvent(const UScriptStruct*,const void*,das::Context*,das::LineInfoArg*);
-    FDasStructValue StoreStructValueImpl(const FInstancedStruct& V,FInstancedStruct* Owned,das::Context* C,das::LineInfoArg* At){if(C!=ActiveContext || !ActiveContext)C->throw_error("struct requires active context");if(DasIsInputEventType(V.GetScriptStruct()))return StoreInputEvent(V.GetScriptStruct(),V.GetMemory(),C,At);FString Error;if(!ValidateDasStructSnapshot(V,Error))C->throw_error(TCHAR_TO_UTF8(*Error));if(!MathSnapshotValid(V))C->throw_error("invalid math snapshot value");for(const auto& P:ActiveContext->StructValues)if(IdenticalDasStructSnapshot(P.Value,V))return {P.Key};if(At && ActiveContext->StructValues.Num()>=ActiveContext->StructNextCollection)CollectStructValues(*ActiveContext,At);if(ActiveContext->StructValues.Num()>=4096)C->throw_error("struct value table limit exceeded");uint64 Token=NextStructValueToken++;if(Owned)ActiveContext->StructValues.Add(Token,MoveTemp(*Owned));else ActiveContext->StructValues.Add(Token,V);return {Token};}
+    FDasStructValue StoreStructValueImpl(const FInstancedStruct& V,FInstancedStruct* Owned,das::Context* C,das::LineInfoArg* At){if(C!=ActiveContext || !ActiveContext)C->throw_error("struct requires active context");if(DasIsGeometryType(V.GetScriptStruct()))return StoreGeometry(V.GetScriptStruct(),V.GetMemory(),C,At);if(DasIsInputEventType(V.GetScriptStruct()))return StoreInputEvent(V.GetScriptStruct(),V.GetMemory(),C,At);FString Error;if(!ValidateDasStructSnapshot(V,Error))C->throw_error(TCHAR_TO_UTF8(*Error));if(!MathSnapshotValid(V))C->throw_error("invalid math snapshot value");for(const auto& P:ActiveContext->StructValues)if(IdenticalDasStructSnapshot(P.Value,V))return {P.Key};if(At && ActiveContext->StructValues.Num()>=ActiveContext->StructNextCollection)CollectStructValues(*ActiveContext,At);if(ActiveContext->StructValues.Num()>=4096)C->throw_error("struct value table limit exceeded");uint64 Token=NextStructValueToken++;if(Owned)ActiveContext->StructValues.Add(Token,MoveTemp(*Owned));else ActiveContext->StructValues.Add(Token,V);return {Token};}
     FDasStructValue StoreStructValue(const FInstancedStruct& V,das::Context* C,das::LineInfoArg* At=nullptr){return StoreStructValueImpl(V,nullptr,C,At);}
     FDasStructValue StoreStructValue(FInstancedStruct&& V,das::Context* C,das::LineInfoArg* At=nullptr){return StoreStructValueImpl(V,&V,C,At);}
     const FInstancedStruct& ResolveStructValue(FDasStructValue V,das::Context* C){if(C!=ActiveContext || !ActiveContext)C->throw_error("struct requires active context");if(const auto* Edit=ActiveContext->StructEdits.Find(V.Token)){if((*Edit)->Poisoned)C->throw_error("snapshot edit was invalidated by a failed write");return (*Edit)->Value;}const auto* S=ActiveContext->StructValues.Find(V.Token);if(!S)C->throw_error("struct is null or belongs to another context");return *S;}
@@ -880,6 +886,7 @@ namespace
     void PublishFrameTransform(int32 I,const FTransform& X,das::Context* C){FDasScalarValue V;V.Kind=11;V.TransformValue=X;PublishFrameValue(I,MoveTemp(V),C);}
     FDelegateHandle RuntimePreExitHandle;
     thread_local bool InputSnapshotDispatch=false;
+    thread_local bool GeometrySnapshotDispatch=false;
     struct FWidgetReplyScope {
         das::Context* Context=nullptr;
         TWeakObjectPtr<UDasScriptUserWidget> Widget;
@@ -904,7 +911,7 @@ namespace
         const FTCHARToUTF8 N(*Entry);auto* F=Program->getThisModule()->findUniqueFunction(N.Get());
         if(WidgetReplyContract && C.ReturnKind==EDasMethodSignature::Struct && C.ReturnClass==TEXT("/Script/UMG.EventReply")){
             auto Handle=[](const das::TypeDeclPtr& T,const char* Name){return Name && T && !T->ref && T->baseType==das::Type::tHandle && T->annotation && T->annotation->name==Name;};
-            return F && F->exports && C.InputDirections.IsEmpty() && C.Inputs.Num()==1 && C.Inputs[0]==EDasMethodSignature::Struct && C.InputClasses.Num()==1 && F->arguments.size()==1 && Handle(F->result,"UEEventReply") && Handle(F->arguments[0]->type,WidgetEventHandleName(C.InputClasses[0]));
+            return F && F->exports && C.InputDirections.IsEmpty() && C.Inputs.Num()==2 && C.Inputs[0]==EDasMethodSignature::Struct && C.Inputs[1]==EDasMethodSignature::Struct && C.InputClasses.Num()==2 && C.InputClasses[0]==TEXT("/Script/SlateCore.Geometry") && F->arguments.size()==2 && Handle(F->result,"UEEventReply") && Handle(F->arguments[0]->type,"UEGeometry") && Handle(F->arguments[1]->type,WidgetEventHandleName(C.InputClasses[1]));
         }
         if(AllowNativeInputValue && F && F->exports && C.ReturnKind==EDasMethodSignature::Void && C.Inputs.Num()==1 && C.Inputs[0]==EDasMethodSignature::Struct && C.InputClasses.Num()==1 && C.InputClasses[0]==TEXT("/Script/EnhancedInput.InputActionValue") && C.InputDirections.IsEmpty() && F->arguments.size()==1 && F->result && !F->result->ref && F->result->baseType==das::Type::tVoid){
             const auto& T=F->arguments[0]->type;if(T && !T->ref && T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="InputActionValue")return true;
@@ -919,6 +926,7 @@ namespace
         {bool Found=false,Valid=true;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St){for(auto* A:St->annotations)if(A->annotation->name=="ue_class" || A->annotation->name=="ue_library"){auto* Wire=A->arguments.find("_ue_model_json",das::Type::tString);FDasAuthoringModule M;FString Error;if(!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire->sValue.c_str()),M,Error)){Valid=false;continue;}for(const auto& Cl:M.Classes)for(const auto& Method:Cl.Methods)if(Method.EntryPoint==Entry){FDasClassSchema Schema;if(!M.ToActorSchema(Cl.Id,Schema,Error)){Valid=false;continue;}for(const auto& S:Schema.Methods)if(S.EntryPoint==Entry){Found=true;Valid &= S.Contract()==C;}}}});if(!Valid)return false;if(!Found){if(InputSnapshotDispatch && (C.ReturnKind==EDasMethodSignature::Int || C.ReturnKind==EDasMethodSignature::Void) && C.InputDirections.IsEmpty() && !C.Inputs.IsEmpty() && C.Inputs.Num()==C.InputClasses.Num()){
                 bool Safe=true;for(int32 I=0;I<C.Inputs.Num();++I)Safe &= C.Inputs[I]==EDasMethodSignature::Struct && DasIsInputEventType(FindObject<UScriptStruct>(nullptr,*C.InputClasses[I]));if(Safe)return true;
             }
+            if(GeometrySnapshotDispatch && C.ReturnKind==EDasMethodSignature::Int && C.InputDirections.IsEmpty() && C.Inputs.Num()==1 && C.Inputs[0]==EDasMethodSignature::Struct && C.InputClasses.Num()==1 && DasIsGeometryType(FindObject<UScriptStruct>(nullptr,*C.InputClasses[0])))return true;
             if(!C.InputDirections.IsEmpty())return false;if(C.ReturnKind==EDasMethodSignature::Class || C.ReturnKind==EDasMethodSignature::Delegate || C.ReturnKind==EDasMethodSignature::Struct || C.ReturnKind==EDasMethodSignature::Enum)return false;for(auto K:C.Inputs)if(K==EDasMethodSignature::Class || K==EDasMethodSignature::Delegate || K==EDasMethodSignature::Struct || K==EDasMethodSignature::Enum)return false;if(C.ReturnKind==EDasMethodSignature::Object && C.ReturnClass!=TEXT("/Script/CoreUObject.Object"))return false;for(int32 I=0;I<C.Inputs.Num();++I)if(C.Inputs[I]==EDasMethodSignature::Object && (!C.InputClasses.IsValidIndex(I) || C.InputClasses[I]!=TEXT("/Script/CoreUObject.Object")))return false;}}
         return true;
     }
@@ -1255,6 +1263,7 @@ void AuthoredSetobject(const FDasObjectHandle& H,const char* Id,const char* Name
     }
 
     void ValidateConstraintCallInputs(FMarshalledCall&,das::Context*);
+    void ValidateGeometryCall(FMarshalledCall&,das::Context*,bool);
     void ValidateInputEventCallInputs(FMarshalledCall&,das::Context*);
     void CaptureConstraintCallOutput(FMarshalledCall&,das::Context*);
     #include "DasMarshalling.inl"
@@ -1813,6 +1822,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     #include "DasGameplayServices.inl"
     #include "DasInputActionValue.inl"
     #include "DasInputEventsRuntime.inl"
+    #include "DasGeometryRuntime.inl"
     #include "DasWidgetEventsRuntime.inl"
     #include "DasHitResultTransport.inl"
     #include "DasConstraintTransport.inl"
@@ -1863,6 +1873,10 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             addAnnotation(new FObjectHandleAnnotation(Library));addAnnotation(new FClassHandleAnnotation(Library));
             addAnnotation(new FTraceHitAnnotation(Library));
             addAnnotation(new FCallHandleAnnotation(Library));
+            addAnnotation(new TInputEventAnnotation<FDasGeometryValue>("UEGeometry",Library,"FDasGeometryValue"));
+            AddUEExtern<DAS_BIND_FUN(ArgumentGeometry)>(*this,Library,"__ue_arg_geometry",das::SideEffects::modifyExternal);
+            AddUEExtern<DAS_BIND_FUN(ResultGeometry),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_result_geometry",das::SideEffects::modifyExternal)->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(GeometryFromStruct),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_unpack_geometry",das::SideEffects::accessExternal);
             addAnnotation(new TInputEventAnnotation<FDasEventReplyValue>("UEEventReply",Library,"FDasEventReplyValue"));
             AddUEExtern<DAS_BIND_FUN(WidgetHandled),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_handled",das::SideEffects::modifyExternal);
             AddUEExtern<DAS_BIND_FUN(WidgetUnhandled),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_unhandled",das::SideEffects::modifyExternal);
@@ -2584,7 +2598,7 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
         TWeakObjectPtr<UWorld> World;
         FString Path;
         FSourceSet AttemptedSources;
-        TMap<FString,FDasCallContract> RequiredEntries;TSet<FString> NativeInputEntries,InputSnapshotEntries,WidgetReplyEntries;
+        TMap<FString,FDasCallContract> RequiredEntries;TSet<FString> NativeInputEntries,GeometrySnapshotEntries,InputSnapshotEntries,WidgetReplyEntries;
         FString ApprovedDSLDeclaration;
         bool bDefaultsUpdateApproved=false;FString AttemptedEntry;FDasCallContract AttemptedContract;
         TUniquePtr<FCompiledContext> Live;
@@ -3213,15 +3227,23 @@ int32 FDasRuntimeModule::PersistentContextCount(const UWorld* World) const
     return Count;
 }
 
-bool FDasRuntimeModule::DispatchWidgetInput(const FString& Path,const FString& Entry,const UScriptStruct* Type,const void* Source,UDasScriptUserWidget* Widget,FReply& Out,FString& Error){
+bool FDasRuntimeModule::DispatchWidgetInput(const FString& Path,const FString& Entry,const FGeometry& Geometry,const UScriptStruct* Type,const void* Source,UDasScriptUserWidget* Widget,FReply& Out,FString& Error){
  if(!IsInGameThread() || !bInitialized || ActiveContext || ActiveWidgetReply || !IsValid(Widget) || Widget->IsTemplate() || !Widget->GetWorld() || !Widget->GetWorld()->IsGameWorld() || Widget->GetWorld()->bIsTearingDown || !Type || !WidgetEventHandleName(Type->GetPathName())){Error=TEXT("Synchronous widget input requires an idle game-thread runtime and supported live widget event");return false;}
+ FInstancedStruct OwnedGeometry;if(!CaptureDasGeometry(FGeometry::StaticStruct(),&Geometry,OwnedGeometry,Error))return false;
+ FDasScalarValue GeometryArg;GeometryArg.Kind=12;GeometryArg.ObjectClass=FGeometry::StaticStruct()->GetPathName();GeometryArg.StructValue=MoveTemp(OwnedGeometry);
  FInstancedStruct Snapshot;if(!CaptureDasInputEvent(Type,Source,Snapshot,Error))return false;
  FDasScalarValue Arg;Arg.Kind=12;Arg.ObjectClass=Type->GetPathName();Arg.StructValue=MoveTemp(Snapshot);
  FWidgetReplyScope Scope;Scope.Widget=Widget;
  TGuardValue<FWidgetReplyScope*> ReplyScope(ActiveWidgetReply,&Scope);TGuardValue<bool> ContractScope(WidgetReplyContract,true);
- const auto Result=RunNamedFramePersistent(Path,Entry,{Arg},EDasMethodSignature::Struct,Widget,TEXT("/Script/UMG.EventReply"));
+ const auto Result=RunNamedFramePersistent(Path,Entry,{GeometryArg,Arg},EDasMethodSignature::Struct,Widget,TEXT("/Script/UMG.EventReply"));
  if(!Result.bSucceeded || !Scope.Produced){Error=Result.Error.IsEmpty()?TEXT("Widget handler did not produce an EventReply"):Result.Error;return false;}
  Out=Scope.Result;Error.Empty();return true;
+}
+
+FDasExecutionResult FDasRuntimeModule::DispatchGeometrySnapshot(const FString& Path,const FString& Entry,const FInstancedStruct& Value,TWeakObjectPtr<UObject> Self){
+ FDasExecutionResult R;FString E;if(!ValidateDasGeometrySnapshot(Value,E)){R.Error=E;return R;}
+ FDasScalarValue A;A.Kind=12;A.ObjectClass=Value.GetScriptStruct()->GetPathName();A.StructValue=Value;
+ TGuardValue<bool> Scope(GeometrySnapshotDispatch,true);return RunNamedFramePersistent(Path,Entry,{A},EDasMethodSignature::Int,Self);
 }
 
 FDasExecutionResult FDasRuntimeModule::DispatchInputEventSnapshots(const FString& Path,const FString& Entry,const TArray<FInstancedStruct>& Values,TWeakObjectPtr<UObject> Self){
@@ -3332,7 +3354,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     if(Frame){bool Objects=false;for(const auto& V:*Frame)Objects |= V.Kind==15 || V.Kind==8 || V.Kind==12 || V.Kind==13 || V.Kind==16;
         if(Objects)for(const auto& V:*Frame){const FString PathClass=(V.Kind==12 || V.Kind==13 || V.Kind==15 || V.Kind==16)?V.ObjectClass:V.Kind==8?(V.ObjectClass.IsEmpty()?TEXT("/Script/CoreUObject.Object"):V.ObjectClass):FString();Expected.InputClasses.Add(PathClass);if(V.Kind==15){if(!FrameClassMatches(V.ClassValue.Get(),PathClass)){Result.Error=TEXT("Class argument has wrong base or is obsolete");return Result;}if(V.ClassValue)ObjectPins.Emplace(V.ClassValue.Get());}if(V.Kind==8){UClass* Class=FindObject<UClass>(nullptr,*PathClass);UObject* Object=V.ObjectValue.Get();if(!Class || (Object && (!IsValid(Object) || !DasReferenceMatches(Object,Class) || (Object->IsA<AActor>() && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))){Result.Error=TEXT("Object argument is expired or has wrong class");return Result;}if(Object)ObjectPins.Emplace(Object);}}
     }
-    if(Frame)for(const auto& V:*Frame)if(V.Kind==12){FString E;if(!V.StructValue.IsValid() || V.StructValue.GetScriptStruct()->GetPathName()!=V.ObjectClass || !(DasIsInputEventType(V.StructValue.GetScriptStruct())?ValidateDasInputEventSnapshot(V.StructValue,E):ValidateDasStructSnapshot(V.StructValue,E))){Result.Error=TEXT("Invalid reflected struct input: ")+E;return Result;}}
+    if(Frame)for(const auto& V:*Frame)if(V.Kind==12){FString E;if(!V.StructValue.IsValid() || V.StructValue.GetScriptStruct()->GetPathName()!=V.ObjectClass || !(DasIsGeometryType(V.StructValue.GetScriptStruct())?ValidateDasGeometrySnapshot(V.StructValue,E):DasIsInputEventType(V.StructValue.GetScriptStruct())?ValidateDasInputEventSnapshot(V.StructValue,E):ValidateDasStructSnapshot(V.StructValue,E))){Result.Error=TEXT("Invalid reflected struct input: ")+E;return Result;}}
     if(Signature==EDasMethodSignature::Delegate){Expected.ReturnClass=ReturnClass;FString E;TStrongObjectPtr<UFunction> Sig(MakeDasSingleDelegateSignature(ReturnClass,E));if(!Sig){Result.Error=E;return Result;}}
     if(Signature==EDasMethodSignature::Enum){Expected.ReturnClass=ReturnClass;FString E;if(!ResolveDasEnum(ReturnClass,E)){Result.Error=E;return Result;}}
     if(Frame)for(const auto& V:*Frame)if(V.Kind==13){FString E;if(!ValidateDasEnumNumber(V.ObjectClass,V.IntValue,E)){Result.Error=E;return Result;}}
@@ -3442,6 +3464,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     if (CandidateError.IsEmpty())
                         for (const auto& Required:Session->RequiredEntries)
                         {
+                            TGuardValue<bool> GeometryContractScope(GeometrySnapshotDispatch,GeometrySnapshotDispatch || Session->GeometrySnapshotEntries.Contains(Required.Key));
                             TGuardValue<bool> SnapshotContractScope(InputSnapshotDispatch,InputSnapshotDispatch || Session->InputSnapshotEntries.Contains(Required.Key));
                             TGuardValue<bool> ReplyContractScope(WidgetReplyContract,WidgetReplyContract || Session->WidgetReplyEntries.Contains(Required.Key));
                             const FTCHARToUTF8 RequiredUtf8(*Required.Key);
@@ -3569,7 +3592,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             Function=Context.findFunction(EntryUtf8.Get());
             if (!Function || !VerifyContract(Session->Live->Program,EntryPoint,Expected))
             { Result.Error=TEXT("Expected exported ")+EntryPoint+TEXT(" with requested scalar signature.");return Result; }
-            Session->RequiredEntries.Add(EntryPoint,Expected);if(InputSnapshotDispatch)Session->InputSnapshotEntries.Add(EntryPoint);if(WidgetReplyEntry)Session->WidgetReplyEntries.Add(EntryPoint);
+            Session->RequiredEntries.Add(EntryPoint,Expected);if(GeometrySnapshotDispatch)Session->GeometrySnapshotEntries.Add(EntryPoint);if(InputSnapshotDispatch)Session->InputSnapshotEntries.Add(EntryPoint);if(WidgetReplyEntry)Session->WidgetReplyEntries.Add(EntryPoint);
         }
         else if (Event == EDasCallback::Tick) Function = Session->Live->Tick;
         else if (Event == EDasCallback::EndPlay)
