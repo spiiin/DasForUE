@@ -4026,3 +4026,19 @@ Engine errors/ensure нет, DLL/source/module hashes стабильны. Мет
 Docs/NavigationQueries.md; runner Scripts/TestNavigationQueries.ps1;
 отчёт logs/navigation-validation.json. Полный PIE/packaged и movement ticks
 не запускались. Дальше по AI — sight/hearing perception stimuli и callbacks.
+
+
+### Настоящие sight/hearing stimuli и callbacks — 2026-10-18
+
+Добавлены DasPerception commandlet, Tests/Perception/probe.template.das и
+Scripts/TestPerception.ps1. Editor build, свежая генерация/preflight Pawn/AI
+пакета и 11 целевых проверок — PASS: sight acquire/loss, реальный ReportNoiseEvent,
+Actor+FAIStimulus callback в DAS, current/known arrays, MaxAge, далёкий шум,
+ReleaseObject и свежая session без stale counters. Native итог: sight_on=2,
+sight_off=1, hearing_on=1. DLL/source/module hashes стабильны, Error/ensure нет.
+Используется существующий snapshot callback backend; отдельного perception
+dispatcher и новых externs нет. User-facing typed stimulus DSL не проверялся.
+Методика и границы: Docs/Perception.md; отчёт logs/perception-validation.json.
+Карты не сохранялись, полный PIE/packaged и сеть не запускались.
+Далее: удобный typed stimulus/sense view, затем occlusion/team-policy и
+дополнительные perception delegates/reload lifecycle по отдельным сценариям.
