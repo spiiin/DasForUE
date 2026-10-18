@@ -3892,3 +3892,25 @@ Editor Development, 31 generator tests, exact generated artifact reproduction an
 seven focused saved-map game checks passed. Foundation, broad PIE and packaged
 build were intentionally not run. No commit. See PlayablePickup.md and
 logs/pickup-validation.json.
+
+## Самостоятельный проект — 2026-10-18
+
+Добавлен [DasStarter](../Examples/Standalone/README.md): шаблон нового проекта,
+NewDasProject.ps1 и project-aware native generation. Скрипты размещаются в
+Content/Das/Scripts проекта; flat require и authored references используют
+project-first lookup с fallback в плагин. Generated header/IR/DAS остаются
+в проекте; внешние plugin DLL UBT размещает в его Binaries.
+
+На C:/src/DasStarter/DasStarter.uproject прошли Editor Development build,
+экспорт трёх Blueprint и карты, четыре игровых проверки NullRHI: possession/
+компонент, настоящий collision и авторский вызов, respawn timer и импорт,
+hot reload импорта с сохранением Score/состояния компонента и восстановлением
+исходника. Повторная project-local генерация — PASS (17 native-классов),
+глобальные generated-артефакты плагина не изменились. Исправлена генерация
+пустых C++ registry arrays; неизменившиеся outputs больше не переписываются.
+Отчёт: logs/standalone-validation.json; проектный отчёт и логи —
+C:/src/DasStarter/Saved/DasValidation. Полные Foundation/PIE/packaged не запускались.
+Визуальный вид, управление и подбор подтверждены пользователем вручную.
+Освещение переведено в Movable; точечный offscreen D3D12/SM5 запуск подтвердил
+ноль незапечённых объектов. LightingOnly обновляет свет существующей карты
+без пересоздания сцены; отчёт — Saved/DasValidation/lighting-validation.json.

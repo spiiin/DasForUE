@@ -170,7 +170,11 @@ def generate(ir,script_dirs=None):
  for value in used:
   if value['kind']=='struct':typename(value)
  header.append('};')
- return '\n'.join(header)+'\n','\n'.join(source).rstrip()+'\n'
+ # A small project can have no soft types/defaults/etc. C++ forbids T[0].
+ header_text='\n'.join(header)+'\n'
+ header_text,empty=re.subn(r'inline const (\w+) (\w+)\[\] = \{\n\};',r'inline const std::array<\1, 0> \2{};',header_text)
+ if empty:header_text=header_text.replace('#pragma once\n','#pragma once\n#include <array>\n',1)
+ return header_text,'\n'.join(source).rstrip()+'\n'
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('ir',type=Path);p.add_argument('header',type=Path);p.add_argument('module',type=Path);p.add_argument('--check',action='store_true');p.add_argument('--scripts',type=Path,action='append',default=[]);a=p.parse_args()
  results=generate(json.loads(a.ir.read_text(encoding='utf-8-sig')),a.scripts)

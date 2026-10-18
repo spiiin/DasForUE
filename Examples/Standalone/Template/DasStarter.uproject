@@ -1,0 +1,33 @@
+{
+  "FileVersion": 3,
+  "AdditionalPluginDirectories": [
+    "@PLUGIN_DIRECTORY@"
+  ],
+  "Modules": [
+    {
+      "Name": "DasStarter",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "DasStarterEditor",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "DasForUE",
+      "Enabled": true
+    },
+    {
+      "Name": "EnhancedInput",
+      "Enabled": true
+    },
+    {
+      "Name": "Niagara",
+      "Enabled": true
+    }
+  ],
+  "DisableEnginePluginsByDefault": true
+}

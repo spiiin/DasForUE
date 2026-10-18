@@ -724,3 +724,5 @@ Montage playback and managed animation events: [Montage](Docs/Montage.md). Examp
 Managed sound and Niagara for pickup/damage: [Effects](Docs/Effects.md). Focused check: `Scripts/TestEffects.ps1` (offscreen RHI).
 
 Managed AIController/MoveTo and a pursuing enemy: [AI](Docs/AI.md). Create demo: `Scripts/CreateAIEnemy.ps1`; focused check: `Scripts/TestAI.ps1`.
+
+Standalone new-project integration and focused validation: [DasStarter](Examples/Standalone/README.md).

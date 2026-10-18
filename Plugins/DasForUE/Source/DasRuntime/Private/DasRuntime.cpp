@@ -233,6 +233,23 @@ namespace
         }
     };
 
+    // Resolve flat project modules before plugin modules; daslib keeps its own resolver.
+    class FUnrealFileAccess final : public das::FsFileAccess {
+    public:
+        virtual das::ModuleInfo getModuleInfo(const das::string& Request,const das::string& From)const override {
+            const FString Name=UTF8_TO_TCHAR(Request.c_str());
+            bool Identifier=!Name.IsEmpty();for(int32 I=0;I<Name.Len();++I)Identifier &= (I==0?!FChar::IsDigit(Name[I]):true) && (FChar::IsAlnum(Name[I]) || Name[I]==TCHAR('_'));
+            if(Identifier){
+                const auto* Runtime=FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"));
+                const FString Path=Runtime?Runtime->ScriptPath(Name+TEXT(".das")):FString();
+                if(!Path.IsEmpty() && IFileManager::Get().FileExists(*Path)){
+                    das::ModuleInfo Info;Info.moduleName=Request;Info.fileName=TCHAR_TO_UTF8(*Path);return Info;
+                }
+            }
+            return das::FsFileAccess::getModuleInfo(Request,From);
+        }
+    };
+
     struct FSubscriptionDeclaration
     {
         TWeakObjectPtr<UObject> Source;
@@ -2746,14 +2763,18 @@ uint64 FDasRuntimeModule::StructSnapshotsReclaimed(const UObject* Owner) const{u
 
 FString FDasRuntimeModule::ScriptPath(const FString& Name) const
 {
+    if(Name==FPaths::GetCleanFilename(Name)){
+        const FString Project=FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir()/TEXT("Das/Scripts")/Name);
+        if(IFileManager::Get().FileExists(*Project))return Project;
+    }
     return Root / TEXT("Scripts") / Name;
 }
 
 bool FDasRuntimeModule::ReadAuthoredInterfaces(const FString& Path,FDasAuthoringModule& Out,FString& Error){
- Error.Reset();if(!IsInGameThread() || !bInitialized){Error=TEXT("Interface declaration compilation requires game-thread runtime");return false;}try{TGuardValue<bool> CollectOnly(CollectTypesOnly,true);das::TextWriter Text;das::ModuleGroup Group;auto Access=das::make_smart<das::FsFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);const FTCHARToUTF8 File(*Path);auto Program=DSLCompile(File.Get(),Access,Text,Group);if(!Program || Program->failed()){Error=Errors(Program,Text);return false;}FDasAuthoringModule Model;bool OK=true;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St){auto* A=DSLAnnotation(St->annotations,"ue_interface");if(!A || !OK)return;auto* J=A->arguments.find(DSLInterfaceKey,das::Type::tString);FDasAuthoringModule Part;if(!J || !FDasAuthoringModule::FromJson(DSLText(J->sValue),Part,Error)){OK=false;return;}if(!Model.Id.IsEmpty() && Model.Id!=Part.Id){Error=TEXT("Interface declarations must share module ID");OK=false;return;}Model.Id=Part.Id;Model.Classes.Append(Part.Classes);});if(!OK || !Model.Validate(Error))return false;Out=MoveTemp(Model);return true;}catch(const std::exception& X){Error=UTF8_TO_TCHAR(X.what());return false;}
+ Error.Reset();if(!IsInGameThread() || !bInitialized){Error=TEXT("Interface declaration compilation requires game-thread runtime");return false;}try{TGuardValue<bool> CollectOnly(CollectTypesOnly,true);das::TextWriter Text;das::ModuleGroup Group;auto Access=das::make_smart<FUnrealFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);const FTCHARToUTF8 File(*Path);auto Program=DSLCompile(File.Get(),Access,Text,Group);if(!Program || Program->failed()){Error=Errors(Program,Text);return false;}FDasAuthoringModule Model;bool OK=true;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& St){auto* A=DSLAnnotation(St->annotations,"ue_interface");if(!A || !OK)return;auto* J=A->arguments.find(DSLInterfaceKey,das::Type::tString);FDasAuthoringModule Part;if(!J || !FDasAuthoringModule::FromJson(DSLText(J->sValue),Part,Error)){OK=false;return;}if(!Model.Id.IsEmpty() && Model.Id!=Part.Id){Error=TEXT("Interface declarations must share module ID");OK=false;return;}Model.Id=Part.Id;Model.Classes.Append(Part.Classes);});if(!OK || !Model.Validate(Error))return false;Out=MoveTemp(Model);return true;}catch(const std::exception& X){Error=UTF8_TO_TCHAR(X.what());return false;}
 }
 bool FDasRuntimeModule::ReadReflectedTypes(const FString& Path,FDasReflectedTypes& Out,FString& Error,FString* SourceModule){
- Error.Reset();if(!IsInGameThread() || !bInitialized){Error=TEXT("Type declaration compilation requires initialized game-thread runtime");return false;}try{TGuardValue<bool> CollectOnly(CollectTypesOnly,true);das::TextWriter Text;das::ModuleGroup Group;auto Access=das::make_smart<das::FsFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);const FTCHARToUTF8 File(*Path);auto Program=DSLCompile(File.Get(),Access,Text,Group);if(!Program || Program->failed()){Error=Errors(Program,Text);return false;}FDasReflectedTypes Model;bool OK=true;auto Append=[&](const das::AnnotationList& List,const char* Name){const auto* A=DSLAnnotation(List,Name);if(!A || !OK)return;const auto* J=A->arguments.find(DSLTypesKey,das::Type::tString);FDasReflectedTypes Part;if(!J || !FDasReflectedTypes::FromJson(DSLText(J->sValue),Part,Error,true)){OK=false;return;}if(!Model.Id.IsEmpty() && Model.Id!=Part.Id){Error=TEXT("Reflected declarations must share module ID");OK=false;return;}Model.Id=Part.Id;Model.Enums.Append(Part.Enums);Model.Structs.Append(Part.Structs);};Program->getThisModule()->enumerations.foreach([&](const das::EnumerationPtr& E){Append(E->annotations,"ue_enum");});Program->getThisModule()->structures.foreach([&](const das::StructurePtr& S){Append(S->annotations,"ue_struct");});if(!OK || !Model.Validate(Error))return false;if(SourceModule){bool HasClasses=false;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& S){HasClasses|=DSLAnnotation(S->annotations,"ue_class")!=nullptr || DSLAnnotation(S->annotations,"ue_interface")!=nullptr;});if(HasClasses){Error=TEXT("Catalog value imports require dedicated enum/struct modules without classes/interfaces");return false;}*SourceModule=DSLText(Program->getThisModule()->name);}Out=MoveTemp(Model);return true;}catch(const std::exception& X){Error=UTF8_TO_TCHAR(X.what());return false;}
+ Error.Reset();if(!IsInGameThread() || !bInitialized){Error=TEXT("Type declaration compilation requires initialized game-thread runtime");return false;}try{TGuardValue<bool> CollectOnly(CollectTypesOnly,true);das::TextWriter Text;das::ModuleGroup Group;auto Access=das::make_smart<FUnrealFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);const FTCHARToUTF8 File(*Path);auto Program=DSLCompile(File.Get(),Access,Text,Group);if(!Program || Program->failed()){Error=Errors(Program,Text);return false;}FDasReflectedTypes Model;bool OK=true;auto Append=[&](const das::AnnotationList& List,const char* Name){const auto* A=DSLAnnotation(List,Name);if(!A || !OK)return;const auto* J=A->arguments.find(DSLTypesKey,das::Type::tString);FDasReflectedTypes Part;if(!J || !FDasReflectedTypes::FromJson(DSLText(J->sValue),Part,Error,true)){OK=false;return;}if(!Model.Id.IsEmpty() && Model.Id!=Part.Id){Error=TEXT("Reflected declarations must share module ID");OK=false;return;}Model.Id=Part.Id;Model.Enums.Append(Part.Enums);Model.Structs.Append(Part.Structs);};Program->getThisModule()->enumerations.foreach([&](const das::EnumerationPtr& E){Append(E->annotations,"ue_enum");});Program->getThisModule()->structures.foreach([&](const das::StructurePtr& S){Append(S->annotations,"ue_struct");});if(!OK || !Model.Validate(Error))return false;if(SourceModule){bool HasClasses=false;Program->getThisModule()->structures.foreach([&](const das::StructurePtr& S){HasClasses|=DSLAnnotation(S->annotations,"ue_class")!=nullptr || DSLAnnotation(S->annotations,"ue_interface")!=nullptr;});if(HasClasses){Error=TEXT("Catalog value imports require dedicated enum/struct modules without classes/interfaces");return false;}*SourceModule=DSLText(Program->getThisModule()->name);}Out=MoveTemp(Model);return true;}catch(const std::exception& X){Error=UTF8_TO_TCHAR(X.what());return false;}
 }
 
 namespace {
@@ -2788,7 +2809,7 @@ bool FDasRuntimeModule::ReadAuthoringScript(const FString& Path,FDasAuthoringMod
     Error.Reset();if(!IsInGameThread() || !bInitialized){Error=TEXT("DSL compilation requires initialized runtime on game thread");return false;}
     try
     {
-        das::TextWriter Output;das::ModuleGroup Group;auto Access=das::make_smart<das::FsFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);
+        das::TextWriter Output;das::ModuleGroup Group;auto Access=das::make_smart<FUnrealFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);
         const FTCHARToUTF8 File(*Path);auto Program=DSLCompile(File.Get(),Access,Output,Group);
         if(!Program || Program->failed()){Error=Errors(Program,Output);return false;}
         FDasAuthoringModule Candidate;bool OK=true;
@@ -2809,7 +2830,7 @@ bool FDasRuntimeModule::ReadAuthoringScript(const FString& Path,FDasAuthoringMod
 
 bool FDasRuntimeModule::ReadSourceCatalogImports(const FString& Path,FDasSourceCatalog& Out,FString& Error){
     Error.Reset();if(!IsInGameThread() || !bInitialized){Error=TEXT("Catalog import discovery requires initialized game-thread runtime");return false;}
-    try{das::TextWriter Text;das::ModuleGroup Group;auto Access=das::make_smart<das::FsFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);const FTCHARToUTF8 File(*Path);auto Program=DSLCompile(File.Get(),Access,Text,Group);if(!Program || Program->failed()){Error=Errors(Program,Text);return false;}FDasSourceCatalog Candidate;if(!CollectDasCatalogModules(Program.get(),*this,Candidate,Error))return false;if(Candidate.ValueModules.IsEmpty()){Error=TEXT("No authored enum/struct/interface imports found");return false;}Out=MoveTemp(Candidate);return true;}catch(const std::exception& E){Error=UTF8_TO_TCHAR(E.what());return false;}
+    try{das::TextWriter Text;das::ModuleGroup Group;auto Access=das::make_smart<FUnrealFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);const FTCHARToUTF8 File(*Path);auto Program=DSLCompile(File.Get(),Access,Text,Group);if(!Program || Program->failed()){Error=Errors(Program,Text);return false;}FDasSourceCatalog Candidate;if(!CollectDasCatalogModules(Program.get(),*this,Candidate,Error))return false;if(Candidate.ValueModules.IsEmpty()){Error=TEXT("No authored enum/struct/interface imports found");return false;}Out=MoveTemp(Candidate);return true;}catch(const std::exception& E){Error=UTF8_TO_TCHAR(E.what());return false;}
 }
 
 bool FDasRuntimeModule::ValidateIntMethod(const FString& Path,FString& Error,const FString& EntryPoint)
@@ -2823,7 +2844,7 @@ bool FDasRuntimeModule::ValidateFrameMethod(const FString& Path,FString& Error,c
     try
     {
         das::TextWriter Output;das::ModuleGroup Modules;
-        auto Access=das::make_smart<das::FsFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);
+        auto Access=das::make_smart<FUnrealFileAccess>();Access->addFileSystem(new FUnrealFileSystem(),true,false);
         const FTCHARToUTF8 Utf8Path(*Path);das::CodeOfPolicies Policies;
         auto Program=DSLCompile(Utf8Path.Get(),Access,Output,Modules,Policies);
         if (!Program || Program->failed()) { Error=Errors(Program,Output);return false; }
@@ -2851,7 +2872,7 @@ FDasExecutionResult FDasRuntimeModule::RunFile(const FString& Path, int32 Input,
     {
         das::TextWriter Output;
         das::ModuleGroup Modules;
-        auto Access = das::make_smart<das::FsFileAccess>();
+        auto Access = das::make_smart<FUnrealFileAccess>();
         Access->addFileSystem(new FUnrealFileSystem(), true, false);
         const FTCHARToUTF8 Utf8Path(*Path);
         das::CodeOfPolicies Policies;
@@ -3111,7 +3132,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         try
         {
             das::TextWriter Output;
-            auto Access = das::make_smart<das::FsFileAccess>();
+            auto Access = das::make_smart<FUnrealFileAccess>();
             Access->addFileSystem(new FUnrealFileSystem(&Session->AttemptedSources), true, false);
             Candidate->Access = Access;
             const FTCHARToUTF8 Utf8Path(*FullPath);
