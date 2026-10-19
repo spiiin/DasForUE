@@ -1,17 +1,5 @@
 // Part of DasRuntime.cpp: Scalar, text and name access to properties of the running script owner (self).
 // Included in place; declaration order matters.
-bool GetSelfBool(const char* Name, das::Context* Context)
-{
-    auto* Self = ResolveSelf(Context);
-    return ReadPropertyScalar(ResolveProperty<FBoolProperty>(Self, Name, false, Context), Self, Context);
-}
-void SetSelfBool(const char* Name, bool Value, das::Context* Context)
-{
-    if (ActiveContext && ActiveContext->bCollectingSubscriptions)
-        Context->throw_error("self writes are forbidden in bind_events");
-    UObject* Self = ResolveSelf(Context);
-    WritePropertyScalar(ResolveProperty<FBoolProperty>(Self, Name, true, Context), Self, Value, Context);
-}
 FDasNameValue MakeDSLName(FName Name, das::Context* C)
 {
     if (C != ActiveContext || !ActiveContext || !IsInGameThread())
@@ -61,42 +49,6 @@ char* DSLNameToString(FDasNameValue V, das::Context* C)
 bool DSLNamesEqual(FDasNameValue A, FDasNameValue B, das::Context* C)
 {
     return ResolveDSLName(A, C) == ResolveDSLName(B, C);
-}
-double GetSelfDouble(const char* N, das::Context* C)
-{
-    auto* S = ResolveSelf(C);
-    return ReadPropertyScalar(ResolveProperty<FDoubleProperty>(S, N, false, C), S, C);
-}
-void SetSelfDouble(const char* N, double V, das::Context* C)
-{
-    auto* S = ResolveSelf(C);
-    if (ActiveContext->bCollectingSubscriptions)
-        C->throw_error("self writes are forbidden in bind_events");
-    WritePropertyScalar(ResolveProperty<FDoubleProperty>(S, N, true, C), S, V, C);
-}
-char* GetSelfString(const char* N, das::Context* C)
-{
-    auto* S = ResolveSelf(C);
-    return CopyDSLString(ReadPropertyScalar(ResolveProperty<FStrProperty>(S, N, false, C), S, C), C);
-}
-void SetSelfString(const char* N, const char* V, das::Context* C)
-{
-    auto* S = ResolveSelf(C);
-    if (ActiveContext->bCollectingSubscriptions)
-        C->throw_error("self writes are forbidden in bind_events");
-    WritePropertyScalar(ResolveProperty<FStrProperty>(S, N, true, C), S, V ? UTF8_TO_TCHAR(V) : TEXT(""), C);
-}
-FDasNameValue GetSelfName(const char* N, das::Context* C)
-{
-    auto* S = ResolveSelf(C);
-    return MakeDSLName(ReadPropertyScalar(ResolveProperty<FNameProperty>(S, N, false, C), S, C), C);
-}
-void SetSelfName(const char* N, FDasNameValue V, das::Context* C)
-{
-    auto* S = ResolveSelf(C);
-    if (ActiveContext->bCollectingSubscriptions)
-        C->throw_error("self writes are forbidden in bind_events");
-    WritePropertyScalar(ResolveProperty<FNameProperty>(S, N, true, C), S, ResolveDSLName(V, C), C);
 }
 FVector DSLVector(double X, double Y, double Z, das::Context* C)
 {

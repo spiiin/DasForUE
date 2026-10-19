@@ -414,26 +414,22 @@ public:
                                                           das::SideEffects::modifyExternal, "CharacterControlsReady");
         AddUEExtern<DAS_BIND_FUN(CharacterPossess)>(*this, Library, "__ue_pawn_possess",
                                                     das::SideEffects::modifyExternal, "CharacterPossess");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceGetint)>(*this, Library, "__ue_native_get_int",
-                                                         das::SideEffects::modifyExternal, "NativeReferenceGetint");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceSetint)>(*this, Library, "__ue_native_set_int",
-                                                         das::SideEffects::modifyExternal, "NativeReferenceSetint");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceGetfloat)>(*this, Library, "__ue_native_get_float",
-                                                           das::SideEffects::modifyExternal, "NativeReferenceGetfloat");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceSetfloat)>(*this, Library, "__ue_native_set_float",
-                                                           das::SideEffects::modifyExternal, "NativeReferenceSetfloat");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceGetdouble)>(
-            *this, Library, "__ue_native_get_double", das::SideEffects::modifyExternal, "NativeReferenceGetdouble");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceSetdouble)>(
-            *this, Library, "__ue_native_set_double", das::SideEffects::modifyExternal, "NativeReferenceSetdouble");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceGetbool)>(*this, Library, "__ue_native_get_bool",
-                                                          das::SideEffects::modifyExternal, "NativeReferenceGetbool");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceSetbool)>(*this, Library, "__ue_native_set_bool",
-                                                          das::SideEffects::modifyExternal, "NativeReferenceSetbool");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceGetstring)>(
-            *this, Library, "__ue_native_get_string", das::SideEffects::modifyExternal, "NativeReferenceGetstring");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceSetstring)>(
-            *this, Library, "__ue_native_set_string", das::SideEffects::modifyExternal, "NativeReferenceSetstring");
+        // Scalar property accessors for self, authored and native references (DasScalarAccessors.inl).
+#define DAS_REGISTER_SCALAR_ACCESSORS(Suffix, SelfKind, RefKind)                                                       \
+    AddUEExtern<DAS_BIND_FUN(GetSelfScalar<SelfKind>)>(*this, Library, "ue_get_self_" #Suffix,                         \
+                                                       das::SideEffects::modifyExternal, "GetSelfScalar");             \
+    AddUEExtern<DAS_BIND_FUN(SetSelfScalar<SelfKind>)>(*this, Library, "ue_set_self_" #Suffix,                         \
+                                                       das::SideEffects::modifyExternal, "SetSelfScalar");             \
+    AddUEExtern<DAS_BIND_FUN(AuthoredGetScalar<RefKind>)>(*this, Library, "__ue_authored_get_" #Suffix,                \
+                                                          das::SideEffects::modifyExternal, "AuthoredGetScalar");      \
+    AddUEExtern<DAS_BIND_FUN(AuthoredSetScalar<RefKind>)>(*this, Library, "__ue_authored_set_" #Suffix,                \
+                                                          das::SideEffects::modifyExternal, "AuthoredSetScalar");      \
+    AddUEExtern<DAS_BIND_FUN(NativeReferenceGetScalar<RefKind>)>(                                                      \
+        *this, Library, "__ue_native_get_" #Suffix, das::SideEffects::modifyExternal, "NativeReferenceGetScalar");     \
+    AddUEExtern<DAS_BIND_FUN(NativeReferenceSetScalar<RefKind>)>(                                                      \
+        *this, Library, "__ue_native_set_" #Suffix, das::SideEffects::modifyExternal, "NativeReferenceSetScalar");
+        DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_SCALAR_ACCESSORS)
+#undef DAS_REGISTER_SCALAR_ACCESSORS
         AddUEExtern<DAS_BIND_FUN(DSLTextCreate)>(*this, Library, "ue_text", das::SideEffects::modifyExternal,
                                                  "DSLTextCreate");
         AddUEExtern<DAS_BIND_FUN(DSLTextInvariant)>(*this, Library, "ue_text_invariant",
@@ -446,22 +442,10 @@ public:
                                               "DSLTextKey");
         AddUEExtern<DAS_BIND_FUN(DSLTextIsInvariant)>(*this, Library, "ue_text_is_invariant",
                                                       das::SideEffects::modifyExternal, "DSLTextIsInvariant");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceGetbyte)>(*this, Library, "__ue_native_get_byte",
-                                                          das::SideEffects::modifyExternal, "NativeReferenceGetbyte");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceSetbyte)>(*this, Library, "__ue_native_set_byte",
-                                                          das::SideEffects::modifyExternal, "NativeReferenceSetbyte");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceGettext)>(*this, Library, "__ue_native_get_text",
-                                                          das::SideEffects::modifyExternal, "NativeReferenceGettext");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceSettext)>(*this, Library, "__ue_native_set_text",
-                                                          das::SideEffects::modifyExternal, "NativeReferenceSettext");
         AddUEExtern<DAS_BIND_FUN(NativeReferenceGetenum)>(*this, Library, "__ue_native_get_enum",
                                                           das::SideEffects::modifyExternal, "NativeReferenceGetenum");
         AddUEExtern<DAS_BIND_FUN(NativeReferenceSetenum)>(*this, Library, "__ue_native_set_enum",
                                                           das::SideEffects::modifyExternal, "NativeReferenceSetenum");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceGetname)>(*this, Library, "__ue_native_get_name",
-                                                          das::SideEffects::modifyExternal, "NativeReferenceGetname");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceSetname)>(*this, Library, "__ue_native_set_name",
-                                                          das::SideEffects::modifyExternal, "NativeReferenceSetname");
         AddUEExtern<DAS_BIND_FUN(NativeReferenceGetclass)>(*this, Library, "__ue_native_get_class",
                                                            das::SideEffects::modifyExternal, "NativeReferenceGetclass");
         AddUEExtern<DAS_BIND_FUN(NativeReferenceSetclass)>(*this, Library, "__ue_native_set_class",
@@ -964,30 +948,6 @@ public:
             *this, Library, "__ue_authored_nullable_check", das::SideEffects::accessExternal, "AuthoredNullableCheck");
         AddUEExtern<DAS_BIND_FUN(AuthoredObjectCheck), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_authored_object_check", das::SideEffects::accessExternal, "AuthoredObjectCheck");
-        AddUEExtern<DAS_BIND_FUN(AuthoredGetint)>(*this, Library, "__ue_authored_get_int",
-                                                  das::SideEffects::accessExternal, "AuthoredGetint");
-        AddUEExtern<DAS_BIND_FUN(AuthoredSetint)>(*this, Library, "__ue_authored_set_int",
-                                                  das::SideEffects::modifyExternal, "AuthoredSetint");
-        AddUEExtern<DAS_BIND_FUN(AuthoredGetfloat)>(*this, Library, "__ue_authored_get_float",
-                                                    das::SideEffects::accessExternal, "AuthoredGetfloat");
-        AddUEExtern<DAS_BIND_FUN(AuthoredSetfloat)>(*this, Library, "__ue_authored_set_float",
-                                                    das::SideEffects::modifyExternal, "AuthoredSetfloat");
-        AddUEExtern<DAS_BIND_FUN(AuthoredGetdouble)>(*this, Library, "__ue_authored_get_double",
-                                                     das::SideEffects::accessExternal, "AuthoredGetdouble");
-        AddUEExtern<DAS_BIND_FUN(AuthoredSetdouble)>(*this, Library, "__ue_authored_set_double",
-                                                     das::SideEffects::modifyExternal, "AuthoredSetdouble");
-        AddUEExtern<DAS_BIND_FUN(AuthoredGetbool)>(*this, Library, "__ue_authored_get_bool",
-                                                   das::SideEffects::accessExternal, "AuthoredGetbool");
-        AddUEExtern<DAS_BIND_FUN(AuthoredSetbool)>(*this, Library, "__ue_authored_set_bool",
-                                                   das::SideEffects::modifyExternal, "AuthoredSetbool");
-        AddUEExtern<DAS_BIND_FUN(AuthoredGetstring)>(*this, Library, "__ue_authored_get_string",
-                                                     das::SideEffects::modifyExternal, "AuthoredGetstring");
-        AddUEExtern<DAS_BIND_FUN(AuthoredSetstring)>(*this, Library, "__ue_authored_set_string",
-                                                     das::SideEffects::modifyExternal, "AuthoredSetstring");
-        AddUEExtern<DAS_BIND_FUN(AuthoredGetname)>(*this, Library, "__ue_authored_get_name",
-                                                   das::SideEffects::modifyExternal, "AuthoredGetname");
-        AddUEExtern<DAS_BIND_FUN(AuthoredSetname)>(*this, Library, "__ue_authored_set_name",
-                                                   das::SideEffects::modifyExternal, "AuthoredSetname");
         AddUEExtern<DAS_BIND_FUN(AuthoredGetenum)>(*this, Library, "__ue_authored_get_enum",
                                                    das::SideEffects::modifyExternal, "AuthoredGetenum");
         AddUEExtern<DAS_BIND_FUN(AuthoredSetenum)>(*this, Library, "__ue_authored_set_enum",
@@ -1314,22 +1274,6 @@ public:
                                                       das::SideEffects::modifyExternal, "PublishFrameString");
         AddUEExtern<DAS_BIND_FUN(PublishFrameDouble)>(*this, Library, "ue_frame_out_double",
                                                       das::SideEffects::modifyExternal, "PublishFrameDouble");
-        AddUEExtern<DAS_BIND_FUN(AuthoredGetbyte)>(*this, Library, "__ue_authored_get_byte",
-                                                   das::SideEffects::modifyExternal, "AuthoredGetbyte");
-        AddUEExtern<DAS_BIND_FUN(AuthoredSetbyte)>(*this, Library, "__ue_authored_set_byte",
-                                                   das::SideEffects::modifyExternal, "AuthoredSetbyte");
-        AddUEExtern<DAS_BIND_FUN(AuthoredGettext)>(*this, Library, "__ue_authored_get_text",
-                                                   das::SideEffects::modifyExternal, "AuthoredGettext");
-        AddUEExtern<DAS_BIND_FUN(AuthoredSettext)>(*this, Library, "__ue_authored_set_text",
-                                                   das::SideEffects::modifyExternal, "AuthoredSettext");
-        AddUEExtern<DAS_BIND_FUN(GetSelfByte)>(*this, Library, "ue_get_self_byte", das::SideEffects::modifyExternal,
-                                               "GetSelfByte");
-        AddUEExtern<DAS_BIND_FUN(SetSelfByte)>(*this, Library, "ue_set_self_byte", das::SideEffects::modifyExternal,
-                                               "SetSelfByte");
-        AddUEExtern<DAS_BIND_FUN(GetSelfText)>(*this, Library, "ue_get_self_text", das::SideEffects::modifyExternal,
-                                               "GetSelfText");
-        AddUEExtern<DAS_BIND_FUN(SetSelfText)>(*this, Library, "ue_set_self_text", das::SideEffects::modifyExternal,
-                                               "SetSelfText");
         AddUEExtern<DAS_BIND_FUN(StructMapKeyByte)>(*this, Library, "ue_struct_map_key_byte",
                                                     das::SideEffects::modifyExternal, "StructMapKeyByte");
         AddUEExtern<DAS_BIND_FUN(StructSetElementByte)>(*this, Library, "ue_struct_set_element_byte",
@@ -1814,30 +1758,6 @@ public:
                                                    "DSLNameToString");
         AddUEExtern<DAS_BIND_FUN(DSLNamesEqual)>(*this, Library, "ue_names_equal", das::SideEffects::accessExternal,
                                                  "DSLNamesEqual");
-        AddUEExtern<DAS_BIND_FUN(GetSelfDouble)>(*this, Library, "ue_get_self_double", das::SideEffects::accessExternal,
-                                                 "GetSelfDouble");
-        AddUEExtern<DAS_BIND_FUN(SetSelfDouble)>(*this, Library, "ue_set_self_double", das::SideEffects::modifyExternal,
-                                                 "SetSelfDouble");
-        AddUEExtern<DAS_BIND_FUN(GetSelfString)>(*this, Library, "ue_get_self_string", das::SideEffects::modifyExternal,
-                                                 "GetSelfString");
-        AddUEExtern<DAS_BIND_FUN(SetSelfString)>(*this, Library, "ue_set_self_string", das::SideEffects::modifyExternal,
-                                                 "SetSelfString");
-        AddUEExtern<DAS_BIND_FUN(GetSelfName)>(*this, Library, "ue_get_self_name", das::SideEffects::modifyExternal,
-                                               "GetSelfName");
-        AddUEExtern<DAS_BIND_FUN(SetSelfName)>(*this, Library, "ue_set_self_name", das::SideEffects::modifyExternal,
-                                               "SetSelfName");
-        AddUEExtern<DAS_BIND_FUN(GetSelfBool)>(*this, Library, "ue_get_self_bool", das::SideEffects::accessExternal,
-                                               "GetSelfBool");
-        AddUEExtern<DAS_BIND_FUN(SetSelfBool)>(*this, Library, "ue_set_self_bool", das::SideEffects::modifyExternal,
-                                               "SetSelfBool");
-        AddUEExtern<DAS_BIND_FUN(GetSelfInt)>(*this, Library, "ue_get_self_int", das::SideEffects::accessExternal,
-                                              "GetSelfInt");
-        AddUEExtern<DAS_BIND_FUN(GetSelfFloat)>(*this, Library, "ue_get_self_float", das::SideEffects::accessExternal,
-                                                "GetSelfFloat");
-        AddUEExtern<DAS_BIND_FUN(SetSelfInt)>(*this, Library, "ue_set_self_int", das::SideEffects::modifyExternal,
-                                              "SetSelfInt");
-        AddUEExtern<DAS_BIND_FUN(SetSelfFloat)>(*this, Library, "ue_set_self_float", das::SideEffects::modifyExternal,
-                                                "SetSelfFloat");
         AddUEExtern<DAS_BIND_FUN(EmitType)>(*this, Library, "ue_emit_type", das::SideEffects::modifyExternal,
                                             "EmitType");
     }

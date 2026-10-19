@@ -367,27 +367,3 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
     }
     return true;
 }
-int32 GetSelfInt(const char* Name, das::Context* Context)
-{
-    UObject* Self = ResolveSelf(Context);
-    return ReadPropertyScalar(ResolveProperty<FIntProperty>(Self, Name, false, Context), Self, Context);
-}
-float GetSelfFloat(const char* Name, das::Context* Context)
-{
-    UObject* Self = ResolveSelf(Context);
-    return ReadPropertyScalar(ResolveProperty<FFloatProperty>(Self, Name, false, Context), Self, Context);
-}
-void SetSelfInt(const char* Name, int32 Value, das::Context* Context)
-{
-    if (ActiveContext && ActiveContext->bCollectingSubscriptions)
-        Context->throw_error("self writes are forbidden in bind_events");
-    UObject* Self = ResolveSelf(Context);
-    WritePropertyScalar(ResolveProperty<FIntProperty>(Self, Name, true, Context), Self, Value, Context);
-}
-void SetSelfFloat(const char* Name, float Value, das::Context* Context)
-{
-    if (ActiveContext && ActiveContext->bCollectingSubscriptions)
-        Context->throw_error("self writes are forbidden in bind_events");
-    UObject* Self = ResolveSelf(Context);
-    WritePropertyScalar(ResolveProperty<FFloatProperty>(Self, Name, true, Context), Self, Value, Context);
-}

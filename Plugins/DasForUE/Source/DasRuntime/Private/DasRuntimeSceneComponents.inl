@@ -381,6 +381,7 @@ FDasObjectHandle PathComponentOperation(const FDasObjectHandle& H, const char* P
 #include "DasObjectQueries.inl"
 #include "DasCharacterControl.inl"
 #include "DasNativeGameplayRuntime.inl"
+#include "DasScalarAccessors.inl"
 FDasObjectHandle AuthoredComponentGet(const FDasObjectHandle& H, const char* Id, const char* Name, das::Context* C)
 {
     auto* Self = ResolveWorldContextObject(C);
