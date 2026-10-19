@@ -161,7 +161,7 @@ int32 UDasStaticLibraryCommandlet::Main(const FString& Params)
                                              ? FCString::Atof(*Value) == -0.125f
                                              : FString(Method) == TEXT("DefaultBool")
                                                    ? Value == TEXT("false")
-                                                   : FString(Method) == TEXT("DefaultText")
+                                                                                           : FString(Method) == TEXT("DefaultText")
                                                              ? Value == TEXT("Пример 世界"): Value.IsEmpty(), Method);
     }
     UBlueprint* Values = nullptr;

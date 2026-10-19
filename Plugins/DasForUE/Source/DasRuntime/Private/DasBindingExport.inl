@@ -422,7 +422,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
                     ExportPolicyError(TEXT("deprecated_function"));
                 if (!bAllowInternal && !ProfileAdapter && Function->HasMetaData(TEXT("BlueprintInternalUseOnly")))
                     ExportPolicyError(TEXT("internal_function"));
-                    // Construction restrictions are retained in generated wrappers and checked by the frame.
+                // Construction restrictions are retained in generated wrappers and checked by the frame.
 #endif
                 if (Class->HasAnyClassFlags(CLASS_Interface) &&
                     (!Function->GetOuterUClass()->HasAnyClassFlags(CLASS_Interface) ||

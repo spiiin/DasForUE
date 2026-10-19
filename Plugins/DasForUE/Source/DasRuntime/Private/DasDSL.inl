@@ -869,7 +869,8 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                         if (FDasAuthoringModule::FromJson(DSLText(J->sValue), M, Issue) &&
                             DSLText(J->sValue) == *LibraryInvocationContract &&
                             M.Classes.ContainsByPredicate(
-                                [&](const auto& C) {
+                                [&](const auto& C)
+                                {
                                     return C.Methods.ContainsByPredicate([&](const auto& Method)
                                                                          { return Method.EntryPoint == Entry; });
                                 }))
@@ -908,7 +909,8 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                                          Entry == TEXT("tick") ||
                                                        Entry == TEXT("end_play") ||
                                                                      C.Callbacks.ContainsByPredicate(
-                                                                         [&](const auto& Callback) {
+                                                                         [&](const auto& Callback)
+                                                                         {
                                                                              return Callback.Kind ==
                                                                                     TEXT("event") &&
                                                                                          Entry ==

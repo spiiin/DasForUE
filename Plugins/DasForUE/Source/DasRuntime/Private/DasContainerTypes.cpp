@@ -585,8 +585,8 @@ UScriptStruct* ObjectMapCarrier(const FDasDeclaredType& Type, int StrongOverride
     }
     else
         Base = DasContainerCarrier(Proxy);
-    return Base ? ObjectMapFromBase(Class, CastField<FMapProperty>(Base->FindPropertyByName(TEXT("Values"))),
-                                                                   Base->GetPathName())
+    return Base                     ? ObjectMapFromBase(Class, CastField<FMapProperty>(Base->FindPropertyByName(TEXT("Values"))),
+                                                                                       Base->GetPathName())
                                     : nullptr;
 }
 UScriptStruct* ResolveObjectHashCarrier(const FString& Path)

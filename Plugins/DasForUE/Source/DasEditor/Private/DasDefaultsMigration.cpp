@@ -881,7 +881,8 @@ bool DasMergeDefaults(UBlueprint* BP, const FDasAuthoringModule& Next, const FSt
         if (B.BP == BP)
             for (auto& V : B.BP->NewVariables)
                 if (New->Properties.ContainsByPredicate(
-                        [&](const auto& F) {
+                        [&](const auto& F)
+                        {
                             return F.Name == V.VarName.ToString() &&
                                    F.Type.Kind != TEXT("event") && F.Type.Kind != TEXT("delegate");
                         }))

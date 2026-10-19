@@ -123,12 +123,12 @@ int32 RunDasStructuralRollbackProbe(const FString& Params)
     if (!Child || !Grand || !External || !World)
         return 1;
     Check(!Parent->GeneratedClass->FindPropertyByName(
-        TEXT("Added")) && !Parent->GeneratedClass->FindFunctionByName(TEXT("NewQuery")) &&
-                                                                      !Parent->FunctionGraphs.ContainsByPredicate(
-                                                                          [](const auto& G) {
-                                                                              return G->GetFName() == TEXT("NewQuery");
-                                                                          }),
-                                                                      TEXT("rolled_back_field_and_method_absent"));
+        TEXT("Added")) &&
+        !Parent->GeneratedClass->FindFunctionByName(TEXT("NewQuery")) &&
+                                                    !Parent->FunctionGraphs.ContainsByPredicate(
+                                                        [](const auto& G)
+                                                        { return G->GetFName() == TEXT("NewQuery"); }),
+                                                    TEXT("rolled_back_field_and_method_absent"));
     Check(StructuralScore(Parent->GeneratedClass->GetDefaultObject()) == 5 &&
           StructuralScore(Child->GeneratedClass->GetDefaultObject()) == 23 &&
           StructuralScore(Grand->GeneratedClass->GetDefaultObject()) == 45 &&

@@ -201,15 +201,14 @@ bool FDasClassSchema::Validate(FString& Error) const
         return false;
     TSet<FName> Names;
     const auto AllMethods = EffectiveMethods();
-    if ((Parent == TEXT("DataAsset") ||
-                        Parent == TEXT("PrimaryDataAsset") ||
-                                       Parent == TEXT("SaveGame") ||
-                                                      Parent == TEXT("Pawn") || Parent == TEXT("Character")) &&
-                                                                     AllMethods.ContainsByPredicate(
-                                                                         [](const auto& M) {
-                                                                             return M.Signature !=
-                                                                                    EDasMethodSignature::Frame;
-                                                                         }))
+    if ((Parent ==
+         TEXT("DataAsset") ||
+              Parent == TEXT("PrimaryDataAsset") ||
+                             Parent == TEXT("SaveGame") ||
+                                            Parent == TEXT("Pawn") || Parent == TEXT("Character")) &&
+                                                           AllMethods.ContainsByPredicate(
+                                                               [](const auto& M)
+                                                               { return M.Signature != EDasMethodSignature::Frame; }))
     {
         Error = TEXT("Pawn/Character hosts require the frame method ABI");
         return false;

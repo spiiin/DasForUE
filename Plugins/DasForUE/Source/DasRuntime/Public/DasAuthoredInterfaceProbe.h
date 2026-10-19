@@ -619,10 +619,9 @@ inline bool RunDasAuthoredInterfaceValues(FDasRuntimeModule& R, UObject* Actor, 
         FDasScalarValue RefMath;
         RefMath.Kind = 9;
         RefMath.VectorValue = FVector(1, 2, 3);
-        RunRefPair(TEXT("RefVector"), RefMath,
-                        [](const auto& Changed, const auto& Previous) {
-                            return Changed.VectorValue == FVector(5, 6, 7) && Previous.VectorValue == FVector(1, 2, 3);
-                        });
+        RunRefPair(
+            TEXT("RefVector"), RefMath, [](const auto& Changed, const auto& Previous)
+                 { return Changed.VectorValue == FVector(5, 6, 7) && Previous.VectorValue == FVector(1, 2, 3); });
         RefMath.Kind = 10;
         RefMath.RotatorValue = FRotator(1, 2, 3);
         RunRefPair(TEXT("RefRotator"), RefMath, [](const auto& Changed, const auto& Previous)

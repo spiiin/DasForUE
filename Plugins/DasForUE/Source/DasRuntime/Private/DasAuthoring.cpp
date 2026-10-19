@@ -483,13 +483,12 @@ bool FDasAuthoringModule::Validate(FString& Error) const
                 else if (!Callback.ParameterTypePath.IsEmpty())
                     return Fail(Error, TEXT("Unexpected callback type identity"));
                 if ((Callback.Source !=
-                     TEXT("self") && Callback.Source != TEXT("owner") && !(Identifier(Callback.Source) &&
-                                                                           (C.Components.ContainsByPredicate(
-                                                                                [&](const auto& Component) {
-                                                                                    return Component.Name ==
-                                                                                           Callback.Source;
-                                                                                }) ||
-                                                                            !C.ParentId.IsEmpty()))) ||
+                     TEXT("self") && Callback.Source != TEXT("owner") &&
+                                                             !(Identifier(Callback.Source) &&
+                                                               (C.Components.ContainsByPredicate(
+                                                                    [&](const auto& Component)
+                                                                    { return Component.Name == Callback.Source; }) ||
+                                                                !C.ParentId.IsEmpty()))) ||
                      !Identifier(Callback.EventName) ||
                      (Callback.Source == TEXT("owner") && !C.NativeParent.IsEmpty() &&
                                               C.NativeParent != TEXT("/Script/Engine.ActorComponent")))
@@ -515,13 +514,12 @@ bool FDasAuthoringModule::Validate(FString& Error) const
             if (!AddId(M.Id) || !Identifier(M.Name) || Names.Contains(M.Name.ToLower()))
                 return Fail(Error, TEXT("Invalid or duplicate method: ")+ M.Name);
             Names.Add(M.Name.ToLower());
-            if (M.bPure && (!M.bCallable || (M.ReturnType.Kind == TEXT("void") && !M.Parameters.ContainsByPredicate(
-                                                                                      [](const auto& P) {
-                                                                                          return P.Direction ==
-                                                                                                 TEXT("out") ||
-                                                                                                      P.Direction ==
-                                                                                                          TEXT("inout");
-                                                                                      }))))
+            if (M.bPure &&
+                (!M.bCallable ||
+                 (M.ReturnType.Kind ==
+                  TEXT("void") &&
+                       !M.Parameters.ContainsByPredicate(
+                           [](const auto& P) { return P.Direction == TEXT("out") || P.Direction == TEXT("inout"); }))))
                 return Fail(Error, TEXT("BlueprintPure requires callable function with a result or output parameter: ")+
                                         M.Name);
             if (!TypeValid(M.ReturnType, ClassIds, true, Error) || !MetadataValid(M.Metadata, Error))
@@ -533,7 +531,8 @@ bool FDasAuthoringModule::Validate(FString& Error) const
             if (!M.WorldContext.IsEmpty() &&
                 (!M.bStatic || C.NativeParent != TEXT("/Script/Engine.BlueprintFunctionLibrary") ||
                                                       !M.Parameters.ContainsByPredicate(
-                                                          [&](const auto& P) {
+                                                          [&](const auto& P)
+                                                          {
                                                               return P.Name == M.WorldContext &&
                                                                      P.Direction == TEXT("in") &&
                                                                                          P.Type.Kind == TEXT("object");

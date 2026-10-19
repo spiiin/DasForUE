@@ -1006,7 +1006,8 @@ FDasExecutionResult FDasRuntimeModule::RunLibraryFrame(const FString& Contract, 
         return Failed;
     }
     const auto* Method = Schema.Methods.FindByPredicate(
-        [&](const auto& M) {
+        [&](const auto& M)
+        {
             return M.EntryPoint == Entry && M.ScriptFile == Script && M.ReturnKind == Kind &&
                    M.ReturnClass == ReturnClass;
         });

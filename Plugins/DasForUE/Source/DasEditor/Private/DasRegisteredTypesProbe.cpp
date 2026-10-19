@@ -342,7 +342,8 @@ int32 RunDasRegisteredTypesProbe(const FString& Params)
         FDasAuthoringModule Names;
         Check(R.ReadAuthoringScript(R.ScriptPath(Script), Names, Error) &&
                   Names.Classes[0].Methods.ContainsByPredicate(
-                      [&](const auto& M) {
+                      [&](const auto& M)
+                      {
                           return M.Name == TEXT("RawConfig") &&
                                                 M.ReturnType.TypePath == Base + TEXT("/Types/Settings.Settings");
                       }),

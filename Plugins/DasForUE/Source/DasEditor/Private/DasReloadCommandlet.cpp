@@ -140,7 +140,7 @@ int32 UDasReloadCommandlet::Main(const FString& Params)
         return 1;
     UE_LOG(LogTemp, Display, TEXT("DAS_RELOAD_ROOT=%s"), *Root);
     TStrongObjectPtr<UBlueprint> Parent(
-        bReopen ? LoadObject<UBlueprint>(nullptr, *(Root + TEXT("/BP_DasGenerated.BP_DasGenerated")))
+        bReopen                          ? LoadObject<UBlueprint>(nullptr, *(Root + TEXT("/BP_DasGenerated.BP_DasGenerated")))
                                          : Blueprint(Root + TEXT("/BP_DasGenerated"), ADasProbeActor::StaticClass()));
     if (!Expect(Parent.IsValid(), TEXT("parent_asset")))
         return 1;
