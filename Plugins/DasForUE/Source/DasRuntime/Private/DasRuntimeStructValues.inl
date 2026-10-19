@@ -437,108 +437,6 @@ FDasStructValue StructNestedWith(const FDasStructValue& H, const char* Path, int
     WritePropertySnapshot(F.Property, F.Memory, Value, C);
     return Mutation.Finish(C, At);
 }
-int32 StructGetInt(const FDasStructValue& H, const char* P, das::Context* C)
-{
-    const auto& V = ResolveStructValue(H, C);
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FIntProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    return ReadPropertyScalarValue(T, F.Memory, C);
-}
-FDasStructValue StructWithInt(const FDasStructValue& H, const char* P, int32 X, das::Context* C, das::LineInfoArg* At)
-{
-    FStructMutation Mutation(H, C);
-    auto& V = Mutation.Value;
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FIntProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    WritePropertyScalarValue(T, F.Memory, X, C);
-    return Mutation.Finish(C, At);
-}
-float StructGetFloat(const FDasStructValue& H, const char* P, das::Context* C)
-{
-    const auto& V = ResolveStructValue(H, C);
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FFloatProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    return ReadPropertyScalarValue(T, F.Memory, C);
-}
-FDasStructValue StructWithFloat(const FDasStructValue& H, const char* P, float X, das::Context* C, das::LineInfoArg* At)
-{
-    FStructMutation Mutation(H, C);
-    auto& V = Mutation.Value;
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FFloatProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    WritePropertyScalarValue(T, F.Memory, X, C);
-    return Mutation.Finish(C, At);
-}
-double StructGetDouble(const FDasStructValue& H, const char* P, das::Context* C)
-{
-    const auto& V = ResolveStructValue(H, C);
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FDoubleProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    return ReadPropertyScalarValue(T, F.Memory, C);
-}
-FDasStructValue StructWithDouble(const FDasStructValue& H, const char* P, double X, das::Context* C,
-                                 das::LineInfoArg* At)
-{
-    FStructMutation Mutation(H, C);
-    auto& V = Mutation.Value;
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FDoubleProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    WritePropertyScalarValue(T, F.Memory, X, C);
-    return Mutation.Finish(C, At);
-}
-bool StructGetBool(const FDasStructValue& H, const char* P, das::Context* C)
-{
-    const auto& V = ResolveStructValue(H, C);
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FBoolProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    return ReadPropertyScalarValue(T, F.Memory, C);
-}
-FDasStructValue StructWithBool(const FDasStructValue& H, const char* P, bool X, das::Context* C, das::LineInfoArg* At)
-{
-    FStructMutation Mutation(H, C);
-    auto& V = Mutation.Value;
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FBoolProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    WritePropertyScalarValue(T, F.Memory, X, C);
-    return Mutation.Finish(C, At);
-}
-char* StructGetString(const FDasStructValue& H, const char* P, das::Context* C)
-{
-    const auto& V = ResolveStructValue(H, C);
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FStrProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    return CopyDSLString(ReadPropertyScalarValue(T, F.Memory, C), C);
-}
-FDasStructValue StructWithString(const FDasStructValue& H, const char* P, const char* X, das::Context* C,
-                                 das::LineInfoArg* At)
-{
-    FStructMutation Mutation(H, C);
-    auto& V = Mutation.Value;
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FStrProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    WritePropertyScalarValue(T, F.Memory, X ? UTF8_TO_TCHAR(X) : TEXT(""), C);
-    return Mutation.Finish(C, At);
-}
 FDasObjectHandle MakeObjectHandle(UObject*, UClass*, das::Context*);
 FDasObjectHandle ReadNullablePropertyObject(FProperty*, const void*, das::Context*);
 uint64 InternObjectKey(UObject*, das::Context*);
@@ -576,27 +474,6 @@ FDasStructValue StructWithObject(const FDasStructValue& H, const char* P, const 
     if (Object && !DasReferenceMatches(Object, T))
         C->throw_error("struct object field has an incompatible class");
     WriteNativePropertyValue(F.Property, F.Memory, SnapshotObjectValue(F.Property, Object, C), C);
-    return Mutation.Finish(C, At);
-}
-FDasNameValue StructGetName(const FDasStructValue& H, const char* P, das::Context* C)
-{
-    const auto& V = ResolveStructValue(H, C);
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FNameProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    return MakeDSLName(ReadPropertyScalarValue(T, F.Memory, C), C);
-}
-FDasStructValue StructWithName(const FDasStructValue& H, const char* P, FDasNameValue X, das::Context* C,
-                               das::LineInfoArg* At)
-{
-    FStructMutation Mutation(H, C);
-    auto& V = Mutation.Value;
-    auto F = StructLeaf(V, P, C);
-    auto* T = CastField<FNameProperty>(F.Property);
-    if (!T)
-        C->throw_error("struct field scalar type mismatch");
-    WritePropertyScalarValue(T, F.Memory, ResolveDSLName(X, C), C);
     return Mutation.Finish(C, At);
 }
 char* StructGetEnum(const FDasStructValue& H, const char* Path, const char* EnumPath, das::Context* C)

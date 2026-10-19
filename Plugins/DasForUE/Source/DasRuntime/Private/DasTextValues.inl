@@ -61,11 +61,3 @@ bool DSLTextIsInvariant(FDasTextValue V, das::Context* C)
 {
     return ResolveDSLText(V, C).IsCultureInvariant();
 }
-void MethodArgtext(const FDasCallHandle& H, const char* Path, FDasTextValue Value, das::Context* C)
-{
-    SetCallScalar<FTextProperty>(H, Path, ResolveDSLText(Value, C), C);
-}
-FDasTextValue MethodResulttext(const FDasCallHandle& H, const char* Path, das::Context* C)
-{
-    return MakeDSLText(GetCallScalar<FTextProperty>(H, Path, C), C);
-}

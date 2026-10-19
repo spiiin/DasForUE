@@ -903,22 +903,6 @@ void SetCallInt(const FDasCallHandle& H, const char* P, int32 V, das::Context* C
 {
     SetCallScalar<FIntProperty>(H, P, V, C);
 }
-void SetCallFloat(const FDasCallHandle& H, const char* P, float V, das::Context* C)
-{
-    SetCallScalar<FFloatProperty>(H, P, V, C);
-}
-void SetCallDouble(const FDasCallHandle& H, const char* P, double V, das::Context* C)
-{
-    SetCallScalar<FDoubleProperty>(H, P, V, C);
-}
-void SetCallBool(const FDasCallHandle& H, const char* P, bool V, das::Context* C)
-{
-    SetCallScalar<FBoolProperty>(H, P, V, C);
-}
-void SetCallString(const FDasCallHandle& H, const char* P, const char* V, das::Context* C)
-{
-    SetCallScalar<FStrProperty>(H, P, FString(V ? UTF8_TO_TCHAR(V) : TEXT("")), C);
-}
 
 void SetCallName(const FDasCallHandle& Handle, const char* Path, const char* Value, das::Context* Context)
 {
@@ -1208,22 +1192,6 @@ template <class P> auto GetCallScalar(const FDasCallHandle& Handle, const char* 
         Context->throw_error("result scalar type mismatch");
     return Value.*TPropertyScalarSlot<P>::Member;
 }
-int32 GetCallInt(const FDasCallHandle& H, const char* P, das::Context* C)
-{
-    return GetCallScalar<FIntProperty>(H, P, C);
-}
-float GetCallFloat(const FDasCallHandle& H, const char* P, das::Context* C)
-{
-    return GetCallScalar<FFloatProperty>(H, P, C);
-}
-double GetCallDouble(const FDasCallHandle& H, const char* P, das::Context* C)
-{
-    return GetCallScalar<FDoubleProperty>(H, P, C);
-}
-bool GetCallBool(const FDasCallHandle& H, const char* P, das::Context* C)
-{
-    return GetCallScalar<FBoolProperty>(H, P, C);
-}
 char* GetCallString(const FDasCallHandle& H, const char* P, das::Context* C)
 {
     const FString Value = GetCallScalar<FStrProperty>(H, P, C);
@@ -1254,14 +1222,3 @@ struct FCallHandleAnnotation : das::ManagedStructureAnnotation<FDasCallHandle, f
     virtual bool isPod() const override { return true; }
     virtual bool canBePlacedInContainer() const override { return true; }
 };
-
-void SetCallByte(const FDasCallHandle& H, const char* Path, int32 Value, das::Context* C)
-{
-    if (Value < 0 || Value > 255)
-        C->throw_error("byte input must be a raw uint8 in range 0..255");
-    SetCallScalar<FByteProperty>(H, Path, uint8(Value), C);
-}
-int32 GetCallByte(const FDasCallHandle& H, const char* Path, das::Context* C)
-{
-    return GetCallScalar<FByteProperty>(H, Path, C);
-}

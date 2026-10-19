@@ -130,15 +130,6 @@ FDasCallHandle BeginAuthoredCallSelected(const FDasObjectHandle& Target, const c
     Call.bAuthored = true;
     return Handle;
 }
-void MethodArgname(const FDasCallHandle& H, const char* Path, FDasNameValue Value, das::Context* C)
-{
-    const auto Name = ResolveDSLName(Value, C);
-    SetCallName(H, Path, TCHAR_TO_UTF8(*Name.ToString()), C);
-}
-FDasNameValue MethodResultname(const FDasCallHandle& H, const char* Path, das::Context* C)
-{
-    return MakeDSLName(GetCallScalar<FNameProperty>(H, Path, C), C);
-}
 void MethodArgenum(const FDasCallHandle& H, const char* Path, FDasEnumValue Value, das::Context* C)
 {
     const auto& V = ResolveEnumValue(Value, C);

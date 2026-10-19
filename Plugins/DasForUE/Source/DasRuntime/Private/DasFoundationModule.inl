@@ -841,18 +841,22 @@ public:
             *this, Library, "__ue_begin_super_call", das::SideEffects::modifyExternal, "BeginAuthoredSuperCall");
         AddUEExtern<DAS_BIND_FUN(BeginAuthoredCall), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_begin_authored_call", das::SideEffects::modifyExternal, "BeginAuthoredCall");
-        AddUEExtern<DAS_BIND_FUN(MethodArgtext)>(*this, Library, "__ue_method_arg_text",
-                                                 das::SideEffects::modifyExternal, "MethodArgtext");
-        AddUEExtern<DAS_BIND_FUN(MethodResulttext)>(*this, Library, "__ue_method_result_text",
-                                                    das::SideEffects::modifyExternal, "MethodResulttext");
-        AddUEExtern<DAS_BIND_FUN(SetCallByte)>(*this, Library, "ue_arg_byte", das::SideEffects::modifyExternal,
-                                               "SetCallByte");
-        AddUEExtern<DAS_BIND_FUN(GetCallByte)>(*this, Library, "ue_result_byte", das::SideEffects::modifyExternal,
-                                               "GetCallByte");
-        AddUEExtern<DAS_BIND_FUN(MethodArgname)>(*this, Library, "__ue_method_arg_name",
-                                                 das::SideEffects::modifyExternal, "MethodArgname");
-        AddUEExtern<DAS_BIND_FUN(MethodResultname)>(*this, Library, "__ue_method_result_name",
-                                                    das::SideEffects::modifyExternal, "MethodResultname");
+        // Struct leaf and call frame scalars (DasScalarAccessors.inl).
+#define DAS_REGISTER_STRUCT_SCALARS(Suffix, SelfKind, RefKind)                                                         \
+    AddUEExtern<DAS_BIND_FUN(StructGetScalar<SelfKind>)>(*this, Library, "ue_struct_get_" #Suffix,                     \
+                                                         das::SideEffects::modifyExternal, "StructGetScalar");         \
+    AddUEExtern<DAS_BIND_FUN(StructWithScalar<SelfKind>), das::SimNode_ExtFuncCallAndCopyOrMove>(                      \
+                    *this, Library, "ue_struct_with_" #Suffix, das::SideEffects::modifyExternal, "StructWithScalar")   \
+                    ->needCallerStackFrame = true;
+        DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_STRUCT_SCALARS)
+#undef DAS_REGISTER_STRUCT_SCALARS
+#define DAS_REGISTER_CALL_SCALARS(ArgName, ResultName, Kind)                                                           \
+    AddUEExtern<DAS_BIND_FUN(SetCallKind<Kind>)>(*this, Library, ArgName, das::SideEffects::modifyExternal,            \
+                                                 "SetCallKind");                                                       \
+    AddUEExtern<DAS_BIND_FUN(GetCallKind<Kind>)>(*this, Library, ResultName, das::SideEffects::modifyExternal,         \
+                                                 "GetCallKind");
+        DAS_CALL_SCALAR_KINDS(DAS_REGISTER_CALL_SCALARS)
+#undef DAS_REGISTER_CALL_SCALARS
         AddUEExtern<DAS_BIND_FUN(MethodArgenum)>(*this, Library, "__ue_method_arg_enum",
                                                  das::SideEffects::modifyExternal, "MethodArgenum");
         AddUEExtern<DAS_BIND_FUN(MethodResultenum)>(*this, Library, "__ue_method_result_enum",
@@ -879,26 +883,6 @@ public:
                                                     "PrepareCallArray");
         AddUEExtern<DAS_BIND_FUN(GetCallArraySize)>(*this, Library, "ue_result_array_size",
                                                     das::SideEffects::modifyExternal, "GetCallArraySize");
-        AddUEExtern<DAS_BIND_FUN(SetCallInt)>(*this, Library, "ue_arg_int", das::SideEffects::modifyExternal,
-                                              "SetCallInt");
-        AddUEExtern<DAS_BIND_FUN(GetCallInt)>(*this, Library, "ue_result_int", das::SideEffects::modifyExternal,
-                                              "GetCallInt");
-        AddUEExtern<DAS_BIND_FUN(SetCallFloat)>(*this, Library, "ue_arg_float", das::SideEffects::modifyExternal,
-                                                "SetCallFloat");
-        AddUEExtern<DAS_BIND_FUN(GetCallFloat)>(*this, Library, "ue_result_float", das::SideEffects::modifyExternal,
-                                                "GetCallFloat");
-        AddUEExtern<DAS_BIND_FUN(SetCallDouble)>(*this, Library, "ue_arg_double", das::SideEffects::modifyExternal,
-                                                 "SetCallDouble");
-        AddUEExtern<DAS_BIND_FUN(GetCallDouble)>(*this, Library, "ue_result_double", das::SideEffects::modifyExternal,
-                                                 "GetCallDouble");
-        AddUEExtern<DAS_BIND_FUN(SetCallBool)>(*this, Library, "ue_arg_bool", das::SideEffects::modifyExternal,
-                                               "SetCallBool");
-        AddUEExtern<DAS_BIND_FUN(GetCallBool)>(*this, Library, "ue_result_bool", das::SideEffects::modifyExternal,
-                                               "GetCallBool");
-        AddUEExtern<DAS_BIND_FUN(SetCallString)>(*this, Library, "ue_arg_string", das::SideEffects::modifyExternal,
-                                                 "SetCallString");
-        AddUEExtern<DAS_BIND_FUN(GetCallString)>(*this, Library, "ue_result_string", das::SideEffects::modifyExternal,
-                                                 "GetCallString");
 
         AddUEExtern<DAS_BIND_FUN(ObjectValue), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "ue_object_value", das::SideEffects::modifyExternal, "ObjectValue");
@@ -1417,20 +1401,10 @@ public:
                         *this, Library, "__ue_struct_map_with_byte_object", das::SideEffects::modifyExternal,
                         "WithTextByteMapByteObject")
                         ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructGetbyte)>(*this, Library, "ue_struct_get_byte", das::SideEffects::modifyExternal,
-                                                 "StructGetbyte");
-        AddUEExtern<DAS_BIND_FUN(StructGettext)>(*this, Library, "ue_struct_get_text", das::SideEffects::modifyExternal,
-                                                 "StructGettext");
         AddUEExtern<DAS_BIND_FUN(PublishFrameByte)>(*this, Library, "ue_frame_out_byte",
                                                     das::SideEffects::modifyExternal, "PublishFrameByte");
         AddUEExtern<DAS_BIND_FUN(PublishFrameText)>(*this, Library, "ue_frame_out_text",
                                                     das::SideEffects::modifyExternal, "PublishFrameText");
-        AddUEExtern<DAS_BIND_FUN(StructWithbyte), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_with_byte", das::SideEffects::modifyExternal, "StructWithbyte")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructWithtext), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_with_text", das::SideEffects::modifyExternal, "StructWithtext")
-                        ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(PublishFrameName)>(*this, Library, "ue_frame_out_name",
                                                     das::SideEffects::modifyExternal, "PublishFrameName");
         AddUEExtern<DAS_BIND_FUN(PublishFrameObject)>(*this, Library, "ue_frame_out_object",
@@ -1710,31 +1684,6 @@ public:
         AddUEExtern<DAS_BIND_FUN(StructNestedWith), das::SimNode_ExtFuncCallAndCopyOrMove>(
                         *this, Library, "ue_struct_nested_with", das::SideEffects::modifyExternal, "StructNestedWith")
                         ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructGetInt)>(*this, Library, "ue_struct_get_int", das::SideEffects::modifyExternal,
-                                                "StructGetInt");
-        AddUEExtern<DAS_BIND_FUN(StructWithInt), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_with_int", das::SideEffects::modifyExternal, "StructWithInt")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructGetFloat)>(*this, Library, "ue_struct_get_float",
-                                                  das::SideEffects::modifyExternal, "StructGetFloat");
-        AddUEExtern<DAS_BIND_FUN(StructWithFloat), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_with_float", das::SideEffects::modifyExternal, "StructWithFloat")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructGetDouble)>(*this, Library, "ue_struct_get_double",
-                                                   das::SideEffects::modifyExternal, "StructGetDouble");
-        AddUEExtern<DAS_BIND_FUN(StructWithDouble), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_with_double", das::SideEffects::modifyExternal, "StructWithDouble")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructGetBool)>(*this, Library, "ue_struct_get_bool", das::SideEffects::modifyExternal,
-                                                 "StructGetBool");
-        AddUEExtern<DAS_BIND_FUN(StructWithBool), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_with_bool", das::SideEffects::modifyExternal, "StructWithBool")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructGetString)>(*this, Library, "ue_struct_get_string",
-                                                   das::SideEffects::modifyExternal, "StructGetString");
-        AddUEExtern<DAS_BIND_FUN(StructWithString), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_with_string", das::SideEffects::modifyExternal, "StructWithString")
-                        ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(StructGetEnum)>(*this, Library, "ue_struct_get_enum", das::SideEffects::modifyExternal,
                                                  "StructGetEnum");
         AddUEExtern<DAS_BIND_FUN(StructWithEnum), das::SimNode_ExtFuncCallAndCopyOrMove>(
@@ -1746,11 +1695,6 @@ public:
             *this, Library, "ue_struct_get_object", das::SideEffects::modifyExternal, "StructGetObject");
         AddUEExtern<DAS_BIND_FUN(StructWithObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
                         *this, Library, "ue_struct_with_object", das::SideEffects::modifyExternal, "StructWithObject")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructGetName)>(*this, Library, "ue_struct_get_name", das::SideEffects::modifyExternal,
-                                                 "StructGetName");
-        AddUEExtern<DAS_BIND_FUN(StructWithName), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_with_name", das::SideEffects::modifyExternal, "StructWithName")
                         ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(DSLNameFromString)>(*this, Library, "ue_name_value", das::SideEffects::modifyExternal,
                                                      "DSLNameFromString");
