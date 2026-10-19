@@ -749,4 +749,4 @@ Synchronous UserWidget input handlers returning scoped EventReply commands: [Wid
 
 GameplayTag and GameplayTagContainer values and real tag properties in authored classes/structs: [GameplayTags](Docs/GameplayTags.md). Focused check: `Scripts/TestGameplayTags.ps1`.
 
-Managed soft-texture/material Image brushes (runtime scenario pending): [ImageSoftBrush](Docs/ImageSoftBrush.md).
+Managed soft-texture/material Image brushes: [ImageSoftBrush](Docs/ImageSoftBrush.md). Focused check: `Scripts/TestImageSoftBrush.ps1`.

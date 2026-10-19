@@ -105,7 +105,7 @@ def check_widget_routes(rows, source):
 def markdown(result):
     labels = {'policy_exclusion':'Исключения политики', 'implemented_adapter':'Готовые адаптеры', 'technical_blocker':'Технические блокеры'}
     counts=result['counts'];adapted=result['partition'].get('implemented_adapter',0)
-    lines = ['# UMG / Input: аудит 110 отказов экспорта', '',
+    lines = [f"# UMG / Input: аудит {counts['export_blocked']} отказов экспорта", '',
         'Профиль: 20 receiver-классов и 5 библиотек; это не аудит всего UMG.',
         'Свежая reflection проверена настоящим пакетным генератором. Исходные статусы и причины сохранены.', '',
         f"**{counts['generation_ready']} generated ready, {counts['export_blocked']} export blocked, {counts['generation_blocked']} generation blocked.** Классификация не меняет eligibility и не публикует API.", '',
@@ -119,7 +119,7 @@ def markdown(result):
     lines += ['| '+k+' | '+str(v)+' |' for k,v in sorted(counts.items())]
     lines += ['', 'Два GetBoundActionValue — две точки входа одной возможности polling; payload Enhanced Input callback не заменяет опрос.',
         'Destruct cleanup и отзыв animation lease уже существуют, но не реализуют пользовательские Destruct/OnAnimationFinished callbacks.', '',
-        'Следующий порядок: soft brush adapter; группа pointer/focus-path notifications; widget lifecycle и query overrides; animation events, motion и guarded input polling.',
+        'Следующий порядок: группа pointer/focus-path notifications; widget lifecycle и query overrides; animation events, motion и guarded input polling.',
         'После этого расширять профиль на новые классы, сохраняя такой же поимённый отчёт. Порядок — рекомендация аудита, а не обещание открыть internal API без guard-контрактов.', '',
         '## Поимённые решения', '']
     for c in ('technical_blocker','implemented_adapter','policy_exclusion'):

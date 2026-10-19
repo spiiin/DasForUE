@@ -21,7 +21,7 @@ class AuditTests(unittest.TestCase):
 
     def test_complete_partition_preserves_raw_refusals(self):
         rows=partition(self.r,self.d)
-        self.assertEqual(len(rows),110)
+        self.assertEqual(len(rows),108)
         self.assertTrue(all(x['raw_status']=='export_blocked' for x in rows))
         self.assertEqual({x['category'] for x in rows},{'implemented_adapter','policy_exclusion','technical_blocker'})
 
@@ -86,8 +86,8 @@ class AuditTests(unittest.TestCase):
         check_widget_routes(rows,source)
         self.refused(lambda:check_widget_routes(rows,source+'\nDAS_WIDGET_INPUT(OnMotionDetected,FMotionEvent)'))
 
-    def test_unrelated_existing_adapter_cannot_claim_soft_brush(self):
-        row=next(x for x in self.d['members'] if x['group']=='soft_brush');row['category']='implemented_adapter';row['adapter']='widget_factory'
+    def test_unrelated_existing_adapter_cannot_claim_technical_blocker(self):
+        row=next(x for x in self.d['members'] if x['category']=='technical_blocker' and x['class_path']!='/Script/UMG.WidgetBlueprintLibrary');row['category']='implemented_adapter';row['adapter']='widget_factory'
         rows=partition(self.r,self.d)
         source=(ROOT/'Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp').read_text(encoding='utf-8-sig')
         self.refused(lambda:check_widget_routes(rows,source))

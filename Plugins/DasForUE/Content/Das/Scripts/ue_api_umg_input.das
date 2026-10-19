@@ -18,6 +18,8 @@ require ue_input_events public
 
 require ue_input_value public
 
+require ue_image_soft_brush public
+
 require ue_native_delegate public
 
 [ue_native_interface(path="/Script/CoreUObject.Interface")]
@@ -2937,6 +2939,27 @@ def ue_image_SetBrushFromMaterial(target : C_Image_61e460fb; arg_material : C_Ma
     ue_expect_signature(call, "v1;SetBrushFromMaterial;Material:ObjectProperty:128:/Script/Engine.MaterialInterface;")
     ue_require_call_context(call, false)
     ue_arg_object(call, "material", C_MaterialInterface_d64f3063_raw(arg_material))
+    ue_invoke_call(call)
+    ue_release_call(call)
+}
+
+def ue_image_SetBrushFromSoftMaterial(target : C_Image_61e460fb; arg_softmaterial : $UESoftObject<C_MaterialInterface_d64f3063>) {
+    let receiver = ue_cast_object(C_Image_61e460fb_raw(target), "/Script/UMG.Image")
+    let call = ue_begin_call(receiver, "SetBrushFromSoftMaterial")
+    ue_expect_signature(call, "v1;SetBrushFromSoftMaterial;SoftMaterial:SoftObjectProperty:128:soft:/Script/Engine.MaterialInterface;")
+    ue_require_call_context(call, false)
+    __ue_method_arg_struct(call, "softmaterial", ue_soft_value(arg_softmaterial))
+    ue_invoke_call(call)
+    ue_release_call(call)
+}
+
+def ue_image_SetBrushFromSoftTexture(target : C_Image_61e460fb; arg_softtexture : $UESoftObject<C_Texture2D_2db8ea5c>; arg_bmatchsize : bool) {
+    let receiver = ue_cast_object(C_Image_61e460fb_raw(target), "/Script/UMG.Image")
+    let call = ue_begin_call(receiver, "SetBrushFromSoftTexture")
+    ue_expect_signature(call, "v1;SetBrushFromSoftTexture;SoftTexture:SoftObjectProperty:128:soft:/Script/Engine.Texture2D;bMatchSize:BoolProperty:128;")
+    ue_require_call_context(call, false)
+    __ue_method_arg_struct(call, "softtexture", ue_soft_value(arg_softtexture))
+    ue_arg_bool(call, "bmatchsize", arg_bmatchsize)
     ue_invoke_call(call)
     ue_release_call(call)
 }

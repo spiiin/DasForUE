@@ -6,8 +6,8 @@
   "value_types": "canonical_math",
   "default_arguments": "explicit",
   "counts": {
-    "generation_ready": 407,
-    "export_blocked": 110,
+    "generation_ready": 409,
+    "export_blocked": 108,
     "generation_blocked": 0,
     "policy_excluded": 0
   },
@@ -17,8 +17,8 @@
   "unknown_declaration_occurrences": 0,
   "surfaces": {
     "receiver": {
-      "generation_ready": 257,
-      "export_blocked": 94,
+      "generation_ready": 259,
+      "export_blocked": 92,
       "generation_blocked": 0,
       "policy_excluded": 0
     },
@@ -29,11 +29,12 @@
       "policy_excluded": 0
     }
   },
-  "source_sha256": "a32bd12bebfe30dec7ed1f8377f7f4062d3af789648afd658aa3616f929e55d3",
+  "source_sha256": "c10efb846d301d2934501b65992d274c2238efd30741ba110e9113114dbfb6f3",
   "dependencies": {
     "das_modules": [
       "ue_foundation",
       "ue_geometry",
+      "ue_image_soft_brush",
       "ue_input_events",
       "ue_input_value",
       "ue_native_delegate",
@@ -50,7 +51,7 @@
       "EnhancedInput"
     ]
   },
-  "staged_module": "ue_api_umg_input_preflight_a32bd12bebfe30de",
+  "staged_module": "ue_api_umg_input_preflight_c10efb846d301d29",
   "members": [
     {
       "class": "/Script/Engine.InputComponent",
@@ -1565,8 +1566,9 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.Image",
-      "status": "export_blocked",
-      "reason": "soft_reference_requires_binding_adapter"
+      "alias": "ue_image_SetBrushFromSoftMaterial",
+      "explicit_defaults": [],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Image",
@@ -1574,8 +1576,14 @@
       "surface": "receiver",
       "construction_unsafe": false,
       "declaring_class": "/Script/UMG.Image",
-      "status": "export_blocked",
-      "reason": "soft_reference_requires_binding_adapter"
+      "alias": "ue_image_SetBrushFromSoftTexture",
+      "explicit_defaults": [
+        {
+          "parameter": "bmatchsize",
+          "value": "false"
+        }
+      ],
+      "status": "generation_ready"
     },
     {
       "class": "/Script/UMG.Image",
@@ -5462,10 +5470,10 @@
   ],
   "preflight": {
     "runtime_probe": "passed",
-    "build_mode": "Editor NullRHI",
     "packaged": "not_run",
-    "game_world": true,
+    "profile_sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa",
     "compile": "passed",
-    "profile_sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa"
+    "game_world": true,
+    "build_mode": "Editor NullRHI"
   }
 }

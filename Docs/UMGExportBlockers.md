@@ -1,17 +1,17 @@
-# UMG / Input: аудит 110 отказов экспорта
+# UMG / Input: аудит 108 отказов экспорта
 
 Профиль: 20 receiver-классов и 5 библиотек; это не аудит всего UMG.
 Свежая reflection проверена настоящим пакетным генератором. Исходные статусы и причины сохранены.
 
-**407 generated ready, 110 export blocked, 0 generation blocked.** Классификация не меняет eligibility и не публикует API.
+**409 generated ready, 108 export blocked, 0 generation blocked.** Классификация не меняет eligibility и не публикует API.
 
 | Категория | Членов |
 | --- | ---: |
 | Исключения политики | 60 |
 | Готовые адаптеры | 32 |
-| Технические блокеры | 18 |
+| Технические блокеры | 16 |
 
-32 адаптированных объявления не прибавляются к числу 407: это отдельные callback/factory/value-helper возможности, часто с более узким контрактом.
+32 адаптированных объявления не прибавляются к числу 409: это отдельные callback/factory/value-helper возможности, часто с более узким контрактом.
 25 delegate signatures — определения типов, а не готовые подписки. Protected legacy input и editor helpers остаются закрытыми.
 Наличие общего accessor backend не является проверкой конкретного UMG свойства; альтернативы для трёх accessor entrypoints отмечены в строках.
 
@@ -23,7 +23,6 @@
 | focus_path_notifications | 2 |
 | motion_event | 1 |
 | pointer_notifications | 3 |
-| soft_brush | 2 |
 | widget_animation_events | 2 |
 | widget_lifecycle | 5 |
 | widget_query_override | 1 |
@@ -31,7 +30,7 @@
 Два GetBoundActionValue — две точки входа одной возможности polling; payload Enhanced Input callback не заменяет опрос.
 Destruct cleanup и отзыв animation lease уже существуют, но не реализуют пользовательские Destruct/OnAnimationFinished callbacks.
 
-Следующий порядок: soft brush adapter; группа pointer/focus-path notifications; widget lifecycle и query overrides; animation events, motion и guarded input polling.
+Следующий порядок: группа pointer/focus-path notifications; widget lifecycle и query overrides; animation events, motion и guarded input polling.
 После этого расширять профиль на новые классы, сохраняя такой же поимённый отчёт. Порядок — рекомендация аудита, а не обещание открыть internal API без guard-контрактов.
 
 ## Поимённые решения
@@ -42,8 +41,6 @@ Destruct cleanup и отзыв animation lease уже существуют, но
 | --- | --- | --- | --- |
 | `/Script/EnhancedInput.EnhancedInputComponent.GetBoundActionValue` | `internal_function` | Безопасный polling helper не реализован. Нужны actor/component/action/world guards, договор о registered value binding и owned InputActionValue result. Callback payload не заменяет polling. | `Engine/Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h:596` |
 | `/Script/EnhancedInput.EnhancedInputLibrary.GetBoundActionValue` | `internal_function` | Безопасный polling helper не реализован. Нужны actor/component/action/world guards, договор о registered value binding и owned InputActionValue result. Callback payload не заменяет polling. | `Engine/Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputLibrary.h:73` |
-| `/Script/UMG.Image.SetBrushFromSoftMaterial` | `soft_reference_requires_binding_adapter` | Нужен typed soft-reference binding adapter с контролем async load, замены запроса, жизни Image и поведения при Destroy/reload; generic soft reference storage не решает контракт этого вызова. | `Engine/Source/Runtime/UMG/Public/Components/Image.h:143` |
-| `/Script/UMG.Image.SetBrushFromSoftTexture` | `soft_reference_requires_binding_adapter` | Нужен typed soft-reference binding adapter с контролем async load, замены запроса, жизни Image и поведения при Destroy/reload; generic soft reference storage не решает контракт этого вызова. | `Engine/Source/Runtime/UMG/Public/Components/Image.h:139` |
 | `/Script/UMG.UserWidget.Construct` | `Expected loaded class and local BlueprintCallable instance function: /Script/UMG.UserWidget.Construct` | Вызов script Construct после построения Slate tree; определить повторную конструкцию и Super. | `Engine/Source/Runtime/UMG/Public/Blueprint/UserWidget.h:523` |
 | `/Script/UMG.UserWidget.Destruct` | `Expected loaded class and local BlueprintCallable instance function: /Script/UMG.UserWidget.Destruct` | Добавить пользовательский Destruct callback. Существующий NativeDestruct освобождает VM, но не вызывает такой script callback. | `Engine/Source/Runtime/UMG/Public/Blueprint/UserWidget.h:538` |
 | `/Script/UMG.UserWidget.IsInteractable` | `Expected loaded class and local BlueprintCallable instance function: /Script/UMG.UserWidget.IsInteractable` | Нужен синхронный bool override с fallback и reentry guard; обычного отражённого вызова недостаточно. | `Engine/Source/Runtime/UMG/Public/Blueprint/UserWidget.h:559` |

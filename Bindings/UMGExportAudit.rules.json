@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "package": "ue_api_umg_input",
-  "expected_export_blocked": 110,
+  "expected_export_blocked": 108,
   "categories": [
     "policy_exclusion",
     "implemented_adapter",
@@ -553,32 +553,6 @@
       "native_evidence": {
         "path": "Engine/Source/Runtime/UMG/Public/Components/EditableTextBox.h",
         "marker": "FOnEditableTextBoxCommittedEvent"
-      }
-    },
-    {
-      "class_path": "/Script/UMG.Image",
-      "function": "SetBrushFromSoftMaterial",
-      "expected_reason": "soft_reference_requires_binding_adapter",
-      "category": "technical_blocker",
-      "group": "soft_brush",
-      "rationale": "Нужен typed soft-reference binding adapter с контролем async load, замены запроса, жизни Image и поведения при Destroy/reload; generic soft reference storage не решает контракт этого вызова.",
-      "next_action": "Нужен typed soft-reference binding adapter с контролем async load, замены запроса, жизни Image и поведения при Destroy/reload; generic soft reference storage не решает контракт этого вызова.",
-      "native_evidence": {
-        "path": "Engine/Source/Runtime/UMG/Public/Components/Image.h",
-        "marker": "SetBrushFromSoftMaterial("
-      }
-    },
-    {
-      "class_path": "/Script/UMG.Image",
-      "function": "SetBrushFromSoftTexture",
-      "expected_reason": "soft_reference_requires_binding_adapter",
-      "category": "technical_blocker",
-      "group": "soft_brush",
-      "rationale": "Нужен typed soft-reference binding adapter с контролем async load, замены запроса, жизни Image и поведения при Destroy/reload; generic soft reference storage не решает контракт этого вызова.",
-      "next_action": "Нужен typed soft-reference binding adapter с контролем async load, замены запроса, жизни Image и поведения при Destroy/reload; generic soft reference storage не решает контракт этого вызова.",
-      "native_evidence": {
-        "path": "Engine/Source/Runtime/UMG/Public/Components/Image.h",
-        "marker": "SetBrushFromSoftTexture("
       }
     },
     {

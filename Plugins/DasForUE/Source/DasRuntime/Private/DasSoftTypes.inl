@@ -50,7 +50,10 @@ struct FUESoftCallMacro:das::CallMacro {
  FUESoftCallMacro(const char* N,int Op):CallMacro(N),Operation(Op){}
  virtual bool canVisitArguments(das::ExprCallMacro*,int I)override{return Operation!=0 || I!=0;}
  virtual das::ExpressionPtr visit(das::Program* P,das::Module* M,das::ExprCallMacro* E)override{try{
-  if(Operation==0){if(E->arguments.size()!=2 || !E->arguments[0]->rtti_isTypeDecl())DSLFail(TEXT("Expected ue_soft(type<SoftType>, path)"));auto T=DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(E->arguments[0])->typeexpr,*P->thisModuleGroup,M);return DSLSoftUnpack(E->at,T,DSLCall(E->at,"__ue_soft_make",{new das::ExprConstString(E->at,DSLUtf8(DSLSoftPath(T))),E->arguments[1]}));}
+  if(Operation==0){if(E->arguments.size()!=2 || !E->arguments[0]->rtti_isTypeDecl())DSLFail(TEXT("Expected ue_soft(type<SoftType>, path)"));auto T=DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(E->arguments[0])->typeexpr,*P->thisModuleGroup,M);
+   // Same-module typedefs are still unexpanded type macros when this call macro runs.
+   if(T && T->baseType==das::Type::typeMacro){const das::string Name=T->typeMacroName();const bool Class=Name=="UESoftClass" || Name=="ue_foundation::UESoftClass";if(Class || Name=="UESoftObject" || Name=="ue_foundation::UESoftObject"){FUESoftTypeMacro Expand(Class);T=Expand.visit(P,M,T,nullptr);if(!T)return nullptr;}}
+   return DSLSoftUnpack(E->at,T,DSLCall(E->at,"__ue_soft_make",{new das::ExprConstString(E->at,DSLUtf8(DSLSoftPath(T))),E->arguments[1]}));}
   if(E->arguments.size()!=1 || !DSLSoft(E->arguments[0]->type))DSLFail(TEXT("Expected one typed soft reference"));const auto T=E->arguments[0]->type;
   if(Operation==1)return DSLSoftPack(E->at,T,E->arguments[0]);
   const auto* A=DSLSoftAnnotation(T);const auto Target=DSLUtf8(DSLString(A->arguments,"target"));das::StructurePtr Found=nullptr;for(auto* Module:P->thisModuleGroup->getModules())Module->structures.foreach([&](const das::StructurePtr& S){if(S->module->name+"::"+S->name==Target)Found=S;});if(!Found)M->structures.foreach([&](const das::StructurePtr& S){if(S->module->name+"::"+S->name==Target)Found=S;});if(!Found)DSLFail(TEXT("Missing canonical soft result type"));auto* Out=new das::TypeDecl(das::Type::tStructure,E->at);Out->structType=Found;const bool Class=DSLBool(*A->arguments.find("class_ref",das::Type::tBool));

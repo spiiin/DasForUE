@@ -3,15 +3,15 @@
   "package": "ue_api_umg_input",
   "engine_version": "5.8.3-0+UE5",
   "counts": {
-    "generation_ready": 407,
-    "export_blocked": 110,
+    "generation_ready": 409,
+    "export_blocked": 108,
     "generation_blocked": 0,
     "policy_excluded": 0
   },
   "candidate_count": 517,
   "partition": {
     "policy_exclusion": 60,
-    "technical_blocker": 18,
+    "technical_blocker": 16,
     "implemented_adapter": 32
   },
   "groups": {
@@ -22,7 +22,6 @@
     "input_value_conversion": 4,
     "delegate_signature": 25,
     "non_callable_accessor": 3,
-    "soft_brush": 2,
     "widget_lifecycle": 5,
     "widget_query_override": 1,
     "protected_legacy_input": 8,
@@ -43,27 +42,27 @@
   "runtime_adapter_execution": "not_run_static_audit_only",
   "evidence": {
     "profile": {
-      "path": "C:\\src\\DasForUE2\\Build\\UMGExportAudit\\a21fdf4f81664b0a9879a6edadc1e43d\\profile.json",
+      "path": "C:\\src\\DasForUE2\\Build\\UMGExportAudit\\5315d5cd592641c596c7ba8f8b02fb7c\\profile.json",
       "sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa"
     },
     "reflection": {
-      "path": "C:\\src\\DasForUE2\\Build\\UMGExportAudit\\a21fdf4f81664b0a9879a6edadc1e43d\\reflection.json",
-      "sha256": "48bb3630159fe69ed53d2751a670e4f791deab110acb2dd2c679b774011aad57"
+      "path": "C:\\src\\DasForUE2\\Build\\UMGExportAudit\\5315d5cd592641c596c7ba8f8b02fb7c\\reflection.json",
+      "sha256": "7f99b9e14a0d7a4256074525fac99a7adb004b18383d740ad26f05144658366b"
     },
     "report": {
-      "path": "C:\\src\\DasForUE2\\Build\\UMGExportAudit\\a21fdf4f81664b0a9879a6edadc1e43d\\report.json",
-      "sha256": "fa225b19895171ab5f2bd14290582a5a598a7859e0adec6dad7511f698644b24"
+      "path": "C:\\src\\DasForUE2\\Build\\UMGExportAudit\\5315d5cd592641c596c7ba8f8b02fb7c\\report.json",
+      "sha256": "76e798d37e2caeed2f963d142eb570c23e7891f71d4326e43803b030aead51bb"
     },
     "summary": {
-      "path": "C:\\src\\DasForUE2\\Build\\UMGExportAudit\\a21fdf4f81664b0a9879a6edadc1e43d\\summary.json",
-      "sha256": "fa225b19895171ab5f2bd14290582a5a598a7859e0adec6dad7511f698644b24"
+      "path": "C:\\src\\DasForUE2\\Build\\UMGExportAudit\\5315d5cd592641c596c7ba8f8b02fb7c\\summary.json",
+      "sha256": "961b37cffe3d4499ab6aef93ee6d85934d0d4fad61d4bc40fa587f47d7497bdd"
     },
     "rules": {
-      "path": "C:\\src\\DasForUE2\\Build\\UMGExportAudit\\a21fdf4f81664b0a9879a6edadc1e43d\\rules.json",
-      "sha256": "7a1caf203494e7b7e5277450c7094a4fadb210f9280a37ee56c178eca13d9725"
+      "path": "C:\\src\\DasForUE2\\Build\\UMGExportAudit\\5315d5cd592641c596c7ba8f8b02fb7c\\rules.json",
+      "sha256": "365d76abc5d9adce75692669d95077832b563532e5bd3b228124f0fca4d9bb56"
     }
   },
-  "regenerated_source_sha256": "a32bd12bebfe30dec7ed1f8377f7f4062d3af789648afd658aa3616f929e55d3",
+  "regenerated_source_sha256": "c10efb846d301d2934501b65992d274c2238efd30741ba110e9113114dbfb6f3",
   "adapters": {
     "input_reply": {
       "api": "ue_widget_bind_input(widget, script, event, handler)",
@@ -78,8 +77,8 @@
         {
           "path": "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp",
           "marker": "bool FDasRuntimeModule::DispatchWidgetInput(",
-          "line": 3478,
-          "sha256": "7efb728ee96d7dbd7680782ffb8bf12bee6e76d1a532284cb8e31298c8be29bc"
+          "line": 3507,
+          "sha256": "ef6393548304d2f3cbfe400000a3725b3bcf4ce920bb348bae23849587a448d6"
         },
         {
           "path": "Plugins/DasForUE/Content/Das/Scripts/ue_widget_events.das",
@@ -102,8 +101,8 @@
         {
           "path": "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp",
           "marker": "bool FDasRuntimeModule::DispatchWidgetFocusLost(",
-          "line": 3494,
-          "sha256": "7efb728ee96d7dbd7680782ffb8bf12bee6e76d1a532284cb8e31298c8be29bc"
+          "line": 3523,
+          "sha256": "ef6393548304d2f3cbfe400000a3725b3bcf4ce920bb348bae23849587a448d6"
         },
         {
           "path": "Plugins/DasForUE/Content/Das/Scripts/ue_widget_events.das",
@@ -150,8 +149,8 @@
         {
           "path": "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp",
           "marker": "bool FDasRuntimeModule::DispatchWidgetPaint(",
-          "line": 3448,
-          "sha256": "7efb728ee96d7dbd7680782ffb8bf12bee6e76d1a532284cb8e31298c8be29bc"
+          "line": 3477,
+          "sha256": "ef6393548304d2f3cbfe400000a3725b3bcf4ce920bb348bae23849587a448d6"
         }
       ]
     },
@@ -174,8 +173,8 @@
         {
           "path": "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp",
           "marker": "\"__ue_widget_create\"",
-          "line": 2094,
-          "sha256": "7efb728ee96d7dbd7680782ffb8bf12bee6e76d1a532284cb8e31298c8be29bc"
+          "line": 2112,
+          "sha256": "ef6393548304d2f3cbfe400000a3725b3bcf4ce920bb348bae23849587a448d6"
         }
       ]
     },
@@ -198,8 +197,8 @@
         {
           "path": "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp",
           "marker": "\"__ue_drag_create\"",
-          "line": 2023,
-          "sha256": "7efb728ee96d7dbd7680782ffb8bf12bee6e76d1a532284cb8e31298c8be29bc"
+          "line": 2039,
+          "sha256": "ef6393548304d2f3cbfe400000a3725b3bcf4ce920bb348bae23849587a448d6"
         }
       ]
     },
@@ -216,8 +215,8 @@
         {
           "path": "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp",
           "marker": "\"ue_input_bool\"",
-          "line": 2069,
-          "sha256": "7efb728ee96d7dbd7680782ffb8bf12bee6e76d1a532284cb8e31298c8be29bc"
+          "line": 2085,
+          "sha256": "ef6393548304d2f3cbfe400000a3725b3bcf4ce920bb348bae23849587a448d6"
         },
         {
           "path": "Plugins/DasForUE/Content/Das/Scripts/ue_input_value.das",
@@ -240,8 +239,8 @@
         {
           "path": "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp",
           "marker": "\"ue_input_axis1d\"",
-          "line": 2070,
-          "sha256": "7efb728ee96d7dbd7680782ffb8bf12bee6e76d1a532284cb8e31298c8be29bc"
+          "line": 2086,
+          "sha256": "ef6393548304d2f3cbfe400000a3725b3bcf4ce920bb348bae23849587a448d6"
         },
         {
           "path": "Plugins/DasForUE/Content/Das/Scripts/ue_input_value.das",
@@ -264,8 +263,8 @@
         {
           "path": "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp",
           "marker": "\"ue_input_axis2d\"",
-          "line": 2071,
-          "sha256": "7efb728ee96d7dbd7680782ffb8bf12bee6e76d1a532284cb8e31298c8be29bc"
+          "line": 2087,
+          "sha256": "ef6393548304d2f3cbfe400000a3725b3bcf4ce920bb348bae23849587a448d6"
         },
         {
           "path": "Plugins/DasForUE/Content/Das/Scripts/ue_input_value.das",
@@ -288,8 +287,8 @@
         {
           "path": "Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp",
           "marker": "\"ue_input_axis3d\"",
-          "line": 2072,
-          "sha256": "7efb728ee96d7dbd7680782ffb8bf12bee6e76d1a532284cb8e31298c8be29bc"
+          "line": 2088,
+          "sha256": "ef6393548304d2f3cbfe400000a3725b3bcf4ce920bb348bae23849587a448d6"
         },
         {
           "path": "Plugins/DasForUE/Content/Das/Scripts/ue_input_value.das",
@@ -807,42 +806,6 @@
       },
       "raw_status": "export_blocked",
       "raw_reason": "Expected loaded class and local BlueprintCallable instance function: /Script/UMG.EditableTextBox.OnEditableTextBoxCommittedEvent__DelegateSignature",
-      "surface": "receiver"
-    },
-    {
-      "class_path": "/Script/UMG.Image",
-      "function": "SetBrushFromSoftMaterial",
-      "expected_reason": "soft_reference_requires_binding_adapter",
-      "category": "technical_blocker",
-      "group": "soft_brush",
-      "rationale": "Нужен typed soft-reference binding adapter с контролем async load, замены запроса, жизни Image и поведения при Destroy/reload; generic soft reference storage не решает контракт этого вызова.",
-      "next_action": "Нужен typed soft-reference binding adapter с контролем async load, замены запроса, жизни Image и поведения при Destroy/reload; generic soft reference storage не решает контракт этого вызова.",
-      "native_evidence": {
-        "path": "Engine/Source/Runtime/UMG/Public/Components/Image.h",
-        "marker": "SetBrushFromSoftMaterial(",
-        "line": 143,
-        "sha256": "0a72a2ce033d4a56ea535e6a524f800558a69380985e97ba6584e4737855b42f"
-      },
-      "raw_status": "export_blocked",
-      "raw_reason": "soft_reference_requires_binding_adapter",
-      "surface": "receiver"
-    },
-    {
-      "class_path": "/Script/UMG.Image",
-      "function": "SetBrushFromSoftTexture",
-      "expected_reason": "soft_reference_requires_binding_adapter",
-      "category": "technical_blocker",
-      "group": "soft_brush",
-      "rationale": "Нужен typed soft-reference binding adapter с контролем async load, замены запроса, жизни Image и поведения при Destroy/reload; generic soft reference storage не решает контракт этого вызова.",
-      "next_action": "Нужен typed soft-reference binding adapter с контролем async load, замены запроса, жизни Image и поведения при Destroy/reload; generic soft reference storage не решает контракт этого вызова.",
-      "native_evidence": {
-        "path": "Engine/Source/Runtime/UMG/Public/Components/Image.h",
-        "marker": "SetBrushFromSoftTexture(",
-        "line": 139,
-        "sha256": "0a72a2ce033d4a56ea535e6a524f800558a69380985e97ba6584e4737855b42f"
-      },
-      "raw_status": "export_blocked",
-      "raw_reason": "soft_reference_requires_binding_adapter",
       "surface": "receiver"
     },
     {

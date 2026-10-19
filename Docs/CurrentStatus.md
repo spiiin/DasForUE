@@ -1143,3 +1143,12 @@ TestGameplayTags.ps1 — PASS, 7 проверок, без Error/ensure. Попу
 managed_soft_brush_v1. UMG/Input staged: 409 ready (+2), 108 export blocked,
 whole-module preflight — PASS; пакет не опубликован, runtime-сценарий не запускался.
 327 Python-тестов генератора/аудита — PASS. Полные Foundation/PIE/packaged не запускались.
+
+Image soft brush проверен в runtime и опубликован: TestImageSoftBrush.ps1 — PASS,
+22 проверки на настоящих async-загрузках временных ассетов в game-world UserWidget
+(вытеснение, отмена генерированным сеттером, внешней сменой кисти, NativeDestruct,
+reload и release владельца, ошибки типа/реестра, отсутствие удержания при GC).
+ue_api_umg_input: 409 ready, 108 export blocked; аудит экспорта обновлён
+(16 technical blockers). Попутно исправлено: ue_soft(type<T>, ...) теперь принимает
+typedef soft-типа из того же файла. TestBindingsPolicy.py падает независимо от этих
+изменений: K2_GetComponentsByClass давно экспортируется, тест устарел.
