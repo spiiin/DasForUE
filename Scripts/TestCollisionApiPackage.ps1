@@ -70,7 +70,7 @@ if($Publish){
   $PublicChecks+=$Case.name
  }
 }
-& C:\Python312\python.exe "$PSScriptRoot/ReportApiPackage.py" --report $ReportPath --inventory "$Stage/inventory.json" --baseline "$Repo/Build/ApiPackages/ue_api_world/latest-report.json" --baseline "$Repo/Build/ApiPackages/ue_api_math/latest-report.json" --output "$Repo/Bindings/Packages/ue_api_collision.summary.json" --markdown "$Repo/Docs/CollisionPhysicsBlockers.md"
+& C:\Python312\python.exe "$PSScriptRoot/ReportApiPackage.py" --report $ReportPath --inventory "$Stage/inventory.json" --baseline "$Repo/Build/ApiPackages/ue_api_world/latest-report.json" --baseline "$Repo/Build/ApiPackages/ue_api_math/latest-report.json" --output "$Repo/Bindings/Packages/ue_api_collision.summary.json" --markdown "$Repo/Docs/Dev/Api/Blockers/CollisionPhysicsBlockers.md"
 if($LASTEXITCODE){throw 'Collision blocker report failed'}
 $Summary=Get-Content -LiteralPath "$Repo/Bindings/Packages/ue_api_collision.summary.json" -Raw|ConvertFrom-Json
 if($Summary.construction_guarded_count -le 0){throw 'Expected construction contracts missing'}

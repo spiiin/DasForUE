@@ -1,88 +1,84 @@
-# Integrated gameplay source example
+# Gameplay demo (source example)
 
-Status: **source-only, validation pending** (2026-10-10). This is a cohesive source
-example and setup specification. Blueprint/InputAction/MappingContext assets and a
-playable map have not been created. Source compilation is validated; this demo map
-has not been imported, played or cooked. Runtime API coverage is described in
-Docs/GameplayRuntimePIEValidation.md.
+A compact source example that combines an authored Actor and an authored ActorComponent with timers,
+an owner delegate, Enhanced Input, a runtime SceneComponent, a latent delay and an async asset load.
+It ships as daScript sources plus a setup description (`manifest.json`); you create the Blueprints,
+input assets and map yourself as described below. For a ready-made scene, use the
+[playable Character example](../../Docs/Guide/GettingStarted/Examples.md#playable-character) instead.
 
 ## Source files
 
-- Plugins/DasForUE/Content/Das/Scripts/dsl_gameplay_actor.das
-- Plugins/DasForUE/Content/Das/Scripts/dsl_gameplay_behavior.das
-- Plugins/DasForUE/Content/Das/Scripts/ue_gameplay_refs.das
-- Plugins/DasForUE/Content/Das/Scripts/ue_gameplay_catalog.json
+| File | Content |
+| --- | --- |
+| `Plugins/DasForUE/Content/Das/Scripts/dsl_gameplay_actor.das` | `GameplayActor`: Score, Move, Ready, async load, input setup, pivot movement |
+| `Plugins/DasForUE/Content/Das/Scripts/dsl_gameplay_behavior.das` | `GameplayBehavior` component: score timer, signal handler, Seconds |
+| `Plugins/DasForUE/Content/Das/Scripts/ue_gameplay_refs.das` | Typed reference views of both authored classes |
+| `Plugins/DasForUE/Content/Das/Scripts/ue_gameplay_catalog.json` | Source catalog shared by the reference views |
 
-Actor/Component reference views share the source catalog; the Actor has one
-Behavior component field declared through ue_components. Shared field flags use
-ue_properties; the Actor uses typed native input/scene/object fields.
-Component timer and owner delegate update Actor.Score through ordinary typed access.
-Source references follow the existing forward-declaration/cycle-aware compiler path;
-that path was compile-validated after conversion to declaration groups on 2026-10-11.
+The Actor has one `Behavior` component field declared through `ue_components`; shared field flags use
+`ue_properties`. The Actor uses typed native input, scene and object fields. The component's timer
+and owner-delegate handler update `Actor.Score` through ordinary typed access. The two sources refer
+to each other through the forward-declaration-aware source catalog.
 
-## Intended gameplay
+## What it does
 
-1. Actor BeginPlay creates an Actor-owned GameplayPivot SceneComponent and starts
-   a 0.25-world-second latent delay. It starts asset loading if AssetPath is nonempty.
-2. Component BeginPlay starts a repeating score timer with saved integer argument 1.
-3. Component subscribes to owning Actor's OnDasSignal. Jump emits that signal and
-   adds another point through the component's annotated event method.
-4. Axis2D input writes Move. Actor Tick applies XY displacement to the pivot's
-   relative transform, preserving native rotation and scale.
-5. Latent completion sets Ready. Asset completion assigns nullable Loaded and
-   LoadSucceeded. Blueprint can inspect state and invoke exposed control methods.
+1. Actor `BeginPlay` creates an Actor-owned `GameplayPivot` SceneComponent and starts a 0.25
+   world-second latent delay. If `AssetPath` is not empty, it also starts an async asset load.
+2. Component `BeginPlay` starts a repeating score timer (`Pulse` with argument 1, once per second).
+3. The component subscribes to the owner's `OnDasSignal`. Jump emits that signal, and the
+   component's event method adds another point and increments `SignalCount`.
+4. The Axis2D move action writes `Move`; Actor `Tick` applies the XY displacement to the pivot's
+   relative location, keeping its rotation and scale.
+5. The latent completion sets `Ready`. The async completion assigns the nullable `Loaded` and sets
+   `LoadSucceeded`.
 
-The pivot is a plain SceneComponent; it has no visible mesh. Add a configured mesh
-child through ordinary Unreal setup if a visual movement demo is desired. The code
-moves the pivot, not a Character movement component and not necessarily Actor root.
+Blueprint-callable control methods: `SetupControls`, `StartLoad`, `CancelPending`, `PauseScore`,
+`ResumeScore`, `GetSeconds`.
 
-## Isolated setup specification
+The pivot is a plain SceneComponent without a mesh. Add a mesh child through normal Unreal setup if
+you want to see the movement. The code moves the pivot, not a CharacterMovement component and not
+necessarily the Actor root.
 
-manifest.json is a **project-specific setup description**, not an Unreal standard
-manifest or an executable importer. It declares source IDs, intended asset names,
-input shapes/key mappings and observable states for the future fixture setup.
+## Setup
 
-Use a new folder such as /Game/DasGameplayDemo in the existing isolated smoke project.
-After compiling the plugin, import GameplayActor through the existing DSL service;
-its declared component source is handled by the existing component import workflow.
-Confirm both generated classes and SCS Behavior before placing an actor on a new map.
+`manifest.json` is a project-specific setup description (not an Unreal manifest or an importer). It
+lists the source IDs, asset names, input actions and key mappings used below.
 
-Configure EnhancedPlayerInput/EnhancedInputComponent using the test project's input
-setup, create IA_Jump (Boolean), IA_Move (Axis2D) and IMC_Gameplay. Map Space to Jump;
-D/A to positive/negative X, W/S to positive/negative Y using normal Enhanced Input
-negate/swizzle modifiers. No such assets or project setting changes were performed.
+1. Use a new folder such as `/Game/DasGameplayDemo` in a test project.
+2. Import the Actor with the DSL service, e.g.
+   `Das.DSL.Apply dsl_gameplay_actor.das /Game/DasGameplayDemo/BP_GameplayActor gameplaydemo.GameplayActor`.
+   The declared component source is imported automatically as `BP_GameplayBehavior`. Check that both
+   classes exist and that the Actor's components contain `Behavior` before placing the Actor on a new
+   map. Save the Blueprints with the map.
+3. Configure the project for `EnhancedPlayerInput` / `EnhancedInputComponent`. Create:
+   - `IA_Jump` (Boolean): SpaceBar;
+   - `IA_Move` (Axis2D): D/A → +X/−X, W/S → +Y/−Y using the usual Negate/Swizzle modifiers;
+   - `IMC_Gameplay` with both mappings (priority 0).
+4. On the placed Actor assign `Player` (the local PlayerController of that world), `Controls`,
+   `JumpAction` and `MoveAction`. After the player and component are ready, call `SetupControls` from
+   Blueprint. An already installed external context is used without taking ownership. Make sure the
+   player has a usable view target/camera.
+5. Optional: set `AssetPath` to an asset that is included in the cook. A string path alone does not
+   make the asset part of the package; add a real soft/primary asset reference or a cook rule.
 
-Assign Player explicitly to the local PlayerController of that actor's world, and
-assign Controls/JumpAction/MoveAction assets. Enable input/finish component readiness
-then call SetupControls from Blueprint. Existing external contexts are queried and
-used without taking ownership. Ensure a usable view target/camera separately.
+## Expected behavior
 
-Optional AssetPath must identify a cook-included asset. A string alone does not
-ensure packaging. Configure a real soft/primary asset reference or cook rule in the
-isolated project. Keep asset selection out of unrelated user projects.
+- `Score` grows by one per world-second while the score timer runs.
+- Jump adds one point and increments `Behavior.SignalCount`.
+- Moving changes `Move` and the pivot's XY location.
+- `Ready` becomes true 0.25 world-seconds after BeginPlay.
+- After an async load completes, `Loaded` and `LoadSucceeded` are set.
 
-## Reload behavior
+## Hot reload
 
-Current input/context recipes restore after accepted body reload/component change.
-Editing SetupControls does not replay it; invoke the revised setup explicitly.
-Accepted component logic reload cancels the old score timer; ResumeScore explicitly
-restarts it. Latent/async work is cancelled at accepted Actor reload; StartLoad can
-restart the asset operation. Failed compilation keeps the old live context/records.
-Actor owns the existing pivot across ordinary logic reload; BeginPlay is not replayed.
-Structural reinstancing/creation tracking and broad migration remain outside this demo.
+- Accepted body reload restores the last installed input configuration (mapping context and
+  handlers). Editing `SetupControls` does not rerun it: call the revised setup explicitly.
+- Accepted component reload cancels the old score timer; call `ResumeScore` to restart it.
+- Accepted Actor reload cancels latent and async work; `StartLoad` restarts the asset load.
+- A failed compilation keeps the old live version, its timers and bindings.
+- The Actor keeps its pivot across logic reload; BeginPlay is not replayed.
 
-## Pending verification package
-
-First perform one build of accumulated code, without repeatedly testing each source
-change. Then import/setup this isolated scene and check the coupled behavior:
-- catalog/forward-source resolution and actual SCS component identity;
-- score timer, signal delivery, owner property writes and cross-context calls;
-- bool/Axis2D input, pivot transform and native ownership;
-- delayed Ready and nullable async asset result;
-- accepted/rejected reload and input restoration versus explicit task restart;
-- EndPlay/Destroy/GC/world cleanup with no remaining callbacks or context leases;
-- save/reopen, actual PIE, and packaged Development with required cooked assets.
-
-These are future checks, not observed passes. Test timing should use world updates,
-not fragile wall-clock sleeps; distinguish user input from replayed/native broadcast
-fixtures. No existing projects/assets should be overwritten for setup.
+See also: [Examples](../../Docs/Guide/GettingStarted/Examples.md) ·
+[Apply and hot reload](../../Docs/Guide/Workflow/ApplyAndHotReload.md) ·
+[Components](../../Docs/Guide/DSL/Components.md) · [Input](../../Docs/Guide/Gameplay/Input.md) ·
+[Timers](../../Docs/Guide/Gameplay/Timers.md)

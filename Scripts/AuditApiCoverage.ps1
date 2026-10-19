@@ -19,6 +19,6 @@ if(!$?){throw 'Native gameplay artifacts are stale; inspect api-coverage-native-
 if($LASTEXITCODE){throw 'API coverage report tests failed'}
 & C:\Python312\python.exe "$PSScriptRoot/TestNativeGameplayGenerator.py"
 if($LASTEXITCODE){throw 'Native gameplay generator regression tests failed'}
-& C:\Python312\python.exe "$PSScriptRoot/AuditApiCoverage.py" --inventory $Reflection --libraries "$Reflection.libraries.json" --output "$Stage/report.json" --summary "$Repo/Bindings/ApiCoverage.summary.json" --markdown "$Repo/Docs/ApiCoverage.md" --csv "$Stage/members.csv"
+& C:\Python312\python.exe "$PSScriptRoot/AuditApiCoverage.py" --inventory $Reflection --libraries "$Reflection.libraries.json" --output "$Stage/report.json" --summary "$Repo/Bindings/ApiCoverage.summary.json" --markdown "$Repo/Docs/Dev/Audits/ApiCoverage.md" --csv "$Stage/members.csv"
 if($LASTEXITCODE){throw 'API coverage report generation failed'}
-Write-Output "DAS_API_COVERAGE=PASS report=$Stage/report.json summary=$Repo/Docs/ApiCoverage.md"
+Write-Output "DAS_API_COVERAGE=PASS report=$Stage/report.json summary=$Repo/Docs/Dev/Audits/ApiCoverage.md"

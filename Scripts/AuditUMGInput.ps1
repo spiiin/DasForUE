@@ -30,6 +30,6 @@ elseif($Audit.generation_failures -ne 74 -or $Audit.input_scope.detached_snapsho
 foreach($Path in $DllHashes.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $DllHashes[$Path]){throw 'DLL changed during audit'}}
 if((Get-Content $EngineManifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during audit'}
 Copy-Item "$Stage/audit.json" "$Repo/Bindings/Packages/ue_api_umg_input.audit.json" -Force
-Copy-Item "$Stage/audit.md" "$Repo/Docs/UMGInputBlockers.md" -Force
+Copy-Item "$Stage/audit.md" "$Repo/Docs/Dev/Api/Blockers/UMGInputBlockers.md" -Force
 [ordered]@{state='PASS';unit_tests=16;fresh_reflection=$true;real_generator_recheck='PASS';native_source_anchors='PASS';contract=(Get-Content "$Repo/Bindings/InputEvents.contract.json" -Raw|ConvertFrom-Json).status;coverage_changed=$false;generation_failures=$Audit.generation_failures;partition=$Audit.partition;input_scope=$Audit.input_scope;dll_sha256=$DllHashes;engine_build_id=$BuildId;stage=$Stage;build='not_run';PIE='not_run';packaged='not_run';physical_input='not_run';runtime_transport=$Audit.runtime_transport_implemented;commit='not_created'}|ConvertTo-Json -Depth 12|Set-Content "$Repo/logs/umg-input-audit-validation.json" -Encoding utf8
 Write-Output "DAS_UMG_INPUT_AUDIT_VALIDATION=PASS stage=$Stage"

@@ -24,6 +24,6 @@ foreach($File in $Dlls.Keys){if((Get-FileHash $File -Algorithm SHA256).Hash -ne 
 if((Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during UMG audit'}
 $Audit=Get-Content "$Stage/audit.json" -Raw|ConvertFrom-Json
 Copy-Item "$Stage/audit.json" "$Repo/Bindings/Packages/ue_api_umg_input.export-audit.json" -Force
-Copy-Item "$Stage/audit.md" "$Repo/Docs/UMGExportBlockers.md" -Force
+Copy-Item "$Stage/audit.md" "$Repo/Docs/Dev/Api/Blockers/UMGExportBlockers.md" -Force
 [ordered]@{state='PASS';unit_tests=20;fresh_reflection=$true;real_generator_recheck='PASS';coverage_changed=$false;partition=$Audit.partition;counts=$Audit.counts;source_sha256=$Sources;native_sha256=$Native;dll_sha256=$Dlls;engine_build_id=$BuildId;stage=$Stage;build='not_run';runtime_adapter_execution='not_run_static_audit_only';PIE='not_run';packaged='not_run';commit='not_created'}|ConvertTo-Json -Depth 12|Set-Content "$Repo/logs/umg-export-audit-validation.json" -Encoding utf8
 Write-Output "DAS_UMG_EXPORT_AUDIT_VALIDATION=PASS stage=$Stage"
