@@ -173,10 +173,6 @@ def Native_InputTriggerRef_9095301f_from(value:UObjectHandle):Native_InputTrigge
 struct Native_PlayerMappableKeySettingsRef_585857fd { handle:UObjectHandle }
 def Native_PlayerMappableKeySettingsRef_585857fd_from(value:UObjectHandle):Native_PlayerMappableKeySettingsRef_585857fd { return Native_PlayerMappableKeySettingsRef_585857fd(handle=ue_cast_nullable_object(value,"/Script/EnhancedInput.PlayerMappableKeySettings")) }
 
-[ue_native_object(path="/Script/PhysicsCore.PhysicalMaterial")]
-struct Native_PhysicalMaterialRef_b3257fa1 { handle:UObjectHandle }
-def Native_PhysicalMaterialRef_b3257fa1_from(value:UObjectHandle):Native_PhysicalMaterialRef_b3257fa1 { return Native_PhysicalMaterialRef_b3257fa1(handle=ue_cast_nullable_object(value,"/Script/PhysicsCore.PhysicalMaterial")) }
-
 [ue_native_object(path="/Script/StaticMeshDescription.StaticMeshDescription")]
 struct Native_StaticMeshDescriptionRef_26792a74 { handle:UObjectHandle }
 def Native_StaticMeshDescriptionRef_26792a74_from(value:UObjectHandle):Native_StaticMeshDescriptionRef_26792a74 { return Native_StaticMeshDescriptionRef_26792a74(handle=ue_cast_nullable_object(value,"/Script/StaticMeshDescription.StaticMeshDescription")) }
@@ -390,13 +386,6 @@ enum EComponentMobility {
     Movable=2
 }
 
-[ue_native_enum(path="/Script/Engine.EConcurrencyVolumeScaleMode")]
-enum EConcurrencyVolumeScaleMode {
-    Default=0
-    Distance=1
-    Priority=2
-}
-
 [ue_native_enum(path="/Script/Engine.EControllerAnalogStick")]
 enum EControllerAnalogStick {
     CAS_LeftStick=0
@@ -486,18 +475,6 @@ enum ELightmapType {
     Default=0
     ForceSurface=1
     ForceVolumetric=2
-}
-
-[ue_native_enum(path="/Script/Engine.EMaxConcurrentResolutionRule")]
-enum EMaxConcurrentResolutionRule {
-    PreventNew=0
-    StopOldest=1
-    StopFarthestThenPreventNew=2
-    StopFarthestThenOldest=3
-    StopLowestPriority=4
-    StopQuietest=5
-    StopLowestPriorityThenPreventNew=6
-    Count=7
 }
 
 [ue_native_enum(path="/Script/Engine.EMovementMode")]
@@ -773,6 +750,81 @@ enum ETouchIndex {
     MAX_TOUCHES=11
 }
 
+[ue_native_enum(path="/Script/PhysicsCore.EFrictionCombineMode")]
+enum EFrictionCombineMode {
+    Average=0
+    Min=1
+    Multiply=2
+    Max=3
+}
+
+[ue_native_enum(path="/Script/PhysicsCore.EPhysicalSurface")]
+enum EPhysicalSurface {
+    SurfaceType_Default=0
+    SurfaceType1=1
+    SurfaceType2=2
+    SurfaceType3=3
+    SurfaceType4=4
+    SurfaceType5=5
+    SurfaceType6=6
+    SurfaceType7=7
+    SurfaceType8=8
+    SurfaceType9=9
+    SurfaceType10=10
+    SurfaceType11=11
+    SurfaceType12=12
+    SurfaceType13=13
+    SurfaceType14=14
+    SurfaceType15=15
+    SurfaceType16=16
+    SurfaceType17=17
+    SurfaceType18=18
+    SurfaceType19=19
+    SurfaceType20=20
+    SurfaceType21=21
+    SurfaceType22=22
+    SurfaceType23=23
+    SurfaceType24=24
+    SurfaceType25=25
+    SurfaceType26=26
+    SurfaceType27=27
+    SurfaceType28=28
+    SurfaceType29=29
+    SurfaceType30=30
+    SurfaceType31=31
+    SurfaceType32=32
+    SurfaceType33=33
+    SurfaceType34=34
+    SurfaceType35=35
+    SurfaceType36=36
+    SurfaceType37=37
+    SurfaceType38=38
+    SurfaceType39=39
+    SurfaceType40=40
+    SurfaceType41=41
+    SurfaceType42=42
+    SurfaceType43=43
+    SurfaceType44=44
+    SurfaceType45=45
+    SurfaceType46=46
+    SurfaceType47=47
+    SurfaceType48=48
+    SurfaceType49=49
+    SurfaceType50=50
+    SurfaceType51=51
+    SurfaceType52=52
+    SurfaceType53=53
+    SurfaceType54=54
+    SurfaceType55=55
+    SurfaceType56=56
+    SurfaceType57=57
+    SurfaceType58=58
+    SurfaceType59=59
+    SurfaceType60=60
+    SurfaceType61=61
+    SurfaceType62=62
+}
+
 [ue_native_enum(path="/Script/PhysicsCore.ERadialImpulseFalloff")]
 enum ERadialImpulseFalloff {
     RIF_Constant=0
@@ -896,12 +948,6 @@ struct LinearColor {
     G:float
     B:float
     A:float
-}
-
-[ue_native_struct(path="/Script/CoreUObject.PerPlatformInt")]
-struct PerPlatformInt {
-    Default:int
-    PerPlatform:table<UENameValue;int>
 }
 
 [ue_native_struct(path="/Script/CoreUObject.PlatformUserId")]
@@ -1031,22 +1077,6 @@ struct SingleAnimationPlayData {
     SavedPlayRate:float
 }
 
-[ue_native_struct(path="/Script/Engine.SoundConcurrencySettings")]
-struct SoundConcurrencySettings {
-    MaxCount:int
-    bLimitToOwner:bool
-    bVolumeScaleCanRelease:bool
-    bEnableMaxCountPlatformScaling:bool
-    ResolutionRule:EMaxConcurrentResolutionRule
-    RetriggerTime:float
-    PlatformMaxCount:PerPlatformInt
-    VolumeScale:float
-    VolumeScaleMode:EConcurrencyVolumeScaleMode
-    VolumeScaleAttackTime:float
-    VolumeScaleReleaseTime:float
-    VoiceStealReleaseTime:float
-}
-
 [ue_native_struct(path="/Script/Engine.StreamingSourceShape")]
 struct StreamingSourceShape {
     bUseGridLoadingRange:bool
@@ -1084,6 +1114,18 @@ struct EnhancedActionKeyMapping {
 [ue_native_struct(path="/Script/EnhancedInput.InputMappingContextMappingData")]
 struct InputMappingContextMappingData {
     Mappings:array<EnhancedActionKeyMapping>
+}
+
+[ue_native_struct(path="/Script/PhysicsCore.PhysicalMaterialDamageModifier")]
+struct PhysicalMaterialDamageModifier {
+    DamageThresholdMultiplier:float
+}
+
+[ue_native_struct(path="/Script/PhysicsCore.PhysicalMaterialStrength")]
+struct PhysicalMaterialStrength {
+    TensileStrength:float
+    CompressionStrength:float
+    ShearStrength:float
 }
 
 [ue_native_struct(path="/Script/Slate.Anchors")]

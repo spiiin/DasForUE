@@ -1150,5 +1150,27 @@ Image soft brush проверен в runtime и опубликован: TestImag
 reload и release владельца, ошибки типа/реестра, отсутствие удержания при GC).
 ue_api_umg_input: 409 ready, 108 export blocked; аудит экспорта обновлён
 (16 technical blockers). Попутно исправлено: ue_soft(type<T>, ...) теперь принимает
-typedef soft-типа из того же файла. TestBindingsPolicy.py падает независимо от этих
-изменений: K2_GetComponentsByClass давно экспортируется, тест устарел.
+typedef soft-типа из того же файла.
+
+## Полный регрессионный прогон — 2026-10-19
+
+Scripts/TestCombined.ps1 — PASS: 327 Python-тестов, Foundation, DynamicPIE,
+MethodValues Create/Reopen, 37/37 Automation DasForUE (включая PIE), Native/Computed
+defaults, cooked export и 5 packaged-карт (gameplay, playable, native, computed,
+method-values). Найдено и исправлено с прошлого полного прогона (faa2f92):
+
+- Авторское присваивание целого значения `:=` пропускало проверку read-only
+  (регрессия ce133dc); MethodValues снова отвергает запись в LockedEnumScores.
+- PerPlatformInt/Float/Bool/FrameRate отклоняются как value struct: поле PerPlatform
+  в cooked-игре отсутствует, а UHT не помечает его editor-only. Из-за
+  SoundBase.ConcurrencyOverrides весь ue_native_gameplay не компилировался в packaged.
+  Нативные привязки перегенерированы (заодно догнали PhysicalMaterialRef из
+  ue_gameplay_services).
+- Cooked-фикстура Character сохраняет сгенерированные для него component Blueprint-ы
+  (BP_HealthComponent), иначе свойство Health в cooked-игре не разрешается.
+- Проба playable Character учитывает постоянные подписки Health.Changed и
+  OnTakeAnyDamage при unpossess/repossess.
+- TestBindingsPolicy.py использует собственный int64-метод фикстуры вместо
+  K2_GetComponentsByClass, который теперь экспортируется.
+- TestCombinedEditor.ps1 больше не падает на stderr unittest в Windows PowerShell 5.
+- Ошибка «self reference property type mismatch» теперь называет свойство.

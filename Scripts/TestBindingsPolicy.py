@@ -36,14 +36,14 @@ def main():
         return ir
 
     rule = dict(class_rules=[{'class': FIXTURE, 'prefix': 'fixture_', 'include': ['Policy*', 'Transform*'], 'exclude': ['Transform*']}],
-        functions=[{'class': '/Script/Engine.Actor', 'function': 'K2_GetComponentsByClass', 'alias': 'actor_Unsupported', 'required': False}])
+        functions=[{'class': FIXTURE, 'function': 'UnsupportedInt64', 'alias': 'fixture_Unsupported', 'required': False}])
     ir = export('filtered', rule)
     assert [f['function'] for f in ir['functions']] == ['PolicyDefault']
     reasons = {d['function']: d['reason'] for d in ir['diagnostics']}
     assert reasons['TransformPayload'] == 'excluded_by_rule'
     assert reasons['PolicyDeprecated'] == 'deprecated_function'
     assert reasons['PolicyInternal'] == 'internal_function'
-    assert 'unsupported UFunction or struct field type' in reasons['K2_GetComponentsByClass']
+    assert 'unsupported UFunction or struct field type' in reasons['UnsupportedInt64']
     fn = ir['functions'][0]
     assert fn['pure'] and fn['const'] and fn['declaring_class'] == FIXTURE
     assert fn['metadata']['Category'] == 'Policy' and fn['metadata']['DisplayName'] == 'Policy default'

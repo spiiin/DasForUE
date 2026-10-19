@@ -1107,7 +1107,7 @@ namespace
         return Class;
     }
     FDasObjectHandle ObjectValue(const char* Path,das::Context* C){const FString P=Path?UTF8_TO_TCHAR(Path):TEXT("");if(!P.StartsWith(TEXT("/Script/")))C->throw_error("Object field requires a native class path");ResolveClass(Path,C);return {};}
-    FProperty* SelfObjectProperty(const char* N,bool Write,das::Context* C){auto* S=ResolveSelf(C);auto* P=S->GetClass()->FindPropertyByName(FName(UTF8_TO_TCHAR(N)));if(!P || P->ArrayDim!=1 || !DasReferencePropertyClass(P))C->throw_error("self reference property type mismatch");if(!P->HasAnyPropertyFlags(CPF_BlueprintVisible) || (Write && P->HasAnyPropertyFlags(CPF_BlueprintReadOnly)))C->throw_error("self property access is not permitted");return P;}
+    FProperty* SelfObjectProperty(const char* N,bool Write,das::Context* C){auto* S=ResolveSelf(C);auto* P=S->GetClass()->FindPropertyByName(FName(UTF8_TO_TCHAR(N)));if(!P || P->ArrayDim!=1 || !DasReferencePropertyClass(P))C->throw_error(TCHAR_TO_UTF8(*(FString(TEXT("self reference property type mismatch: "))+UTF8_TO_TCHAR(N))));if(!P->HasAnyPropertyFlags(CPF_BlueprintVisible) || (Write && P->HasAnyPropertyFlags(CPF_BlueprintReadOnly)))C->throw_error("self property access is not permitted");return P;}
     FDasObjectHandle ReadNullablePropertyObject(FProperty* P,const void* Memory,das::Context* C){
         // VM object getters expose destroyed references as null, including
         // nested/array/map-value getters. Queued captures still use the strict

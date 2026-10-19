@@ -128,6 +128,11 @@
 				"name": "NiagaraSystemRef"
 			},
 			{
+				"path": "/Script/PhysicsCore.PhysicalMaterial",
+				"module": "ue_gameplay_services",
+				"name": "PhysicalMaterialRef"
+			},
+			{
 				"path": "/Script/UMG.UserWidget",
 				"module": "ue_gameplay_services",
 				"name": "UserWidgetRef"
@@ -696,23 +701,6 @@
 			]
 		},
 		{
-			"path": "/Script/Engine.EConcurrencyVolumeScaleMode",
-			"entries": [
-				{
-					"name": "Default",
-					"value": 0
-				},
-				{
-					"name": "Distance",
-					"value": 1
-				},
-				{
-					"name": "Priority",
-					"value": 2
-				}
-			]
-		},
-		{
 			"path": "/Script/Engine.EControllerAnalogStick",
 			"entries": [
 				{
@@ -941,43 +929,6 @@
 				{
 					"name": "ForceVolumetric",
 					"value": 2
-				}
-			]
-		},
-		{
-			"path": "/Script/Engine.EMaxConcurrentResolutionRule",
-			"entries": [
-				{
-					"name": "PreventNew",
-					"value": 0
-				},
-				{
-					"name": "StopOldest",
-					"value": 1
-				},
-				{
-					"name": "StopFarthestThenPreventNew",
-					"value": 2
-				},
-				{
-					"name": "StopFarthestThenOldest",
-					"value": 3
-				},
-				{
-					"name": "StopLowestPriority",
-					"value": 4
-				},
-				{
-					"name": "StopQuietest",
-					"value": 5
-				},
-				{
-					"name": "StopLowestPriorityThenPreventNew",
-					"value": 6
-				},
-				{
-					"name": "Count",
-					"value": 7
 				}
 			]
 		},
@@ -1744,6 +1695,284 @@
 			]
 		},
 		{
+			"path": "/Script/PhysicsCore.EFrictionCombineMode",
+			"entries": [
+				{
+					"name": "Average",
+					"value": 0
+				},
+				{
+					"name": "Min",
+					"value": 1
+				},
+				{
+					"name": "Multiply",
+					"value": 2
+				},
+				{
+					"name": "Max",
+					"value": 3
+				}
+			]
+		},
+		{
+			"path": "/Script/PhysicsCore.EPhysicalSurface",
+			"entries": [
+				{
+					"name": "SurfaceType_Default",
+					"value": 0
+				},
+				{
+					"name": "SurfaceType1",
+					"value": 1
+				},
+				{
+					"name": "SurfaceType2",
+					"value": 2
+				},
+				{
+					"name": "SurfaceType3",
+					"value": 3
+				},
+				{
+					"name": "SurfaceType4",
+					"value": 4
+				},
+				{
+					"name": "SurfaceType5",
+					"value": 5
+				},
+				{
+					"name": "SurfaceType6",
+					"value": 6
+				},
+				{
+					"name": "SurfaceType7",
+					"value": 7
+				},
+				{
+					"name": "SurfaceType8",
+					"value": 8
+				},
+				{
+					"name": "SurfaceType9",
+					"value": 9
+				},
+				{
+					"name": "SurfaceType10",
+					"value": 10
+				},
+				{
+					"name": "SurfaceType11",
+					"value": 11
+				},
+				{
+					"name": "SurfaceType12",
+					"value": 12
+				},
+				{
+					"name": "SurfaceType13",
+					"value": 13
+				},
+				{
+					"name": "SurfaceType14",
+					"value": 14
+				},
+				{
+					"name": "SurfaceType15",
+					"value": 15
+				},
+				{
+					"name": "SurfaceType16",
+					"value": 16
+				},
+				{
+					"name": "SurfaceType17",
+					"value": 17
+				},
+				{
+					"name": "SurfaceType18",
+					"value": 18
+				},
+				{
+					"name": "SurfaceType19",
+					"value": 19
+				},
+				{
+					"name": "SurfaceType20",
+					"value": 20
+				},
+				{
+					"name": "SurfaceType21",
+					"value": 21
+				},
+				{
+					"name": "SurfaceType22",
+					"value": 22
+				},
+				{
+					"name": "SurfaceType23",
+					"value": 23
+				},
+				{
+					"name": "SurfaceType24",
+					"value": 24
+				},
+				{
+					"name": "SurfaceType25",
+					"value": 25
+				},
+				{
+					"name": "SurfaceType26",
+					"value": 26
+				},
+				{
+					"name": "SurfaceType27",
+					"value": 27
+				},
+				{
+					"name": "SurfaceType28",
+					"value": 28
+				},
+				{
+					"name": "SurfaceType29",
+					"value": 29
+				},
+				{
+					"name": "SurfaceType30",
+					"value": 30
+				},
+				{
+					"name": "SurfaceType31",
+					"value": 31
+				},
+				{
+					"name": "SurfaceType32",
+					"value": 32
+				},
+				{
+					"name": "SurfaceType33",
+					"value": 33
+				},
+				{
+					"name": "SurfaceType34",
+					"value": 34
+				},
+				{
+					"name": "SurfaceType35",
+					"value": 35
+				},
+				{
+					"name": "SurfaceType36",
+					"value": 36
+				},
+				{
+					"name": "SurfaceType37",
+					"value": 37
+				},
+				{
+					"name": "SurfaceType38",
+					"value": 38
+				},
+				{
+					"name": "SurfaceType39",
+					"value": 39
+				},
+				{
+					"name": "SurfaceType40",
+					"value": 40
+				},
+				{
+					"name": "SurfaceType41",
+					"value": 41
+				},
+				{
+					"name": "SurfaceType42",
+					"value": 42
+				},
+				{
+					"name": "SurfaceType43",
+					"value": 43
+				},
+				{
+					"name": "SurfaceType44",
+					"value": 44
+				},
+				{
+					"name": "SurfaceType45",
+					"value": 45
+				},
+				{
+					"name": "SurfaceType46",
+					"value": 46
+				},
+				{
+					"name": "SurfaceType47",
+					"value": 47
+				},
+				{
+					"name": "SurfaceType48",
+					"value": 48
+				},
+				{
+					"name": "SurfaceType49",
+					"value": 49
+				},
+				{
+					"name": "SurfaceType50",
+					"value": 50
+				},
+				{
+					"name": "SurfaceType51",
+					"value": 51
+				},
+				{
+					"name": "SurfaceType52",
+					"value": 52
+				},
+				{
+					"name": "SurfaceType53",
+					"value": 53
+				},
+				{
+					"name": "SurfaceType54",
+					"value": 54
+				},
+				{
+					"name": "SurfaceType55",
+					"value": 55
+				},
+				{
+					"name": "SurfaceType56",
+					"value": 56
+				},
+				{
+					"name": "SurfaceType57",
+					"value": 57
+				},
+				{
+					"name": "SurfaceType58",
+					"value": 58
+				},
+				{
+					"name": "SurfaceType59",
+					"value": 59
+				},
+				{
+					"name": "SurfaceType60",
+					"value": 60
+				},
+				{
+					"name": "SurfaceType61",
+					"value": 61
+				},
+				{
+					"name": "SurfaceType62",
+					"value": 62
+				}
+			]
+		},
+		{
 			"path": "/Script/PhysicsCore.ERadialImpulseFalloff",
 			"entries": [
 				{
@@ -2073,32 +2302,6 @@
 					"kind": "float",
 					"type_path": "",
 					"name": "A"
-				}
-			]
-		},
-		{
-			"path": "/Script/CoreUObject.PerPlatformInt",
-			"signature": "Default:IntProperty:0;PerPlatform:MapProperty:0[PerPlatform_Key:NameProperty:0;PerPlatform:IntProperty:0;];",
-			"fields": [
-				{
-					"kind": "int",
-					"type_path": "",
-					"name": "Default"
-				},
-				{
-					"kind": "map",
-					"type_path": "",
-					"key":
-					{
-						"kind": "name",
-						"type_path": ""
-					},
-					"value":
-					{
-						"kind": "int",
-						"type_path": ""
-					},
-					"name": "PerPlatform"
 				}
 			]
 		},
@@ -2638,72 +2841,6 @@
 			]
 		},
 		{
-			"path": "/Script/Engine.SoundConcurrencySettings",
-			"signature": "MaxCount:IntProperty:0;bLimitToOwner:BoolProperty:0;bVolumeScaleCanRelease:BoolProperty:0;bEnableMaxCountPlatformScaling:BoolProperty:0;ResolutionRule:ByteProperty:0:/Script/Engine.EMaxConcurrentResolutionRule;RetriggerTime:FloatProperty:0;PlatformMaxCount:StructProperty:0:/Script/CoreUObject.PerPlatformInt{Default:IntProperty:0;PerPlatform:MapProperty:0[PerPlatform_Key:NameProperty:0;PerPlatform:IntProperty:0;];};VolumeScale:FloatProperty:0;VolumeScaleMode:EnumProperty:0:/Script/Engine.EConcurrencyVolumeScaleMode;VolumeScaleAttackTime:FloatProperty:0;VolumeScaleReleaseTime:FloatProperty:0;VoiceStealReleaseTime:FloatProperty:0;",
-			"fields": [
-				{
-					"kind": "int",
-					"type_path": "",
-					"name": "MaxCount"
-				},
-				{
-					"kind": "bool",
-					"type_path": "",
-					"name": "bLimitToOwner"
-				},
-				{
-					"kind": "bool",
-					"type_path": "",
-					"name": "bVolumeScaleCanRelease"
-				},
-				{
-					"kind": "bool",
-					"type_path": "",
-					"name": "bEnableMaxCountPlatformScaling"
-				},
-				{
-					"kind": "enum",
-					"type_path": "/Script/Engine.EMaxConcurrentResolutionRule",
-					"name": "ResolutionRule"
-				},
-				{
-					"kind": "float",
-					"type_path": "",
-					"name": "RetriggerTime"
-				},
-				{
-					"kind": "struct",
-					"type_path": "/Script/CoreUObject.PerPlatformInt",
-					"name": "PlatformMaxCount"
-				},
-				{
-					"kind": "float",
-					"type_path": "",
-					"name": "VolumeScale"
-				},
-				{
-					"kind": "enum",
-					"type_path": "/Script/Engine.EConcurrencyVolumeScaleMode",
-					"name": "VolumeScaleMode"
-				},
-				{
-					"kind": "float",
-					"type_path": "",
-					"name": "VolumeScaleAttackTime"
-				},
-				{
-					"kind": "float",
-					"type_path": "",
-					"name": "VolumeScaleReleaseTime"
-				},
-				{
-					"kind": "float",
-					"type_path": "",
-					"name": "VoiceStealReleaseTime"
-				}
-			]
-		},
-		{
 			"path": "/Script/Engine.StreamingSourceShape",
 			"signature": "bUseGridLoadingRange:BoolProperty:0;LoadingRangeScale:FloatProperty:0;Radius:FloatProperty:0;bIsSector:BoolProperty:0;SectorAngle:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Rotation:StructProperty:0:/Script/CoreUObject.Rotator{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;};",
 			"fields": [
@@ -2840,6 +2977,38 @@
 					"kind": "name",
 					"type_path": "",
 					"name": "KeyName"
+				}
+			]
+		},
+		{
+			"path": "/Script/PhysicsCore.PhysicalMaterialDamageModifier",
+			"signature": "DamageThresholdMultiplier:FloatProperty:0;",
+			"fields": [
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "DamageThresholdMultiplier"
+				}
+			]
+		},
+		{
+			"path": "/Script/PhysicsCore.PhysicalMaterialStrength",
+			"signature": "TensileStrength:FloatProperty:0;CompressionStrength:FloatProperty:0;ShearStrength:FloatProperty:0;",
+			"fields": [
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "TensileStrength"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "CompressionStrength"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "ShearStrength"
 				}
 			]
 		},
@@ -6356,6 +6525,11 @@
 					"domain": "method",
 					"name": "RecordForeignSignal",
 					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "UnsupportedInt64",
+					"reason": "unsupported_parameter_type"
 				}
 			]
 		},
@@ -55454,23 +55628,6 @@
 					"signature": "bOverrideConcurrency:BoolProperty:0;"
 				},
 				{
-					"kind": "struct",
-					"type_path": "/Script/Engine.SoundConcurrencySettings",
-					"name": "ConcurrencyOverrides",
-					"declaring_class": "/Script/Engine.SoundBase",
-					"readonly": false,
-					"access":
-					{
-						"native_getter": false,
-						"native_setter": false,
-						"getter_unsafe": false,
-						"setter_unsafe": false,
-						"getter": "",
-						"setter": ""
-					},
-					"signature": "ConcurrencyOverrides:StructProperty:0:/Script/Engine.SoundConcurrencySettings{MaxCount:IntProperty:0;bLimitToOwner:BoolProperty:0;bVolumeScaleCanRelease:BoolProperty:0;bEnableMaxCountPlatformScaling:BoolProperty:0;ResolutionRule:ByteProperty:0:/Script/Engine.EMaxConcurrentResolutionRule;RetriggerTime:FloatProperty:0;PlatformMaxCount:StructProperty:0:/Script/CoreUObject.PerPlatformInt{Default:IntProperty:0;PerPlatform:MapProperty:0[PerPlatform_Key:NameProperty:0;PerPlatform:IntProperty:0;];};VolumeScale:FloatProperty:0;VolumeScaleMode:EnumProperty:0:/Script/Engine.EConcurrencyVolumeScaleMode;VolumeScaleAttackTime:FloatProperty:0;VolumeScaleReleaseTime:FloatProperty:0;VoiceStealReleaseTime:FloatProperty:0;};"
-				},
-				{
 					"kind": "set",
 					"type_path": "",
 					"element":
@@ -55684,6 +55841,11 @@
 				{
 					"domain": "field",
 					"name": "BusSends",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "ConcurrencyOverrides",
 					"reason": "unsupported_property_type"
 				},
 				{
@@ -77860,6 +78022,322 @@
 				{
 					"domain": "field",
 					"name": "WarmupTime",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				}
+			]
+		},
+		{
+			"path": "/Script/PhysicsCore.PhysicalMaterial",
+			"fixture": false,
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bOverrideFrictionCombineMode",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bOverrideFrictionCombineMode:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bOverrideRestitutionCombineMode",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bOverrideRestitutionCombineMode:BoolProperty:0;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/PhysicsCore.PhysicalMaterialDamageModifier",
+					"name": "DamageModifier",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "DamageModifier:StructProperty:0:/Script/PhysicsCore.PhysicalMaterialDamageModifier{DamageThresholdMultiplier:FloatProperty:0;};"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.LinearColor",
+					"name": "DebugColor",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "DebugColor:StructProperty:0:/Script/CoreUObject.LinearColor{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;};"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Density",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Density:FloatProperty:0;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Friction",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Friction:FloatProperty:0;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/PhysicsCore.EFrictionCombineMode",
+					"name": "FrictionCombineMode",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "FrictionCombineMode:ByteProperty:0:/Script/PhysicsCore.EFrictionCombineMode;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "RaiseMassToPower",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "RaiseMassToPower:FloatProperty:0;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Restitution",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Restitution:FloatProperty:0;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/PhysicsCore.EFrictionCombineMode",
+					"name": "RestitutionCombineMode",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "RestitutionCombineMode:ByteProperty:0:/Script/PhysicsCore.EFrictionCombineMode;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "SleepAngularVelocityThreshold",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "SleepAngularVelocityThreshold:FloatProperty:0;"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "SleepCounterThreshold",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "SleepCounterThreshold:IntProperty:0;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "SleepLinearVelocityThreshold",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "SleepLinearVelocityThreshold:FloatProperty:0;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "StaticFriction",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "StaticFriction:FloatProperty:0;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/PhysicsCore.PhysicalMaterialStrength",
+					"name": "Strength",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Strength:StructProperty:0:/Script/PhysicsCore.PhysicalMaterialStrength{TensileStrength:FloatProperty:0;CompressionStrength:FloatProperty:0;ShearStrength:FloatProperty:0;};"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/PhysicsCore.EPhysicalSurface",
+					"name": "SurfaceType",
+					"declaring_class": "/Script/PhysicsCore.PhysicalMaterial",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "SurfaceType:ByteProperty:0:/Script/PhysicsCore.EPhysicalSurface;"
+				}
+			],
+			"methods": [],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "BaseFrictionImpulse",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bShowExperimentalProperties",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DestructibleDamageThresholdScale",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "PhysicalMaterialProperty",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SoftCollisionMode",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SoftCollisionThickness",
 					"reason": "hidden_editor_or_deprecated"
 				},
 				{

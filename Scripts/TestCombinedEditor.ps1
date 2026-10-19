@@ -13,8 +13,11 @@ try {
   if($LASTEXITCODE){throw 'Combined Editor build failed'}
  }
  Push-Location $Repo
- try { & $Python -m unittest discover -s Scripts -p 'Test*.py' -v *> (Join-Path $Logs 'combined-python-tests.log');if($LASTEXITCODE){throw 'Generator tests failed'} }
- finally { Pop-Location }
+ # Windows PowerShell turns redirected native stderr (unittest's report) into terminating errors under Stop.
+ $PreviousPreference=$ErrorActionPreference;$ErrorActionPreference='Continue'
+ try { & $Python -m unittest discover -s Scripts -p 'Test*.py' -v *> (Join-Path $Logs 'combined-python-tests.log');$PythonExit=$LASTEXITCODE }
+ finally { $ErrorActionPreference=$PreviousPreference;Pop-Location }
+ if($PythonExit){throw 'Generator tests failed'}
  function Invoke-CombinedAutomation([string]$Filter,[string]$Name,[int]$MinimumCount,[string[]]$Extra=@()) {
   $Log=Join-Path $Logs ($Name+'.log');$Report=Join-Path $Logs ($Name+'-report')
   $Arguments=@(('"'+$Project+'"'),'-unattended','-NullRHI','-nosplash','-nosound','-RenderOffscreen',

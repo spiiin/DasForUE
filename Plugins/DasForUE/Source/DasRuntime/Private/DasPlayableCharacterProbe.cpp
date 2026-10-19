@@ -44,7 +44,9 @@ bool RunDasPlayableCharacterProbe(ADasStaticLibraryProbe* Carrier,FString& Repor
  Check(PC->GetPawn()==C && C->GetController()==PC,TEXT("playable_DAS_authority_possession"));if(PC->GetPawn()!=C)return false;
  C->PawnClientRestart();auto* Component=Cast<UEnhancedInputComponent>(C->InputComponent);
  if(!Component){Check(false,TEXT("playable_possession_input_component"));return false;}
- PC->SetControlRotation(FRotator::ZeroRotator);C->Tick(0.016f);
+ PC->SetControlRotation(FRotator::ZeroRotator);C->Tick(0.016f);const int32 BoundSubscriptions=Runtime.SubscriptionCount(C);
+ // Health.Changed and OnTakeAnyDamage handlers belong to the actor, not to possession.
+ constexpr int32 ActorEventSubscriptions=2;
  auto* Context=Cast<UInputMappingContext>(Obj(TEXT("Controls")));auto* Move=Cast<UInputAction>(Obj(TEXT("MoveAction")));auto* Look=Cast<UInputAction>(Obj(TEXT("LookAction")));auto* Jump=Cast<UInputAction>(Obj(TEXT("JumpAction")));
  Check(Context && Move && Look && Jump && Subsystem->HasMappingContext(Context),TEXT("playable_DAS_mapping_context_installed"));if(!Context || !Move || !Look || !Jump)return false;
  FModifyContextOptions Rebuild;Rebuild.bForceImmediately=true;Subsystem->RequestRebuildControlMappings(Rebuild,EInputMappingRebuildType::RebuildWithFlush);
@@ -79,8 +81,8 @@ bool RunDasPlayableCharacterProbe(ADasStaticLibraryProbe* Carrier,FString& Repor
    const auto StaleHash=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("native_gameplay_hash_probe.das")),TEXT("stale"),{},EDasMethodSignature::Bool,C);Check(StaleHash.bSucceeded && StaleHash.BoolValue,TEXT("native_hash_destroyed_keys_rejected_and_empty_replacement_allowed"));if(!StaleHash.bSucceeded)Report+=StaleHash.Error+TEXT("\n");HashProbe->DestroyComponent();
  const auto WrongReceiver=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("native_gameplay_wrong_receiver.das")),TEXT("main"),{},EDasMethodSignature::Bool,C);Check(!WrongReceiver.bSucceeded && WrongReceiver.Error.Contains(TEXT("receiver class mismatch")),TEXT("native_generated_receiver_class_enforced"));
  const auto Rejection=Runtime.RunNamedFramePersistent(Runtime.ScriptPath(TEXT("playable_character_negative_probe.das")),TEXT("main"),{},EDasMethodSignature::Bool,C);Check(Rejection.bSucceeded && Rejection.BoolValue && C->GetCharacterMovement()->MaxWalkSpeed==320,TEXT("playable_invalid_speed_rejected_without_write"));if(!Rejection.bSucceeded)Report+=Rejection.Error+TEXT("\n");
- PC->UnPossess();C->Tick(.016f);Check(!Subsystem->HasMappingContext(Context) && Runtime.SubscriptionCount(C)==0,TEXT("playable_unpossess_releases_owned_input"));
- PC->Possess(C);C->PawnClientRestart();C->Tick(.016f);Component=Cast<UEnhancedInputComponent>(C->InputComponent);Check(Component && Subsystem->HasMappingContext(Context) && Runtime.SubscriptionCount(C)==5,TEXT("playable_repossess_rebinds_new_input_component"));
+ PC->UnPossess();C->Tick(.016f);Check(!Subsystem->HasMappingContext(Context) && BoundSubscriptions>ActorEventSubscriptions && Runtime.SubscriptionCount(C)==ActorEventSubscriptions,TEXT("playable_unpossess_releases_owned_input"));
+ PC->Possess(C);C->PawnClientRestart();C->Tick(.016f);Component=Cast<UEnhancedInputComponent>(C->InputComponent);Check(Component && Subsystem->HasMappingContext(Context) && Runtime.SubscriptionCount(C)==BoundSubscriptions,TEXT("playable_repossess_rebinds_new_input_component"));
  const auto* Error=DasHostString(C,TEXT("LastDasError"));Check(Error && Error->IsEmpty(),TEXT("playable_no_DAS_runtime_errors"));if(Error && !Error->IsEmpty())Report+=*Error;
  C->Destroy();Runtime.ReleaseObject(C);Check(!Subsystem->HasMappingContext(Context),TEXT("playable_EndPlay_removes_owned_context"));Check(Runtime.SubscriptionCount(C)==0 && (!IsValid(Component) || Component->GetActionEventBindings().Num()==0),TEXT("playable_EndPlay_revokes_handlers_or_destroys_component"));
  return Good;

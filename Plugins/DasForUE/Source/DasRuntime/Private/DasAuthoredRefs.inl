@@ -213,7 +213,8 @@ struct FUEReferenceMutationVisitor:das::Visitor {
  das::ExpressionPtr Rewrite(das::Expression* Original,das::Expression* Target,das::ExprOp2* Assignment,das::ExprCall* OperationCall){
   const auto R=Root(Target);if(!R.Expr)return Original;
   try{
-   const bool Native=!DSLAuthoredView(R.OwnerType);if(!OperationCall && R.Expr==Target)return Original;
+   // Authored whole-value writes still need the readonly check below.
+   const bool Native=!DSLAuthoredView(R.OwnerType);if(Native && !OperationCall && R.Expr==Target)return Original;
    FDasDeclaredClass C;FDasDeclaredProperty NativeProperty;
    if(Native){C.Id=DSLTypedReferencePath(R.OwnerType);NativeProperty=DSLNativeReferenceProperty(R.OwnerType,R.Name);}else C=DSLReferenceDeclaration(R.OwnerType);
    const auto* Property=Native?&NativeProperty:C.Properties.FindByPredicate([&](const auto& V){return V.Name==DSLText(R.Name);});
