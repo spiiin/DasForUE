@@ -59,6 +59,27 @@ bool RunDasFoundationTests(FString& Report)
         }
     }
 #endif
+#if WITH_EDITOR
+    {
+        // Compile-time DSL checks: method references and native ue_event delegates.
+        auto Authoring = [&](const TCHAR* Name, FString& Error)
+        {
+            FDasAuthoringModule Model;
+            return Runtime.ReadAuthoringScript(Runtime.ScriptPath(Name), Model, Error);
+        };
+        FString RefError, BadRefError, UnknownError, ArityError;
+        Expect(Authoring(TEXT("dsl_method_refs.das"), RefError), TEXT("dsl_method_references_compile"), RefError);
+        Expect(!Authoring(TEXT("dsl_method_refs_bad.das"), BadRefError) && !BadRefError.IsEmpty(),
+                          TEXT("dsl_method_reference_to_field_rejected"));
+        Expect(!Authoring(TEXT("dsl_event_unknown.das"), UnknownError) &&
+                          UnknownError.Contains(TEXT("multicast delegate OnTakeAnyDamagee")),
+                                                TEXT("dsl_unknown_native_event_rejected_at_compile_time"),
+                                                     UnknownError);
+        Expect(!Authoring(TEXT("dsl_event_arity.das"), ArityError) &&
+                          ArityError.Contains(TEXT("with 1 parameter")),
+                                              TEXT("dsl_native_event_arity_rejected_at_compile_time"), ArityError);
+    }
+#endif
     auto Run = [&](const TCHAR* Name)
     {
         return Runtime.RunFile(Runtime.ScriptPath(Name), 40);

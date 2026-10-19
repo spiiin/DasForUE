@@ -215,6 +215,10 @@ class ScalarEventActor {
 
 - `source="self"` is the default; `source="owner"` is available in ActorComponents;
   a component name subscribes to one of the object's own components.
+- When the source is native (self of a class with a native parent, or a native
+  component), the delegate is checked while the script compiles: a misspelled name or
+  a handler with the wrong number of parameters is a compile error. Owner and authored
+  sources are checked when `bind_events` subscribes.
 - Handlers return `void` and take 0–16 by-value parameters (`var` allows local
   mutation of the copy); no `ref`/`out`/defaults, and not combined with
   `BlueprintCallable`. Several handlers per class are allowed; duplicates are

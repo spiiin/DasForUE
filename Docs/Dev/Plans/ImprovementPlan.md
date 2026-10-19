@@ -21,6 +21,7 @@ Effort is in focused working days.
 | 1.3 DSL lowering | Partly done | Self accessor names come from one helper. |
 | 3.1 method references | Done | Callback arguments accept `self.Method` (timers, input, Enhanced Input, latent, effects, montage, AI move, asset and soft loads); `ue_widget_bind_click` handlers are checked at compile time. |
 | 3.3 trigger enum | Done | `TriggerEvent` for `ue_enhanced_bind` / `ue_enhanced_unbind`; string triggers still accepted. |
+| 3.5 event checks | Partly done | Native `ue_event` sources (self with a native parent, native components) are checked at compile time for delegate name and arity. Payload type checks and authored sources remain at subscription time. |
 | 4.1 benchmark | Done | `self_int_read_write_benchmark` in foundation tests. |
 | 4.2–4.4 property access | Partly done | Registry index, cached (class, name) resolution with field paths, cached validated access contracts and in-place plain scalar access: self int read+write 14.9 us -> 0.54 us. Slot-based access and in-place struct member writes remain. |
 

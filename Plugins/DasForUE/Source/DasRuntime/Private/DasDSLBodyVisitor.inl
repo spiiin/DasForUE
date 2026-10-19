@@ -42,6 +42,30 @@ int32 DSLCallbackArgument(const das::string& QualifiedName, size_t Count)
         Index = 4;
     return Index >= 0 && size_t(Index) < Count ? Index : -1;
 }
+// Native class of a ue_event source when it is known at compile time: self of a class with a native
+// parent (its script host) or a native component. Owner and authored sources return null.
+UClass* DSLEventSourceClass(const FDasDeclaredClass& C, const FString& Source)
+{
+    if (Source == TEXT("self"))
+        return C.ParentId.IsEmpty() ? DasNativeScriptHost(C.NativeParent) : nullptr;
+    if (Source == TEXT("owner"))
+        return nullptr;
+    const auto* Component = C.Components.FindByPredicate([&](const auto& X) { return X.Name == Source; });
+    return Component && !Component->NativeClass.IsEmpty() ? FindObject<UClass>(nullptr, *Component->NativeClass)
+                                                          : nullptr;
+}
+// A BlueprintAssignable multicast delegate with the given number of parameters.
+bool DSLNativeEventMatches(UClass* Class, const FString& Name, int32 Arity)
+{
+    auto* P = FindFProperty<FMulticastDelegateProperty>(Class, FName(*Name));
+    if (!P || !P->HasAnyPropertyFlags(CPF_BlueprintAssignable) || !P->SignatureFunction)
+        return false;
+    int32 Parameters = 0;
+    for (TFieldIterator<FProperty> It(P->SignatureFunction); It; ++It)
+        if (It->HasAnyPropertyFlags(CPF_Parm) && !It->HasAnyPropertyFlags(CPF_ReturnParm))
+            ++Parameters;
+    return Parameters == Arity;
+}
 // Rewrites self.Method callback arguments in the declared class methods to the method name, so the
 // methods themselves type-check against the name-based managed APIs. The generated entry points
 // are lowered by FDSLBodyVisitor, which accepts both forms.

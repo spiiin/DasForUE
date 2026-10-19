@@ -935,8 +935,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     {
                         C.Methods.Add(M);
                         const auto* Owner = Model.Classes.FindByPredicate(
-                            [&](const auto& Cl)
-                            {
+                            [&](const auto& Cl) {
                                 return Cl.Methods.ContainsByPredicate([&](const auto& Method)
                                                                       { return Method.Id == M.Id; });
                             });
@@ -1573,6 +1572,17 @@ struct FUEClassAnnotation : das::StructureAnnotation
                         DSLFail(TEXT("Event source must be self, owner or a declared component"));
                     if (Callback.Source == TEXT("owner") && C.NativeParent != TEXT("/Script/Engine.ActorComponent"))
                         DSLFail(TEXT("Owner event source requires ActorComponent"));
+                    // Native sources are known while compiling: check the delegate and its arity here
+                    // instead of at subscription time. Authored sources keep the runtime check.
+                    if (UClass* EventClass = DSLEventSourceClass(C, Callback.Source))
+                    {
+                        const bool AuthoredEvent = C.Properties.ContainsByPredicate(
+                            [&](const auto& P) { return P.Name == Callback.EventName; });
+                        const int32 Arity = int32(F->arguments.size()) - 1;
+                        if (!AuthoredEvent && !DSLNativeEventMatches(EventClass, Callback.EventName, Arity))
+                            DSLFail(FString::Printf(TEXT("ue_event %s: %s has no BlueprintAssignable multicast delegate %s with %d parameter(s)"),
+                                *Callback.Name, *EventClass->GetName(), *Callback.EventName, Arity));
+                    }
                     auto* SelfObject = DSLCall(F->at, "ue_self_object", {});
                     das::ExpressionPtr Source =
                         Callback.Source ==
@@ -1711,20 +1721,17 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 Own.NativeParent.Reset();
                 Own.ParentId = BaseId;
                 Own.Properties.RemoveAll(
-                    [&](const auto& P)
-                    {
+                    [&](const auto& P) {
                         return BaseEffective.Properties.ContainsByPredicate([&](const auto& Base)
                                                                             { return Base.Id == P.Id; });
                     });
                 Own.Methods.RemoveAll(
-                    [&](const auto& M)
-                    {
+                    [&](const auto& M) {
                         return BaseEffective.Methods.ContainsByPredicate([&](const auto& Base)
                                                                          { return Base.Id == M.Id; });
                     });
                 Own.Components.RemoveAll(
-                    [&](const auto& P)
-                    {
+                    [&](const auto& P) {
                         return BaseEffective.Components.ContainsByPredicate([&](const auto& Base)
                                                                             { return Base.Id == P.Id; });
                     });
