@@ -90,7 +90,7 @@ template <class P, class T> void WritePropertyScalarValue(P* Property, void* Mem
 {
     WriteNativePropertyValue(Property, Memory, PropertyScalarValue<P>(Input), C);
 }
-FDasPropertyAccess ObjectPropertyAccess(FProperty* P, das::Context* C)
+FDasPropertyAccess DescribeObjectPropertyAccess(FProperty* P, das::Context* C)
 {
     // FName equality matches the former case-insensitive FString comparison of names.
     if (const auto* Rows = DasNativeGameplayFieldsNamed(P->GetFName()))
@@ -107,6 +107,29 @@ FDasPropertyAccess ObjectPropertyAccess(FProperty* P, das::Context* C)
         C->throw_error(TCHAR_TO_UTF8(*Error));
     return Access;
 }
+// The access contract depends only on the property. Entries are keyed by address and
+// validated through a field path, which goes stale when the owner struct is relinked.
+FDasPropertyAccess ObjectPropertyAccess(FProperty* P, das::Context* C)
+{
+    struct FEntry
+    {
+        TFieldPath<FProperty> Path;
+        FDasPropertyAccess Access;
+    };
+    static TMap<FProperty*, FEntry> Cache;
+    if (const FEntry* Entry = Cache.Find(P))
+        if (Entry->Path.Get() == P)
+            return Entry->Access;
+    FDasPropertyAccess Access = DescribeObjectPropertyAccess(P, C);
+    // Validate once per property; a failing contract is not cached and keeps reporting on access.
+    FString Error;
+    if (ValidateDasPropertyAccess(P, Access, Error))
+    {
+        Access.bValidated = true;
+        Cache.Add(P, FEntry{TFieldPath<FProperty>(P), Access});
+    }
+    return Access;
+}
 FDasScalarValue ReadOwnerProperty(FProperty* P, UObject* O, das::Context* C)
 {
     FDasScalarValue V;
@@ -121,8 +144,35 @@ void WriteOwnerProperty(FProperty* P, UObject* O, const FDasScalarValue& V, das:
     if (!WriteDasObjectProperty(P, O, ObjectPropertyAccess(P, C), ConstructingObject, V, Error))
         C->throw_error(TCHAR_TO_UTF8(*Error));
 }
-template <class P> auto ReadPropertyScalar(P* Property, UObject* Owner, das::Context* C)
+// Plain reflected scalars without accessors are read and written in place. The conditions mirror
+// the generic path (validated contract, game thread, live owner of the declaring class, no static
+// array); anything else, including readonly or non-finite writes, takes the generic path and its errors.
+template <class P> bool DasPlainScalarAccess(P* Property, UObject* Owner, const FDasPropertyAccess& Access, bool bWrite)
 {
+    const bool NoAccessor =
+        bWrite ? Access.Setter.IsNone() && !Access.NativeSetter : Access.Getter.IsNone() && !Access.NativeGetter;
+    return Access.bValidated && NoAccessor && IsInGameThread() && IsValid(Owner) && Property->GetOwnerClass() &&
+           Owner->IsA(Property->GetOwnerClass()) && Property->ArrayDim == 1;
+}
+template <class T> bool DasFiniteScalar(const T&)
+{
+    return true;
+}
+inline bool DasFiniteScalar(float V)
+{
+    return FMath::IsFinite(V);
+}
+inline bool DasFiniteScalar(double V)
+{
+    return FMath::IsFinite(V);
+}
+template <class P>
+using TPropertyScalarType = std::decay_t<decltype(std::declval<FDasScalarValue&>().*TPropertyScalarSlot<P>::Member)>;
+
+template <class P> TPropertyScalarType<P> ReadPropertyScalar(P* Property, UObject* Owner, das::Context* C)
+{
+    if (DasPlainScalarAccess(Property, Owner, ObjectPropertyAccess(Property, C), false))
+        return Property->GetPropertyValue_InContainer(Owner);
     const auto V = ReadOwnerProperty(Property, Owner, C);
     if (V.Kind != int32(TPropertyScalarSlot<P>::Kind))
         C->throw_error("property scalar type mismatch");
@@ -130,5 +180,12 @@ template <class P> auto ReadPropertyScalar(P* Property, UObject* Owner, das::Con
 }
 template <class P, class T> void WritePropertyScalar(P* Property, UObject* Owner, const T& Input, das::Context* C)
 {
-    WriteOwnerProperty(Property, Owner, PropertyScalarValue<P>(Input), C);
+    const TPropertyScalarType<P> Value = Input;
+    if (DasPlainScalarAccess(Property, Owner, ObjectPropertyAccess(Property, C), true) &&
+        !Property->HasAnyPropertyFlags(CPF_BlueprintReadOnly) && DasFiniteScalar(Value))
+    {
+        Property->SetPropertyValue_InContainer(Owner, Value);
+        return;
+    }
+    WriteOwnerProperty(Property, Owner, PropertyScalarValue<P>(Value), C);
 }

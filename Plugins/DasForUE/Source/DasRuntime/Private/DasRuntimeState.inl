@@ -384,19 +384,49 @@ UObject* ResolveWorldContextObject(das::Context* C)
     return Object;
 }
 
+// Property lookup by (class, UTF-8 name). Entries hold a weak class and a field path,
+// so a recompiled or reinstanced class is resolved again instead of reusing freed fields.
+FProperty* FindSelfPropertyCached(UClass* Class, const char* Name, das::Context* Context)
+{
+    struct FEntry
+    {
+        TWeakObjectPtr<UClass> Class;
+        das::string Name;
+        TFieldPath<FProperty> Property;
+    };
+    static TMap<uint64, TArray<FEntry, TInlineAllocator<1>>> Cache;
+    const SIZE_T Length = FCStringAnsi::Strlen(Name);
+    const uint64 Key = CityHash64(Name, Length) ^ (uint64(UPTRINT(Class)) * 0x9E3779B97F4A7C15ull);
+    auto Resolve = [&]() -> FProperty*
+    {
+        const FString FieldName(UTF8_TO_TCHAR(Name));
+        if (FieldName.Len() >= NAME_SIZE)
+            Context->throw_error("property name is too long");
+        return Class->FindPropertyByName(FName(*FieldName));
+    };
+    auto& Bucket = Cache.FindOrAdd(Key);
+    for (auto& Entry : Bucket)
+        if (Entry.Class.Get() == Class && Entry.Name == Name)
+        {
+            if (FProperty* Cached = Entry.Property.Get(Class))
+                return Cached;
+            FProperty* Fresh = Resolve();
+            Entry.Property = TFieldPath<FProperty>(Fresh);
+            return Fresh;
+        }
+    FProperty* Found = Resolve();
+    if (Found)
+        Bucket.Add(FEntry{Class, Name, TFieldPath<FProperty>(Found)});
+    return Found;
+}
+
 template <class P> P* ResolveProperty(UObject* Self, const char* Name, bool bWrite, das::Context* Context)
 {
     if (!Name || !*Name)
     {
         Context->throw_error("property name is empty");
     }
-    // Resolve again for every call; never retain FProperty pointers across reinstancing.
-    const FString FieldName(UTF8_TO_TCHAR(Name));
-    if (FieldName.Len() >= NAME_SIZE)
-    {
-        Context->throw_error("property name is too long");
-    }
-    FProperty* Property = Self->GetClass()->FindPropertyByName(FName(*FieldName));
+    FProperty* Property = FindSelfPropertyCached(Self->GetClass(), Name, Context);
     if (!Property)
     {
         Context->throw_error("self property does not exist");

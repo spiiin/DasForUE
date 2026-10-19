@@ -1,3 +1,5 @@
+#include "Hash/CityHash.h"
+#include "UObject/FieldPath.h"
 #include "DasGameplayTags.h"
 #include "Engine/CurveTable.h"
 #include "Engine/DataTable.h"
@@ -865,13 +867,13 @@ FString DasFoundationExternManifest()
 {
     TArray<FString> Lines;
     if (das::Module* Module = das::Module::require("ue_foundation"))
-        Module->functions.foreach(
+        Module->functions.foreach (
             [&](const das::FunctionPtr& Fn)
             {
                 const das::string Result = Fn->result ? Fn->result->describe() : das::string();
                 Lines.Add(FString::Printf(TEXT("%s\t%s\t%s\t%u"), UTF8_TO_TCHAR(Fn->name.c_str()),
-                                          UTF8_TO_TCHAR(Fn->getMangledName().c_str()), UTF8_TO_TCHAR(Result.c_str()),
-                                          Fn->sideEffectFlags));
+                                               UTF8_TO_TCHAR(Fn->getMangledName().c_str()),
+                                               UTF8_TO_TCHAR(Result.c_str()), Fn->sideEffectFlags));
             });
     Lines.Sort();
     return FString::Join(Lines, TEXT("\n")) + TEXT("\n");

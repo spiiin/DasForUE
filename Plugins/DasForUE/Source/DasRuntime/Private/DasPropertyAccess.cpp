@@ -63,7 +63,7 @@ bool OwnerCheck(FProperty* P, UObject* O, const FDasPropertyAccess& Access, FStr
         Error = TEXT("Invalid owner-property access");
         return false;
     }
-    return ValidateDasPropertyAccess(P, Access, Error);
+    return Access.bValidated || ValidateDasPropertyAccess(P, Access, Error);
 }
 bool ContextCheck(bool Unsafe, bool Construction, UFunction* Function, FString& Error)
 {
@@ -141,6 +141,9 @@ bool ReadDasObjectProperty(FProperty* P, UObject* O, const FDasPropertyAccess& A
     Error.Reset();
     if (!OwnerCheck(P, O, Access, Error))
         return false;
+    // Plain reflected reads run no code; only accessor calls need the owner rooted.
+    if (Access.Getter.IsNone() && !Access.NativeGetter)
+        return ReadDasPropertyValue(P, P->ContainerPtrToValuePtr<void>(O), Out, Error);
     TStrongObjectPtr<UObject> KeepOwner(O);
     if (!Access.Getter.IsNone())
     {
@@ -173,7 +176,6 @@ bool WriteDasObjectProperty(FProperty* P, UObject* O, const FDasPropertyAccess& 
     Error.Reset();
     if (!OwnerCheck(P, O, Access, Error))
         return false;
-    TStrongObjectPtr<UObject> KeepOwner(O);
     if ((Value.Kind == int32(EDasMethodSignature::Float) && !FMath::IsFinite(Value.FloatValue)) ||
         (Value.Kind == int32(EDasMethodSignature::Double) && !FMath::IsFinite(Value.DoubleValue)))
     {
@@ -185,6 +187,10 @@ bool WriteDasObjectProperty(FProperty* P, UObject* O, const FDasPropertyAccess& 
         Error = TEXT("Native property is readonly");
         return false;
     }
+    // Plain reflected writes run no code; only accessor calls need the owner rooted.
+    if (Access.Setter.IsNone() && !Access.NativeSetter)
+        return WriteDasPropertyValue(P, P->ContainerPtrToValuePtr<void>(O), Value, Error);
+    TStrongObjectPtr<UObject> KeepOwner(O);
     if (!Access.Setter.IsNone())
     {
         UFunction* F = nullptr;
