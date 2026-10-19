@@ -109,6 +109,22 @@ bool RunDasFoundationTests(FString& Report)
     const auto Access = RunSelf(TEXT("self_properties.das"));
     Expect(Access.bSucceeded && Access.Value == 105 && Fixture->health == 105 && Fixture->speed == 38.f,
            TEXT("self_scalar_read_write"), Access.Error);
+    {
+        // Informational: cost of one self int read plus write, compile time excluded by differencing.
+        Fixture->health = 0;
+        const int32 Iterations = 20000;
+        const double Start = FPlatformTime::Seconds();
+        const auto Short = Runtime.RunFile(Runtime.ScriptPath(TEXT("self_access_benchmark.das")), 1, false, WeakSelf);
+        const double Middle = FPlatformTime::Seconds();
+        const auto Long =
+            Runtime.RunFile(Runtime.ScriptPath(TEXT("self_access_benchmark.das")), Iterations + 1, false, WeakSelf);
+        const double End = FPlatformTime::Seconds();
+        const double NsPerAccess = FMath::Max(0.0, (End - Middle) - (Middle - Start)) * 1e9 / Iterations;
+        Expect(Short.bSucceeded && Long.bSucceeded && Long.Value == Iterations + 2,
+               TEXT("self_int_read_write_benchmark"),
+               FString::Printf(TEXT("ns_per_read_write=%.0f %s"), NsPerAccess, *Long.Error));
+        Fixture->health = 105;
+    }
     const auto WrongType = RunSelf(TEXT("self_wrong_type.das"));
     Expect(!WrongType.bSucceeded && WrongType.Error.Contains(TEXT("different scalar type")),
                                                              TEXT("self_wrong_type_rejected"));
