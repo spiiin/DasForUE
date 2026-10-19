@@ -116,6 +116,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                                   St->module});
             TGuardValue<FString> NativeDefaultsHint(DSLNativeDefaultsParentHint, NativeHint);
             DSLExpandDeclarationGroups(St, true);
+            DSLNormalizeMethodReferences(St);
             DSLPrepareComputedDefaults(St);
             const auto ComponentDefaults = DSLCollectComponentDefaults(St);
             DSLCommentTooltip(St->at, Args);
@@ -714,8 +715,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 DSLCommentTooltip(F->at, A->arguments, &F->annotations);
                 DSLAnnotationArguments(A->arguments, {TEXT("out"), TEXT("ref")});
                 FDasDeclaredMethod M;
-                M.Name = DSLText(
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+                M.Name = DSLText(DSLMethodName(F));
                 M.Id = C.Id + TEXT(".")+ M.Name;
                 M.ScriptFile = Script;
                 M.EntryPoint = TEXT("ue_")+ C.Name + TEXT("_")+ M.Name;
@@ -1160,8 +1160,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             }
             for (const auto& F : Functions)
             {
-                const FString MethodName = DSLText(
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+                const FString MethodName = DSLText(DSLMethodName(F));
                 const auto M = *C.Methods.FindByPredicate([&](const auto& Item) { return Item.Name == MethodName; });
                 const FString ResultType = DSLTypeName(F->result);
                 FDSLTypeCallVisitor TypeCalls(TypeScope);
@@ -1373,8 +1372,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 if ((Life && Event) || DSLAnnotation(F->annotations, "ue_function"))
                     DSLFail(TEXT("Conflicting UE callback/function annotations"));
                 FDasDeclaredCallback Callback;
-                Callback.Name = DSLText(
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+                Callback.Name = DSLText(DSLMethodName(F));
                 Callback.Kind = Event ? TEXT("event"): Callback.Name;
                 if (F->result && F->result->baseType == das::Type::autoinfer)
                     F->result = new das::TypeDecl(das::Type::tVoid, F->at);

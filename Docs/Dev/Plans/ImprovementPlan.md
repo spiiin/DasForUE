@@ -8,6 +8,22 @@ and hot-path performance. Feature work (new APIs, networking, Shipping) stays in
 Phases are ordered by dependency. Each step lists the acceptance gate that closes it.
 Effort is in focused working days.
 
+## Status
+
+| Step | State | Notes |
+| --- | --- | --- |
+| 0.1 formatting | Done | `.clang-format`, `.editorconfig`, `Scripts/CheckFormat.py` (`--fix`, `--staged`). |
+| 0.2 split large files | Done (textual) | `DasRuntime.cpp` and `DasDSL.inl` split into contiguous `DasRuntime*.inl`, `DasFoundationModule.inl` and `DasDSL*.inl` parts included in place; the preprocessed unit is unchanged. Turning parts into separate `.cpp` units is still open. |
+| 0.3 generated registry | Done | `Private/Generated/DasNativeGameplay.generated.h`; `GenerateNativeGameplay.ps1 -Check` covers freshness. |
+| 0.4 line-length gate | Done | `CheckFormat.py --staged` rejects new lines over 400 characters. |
+| Extern manifest gate | Done | Foundation tests compare name, mangled signature, result type and side effects of every `ue_foundation` function with `Bindings/FoundationExterns.txt`. |
+| 1.1/1.2 kind table | Partly done | `DasScalarAccessors.inl`: kind traits for int, float, double, bool, string, name, byte, text drive self, authored, native-reference, struct-leaf, call-frame and scalar struct-map accessors (142 hand-written functions replaced by templates; manifest unchanged). Enum/object/class/struct families remain. |
+| 1.3 DSL lowering | Partly done | Self accessor names come from one helper. |
+| 3.1 method references | Done | Callback arguments accept `self.Method` (timers, input, Enhanced Input, latent, effects, montage, AI move, asset and soft loads); `ue_widget_bind_click` handlers are checked at compile time. |
+| 3.3 trigger enum | Done | `TriggerEvent` for `ue_enhanced_bind` / `ue_enhanced_unbind`; string triggers still accepted. |
+| 4.1 benchmark | Done | `self_int_read_write_benchmark` in foundation tests. |
+| 4.2–4.4 property access | Partly done | Registry index, cached (class, name) resolution with field paths, cached validated access contracts and in-place plain scalar access: self int read+write 14.9 us -> 0.54 us. Slot-based access and in-place struct member writes remain. |
+
 ## Phase 0 — make the code reviewable (3–4 days)
 
 Everything later touches `DasRuntime.cpp` and `DasDSL.inl`. Today `DasRuntime.cpp` is

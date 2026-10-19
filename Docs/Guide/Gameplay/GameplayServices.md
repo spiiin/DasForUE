@@ -67,7 +67,7 @@ Multi-hit traces, box/capsule sweeps, object-type/profile queries and the full g
 self.HUD=ue_widget_create(self.HUDClass,player)
 verify(ue_widget_show(self.HUD),"HUD cannot be shown")
 ue_widget_set_text(self.HUD,"Score",ue_text_invariant("Score: {self.Score}"))
-ue_widget_bind_click(self.HUD,"Damage","HurtFromHUD")
+ue_widget_bind_click(self.HUD,"Damage",self.HurtFromHUD)
 ue_widget_input(self.HUD,true)
 // Later:
 ue_widget_remove(self.HUD)
@@ -78,7 +78,7 @@ ue_widget_remove(self.HUD)
 | `ue_widget_create(kind:UserWidgetClass, player:PlayerControllerRef):UserWidgetRef` | Needs a live game world and a local PlayerController; refused on a dedicated server. |
 | `ue_widget_show(widget, z_order=0):bool`, `ue_widget_visible(widget):bool`, `ue_widget_remove(widget)` | Viewport management. |
 | `ue_widget_set_text(widget, name, text)` | `name` must find a `TextBlock`; FText semantics are kept. |
-| `ue_widget_bind_click(widget, name, handler)` | `name` must find a `Button`; handler is a `BlueprintCallable` method of the context owner with no parameters and no result. |
+| `ue_widget_bind_click(widget, name, handler)` | `name` must find a `Button`; handler (`self.Method` or its name; inside `ue_class` it is checked at compile time) is a `BlueprintCallable` method of the context owner with no parameters and no result. |
 | `ue_widget_input(widget, enabled)` | `true` switches to GameAndUI with a cursor; `false`/cleanup restores GameOnly and the previous cursor visibility. |
 
 - The context keeps created widgets alive against GC. Binding the same button again replaces the previous handler.

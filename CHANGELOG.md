@@ -8,6 +8,30 @@ Target environment for every entry: Unreal Engine 5.8.3 (source build),
 daScript 0.6.4 (pinned), Win64 Development. Start at the
 [documentation index](Docs/index.md).
 
+## 2026-10-20
+
+### Added
+
+- Callback arguments accept method references: `ue_timer_start("score",1.0,self.Pulse,true)`,
+  `ue_enhanced_bind(action,TriggerEvent.Started,self.OnJump)`, `ue_widget_bind_click(hud,"Damage",self.OnDamage)`
+  and the same for input, latent delays, effects, montages, AI MoveTo and asset loads. Handlers are
+  checked at compile time, including button handlers ([Functions](Docs/Guide/DSL/Functions.md#methods-as-callbacks)).
+- `TriggerEvent` enum for Enhanced Input bindings; trigger strings are still accepted
+  ([Input](Docs/Guide/Gameplay/Input.md)).
+
+### Changed
+
+- Self, authored and native property access is much faster: registry lookups are indexed, property
+  resolution and access contracts are cached (safe across recompilation and reinstancing) and plain
+  scalars are accessed in place. A self int read plus write went from about 15 µs to about 0.5 µs.
+
+### Internal
+
+- C++ sources are clang-formatted; `DasRuntime.cpp` and `DasDSL.inl` are split into subsystem parts;
+  scalar accessor families are generated from one kind table; foundation tests guard the script-visible
+  extern surface with `Bindings/FoundationExterns.txt`
+  ([Improvement plan](Docs/Dev/Plans/ImprovementPlan.md)).
+
 ## 2026-10-19
 
 ### Added

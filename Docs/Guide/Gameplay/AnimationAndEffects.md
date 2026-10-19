@@ -46,7 +46,7 @@ Assign a SkeletalMesh and a suitable AnimInstance/AnimBlueprint to the mesh. For
 
 Before playing, the plugin checks references, the game world, skeleton compatibility, a positive finite rate, position, section and the handler contract. `SoftAnimMontage` works with the regular [async asset loading](../Data/AssetLoading.md).
 
-The handler must be `[ue_function] def Handler(event:MontageEvent):void` in the DSL class. Pass the method name as a string literal; the macro maps it to the exported entry point and the signature is checked at authoring time. A handler with the wrong parameter type (see the negative example `montage_bad_callback.das`, which takes `int`) is rejected with a montage-callback mismatch diagnostic before the Blueprint is created.
+The handler must be `[ue_function] def Handler(event:MontageEvent):void` in the DSL class. Pass the method as `self.Handler` (or its name as a string literal); the macro maps it to the exported entry point and the signature is checked at authoring time. A handler with the wrong parameter type (see the negative example `montage_bad_callback.das`, which takes `int`) is rejected with a montage-callback mismatch diagnostic before the Blueprint is created.
 
 ### MontageEvent
 

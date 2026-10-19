@@ -81,14 +81,14 @@ class PlayableCharacter : Character {
     def BindControls():void {
         let pawn=ue_character_self()
         ue_enhanced_add_context(ue_pawn_controller(pawn),self.Controls,0)
-        ue_enhanced_bind(self.MoveAction,"Triggered","OnMove")
-        ue_enhanced_bind(self.LookAction,"Triggered","OnLook")
-        ue_enhanced_bind(self.JumpAction,"Started","OnJump")
-        ue_enhanced_bind(self.JumpAction,"Completed","OnJump")
-        ue_enhanced_bind(self.JumpAction,"Canceled","OnJump")
-        if(ue_is_valid(self.InteractAction)) { ue_enhanced_bind(self.InteractAction,"Started","OnInteract") }
-        if(ue_is_valid(self.HurtAction)) { ue_enhanced_bind(self.HurtAction,"Started","OnHurt") }
-        if(ue_is_valid(self.UIAction)) { ue_enhanced_bind(self.UIAction,"Started","OnToggleUI") }
+        ue_enhanced_bind(self.MoveAction,TriggerEvent.Triggered,self.OnMove)
+        ue_enhanced_bind(self.LookAction,TriggerEvent.Triggered,self.OnLook)
+        ue_enhanced_bind(self.JumpAction,TriggerEvent.Started,self.OnJump)
+        ue_enhanced_bind(self.JumpAction,TriggerEvent.Completed,self.OnJump)
+        ue_enhanced_bind(self.JumpAction,TriggerEvent.Canceled,self.OnJump)
+        if(ue_is_valid(self.InteractAction)) { ue_enhanced_bind(self.InteractAction,TriggerEvent.Started,self.OnInteract) }
+        if(ue_is_valid(self.HurtAction)) { ue_enhanced_bind(self.HurtAction,TriggerEvent.Started,self.OnHurt) }
+        if(ue_is_valid(self.UIAction)) { ue_enhanced_bind(self.UIAction,TriggerEvent.Started,self.OnToggleUI) }
         self.ControlsBound=true
     }
     [ue_function(BlueprintCallable)]
@@ -116,7 +116,7 @@ class PlayableCharacter : Character {
         self.UIOpen=false
         self.HUD=ue_widget_create(self.HUDClass,ue_pawn_controller(ue_character_self()))
         verify(ue_widget_show(self.HUD),"Cannot add HUD to local player screen")
-        ue_widget_bind_click(self.HUD,"Damage","HurtFromHUD")
+        ue_widget_bind_click(self.HUD,"Damage",self.HurtFromHUD)
         self.RefreshHUD()
     }
     def RefreshHUD():void {
@@ -132,7 +132,7 @@ class PlayableCharacter : Character {
         let start=self.Camera.K2_GetComponentLocation()
         let forward=self.Camera.GetForwardVector()
         let point=ue_vector(start.x+forward.x*100.0lf,start.y+forward.y*100.0lf,start.z+forward.z*100.0lf)
-        if(ue_effect_at("hurt",self.HurtSound,self.HurtVFX,point,"OnHurtEffectFinished",0.25f,0.7f,0.2f)) { self.HurtEffectsStarted+=1 }
+        if(ue_effect_at("hurt",self.HurtSound,self.HurtVFX,point,self.OnHurtEffectFinished,0.25f,0.7f,0.2f)) { self.HurtEffectsStarted+=1 }
     }
     [ue_function(BlueprintCallable)]
     def OnHurtEffectFinished():void { self.HurtEffectsFinished+=1 }

@@ -12,11 +12,28 @@ def InputActionRef_from(value:UObjectHandle):InputActionRef {
 def InputActionRef_raw(value:InputActionRef):UObjectHandle {
     return ue_cast_nullable_object(value.handle,"/Script/EnhancedInput.InputAction")
 }
+// Enhanced Input trigger events (ETriggerEvent). Prefer these over trigger strings.
+enum TriggerEvent {
+    Triggered
+    Started
+    Ongoing
+    Canceled
+    Completed
+}
+def ue_trigger_event_name(trigger:TriggerEvent):string {
+    return "{trigger}"
+}
 def ue_enhanced_bind(action:InputActionRef; trigger:string; handler:string):void {
     __ue_enhanced_bind(InputActionRef_raw(action),trigger,handler)
 }
+def ue_enhanced_bind(action:InputActionRef; trigger:TriggerEvent; handler:string):void {
+    __ue_enhanced_bind(InputActionRef_raw(action),ue_trigger_event_name(trigger),handler)
+}
 def ue_enhanced_unbind(action:InputActionRef; trigger:string):bool {
     return __ue_enhanced_unbind(InputActionRef_raw(action),trigger)
+}
+def ue_enhanced_unbind(action:InputActionRef; trigger:TriggerEvent):bool {
+    return __ue_enhanced_unbind(InputActionRef_raw(action),ue_trigger_event_name(trigger))
 }
 
 [ue_native_object(path="/Script/Engine.PlayerController")]

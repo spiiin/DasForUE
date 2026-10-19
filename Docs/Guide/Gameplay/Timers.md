@@ -14,7 +14,7 @@ class TimerCounter {
     Score:int=0
 
     def BeginPlay():void {
-        ue_timer_start("score",1.0,"Pulse",true)
+        ue_timer_start("score",1.0,self.Pulse,true)
     }
     [ue_function(BlueprintCallable)]
     def Pulse():void {
@@ -39,7 +39,7 @@ Example: `Plugins/DasForUE/Content/Das/Scripts/dsl_managed_timers.das`. For plai
 | `ue_timer_remaining(name)` | Seconds, or `-1` when absent. |
 | `ue_timer_elapsed(name)` | UE elapsed seconds, or `-1` when absent. |
 
-- The handler is an annotated instance method returning `void`, named by a short string literal; methods declared later in the class are resolved. No extra callback annotation is needed.
+- The handler is an annotated instance method returning `void`, passed as `self.Method` (or its name as a string literal); methods declared later in the class are resolved. A misspelled or mismatched handler is a compile error. No extra callback annotation is needed.
 - `interval` must be a positive finite float.
 - Queries follow TimerManager semantics, including those of pending next-tick handles. A fired one-shot timer has no record.
 

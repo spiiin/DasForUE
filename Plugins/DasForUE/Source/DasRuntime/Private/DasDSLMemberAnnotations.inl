@@ -54,8 +54,7 @@ struct FUEFunctionAnnotation : das::FunctionAnnotation
 };
 bool DSLStandardLifecycle(const das::FunctionPtr& F)
 {
-    const FString Name =
-        DSLText(F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+    const FString Name = DSLText(DSLMethodName(F));
     return Name == TEXT("ConstructionScript") ||
                         Name == TEXT("Initialize") || Name == TEXT("BeginPlay") || Name == TEXT("Tick") ||
                                                                                                 Name == TEXT("EndPlay");

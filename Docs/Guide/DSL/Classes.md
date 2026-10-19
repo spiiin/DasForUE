@@ -58,9 +58,9 @@ class PlayableCharacter : Character {
     def BindControls():void {
         let pawn=ue_character_self()
         ue_enhanced_add_context(ue_pawn_controller(pawn),self.Controls,0)
-        ue_enhanced_bind(self.MoveAction,"Triggered","OnMove")
-        ue_enhanced_bind(self.JumpAction,"Started","OnJump")
-        ue_enhanced_bind(self.JumpAction,"Completed","OnJump")
+        ue_enhanced_bind(self.MoveAction,TriggerEvent.Triggered,self.OnMove)
+        ue_enhanced_bind(self.JumpAction,TriggerEvent.Started,self.OnJump)
+        ue_enhanced_bind(self.JumpAction,TriggerEvent.Completed,self.OnJump)
         self.ControlsBound=true
     }
     [ue_function(BlueprintCallable)]

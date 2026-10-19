@@ -18,6 +18,66 @@ das::string DSLSelfAccessor(const char* Prefix, const FDasDeclaredType& Type)
         return das::string(Prefix) + "enum";
     return das::string(Prefix) + "name";
 }
+// Unqualified name of a class method function (after the last ` or ' separator).
+das::string DSLMethodName(const das::FunctionPtr& F)
+{
+    return F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1);
+}
+// Index of the callback-method argument of managed APIs, or -1.
+int32 DSLCallbackArgument(const das::string& QualifiedName, size_t Count)
+{
+    const auto Separator = QualifiedName.rfind("::");
+    const das::string Name = Separator == das::string::npos ? QualifiedName : QualifiedName.substr(Separator + 2);
+    int32 Index = -1;
+    if (Name == "ue_timer_start" || Name == "ue_input_bind_action" || Name == "ue_enhanced_bind" ||
+        Name == "ue_latent_delay" || Name == "ue_asset_load_async" || Name == "ue_soft_load_async" ||
+        Name == "ue_widget_bind_click")
+        Index = 2;
+    else if (Name == "ue_timer_next_tick" || Name == "ue_input_bind_axis")
+        Index = 1;
+    else if (Name == "ue_sound_play" || Name == "ue_niagara_spawn" || Name == "ue_ai_move_to_actor" ||
+             Name == "ue_ai_move_to_location" || Name == "ue_montage_play")
+        Index = 3;
+    else if (Name == "ue_effect_play" || Name == "ue_effect_at")
+        Index = 4;
+    return Index >= 0 && size_t(Index) < Count ? Index : -1;
+}
+// Rewrites self.Method callback arguments in the declared class methods to the method name, so the
+// methods themselves type-check against the name-based managed APIs. The generated entry points
+// are lowered by FDSLBodyVisitor, which accepts both forms.
+struct FDSLMethodReferenceVisitor : das::Visitor
+{
+    das::string Self;
+    das::StructurePtr Source;
+    FDSLMethodReferenceVisitor(const das::string& InSelf, const das::StructurePtr& InSource)
+        : Self(InSelf), Source(InSource)
+    {
+    }
+    virtual void preVisit(das::ExprCall* E) override
+    {
+        const int32 Index = DSLCallbackArgument(E->name, E->arguments.size());
+        if (Index < 0 || !E->arguments[Index] || !E->arguments[Index]->rtti_isField())
+            return;
+        auto* Field = static_cast<das::ExprField*>(E->arguments[Index]);
+        if (!Field->value || !Field->value->rtti_isVar() || static_cast<das::ExprVar*>(Field->value)->name != Self)
+            return;
+        const auto* Member = Source->findField(Field->name);
+        if (Member && Member->classMethod)
+            E->arguments[Index] = new das::ExprConstString(Field->at, Field->name);
+    }
+};
+// Applies FDSLMethodReferenceVisitor to every method declared by the class.
+void DSLNormalizeMethodReferences(const das::StructurePtr& St)
+{
+    St->module->functions.foreach (
+        [&](const das::FunctionPtr& F)
+        {
+            if (F->classParent != St || !F->body || F->arguments.empty())
+                return;
+            FDSLMethodReferenceVisitor References(F->arguments[0]->name, St);
+            F->body = F->body->visit(References);
+        });
+}
 struct FDSLBodyVisitor : das::Visitor
 {
     const FDasDeclaredClass& Decl;
@@ -827,6 +887,21 @@ struct FDSLBodyVisitor : das::Visitor
         const auto* Member = Field ? Source->findField(Field->name) : nullptr;
         return (Member && Member->classMethod) || (Field && LocalTargets.Contains(DSLText(Field->name)));
     }
+    // Callback arguments accept a method reference (self.Method) or its name as a string literal.
+    // A reference is replaced by the literal, so the checks and lowering below are shared.
+    das::ExprConstString* CallbackName(das::ExpressionPtr& Arg)
+    {
+        if (!Arg)
+            return nullptr;
+        if (Arg->__rtti == das::string("ExprConstString"))
+            return static_cast<das::ExprConstString*>(Arg);
+        auto* Field = SelfField(Arg);
+        if (!OwnMethod(Field))
+            return nullptr;
+        auto* Literal = new das::ExprConstString(Arg->at, Field->name);
+        Arg = Literal;
+        return Literal;
+    }
     das::ExprField* NativeSelfMethod(das::Expression* E)
     {
         if (!E || !E->rtti_isField())
@@ -970,6 +1045,10 @@ struct FDSLBodyVisitor : das::Visitor
     }
     virtual void preVisit(das::ExprCall* E) override
     {
+        // Method references must become names before the field itself is lowered as a property read.
+        const int32 Callback = DSLCallbackArgument(E->name, E->arguments.size());
+        if (Callback >= 0)
+            CallbackName(E->arguments[Callback]);
         if ((ContainerOperation(E->name)) && !E->arguments.empty() &&
             (StructRoot(E->arguments[0]) || IndexedSelf(E->arguments[0])))
             MarkLeft(E->arguments[0]);
@@ -982,6 +1061,8 @@ struct FDSLBodyVisitor : das::Visitor
         const bool NextTick = E->name == "ue_timer_next_tick" || E->name == "ue_foundation::ue_timer_next_tick";
         const size_t BaseCount = NextTick ? 2 : 4, HandlerIndex = NextTick ? 1 : 2, PayloadIndex = NextTick ? 2 : 4;
         const bool HasArgument = E->arguments.size() == BaseCount + 1;
+        if (E->arguments.size() > HandlerIndex)
+            CallbackName(E->arguments[HandlerIndex]);
         if (E->arguments.size() >= BaseCount + 2)
         {
             try
@@ -994,10 +1075,9 @@ struct FDSLBodyVisitor : das::Visitor
                 return E;
             }
         }
-        if ((E->arguments.size() != BaseCount && !HasArgument) ||
-            E->arguments[HandlerIndex]->__rtti != das::string("ExprConstString"))
+        if ((E->arguments.size() != BaseCount && !HasArgument) || !CallbackName(E->arguments[HandlerIndex]))
         {
-            Error = TEXT("Class timer requires a literal callback method name");
+            Error = TEXT("Class timer requires a callback method (self.Method or its name)");
             return E;
         }
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[HandlerIndex]);
@@ -1009,8 +1089,7 @@ struct FDSLBodyVisitor : das::Visitor
             {
                 if (F->classParent != Source)
                     return;
-                const FString N = DSLText(
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+                const FString N = DSLText(DSLMethodName(F));
                 if (N != MethodName || !DSLAnnotation(F->annotations, "ue_function") || F->isStaticClassMethod ||
                     !F->result || F->result->baseType != das::Type::tVoid ||
                     F->arguments.size() != (HasArgument ? 2u : 1u))
@@ -1084,10 +1163,9 @@ struct FDSLBodyVisitor : das::Visitor
     {
         const bool Axis = E->name == "ue_input_bind_axis" || E->name == "ue_foundation::ue_input_bind_axis";
         const size_t HandlerIndex = Axis ? 1 : 2;
-        if (E->arguments.size() != (Axis ? 4u : 5u) ||
-            E->arguments[HandlerIndex]->__rtti != das::string("ExprConstString"))
+        if (E->arguments.size() != (Axis ? 4u : 5u) || !CallbackName(E->arguments[HandlerIndex]))
         {
-            Error = TEXT("Class input binding requires literal callback name and consume/paused flags");
+            Error = TEXT("Class input binding requires a callback method (self.Method or its name) and consume/paused flags");
             return E;
         }
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[HandlerIndex]);
@@ -1098,8 +1176,7 @@ struct FDSLBodyVisitor : das::Visitor
             {
                 if (F->classParent != Source)
                     return;
-                const FString N = DSLText(
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+                const FString N = DSLText(DSLMethodName(F));
                 if (N != Method || !DSLAnnotation(F->annotations, "ue_function") || F->isStaticClassMethod ||
                     !F->result || F->result->baseType != das::Type::tVoid || F->arguments.size() != (Axis ? 2u : 1u))
                     return;
@@ -1116,9 +1193,9 @@ struct FDSLBodyVisitor : das::Visitor
     }
     das::ExpressionPtr RewriteEnhancedInput(das::ExprCall* E)
     {
-        if (E->arguments.size() != 3 || E->arguments[2]->__rtti != das::string("ExprConstString"))
+        if (E->arguments.size() != 3 || !CallbackName(E->arguments[2]))
         {
-            Error = TEXT("Enhanced Input class binding requires a literal callback name");
+            Error = TEXT("Enhanced Input class binding requires a callback method (self.Method or its name)");
             return E;
         }
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[2]);
@@ -1129,8 +1206,7 @@ struct FDSLBodyVisitor : das::Visitor
             {
                 if (F->classParent != Source)
                     return;
-                const FString N = DSLText(
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+                const FString N = DSLText(DSLMethodName(F));
                 if (N != Method || !DSLAnnotation(F->annotations, "ue_function") || F->isStaticClassMethod ||
                     !F->result || F->result->baseType != das::Type::tVoid || F->arguments.size() != 2)
                     return;
@@ -1155,9 +1231,9 @@ struct FDSLBodyVisitor : das::Visitor
     }
     das::ExpressionPtr RewriteLatent(das::ExprCall* E)
     {
-        if (E->arguments.size() != 3 || E->arguments[2]->__rtti != das::string("ExprConstString"))
+        if (E->arguments.size() != 3 || !CallbackName(E->arguments[2]))
         {
-            Error = TEXT("Class latent delay requires literal callback name");
+            Error = TEXT("Class latent delay requires a callback method (self.Method or its name)");
             return E;
         }
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[2]);
@@ -1168,8 +1244,7 @@ struct FDSLBodyVisitor : das::Visitor
             {
                 if (F->classParent != Source)
                     return;
-                const FString N = DSLText(
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+                const FString N = DSLText(DSLMethodName(F));
                 if (N == Method && DSLAnnotation(F->annotations, "ue_function") && !F->isStaticClassMethod &&
                     F->result && F->result->baseType == das::Type::tVoid && F->arguments.size() == 1)
                     Found = true;
@@ -1189,9 +1264,9 @@ struct FDSLBodyVisitor : das::Visitor
         const size_t Index = Single ? 3 : 4;
         if (E->arguments.size() <= Index)
             return E;
-        if (E->arguments[Index]->__rtti != das::string("ExprConstString"))
+        if (!CallbackName(E->arguments[Index]))
         {
-            Error = TEXT("Effect completion requires a literal callback name");
+            Error = TEXT("Effect completion requires a callback method (self.Method or its name)");
             return E;
         }
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[Index]);
@@ -1203,9 +1278,7 @@ struct FDSLBodyVisitor : das::Visitor
             {
                 if (F->classParent == Source && DSLAnnotation(F->annotations, "ue_function") &&
                     !F->isStaticClassMethod && F->result && F->result->baseType == das::Type::tVoid &&
-                    F->arguments.size() == 1 &&
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1) ==
-                        Name->text)
+                    F->arguments.size() == 1 && DSLMethodName(F) == Name->text)
                     Found = true;
             });
         if (!Found)
@@ -1223,9 +1296,9 @@ struct FDSLBodyVisitor : das::Visitor
         if (E->arguments[3]->__rtti == das::string("ExprConstString") &&
             static_cast<das::ExprConstString*>(E->arguments[3])->text.empty())
             return E;
-        if (E->arguments.size() < 4 || E->arguments[3]->__rtti != das::string("ExprConstString"))
+        if (E->arguments.size() < 4 || !CallbackName(E->arguments[3]))
         {
-            Error = TEXT("MoveTo requires a literal callback method name");
+            Error = TEXT("MoveTo requires a callback method (self.Method or its name)");
             return E;
         }
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[3]);
@@ -1237,8 +1310,7 @@ struct FDSLBodyVisitor : das::Visitor
                     F->isStaticClassMethod || !F->result || F->result->baseType != das::Type::tVoid ||
                     F->arguments.size() != 2)
                     return;
-                const FString N = DSLText(
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+                const FString N = DSLText(DSLMethodName(F));
                 const auto T = F->arguments[1]->type;
                 if (N == DSLText(Name->text) && T && !T->ref && !F->arguments[1]->init && DSLDirectStruct(T) &&
                     DSLDirectPath(T, Folder, Registry) == TEXT("/Script/DasRuntime.DasMoveResult"))
@@ -1254,9 +1326,9 @@ struct FDSLBodyVisitor : das::Visitor
     }
     das::ExpressionPtr RewriteMontage(das::ExprCall* E)
     {
-        if (E->arguments.size() < 4 || E->arguments[3]->__rtti != das::string("ExprConstString"))
+        if (E->arguments.size() < 4 || !CallbackName(E->arguments[3]))
         {
-            Error = TEXT("Montage requires a literal callback method name");
+            Error = TEXT("Montage requires a callback method (self.Method or its name)");
             return E;
         }
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[3]);
@@ -1268,8 +1340,7 @@ struct FDSLBodyVisitor : das::Visitor
                     F->isStaticClassMethod || !F->result || F->result->baseType != das::Type::tVoid ||
                     F->arguments.size() != 2)
                     return;
-                const FString N = DSLText(
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+                const FString N = DSLText(DSLMethodName(F));
                 const auto T = F->arguments[1]->type;
                 if (N == DSLText(Name->text) && T && !T->ref && !F->arguments[1]->init && DSLDirectStruct(T) &&
                     DSLDirectPath(T, Folder, Registry) == TEXT("/Script/DasRuntime.DasMontageEvent"))
@@ -1283,11 +1354,32 @@ struct FDSLBodyVisitor : das::Visitor
         Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ DSLText(Name->text));
         return E;
     }
+    // Button handlers are Blueprint functions found by name at runtime; check them here when known.
+    das::ExpressionPtr RewriteWidgetClick(das::ExprCall* E)
+    {
+        if (E->arguments.size() != 3)
+            return E;
+        auto* Name = CallbackName(E->arguments[2]);
+        if (!Name)
+            return E;
+        bool Found = false;
+        Source->module->functions.foreach (
+            [&](const das::FunctionPtr& F)
+            {
+                if (F->classParent == Source && DSLMethodName(F) == Name->text &&
+                    DSLAnnotation(F->annotations, "ue_function") && !F->isStaticClassMethod && F->result &&
+                    F->result->baseType == das::Type::tVoid && F->arguments.size() == 1)
+                    Found = true;
+            });
+        if (!Found)
+            Error = TEXT("Button handler requires ue_function(BlueprintCallable) void Handler()");
+        return E;
+    }
     das::ExpressionPtr RewriteAssetLoad(das::ExprCall* E)
     {
-        if (E->arguments.size() != 3 || E->arguments[2]->__rtti != das::string("ExprConstString"))
+        if (E->arguments.size() != 3 || !CallbackName(E->arguments[2]))
         {
-            Error = TEXT("Class async load requires a literal callback name");
+            Error = TEXT("Class async load requires a callback method (self.Method or its name)");
             return E;
         }
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[2]);
@@ -1298,8 +1390,7 @@ struct FDSLBodyVisitor : das::Visitor
             {
                 if (F->classParent != Source)
                     return;
-                const FString N = DSLText(
-                    F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
+                const FString N = DSLText(DSLMethodName(F));
                 if (N != Method || !DSLAnnotation(F->annotations, "ue_function") || F->isStaticClassMethod ||
                     !F->result || F->result->baseType != das::Type::tVoid || F->arguments.size() != 2)
                     return;
@@ -1332,16 +1423,14 @@ struct FDSLBodyVisitor : das::Visitor
             E->name = *Renamed;
         if (E->name == "ue_soft_load_async" || E->name == "ue_soft_references::ue_soft_load_async")
         {
-            if (E->arguments.size() != 3 || E->arguments[2]->__rtti != das::string("ExprConstString"))
-                DSLFail(TEXT("Soft async callback requires a literal method name"));
+            if (E->arguments.size() != 3 || !CallbackName(E->arguments[2]))
+                DSLFail(TEXT("Soft async callback requires a callback method (self.Method or its name)"));
             auto* Name = static_cast<das::ExprConstString*>(E->arguments[2]);
             bool Found = false;
             Source->module->functions.foreach (
                 [&](const das::FunctionPtr& F)
                 {
-                    if (F->classParent == Source &&
-                        F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1) ==
-                            Name->text &&
+                    if (F->classParent == Source && DSLMethodName(F) == Name->text &&
                         DSLAnnotation(F->annotations, "ue_function") && F->result &&
                         F->result->baseType == das::Type::tVoid && F->arguments.size() == 2 &&
                         !F->arguments[1]->type->ref &&
@@ -1353,6 +1442,8 @@ struct FDSLBodyVisitor : das::Visitor
             Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ DSLText(Name->text));
             return E;
         }
+        if (E->name == "ue_widget_bind_click" || E->name == "ue_gameplay_services::ue_widget_bind_click")
+            return RewriteWidgetClick(E);
         if (E->name == "ue_effect_play" || E->name == "ue_effects::ue_effect_play" || E->name == "ue_effect_at" ||
             E->name == "ue_effects::ue_effect_at" || E->name == "ue_sound_play" ||
             E->name == "ue_effects::ue_sound_play" || E->name == "ue_niagara_spawn" ||

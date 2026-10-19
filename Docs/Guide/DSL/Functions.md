@@ -161,6 +161,23 @@ def Add(left:int=7; right:int=-2):int { return left+right }
 
 See [Defaults](Defaults.md#parameter-defaults) for the full rules.
 
+## Methods as callbacks
+
+Managed APIs that call back into the class take the method itself:
+
+```das
+ue_timer_start("score",1.0,self.Pulse,true)
+ue_enhanced_bind(self.JumpAction,TriggerEvent.Started,self.OnJump)
+ue_widget_bind_click(self.HUD,"Damage",self.HurtFromHUD)
+ue_effect_at("hurt",self.HurtSound,self.HurtVFX,point,self.OnHurtEffectFinished,0.25f,0.7f,0.2f)
+```
+
+This works for timers and next-tick timers, legacy and Enhanced Input, latent delays,
+effects, montages, AI MoveTo, asset and soft-reference loads and button clicks. The
+compiler checks that the method exists, is a `[ue_function]` instance method returning
+`void` and has the parameter the API delivers; renaming the method updates every use.
+A string literal with the method name is still accepted.
+
 ## Calls and dispatch
 
 - **Own helpers and reflected methods** called as `self.Name(...)` from methods,

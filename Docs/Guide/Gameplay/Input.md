@@ -22,9 +22,9 @@ class Player : Character {
     [ue_function(BlueprintCallable)]
     def BindControls():void {
         ue_enhanced_add_context(ue_pawn_controller(ue_character_self()),self.Controls,0)
-        ue_enhanced_bind(self.MoveAction,"Triggered","OnMove")
-        ue_enhanced_bind(self.JumpAction,"Started","OnJump")
-        ue_enhanced_bind(self.JumpAction,"Completed","OnJump")
+        ue_enhanced_bind(self.MoveAction,TriggerEvent.Triggered,self.OnMove)
+        ue_enhanced_bind(self.JumpAction,TriggerEvent.Started,self.OnJump)
+        ue_enhanced_bind(self.JumpAction,TriggerEvent.Completed,self.OnJump)
     }
     [ue_function(BlueprintCallable)]
     def OnMove(value:InputActionValue):void {
@@ -38,7 +38,7 @@ class Player : Character {
 
 | Function | Purpose |
 | --- | --- |
-| `ue_enhanced_bind(action:InputActionRef, trigger:string, handler:string)` | Bind or replace the handler for this action + trigger. |
+| `ue_enhanced_bind(action:InputActionRef, trigger:TriggerEvent, handler)` | Bind or replace the handler for this action + trigger. `trigger` is `TriggerEvent.Triggered/Started/Ongoing/Canceled/Completed` (the string names are still accepted); `handler` is `self.Method` or the method name. |
 | `ue_enhanced_unbind(action, trigger):bool` | Remove that binding. |
 | `ue_enhanced_is_available():bool` | Does the owner have an EnhancedInputComponent? (Does not prove that assets/contexts/routing are configured.) |
 | `ue_input_unbind_all():int` | Remove all legacy and Enhanced bindings of the session. |
@@ -57,7 +57,7 @@ The handler signature selects the transport:
 | `UEVector2D` | Axis2D actions |
 | `UEVector` | Axis3D actions |
 
-Class handlers are `[ue_function]` methods returning `void`, named by a short string literal (forward declarations are resolved). Plain `[export] def handler(value:InputActionValue):void` functions are also accepted. With a scalar/vector handler, a runtime value of the wrong kind is dropped. The native proxy checks the SourceAction and finite values and delivers an owned copy; you may store it in an array.
+Class handlers are `[ue_function]` methods returning `void`, passed as `self.Method` (a string literal with the method name also works; forward declarations are resolved). Plain `[export] def handler(value:InputActionValue):void` functions are also accepted. With a scalar/vector handler, a runtime value of the wrong kind is dropped. The native proxy checks the SourceAction and finite values and delivers an owned copy; you may store it in an array.
 
 ### InputActionValue
 
