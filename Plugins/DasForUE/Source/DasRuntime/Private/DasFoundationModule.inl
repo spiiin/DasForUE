@@ -1199,55 +1199,40 @@ public:
                         *this, Library, "__ue_struct_map_with_string_struct", das::SideEffects::modifyExternal,
                         "StructMapWithStringStruct")
                         ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetIntFloat)>(*this, Library, "ue_struct_map_get_int_float",
-                                                        das::SideEffects::modifyExternal, "StructMapGetIntFloat");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithIntFloat), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_int_float", das::SideEffects::modifyExternal,
-                        "StructMapWithIntFloat")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetIntDouble)>(*this, Library, "ue_struct_map_get_int_double",
-                                                         das::SideEffects::modifyExternal, "StructMapGetIntDouble");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithIntDouble), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_int_double", das::SideEffects::modifyExternal,
-                        "StructMapWithIntDouble")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetIntBool)>(*this, Library, "ue_struct_map_get_int_bool",
-                                                       das::SideEffects::modifyExternal, "StructMapGetIntBool");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithIntBool), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_int_bool", das::SideEffects::modifyExternal,
-                        "StructMapWithIntBool")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetIntName)>(*this, Library, "ue_struct_map_get_int_name",
-                                                       das::SideEffects::modifyExternal, "StructMapGetIntName");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithIntName), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_int_name", das::SideEffects::modifyExternal,
-                        "StructMapWithIntName")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetStringFloat)>(*this, Library, "ue_struct_map_get_string_float",
-                                                           das::SideEffects::modifyExternal, "StructMapGetStringFloat");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithStringFloat), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_string_float", das::SideEffects::modifyExternal,
-                        "StructMapWithStringFloat")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetStringDouble)>(*this, Library, "ue_struct_map_get_string_double",
-                                                            das::SideEffects::modifyExternal,
-                                                            "StructMapGetStringDouble");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithStringDouble), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_string_double", das::SideEffects::modifyExternal,
-                        "StructMapWithStringDouble")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetStringBool)>(*this, Library, "ue_struct_map_get_string_bool",
-                                                          das::SideEffects::modifyExternal, "StructMapGetStringBool");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithStringBool), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_string_bool", das::SideEffects::modifyExternal,
-                        "StructMapWithStringBool")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetStringName)>(*this, Library, "ue_struct_map_get_string_name",
-                                                          das::SideEffects::modifyExternal, "StructMapGetStringName");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithStringName), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_string_name", das::SideEffects::modifyExternal,
-                        "StructMapWithStringName")
-                        ->needCallerStackFrame = true;
+        // Scalar map members of struct snapshots: key kind x value kind (DasScalarAccessors.inl).
+#define DAS_REGISTER_MAP_SCALAR(GetName, WithName, KeyKind, ValueKind)                                                 \
+    AddUEExtern<DAS_BIND_FUN((StructMapGetScalar<KeyKind, ValueKind>))>(                                                \
+        *this, Library, GetName, das::SideEffects::modifyExternal, "StructMapGetScalar");                              \
+    AddUEExtern<DAS_BIND_FUN((StructMapWithScalar<KeyKind, ValueKind>)), das::SimNode_ExtFuncCallAndCopyOrMove>(        \
+        *this, Library, WithName, das::SideEffects::modifyExternal, "StructMapWithScalar")                             \
+                                 ->needCallerStackFrame = true;
+#define DAS_REGISTER_MAP_VALUES(Key, KeyKind)                                                                          \
+    DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_" #Key "_bool", "ue_struct_map_with_" #Key "_bool", KeyKind,            \
+                            FDasKindBool)                                                                              \
+    DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_" #Key "_byte", "ue_struct_map_with_" #Key "_byte", KeyKind,            \
+                            FDasKindByte)                                                                              \
+    DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_" #Key "_double", "ue_struct_map_with_" #Key "_double", KeyKind,        \
+                            FDasKindDouble)                                                                            \
+    DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_" #Key "_float", "ue_struct_map_with_" #Key "_float", KeyKind,          \
+                            FDasKindFloat)                                                                             \
+    DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_" #Key "_name", "ue_struct_map_with_" #Key "_name", KeyKind,            \
+                            FDasKindName)                                                                              \
+    DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_" #Key "_string", "ue_struct_map_with_" #Key "_string", KeyKind,        \
+                            FDasKindString)                                                                            \
+    DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_" #Key "_text", "ue_struct_map_with_" #Key "_text", KeyKind,            \
+                            FDasKindText)
+        DAS_REGISTER_MAP_VALUES(int, FDasKindInt)
+        DAS_REGISTER_MAP_VALUES(string, FDasKindString)
+        DAS_REGISTER_MAP_VALUES(name, FDasKindName)
+        DAS_REGISTER_MAP_VALUES(byte, FDasKindByte)
+        // int -> int keeps its historical short name.
+        DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_int", "ue_struct_map_with_int", FDasKindInt, FDasKindInt)
+        DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_string_int", "ue_struct_map_with_string_int", FDasKindString,
+                                FDasKindInt)
+        DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_name_int", "ue_struct_map_with_name_int", FDasKindName, FDasKindInt)
+        DAS_REGISTER_MAP_SCALAR("ue_struct_map_get_byte_int", "ue_struct_map_with_byte_int", FDasKindByte, FDasKindInt)
+#undef DAS_REGISTER_MAP_VALUES
+#undef DAS_REGISTER_MAP_SCALAR
         AddUEExtern<DAS_BIND_FUN(PublishFrameInt)>(*this, Library, "ue_frame_out_int", das::SideEffects::modifyExternal,
                                                    "PublishFrameInt");
         AddUEExtern<DAS_BIND_FUN(PublishFrameFloat)>(*this, Library, "ue_frame_out_float",
@@ -1265,44 +1250,6 @@ public:
         AddUEExtern<DAS_BIND_FUN(StructSetWithByte), das::SimNode_ExtFuncCallAndCopyOrMove>(
                         *this, Library, "ue_struct_set_with_byte", das::SideEffects::modifyExternal,
                         "StructSetWithByte")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapIntByte)>(*this, Library, "ue_struct_map_get_int_byte",
-                                                         das::SideEffects::modifyExternal, "GetTextByteMapIntByte");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapIntByte), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_int_byte", das::SideEffects::modifyExternal,
-                        "WithTextByteMapIntByte")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapIntText)>(*this, Library, "ue_struct_map_get_int_text",
-                                                         das::SideEffects::modifyExternal, "GetTextByteMapIntText");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapIntText), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_int_text", das::SideEffects::modifyExternal,
-                        "WithTextByteMapIntText")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapStringByte)>(*this, Library, "ue_struct_map_get_string_byte",
-                                                            das::SideEffects::modifyExternal,
-                                                            "GetTextByteMapStringByte");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapStringByte), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_string_byte", das::SideEffects::modifyExternal,
-                        "WithTextByteMapStringByte")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapStringText)>(*this, Library, "ue_struct_map_get_string_text",
-                                                            das::SideEffects::modifyExternal,
-                                                            "GetTextByteMapStringText");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapStringText), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_string_text", das::SideEffects::modifyExternal,
-                        "WithTextByteMapStringText")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapNameByte)>(*this, Library, "ue_struct_map_get_name_byte",
-                                                          das::SideEffects::modifyExternal, "GetTextByteMapNameByte");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapNameByte), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_name_byte", das::SideEffects::modifyExternal,
-                        "WithTextByteMapNameByte")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapNameText)>(*this, Library, "ue_struct_map_get_name_text",
-                                                          das::SideEffects::modifyExternal, "GetTextByteMapNameText");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapNameText), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_name_text", das::SideEffects::modifyExternal,
-                        "WithTextByteMapNameText")
                         ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(GetTextByteMapObjectByte)>(*this, Library, "__ue_struct_map_get_object_byte",
                                                             das::SideEffects::modifyExternal,
@@ -1329,56 +1276,6 @@ public:
         AddUEExtern<DAS_BIND_FUN(WithTextByteMapEnumText), das::SimNode_ExtFuncCallAndCopyOrMove>(
                         *this, Library, "__ue_struct_map_with_enum_text", das::SideEffects::modifyExternal,
                         "WithTextByteMapEnumText")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapByteByte)>(*this, Library, "ue_struct_map_get_byte_byte",
-                                                          das::SideEffects::modifyExternal, "GetTextByteMapByteByte");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapByteByte), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_byte_byte", das::SideEffects::modifyExternal,
-                        "WithTextByteMapByteByte")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapByteText)>(*this, Library, "ue_struct_map_get_byte_text",
-                                                          das::SideEffects::modifyExternal, "GetTextByteMapByteText");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapByteText), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_byte_text", das::SideEffects::modifyExternal,
-                        "WithTextByteMapByteText")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapByteInt)>(*this, Library, "ue_struct_map_get_byte_int",
-                                                         das::SideEffects::modifyExternal, "GetTextByteMapByteInt");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapByteInt), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_byte_int", das::SideEffects::modifyExternal,
-                        "WithTextByteMapByteInt")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapByteFloat)>(*this, Library, "ue_struct_map_get_byte_float",
-                                                           das::SideEffects::modifyExternal, "GetTextByteMapByteFloat");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapByteFloat), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_byte_float", das::SideEffects::modifyExternal,
-                        "WithTextByteMapByteFloat")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapByteDouble)>(*this, Library, "ue_struct_map_get_byte_double",
-                                                            das::SideEffects::modifyExternal,
-                                                            "GetTextByteMapByteDouble");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapByteDouble), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_byte_double", das::SideEffects::modifyExternal,
-                        "WithTextByteMapByteDouble")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapByteBool)>(*this, Library, "ue_struct_map_get_byte_bool",
-                                                          das::SideEffects::modifyExternal, "GetTextByteMapByteBool");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapByteBool), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_byte_bool", das::SideEffects::modifyExternal,
-                        "WithTextByteMapByteBool")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapByteString)>(*this, Library, "ue_struct_map_get_byte_string",
-                                                            das::SideEffects::modifyExternal,
-                                                            "GetTextByteMapByteString");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapByteString), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_byte_string", das::SideEffects::modifyExternal,
-                        "WithTextByteMapByteString")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(GetTextByteMapByteName)>(*this, Library, "ue_struct_map_get_byte_name",
-                                                          das::SideEffects::modifyExternal, "GetTextByteMapByteName");
-        AddUEExtern<DAS_BIND_FUN(WithTextByteMapByteName), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_byte_name", das::SideEffects::modifyExternal,
-                        "WithTextByteMapByteName")
                         ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(GetTextByteMapByteStruct), das::SimNode_ExtFuncCallAndCopyOrMove>(
                         *this, Library, "__ue_struct_map_get_byte_struct", das::SideEffects::modifyExternal,
@@ -1433,11 +1330,6 @@ public:
                                                  "StructMapSize");
         AddUEExtern<DAS_BIND_FUN(StructMapKey)>(*this, Library, "ue_struct_map_key", das::SideEffects::modifyExternal,
                                                 "StructMapKey");
-        AddUEExtern<DAS_BIND_FUN(StructMapGetInt)>(*this, Library, "ue_struct_map_get_int",
-                                                   das::SideEffects::modifyExternal, "StructMapGetInt");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithInt), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_int", das::SideEffects::modifyExternal, "StructMapWithInt")
-                        ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(ObjectKeyFromReference)>(*this, Library, "__ue_object_key_from_ref",
                                                           das::SideEffects::modifyExternal, "ObjectKeyFromReference");
         AddUEExtern<DAS_BIND_FUN(CheckedObjectKey)>(*this, Library, "__ue_object_key_check",
@@ -1595,42 +1487,6 @@ public:
                         ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(StructMapNameKey)>(*this, Library, "ue_struct_map_key_name",
                                                     das::SideEffects::modifyExternal, "StructMapNameKey");
-        AddUEExtern<DAS_BIND_FUN(StructMapGetNameInt)>(*this, Library, "ue_struct_map_get_name_int",
-                                                       das::SideEffects::modifyExternal, "StructMapGetNameInt");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithNameInt), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_name_int", das::SideEffects::modifyExternal,
-                        "StructMapWithNameInt")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetNameFloat)>(*this, Library, "ue_struct_map_get_name_float",
-                                                         das::SideEffects::modifyExternal, "StructMapGetNameFloat");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithNameFloat), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_name_float", das::SideEffects::modifyExternal,
-                        "StructMapWithNameFloat")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetNameDouble)>(*this, Library, "ue_struct_map_get_name_double",
-                                                          das::SideEffects::modifyExternal, "StructMapGetNameDouble");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithNameDouble), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_name_double", das::SideEffects::modifyExternal,
-                        "StructMapWithNameDouble")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetNameBool)>(*this, Library, "ue_struct_map_get_name_bool",
-                                                        das::SideEffects::modifyExternal, "StructMapGetNameBool");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithNameBool), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_name_bool", das::SideEffects::modifyExternal,
-                        "StructMapWithNameBool")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetNameString)>(*this, Library, "ue_struct_map_get_name_string",
-                                                          das::SideEffects::modifyExternal, "StructMapGetNameString");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithNameString), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_name_string", das::SideEffects::modifyExternal,
-                        "StructMapWithNameString")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetNameName)>(*this, Library, "ue_struct_map_get_name_name",
-                                                        das::SideEffects::modifyExternal, "StructMapGetNameName");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithNameName), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_name_name", das::SideEffects::modifyExternal,
-                        "StructMapWithNameName")
-                        ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(StructMapGetNameStruct), das::SimNode_ExtFuncCallAndCopyOrMove>(
                         *this, Library, "__ue_struct_map_get_name_struct", das::SideEffects::modifyExternal,
                         "StructMapGetNameStruct")
@@ -1654,25 +1510,6 @@ public:
                         ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(StructMapStringKey)>(*this, Library, "ue_struct_map_key_string",
                                                       das::SideEffects::modifyExternal, "StructMapStringKey");
-        AddUEExtern<DAS_BIND_FUN(StructMapGetIntString)>(*this, Library, "ue_struct_map_get_int_string",
-                                                         das::SideEffects::modifyExternal, "StructMapGetIntString");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithIntString), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_int_string", das::SideEffects::modifyExternal,
-                        "StructMapWithIntString")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetStringInt)>(*this, Library, "ue_struct_map_get_string_int",
-                                                         das::SideEffects::modifyExternal, "StructMapGetStringInt");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithStringInt), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_string_int", das::SideEffects::modifyExternal,
-                        "StructMapWithStringInt")
-                        ->needCallerStackFrame = true;
-        AddUEExtern<DAS_BIND_FUN(StructMapGetStringString)>(*this, Library, "ue_struct_map_get_string_string",
-                                                            das::SideEffects::modifyExternal,
-                                                            "StructMapGetStringString");
-        AddUEExtern<DAS_BIND_FUN(StructMapWithStringString), das::SimNode_ExtFuncCallAndCopyOrMove>(
-                        *this, Library, "ue_struct_map_with_string_string", das::SideEffects::modifyExternal,
-                        "StructMapWithStringString")
-                        ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(StructArraySize)>(*this, Library, "ue_struct_array_size",
                                                    das::SideEffects::modifyExternal, "StructArraySize");
         AddUEExtern<DAS_BIND_FUN(StructArrayResize), das::SimNode_ExtFuncCallAndCopyOrMove>(

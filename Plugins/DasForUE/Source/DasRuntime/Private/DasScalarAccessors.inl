@@ -8,6 +8,7 @@
 
 struct FDasKindInt
 {
+    static constexpr ESnapshotKind SnapshotKind = ESnapshotKind::Int; // as a map/set key
     using Property = FIntProperty;
     using In = int32;
     using Out = int32;
@@ -48,6 +49,7 @@ struct FDasKindBool
 };
 struct FDasKindString
 {
+    static constexpr ESnapshotKind SnapshotKind = ESnapshotKind::String; // as a map/set key
     using Property = FStrProperty;
     using In = const char*;
     using Out = char*;
@@ -58,6 +60,7 @@ struct FDasKindString
 };
 struct FDasKindName
 {
+    static constexpr ESnapshotKind SnapshotKind = ESnapshotKind::Name; // as a map/set key
     using Property = FNameProperty;
     using In = FDasNameValue;
     using Out = FDasNameValue;
@@ -79,6 +82,7 @@ struct FDasKindText
 // Raw (non-enum) byte as uint8: the self accessors.
 struct FDasKindByte
 {
+    static constexpr ESnapshotKind SnapshotKind = ESnapshotKind::Byte; // as a map/set key
     using Property = FByteProperty;
     using In = uint8;
     using Out = uint8;
@@ -206,6 +210,20 @@ FDasStructValue StructWithScalar(const FDasStructValue& H, const char* Path, typ
     K::Check(P, C);
     WritePropertyScalarValue(P, F.Memory, K::FromDas(X, C), C);
     return Mutation.Finish(C, At);
+}
+
+// Struct snapshot maps with scalar keys and values.
+template <class KK, class VK>
+typename VK::Out StructMapGetScalar(const FDasStructValue& H, const char* Path, typename KK::In Key, das::Context* C)
+{
+    return VK::ToDas(StructScalarMapGet<typename VK::Property>(H, Path, KK::FromDas(Key, C), KK::SnapshotKind, C), C);
+}
+template <class KK, class VK>
+FDasStructValue StructMapWithScalar(const FDasStructValue& H, const char* Path, typename KK::In Key,
+                                    typename VK::In Value, das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<typename VK::Property>(H, Path, KK::FromDas(Key, C), VK::FromDas(Value, C),
+                                                      KK::SnapshotKind, C, At);
 }
 
 // Reflected call frames: named arguments and results.

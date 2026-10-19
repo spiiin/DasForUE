@@ -223,15 +223,6 @@ int32 StructMapKey(const FDasStructValue& H, const char* Path, int32 Index, das:
         Index, C);
     return ReadPropertyScalarValue(CastFieldChecked<FIntProperty>(F.Property), F.Memory, C);
 }
-int32 StructMapGetInt(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C)
-{
-    return StructScalarMapGet<FIntProperty>(H, Path, Key, ESnapshotKind::Int, C);
-}
-FDasStructValue StructMapWithInt(const FDasStructValue& H, const char* Path, int32 Key, int32 Value, das::Context* C,
-                                 das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FIntProperty>(H, Path, Key, Value, ESnapshotKind::Int, C, At);
-}
 
 char* StructMapStringKey(const FDasStructValue& H, const char* Path, int32 Index, das::Context* C)
 {
@@ -240,40 +231,6 @@ char* StructMapStringKey(const FDasStructValue& H, const char* Path, int32 Index
         SnapshotMap(StructLeaf(ResolveStructValue(H, C), Path, C), ESnapshotKind::String, ESnapshotKind::Invalid, C),
         Index, C);
     return CopyDSLString(ReadPropertyScalarValue(CastFieldChecked<FStrProperty>(F.Property), F.Memory, C), C);
-}
-char* StructMapGetIntString(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C)
-{
-    return CopyDSLString(StructScalarMapGet<FStrProperty>(H, Path, Key, ESnapshotKind::Int, C), C);
-}
-FDasStructValue StructMapWithIntString(const FDasStructValue& H, const char* Path, int32 Key, const char* Value,
-                                       das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FStrProperty>(
-        H, Path, Key, FString(Value ? UTF8_TO_TCHAR(Value) : TEXT("")), ESnapshotKind::Int, C, At);
-}
-int32 StructMapGetStringInt(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C)
-{
-    return StructScalarMapGet<FIntProperty>(H, Path,
-                                            FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C);
-}
-FDasStructValue StructMapWithStringInt(const FDasStructValue& H, const char* Path, const char* Key, int32 Value,
-                                       das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FIntProperty>(
-        H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), Value, ESnapshotKind::String, C, At);
-}
-char* StructMapGetStringString(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C)
-{
-    return CopyDSLString(StructScalarMapGet<FStrProperty>(
-        H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C), C);
-}
-FDasStructValue StructMapWithStringString(const FDasStructValue& H, const char* Path, const char* Key,
-                                          const char* Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FStrProperty>(H, Path,
-                                             FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")),
-                                                     FString(Value ? UTF8_TO_TCHAR(Value) : TEXT("")),
-                                                             ESnapshotKind::String, C, At);
 }
 int32 StructArraySize(const FDasStructValue& H, const char* Path, das::Context* C)
 {
@@ -328,86 +285,6 @@ FDasStructValue StructMapWithStringStruct(const FDasStructValue& H, const char* 
     return StructMapWithStruct(H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), V, ESnapshotKind::String, C, At);
 }
 
-float StructMapGetIntFloat(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C)
-{
-    return StructScalarMapGet<FFloatProperty>(H, Path, Key, ESnapshotKind::Int, C);
-}
-FDasStructValue StructMapWithIntFloat(const FDasStructValue& H, const char* Path, int32 Key, float Value,
-                                      das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FFloatProperty>(H, Path, Key, Value, ESnapshotKind::Int, C, At);
-}
-double StructMapGetIntDouble(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C)
-{
-    return StructScalarMapGet<FDoubleProperty>(H, Path, Key, ESnapshotKind::Int, C);
-}
-FDasStructValue StructMapWithIntDouble(const FDasStructValue& H, const char* Path, int32 Key, double Value,
-                                       das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FDoubleProperty>(H, Path, Key, Value, ESnapshotKind::Int, C, At);
-}
-bool StructMapGetIntBool(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C)
-{
-    return StructScalarMapGet<FBoolProperty>(H, Path, Key, ESnapshotKind::Int, C);
-}
-FDasStructValue StructMapWithIntBool(const FDasStructValue& H, const char* Path, int32 Key, bool Value, das::Context* C,
-                                     das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FBoolProperty>(H, Path, Key, Value, ESnapshotKind::Int, C, At);
-}
-FDasNameValue StructMapGetIntName(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C)
-{
-    return MakeDSLName(StructScalarMapGet<FNameProperty>(H, Path, Key, ESnapshotKind::Int, C), C);
-}
-FDasStructValue StructMapWithIntName(const FDasStructValue& H, const char* Path, int32 Key, FDasNameValue Value,
-                                     das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FNameProperty>(H, Path, Key, ResolveDSLName(Value, C), ESnapshotKind::Int, C, At);
-}
-float StructMapGetStringFloat(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C)
-{
-    return StructScalarMapGet<FFloatProperty>(H, Path,
-                                              FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C);
-}
-FDasStructValue StructMapWithStringFloat(const FDasStructValue& H, const char* Path, const char* Key, float Value,
-                                         das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FFloatProperty>(
-        H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), Value, ESnapshotKind::String, C, At);
-}
-double StructMapGetStringDouble(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C)
-{
-    return StructScalarMapGet<FDoubleProperty>(H, Path,
-                                               FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C);
-}
-FDasStructValue StructMapWithStringDouble(const FDasStructValue& H, const char* Path, const char* Key, double Value,
-                                          das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FDoubleProperty>(
-        H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), Value, ESnapshotKind::String, C, At);
-}
-bool StructMapGetStringBool(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C)
-{
-    return StructScalarMapGet<FBoolProperty>(H, Path,
-                                             FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C);
-}
-FDasStructValue StructMapWithStringBool(const FDasStructValue& H, const char* Path, const char* Key, bool Value,
-                                        das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FBoolProperty>(
-        H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), Value, ESnapshotKind::String, C, At);
-}
-FDasNameValue StructMapGetStringName(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C)
-{
-    return MakeDSLName(StructScalarMapGet<FNameProperty>(
-        H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C), C);
-}
-FDasStructValue StructMapWithStringName(const FDasStructValue& H, const char* Path, const char* Key,
-                                        FDasNameValue Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FNameProperty>(
-        H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ResolveDSLName(Value, C), ESnapshotKind::String, C, At);
-}
 template <class Snapshot> auto StructNestedLeaf(Snapshot& V, const char* Path, int32 Index, das::Context* C)
 {
     auto F = StructLeaf(V, Path, C);
@@ -825,62 +702,6 @@ FDasNameValue StructMapNameKey(const FDasStructValue& H, const char* Path, int32
         SnapshotMap(StructLeaf(ResolveStructValue(H, C), Path, C), ESnapshotKind::Name, ESnapshotKind::Invalid, C),
         Index, C);
     return MakeDSLName(ReadPropertyScalarValue(CastFieldChecked<FNameProperty>(F.Property), F.Memory, C), C);
-}
-int32 StructMapGetNameInt(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C)
-{
-    return StructScalarMapGet<FIntProperty>(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C);
-}
-FDasStructValue StructMapWithNameInt(const FDasStructValue& H, const char* Path, FDasNameValue Key, int32 Value,
-                                     das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FIntProperty>(H, Path, ResolveDSLName(Key, C), Value, ESnapshotKind::Name, C, At);
-}
-float StructMapGetNameFloat(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C)
-{
-    return StructScalarMapGet<FFloatProperty>(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C);
-}
-FDasStructValue StructMapWithNameFloat(const FDasStructValue& H, const char* Path, FDasNameValue Key, float Value,
-                                       das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FFloatProperty>(H, Path, ResolveDSLName(Key, C), Value, ESnapshotKind::Name, C, At);
-}
-double StructMapGetNameDouble(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C)
-{
-    return StructScalarMapGet<FDoubleProperty>(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C);
-}
-FDasStructValue StructMapWithNameDouble(const FDasStructValue& H, const char* Path, FDasNameValue Key, double Value,
-                                        das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FDoubleProperty>(H, Path, ResolveDSLName(Key, C), Value, ESnapshotKind::Name, C, At);
-}
-bool StructMapGetNameBool(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C)
-{
-    return StructScalarMapGet<FBoolProperty>(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C);
-}
-FDasStructValue StructMapWithNameBool(const FDasStructValue& H, const char* Path, FDasNameValue Key, bool Value,
-                                      das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FBoolProperty>(H, Path, ResolveDSLName(Key, C), Value, ESnapshotKind::Name, C, At);
-}
-char* StructMapGetNameString(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C)
-{
-    return CopyDSLString(StructScalarMapGet<FStrProperty>(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C), C);
-}
-FDasStructValue StructMapWithNameString(const FDasStructValue& H, const char* Path, FDasNameValue Key,
-                                        const char* Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FStrProperty>(
-        H, Path, ResolveDSLName(Key, C), FString(Value ? UTF8_TO_TCHAR(Value) : TEXT("")), ESnapshotKind::Name, C, At);
-}
-FDasNameValue StructMapGetNameName(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C)
-{
-    return MakeDSLName(StructScalarMapGet<FNameProperty>(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C), C);
-}
-FDasStructValue StructMapWithNameName(const FDasStructValue& H, const char* Path, FDasNameValue Key,
-                                      FDasNameValue Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FNameProperty>(H, Path, ResolveDSLName(Key, C), ResolveDSLName(Value, C),
-                                              ESnapshotKind::Name, C, At);
 }
 FDasStructValue StructMapGetNameStruct(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C,
                                        das::LineInfoArg* At)
