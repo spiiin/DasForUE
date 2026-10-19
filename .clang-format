@@ -1,0 +1,34 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 120
+BreakBeforeBraces: Allman
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: Inline
+AllowShortBlocksOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AccessModifierOffset: -4
+NamespaceIndentation: None
+PointerAlignment: Left
+SortIncludes: Never
+IncludeBlocks: Preserve
+ReflowComments: false
+BreakStringLiterals: false
+FixNamespaceComments: false
+InsertBraces: false
+InsertNewlineAtEOF: false
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 2
+SpaceAfterTemplateKeyword: true
+Cpp11BracedListStyle: true
+LambdaBodyIndentation: Signature
+AlignAfterOpenBracket: Align
+BinPackArguments: true
+BinPackParameters: true
+StatementMacros: [DAS_DOC_NAME_NOOP, DAS_DOC_NOOP, INPUT_KIND, CAPTURE_KIND, UCLASS, USTRUCT, UENUM, UINTERFACE, UPROPERTY, UFUNCTION, UDELEGATE, GENERATED_BODY, GENERATED_UCLASS_BODY, GENERATED_USTRUCT_BODY, GENERATED_IINTERFACE_BODY, GENERATED_UINTERFACE_BODY, UE_DEPRECATED]
+WhitespaceSensitiveMacros: [TEXT, UMETA, DAS_BIND_FUN, STRINGIFY, PREPROCESSOR_TO_STRING]
+...

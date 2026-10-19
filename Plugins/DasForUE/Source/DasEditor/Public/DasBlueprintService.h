@@ -2,7 +2,13 @@
 #include "CoreMinimal.h"
 #include "DasSchema.h"
 
-enum class EDasDefaultMigrationPolicy : uint8 { Refuse, PreserveInstances, PreserveOverrides, Automatic };
+enum class EDasDefaultMigrationPolicy : uint8
+{
+    Refuse,
+    PreserveInstances,
+    PreserveOverrides,
+    Automatic
+};
 class UBlueprint;
 struct FDasAuthoringModule;
 
@@ -11,8 +17,11 @@ struct FDasAuthoringModule;
 class DASEDITOR_API FDasBlueprintService
 {
 public:
-    static bool ApplyLibraryGraphs(UBlueprint* Blueprint,const FDasAuthoringModule& Module,const FString& Id,FString& Error);
+    static bool ApplyLibraryGraphs(UBlueprint* Blueprint, const FDasAuthoringModule& Module, const FString& Id,
+                                   FString& Error);
     static bool ReadSchema(const FString& ScriptFile, FDasClassSchema& Out, FString& Error);
-    static bool ApplyAuthoring(UBlueprint* Blueprint, const FDasAuthoringModule& Module, const FString& ClassId, FString& Error);
-    static bool Apply(UBlueprint* Blueprint, const FDasClassSchema& Schema, FString& Error, bool bValidateOnly = false, EDasDefaultMigrationPolicy DefaultPolicy = EDasDefaultMigrationPolicy::Refuse);
+    static bool ApplyAuthoring(UBlueprint* Blueprint, const FDasAuthoringModule& Module, const FString& ClassId,
+                               FString& Error);
+    static bool Apply(UBlueprint* Blueprint, const FDasClassSchema& Schema, FString& Error, bool bValidateOnly = false,
+                      EDasDefaultMigrationPolicy DefaultPolicy = EDasDefaultMigrationPolicy::Refuse);
 };

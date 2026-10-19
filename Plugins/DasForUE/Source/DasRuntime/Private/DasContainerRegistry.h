@@ -26,5 +26,5 @@ private:
     int32 Limit;
 };
 
-bool DasPropertyLayoutFingerprint(const FDasDeclaredType& Type,FString& Out);
+bool DasPropertyLayoutFingerprint(const FDasDeclaredType& Type, FString& Out);
 bool CheckDasContainerRegistry(FString& Error);

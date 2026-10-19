@@ -1,15 +1,117 @@
 
-int32 AuthoredGetbyte(const FDasObjectHandle& H,const char* Id,const char* Name,das::Context* C){auto* O=ResolveAuthoredObject(H,Id,C);auto* P=ResolveProperty<FByteProperty>(O,Name,false,C);if(P->Enum)C->throw_error("expected raw byte");return ReadPropertyScalar(P,O,C);}
-void AuthoredSetbyte(const FDasObjectHandle& H,const char* Id,const char* Name,int32 V,das::Context* C){if(ActiveContext && ActiveContext->bCollectingSubscriptions)C->throw_error("object writes are forbidden in bind_events");auto* O=ResolveAuthoredObject(H,Id,C);auto* P=ResolveProperty<FByteProperty>(O,Name,true,C);if(P->Enum || V<0 || V>255)C->throw_error("byte must be 0..255");WritePropertyScalar(P,O,uint8(V),C);}
-FDasTextValue AuthoredGettext(const FDasObjectHandle& H,const char* Id,const char* Name,das::Context* C){auto* O=ResolveAuthoredObject(H,Id,C);return MakeDSLText(ReadPropertyScalar(ResolveProperty<FTextProperty>(O,Name,false,C),O,C),C);}
-void AuthoredSettext(const FDasObjectHandle& H,const char* Id,const char* Name,FDasTextValue V,das::Context* C){if(ActiveContext && ActiveContext->bCollectingSubscriptions)C->throw_error("object writes are forbidden in bind_events");auto* O=ResolveAuthoredObject(H,Id,C);WritePropertyScalar(ResolveProperty<FTextProperty>(O,Name,true,C),O,ResolveDSLText(V,C),C);}
-uint8 GetSelfByte(const char* N,das::Context* C){auto* O=ResolveSelf(C);auto* P=ResolveProperty<FByteProperty>(O,N,false,C);if(P->Enum)C->throw_error("expected raw byte");return ReadPropertyScalar(P,O,C);}
-void SetSelfByte(const char* N,uint8 V,das::Context* C){if(ActiveContext && ActiveContext->bCollectingSubscriptions)C->throw_error("object writes are forbidden in bind_events");auto* O=ResolveSelf(C);auto* P=ResolveProperty<FByteProperty>(O,N,true,C);if(P->Enum)C->throw_error("expected raw byte");WritePropertyScalar(P,O,V,C);}
-FDasTextValue GetSelfText(const char* N,das::Context* C){auto* O=ResolveSelf(C);return MakeDSLText(ReadPropertyScalar(ResolveProperty<FTextProperty>(O,N,false,C),O,C),C);}
-void SetSelfText(const char* N,FDasTextValue V,das::Context* C){if(ActiveContext && ActiveContext->bCollectingSubscriptions)C->throw_error("object writes are forbidden in bind_events");auto* O=ResolveSelf(C);WritePropertyScalar(ResolveProperty<FTextProperty>(O,N,true,C),O,ResolveDSLText(V,C),C);}
-uint8 StructGetbyte(const FDasStructValue& H,const char* Path,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FByteProperty>(F.Property);if(!P || P->Enum)C->throw_error("expected raw byte struct leaf");return ReadPropertyScalarValue(P,F.Memory,C);}
-FDasStructValue StructWithbyte(const FDasStructValue& H,const char* Path,uint8 X,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,Path,C);auto* P=CastField<FByteProperty>(F.Property);if(!P || P->Enum)C->throw_error("expected raw byte struct leaf");WritePropertyScalarValue(P,F.Memory,X,C);return Mutation.Finish(C,At);}
-FDasTextValue StructGettext(const FDasStructValue& H,const char* Path,das::Context* C){const auto& V=ResolveStructValue(H,C);auto F=StructLeaf(V,Path,C);auto* P=CastField<FTextProperty>(F.Property);if(!P)C->throw_error("expected text struct leaf");return MakeDSLText(ReadPropertyScalarValue(P,F.Memory,C),C);}
-FDasStructValue StructWithtext(const FDasStructValue& H,const char* Path,FDasTextValue X,das::Context* C,das::LineInfoArg* At){FStructMutation Mutation(H,C);auto& V=Mutation.Value;auto F=StructLeaf(V,Path,C);auto* P=CastField<FTextProperty>(F.Property);if(!P)C->throw_error("expected text struct leaf");WritePropertyScalarValue(P,F.Memory,ResolveDSLText(X,C),C);return Mutation.Finish(C,At);}
-void PublishFrameByte(int32 I,uint8 X,das::Context* C){FDasScalarValue V;V.Kind=17;V.ByteValue=X;PublishFrameValue(I,MoveTemp(V),C);}
-void PublishFrameText(int32 I,FDasTextValue X,das::Context* C){FDasScalarValue V;V.Kind=18;V.TextValue=ResolveDSLText(X,C);PublishFrameValue(I,MoveTemp(V),C);}
+int32 AuthoredGetbyte(const FDasObjectHandle& H, const char* Id, const char* Name, das::Context* C)
+{
+    auto* O = ResolveAuthoredObject(H, Id, C);
+    auto* P = ResolveProperty<FByteProperty>(O, Name, false, C);
+    if (P->Enum)
+        C->throw_error("expected raw byte");
+    return ReadPropertyScalar(P, O, C);
+}
+void AuthoredSetbyte(const FDasObjectHandle& H, const char* Id, const char* Name, int32 V, das::Context* C)
+{
+    if (ActiveContext && ActiveContext->bCollectingSubscriptions)
+        C->throw_error("object writes are forbidden in bind_events");
+    auto* O = ResolveAuthoredObject(H, Id, C);
+    auto* P = ResolveProperty<FByteProperty>(O, Name, true, C);
+    if (P->Enum || V < 0 || V > 255)
+        C->throw_error("byte must be 0..255");
+    WritePropertyScalar(P, O, uint8(V), C);
+}
+FDasTextValue AuthoredGettext(const FDasObjectHandle& H, const char* Id, const char* Name, das::Context* C)
+{
+    auto* O = ResolveAuthoredObject(H, Id, C);
+    return MakeDSLText(ReadPropertyScalar(ResolveProperty<FTextProperty>(O, Name, false, C), O, C), C);
+}
+void AuthoredSettext(const FDasObjectHandle& H, const char* Id, const char* Name, FDasTextValue V, das::Context* C)
+{
+    if (ActiveContext && ActiveContext->bCollectingSubscriptions)
+        C->throw_error("object writes are forbidden in bind_events");
+    auto* O = ResolveAuthoredObject(H, Id, C);
+    WritePropertyScalar(ResolveProperty<FTextProperty>(O, Name, true, C), O, ResolveDSLText(V, C), C);
+}
+uint8 GetSelfByte(const char* N, das::Context* C)
+{
+    auto* O = ResolveSelf(C);
+    auto* P = ResolveProperty<FByteProperty>(O, N, false, C);
+    if (P->Enum)
+        C->throw_error("expected raw byte");
+    return ReadPropertyScalar(P, O, C);
+}
+void SetSelfByte(const char* N, uint8 V, das::Context* C)
+{
+    if (ActiveContext && ActiveContext->bCollectingSubscriptions)
+        C->throw_error("object writes are forbidden in bind_events");
+    auto* O = ResolveSelf(C);
+    auto* P = ResolveProperty<FByteProperty>(O, N, true, C);
+    if (P->Enum)
+        C->throw_error("expected raw byte");
+    WritePropertyScalar(P, O, V, C);
+}
+FDasTextValue GetSelfText(const char* N, das::Context* C)
+{
+    auto* O = ResolveSelf(C);
+    return MakeDSLText(ReadPropertyScalar(ResolveProperty<FTextProperty>(O, N, false, C), O, C), C);
+}
+void SetSelfText(const char* N, FDasTextValue V, das::Context* C)
+{
+    if (ActiveContext && ActiveContext->bCollectingSubscriptions)
+        C->throw_error("object writes are forbidden in bind_events");
+    auto* O = ResolveSelf(C);
+    WritePropertyScalar(ResolveProperty<FTextProperty>(O, N, true, C), O, ResolveDSLText(V, C), C);
+}
+uint8 StructGetbyte(const FDasStructValue& H, const char* Path, das::Context* C)
+{
+    const auto& V = ResolveStructValue(H, C);
+    auto F = StructLeaf(V, Path, C);
+    auto* P = CastField<FByteProperty>(F.Property);
+    if (!P || P->Enum)
+        C->throw_error("expected raw byte struct leaf");
+    return ReadPropertyScalarValue(P, F.Memory, C);
+}
+FDasStructValue StructWithbyte(const FDasStructValue& H, const char* Path, uint8 X, das::Context* C,
+                               das::LineInfoArg* At)
+{
+    FStructMutation Mutation(H, C);
+    auto& V = Mutation.Value;
+    auto F = StructLeaf(V, Path, C);
+    auto* P = CastField<FByteProperty>(F.Property);
+    if (!P || P->Enum)
+        C->throw_error("expected raw byte struct leaf");
+    WritePropertyScalarValue(P, F.Memory, X, C);
+    return Mutation.Finish(C, At);
+}
+FDasTextValue StructGettext(const FDasStructValue& H, const char* Path, das::Context* C)
+{
+    const auto& V = ResolveStructValue(H, C);
+    auto F = StructLeaf(V, Path, C);
+    auto* P = CastField<FTextProperty>(F.Property);
+    if (!P)
+        C->throw_error("expected text struct leaf");
+    return MakeDSLText(ReadPropertyScalarValue(P, F.Memory, C), C);
+}
+FDasStructValue StructWithtext(const FDasStructValue& H, const char* Path, FDasTextValue X, das::Context* C,
+                               das::LineInfoArg* At)
+{
+    FStructMutation Mutation(H, C);
+    auto& V = Mutation.Value;
+    auto F = StructLeaf(V, Path, C);
+    auto* P = CastField<FTextProperty>(F.Property);
+    if (!P)
+        C->throw_error("expected text struct leaf");
+    WritePropertyScalarValue(P, F.Memory, ResolveDSLText(X, C), C);
+    return Mutation.Finish(C, At);
+}
+void PublishFrameByte(int32 I, uint8 X, das::Context* C)
+{
+    FDasScalarValue V;
+    V.Kind = 17;
+    V.ByteValue = X;
+    PublishFrameValue(I, MoveTemp(V), C);
+}
+void PublishFrameText(int32 I, FDasTextValue X, das::Context* C)
+{
+    FDasScalarValue V;
+    V.Kind = 18;
+    V.TextValue = ResolveDSLText(X, C);
+    PublishFrameValue(I, MoveTemp(V), C);
+}

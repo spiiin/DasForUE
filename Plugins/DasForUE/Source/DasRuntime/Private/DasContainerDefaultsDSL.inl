@@ -1,47 +1,197 @@
 // Only resolved, bounded values enter the persisted default wire.
-TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T,das::ExpressionPtr E,das::ModuleGroup& Group,das::Module* Module){
- if(!E)DSLFail(TEXT("Missing container default value"));
- if(DSLSoft(T)){if(E->__rtti!=das::string("ExprCallMacro"))DSLFail(TEXT("Soft container defaults require ue_soft(type<SoftType>, literal_path)"));auto* Call=static_cast<das::ExprCallMacro*>(E);if(Call->name!="ue_soft" || Call->arguments.size()!=2 || !Call->arguments[0]->rtti_isTypeDecl() || Call->arguments[1]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Soft default requires type and literal path"));auto Input=DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(Call->arguments[0])->typeexpr,Group,Module);if(!DSLSoft(Input) || DSLSoftPath(Input)!=DSLSoftPath(T))DSLFail(TEXT("Soft default type differs from container element"));const FString Path=DSLText(static_cast<das::ExprConstString*>(Call->arguments[1])->text);FString Error;if(!ValidateDasSoftPath(Path,Error))DSLFail(Error);return MakeShared<FJsonValueString>(Path);}
- if(DSLTypedReference(T) || DSLObjectKey(T)){
-  if((DSLTypedReference(T) && DSLAuthoredView(T)) || (DSLObjectKey(T) && !DSLKeyAnnotation(T)->AuthoredId.IsEmpty()))DSLFail(TEXT("Container asset defaults require native reference types"));
-  auto* Call=E->rtti_isCall()?static_cast<das::ExprCall*>(E):nullptr;
-  if(!Call || Call->name!="ue_asset_default" || Call->arguments.size()!=1 || Call->arguments[0]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Container assets require ue_asset_default(path)"));
-  auto Object=MakeShared<FJsonObject>();Object->SetStringField(TEXT("asset"),DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text));return MakeShared<FJsonValueObject>(Object);
- }
- if(DSLContainer(T)){
-  auto* Items=DSLDefaultItems(E,T);TArray<TSharedPtr<FJsonValue>> Values;
-  if(Items)for(const auto& Item:Items->values){if(T->baseType==das::Type::tTable && !DSLSet(T)){if(Item->__rtti!=das::string("ExprMakeTuple"))DSLFail(TEXT("Map defaults require pairs"));auto* Pair=static_cast<das::ExprMakeTuple*>(Item);if(Pair->values.size()!=2)DSLFail(TEXT("Map defaults require pairs"));Values.Add(MakeShared<FJsonValueArray>(TArray<TSharedPtr<FJsonValue>>{DSLDefaultJsonValue(T->firstType,Pair->values[0],Group,Module),DSLDefaultJsonValue(T->secondType,Pair->values[1],Group,Module)}));}else Values.Add(DSLDefaultJsonValue(T->firstType,Item,Group,Module));}
-  return MakeShared<FJsonValueArray>(Values);
- }
- if(DSLDirectStruct(T)){
-  auto* Call=E->rtti_isCall()?static_cast<das::ExprCall*>(E):nullptr;
-  if(Call && Call->name=="ue_default_text" && Call->arguments.size()==1 && Call->arguments[0]->__rtti==das::string("ExprConstString")){TSharedPtr<FJsonValue> Value;FString Error;if(!ParseDasDefaultJson(DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text),Value,Error) || Value->Type!=EJson::Object)DSLFail(TEXT("Struct defaults require JSON fields: ")+Error);return Value;}
-  if(E->rtti_isMakeStruct()){auto* S=static_cast<das::ExprMakeStruct*>(E);if(S->structs.empty() && !S->block)return MakeShared<FJsonValueObject>(MakeShared<FJsonObject>());}
-  DSLFail(TEXT("Struct defaults require ue_default_text or an empty constructor"));
- }
- if(DSLDirectEnum(T)){das::Structure::FieldDeclaration F;F.type=T;F.init=E;FString Member;
-  if(E->rtti_isField()){auto* V=static_cast<das::ExprField*>(E);if(!V->value->rtti_isVar() || static_cast<das::ExprVar*>(V->value)->name!=T->enumType->name)DSLFail(TEXT("Container enum default requires its declared enum"));Member=DSLText(V->name);}
-  else if(E->__rtti==das::string("ExprConstEnumeration")){Member=DSLText(static_cast<das::ExprConstEnumeration*>(E)->text);int32 Dot;if(Member.FindLastChar('.',Dot))Member=Member.Mid(Dot+1);int32 Colon=Member.Find(TEXT("::"),ESearchCase::CaseSensitive,ESearchDir::FromEnd);if(Colon!=INDEX_NONE)Member=Member.Mid(Colon+2);}
-  else DSLFail(TEXT("Container enum default requires a named enum member"));return MakeShared<FJsonValueString>(Member);
- }
- if(!DSLMathPath(T).IsEmpty()){
-  // Constructors are source syntax. Lower their native math fields into the
-  // same recursive object representation as any other reflected struct.
-  das::Structure::FieldDeclaration F;F.type=T;F.init=E;FInstancedStruct Value;FString Error;if(!ParseDasStructDefault(DSLMathPath(T),DSLMathPropertyDefault(F),Value,Error))DSLFail(Error);
-  TFunction<TSharedPtr<FJsonValue>(const UScriptStruct*,const void*)> Struct;
-  Struct=[&](const UScriptStruct* Type,const void* Data){auto Object=MakeShared<FJsonObject>();for(TFieldIterator<FProperty> It(Type);It;++It){auto* P=*It;const auto* Field=P->ContainerPtrToValuePtr<void>(Data);if(auto* Nested=CastField<FStructProperty>(P))Object->SetField(P->GetName(),Struct(Nested->Struct,Field));else if(auto* Number=CastField<FNumericProperty>(P))Object->SetNumberField(P->GetName(),Number->IsInteger()?double(Number->GetSignedIntPropertyValue(Field)):Number->GetFloatingPointPropertyValue(Field));else DSLFail(TEXT("Unsupported math source field"));}return MakeShared<FJsonValueObject>(Object);};return Struct(Value.GetScriptStruct(),Value.GetMemory());
- }
- const auto K=DSLTypeName(T);
- if(K==TEXT("byte")){const auto D=DSLByteDefault(E);return MakeShared<FJsonValueNumber>(D.Number);}
- if(K==TEXT("text")){const auto D=DSLTextDefault(E);auto O=MakeShared<FJsonObject>();O->SetStringField(TEXT("text"),D.String);return MakeShared<FJsonValueObject>(O);}
+TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T, das::ExpressionPtr E, das::ModuleGroup& Group,
+                                           das::Module* Module)
+{
+    if (!E)
+        DSLFail(TEXT("Missing container default value"));
+    if (DSLSoft(T))
+    {
+        if (E->__rtti != das::string("ExprCallMacro"))
+            DSLFail(TEXT("Soft container defaults require ue_soft(type<SoftType>, literal_path)"));
+        auto* Call = static_cast<das::ExprCallMacro*>(E);
+        if (Call->name != "ue_soft" || Call->arguments.size() != 2 || !Call->arguments[0]->rtti_isTypeDecl() ||
+            Call->arguments[1]->__rtti != das::string("ExprConstString"))
+            DSLFail(TEXT("Soft default requires type and literal path"));
+        auto Input = DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(Call->arguments[0])->typeexpr, Group, Module);
+        if (!DSLSoft(Input) || DSLSoftPath(Input) != DSLSoftPath(T))
+            DSLFail(TEXT("Soft default type differs from container element"));
+        const FString Path = DSLText(static_cast<das::ExprConstString*>(Call->arguments[1])->text);
+        FString Error;
+        if (!ValidateDasSoftPath(Path, Error))
+            DSLFail(Error);
+        return MakeShared<FJsonValueString>(Path);
+    }
+    if (DSLTypedReference(T) || DSLObjectKey(T))
+    {
+        if ((DSLTypedReference(T) && DSLAuthoredView(T)) ||
+            (DSLObjectKey(T) && !DSLKeyAnnotation(T)->AuthoredId.IsEmpty()))
+            DSLFail(TEXT("Container asset defaults require native reference types"));
+        auto* Call = E->rtti_isCall() ? static_cast<das::ExprCall*>(E) : nullptr;
+        if (!Call || Call->name != "ue_asset_default" || Call->arguments.size() != 1 ||
+            Call->arguments[0]->__rtti != das::string("ExprConstString"))
+            DSLFail(TEXT("Container assets require ue_asset_default(path)"));
+        auto Object = MakeShared<FJsonObject>();
+        Object->SetStringField(TEXT("asset"), DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text));
+        return MakeShared<FJsonValueObject>(Object);
+    }
+    if (DSLContainer(T))
+    {
+        auto* Items = DSLDefaultItems(E, T);
+        TArray<TSharedPtr<FJsonValue>> Values;
+        if (Items)
+            for (const auto& Item : Items->values)
+            {
+                if (T->baseType == das::Type::tTable && !DSLSet(T))
+                {
+                    if (Item->__rtti != das::string("ExprMakeTuple"))
+                        DSLFail(TEXT("Map defaults require pairs"));
+                    auto* Pair = static_cast<das::ExprMakeTuple*>(Item);
+                    if (Pair->values.size() != 2)
+                        DSLFail(TEXT("Map defaults require pairs"));
+                    Values.Add(MakeShared<FJsonValueArray>(TArray<TSharedPtr<FJsonValue>>{
+                        DSLDefaultJsonValue(T->firstType, Pair->values[0], Group, Module),
+                        DSLDefaultJsonValue(T->secondType, Pair->values[1], Group, Module)}));
+                }
+                else
+                    Values.Add(DSLDefaultJsonValue(T->firstType, Item, Group, Module));
+            }
+        return MakeShared<FJsonValueArray>(Values);
+    }
+    if (DSLDirectStruct(T))
+    {
+        auto* Call = E->rtti_isCall() ? static_cast<das::ExprCall*>(E) : nullptr;
+        if (Call && Call->name == "ue_default_text" && Call->arguments.size() == 1 &&
+            Call->arguments[0]->__rtti == das::string("ExprConstString"))
+        {
+            TSharedPtr<FJsonValue> Value;
+            FString Error;
+            if (!ParseDasDefaultJson(DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text), Value,
+                                     Error) ||
+                Value->Type != EJson::Object)
+                DSLFail(TEXT("Struct defaults require JSON fields: ")+ Error);
+            return Value;
+        }
+        if (E->rtti_isMakeStruct())
+        {
+            auto* S = static_cast<das::ExprMakeStruct*>(E);
+            if (S->structs.empty() && !S->block)
+                return MakeShared<FJsonValueObject>(MakeShared<FJsonObject>());
+        }
+        DSLFail(TEXT("Struct defaults require ue_default_text or an empty constructor"));
+    }
+    if (DSLDirectEnum(T))
+    {
+        das::Structure::FieldDeclaration F;
+        F.type = T;
+        F.init = E;
+        FString Member;
+        if (E->rtti_isField())
+        {
+            auto* V = static_cast<das::ExprField*>(E);
+            if (!V->value->rtti_isVar() || static_cast<das::ExprVar*>(V->value)->name != T->enumType->name)
+                DSLFail(TEXT("Container enum default requires its declared enum"));
+            Member = DSLText(V->name);
+        }
+        else if (E->__rtti == das::string("ExprConstEnumeration"))
+        {
+            Member = DSLText(static_cast<das::ExprConstEnumeration*>(E)->text);
+            int32 Dot;
+            if (Member.FindLastChar('.', Dot))
+                Member = Member.Mid(Dot + 1);
+            int32 Colon = Member.Find(TEXT("::"), ESearchCase::CaseSensitive, ESearchDir::FromEnd);
+            if (Colon != INDEX_NONE)
+                Member = Member.Mid(Colon + 2);
+        }
+        else
+            DSLFail(TEXT("Container enum default requires a named enum member"));
+        return MakeShared<FJsonValueString>(Member);
+    }
+    if (!DSLMathPath(T).IsEmpty())
+    {
+        // Constructors are source syntax. Lower their native math fields into the
+        // same recursive object representation as any other reflected struct.
+        das::Structure::FieldDeclaration F;
+        F.type = T;
+        F.init = E;
+        FInstancedStruct Value;
+        FString Error;
+        if (!ParseDasStructDefault(DSLMathPath(T), DSLMathPropertyDefault(F), Value, Error))
+            DSLFail(Error);
+        TFunction<TSharedPtr<FJsonValue>(const UScriptStruct*, const void*)> Struct;
+        Struct = [&](const UScriptStruct* Type, const void* Data)
+        {
+            auto Object = MakeShared<FJsonObject>();
+            for (TFieldIterator<FProperty> It(Type); It; ++It)
+            {
+                auto* P = *It;
+                const auto* Field = P->ContainerPtrToValuePtr<void>(Data);
+                if (auto* Nested = CastField<FStructProperty>(P))
+                    Object->SetField(P->GetName(), Struct(Nested->Struct, Field));
+                else if (auto* Number = CastField<FNumericProperty>(P))
+                    Object->SetNumberField(P->GetName(), Number->IsInteger()
+                                                             ? double(Number->GetSignedIntPropertyValue(Field))
+                                                             : Number->GetFloatingPointPropertyValue(Field));
+                else
+                    DSLFail(TEXT("Unsupported math source field"));
+            }
+            return MakeShared<FJsonValueObject>(Object);
+        };
+        return Struct(Value.GetScriptStruct(), Value.GetMemory());
+    }
+    const auto K = DSLTypeName(T);
+    if (K == TEXT("byte"))
+    {
+        const auto D = DSLByteDefault(E);
+        return MakeShared<FJsonValueNumber>(D.Number);
+    }
+    if (K == TEXT("text"))
+    {
+        const auto D = DSLTextDefault(E);
+        auto O = MakeShared<FJsonObject>();
+        O->SetStringField(TEXT("text"), D.String);
+        return MakeShared<FJsonValueObject>(O);
+    }
 
- if(K==TEXT("name")){auto* Call=E->rtti_isCall()?static_cast<das::ExprCall*>(E):nullptr;if(!Call || Call->name!="ue_name_value" || Call->arguments.size()!=1 || Call->arguments[0]->__rtti!=das::string("ExprConstString"))DSLFail(TEXT("Container FName defaults require ue_name_value(string)"));return MakeShared<FJsonValueString>(DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text));}
- if(K==TEXT("string") && E->__rtti==das::string("ExprConstString"))return MakeShared<FJsonValueString>(DSLText(static_cast<das::ExprConstString*>(E)->text));
- if(K==TEXT("bool") && E->__rtti==das::string("ExprConstBool"))return MakeShared<FJsonValueBoolean>(static_cast<das::ExprConstBool*>(E)->getValue());
- if((K==TEXT("int") && E->__rtti==das::string("ExprConstInt")) || (K==TEXT("float") && (E->__rtti==das::string("ExprConstFloat") || E->__rtti==das::string("ExprConstInt"))) || (K==TEXT("double") && (E->__rtti==das::string("ExprConstDouble") || E->__rtti==das::string("ExprConstInt"))))return MakeShared<FJsonValueNumber>(DSLDefaultNumber(E));
- DSLFail(TEXT("Container default value type is unsupported or differs from its declaration: ")+K);return nullptr;
+    if (K == TEXT("name"))
+    {
+        auto* Call = E->rtti_isCall() ? static_cast<das::ExprCall*>(E) : nullptr;
+        if (!Call || Call->name != "ue_name_value" || Call->arguments.size() != 1 ||
+            Call->arguments[0]->__rtti != das::string("ExprConstString"))
+            DSLFail(TEXT("Container FName defaults require ue_name_value(string)"));
+        return MakeShared<FJsonValueString>(DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text));
+    }
+    if (K == TEXT("string") && E->__rtti == das::string("ExprConstString"))
+        return MakeShared<FJsonValueString>(DSLText(static_cast<das::ExprConstString*>(E)->text));
+    if (K == TEXT("bool") && E->__rtti == das::string("ExprConstBool"))
+        return MakeShared<FJsonValueBoolean>(static_cast<das::ExprConstBool*>(E)->getValue());
+    if ((K == TEXT("int") && E->__rtti == das::string("ExprConstInt")) ||
+         (K == TEXT("float") &&
+                    (E->__rtti == das::string("ExprConstFloat") || E->__rtti == das::string("ExprConstInt"))) ||
+          (K == TEXT("double") &&
+                     (E->__rtti == das::string("ExprConstDouble") || E->__rtti == das::string("ExprConstInt"))))
+        return MakeShared<FJsonValueNumber>(DSLDefaultNumber(E));
+    DSLFail(TEXT("Container default value type is unsupported or differs from its declaration: ")+ K);
+    return nullptr;
 }
-FString DSLContainerDefault(das::Structure::FieldDeclaration& F,const FString& Path,das::ModuleGroup& Group,das::Module* Module){
- if(!F.init)return {};auto Value=DSLDefaultJsonValue(F.type,F.init,Group,Module);const auto& Values=Value->AsArray();
- FString Wire;auto Writer=TJsonWriterFactory<TCHAR,TCondensedJsonPrintPolicy<TCHAR>>::Create(&Wire);FJsonSerializer::Serialize(Values,Writer);FInstancedStruct Parsed;FString Error;if(DSLComputedDefaults && !DSLComputedDefaults->Resolved && !DSLComputedDefaults->Pending.IsEmpty()){F.init=nullptr;return TEXT("[]");}if(!ParseDasStructDefault(Path,Wire,Parsed,Error))DSLFail(Error);F.init=nullptr;return Wire;
+FString DSLContainerDefault(das::Structure::FieldDeclaration& F, const FString& Path, das::ModuleGroup& Group,
+                            das::Module* Module)
+{
+    if (!F.init)
+        return {};
+    auto Value = DSLDefaultJsonValue(F.type, F.init, Group, Module);
+    const auto& Values = Value->AsArray();
+    FString Wire;
+    auto Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&Wire);
+    FJsonSerializer::Serialize(Values, Writer);
+    FInstancedStruct Parsed;
+    FString Error;
+    if (DSLComputedDefaults && !DSLComputedDefaults->Resolved && !DSLComputedDefaults->Pending.IsEmpty())
+    {
+        F.init = nullptr;
+        return TEXT("[]");
+    }
+    if (!ParseDasStructDefault(Path, Wire, Parsed, Error))
+        DSLFail(Error);
+    F.init = nullptr;
+    return Wire;
 }

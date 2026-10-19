@@ -3,9 +3,10 @@
 #include "Commandlets/Commandlet.h"
 #include "DasNativeDefaultsCommandlet.generated.h"
 UCLASS()
-class UDasNativeDefaultsCommandlet:public UCommandlet {
- GENERATED_BODY()
+class UDasNativeDefaultsCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
 public:
- UDasNativeDefaultsCommandlet();
- virtual int32 Main(const FString& Params)override;
+    UDasNativeDefaultsCommandlet();
+    virtual int32 Main(const FString& Params) override;
 };

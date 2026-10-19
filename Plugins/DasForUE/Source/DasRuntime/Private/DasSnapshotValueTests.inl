@@ -1,6 +1,6 @@
 // Drafts must keep their reflected references alive, and release them on rollback.
 {
-    const auto BatchGC=ObjectRun(TEXT(R"das(
+    const auto BatchGC = ObjectRun(TEXT(R"das(
 let original=ue_struct_value("/Script/DasRuntime.DasDefaultBundleProbe")
 let made=ue_begin_call(ue_self_object(),"NewFixture")
 ue_invoke_call(made)
@@ -28,30 +28,49 @@ let gc=ue_begin_call(ue_self_object(),"ForceTestGC"); ue_invoke_call(gc); ue_rel
 verify(rejected && !ue_object_valid(discarded) && ue_object_valid(object))
 return 1
 )das"));
-    Expect(BatchGC.bSucceeded && BatchGC.Value==1,TEXT("snapshot_batch_GC_roots_draft_and_releases_rollback"),BatchGC.Error);
+    Expect(BatchGC.bSucceeded && BatchGC.Value == 1, TEXT("snapshot_batch_GC_roots_draft_and_releases_rollback"),
+                                                          BatchGC.Error);
 }
 // Use the public snapshot adapters, including exception recovery in one context.
 {
     Runtime.ReleaseObject(First.Get());
     TStrongObjectPtr<UDasObjectFixture> ReadTarget(NewObject<UDasObjectFixture>());
-    FDasScalarValue ReadInput;ReadInput.Kind=12;ReadInput.ObjectClass=FDasSnapshotReadProbe::StaticStruct()->GetPathName();
-    ReadInput.StructValue.InitializeAs<FDasSnapshotReadProbe>();auto& Probe=ReadInput.StructValue.GetMutable<FDasSnapshotReadProbe>();
-    Probe.IntMap.Add(-1,7);Probe.IntMap.Add(2,9);Probe.IntSet.Add(4);Probe.IntSet.Add(8);
-    Probe.Nested.Priority=11;Probe.Nested.Caption=NSLOCTEXT("SnapshotRead","Caption","Saved");
-    Probe.Nested.Positions.Add(FVector(1,2,3));Probe.Nested.Tags.Add(TEXT("SnapshotReadTag_3"));Probe.Nested.Lookup.Add(TEXT("SnapshotReadAsset"),ReadTarget.Get());
-    Probe.Rows.Add(Probe.Nested);Probe.Catalog.Add(TEXT("saved"),Probe.Nested);
-    const auto& Frozen=ReadInput.StructValue;
-    DasSnapshotFields::TField<const uint8> Borrowed{};FString FieldError;
-    const bool Found=DasSnapshotFields::Find(Frozen.GetScriptStruct(),Frozen.GetMemory(),TEXT("Rows.0.Priority"),Borrowed,FieldError);
-    static_assert(std::is_same_v<decltype(Borrowed.Memory),const uint8*>);
-    Expect(Found && Borrowed.Memory==&Probe.Rows[0].Priority,TEXT("snapshot_read_field_aliases_const_source"),FieldError);
-    #include "DasSnapshotFieldsTests.inl"
+    FDasScalarValue ReadInput;
+    ReadInput.Kind = 12;
+    ReadInput.ObjectClass = FDasSnapshotReadProbe::StaticStruct()->GetPathName();
+    ReadInput.StructValue.InitializeAs<FDasSnapshotReadProbe>();
+    auto& Probe = ReadInput.StructValue.GetMutable<FDasSnapshotReadProbe>();
+    Probe.IntMap.Add(-1, 7);
+    Probe.IntMap.Add(2, 9);
+    Probe.IntSet.Add(4);
+    Probe.IntSet.Add(8);
+    Probe.Nested.Priority = 11;
+    Probe.Nested.Caption = NSLOCTEXT("SnapshotRead", "Caption", "Saved");
+    Probe.Nested.Positions.Add(FVector(1, 2, 3));
+    Probe.Nested.Tags.Add(TEXT("SnapshotReadTag_3"));
+    Probe.Nested.Lookup.Add(TEXT("SnapshotReadAsset"), ReadTarget.Get());
+    Probe.Rows.Add(Probe.Nested);
+    Probe.Catalog.Add(TEXT("saved"), Probe.Nested);
+    const auto& Frozen = ReadInput.StructValue;
+    DasSnapshotFields::TField<const uint8> Borrowed{};
+    FString FieldError;
+    const bool Found = DasSnapshotFields::Find(Frozen.GetScriptStruct(), Frozen.GetMemory(),
+                                               TEXT("Rows.0.Priority"), Borrowed, FieldError);
+    static_assert(std::is_same_v<decltype(Borrowed.Memory), const uint8*>);
+    Expect(Found && Borrowed.Memory == &Probe.Rows[0].Priority, TEXT("snapshot_read_field_aliases_const_source"),
+                                                                     FieldError);
+#include "DasSnapshotFieldsTests.inl"
     FDasSnapshotReadProbe::CopyCount.Store(0);
-    { FInstancedStruct ControlCopy=Frozen;Expect(FDasSnapshotReadProbe::CopyCount.Load()>0,TEXT("snapshot_read_copy_counter_detects_real_clone")); }
-    TStrongObjectPtr<UDasSnapshotReadOwner> ReadOwner(NewObject<UDasSnapshotReadOwner>());ReadOwner->Snapshot=Probe;
-    auto* SnapshotField=FindFProperty<FStructProperty>(ReadOwner->GetClass(),TEXT("Snapshot"));
-    const auto PreviousFlags=SnapshotField->GetPropertyFlags();SnapshotField->SetPropertyFlags(CPF_BlueprintVisible);
-    const bool Written=Write(TEXT(R"das(options gen2
+    {
+        FInstancedStruct ControlCopy = Frozen;
+        Expect(FDasSnapshotReadProbe::CopyCount.Load() > 0, TEXT("snapshot_read_copy_counter_detects_real_clone"));
+    }
+    TStrongObjectPtr<UDasSnapshotReadOwner> ReadOwner(NewObject<UDasSnapshotReadOwner>());
+    ReadOwner->Snapshot = Probe;
+    auto* SnapshotField = FindFProperty<FStructProperty>(ReadOwner->GetClass(), TEXT("Snapshot"));
+    const auto PreviousFlags = SnapshotField->GetPropertyFlags();
+    SnapshotField->SetPropertyFlags(CPF_BlueprintVisible);
+    const bool Written = Write(TEXT(R"das(options gen2
 require ue_foundation
 var escaped:UEStructValue
 [export]
@@ -171,23 +190,42 @@ def changed(input:int):int {
     return 1
 }
 )das"));
-    auto InvokeRead=[&](const TCHAR* Entry){return Runtime.RunNamedPersistent(Scratch,Entry,0,ReadOwner.Get());};
-    auto Warm=InvokeRead(TEXT("noop"));auto WarmQueries=InvokeRead(TEXT("queries"));
-    FDasSnapshotReadProbe::CopyCount.Store(0);const auto Baseline=InvokeRead(TEXT("noop"));const int32 TransportCopies=FDasSnapshotReadProbe::CopyCount.Load();
-    FDasSnapshotReadProbe::CopyCount.Store(0);const auto Queries=InvokeRead(TEXT("queries"));const int32 QueryCopies=FDasSnapshotReadProbe::CopyCount.Load();
-    Expect(Written && Warm.bSucceeded && WarmQueries.bSucceeded && Baseline.bSucceeded && Queries.bSucceeded && Queries.Value==1 && QueryCopies==TransportCopies,
-        TEXT("snapshot_queries_add_zero_native_parent_copies"),FString::Printf(TEXT("transport=%d queries=%d %s %s"),TransportCopies,QueryCopies,*WarmQueries.Error,*Queries.Error));
-    Expect(Probe.Rows[0].Priority==11 && Probe.IntMap.Num()==2 && Probe.IntSet.Num()==2,TEXT("snapshot_queries_and_child_changes_preserve_input"));
-    const auto Changed=InvokeRead(TEXT("changed"));Expect(Changed.bSucceeded && Changed.Value==1,TEXT("snapshot_key_orders_isolate_changed_snapshots"),Changed.Error);
+    auto InvokeRead = [&](const TCHAR* Entry)
+    {
+        return Runtime.RunNamedPersistent(Scratch, Entry, 0, ReadOwner.Get());
+    };
+    auto Warm = InvokeRead(TEXT("noop"));
+    auto WarmQueries = InvokeRead(TEXT("queries"));
     FDasSnapshotReadProbe::CopyCount.Store(0);
-    const auto Batch=InvokeRead(TEXT("batch"));const int32 BatchCopies=FDasSnapshotReadProbe::CopyCount.Load();
-    Expect(Batch.bSucceeded && Batch.Value==1 && BatchCopies==TransportCopies+1,TEXT("snapshot_batch_mixed_writes_clone_once_and_expire_draft"),FString::Printf(TEXT("copies=%d transport=%d %s"),BatchCopies,TransportCopies,*Batch.Error));
-    const auto BatchFailures=InvokeRead(TEXT("batch_failures"));
-    Expect(BatchFailures.bSucceeded && BatchFailures.Value==1,TEXT("snapshot_batch_rollback_caught_write_poisoning_and_nested_scope"),BatchFailures.Error);
-    Runtime.ReleaseObject(ReadOwner.Get());SnapshotField->ClearPropertyFlags(CPF_BlueprintVisible & ~PreviousFlags);
+    const auto Baseline = InvokeRead(TEXT("noop"));
+    const int32 TransportCopies = FDasSnapshotReadProbe::CopyCount.Load();
+    FDasSnapshotReadProbe::CopyCount.Store(0);
+    const auto Queries = InvokeRead(TEXT("queries"));
+    const int32 QueryCopies = FDasSnapshotReadProbe::CopyCount.Load();
+    Expect(Written && Warm.bSucceeded && WarmQueries.bSucceeded && Baseline.bSucceeded && Queries.bSucceeded &&
+               Queries.Value == 1 && QueryCopies == TransportCopies,
+           TEXT("snapshot_queries_add_zero_native_parent_copies"),
+                FString::Printf(TEXT("transport=%d queries=%d %s %s"), TransportCopies, QueryCopies, *WarmQueries.Error,
+                                     *Queries.Error));
+    Expect(Probe.Rows[0].Priority == 11 && Probe.IntMap.Num() == 2 && Probe.IntSet.Num() == 2,
+           TEXT("snapshot_queries_and_child_changes_preserve_input"));
+    const auto Changed = InvokeRead(TEXT("changed"));
+    Expect(Changed.bSucceeded && Changed.Value == 1, TEXT("snapshot_key_orders_isolate_changed_snapshots"),
+                                                          Changed.Error);
+    FDasSnapshotReadProbe::CopyCount.Store(0);
+    const auto Batch = InvokeRead(TEXT("batch"));
+    const int32 BatchCopies = FDasSnapshotReadProbe::CopyCount.Load();
+    Expect(Batch.bSucceeded && Batch.Value == 1 && BatchCopies == TransportCopies + 1,
+           TEXT("snapshot_batch_mixed_writes_clone_once_and_expire_draft"),
+                FString::Printf(TEXT("copies=%d transport=%d %s"), BatchCopies, TransportCopies, *Batch.Error));
+    const auto BatchFailures = InvokeRead(TEXT("batch_failures"));
+    Expect(BatchFailures.bSucceeded && BatchFailures.Value == 1,
+           TEXT("snapshot_batch_rollback_caught_write_poisoning_and_nested_scope"), BatchFailures.Error);
+    Runtime.ReleaseObject(ReadOwner.Get());
+    SnapshotField->ClearPropertyFlags(CPF_BlueprintVisible & ~PreviousFlags);
 }
 {
-    const auto R=ObjectRun(TEXT(R"das(
+    const auto R = ObjectRun(TEXT(R"das(
 let original=ue_struct_with_int(ue_struct_value("/Script/DasRuntime.DasCallPayload"),"Count",17)
 var changed=ue_struct_with_int(original,"Count",19)
 var rejected=false
@@ -201,10 +239,11 @@ try { changed=ue_struct_nested_with(changed,"Metrics",-1,original) } recover { r
 verify(rejected && ue_struct_get_float(changed,"Metrics.Ratio")==2.5)
 return ue_struct_get_int(changed,"Count")
 )das"));
-    Expect(R.bSucceeded && R.Value==19,TEXT("snapshot_values_leaf_nested_copy_and_failed_assignment_atomic"),R.Error);
+    Expect(R.bSucceeded && R.Value == 19, TEXT("snapshot_values_leaf_nested_copy_and_failed_assignment_atomic"),
+                                               R.Error);
 }
 {
-    const auto R=ObjectRun(TEXT(R"das(
+    const auto R = ObjectRun(TEXT(R"das(
 let original=ue_struct_value("/Script/DasRuntime.DasDefaultBundleProbe")
 var changed=original
 let wrong=ue_struct_value("/Script/CoreUObject.IntPoint")
@@ -226,14 +265,17 @@ try { changed=ue_struct_nested_with(changed,"Rows",2,child) } recover { rejected
 verify(rejected && ue_struct_get_byte(changed,"Rows.0.Priority")==uint8(255))
 return 1
 )das"));
-    Expect(R.bSucceeded && R.Value==1,TEXT("snapshot_values_map_insert_failure_nested_array_text_byte_isolation"),R.Error);
+    Expect(R.bSucceeded && R.Value == 1, TEXT("snapshot_values_map_insert_failure_nested_array_text_byte_isolation"),
+                                              R.Error);
 }
 #if WITH_EDITOR
 {
-    auto* Enum=StaticEnum<EDasCallMode>();const int32 Index=Enum->GetIndexByValue(int64(EDasCallMode::Active));
-    const bool Had=Enum->HasMetaData(TEXT("Hidden"),Index);const FString Previous=Enum->GetMetaData(TEXT("Hidden"),Index);
-    Enum->SetMetaData(TEXT("Hidden"),TEXT("true"),Index);
-    const auto R=ObjectRun(TEXT(R"das(
+    auto* Enum = StaticEnum<EDasCallMode>();
+    const int32 Index = Enum->GetIndexByValue(int64(EDasCallMode::Active));
+    const bool Had = Enum->HasMetaData(TEXT("Hidden"), Index);
+    const FString Previous = Enum->GetMetaData(TEXT("Hidden"), Index);
+    Enum->SetMetaData(TEXT("Hidden"), TEXT("true"), Index);
+    const auto R = ObjectRun(TEXT(R"das(
 let value=ue_struct_with_enum(ue_struct_value("/Script/DasRuntime.DasNamedMode"),"Mode","/Script/DasRuntime.EDasCallMode","Active")
 verify(ue_struct_get_enum(value,"Mode","/Script/DasRuntime.EDasCallMode")=="Active")
 var rejected=false
@@ -241,7 +283,10 @@ try { let typed=ue_enum_value("/Script/DasRuntime.EDasCallMode","Active") } reco
 verify(rejected)
 return 1
 )das"));
-    if(Had)Enum->SetMetaData(TEXT("Hidden"),*Previous,Index);else Enum->RemoveMetaData(TEXT("Hidden"),Index);
-    Expect(R.bSucceeded && R.Value==1,TEXT("snapshot_values_native_symbol_enum_policy_preserved"),R.Error);
+    if (Had)
+        Enum->SetMetaData(TEXT("Hidden"), *Previous, Index);
+    else
+        Enum->RemoveMetaData(TEXT("Hidden"), Index);
+    Expect(R.bSucceeded && R.Value == 1, TEXT("snapshot_values_native_symbol_enum_policy_preserved"), R.Error);
 }
 #endif

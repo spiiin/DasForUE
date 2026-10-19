@@ -3,9 +3,10 @@
 #include "Commandlets/Commandlet.h"
 #include "DasCookedCallsCommandlet.generated.h"
 UCLASS()
-class UDasCookedCallsCommandlet:public UCommandlet {
- GENERATED_BODY()
+class UDasCookedCallsCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
 public:
- UDasCookedCallsCommandlet();
- virtual int32 Main(const FString& Params)override;
+    UDasCookedCallsCommandlet();
+    virtual int32 Main(const FString& Params) override;
 };

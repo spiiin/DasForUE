@@ -6,8 +6,9 @@ class USaveGame;
 UCLASS(Transient)
 class UDasSaveGameProxy : public UObject
 {
- GENERATED_BODY()
+    GENERATED_BODY()
 public:
- uint64 SubscriptionId=0;
- UPROPERTY() TObjectPtr<USaveGame> SaveObject;
+    uint64 SubscriptionId = 0;
+    UPROPERTY()
+    TObjectPtr<USaveGame> SaveObject;
 };

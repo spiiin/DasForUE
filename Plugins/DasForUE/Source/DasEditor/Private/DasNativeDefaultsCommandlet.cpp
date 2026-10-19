@@ -20,75 +20,497 @@
 #include "Misc/ScopeExit.h"
 #include "Misc/PackageName.h"
 #include "HAL/FileManager.h"
-namespace {
-float Life(UObject* O){return FindFProperty<FFloatProperty>(O->GetClass(),TEXT("InitialLifeSpan"))->GetPropertyValue_InContainer(O);}
-void LifeSet(UObject* O,float V){FindFProperty<FFloatProperty>(O->GetClass(),TEXT("InitialLifeSpan"))->SetPropertyValue_InContainer(O,V);}
-USceneComponent* NativeRoot(UObject* O){FString Error;return Cast<USceneComponent>(DasNativeDefaultTarget(TEXT("/Script/Engine.Actor"),O,TEXT("RootComponent"),Error));}
-int32 NativeRead(UObject* O){auto* F=O->FindFunction(TEXT("Read"));if(!F)return MIN_int32;auto* In=FindFProperty<FIntProperty>(F,TEXT("input"));auto* Result=CastField<FIntProperty>(F->GetReturnProperty());if(!In || !Result)return MIN_int32;FStructOnScope Args(F);In->SetPropertyValue_InContainer(Args.GetStructMemory(),0);O->ProcessEvent(F,Args.GetStructMemory());return Result->GetPropertyValue_InContainer(Args.GetStructMemory());}
-bool NativeSave(UObject* O){const FString File=FPackageName::LongPackageNameToFilename(O->GetOutermost()->GetName(),O->IsA<UWorld>()?FPackageName::GetMapPackageExtension():FPackageName::GetAssetPackageExtension());IFileManager::Get().MakeDirectory(*FPaths::GetPath(File),true);FSavePackageArgs Args;Args.TopLevelFlags=RF_Public|RF_Standalone;return UPackage::SavePackage(O->GetOutermost(),O,*File,Args);}
+namespace
+{
+float Life(UObject* O)
+{
+    return FindFProperty<FFloatProperty>(O->GetClass(), TEXT("InitialLifeSpan"))->GetPropertyValue_InContainer(O);
 }
-UDasNativeDefaultsCommandlet::UDasNativeDefaultsCommandlet(){IsEditor=true;IsClient=false;IsServer=false;LogToConsole=true;}
-int32 UDasNativeDefaultsCommandlet::Main(const FString& Params){
- FString Id,Phase;FParse::Value(*Params,TEXT("ProbeId="),Id);FParse::Value(*Params,TEXT("Phase="),Phase);FGuid Guid;if(!FGuid::ParseExact(Id,EGuidFormats::Digits,Guid))return 1;
- FEditorScriptExecutionGuard Guard;auto& R=FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));FString Error;const FString Root=TEXT("/Game/DasNativeDefaults/")+Id,Path=R.ScriptPath(TEXT("dsl_native_defaults.das"));FString Final;if(!FFileHelper::LoadFileToString(Final,*Path))return 1;
- auto Write=[](const FString& P,const FString& S){return FFileHelper::SaveStringToFile(S,*P,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);};ON_SCOPE_EXIT{Write(Path,Final);};
- auto Check=[&](bool Good,const TCHAR* Name){UE_LOG(LogTemp,Display,TEXT("DAS_NATIVE_DEFAULTS %s %s %s"),Good?TEXT("PASS"):TEXT("FAIL"),Name,*Error);return Good;};
- UBlueprint* BP=nullptr;UBlueprint* Child=nullptr;UBlueprint* ComputedChild=nullptr;UWorld* W=nullptr;ADasProbeActor* A=nullptr;ADasProbeActor* Manual=nullptr;ON_SCOPE_EXIT{if(W){for(const auto& Actor:W->PersistentLevel->Actors)if(IsValid(Actor))R.ReleaseObject(Actor);if(W->IsInitialized())W->DestroyWorld(false);}};
- auto LoadBP=[&](const TCHAR* Name){return LoadObject<UBlueprint>(nullptr,*(Root+TEXT("/")+Name+TEXT(".")+Name));};
- if(Phase==TEXT("Create")){
-  FDasAuthoringModule Model;if(!Check(R.ReadAuthoringScript(Path,Model,Error) && Model.Classes[0].Properties.Num()==1 && Model.Classes[0].NativeDefaults.Num()==2,TEXT("separate_IR_without_native_redeclaration")))return 1;
-  const FString Old=Final.Replace(TEXT("10.0f*3.0f"),TEXT("10.0f*2.0f")).Replace(TEXT("1.0lf,4.0lf,5.0lf"),TEXT("1.0lf,2.0lf,3.0lf"));if(!Write(Path,Old))return 1;
-  if(!Check(FDasDSLService::Apply(TEXT("dsl_native_defaults.das"),Root+TEXT("/BP_NativeDefaults"),TEXT("nativedefaults.NativeDefaults"),BP,Error),TEXT("initial_native_defaults_import")))return 1;FKismetEditorUtilities::CompileBlueprint(BP);
-  if(!Check(FDasDSLService::Apply(TEXT("dsl_native_defaults_child.das"),Root+TEXT("/BP_NativeDefaultsChild"),TEXT("nativedefaults.NativeDefaultsChild"),Child,Error) && FDasDSLService::Apply(TEXT("dsl_native_defaults_child.das"),Root+TEXT("/BP_NativeDefaultsComputedChild"),TEXT("nativedefaults.NativeDefaultsComputedChild"),ComputedChild,Error),TEXT("inherited_native_defaults_and_source_computation")))return 1;
-  auto* CDO=BP->GeneratedClass->GetDefaultObject();if(!Check(Life(CDO)==20 && Life(ComputedChild->GeneratedClass->GetDefaultObject())==21 && NativeRoot(CDO)->GetRelativeScale3D()==FVector(1,2,3) && BP->NewVariables.Num()==1 && Child->NewVariables.IsEmpty(),TEXT("native_layout_and_parent_CDO_isolation")))return 1;
-  NativeRoot(CDO)->SetRelativeScale3D(FVector(99,2,3));FindFProperty<FBoolProperty>(CDO->GetClass(),TEXT("bHidden"))->SetPropertyValue_InContainer(CDO,true);
-  W=UWorld::CreateWorld(EWorldType::Editor,false,TEXT("Map"),CreatePackage(*(Root+TEXT("/Map"))));if(!W)return 1;W->SetFlags(RF_Public|RF_Standalone);W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
-  A=W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);Manual=W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);if(!A || !Manual)return 1;A->Tags.Add(TEXT("NativeDefault"));Manual->Tags.Add(TEXT("NativeManual"));LifeSet(Manual,77);NativeRoot(Manual)->SetRelativeScale3D(FVector(99,88,3));if(!Check(NativeRead(A)==7 && A->LastDasError.IsEmpty(),TEXT("runtime_validates_native_source_with_manual_CDO")))return 1;
-  const auto* Class=BP->GeneratedClass.Get();if(!Write(Path,Final))return 1;
+void LifeSet(UObject* O, float V)
+{
+    FindFProperty<FFloatProperty>(O->GetClass(), TEXT("InitialLifeSpan"))->SetPropertyValue_InContainer(O, V);
+}
+USceneComponent* NativeRoot(UObject* O)
+{
+    FString Error;
+    return Cast<USceneComponent>(DasNativeDefaultTarget(TEXT("/Script/Engine.Actor"), O, TEXT("RootComponent"), Error));
+}
+int32 NativeRead(UObject* O)
+{
+    auto* F = O->FindFunction(TEXT("Read"));
+    if (!F)
+        return MIN_int32;
+    auto* In = FindFProperty<FIntProperty>(F, TEXT("input"));
+    auto* Result = CastField<FIntProperty>(F->GetReturnProperty());
+    if (!In || !Result)
+        return MIN_int32;
+    FStructOnScope Args(F);
+    In->SetPropertyValue_InContainer(Args.GetStructMemory(), 0);
+    O->ProcessEvent(F, Args.GetStructMemory());
+    return Result->GetPropertyValue_InContainer(Args.GetStructMemory());
+}
+bool NativeSave(UObject* O)
+{
+    const FString File = FPackageName::LongPackageNameToFilename(
+        O->GetOutermost()->GetName(),
+        O->IsA<UWorld>() ? FPackageName::GetMapPackageExtension() : FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(File), true);
+    FSavePackageArgs Args;
+    Args.TopLevelFlags = RF_Public | RF_Standalone;
+    return UPackage::SavePackage(O->GetOutermost(), O, *File, Args);
+}
+}
+UDasNativeDefaultsCommandlet::UDasNativeDefaultsCommandlet()
+{
+    IsEditor = true;
+    IsClient = false;
+    IsServer = false;
+    LogToConsole = true;
+}
+int32 UDasNativeDefaultsCommandlet::Main(const FString& Params)
+{
+    FString Id, Phase;
+    FParse::Value(*Params, TEXT("ProbeId="), Id);
+    FParse::Value(*Params, TEXT("Phase="), Phase);
+    FGuid Guid;
+    if (!FGuid::ParseExact(Id, EGuidFormats::Digits, Guid))
+        return 1;
+    FEditorScriptExecutionGuard Guard;
+    auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    FString Error;
+    const FString Root = TEXT("/Game/DasNativeDefaults/")+ Id, Path = R.ScriptPath(TEXT("dsl_native_defaults.das"));
+    FString Final;
+    if (!FFileHelper::LoadFileToString(Final, *Path))
+        return 1;
+    auto Write = [](const FString& P, const FString& S)
+    {
+        return FFileHelper::SaveStringToFile(S, *P, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+    };
+    ON_SCOPE_EXIT
+    {
+        Write(Path, Final);
+    };
+    auto Check = [&](bool Good, const TCHAR* Name)
+    {
+        UE_LOG(LogTemp, Display, TEXT("DAS_NATIVE_DEFAULTS %s %s %s"), Good ? TEXT("PASS"): TEXT("FAIL"), Name, *Error);
+        return Good;
+    };
+    UBlueprint* BP = nullptr;
+    UBlueprint* Child = nullptr;
+    UBlueprint* ComputedChild = nullptr;
+    UWorld* W = nullptr;
+    ADasProbeActor* A = nullptr;
+    ADasProbeActor* Manual = nullptr;
+    ON_SCOPE_EXIT
+    {
+        if (W)
+        {
+            for (const auto& Actor : W->PersistentLevel->Actors)
+                if (IsValid(Actor))
+                    R.ReleaseObject(Actor);
+            if (W->IsInitialized())
+                W->DestroyWorld(false);
+        }
+    };
+    auto LoadBP = [&](const TCHAR* Name)
+    {
+        return LoadObject<UBlueprint>(nullptr, *(Root + TEXT("/")+ Name + TEXT(".")+ Name));
+    };
+    if (Phase == TEXT("Create"))
+    {
+        FDasAuthoringModule Model;
+        if (!Check(R.ReadAuthoringScript(Path, Model, Error) && Model.Classes[0].Properties.Num() == 1 &&
+                       Model.Classes[0].NativeDefaults.Num() == 2,
+                   TEXT("separate_IR_without_native_redeclaration")))
+            return 1;
+        const FString Old = Final.Replace(
+            TEXT("10.0f*3.0f"), TEXT("10.0f*2.0f")).Replace(TEXT("1.0lf,4.0lf,5.0lf"), TEXT("1.0lf,2.0lf,3.0lf"));
+        if (!Write(Path, Old))
+            return 1;
+        if (!Check(FDasDSLService::Apply(TEXT("dsl_native_defaults.das"),
+                                              Root + TEXT("/BP_NativeDefaults"),
+                                                          TEXT("nativedefaults.NativeDefaults"), BP, Error),
+                                                  TEXT("initial_native_defaults_import")))
+            return 1;
+        FKismetEditorUtilities::CompileBlueprint(BP);
+        if (!Check(FDasDSLService::Apply(TEXT("dsl_native_defaults_child.das"),
+                Root + TEXT("/BP_NativeDefaultsChild"), TEXT("nativedefaults.NativeDefaultsChild"), Child, Error) &&
+                            FDasDSLService::Apply(TEXT("dsl_native_defaults_child.das"),
+                                                       Root + TEXT("/BP_NativeDefaultsComputedChild"),
+                                                                   TEXT("nativedefaults.NativeDefaultsComputedChild"),
+                                                                        ComputedChild, Error),
+                                                           TEXT("inherited_native_defaults_and_source_computation")))
+            return 1;
+        auto* CDO = BP->GeneratedClass->GetDefaultObject();
+        if (!Check(Life(CDO) == 20 && Life(ComputedChild->GeneratedClass->GetDefaultObject()) == 21 &&
+                       NativeRoot(CDO)->GetRelativeScale3D() == FVector(1, 2, 3) && BP->NewVariables.Num() == 1 &&
+                       Child->NewVariables.IsEmpty(),
+                   TEXT("native_layout_and_parent_CDO_isolation")))
+            return 1;
+        NativeRoot(CDO)->SetRelativeScale3D(FVector(99, 2, 3));
+        FindFProperty<FBoolProperty>(CDO->GetClass(), TEXT("bHidden"))->SetPropertyValue_InContainer(CDO, true);
+        W = UWorld::CreateWorld(EWorldType::Editor, false, TEXT("Map"), CreatePackage(*(Root + TEXT("/Map"))));
+        if (!W)
+            return 1;
+        W->SetFlags(RF_Public | RF_Standalone);
+        W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
+        A = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        Manual = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        if (!A || !Manual)
+            return 1;
+        A->Tags.Add(TEXT("NativeDefault"));
+        Manual->Tags.Add(TEXT("NativeManual"));
+        LifeSet(Manual, 77);
+        NativeRoot(Manual)->SetRelativeScale3D(FVector(99, 88, 3));
+        if (!Check(NativeRead(A) == 7 && A->LastDasError.IsEmpty(),
+                   TEXT("runtime_validates_native_source_with_manual_CDO")))
+            return 1;
+        const auto* Class = BP->GeneratedClass.Get();
+        if (!Write(Path, Final))
+            return 1;
 #if WITH_DEV_AUTOMATION_TESTS
-  for(int32 Stage:{1,2}){DasFailDefaultsMergeForTesting(Stage);const bool Changed=FDasDSLService::Reimport(BP,Error);DasFailDefaultsMergeForTesting(0);if(!Check(!Changed && Error.Contains(TEXT("rolled back")) && Life(CDO)==20 && NativeRoot(CDO)->GetRelativeScale3D()==FVector(99,2,3),TEXT("native_values_and_metadata_rollback")))return 1;}
+        for (int32 Stage : {1, 2})
+        {
+            DasFailDefaultsMergeForTesting(Stage);
+            const bool Changed = FDasDSLService::Reimport(BP, Error);
+            DasFailDefaultsMergeForTesting(0);
+            if (!Check(!Changed && Error.Contains(TEXT("rolled back")) && Life(CDO) == 20 &&
+                                                  NativeRoot(CDO)->GetRelativeScale3D() == FVector(99, 2, 3),
+                                                  TEXT("native_values_and_metadata_rollback")))
+                return 1;
+        }
 #endif
-  if(!Check(FDasDSLService::Reimport(BP,Error) && BP->GeneratedClass.Get()==Class && Life(CDO)==30 && Life(A)==30 && Life(Manual)==77 && NativeRoot(CDO)->GetRelativeScale3D()==FVector(99,4,5) && NativeRoot(Manual)->GetRelativeScale3D()==FVector(99,88,5),TEXT("native_three_way_merge_without_reinstance")))return 1;
-  if(!Check(Life(Child->GeneratedClass->GetDefaultObject())==20 && NativeRoot(Child->GeneratedClass->GetDefaultObject())->GetRelativeScale3D()==FVector(1,2,3),TEXT("explicit_child_native_defaults_block_parent_propagation")))return 1;
-  if(!Check(FDasDSLService::Reimport(Child,Error) && FDasDSLService::Reimport(ComputedChild,Error) && Life(ComputedChild->GeneratedClass->GetDefaultObject())==31,TEXT("refresh_child_native_source_contracts")))return 1;
-  const FString Removed=Final.Replace(TEXT("self.InitialLifeSpan=10.0f*3.0f"),TEXT(""));if(!Write(Path,Removed) || !Check(FDasDSLService::Reimport(BP,Error) && Life(CDO)==0 && Life(Manual)==77,TEXT("removed_native_default_returns_to_parent")))return 1;if(!Write(Path,Final) || !Check(FDasDSLService::Reimport(BP,Error) && Life(CDO)==30,TEXT("restore_native_default")))return 1;
-  const FString BadScript=TEXT("native_bad_")+Id+TEXT(".das"),BadPath=R.ScriptPath(BadScript);ON_SCOPE_EXIT{IFileManager::Get().Delete(*BadPath);};
-  for(const auto* Case:{TEXT("unknown"),TEXT("private"),TEXT("type"),TEXT("subobject"),TEXT("duplicate"),TEXT("case")}){FString Bad=Final;if(FString(Case)==TEXT("unknown"))Bad.ReplaceInline(TEXT("self.InitialLifeSpan="),TEXT("self.MissingNative="));if(FString(Case)==TEXT("private"))Bad.ReplaceInline(TEXT("self.InitialLifeSpan=10.0f*3.0f"),TEXT("self.AuthoredTypeId=\"bad\""));if(FString(Case)==TEXT("type"))Bad.ReplaceInline(TEXT("self.InitialLifeSpan=10.0f*3.0f"),TEXT("self.InitialLifeSpan=true"));if(FString(Case)==TEXT("subobject"))Bad.ReplaceInline(TEXT("self.RootComponent."),TEXT("self.Owner."));if(FString(Case)==TEXT("case"))Bad.ReplaceInline(TEXT("self.InitialLifeSpan="),TEXT("self.initiallifespan="));if(FString(Case)==TEXT("duplicate"))Bad.ReplaceInline(TEXT("self.bHidden=(1==2)"),TEXT("self.InitialLifeSpan=1.0f"));if(!Write(BadPath,Bad) || !Check(!R.ReadAuthoringScript(BadPath,Model,Error),Case))return 1;UBlueprint* Rejected=nullptr;const FString Package=Root+TEXT("/BP_Bad_")+Case;if(!Check(!FDasDSLService::Apply(BadScript,Package,TEXT("nativedefaults.NativeDefaults"),Rejected,Error) && !FindPackage(nullptr,*Package),TEXT("reject_before_asset_creation")))return 1;}
-  UBlueprint* ComponentBP=nullptr;if(!Check(FDasDSLService::Apply(TEXT("dsl_native_defaults_component.das"),Root+TEXT("/BP_NativeDefaultsComponent"),TEXT("nativedefaults.NativeDefaultsComponent"),ComponentBP,Error),TEXT("native_ActorComponent_defaults")))return 1;auto* Component=NewObject<UDasScriptComponent>(A,ComponentBP->GeneratedClass);A->AddInstanceComponent(Component);Component->RegisterComponent();Component->ComponentTags.Add(TEXT("NativeComponent"));if(!Check(!Component->bAutoActivate && NativeRead(Component)==1 && Component->LastDasError.IsEmpty(),TEXT("component_runtime_native_owner")))return 1;R.ReleaseObject(Component);
-  auto* ChildActor=W->SpawnActor<ADasProbeActor>(Child->GeneratedClass);ChildActor->Tags.Add(TEXT("NativeChild"));auto* ComputedActor=W->SpawnActor<ADasProbeActor>(ComputedChild->GeneratedClass);ComputedActor->Tags.Add(TEXT("NativeComputedChild"));
-  {const bool Previous=SetDasNativeArraySelfProbeEnabled(true);ON_SCOPE_EXIT{SetDasNativeArraySelfProbeEnabled(Previous);};UBlueprint* ArrayBP=nullptr;if(!Check(FDasDSLService::Apply(TEXT("dsl_native_array_self.das"),Root+TEXT("/BP_NativeArrays"),TEXT("nativearrays.NativeArraySelf"),ArrayBP,Error) && ArrayBP->NewVariables.IsEmpty(),TEXT("native_value_array_import_no_authored_fields")))return 1;auto* ArrayActor=W->SpawnActor<ADasProbeActor>(ArrayBP->GeneratedClass);if(!ArrayActor)return 1;ArrayActor->Tags.Add(TEXT("NativeValueArrays"));if(!NativeSave(ArrayBP))return 1;
-   FString Source;if(!FFileHelper::LoadFileToString(Source,*R.ScriptPath(TEXT("dsl_native_array_self.das"))))return 1;const FString NegativePath=R.ScriptPath(TEXT("native_value_array_bad_")+Id+TEXT(".das"));ON_SCOPE_EXIT{IFileManager::Get().Delete(*NegativePath);};FDasAuthoringModule ArrayRejectedModel;
-   for(const auto* Body:{TEXT("push(self.DasNativeArrayEnums,1)"),TEXT("push(self.DasNativeArrayEnums,NativeMobility.Movable)"),TEXT("push(self.DasNativeArrayVectors,ue_rotator(1.0lf,2.0lf,3.0lf))"),TEXT("clear(self.DasNativeArrayReadonly)"),TEXT("clear(self.DasNativeArrayReadonlyMap)"),TEXT("clear(self.DasNativeArrayReadonlySet)"),TEXT("clear(self.DasNativeArrayReadonlyObjects)"),TEXT("push(self.DasNativeArrayPawns,ue_ref(type<ActorRef>,ue_self_object()))"),TEXT("self.DasNativeArrayIntMap[\"bad\"]=1"),TEXT("self.DasNativeArrayIntMap[1]=true"),TEXT("insert(self.DasNativeArrayIntSet,\"bad\")"),TEXT("insert(self.DasNativeArrayNameSet,\"bad\")"),TEXT("self.DasNativeArrayNameKeys[1]=1"),TEXT("clear(self.DasNativeArrayReadonlyNameSet)"),TEXT("clear(self.DasNativeArrayReadonlyNameMap)"),TEXT("insert(self.DasNativeArrayEnumSet,1)"),TEXT("insert(self.DasNativeArrayEnumSet,NativeMobility.Movable)"),TEXT("clear(self.DasNativeArrayReadonlyEnumSet)"),TEXT("self.DasNativeArrayEnumKeys[1]=7"),TEXT("self.DasNativeArrayEnumKeys[NativeMobility.Movable]=7"),TEXT("clear(self.DasNativeArrayLockedEnumKeys)"),TEXT("insert(self.DasNativeArrayActorSet,ue_ref(type<ActorRef>,ue_self_object()))"),TEXT("insert(self.DasNativeArrayActorSet,ue_key(self.DasNativeArrayPawns[0]))"),TEXT("clear(self.DasNativeArrayReadonlyActorSet)"),TEXT("clear(self.DasNativeArrayReadonlyObjectKeys)")}){const FString Bad=Source.Replace(TEXT("clear(self.DasNativeArrayEnums)"),Body);if(!Write(NegativePath,Bad) || !Check(!R.ReadAuthoringScript(NegativePath,ArrayRejectedModel,Error),TEXT("native_value_array_type_readonly_rejection")))return 1;}
-  }
-  if(!NativeSave(ComponentBP) || !NativeSave(BP) || !NativeSave(Child) || !NativeSave(ComputedChild) || !NativeSave(W))return 1;
- }else{BP=LoadBP(TEXT("BP_NativeDefaults"));Child=LoadBP(TEXT("BP_NativeDefaultsChild"));ComputedChild=LoadBP(TEXT("BP_NativeDefaultsComputedChild"));W=LoadObject<UWorld>(nullptr,*(Root+TEXT("/Map.Map")));if(!BP || !W)return 1;W->WorldType=EWorldType::Editor;if(!W->IsInitialized())W->InitWorld();W->UpdateWorldComponents(true,false);for(const auto& Actor:W->PersistentLevel->Actors)if(auto* P=Cast<ADasProbeActor>(Actor)){if(P->Tags.Contains(TEXT("NativeDefault")))A=P;if(P->Tags.Contains(TEXT("NativeManual")))Manual=P;}}
- if(!A || !Manual)return 1;
- if(Phase==TEXT("Recompile")){for(const auto& Actor:W->PersistentLevel->Actors)if(IsValid(Actor))R.ReleaseObject(Actor);FKismetEditorUtilities::CompileBlueprint(BP);auto* Fresh=W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);if(!Check(Fresh && Life(Fresh)==30 && NativeRoot(Fresh)->GetRelativeScale3D()==FVector(99,4,5) && NativeRead(Fresh)==7,TEXT("native_defaults_survive_Blueprint_recompile")))return 1;R.ReleaseObject(Fresh);Fresh->Destroy();A=nullptr;Manual=nullptr;for(const auto& Actor:W->PersistentLevel->Actors)if(auto* P=Cast<ADasProbeActor>(Actor)){if(P->Tags.Contains(TEXT("NativeDefault")))A=P;if(P->Tags.Contains(TEXT("NativeManual")))Manual=P;}}
- if(!Check(A && Manual && Life(BP->GeneratedClass->GetDefaultObject())==30 && Life(A)==30 && Life(Manual)==77 && NativeRead(A)==7 && A->LastDasError.IsEmpty(),TEXT("saved_native_defaults_and_runtime")))return 1;
- FString NativeReport;if(!Check(RunDasNativeDefaultsProbe(W,NativeReport),TEXT("native_self_runtime_probe"))){UE_LOG(LogTemp,Error,TEXT("%s"),*NativeReport);return 1;}UE_LOG(LogTemp,Display,TEXT("%s"),*NativeReport);
- if(Phase==TEXT("Create")){
-  FDasAuthoringModule Rejected;const FString BadPath=R.ScriptPath(TEXT("native_self_bad_")+Id+TEXT(".das"));ON_SCOPE_EXIT{IFileManager::Get().Delete(*BadPath);};
-  if(!Write(BadPath,Final) || !Check(R.ReadAuthoringScript(BadPath,Rejected,Error),TEXT("native_method_negative_fixture_control")))return 1;
-  FDasReflectedTypes Collected;const FString TypeOnly=Final+TEXT("\n[ue_enum(module_id=\"nativedefaults\",BlueprintType)]\nenum NativeArrayMode { Value=1 }\n");if(!Write(BadPath,TypeOnly) || !Check(R.ReadReflectedTypes(BadPath,Collected,Error) && Collected.Enums.Num()==1,TEXT("native_array_declaration_collection")))return 1;
-  const TArray<FString> Bodies={TEXT("self.InitialLifeSpan=1.0f;return input"),TEXT("self.bHidden=false;return input"),TEXT("return self.initiallifespan"),TEXT("self.CustomTimeDilation=input;return self.customtimedilation"),TEXT("self.AuthoredTypeId=\"bad\";return input"),TEXT("self.CustomTimeDilation=true;return input"),TEXT("return self.Tags"),TEXT("self.NetUpdateFrequency=input;return input"),TEXT("self.RootComponent=ue_null_object();return input")};
-  for(const auto& Body:Bodies){const FString Bad=Final.Replace(TEXT("return self.ChangeNativeHelper(input)"),*Body);if(!Write(BadPath,Bad) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error),TEXT("invalid_native_method_rejected")))return 1;}
-  for(const auto* Body:{TEXT("self.Instigator=self.Owner;return input"),TEXT("self.Owner=self.Owner;return input"),TEXT("self.Instigator=ue_null_object();return input"),TEXT("self.Instigator=self.RootComponent;return input")}){const FString Bad=Final.Replace(TEXT("return self.ChangeNativeHelper(input)"),Body);if(!Write(BadPath,Bad) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error),*FString::Printf(TEXT("wrong_nominal_native_reference_rejected (%s)"),Body)))return 1;}
-  // Missing/duplicate/non-visible wrappers must not change the meaning of a native field.
-  const FString Minimal=TEXT("options gen2\nrequire ue_dsl\n[ue_class(Blueprintable)]\nclass MissingRef : Actor { [ue_function(BlueprintPure)] def const HasRoot():bool { return ue_object_valid(self.RootComponent) } }\n");
-  if(!Write(BadPath,Minimal) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error) && Error.Contains(TEXT("Missing native self reference wrapper")),TEXT("missing_native_reference_wrapper_diagnostic")))return 1;
-  const FString Duplicate=Final.Replace(TEXT("[ue_class(module_id="),TEXT("[ue_native_object(path=\"/Script/Engine.SceneComponent\")]\nstruct DuplicateSceneRef { handle:UObjectHandle }\n[ue_class(module_id="));
-  if(!Write(BadPath,Duplicate) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error) && Error.Contains(TEXT("Ambiguous native self reference wrapper")),TEXT("ambiguous_native_reference_wrapper_diagnostic")))return 1;
-  for(const auto* Body:{TEXT("push(self.Tags,123);return input"),TEXT("self.Tags[0]=123;return input"),TEXT("self.Tags := input;return input")}){const FString Bad=Final.Replace(TEXT("return self.ChangeNativeHelper(input)"),Body);if(!Write(BadPath,Bad) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error),TEXT("wrong_native_array_type_rejected")))return 1;}
-  for(const auto* Body:{TEXT("self.SpawnCollisionHandlingMethod=1;return input"),TEXT("self.SpawnCollisionHandlingMethod=ue_enum_from_number(\"/Script/Engine.ESpawnActorCollisionHandlingMethod\",1);return input"),TEXT("self.RootComponent.RelativeLocation=ue_vector(0.0lf,0.0lf,0.0lf);return input"),TEXT("self.RootComponent.RelativeScale3D.x=2.0lf;return input"),TEXT("self.ActorTransform=ue_vector(0.0lf,0.0lf,0.0lf);return input"),TEXT("self.ActorTransform.translation=ue_vector(0.0lf,0.0lf,0.0lf);return input"),TEXT("return self.ReplicatedMovement")}){const FString Bad=Final.Replace(TEXT("return self.ChangeNativeHelper(input)"),Body);if(!Write(BadPath,Bad) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error),TEXT("native_enum_struct_invalid_write_rejected")))return 1;}
-  const FString MissingEnum=TEXT("options gen2\nrequire ue_dsl\n[ue_class(Blueprintable)]\nclass MissingEnum : Actor { [ue_function(BlueprintPure)] def const Mode():int { return int(self.SpawnCollisionHandlingMethod) } }\n");if(!Write(BadPath,MissingEnum) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error) && Error.Contains(TEXT("Missing ue_native_enum")),TEXT("missing_native_enum_diagnostic")))return 1;
-  const FString EnumDecl=TEXT("[ue_native_enum(path=\"/Script/Engine.ESpawnActorCollisionHandlingMethod\")]\nenum AnotherCollision {\nUndefined=0\nAlwaysSpawn=1\nAdjustIfPossibleButAlwaysSpawn=2\nAdjustIfPossibleButDontSpawnIfColliding=3\nDontSpawnIfColliding=4\n}\n");
-  const FString EnumControl=TEXT("options gen2\nrequire ue_dsl\n")+EnumDecl+TEXT("[ue_class(Blueprintable)]\nclass EnumControlActor : Actor { [ue_function(BlueprintPure)] def const Read():int { return 1 } }\n");if(!Write(BadPath,EnumControl) || !Check(R.ReadAuthoringScript(BadPath,Rejected,Error),TEXT("native_enum_declaration_control")))return 1;
-  for(const auto* Case:{TEXT("name"),TEXT("number"),TEXT("missing")}){FString Bad=EnumControl;if(FString(Case)==TEXT("name"))Bad.ReplaceInline(TEXT("AlwaysSpawn=1"),TEXT("WrongName=1"));if(FString(Case)==TEXT("number"))Bad.ReplaceInline(TEXT("AlwaysSpawn=1"),TEXT("AlwaysSpawn=9"));if(FString(Case)==TEXT("missing"))Bad.ReplaceInline(TEXT("DontSpawnIfColliding=4"),TEXT(""));if(!Write(BadPath,Bad) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error),TEXT("native_enum_declaration_mismatch_rejected")))return 1;}
-  const FString AmbiguousEnum=Final.Replace(TEXT("[ue_class(module_id="),*(EnumDecl+TEXT("[ue_class(module_id=")));if(!Write(BadPath,AmbiguousEnum) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error) && Error.Contains(TEXT("Ambiguous native self enum")),TEXT("ambiguous_native_enum_rejected")))return 1;
-  const FString WrongEnum=Final.Replace(TEXT("return self.ChangeNativeHelper(input)"),TEXT("self.SpawnCollisionHandlingMethod=WrongCollision.Value;return input"))+TEXT("\nenum WrongCollision { Value=1 }\n");if(!Write(BadPath,WrongEnum) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error),TEXT("wrong_nominal_native_enum_rejected")))return 1;
-  const FString BadTransformConst=Final.Replace(TEXT("return self.InitialLifeSpan }"),TEXT("self.ActorTransform=self.ActorTransform;return self.InitialLifeSpan }"));if(!Write(BadPath,BadTransformConst) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error) && Error.Contains(TEXT("Const")),TEXT("const_native_transform_mutation_rejected")))return 1;
-  const FString BadArrayConst=Final.Replace(TEXT("return self.InitialLifeSpan }"),TEXT("push(self.Tags,ue_name_value(\"Forbidden\"));return self.InitialLifeSpan }"));if(!Write(BadPath,BadArrayConst) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error) && Error.Contains(TEXT("Const")),TEXT("const_native_array_mutation_rejected")))return 1;
-  const FString BadConst=Final.Replace(TEXT("return self.InitialLifeSpan }"),TEXT("self.CustomTimeDilation=1.0f;return self.InitialLifeSpan }"));if(!Write(BadPath,BadConst) || !Check(!R.ReadAuthoringScript(BadPath,Rejected,Error),TEXT("const_native_write_rejected")))return 1;
- }
- UE_LOG(LogTemp,Display,TEXT("DAS_NATIVE_DEFAULTS_RESULT=PASS phase=%s"),*Phase);return 0;
+        if (!Check(FDasDSLService::Reimport(BP, Error) && BP->GeneratedClass.Get() == Class && Life(CDO) == 30 &&
+                       Life(A) == 30 && Life(Manual) == 77 &&
+                       NativeRoot(CDO)->GetRelativeScale3D() == FVector(99, 4, 5) &&
+                       NativeRoot(Manual)->GetRelativeScale3D() == FVector(99, 88, 5),
+                   TEXT("native_three_way_merge_without_reinstance")))
+            return 1;
+        if (!Check(Life(Child->GeneratedClass->GetDefaultObject()) == 20 &&
+                       NativeRoot(Child->GeneratedClass->GetDefaultObject())->GetRelativeScale3D() == FVector(1, 2, 3),
+                   TEXT("explicit_child_native_defaults_block_parent_propagation")))
+            return 1;
+        if (!Check(FDasDSLService::Reimport(Child, Error) && FDasDSLService::Reimport(ComputedChild, Error) &&
+                       Life(ComputedChild->GeneratedClass->GetDefaultObject()) == 31,
+                   TEXT("refresh_child_native_source_contracts")))
+            return 1;
+        const FString Removed = Final.Replace(TEXT("self.InitialLifeSpan=10.0f*3.0f"), TEXT(""));
+        if (!Write(Path, Removed) || !Check(FDasDSLService::Reimport(BP, Error) && Life(CDO) == 0 && Life(Manual) == 77,
+                                            TEXT("removed_native_default_returns_to_parent")))
+            return 1;
+        if (!Write(Path, Final) ||
+            !Check(FDasDSLService::Reimport(BP, Error) && Life(CDO) == 30, TEXT("restore_native_default")))
+            return 1;
+        const FString BadScript = TEXT("native_bad_")+ Id + TEXT(".das"), BadPath = R.ScriptPath(BadScript);
+        ON_SCOPE_EXIT
+        {
+            IFileManager::Get().Delete(*BadPath);
+        };
+        for (const auto* Case :
+             {TEXT("unknown"), TEXT("private"), TEXT("type"), TEXT("subobject"), TEXT("duplicate"), TEXT("case")})
+        {
+            FString Bad = Final;
+            if (FString(Case) == TEXT("unknown"))
+                Bad.ReplaceInline(TEXT("self.InitialLifeSpan="), TEXT("self.MissingNative="));
+            if (FString(Case) == TEXT("private"))
+                Bad.ReplaceInline(TEXT("self.InitialLifeSpan=10.0f*3.0f"), TEXT("self.AuthoredTypeId=\"bad\""));
+            if (FString(Case) == TEXT("type"))
+                Bad.ReplaceInline(TEXT("self.InitialLifeSpan=10.0f*3.0f"), TEXT("self.InitialLifeSpan=true"));
+            if (FString(Case) == TEXT("subobject"))
+                Bad.ReplaceInline(TEXT("self.RootComponent."), TEXT("self.Owner."));
+            if (FString(Case) == TEXT("case"))
+                Bad.ReplaceInline(TEXT("self.InitialLifeSpan="), TEXT("self.initiallifespan="));
+            if (FString(Case) == TEXT("duplicate"))
+                Bad.ReplaceInline(TEXT("self.bHidden=(1==2)"), TEXT("self.InitialLifeSpan=1.0f"));
+            if (!Write(BadPath, Bad) || !Check(!R.ReadAuthoringScript(BadPath, Model, Error), Case))
+                return 1;
+            UBlueprint* Rejected = nullptr;
+            const FString Package = Root + TEXT("/BP_Bad_")+ Case;
+            if (!Check(!FDasDSLService::Apply(BadScript, Package,
+                                              TEXT("nativedefaults.NativeDefaults"), Rejected, Error) &&
+                                              !FindPackage(nullptr, *Package),
+                                              TEXT("reject_before_asset_creation")))
+                return 1;
+        }
+        UBlueprint* ComponentBP = nullptr;
+        if (!Check(FDasDSLService::Apply(TEXT("dsl_native_defaults_component.das"),
+                                              Root + TEXT("/BP_NativeDefaultsComponent"),
+                                                          TEXT("nativedefaults.NativeDefaultsComponent"), ComponentBP,
+                                                               Error),
+                                                  TEXT("native_ActorComponent_defaults")))
+            return 1;
+        auto* Component = NewObject<UDasScriptComponent>(A, ComponentBP->GeneratedClass);
+        A->AddInstanceComponent(Component);
+        Component->RegisterComponent();
+        Component->ComponentTags.Add(TEXT("NativeComponent"));
+        if (!Check(!Component->bAutoActivate && NativeRead(Component) == 1 && Component->LastDasError.IsEmpty(),
+                   TEXT("component_runtime_native_owner")))
+            return 1;
+        R.ReleaseObject(Component);
+        auto* ChildActor = W->SpawnActor<ADasProbeActor>(Child->GeneratedClass);
+        ChildActor->Tags.Add(TEXT("NativeChild"));
+        auto* ComputedActor = W->SpawnActor<ADasProbeActor>(ComputedChild->GeneratedClass);
+        ComputedActor->Tags.Add(TEXT("NativeComputedChild"));
+        {
+            const bool Previous = SetDasNativeArraySelfProbeEnabled(true);
+            ON_SCOPE_EXIT
+            {
+                SetDasNativeArraySelfProbeEnabled(Previous);
+            };
+            UBlueprint* ArrayBP = nullptr;
+            if (!Check(FDasDSLService::Apply(TEXT("dsl_native_array_self.das"),
+                                                  Root + TEXT("/BP_NativeArrays"),
+                                                              TEXT("nativearrays.NativeArraySelf"), ArrayBP, Error) &&
+                                                              ArrayBP->NewVariables.IsEmpty(),
+                                                      TEXT("native_value_array_import_no_authored_fields")))
+                return 1;
+            auto* ArrayActor = W->SpawnActor<ADasProbeActor>(ArrayBP->GeneratedClass);
+            if (!ArrayActor)
+                return 1;
+            ArrayActor->Tags.Add(TEXT("NativeValueArrays"));
+            if (!NativeSave(ArrayBP))
+                return 1;
+            FString Source;
+            if (!FFileHelper::LoadFileToString(Source, *R.ScriptPath(TEXT("dsl_native_array_self.das"))))
+                return 1;
+            const FString NegativePath = R.ScriptPath(TEXT("native_value_array_bad_")+ Id + TEXT(".das"));
+            ON_SCOPE_EXIT
+            {
+                IFileManager::Get().Delete(*NegativePath);
+            };
+            FDasAuthoringModule ArrayRejectedModel;
+            for (
+                const auto* Body : {TEXT("push(self.DasNativeArrayEnums,1)"),
+                    TEXT("push(self.DasNativeArrayEnums,NativeMobility.Movable)"),
+                        TEXT("push(self.DasNativeArrayVectors,ue_rotator(1.0lf,2.0lf,3.0lf))"),
+                            TEXT("clear(self.DasNativeArrayReadonly)"),
+                                TEXT("clear(self.DasNativeArrayReadonlyMap)"),
+                                    TEXT("clear(self.DasNativeArrayReadonlySet)"),
+                                        TEXT("clear(self.DasNativeArrayReadonlyObjects)"),
+                                            TEXT("push(self.DasNativeArrayPawns,ue_ref(type<ActorRef>,ue_self_object()))"),
+                                                TEXT("self.DasNativeArrayIntMap[\"bad\"]=1"),
+                                                    TEXT("self.DasNativeArrayIntMap[1]=true"),
+                                                        TEXT("insert(self.DasNativeArrayIntSet,\"bad\")"),
+                                                            TEXT("insert(self.DasNativeArrayNameSet,\"bad\")"),
+                                                                TEXT("self.DasNativeArrayNameKeys[1]=1"),
+                                                                    TEXT("clear(self.DasNativeArrayReadonlyNameSet)"),
+                                                                        TEXT("clear(self.DasNativeArrayReadonlyNameMap)"),
+                                                                            TEXT("insert(self.DasNativeArrayEnumSet,1)"),
+                                                                                TEXT("insert(self.DasNativeArrayEnumSet,NativeMobility.Movable)"),
+                                                                                    TEXT("clear(self.DasNativeArrayReadonlyEnumSet)"),
+                                                                                        TEXT("self.DasNativeArrayEnumKeys[1]=7"),
+                                                                                            TEXT("self.DasNativeArrayEnumKeys[NativeMobility.Movable]=7"),
+                                                                                                TEXT("clear(self.DasNativeArrayLockedEnumKeys)"),
+                                                                                                    TEXT("insert(self.DasNativeArrayActorSet,ue_ref(type<ActorRef>,ue_self_object()))"),
+                                                                                                        TEXT("insert(self.DasNativeArrayActorSet,ue_key(self.DasNativeArrayPawns[0]))"),
+                                                                                                            TEXT("clear(self.DasNativeArrayReadonlyActorSet)"),
+                                                                                                                TEXT("clear(self.DasNativeArrayReadonlyObjectKeys)")})
+            {
+                const FString Bad = Source.Replace(TEXT("clear(self.DasNativeArrayEnums)"), Body);
+                if (!Write(NegativePath, Bad) || !Check(!R.ReadAuthoringScript(NegativePath, ArrayRejectedModel, Error),
+                                                        TEXT("native_value_array_type_readonly_rejection")))
+                    return 1;
+            }
+        }
+        if (!NativeSave(ComponentBP) || !NativeSave(BP) || !NativeSave(Child) || !NativeSave(ComputedChild) ||
+            !NativeSave(W))
+            return 1;
+    }
+    else
+    {
+        BP = LoadBP(TEXT("BP_NativeDefaults"));
+        Child = LoadBP(TEXT("BP_NativeDefaultsChild"));
+        ComputedChild = LoadBP(TEXT("BP_NativeDefaultsComputedChild"));
+        W = LoadObject<UWorld>(nullptr, *(Root + TEXT("/Map.Map")));
+        if (!BP || !W)
+            return 1;
+        W->WorldType = EWorldType::Editor;
+        if (!W->IsInitialized())
+            W->InitWorld();
+        W->UpdateWorldComponents(true, false);
+        for (const auto& Actor : W->PersistentLevel->Actors)
+            if (auto* P = Cast<ADasProbeActor>(Actor))
+            {
+                if (P->Tags.Contains(TEXT("NativeDefault")))
+                    A = P;
+                if (P->Tags.Contains(TEXT("NativeManual")))
+                    Manual = P;
+            }
+    }
+    if (!A || !Manual)
+        return 1;
+    if (Phase == TEXT("Recompile"))
+    {
+        for (const auto& Actor : W->PersistentLevel->Actors)
+            if (IsValid(Actor))
+                R.ReleaseObject(Actor);
+        FKismetEditorUtilities::CompileBlueprint(BP);
+        auto* Fresh = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        if (!Check(Fresh && Life(Fresh) == 30 && NativeRoot(Fresh)->GetRelativeScale3D() == FVector(99, 4, 5) &&
+                       NativeRead(Fresh) == 7,
+                   TEXT("native_defaults_survive_Blueprint_recompile")))
+            return 1;
+        R.ReleaseObject(Fresh);
+        Fresh->Destroy();
+        A = nullptr;
+        Manual = nullptr;
+        for (const auto& Actor : W->PersistentLevel->Actors)
+            if (auto* P = Cast<ADasProbeActor>(Actor))
+            {
+                if (P->Tags.Contains(TEXT("NativeDefault")))
+                    A = P;
+                if (P->Tags.Contains(TEXT("NativeManual")))
+                    Manual = P;
+            }
+    }
+    if (!Check(A && Manual && Life(BP->GeneratedClass->GetDefaultObject()) == 30 && Life(A) == 30 &&
+                   Life(Manual) == 77 && NativeRead(A) == 7 && A->LastDasError.IsEmpty(),
+               TEXT("saved_native_defaults_and_runtime")))
+        return 1;
+    FString NativeReport;
+    if (!Check(RunDasNativeDefaultsProbe(W, NativeReport), TEXT("native_self_runtime_probe")))
+    {
+        UE_LOG(LogTemp, Error, TEXT("%s"), *NativeReport);
+        return 1;
+    }
+    UE_LOG(LogTemp, Display, TEXT("%s"), *NativeReport);
+    if (Phase == TEXT("Create"))
+    {
+        FDasAuthoringModule Rejected;
+        const FString BadPath = R.ScriptPath(TEXT("native_self_bad_")+ Id + TEXT(".das"));
+        ON_SCOPE_EXIT
+        {
+            IFileManager::Get().Delete(*BadPath);
+        };
+        if (!Write(BadPath, Final) ||
+            !Check(R.ReadAuthoringScript(BadPath, Rejected, Error), TEXT("native_method_negative_fixture_control")))
+            return 1;
+        FDasReflectedTypes Collected;
+        const FString TypeOnly =
+            Final + TEXT("\n[ue_enum(module_id=\"nativedefaults\",BlueprintType)]\nenum NativeArrayMode { Value=1 }\n");
+        if (!Write(BadPath, TypeOnly) ||
+            !Check(R.ReadReflectedTypes(BadPath, Collected, Error) && Collected.Enums.Num() == 1,
+                   TEXT("native_array_declaration_collection")))
+            return 1;
+        const TArray<FString> Bodies = {
+            TEXT("self.InitialLifeSpan=1.0f;return input"),
+                 TEXT("self.bHidden=false;return input"),
+                      TEXT("return self.initiallifespan"),
+                           TEXT("self.CustomTimeDilation=input;return self.customtimedilation"),
+                                TEXT("self.AuthoredTypeId=\"bad\";return input"),
+                                     TEXT("self.CustomTimeDilation=true;return input"),
+                                          TEXT("return self.Tags"),
+                                               TEXT("self.NetUpdateFrequency=input;return input"),
+                                                    TEXT("self.RootComponent=ue_null_object();return input")};
+        for (const auto& Body : Bodies)
+        {
+            const FString Bad = Final.Replace(TEXT("return self.ChangeNativeHelper(input)"), *Body);
+            if (!Write(BadPath, Bad) ||
+                !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error), TEXT("invalid_native_method_rejected")))
+                return 1;
+        }
+        for (const auto* Body : {TEXT("self.Instigator=self.Owner;return input"),
+                                      TEXT("self.Owner=self.Owner;return input"),
+                                           TEXT("self.Instigator=ue_null_object();return input"),
+                                                TEXT("self.Instigator=self.RootComponent;return input")})
+        {
+            const FString Bad = Final.Replace(TEXT("return self.ChangeNativeHelper(input)"), Body);
+            if (!Write(BadPath, Bad) ||
+                !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error),
+                       *FString::Printf(TEXT("wrong_nominal_native_reference_rejected (%s)"), Body)))
+                return 1;
+        }
+        // Missing/duplicate/non-visible wrappers must not change the meaning of a native field.
+        const FString Minimal = TEXT("options gen2\nrequire ue_dsl\n[ue_class(Blueprintable)]\nclass MissingRef : Actor { [ue_function(BlueprintPure)] def const HasRoot():bool { return ue_object_valid(self.RootComponent) } }\n");
+        if (!Write(BadPath, Minimal) || !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error) &&
+                                               Error.Contains(TEXT("Missing native self reference wrapper")),
+                                                              TEXT("missing_native_reference_wrapper_diagnostic")))
+            return 1;
+        const FString Duplicate = Final.Replace(TEXT("[ue_class(module_id="),
+            TEXT("[ue_native_object(path=\"/Script/Engine.SceneComponent\")]\nstruct DuplicateSceneRef { handle:UObjectHandle }\n[ue_class(module_id="));
+        if (!Write(BadPath, Duplicate) || !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error) &&
+                                                 Error.Contains(TEXT("Ambiguous native self reference wrapper")),
+                                                                TEXT("ambiguous_native_reference_wrapper_diagnostic")))
+            return 1;
+        for (const auto* Body : {TEXT("push(self.Tags,123);return input"),
+                                      TEXT("self.Tags[0]=123;return input"), TEXT("self.Tags := input;return input")})
+        {
+            const FString Bad = Final.Replace(TEXT("return self.ChangeNativeHelper(input)"), Body);
+            if (!Write(BadPath, Bad) ||
+                !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error), TEXT("wrong_native_array_type_rejected")))
+                return 1;
+        }
+        for (
+            const auto* Body : {TEXT("self.SpawnCollisionHandlingMethod=1;return input"),
+                TEXT("self.SpawnCollisionHandlingMethod=ue_enum_from_number(\"/Script/Engine.ESpawnActorCollisionHandlingMethod\",1);return input"),
+                    TEXT("self.RootComponent.RelativeLocation=ue_vector(0.0lf,0.0lf,0.0lf);return input"),
+                         TEXT("self.RootComponent.RelativeScale3D.x=2.0lf;return input"),
+                              TEXT("self.ActorTransform=ue_vector(0.0lf,0.0lf,0.0lf);return input"),
+                                   TEXT("self.ActorTransform.translation=ue_vector(0.0lf,0.0lf,0.0lf);return input"),
+                                        TEXT("return self.ReplicatedMovement")})
+        {
+            const FString Bad = Final.Replace(TEXT("return self.ChangeNativeHelper(input)"), Body);
+            if (!Write(BadPath, Bad) || !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error),
+                                               TEXT("native_enum_struct_invalid_write_rejected")))
+                return 1;
+        }
+        const FString MissingEnum = TEXT("options gen2\nrequire ue_dsl\n[ue_class(Blueprintable)]\nclass MissingEnum : Actor { [ue_function(BlueprintPure)] def const Mode():int { return int(self.SpawnCollisionHandlingMethod) } }\n");
+        if (!Write(BadPath, MissingEnum) ||
+            !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error) &&
+                   Error.Contains(TEXT("Missing ue_native_enum")), TEXT("missing_native_enum_diagnostic")))
+            return 1;
+        const FString EnumDecl = TEXT("[ue_native_enum(path=\"/Script/Engine.ESpawnActorCollisionHandlingMethod\")]\nenum AnotherCollision {\nUndefined=0\nAlwaysSpawn=1\nAdjustIfPossibleButAlwaysSpawn=2\nAdjustIfPossibleButDontSpawnIfColliding=3\nDontSpawnIfColliding=4\n}\n");
+        const FString EnumControl = TEXT("options gen2\nrequire ue_dsl\n")+ EnumDecl +
+            TEXT("[ue_class(Blueprintable)]\nclass EnumControlActor : Actor { [ue_function(BlueprintPure)] def const Read():int { return 1 } }\n");
+        if (!Write(BadPath, EnumControl) ||
+            !Check(R.ReadAuthoringScript(BadPath, Rejected, Error), TEXT("native_enum_declaration_control")))
+            return 1;
+        for (const auto* Case : {TEXT("name"), TEXT("number"), TEXT("missing")})
+        {
+            FString Bad = EnumControl;
+            if (FString(Case) == TEXT("name"))
+                Bad.ReplaceInline(TEXT("AlwaysSpawn=1"), TEXT("WrongName=1"));
+            if (FString(Case) == TEXT("number"))
+                Bad.ReplaceInline(TEXT("AlwaysSpawn=1"), TEXT("AlwaysSpawn=9"));
+            if (FString(Case) == TEXT("missing"))
+                Bad.ReplaceInline(TEXT("DontSpawnIfColliding=4"), TEXT(""));
+            if (!Write(BadPath, Bad) || !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error),
+                                               TEXT("native_enum_declaration_mismatch_rejected")))
+                return 1;
+        }
+        const FString AmbiguousEnum =
+            Final.Replace(TEXT("[ue_class(module_id="), *(EnumDecl + TEXT("[ue_class(module_id=")));
+        if (!Write(BadPath, AmbiguousEnum) ||
+            !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error) &&
+                   Error.Contains(TEXT("Ambiguous native self enum")), TEXT("ambiguous_native_enum_rejected")))
+            return 1;
+        const FString WrongEnum =
+            Final.Replace(TEXT("return self.ChangeNativeHelper(input)"),
+                               TEXT("self.SpawnCollisionHandlingMethod=WrongCollision.Value;return input")) +
+                               TEXT("\nenum WrongCollision { Value=1 }\n");
+        if (!Write(BadPath, WrongEnum) ||
+            !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error), TEXT("wrong_nominal_native_enum_rejected")))
+            return 1;
+        const FString BadTransformConst =
+            Final.Replace(TEXT("return self.InitialLifeSpan }"),
+                               TEXT("self.ActorTransform=self.ActorTransform;return self.InitialLifeSpan }"));
+        if (!Write(BadPath, BadTransformConst) ||
+            !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error) &&
+                   Error.Contains(TEXT("Const")), TEXT("const_native_transform_mutation_rejected")))
+            return 1;
+        const FString BadArrayConst =
+            Final.Replace(TEXT("return self.InitialLifeSpan }"),
+                               TEXT("push(self.Tags,ue_name_value(\"Forbidden\"));return self.InitialLifeSpan }"));
+        if (!Write(BadPath, BadArrayConst) ||
+            !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error) &&
+                   Error.Contains(TEXT("Const")), TEXT("const_native_array_mutation_rejected")))
+            return 1;
+        const FString BadConst = Final.Replace(TEXT("return self.InitialLifeSpan }"),
+                                                    TEXT("self.CustomTimeDilation=1.0f;return self.InitialLifeSpan }"));
+        if (!Write(BadPath, BadConst) ||
+            !Check(!R.ReadAuthoringScript(BadPath, Rejected, Error), TEXT("const_native_write_rejected")))
+            return 1;
+    }
+    UE_LOG(LogTemp, Display, TEXT("DAS_NATIVE_DEFAULTS_RESULT=PASS phase=%s"), *Phase);
+    return 0;
 }

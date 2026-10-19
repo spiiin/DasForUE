@@ -3,19 +3,26 @@
 #include "DasScriptUserWidget.h"
 #include "DasWidgetAnimationCommandlet.generated.h"
 UCLASS()
-class UDasWidgetAnimationCommandlet:public UCommandlet {
- GENERATED_BODY()
+class UDasWidgetAnimationCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
 public:
- UDasWidgetAnimationCommandlet();virtual int32 Main(const FString& Params)override;
+    UDasWidgetAnimationCommandlet();
+    virtual int32 Main(const FString& Params) override;
 };
 
 // Test-only access to the real engine's protected animation tick and state.
 UCLASS()
-class UDasWidgetAnimationFixture:public UDasScriptUserWidget {
- GENERATED_BODY()
+class UDasWidgetAnimationFixture : public UDasScriptUserWidget
+{
+    GENERATED_BODY()
 public:
- using UUserWidget::GetAnimationState;
- using UUserWidget::TickActionsAndAnimation;
- UFUNCTION(BlueprintCallable)
- void ReconstructForAnimationTest(){NativeDestruct();NativeConstruct();}
+    using UUserWidget::GetAnimationState;
+    using UUserWidget::TickActionsAndAnimation;
+    UFUNCTION(BlueprintCallable)
+    void ReconstructForAnimationTest()
+    {
+        NativeDestruct();
+        NativeConstruct();
+    }
 };

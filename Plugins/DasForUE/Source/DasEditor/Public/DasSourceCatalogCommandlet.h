@@ -2,7 +2,8 @@
 #include "Commandlets/Commandlet.h"
 #include "DasSourceCatalogCommandlet.generated.h"
 UCLASS()
-class UDasSourceCatalogCommandlet : public UCommandlet {
+class UDasSourceCatalogCommandlet : public UCommandlet
+{
     GENERATED_BODY()
 public:
     UDasSourceCatalogCommandlet();

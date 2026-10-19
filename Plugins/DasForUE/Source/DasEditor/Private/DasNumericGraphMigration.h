@@ -3,11 +3,17 @@
 #include "EdGraph/EdGraphPin.h"
 #include "DasNumericLibrary.h"
 class UBlueprint;
-class FDasNumericGraphMigration {
- struct FImpl;TUniquePtr<FImpl> Impl;
+class FDasNumericGraphMigration
+{
+    struct FImpl;
+    TUniquePtr<FImpl> Impl;
+
 public:
- FDasNumericGraphMigration();~FDasNumericGraphMigration();
- bool Prepare(const TArray<UBlueprint*>& Blueprints,UClass* Root,const TMap<FName,FEdGraphPinType>& Types,EDasIntegerRule I,EDasFloatRule F,FString& Error,const TMap<UEdGraphPin*,FEdGraphPinType>& Pins={});
- bool Apply(FString& Error);
- bool Restore(FString& Error);
+    FDasNumericGraphMigration();
+    ~FDasNumericGraphMigration();
+    bool Prepare(const TArray<UBlueprint*>& Blueprints, UClass* Root, const TMap<FName, FEdGraphPinType>& Types,
+                 EDasIntegerRule I, EDasFloatRule F, FString& Error,
+                 const TMap<UEdGraphPin*, FEdGraphPinType>& Pins = {});
+    bool Apply(FString& Error);
+    bool Restore(FString& Error);
 };

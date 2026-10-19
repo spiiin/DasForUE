@@ -2,42 +2,314 @@
 #include "Dom/JsonObject.h"
 #include "Misc/Paths.h"
 #include "Serialization/JsonSerializer.h"
-namespace {
-bool CatalogIdentifier(const FString& S){if(S.IsEmpty() || S.Len()>=NAME_SIZE || FChar::IsDigit(S[0]))return false;for(TCHAR C:S)if(!(C>='a' && C<='z') && !(C>='A' && C<='Z') && !(C>='0' && C<='9') && C!='_')return false;return true;}
-bool CatalogId(const FString& S){if(S.IsEmpty() || S.Len()>256)return false;for(TCHAR C:S)if(!FChar::IsAlnum(C) && C!='_' && C!='.' && C!='-')return false;return true;}
-bool CatalogKeys(const TSharedPtr<FJsonObject>& J,std::initializer_list<const TCHAR*> Allowed){for(const auto& P:J->Values){bool Found=false;for(const auto* K:Allowed)Found|=P.Key==K;if(!Found)return false;}return true;}
-}
-bool FDasSourceCatalog::LocalFile(const FString& File,const FString& Extension){return !File.IsEmpty() && File.Len()<NAME_SIZE && FPaths::GetCleanFilename(File)==File && !File.Contains(TEXT(":")) && CatalogIdentifier(FPaths::GetBaseFilename(File)) && FPaths::GetExtension(File)==Extension;}
-bool FDasSourceCatalog::Validate(FString& Error)const{
-    Error.Reset();if((Entries.IsEmpty() && ValueModules.IsEmpty()) || Entries.Num()>1024 || ValueModules.Num()>256){Error=TEXT("Source catalog requires classes or value modules within limits");return false;}TSet<FString> Ids,Refs,Locations,InterfaceDeclarations;TMap<FString,FString> IdKinds;
-    for(const auto& E:Entries){const FString Location=(E.Script+TEXT("::")+E.Name).ToLower();if(!CatalogId(E.Id) || !CatalogIdentifier(E.Name) || !LocalFile(E.Script,TEXT("das")) || !CatalogIdentifier(E.Reference) || Ids.Contains(E.Id) || Refs.Contains(E.Reference.ToLower()) || Locations.Contains(Location)){Error=TEXT("Invalid/duplicate catalog class ID, reference name or source location: ")+E.Id;return false;}Ids.Add(E.Id);IdKinds.Add(E.Id,TEXT("class"));Refs.Add(E.Reference.ToLower());Locations.Add(Location);}
-    TSet<FString> Modules,Files;int32 TotalTypes=0;
-    for(const auto& M:ValueModules){if(!CatalogIdentifier(M.Module) || M.Module==TEXT("ue_dsl") || !LocalFile(M.Script,TEXT("das")) || FPaths::GetBaseFilename(M.Script)!=M.Module || Modules.Contains(M.Module.ToLower()) || Files.Contains(M.Script.ToLower()) || M.Types.IsEmpty()){Error=TEXT("Invalid/duplicate catalog value module: ")+M.Module;return false;}Modules.Add(M.Module.ToLower());Files.Add(M.Script.ToLower());TSet<FString> Names;
-        for(const auto& T:M.Types){const bool Interface=T.Kind==TEXT("interface") || T.Kind==TEXT("interface_ref");const FString LogicalKind=Interface?TEXT("interface"):T.Kind;if((!Interface && T.Kind!=TEXT("enum") && T.Kind!=TEXT("struct")) || !CatalogId(T.Id) || !CatalogIdentifier(T.Name) || (Ids.Contains(T.Id) && (!Interface || IdKinds.FindRef(T.Id)!=TEXT("interface"))) || (T.Kind==TEXT("interface") && InterfaceDeclarations.Contains(T.Id)) || Names.Contains(T.Name.ToLower()) || Refs.Contains(T.Name.ToLower()) || ++TotalTypes>1024){Error=TEXT("Invalid/duplicate catalog value type or reference-name collision: ")+T.Id;return false;}Ids.Add(T.Id);IdKinds.Add(T.Id,LogicalKind);if(T.Kind==TEXT("interface"))InterfaceDeclarations.Add(T.Id);Names.Add(T.Name.ToLower());}}
+namespace
+{
+bool CatalogIdentifier(const FString& S)
+{
+    if (S.IsEmpty() || S.Len() >= NAME_SIZE || FChar::IsDigit(S[0]))
+        return false;
+    for (TCHAR C : S)
+        if (!(C >= 'a' && C <= 'z') && !(C >= 'A' && C <= 'Z') && !(C >= '0' && C <= '9') && C != '_')
+            return false;
     return true;
 }
-bool FDasSourceCatalog::Resolve(const FString& Identity,FDasSourceCatalogEntry& Out,FString& Error)const{
-    if(!Validate(Error))return false;TArray<const FDasSourceCatalogEntry*> Matches;
-    for(const auto& E:Entries)if(E.Id==Identity || E.Name==Identity)Matches.Add(&E);
-    if(Matches.Num()!=1){Error=Matches.IsEmpty()?TEXT("Unknown catalog class: ")+Identity:TEXT("Ambiguous catalog class name; use stable ID: ")+Identity;return false;}Out=*Matches[0];return true;
+bool CatalogId(const FString& S)
+{
+    if (S.IsEmpty() || S.Len() > 256)
+        return false;
+    for (TCHAR C : S)
+        if (!FChar::IsAlnum(C) && C != '_' && C != '.' && C != '-')
+            return false;
+    return true;
 }
-bool FDasSourceCatalog::ToJson(FString& Out,FString& Error)const{
-    if(!Validate(Error))return false;auto Root=MakeShared<FJsonObject>();Root->SetNumberField(TEXT("schema_version"),3);auto Sorted=Entries;Sorted.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});TArray<TSharedPtr<FJsonValue>> Values;
-    for(const auto& E:Sorted){auto J=MakeShared<FJsonObject>();J->SetStringField(TEXT("id"),E.Id);J->SetStringField(TEXT("name"),E.Name);J->SetStringField(TEXT("script"),E.Script);J->SetStringField(TEXT("reference"),E.Reference);Values.Add(MakeShared<FJsonValueObject>(J));}Root->SetArrayField(TEXT("classes"),Values);auto Modules=ValueModules;Modules.Sort([](const auto& A,const auto& B){return A.Module<B.Module;});TArray<TSharedPtr<FJsonValue>> Imports;
-    for(auto M:Modules){auto J=MakeShared<FJsonObject>();J->SetStringField(TEXT("module"),M.Module);J->SetStringField(TEXT("script"),M.Script);M.Types.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});TArray<TSharedPtr<FJsonValue>> Types;for(const auto& T:M.Types){auto V=MakeShared<FJsonObject>();V->SetStringField(TEXT("kind"),T.Kind);V->SetStringField(TEXT("id"),T.Id);V->SetStringField(TEXT("name"),T.Name);Types.Add(MakeShared<FJsonValueObject>(V));}J->SetArrayField(TEXT("types"),Types);Imports.Add(MakeShared<FJsonValueObject>(J));}Root->SetArrayField(TEXT("value_modules"),Imports);FString Candidate;FJsonSerializer::Serialize(Root,TJsonWriterFactory<>::Create(&Candidate));Out=MoveTemp(Candidate);return true;
+bool CatalogKeys(const TSharedPtr<FJsonObject>& J, std::initializer_list<const TCHAR*> Allowed)
+{
+    for (const auto& P : J->Values)
+    {
+        bool Found = false;
+        for (const auto* K : Allowed)
+            Found |= P.Key == K;
+        if (!Found)
+            return false;
+    }
+    return true;
 }
-bool FDasSourceCatalog::FromJson(const FString& Wire,FDasSourceCatalog& Out,FString& Error){
-    Error.Reset();TSharedPtr<FJsonObject> Root;const TArray<TSharedPtr<FJsonValue>>* Values=nullptr;
-    if(Wire.Len()>1024*1024 || !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Wire),Root) || !Root || !Root->HasTypedField<EJson::Number>(TEXT("schema_version"))){Error=TEXT("Invalid source catalog JSON/version");return false;}
-    const double Version=Root->GetNumberField(TEXT("schema_version"));if((Version!=1 && Version!=2 && Version!=3) || !(Version==1?CatalogKeys(Root,{TEXT("schema_version"),TEXT("classes")}):CatalogKeys(Root,{TEXT("schema_version"),TEXT("classes"),TEXT("value_modules")})) || !Root->TryGetArrayField(TEXT("classes"),Values)){Error=TEXT("Invalid source catalog fields/version");return false;}
-    FDasSourceCatalog Candidate;for(const auto& V:*Values){const TSharedPtr<FJsonObject>* J=nullptr;FDasSourceCatalogEntry E;if(!V->TryGetObject(J) || !CatalogKeys(*J,{TEXT("id"),TEXT("name"),TEXT("script"),TEXT("reference")}) || !(*J)->TryGetStringField(TEXT("id"),E.Id) || !(*J)->TryGetStringField(TEXT("name"),E.Name) || !(*J)->TryGetStringField(TEXT("script"),E.Script) || !(*J)->TryGetStringField(TEXT("reference"),E.Reference)){Error=TEXT("Invalid source catalog class entry");return false;}Candidate.Entries.Add(MoveTemp(E));}
-    if(Version>=2){const TArray<TSharedPtr<FJsonValue>>* Imports=nullptr;if(!Root->TryGetArrayField(TEXT("value_modules"),Imports)){Error=TEXT("Missing catalog value modules");return false;}for(const auto& V:*Imports){const TSharedPtr<FJsonObject>* J=nullptr;FDasCatalogValueModule M;const TArray<TSharedPtr<FJsonValue>>* Types=nullptr;if(!V->TryGetObject(J) || !CatalogKeys(*J,{TEXT("module"),TEXT("script"),TEXT("types")}) || !(*J)->TryGetStringField(TEXT("module"),M.Module) || !(*J)->TryGetStringField(TEXT("script"),M.Script) || !(*J)->TryGetArrayField(TEXT("types"),Types)){Error=TEXT("Invalid catalog value module");return false;}for(const auto& X:*Types){const TSharedPtr<FJsonObject>* T=nullptr;FDasCatalogValueType E;if(!X->TryGetObject(T) || !CatalogKeys(*T,{TEXT("kind"),TEXT("id"),TEXT("name")}) || !(*T)->TryGetStringField(TEXT("kind"),E.Kind) || !(*T)->TryGetStringField(TEXT("id"),E.Id) || !(*T)->TryGetStringField(TEXT("name"),E.Name)){Error=TEXT("Invalid catalog value type");return false;}if(Version==2 && E.Kind!=TEXT("enum") && E.Kind!=TEXT("struct")){Error=TEXT("Interface inventory requires catalog version 3");return false;}M.Types.Add(MoveTemp(E));}Candidate.ValueModules.Add(MoveTemp(M));}}
-    if(!Candidate.Validate(Error))return false;Out=MoveTemp(Candidate);return true;
 }
-bool FDasSourceCatalog::ReferenceModule(const FString& Module,const FString& Catalog,FString& Out,FString& Error)const{
-    if(!Validate(Error))return false;if(!CatalogIdentifier(Module) || !LocalFile(Catalog,TEXT("json"))){Error=TEXT("Expected local catalog and DAS module identifier");return false;}
-    auto Sorted=Entries;Sorted.Sort([](const auto& A,const auto& B){return A.Id<B.Id;});FString Source=TEXT("// Generated from the explicit source catalog.\noptions gen2\nmodule ")+Module+TEXT(" public\nrequire ue_dsl public\n");
-    auto Imports=ValueModules;Imports.Sort([](const auto& A,const auto& B){return A.Module<B.Module;});TSet<FString> BoundInterfaces,ExportedNames;for(const auto& M:Imports)for(const auto& T:M.Types)if(T.Kind==TEXT("interface_ref"))BoundInterfaces.Add(T.Id);for(const auto& E:Entries)ExportedNames.Add(E.Reference.ToLower());
-    for(const auto& M:Imports){bool OnlyBoundDeclarations=!M.Types.IsEmpty();for(const auto& T:M.Types)OnlyBoundDeclarations &= T.Kind==TEXT("interface") && BoundInterfaces.Contains(T.Id);if(OnlyBoundDeclarations)continue;for(const auto& T:M.Types){const FString Name=T.Name.ToLower();if(ExportedNames.Contains(Name)){Error=TEXT("Conflicting publicly imported catalog type name: ")+T.Name;return false;}ExportedNames.Add(Name);}if(M.Module==Module || M.Script.Equals(Module+TEXT(".das"),ESearchCase::IgnoreCase)){Error=TEXT("Generated reference module would import itself");return false;}Source+=TEXT("require ")+M.Module+TEXT(" public\n");}
-    for(const auto& E:Sorted)Source+=TEXT("\n[ue_object_ref(type=\"")+E.Id+TEXT("\", catalog=\"")+Catalog+TEXT("\")]\nstruct ")+E.Reference+TEXT(" { handle:UObjectHandle }\n");Out=MoveTemp(Source);return true;
+bool FDasSourceCatalog::LocalFile(const FString& File, const FString& Extension)
+{
+    return !File.IsEmpty() && File.Len() < NAME_SIZE && FPaths::GetCleanFilename(File) == File &&
+           !File.Contains(TEXT(":")) && CatalogIdentifier(FPaths::GetBaseFilename(File)) &&
+                          FPaths::GetExtension(File) == Extension;
+}
+bool FDasSourceCatalog::Validate(FString& Error) const
+{
+    Error.Reset();
+    if ((Entries.IsEmpty() && ValueModules.IsEmpty()) || Entries.Num() > 1024 || ValueModules.Num() > 256)
+    {
+        Error = TEXT("Source catalog requires classes or value modules within limits");
+        return false;
+    }
+    TSet<FString> Ids, Refs, Locations, InterfaceDeclarations;
+    TMap<FString, FString> IdKinds;
+    for (const auto& E : Entries)
+    {
+        const FString Location = (E.Script + TEXT("::")+ E.Name).ToLower();
+        if (!CatalogId(E.Id) || !CatalogIdentifier(E.Name) ||
+            !LocalFile(E.Script, TEXT("das")) || !CatalogIdentifier(E.Reference) || Ids.Contains(E.Id) ||
+                       Refs.Contains(E.Reference.ToLower()) || Locations.Contains(Location))
+        {
+            Error = TEXT("Invalid/duplicate catalog class ID, reference name or source location: ")+ E.Id;
+            return false;
+        }
+        Ids.Add(E.Id);
+        IdKinds.Add(E.Id, TEXT("class"));
+        Refs.Add(E.Reference.ToLower());
+        Locations.Add(Location);
+    }
+    TSet<FString> Modules, Files;
+    int32 TotalTypes = 0;
+    for (const auto& M : ValueModules)
+    {
+        if (!CatalogIdentifier(M.Module) ||
+            M.Module == TEXT("ue_dsl") || !LocalFile(M.Script, TEXT("das")) ||
+                                                     FPaths::GetBaseFilename(M.Script) != M.Module ||
+                                                     Modules.Contains(M.Module.ToLower()) ||
+                                                     Files.Contains(M.Script.ToLower()) || M.Types.IsEmpty())
+        {
+            Error = TEXT("Invalid/duplicate catalog value module: ")+ M.Module;
+            return false;
+        }
+        Modules.Add(M.Module.ToLower());
+        Files.Add(M.Script.ToLower());
+        TSet<FString> Names;
+        for (const auto& T : M.Types)
+        {
+            const bool Interface = T.Kind == TEXT("interface") || T.Kind == TEXT("interface_ref");
+            const FString LogicalKind = Interface ? TEXT("interface"): T.Kind;
+            if ((!Interface && T.Kind != TEXT("enum") && T.Kind != TEXT("struct")) || !CatalogId(T.Id) ||
+                                   !CatalogIdentifier(T.Name) ||
+                                   (Ids.Contains(T.Id) && (!Interface || IdKinds.FindRef(T.Id) != TEXT("interface"))) ||
+                                    (T.Kind == TEXT("interface") && InterfaceDeclarations.Contains(T.Id)) ||
+                                     Names.Contains(T.Name.ToLower()) || Refs.Contains(T.Name.ToLower()) ||
+                                     ++TotalTypes > 1024)
+            {
+                Error = TEXT("Invalid/duplicate catalog value type or reference-name collision: ")+ T.Id;
+                return false;
+            }
+            Ids.Add(T.Id);
+            IdKinds.Add(T.Id, LogicalKind);
+            if (T.Kind == TEXT("interface"))
+                InterfaceDeclarations.Add(T.Id);
+            Names.Add(T.Name.ToLower());
+        }
+    }
+    return true;
+}
+bool FDasSourceCatalog::Resolve(const FString& Identity, FDasSourceCatalogEntry& Out, FString& Error) const
+{
+    if (!Validate(Error))
+        return false;
+    TArray<const FDasSourceCatalogEntry*> Matches;
+    for (const auto& E : Entries)
+        if (E.Id == Identity || E.Name == Identity)
+            Matches.Add(&E);
+    if (Matches.Num() != 1)
+    {
+        Error = Matches.IsEmpty() ? TEXT("Unknown catalog class: ")+ Identity
+                                  : TEXT("Ambiguous catalog class name; use stable ID: ")+ Identity;
+        return false;
+    }
+    Out = *Matches[0];
+    return true;
+}
+bool FDasSourceCatalog::ToJson(FString& Out, FString& Error) const
+{
+    if (!Validate(Error))
+        return false;
+    auto Root = MakeShared<FJsonObject>();
+    Root->SetNumberField(TEXT("schema_version"), 3);
+    auto Sorted = Entries;
+    Sorted.Sort([](const auto& A, const auto& B) { return A.Id < B.Id; });
+    TArray<TSharedPtr<FJsonValue>> Values;
+    for (const auto& E : Sorted)
+    {
+        auto J = MakeShared<FJsonObject>();
+        J->SetStringField(TEXT("id"), E.Id);
+        J->SetStringField(TEXT("name"), E.Name);
+        J->SetStringField(TEXT("script"), E.Script);
+        J->SetStringField(TEXT("reference"), E.Reference);
+        Values.Add(MakeShared<FJsonValueObject>(J));
+    }
+    Root->SetArrayField(TEXT("classes"), Values);
+    auto Modules = ValueModules;
+    Modules.Sort([](const auto& A, const auto& B) { return A.Module < B.Module; });
+    TArray<TSharedPtr<FJsonValue>> Imports;
+    for (auto M : Modules)
+    {
+        auto J = MakeShared<FJsonObject>();
+        J->SetStringField(TEXT("module"), M.Module);
+        J->SetStringField(TEXT("script"), M.Script);
+        M.Types.Sort([](const auto& A, const auto& B) { return A.Id < B.Id; });
+        TArray<TSharedPtr<FJsonValue>> Types;
+        for (const auto& T : M.Types)
+        {
+            auto V = MakeShared<FJsonObject>();
+            V->SetStringField(TEXT("kind"), T.Kind);
+            V->SetStringField(TEXT("id"), T.Id);
+            V->SetStringField(TEXT("name"), T.Name);
+            Types.Add(MakeShared<FJsonValueObject>(V));
+        }
+        J->SetArrayField(TEXT("types"), Types);
+        Imports.Add(MakeShared<FJsonValueObject>(J));
+    }
+    Root->SetArrayField(TEXT("value_modules"), Imports);
+    FString Candidate;
+    FJsonSerializer::Serialize(Root, TJsonWriterFactory<>::Create(&Candidate));
+    Out = MoveTemp(Candidate);
+    return true;
+}
+bool FDasSourceCatalog::FromJson(const FString& Wire, FDasSourceCatalog& Out, FString& Error)
+{
+    Error.Reset();
+    TSharedPtr<FJsonObject> Root;
+    const TArray<TSharedPtr<FJsonValue>>* Values = nullptr;
+    if (Wire.Len() > 1024 * 1024 || !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Wire), Root) || !Root ||
+        !Root->HasTypedField<EJson::Number>(TEXT("schema_version")))
+    {
+        Error = TEXT("Invalid source catalog JSON/version");
+        return false;
+    }
+    const double Version = Root->GetNumberField(TEXT("schema_version"));
+    if ((Version != 1 && Version != 2 && Version != 3) ||
+        !(Version == 1
+          ? CatalogKeys(Root, {TEXT("schema_version"), TEXT("classes")})
+                        : CatalogKeys(Root, {TEXT("schema_version"), TEXT("classes"), TEXT("value_modules")})) ||
+                                      !Root->TryGetArrayField(TEXT("classes"), Values))
+    {
+        Error = TEXT("Invalid source catalog fields/version");
+        return false;
+    }
+    FDasSourceCatalog Candidate;
+    for (const auto& V : *Values)
+    {
+        const TSharedPtr<FJsonObject>* J = nullptr;
+        FDasSourceCatalogEntry E;
+        if (!V->TryGetObject(J) ||
+            !CatalogKeys(*J, {TEXT("id"), TEXT("name"), TEXT("script"), TEXT("reference")}) ||
+                                   !(*J)->TryGetStringField(
+                                       TEXT("id"), E.Id) ||
+                                       !(*J)->TryGetStringField(TEXT("name"), E.Name) ||
+                                                                !(*J)->TryGetStringField(TEXT("script"), E.Script) ||
+                                                                                         !(*J)->TryGetStringField(TEXT("reference"), E.Reference))
+        {
+            Error = TEXT("Invalid source catalog class entry");
+            return false;
+        }
+        Candidate.Entries.Add(MoveTemp(E));
+    }
+    if (Version >= 2)
+    {
+        const TArray<TSharedPtr<FJsonValue>>* Imports = nullptr;
+        if (!Root->TryGetArrayField(TEXT("value_modules"), Imports))
+        {
+            Error = TEXT("Missing catalog value modules");
+            return false;
+        }
+        for (const auto& V : *Imports)
+        {
+            const TSharedPtr<FJsonObject>* J = nullptr;
+            FDasCatalogValueModule M;
+            const TArray<TSharedPtr<FJsonValue>>* Types = nullptr;
+            if (!V->TryGetObject(J) ||
+                !CatalogKeys(*J, {TEXT("module"), TEXT("script"), TEXT("types")}) ||
+                                  !(*J)->TryGetStringField(
+                                      TEXT("module"), M.Module) ||
+                                      !(*J)->TryGetStringField(TEXT("script"), M.Script) ||
+                                                               !(*J)->TryGetArrayField(TEXT("types"), Types))
+            {
+                Error = TEXT("Invalid catalog value module");
+                return false;
+            }
+            for (const auto& X : *Types)
+            {
+                const TSharedPtr<FJsonObject>* T = nullptr;
+                FDasCatalogValueType E;
+                if (!X->TryGetObject(T) ||
+                    !CatalogKeys(*T, {TEXT("kind"), TEXT("id"), TEXT("name")}) ||
+                                      !(*T)->TryGetStringField(
+                                          TEXT("kind"), E.Kind) ||
+                                          !(*T)->TryGetStringField(TEXT("id"), E.Id) ||
+                                                                   !(*T)->TryGetStringField(TEXT("name"), E.Name))
+                {
+                    Error = TEXT("Invalid catalog value type");
+                    return false;
+                }
+                if (Version == 2 && E.Kind != TEXT("enum") && E.Kind != TEXT("struct"))
+                {
+                    Error = TEXT("Interface inventory requires catalog version 3");
+                    return false;
+                }
+                M.Types.Add(MoveTemp(E));
+            }
+            Candidate.ValueModules.Add(MoveTemp(M));
+        }
+    }
+    if (!Candidate.Validate(Error))
+        return false;
+    Out = MoveTemp(Candidate);
+    return true;
+}
+bool FDasSourceCatalog::ReferenceModule(const FString& Module, const FString& Catalog, FString& Out,
+                                        FString& Error) const
+{
+    if (!Validate(Error))
+        return false;
+    if (!CatalogIdentifier(Module) || !LocalFile(Catalog, TEXT("json")))
+    {
+        Error = TEXT("Expected local catalog and DAS module identifier");
+        return false;
+    }
+    auto Sorted = Entries;
+    Sorted.Sort([](const auto& A, const auto& B) { return A.Id < B.Id; });
+    FString Source = TEXT("// Generated from the explicit source catalog.\noptions gen2\nmodule ")+ Module +
+                          TEXT(" public\nrequire ue_dsl public\n");
+    auto Imports = ValueModules;
+    Imports.Sort([](const auto& A, const auto& B) { return A.Module < B.Module; });
+    TSet<FString> BoundInterfaces, ExportedNames;
+    for (const auto& M : Imports)
+        for (const auto& T : M.Types)
+            if (T.Kind == TEXT("interface_ref"))
+                BoundInterfaces.Add(T.Id);
+    for (const auto& E : Entries)
+        ExportedNames.Add(E.Reference.ToLower());
+    for (const auto& M : Imports)
+    {
+        bool OnlyBoundDeclarations = !M.Types.IsEmpty();
+        for (const auto& T : M.Types)
+            OnlyBoundDeclarations &= T.Kind == TEXT("interface") && BoundInterfaces.Contains(T.Id);
+        if (OnlyBoundDeclarations)
+            continue;
+        for (const auto& T : M.Types)
+        {
+            const FString Name = T.Name.ToLower();
+            if (ExportedNames.Contains(Name))
+            {
+                Error = TEXT("Conflicting publicly imported catalog type name: ")+ T.Name;
+                return false;
+            }
+            ExportedNames.Add(Name);
+        }
+        if (M.Module == Module || M.Script.Equals(Module + TEXT(".das"), ESearchCase::IgnoreCase))
+        {
+            Error = TEXT("Generated reference module would import itself");
+            return false;
+        }
+        Source += TEXT("require ")+ M.Module + TEXT(" public\n");
+    }
+    for (const auto& E : Sorted)
+        Source += TEXT("\n[ue_object_ref(type=\"")+ E.Id +
+                       TEXT("\", catalog=\"")+ Catalog +
+                            TEXT("\")]\nstruct ")+ E.Reference + TEXT(" { handle:UObjectHandle }\n");
+    Out = MoveTemp(Source);
+    return true;
 }

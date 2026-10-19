@@ -69,3 +69,16 @@ Generated artifacts are checked for staleness without rewriting them:
 whole-module preflight; it installs the module only with `-Publish`.
 
 See also: [Roadmap](Plans/Roadmap.md), [validation records](Validation/).
+
+## Formatting
+
+C++ sources follow `.clang-format` (4 spaces, Allman braces, 120 columns).
+Generated files (`*.generated.h`, `Private/Generated/*`) are excluded.
+
+```powershell
+python Scripts\CheckFormat.py           # check all plugin sources
+python Scripts\CheckFormat.py --fix     # reformat in place
+python Scripts\CheckFormat.py --staged  # check staged files; new lines must be <= 400 chars
+```
+
+The script uses `clang-format` from PATH or from the Visual Studio LLVM tools.

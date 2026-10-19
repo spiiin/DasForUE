@@ -3,7 +3,8 @@
 #include "DasPerformanceCommandlet.generated.h"
 
 UCLASS()
-class UDasPerformanceCommandlet : public UCommandlet {
+class UDasPerformanceCommandlet : public UCommandlet
+{
     GENERATED_BODY()
 public:
     UDasPerformanceCommandlet();

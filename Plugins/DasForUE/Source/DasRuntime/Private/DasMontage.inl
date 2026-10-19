@@ -1,20 +1,97 @@
-float ScriptMontagePlay(const char* Name,const FDasObjectHandle& MeshHandle,const FDasObjectHandle& MontageHandle,const char* Handler,float Rate,float Position,FDasNameValue Section,das::Context* C){
- auto* S=ManagedOwnerSession(C);auto* W=GameplayWorld(C);const FString Key=TimerName(Name,C),Entry=Handler?UTF8_TO_TCHAR(Handler):TEXT("");
- auto* Mesh=Cast<USkeletalMeshComponent>(ResolveObject(MeshHandle,C));auto* Montage=Cast<UAnimMontage>(ResolveObject(MontageHandle,C));auto* Anim=Mesh?Mesh->GetAnimInstance():nullptr;
- const FName StartSection=ResolveDSLName(Section,C);
- if(!Mesh || Mesh->IsBeingDestroyed() || Mesh->GetWorld()!=W || !IsValid(Mesh->GetOwner()) || Mesh->GetOwner()->IsActorBeingDestroyed() || !Montage || !Anim || Anim->IsUnreachable() || !Mesh->GetSkeletalMeshAsset() || !Mesh->GetSkeletalMeshAsset()->GetSkeleton() || !Montage->GetSkeleton() || !Montage->GetSkeleton()->IsCompatibleMesh(Mesh->GetSkeletalMeshAsset()))C->throw_error("montage requires a live same-world mesh, AnimInstance and compatible skeleton");
- if(!FMath::IsFinite(Rate) || Rate<=0.f || !FMath::IsFinite(Position) || Position<0.f || Position>=Montage->GetPlayLength() || (!StartSection.IsNone() && Montage->GetSectionIndex(StartSection)==INDEX_NONE))C->throw_error("invalid montage rate, start position or section");
- FDasCallContract Contract=FDasCallContract::Scalar(EDasMethodSignature::Void);Contract.Inputs.Add(EDasMethodSignature::Struct);Contract.InputClasses.Add(FDasMontageEvent::StaticStruct()->GetPathName());
- if(!VerifyContract(S->Live->Program,Entry,Contract))C->throw_error("montage handler must be exported void(event:MontageEvent)");
- int32 Count=0;for(const auto& B:S->Bindings)if(B->MontageProxy.IsValid())++Count;
- const bool Replacing=S->Bindings.ContainsByPredicate([&](const auto& B){return B->MontageProxy.IsValid() && B->MontageName==Key;});if(!Replacing && Count>=64)C->throw_error("montage subscription limit exceeded");
- const float Length=Anim->Montage_Play(Montage,Rate,EMontagePlayReturnType::Duration,Position,true);if(Length<=0.f)return 0.f;
- auto* Instance=Anim->GetActiveInstanceForMontage(Montage);if(!Instance || Instance->OnMontageEnded.IsBound() || Instance->OnMontageBlendingOutStarted.IsBound()){if(Instance)Instance->Stop(FAlphaBlend(0.f),true);C->throw_error("new montage instance callbacks are already owned externally");}
- if(!StartSection.IsNone())Anim->Montage_JumpToSection(StartSection,Montage);
- auto B=MakeUnique<FManagedSubscription>();B->Id=NextSubscriptionId++;B->Handler=Entry;B->Kind=EDasMethodSignature::Struct;B->PayloadPath=FDasMontageEvent::StaticStruct()->GetPathName();B->MontageName=Key;B->MontageProxy.Reset(NewObject<UDasMontageProxy>());
- auto* P=B->MontageProxy.Get();P->SubscriptionId=B->Id;P->Owner=S->Owner;P->Mesh=Mesh;P->Anim=Anim;P->Montage=Montage;P->InstanceId=Instance->GetInstanceID();B->Source=P;P->Attach();
- S->Bindings.RemoveAll([&](const auto& Old){return Old->MontageProxy.IsValid() && Old->MontageName==Key;});S->Bindings.Add(MoveTemp(B));S->RequiredEntries.Add(Entry,Contract);return Length;
+float ScriptMontagePlay(const char* Name, const FDasObjectHandle& MeshHandle, const FDasObjectHandle& MontageHandle,
+                        const char* Handler, float Rate, float Position, FDasNameValue Section, das::Context* C)
+{
+    auto* S = ManagedOwnerSession(C);
+    auto* W = GameplayWorld(C);
+    const FString Key = TimerName(Name, C), Entry = Handler ? UTF8_TO_TCHAR(Handler) : TEXT("");
+    auto* Mesh = Cast<USkeletalMeshComponent>(ResolveObject(MeshHandle, C));
+    auto* Montage = Cast<UAnimMontage>(ResolveObject(MontageHandle, C));
+    auto* Anim = Mesh ? Mesh->GetAnimInstance() : nullptr;
+    const FName StartSection = ResolveDSLName(Section, C);
+    if (!Mesh || Mesh->IsBeingDestroyed() || Mesh->GetWorld() != W || !IsValid(Mesh->GetOwner()) ||
+        Mesh->GetOwner()->IsActorBeingDestroyed() || !Montage || !Anim || Anim->IsUnreachable() ||
+        !Mesh->GetSkeletalMeshAsset() || !Mesh->GetSkeletalMeshAsset()->GetSkeleton() || !Montage->GetSkeleton() ||
+        !Montage->GetSkeleton()->IsCompatibleMesh(Mesh->GetSkeletalMeshAsset()))
+        C->throw_error("montage requires a live same-world mesh, AnimInstance and compatible skeleton");
+    if (!FMath::IsFinite(Rate) || Rate <= 0.f || !FMath::IsFinite(Position) || Position < 0.f ||
+        Position >= Montage->GetPlayLength() ||
+        (!StartSection.IsNone() && Montage->GetSectionIndex(StartSection) == INDEX_NONE))
+        C->throw_error("invalid montage rate, start position or section");
+    FDasCallContract Contract = FDasCallContract::Scalar(EDasMethodSignature::Void);
+    Contract.Inputs.Add(EDasMethodSignature::Struct);
+    Contract.InputClasses.Add(FDasMontageEvent::StaticStruct()->GetPathName());
+    if (!VerifyContract(S->Live->Program, Entry, Contract))
+        C->throw_error("montage handler must be exported void(event:MontageEvent)");
+    int32 Count = 0;
+    for (const auto& B : S->Bindings)
+        if (B->MontageProxy.IsValid())
+            ++Count;
+    const bool Replacing = S->Bindings.ContainsByPredicate(
+        [&](const auto& B) { return B->MontageProxy.IsValid() && B->MontageName == Key; });
+    if (!Replacing && Count >= 64)
+        C->throw_error("montage subscription limit exceeded");
+    const float Length = Anim->Montage_Play(Montage, Rate, EMontagePlayReturnType::Duration, Position, true);
+    if (Length <= 0.f)
+        return 0.f;
+    auto* Instance = Anim->GetActiveInstanceForMontage(Montage);
+    if (!Instance || Instance->OnMontageEnded.IsBound() || Instance->OnMontageBlendingOutStarted.IsBound())
+    {
+        if (Instance)
+            Instance->Stop(FAlphaBlend(0.f), true);
+        C->throw_error("new montage instance callbacks are already owned externally");
+    }
+    if (!StartSection.IsNone())
+        Anim->Montage_JumpToSection(StartSection, Montage);
+    auto B = MakeUnique<FManagedSubscription>();
+    B->Id = NextSubscriptionId++;
+    B->Handler = Entry;
+    B->Kind = EDasMethodSignature::Struct;
+    B->PayloadPath = FDasMontageEvent::StaticStruct()->GetPathName();
+    B->MontageName = Key;
+    B->MontageProxy.Reset(NewObject<UDasMontageProxy>());
+    auto* P = B->MontageProxy.Get();
+    P->SubscriptionId = B->Id;
+    P->Owner = S->Owner;
+    P->Mesh = Mesh;
+    P->Anim = Anim;
+    P->Montage = Montage;
+    P->InstanceId = Instance->GetInstanceID();
+    B->Source = P;
+    P->Attach();
+    S->Bindings.RemoveAll([&](const auto& Old) { return Old->MontageProxy.IsValid() && Old->MontageName == Key; });
+    S->Bindings.Add(MoveTemp(B));
+    S->RequiredEntries.Add(Entry, Contract);
+    return Length;
 }
-bool ScriptMontageStop(const char* Name,float BlendOut,das::Context* C){auto* S=ManagedOwnerSession(C);GameplayWorld(C);const FString Key=TimerName(Name,C);if(!FMath::IsFinite(BlendOut) || BlendOut<0.f)C->throw_error("montage blend-out must be finite and nonnegative");for(const auto& B:S->Bindings)if(B->MontageProxy.IsValid() && B->MontageName==Key){if(!B->MontageProxy->IsPlaying())return false;B->MontageProxy->Stop(BlendOut);return true;}return false;}
-bool ScriptMontageCancel(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString Key=TimerName(Name,C);return S->Bindings.RemoveAll([&](const auto& B){return B->MontageProxy.IsValid() && B->MontageName==Key;})>0;}
-bool ScriptMontagePlaying(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString Key=TimerName(Name,C);for(const auto& B:S->Bindings)if(B->MontageProxy.IsValid() && B->MontageName==Key)return B->MontageProxy->IsPlaying();return false;}
+bool ScriptMontageStop(const char* Name, float BlendOut, das::Context* C)
+{
+    auto* S = ManagedOwnerSession(C);
+    GameplayWorld(C);
+    const FString Key = TimerName(Name, C);
+    if (!FMath::IsFinite(BlendOut) || BlendOut < 0.f)
+        C->throw_error("montage blend-out must be finite and nonnegative");
+    for (const auto& B : S->Bindings)
+        if (B->MontageProxy.IsValid() && B->MontageName == Key)
+        {
+            if (!B->MontageProxy->IsPlaying())
+                return false;
+            B->MontageProxy->Stop(BlendOut);
+            return true;
+        }
+    return false;
+}
+bool ScriptMontageCancel(const char* Name, das::Context* C)
+{
+    auto* S = ManagedOwnerSession(C);
+    const FString Key = TimerName(Name, C);
+    return S->Bindings.RemoveAll([&](const auto& B) { return B->MontageProxy.IsValid() && B->MontageName == Key; }) > 0;
+}
+bool ScriptMontagePlaying(const char* Name, das::Context* C)
+{
+    auto* S = ManagedOwnerSession(C);
+    const FString Key = TimerName(Name, C);
+    for (const auto& B : S->Bindings)
+        if (B->MontageProxy.IsValid() && B->MontageName == Key)
+            return B->MontageProxy->IsPlaying();
+    return false;
+}

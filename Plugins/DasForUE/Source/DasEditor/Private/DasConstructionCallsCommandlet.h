@@ -4,7 +4,8 @@
 #include "DasConstructionCallsCommandlet.generated.h"
 
 UCLASS()
-class UDasConstructionCallsCommandlet : public UCommandlet {
+class UDasConstructionCallsCommandlet : public UCommandlet
+{
     GENERATED_BODY()
 public:
     UDasConstructionCallsCommandlet();

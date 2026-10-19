@@ -3,9 +3,10 @@
 #include "Commandlets/Commandlet.h"
 #include "DasClassCallbacksCommandlet.generated.h"
 UCLASS()
-class UDasClassCallbacksCommandlet:public UCommandlet {
- GENERATED_BODY()
+class UDasClassCallbacksCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
 public:
- UDasClassCallbacksCommandlet();
- virtual int32 Main(const FString& Params)override;
+    UDasClassCallbacksCommandlet();
+    virtual int32 Main(const FString& Params) override;
 };

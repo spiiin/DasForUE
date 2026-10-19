@@ -1,8 +1,124 @@
-bool DSLComponentField(das::Structure::FieldDeclaration& F,FDasDeclaredClass& C){
- bool Marked=false;for(const auto& A:F.annotation)if(A.name=="ue_component"){if(Marked)DSLFail(TEXT("Repeated ue_component field marker"));if(A.type!=das::Type::tBool || !A.bValue)DSLFail(TEXT("ue_component field marker must be true"));Marked=true;}if(!Marked)return false;
- if(!DasActorNativeParent(C.NativeParent))DSLFail(TEXT("Component fields require Actor, Pawn or Character parent"));if(F.init)DSLFail(TEXT("Component fields are initialized by Unreal; omit the initializer"));if(!F.type || F.type->ref || F.type->baseType!=das::Type::tStructure || !F.type->structType)DSLFail(TEXT("Component field requires imported authored reference type"));const auto* Reference=DSLAnnotation(F.type->structType->annotations,"ue_object_ref");const auto* Native=DSLAnnotation(F.type->structType->annotations,"ue_native_object");if(!Reference && !Native)DSLFail(TEXT("Component field requires imported authored reference type or native component reference"));FDasDeclaredComponent Component;Component.Name=DSLText(F.name);Component.Id=C.Id+TEXT(".")+Component.Name;if(Reference){Component.ScriptFile=DSLString(Reference->arguments,"script");Component.ClassName=DSLString(Reference->arguments,"type");}else{Component.NativeClass=DSLTypedReferencePath(F.type);auto* NativeType=FindObject<UClass>(nullptr,*Component.NativeClass);if(!NativeType || !NativeType->IsChildOf(UActorComponent::StaticClass()) || NativeType->HasAnyClassFlags(CLASS_Abstract|CLASS_Deprecated|CLASS_NewerVersionExists))DSLFail(TEXT("Expected concrete native ActorComponent class: ")+Component.NativeClass);}Component.bReadOnly=true;Component.bVisible=true;bool RO=false,RW=false,Visible=false,Editable=false;TSet<FString> Flags,Metas;
- for(const auto& A:F.annotation){if(A.name=="ue_component")continue;if(A.name=="ue_property"){if(A.type==das::Type::tBool){if(!A.bValue)DSLFail(TEXT("ue_property must be true"));continue;}if(A.type!=das::Type::tString)DSLFail(TEXT("Invalid component property flag"));const FString Flag=DSLText(A.sValue);if(Flags.Contains(Flag))DSLFail(TEXT("Repeated component property flag: ")+Flag);Flags.Add(Flag);if(Flag==TEXT("VisibleAnywhere"))Visible=true;else if(Flag==TEXT("EditAnywhere"))Editable=true;else if(Flag==TEXT("BlueprintReadOnly"))RO=true;else if(Flag==TEXT("BlueprintReadWrite"))RW=true;else DSLFail(TEXT("Unsupported component property flag: ")+Flag);}else if(A.name=="RootComponent"){if(Metas.Contains(TEXT("RootComponent")))DSLFail(TEXT("Repeated RootComponent"));Metas.Add(TEXT("RootComponent"));Component.bRoot=DSLBool(A);if(!Component.bRoot)DSLFail(TEXT("RootComponent must be true"));}else if(A.name=="Attach" || A.name=="AttachSocket"){if(A.type!=das::Type::tString || Metas.Contains(DSLText(A.name)))DSLFail(TEXT("Attachment requires a unique string annotation"));Metas.Add(DSLText(A.name));if(A.name=="Attach")Component.Attach=DSLText(A.sValue);else Component.AttachSocket=DSLText(A.sValue);}else if(A.name=="ue_id"){if(A.type!=das::Type::tString)DSLFail(TEXT("ue_id must be string"));Component.Id=DSLText(A.sValue);}else if(DSLIsMetadata(A.name)){const FString Key=DSLText(A.name);if(Metas.Contains(Key))DSLFail(TEXT("Repeated component metadata: ")+Key);Metas.Add(Key);DSLMetadata(A,Component.Metadata);}else DSLFail(TEXT("Unknown component field metadata: ")+DSLText(A.name));}
- if(RO && RW)DSLFail(TEXT("Conflicting component BlueprintReadOnly/BlueprintReadWrite"));if(Visible && Editable)DSLFail(TEXT("Conflicting component VisibleAnywhere/EditAnywhere"));Component.bReadOnly=!RW;Component.bEditable=Editable;Component.bVisible=!Editable;C.Components.Add(Component);
- // The source field represents a reference, not a separately constructed component.
- auto* Init=new das::ExprMakeStruct(F.at);Init->makeType=DSLObjectCopyType(F.type);Init->useInitializer=true;F.init=Init;return true;
+bool DSLComponentField(das::Structure::FieldDeclaration& F, FDasDeclaredClass& C)
+{
+    bool Marked = false;
+    for (const auto& A : F.annotation)
+        if (A.name == "ue_component")
+        {
+            if (Marked)
+                DSLFail(TEXT("Repeated ue_component field marker"));
+            if (A.type != das::Type::tBool || !A.bValue)
+                DSLFail(TEXT("ue_component field marker must be true"));
+            Marked = true;
+        }
+    if (!Marked)
+        return false;
+    if (!DasActorNativeParent(C.NativeParent))
+        DSLFail(TEXT("Component fields require Actor, Pawn or Character parent"));
+    if (F.init)
+        DSLFail(TEXT("Component fields are initialized by Unreal; omit the initializer"));
+    if (!F.type || F.type->ref || F.type->baseType != das::Type::tStructure || !F.type->structType)
+        DSLFail(TEXT("Component field requires imported authored reference type"));
+    const auto* Reference = DSLAnnotation(F.type->structType->annotations, "ue_object_ref");
+    const auto* Native = DSLAnnotation(F.type->structType->annotations, "ue_native_object");
+    if (!Reference && !Native)
+        DSLFail(TEXT("Component field requires imported authored reference type or native component reference"));
+    FDasDeclaredComponent Component;
+    Component.Name = DSLText(F.name);
+    Component.Id = C.Id + TEXT(".")+ Component.Name;
+    if (Reference)
+    {
+        Component.ScriptFile = DSLString(Reference->arguments, "script");
+        Component.ClassName = DSLString(Reference->arguments, "type");
+    }
+    else
+    {
+        Component.NativeClass = DSLTypedReferencePath(F.type);
+        auto* NativeType = FindObject<UClass>(nullptr, *Component.NativeClass);
+        if (!NativeType || !NativeType->IsChildOf(UActorComponent::StaticClass()) ||
+            NativeType->HasAnyClassFlags(CLASS_Abstract | CLASS_Deprecated | CLASS_NewerVersionExists))
+            DSLFail(TEXT("Expected concrete native ActorComponent class: ")+ Component.NativeClass);
+    }
+    Component.bReadOnly = true;
+    Component.bVisible = true;
+    bool RO = false, RW = false, Visible = false, Editable = false;
+    TSet<FString> Flags, Metas;
+    for (const auto& A : F.annotation)
+    {
+        if (A.name == "ue_component")
+            continue;
+        if (A.name == "ue_property")
+        {
+            if (A.type == das::Type::tBool)
+            {
+                if (!A.bValue)
+                    DSLFail(TEXT("ue_property must be true"));
+                continue;
+            }
+            if (A.type != das::Type::tString)
+                DSLFail(TEXT("Invalid component property flag"));
+            const FString Flag = DSLText(A.sValue);
+            if (Flags.Contains(Flag))
+                DSLFail(TEXT("Repeated component property flag: ")+ Flag);
+            Flags.Add(Flag);
+            if (Flag == TEXT("VisibleAnywhere"))
+                Visible = true;
+            else if (Flag == TEXT("EditAnywhere"))
+                Editable = true;
+            else if (Flag == TEXT("BlueprintReadOnly"))
+                RO = true;
+            else if (Flag == TEXT("BlueprintReadWrite"))
+                RW = true;
+            else
+                DSLFail(TEXT("Unsupported component property flag: ")+ Flag);
+        }
+        else if (A.name == "RootComponent")
+        {
+            if (Metas.Contains(TEXT("RootComponent")))
+                DSLFail(TEXT("Repeated RootComponent"));
+            Metas.Add(TEXT("RootComponent"));
+            Component.bRoot = DSLBool(A);
+            if (!Component.bRoot)
+                DSLFail(TEXT("RootComponent must be true"));
+        }
+        else if (A.name == "Attach" || A.name == "AttachSocket")
+        {
+            if (A.type != das::Type::tString || Metas.Contains(DSLText(A.name)))
+                DSLFail(TEXT("Attachment requires a unique string annotation"));
+            Metas.Add(DSLText(A.name));
+            if (A.name == "Attach")
+                Component.Attach = DSLText(A.sValue);
+            else
+                Component.AttachSocket = DSLText(A.sValue);
+        }
+        else if (A.name == "ue_id")
+        {
+            if (A.type != das::Type::tString)
+                DSLFail(TEXT("ue_id must be string"));
+            Component.Id = DSLText(A.sValue);
+        }
+        else if (DSLIsMetadata(A.name))
+        {
+            const FString Key = DSLText(A.name);
+            if (Metas.Contains(Key))
+                DSLFail(TEXT("Repeated component metadata: ")+ Key);
+            Metas.Add(Key);
+            DSLMetadata(A, Component.Metadata);
+        }
+        else
+            DSLFail(TEXT("Unknown component field metadata: ")+ DSLText(A.name));
+    }
+    if (RO && RW)
+        DSLFail(TEXT("Conflicting component BlueprintReadOnly/BlueprintReadWrite"));
+    if (Visible && Editable)
+        DSLFail(TEXT("Conflicting component VisibleAnywhere/EditAnywhere"));
+    Component.bReadOnly = !RW;
+    Component.bEditable = Editable;
+    Component.bVisible = !Editable;
+    C.Components.Add(Component);
+    // The source field represents a reference, not a separately constructed component.
+    auto* Init = new das::ExprMakeStruct(F.at);
+    Init->makeType = DSLObjectCopyType(F.type);
+    Init->useInitializer = true;
+    F.init = Init;
+    return true;
 }

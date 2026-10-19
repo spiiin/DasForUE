@@ -2,8 +2,34 @@
 #include "CoreMinimal.h"
 #include "DasSchema.h"
 
-enum class EDasTypeKind : uint8 { Invalid,Void,Byte,Text,Int,Float,Double,Bool,String,Name,Object,Class,Struct,Enum,Array,Set,Map,Delegate,Event };
-enum class EDasEnumStorage : uint8 { Automatic,Byte,Enum8 };
+enum class EDasTypeKind : uint8
+{
+    Invalid,
+    Void,
+    Byte,
+    Text,
+    Int,
+    Float,
+    Double,
+    Bool,
+    String,
+    Name,
+    Object,
+    Class,
+    Struct,
+    Enum,
+    Array,
+    Set,
+    Map,
+    Delegate,
+    Event
+};
+enum class EDasEnumStorage : uint8
+{
+    Automatic,
+    Byte,
+    Enum8
+};
 DASRUNTIME_API EDasTypeKind DasTypeKind(const FString& Name);
 DASRUNTIME_API FString DasTypeKindName(EDasTypeKind Kind);
 
@@ -13,7 +39,7 @@ struct DASRUNTIME_API FDasDeclaredType
     FString Kind = TEXT("int");
     FString TypePath;
     FString DelegateWire; // Single-cast method value signature; not a UObject path.
-    FString AuthoredId; // Optional authored object identity, separate from host storage.
+    FString AuthoredId;   // Optional authored object identity, separate from host storage.
     TSharedPtr<const FDasDeclaredType> Element, Key, Value;
     FString Identity() const;
     EDasTypeKind GetKind() const { return DasTypeKind(Kind); }
@@ -28,7 +54,10 @@ struct FDasDeclaredLiteral
     FString Kind; // Empty means no explicit default; null/bool/number/string otherwise.
     double Number = 0;
     bool Boolean = false;
-    bool operator==(const FDasDeclaredLiteral& O)const{return Kind==O.Kind && Number==O.Number && Boolean==O.Boolean && String==O.String;}
+    bool operator==(const FDasDeclaredLiteral& O) const
+    {
+        return Kind == O.Kind && Number == O.Number && Boolean == O.Boolean && String == O.String;
+    }
     FString String;
 };
 struct FDasDeclaredProperty
@@ -60,40 +89,69 @@ struct FDasDeclaredMethod
 };
 struct FDasDeclaredComponent
 {
-    FString Id,Name,ScriptFile,ClassName;
-    TMap<FString,FDasDeclaredLiteral> Defaults;
+    FString Id, Name, ScriptFile, ClassName;
+    TMap<FString, FDasDeclaredLiteral> Defaults;
     FString Attach, AttachSocket;
-    bool bRoot=false;
+    bool bRoot = false;
     FString NativeClass; // Native component path; mutually exclusive with authored source.
-    bool bReadOnly=false,bEditable=false,bVisible=false;
-    TMap<FString,FString> Metadata;
-    bool operator==(const FDasDeclaredComponent& Other)const{return Id==Other.Id && Name==Other.Name && ScriptFile==Other.ScriptFile && ClassName==Other.ClassName && NativeClass==Other.NativeClass && Attach==Other.Attach && AttachSocket==Other.AttachSocket && bRoot==Other.bRoot && Defaults.OrderIndependentCompareEqual(Other.Defaults) && bReadOnly==Other.bReadOnly && bEditable==Other.bEditable && bVisible==Other.bVisible && Metadata.OrderIndependentCompareEqual(Other.Metadata);}
+    bool bReadOnly = false, bEditable = false, bVisible = false;
+    TMap<FString, FString> Metadata;
+    bool operator==(const FDasDeclaredComponent& Other) const
+    {
+        return Id == Other.Id && Name == Other.Name && ScriptFile == Other.ScriptFile && ClassName == Other.ClassName &&
+               NativeClass == Other.NativeClass && Attach == Other.Attach && AttachSocket == Other.AttachSocket &&
+               bRoot == Other.bRoot && Defaults.OrderIndependentCompareEqual(Other.Defaults) &&
+               bReadOnly == Other.bReadOnly && bEditable == Other.bEditable && bVisible == Other.bVisible &&
+               Metadata.OrderIndependentCompareEqual(Other.Metadata);
+    }
 };
-struct FDasComponentOverride {
-    FString Id,Name; // Stable identity of an inherited SCS node.
-    TMap<FString,FDasDeclaredLiteral> Defaults;
-    bool operator==(const FDasComponentOverride& O)const{return Id==O.Id && Name==O.Name && Defaults.OrderIndependentCompareEqual(O.Defaults);}
+struct FDasComponentOverride
+{
+    FString Id, Name; // Stable identity of an inherited SCS node.
+    TMap<FString, FDasDeclaredLiteral> Defaults;
+    bool operator==(const FDasComponentOverride& O) const
+    {
+        return Id == O.Id && Name == O.Name && Defaults.OrderIndependentCompareEqual(O.Defaults);
+    }
 };
-struct FDasDeclaredCallback {
-    FString Name,Kind,Source,EventName;
-    FString ParameterKind=TEXT("int");
+struct FDasDeclaredCallback
+{
+    FString Name, Kind, Source, EventName;
+    FString ParameterKind = TEXT("int");
     FString ParameterTypePath;
-    bool operator==(const FDasDeclaredCallback& O)const{return Name==O.Name && Kind==O.Kind && Source==O.Source && EventName==O.EventName && (Kind!=TEXT("event") || (ParameterKind==O.ParameterKind && ParameterTypePath==O.ParameterTypePath));}
+    bool operator==(const FDasDeclaredCallback& O) const
+    {
+        return Name == O.Name && Kind == O.Kind && Source == O.Source && EventName == O.EventName &&
+               (Kind != TEXT("event") ||
+                             (ParameterKind == O.ParameterKind && ParameterTypePath == O.ParameterTypePath));
+    }
 };
-struct FDasPropertyDefaultOverride {
-    FString Id,Name;
+struct FDasPropertyDefaultOverride
+{
+    FString Id, Name;
     FDasDeclaredLiteral Default;
-    bool operator==(const FDasPropertyDefaultOverride& O)const{return Id==O.Id && Name==O.Name && Default==O.Default;}
+    bool operator==(const FDasPropertyDefaultOverride& O) const
+    {
+        return Id == O.Id && Name == O.Name && Default == O.Default;
+    }
 };
-struct FDasNativeDefaultGroup {
+struct FDasNativeDefaultGroup
+{
     FString Component; // Empty: native host property; otherwise a native subobject reference.
-    TMap<FString,FDasDeclaredLiteral> Defaults;
-    bool operator==(const FDasNativeDefaultGroup& O)const{return Component==O.Component && Defaults.OrderIndependentCompareEqual(O.Defaults);}
+    TMap<FString, FDasDeclaredLiteral> Defaults;
+    bool operator==(const FDasNativeDefaultGroup& O) const
+    {
+        return Component == O.Component && Defaults.OrderIndependentCompareEqual(O.Defaults);
+    }
 };
-struct FDasDeclaredAsyncPhysics {
+struct FDasDeclaredAsyncPhysics
+{
     FString ScriptFile;
-    TMap<int32,FString> Bodies;
-    bool operator==(const FDasDeclaredAsyncPhysics& O)const{return ScriptFile==O.ScriptFile && Bodies.OrderIndependentCompareEqual(O.Bodies);}
+    TMap<int32, FString> Bodies;
+    bool operator==(const FDasDeclaredAsyncPhysics& O) const
+    {
+        return ScriptFile == O.ScriptFile && Bodies.OrderIndependentCompareEqual(O.Bodies);
+    }
 };
 struct FDasDeclaredClass
 {
@@ -121,12 +179,13 @@ struct DASRUNTIME_API FDasAuthoringModule
     FString Id;
     TArray<FDasDeclaredClass> Classes;
     bool Validate(FString& Error) const;
-    static bool DefaultsOnly(const FDasAuthoringModule& Before,const FDasAuthoringModule& After,FString& Error);
+    static bool DefaultsOnly(const FDasAuthoringModule& Before, const FDasAuthoringModule& After, FString& Error);
     // Effective view; source declarations retain only their own members.
-    bool ResolveClass(const FString& ClassId,FDasDeclaredClass& Out,FString& Error) const;
+    bool ResolveClass(const FString& ClassId, FDasDeclaredClass& Out, FString& Error) const;
     static bool FromJson(const FString& Json, FDasAuthoringModule& Out, FString& Error);
     bool ToJson(FString& Out, FString& Error) const;
     // Preflight for the existing Actor adapter: all unsupported capabilities are refused explicitly.
-    bool ToActorSchema(const FString& ClassId, FDasClassSchema& Out, FString& Error,bool IncludeInherited=false) const;
+    bool ToActorSchema(const FString& ClassId, FDasClassSchema& Out, FString& Error,
+                       bool IncludeInherited = false) const;
     static FDasAuthoringDelta Compare(const FDasDeclaredClass& Old, const FDasDeclaredClass& Next);
 };

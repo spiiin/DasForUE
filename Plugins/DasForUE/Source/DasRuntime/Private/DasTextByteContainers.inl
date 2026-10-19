@@ -1,46 +1,221 @@
 // Typed container leaves reuse owned snapshots and the existing size limits.
-uint8 StructMapKeyByte(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotMap(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Byte,ESnapshotKind::Invalid,C),Index,C);return ReadPropertyScalarValue(CastFieldChecked<FByteProperty>(F.Property),F.Memory,C);}
-uint8 StructSetElementByte(const FDasStructValue& H,const char* Path,int32 Index,das::Context* C){auto F=SnapshotKeyAt(H,Path,SnapshotSet(StructLeaf(ResolveStructValue(H,C),Path,C),ESnapshotKind::Byte,C),Index,C);return ReadPropertyScalarValue(CastFieldChecked<FByteProperty>(F.Property),F.Memory,C);}
-FDasStructValue StructSetWithByte(const FDasStructValue& H,const char* Path,uint8 Key,bool Present,das::Context* C,das::LineInfoArg* At){return SetSnapshotValue(H,Path,&Key,ESnapshotKind::Byte,Present,C,At);}
-uint8 GetTextByteMapIntByte(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return StructScalarMapGet<FByteProperty>(H,Path,Key,ESnapshotKind::Int,C);}
-FDasStructValue WithTextByteMapIntByte(const FDasStructValue& H,const char* Path,int32 Key,uint8 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FByteProperty>(H,Path,Key,Value,ESnapshotKind::Int,C,At);}
-FDasTextValue GetTextByteMapIntText(const FDasStructValue& H,const char* Path,int32 Key,das::Context* C){return MakeDSLText(StructScalarMapGet<FTextProperty>(H,Path,Key,ESnapshotKind::Int,C),C);}
-FDasStructValue WithTextByteMapIntText(const FDasStructValue& H,const char* Path,int32 Key,FDasTextValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FTextProperty>(H,Path,Key,ResolveDSLText(Value,C),ESnapshotKind::Int,C,At);}
-uint8 GetTextByteMapStringByte(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return StructScalarMapGet<FByteProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C);}
-FDasStructValue WithTextByteMapStringByte(const FDasStructValue& H,const char* Path,const char* Key,uint8 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FByteProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),Value,ESnapshotKind::String,C,At);}
-FDasTextValue GetTextByteMapStringText(const FDasStructValue& H,const char* Path,const char* Key,das::Context* C){return MakeDSLText(StructScalarMapGet<FTextProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ESnapshotKind::String,C),C);}
-FDasStructValue WithTextByteMapStringText(const FDasStructValue& H,const char* Path,const char* Key,FDasTextValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FTextProperty>(H,Path,FString(Key?UTF8_TO_TCHAR(Key):TEXT("")),ResolveDSLText(Value,C),ESnapshotKind::String,C,At);}
-uint8 GetTextByteMapNameByte(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return StructScalarMapGet<FByteProperty>(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C);}
-FDasStructValue WithTextByteMapNameByte(const FDasStructValue& H,const char* Path,FDasNameValue Key,uint8 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FByteProperty>(H,Path,ResolveDSLName(Key,C),Value,ESnapshotKind::Name,C,At);}
-FDasTextValue GetTextByteMapNameText(const FDasStructValue& H,const char* Path,FDasNameValue Key,das::Context* C){return MakeDSLText(StructScalarMapGet<FTextProperty>(H,Path,ResolveDSLName(Key,C),ESnapshotKind::Name,C),C);}
-FDasStructValue WithTextByteMapNameText(const FDasStructValue& H,const char* Path,FDasNameValue Key,FDasTextValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FTextProperty>(H,Path,ResolveDSLName(Key,C),ResolveDSLText(Value,C),ESnapshotKind::Name,C,At);}
-uint8 GetTextByteMapObjectByte(const FDasStructValue& H,const char* Path,uint64 Key,das::Context* C){return StructScalarMapGet<FByteProperty>(H,Path,ObjectMapKey(H,Path,Key,C),ESnapshotKind::Object,C);}
-FDasStructValue WithTextByteMapObjectByte(const FDasStructValue& H,const char* Path,uint64 Key,uint8 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FByteProperty>(H,Path,ObjectMapKey(H,Path,Key,C),Value,ESnapshotKind::Object,C,At);}
-FDasTextValue GetTextByteMapObjectText(const FDasStructValue& H,const char* Path,uint64 Key,das::Context* C){return MakeDSLText(StructScalarMapGet<FTextProperty>(H,Path,ObjectMapKey(H,Path,Key,C),ESnapshotKind::Object,C),C);}
-FDasStructValue WithTextByteMapObjectText(const FDasStructValue& H,const char* Path,uint64 Key,FDasTextValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FTextProperty>(H,Path,ObjectMapKey(H,Path,Key,C),ResolveDSLText(Value,C),ESnapshotKind::Object,C,At);}
-uint8 GetTextByteMapEnumByte(const FDasStructValue& H,const char* Path,FDasEnumValue Key,das::Context* C){return StructScalarMapGet<FByteProperty>(H,Path,EnumMapKey(H,Path,Key,C),ESnapshotKind::Enum,C);}
-FDasStructValue WithTextByteMapEnumByte(const FDasStructValue& H,const char* Path,FDasEnumValue Key,uint8 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FByteProperty>(H,Path,EnumMapKey(H,Path,Key,C),Value,ESnapshotKind::Enum,C,At);}
-FDasTextValue GetTextByteMapEnumText(const FDasStructValue& H,const char* Path,FDasEnumValue Key,das::Context* C){return MakeDSLText(StructScalarMapGet<FTextProperty>(H,Path,EnumMapKey(H,Path,Key,C),ESnapshotKind::Enum,C),C);}
-FDasStructValue WithTextByteMapEnumText(const FDasStructValue& H,const char* Path,FDasEnumValue Key,FDasTextValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FTextProperty>(H,Path,EnumMapKey(H,Path,Key,C),ResolveDSLText(Value,C),ESnapshotKind::Enum,C,At);}
-uint8 GetTextByteMapByteByte(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C){return StructScalarMapGet<FByteProperty>(H,Path,Key,ESnapshotKind::Byte,C);}
-FDasStructValue WithTextByteMapByteByte(const FDasStructValue& H,const char* Path,uint8 Key,uint8 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FByteProperty>(H,Path,Key,Value,ESnapshotKind::Byte,C,At);}
-FDasTextValue GetTextByteMapByteText(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C){return MakeDSLText(StructScalarMapGet<FTextProperty>(H,Path,Key,ESnapshotKind::Byte,C),C);}
-FDasStructValue WithTextByteMapByteText(const FDasStructValue& H,const char* Path,uint8 Key,FDasTextValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FTextProperty>(H,Path,Key,ResolveDSLText(Value,C),ESnapshotKind::Byte,C,At);}
-int32 GetTextByteMapByteInt(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C){return StructScalarMapGet<FIntProperty>(H,Path,Key,ESnapshotKind::Byte,C);}
-FDasStructValue WithTextByteMapByteInt(const FDasStructValue& H,const char* Path,uint8 Key,int32 Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FIntProperty>(H,Path,Key,Value,ESnapshotKind::Byte,C,At);}
-float GetTextByteMapByteFloat(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C){return StructScalarMapGet<FFloatProperty>(H,Path,Key,ESnapshotKind::Byte,C);}
-FDasStructValue WithTextByteMapByteFloat(const FDasStructValue& H,const char* Path,uint8 Key,float Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FFloatProperty>(H,Path,Key,Value,ESnapshotKind::Byte,C,At);}
-double GetTextByteMapByteDouble(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C){return StructScalarMapGet<FDoubleProperty>(H,Path,Key,ESnapshotKind::Byte,C);}
-FDasStructValue WithTextByteMapByteDouble(const FDasStructValue& H,const char* Path,uint8 Key,double Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FDoubleProperty>(H,Path,Key,Value,ESnapshotKind::Byte,C,At);}
-bool GetTextByteMapByteBool(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C){return StructScalarMapGet<FBoolProperty>(H,Path,Key,ESnapshotKind::Byte,C);}
-FDasStructValue WithTextByteMapByteBool(const FDasStructValue& H,const char* Path,uint8 Key,bool Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FBoolProperty>(H,Path,Key,Value,ESnapshotKind::Byte,C,At);}
-char* GetTextByteMapByteString(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C){return CopyDSLString(StructScalarMapGet<FStrProperty>(H,Path,Key,ESnapshotKind::Byte,C),C);}
-FDasStructValue WithTextByteMapByteString(const FDasStructValue& H,const char* Path,uint8 Key,const char* Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FStrProperty>(H,Path,Key,FString(Value?UTF8_TO_TCHAR(Value):TEXT("")),ESnapshotKind::Byte,C,At);}
-FDasNameValue GetTextByteMapByteName(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C){return MakeDSLName(StructScalarMapGet<FNameProperty>(H,Path,Key,ESnapshotKind::Byte,C),C);}
-FDasStructValue WithTextByteMapByteName(const FDasStructValue& H,const char* Path,uint8 Key,FDasNameValue Value,das::Context* C,das::LineInfoArg* At){return StructScalarMapWith<FNameProperty>(H,Path,Key,ResolveDSLName(Value,C),ESnapshotKind::Byte,C,At);}
-FDasStructValue GetTextByteMapByteStruct(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C,das::LineInfoArg* At){return StructMapGetStruct(H,Path,Key,ESnapshotKind::Byte,C,At);}
-FDasStructValue WithTextByteMapByteStruct(const FDasStructValue& H,const char* Path,uint8 Key,const FDasStructValue& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithStruct(H,Path,Key,Value,ESnapshotKind::Byte,C,At);}
-FDasEnumValue GetTextByteMapByteEnum(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C){return StructMapGetEnum(H,Path,Key,ESnapshotKind::Byte,C);}
-FDasStructValue WithTextByteMapByteEnum(const FDasStructValue& H,const char* Path,uint8 Key,FDasEnumValue Value,das::Context* C,das::LineInfoArg* At){return StructMapWithEnum(H,Path,Key,Value,ESnapshotKind::Byte,C,At);}
-FDasObjectHandle GetTextByteMapByteObject(const FDasStructValue& H,const char* Path,uint8 Key,das::Context* C){return StructMapGetObject(H,Path,Key,ESnapshotKind::Byte,C);}
-FDasStructValue WithTextByteMapByteObject(const FDasStructValue& H,const char* Path,uint8 Key,const FDasObjectHandle& Value,das::Context* C,das::LineInfoArg* At){return StructMapWithObject(H,Path,Key,Value,ESnapshotKind::Byte,C,At);}
+uint8 StructMapKeyByte(const FDasStructValue& H, const char* Path, int32 Index, das::Context* C)
+{
+    auto F = SnapshotKeyAt(
+        H, Path,
+        SnapshotMap(StructLeaf(ResolveStructValue(H, C), Path, C), ESnapshotKind::Byte, ESnapshotKind::Invalid, C),
+        Index, C);
+    return ReadPropertyScalarValue(CastFieldChecked<FByteProperty>(F.Property), F.Memory, C);
+}
+uint8 StructSetElementByte(const FDasStructValue& H, const char* Path, int32 Index, das::Context* C)
+{
+    auto F = SnapshotKeyAt(H, Path, SnapshotSet(StructLeaf(ResolveStructValue(H, C), Path, C), ESnapshotKind::Byte, C),
+                           Index, C);
+    return ReadPropertyScalarValue(CastFieldChecked<FByteProperty>(F.Property), F.Memory, C);
+}
+FDasStructValue StructSetWithByte(const FDasStructValue& H, const char* Path, uint8 Key, bool Present, das::Context* C,
+                                  das::LineInfoArg* At)
+{
+    return SetSnapshotValue(H, Path, &Key, ESnapshotKind::Byte, Present, C, At);
+}
+uint8 GetTextByteMapIntByte(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C)
+{
+    return StructScalarMapGet<FByteProperty>(H, Path, Key, ESnapshotKind::Int, C);
+}
+FDasStructValue WithTextByteMapIntByte(const FDasStructValue& H, const char* Path, int32 Key, uint8 Value,
+                                       das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FByteProperty>(H, Path, Key, Value, ESnapshotKind::Int, C, At);
+}
+FDasTextValue GetTextByteMapIntText(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C)
+{
+    return MakeDSLText(StructScalarMapGet<FTextProperty>(H, Path, Key, ESnapshotKind::Int, C), C);
+}
+FDasStructValue WithTextByteMapIntText(const FDasStructValue& H, const char* Path, int32 Key, FDasTextValue Value,
+                                       das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FTextProperty>(H, Path, Key, ResolveDSLText(Value, C), ESnapshotKind::Int, C, At);
+}
+uint8 GetTextByteMapStringByte(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C)
+{
+    return StructScalarMapGet<FByteProperty>(H, Path,
+                                             FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C);
+}
+FDasStructValue WithTextByteMapStringByte(const FDasStructValue& H, const char* Path, const char* Key, uint8 Value,
+                                          das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FByteProperty>(
+        H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), Value, ESnapshotKind::String, C, At);
+}
+FDasTextValue GetTextByteMapStringText(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C)
+{
+    return MakeDSLText(StructScalarMapGet<FTextProperty>(
+        H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C), C);
+}
+FDasStructValue WithTextByteMapStringText(const FDasStructValue& H, const char* Path, const char* Key,
+                                          FDasTextValue Value, das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FTextProperty>(
+        H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ResolveDSLText(Value, C), ESnapshotKind::String, C, At);
+}
+uint8 GetTextByteMapNameByte(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C)
+{
+    return StructScalarMapGet<FByteProperty>(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C);
+}
+FDasStructValue WithTextByteMapNameByte(const FDasStructValue& H, const char* Path, FDasNameValue Key, uint8 Value,
+                                        das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FByteProperty>(H, Path, ResolveDSLName(Key, C), Value, ESnapshotKind::Name, C, At);
+}
+FDasTextValue GetTextByteMapNameText(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C)
+{
+    return MakeDSLText(StructScalarMapGet<FTextProperty>(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C), C);
+}
+FDasStructValue WithTextByteMapNameText(const FDasStructValue& H, const char* Path, FDasNameValue Key,
+                                        FDasTextValue Value, das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FTextProperty>(H, Path, ResolveDSLName(Key, C), ResolveDSLText(Value, C),
+                                              ESnapshotKind::Name, C, At);
+}
+uint8 GetTextByteMapObjectByte(const FDasStructValue& H, const char* Path, uint64 Key, das::Context* C)
+{
+    return StructScalarMapGet<FByteProperty>(H, Path, ObjectMapKey(H, Path, Key, C), ESnapshotKind::Object, C);
+}
+FDasStructValue WithTextByteMapObjectByte(const FDasStructValue& H, const char* Path, uint64 Key, uint8 Value,
+                                          das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FByteProperty>(H, Path, ObjectMapKey(H, Path, Key, C), Value, ESnapshotKind::Object, C,
+                                              At);
+}
+FDasTextValue GetTextByteMapObjectText(const FDasStructValue& H, const char* Path, uint64 Key, das::Context* C)
+{
+    return MakeDSLText(
+        StructScalarMapGet<FTextProperty>(H, Path, ObjectMapKey(H, Path, Key, C), ESnapshotKind::Object, C), C);
+}
+FDasStructValue WithTextByteMapObjectText(const FDasStructValue& H, const char* Path, uint64 Key, FDasTextValue Value,
+                                          das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FTextProperty>(H, Path, ObjectMapKey(H, Path, Key, C), ResolveDSLText(Value, C),
+                                              ESnapshotKind::Object, C, At);
+}
+uint8 GetTextByteMapEnumByte(const FDasStructValue& H, const char* Path, FDasEnumValue Key, das::Context* C)
+{
+    return StructScalarMapGet<FByteProperty>(H, Path, EnumMapKey(H, Path, Key, C), ESnapshotKind::Enum, C);
+}
+FDasStructValue WithTextByteMapEnumByte(const FDasStructValue& H, const char* Path, FDasEnumValue Key, uint8 Value,
+                                        das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FByteProperty>(H, Path, EnumMapKey(H, Path, Key, C), Value, ESnapshotKind::Enum, C, At);
+}
+FDasTextValue GetTextByteMapEnumText(const FDasStructValue& H, const char* Path, FDasEnumValue Key, das::Context* C)
+{
+    return MakeDSLText(StructScalarMapGet<FTextProperty>(H, Path, EnumMapKey(H, Path, Key, C), ESnapshotKind::Enum, C),
+                       C);
+}
+FDasStructValue WithTextByteMapEnumText(const FDasStructValue& H, const char* Path, FDasEnumValue Key,
+                                        FDasTextValue Value, das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FTextProperty>(H, Path, EnumMapKey(H, Path, Key, C), ResolveDSLText(Value, C),
+                                              ESnapshotKind::Enum, C, At);
+}
+uint8 GetTextByteMapByteByte(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C)
+{
+    return StructScalarMapGet<FByteProperty>(H, Path, Key, ESnapshotKind::Byte, C);
+}
+FDasStructValue WithTextByteMapByteByte(const FDasStructValue& H, const char* Path, uint8 Key, uint8 Value,
+                                        das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FByteProperty>(H, Path, Key, Value, ESnapshotKind::Byte, C, At);
+}
+FDasTextValue GetTextByteMapByteText(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C)
+{
+    return MakeDSLText(StructScalarMapGet<FTextProperty>(H, Path, Key, ESnapshotKind::Byte, C), C);
+}
+FDasStructValue WithTextByteMapByteText(const FDasStructValue& H, const char* Path, uint8 Key, FDasTextValue Value,
+                                        das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FTextProperty>(H, Path, Key, ResolveDSLText(Value, C), ESnapshotKind::Byte, C, At);
+}
+int32 GetTextByteMapByteInt(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C)
+{
+    return StructScalarMapGet<FIntProperty>(H, Path, Key, ESnapshotKind::Byte, C);
+}
+FDasStructValue WithTextByteMapByteInt(const FDasStructValue& H, const char* Path, uint8 Key, int32 Value,
+                                       das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FIntProperty>(H, Path, Key, Value, ESnapshotKind::Byte, C, At);
+}
+float GetTextByteMapByteFloat(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C)
+{
+    return StructScalarMapGet<FFloatProperty>(H, Path, Key, ESnapshotKind::Byte, C);
+}
+FDasStructValue WithTextByteMapByteFloat(const FDasStructValue& H, const char* Path, uint8 Key, float Value,
+                                         das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FFloatProperty>(H, Path, Key, Value, ESnapshotKind::Byte, C, At);
+}
+double GetTextByteMapByteDouble(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C)
+{
+    return StructScalarMapGet<FDoubleProperty>(H, Path, Key, ESnapshotKind::Byte, C);
+}
+FDasStructValue WithTextByteMapByteDouble(const FDasStructValue& H, const char* Path, uint8 Key, double Value,
+                                          das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FDoubleProperty>(H, Path, Key, Value, ESnapshotKind::Byte, C, At);
+}
+bool GetTextByteMapByteBool(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C)
+{
+    return StructScalarMapGet<FBoolProperty>(H, Path, Key, ESnapshotKind::Byte, C);
+}
+FDasStructValue WithTextByteMapByteBool(const FDasStructValue& H, const char* Path, uint8 Key, bool Value,
+                                        das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FBoolProperty>(H, Path, Key, Value, ESnapshotKind::Byte, C, At);
+}
+char* GetTextByteMapByteString(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C)
+{
+    return CopyDSLString(StructScalarMapGet<FStrProperty>(H, Path, Key, ESnapshotKind::Byte, C), C);
+}
+FDasStructValue WithTextByteMapByteString(const FDasStructValue& H, const char* Path, uint8 Key, const char* Value,
+                                          das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FStrProperty>(
+        H, Path, Key, FString(Value ? UTF8_TO_TCHAR(Value) : TEXT("")), ESnapshotKind::Byte, C, At);
+}
+FDasNameValue GetTextByteMapByteName(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C)
+{
+    return MakeDSLName(StructScalarMapGet<FNameProperty>(H, Path, Key, ESnapshotKind::Byte, C), C);
+}
+FDasStructValue WithTextByteMapByteName(const FDasStructValue& H, const char* Path, uint8 Key, FDasNameValue Value,
+                                        das::Context* C, das::LineInfoArg* At)
+{
+    return StructScalarMapWith<FNameProperty>(H, Path, Key, ResolveDSLName(Value, C), ESnapshotKind::Byte, C, At);
+}
+FDasStructValue GetTextByteMapByteStruct(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C,
+                                         das::LineInfoArg* At)
+{
+    return StructMapGetStruct(H, Path, Key, ESnapshotKind::Byte, C, At);
+}
+FDasStructValue WithTextByteMapByteStruct(const FDasStructValue& H, const char* Path, uint8 Key,
+                                          const FDasStructValue& Value, das::Context* C, das::LineInfoArg* At)
+{
+    return StructMapWithStruct(H, Path, Key, Value, ESnapshotKind::Byte, C, At);
+}
+FDasEnumValue GetTextByteMapByteEnum(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C)
+{
+    return StructMapGetEnum(H, Path, Key, ESnapshotKind::Byte, C);
+}
+FDasStructValue WithTextByteMapByteEnum(const FDasStructValue& H, const char* Path, uint8 Key, FDasEnumValue Value,
+                                        das::Context* C, das::LineInfoArg* At)
+{
+    return StructMapWithEnum(H, Path, Key, Value, ESnapshotKind::Byte, C, At);
+}
+FDasObjectHandle GetTextByteMapByteObject(const FDasStructValue& H, const char* Path, uint8 Key, das::Context* C)
+{
+    return StructMapGetObject(H, Path, Key, ESnapshotKind::Byte, C);
+}
+FDasStructValue WithTextByteMapByteObject(const FDasStructValue& H, const char* Path, uint8 Key,
+                                          const FDasObjectHandle& Value, das::Context* C, das::LineInfoArg* At)
+{
+    return StructMapWithObject(H, Path, Key, Value, ESnapshotKind::Byte, C, At);
+}

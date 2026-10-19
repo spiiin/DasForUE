@@ -2,8 +2,10 @@
 #include "Commandlets/Commandlet.h"
 #include "DasInputEventsCommandlet.generated.h"
 UCLASS()
-class UDasInputEventsCommandlet:public UCommandlet {
- GENERATED_BODY()
+class UDasInputEventsCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
 public:
- UDasInputEventsCommandlet();virtual int32 Main(const FString& Params)override;
+    UDasInputEventsCommandlet();
+    virtual int32 Main(const FString& Params) override;
 };

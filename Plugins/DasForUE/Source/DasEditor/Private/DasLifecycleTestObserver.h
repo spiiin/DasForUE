@@ -36,15 +36,28 @@ public:
     void OnSignal(int32 Value)
     {
         ++Calls;
-        if (AActor* Actor = Target.Get()) Actor->Destroy();
+        if (AActor* Actor = Target.Get())
+            Actor->Destroy();
     }
 };
 
 UCLASS(Transient)
-class UDasComponentLifecycleObserver:public UObject {
- GENERATED_BODY()
+class UDasComponentLifecycleObserver : public UObject
+{
+    GENERATED_BODY()
 public:
- int32 Calls=0;int32 ActorEnds=0;int32 ComponentEnds=0;
- void OnComponentEnded(UDasScriptComponent* Component,EEndPlayReason::Type){ComponentEnds=DasComponentInt(Component,TEXT("EndCount"));}
- UFUNCTION() void OnEnded(AActor* Actor,EEndPlayReason::Type Reason){++Calls;if(auto* P=FindFProperty<FIntProperty>(Actor->GetClass(),TEXT("Ends")))ActorEnds=P->GetPropertyValue_InContainer(Actor);}
+    int32 Calls = 0;
+    int32 ActorEnds = 0;
+    int32 ComponentEnds = 0;
+    void OnComponentEnded(UDasScriptComponent* Component, EEndPlayReason::Type)
+    {
+        ComponentEnds = DasComponentInt(Component, TEXT("EndCount"));
+    }
+    UFUNCTION()
+    void OnEnded(AActor* Actor, EEndPlayReason::Type Reason)
+    {
+        ++Calls;
+        if (auto* P = FindFProperty<FIntProperty>(Actor->GetClass(), TEXT("Ends")))
+            ActorEnds = P->GetPropertyValue_InContainer(Actor);
+    }
 };

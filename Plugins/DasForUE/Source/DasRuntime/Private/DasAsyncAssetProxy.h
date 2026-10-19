@@ -4,12 +4,13 @@
 #include "UObject/SoftObjectPath.h"
 #include "DasAsyncAssetProxy.generated.h"
 UCLASS(Transient)
-class UDasAsyncAssetProxy:public UObject {
+class UDasAsyncAssetProxy : public UObject
+{
     GENERATED_BODY()
 public:
-    uint64 SubscriptionId=0;
+    uint64 SubscriptionId = 0;
     FSoftObjectPath Path;
     FString ExpectedClass;
-    bool ClassReference=false;
+    bool ClassReference = false;
     void Complete();
 };

@@ -1,98 +1,1002 @@
-    thread_local bool CollectTypesOnly=false;
-    das::TypeDeclPtr DSLCopyType(const das::TypeDeclPtr& T){das::TypeDeclPtr C=nullptr;das::TypeDecl::clone(C,T);return C;}
-    bool DSLNativeEnum(const das::TypeDeclPtr& T){return T && T->baseType==das::Type::tEnumeration && T->enumType && DSLAnnotation(T->enumType->annotations,"ue_native_enum");}
-    bool DSLDirectEnum(const das::TypeDeclPtr& T){return T && T->baseType==das::Type::tEnumeration && T->enumType && (DSLAnnotation(T->enumType->annotations,"ue_enum") || DSLAnnotation(T->enumType->annotations,"ue_native_enum"));}
-    bool DSLRawStruct(const das::TypeDeclPtr& T){return T && T->baseType==das::Type::tHandle && T->annotation && T->annotation->name=="UEStructValue";}
-    bool DSLNativeStruct(const das::TypeDeclPtr& T){return T && T->baseType==das::Type::tStructure && T->structType && DSLAnnotation(T->structType->annotations,"ue_native_struct");}
-    bool DSLDirectStruct(const das::TypeDeclPtr& T){return DSLGameplay(T) || DSLSoft(T) || (T && T->baseType==das::Type::tStructure && T->structType && (DSLAnnotation(T->structType->annotations,"ue_struct") || DSLAnnotation(T->structType->annotations,"ue_native_struct")));}
+thread_local bool CollectTypesOnly = false;
+das::TypeDeclPtr DSLCopyType(const das::TypeDeclPtr& T)
+{
+    das::TypeDeclPtr C = nullptr;
+    das::TypeDecl::clone(C, T);
+    return C;
+}
+bool DSLNativeEnum(const das::TypeDeclPtr& T)
+{
+    return T && T->baseType == das::Type::tEnumeration && T->enumType &&
+           DSLAnnotation(T->enumType->annotations, "ue_native_enum");
+}
+bool DSLDirectEnum(const das::TypeDeclPtr& T)
+{
+    return T && T->baseType == das::Type::tEnumeration && T->enumType &&
+           (DSLAnnotation(T->enumType->annotations, "ue_enum") ||
+            DSLAnnotation(T->enumType->annotations, "ue_native_enum"));
+}
+bool DSLRawStruct(const das::TypeDeclPtr& T)
+{
+    return T && T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEStructValue";
+}
+bool DSLNativeStruct(const das::TypeDeclPtr& T)
+{
+    return T && T->baseType == das::Type::tStructure && T->structType &&
+           DSLAnnotation(T->structType->annotations, "ue_native_struct");
+}
+bool DSLDirectStruct(const das::TypeDeclPtr& T)
+{
+    return DSLGameplay(T) || DSLSoft(T) ||
+           (T && T->baseType == das::Type::tStructure && T->structType &&
+            (DSLAnnotation(T->structType->annotations, "ue_struct") ||
+             DSLAnnotation(T->structType->annotations, "ue_native_struct")));
+}
 
-    FString DSLValidateNativeStruct(const das::TypeDeclPtr& T){
-     static thread_local int32 Depth=0;TGuardValue<int32> Guard(Depth,Depth+1);if(Depth>16)DSLFail(TEXT("Recursive native source struct"));
-     const auto* Annotation=DSLAnnotation(T->structType->annotations,"ue_native_struct");if(!Annotation)DSLFail(TEXT("Missing native struct annotation"));const FString Path=DSLString(Annotation->arguments,"path");auto* S=FindObject<UScriptStruct>(nullptr,*Path);const FDasNativeGameplayStruct* Row=nullptr;for(const auto& V:DasNativeGameplayStructs)if(Path==V.Path){Row=&V;break;}if(!Row && S)Row=DasAdapterValueStruct(S);if(!S || !Row || !T->structType->module || DSLText(T->structType->module->name+"::"+T->structType->name)!=Row->Source)DSLFail(TEXT("Native struct not in generated registry or noncanonical source declaration"));FString Shape;int32 Count=0;
-     for(TFieldIterator<FProperty> I(S);I;++I){AppendCallShape(*I,Shape);++Count;const auto* F=T->structType->findField(DSLUtf8(I->GetName()));FDasDeclaredType Native;if(!F || F->generated || F->classMethod || !DasNativeGameplayType(*I,Native))DSLFail(TEXT("Native struct layout mismatch"));const auto& Type=F->type;if(!Type || Type->ref || Type->isFixedArray())DSLFail(TEXT("Native struct members require by-value fields"));if(DSLTypeName(Type)!=Native.Kind)DSLFail(TEXT("Native struct member kind mismatch"));if(Native.Kind==TEXT("array") || Native.Kind==TEXT("map") || Native.Kind==TEXT("set")){if(DSLContainerType(Type).Identity()!=Native.Identity())DSLFail(TEXT("Native struct array identity mismatch"));}else if(Native.Kind==TEXT("object")){if(!DSLTypedReference(Type) || DSLTypedReferencePath(Type)!=Native.TypePath)DSLFail(TEXT("Native struct object identity mismatch"));}else if(Native.Kind==TEXT("enum") || Native.Kind==TEXT("struct")){if(DSLDirectPath(Type,FString(),FString())!=Native.TypePath)DSLFail(TEXT("Native struct member identity mismatch"));}}
-     if(Shape!=Row->Signature || Count!=int32(T->structType->fields.size()))DSLFail(TEXT("Native struct schema stale or fields added"));return Path;
+FString DSLValidateNativeStruct(const das::TypeDeclPtr& T)
+{
+    static thread_local int32 Depth = 0;
+    TGuardValue<int32> Guard(Depth, Depth + 1);
+    if (Depth > 16)
+        DSLFail(TEXT("Recursive native source struct"));
+    const auto* Annotation = DSLAnnotation(T->structType->annotations, "ue_native_struct");
+    if (!Annotation)
+        DSLFail(TEXT("Missing native struct annotation"));
+    const FString Path = DSLString(Annotation->arguments, "path");
+    auto* S = FindObject<UScriptStruct>(nullptr, *Path);
+    const FDasNativeGameplayStruct* Row = nullptr;
+    for (const auto& V : DasNativeGameplayStructs)
+        if (Path == V.Path)
+        {
+            Row = &V;
+            break;
+        }
+    if (!Row && S)
+        Row = DasAdapterValueStruct(S);
+    if (!S || !Row || !T->structType->module ||
+        DSLText(T->structType->module->name + "::" + T->structType->name) != Row->Source)
+        DSLFail(TEXT("Native struct not in generated registry or noncanonical source declaration"));
+    FString Shape;
+    int32 Count = 0;
+    for (TFieldIterator<FProperty> I(S); I; ++I)
+    {
+        AppendCallShape(*I, Shape);
+        ++Count;
+        const auto* F = T->structType->findField(DSLUtf8(I->GetName()));
+        FDasDeclaredType Native;
+        if (!F || F->generated || F->classMethod || !DasNativeGameplayType(*I, Native))
+            DSLFail(TEXT("Native struct layout mismatch"));
+        const auto& Type = F->type;
+        if (!Type || Type->ref || Type->isFixedArray())
+            DSLFail(TEXT("Native struct members require by-value fields"));
+        if (DSLTypeName(Type) != Native.Kind)
+            DSLFail(TEXT("Native struct member kind mismatch"));
+        if (Native.Kind == TEXT("array") || Native.Kind == TEXT("map") || Native.Kind == TEXT("set"))
+        {
+            if (DSLContainerType(Type).Identity() != Native.Identity())
+                DSLFail(TEXT("Native struct array identity mismatch"));
+        }
+        else if (Native.Kind == TEXT("object"))
+        {
+            if (!DSLTypedReference(Type) || DSLTypedReferencePath(Type) != Native.TypePath)
+                DSLFail(TEXT("Native struct object identity mismatch"));
+        }
+        else if (Native.Kind == TEXT("enum") || Native.Kind == TEXT("struct"))
+        {
+            if (DSLDirectPath(Type, FString(), FString()) != Native.TypePath)
+                DSLFail(TEXT("Native struct member identity mismatch"));
+        }
     }
-    FString DSLPropertySnapshotPath(FProperty* P){if(auto* S=CastField<FStructProperty>(P))return S->Struct->GetPathName();if(auto* S=DasSoftCarrierForProperty(P))return S->GetPathName();DSLFail(TEXT("Expected reflected struct or soft reference property"));return {}; }
-    FString DSLDirectPath(const das::TypeDeclPtr& T,const FString& Folder,const FString& Registry){if(DSLGameplay(T))return DSLGameplayPath(T);if(DSLSoft(T))return DSLSoftPath(T);if(DSLNativeStruct(T))return DSLValidateNativeStruct(T);if(DSLNativeEnum(T))return DSLString(DSLAnnotation(T->enumType->annotations,"ue_native_enum")->arguments,"path");if(!DSLMathPath(T).IsEmpty())return DSLMathPath(T);if(DSLContainer(T))return DasContainerCarrier(DSLContainerType(T,Folder,Registry))->GetPathName();if(!DSLDirectEnum(T) && !DSLDirectStruct(T))return {};FString Path,Error;if(Registry.IsEmpty() && !Folder.StartsWith(TEXT("/Game/")))DSLFail(TEXT("Direct authored types require type_registry or type_folder"));const auto* Annotation=DSLDirectEnum(T)?DSLAnnotation(T->enumType->annotations,"ue_enum"):DSLAnnotation(T->structType->annotations,"ue_struct");const auto* DeclaredWire=Annotation->arguments.find("_ue_types_json",das::Type::tString);FDasReflectedTypes Declared;if(!DeclaredWire || !FDasReflectedTypes::FromJson(DSLText(DeclaredWire->sValue),Declared,Error,true))DSLFail(TEXT("Missing authored type identity"));const FString Id=DSLDirectEnum(T)?Declared.Enums[0].Id:Declared.Structs[0].Id;const FString Name=DSLText(DSLDirectEnum(T)?T->enumType->name:T->structType->name);Path=DSLResolveType(DSLDirectEnum(T)?EDSLTypeKind::Enum:EDSLTypeKind::Struct,Registry.IsEmpty()?Folder+TEXT("/")+Name+TEXT(".")+Name:Id,FDSLTypeScope{Declared.Id,Folder,Registry});if(DSLDirectEnum(T)){auto* E=ResolveDasEnum(Path,Error);if(!E)DSLFail(Error);if(E->NumEnums()!=static_cast<int32>(T->enumType->list.size())+1)DSLFail(TEXT("Direct enum declaration differs from loaded asset"));for(const auto& V:T->enumType->list){if(!V.value || V.value->__rtti!=das::string("ExprConstInt") || E->GetValueByNameString(DSLText(V.name))!=static_cast<das::ExprConstInt*>(V.value)->getValue())DSLFail(TEXT("Direct enum value differs from loaded asset"));}auto* Authored=Cast<UDasDefinedEnum>(E);if(Authored && !Authored->MemberIds.IsEmpty()){const auto* A=DSLAnnotation(T->enumType->annotations,"ue_enum");const auto* Wire=A->arguments.find("_ue_types_json",das::Type::tString);FDasReflectedTypes Model;if(!Wire || !FDasReflectedTypes::FromJson(DSLText(Wire->sValue),Model,Error,true) || Model.Enums.Num()!=1 || Authored->MemberIds.Num()!=Model.Enums[0].Entries.Num())DSLFail(TEXT("Direct enum member identity differs from loaded asset"));for(const auto& V:Model.Enums[0].Entries)if(Authored->MemberIds.FindRef(V.Value)!=V.Id)DSLFail(TEXT("Direct enum member identity differs from loaded asset"));}}else {if(!ValidateDasValueStruct(Path,Error))DSLFail(Error);auto* S=FindObject<UScriptStruct>(nullptr,*Path);int32 Count=0;for(TFieldIterator<FProperty> It(S);It;++It)++Count;int32 SourceCount=0;for(const auto& F:T->structType->fields){if(F.generated || F.classMethod)continue;++SourceCount;if(DSLSet(F.type)){auto* Set=CastField<FSetProperty>(FindDasStructField(S,DSLText(F.name)));if(!Set || !DSLPropertyMatches(Set->ElementProp,DSLTypeName(F.type->firstType)))DSLFail(TEXT("Direct set layout mismatch"));}else if(F.type->baseType==das::Type::tTable){auto* Map=CastField<FMapProperty>(FindDasStructField(S,DSLText(F.name)));if(!Map || !DSLPropertyMatches(Map->KeyProp,DSLTypeName(F.type->firstType)) || !DSLPropertyMatches(Map->ValueProp,DSLTypeName(F.type->secondType)))DSLFail(TEXT("Direct map layout mismatch"));if(DSLTypeName(F.type->secondType)==TEXT("struct")){if(DSLPropertySnapshotPath(Map->ValueProp)!=(!DSLMathPath(F.type->secondType).IsEmpty()?DSLMathPath(F.type->secondType):DSLDirectPath(F.type->secondType,Folder,Registry)))DSLFail(TEXT("Direct map struct identity mismatch"));}if(DSLDirectEnum(F.type->secondType)){auto* E=DasEnumPropertyType(Map->ValueProp);if(!E || E->GetPathName()!=DSLDirectPath(F.type->secondType,Folder,Registry))DSLFail(TEXT("Direct map enum identity mismatch"));}if(DSLTypedReference(F.type->secondType)){auto* C=DasReferencePropertyClass(Map->ValueProp);if(!C || C->GetPathName()!=DSLTypedReferencePath(F.type->secondType))DSLFail(TEXT("Direct map reference identity mismatch"));}}else if(F.type->baseType==das::Type::tArray){auto* Array=CastField<FArrayProperty>(FindDasStructField(S,DSLText(F.name)));auto* Element=Array?CastField<FStructProperty>(Array->Inner):nullptr;if(!Array)DSLFail(TEXT("Direct array field mismatch"));if(DSLTypedReference(F.type->firstType)){auto* C=DasReferencePropertyClass(Array->Inner);if(!C || C->GetPathName()!=DSLTypedReferencePath(F.type->firstType))DSLFail(TEXT("Direct reference array identity mismatch"));}else if(DSLDirectEnum(F.type->firstType)){auto* E=DasEnumPropertyType(Array->Inner);if(!E || E->GetPathName()!=DSLDirectPath(F.type->firstType,Folder,Registry))DSLFail(TEXT("Direct enum array identity mismatch"));}else if(DSLDirectStruct(F.type->firstType) || !DSLMathPath(F.type->firstType).IsEmpty()){if(DSLPropertySnapshotPath(Array->Inner)!=(!DSLMathPath(F.type->firstType).IsEmpty()?DSLMathPath(F.type->firstType):DSLDirectPath(F.type->firstType,Folder,Registry)))DSLFail(TEXT("Direct struct array identity mismatch"));}else if(!DSLPropertyMatches(Array->Inner,DSLTypeName(F.type->firstType)))DSLFail(TEXT("Direct scalar array element mismatch"));}else if(!DSLPropertyMatches(FindDasStructField(S,DSLText(F.name)),DSLTypeName(F.type)))DSLFail(TEXT("Direct struct field differs from loaded asset"));if(DSLDirectEnum(F.type)){auto* E=DasEnumPropertyType(FindDasStructField(S,DSLText(F.name)));if(!E || E->GetPathName()!=DSLDirectPath(F.type,Folder,Registry))DSLFail(TEXT("Direct struct enum identity mismatch"));}if(DSLTypedReference(F.type)){auto* ReferenceClass=DasReferencePropertyClass(FindDasStructField(S,DSLText(F.name)));if(ReferenceClass->GetPathName()!=DSLTypedReferencePath(F.type))DSLFail(TEXT("Direct struct object class identity mismatch"));}if(DSLDirectStruct(F.type) || !DSLMathPath(F.type).IsEmpty()){if(DSLPropertySnapshotPath(FindDasStructField(S,DSLText(F.name)))!=(!DSLMathPath(F.type).IsEmpty()?DSLMathPath(F.type):DSLDirectPath(F.type,Folder,Registry)))DSLFail(TEXT("Direct nested struct identity differs from loaded asset"));}}if(Count!=SourceCount)DSLFail(TEXT("Direct struct layout differs from loaded asset"));
-        const auto* A=DSLAnnotation(T->structType->annotations,"ue_struct");const auto* Wire=A->arguments.find("_ue_types_json",das::Type::tString);FDasReflectedTypes Model;if(!Wire || !FDasReflectedTypes::FromJson(DSLText(Wire->sValue),Model,Error,true) || Model.Structs.Num()!=1)DSLFail(TEXT("Missing direct struct declaration"));FInstancedStruct Defaults;if(!ParseDasStructDefault(Path,TEXT(""),Defaults,Error))DSLFail(Error);for(const auto& F:Model.Structs[0].Properties){auto* P=FindDasStructField(S,F.Name);const auto* Memory=Defaults.GetMemory();const auto& K=F.Type.Kind;if(K==TEXT("enum")){auto* E=DasEnumPropertyType(P);if(!E || DasEnumPropertyNumber(P,P->ContainerPtrToValuePtr<void>(Memory))!=E->GetValueByNameString(F.Default.String))DSLFail(TEXT("Direct struct enum default mismatch"));continue;}if(K==TEXT("object")){if(DasReferenceGet(P,P->ContainerPtrToValuePtr<void>(Memory)))DSLFail(TEXT("Authored struct object defaults must be null"));continue;}if(K==TEXT("set")){auto* Set=CastFieldChecked<FSetProperty>(P);if(FScriptSetHelper(Set,Set->ContainerPtrToValuePtr<void>(Memory)).Num()!=0)DSLFail(TEXT("Authored set defaults must be empty"));continue;}if(K==TEXT("map")){auto* Map=CastFieldChecked<FMapProperty>(P);if(FScriptMapHelper(Map,Map->ContainerPtrToValuePtr<void>(Memory)).Num()!=0)DSLFail(TEXT("Authored map defaults must be empty"));continue;}if(K==TEXT("array")){auto* Array=CastFieldChecked<FArrayProperty>(P);if(FScriptArrayHelper(Array,Array->ContainerPtrToValuePtr<void>(Memory)).Num()!=0)DSLFail(TEXT("Authored array defaults must be empty"));continue;}if(K==TEXT("struct") && CastField<FSoftObjectProperty>(P)){if(!CastFieldChecked<FSoftObjectProperty>(P)->GetPropertyValue(P->ContainerPtrToValuePtr<void>(Memory)).IsNull())DSLFail(TEXT("Authored soft fields require null defaults"));continue;}if(K==TEXT("struct")){auto* Nested=CastFieldChecked<FStructProperty>(P);FInstancedStruct Child;if(!ParseDasStructDefault(Nested->Struct->GetPathName(),IsDasMathStructPath(F.Type.TypePath)?F.Default.String:TEXT(""),Child,Error) || !MatchesDasStructDefault(Nested->Struct,Nested->ContainerPtrToValuePtr<void>(Memory),Child.GetMemory()))DSLFail(TEXT("Nested default differs from child default"));continue;}if(K==TEXT("byte")){if(CastFieldChecked<FByteProperty>(P)->GetPropertyValue_InContainer(Memory)!=uint8(F.Default.Number))DSLFail(TEXT("Direct byte default mismatch"));continue;}if(K==TEXT("text")){FText Expected;FString Issue;if(!ParseDasTextDefault(F.Default.String,Expected,Issue) || !DasTextDefaultsEqual(CastFieldChecked<FTextProperty>(P)->GetPropertyValue_InContainer(Memory),Expected))DSLFail(TEXT("Direct text default mismatch"));continue;}const bool Matches=K==TEXT("int")?CastFieldChecked<FIntProperty>(P)->GetPropertyValue_InContainer(Memory)==static_cast<int32>(F.Default.Number):K==TEXT("float")?CastFieldChecked<FFloatProperty>(P)->GetPropertyValue_InContainer(Memory)==static_cast<float>(F.Default.Number):K==TEXT("double")?CastFieldChecked<FDoubleProperty>(P)->GetPropertyValue_InContainer(Memory)==F.Default.Number:K==TEXT("bool")?CastFieldChecked<FBoolProperty>(P)->GetPropertyValue_InContainer(Memory)==F.Default.Boolean:K==TEXT("string")?CastFieldChecked<FStrProperty>(P)->GetPropertyValue_InContainer(Memory)==F.Default.String:CastFieldChecked<FNameProperty>(P)->GetPropertyValue_InContainer(Memory)==FName(*F.Default.String);if(!Matches)DSLFail(TEXT("Direct struct default differs from loaded asset"));}
-}return Path;}
-    das::TypeDeclPtr DSLHandleType(das::ModuleGroup& Group,das::Module* Module,const char* Name){auto A=Group.findAnnotation(Name,Module);if(A.size()!=1)DSLFail(TEXT("Missing or ambiguous bridge type"));auto T=new das::TypeDecl(das::Type::tHandle,das::LineInfo());T->annotation=static_cast<das::TypeAnnotation*>(A[0]);return T;}
-    das::ExprCall* DSLCall(const das::LineInfo& At,const das::string& Name,std::initializer_list<das::ExpressionPtr> Args){auto* C=new das::ExprCall(At,Name);for(auto* A:Args)C->arguments.push_back(A);return C;}
-    das::string DSLMathSuffix(const das::TypeDeclPtr& Type){const auto Path=DSLMathPath(Type);return Path==TEXT("/Script/EnhancedInput.InputActionValue")?"input_value":Path==TEXT("/Script/CoreUObject.Vector2D")?"vector2d":Path==TEXT("/Script/CoreUObject.Vector")?"vector":Path==TEXT("/Script/CoreUObject.Rotator")?"rotator":"transform";}
-    FString DSLSourceValueKey(const das::TypeDeclPtr& Type,const FString& Path){if(DSLContainer(Type)){const auto Value=Type->baseType==das::Type::tTable && !DSLSet(Type)?Type->secondType:Type->firstType;if(DSLTypedReference(Value))return Path+TEXT(":reference:")+DSLText(Value->structType->module->name)+TEXT("::")+DSLText(Value->structType->name);}return Path;}
-    das::ExpressionPtr DSLDirectUnpack(const das::LineInfo& At,const das::TypeDeclPtr& Type,das::ExpressionPtr V,const FString& Path){if(Type && Type->baseType==das::Type::tUInt8)return DSLCall(At,"uint8",{V});if(DSLRawStruct(Type))return V;if(DSLGameplay(Type))return DSLGameplayUnpack(At,Type,V);if(DSLSoft(Type))return DSLSoftUnpack(At,Type,V);if(DSLTypedClass(Type))return DSLClassUnpack(At,Type,V);if(DSLDelegate(Type))return DSLDelegateSnapshot(At,Type,V);if(!DSLMathPath(Type).IsEmpty())return DSLCall(At,"__ue_math_unpack_"+DSLMathSuffix(Type),{V});if(DSLAuthoredView(Type))return DSLAuthoredUnpack(At,Type,V);if(DSLTypedReference(Type))return DSLCall(At,Type->structType->module->name+"::"+Type->structType->name+"_from",{V});if(DSLDirectEnum(Type)){auto T=DSLCopyType(Type);T->ref=false;T->constant=false;auto* C=new das::ExprCast(At,DSLCall(At,"__ue_checked_enum_number",{V,new das::ExprConstString(At,DSLUtf8(Path))}),T);C->reinterpret=true;auto* U=new das::ExprUnsafe(At);U->body=C;return U;}return DSLCall(At,DSLUtf8(TEXT("__ue_unpack_")+FMD5::HashAnsiString(*DSLSourceValueKey(Type,Path))),{V});}
-    das::ExpressionPtr DSLDirectPack(const das::LineInfo& At,const das::TypeDeclPtr& Type,das::ExpressionPtr V,const FString& Path){if(Type && Type->baseType==das::Type::tUInt8)return DSLCall(At,"int",{V});if(DSLRawStruct(Type))return V;if(DSLGameplay(Type))return DSLGameplayPack(At,Type,V);if(DSLSoft(Type))return DSLSoftPack(At,Type,V);if(DSLNativeEnum(Type))return DSLCall(At,Type->enumType->module->name+"::__ue_pack_native_enum_"+Type->enumType->name,{V});if(DSLTypedClass(Type))return DSLClassPack(At,Type,V);if(DSLDelegate(Type))return new das::ExprField(At,V,"__delegate_token");if(!DSLMathPath(Type).IsEmpty())return DSLCall(At,"__ue_math_pack_"+DSLMathSuffix(Type),{V});if(DSLAuthoredView(Type))return DSLAuthoredPack(At,Type,V);if(DSLTypedObject(Type))return DSLCall(At,"ue_cast_nullable_object",{new das::ExprField(At,V,"handle"),new das::ExprConstString(At,DSLUtf8(DSLTypedReferencePath(Type)))});if(DSLTypedReference(Type))return DSLCall(At,Type->structType->module->name+"::"+Type->structType->name+"_raw",{V});if(DSLDirectEnum(Type))return DSLCall(At,"ue_enum_from_number",{new das::ExprConstString(At,DSLUtf8(Path)),DSLCall(At,"int",{V})});return DSLCall(At,DSLUtf8(TEXT("__ue_pack_")+FMD5::HashAnsiString(*DSLSourceValueKey(Type,Path))),{V});}
-    const char* DSLScalarSuffix(const FString& K){return K==TEXT("byte")?"byte":K==TEXT("text")?"text":K==TEXT("int")?"int":K==TEXT("float")?"float":K==TEXT("double")?"double":K==TEXT("bool")?"bool":K==TEXT("string")?"string":"name";}
-    das::FunctionPtr DSLHelper(const das::LineInfo& At,const das::string& Name,const das::TypeDeclPtr& Input,const das::TypeDeclPtr& Output,das::ExpressionPtr Value){auto F=new das::Function();F->at=At;F->name=Name;F->result=Output;F->generated=true;F->privateFunction=true;auto Arg=new das::Variable();Arg->at=At;Arg->name="value";Arg->type=DSLCopyType(Input);Arg->type->constant=true;F->arguments.push_back(Arg);auto* Block=new das::ExprBlock();Block->at=At;Block->list.push_back(new das::ExprReturn(At,Value));F->body=Block;return F;}
-    void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType,const FString& Path,das::ModuleGroup& Group,das::Module* Module,das::vector<das::FunctionPtr>& Generated,TSet<FString>& Helpers){if(DSLSoft(InputType) || DSLGameplay(InputType))return;auto Type=DSLCopyType(InputType);Type->ref=false;Type->constant=false;const bool Container=DSLContainer(Type);const FString HelperKey=DSLSourceValueKey(Type,Path);if((!Container && !DSLDirectStruct(Type)) || Helpers.Contains(HelperKey))return;Helpers.Add(HelperKey);if(Module->functionsByName.find(das::hash64z(DSLUtf8(TEXT("__ue_pack_")+FMD5::HashAnsiString(*HelperKey)).c_str())))return;const auto& At=Container?Type->at:Type->structType->at;auto Handle=DSLHandleType(Group,Module,"UEStructValue");das::ExpressionPtr Packed=DSLCall(At,"ue_struct_value",{new das::ExprConstString(At,DSLUtf8(Path))});
-        auto Local=[&](const das::string& Name,const das::TypeDeclPtr& T,das::ExpressionPtr Init){auto* V=new das::Variable();V->at=At;V->name=Name;V->type=DSLCopyType(T);V->type->ref=false;V->type->constant=false;V->init=Init;auto* Let=new das::ExprLet();Let->at=At;Let->variables.push_back(V);return Let;};
-        auto* PackBody=new das::ExprBlock();PackBody->at=At;PackBody->list.push_back(Local("packed",Handle,Packed));auto* UnpackBody=new das::ExprBlock();UnpackBody->at=At;UnpackBody->list.push_back(DSLCall(At,"__ue_require_struct_type",{new das::ExprVar(At,"value"),new das::ExprConstString(At,DSLUtf8(Path))}));auto* Empty=new das::ExprMakeStruct(At);Empty->makeType=DSLCopyType(Type);Empty->makeType->ref=false;Empty->makeType->constant=false;Empty->useInitializer=true;Empty->alwaysUseInitializer=Container;UnpackBody->list.push_back(Local("result",Type,Empty));
-        auto Loop=[&](das::ExpressionPtr Count,das::ExprBlock* Body){auto* L=new das::ExprFor(At);L->iterators.push_back("index");L->iteratorsAka.push_back("");L->iteratorsAt.push_back(At);L->iteratorsTags.push_back(nullptr);L->iteratorsTupleExpansion.push_back(0);L->sources.push_back(DSLCall(At,"range",{new das::ExprConstInt(At,0),Count}));L->body=Body;return L;};
-        das::vector<das::Structure::FieldDeclaration> ContainerFields;if(Container){das::Structure::FieldDeclaration F;F.name="Values";F.type=Type;ContainerFields.push_back(F);}const auto& Fields=Container?ContainerFields:Type->structType->fields;
-        for(const auto& Field:Fields){if(Field.generated || Field.classMethod)continue;const bool Array=Field.type->baseType==das::Type::tArray;const auto Child=Array?Field.type->firstType:Field.type;auto Access=[&](){return Container?static_cast<das::ExpressionPtr>(new das::ExprVar(At,"value")):static_cast<das::ExpressionPtr>(new das::ExprField(At,new das::ExprVar(At,"value"),Field.name));};auto Target=[&](){return Container?static_cast<das::ExpressionPtr>(new das::ExprVar(At,"result")):static_cast<das::ExpressionPtr>(new das::ExprField(At,new das::ExprVar(At,"result"),Field.name));};auto Name=[&](){return new das::ExprConstString(At,Field.name);};
-            if(DSLSet(Field.type) && DSLObjectKey(Field.type->firstType)){
-                const auto Element=Field.type->firstType;auto* PLoop=new das::ExprBlock();PLoop->at=At;
-                PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"__ue_struct_set_with_object_key",{new das::ExprVar(At,"packed"),Name(),DSLKeyPack(At,Element,new das::ExprVar(At,"index")),new das::ExprConstBool(At,true)})));
-                auto* KeysLoop=Loop(new das::ExprConstInt(At,0),PLoop);KeysLoop->sources[0]=DSLCall(At,"keys",{Access()});PackBody->list.push_back(KeysLoop);
-                auto* ULoop=new das::ExprBlock();ULoop->at=At;ULoop->list.push_back(DSLCall(At,"insert",{Target(),DSLKeyUnpack(At,Element,DSLCall(At,"__ue_struct_set_element_object_key",{new das::ExprVar(At,"value"),Name(),new das::ExprVar(At,"index")}))}));
-                UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_set_size",{new das::ExprVar(At,"value"),Name()}),ULoop));
-            }
-            else if(DSLSet(Field.type) && DSLDirectEnum(Field.type->firstType)){
-                const auto Element=Field.type->firstType;
-                // Resolve the actual enum from the carrier (authored paths depend on registry scope).
-                auto* Native=FindObject<UScriptStruct>(nullptr,*Path);auto* Set=Native?CastField<FSetProperty>(FindDasStructField(Native,DSLText(Field.name))):nullptr;
-                auto* Enum=Set?DasEnumPropertyType(Set->ElementProp):nullptr;if(!Enum)DSLFail(TEXT("Expected enum set carrier"));
-                auto* PLoop=new das::ExprBlock();PLoop->at=At;
-                PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"__ue_struct_set_with_enum",{new das::ExprVar(At,"packed"),Name(),DSLDirectPack(At,Element,new das::ExprVar(At,"index"),Enum->GetPathName()),new das::ExprConstBool(At,true)})));
-                auto* KeysLoop=Loop(new das::ExprConstInt(At,0),PLoop);KeysLoop->sources[0]=DSLCall(At,"keys",{Access()});PackBody->list.push_back(KeysLoop);
-                auto* ULoop=new das::ExprBlock();ULoop->at=At;
-                ULoop->list.push_back(DSLCall(At,"insert",{Target(),DSLDirectUnpack(At,Element,DSLCall(At,"__ue_struct_set_element_enum",{new das::ExprVar(At,"value"),Name(),new das::ExprVar(At,"index")}),Enum->GetPathName())}));
-                UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_set_size",{new das::ExprVar(At,"value"),Name()}),ULoop));
-            }
-            else if(DSLSet(Field.type)){
-                const das::string Suffix=DSLTypeName(Field.type->firstType)==TEXT("byte")?"byte":DSLTypeName(Field.type->firstType)==TEXT("name")?"name":DSLTypeName(Field.type->firstType)==TEXT("string")?"string":"int";
-                auto* PLoop=new das::ExprBlock();PLoop->at=At;
-                PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"ue_struct_set_with_"+Suffix,{new das::ExprVar(At,"packed"),Name(),new das::ExprVar(At,"index"),new das::ExprConstBool(At,true)})));
-                auto* KeysLoop=Loop(new das::ExprConstInt(At,0),PLoop);KeysLoop->sources[0]=DSLCall(At,"keys",{Access()});PackBody->list.push_back(KeysLoop);
-                auto* ULoop=new das::ExprBlock();ULoop->at=At;
-                ULoop->list.push_back(DSLCall(At,"insert",{Target(),DSLCall(At,"ue_struct_set_element_"+Suffix,{new das::ExprVar(At,"value"),Name(),new das::ExprVar(At,"index")})}));
-                UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_set_size",{new das::ExprVar(At,"value"),Name()}),ULoop));
-            }
-            else if(Field.type->baseType==das::Type::tTable){
-                const das::string K=DSLDirectEnum(Field.type->firstType)?"enum":DSLObjectKey(Field.type->firstType)?"object":DSLTypeName(Field.type->firstType)==TEXT("byte")?"byte":DSLTypeName(Field.type->firstType)==TEXT("name")?"name":DSLTypeName(Field.type->firstType)==TEXT("string")?"string":"int",V=DSLUtf8(DSLTypeName(Field.type->secondType));const bool StructValue=V=="struct",EnumValue=DSLDirectEnum(Field.type->secondType),ObjectValue=DSLTypedReference(Field.type->secondType),TypedValue=StructValue || EnumValue || ObjectValue;
-                FString ValuePath;if(StructValue){auto* Native=FindObject<UScriptStruct>(nullptr,*Path);auto* Map=CastField<FMapProperty>(FindDasStructField(Native,DSLText(Field.name)));if(!Map)DSLFail(TEXT("Expected map snapshot value"));ValuePath=DSLPropertySnapshotPath(Map->ValueProp);DSLEnsureStructHelpers(Field.type->secondType,ValuePath,Group,Module,Generated,Helpers);}
-                if(EnumValue || ObjectValue){auto* Native=FindObject<UScriptStruct>(nullptr,*Path);auto* Map=CastFieldChecked<FMapProperty>(FindDasStructField(Native,DSLText(Field.name)));ValuePath=EnumValue?DasEnumPropertyType(Map->ValueProp)->GetPathName():DasReferencePropertyClass(Map->ValueProp)->GetPathName();}
-                FString KeyPath;if(K=="enum"){auto* Native=FindObject<UScriptStruct>(nullptr,*Path);auto* Map=Native?CastField<FMapProperty>(FindDasStructField(Native,DSLText(Field.name))):nullptr;auto* Enum=Map?DasEnumPropertyType(Map->KeyProp):nullptr;if(!Enum)DSLFail(TEXT("Expected enum-key map carrier"));KeyPath=Enum->GetPathName();}
-                const das::string With=(K=="object" || K=="enum")?"__ue_struct_map_with_"+K+"_"+V:EnumValue?"__ue_struct_map_with_"+K+"_enum":ObjectValue?"__ue_struct_map_with_"+K+"_object":StructValue?"__ue_struct_map_with_"+K+"_struct":K=="int" && V=="int"?"ue_struct_map_with_int":"ue_struct_map_with_"+K+"_"+V;
-                const das::string Get=(K=="object" || K=="enum")?"__ue_struct_map_get_"+K+"_"+V:EnumValue?"__ue_struct_map_get_"+K+"_enum":ObjectValue?"__ue_struct_map_get_"+K+"_object":StructValue?"__ue_struct_map_get_"+K+"_struct":K=="int" && V=="int"?"ue_struct_map_get_int":"ue_struct_map_get_"+K+"_"+V;
-                auto* PLoop=new das::ExprBlock();PLoop->at=At;das::ExpressionPtr Mapped=new das::ExprVar(At,"mapped");das::ExpressionPtr PackedKey=new das::ExprVar(At,"index");if(K=="enum")PackedKey=DSLDirectPack(At,Field.type->firstType,PackedKey,KeyPath);if(K=="object")PackedKey=DSLKeyPack(At,Field.type->firstType,PackedKey);if(TypedValue)Mapped=DSLDirectPack(At,Field.type->secondType,Mapped,ValuePath);
-                PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,With,{new das::ExprVar(At,"packed"),Name(),PackedKey,Mapped})));
-                auto* KeysLoop=Loop(new das::ExprConstInt(At,0),PLoop);KeysLoop->sources[0]=DSLCall(At,"keys",{Access()});KeysLoop->iterators.push_back("mapped");KeysLoop->iteratorsAka.push_back("");KeysLoop->iteratorsAt.push_back(At);KeysLoop->iteratorsTags.push_back(nullptr);KeysLoop->iteratorsTupleExpansion.push_back(0);KeysLoop->sources.push_back(DSLCall(At,"values",{Access()}));PackBody->list.push_back(KeysLoop);
-                auto* ULoop=new das::ExprBlock();ULoop->at=At;das::ExpressionPtr Key=DSLCall(At,K=="enum"?"__ue_struct_map_key_enum":K=="object"?"__ue_struct_map_key_object":K=="byte"?"ue_struct_map_key_byte":K=="name"?"ue_struct_map_key_name":K=="string"?"ue_struct_map_key_string":"ue_struct_map_key",{new das::ExprVar(At,"value"),Name(),new das::ExprVar(At,"index")});das::ExpressionPtr Result=DSLCall(At,Get,{new das::ExprVar(At,"value"),Name(),Key->clone()});if(TypedValue)Result=DSLDirectUnpack(At,Field.type->secondType,Result,ValuePath);if(K=="enum")Key=DSLDirectUnpack(At,Field.type->firstType,Key,KeyPath);if(K=="object")Key=DSLKeyUnpack(At,Field.type->firstType,Key);
-                if(StructValue){auto* Insert=DSLCall(At,"insert_clone",{Target(),Key,Result});ULoop->list.push_back(Insert);}else ULoop->list.push_back(new das::ExprCopy(At,new das::ExprAt(At,Target(),Key),Result));
-                UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_map_size",{new das::ExprVar(At,"value"),Name()}),ULoop));
-            }
-            else if(Array && DSLTypedReference(Child)){
-                const FString ObjectPath=DSLTypedReferencePath(Child);
-                auto IndexPath=[&](){return new das::ExprOp2(At,"+",new das::ExprConstString(At,Field.name+"."),DSLCall(At,"string",{new das::ExprVar(At,"index")}));};
-                PackBody->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"ue_struct_array_resize",{new das::ExprVar(At,"packed"),Name(),DSLCall(At,"int",{DSLCall(At,"length",{Access()})})})));
-                auto* PLoop=new das::ExprBlock();PLoop->at=At;PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"ue_struct_with_object",{new das::ExprVar(At,"packed"),IndexPath(),DSLDirectPack(At,Child,new das::ExprAt(At,Access(),new das::ExprVar(At,"index")),ObjectPath)})));PackBody->list.push_back(Loop(DSLCall(At,"int",{DSLCall(At,"length",{Access()})}),PLoop));
-                auto* ULoop=new das::ExprBlock();ULoop->at=At;ULoop->list.push_back(DSLCall(At,"push",{Target(),DSLDirectUnpack(At,Child,DSLCall(At,"ue_struct_get_object",{new das::ExprVar(At,"value"),IndexPath()}),ObjectPath)}));UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_array_size",{new das::ExprVar(At,"value"),Name()}),ULoop));
-            }
-            else if(Array && DSLDirectEnum(Child)){
-                auto* Native=FindObject<UScriptStruct>(nullptr,*Path);auto* ArrayField=CastField<FArrayProperty>(FindDasStructField(Native,DSLText(Field.name)));auto* E=ArrayField?DasEnumPropertyType(ArrayField->Inner):nullptr;if(!E)DSLFail(TEXT("Expected enum array element"));const FString EnumPath=E->GetPathName();
-                auto IndexPath=[&](){return new das::ExprOp2(At,"+",new das::ExprConstString(At,Field.name+"."),DSLCall(At,"string",{new das::ExprVar(At,"index")}));};
-                PackBody->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"ue_struct_array_resize",{new das::ExprVar(At,"packed"),Name(),DSLCall(At,"int",{DSLCall(At,"length",{Access()})})})));
-                auto* PLoop=new das::ExprBlock();PLoop->at=At;PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"__ue_struct_with_enum_value",{new das::ExprVar(At,"packed"),IndexPath(),DSLDirectPack(At,Child,new das::ExprAt(At,Access(),new das::ExprVar(At,"index")),EnumPath)})));PackBody->list.push_back(Loop(DSLCall(At,"int",{DSLCall(At,"length",{Access()})}),PLoop));
-                auto* ULoop=new das::ExprBlock();ULoop->at=At;ULoop->list.push_back(DSLCall(At,"push",{Target(),DSLDirectUnpack(At,Child,DSLCall(At,"__ue_struct_get_enum_value",{new das::ExprVar(At,"value"),IndexPath(),new das::ExprConstString(At,DSLUtf8(EnumPath))}),EnumPath)}));UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_array_size",{new das::ExprVar(At,"value"),Name()}),ULoop));
-            }
-            else if(Array && !DSLDirectStruct(Child) && !DSLRawStruct(Child) && DSLMathPath(Child).IsEmpty()){const char* Suffix=DSLScalarSuffix(DSLTypeName(Child));auto IndexPath=[&](){return new das::ExprOp2(At,"+",new das::ExprConstString(At,Field.name+"."),DSLCall(At,"string",{new das::ExprVar(At,"index")}));};PackBody->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"ue_struct_array_resize",{new das::ExprVar(At,"packed"),Name(),DSLCall(At,"int",{DSLCall(At,"length",{Access()})})})));auto* PLoop=new das::ExprBlock();PLoop->at=At;PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,das::string("ue_struct_with_")+Suffix,{new das::ExprVar(At,"packed"),IndexPath(),new das::ExprVar(At,"element")})));auto* Indexed=Loop(DSLCall(At,"int",{DSLCall(At,"length",{Access()})}),PLoop);Indexed->iterators.push_back("element");Indexed->iteratorsAka.push_back("");Indexed->iteratorsAt.push_back(At);Indexed->iteratorsTags.push_back(nullptr);Indexed->iteratorsTupleExpansion.push_back(0);Indexed->sources.push_back(Access());PackBody->list.push_back(Indexed);auto* ULoop=new das::ExprBlock();ULoop->at=At;ULoop->list.push_back(DSLCall(At,"push",{Target(),DSLCall(At,das::string("ue_struct_get_")+Suffix,{new das::ExprVar(At,"value"),IndexPath()})}));UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_array_size",{new das::ExprVar(At,"value"),Name()}),ULoop));}
-            else if(Array || DSLDirectStruct(Child) || !DSLMathPath(Child).IsEmpty()){auto* Native=FindObject<UScriptStruct>(nullptr,*Path);auto* P=FindDasStructField(Native,DSLText(Field.name));auto* Element=Array?CastFieldChecked<FArrayProperty>(P)->Inner:P;const FString ChildPath=DSLPropertySnapshotPath(Element);DSLEnsureStructHelpers(Child,ChildPath,Group,Module,Generated,Helpers);
-                if(Array){PackBody->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"ue_struct_array_resize",{new das::ExprVar(At,"packed"),Name(),DSLCall(At,"int",{DSLCall(At,"length",{Access()})})})));auto* PLoop=new das::ExprBlock();PLoop->at=At;PLoop->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"ue_struct_nested_with",{new das::ExprVar(At,"packed"),Name(),new das::ExprVar(At,"index"),DSLDirectPack(At,Child,new das::ExprAt(At,Access(),new das::ExprVar(At,"index")),ChildPath)})));PackBody->list.push_back(Loop(DSLCall(At,"int",{DSLCall(At,"length",{Access()})}),PLoop));auto* ULoop=new das::ExprBlock();ULoop->at=At;ULoop->list.push_back(DSLCall(At,"push_clone",{Target(),DSLDirectUnpack(At,Child,DSLCall(At,"ue_struct_nested_get",{new das::ExprVar(At,"value"),Name(),new das::ExprVar(At,"index")}),ChildPath)}));UnpackBody->list.push_back(Loop(DSLCall(At,"ue_struct_array_size",{new das::ExprVar(At,"value"),Name()}),ULoop));}
-                else{PackBody->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"ue_struct_nested_with",{new das::ExprVar(At,"packed"),Name(),new das::ExprConstInt(At,-1),DSLDirectPack(At,Child,Access(),ChildPath)})));UnpackBody->list.push_back(new das::ExprMove(At,Target(),DSLDirectUnpack(At,Child,DSLCall(At,"ue_struct_nested_get",{new das::ExprVar(At,"value"),Name(),new das::ExprConstInt(At,-1)}),ChildPath)));}
-            }else if(DSLDirectEnum(Field.type)){auto* Native=FindObject<UScriptStruct>(nullptr,*Path);auto* E=DasEnumPropertyType(FindDasStructField(Native,DSLText(Field.name)));if(!E)DSLFail(TEXT("Expected enum struct member"));const FString EnumPath=E->GetPathName();PackBody->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"__ue_struct_with_enum_value",{new das::ExprVar(At,"packed"),Name(),DSLDirectPack(At,Field.type,Access(),EnumPath)})));UnpackBody->list.push_back(new das::ExprCopy(At,Target(),DSLDirectUnpack(At,Field.type,DSLCall(At,"__ue_struct_get_enum_value",{new das::ExprVar(At,"value"),Name(),new das::ExprConstString(At,DSLUtf8(EnumPath))}),EnumPath)));
-            }else if(DSLTypedReference(Field.type)){const FString ObjectPath=DSLTypedReferencePath(Field.type);PackBody->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,"ue_struct_with_object",{new das::ExprVar(At,"packed"),Name(),DSLDirectPack(At,Field.type,Access(),ObjectPath)})));UnpackBody->list.push_back(new das::ExprCopy(At,Target(),DSLDirectUnpack(At,Field.type,DSLCall(At,"ue_struct_get_object",{new das::ExprVar(At,"value"),Name()}),ObjectPath)));
-            }else{const char* Suffix=DSLScalarSuffix(DSLTypeName(Field.type));PackBody->list.push_back(new das::ExprCopy(At,new das::ExprVar(At,"packed"),DSLCall(At,das::string("ue_struct_with_")+Suffix,{new das::ExprVar(At,"packed"),Name(),Access()})));UnpackBody->list.push_back(new das::ExprCopy(At,Target(),DSLCall(At,das::string("ue_struct_get_")+Suffix,{new das::ExprVar(At,"value"),Name()})));}}
-        PackBody->list.push_back(new das::ExprReturn(At,new das::ExprVar(At,"packed")));auto* Return=new das::ExprReturn(At,new das::ExprVar(At,"result"));Return->moveSemantics=true;UnpackBody->list.push_back(Return);auto Pack=DSLHelper(At,DSLUtf8(TEXT("__ue_pack_")+FMD5::HashAnsiString(*HelperKey)),DSLCopyType(Type),DSLCopyType(Handle),nullptr);Pack->body=PackBody;auto Unpack=DSLHelper(At,DSLUtf8(TEXT("__ue_unpack_")+FMD5::HashAnsiString(*HelperKey)),DSLCopyType(Handle),DSLCopyType(Type),nullptr);Unpack->body=UnpackBody;Generated.push_back(Pack);Generated.push_back(Unpack);
-
+    if (Shape != Row->Signature || Count != int32(T->structType->fields.size()))
+        DSLFail(TEXT("Native struct schema stale or fields added"));
+    return Path;
+}
+FString DSLPropertySnapshotPath(FProperty* P)
+{
+    if (auto* S = CastField<FStructProperty>(P))
+        return S->Struct->GetPathName();
+    if (auto* S = DasSoftCarrierForProperty(P))
+        return S->GetPathName();
+    DSLFail(TEXT("Expected reflected struct or soft reference property"));
+    return {};
+}
+FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FString& Registry)
+{
+    if (DSLGameplay(T))
+        return DSLGameplayPath(T);
+    if (DSLSoft(T))
+        return DSLSoftPath(T);
+    if (DSLNativeStruct(T))
+        return DSLValidateNativeStruct(T);
+    if (DSLNativeEnum(T))
+        return DSLString(DSLAnnotation(T->enumType->annotations, "ue_native_enum")->arguments, "path");
+    if (!DSLMathPath(T).IsEmpty())
+        return DSLMathPath(T);
+    if (DSLContainer(T))
+        return DasContainerCarrier(DSLContainerType(T, Folder, Registry))->GetPathName();
+    if (!DSLDirectEnum(T) && !DSLDirectStruct(T))
+        return {};
+    FString Path, Error;
+    if (Registry.IsEmpty() && !Folder.StartsWith(TEXT("/Game/")))
+        DSLFail(TEXT("Direct authored types require type_registry or type_folder"));
+    const auto* Annotation = DSLDirectEnum(T) ? DSLAnnotation(T->enumType->annotations, "ue_enum")
+                                              : DSLAnnotation(T->structType->annotations, "ue_struct");
+    const auto* DeclaredWire = Annotation->arguments.find("_ue_types_json", das::Type::tString);
+    FDasReflectedTypes Declared;
+    if (!DeclaredWire || !FDasReflectedTypes::FromJson(DSLText(DeclaredWire->sValue), Declared, Error, true))
+        DSLFail(TEXT("Missing authored type identity"));
+    const FString Id = DSLDirectEnum(T) ? Declared.Enums[0].Id : Declared.Structs[0].Id;
+    const FString Name = DSLText(DSLDirectEnum(T) ? T->enumType->name : T->structType->name);
+    Path =
+        DSLResolveType(DSLDirectEnum(T) ? EDSLTypeKind::Enum : EDSLTypeKind::Struct, Registry.IsEmpty()
+                       ? Folder + TEXT("/")+ Name + TEXT(".")+ Name : Id, FDSLTypeScope{Declared.Id, Folder, Registry});
+    if (DSLDirectEnum(T))
+    {
+        auto* E = ResolveDasEnum(Path, Error);
+        if (!E)
+            DSLFail(Error);
+        if (E->NumEnums() != static_cast<int32>(T->enumType->list.size()) + 1)
+            DSLFail(TEXT("Direct enum declaration differs from loaded asset"));
+        for (const auto& V : T->enumType->list)
+        {
+            if (!V.value || V.value->__rtti != das::string("ExprConstInt") ||
+                E->GetValueByNameString(DSLText(V.name)) != static_cast<das::ExprConstInt*>(V.value)->getValue())
+                DSLFail(TEXT("Direct enum value differs from loaded asset"));
+        }
+        auto* Authored = Cast<UDasDefinedEnum>(E);
+        if (Authored && !Authored->MemberIds.IsEmpty())
+        {
+            const auto* A = DSLAnnotation(T->enumType->annotations, "ue_enum");
+            const auto* Wire = A->arguments.find("_ue_types_json", das::Type::tString);
+            FDasReflectedTypes Model;
+            if (!Wire || !FDasReflectedTypes::FromJson(DSLText(Wire->sValue), Model, Error, true) ||
+                Model.Enums.Num() != 1 || Authored->MemberIds.Num() != Model.Enums[0].Entries.Num())
+                DSLFail(TEXT("Direct enum member identity differs from loaded asset"));
+            for (const auto& V : Model.Enums[0].Entries)
+                if (Authored->MemberIds.FindRef(V.Value) != V.Id)
+                    DSLFail(TEXT("Direct enum member identity differs from loaded asset"));
+        }
     }
+    else
+    {
+        if (!ValidateDasValueStruct(Path, Error))
+            DSLFail(Error);
+        auto* S = FindObject<UScriptStruct>(nullptr, *Path);
+        int32 Count = 0;
+        for (TFieldIterator<FProperty> It(S); It; ++It)
+            ++Count;
+        int32 SourceCount = 0;
+        for (const auto& F : T->structType->fields)
+        {
+            if (F.generated || F.classMethod)
+                continue;
+            ++SourceCount;
+            if (DSLSet(F.type))
+            {
+                auto* Set = CastField<FSetProperty>(FindDasStructField(S, DSLText(F.name)));
+                if (!Set || !DSLPropertyMatches(Set->ElementProp, DSLTypeName(F.type->firstType)))
+                    DSLFail(TEXT("Direct set layout mismatch"));
+            }
+            else if (F.type->baseType == das::Type::tTable)
+            {
+                auto* Map = CastField<FMapProperty>(FindDasStructField(S, DSLText(F.name)));
+                if (!Map || !DSLPropertyMatches(Map->KeyProp, DSLTypeName(F.type->firstType)) ||
+                    !DSLPropertyMatches(Map->ValueProp, DSLTypeName(F.type->secondType)))
+                    DSLFail(TEXT("Direct map layout mismatch"));
+                if (DSLTypeName(F.type->secondType) == TEXT("struct"))
+                {
+                    if (DSLPropertySnapshotPath(Map->ValueProp) !=
+                        (!DSLMathPath(F.type->secondType).IsEmpty()
+                             ? DSLMathPath(F.type->secondType)
+                             : DSLDirectPath(F.type->secondType, Folder, Registry)))
+                        DSLFail(TEXT("Direct map struct identity mismatch"));
+                }
+                if (DSLDirectEnum(F.type->secondType))
+                {
+                    auto* E = DasEnumPropertyType(Map->ValueProp);
+                    if (!E || E->GetPathName() != DSLDirectPath(F.type->secondType, Folder, Registry))
+                        DSLFail(TEXT("Direct map enum identity mismatch"));
+                }
+                if (DSLTypedReference(F.type->secondType))
+                {
+                    auto* C = DasReferencePropertyClass(Map->ValueProp);
+                    if (!C || C->GetPathName() != DSLTypedReferencePath(F.type->secondType))
+                        DSLFail(TEXT("Direct map reference identity mismatch"));
+                }
+            }
+            else if (F.type->baseType == das::Type::tArray)
+            {
+                auto* Array = CastField<FArrayProperty>(FindDasStructField(S, DSLText(F.name)));
+                auto* Element = Array ? CastField<FStructProperty>(Array->Inner) : nullptr;
+                if (!Array)
+                    DSLFail(TEXT("Direct array field mismatch"));
+                if (DSLTypedReference(F.type->firstType))
+                {
+                    auto* C = DasReferencePropertyClass(Array->Inner);
+                    if (!C || C->GetPathName() != DSLTypedReferencePath(F.type->firstType))
+                        DSLFail(TEXT("Direct reference array identity mismatch"));
+                }
+                else if (DSLDirectEnum(F.type->firstType))
+                {
+                    auto* E = DasEnumPropertyType(Array->Inner);
+                    if (!E || E->GetPathName() != DSLDirectPath(F.type->firstType, Folder, Registry))
+                        DSLFail(TEXT("Direct enum array identity mismatch"));
+                }
+                else if (DSLDirectStruct(F.type->firstType) || !DSLMathPath(F.type->firstType).IsEmpty())
+                {
+                    if (DSLPropertySnapshotPath(Array->Inner) !=
+                        (!DSLMathPath(F.type->firstType).IsEmpty()
+                             ? DSLMathPath(F.type->firstType)
+                             : DSLDirectPath(F.type->firstType, Folder, Registry)))
+                        DSLFail(TEXT("Direct struct array identity mismatch"));
+                }
+                else if (!DSLPropertyMatches(Array->Inner, DSLTypeName(F.type->firstType)))
+                    DSLFail(TEXT("Direct scalar array element mismatch"));
+            }
+            else if (!DSLPropertyMatches(FindDasStructField(S, DSLText(F.name)), DSLTypeName(F.type)))
+                DSLFail(TEXT("Direct struct field differs from loaded asset"));
+            if (DSLDirectEnum(F.type))
+            {
+                auto* E = DasEnumPropertyType(FindDasStructField(S, DSLText(F.name)));
+                if (!E || E->GetPathName() != DSLDirectPath(F.type, Folder, Registry))
+                    DSLFail(TEXT("Direct struct enum identity mismatch"));
+            }
+            if (DSLTypedReference(F.type))
+            {
+                auto* ReferenceClass = DasReferencePropertyClass(FindDasStructField(S, DSLText(F.name)));
+                if (ReferenceClass->GetPathName() != DSLTypedReferencePath(F.type))
+                    DSLFail(TEXT("Direct struct object class identity mismatch"));
+            }
+            if (DSLDirectStruct(F.type) || !DSLMathPath(F.type).IsEmpty())
+            {
+                if (DSLPropertySnapshotPath(FindDasStructField(S, DSLText(F.name))) !=
+                    (!DSLMathPath(F.type).IsEmpty() ? DSLMathPath(F.type) : DSLDirectPath(F.type, Folder, Registry)))
+                    DSLFail(TEXT("Direct nested struct identity differs from loaded asset"));
+            }
+        }
+        if (Count != SourceCount)
+            DSLFail(TEXT("Direct struct layout differs from loaded asset"));
+        const auto* A = DSLAnnotation(T->structType->annotations, "ue_struct");
+        const auto* Wire = A->arguments.find("_ue_types_json", das::Type::tString);
+        FDasReflectedTypes Model;
+        if (!Wire || !FDasReflectedTypes::FromJson(DSLText(Wire->sValue), Model, Error, true) ||
+            Model.Structs.Num() != 1)
+            DSLFail(TEXT("Missing direct struct declaration"));
+        FInstancedStruct Defaults;
+        if (!ParseDasStructDefault(Path, TEXT(""), Defaults, Error))
+            DSLFail(Error);
+        for (const auto& F : Model.Structs[0].Properties)
+        {
+            auto* P = FindDasStructField(S, F.Name);
+            const auto* Memory = Defaults.GetMemory();
+            const auto& K = F.Type.Kind;
+            if (K == TEXT("enum"))
+            {
+                auto* E = DasEnumPropertyType(P);
+                if (!E || DasEnumPropertyNumber(P, P->ContainerPtrToValuePtr<void>(Memory)) !=
+                              E->GetValueByNameString(F.Default.String))
+                    DSLFail(TEXT("Direct struct enum default mismatch"));
+                continue;
+            }
+            if (K == TEXT("object"))
+            {
+                if (DasReferenceGet(P, P->ContainerPtrToValuePtr<void>(Memory)))
+                    DSLFail(TEXT("Authored struct object defaults must be null"));
+                continue;
+            }
+            if (K == TEXT("set"))
+            {
+                auto* Set = CastFieldChecked<FSetProperty>(P);
+                if (FScriptSetHelper(Set, Set->ContainerPtrToValuePtr<void>(Memory)).Num() != 0)
+                    DSLFail(TEXT("Authored set defaults must be empty"));
+                continue;
+            }
+            if (K == TEXT("map"))
+            {
+                auto* Map = CastFieldChecked<FMapProperty>(P);
+                if (FScriptMapHelper(Map, Map->ContainerPtrToValuePtr<void>(Memory)).Num() != 0)
+                    DSLFail(TEXT("Authored map defaults must be empty"));
+                continue;
+            }
+            if (K == TEXT("array"))
+            {
+                auto* Array = CastFieldChecked<FArrayProperty>(P);
+                if (FScriptArrayHelper(Array, Array->ContainerPtrToValuePtr<void>(Memory)).Num() != 0)
+                    DSLFail(TEXT("Authored array defaults must be empty"));
+                continue;
+            }
+            if (K == TEXT("struct") && CastField<FSoftObjectProperty>(P))
+            {
+                if (!CastFieldChecked<FSoftObjectProperty>(P)
+                         ->GetPropertyValue(P->ContainerPtrToValuePtr<void>(Memory))
+                         .IsNull())
+                    DSLFail(TEXT("Authored soft fields require null defaults"));
+                continue;
+            }
+            if (K == TEXT("struct"))
+            {
+                auto* Nested = CastFieldChecked<FStructProperty>(P);
+                FInstancedStruct Child;
+                if (!ParseDasStructDefault(
+                        Nested->Struct->GetPathName(),
+                        IsDasMathStructPath(F.Type.TypePath) ? F.Default.String : TEXT(""), Child, Error) ||
+                            !MatchesDasStructDefault(Nested->Struct, Nested->ContainerPtrToValuePtr<void>(Memory),
+                                                     Child.GetMemory()))
+                    DSLFail(TEXT("Nested default differs from child default"));
+                continue;
+            }
+            if (K == TEXT("byte"))
+            {
+                if (CastFieldChecked<FByteProperty>(P)->GetPropertyValue_InContainer(Memory) != uint8(F.Default.Number))
+                    DSLFail(TEXT("Direct byte default mismatch"));
+                continue;
+            }
+            if (K == TEXT("text"))
+            {
+                FText Expected;
+                FString Issue;
+                if (!ParseDasTextDefault(F.Default.String, Expected, Issue) ||
+                    !DasTextDefaultsEqual(CastFieldChecked<FTextProperty>(P)->GetPropertyValue_InContainer(Memory),
+                                          Expected))
+                    DSLFail(TEXT("Direct text default mismatch"));
+                continue;
+            }
+            const bool Matches =
+                K ==
+                TEXT("int")
+                     ? CastFieldChecked<FIntProperty>(P)->GetPropertyValue_InContainer(Memory) ==
+                           static_cast<int32>(F.Default.Number)
+                     : K == TEXT("float")
+                                 ? CastFieldChecked<FFloatProperty>(P)->GetPropertyValue_InContainer(Memory) ==
+                                       static_cast<float>(F.Default.Number)
+                                 : K == TEXT("double")
+                                             ? CastFieldChecked<FDoubleProperty>(P)->GetPropertyValue_InContainer(
+                                                   Memory) == F.Default.Number
+                                             : K == TEXT("bool")
+                                                         ? CastFieldChecked<FBoolProperty>(P)
+                                                                   ->GetPropertyValue_InContainer(Memory) ==
+                                                               F.Default.Boolean
+                                                         : K == TEXT("string")
+                                                                     ? CastFieldChecked<FStrProperty>(P)
+                                                                               ->GetPropertyValue_InContainer(Memory) ==
+                                                                           F.Default.String
+                                                                     : CastFieldChecked<FNameProperty>(P)
+                                                                               ->GetPropertyValue_InContainer(Memory) ==
+                                                                           FName(*F.Default.String);
+            if (!Matches)
+                DSLFail(TEXT("Direct struct default differs from loaded asset"));
+        }
+    }
+    return Path;
+}
+das::TypeDeclPtr DSLHandleType(das::ModuleGroup& Group, das::Module* Module, const char* Name)
+{
+    auto A = Group.findAnnotation(Name, Module);
+    if (A.size() != 1)
+        DSLFail(TEXT("Missing or ambiguous bridge type"));
+    auto T = new das::TypeDecl(das::Type::tHandle, das::LineInfo());
+    T->annotation = static_cast<das::TypeAnnotation*>(A[0]);
+    return T;
+}
+das::ExprCall* DSLCall(const das::LineInfo& At, const das::string& Name, std::initializer_list<das::ExpressionPtr> Args)
+{
+    auto* C = new das::ExprCall(At, Name);
+    for (auto* A : Args)
+        C->arguments.push_back(A);
+    return C;
+}
+das::string DSLMathSuffix(const das::TypeDeclPtr& Type)
+{
+    const auto Path = DSLMathPath(Type);
+    return Path == TEXT("/Script/EnhancedInput.InputActionValue")
+                        ? "input_value"
+                        : Path == TEXT("/Script/CoreUObject.Vector2D")
+                                       ? "vector2d"
+                                       : Path == TEXT("/Script/CoreUObject.Vector")
+                                                      ? "vector"
+                                                      : Path == TEXT("/Script/CoreUObject.Rotator")? "rotator"
+                                                                                                   : "transform";
+}
+FString DSLSourceValueKey(const das::TypeDeclPtr& Type, const FString& Path)
+{
+    if (DSLContainer(Type))
+    {
+        const auto Value = Type->baseType == das::Type::tTable && !DSLSet(Type) ? Type->secondType : Type->firstType;
+        if (DSLTypedReference(Value))
+            return Path + TEXT(":reference:")+ DSLText(Value->structType->module->name) +
+                               TEXT("::")+ DSLText(Value->structType->name);
+    }
+    return Path;
+}
+das::ExpressionPtr DSLDirectUnpack(const das::LineInfo& At, const das::TypeDeclPtr& Type, das::ExpressionPtr V,
+                                   const FString& Path)
+{
+    if (Type && Type->baseType == das::Type::tUInt8)
+        return DSLCall(At, "uint8", {V});
+    if (DSLRawStruct(Type))
+        return V;
+    if (DSLGameplay(Type))
+        return DSLGameplayUnpack(At, Type, V);
+    if (DSLSoft(Type))
+        return DSLSoftUnpack(At, Type, V);
+    if (DSLTypedClass(Type))
+        return DSLClassUnpack(At, Type, V);
+    if (DSLDelegate(Type))
+        return DSLDelegateSnapshot(At, Type, V);
+    if (!DSLMathPath(Type).IsEmpty())
+        return DSLCall(At, "__ue_math_unpack_" + DSLMathSuffix(Type), {V});
+    if (DSLAuthoredView(Type))
+        return DSLAuthoredUnpack(At, Type, V);
+    if (DSLTypedReference(Type))
+        return DSLCall(At, Type->structType->module->name + "::" + Type->structType->name + "_from", {V});
+    if (DSLDirectEnum(Type))
+    {
+        auto T = DSLCopyType(Type);
+        T->ref = false;
+        T->constant = false;
+        auto* C = new das::ExprCast(
+            At, DSLCall(At, "__ue_checked_enum_number", {V, new das::ExprConstString(At, DSLUtf8(Path))}), T);
+        C->reinterpret = true;
+        auto* U = new das::ExprUnsafe(At);
+        U->body = C;
+        return U;
+    }
+    return DSLCall(At, DSLUtf8(TEXT("__ue_unpack_")+ FMD5::HashAnsiString(*DSLSourceValueKey(Type, Path))), {V});
+}
+das::ExpressionPtr DSLDirectPack(const das::LineInfo& At, const das::TypeDeclPtr& Type, das::ExpressionPtr V,
+                                 const FString& Path)
+{
+    if (Type && Type->baseType == das::Type::tUInt8)
+        return DSLCall(At, "int", {V});
+    if (DSLRawStruct(Type))
+        return V;
+    if (DSLGameplay(Type))
+        return DSLGameplayPack(At, Type, V);
+    if (DSLSoft(Type))
+        return DSLSoftPack(At, Type, V);
+    if (DSLNativeEnum(Type))
+        return DSLCall(At, Type->enumType->module->name + "::__ue_pack_native_enum_" + Type->enumType->name, {V});
+    if (DSLTypedClass(Type))
+        return DSLClassPack(At, Type, V);
+    if (DSLDelegate(Type))
+        return new das::ExprField(At, V, "__delegate_token");
+    if (!DSLMathPath(Type).IsEmpty())
+        return DSLCall(At, "__ue_math_pack_" + DSLMathSuffix(Type), {V});
+    if (DSLAuthoredView(Type))
+        return DSLAuthoredPack(At, Type, V);
+    if (DSLTypedObject(Type))
+        return DSLCall(
+            At, "ue_cast_nullable_object",
+            {new das::ExprField(At, V, "handle"), new das::ExprConstString(At, DSLUtf8(DSLTypedReferencePath(Type)))});
+    if (DSLTypedReference(Type))
+        return DSLCall(At, Type->structType->module->name + "::" + Type->structType->name + "_raw", {V});
+    if (DSLDirectEnum(Type))
+        return DSLCall(At, "ue_enum_from_number",
+                       {new das::ExprConstString(At, DSLUtf8(Path)), DSLCall(At, "int", {V})});
+    return DSLCall(At, DSLUtf8(TEXT("__ue_pack_")+ FMD5::HashAnsiString(*DSLSourceValueKey(Type, Path))), {V});
+}
+const char* DSLScalarSuffix(const FString& K)
+{
+    return K == TEXT("byte")
+                     ? "byte"
+                     : K == TEXT("text")
+                                 ? "text"
+                                 : K == TEXT("int")
+                                             ? "int"
+                                             : K == TEXT("float")
+                                                         ? "float"
+                                                         : K == TEXT("double")
+                                                                     ? "double"
+                                                                     : K == TEXT("bool")? "bool"
+                                                                                        : K == TEXT("string")? "string"
+                                                                                                             : "name";
+}
+das::FunctionPtr DSLHelper(const das::LineInfo& At, const das::string& Name, const das::TypeDeclPtr& Input,
+                           const das::TypeDeclPtr& Output, das::ExpressionPtr Value)
+{
+    auto F = new das::Function();
+    F->at = At;
+    F->name = Name;
+    F->result = Output;
+    F->generated = true;
+    F->privateFunction = true;
+    auto Arg = new das::Variable();
+    Arg->at = At;
+    Arg->name = "value";
+    Arg->type = DSLCopyType(Input);
+    Arg->type->constant = true;
+    F->arguments.push_back(Arg);
+    auto* Block = new das::ExprBlock();
+    Block->at = At;
+    Block->list.push_back(new das::ExprReturn(At, Value));
+    F->body = Block;
+    return F;
+}
+void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Path, das::ModuleGroup& Group,
+                            das::Module* Module, das::vector<das::FunctionPtr>& Generated, TSet<FString>& Helpers)
+{
+    if (DSLSoft(InputType) || DSLGameplay(InputType))
+        return;
+    auto Type = DSLCopyType(InputType);
+    Type->ref = false;
+    Type->constant = false;
+    const bool Container = DSLContainer(Type);
+    const FString HelperKey = DSLSourceValueKey(Type, Path);
+    if ((!Container && !DSLDirectStruct(Type)) || Helpers.Contains(HelperKey))
+        return;
+    Helpers.Add(HelperKey);
+    if (Module->functionsByName.find(
+            das::hash64z(DSLUtf8(TEXT("__ue_pack_")+ FMD5::HashAnsiString(*HelperKey)).c_str())))
+        return;
+    const auto& At = Container ? Type->at : Type->structType->at;
+    auto Handle = DSLHandleType(Group, Module, "UEStructValue");
+    das::ExpressionPtr Packed = DSLCall(At, "ue_struct_value", {new das::ExprConstString(At, DSLUtf8(Path))});
+    auto Local = [&](const das::string& Name, const das::TypeDeclPtr& T, das::ExpressionPtr Init)
+    {
+        auto* V = new das::Variable();
+        V->at = At;
+        V->name = Name;
+        V->type = DSLCopyType(T);
+        V->type->ref = false;
+        V->type->constant = false;
+        V->init = Init;
+        auto* Let = new das::ExprLet();
+        Let->at = At;
+        Let->variables.push_back(V);
+        return Let;
+    };
+    auto* PackBody = new das::ExprBlock();
+    PackBody->at = At;
+    PackBody->list.push_back(Local("packed", Handle, Packed));
+    auto* UnpackBody = new das::ExprBlock();
+    UnpackBody->at = At;
+    UnpackBody->list.push_back(DSLCall(At, "__ue_require_struct_type",
+                                       {new das::ExprVar(At, "value"), new das::ExprConstString(At, DSLUtf8(Path))}));
+    auto* Empty = new das::ExprMakeStruct(At);
+    Empty->makeType = DSLCopyType(Type);
+    Empty->makeType->ref = false;
+    Empty->makeType->constant = false;
+    Empty->useInitializer = true;
+    Empty->alwaysUseInitializer = Container;
+    UnpackBody->list.push_back(Local("result", Type, Empty));
+    auto Loop = [&](das::ExpressionPtr Count, das::ExprBlock* Body)
+    {
+        auto* L = new das::ExprFor(At);
+        L->iterators.push_back("index");
+        L->iteratorsAka.push_back("");
+        L->iteratorsAt.push_back(At);
+        L->iteratorsTags.push_back(nullptr);
+        L->iteratorsTupleExpansion.push_back(0);
+        L->sources.push_back(DSLCall(At, "range", {new das::ExprConstInt(At, 0), Count}));
+        L->body = Body;
+        return L;
+    };
+    das::vector<das::Structure::FieldDeclaration> ContainerFields;
+    if (Container)
+    {
+        das::Structure::FieldDeclaration F;
+        F.name = "Values";
+        F.type = Type;
+        ContainerFields.push_back(F);
+    }
+    const auto& Fields = Container ? ContainerFields : Type->structType->fields;
+    for (const auto& Field : Fields)
+    {
+        if (Field.generated || Field.classMethod)
+            continue;
+        const bool Array = Field.type->baseType == das::Type::tArray;
+        const auto Child = Array ? Field.type->firstType : Field.type;
+        auto Access = [&]()
+        {
+            return Container ? static_cast<das::ExpressionPtr>(new das::ExprVar(At, "value"))
+                             : static_cast<das::ExpressionPtr>(
+                                   new das::ExprField(At, new das::ExprVar(At, "value"), Field.name));
+        };
+        auto Target = [&]()
+        {
+            return Container ? static_cast<das::ExpressionPtr>(new das::ExprVar(At, "result"))
+                             : static_cast<das::ExpressionPtr>(
+                                   new das::ExprField(At, new das::ExprVar(At, "result"), Field.name));
+        };
+        auto Name = [&]()
+        {
+            return new das::ExprConstString(At, Field.name);
+        };
+        if (DSLSet(Field.type) && DSLObjectKey(Field.type->firstType))
+        {
+            const auto Element = Field.type->firstType;
+            auto* PLoop = new das::ExprBlock();
+            PLoop->at = At;
+            PLoop->list.push_back(new das::ExprCopy(
+                At, new das::ExprVar(At, "packed"),
+                DSLCall(At, "__ue_struct_set_with_object_key",
+                        {new das::ExprVar(At, "packed"), Name(), DSLKeyPack(At, Element, new das::ExprVar(At, "index")),
+                         new das::ExprConstBool(At, true)})));
+            auto* KeysLoop = Loop(new das::ExprConstInt(At, 0), PLoop);
+            KeysLoop->sources[0] = DSLCall(At, "keys", {Access()});
+            PackBody->list.push_back(KeysLoop);
+            auto* ULoop = new das::ExprBlock();
+            ULoop->at = At;
+            ULoop->list.push_back(DSLCall(At, "insert",
+                                          {Target(), DSLKeyUnpack(At, Element,
+                                                                  DSLCall(At, "__ue_struct_set_element_object_key",
+                                                                          {new das::ExprVar(At, "value"), Name(),
+                                                                           new das::ExprVar(At, "index")}))}));
+            UnpackBody->list.push_back(
+                Loop(DSLCall(At, "ue_struct_set_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
+        }
+        else if (DSLSet(Field.type) && DSLDirectEnum(Field.type->firstType))
+        {
+            const auto Element = Field.type->firstType;
+            // Resolve the actual enum from the carrier (authored paths depend on registry scope).
+            auto* Native = FindObject<UScriptStruct>(nullptr, *Path);
+            auto* Set = Native ? CastField<FSetProperty>(FindDasStructField(Native, DSLText(Field.name))) : nullptr;
+            auto* Enum = Set ? DasEnumPropertyType(Set->ElementProp) : nullptr;
+            if (!Enum)
+                DSLFail(TEXT("Expected enum set carrier"));
+            auto* PLoop = new das::ExprBlock();
+            PLoop->at = At;
+            PLoop->list.push_back(new das::ExprCopy(
+                At, new das::ExprVar(At, "packed"),
+                DSLCall(At, "__ue_struct_set_with_enum",
+                        {new das::ExprVar(At, "packed"), Name(),
+                         DSLDirectPack(At, Element, new das::ExprVar(At, "index"), Enum->GetPathName()),
+                         new das::ExprConstBool(At, true)})));
+            auto* KeysLoop = Loop(new das::ExprConstInt(At, 0), PLoop);
+            KeysLoop->sources[0] = DSLCall(At, "keys", {Access()});
+            PackBody->list.push_back(KeysLoop);
+            auto* ULoop = new das::ExprBlock();
+            ULoop->at = At;
+            ULoop->list.push_back(DSLCall(At, "insert",
+                                          {Target(), DSLDirectUnpack(At, Element,
+                                                                     DSLCall(At, "__ue_struct_set_element_enum",
+                                                                             {new das::ExprVar(At, "value"), Name(),
+                                                                              new das::ExprVar(At, "index")}),
+                                                                     Enum->GetPathName())}));
+            UnpackBody->list.push_back(
+                Loop(DSLCall(At, "ue_struct_set_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
+        }
+        else if (DSLSet(Field.type))
+        {
+            const das::string Suffix =
+                DSLTypeName(Field.type->firstType) ==
+                TEXT("byte")? "byte"
+                            : DSLTypeName(Field.type->firstType) == TEXT("name")? "name"
+                                                                                : DSLTypeName(Field.type->firstType) ==
+                                                                                      TEXT("string")? "string" : "int";
+            auto* PLoop = new das::ExprBlock();
+            PLoop->at = At;
+            PLoop->list.push_back(
+                new das::ExprCopy(At, new das::ExprVar(At, "packed"),
+                                  DSLCall(At, "ue_struct_set_with_" + Suffix,
+                                          {new das::ExprVar(At, "packed"), Name(), new das::ExprVar(At, "index"),
+                                           new das::ExprConstBool(At, true)})));
+            auto* KeysLoop = Loop(new das::ExprConstInt(At, 0), PLoop);
+            KeysLoop->sources[0] = DSLCall(At, "keys", {Access()});
+            PackBody->list.push_back(KeysLoop);
+            auto* ULoop = new das::ExprBlock();
+            ULoop->at = At;
+            ULoop->list.push_back(
+                DSLCall(At, "insert",
+                        {Target(), DSLCall(At, "ue_struct_set_element_" + Suffix,
+                                           {new das::ExprVar(At, "value"), Name(), new das::ExprVar(At, "index")})}));
+            UnpackBody->list.push_back(
+                Loop(DSLCall(At, "ue_struct_set_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
+        }
+        else if (Field.type->baseType == das::Type::tTable)
+        {
+            const das::string K = DSLDirectEnum(Field.type->firstType) ? "enum"
+                                  : DSLObjectKey(Field.type->firstType)
+                                      ? "object"
+                                      : DSLTypeName(Field.type->firstType) ==
+                                            TEXT("byte")
+                                                 ? "byte"
+                                                 : DSLTypeName(Field.type->firstType) ==
+                                                       TEXT("name")
+                                                            ? "name"
+                                                                                : DSLTypeName(Field.type->firstType) ==
+                                                                  TEXT("string")? "string" : "int",
+                                                                       V = DSLUtf8(DSLTypeName(Field.type->secondType));
+            const bool StructValue = V == "struct", EnumValue = DSLDirectEnum(Field.type->secondType),
+                       ObjectValue = DSLTypedReference(Field.type->secondType),
+                       TypedValue = StructValue || EnumValue || ObjectValue;
+            FString ValuePath;
+            if (StructValue)
+            {
+                auto* Native = FindObject<UScriptStruct>(nullptr, *Path);
+                auto* Map = CastField<FMapProperty>(FindDasStructField(Native, DSLText(Field.name)));
+                if (!Map)
+                    DSLFail(TEXT("Expected map snapshot value"));
+                ValuePath = DSLPropertySnapshotPath(Map->ValueProp);
+                DSLEnsureStructHelpers(Field.type->secondType, ValuePath, Group, Module, Generated, Helpers);
+            }
+            if (EnumValue || ObjectValue)
+            {
+                auto* Native = FindObject<UScriptStruct>(nullptr, *Path);
+                auto* Map = CastFieldChecked<FMapProperty>(FindDasStructField(Native, DSLText(Field.name)));
+                ValuePath = EnumValue ? DasEnumPropertyType(Map->ValueProp)->GetPathName()
+                                      : DasReferencePropertyClass(Map->ValueProp)->GetPathName();
+            }
+            FString KeyPath;
+            if (K == "enum")
+            {
+                auto* Native = FindObject<UScriptStruct>(nullptr, *Path);
+                auto* Map = Native ? CastField<FMapProperty>(FindDasStructField(Native, DSLText(Field.name))) : nullptr;
+                auto* Enum = Map ? DasEnumPropertyType(Map->KeyProp) : nullptr;
+                if (!Enum)
+                    DSLFail(TEXT("Expected enum-key map carrier"));
+                KeyPath = Enum->GetPathName();
+            }
+            const das::string With = (K == "object" || K == "enum") ? "__ue_struct_map_with_" + K + "_" + V
+                                     : EnumValue                    ? "__ue_struct_map_with_" + K + "_enum"
+                                     : ObjectValue                  ? "__ue_struct_map_with_" + K + "_object"
+                                     : StructValue                  ? "__ue_struct_map_with_" + K + "_struct"
+                                     : K == "int" && V == "int"     ? "ue_struct_map_with_int"
+                                                                    : "ue_struct_map_with_" + K + "_" + V;
+            const das::string Get = (K == "object" || K == "enum") ? "__ue_struct_map_get_" + K + "_" + V
+                                    : EnumValue                    ? "__ue_struct_map_get_" + K + "_enum"
+                                    : ObjectValue                  ? "__ue_struct_map_get_" + K + "_object"
+                                    : StructValue                  ? "__ue_struct_map_get_" + K + "_struct"
+                                    : K == "int" && V == "int"     ? "ue_struct_map_get_int"
+                                                                   : "ue_struct_map_get_" + K + "_" + V;
+            auto* PLoop = new das::ExprBlock();
+            PLoop->at = At;
+            das::ExpressionPtr Mapped = new das::ExprVar(At, "mapped");
+            das::ExpressionPtr PackedKey = new das::ExprVar(At, "index");
+            if (K == "enum")
+                PackedKey = DSLDirectPack(At, Field.type->firstType, PackedKey, KeyPath);
+            if (K == "object")
+                PackedKey = DSLKeyPack(At, Field.type->firstType, PackedKey);
+            if (TypedValue)
+                Mapped = DSLDirectPack(At, Field.type->secondType, Mapped, ValuePath);
+            PLoop->list.push_back(
+                new das::ExprCopy(At, new das::ExprVar(At, "packed"),
+                                  DSLCall(At, With, {new das::ExprVar(At, "packed"), Name(), PackedKey, Mapped})));
+            auto* KeysLoop = Loop(new das::ExprConstInt(At, 0), PLoop);
+            KeysLoop->sources[0] = DSLCall(At, "keys", {Access()});
+            KeysLoop->iterators.push_back("mapped");
+            KeysLoop->iteratorsAka.push_back("");
+            KeysLoop->iteratorsAt.push_back(At);
+            KeysLoop->iteratorsTags.push_back(nullptr);
+            KeysLoop->iteratorsTupleExpansion.push_back(0);
+            KeysLoop->sources.push_back(DSLCall(At, "values", {Access()}));
+            PackBody->list.push_back(KeysLoop);
+            auto* ULoop = new das::ExprBlock();
+            ULoop->at = At;
+            das::ExpressionPtr Key = DSLCall(At,
+                                             K == "enum"     ? "__ue_struct_map_key_enum"
+                                             : K == "object" ? "__ue_struct_map_key_object"
+                                             : K == "byte"   ? "ue_struct_map_key_byte"
+                                             : K == "name"   ? "ue_struct_map_key_name"
+                                             : K == "string" ? "ue_struct_map_key_string"
+                                                             : "ue_struct_map_key",
+                                             {new das::ExprVar(At, "value"), Name(), new das::ExprVar(At, "index")});
+            das::ExpressionPtr Result = DSLCall(At, Get, {new das::ExprVar(At, "value"), Name(), Key->clone()});
+            if (TypedValue)
+                Result = DSLDirectUnpack(At, Field.type->secondType, Result, ValuePath);
+            if (K == "enum")
+                Key = DSLDirectUnpack(At, Field.type->firstType, Key, KeyPath);
+            if (K == "object")
+                Key = DSLKeyUnpack(At, Field.type->firstType, Key);
+            if (StructValue)
+            {
+                auto* Insert = DSLCall(At, "insert_clone", {Target(), Key, Result});
+                ULoop->list.push_back(Insert);
+            }
+            else
+                ULoop->list.push_back(new das::ExprCopy(At, new das::ExprAt(At, Target(), Key), Result));
+            UnpackBody->list.push_back(
+                Loop(DSLCall(At, "ue_struct_map_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
+        }
+        else if (Array && DSLTypedReference(Child))
+        {
+            const FString ObjectPath = DSLTypedReferencePath(Child);
+            auto IndexPath = [&]()
+            {
+                return new das::ExprOp2(At, "+", new das::ExprConstString(At, Field.name + "."),
+                                        DSLCall(At, "string", {new das::ExprVar(At, "index")}));
+            };
+            PackBody->list.push_back(
+                new das::ExprCopy(At, new das::ExprVar(At, "packed"),
+                                  DSLCall(At, "ue_struct_array_resize",
+                                          {new das::ExprVar(At, "packed"), Name(),
+                                           DSLCall(At, "int", {DSLCall(At, "length", {Access()})})})));
+            auto* PLoop = new das::ExprBlock();
+            PLoop->at = At;
+            PLoop->list.push_back(new das::ExprCopy(
+                At, new das::ExprVar(At, "packed"),
+                DSLCall(At, "ue_struct_with_object",
+                        {new das::ExprVar(At, "packed"), IndexPath(),
+                         DSLDirectPack(At, Child, new das::ExprAt(At, Access(), new das::ExprVar(At, "index")),
+                                       ObjectPath)})));
+            PackBody->list.push_back(Loop(DSLCall(At, "int", {DSLCall(At, "length", {Access()})}), PLoop));
+            auto* ULoop = new das::ExprBlock();
+            ULoop->at = At;
+            ULoop->list.push_back(DSLCall(
+                At, "push",
+                {Target(),
+                 DSLDirectUnpack(At, Child,
+                                 DSLCall(At, "ue_struct_get_object", {new das::ExprVar(At, "value"), IndexPath()}),
+                                 ObjectPath)}));
+            UnpackBody->list.push_back(
+                Loop(DSLCall(At, "ue_struct_array_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
+        }
+        else if (Array && DSLDirectEnum(Child))
+        {
+            auto* Native = FindObject<UScriptStruct>(nullptr, *Path);
+            auto* ArrayField = CastField<FArrayProperty>(FindDasStructField(Native, DSLText(Field.name)));
+            auto* E = ArrayField ? DasEnumPropertyType(ArrayField->Inner) : nullptr;
+            if (!E)
+                DSLFail(TEXT("Expected enum array element"));
+            const FString EnumPath = E->GetPathName();
+            auto IndexPath = [&]()
+            {
+                return new das::ExprOp2(At, "+", new das::ExprConstString(At, Field.name + "."),
+                                        DSLCall(At, "string", {new das::ExprVar(At, "index")}));
+            };
+            PackBody->list.push_back(
+                new das::ExprCopy(At, new das::ExprVar(At, "packed"),
+                                  DSLCall(At, "ue_struct_array_resize",
+                                          {new das::ExprVar(At, "packed"), Name(),
+                                           DSLCall(At, "int", {DSLCall(At, "length", {Access()})})})));
+            auto* PLoop = new das::ExprBlock();
+            PLoop->at = At;
+            PLoop->list.push_back(new das::ExprCopy(
+                At, new das::ExprVar(At, "packed"),
+                DSLCall(At, "__ue_struct_with_enum_value",
+                        {new das::ExprVar(At, "packed"), IndexPath(),
+                         DSLDirectPack(At, Child, new das::ExprAt(At, Access(), new das::ExprVar(At, "index")),
+                                       EnumPath)})));
+            PackBody->list.push_back(Loop(DSLCall(At, "int", {DSLCall(At, "length", {Access()})}), PLoop));
+            auto* ULoop = new das::ExprBlock();
+            ULoop->at = At;
+            ULoop->list.push_back(
+                DSLCall(At, "push",
+                        {Target(), DSLDirectUnpack(At, Child,
+                                                   DSLCall(At, "__ue_struct_get_enum_value",
+                                                           {new das::ExprVar(At, "value"), IndexPath(),
+                                                            new das::ExprConstString(At, DSLUtf8(EnumPath))}),
+                                                   EnumPath)}));
+            UnpackBody->list.push_back(
+                Loop(DSLCall(At, "ue_struct_array_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
+        }
+        else if (Array && !DSLDirectStruct(Child) && !DSLRawStruct(Child) && DSLMathPath(Child).IsEmpty())
+        {
+            const char* Suffix = DSLScalarSuffix(DSLTypeName(Child));
+            auto IndexPath = [&]()
+            {
+                return new das::ExprOp2(At, "+", new das::ExprConstString(At, Field.name + "."),
+                                        DSLCall(At, "string", {new das::ExprVar(At, "index")}));
+            };
+            PackBody->list.push_back(
+                new das::ExprCopy(At, new das::ExprVar(At, "packed"),
+                                  DSLCall(At, "ue_struct_array_resize",
+                                          {new das::ExprVar(At, "packed"), Name(),
+                                           DSLCall(At, "int", {DSLCall(At, "length", {Access()})})})));
+            auto* PLoop = new das::ExprBlock();
+            PLoop->at = At;
+            PLoop->list.push_back(new das::ExprCopy(
+                At, new das::ExprVar(At, "packed"),
+                DSLCall(At, das::string("ue_struct_with_") + Suffix,
+                        {new das::ExprVar(At, "packed"), IndexPath(), new das::ExprVar(At, "element")})));
+            auto* Indexed = Loop(DSLCall(At, "int", {DSLCall(At, "length", {Access()})}), PLoop);
+            Indexed->iterators.push_back("element");
+            Indexed->iteratorsAka.push_back("");
+            Indexed->iteratorsAt.push_back(At);
+            Indexed->iteratorsTags.push_back(nullptr);
+            Indexed->iteratorsTupleExpansion.push_back(0);
+            Indexed->sources.push_back(Access());
+            PackBody->list.push_back(Indexed);
+            auto* ULoop = new das::ExprBlock();
+            ULoop->at = At;
+            ULoop->list.push_back(DSLCall(At, "push",
+                                          {Target(), DSLCall(At, das::string("ue_struct_get_") + Suffix,
+                                                             {new das::ExprVar(At, "value"), IndexPath()})}));
+            UnpackBody->list.push_back(
+                Loop(DSLCall(At, "ue_struct_array_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
+        }
+        else if (Array || DSLDirectStruct(Child) || !DSLMathPath(Child).IsEmpty())
+        {
+            auto* Native = FindObject<UScriptStruct>(nullptr, *Path);
+            auto* P = FindDasStructField(Native, DSLText(Field.name));
+            auto* Element = Array ? CastFieldChecked<FArrayProperty>(P)->Inner : P;
+            const FString ChildPath = DSLPropertySnapshotPath(Element);
+            DSLEnsureStructHelpers(Child, ChildPath, Group, Module, Generated, Helpers);
+            if (Array)
+            {
+                PackBody->list.push_back(
+                    new das::ExprCopy(At, new das::ExprVar(At, "packed"),
+                                      DSLCall(At, "ue_struct_array_resize",
+                                              {new das::ExprVar(At, "packed"), Name(),
+                                               DSLCall(At, "int", {DSLCall(At, "length", {Access()})})})));
+                auto* PLoop = new das::ExprBlock();
+                PLoop->at = At;
+                PLoop->list.push_back(new das::ExprCopy(
+                    At, new das::ExprVar(At, "packed"),
+                    DSLCall(At, "ue_struct_nested_with",
+                            {new das::ExprVar(At, "packed"), Name(), new das::ExprVar(At, "index"),
+                             DSLDirectPack(At, Child, new das::ExprAt(At, Access(), new das::ExprVar(At, "index")),
+                                           ChildPath)})));
+                PackBody->list.push_back(Loop(DSLCall(At, "int", {DSLCall(At, "length", {Access()})}), PLoop));
+                auto* ULoop = new das::ExprBlock();
+                ULoop->at = At;
+                ULoop->list.push_back(DSLCall(At, "push_clone",
+                                              {Target(), DSLDirectUnpack(At, Child,
+                                                                         DSLCall(At, "ue_struct_nested_get",
+                                                                                 {new das::ExprVar(At, "value"), Name(),
+                                                                                  new das::ExprVar(At, "index")}),
+                                                                         ChildPath)}));
+                UnpackBody->list.push_back(
+                    Loop(DSLCall(At, "ue_struct_array_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
+            }
+            else
+            {
+                PackBody->list.push_back(
+                    new das::ExprCopy(At, new das::ExprVar(At, "packed"),
+                                      DSLCall(At, "ue_struct_nested_with",
+                                              {new das::ExprVar(At, "packed"), Name(), new das::ExprConstInt(At, -1),
+                                               DSLDirectPack(At, Child, Access(), ChildPath)})));
+                UnpackBody->list.push_back(new das::ExprMove(
+                    At, Target(),
+                    DSLDirectUnpack(At, Child,
+                                    DSLCall(At, "ue_struct_nested_get",
+                                            {new das::ExprVar(At, "value"), Name(), new das::ExprConstInt(At, -1)}),
+                                    ChildPath)));
+            }
+        }
+        else if (DSLDirectEnum(Field.type))
+        {
+            auto* Native = FindObject<UScriptStruct>(nullptr, *Path);
+            auto* E = DasEnumPropertyType(FindDasStructField(Native, DSLText(Field.name)));
+            if (!E)
+                DSLFail(TEXT("Expected enum struct member"));
+            const FString EnumPath = E->GetPathName();
+            PackBody->list.push_back(new das::ExprCopy(
+                At, new das::ExprVar(At, "packed"),
+                DSLCall(At, "__ue_struct_with_enum_value",
+                        {new das::ExprVar(At, "packed"), Name(), DSLDirectPack(At, Field.type, Access(), EnumPath)})));
+            UnpackBody->list.push_back(new das::ExprCopy(
+                At, Target(),
+                DSLDirectUnpack(
+                    At, Field.type,
+                    DSLCall(At, "__ue_struct_get_enum_value",
+                            {new das::ExprVar(At, "value"), Name(), new das::ExprConstString(At, DSLUtf8(EnumPath))}),
+                    EnumPath)));
+        }
+        else if (DSLTypedReference(Field.type))
+        {
+            const FString ObjectPath = DSLTypedReferencePath(Field.type);
+            PackBody->list.push_back(new das::ExprCopy(At, new das::ExprVar(At, "packed"),
+                                                       DSLCall(At, "ue_struct_with_object",
+                                                               {new das::ExprVar(At, "packed"), Name(),
+                                                                DSLDirectPack(At, Field.type, Access(), ObjectPath)})));
+            UnpackBody->list.push_back(new das::ExprCopy(
+                At, Target(),
+                DSLDirectUnpack(At, Field.type,
+                                DSLCall(At, "ue_struct_get_object", {new das::ExprVar(At, "value"), Name()}),
+                                ObjectPath)));
+        }
+        else
+        {
+            const char* Suffix = DSLScalarSuffix(DSLTypeName(Field.type));
+            PackBody->list.push_back(new das::ExprCopy(At, new das::ExprVar(At, "packed"),
+                                                       DSLCall(At, das::string("ue_struct_with_") + Suffix,
+                                                               {new das::ExprVar(At, "packed"), Name(), Access()})));
+            UnpackBody->list.push_back(new das::ExprCopy(
+                At, Target(),
+                DSLCall(At, das::string("ue_struct_get_") + Suffix, {new das::ExprVar(At, "value"), Name()})));
+        }
+    }
+    PackBody->list.push_back(new das::ExprReturn(At, new das::ExprVar(At, "packed")));
+    auto* Return = new das::ExprReturn(At, new das::ExprVar(At, "result"));
+    Return->moveSemantics = true;
+    UnpackBody->list.push_back(Return);
+    auto Pack = DSLHelper(At, DSLUtf8(TEXT("__ue_pack_")+ FMD5::HashAnsiString(*HelperKey)), DSLCopyType(Type),
+                                      DSLCopyType(Handle), nullptr);
+    Pack->body = PackBody;
+    auto Unpack = DSLHelper(At, DSLUtf8(TEXT("__ue_unpack_")+ FMD5::HashAnsiString(*HelperKey)), DSLCopyType(Handle),
+                                        DSLCopyType(Type), nullptr);
+    Unpack->body = UnpackBody;
+    Generated.push_back(Pack);
+    Generated.push_back(Unpack);
+}

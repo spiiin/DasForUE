@@ -5,8 +5,8 @@
 UCLASS()
 class UDasWidgetEventsCommandlet : public UCommandlet
 {
- GENERATED_BODY()
+    GENERATED_BODY()
 public:
- UDasWidgetEventsCommandlet();
- virtual int32 Main(const FString& Params) override;
+    UDasWidgetEventsCommandlet();
+    virtual int32 Main(const FString& Params) override;
 };
