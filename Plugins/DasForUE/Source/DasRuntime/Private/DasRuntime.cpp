@@ -858,7 +858,7 @@ bool FDasRuntimeModule::ReadReflectedTypes(const FString& Path, FDasReflectedTyp
     }
 }
 
-// Sorted name, mangled signature and side-effect flags of every ue_foundation function.
+// Sorted name, mangled signature, result type and side-effect flags of every ue_foundation function.
 // Foundation tests compare it with Bindings/FoundationExterns.txt so that binding
 // refactors keep the script-visible surface unchanged.
 FString DasFoundationExternManifest()
@@ -868,8 +868,10 @@ FString DasFoundationExternManifest()
         Module->functions.foreach(
             [&](const das::FunctionPtr& Fn)
             {
-                Lines.Add(FString::Printf(TEXT("%s\t%s\t%u"), UTF8_TO_TCHAR(Fn->name.c_str()),
-                                          UTF8_TO_TCHAR(Fn->getMangledName().c_str()), Fn->sideEffectFlags));
+                const das::string Result = Fn->result ? Fn->result->describe() : das::string();
+                Lines.Add(FString::Printf(TEXT("%s\t%s\t%s\t%u"), UTF8_TO_TCHAR(Fn->name.c_str()),
+                                          UTF8_TO_TCHAR(Fn->getMangledName().c_str()), UTF8_TO_TCHAR(Result.c_str()),
+                                          Fn->sideEffectFlags));
             });
     Lines.Sort();
     return FString::Join(Lines, TEXT("\n")) + TEXT("\n");

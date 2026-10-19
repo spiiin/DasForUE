@@ -1,688 +1,688 @@
-__ue_actor_owner	@ue_foundation::__ue_actor_owner CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_actor_spawn	@ue_foundation::__ue_actor_spawn CH<ue_foundation::UEClassHandle> CIH<ue_foundation::UETransform> CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-__ue_ai_active	@ue_foundation::__ue_ai_active CIs C_c	4
-__ue_ai_cancel	@ue_foundation::__ue_ai_cancel CIs C_c	4
-__ue_ai_move	@ue_foundation::__ue_ai_move CIs CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UEVector> Cb CIs Cf Cb Cb C_c	4
-__ue_ai_self	@ue_foundation::__ue_ai_self C_c	4
-__ue_apply_damage	@ue_foundation::__ue_apply_damage CIH<ue_foundation::UObjectHandle> Cf CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_arg_analoginputevent	@ue_foundation::__ue_arg_analoginputevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEAnalogInputEvent> C_c	4
-__ue_arg_characterevent	@ue_foundation::__ue_arg_characterevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UECharacterEvent> C_c	4
-__ue_arg_constraint	@ue_foundation::__ue_arg_constraint CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEConstraintHandle> C_c	4
-__ue_arg_event_reply	@ue_foundation::__ue_arg_event_reply CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEEventReply> C_c	4
-__ue_arg_geometry	@ue_foundation::__ue_arg_geometry CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEGeometry> C_c	4
-__ue_arg_hit_result	@ue_foundation::__ue_arg_hit_result CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEHitResult> C_c	4
-__ue_arg_input_value	@ue_foundation::__ue_arg_input_value CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::InputActionValue> C_c	4
-__ue_arg_inputevent	@ue_foundation::__ue_arg_inputevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEInputEvent> C_c	4
-__ue_arg_keyevent	@ue_foundation::__ue_arg_keyevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEKeyEvent> C_c	4
-__ue_arg_native_delegate	@ue_foundation::__ue_arg_native_delegate CIH<ue_foundation::UCallHandle> CIs CIs CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_arg_navigationevent	@ue_foundation::__ue_arg_navigationevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UENavigationEvent> C_c	4
-__ue_arg_paint_context	@ue_foundation::__ue_arg_paint_context CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEPaintContext> C_c	4
-__ue_arg_pointerevent	@ue_foundation::__ue_arg_pointerevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEPointerEvent> C_c	4
-__ue_asset_load_async	@ue_foundation::__ue_asset_load_async CIs CIs CIs CIs C_c	4
-__ue_authored_component_get	@ue_foundation::__ue_authored_component_get CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_get_bool	@ue_foundation::__ue_authored_get_bool CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_get_byte	@ue_foundation::__ue_authored_get_byte CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_get_class	@ue_foundation::__ue_authored_get_class CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_get_double	@ue_foundation::__ue_authored_get_double CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_get_enum	@ue_foundation::__ue_authored_get_enum CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_get_float	@ue_foundation::__ue_authored_get_float CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_get_int	@ue_foundation::__ue_authored_get_int CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_get_name	@ue_foundation::__ue_authored_get_name CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_get_object	@ue_foundation::__ue_authored_get_object CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-__ue_authored_get_string	@ue_foundation::__ue_authored_get_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_get_struct	@ue_foundation::__ue_authored_get_struct CIH<ue_foundation::UObjectHandle> CIs CIs C_c C_l	4
-__ue_authored_get_text	@ue_foundation::__ue_authored_get_text CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_authored_nullable_check	@ue_foundation::__ue_authored_nullable_check CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_authored_object_check	@ue_foundation::__ue_authored_object_check CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_authored_set_bool	@ue_foundation::__ue_authored_set_bool CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	4
-__ue_authored_set_byte	@ue_foundation::__ue_authored_set_byte CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	4
-__ue_authored_set_class	@ue_foundation::__ue_authored_set_class CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UEClassHandle> C_c	4
-__ue_authored_set_double	@ue_foundation::__ue_authored_set_double CIH<ue_foundation::UObjectHandle> CIs CIs Cd C_c	4
-__ue_authored_set_enum	@ue_foundation::__ue_authored_set_enum CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_authored_set_float	@ue_foundation::__ue_authored_set_float CIH<ue_foundation::UObjectHandle> CIs CIs Cf C_c	4
-__ue_authored_set_int	@ue_foundation::__ue_authored_set_int CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	4
-__ue_authored_set_name	@ue_foundation::__ue_authored_set_name CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UENameValue> C_c	4
-__ue_authored_set_object	@ue_foundation::__ue_authored_set_object CIH<ue_foundation::UObjectHandle> CIs CIs CIs CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_authored_set_string	@ue_foundation::__ue_authored_set_string CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-__ue_authored_set_struct	@ue_foundation::__ue_authored_set_struct CIH<ue_foundation::UObjectHandle> CIs CIs CIH<ue_foundation::UEStructValue> C_c	4
-__ue_authored_set_text	@ue_foundation::__ue_authored_set_text CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UETextValue> C_c	4
-__ue_begin_authored_call	@ue_foundation::__ue_begin_authored_call CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-__ue_begin_callback_frame	@ue_foundation::__ue_begin_callback_frame CIs C_c	4
-__ue_begin_native_gameplay_call	@ue_foundation::__ue_begin_native_gameplay_call CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_begin_super_call	@ue_foundation::__ue_begin_super_call CIH<ue_foundation::UObjectHandle> CIs CIs CIs CIs C_c	4
-__ue_character_controls_ready	@ue_foundation::__ue_character_controls_ready CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_character_jump	@ue_foundation::__ue_character_jump CIH<ue_foundation::UObjectHandle> Cb C_c	4
-__ue_character_look	@ue_foundation::__ue_character_look CIH<ue_foundation::UObjectHandle> Cf Cf C_c	4
-__ue_character_move	@ue_foundation::__ue_character_move CIH<ue_foundation::UObjectHandle> Cf Cf C_c	4
-__ue_checked_enum_number	@ue_foundation::__ue_checked_enum_number CH<ue_foundation::UEEnumValue> CIs C_c	4
-__ue_class_check	@ue_foundation::__ue_class_check CH<ue_foundation::UEClassHandle> CIs C_c	4
-__ue_class_component_operation	@ue_foundation::__ue_class_component_operation CIH<ue_foundation::UObjectHandle> CH<ue_foundation::UEClassHandle> CIs Ci CIs CIs C_c	4
-__ue_class_component_operation	@ue_foundation::__ue_class_component_operation CIH<ue_foundation::UObjectHandle> CIs CIs Ci CIs CIs C_c	4
-__ue_class_loaded	@ue_foundation::__ue_class_loaded CIs CIs CIs C_c	4
-__ue_curve_table_eval	@ue_foundation::__ue_curve_table_eval CIH<ue_foundation::UObjectHandle> CIs Cf Cf C_c	4
-__ue_curve_table_has	@ue_foundation::__ue_curve_table_has CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_curve_table_names	@ue_foundation::__ue_curve_table_names CIH<ue_foundation::UObjectHandle> C_c C_l	4
-__ue_data_table_has	@ue_foundation::__ue_data_table_has CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_data_table_names	@ue_foundation::__ue_data_table_names CIH<ue_foundation::UObjectHandle> C_c C_l	4
-__ue_data_table_row	@ue_foundation::__ue_data_table_row CIH<ue_foundation::UObjectHandle> CIs CIs C_c C_l	4
-__ue_delegate_begin_call	@ue_foundation::__ue_delegate_begin_call Cu64 CIs Cb Cb C_c	4
-__ue_delegate_bind	@ue_foundation::__ue_delegate_bind Cu64 CIs Cb CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_delegate_clear	@ue_foundation::__ue_delegate_clear Cu64 CIs Cb C_c	4
-__ue_delegate_create	@ue_foundation::__ue_delegate_create CIs C_c	4
-__ue_delegate_event_view	@ue_foundation::__ue_delegate_event_view CIs CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_delegate_get_field	@ue_foundation::__ue_delegate_get_field CIs CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_delegate_is_bound	@ue_foundation::__ue_delegate_is_bound Cu64 CIs Cb C_c	4
-__ue_delegate_remove	@ue_foundation::__ue_delegate_remove Cu64 CIs Cb CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_delegate_set_field	@ue_foundation::__ue_delegate_set_field CIs CIH<ue_foundation::UObjectHandle> CIs Cu64 C_c	4
-__ue_drag_create	@ue_foundation::__ue_drag_create CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs Ci CIH<ue_foundation::UEVector2D> C_c	4
-__ue_drag_payload	@ue_foundation::__ue_drag_payload CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_drag_tag	@ue_foundation::__ue_drag_tag CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_drag_valid	@ue_foundation::__ue_drag_valid CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_drag_visual	@ue_foundation::__ue_drag_visual CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_effect_active	@ue_foundation::__ue_effect_active CIs C_c	4
-__ue_effect_play	@ue_foundation::__ue_effect_play CIs CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UETransform> CIs Cf Cf C_c	4
-__ue_effect_stop	@ue_foundation::__ue_effect_stop CIs C_c	4
-__ue_effect_stop_all	@ue_foundation::__ue_effect_stop_all C_c	4
-__ue_enhanced_add_context	@ue_foundation::__ue_enhanced_add_context CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> Ci C_c	4
-__ue_enhanced_bind	@ue_foundation::__ue_enhanced_bind CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_enhanced_has_context	@ue_foundation::__ue_enhanced_has_context CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_enhanced_remove_context	@ue_foundation::__ue_enhanced_remove_context CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_enhanced_unbind	@ue_foundation::__ue_enhanced_unbind CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_find_by_type	@ue_foundation::__ue_find_by_type CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	4
-__ue_focus_cause	@ue_foundation::__ue_focus_cause CIH<ue_foundation::UEFocusEvent> C_c	4
-__ue_focus_user	@ue_foundation::__ue_focus_user CIH<ue_foundation::UEFocusEvent> C_c	4
-__ue_image_soft_error	@ue_foundation::__ue_image_soft_error CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_image_soft_status	@ue_foundation::__ue_image_soft_status CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_input_kind	@ue_foundation::__ue_input_kind CIH<ue_foundation::InputActionValue> C_c	4
-__ue_input_make	@ue_foundation::__ue_input_make Ci Cd Cd Cd C_c	4
-__ue_library_scope	@ue_foundation::__ue_library_scope CIH<ue_foundation::UObjectHandle> Cb CI1<v>$ C_c	4
-__ue_math_pack_input_value	@ue_foundation::__ue_math_pack_input_value CIH<ue_foundation::InputActionValue> C_c C_l	4
-__ue_math_pack_rotator	@ue_foundation::__ue_math_pack_rotator CIH<ue_foundation::UERotator> C_c C_l	4
-__ue_math_pack_transform	@ue_foundation::__ue_math_pack_transform CIH<ue_foundation::UETransform> C_c C_l	4
-__ue_math_pack_vector	@ue_foundation::__ue_math_pack_vector CIH<ue_foundation::UEVector> C_c C_l	4
-__ue_math_pack_vector2d	@ue_foundation::__ue_math_pack_vector2d CIH<ue_foundation::UEVector2D> C_c C_l	4
-__ue_math_unpack_input_value	@ue_foundation::__ue_math_unpack_input_value CIH<ue_foundation::UEStructValue> C_c	4
-__ue_math_unpack_rotator	@ue_foundation::__ue_math_unpack_rotator CIH<ue_foundation::UEStructValue> C_c	4
-__ue_math_unpack_transform	@ue_foundation::__ue_math_unpack_transform CIH<ue_foundation::UEStructValue> C_c	4
-__ue_math_unpack_vector	@ue_foundation::__ue_math_unpack_vector CIH<ue_foundation::UEStructValue> C_c	4
-__ue_math_unpack_vector2d	@ue_foundation::__ue_math_unpack_vector2d CIH<ue_foundation::UEStructValue> C_c	4
-__ue_method_arg_delegate	@ue_foundation::__ue_method_arg_delegate CIH<ue_foundation::UCallHandle> CIs CIs Cu64 C_c	4
-__ue_method_arg_enum	@ue_foundation::__ue_method_arg_enum CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_method_arg_name	@ue_foundation::__ue_method_arg_name CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UENameValue> C_c	4
-__ue_method_arg_rotator	@ue_foundation::__ue_method_arg_rotator CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UERotator> C_c	4
-__ue_method_arg_struct	@ue_foundation::__ue_method_arg_struct CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEStructValue> C_c	4
-__ue_method_arg_text	@ue_foundation::__ue_method_arg_text CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UETextValue> C_c	4
-__ue_method_arg_transform	@ue_foundation::__ue_method_arg_transform CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UETransform> C_c	4
-__ue_method_arg_vector	@ue_foundation::__ue_method_arg_vector CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEVector> C_c	4
-__ue_method_arg_vector2d	@ue_foundation::__ue_method_arg_vector2d CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEVector2D> C_c	4
-__ue_method_result_delegate	@ue_foundation::__ue_method_result_delegate CIH<ue_foundation::UCallHandle> CIs CIs C_c	4
-__ue_method_result_enum	@ue_foundation::__ue_method_result_enum CIH<ue_foundation::UCallHandle> CIs C_c	4
-__ue_method_result_name	@ue_foundation::__ue_method_result_name CIH<ue_foundation::UCallHandle> CIs C_c	4
-__ue_method_result_rotator	@ue_foundation::__ue_method_result_rotator CIH<ue_foundation::UCallHandle> CIs C_c	4
-__ue_method_result_struct	@ue_foundation::__ue_method_result_struct CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_method_result_text	@ue_foundation::__ue_method_result_text CIH<ue_foundation::UCallHandle> CIs C_c	4
-__ue_method_result_transform	@ue_foundation::__ue_method_result_transform CIH<ue_foundation::UCallHandle> CIs C_c	4
-__ue_method_result_vector	@ue_foundation::__ue_method_result_vector CIH<ue_foundation::UCallHandle> CIs C_c	4
-__ue_method_result_vector2d	@ue_foundation::__ue_method_result_vector2d CIH<ue_foundation::UCallHandle> CIs C_c	4
-__ue_montage_cancel	@ue_foundation::__ue_montage_cancel CIs C_c	4
-__ue_montage_play	@ue_foundation::__ue_montage_play CIs CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs Cf Cf CH<ue_foundation::UENameValue> C_c	4
-__ue_montage_playing	@ue_foundation::__ue_montage_playing CIs C_c	4
-__ue_montage_stop	@ue_foundation::__ue_montage_stop CIs Cf C_c	4
-__ue_native_component_operation	@ue_foundation::__ue_native_component_operation CIH<ue_foundation::UObjectHandle> CIs CIs Ci CIs C_c	4
-__ue_native_get_bool	@ue_foundation::__ue_native_get_bool CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_native_get_byte	@ue_foundation::__ue_native_get_byte CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_native_get_class	@ue_foundation::__ue_native_get_class CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_native_get_double	@ue_foundation::__ue_native_get_double CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_native_get_enum	@ue_foundation::__ue_native_get_enum CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_native_get_float	@ue_foundation::__ue_native_get_float CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_native_get_int	@ue_foundation::__ue_native_get_int CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_native_get_name	@ue_foundation::__ue_native_get_name CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_native_get_object	@ue_foundation::__ue_native_get_object CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-__ue_native_get_string	@ue_foundation::__ue_native_get_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_native_get_struct	@ue_foundation::__ue_native_get_struct CIH<ue_foundation::UObjectHandle> CIs CIs C_c C_l	4
-__ue_native_get_text	@ue_foundation::__ue_native_get_text CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_native_set_bool	@ue_foundation::__ue_native_set_bool CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	4
-__ue_native_set_byte	@ue_foundation::__ue_native_set_byte CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	4
-__ue_native_set_class	@ue_foundation::__ue_native_set_class CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UEClassHandle> C_c	4
-__ue_native_set_double	@ue_foundation::__ue_native_set_double CIH<ue_foundation::UObjectHandle> CIs CIs Cd C_c	4
-__ue_native_set_enum	@ue_foundation::__ue_native_set_enum CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_native_set_float	@ue_foundation::__ue_native_set_float CIH<ue_foundation::UObjectHandle> CIs CIs Cf C_c	4
-__ue_native_set_int	@ue_foundation::__ue_native_set_int CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	4
-__ue_native_set_name	@ue_foundation::__ue_native_set_name CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UENameValue> C_c	4
-__ue_native_set_object	@ue_foundation::__ue_native_set_object CIH<ue_foundation::UObjectHandle> CIs CIs CIs CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_native_set_string	@ue_foundation::__ue_native_set_string CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-__ue_native_set_struct	@ue_foundation::__ue_native_set_struct CIH<ue_foundation::UObjectHandle> CIs CIs CIH<ue_foundation::UEStructValue> C_c	4
-__ue_native_set_text	@ue_foundation::__ue_native_set_text CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UETextValue> C_c	4
-__ue_object_key_check	@ue_foundation::__ue_object_key_check Cu64 CIs CIs C_c	4
-__ue_object_key_from_ref	@ue_foundation::__ue_object_key_from_ref CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_object_key_reference	@ue_foundation::__ue_object_key_reference Cu64 CIs CIs C_c	4
-__ue_object_key_valid	@ue_foundation::__ue_object_key_valid Cu64 C_c	4
-__ue_overlap_reference	@ue_foundation::__ue_overlap_reference CIH<ue_foundation::UEOverlapResult> Ci C_c	4
-__ue_overlap_world	@ue_foundation::__ue_overlap_world CIH<ue_foundation::UEVector> Cd Ci CI1<H<ue_foundation::UObjectHandle>>A Cb I1<H<ue_foundation::UEOverlapResult>>A C_c C_l	4
-__ue_parent_lifecycle	@ue_foundation::__ue_parent_lifecycle CIs Ci Cf Ci C_c	4
-__ue_pawn_controller	@ue_foundation::__ue_pawn_controller CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_pawn_possess	@ue_foundation::__ue_pawn_possess CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_primary_cancel	@ue_foundation::__ue_primary_cancel CIs C_c	4
-__ue_primary_exists	@ue_foundation::__ue_primary_exists CIs CIs C_c	4
-__ue_primary_find	@ue_foundation::__ue_primary_find CIs C_c	4
-__ue_primary_load_async	@ue_foundation::__ue_primary_load_async CIs CIs CIs CI1<s>A CIs C_c	4
-__ue_primary_object	@ue_foundation::__ue_primary_object CIs CIs C_c	4
-__ue_primary_path	@ue_foundation::__ue_primary_path CIs CIs C_c	4
-__ue_primary_pending	@ue_foundation::__ue_primary_pending CIs C_c	4
-__ue_primary_query_count	@ue_foundation::__ue_primary_query_count Cu64 C_c	4
-__ue_primary_query_name	@ue_foundation::__ue_primary_query_name Cu64 Ci C_c	4
-__ue_primary_query_release	@ue_foundation::__ue_primary_query_release Cu64 C_c	4
-__ue_primary_unload	@ue_foundation::__ue_primary_unload CIs CIs C_c	4
-__ue_query_begin	@ue_foundation::__ue_query_begin CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	4
-__ue_query_count	@ue_foundation::__ue_query_count Cu64 C_c	4
-__ue_query_get	@ue_foundation::__ue_query_get Cu64 Ci C_c	4
-__ue_query_release	@ue_foundation::__ue_query_release Cu64 C_c	4
-__ue_release_authored_call	@ue_foundation::__ue_release_authored_call CIH<ue_foundation::UCallHandle> C_c	4
-__ue_require_struct_type	@ue_foundation::__ue_require_struct_type CIH<ue_foundation::UEStructValue> CIs C_c	4
-__ue_result_analoginputevent	@ue_foundation::__ue_result_analoginputevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_result_characterevent	@ue_foundation::__ue_result_characterevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_result_constraint	@ue_foundation::__ue_result_constraint CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_result_event_reply	@ue_foundation::__ue_result_event_reply CIH<ue_foundation::UCallHandle> CIs C_c	4
-__ue_result_geometry	@ue_foundation::__ue_result_geometry CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_result_hit_result	@ue_foundation::__ue_result_hit_result CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_result_input_value	@ue_foundation::__ue_result_input_value CIH<ue_foundation::UCallHandle> CIs C_c	4
-__ue_result_inputevent	@ue_foundation::__ue_result_inputevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_result_keyevent	@ue_foundation::__ue_result_keyevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_result_navigationevent	@ue_foundation::__ue_result_navigationevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_result_paint_context	@ue_foundation::__ue_result_paint_context CIH<ue_foundation::UCallHandle> CIs C_c	4
-__ue_result_pointerevent	@ue_foundation::__ue_result_pointerevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_result_widget_animation	@ue_foundation::__ue_result_widget_animation CIH<ue_foundation::UCallHandle> CIs C_c C_l	4
-__ue_same_object	@ue_foundation::__ue_same_object CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_savegame_cancel	@ue_foundation::__ue_savegame_cancel CIs C_c	4
-__ue_savegame_create	@ue_foundation::__ue_savegame_create C&IH<ue_foundation::UEClassHandle> C_c	4
-__ue_savegame_create_path	@ue_foundation::__ue_savegame_create_path CIs C_c	4
-__ue_savegame_delete	@ue_foundation::__ue_savegame_delete CIs Ci C_c	4
-__ue_savegame_exists	@ue_foundation::__ue_savegame_exists CIs Ci C_c	4
-__ue_savegame_load	@ue_foundation::__ue_savegame_load CIs Ci C_c	4
-__ue_savegame_load_async	@ue_foundation::__ue_savegame_load_async CIs CIs Ci CIs C_c	4
-__ue_savegame_pending	@ue_foundation::__ue_savegame_pending CIs C_c	4
-__ue_savegame_release	@ue_foundation::__ue_savegame_release CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_savegame_save	@ue_foundation::__ue_savegame_save CIH<ue_foundation::UObjectHandle> CIs Ci C_c	4
-__ue_savegame_save_async	@ue_foundation::__ue_savegame_save_async CIs CIH<ue_foundation::UObjectHandle> CIs Ci CIs C_c	4
-__ue_savegame_valid	@ue_foundation::__ue_savegame_valid CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_scene_actor_root	@ue_foundation::__ue_scene_actor_root CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_scene_attach	@ue_foundation::__ue_scene_attach CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	4
-__ue_scene_create	@ue_foundation::__ue_scene_create CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_scene_destroy	@ue_foundation::__ue_scene_destroy CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_scene_detach	@ue_foundation::__ue_scene_detach CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_scene_get	@ue_foundation::__ue_scene_get CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_scene_get_or_create	@ue_foundation::__ue_scene_get_or_create CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_scene_parent	@ue_foundation::__ue_scene_parent CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_scene_relative_rotation	@ue_foundation::__ue_scene_relative_rotation CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_scene_relative_scale	@ue_foundation::__ue_scene_relative_scale CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_scene_relative_transform	@ue_foundation::__ue_scene_relative_transform CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_scene_relative_translation	@ue_foundation::__ue_scene_relative_translation CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_scene_set_relative_transform	@ue_foundation::__ue_scene_set_relative_transform CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UETransform> Cb C_c	4
-__ue_scene_set_world_transform	@ue_foundation::__ue_scene_set_world_transform CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UETransform> Cb C_c	4
-__ue_scene_valid	@ue_foundation::__ue_scene_valid CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_scene_world_transform	@ue_foundation::__ue_scene_world_transform CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_soft_check	@ue_foundation::__ue_soft_check CIH<ue_foundation::UEStructValue> CIs C_c	4
-__ue_soft_get_class	@ue_foundation::__ue_soft_get_class CIH<ue_foundation::UEStructValue> Cb C_c	4
-__ue_soft_get_object	@ue_foundation::__ue_soft_get_object CIH<ue_foundation::UEStructValue> Cb C_c	4
-__ue_soft_load_async	@ue_foundation::__ue_soft_load_async CIs CIH<ue_foundation::UEStructValue> CIs C_c	4
-__ue_soft_loaded	@ue_foundation::__ue_soft_loaded CIH<ue_foundation::UEStructValue> C_c	4
-__ue_soft_make	@ue_foundation::__ue_soft_make CIs CIs C_c	4
-__ue_soft_null	@ue_foundation::__ue_soft_null CIH<ue_foundation::UEStructValue> C_c	4
-__ue_soft_path	@ue_foundation::__ue_soft_path CIH<ue_foundation::UEStructValue> C_c	4
-__ue_soft_upcast	@ue_foundation::__ue_soft_upcast CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-__ue_struct_get_class	@ue_foundation::__ue_struct_get_class CIH<ue_foundation::UEStructValue> CIs C_c	4
-__ue_struct_get_enum_value	@ue_foundation::__ue_struct_get_enum_value CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-__ue_struct_map_get_byte_enum	@ue_foundation::__ue_struct_map_get_byte_enum CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	4
-__ue_struct_map_get_byte_object	@ue_foundation::__ue_struct_map_get_byte_object CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	4
-__ue_struct_map_get_byte_struct	@ue_foundation::__ue_struct_map_get_byte_struct CIH<ue_foundation::UEStructValue> CIs Cu8 C_c C_l	4
-__ue_struct_map_get_enum_bool	@ue_foundation::__ue_struct_map_get_enum_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_struct_map_get_enum_byte	@ue_foundation::__ue_struct_map_get_enum_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_struct_map_get_enum_double	@ue_foundation::__ue_struct_map_get_enum_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_struct_map_get_enum_enum	@ue_foundation::__ue_struct_map_get_enum_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_struct_map_get_enum_float	@ue_foundation::__ue_struct_map_get_enum_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_struct_map_get_enum_int	@ue_foundation::__ue_struct_map_get_enum_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_struct_map_get_enum_name	@ue_foundation::__ue_struct_map_get_enum_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_struct_map_get_enum_object	@ue_foundation::__ue_struct_map_get_enum_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_struct_map_get_enum_string	@ue_foundation::__ue_struct_map_get_enum_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_struct_map_get_enum_struct	@ue_foundation::__ue_struct_map_get_enum_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c C_l	4
-__ue_struct_map_get_enum_text	@ue_foundation::__ue_struct_map_get_enum_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	4
-__ue_struct_map_get_int_enum	@ue_foundation::__ue_struct_map_get_int_enum CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-__ue_struct_map_get_int_object	@ue_foundation::__ue_struct_map_get_int_object CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-__ue_struct_map_get_int_struct	@ue_foundation::__ue_struct_map_get_int_struct CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	4
-__ue_struct_map_get_name_enum	@ue_foundation::__ue_struct_map_get_name_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	4
-__ue_struct_map_get_name_object	@ue_foundation::__ue_struct_map_get_name_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	4
-__ue_struct_map_get_name_struct	@ue_foundation::__ue_struct_map_get_name_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c C_l	4
-__ue_struct_map_get_object_bool	@ue_foundation::__ue_struct_map_get_object_bool CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	4
-__ue_struct_map_get_object_byte	@ue_foundation::__ue_struct_map_get_object_byte CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	4
-__ue_struct_map_get_object_double	@ue_foundation::__ue_struct_map_get_object_double CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	4
-__ue_struct_map_get_object_enum	@ue_foundation::__ue_struct_map_get_object_enum CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	4
-__ue_struct_map_get_object_float	@ue_foundation::__ue_struct_map_get_object_float CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	4
-__ue_struct_map_get_object_int	@ue_foundation::__ue_struct_map_get_object_int CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	4
-__ue_struct_map_get_object_name	@ue_foundation::__ue_struct_map_get_object_name CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	4
-__ue_struct_map_get_object_object	@ue_foundation::__ue_struct_map_get_object_object CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	4
-__ue_struct_map_get_object_string	@ue_foundation::__ue_struct_map_get_object_string CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	4
-__ue_struct_map_get_object_struct	@ue_foundation::__ue_struct_map_get_object_struct CIH<ue_foundation::UEStructValue> CIs Cu64 C_c C_l	4
-__ue_struct_map_get_object_text	@ue_foundation::__ue_struct_map_get_object_text CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	4
-__ue_struct_map_get_string_enum	@ue_foundation::__ue_struct_map_get_string_enum CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-__ue_struct_map_get_string_object	@ue_foundation::__ue_struct_map_get_string_object CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-__ue_struct_map_get_string_struct	@ue_foundation::__ue_struct_map_get_string_struct CIH<ue_foundation::UEStructValue> CIs CIs C_c C_l	4
-__ue_struct_map_key_enum	@ue_foundation::__ue_struct_map_key_enum CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-__ue_struct_map_key_object	@ue_foundation::__ue_struct_map_key_object CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-__ue_struct_map_with_byte_enum	@ue_foundation::__ue_struct_map_with_byte_enum CIH<ue_foundation::UEStructValue> CIs Cu8 CH<ue_foundation::UEEnumValue> C_c C_l	4
-__ue_struct_map_with_byte_object	@ue_foundation::__ue_struct_map_with_byte_object CIH<ue_foundation::UEStructValue> CIs Cu8 CIH<ue_foundation::UObjectHandle> C_c C_l	4
-__ue_struct_map_with_byte_struct	@ue_foundation::__ue_struct_map_with_byte_struct CIH<ue_foundation::UEStructValue> CIs Cu8 CIH<ue_foundation::UEStructValue> C_c C_l	4
-__ue_struct_map_with_enum_bool	@ue_foundation::__ue_struct_map_with_enum_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cb C_c C_l	4
-__ue_struct_map_with_enum_byte	@ue_foundation::__ue_struct_map_with_enum_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cu8 C_c C_l	4
-__ue_struct_map_with_enum_double	@ue_foundation::__ue_struct_map_with_enum_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cd C_c C_l	4
-__ue_struct_map_with_enum_enum	@ue_foundation::__ue_struct_map_with_enum_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CH<ue_foundation::UEEnumValue> C_c C_l	4
-__ue_struct_map_with_enum_float	@ue_foundation::__ue_struct_map_with_enum_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cf C_c C_l	4
-__ue_struct_map_with_enum_int	@ue_foundation::__ue_struct_map_with_enum_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Ci C_c C_l	4
-__ue_struct_map_with_enum_name	@ue_foundation::__ue_struct_map_with_enum_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CH<ue_foundation::UENameValue> C_c C_l	4
-__ue_struct_map_with_enum_object	@ue_foundation::__ue_struct_map_with_enum_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CIH<ue_foundation::UObjectHandle> C_c C_l	4
-__ue_struct_map_with_enum_string	@ue_foundation::__ue_struct_map_with_enum_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CIs C_c C_l	4
-__ue_struct_map_with_enum_struct	@ue_foundation::__ue_struct_map_with_enum_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CIH<ue_foundation::UEStructValue> C_c C_l	4
-__ue_struct_map_with_enum_text	@ue_foundation::__ue_struct_map_with_enum_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CH<ue_foundation::UETextValue> C_c C_l	4
-__ue_struct_map_with_int_enum	@ue_foundation::__ue_struct_map_with_int_enum CIH<ue_foundation::UEStructValue> CIs Ci CH<ue_foundation::UEEnumValue> C_c C_l	4
-__ue_struct_map_with_int_object	@ue_foundation::__ue_struct_map_with_int_object CIH<ue_foundation::UEStructValue> CIs Ci CIH<ue_foundation::UObjectHandle> C_c C_l	4
-__ue_struct_map_with_int_struct	@ue_foundation::__ue_struct_map_with_int_struct CIH<ue_foundation::UEStructValue> CIs Ci CIH<ue_foundation::UEStructValue> C_c C_l	4
-__ue_struct_map_with_name_enum	@ue_foundation::__ue_struct_map_with_name_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UEEnumValue> C_c C_l	4
-__ue_struct_map_with_name_object	@ue_foundation::__ue_struct_map_with_name_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CIH<ue_foundation::UObjectHandle> C_c C_l	4
-__ue_struct_map_with_name_struct	@ue_foundation::__ue_struct_map_with_name_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CIH<ue_foundation::UEStructValue> C_c C_l	4
-__ue_struct_map_with_object_bool	@ue_foundation::__ue_struct_map_with_object_bool CIH<ue_foundation::UEStructValue> CIs Cu64 Cb C_c C_l	4
-__ue_struct_map_with_object_byte	@ue_foundation::__ue_struct_map_with_object_byte CIH<ue_foundation::UEStructValue> CIs Cu64 Cu8 C_c C_l	4
-__ue_struct_map_with_object_double	@ue_foundation::__ue_struct_map_with_object_double CIH<ue_foundation::UEStructValue> CIs Cu64 Cd C_c C_l	4
-__ue_struct_map_with_object_enum	@ue_foundation::__ue_struct_map_with_object_enum CIH<ue_foundation::UEStructValue> CIs Cu64 CH<ue_foundation::UEEnumValue> C_c C_l	4
-__ue_struct_map_with_object_float	@ue_foundation::__ue_struct_map_with_object_float CIH<ue_foundation::UEStructValue> CIs Cu64 Cf C_c C_l	4
-__ue_struct_map_with_object_int	@ue_foundation::__ue_struct_map_with_object_int CIH<ue_foundation::UEStructValue> CIs Cu64 Ci C_c C_l	4
-__ue_struct_map_with_object_name	@ue_foundation::__ue_struct_map_with_object_name CIH<ue_foundation::UEStructValue> CIs Cu64 CH<ue_foundation::UENameValue> C_c C_l	4
-__ue_struct_map_with_object_object	@ue_foundation::__ue_struct_map_with_object_object CIH<ue_foundation::UEStructValue> CIs Cu64 CIH<ue_foundation::UObjectHandle> C_c C_l	4
-__ue_struct_map_with_object_string	@ue_foundation::__ue_struct_map_with_object_string CIH<ue_foundation::UEStructValue> CIs Cu64 CIs C_c C_l	4
-__ue_struct_map_with_object_struct	@ue_foundation::__ue_struct_map_with_object_struct CIH<ue_foundation::UEStructValue> CIs Cu64 CIH<ue_foundation::UEStructValue> C_c C_l	4
-__ue_struct_map_with_object_text	@ue_foundation::__ue_struct_map_with_object_text CIH<ue_foundation::UEStructValue> CIs Cu64 CH<ue_foundation::UETextValue> C_c C_l	4
-__ue_struct_map_with_string_enum	@ue_foundation::__ue_struct_map_with_string_enum CIH<ue_foundation::UEStructValue> CIs CIs CH<ue_foundation::UEEnumValue> C_c C_l	4
-__ue_struct_map_with_string_object	@ue_foundation::__ue_struct_map_with_string_object CIH<ue_foundation::UEStructValue> CIs CIs CIH<ue_foundation::UObjectHandle> C_c C_l	4
-__ue_struct_map_with_string_struct	@ue_foundation::__ue_struct_map_with_string_struct CIH<ue_foundation::UEStructValue> CIs CIs CIH<ue_foundation::UEStructValue> C_c C_l	4
-__ue_struct_set_element_enum	@ue_foundation::__ue_struct_set_element_enum CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-__ue_struct_set_element_object_key	@ue_foundation::__ue_struct_set_element_object_key CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-__ue_struct_set_with_enum	@ue_foundation::__ue_struct_set_with_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cb C_c C_l	4
-__ue_struct_set_with_object_key	@ue_foundation::__ue_struct_set_with_object_key CIH<ue_foundation::UEStructValue> CIs Cu64 Cb C_c C_l	4
-__ue_struct_with_enum_value	@ue_foundation::__ue_struct_with_enum_value CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c C_l	4
-__ue_tag_check	@ue_foundation::__ue_tag_check CIH<ue_foundation::UEStructValue> Cb C_c	4
-__ue_tag_matches	@ue_foundation::__ue_tag_matches CIH<ue_foundation::UEStructValue> CIH<ue_foundation::UEStructValue> Cb C_c	4
-__ue_tag_name	@ue_foundation::__ue_tag_name CIH<ue_foundation::UEStructValue> C_c	4
-__ue_tag_request	@ue_foundation::__ue_tag_request CIs Cb C_c	4
-__ue_tag_valid	@ue_foundation::__ue_tag_valid CIH<ue_foundation::UEStructValue> C_c	4
-__ue_tags_count	@ue_foundation::__ue_tags_count CIH<ue_foundation::UEStructValue> C_c	4
-__ue_tags_has	@ue_foundation::__ue_tags_has CIH<ue_foundation::UEStructValue> CIH<ue_foundation::UEStructValue> Cb C_c	4
-__ue_tags_has_set	@ue_foundation::__ue_tags_has_set CIH<ue_foundation::UEStructValue> CIH<ue_foundation::UEStructValue> Cb Cb C_c	4
-__ue_tags_names	@ue_foundation::__ue_tags_names CIH<ue_foundation::UEStructValue> C_c C_l	4
-__ue_tags_with	@ue_foundation::__ue_tags_with CIH<ue_foundation::UEStructValue> CIH<ue_foundation::UEStructValue> Cb C_c C_l	4
-__ue_timer_next_tick_array	@ue_foundation::__ue_timer_next_tick_array CIs CIs CIH<ue_foundation::UEStructValue> C_c	4
-__ue_timer_next_tick_class	@ue_foundation::__ue_timer_next_tick_class CIs CIs CH<ue_foundation::UEClassHandle> CIs C_c	4
-__ue_timer_next_tick_frame	@ue_foundation::__ue_timer_next_tick_frame CIs CIs CIH<ue_foundation::UCallHandle> C_c	4
-__ue_timer_next_tick_object	@ue_foundation::__ue_timer_next_tick_object CIs CIs CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_timer_start_array	@ue_foundation::__ue_timer_start_array CIs Cf CIs Cb CIH<ue_foundation::UEStructValue> C_c	4
-__ue_timer_start_class	@ue_foundation::__ue_timer_start_class CIs Cf CIs Cb CH<ue_foundation::UEClassHandle> CIs C_c	4
-__ue_timer_start_frame	@ue_foundation::__ue_timer_start_frame CIs Cf CIs Cb CIH<ue_foundation::UCallHandle> C_c	4
-__ue_timer_start_object	@ue_foundation::__ue_timer_start_object CIs Cf CIs Cb CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_trace_actor	@ue_foundation::__ue_trace_actor CIH<ue_foundation::UETraceHit> C_c	4
-__ue_trace_bone	@ue_foundation::__ue_trace_bone CIH<ue_foundation::UETraceHit> Cb C_c C_l	4
-__ue_trace_component	@ue_foundation::__ue_trace_component CIH<ue_foundation::UETraceHit> C_c	4
-__ue_trace_material	@ue_foundation::__ue_trace_material CIH<ue_foundation::UETraceHit> C_c	4
-__ue_trace_physics_owner	@ue_foundation::__ue_trace_physics_owner CIH<ue_foundation::UETraceHit> C_c	4
-__ue_trace_world	@ue_foundation::__ue_trace_world CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> Cd Ci CI1<H<ue_foundation::UObjectHandle>>A Cb Cb C_c	4
-__ue_unpack_analoginputevent	@ue_foundation::__ue_unpack_analoginputevent CIH<ue_foundation::UEStructValue> C_c	4
-__ue_unpack_characterevent	@ue_foundation::__ue_unpack_characterevent CIH<ue_foundation::UEStructValue> C_c	4
-__ue_unpack_geometry	@ue_foundation::__ue_unpack_geometry CIH<ue_foundation::UEStructValue> C_c	4
-__ue_unpack_inputevent	@ue_foundation::__ue_unpack_inputevent CIH<ue_foundation::UEStructValue> C_c	4
-__ue_unpack_keyevent	@ue_foundation::__ue_unpack_keyevent CIH<ue_foundation::UEStructValue> C_c	4
-__ue_unpack_navigationevent	@ue_foundation::__ue_unpack_navigationevent CIH<ue_foundation::UEStructValue> C_c	4
-__ue_unpack_pointerevent	@ue_foundation::__ue_unpack_pointerevent CIH<ue_foundation::UEStructValue> C_c	4
-__ue_widget_animation_playing	@ue_foundation::__ue_widget_animation_playing CIH<ue_foundation::UEWidgetAnimationHandle> C_c	4
-__ue_widget_animation_valid	@ue_foundation::__ue_widget_animation_valid CIH<ue_foundation::UEWidgetAnimationHandle> C_c	4
-__ue_widget_bind_drag	@ue_foundation::__ue_widget_bind_drag CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-__ue_widget_bind_input	@ue_foundation::__ue_widget_bind_input CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-__ue_widget_capture	@ue_foundation::__ue_widget_capture CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_widget_clear_focus	@ue_foundation::__ue_widget_clear_focus CIH<ue_foundation::UEEventReply> Cb C_c	4
-__ue_widget_click	@ue_foundation::__ue_widget_click CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-__ue_widget_create	@ue_foundation::__ue_widget_create C&IH<ue_foundation::UEClassHandle> CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_widget_drag	@ue_foundation::__ue_widget_drag CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> CIs C_c	4
-__ue_widget_end_drag	@ue_foundation::__ue_widget_end_drag CIH<ue_foundation::UEEventReply> C_c	4
-__ue_widget_focus	@ue_foundation::__ue_widget_focus CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> Cb C_c	4
-__ue_widget_handled	@ue_foundation::__ue_widget_handled C_c	4
-__ue_widget_input	@ue_foundation::__ue_widget_input CIH<ue_foundation::UObjectHandle> Cb C_c	4
-__ue_widget_lock	@ue_foundation::__ue_widget_lock CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_widget_position	@ue_foundation::__ue_widget_position CIH<ue_foundation::UEEventReply> Ci Ci C_c	4
-__ue_widget_release	@ue_foundation::__ue_widget_release CIH<ue_foundation::UEEventReply> C_c	4
-__ue_widget_remove	@ue_foundation::__ue_widget_remove CIH<ue_foundation::UObjectHandle> C_c	4
-__ue_widget_show	@ue_foundation::__ue_widget_show CIH<ue_foundation::UObjectHandle> Ci C_c	4
-__ue_widget_text	@ue_foundation::__ue_widget_text CIH<ue_foundation::UObjectHandle> CIs CH<ue_foundation::UETextValue> C_c	4
-__ue_widget_unhandled	@ue_foundation::__ue_widget_unhandled C_c	4
-__ue_widget_unlock	@ue_foundation::__ue_widget_unlock CIH<ue_foundation::UEEventReply> C_c	4
-__ue_widget_visible	@ue_foundation::__ue_widget_visible CIH<ue_foundation::UObjectHandle> C_c	4
-ue_actor_destroy_handle	@ue_foundation::ue_actor_destroy_handle CIH<ue_foundation::UObjectHandle> C_c	4
-ue_add	@ue_foundation::ue_add Ci Ci	4
-ue_arg_array	@ue_foundation::ue_arg_array CIH<ue_foundation::UCallHandle> CIs Ci C_c	4
-ue_arg_bool	@ue_foundation::ue_arg_bool CIH<ue_foundation::UCallHandle> CIs Cb C_c	4
-ue_arg_byte	@ue_foundation::ue_arg_byte CIH<ue_foundation::UCallHandle> CIs Ci C_c	4
-ue_arg_class	@ue_foundation::ue_arg_class CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UEClassHandle> C_c	4
-ue_arg_double	@ue_foundation::ue_arg_double CIH<ue_foundation::UCallHandle> CIs Cd C_c	4
-ue_arg_enum	@ue_foundation::ue_arg_enum CIH<ue_foundation::UCallHandle> CIs CIs CIs C_c	4
-ue_arg_float	@ue_foundation::ue_arg_float CIH<ue_foundation::UCallHandle> CIs Cf C_c	4
-ue_arg_hash	@ue_foundation::ue_arg_hash CIH<ue_foundation::UCallHandle> CIs Ci C_c	4
-ue_arg_int	@ue_foundation::ue_arg_int CIH<ue_foundation::UCallHandle> CIs Ci C_c	4
-ue_arg_name	@ue_foundation::ue_arg_name CIH<ue_foundation::UCallHandle> CIs CIs C_c	4
-ue_arg_object	@ue_foundation::ue_arg_object CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UObjectHandle> C_c	4
-ue_arg_string	@ue_foundation::ue_arg_string CIH<ue_foundation::UCallHandle> CIs CIs C_c	4
-ue_asset_cancel	@ue_foundation::ue_asset_cancel CIs C_c	4
-ue_asset_cancel_all	@ue_foundation::ue_asset_cancel_all C_c	4
-ue_asset_is_pending	@ue_foundation::ue_asset_is_pending CIs C_c	4
-ue_asset_load_async	@ue_foundation::ue_asset_load_async CIs CIs CIs C_c	4
-ue_async_physics_error	@ue_foundation::ue_async_physics_error C_c	4
-ue_async_physics_has_output	@ue_foundation::ue_async_physics_has_output C_c	4
-ue_async_physics_output	@ue_foundation::ue_async_physics_output Ci C_c	4
-ue_async_physics_running	@ue_foundation::ue_async_physics_running C_c	4
-ue_async_physics_set_input	@ue_foundation::ue_async_physics_set_input Ci Cd C_c	4
-ue_begin_call	@ue_foundation::ue_begin_call CIH<ue_foundation::UObjectHandle> CIs C_c	4
-ue_begin_interface_call	@ue_foundation::ue_begin_interface_call CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_begin_static_call	@ue_foundation::ue_begin_static_call CIs CIs CIs C_c	4
-ue_call_float	@ue_foundation::ue_call_float CIH<ue_foundation::UObjectHandle> CIs Cf C_c	4
-ue_call_int	@ue_foundation::ue_call_int CIH<ue_foundation::UObjectHandle> CIs Ci C_c	4
-ue_call_object	@ue_foundation::ue_call_object CIH<ue_foundation::UObjectHandle> CIs C_c	4
-ue_call_void_int	@ue_foundation::ue_call_void_int CIH<ue_foundation::UObjectHandle> CIs Ci C_c	4
-ue_call_void_object	@ue_foundation::ue_call_void_object CIH<ue_foundation::UObjectHandle> CIs CIH<ue_foundation::UObjectHandle> C_c	4
-ue_cast_interface	@ue_foundation::ue_cast_interface CIH<ue_foundation::UObjectHandle> CIs C_c	4
-ue_cast_nullable_object	@ue_foundation::ue_cast_nullable_object CIH<ue_foundation::UObjectHandle> CIs C_c	4
-ue_cast_object	@ue_foundation::ue_cast_object CIH<ue_foundation::UObjectHandle> CIs C_c	4
-ue_class_null	@ue_foundation::ue_class_null	4
-ue_class_path	@ue_foundation::ue_class_path CH<ue_foundation::UEClassHandle> C_c	4
-ue_class_valid	@ue_foundation::ue_class_valid CH<ue_foundation::UEClassHandle> C_c	4
-ue_component_destroy_handle	@ue_foundation::ue_component_destroy_handle CIH<ue_foundation::UObjectHandle> C_c	4
-ue_component_owner	@ue_foundation::ue_component_owner CIH<ue_foundation::UObjectHandle> C_c	4
-ue_constraint_valid	@ue_foundation::ue_constraint_valid CIH<ue_foundation::UEConstraintHandle> C_c	4
-ue_emit_signal	@ue_foundation::ue_emit_signal Ci C_c	4
-ue_emit_type	@ue_foundation::ue_emit_type CIs CIs CIs C_c	4
-ue_enhanced_clear_contexts	@ue_foundation::ue_enhanced_clear_contexts C_c	4
-ue_enhanced_is_available	@ue_foundation::ue_enhanced_is_available C_c	4
-ue_enum_from_number	@ue_foundation::ue_enum_from_number CIs Ci C_c	4
-ue_enum_number	@ue_foundation::ue_enum_number CH<ue_foundation::UEEnumValue> C_c	4
-ue_enum_value	@ue_foundation::ue_enum_value CIs CIs C_c	4
-ue_expect_interface_signature	@ue_foundation::ue_expect_interface_signature CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_expect_signature	@ue_foundation::ue_expect_signature CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_frame_out_bool	@ue_foundation::ue_frame_out_bool Ci Cb C_c	4
-ue_frame_out_byte	@ue_foundation::ue_frame_out_byte Ci Cu8 C_c	4
-ue_frame_out_class	@ue_foundation::ue_frame_out_class Ci CH<ue_foundation::UEClassHandle> C_c	4
-ue_frame_out_double	@ue_foundation::ue_frame_out_double Ci Cd C_c	4
-ue_frame_out_enum	@ue_foundation::ue_frame_out_enum Ci CH<ue_foundation::UEEnumValue> C_c	4
-ue_frame_out_float	@ue_foundation::ue_frame_out_float Ci Cf C_c	4
-ue_frame_out_int	@ue_foundation::ue_frame_out_int Ci Ci C_c	4
-ue_frame_out_name	@ue_foundation::ue_frame_out_name Ci CH<ue_foundation::UENameValue> C_c	4
-ue_frame_out_object	@ue_foundation::ue_frame_out_object Ci CIH<ue_foundation::UObjectHandle> C_c	4
-ue_frame_out_rotator	@ue_foundation::ue_frame_out_rotator Ci CIH<ue_foundation::UERotator> C_c	4
-ue_frame_out_string	@ue_foundation::ue_frame_out_string Ci CIs C_c	4
-ue_frame_out_struct	@ue_foundation::ue_frame_out_struct Ci CIH<ue_foundation::UEStructValue> C_c	4
-ue_frame_out_text	@ue_foundation::ue_frame_out_text Ci CH<ue_foundation::UETextValue> C_c	4
-ue_frame_out_transform	@ue_foundation::ue_frame_out_transform Ci CIH<ue_foundation::UETransform> C_c	4
-ue_frame_out_vector	@ue_foundation::ue_frame_out_vector Ci CIH<ue_foundation::UEVector> C_c	4
-ue_get_object	@ue_foundation::ue_get_object CIH<ue_foundation::UObjectHandle> CIs C_c	4
-ue_get_self_bool	@ue_foundation::ue_get_self_bool CIs C_c	4
-ue_get_self_byte	@ue_foundation::ue_get_self_byte CIs C_c	4
-ue_get_self_class	@ue_foundation::ue_get_self_class CIs C_c	4
-ue_get_self_double	@ue_foundation::ue_get_self_double CIs C_c	4
-ue_get_self_enum	@ue_foundation::ue_get_self_enum CIs C_c	4
-ue_get_self_float	@ue_foundation::ue_get_self_float CIs C_c	4
-ue_get_self_int	@ue_foundation::ue_get_self_int CIs C_c	4
-ue_get_self_name	@ue_foundation::ue_get_self_name CIs C_c	4
-ue_get_self_object	@ue_foundation::ue_get_self_object CIs C_c	4
-ue_get_self_string	@ue_foundation::ue_get_self_string CIs C_c	4
-ue_get_self_struct	@ue_foundation::ue_get_self_struct CIs C_c C_l	4
-ue_get_self_text	@ue_foundation::ue_get_self_text CIs C_c	4
-ue_hit_result_empty	@ue_foundation::ue_hit_result_empty C_c C_l	4
-ue_hit_result_view	@ue_foundation::ue_hit_result_view CIH<ue_foundation::UEHitResult> C_c	4
-ue_implements_interface	@ue_foundation::ue_implements_interface CIH<ue_foundation::UObjectHandle> CIs C_c	4
-ue_input_axis1d	@ue_foundation::ue_input_axis1d CIH<ue_foundation::InputActionValue> C_c	4
-ue_input_axis2d	@ue_foundation::ue_input_axis2d CIH<ue_foundation::InputActionValue> C_c	4
-ue_input_axis3d	@ue_foundation::ue_input_axis3d CIH<ue_foundation::InputActionValue> C_c	4
-ue_input_bind_action	@ue_foundation::ue_input_bind_action CIs CIs CIs Cb Cb C_c	4
-ue_input_bind_axis	@ue_foundation::ue_input_bind_axis CIs CIs Cb Cb C_c	4
-ue_input_bool	@ue_foundation::ue_input_bool CIH<ue_foundation::InputActionValue> C_c	4
-ue_input_is_available	@ue_foundation::ue_input_is_available C_c	4
-ue_input_unbind_action	@ue_foundation::ue_input_unbind_action CIs CIs C_c	4
-ue_input_unbind_all	@ue_foundation::ue_input_unbind_all C_c	4
-ue_input_unbind_axis	@ue_foundation::ue_input_unbind_axis CIs C_c	4
-ue_interface_call_int	@ue_foundation::ue_interface_call_int CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	4
-ue_interface_call_string	@ue_foundation::ue_interface_call_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_invoke_call	@ue_foundation::ue_invoke_call CIH<ue_foundation::UCallHandle> C_c	4
-ue_latent_cancel	@ue_foundation::ue_latent_cancel CIs C_c	4
-ue_latent_cancel_all	@ue_foundation::ue_latent_cancel_all C_c	4
-ue_latent_delay	@ue_foundation::ue_latent_delay CIs Cf CIs C_c	4
-ue_latent_is_pending	@ue_foundation::ue_latent_is_pending CIs C_c	4
-ue_name_text	@ue_foundation::ue_name_text CH<ue_foundation::UENameValue> C_c	4
-ue_name_value	@ue_foundation::ue_name_value CIs C_c	4
-ue_names_equal	@ue_foundation::ue_names_equal CH<ue_foundation::UENameValue> CH<ue_foundation::UENameValue> C_c	4
-ue_null_object	@ue_foundation::ue_null_object	4
-ue_object_get_int	@ue_foundation::ue_object_get_int CIH<ue_foundation::UObjectHandle> CIs C_c	4
-ue_object_is_a	@ue_foundation::ue_object_is_a CIH<ue_foundation::UObjectHandle> CIs C_c	4
-ue_object_set_int	@ue_foundation::ue_object_set_int CIH<ue_foundation::UObjectHandle> CIs Ci C_c	4
-ue_object_valid	@ue_foundation::ue_object_valid CIH<ue_foundation::UObjectHandle> C_c	4
-ue_object_value	@ue_foundation::ue_object_value CIs C_c	4
-ue_physics_add_force	@ue_foundation::ue_physics_add_force CH<ue_foundation::UEPhysicsBodyToken> Cd Cd Cd Cb C_c	4
-ue_physics_body	@ue_foundation::ue_physics_body Ci C_c	4
-ue_physics_input	@ue_foundation::ue_physics_input Ci C_c	4
-ue_physics_output	@ue_foundation::ue_physics_output Ci Cd C_c	4
-ue_release_call	@ue_foundation::ue_release_call CIH<ue_foundation::UCallHandle> C_c	4
-ue_require_call_context	@ue_foundation::ue_require_call_context CIH<ue_foundation::UCallHandle> Cb C_c	4
-ue_result_array_size	@ue_foundation::ue_result_array_size CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_result_bool	@ue_foundation::ue_result_bool CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_result_byte	@ue_foundation::ue_result_byte CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_result_class	@ue_foundation::ue_result_class CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_result_double	@ue_foundation::ue_result_double CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_result_enum	@ue_foundation::ue_result_enum CIH<ue_foundation::UCallHandle> CIs CIs C_c	4
-ue_result_float	@ue_foundation::ue_result_float CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_result_hash_size	@ue_foundation::ue_result_hash_size CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_result_int	@ue_foundation::ue_result_int CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_result_name	@ue_foundation::ue_result_name CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_result_object	@ue_foundation::ue_result_object CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_result_string	@ue_foundation::ue_result_string CIH<ue_foundation::UCallHandle> CIs C_c	4
-ue_rotator	@ue_foundation::ue_rotator Cd Cd Cd C_c	4
-ue_self_object	@ue_foundation::ue_self_object C_c	4
-ue_set_self_bool	@ue_foundation::ue_set_self_bool CIs Cb C_c	4
-ue_set_self_byte	@ue_foundation::ue_set_self_byte CIs Cu8 C_c	4
-ue_set_self_class	@ue_foundation::ue_set_self_class CIs CH<ue_foundation::UEClassHandle> C_c	4
-ue_set_self_double	@ue_foundation::ue_set_self_double CIs Cd C_c	4
-ue_set_self_enum	@ue_foundation::ue_set_self_enum CIs CH<ue_foundation::UEEnumValue> C_c	4
-ue_set_self_float	@ue_foundation::ue_set_self_float CIs Cf C_c	4
-ue_set_self_int	@ue_foundation::ue_set_self_int CIs Ci C_c	4
-ue_set_self_name	@ue_foundation::ue_set_self_name CIs CH<ue_foundation::UENameValue> C_c	4
-ue_set_self_object	@ue_foundation::ue_set_self_object CIs CIH<ue_foundation::UObjectHandle> C_c	4
-ue_set_self_string	@ue_foundation::ue_set_self_string CIs CIs C_c	4
-ue_set_self_struct	@ue_foundation::ue_set_self_struct CIs CIH<ue_foundation::UEStructValue> C_c	4
-ue_set_self_text	@ue_foundation::ue_set_self_text CIs CH<ue_foundation::UETextValue> C_c	4
-ue_state_get_int	@ue_foundation::ue_state_get_int CIs Ci C_c	4
-ue_state_set_int	@ue_foundation::ue_state_set_int CIs Ci C_c	4
-ue_struct_array_resize	@ue_foundation::ue_struct_array_resize CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	4
-ue_struct_array_size	@ue_foundation::ue_struct_array_size CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_collect	@ue_foundation::ue_struct_collect C_c C_l	4
-ue_struct_default	@ue_foundation::ue_struct_default CIs CIs C_c C_l	4
-ue_struct_edit	@ue_foundation::ue_struct_edit CIH<ue_foundation::UEStructValue> CI0<H<ue_foundation::UEStructValue>>1<v>$ C_c C_l	4
-ue_struct_get_bool	@ue_foundation::ue_struct_get_bool CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_get_byte	@ue_foundation::ue_struct_get_byte CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_get_double	@ue_foundation::ue_struct_get_double CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_get_enum	@ue_foundation::ue_struct_get_enum CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-ue_struct_get_float	@ue_foundation::ue_struct_get_float CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_get_int	@ue_foundation::ue_struct_get_int CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_get_name	@ue_foundation::ue_struct_get_name CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_get_object	@ue_foundation::ue_struct_get_object CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_get_string	@ue_foundation::ue_struct_get_string CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_get_text	@ue_foundation::ue_struct_get_text CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_map_get_byte_bool	@ue_foundation::ue_struct_map_get_byte_bool CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	4
-ue_struct_map_get_byte_byte	@ue_foundation::ue_struct_map_get_byte_byte CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	4
-ue_struct_map_get_byte_double	@ue_foundation::ue_struct_map_get_byte_double CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	4
-ue_struct_map_get_byte_float	@ue_foundation::ue_struct_map_get_byte_float CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	4
-ue_struct_map_get_byte_int	@ue_foundation::ue_struct_map_get_byte_int CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	4
-ue_struct_map_get_byte_name	@ue_foundation::ue_struct_map_get_byte_name CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	4
-ue_struct_map_get_byte_string	@ue_foundation::ue_struct_map_get_byte_string CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	4
-ue_struct_map_get_byte_text	@ue_foundation::ue_struct_map_get_byte_text CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	4
-ue_struct_map_get_int	@ue_foundation::ue_struct_map_get_int CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_get_int_bool	@ue_foundation::ue_struct_map_get_int_bool CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_get_int_byte	@ue_foundation::ue_struct_map_get_int_byte CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_get_int_double	@ue_foundation::ue_struct_map_get_int_double CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_get_int_float	@ue_foundation::ue_struct_map_get_int_float CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_get_int_name	@ue_foundation::ue_struct_map_get_int_name CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_get_int_string	@ue_foundation::ue_struct_map_get_int_string CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_get_int_text	@ue_foundation::ue_struct_map_get_int_text CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_get_name_bool	@ue_foundation::ue_struct_map_get_name_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	4
-ue_struct_map_get_name_byte	@ue_foundation::ue_struct_map_get_name_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	4
-ue_struct_map_get_name_double	@ue_foundation::ue_struct_map_get_name_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	4
-ue_struct_map_get_name_float	@ue_foundation::ue_struct_map_get_name_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	4
-ue_struct_map_get_name_int	@ue_foundation::ue_struct_map_get_name_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	4
-ue_struct_map_get_name_name	@ue_foundation::ue_struct_map_get_name_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	4
-ue_struct_map_get_name_string	@ue_foundation::ue_struct_map_get_name_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	4
-ue_struct_map_get_name_text	@ue_foundation::ue_struct_map_get_name_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	4
-ue_struct_map_get_string_bool	@ue_foundation::ue_struct_map_get_string_bool CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-ue_struct_map_get_string_byte	@ue_foundation::ue_struct_map_get_string_byte CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-ue_struct_map_get_string_double	@ue_foundation::ue_struct_map_get_string_double CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-ue_struct_map_get_string_float	@ue_foundation::ue_struct_map_get_string_float CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-ue_struct_map_get_string_int	@ue_foundation::ue_struct_map_get_string_int CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-ue_struct_map_get_string_name	@ue_foundation::ue_struct_map_get_string_name CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-ue_struct_map_get_string_string	@ue_foundation::ue_struct_map_get_string_string CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-ue_struct_map_get_string_text	@ue_foundation::ue_struct_map_get_string_text CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-ue_struct_map_key	@ue_foundation::ue_struct_map_key CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_key_byte	@ue_foundation::ue_struct_map_key_byte CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_key_name	@ue_foundation::ue_struct_map_key_name CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_key_string	@ue_foundation::ue_struct_map_key_string CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_map_size	@ue_foundation::ue_struct_map_size CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_map_with_byte_bool	@ue_foundation::ue_struct_map_with_byte_bool CIH<ue_foundation::UEStructValue> CIs Cu8 Cb C_c C_l	4
-ue_struct_map_with_byte_byte	@ue_foundation::ue_struct_map_with_byte_byte CIH<ue_foundation::UEStructValue> CIs Cu8 Cu8 C_c C_l	4
-ue_struct_map_with_byte_double	@ue_foundation::ue_struct_map_with_byte_double CIH<ue_foundation::UEStructValue> CIs Cu8 Cd C_c C_l	4
-ue_struct_map_with_byte_float	@ue_foundation::ue_struct_map_with_byte_float CIH<ue_foundation::UEStructValue> CIs Cu8 Cf C_c C_l	4
-ue_struct_map_with_byte_int	@ue_foundation::ue_struct_map_with_byte_int CIH<ue_foundation::UEStructValue> CIs Cu8 Ci C_c C_l	4
-ue_struct_map_with_byte_name	@ue_foundation::ue_struct_map_with_byte_name CIH<ue_foundation::UEStructValue> CIs Cu8 CH<ue_foundation::UENameValue> C_c C_l	4
-ue_struct_map_with_byte_string	@ue_foundation::ue_struct_map_with_byte_string CIH<ue_foundation::UEStructValue> CIs Cu8 CIs C_c C_l	4
-ue_struct_map_with_byte_text	@ue_foundation::ue_struct_map_with_byte_text CIH<ue_foundation::UEStructValue> CIs Cu8 CH<ue_foundation::UETextValue> C_c C_l	4
-ue_struct_map_with_int	@ue_foundation::ue_struct_map_with_int CIH<ue_foundation::UEStructValue> CIs Ci Ci C_c C_l	4
-ue_struct_map_with_int_bool	@ue_foundation::ue_struct_map_with_int_bool CIH<ue_foundation::UEStructValue> CIs Ci Cb C_c C_l	4
-ue_struct_map_with_int_byte	@ue_foundation::ue_struct_map_with_int_byte CIH<ue_foundation::UEStructValue> CIs Ci Cu8 C_c C_l	4
-ue_struct_map_with_int_double	@ue_foundation::ue_struct_map_with_int_double CIH<ue_foundation::UEStructValue> CIs Ci Cd C_c C_l	4
-ue_struct_map_with_int_float	@ue_foundation::ue_struct_map_with_int_float CIH<ue_foundation::UEStructValue> CIs Ci Cf C_c C_l	4
-ue_struct_map_with_int_name	@ue_foundation::ue_struct_map_with_int_name CIH<ue_foundation::UEStructValue> CIs Ci CH<ue_foundation::UENameValue> C_c C_l	4
-ue_struct_map_with_int_string	@ue_foundation::ue_struct_map_with_int_string CIH<ue_foundation::UEStructValue> CIs Ci CIs C_c C_l	4
-ue_struct_map_with_int_text	@ue_foundation::ue_struct_map_with_int_text CIH<ue_foundation::UEStructValue> CIs Ci CH<ue_foundation::UETextValue> C_c C_l	4
-ue_struct_map_with_name_bool	@ue_foundation::ue_struct_map_with_name_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cb C_c C_l	4
-ue_struct_map_with_name_byte	@ue_foundation::ue_struct_map_with_name_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cu8 C_c C_l	4
-ue_struct_map_with_name_double	@ue_foundation::ue_struct_map_with_name_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cd C_c C_l	4
-ue_struct_map_with_name_float	@ue_foundation::ue_struct_map_with_name_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cf C_c C_l	4
-ue_struct_map_with_name_int	@ue_foundation::ue_struct_map_with_name_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Ci C_c C_l	4
-ue_struct_map_with_name_name	@ue_foundation::ue_struct_map_with_name_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UENameValue> C_c C_l	4
-ue_struct_map_with_name_string	@ue_foundation::ue_struct_map_with_name_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CIs C_c C_l	4
-ue_struct_map_with_name_text	@ue_foundation::ue_struct_map_with_name_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UETextValue> C_c C_l	4
-ue_struct_map_with_string_bool	@ue_foundation::ue_struct_map_with_string_bool CIH<ue_foundation::UEStructValue> CIs CIs Cb C_c C_l	4
-ue_struct_map_with_string_byte	@ue_foundation::ue_struct_map_with_string_byte CIH<ue_foundation::UEStructValue> CIs CIs Cu8 C_c C_l	4
-ue_struct_map_with_string_double	@ue_foundation::ue_struct_map_with_string_double CIH<ue_foundation::UEStructValue> CIs CIs Cd C_c C_l	4
-ue_struct_map_with_string_float	@ue_foundation::ue_struct_map_with_string_float CIH<ue_foundation::UEStructValue> CIs CIs Cf C_c C_l	4
-ue_struct_map_with_string_int	@ue_foundation::ue_struct_map_with_string_int CIH<ue_foundation::UEStructValue> CIs CIs Ci C_c C_l	4
-ue_struct_map_with_string_name	@ue_foundation::ue_struct_map_with_string_name CIH<ue_foundation::UEStructValue> CIs CIs CH<ue_foundation::UENameValue> C_c C_l	4
-ue_struct_map_with_string_string	@ue_foundation::ue_struct_map_with_string_string CIH<ue_foundation::UEStructValue> CIs CIs CIs C_c C_l	4
-ue_struct_map_with_string_text	@ue_foundation::ue_struct_map_with_string_text CIH<ue_foundation::UEStructValue> CIs CIs CH<ue_foundation::UETextValue> C_c C_l	4
-ue_struct_nested_get	@ue_foundation::ue_struct_nested_get CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	4
-ue_struct_nested_with	@ue_foundation::ue_struct_nested_with CIH<ue_foundation::UEStructValue> CIs Ci CIH<ue_foundation::UEStructValue> C_c C_l	4
-ue_struct_set_contains_int	@ue_foundation::ue_struct_set_contains_int CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_set_contains_string	@ue_foundation::ue_struct_set_contains_string CIH<ue_foundation::UEStructValue> CIs CIs C_c	4
-ue_struct_set_element_byte	@ue_foundation::ue_struct_set_element_byte CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_set_element_int	@ue_foundation::ue_struct_set_element_int CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_set_element_name	@ue_foundation::ue_struct_set_element_name CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_set_element_string	@ue_foundation::ue_struct_set_element_string CIH<ue_foundation::UEStructValue> CIs Ci C_c	4
-ue_struct_set_size	@ue_foundation::ue_struct_set_size CIH<ue_foundation::UEStructValue> CIs C_c	4
-ue_struct_set_with_byte	@ue_foundation::ue_struct_set_with_byte CIH<ue_foundation::UEStructValue> CIs Cu8 Cb C_c C_l	4
-ue_struct_set_with_int	@ue_foundation::ue_struct_set_with_int CIH<ue_foundation::UEStructValue> CIs Ci Cb C_c C_l	4
-ue_struct_set_with_name	@ue_foundation::ue_struct_set_with_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cb C_c C_l	4
-ue_struct_set_with_string	@ue_foundation::ue_struct_set_with_string CIH<ue_foundation::UEStructValue> CIs CIs Cb C_c C_l	4
-ue_struct_value	@ue_foundation::ue_struct_value CIs C_c C_l	4
-ue_struct_value_count	@ue_foundation::ue_struct_value_count C_c	4
-ue_struct_with_bool	@ue_foundation::ue_struct_with_bool CIH<ue_foundation::UEStructValue> CIs Cb C_c C_l	4
-ue_struct_with_byte	@ue_foundation::ue_struct_with_byte CIH<ue_foundation::UEStructValue> CIs Cu8 C_c C_l	4
-ue_struct_with_double	@ue_foundation::ue_struct_with_double CIH<ue_foundation::UEStructValue> CIs Cd C_c C_l	4
-ue_struct_with_enum	@ue_foundation::ue_struct_with_enum CIH<ue_foundation::UEStructValue> CIs CIs CIs C_c C_l	4
-ue_struct_with_float	@ue_foundation::ue_struct_with_float CIH<ue_foundation::UEStructValue> CIs Cf C_c C_l	4
-ue_struct_with_int	@ue_foundation::ue_struct_with_int CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	4
-ue_struct_with_name	@ue_foundation::ue_struct_with_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c C_l	4
-ue_struct_with_object	@ue_foundation::ue_struct_with_object CIH<ue_foundation::UEStructValue> CIs CIH<ue_foundation::UObjectHandle> C_c C_l	4
-ue_struct_with_string	@ue_foundation::ue_struct_with_string CIH<ue_foundation::UEStructValue> CIs CIs C_c C_l	4
-ue_struct_with_text	@ue_foundation::ue_struct_with_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UETextValue> C_c C_l	4
-ue_subscribe_int	@ue_foundation::ue_subscribe_int CIs CIs CIs C_c	4
-ue_subscribe_object_array_bool	@ue_foundation::ue_subscribe_object_array_bool CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_array_byte	@ue_foundation::ue_subscribe_object_array_byte CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_array_double	@ue_foundation::ue_subscribe_object_array_double CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_array_float	@ue_foundation::ue_subscribe_object_array_float CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_array_int	@ue_foundation::ue_subscribe_object_array_int CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_array_name	@ue_foundation::ue_subscribe_object_array_name CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_array_string	@ue_foundation::ue_subscribe_object_array_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_array_text	@ue_foundation::ue_subscribe_object_array_text CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_bool	@ue_foundation::ue_subscribe_object_bool CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_byte	@ue_foundation::ue_subscribe_object_byte CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_class	@ue_foundation::ue_subscribe_object_class CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-ue_subscribe_object_double	@ue_foundation::ue_subscribe_object_double CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_enum	@ue_foundation::ue_subscribe_object_enum CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-ue_subscribe_object_float	@ue_foundation::ue_subscribe_object_float CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_int	@ue_foundation::ue_subscribe_object_int CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_name	@ue_foundation::ue_subscribe_object_name CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_object	@ue_foundation::ue_subscribe_object_object CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_object	@ue_foundation::ue_subscribe_object_object CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-ue_subscribe_object_rotator	@ue_foundation::ue_subscribe_object_rotator CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_string	@ue_foundation::ue_subscribe_object_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_struct	@ue_foundation::ue_subscribe_object_struct CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	4
-ue_subscribe_object_text	@ue_foundation::ue_subscribe_object_text CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_transform	@ue_foundation::ue_subscribe_object_transform CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_vector	@ue_foundation::ue_subscribe_object_vector CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_vector2d	@ue_foundation::ue_subscribe_object_vector2d CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_subscribe_object_void	@ue_foundation::ue_subscribe_object_void CIH<ue_foundation::UObjectHandle> CIs CIs C_c	4
-ue_text	@ue_foundation::ue_text CIs CIs CIs C_c	4
-ue_text_invariant	@ue_foundation::ue_text_invariant CIs C_c	4
-ue_text_is_invariant	@ue_foundation::ue_text_is_invariant CH<ue_foundation::UETextValue> C_c	4
-ue_text_key	@ue_foundation::ue_text_key CH<ue_foundation::UETextValue> C_c	4
-ue_text_namespace	@ue_foundation::ue_text_namespace CH<ue_foundation::UETextValue> C_c	4
-ue_text_to_string	@ue_foundation::ue_text_to_string CH<ue_foundation::UETextValue> C_c	4
-ue_timer_cancel	@ue_foundation::ue_timer_cancel CIs C_c	4
-ue_timer_cancel_all	@ue_foundation::ue_timer_cancel_all C_c	4
-ue_timer_elapsed	@ue_foundation::ue_timer_elapsed CIs C_c	4
-ue_timer_is_active	@ue_foundation::ue_timer_is_active CIs C_c	4
-ue_timer_is_paused	@ue_foundation::ue_timer_is_paused CIs C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs Cb C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs Cd C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs Cf C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CH<ue_foundation::UEEnumValue> C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CH<ue_foundation::UENameValue> C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CH<ue_foundation::UETextValue> C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs Ci C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CIH<ue_foundation::UERotator> C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CIH<ue_foundation::UETransform> C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CIH<ue_foundation::UEVector2D> C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CIH<ue_foundation::UEVector> C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CIs C_c	4
-ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs Cu8 C_c	4
-ue_timer_pause	@ue_foundation::ue_timer_pause CIs C_c	4
-ue_timer_remaining	@ue_foundation::ue_timer_remaining CIs C_c	4
-ue_timer_resume	@ue_foundation::ue_timer_resume CIs C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Cb C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Cd C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Cf C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CH<ue_foundation::UEEnumValue> C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CH<ue_foundation::UENameValue> C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CH<ue_foundation::UETextValue> C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Ci C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIH<ue_foundation::UERotator> C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIH<ue_foundation::UETransform> C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIH<ue_foundation::UEVector2D> C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIH<ue_foundation::UEVector> C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIs C_c	4
-ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Cu8 C_c	4
-ue_transform	@ue_foundation::ue_transform CIH<ue_foundation::UEVector> CIH<ue_foundation::UERotator> CIH<ue_foundation::UEVector> C_c	4
-ue_transform_identity	@ue_foundation::ue_transform_identity	4
-ue_transform_position	@ue_foundation::ue_transform_position CIH<ue_foundation::UETransform> CIH<ue_foundation::UEVector> C_c	4
-ue_transform_rotation	@ue_foundation::ue_transform_rotation CIH<ue_foundation::UETransform>	4
-ue_transform_scale	@ue_foundation::ue_transform_scale CIH<ue_foundation::UETransform>	4
-ue_transform_translation	@ue_foundation::ue_transform_translation CIH<ue_foundation::UETransform>	4
-ue_vector	@ue_foundation::ue_vector Cd Cd Cd C_c	4
-ue_vector2d	@ue_foundation::ue_vector2d Cd Cd	4
+__ue_actor_owner	@ue_foundation::__ue_actor_owner CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_actor_spawn	@ue_foundation::__ue_actor_spawn CH<ue_foundation::UEClassHandle> CIH<ue_foundation::UETransform> CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_ai_active	@ue_foundation::__ue_ai_active CIs C_c	bool const	4
+__ue_ai_cancel	@ue_foundation::__ue_ai_cancel CIs C_c	bool const	4
+__ue_ai_move	@ue_foundation::__ue_ai_move CIs CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UEVector> Cb CIs Cf Cb Cb C_c	bool const	4
+__ue_ai_self	@ue_foundation::__ue_ai_self C_c	ue_foundation::UObjectHandle	4
+__ue_apply_damage	@ue_foundation::__ue_apply_damage CIH<ue_foundation::UObjectHandle> Cf CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	float const	4
+__ue_arg_analoginputevent	@ue_foundation::__ue_arg_analoginputevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEAnalogInputEvent> C_c	void	4
+__ue_arg_characterevent	@ue_foundation::__ue_arg_characterevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UECharacterEvent> C_c	void	4
+__ue_arg_constraint	@ue_foundation::__ue_arg_constraint CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEConstraintHandle> C_c	void	4
+__ue_arg_event_reply	@ue_foundation::__ue_arg_event_reply CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEEventReply> C_c	void	4
+__ue_arg_geometry	@ue_foundation::__ue_arg_geometry CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEGeometry> C_c	void	4
+__ue_arg_hit_result	@ue_foundation::__ue_arg_hit_result CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEHitResult> C_c	void	4
+__ue_arg_input_value	@ue_foundation::__ue_arg_input_value CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::InputActionValue> C_c	void	4
+__ue_arg_inputevent	@ue_foundation::__ue_arg_inputevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEInputEvent> C_c	void	4
+__ue_arg_keyevent	@ue_foundation::__ue_arg_keyevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEKeyEvent> C_c	void	4
+__ue_arg_native_delegate	@ue_foundation::__ue_arg_native_delegate CIH<ue_foundation::UCallHandle> CIs CIs CIH<ue_foundation::UObjectHandle> CIs C_c	void	4
+__ue_arg_navigationevent	@ue_foundation::__ue_arg_navigationevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UENavigationEvent> C_c	void	4
+__ue_arg_paint_context	@ue_foundation::__ue_arg_paint_context CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEPaintContext> C_c	void	4
+__ue_arg_pointerevent	@ue_foundation::__ue_arg_pointerevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEPointerEvent> C_c	void	4
+__ue_asset_load_async	@ue_foundation::__ue_asset_load_async CIs CIs CIs CIs C_c	void	4
+__ue_authored_component_get	@ue_foundation::__ue_authored_component_get CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_authored_get_bool	@ue_foundation::__ue_authored_get_bool CIH<ue_foundation::UObjectHandle> CIs CIs C_c	bool const	4
+__ue_authored_get_byte	@ue_foundation::__ue_authored_get_byte CIH<ue_foundation::UObjectHandle> CIs CIs C_c	int const	4
+__ue_authored_get_class	@ue_foundation::__ue_authored_get_class CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UEClassHandle	4
+__ue_authored_get_double	@ue_foundation::__ue_authored_get_double CIH<ue_foundation::UObjectHandle> CIs CIs C_c	double const	4
+__ue_authored_get_enum	@ue_foundation::__ue_authored_get_enum CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UEEnumValue	4
+__ue_authored_get_float	@ue_foundation::__ue_authored_get_float CIH<ue_foundation::UObjectHandle> CIs CIs C_c	float const	4
+__ue_authored_get_int	@ue_foundation::__ue_authored_get_int CIH<ue_foundation::UObjectHandle> CIs CIs C_c	int const	4
+__ue_authored_get_name	@ue_foundation::__ue_authored_get_name CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UENameValue	4
+__ue_authored_get_object	@ue_foundation::__ue_authored_get_object CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_authored_get_string	@ue_foundation::__ue_authored_get_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	string const	4
+__ue_authored_get_struct	@ue_foundation::__ue_authored_get_struct CIH<ue_foundation::UObjectHandle> CIs CIs C_c C_l	ue_foundation::UEStructValue	4
+__ue_authored_get_text	@ue_foundation::__ue_authored_get_text CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UETextValue	4
+__ue_authored_nullable_check	@ue_foundation::__ue_authored_nullable_check CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+__ue_authored_object_check	@ue_foundation::__ue_authored_object_check CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+__ue_authored_set_bool	@ue_foundation::__ue_authored_set_bool CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	void	4
+__ue_authored_set_byte	@ue_foundation::__ue_authored_set_byte CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	void	4
+__ue_authored_set_class	@ue_foundation::__ue_authored_set_class CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UEClassHandle> C_c	void	4
+__ue_authored_set_double	@ue_foundation::__ue_authored_set_double CIH<ue_foundation::UObjectHandle> CIs CIs Cd C_c	void	4
+__ue_authored_set_enum	@ue_foundation::__ue_authored_set_enum CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UEEnumValue> C_c	void	4
+__ue_authored_set_float	@ue_foundation::__ue_authored_set_float CIH<ue_foundation::UObjectHandle> CIs CIs Cf C_c	void	4
+__ue_authored_set_int	@ue_foundation::__ue_authored_set_int CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	void	4
+__ue_authored_set_name	@ue_foundation::__ue_authored_set_name CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UENameValue> C_c	void	4
+__ue_authored_set_object	@ue_foundation::__ue_authored_set_object CIH<ue_foundation::UObjectHandle> CIs CIs CIs CIH<ue_foundation::UObjectHandle> C_c	void	4
+__ue_authored_set_string	@ue_foundation::__ue_authored_set_string CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	void	4
+__ue_authored_set_struct	@ue_foundation::__ue_authored_set_struct CIH<ue_foundation::UObjectHandle> CIs CIs CIH<ue_foundation::UEStructValue> C_c	void	4
+__ue_authored_set_text	@ue_foundation::__ue_authored_set_text CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UETextValue> C_c	void	4
+__ue_begin_authored_call	@ue_foundation::__ue_begin_authored_call CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	ue_foundation::UCallHandle	4
+__ue_begin_callback_frame	@ue_foundation::__ue_begin_callback_frame CIs C_c	ue_foundation::UCallHandle	4
+__ue_begin_native_gameplay_call	@ue_foundation::__ue_begin_native_gameplay_call CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UCallHandle	4
+__ue_begin_super_call	@ue_foundation::__ue_begin_super_call CIH<ue_foundation::UObjectHandle> CIs CIs CIs CIs C_c	ue_foundation::UCallHandle	4
+__ue_character_controls_ready	@ue_foundation::__ue_character_controls_ready CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_character_jump	@ue_foundation::__ue_character_jump CIH<ue_foundation::UObjectHandle> Cb C_c	void	4
+__ue_character_look	@ue_foundation::__ue_character_look CIH<ue_foundation::UObjectHandle> Cf Cf C_c	void	4
+__ue_character_move	@ue_foundation::__ue_character_move CIH<ue_foundation::UObjectHandle> Cf Cf C_c	void	4
+__ue_checked_enum_number	@ue_foundation::__ue_checked_enum_number CH<ue_foundation::UEEnumValue> CIs C_c	int const	4
+__ue_class_check	@ue_foundation::__ue_class_check CH<ue_foundation::UEClassHandle> CIs C_c	ue_foundation::UEClassHandle	4
+__ue_class_component_operation	@ue_foundation::__ue_class_component_operation CIH<ue_foundation::UObjectHandle> CH<ue_foundation::UEClassHandle> CIs Ci CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_class_component_operation	@ue_foundation::__ue_class_component_operation CIH<ue_foundation::UObjectHandle> CIs CIs Ci CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_class_loaded	@ue_foundation::__ue_class_loaded CIs CIs CIs C_c	ue_foundation::UEClassHandle	4
+__ue_curve_table_eval	@ue_foundation::__ue_curve_table_eval CIH<ue_foundation::UObjectHandle> CIs Cf Cf C_c	float const	4
+__ue_curve_table_has	@ue_foundation::__ue_curve_table_has CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
+__ue_curve_table_names	@ue_foundation::__ue_curve_table_names CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
+__ue_data_table_has	@ue_foundation::__ue_data_table_has CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
+__ue_data_table_names	@ue_foundation::__ue_data_table_names CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
+__ue_data_table_row	@ue_foundation::__ue_data_table_row CIH<ue_foundation::UObjectHandle> CIs CIs C_c C_l	ue_foundation::UEStructValue	4
+__ue_delegate_begin_call	@ue_foundation::__ue_delegate_begin_call Cu64 CIs Cb Cb C_c	ue_foundation::UCallHandle	4
+__ue_delegate_bind	@ue_foundation::__ue_delegate_bind Cu64 CIs Cb CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
+__ue_delegate_clear	@ue_foundation::__ue_delegate_clear Cu64 CIs Cb C_c	uint64 const	4
+__ue_delegate_create	@ue_foundation::__ue_delegate_create CIs C_c	uint64 const	4
+__ue_delegate_event_view	@ue_foundation::__ue_delegate_event_view CIs CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
+__ue_delegate_get_field	@ue_foundation::__ue_delegate_get_field CIs CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
+__ue_delegate_is_bound	@ue_foundation::__ue_delegate_is_bound Cu64 CIs Cb C_c	bool const	4
+__ue_delegate_remove	@ue_foundation::__ue_delegate_remove Cu64 CIs Cb CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
+__ue_delegate_set_field	@ue_foundation::__ue_delegate_set_field CIs CIH<ue_foundation::UObjectHandle> CIs Cu64 C_c	void	4
+__ue_drag_create	@ue_foundation::__ue_drag_create CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs Ci CIH<ue_foundation::UEVector2D> C_c	ue_foundation::UObjectHandle	4
+__ue_drag_payload	@ue_foundation::__ue_drag_payload CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_drag_tag	@ue_foundation::__ue_drag_tag CIH<ue_foundation::UObjectHandle> C_c	string const	4
+__ue_drag_valid	@ue_foundation::__ue_drag_valid CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_drag_visual	@ue_foundation::__ue_drag_visual CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_effect_active	@ue_foundation::__ue_effect_active CIs C_c	bool const	4
+__ue_effect_play	@ue_foundation::__ue_effect_play CIs CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UETransform> CIs Cf Cf C_c	bool const	4
+__ue_effect_stop	@ue_foundation::__ue_effect_stop CIs C_c	bool const	4
+__ue_effect_stop_all	@ue_foundation::__ue_effect_stop_all C_c	int const	4
+__ue_enhanced_add_context	@ue_foundation::__ue_enhanced_add_context CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> Ci C_c	void	4
+__ue_enhanced_bind	@ue_foundation::__ue_enhanced_bind CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+__ue_enhanced_has_context	@ue_foundation::__ue_enhanced_has_context CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_enhanced_remove_context	@ue_foundation::__ue_enhanced_remove_context CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_enhanced_unbind	@ue_foundation::__ue_enhanced_unbind CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
+__ue_find_by_type	@ue_foundation::__ue_find_by_type CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	ue_foundation::UObjectHandle	4
+__ue_focus_cause	@ue_foundation::__ue_focus_cause CIH<ue_foundation::UEFocusEvent> C_c	string const	4
+__ue_focus_user	@ue_foundation::__ue_focus_user CIH<ue_foundation::UEFocusEvent> C_c	uint const	4
+__ue_image_soft_error	@ue_foundation::__ue_image_soft_error CIH<ue_foundation::UObjectHandle> C_c	string const	4
+__ue_image_soft_status	@ue_foundation::__ue_image_soft_status CIH<ue_foundation::UObjectHandle> C_c	string const	4
+__ue_input_kind	@ue_foundation::__ue_input_kind CIH<ue_foundation::InputActionValue> C_c	int const	4
+__ue_input_make	@ue_foundation::__ue_input_make Ci Cd Cd Cd C_c	ue_foundation::InputActionValue	4
+__ue_library_scope	@ue_foundation::__ue_library_scope CIH<ue_foundation::UObjectHandle> Cb CI1<v>$ C_c	void	4
+__ue_math_pack_input_value	@ue_foundation::__ue_math_pack_input_value CIH<ue_foundation::InputActionValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_math_pack_rotator	@ue_foundation::__ue_math_pack_rotator CIH<ue_foundation::UERotator> C_c C_l	ue_foundation::UEStructValue	4
+__ue_math_pack_transform	@ue_foundation::__ue_math_pack_transform CIH<ue_foundation::UETransform> C_c C_l	ue_foundation::UEStructValue	4
+__ue_math_pack_vector	@ue_foundation::__ue_math_pack_vector CIH<ue_foundation::UEVector> C_c C_l	ue_foundation::UEStructValue	4
+__ue_math_pack_vector2d	@ue_foundation::__ue_math_pack_vector2d CIH<ue_foundation::UEVector2D> C_c C_l	ue_foundation::UEStructValue	4
+__ue_math_unpack_input_value	@ue_foundation::__ue_math_unpack_input_value CIH<ue_foundation::UEStructValue> C_c	ue_foundation::InputActionValue	4
+__ue_math_unpack_rotator	@ue_foundation::__ue_math_unpack_rotator CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UERotator	4
+__ue_math_unpack_transform	@ue_foundation::__ue_math_unpack_transform CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UETransform	4
+__ue_math_unpack_vector	@ue_foundation::__ue_math_unpack_vector CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEVector	4
+__ue_math_unpack_vector2d	@ue_foundation::__ue_math_unpack_vector2d CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEVector2D	4
+__ue_method_arg_delegate	@ue_foundation::__ue_method_arg_delegate CIH<ue_foundation::UCallHandle> CIs CIs Cu64 C_c	void	4
+__ue_method_arg_enum	@ue_foundation::__ue_method_arg_enum CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UEEnumValue> C_c	void	4
+__ue_method_arg_name	@ue_foundation::__ue_method_arg_name CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UENameValue> C_c	void	4
+__ue_method_arg_rotator	@ue_foundation::__ue_method_arg_rotator CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UERotator> C_c	void	4
+__ue_method_arg_struct	@ue_foundation::__ue_method_arg_struct CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEStructValue> C_c	void	4
+__ue_method_arg_text	@ue_foundation::__ue_method_arg_text CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UETextValue> C_c	void	4
+__ue_method_arg_transform	@ue_foundation::__ue_method_arg_transform CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UETransform> C_c	void	4
+__ue_method_arg_vector	@ue_foundation::__ue_method_arg_vector CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEVector> C_c	void	4
+__ue_method_arg_vector2d	@ue_foundation::__ue_method_arg_vector2d CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEVector2D> C_c	void	4
+__ue_method_result_delegate	@ue_foundation::__ue_method_result_delegate CIH<ue_foundation::UCallHandle> CIs CIs C_c	uint64 const	4
+__ue_method_result_enum	@ue_foundation::__ue_method_result_enum CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UEEnumValue	4
+__ue_method_result_name	@ue_foundation::__ue_method_result_name CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UENameValue	4
+__ue_method_result_rotator	@ue_foundation::__ue_method_result_rotator CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UERotator	4
+__ue_method_result_struct	@ue_foundation::__ue_method_result_struct CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEStructValue	4
+__ue_method_result_text	@ue_foundation::__ue_method_result_text CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UETextValue	4
+__ue_method_result_transform	@ue_foundation::__ue_method_result_transform CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UETransform	4
+__ue_method_result_vector	@ue_foundation::__ue_method_result_vector CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UEVector	4
+__ue_method_result_vector2d	@ue_foundation::__ue_method_result_vector2d CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UEVector2D	4
+__ue_montage_cancel	@ue_foundation::__ue_montage_cancel CIs C_c	bool const	4
+__ue_montage_play	@ue_foundation::__ue_montage_play CIs CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs Cf Cf CH<ue_foundation::UENameValue> C_c	float const	4
+__ue_montage_playing	@ue_foundation::__ue_montage_playing CIs C_c	bool const	4
+__ue_montage_stop	@ue_foundation::__ue_montage_stop CIs Cf C_c	bool const	4
+__ue_native_component_operation	@ue_foundation::__ue_native_component_operation CIH<ue_foundation::UObjectHandle> CIs CIs Ci CIs C_c	ue_foundation::UObjectHandle	4
+__ue_native_get_bool	@ue_foundation::__ue_native_get_bool CIH<ue_foundation::UObjectHandle> CIs CIs C_c	bool const	4
+__ue_native_get_byte	@ue_foundation::__ue_native_get_byte CIH<ue_foundation::UObjectHandle> CIs CIs C_c	int const	4
+__ue_native_get_class	@ue_foundation::__ue_native_get_class CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UEClassHandle	4
+__ue_native_get_double	@ue_foundation::__ue_native_get_double CIH<ue_foundation::UObjectHandle> CIs CIs C_c	double const	4
+__ue_native_get_enum	@ue_foundation::__ue_native_get_enum CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UEEnumValue	4
+__ue_native_get_float	@ue_foundation::__ue_native_get_float CIH<ue_foundation::UObjectHandle> CIs CIs C_c	float const	4
+__ue_native_get_int	@ue_foundation::__ue_native_get_int CIH<ue_foundation::UObjectHandle> CIs CIs C_c	int const	4
+__ue_native_get_name	@ue_foundation::__ue_native_get_name CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UENameValue	4
+__ue_native_get_object	@ue_foundation::__ue_native_get_object CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_native_get_string	@ue_foundation::__ue_native_get_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	string const	4
+__ue_native_get_struct	@ue_foundation::__ue_native_get_struct CIH<ue_foundation::UObjectHandle> CIs CIs C_c C_l	ue_foundation::UEStructValue	4
+__ue_native_get_text	@ue_foundation::__ue_native_get_text CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UETextValue	4
+__ue_native_set_bool	@ue_foundation::__ue_native_set_bool CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	void	4
+__ue_native_set_byte	@ue_foundation::__ue_native_set_byte CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	void	4
+__ue_native_set_class	@ue_foundation::__ue_native_set_class CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UEClassHandle> C_c	void	4
+__ue_native_set_double	@ue_foundation::__ue_native_set_double CIH<ue_foundation::UObjectHandle> CIs CIs Cd C_c	void	4
+__ue_native_set_enum	@ue_foundation::__ue_native_set_enum CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UEEnumValue> C_c	void	4
+__ue_native_set_float	@ue_foundation::__ue_native_set_float CIH<ue_foundation::UObjectHandle> CIs CIs Cf C_c	void	4
+__ue_native_set_int	@ue_foundation::__ue_native_set_int CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	void	4
+__ue_native_set_name	@ue_foundation::__ue_native_set_name CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UENameValue> C_c	void	4
+__ue_native_set_object	@ue_foundation::__ue_native_set_object CIH<ue_foundation::UObjectHandle> CIs CIs CIs CIH<ue_foundation::UObjectHandle> C_c	void	4
+__ue_native_set_string	@ue_foundation::__ue_native_set_string CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	void	4
+__ue_native_set_struct	@ue_foundation::__ue_native_set_struct CIH<ue_foundation::UObjectHandle> CIs CIs CIH<ue_foundation::UEStructValue> C_c	void	4
+__ue_native_set_text	@ue_foundation::__ue_native_set_text CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UETextValue> C_c	void	4
+__ue_object_key_check	@ue_foundation::__ue_object_key_check Cu64 CIs CIs C_c	uint64 const	4
+__ue_object_key_from_ref	@ue_foundation::__ue_object_key_from_ref CIH<ue_foundation::UObjectHandle> CIs CIs C_c	uint64 const	4
+__ue_object_key_reference	@ue_foundation::__ue_object_key_reference Cu64 CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_object_key_valid	@ue_foundation::__ue_object_key_valid Cu64 C_c	bool const	4
+__ue_overlap_reference	@ue_foundation::__ue_overlap_reference CIH<ue_foundation::UEOverlapResult> Ci C_c	ue_foundation::UObjectHandle	4
+__ue_overlap_world	@ue_foundation::__ue_overlap_world CIH<ue_foundation::UEVector> Cd Ci CI1<H<ue_foundation::UObjectHandle>>A Cb I1<H<ue_foundation::UEOverlapResult>>A C_c C_l	void	4
+__ue_parent_lifecycle	@ue_foundation::__ue_parent_lifecycle CIs Ci Cf Ci C_c	void	4
+__ue_pawn_controller	@ue_foundation::__ue_pawn_controller CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_pawn_possess	@ue_foundation::__ue_pawn_possess CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_primary_cancel	@ue_foundation::__ue_primary_cancel CIs C_c	bool const	4
+__ue_primary_exists	@ue_foundation::__ue_primary_exists CIs CIs C_c	bool const	4
+__ue_primary_find	@ue_foundation::__ue_primary_find CIs C_c	uint64 const	4
+__ue_primary_load_async	@ue_foundation::__ue_primary_load_async CIs CIs CIs CI1<s>A CIs C_c	void	4
+__ue_primary_object	@ue_foundation::__ue_primary_object CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_primary_path	@ue_foundation::__ue_primary_path CIs CIs C_c	string const	4
+__ue_primary_pending	@ue_foundation::__ue_primary_pending CIs C_c	bool const	4
+__ue_primary_query_count	@ue_foundation::__ue_primary_query_count Cu64 C_c	int const	4
+__ue_primary_query_name	@ue_foundation::__ue_primary_query_name Cu64 Ci C_c	string const	4
+__ue_primary_query_release	@ue_foundation::__ue_primary_query_release Cu64 C_c	void	4
+__ue_primary_unload	@ue_foundation::__ue_primary_unload CIs CIs C_c	bool const	4
+__ue_query_begin	@ue_foundation::__ue_query_begin CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	uint64 const	4
+__ue_query_count	@ue_foundation::__ue_query_count Cu64 C_c	int const	4
+__ue_query_get	@ue_foundation::__ue_query_get Cu64 Ci C_c	ue_foundation::UObjectHandle	4
+__ue_query_release	@ue_foundation::__ue_query_release Cu64 C_c	void	4
+__ue_release_authored_call	@ue_foundation::__ue_release_authored_call CIH<ue_foundation::UCallHandle> C_c	void	4
+__ue_require_struct_type	@ue_foundation::__ue_require_struct_type CIH<ue_foundation::UEStructValue> CIs C_c	void	4
+__ue_result_analoginputevent	@ue_foundation::__ue_result_analoginputevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEAnalogInputEvent	4
+__ue_result_characterevent	@ue_foundation::__ue_result_characterevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UECharacterEvent	4
+__ue_result_constraint	@ue_foundation::__ue_result_constraint CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEConstraintHandle	4
+__ue_result_event_reply	@ue_foundation::__ue_result_event_reply CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UEEventReply	4
+__ue_result_geometry	@ue_foundation::__ue_result_geometry CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEGeometry	4
+__ue_result_hit_result	@ue_foundation::__ue_result_hit_result CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEHitResult	4
+__ue_result_input_value	@ue_foundation::__ue_result_input_value CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::InputActionValue	4
+__ue_result_inputevent	@ue_foundation::__ue_result_inputevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEInputEvent	4
+__ue_result_keyevent	@ue_foundation::__ue_result_keyevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEKeyEvent	4
+__ue_result_navigationevent	@ue_foundation::__ue_result_navigationevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UENavigationEvent	4
+__ue_result_paint_context	@ue_foundation::__ue_result_paint_context CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UEPaintContext	4
+__ue_result_pointerevent	@ue_foundation::__ue_result_pointerevent CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEPointerEvent	4
+__ue_result_widget_animation	@ue_foundation::__ue_result_widget_animation CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEWidgetAnimationHandle	4
+__ue_same_object	@ue_foundation::__ue_same_object CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_savegame_cancel	@ue_foundation::__ue_savegame_cancel CIs C_c	bool const	4
+__ue_savegame_create	@ue_foundation::__ue_savegame_create C&IH<ue_foundation::UEClassHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_savegame_create_path	@ue_foundation::__ue_savegame_create_path CIs C_c	ue_foundation::UObjectHandle	4
+__ue_savegame_delete	@ue_foundation::__ue_savegame_delete CIs Ci C_c	bool const	4
+__ue_savegame_exists	@ue_foundation::__ue_savegame_exists CIs Ci C_c	bool const	4
+__ue_savegame_load	@ue_foundation::__ue_savegame_load CIs Ci C_c	ue_foundation::UObjectHandle	4
+__ue_savegame_load_async	@ue_foundation::__ue_savegame_load_async CIs CIs Ci CIs C_c	void	4
+__ue_savegame_pending	@ue_foundation::__ue_savegame_pending CIs C_c	bool const	4
+__ue_savegame_release	@ue_foundation::__ue_savegame_release CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_savegame_save	@ue_foundation::__ue_savegame_save CIH<ue_foundation::UObjectHandle> CIs Ci C_c	bool const	4
+__ue_savegame_save_async	@ue_foundation::__ue_savegame_save_async CIs CIH<ue_foundation::UObjectHandle> CIs Ci CIs C_c	void	4
+__ue_savegame_valid	@ue_foundation::__ue_savegame_valid CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_scene_actor_root	@ue_foundation::__ue_scene_actor_root CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_scene_attach	@ue_foundation::__ue_scene_attach CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	bool const	4
+__ue_scene_create	@ue_foundation::__ue_scene_create CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+__ue_scene_destroy	@ue_foundation::__ue_scene_destroy CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_scene_detach	@ue_foundation::__ue_scene_detach CIH<ue_foundation::UObjectHandle> CIs C_c	void	4
+__ue_scene_get	@ue_foundation::__ue_scene_get CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+__ue_scene_get_or_create	@ue_foundation::__ue_scene_get_or_create CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+__ue_scene_parent	@ue_foundation::__ue_scene_parent CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_scene_relative_rotation	@ue_foundation::__ue_scene_relative_rotation CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UERotator	4
+__ue_scene_relative_scale	@ue_foundation::__ue_scene_relative_scale CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UEVector	4
+__ue_scene_relative_transform	@ue_foundation::__ue_scene_relative_transform CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UETransform	4
+__ue_scene_relative_translation	@ue_foundation::__ue_scene_relative_translation CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UEVector	4
+__ue_scene_set_relative_transform	@ue_foundation::__ue_scene_set_relative_transform CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UETransform> Cb C_c	void	4
+__ue_scene_set_world_transform	@ue_foundation::__ue_scene_set_world_transform CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UETransform> Cb C_c	void	4
+__ue_scene_valid	@ue_foundation::__ue_scene_valid CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_scene_world_transform	@ue_foundation::__ue_scene_world_transform CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UETransform	4
+__ue_soft_check	@ue_foundation::__ue_soft_check CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UEStructValue	4
+__ue_soft_get_class	@ue_foundation::__ue_soft_get_class CIH<ue_foundation::UEStructValue> Cb C_c	ue_foundation::UEClassHandle	4
+__ue_soft_get_object	@ue_foundation::__ue_soft_get_object CIH<ue_foundation::UEStructValue> Cb C_c	ue_foundation::UObjectHandle	4
+__ue_soft_load_async	@ue_foundation::__ue_soft_load_async CIs CIH<ue_foundation::UEStructValue> CIs C_c	void	4
+__ue_soft_loaded	@ue_foundation::__ue_soft_loaded CIH<ue_foundation::UEStructValue> C_c	bool const	4
+__ue_soft_make	@ue_foundation::__ue_soft_make CIs CIs C_c	ue_foundation::UEStructValue	4
+__ue_soft_null	@ue_foundation::__ue_soft_null CIH<ue_foundation::UEStructValue> C_c	bool const	4
+__ue_soft_path	@ue_foundation::__ue_soft_path CIH<ue_foundation::UEStructValue> C_c	string const	4
+__ue_soft_upcast	@ue_foundation::__ue_soft_upcast CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UEStructValue	4
+__ue_struct_get_class	@ue_foundation::__ue_struct_get_class CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UEClassHandle	4
+__ue_struct_get_enum_value	@ue_foundation::__ue_struct_get_enum_value CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UEEnumValue	4
+__ue_struct_map_get_byte_enum	@ue_foundation::__ue_struct_map_get_byte_enum CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	ue_foundation::UEEnumValue	4
+__ue_struct_map_get_byte_object	@ue_foundation::__ue_struct_map_get_byte_object CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	ue_foundation::UObjectHandle	4
+__ue_struct_map_get_byte_struct	@ue_foundation::__ue_struct_map_get_byte_struct CIH<ue_foundation::UEStructValue> CIs Cu8 C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_get_enum_bool	@ue_foundation::__ue_struct_map_get_enum_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	bool const	4
+__ue_struct_map_get_enum_byte	@ue_foundation::__ue_struct_map_get_enum_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	uint8 const	4
+__ue_struct_map_get_enum_double	@ue_foundation::__ue_struct_map_get_enum_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	double const	4
+__ue_struct_map_get_enum_enum	@ue_foundation::__ue_struct_map_get_enum_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	ue_foundation::UEEnumValue	4
+__ue_struct_map_get_enum_float	@ue_foundation::__ue_struct_map_get_enum_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	float const	4
+__ue_struct_map_get_enum_int	@ue_foundation::__ue_struct_map_get_enum_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	int const	4
+__ue_struct_map_get_enum_name	@ue_foundation::__ue_struct_map_get_enum_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	ue_foundation::UENameValue	4
+__ue_struct_map_get_enum_object	@ue_foundation::__ue_struct_map_get_enum_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	ue_foundation::UObjectHandle	4
+__ue_struct_map_get_enum_string	@ue_foundation::__ue_struct_map_get_enum_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	string const	4
+__ue_struct_map_get_enum_struct	@ue_foundation::__ue_struct_map_get_enum_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_get_enum_text	@ue_foundation::__ue_struct_map_get_enum_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	ue_foundation::UETextValue	4
+__ue_struct_map_get_int_enum	@ue_foundation::__ue_struct_map_get_int_enum CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UEEnumValue	4
+__ue_struct_map_get_int_object	@ue_foundation::__ue_struct_map_get_int_object CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UObjectHandle	4
+__ue_struct_map_get_int_struct	@ue_foundation::__ue_struct_map_get_int_struct CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_get_name_enum	@ue_foundation::__ue_struct_map_get_name_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	ue_foundation::UEEnumValue	4
+__ue_struct_map_get_name_object	@ue_foundation::__ue_struct_map_get_name_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	ue_foundation::UObjectHandle	4
+__ue_struct_map_get_name_struct	@ue_foundation::__ue_struct_map_get_name_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_get_object_bool	@ue_foundation::__ue_struct_map_get_object_bool CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	bool const	4
+__ue_struct_map_get_object_byte	@ue_foundation::__ue_struct_map_get_object_byte CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	uint8 const	4
+__ue_struct_map_get_object_double	@ue_foundation::__ue_struct_map_get_object_double CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	double const	4
+__ue_struct_map_get_object_enum	@ue_foundation::__ue_struct_map_get_object_enum CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	ue_foundation::UEEnumValue	4
+__ue_struct_map_get_object_float	@ue_foundation::__ue_struct_map_get_object_float CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	float const	4
+__ue_struct_map_get_object_int	@ue_foundation::__ue_struct_map_get_object_int CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	int const	4
+__ue_struct_map_get_object_name	@ue_foundation::__ue_struct_map_get_object_name CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	ue_foundation::UENameValue	4
+__ue_struct_map_get_object_object	@ue_foundation::__ue_struct_map_get_object_object CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	ue_foundation::UObjectHandle	4
+__ue_struct_map_get_object_string	@ue_foundation::__ue_struct_map_get_object_string CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	string const	4
+__ue_struct_map_get_object_struct	@ue_foundation::__ue_struct_map_get_object_struct CIH<ue_foundation::UEStructValue> CIs Cu64 C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_get_object_text	@ue_foundation::__ue_struct_map_get_object_text CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	ue_foundation::UETextValue	4
+__ue_struct_map_get_string_enum	@ue_foundation::__ue_struct_map_get_string_enum CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UEEnumValue	4
+__ue_struct_map_get_string_object	@ue_foundation::__ue_struct_map_get_string_object CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_struct_map_get_string_struct	@ue_foundation::__ue_struct_map_get_string_struct CIH<ue_foundation::UEStructValue> CIs CIs C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_key_enum	@ue_foundation::__ue_struct_map_key_enum CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UEEnumValue	4
+__ue_struct_map_key_object	@ue_foundation::__ue_struct_map_key_object CIH<ue_foundation::UEStructValue> CIs Ci C_c	uint64 const	4
+__ue_struct_map_with_byte_enum	@ue_foundation::__ue_struct_map_with_byte_enum CIH<ue_foundation::UEStructValue> CIs Cu8 CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_byte_object	@ue_foundation::__ue_struct_map_with_byte_object CIH<ue_foundation::UEStructValue> CIs Cu8 CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_byte_struct	@ue_foundation::__ue_struct_map_with_byte_struct CIH<ue_foundation::UEStructValue> CIs Cu8 CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_bool	@ue_foundation::__ue_struct_map_with_enum_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cb C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_byte	@ue_foundation::__ue_struct_map_with_enum_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cu8 C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_double	@ue_foundation::__ue_struct_map_with_enum_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cd C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_enum	@ue_foundation::__ue_struct_map_with_enum_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_float	@ue_foundation::__ue_struct_map_with_enum_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cf C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_int	@ue_foundation::__ue_struct_map_with_enum_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Ci C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_name	@ue_foundation::__ue_struct_map_with_enum_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_object	@ue_foundation::__ue_struct_map_with_enum_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_string	@ue_foundation::__ue_struct_map_with_enum_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CIs C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_struct	@ue_foundation::__ue_struct_map_with_enum_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_enum_text	@ue_foundation::__ue_struct_map_with_enum_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_int_enum	@ue_foundation::__ue_struct_map_with_int_enum CIH<ue_foundation::UEStructValue> CIs Ci CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_int_object	@ue_foundation::__ue_struct_map_with_int_object CIH<ue_foundation::UEStructValue> CIs Ci CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_int_struct	@ue_foundation::__ue_struct_map_with_int_struct CIH<ue_foundation::UEStructValue> CIs Ci CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_name_enum	@ue_foundation::__ue_struct_map_with_name_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_name_object	@ue_foundation::__ue_struct_map_with_name_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_name_struct	@ue_foundation::__ue_struct_map_with_name_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_bool	@ue_foundation::__ue_struct_map_with_object_bool CIH<ue_foundation::UEStructValue> CIs Cu64 Cb C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_byte	@ue_foundation::__ue_struct_map_with_object_byte CIH<ue_foundation::UEStructValue> CIs Cu64 Cu8 C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_double	@ue_foundation::__ue_struct_map_with_object_double CIH<ue_foundation::UEStructValue> CIs Cu64 Cd C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_enum	@ue_foundation::__ue_struct_map_with_object_enum CIH<ue_foundation::UEStructValue> CIs Cu64 CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_float	@ue_foundation::__ue_struct_map_with_object_float CIH<ue_foundation::UEStructValue> CIs Cu64 Cf C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_int	@ue_foundation::__ue_struct_map_with_object_int CIH<ue_foundation::UEStructValue> CIs Cu64 Ci C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_name	@ue_foundation::__ue_struct_map_with_object_name CIH<ue_foundation::UEStructValue> CIs Cu64 CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_object	@ue_foundation::__ue_struct_map_with_object_object CIH<ue_foundation::UEStructValue> CIs Cu64 CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_string	@ue_foundation::__ue_struct_map_with_object_string CIH<ue_foundation::UEStructValue> CIs Cu64 CIs C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_struct	@ue_foundation::__ue_struct_map_with_object_struct CIH<ue_foundation::UEStructValue> CIs Cu64 CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_object_text	@ue_foundation::__ue_struct_map_with_object_text CIH<ue_foundation::UEStructValue> CIs Cu64 CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_string_enum	@ue_foundation::__ue_struct_map_with_string_enum CIH<ue_foundation::UEStructValue> CIs CIs CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_string_object	@ue_foundation::__ue_struct_map_with_string_object CIH<ue_foundation::UEStructValue> CIs CIs CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_map_with_string_struct	@ue_foundation::__ue_struct_map_with_string_struct CIH<ue_foundation::UEStructValue> CIs CIs CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_set_element_enum	@ue_foundation::__ue_struct_set_element_enum CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UEEnumValue	4
+__ue_struct_set_element_object_key	@ue_foundation::__ue_struct_set_element_object_key CIH<ue_foundation::UEStructValue> CIs Ci C_c	uint64 const	4
+__ue_struct_set_with_enum	@ue_foundation::__ue_struct_set_with_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cb C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_set_with_object_key	@ue_foundation::__ue_struct_set_with_object_key CIH<ue_foundation::UEStructValue> CIs Cu64 Cb C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_with_enum_value	@ue_foundation::__ue_struct_with_enum_value CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_tag_check	@ue_foundation::__ue_tag_check CIH<ue_foundation::UEStructValue> Cb C_c	ue_foundation::UEStructValue	4
+__ue_tag_matches	@ue_foundation::__ue_tag_matches CIH<ue_foundation::UEStructValue> CIH<ue_foundation::UEStructValue> Cb C_c	bool const	4
+__ue_tag_name	@ue_foundation::__ue_tag_name CIH<ue_foundation::UEStructValue> C_c	string const	4
+__ue_tag_request	@ue_foundation::__ue_tag_request CIs Cb C_c	ue_foundation::UEStructValue	4
+__ue_tag_valid	@ue_foundation::__ue_tag_valid CIH<ue_foundation::UEStructValue> C_c	bool const	4
+__ue_tags_count	@ue_foundation::__ue_tags_count CIH<ue_foundation::UEStructValue> C_c	int const	4
+__ue_tags_has	@ue_foundation::__ue_tags_has CIH<ue_foundation::UEStructValue> CIH<ue_foundation::UEStructValue> Cb C_c	bool const	4
+__ue_tags_has_set	@ue_foundation::__ue_tags_has_set CIH<ue_foundation::UEStructValue> CIH<ue_foundation::UEStructValue> Cb Cb C_c	bool const	4
+__ue_tags_names	@ue_foundation::__ue_tags_names CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_tags_with	@ue_foundation::__ue_tags_with CIH<ue_foundation::UEStructValue> CIH<ue_foundation::UEStructValue> Cb C_c C_l	ue_foundation::UEStructValue	4
+__ue_timer_next_tick_array	@ue_foundation::__ue_timer_next_tick_array CIs CIs CIH<ue_foundation::UEStructValue> C_c	void	4
+__ue_timer_next_tick_class	@ue_foundation::__ue_timer_next_tick_class CIs CIs CH<ue_foundation::UEClassHandle> CIs C_c	void	4
+__ue_timer_next_tick_frame	@ue_foundation::__ue_timer_next_tick_frame CIs CIs CIH<ue_foundation::UCallHandle> C_c	void	4
+__ue_timer_next_tick_object	@ue_foundation::__ue_timer_next_tick_object CIs CIs CIH<ue_foundation::UObjectHandle> CIs C_c	void	4
+__ue_timer_start_array	@ue_foundation::__ue_timer_start_array CIs Cf CIs Cb CIH<ue_foundation::UEStructValue> C_c	void	4
+__ue_timer_start_class	@ue_foundation::__ue_timer_start_class CIs Cf CIs Cb CH<ue_foundation::UEClassHandle> CIs C_c	void	4
+__ue_timer_start_frame	@ue_foundation::__ue_timer_start_frame CIs Cf CIs Cb CIH<ue_foundation::UCallHandle> C_c	void	4
+__ue_timer_start_object	@ue_foundation::__ue_timer_start_object CIs Cf CIs Cb CIH<ue_foundation::UObjectHandle> CIs C_c	void	4
+__ue_trace_actor	@ue_foundation::__ue_trace_actor CIH<ue_foundation::UETraceHit> C_c	ue_foundation::UObjectHandle	4
+__ue_trace_bone	@ue_foundation::__ue_trace_bone CIH<ue_foundation::UETraceHit> Cb C_c C_l	string const	4
+__ue_trace_component	@ue_foundation::__ue_trace_component CIH<ue_foundation::UETraceHit> C_c	ue_foundation::UObjectHandle	4
+__ue_trace_material	@ue_foundation::__ue_trace_material CIH<ue_foundation::UETraceHit> C_c	ue_foundation::UObjectHandle	4
+__ue_trace_physics_owner	@ue_foundation::__ue_trace_physics_owner CIH<ue_foundation::UETraceHit> C_c	ue_foundation::UObjectHandle	4
+__ue_trace_world	@ue_foundation::__ue_trace_world CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> Cd Ci CI1<H<ue_foundation::UObjectHandle>>A Cb Cb C_c	ue_foundation::UETraceHit	4
+__ue_unpack_analoginputevent	@ue_foundation::__ue_unpack_analoginputevent CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEAnalogInputEvent	4
+__ue_unpack_characterevent	@ue_foundation::__ue_unpack_characterevent CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UECharacterEvent	4
+__ue_unpack_geometry	@ue_foundation::__ue_unpack_geometry CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEGeometry	4
+__ue_unpack_inputevent	@ue_foundation::__ue_unpack_inputevent CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEInputEvent	4
+__ue_unpack_keyevent	@ue_foundation::__ue_unpack_keyevent CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEKeyEvent	4
+__ue_unpack_navigationevent	@ue_foundation::__ue_unpack_navigationevent CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UENavigationEvent	4
+__ue_unpack_pointerevent	@ue_foundation::__ue_unpack_pointerevent CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEPointerEvent	4
+__ue_widget_animation_playing	@ue_foundation::__ue_widget_animation_playing CIH<ue_foundation::UEWidgetAnimationHandle> C_c	bool const	4
+__ue_widget_animation_valid	@ue_foundation::__ue_widget_animation_valid CIH<ue_foundation::UEWidgetAnimationHandle> C_c	bool const	4
+__ue_widget_bind_drag	@ue_foundation::__ue_widget_bind_drag CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	void	4
+__ue_widget_bind_input	@ue_foundation::__ue_widget_bind_input CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	void	4
+__ue_widget_capture	@ue_foundation::__ue_widget_capture CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UEEventReply	4
+__ue_widget_clear_focus	@ue_foundation::__ue_widget_clear_focus CIH<ue_foundation::UEEventReply> Cb C_c	ue_foundation::UEEventReply	4
+__ue_widget_click	@ue_foundation::__ue_widget_click CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+__ue_widget_create	@ue_foundation::__ue_widget_create C&IH<ue_foundation::UEClassHandle> CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_widget_drag	@ue_foundation::__ue_widget_drag CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UEEventReply	4
+__ue_widget_end_drag	@ue_foundation::__ue_widget_end_drag CIH<ue_foundation::UEEventReply> C_c	ue_foundation::UEEventReply	4
+__ue_widget_focus	@ue_foundation::__ue_widget_focus CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> Cb C_c	ue_foundation::UEEventReply	4
+__ue_widget_handled	@ue_foundation::__ue_widget_handled C_c	ue_foundation::UEEventReply	4
+__ue_widget_input	@ue_foundation::__ue_widget_input CIH<ue_foundation::UObjectHandle> Cb C_c	void	4
+__ue_widget_lock	@ue_foundation::__ue_widget_lock CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UEEventReply	4
+__ue_widget_position	@ue_foundation::__ue_widget_position CIH<ue_foundation::UEEventReply> Ci Ci C_c	ue_foundation::UEEventReply	4
+__ue_widget_release	@ue_foundation::__ue_widget_release CIH<ue_foundation::UEEventReply> C_c	ue_foundation::UEEventReply	4
+__ue_widget_remove	@ue_foundation::__ue_widget_remove CIH<ue_foundation::UObjectHandle> C_c	void	4
+__ue_widget_show	@ue_foundation::__ue_widget_show CIH<ue_foundation::UObjectHandle> Ci C_c	bool const	4
+__ue_widget_text	@ue_foundation::__ue_widget_text CIH<ue_foundation::UObjectHandle> CIs CH<ue_foundation::UETextValue> C_c	void	4
+__ue_widget_unhandled	@ue_foundation::__ue_widget_unhandled C_c	ue_foundation::UEEventReply	4
+__ue_widget_unlock	@ue_foundation::__ue_widget_unlock CIH<ue_foundation::UEEventReply> C_c	ue_foundation::UEEventReply	4
+__ue_widget_visible	@ue_foundation::__ue_widget_visible CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+ue_actor_destroy_handle	@ue_foundation::ue_actor_destroy_handle CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+ue_add	@ue_foundation::ue_add Ci Ci	int const	4
+ue_arg_array	@ue_foundation::ue_arg_array CIH<ue_foundation::UCallHandle> CIs Ci C_c	void	4
+ue_arg_bool	@ue_foundation::ue_arg_bool CIH<ue_foundation::UCallHandle> CIs Cb C_c	void	4
+ue_arg_byte	@ue_foundation::ue_arg_byte CIH<ue_foundation::UCallHandle> CIs Ci C_c	void	4
+ue_arg_class	@ue_foundation::ue_arg_class CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UEClassHandle> C_c	void	4
+ue_arg_double	@ue_foundation::ue_arg_double CIH<ue_foundation::UCallHandle> CIs Cd C_c	void	4
+ue_arg_enum	@ue_foundation::ue_arg_enum CIH<ue_foundation::UCallHandle> CIs CIs CIs C_c	void	4
+ue_arg_float	@ue_foundation::ue_arg_float CIH<ue_foundation::UCallHandle> CIs Cf C_c	void	4
+ue_arg_hash	@ue_foundation::ue_arg_hash CIH<ue_foundation::UCallHandle> CIs Ci C_c	void	4
+ue_arg_int	@ue_foundation::ue_arg_int CIH<ue_foundation::UCallHandle> CIs Ci C_c	void	4
+ue_arg_name	@ue_foundation::ue_arg_name CIH<ue_foundation::UCallHandle> CIs CIs C_c	void	4
+ue_arg_object	@ue_foundation::ue_arg_object CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UObjectHandle> C_c	void	4
+ue_arg_string	@ue_foundation::ue_arg_string CIH<ue_foundation::UCallHandle> CIs CIs C_c	void	4
+ue_asset_cancel	@ue_foundation::ue_asset_cancel CIs C_c	bool const	4
+ue_asset_cancel_all	@ue_foundation::ue_asset_cancel_all C_c	int const	4
+ue_asset_is_pending	@ue_foundation::ue_asset_is_pending CIs C_c	bool const	4
+ue_asset_load_async	@ue_foundation::ue_asset_load_async CIs CIs CIs C_c	void	4
+ue_async_physics_error	@ue_foundation::ue_async_physics_error C_c	string const	4
+ue_async_physics_has_output	@ue_foundation::ue_async_physics_has_output C_c	bool const	4
+ue_async_physics_output	@ue_foundation::ue_async_physics_output Ci C_c	double const	4
+ue_async_physics_running	@ue_foundation::ue_async_physics_running C_c	bool const	4
+ue_async_physics_set_input	@ue_foundation::ue_async_physics_set_input Ci Cd C_c	void	4
+ue_begin_call	@ue_foundation::ue_begin_call CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UCallHandle	4
+ue_begin_interface_call	@ue_foundation::ue_begin_interface_call CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UCallHandle	4
+ue_begin_static_call	@ue_foundation::ue_begin_static_call CIs CIs CIs C_c	ue_foundation::UCallHandle	4
+ue_call_float	@ue_foundation::ue_call_float CIH<ue_foundation::UObjectHandle> CIs Cf C_c	float const	4
+ue_call_int	@ue_foundation::ue_call_int CIH<ue_foundation::UObjectHandle> CIs Ci C_c	int const	4
+ue_call_object	@ue_foundation::ue_call_object CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+ue_call_void_int	@ue_foundation::ue_call_void_int CIH<ue_foundation::UObjectHandle> CIs Ci C_c	void	4
+ue_call_void_object	@ue_foundation::ue_call_void_object CIH<ue_foundation::UObjectHandle> CIs CIH<ue_foundation::UObjectHandle> C_c	void	4
+ue_cast_interface	@ue_foundation::ue_cast_interface CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+ue_cast_nullable_object	@ue_foundation::ue_cast_nullable_object CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+ue_cast_object	@ue_foundation::ue_cast_object CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+ue_class_null	@ue_foundation::ue_class_null	ue_foundation::UEClassHandle	4
+ue_class_path	@ue_foundation::ue_class_path CH<ue_foundation::UEClassHandle> C_c	string const	4
+ue_class_valid	@ue_foundation::ue_class_valid CH<ue_foundation::UEClassHandle> C_c	bool const	4
+ue_component_destroy_handle	@ue_foundation::ue_component_destroy_handle CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+ue_component_owner	@ue_foundation::ue_component_owner CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+ue_constraint_valid	@ue_foundation::ue_constraint_valid CIH<ue_foundation::UEConstraintHandle> C_c	bool const	4
+ue_emit_signal	@ue_foundation::ue_emit_signal Ci C_c	void	4
+ue_emit_type	@ue_foundation::ue_emit_type CIs CIs CIs C_c	int const	4
+ue_enhanced_clear_contexts	@ue_foundation::ue_enhanced_clear_contexts C_c	int const	4
+ue_enhanced_is_available	@ue_foundation::ue_enhanced_is_available C_c	bool const	4
+ue_enum_from_number	@ue_foundation::ue_enum_from_number CIs Ci C_c	ue_foundation::UEEnumValue	4
+ue_enum_number	@ue_foundation::ue_enum_number CH<ue_foundation::UEEnumValue> C_c	int const	4
+ue_enum_value	@ue_foundation::ue_enum_value CIs CIs C_c	ue_foundation::UEEnumValue	4
+ue_expect_interface_signature	@ue_foundation::ue_expect_interface_signature CIH<ue_foundation::UCallHandle> CIs C_c	void	4
+ue_expect_signature	@ue_foundation::ue_expect_signature CIH<ue_foundation::UCallHandle> CIs C_c	void	4
+ue_frame_out_bool	@ue_foundation::ue_frame_out_bool Ci Cb C_c	void	4
+ue_frame_out_byte	@ue_foundation::ue_frame_out_byte Ci Cu8 C_c	void	4
+ue_frame_out_class	@ue_foundation::ue_frame_out_class Ci CH<ue_foundation::UEClassHandle> C_c	void	4
+ue_frame_out_double	@ue_foundation::ue_frame_out_double Ci Cd C_c	void	4
+ue_frame_out_enum	@ue_foundation::ue_frame_out_enum Ci CH<ue_foundation::UEEnumValue> C_c	void	4
+ue_frame_out_float	@ue_foundation::ue_frame_out_float Ci Cf C_c	void	4
+ue_frame_out_int	@ue_foundation::ue_frame_out_int Ci Ci C_c	void	4
+ue_frame_out_name	@ue_foundation::ue_frame_out_name Ci CH<ue_foundation::UENameValue> C_c	void	4
+ue_frame_out_object	@ue_foundation::ue_frame_out_object Ci CIH<ue_foundation::UObjectHandle> C_c	void	4
+ue_frame_out_rotator	@ue_foundation::ue_frame_out_rotator Ci CIH<ue_foundation::UERotator> C_c	void	4
+ue_frame_out_string	@ue_foundation::ue_frame_out_string Ci CIs C_c	void	4
+ue_frame_out_struct	@ue_foundation::ue_frame_out_struct Ci CIH<ue_foundation::UEStructValue> C_c	void	4
+ue_frame_out_text	@ue_foundation::ue_frame_out_text Ci CH<ue_foundation::UETextValue> C_c	void	4
+ue_frame_out_transform	@ue_foundation::ue_frame_out_transform Ci CIH<ue_foundation::UETransform> C_c	void	4
+ue_frame_out_vector	@ue_foundation::ue_frame_out_vector Ci CIH<ue_foundation::UEVector> C_c	void	4
+ue_get_object	@ue_foundation::ue_get_object CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+ue_get_self_bool	@ue_foundation::ue_get_self_bool CIs C_c	bool const	4
+ue_get_self_byte	@ue_foundation::ue_get_self_byte CIs C_c	uint8 const	4
+ue_get_self_class	@ue_foundation::ue_get_self_class CIs C_c	ue_foundation::UEClassHandle	4
+ue_get_self_double	@ue_foundation::ue_get_self_double CIs C_c	double const	4
+ue_get_self_enum	@ue_foundation::ue_get_self_enum CIs C_c	ue_foundation::UEEnumValue	4
+ue_get_self_float	@ue_foundation::ue_get_self_float CIs C_c	float const	4
+ue_get_self_int	@ue_foundation::ue_get_self_int CIs C_c	int const	4
+ue_get_self_name	@ue_foundation::ue_get_self_name CIs C_c	ue_foundation::UENameValue	4
+ue_get_self_object	@ue_foundation::ue_get_self_object CIs C_c	ue_foundation::UObjectHandle	4
+ue_get_self_string	@ue_foundation::ue_get_self_string CIs C_c	string const	4
+ue_get_self_struct	@ue_foundation::ue_get_self_struct CIs C_c C_l	ue_foundation::UEStructValue	4
+ue_get_self_text	@ue_foundation::ue_get_self_text CIs C_c	ue_foundation::UETextValue	4
+ue_hit_result_empty	@ue_foundation::ue_hit_result_empty C_c C_l	ue_foundation::UEHitResult	4
+ue_hit_result_view	@ue_foundation::ue_hit_result_view CIH<ue_foundation::UEHitResult> C_c	ue_foundation::UETraceHit	4
+ue_implements_interface	@ue_foundation::ue_implements_interface CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
+ue_input_axis1d	@ue_foundation::ue_input_axis1d CIH<ue_foundation::InputActionValue> C_c	double const	4
+ue_input_axis2d	@ue_foundation::ue_input_axis2d CIH<ue_foundation::InputActionValue> C_c	ue_foundation::UEVector2D	4
+ue_input_axis3d	@ue_foundation::ue_input_axis3d CIH<ue_foundation::InputActionValue> C_c	ue_foundation::UEVector	4
+ue_input_bind_action	@ue_foundation::ue_input_bind_action CIs CIs CIs Cb Cb C_c	void	4
+ue_input_bind_axis	@ue_foundation::ue_input_bind_axis CIs CIs Cb Cb C_c	void	4
+ue_input_bool	@ue_foundation::ue_input_bool CIH<ue_foundation::InputActionValue> C_c	bool const	4
+ue_input_is_available	@ue_foundation::ue_input_is_available C_c	bool const	4
+ue_input_unbind_action	@ue_foundation::ue_input_unbind_action CIs CIs C_c	bool const	4
+ue_input_unbind_all	@ue_foundation::ue_input_unbind_all C_c	int const	4
+ue_input_unbind_axis	@ue_foundation::ue_input_unbind_axis CIs C_c	bool const	4
+ue_interface_call_int	@ue_foundation::ue_interface_call_int CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	int const	4
+ue_interface_call_string	@ue_foundation::ue_interface_call_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	string const	4
+ue_invoke_call	@ue_foundation::ue_invoke_call CIH<ue_foundation::UCallHandle> C_c	void	4
+ue_latent_cancel	@ue_foundation::ue_latent_cancel CIs C_c	bool const	4
+ue_latent_cancel_all	@ue_foundation::ue_latent_cancel_all C_c	int const	4
+ue_latent_delay	@ue_foundation::ue_latent_delay CIs Cf CIs C_c	void	4
+ue_latent_is_pending	@ue_foundation::ue_latent_is_pending CIs C_c	bool const	4
+ue_name_text	@ue_foundation::ue_name_text CH<ue_foundation::UENameValue> C_c	string const	4
+ue_name_value	@ue_foundation::ue_name_value CIs C_c	ue_foundation::UENameValue	4
+ue_names_equal	@ue_foundation::ue_names_equal CH<ue_foundation::UENameValue> CH<ue_foundation::UENameValue> C_c	bool const	4
+ue_null_object	@ue_foundation::ue_null_object	ue_foundation::UObjectHandle	4
+ue_object_get_int	@ue_foundation::ue_object_get_int CIH<ue_foundation::UObjectHandle> CIs C_c	int const	4
+ue_object_is_a	@ue_foundation::ue_object_is_a CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
+ue_object_set_int	@ue_foundation::ue_object_set_int CIH<ue_foundation::UObjectHandle> CIs Ci C_c	void	4
+ue_object_valid	@ue_foundation::ue_object_valid CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+ue_object_value	@ue_foundation::ue_object_value CIs C_c	ue_foundation::UObjectHandle	4
+ue_physics_add_force	@ue_foundation::ue_physics_add_force CH<ue_foundation::UEPhysicsBodyToken> Cd Cd Cd Cb C_c	void	4
+ue_physics_body	@ue_foundation::ue_physics_body Ci C_c	ue_foundation::UEPhysicsBodyToken	4
+ue_physics_input	@ue_foundation::ue_physics_input Ci C_c	double const	4
+ue_physics_output	@ue_foundation::ue_physics_output Ci Cd C_c	void	4
+ue_release_call	@ue_foundation::ue_release_call CIH<ue_foundation::UCallHandle> C_c	void	4
+ue_require_call_context	@ue_foundation::ue_require_call_context CIH<ue_foundation::UCallHandle> Cb C_c	void	4
+ue_result_array_size	@ue_foundation::ue_result_array_size CIH<ue_foundation::UCallHandle> CIs C_c	int const	4
+ue_result_bool	@ue_foundation::ue_result_bool CIH<ue_foundation::UCallHandle> CIs C_c	bool const	4
+ue_result_byte	@ue_foundation::ue_result_byte CIH<ue_foundation::UCallHandle> CIs C_c	int const	4
+ue_result_class	@ue_foundation::ue_result_class CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UEClassHandle	4
+ue_result_double	@ue_foundation::ue_result_double CIH<ue_foundation::UCallHandle> CIs C_c	double const	4
+ue_result_enum	@ue_foundation::ue_result_enum CIH<ue_foundation::UCallHandle> CIs CIs C_c	string const	4
+ue_result_float	@ue_foundation::ue_result_float CIH<ue_foundation::UCallHandle> CIs C_c	float const	4
+ue_result_hash_size	@ue_foundation::ue_result_hash_size CIH<ue_foundation::UCallHandle> CIs C_c	int const	4
+ue_result_int	@ue_foundation::ue_result_int CIH<ue_foundation::UCallHandle> CIs C_c	int const	4
+ue_result_name	@ue_foundation::ue_result_name CIH<ue_foundation::UCallHandle> CIs C_c	string const	4
+ue_result_object	@ue_foundation::ue_result_object CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UObjectHandle	4
+ue_result_string	@ue_foundation::ue_result_string CIH<ue_foundation::UCallHandle> CIs C_c	string const	4
+ue_rotator	@ue_foundation::ue_rotator Cd Cd Cd C_c	ue_foundation::UERotator	4
+ue_self_object	@ue_foundation::ue_self_object C_c	ue_foundation::UObjectHandle	4
+ue_set_self_bool	@ue_foundation::ue_set_self_bool CIs Cb C_c	void	4
+ue_set_self_byte	@ue_foundation::ue_set_self_byte CIs Cu8 C_c	void	4
+ue_set_self_class	@ue_foundation::ue_set_self_class CIs CH<ue_foundation::UEClassHandle> C_c	void	4
+ue_set_self_double	@ue_foundation::ue_set_self_double CIs Cd C_c	void	4
+ue_set_self_enum	@ue_foundation::ue_set_self_enum CIs CH<ue_foundation::UEEnumValue> C_c	void	4
+ue_set_self_float	@ue_foundation::ue_set_self_float CIs Cf C_c	void	4
+ue_set_self_int	@ue_foundation::ue_set_self_int CIs Ci C_c	void	4
+ue_set_self_name	@ue_foundation::ue_set_self_name CIs CH<ue_foundation::UENameValue> C_c	void	4
+ue_set_self_object	@ue_foundation::ue_set_self_object CIs CIH<ue_foundation::UObjectHandle> C_c	void	4
+ue_set_self_string	@ue_foundation::ue_set_self_string CIs CIs C_c	void	4
+ue_set_self_struct	@ue_foundation::ue_set_self_struct CIs CIH<ue_foundation::UEStructValue> C_c	void	4
+ue_set_self_text	@ue_foundation::ue_set_self_text CIs CH<ue_foundation::UETextValue> C_c	void	4
+ue_state_get_int	@ue_foundation::ue_state_get_int CIs Ci C_c	int const	4
+ue_state_set_int	@ue_foundation::ue_state_set_int CIs Ci C_c	void	4
+ue_struct_array_resize	@ue_foundation::ue_struct_array_resize CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_array_size	@ue_foundation::ue_struct_array_size CIH<ue_foundation::UEStructValue> CIs C_c	int const	4
+ue_struct_collect	@ue_foundation::ue_struct_collect C_c C_l	void	4
+ue_struct_default	@ue_foundation::ue_struct_default CIs CIs C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_edit	@ue_foundation::ue_struct_edit CIH<ue_foundation::UEStructValue> CI0<H<ue_foundation::UEStructValue>>1<v>$ C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_get_bool	@ue_foundation::ue_struct_get_bool CIH<ue_foundation::UEStructValue> CIs C_c	bool const	4
+ue_struct_get_byte	@ue_foundation::ue_struct_get_byte CIH<ue_foundation::UEStructValue> CIs C_c	uint8 const	4
+ue_struct_get_double	@ue_foundation::ue_struct_get_double CIH<ue_foundation::UEStructValue> CIs C_c	double const	4
+ue_struct_get_enum	@ue_foundation::ue_struct_get_enum CIH<ue_foundation::UEStructValue> CIs CIs C_c	string const	4
+ue_struct_get_float	@ue_foundation::ue_struct_get_float CIH<ue_foundation::UEStructValue> CIs C_c	float const	4
+ue_struct_get_int	@ue_foundation::ue_struct_get_int CIH<ue_foundation::UEStructValue> CIs C_c	int const	4
+ue_struct_get_name	@ue_foundation::ue_struct_get_name CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UENameValue	4
+ue_struct_get_object	@ue_foundation::ue_struct_get_object CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UObjectHandle	4
+ue_struct_get_string	@ue_foundation::ue_struct_get_string CIH<ue_foundation::UEStructValue> CIs C_c	string const	4
+ue_struct_get_text	@ue_foundation::ue_struct_get_text CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UETextValue	4
+ue_struct_map_get_byte_bool	@ue_foundation::ue_struct_map_get_byte_bool CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	bool const	4
+ue_struct_map_get_byte_byte	@ue_foundation::ue_struct_map_get_byte_byte CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	uint8 const	4
+ue_struct_map_get_byte_double	@ue_foundation::ue_struct_map_get_byte_double CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	double const	4
+ue_struct_map_get_byte_float	@ue_foundation::ue_struct_map_get_byte_float CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	float const	4
+ue_struct_map_get_byte_int	@ue_foundation::ue_struct_map_get_byte_int CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	int const	4
+ue_struct_map_get_byte_name	@ue_foundation::ue_struct_map_get_byte_name CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	ue_foundation::UENameValue	4
+ue_struct_map_get_byte_string	@ue_foundation::ue_struct_map_get_byte_string CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	string const	4
+ue_struct_map_get_byte_text	@ue_foundation::ue_struct_map_get_byte_text CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	ue_foundation::UETextValue	4
+ue_struct_map_get_int	@ue_foundation::ue_struct_map_get_int CIH<ue_foundation::UEStructValue> CIs Ci C_c	int const	4
+ue_struct_map_get_int_bool	@ue_foundation::ue_struct_map_get_int_bool CIH<ue_foundation::UEStructValue> CIs Ci C_c	bool const	4
+ue_struct_map_get_int_byte	@ue_foundation::ue_struct_map_get_int_byte CIH<ue_foundation::UEStructValue> CIs Ci C_c	uint8 const	4
+ue_struct_map_get_int_double	@ue_foundation::ue_struct_map_get_int_double CIH<ue_foundation::UEStructValue> CIs Ci C_c	double const	4
+ue_struct_map_get_int_float	@ue_foundation::ue_struct_map_get_int_float CIH<ue_foundation::UEStructValue> CIs Ci C_c	float const	4
+ue_struct_map_get_int_name	@ue_foundation::ue_struct_map_get_int_name CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UENameValue	4
+ue_struct_map_get_int_string	@ue_foundation::ue_struct_map_get_int_string CIH<ue_foundation::UEStructValue> CIs Ci C_c	string const	4
+ue_struct_map_get_int_text	@ue_foundation::ue_struct_map_get_int_text CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UETextValue	4
+ue_struct_map_get_name_bool	@ue_foundation::ue_struct_map_get_name_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	bool const	4
+ue_struct_map_get_name_byte	@ue_foundation::ue_struct_map_get_name_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	uint8 const	4
+ue_struct_map_get_name_double	@ue_foundation::ue_struct_map_get_name_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	double const	4
+ue_struct_map_get_name_float	@ue_foundation::ue_struct_map_get_name_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	float const	4
+ue_struct_map_get_name_int	@ue_foundation::ue_struct_map_get_name_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	int const	4
+ue_struct_map_get_name_name	@ue_foundation::ue_struct_map_get_name_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	ue_foundation::UENameValue	4
+ue_struct_map_get_name_string	@ue_foundation::ue_struct_map_get_name_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	string const	4
+ue_struct_map_get_name_text	@ue_foundation::ue_struct_map_get_name_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	ue_foundation::UETextValue	4
+ue_struct_map_get_string_bool	@ue_foundation::ue_struct_map_get_string_bool CIH<ue_foundation::UEStructValue> CIs CIs C_c	bool const	4
+ue_struct_map_get_string_byte	@ue_foundation::ue_struct_map_get_string_byte CIH<ue_foundation::UEStructValue> CIs CIs C_c	uint8 const	4
+ue_struct_map_get_string_double	@ue_foundation::ue_struct_map_get_string_double CIH<ue_foundation::UEStructValue> CIs CIs C_c	double const	4
+ue_struct_map_get_string_float	@ue_foundation::ue_struct_map_get_string_float CIH<ue_foundation::UEStructValue> CIs CIs C_c	float const	4
+ue_struct_map_get_string_int	@ue_foundation::ue_struct_map_get_string_int CIH<ue_foundation::UEStructValue> CIs CIs C_c	int const	4
+ue_struct_map_get_string_name	@ue_foundation::ue_struct_map_get_string_name CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UENameValue	4
+ue_struct_map_get_string_string	@ue_foundation::ue_struct_map_get_string_string CIH<ue_foundation::UEStructValue> CIs CIs C_c	string const	4
+ue_struct_map_get_string_text	@ue_foundation::ue_struct_map_get_string_text CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UETextValue	4
+ue_struct_map_key	@ue_foundation::ue_struct_map_key CIH<ue_foundation::UEStructValue> CIs Ci C_c	int const	4
+ue_struct_map_key_byte	@ue_foundation::ue_struct_map_key_byte CIH<ue_foundation::UEStructValue> CIs Ci C_c	uint8 const	4
+ue_struct_map_key_name	@ue_foundation::ue_struct_map_key_name CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UENameValue	4
+ue_struct_map_key_string	@ue_foundation::ue_struct_map_key_string CIH<ue_foundation::UEStructValue> CIs Ci C_c	string const	4
+ue_struct_map_size	@ue_foundation::ue_struct_map_size CIH<ue_foundation::UEStructValue> CIs C_c	int const	4
+ue_struct_map_with_byte_bool	@ue_foundation::ue_struct_map_with_byte_bool CIH<ue_foundation::UEStructValue> CIs Cu8 Cb C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_byte_byte	@ue_foundation::ue_struct_map_with_byte_byte CIH<ue_foundation::UEStructValue> CIs Cu8 Cu8 C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_byte_double	@ue_foundation::ue_struct_map_with_byte_double CIH<ue_foundation::UEStructValue> CIs Cu8 Cd C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_byte_float	@ue_foundation::ue_struct_map_with_byte_float CIH<ue_foundation::UEStructValue> CIs Cu8 Cf C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_byte_int	@ue_foundation::ue_struct_map_with_byte_int CIH<ue_foundation::UEStructValue> CIs Cu8 Ci C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_byte_name	@ue_foundation::ue_struct_map_with_byte_name CIH<ue_foundation::UEStructValue> CIs Cu8 CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_byte_string	@ue_foundation::ue_struct_map_with_byte_string CIH<ue_foundation::UEStructValue> CIs Cu8 CIs C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_byte_text	@ue_foundation::ue_struct_map_with_byte_text CIH<ue_foundation::UEStructValue> CIs Cu8 CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_int	@ue_foundation::ue_struct_map_with_int CIH<ue_foundation::UEStructValue> CIs Ci Ci C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_int_bool	@ue_foundation::ue_struct_map_with_int_bool CIH<ue_foundation::UEStructValue> CIs Ci Cb C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_int_byte	@ue_foundation::ue_struct_map_with_int_byte CIH<ue_foundation::UEStructValue> CIs Ci Cu8 C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_int_double	@ue_foundation::ue_struct_map_with_int_double CIH<ue_foundation::UEStructValue> CIs Ci Cd C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_int_float	@ue_foundation::ue_struct_map_with_int_float CIH<ue_foundation::UEStructValue> CIs Ci Cf C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_int_name	@ue_foundation::ue_struct_map_with_int_name CIH<ue_foundation::UEStructValue> CIs Ci CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_int_string	@ue_foundation::ue_struct_map_with_int_string CIH<ue_foundation::UEStructValue> CIs Ci CIs C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_int_text	@ue_foundation::ue_struct_map_with_int_text CIH<ue_foundation::UEStructValue> CIs Ci CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_name_bool	@ue_foundation::ue_struct_map_with_name_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cb C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_name_byte	@ue_foundation::ue_struct_map_with_name_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cu8 C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_name_double	@ue_foundation::ue_struct_map_with_name_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cd C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_name_float	@ue_foundation::ue_struct_map_with_name_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cf C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_name_int	@ue_foundation::ue_struct_map_with_name_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Ci C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_name_name	@ue_foundation::ue_struct_map_with_name_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_name_string	@ue_foundation::ue_struct_map_with_name_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CIs C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_name_text	@ue_foundation::ue_struct_map_with_name_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_string_bool	@ue_foundation::ue_struct_map_with_string_bool CIH<ue_foundation::UEStructValue> CIs CIs Cb C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_string_byte	@ue_foundation::ue_struct_map_with_string_byte CIH<ue_foundation::UEStructValue> CIs CIs Cu8 C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_string_double	@ue_foundation::ue_struct_map_with_string_double CIH<ue_foundation::UEStructValue> CIs CIs Cd C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_string_float	@ue_foundation::ue_struct_map_with_string_float CIH<ue_foundation::UEStructValue> CIs CIs Cf C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_string_int	@ue_foundation::ue_struct_map_with_string_int CIH<ue_foundation::UEStructValue> CIs CIs Ci C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_string_name	@ue_foundation::ue_struct_map_with_string_name CIH<ue_foundation::UEStructValue> CIs CIs CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_string_string	@ue_foundation::ue_struct_map_with_string_string CIH<ue_foundation::UEStructValue> CIs CIs CIs C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_map_with_string_text	@ue_foundation::ue_struct_map_with_string_text CIH<ue_foundation::UEStructValue> CIs CIs CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_nested_get	@ue_foundation::ue_struct_nested_get CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_nested_with	@ue_foundation::ue_struct_nested_with CIH<ue_foundation::UEStructValue> CIs Ci CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_set_contains_int	@ue_foundation::ue_struct_set_contains_int CIH<ue_foundation::UEStructValue> CIs Ci C_c	bool const	4
+ue_struct_set_contains_string	@ue_foundation::ue_struct_set_contains_string CIH<ue_foundation::UEStructValue> CIs CIs C_c	bool const	4
+ue_struct_set_element_byte	@ue_foundation::ue_struct_set_element_byte CIH<ue_foundation::UEStructValue> CIs Ci C_c	uint8 const	4
+ue_struct_set_element_int	@ue_foundation::ue_struct_set_element_int CIH<ue_foundation::UEStructValue> CIs Ci C_c	int const	4
+ue_struct_set_element_name	@ue_foundation::ue_struct_set_element_name CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UENameValue	4
+ue_struct_set_element_string	@ue_foundation::ue_struct_set_element_string CIH<ue_foundation::UEStructValue> CIs Ci C_c	string const	4
+ue_struct_set_size	@ue_foundation::ue_struct_set_size CIH<ue_foundation::UEStructValue> CIs C_c	int const	4
+ue_struct_set_with_byte	@ue_foundation::ue_struct_set_with_byte CIH<ue_foundation::UEStructValue> CIs Cu8 Cb C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_set_with_int	@ue_foundation::ue_struct_set_with_int CIH<ue_foundation::UEStructValue> CIs Ci Cb C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_set_with_name	@ue_foundation::ue_struct_set_with_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cb C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_set_with_string	@ue_foundation::ue_struct_set_with_string CIH<ue_foundation::UEStructValue> CIs CIs Cb C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_value	@ue_foundation::ue_struct_value CIs C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_value_count	@ue_foundation::ue_struct_value_count C_c	int const	4
+ue_struct_with_bool	@ue_foundation::ue_struct_with_bool CIH<ue_foundation::UEStructValue> CIs Cb C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_with_byte	@ue_foundation::ue_struct_with_byte CIH<ue_foundation::UEStructValue> CIs Cu8 C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_with_double	@ue_foundation::ue_struct_with_double CIH<ue_foundation::UEStructValue> CIs Cd C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_with_enum	@ue_foundation::ue_struct_with_enum CIH<ue_foundation::UEStructValue> CIs CIs CIs C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_with_float	@ue_foundation::ue_struct_with_float CIH<ue_foundation::UEStructValue> CIs Cf C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_with_int	@ue_foundation::ue_struct_with_int CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_with_name	@ue_foundation::ue_struct_with_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_with_object	@ue_foundation::ue_struct_with_object CIH<ue_foundation::UEStructValue> CIs CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_with_string	@ue_foundation::ue_struct_with_string CIH<ue_foundation::UEStructValue> CIs CIs C_c C_l	ue_foundation::UEStructValue	4
+ue_struct_with_text	@ue_foundation::ue_struct_with_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
+ue_subscribe_int	@ue_foundation::ue_subscribe_int CIs CIs CIs C_c	void	4
+ue_subscribe_object_array_bool	@ue_foundation::ue_subscribe_object_array_bool CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_array_byte	@ue_foundation::ue_subscribe_object_array_byte CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_array_double	@ue_foundation::ue_subscribe_object_array_double CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_array_float	@ue_foundation::ue_subscribe_object_array_float CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_array_int	@ue_foundation::ue_subscribe_object_array_int CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_array_name	@ue_foundation::ue_subscribe_object_array_name CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_array_string	@ue_foundation::ue_subscribe_object_array_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_array_text	@ue_foundation::ue_subscribe_object_array_text CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_bool	@ue_foundation::ue_subscribe_object_bool CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_byte	@ue_foundation::ue_subscribe_object_byte CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_class	@ue_foundation::ue_subscribe_object_class CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	void	4
+ue_subscribe_object_double	@ue_foundation::ue_subscribe_object_double CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_enum	@ue_foundation::ue_subscribe_object_enum CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	void	4
+ue_subscribe_object_float	@ue_foundation::ue_subscribe_object_float CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_int	@ue_foundation::ue_subscribe_object_int CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_name	@ue_foundation::ue_subscribe_object_name CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_object	@ue_foundation::ue_subscribe_object_object CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_object	@ue_foundation::ue_subscribe_object_object CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	void	4
+ue_subscribe_object_rotator	@ue_foundation::ue_subscribe_object_rotator CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_string	@ue_foundation::ue_subscribe_object_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_struct	@ue_foundation::ue_subscribe_object_struct CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	void	4
+ue_subscribe_object_text	@ue_foundation::ue_subscribe_object_text CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_transform	@ue_foundation::ue_subscribe_object_transform CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_vector	@ue_foundation::ue_subscribe_object_vector CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_vector2d	@ue_foundation::ue_subscribe_object_vector2d CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_subscribe_object_void	@ue_foundation::ue_subscribe_object_void CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+ue_text	@ue_foundation::ue_text CIs CIs CIs C_c	ue_foundation::UETextValue	4
+ue_text_invariant	@ue_foundation::ue_text_invariant CIs C_c	ue_foundation::UETextValue	4
+ue_text_is_invariant	@ue_foundation::ue_text_is_invariant CH<ue_foundation::UETextValue> C_c	bool const	4
+ue_text_key	@ue_foundation::ue_text_key CH<ue_foundation::UETextValue> C_c	string const	4
+ue_text_namespace	@ue_foundation::ue_text_namespace CH<ue_foundation::UETextValue> C_c	string const	4
+ue_text_to_string	@ue_foundation::ue_text_to_string CH<ue_foundation::UETextValue> C_c	string const	4
+ue_timer_cancel	@ue_foundation::ue_timer_cancel CIs C_c	bool const	4
+ue_timer_cancel_all	@ue_foundation::ue_timer_cancel_all C_c	int const	4
+ue_timer_elapsed	@ue_foundation::ue_timer_elapsed CIs C_c	float const	4
+ue_timer_is_active	@ue_foundation::ue_timer_is_active CIs C_c	bool const	4
+ue_timer_is_paused	@ue_foundation::ue_timer_is_paused CIs C_c	bool const	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs Cb C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs Cd C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs Cf C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CH<ue_foundation::UEEnumValue> C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CH<ue_foundation::UENameValue> C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CH<ue_foundation::UETextValue> C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs Ci C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CIH<ue_foundation::UERotator> C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CIH<ue_foundation::UETransform> C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CIH<ue_foundation::UEVector2D> C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CIH<ue_foundation::UEVector> C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs CIs C_c	void	4
+ue_timer_next_tick	@ue_foundation::ue_timer_next_tick CIs CIs Cu8 C_c	void	4
+ue_timer_pause	@ue_foundation::ue_timer_pause CIs C_c	bool const	4
+ue_timer_remaining	@ue_foundation::ue_timer_remaining CIs C_c	float const	4
+ue_timer_resume	@ue_foundation::ue_timer_resume CIs C_c	bool const	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Cb C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Cd C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Cf C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CH<ue_foundation::UEEnumValue> C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CH<ue_foundation::UENameValue> C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CH<ue_foundation::UETextValue> C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Ci C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIH<ue_foundation::UERotator> C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIH<ue_foundation::UETransform> C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIH<ue_foundation::UEVector2D> C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIH<ue_foundation::UEVector> C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIs C_c	void	4
+ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Cu8 C_c	void	4
+ue_transform	@ue_foundation::ue_transform CIH<ue_foundation::UEVector> CIH<ue_foundation::UERotator> CIH<ue_foundation::UEVector> C_c	ue_foundation::UETransform	4
+ue_transform_identity	@ue_foundation::ue_transform_identity	ue_foundation::UETransform	4
+ue_transform_position	@ue_foundation::ue_transform_position CIH<ue_foundation::UETransform> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
+ue_transform_rotation	@ue_foundation::ue_transform_rotation CIH<ue_foundation::UETransform>	ue_foundation::UERotator	4
+ue_transform_scale	@ue_foundation::ue_transform_scale CIH<ue_foundation::UETransform>	ue_foundation::UEVector	4
+ue_transform_translation	@ue_foundation::ue_transform_translation CIH<ue_foundation::UETransform>	ue_foundation::UEVector	4
+ue_vector	@ue_foundation::ue_vector Cd Cd Cd C_c	ue_foundation::UEVector	4
+ue_vector2d	@ue_foundation::ue_vector2d Cd Cd	ue_foundation::UEVector2D	4
