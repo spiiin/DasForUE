@@ -850,6 +850,14 @@ public:
                     ->needCallerStackFrame = true;
         DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_STRUCT_SCALARS)
 #undef DAS_REGISTER_STRUCT_SCALARS
+#define DAS_REGISTER_SELF_STRUCT_MEMBERS(Suffix, SelfKind, RefKind)                                                    \
+    AddUEExtern<DAS_BIND_FUN(GetSelfStructMember<SelfKind>)>(*this, Library, "__ue_self_struct_get_" #Suffix,          \
+                                                             das::SideEffects::modifyExternal, "GetSelfStructMember"); \
+    AddUEExtern<DAS_BIND_FUN(SetSelfStructMember<SelfKind>)>(*this, Library, "__ue_self_struct_set_" #Suffix,          \
+                                                             das::SideEffects::modifyExternal, "SetSelfStructMember")  \
+                    ->needCallerStackFrame = true;
+        DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_SELF_STRUCT_MEMBERS)
+#undef DAS_REGISTER_SELF_STRUCT_MEMBERS
 #define DAS_REGISTER_CALL_SCALARS(ArgName, ResultName, Kind)                                                           \
     AddUEExtern<DAS_BIND_FUN(SetCallKind<Kind>)>(*this, Library, ArgName, das::SideEffects::modifyExternal,            \
                                                  "SetCallKind");                                                       \

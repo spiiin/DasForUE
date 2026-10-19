@@ -226,6 +226,49 @@ FDasStructValue StructMapWithScalar(const FDasStructValue& H, const char* Path, 
                                                       KK::SnapshotKind, C, At);
 }
 
+// Scalar members of self struct properties, read and written in place. The former lowering copied the
+// whole struct into a snapshot, changed one leaf and wrote the snapshot back.
+FStructProperty* SelfStructProperty(UObject* Self, const char* Property, bool bWrite, das::Context* C)
+{
+    auto* P = CastField<FStructProperty>(ResolveProperty<FProperty>(Self, Property, bWrite, C));
+    if (!P)
+        C->throw_error("self property is not a struct");
+    return P;
+}
+template <class K> typename K::Out GetSelfStructMember(const char* Property, const char* Member, das::Context* C)
+{
+    UObject* Self = ResolveSelf(C);
+    auto* S = SelfStructProperty(Self, Property, false, C);
+    auto F = StructLeafMemory(S->Struct.Get(), S->ContainerPtrToValuePtr<const uint8>(Self), Member, C);
+    auto* P = CastField<typename K::Property>(F.Property);
+    if (!P)
+        C->throw_error("struct field scalar type mismatch");
+    K::Check(P, C);
+    return K::ToDas(ReadPropertyScalarValue(P, F.Memory, C), C);
+}
+template <class K>
+void SetSelfStructMember(const char* Property, const char* Member, typename K::In Value, das::Context* C,
+                         das::LineInfoArg* At)
+{
+    if (ActiveContext && ActiveContext->bCollectingSubscriptions)
+        C->throw_error("self writes are forbidden in bind_events");
+    const auto Native = K::FromDas(Value, C);
+    if (!DasFiniteScalar(Native))
+    {
+        // Non-finite numbers take the snapshot path, which validates math members and reports the error.
+        SetSelfStruct(Property, StructWithScalar<K>(GetSelfStruct(Property, C, At), Member, Value, C, At), C);
+        return;
+    }
+    UObject* Self = ResolveSelf(C);
+    auto* S = SelfStructProperty(Self, Property, true, C);
+    auto F = StructLeafMemory(S->Struct.Get(), S->ContainerPtrToValuePtr<uint8>(Self), Member, C);
+    auto* P = CastField<typename K::Property>(F.Property);
+    if (!P)
+        C->throw_error("struct field scalar type mismatch");
+    K::Check(P, C);
+    WritePropertyScalarValue(P, F.Memory, Native, C);
+}
+
 // Reflected call frames: named arguments and results.
 template <class K> void SetCallKind(const FDasCallHandle& H, const char* Path, typename K::In V, das::Context* C)
 {

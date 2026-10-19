@@ -484,8 +484,66 @@ struct FDSLBodyVisitor : das::Visitor
                : Field->name == "RelativeScale3D"  ? "scale"
                                                    : "";
     }
+    // Scalar leaves of authored self struct properties (self.Stats.Count), read in place.
+    struct FScalarLeafRead
+    {
+        das::string Root, Path, Suffix;
+    };
+    TMap<const das::ExprField*, FScalarLeafRead> ScalarLeafReads;
+    bool ScalarLeaf(das::ExprField* Leaf, FScalarLeafRead& Out)
+    {
+        auto* Root = StructRoot(Leaf);
+        if (!Root || Root == Leaf || !Source->findField(Root->name) || !Property(Root))
+            return false;
+        das::vector<das::string> Names;
+        for (auto* Current = Leaf; Current != Root; Current = static_cast<das::ExprField*>(Current->value))
+        {
+            if (!Current->rtti_isField())
+                return false;
+            Names.push_back(Current->name);
+        }
+        auto Type = RootFieldType(Root);
+        das::string Path;
+        for (auto It = Names.rbegin(); It != Names.rend(); ++It)
+        {
+            if (!Type)
+                return false;
+            if (!DSLMathPath(Type).IsEmpty())
+            {
+                const bool Vector = DSLMathPath(Type) == TEXT("/Script/CoreUObject.Vector");
+                const bool Rotator = DSLMathPath(Type) == TEXT("/Script/CoreUObject.Rotator");
+                if (It + 1 != Names.rend() || !(Vector ? (*It == "x" || *It == "y" || *It == "z")
+                                                       : Rotator && (*It == "pitch" || *It == "yaw" || *It == "roll")))
+                    return false;
+                Path += (Path.empty() ? "" : ".") + *It;
+                Out = {Root->name, Path, "double"};
+                return true;
+            }
+            if (!DSLDirectStruct(Type))
+                return false;
+            const auto* Field = Type->structType->findField(*It);
+            if (!Field)
+                return false;
+            Path += (Path.empty() ? "" : ".") + *It;
+            Type = Field->type;
+        }
+        if (!Type || DSLContainer(Type) || DSLDirectStruct(Type) || DSLDirectEnum(Type) || !DSLMathPath(Type).IsEmpty())
+            return false;
+        const FString Kind = DSLTypeName(Type);
+        for (const TCHAR* Scalar :
+             {TEXT("int"), TEXT("float"), TEXT("double"), TEXT("bool"), TEXT("string"), TEXT("byte"), TEXT("text")})
+            if (Kind == Scalar)
+            {
+                Out = {Root->name, Path, TCHAR_TO_UTF8(Scalar)};
+                return true;
+            }
+        return false;
+    }
     virtual void preVisit(das::ExprField* F) override
     {
+        FScalarLeafRead Leaf;
+        if (!LeftFields.Contains(F) && ScalarLeaf(F, Leaf))
+            ScalarLeafReads.Add(F, Leaf);
         const auto Suffix = NativeSceneSuffix(F);
         if (Suffix.empty())
             return;
@@ -887,18 +945,17 @@ struct FDSLBodyVisitor : das::Visitor
             Error = TEXT("Nested member assignment supports scalar leaves; copy and assign the whole self property for nested values");
             return E;
         }
+        // Scalar leaves are read and written in place on the self property.
         const char* Suffix = DSLScalarSuffix(K);
-        auto Token = [&]()
-        {
-            return DSLCall(E->at, "ue_get_self_struct", {new das::ExprConstString(E->at, Root->name)});
-        };
-        auto* Value = Compound ? static_cast<das::ExpressionPtr>(
-                                     new das::ExprOp2(E->at, E->op.substr(0, E->op.size() - 1),
-                                                      DSLCall(E->at, das::string("ue_struct_get_") + Suffix,
-                                                              {Token(), new das::ExprConstString(E->at, Path)}),
-                                                      E->right))
-                               : E->right;
-        return DSLCall(E->at, das::string("ue_dsl_commit_struct_member_") + Suffix,
+        auto* Value =
+            Compound
+                ? static_cast<das::ExpressionPtr>(new das::ExprOp2(
+                      E->at, E->op.substr(0, E->op.size() - 1),
+                      DSLCall(E->at, das::string("__ue_self_struct_get_") + Suffix,
+                              {new das::ExprConstString(E->at, Root->name), new das::ExprConstString(E->at, Path)}),
+                      E->right))
+                : E->right;
+        return DSLCall(E->at, das::string("__ue_self_struct_set_") + Suffix,
                        {new das::ExprConstString(E->at, Root->name), new das::ExprConstString(E->at, Path), Value});
     }
     bool ContainerOperation(const das::string& N)
@@ -1654,6 +1711,9 @@ struct FDSLBodyVisitor : das::Visitor
     }
     virtual das::ExpressionPtr visit(das::ExprField* E) override
     {
+        if (const auto* Leaf = ScalarLeafReads.Find(E))
+            return DSLCall(E->at, "__ue_self_struct_get_" + Leaf->Suffix,
+                           {new das::ExprConstString(E->at, Leaf->Root), new das::ExprConstString(E->at, Leaf->Path)});
         if (const auto* Native = NativeSceneReads.Find(E))
             return DSLCall(E->at, "__ue_scene_relative_" + Native->Suffix,
                            {DSLDirectPack(E->at, Native->Receiver, E->value, DSLTypedReferencePath(Native->Receiver))});

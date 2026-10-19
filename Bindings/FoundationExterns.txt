@@ -221,6 +221,22 @@ __ue_scene_set_relative_transform	@ue_foundation::__ue_scene_set_relative_transf
 __ue_scene_set_world_transform	@ue_foundation::__ue_scene_set_world_transform CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UETransform> Cb C_c	void	4
 __ue_scene_valid	@ue_foundation::__ue_scene_valid CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 __ue_scene_world_transform	@ue_foundation::__ue_scene_world_transform CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UETransform	4
+__ue_self_struct_get_bool	@ue_foundation::__ue_self_struct_get_bool CIs CIs C_c	bool const	4
+__ue_self_struct_get_byte	@ue_foundation::__ue_self_struct_get_byte CIs CIs C_c	uint8 const	4
+__ue_self_struct_get_double	@ue_foundation::__ue_self_struct_get_double CIs CIs C_c	double const	4
+__ue_self_struct_get_float	@ue_foundation::__ue_self_struct_get_float CIs CIs C_c	float const	4
+__ue_self_struct_get_int	@ue_foundation::__ue_self_struct_get_int CIs CIs C_c	int const	4
+__ue_self_struct_get_name	@ue_foundation::__ue_self_struct_get_name CIs CIs C_c	ue_foundation::UENameValue	4
+__ue_self_struct_get_string	@ue_foundation::__ue_self_struct_get_string CIs CIs C_c	string const	4
+__ue_self_struct_get_text	@ue_foundation::__ue_self_struct_get_text CIs CIs C_c	ue_foundation::UETextValue	4
+__ue_self_struct_set_bool	@ue_foundation::__ue_self_struct_set_bool CIs CIs Cb C_c C_l	void	4
+__ue_self_struct_set_byte	@ue_foundation::__ue_self_struct_set_byte CIs CIs Cu8 C_c C_l	void	4
+__ue_self_struct_set_double	@ue_foundation::__ue_self_struct_set_double CIs CIs Cd C_c C_l	void	4
+__ue_self_struct_set_float	@ue_foundation::__ue_self_struct_set_float CIs CIs Cf C_c C_l	void	4
+__ue_self_struct_set_int	@ue_foundation::__ue_self_struct_set_int CIs CIs Ci C_c C_l	void	4
+__ue_self_struct_set_name	@ue_foundation::__ue_self_struct_set_name CIs CIs CH<ue_foundation::UENameValue> C_c C_l	void	4
+__ue_self_struct_set_string	@ue_foundation::__ue_self_struct_set_string CIs CIs CIs C_c C_l	void	4
+__ue_self_struct_set_text	@ue_foundation::__ue_self_struct_set_text CIs CIs CH<ue_foundation::UETextValue> C_c C_l	void	4
 __ue_soft_check	@ue_foundation::__ue_soft_check CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UEStructValue	4
 __ue_soft_get_class	@ue_foundation::__ue_soft_get_class CIH<ue_foundation::UEStructValue> Cb C_c	ue_foundation::UEClassHandle	4
 __ue_soft_get_object	@ue_foundation::__ue_soft_get_object CIH<ue_foundation::UEStructValue> Cb C_c	ue_foundation::UObjectHandle	4
