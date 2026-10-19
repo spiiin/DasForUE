@@ -4,7 +4,7 @@
 #if DAS_PROJECT_NATIVE_GAMEPLAY
 #include "DasProjectNativeGameplay.generated.h"
 #else
-#include "DasNativeGameplay.generated.h"
+#include "Generated/DasNativeGameplay.generated.h"
 #endif
 inline FDasPropertyAccess DasNativeAccessContract(const FDasNativeGameplayField& Row)
 {

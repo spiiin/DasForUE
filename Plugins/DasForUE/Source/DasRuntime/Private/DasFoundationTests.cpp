@@ -20,6 +20,8 @@
 #include "Modules/ModuleManager.h"
 #include "Engine/World.h"
 
+FString DasFoundationExternManifest();
+
 bool RunDasFoundationTests(FString& Report)
 {
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
@@ -39,6 +41,24 @@ bool RunDasFoundationTests(FString& Report)
     FString CallbackError;
     const bool CallbacksOK = CheckDasCallbackTypes(CallbackError) && CheckDasCallbackFrames(CallbackError);
     Expect(CallbacksOK, TEXT("shared_callback_capabilities_and_payload_validation"), CallbackError);
+#if WITH_EDITOR
+    {
+        // Script-visible extern surface; the baseline is updated deliberately when the API changes.
+        const FString Manifest = DasFoundationExternManifest();
+        const FString Repo = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("../.."));
+        const FString Baseline = Repo / TEXT("Bindings/FoundationExterns.txt");
+        if (IFileManager::Get().DirectoryExists(*(Repo / TEXT("logs"))))
+            FFileHelper::SaveStringToFile(Manifest, *(Repo / TEXT("logs/foundation-externs.txt")),
+                                          FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        FString Expected;
+        if (FFileHelper::LoadFileToString(Expected, *Baseline))
+        {
+            Expected.ReplaceInline(TEXT("\r\n"), TEXT("\n"));
+            Expect(Expected == Manifest, TEXT("foundation_extern_manifest_matches_baseline"),
+                   TEXT("diff logs/foundation-externs.txt Bindings/FoundationExterns.txt"));
+        }
+    }
+#endif
     auto Run = [&](const TCHAR* Name)
     {
         return Runtime.RunFile(Runtime.ScriptPath(Name), 40);
