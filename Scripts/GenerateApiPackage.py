@@ -67,7 +67,7 @@ def closure(ir, functions):
         cls(classes[path]['parent'])
     def visit(field):
         kind, path = field['kind'], field.get('type_path', '')
-        if kind in ('object', 'class'):
+        if kind in ('object', 'class', 'soft_object'):
             cls(path)
         if kind == 'struct' and path not in used_structs:
             if path not in structures:

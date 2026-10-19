@@ -107,6 +107,16 @@ OPAQUE_TRANSPORTS = {
     '/Script/SlateCore.NavigationEvent': ('slate_input_event_snapshot_v1','UENavigationEvent','__ue_arg_navigationevent','__ue_result_navigationevent'),
     CONSTRAINT_PATH: ('constraint_component_v1','UEConstraintHandle','__ue_arg_constraint','__ue_result_constraint'),
 }
+def soft_brush_adapter(fn):
+    expected={'SetBrushFromSoftTexture':('softtexture','/Script/Engine.Texture2D'), 'SetBrushFromSoftMaterial':('softmaterial','/Script/Engine.MaterialInterface')}.get(fn.get('function'))
+    if not expected or fn.get('class')!='/Script/UMG.Image' or fn.get('static',False) or fn.get('call_adapter')!='managed_soft_brush_v1': return False
+    values=fn.get('parameters',[]); fields=fn.get('fields',[])
+    def valid(items):
+        if len(items)!=(2 if expected[0]=='softtexture' else 1):return False
+        soft=[x for x in items if x.get('kind')=='soft_object']
+        return len(soft)==1 and soft[0].get('path')==expected[0] and soft[0].get('type_path')==expected[1] and soft[0].get('transport')=='managed_soft_brush_v1' and all(x.get('input') and not x.get('output') and (x in soft or (x.get('path')=='bmatchsize' and x.get('kind')=='bool' and x.get('type_path','')=='')) for x in items)
+    return valid(values) and valid(fields)
+
 def is_opaque_native(value):
     return value.get('kind')=='struct' and value.get('type_path') in OPAQUE_TRANSPORTS
 
@@ -124,6 +134,9 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
         raise ValueError('Unsupported IR schema version')
     def validate_weak_marker(value, depth=0):
         if depth>16: raise ValueError('Weak type descriptor nesting limit')
+        if value.get('kind')=='soft_object':
+            if depth or value.get('transport')!='managed_soft_brush_v1' or not value.get('input') or value.get('output'):raise ValueError('Soft brush requires attested scalar input')
+            return
         if value.get('transport')=='weak_widget_animation_v1' and (depth or value.get('input') or not value.get('output') or value.get('path','').lower()!='returnvalue'): raise ValueError('WidgetAnimation transport requires scalar producer result')
         if value.get('transport')=='scoped_paint_context_v1' and (depth or value.get('path','').lower()!='context'): raise ValueError('PaintContext transport requires scalar context parameter')
         if depth and value.get('transport')=='scoped_event_reply_v1': raise ValueError('EventReply transport requires scalar parameters')
@@ -142,6 +155,7 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
         expected=events.get(fn.get('function'))
         return fn.get('call_adapter')=='live_input_navigation_v1' and fn.get('class')=='/Script/Engine.KismetInputLibrary' and expected and all(v.get('path','').lower()==expected[0] and v.get('type_path')==expected[1] and v.get('input') and not v.get('output') for v in [*fn['parameters'],*fn['fields']] if v.get('transport')=='slate_input_event_snapshot_v1')
     for fn in ir['functions']:
+        if (fn.get('call_adapter')=='managed_soft_brush_v1' or any(v.get('kind')=='soft_object' for v in [*fn['parameters'],*fn['fields']])) and not soft_brush_adapter(fn):raise ValueError('Soft brush requires exact attested Image function')
         if any(v.get('transport')=='scoped_paint_context_v1' for v in [*fn['parameters'],*fn['fields']]) and fn.get('call_adapter')!='scoped_paint_context_v1': raise ValueError('PaintContext requires attested synchronous function adapter')
         if any(v.get('transport')=='weak_widget_animation_v1' for v in [*fn['parameters'],*fn['fields']]) and fn.get('call_adapter')!='weak_widget_animation_v1': raise ValueError('WidgetAnimation requires attested producer function adapter')
         if any(v.get('transport')=='scoped_event_reply_v1' for v in [*fn['parameters'],*fn['fields']]) and fn.get('call_adapter')!='scoped_event_reply_v1': raise ValueError('EventReply requires attested synchronous function adapter')
@@ -189,7 +203,7 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
                 raise ValueError('Missing object class')
     aliases = set()
     enums = {}
-    kinds = {'delegate', 'byte', 'text', 'int', 'float', 'double', 'bool', 'string', 'object', 'class', 'name', 'enum', 'array', 'map', 'set', 'struct'}
+    kinds = {'soft_object', 'delegate', 'byte', 'text', 'int', 'float', 'double', 'bool', 'string', 'object', 'class', 'name', 'enum', 'array', 'map', 'set', 'struct'}
     for fn in ir['functions']:
         alias = fn['alias']
         if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', alias) or alias in aliases or not alias.startswith(('actor_', 'fixture_', 'ue_')):
@@ -443,6 +457,7 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
             register(fn['alias'] + '_Result')
 
     def typ(field):
+        if field['kind']=='soft_object':return '$UESoftObject<'+class_name(field['type_path'])+'>'
         if is_opaque_native(field): return OPAQUE_TRANSPORTS[field['type_path']][1]
         if field['kind'] == 'struct' and field['type_path'] in math_types: return math_types[field['type_path']][0]
         if field['kind'] in ('map', 'set'): return hash_container_name(field)
@@ -460,6 +475,7 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
     if '/Script/SlateCore.Geometry' in structures: lines += ['require ue_geometry public', '']
     if any(p.startswith('/Script/SlateCore.') and p!='/Script/SlateCore.Geometry' and p in OPAQUE_TRANSPORTS for p in structures): lines += ['require ue_input_events public', '']
     if INPUT_ACTION_VALUE_PATH in structures: lines += ['require ue_input_value public', '']
+    if any(f['kind']=='soft_object' for fn in ir['functions'] for f in fn['fields']): lines += ['require ue_image_soft_brush public', '']
     if any(f['kind']=='delegate' for fn in ir['functions'] for f in fn['fields']): lines += ['require ue_native_delegate public', '']
     if source_module: lines += ['require ' + source_module + ' public', '']
     for path in sorted(classes):
@@ -634,6 +650,8 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
             lines += ['    return <- result' if owns_container(dict(kind='struct',type_path=path)) else '    return result']
         lines += ['}', '']
     def write_input(field, path, val, indent='    ', depth=0):
+        if field['kind']=='soft_object':
+            lines.append(f'{indent}__ue_method_arg_struct(call, {path_expr(path)}, ue_soft_value({val}))');return
         if field['kind']=='delegate':
             lines.append(f"{indent}__ue_arg_native_delegate(call, {path_expr(path)}, {quote(field['type_path'])}, {val}.target, {val}.method)")
             return

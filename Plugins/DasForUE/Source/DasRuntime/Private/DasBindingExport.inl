@@ -47,10 +47,11 @@ namespace
     TSharedPtr<FJsonObject> ExportParameterType(FProperty* Property, TMap<FString, TSharedPtr<FJsonObject>>& Structs)
     {
         // Soft references have a snapshot representation, but no generic wrapper ABI yet.
-        if (CastField<FSoftObjectProperty>(Property)) ExportPolicyError(TEXT("soft_reference_requires_binding_adapter"));
+        if (CastField<FSoftObjectProperty>(Property) && !DasImageSoftBrushFunctionAllowed(Cast<UFunction>(Property->GetOwnerStruct()))) ExportPolicyError(TEXT("soft_reference_requires_binding_adapter"));
         auto Field = MakeShared<FJsonObject>();
         Field->SetStringField(TEXT("path"), Property->GetName().ToLower());
         Field->SetObjectField(TEXT("metadata"), ExportMetadata(Property));
+        if(auto* Soft=CastField<FSoftObjectProperty>(Property)){Field->SetStringField(TEXT("kind"),TEXT("soft_object"));Field->SetStringField(TEXT("type_path"),Soft->PropertyClass->GetPathName());Field->SetStringField(TEXT("transport"),TEXT("managed_soft_brush_v1"));return Field;}
         if(CastField<FWeakObjectProperty>(Property))Field->SetBoolField(TEXT("weak_reference"),true);
         if (auto* Map = CastField<FMapProperty>(Property))
         {
@@ -299,6 +300,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
             auto Metadata=ExportMetadata(Function);
             if(ProfileAdapter){Metadata->SetStringField(TEXT("UnsafeDuringActorConstruction"),TEXT("true"));Item->SetStringField(TEXT("call_adapter"),TEXT("collision_profile_property_v1"));}
             Item->SetObjectField(TEXT("metadata"), Metadata);
+            if(DasImageSoftBrushFunctionAllowed(Function))Item->SetStringField(TEXT("call_adapter"),TEXT("managed_soft_brush_v1"));
             if(DasWidgetAnimationFunctionAllowed(Function))Item->SetStringField(TEXT("call_adapter"),TEXT("weak_widget_animation_v1"));
             if(DasPaintFunctionAllowed(Function))Item->SetStringField(TEXT("call_adapter"),TEXT("scoped_paint_context_v1"));
             if(DasEventReplyFunctionAllowed(Function))Item->SetStringField(TEXT("call_adapter"),TEXT("scoped_event_reply_v1"));
@@ -341,6 +343,7 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
                         }
                     Field->SetArrayField(TEXT("members"), Members);
                 }
+                if(DasImageSoftBrushFunctionAllowed(Function)){if(auto* Soft=FindFProperty<FSoftObjectProperty>(Function,*Parameter.Path)){Field->SetStringField(TEXT("kind"),TEXT("soft_object"));Field->SetStringField(TEXT("type_path"),Soft->PropertyClass->GetPathName());Field->SetStringField(TEXT("transport"),TEXT("managed_soft_brush_v1"));AddClass(Soft->PropertyClass);}}
                 Fields.Add(MakeShared<FJsonValueObject>(Field));
             }
             Item->SetArrayField(TEXT("fields"), Fields);

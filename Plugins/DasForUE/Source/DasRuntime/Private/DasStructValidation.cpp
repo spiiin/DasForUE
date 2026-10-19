@@ -1,3 +1,4 @@
+#include "DasGameplayTags.h"
 #include "DasValueTraversal.h"
 #include "DasInputEvents.h"
 #include "DasGeometry.h"
@@ -40,6 +41,7 @@ bool ValidateDasStructSnapshot(const FInstancedStruct& Value,FString& Error){
         struct FKeys {TSet<UObject*> Objects;TSet<int64> Enums;};
         TArray<FKeys> Containers;
         bool Struct(const UScriptStruct* Type,const uint8* Data){
+            if(DasIsGameplayTagType(Type) && !ValidateDasGameplayTagValue(Type,Data,Error))return false;
             if((Type==TBaseStructure<FVector2D>::Get() && reinterpret_cast<const FVector2D*>(Data)->ContainsNaN()) || (Type==TBaseStructure<FVector>::Get() && reinterpret_cast<const FVector*>(Data)->ContainsNaN()) || (Type==TBaseStructure<FRotator>::Get() && reinterpret_cast<const FRotator*>(Data)->ContainsNaN()) || (Type==TBaseStructure<FTransform>::Get() && (reinterpret_cast<const FTransform*>(Data)->ContainsNaN() || !reinterpret_cast<const FTransform*>(Data)->IsRotationNormalized()))){Error=TEXT("Invalid nested math snapshot value");return false;}
             return true;
         }

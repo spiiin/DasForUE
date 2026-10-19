@@ -1,3 +1,4 @@
+#include "DasGameplayTags.h"
 #include "Engine/CurveTable.h"
 #include "Engine/DataTable.h"
 #include "DasDataAssets.h"
@@ -20,6 +21,8 @@
 #include "Animation/Skeleton.h"
 #include "Engine/SkeletalMesh.h"
 #include "DasWidgetLifetime.h"
+#include "DasImageSoftBrush.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
@@ -442,6 +445,7 @@ namespace
         virtual FString GetReferencerName() const override {return TEXT("FUnrealDasContext snapshots");}
         uint64 TraceScope=NextTraceScope++;
         FDasWidgetLifetime WidgetLifetime;
+        FDasImageSoftBrushLifetime ImageBrushes;
         FDasDragLifetime DragLifetime;
         TArray<TStrongObjectPtr<USaveGame>> SaveGames;
         TMap<FPrimaryAssetId,TSharedPtr<FDasPrimaryAssetLease>> PrimaryAssets;
@@ -1355,6 +1359,7 @@ void AuthoredSetobject(const FDasObjectHandle& H,const char* Id,const char* Name
     void BindEventReplyCall(FMarshalledCall&,das::Context*);
     bool DispatchEventReplyCall(FMarshalledCall&,das::Context*);
     bool DispatchInputNavigationCall(FMarshalledCall&,das::Context*);
+    bool DispatchImageSoftBrush(FMarshalledCall&,das::Context*);
     void CaptureWidgetAnimationOutput(FMarshalledCall&,das::Context*);
     void ValidateWidgetAnimationCall(FMarshalledCall&,das::Context*);
     void ValidateGeometryCall(FMarshalledCall&,das::Context*,bool);
@@ -1778,6 +1783,16 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     bool ScriptInputUnbindAction(const char*,const char*,das::Context*);
     bool ScriptInputUnbindAxis(const char*,das::Context*);
     int32 ScriptInputUnbindAll(das::Context*);
+    FDasStructValue GameplayCheck(const FDasStructValue&,bool,das::Context*);
+    FDasStructValue GameplayRequest(const char*,bool,das::Context*);
+    bool GameplayValid(const FDasStructValue&,das::Context*);
+    char* GameplayName(const FDasStructValue&,das::Context*);
+    bool GameplayMatches(const FDasStructValue&,const FDasStructValue&,bool,das::Context*);
+    FDasStructValue GameplayWith(const FDasStructValue&,const FDasStructValue&,bool,das::Context*,das::LineInfoArg*);
+    int32 GameplayCount(const FDasStructValue&,das::Context*);
+    bool GameplayHas(const FDasStructValue&,const FDasStructValue&,bool,das::Context*);
+    bool GameplayHasSet(const FDasStructValue&,const FDasStructValue&,bool,bool,das::Context*);
+    FDasStructValue GameplayNames(const FDasStructValue&,das::Context*,das::LineInfoArg*);
     bool ScriptCurveTableHas(const FDasObjectHandle&,const char*,das::Context*);
     FDasStructValue ScriptCurveTableNames(const FDasObjectHandle&,das::Context*,das::LineInfoArg*);
     float ScriptCurveTableEval(const FDasObjectHandle&,const char*,float,float,das::Context*);
@@ -1943,6 +1958,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
     #include "DasSoftRuntime.inl"
     #include "DasDSL.inl"
     #include "DasGameplayServices.inl"
+    #include "DasImageSoftBrushRuntime.inl"
     #include "DasInputActionValue.inl"
     #include "DasInputEventsRuntime.inl"
     #include "DasGeometryRuntime.inl"
@@ -1968,7 +1984,7 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
         {
             addCommentReader(new FUECommentReader());
             addAnnotation(new FUENativeBaseAnnotation());addAnnotation(new FUEClassAnnotation());addAnnotation(new FUEAsyncPhysicsAnnotation());addAnnotation(new FUELibraryAnnotation());addAnnotation(new FUEEnumAnnotation());addAnnotation(new FUENativeEnumAnnotation());addAnnotation(new FUENativeStructAnnotation());addAnnotation(new FUEStructAnnotation());
-            addAnnotation(new FUENativeInterfaceAnnotation());addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));addAnnotation(new FUESourceValueBinding());addAnnotation(new FUEObjectTypeAnnotation());addAnnotation(new FUEAuthoredRefAnnotation());addTypeMacro(new FUEObjectTypeMacro());addTypeMacro(new FUEObjectKeyTypeMacro());addAnnotation(new FUEClassTypeAnnotation());addTypeMacro(new FUEClassTypeMacro());addAnnotation(new FUESoftAnnotation());addTypeMacro(new FUESoftTypeMacro(false));addTypeMacro(new FUESoftTypeMacro(true));
+            addAnnotation(new FUENativeInterfaceAnnotation());addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));addAnnotation(new FUESourceValueBinding());addAnnotation(new FUEObjectTypeAnnotation());addAnnotation(new FUEAuthoredRefAnnotation());addTypeMacro(new FUEObjectTypeMacro());addTypeMacro(new FUEObjectKeyTypeMacro());addAnnotation(new FUEClassTypeAnnotation());addTypeMacro(new FUEClassTypeMacro());addAnnotation(new FUESoftAnnotation());addAnnotation(new FUEGameplayValueAnnotation());addTypeMacro(new FUESoftTypeMacro(false));addTypeMacro(new FUESoftTypeMacro(true));
             for(const auto& Pair:{std::pair<const char*,int>{"ue_soft",0},{"ue_soft_value",1},{"ue_soft_get",2},{"ue_soft_load",3}}){auto* Macro=new FUESoftCallMacro(Pair.first,Pair.second);ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
             {auto* Macro=new FUESoftUpcastMacro();ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
             for(bool Raw:{false,true}){auto* Macro=new FUEClassCastFactory(Raw);ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
@@ -2091,6 +2107,8 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             AddUEExtern<DAS_BIND_FUN(TraceActor),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_trace_actor",das::SideEffects::accessExternal,"TraceActor");
             AddUEExtern<DAS_BIND_FUN(TraceComponent),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_trace_component",das::SideEffects::accessExternal,"TraceComponent");
             AddUEExtern<DAS_BIND_FUN(ApplyGameplayDamage)>(*this,Library,"__ue_apply_damage",das::SideEffects::modifyExternal,"ApplyGameplayDamage");
+            AddUEExtern<DAS_BIND_FUN(ImageSoftBrushStatus)>(*this,Library,"__ue_image_soft_status",das::SideEffects::accessExternal);
+            AddUEExtern<DAS_BIND_FUN(ImageSoftBrushError)>(*this,Library,"__ue_image_soft_error",das::SideEffects::accessExternal);
             AddUEExtern<DAS_BIND_FUN(CreateGameplayWidget),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_create",das::SideEffects::modifyExternal,"CreateGameplayWidget");
             AddUEExtern<DAS_BIND_FUN(GameplayWidgetVisible)>(*this,Library,"__ue_widget_visible",das::SideEffects::accessExternal,"GameplayWidgetVisible");
             AddUEExtern<DAS_BIND_FUN(ShowGameplayWidget)>(*this,Library,"__ue_widget_show",das::SideEffects::modifyExternal,"ShowGameplayWidget");
@@ -2149,6 +2167,16 @@ FTransform MethodResulttransform(const FDasCallHandle& H,const char* P,das::Cont
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAction)>(*this,Library,"ue_input_unbind_action",das::SideEffects::modifyExternal,"ScriptInputUnbindAction");
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAxis)>(*this,Library,"ue_input_unbind_axis",das::SideEffects::modifyExternal,"ScriptInputUnbindAxis");
             AddUEExtern<DAS_BIND_FUN(ScriptInputUnbindAll)>(*this,Library,"ue_input_unbind_all",das::SideEffects::modifyExternal,"ScriptInputUnbindAll");
+            AddUEExtern<DAS_BIND_FUN(GameplayCheck),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_tag_check",das::SideEffects::modifyExternal,"GameplayCheck")->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(GameplayRequest),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_tag_request",das::SideEffects::modifyExternal,"GameplayRequest")->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(GameplayValid)>(*this,Library,"__ue_tag_valid",das::SideEffects::modifyExternal,"GameplayValid");
+            AddUEExtern<DAS_BIND_FUN(GameplayName)>(*this,Library,"__ue_tag_name",das::SideEffects::modifyExternal,"GameplayName");
+            AddUEExtern<DAS_BIND_FUN(GameplayMatches)>(*this,Library,"__ue_tag_matches",das::SideEffects::modifyExternal,"GameplayMatches");
+            AddUEExtern<DAS_BIND_FUN(GameplayWith),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_tags_with",das::SideEffects::modifyExternal,"GameplayWith")->needCallerStackFrame=true;
+            AddUEExtern<DAS_BIND_FUN(GameplayCount)>(*this,Library,"__ue_tags_count",das::SideEffects::modifyExternal,"GameplayCount");
+            AddUEExtern<DAS_BIND_FUN(GameplayHas)>(*this,Library,"__ue_tags_has",das::SideEffects::modifyExternal,"GameplayHas");
+            AddUEExtern<DAS_BIND_FUN(GameplayHasSet)>(*this,Library,"__ue_tags_has_set",das::SideEffects::modifyExternal,"GameplayHasSet");
+            AddUEExtern<DAS_BIND_FUN(GameplayNames),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_tags_names",das::SideEffects::modifyExternal,"GameplayNames")->needCallerStackFrame=true;
             AddUEExtern<DAS_BIND_FUN(ScriptCurveTableHas)>(*this,Library,"__ue_curve_table_has",das::SideEffects::accessExternal,"ScriptCurveTableHas");
             AddUEExtern<DAS_BIND_FUN(ScriptCurveTableNames),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_curve_table_names",das::SideEffects::modifyExternal,"ScriptCurveTableNames")->needCallerStackFrame=true;
             AddUEExtern<DAS_BIND_FUN(ScriptCurveTableEval)>(*this,Library,"__ue_curve_table_eval",das::SideEffects::accessExternal,"ScriptCurveTableEval");
@@ -3001,6 +3029,7 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
     int32 ScriptAssetCancelAll(das::Context* C){auto* S=ManagedOwnerSession(C);return S->Bindings.RemoveAll([](const auto& B){return B->AsyncKind==1;});}
     bool ScriptAssetPending(const char* Name,das::Context* C){auto* S=ManagedOwnerSession(C);const FString N=TimerName(Name,C);return S->Bindings.ContainsByPredicate([&](const auto& B){return B->AsyncKind==1 && B->AsyncName==N;});}
 #include "DasSaveGameRuntime.inl"
+#include "DasGameplayTagsRuntime.inl"
 #include "DasCurveTableRuntime.inl"
 #include "DasDataTableRuntime.inl"
 #include "DasPrimaryAssetsRuntime.inl"
@@ -3015,7 +3044,7 @@ AddUEExtern<DAS_BIND_FUN(AuthoredSetobject)>(*this,Library,"__ue_authored_set_ob
         UDasAsyncPhysicsBridge::RevokeOwner(Session.Owner.GetEvenIfUnreachable());
         ClearSessionTimers(Session);
         Session.InputRecipes.Empty();Session.ContextRecipes.Empty();
-        if(Session.Live)Session.Live->Context->DragLifetime.Revoke();
+        if(Session.Live){Session.Live->Context->DragLifetime.Revoke();Session.Live->Context->ImageBrushes.Revoke();}
         if(ActiveWidgetReply && ActiveWidgetReply->Widget.Get()==Session.Owner.Get())ActiveWidgetReply->NavigationRevoked=true;
         Session.bReleaseRequested = true;
         Session.Bindings.Empty();
@@ -3775,6 +3804,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             Candidate->Context->Self = Self;
             const uint64 NewPhysicsRevision=Candidate->Physics && Candidate->Physics->VM?Candidate->Physics->VM->BindingRevision():0;
             if(Session->Revision && !ParentLifecycle && !Candidate->bPhysicsForeignSession)UDasAsyncPhysicsBridge::RevokeOwnerExcept(Session->Owner.Get(),NewPhysicsRevision);
+            if(Session->Live)Session->Live->Context->ImageBrushes.Revoke();
             Session->Live = MoveTemp(Candidate);
             if(Session->Live->bPhysicsOwner){if(Session->Live->Physics)DSLPhysicsOwners.Add(Self,Session->Live->Physics);else DSLPhysicsOwners.Remove(Self);}
             Session->ApprovedDSLDeclaration.Empty();Session->bDefaultsUpdateApproved=false;
@@ -3865,7 +3895,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         else if (Event == EDasCallback::EndPlay)
         {
             ClearSessionTimers(*Session);
-            Session->Live->Context->DragLifetime.Revoke();
+            Session->Live->Context->DragLifetime.Revoke();Session->Live->Context->ImageBrushes.Revoke();
             Session->bEndDelivered = true;
             Session->Bindings.Empty();Session->InputContexts.Empty();Session->InputRecipes.Empty();Session->ContextRecipes.Empty();
             Function = Session->Live->EndPlay;

@@ -695,7 +695,7 @@
             TGuardValue<int32> Depth(AuthoredDispatchDepth,AuthoredDispatchDepth+1);
             TGuardValue<FString*> Failure(AuthoredDispatchFailure,&DispatchFailure);
             if(Call.DelegateInvoke)Call.DelegateInvoke(Call.Frame->GetStructMemory());else Object->ProcessEvent(Call.Function.Get(),Call.Frame->GetStructMemory());
-        }else if(!DispatchInputNavigationCall(Call,Context) && !StagePaintCall(Call,Context) && !DispatchEventReplyCall(Call,Context) && !DispatchCollisionProfileProperty(Call,Context))Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
+        }else if(!DispatchImageSoftBrush(Call,Context) && !DispatchInputNavigationCall(Call,Context) && !StagePaintCall(Call,Context) && !DispatchEventReplyCall(Call,Context) && !DispatchCollisionProfileProperty(Call,Context))Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
         if(!DispatchFailure.IsEmpty())Context->throw_error(TCHAR_TO_UTF8(*DispatchFailure));
         CaptureConstraintCallOutput(Call,Context);
         CaptureWidgetAnimationOutput(Call,Context);

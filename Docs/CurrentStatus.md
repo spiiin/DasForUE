@@ -1127,3 +1127,19 @@ UE JSON accessor-ом; финальный прогон принят. Време�
 Без full Foundation/PIE/packaged, коммит не создан.
 Docs/DataTableAuthoring.md; Docs/DataTables.md; Scripts/TestDataTables.ps1;
 logs/data-tables-validation.json; Examples/DataTables/Items.json.
+
+
+## GameplayTags и Image soft brush — 2026-10-19
+
+Добавлен [ue_gameplay_tags](GameplayTags.md): GameplayTag/GameplayTagContainer как
+owned значения, сопоставление по иерархии, операции контейнера, настоящие tag-свойства
+в авторских class/struct, параметры/результаты/ref методов. Editor build и
+TestGameplayTags.ps1 — PASS, 7 проверок, без Error/ensure. Попутно исправлены
+сборка (forward declaration, include, зависимость DasEditor от GameplayTags),
+валидация tag-полей авторских struct, неразбираемый Blueprint default контейнера,
+коллизия имени Actor.Tags в примере и выполнение Blueprint-методов в commandlet.
+
+[Image soft brush](ImageSoftBrush.md): SetBrushFromSoftTexture/Material через
+managed_soft_brush_v1. UMG/Input staged: 409 ready (+2), 108 export blocked,
+whole-module preflight — PASS; пакет не опубликован, runtime-сценарий не запускался.
+327 Python-тестов генератора/аудита — PASS. Полные Foundation/PIE/packaged не запускались.

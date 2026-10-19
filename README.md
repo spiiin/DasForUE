@@ -746,3 +746,7 @@ Object/class arrays in reflected structs and Advanced projectile prediction: [St
 Owned Slate input-event snapshots and 33 generated functions: [InputEvents](Docs/InputEvents.md). Targeted check: `Scripts/TestInputEvents.ps1 -Publish`.
 
 Synchronous UserWidget input handlers returning scoped EventReply commands: [WidgetInputHandlers](Docs/WidgetInputHandlers.md). Targeted build and one runtime scenario: `Scripts/TestWidgetEvents.ps1`.
+
+GameplayTag and GameplayTagContainer values and real tag properties in authored classes/structs: [GameplayTags](Docs/GameplayTags.md). Focused check: `Scripts/TestGameplayTags.ps1`.
+
+Managed soft-texture/material Image brushes (runtime scenario pending): [ImageSoftBrush](Docs/ImageSoftBrush.md).

@@ -1,11 +1,14 @@
 #include "DasBlueprintDefaults.h"
 #include "DasContainerTypes.h"
 #include "DasDefaultRoots.h"
+#include "DasGameplayTags.h"
 #include "UObject/UnrealType.h"
 #include "UObject/NoExportTypes.h"
 namespace {
     FString PreciseDasStructDefault(const UScriptStruct* Type,const void* Memory){FString Text=TEXT("(");bool First=true;for(TFieldIterator<FProperty> It(Type);It;++It){auto* P=*It;const void* Value=P->ContainerPtrToValuePtr<void>(Memory);FString Field;if(auto* S=CastField<FStructProperty>(P))Field=PreciseDasStructDefault(S->Struct,Value);else if(auto* N=CastField<FNumericProperty>(P);N && N->IsFloatingPoint())Field=FString::Printf(TEXT("%.17g"),N->GetFloatingPointPropertyValue(Value));else P->ExportTextItem_Direct(Field,Value,nullptr,nullptr,PPF_Delimited);if(!First)Text+=TEXT(",");First=false;Text+=P->GetName()+TEXT("=")+Field;}return Text+TEXT(")");}
     FString BlueprintDasStructDefault(const UScriptStruct* Type,const void* Memory){
+        // DSL tag fields are always default-constructed; the container text grammar rejects field-wise export.
+        if(DasIsGameplayTagType(Type))return FString();
         if(Type!=TBaseStructure<FTransform>::Get())return PreciseDasStructDefault(Type,Memory);
         // Blueprint variable defaults use the Transform pin grammar, unlike struct ImportText.
         const auto& Value=*static_cast<const FTransform*>(Memory);const auto T=Value.GetTranslation(),S=Value.GetScale3D();const auto R=Value.Rotator();
