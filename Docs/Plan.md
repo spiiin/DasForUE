@@ -4208,6 +4208,7 @@ DLL/source hashes стабильны; Error/ensure в принятом прог�
 Docs/InputUICallbacks.md; Scripts/TestInputUI.ps1; logs/input-ui-validation.json.
 Изменения без коммита. Сеть и структурные миграции остаются отложены.
 
+
 ### AssetManager / Primary Assets — 2026-10-18
 
 Добавлен managed API `ue_primary_assets`: value IDs, поиск зарегистрированных ID
@@ -4230,6 +4231,7 @@ null failure, cancel delivery и session release. Финальный прого�
 не проверялись. Изменения без коммита.
 Docs/PrimaryAssets.md; Scripts/TestPrimaryAssets.ps1;
 logs/primary-assets-validation.json; Tests/PrimaryAssets/probe.das.
+
 
 ### Авторские DataAsset / PrimaryDataAsset — 2026-10-18
 
@@ -4267,6 +4269,7 @@ Editor Development build и один объединённый короткий r
 несохранённые изменения, отсутствующий источник, устаревшие bundles и NeverCook.
 Полный Foundation/PIE/packaged не запускался. Изменения не закоммичены.
 
+
 ### Типизированное чтение DataTable — 2026-10-18
 
 Добавлен ue_data_tables: ue_data_table_row(type<Row>, loaded_table, name [, scope]),
@@ -4290,6 +4293,7 @@ Source/DLL hashes и engine BuildId стабильны, engine Error/ensure не
 Docs/DataTables.md; Scripts/TestDataTables.ps1; Tests/DataTables/probe.das;
 logs/data-tables-validation.json.
 
+
 ### Чтение CurveTable и вычисление значений — 2026-10-18
 
 Добавлен ue_curve_tables: ue_curve_table_has_row, ue_curve_table_names и
@@ -4312,6 +4316,7 @@ Source/DLL hashes и engine BuildId стабильны, engine Error/ensure не
 Полный Foundation/PIE/packaged не запускался, коммит не создан.
 Docs/CurveTables.md; Scripts/TestCurveTables.ps1; Tests/CurveTables/probe.das;
 logs/curve-tables-validation.json.
+
 
 ### Создание авторского DataTable из JSON — 2026-10-18
 
