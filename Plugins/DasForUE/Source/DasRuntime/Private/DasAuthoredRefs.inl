@@ -283,7 +283,6 @@ FString DSLAuthoredReferencePath(const das::TypeDeclPtr& Type)
     if (Class.NativeParent == TEXT("/Script/Engine.ActorComponent"))
         return TEXT("/Script/DasRuntime.DasScriptComponent");
     DSLFail(TEXT("Authored signature reference requires an Actor/Component host"));
-    return {};
 }
 das::ExpressionPtr DSLAuthoredPack(const das::LineInfo& At, const das::TypeDeclPtr& Type, das::ExpressionPtr Value)
 {

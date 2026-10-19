@@ -7295,7 +7295,6 @@ FPersistentSession* ManagedOwnerSession(das::Context* C)
         if (S->Live && S->Live->Context.Get() == ActiveContext && !S->bReleaseRequested && !S->bEndDelivered)
             return S.Get();
     C->throw_error("managed callbacks require a live persistent owner session");
-    return nullptr;
 }
 FString TimerName(const char* Name, das::Context* C)
 {

@@ -98,7 +98,6 @@ FString DSLPropertySnapshotPath(FProperty* P)
     if (auto* S = DasSoftCarrierForProperty(P))
         return S->GetPathName();
     DSLFail(TEXT("Expected reflected struct or soft reference property"));
-    return {};
 }
 FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FString& Registry)
 {

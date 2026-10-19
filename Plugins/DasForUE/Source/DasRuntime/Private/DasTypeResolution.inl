@@ -297,7 +297,6 @@ FString DSLResolveType(EDSLTypeKind Kind, const FString& Name, const FDSLTypeSco
     DSLFail((Kind == EDSLTypeKind::Interface ? TEXT("Unknown authored interface: ")
                                              : TEXT("Unknown ")+ DSLTypeKindLabel(Kind) + TEXT(" type identity: ")) +
              Identity);
-    return {};
 }
 FString DSLConstraint(TMap<FString, FString>& Options, const FString& Key, EDSLTypeKind Kind, const FString& Inferred,
                       const FDSLTypeScope& Scope)
