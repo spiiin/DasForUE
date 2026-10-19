@@ -49,13 +49,13 @@ bool RunDasFoundationTests(FString& Report)
         const FString Baseline = Repo / TEXT("Bindings/FoundationExterns.txt");
         if (IFileManager::Get().DirectoryExists(*(Repo / TEXT("logs"))))
             FFileHelper::SaveStringToFile(Manifest, *(Repo / TEXT("logs/foundation-externs.txt")),
-                                          FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+                                                      FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
         FString Expected;
         if (FFileHelper::LoadFileToString(Expected, *Baseline))
         {
             Expected.ReplaceInline(TEXT("\r\n"), TEXT("\n"));
             Expect(Expected == Manifest, TEXT("foundation_extern_manifest_matches_baseline"),
-                   TEXT("diff logs/foundation-externs.txt Bindings/FoundationExterns.txt"));
+                                              TEXT("diff logs/foundation-externs.txt Bindings/FoundationExterns.txt"));
         }
     }
 #endif
@@ -122,7 +122,7 @@ bool RunDasFoundationTests(FString& Report)
         const double NsPerAccess = FMath::Max(0.0, (End - Middle) - (Middle - Start)) * 1e9 / Iterations;
         Expect(Short.bSucceeded && Long.bSucceeded && Long.Value == Iterations + 2,
                TEXT("self_int_read_write_benchmark"),
-               FString::Printf(TEXT("ns_per_read_write=%.0f %s"), NsPerAccess, *Long.Error));
+                    FString::Printf(TEXT("ns_per_read_write=%.0f %s"), NsPerAccess, *Long.Error));
         Fixture->health = 105;
     }
     const auto WrongType = RunSelf(TEXT("self_wrong_type.das"));

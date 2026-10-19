@@ -1,5 +1,23 @@
 // Part of DasDSL.inl: Method body lowering: rewrites self/field access, calls and managed APIs inside authored methods.
 // Included in place; declaration order matters.
+// daScript self accessor for a declared property: <Prefix><kind>, with struct snapshots for
+// structs and container carriers and name as the remaining reflected kind.
+das::string DSLSelfAccessor(const char* Prefix, const FDasDeclaredType& Type)
+{
+    static const TCHAR* const Scalars[] = {
+        TEXT("byte"),  TEXT("text"), TEXT("class"),  TEXT("int"),
+                                                          TEXT("float"), TEXT("bool"), TEXT("double"), TEXT("string")};
+    for (const TCHAR* Kind : Scalars)
+        if (Type.Kind == Kind)
+            return das::string(Prefix) + TCHAR_TO_UTF8(Kind);
+    if (Type.Kind == TEXT("struct") || DasContainerCarrier(Type))
+        return das::string(Prefix) + "struct";
+    if (Type.Kind == TEXT("object"))
+        return das::string(Prefix) + "object";
+    if (Type.Kind == TEXT("enum"))
+        return das::string(Prefix) + "enum";
+    return das::string(Prefix) + "name";
+}
 struct FDSLBodyVisitor : das::Visitor
 {
     const FDasDeclaredClass& Decl;
@@ -220,44 +238,7 @@ struct FDSLBodyVisitor : das::Visitor
             const auto* Field = Source->findField(F->name);
             return DSLDelegateView(F->at, Field->type, DSLCall(F->at, "ue_self_object", {}), P->Name);
         }
-        auto* C = new das::ExprCall(
-            F->at,
-            P->Type.Kind ==
-                TEXT("byte")
-                    ? "ue_get_self_byte"
-                    : P->Type.Kind ==
-                          TEXT("text")
-                              ? "ue_get_self_text"
-                              : P->Type.Kind ==
-                                    TEXT("class")
-                                        ? "ue_get_self_class"
-                                        : P->Type.Kind ==
-                                              TEXT("int")
-                                                  ? "ue_get_self_int"
-                                                  : P->Type.Kind ==
-                                                        TEXT("float")
-                                                            ? "ue_get_self_float"
-                                                            : P->Type.Kind ==
-                                                                  TEXT("bool")
-                                                                      ? "ue_get_self_bool"
-                                                                      : P->Type.Kind ==
-                                                                            TEXT("double")
-                                                                                ? "ue_get_self_double"
-                                                                                : P->Type.Kind ==
-                                                                                      TEXT("string")
-                                                                                          ? "ue_get_self_string"
-                                                                                          : (P->Type.Kind ==
-                                                                                                     TEXT("struct") ||
-                                                                                                         DasContainerCarrier(
-                                                                                                             P->Type))
-                                                                                             ? "ue_get_self_struct"
-                                                                                             : P->Type.Kind ==
-                                                                                                   TEXT("object")
-                                                                                                       ? "ue_get_self_object"
-                                                                                                       : P->Type.Kind ==
-                                                                                                             TEXT("enum")
-                                                                                                                 ? "ue_get_self_enum"
-                                                                                                                 : "ue_get_self_name");
+        auto* C = new das::ExprCall(F->at, DSLSelfAccessor("ue_get_self_", P->Type));
         C->arguments.push_back(new das::ExprConstString(F->at, DSLUtf8(P->Name)));
         const auto Type = SelfPropertyType(F, P);
         return Type && (DSLTypedClass(Type) || DSLContainer(Type) || DSLDirectEnum(Type) || DSLDirectStruct(Type) ||
@@ -303,44 +284,7 @@ struct FDSLBodyVisitor : das::Visitor
                            {DSLCall(E->at, "__ue_scene_actor_root", {DSLCall(E->at, "ue_self_object", {})}), E->right,
                             new das::ExprConstBool(E->at, false)});
         }
-        auto* C = new das::ExprCall(
-            E->at,
-            P->Type.Kind ==
-                TEXT("byte")
-                    ? "ue_set_self_byte"
-                    : P->Type.Kind ==
-                          TEXT("text")
-                              ? "ue_set_self_text"
-                              : P->Type.Kind ==
-                                    TEXT("class")
-                                        ? "ue_set_self_class"
-                                        : P->Type.Kind ==
-                                              TEXT("int")
-                                                  ? "ue_set_self_int"
-                                                  : P->Type.Kind ==
-                                                        TEXT("float")
-                                                            ? "ue_set_self_float"
-                                                            : P->Type.Kind ==
-                                                                  TEXT("bool")
-                                                                      ? "ue_set_self_bool"
-                                                                      : P->Type.Kind ==
-                                                                            TEXT("double")
-                                                                                ? "ue_set_self_double"
-                                                                                : P->Type.Kind ==
-                                                                                      TEXT("string")
-                                                                                          ? "ue_set_self_string"
-                                                                                          : (P->Type.Kind ==
-                                                                                                     TEXT("struct") ||
-                                                                                                         DasContainerCarrier(
-                                                                                                             P->Type))
-                                                                                             ? "ue_set_self_struct"
-                                                                                             : P->Type.Kind ==
-                                                                                                   TEXT("object")
-                                                                                                       ? "ue_set_self_object"
-                                                                                                       : P->Type.Kind ==
-                                                                                                             TEXT("enum")
-                                                                                                                 ? "ue_set_self_enum"
-                                                                                                                 : "ue_set_self_name");
+        auto* C = new das::ExprCall(E->at, DSLSelfAccessor("ue_set_self_", P->Type));
         C->arguments.push_back(new das::ExprConstString(E->at, DSLUtf8(P->Name)));
         auto* Value = Compound ? static_cast<das::ExpressionPtr>(
                                      new das::ExprOp2(E->at, E->op.substr(0, E->op.size() - 1), Read(F), E->right))

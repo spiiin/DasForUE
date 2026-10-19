@@ -92,9 +92,15 @@ template <class P, class T> void WritePropertyScalarValue(P* Property, void* Mem
 }
 FDasPropertyAccess ObjectPropertyAccess(FProperty* P, das::Context* C)
 {
-    for (const auto& Row : DasNativeGameplayFields)
-        if (P->GetName() == Row.Name && P->GetOwnerClass() && P->GetOwnerClass()->GetPathName() == Row.Declaring)
-            return DasNativeAccessContract(Row);
+    // FName equality matches the former case-insensitive FString comparison of names.
+    if (const auto* Rows = DasNativeGameplayFieldsNamed(P->GetFName()))
+        if (const UClass* Owner = P->GetOwnerClass())
+        {
+            const FString OwnerPath = Owner->GetPathName();
+            for (const auto* Row : *Rows)
+                if (OwnerPath == Row->Declaring)
+                    return DasNativeAccessContract(*Row);
+        }
     FDasPropertyAccess Access;
     FString Error;
     if (!DescribeDasPropertyAccess(P, Access, Error))
