@@ -1,14 +1,18 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$Package)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests\DasForUESmoke\DasForUESmoke.uproject'
-& (Join-Path $Engine 'Engine\Build\BatchFiles\Build.bat') DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12
+Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=12')
 if($LASTEXITCODE){throw 'Inherited defaults editor build failed'}
 $Id=[Guid]::NewGuid().ToString('N')
 foreach($Phase in @('Create','Reopen','Recompile')){
  $Log=Join-Path $Repo "logs\inherited-defaults-$Phase.log"
  & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') $Project -run=DasInheritedDefaults "-ProbeId=$Id" "-Phase=$Phase" -unattended -NullRHI -nosplash -stdout "-abslog=$Log"
- if($LASTEXITCODE -or (Select-String -LiteralPath $Log -Pattern ':\s+Error:|Fatal error:|DAS_INHERITED_DEFAULTS FAIL') -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_INHERITED_DEFAULTS_RESULT=PASS')){throw "Inherited defaults $Phase failed"}
+ if($LASTEXITCODE -or (Select-String -LiteralPath $Log -Pattern ':\s+Error:|Fatal error:|DAS_INHERITED_DEFAULTS FAIL') -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_INHERITED_DEFAULTS_RESULT=PASS')){throw "Inherited defaults $Phase failed"}
 }
 if($Package){
  $Map="/Game/DasInheritedDefaults/$Id/Map"

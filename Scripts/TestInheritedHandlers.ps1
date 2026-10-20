@@ -3,8 +3,10 @@ $ErrorActionPreference='Stop'
 Import-Module "$PSScriptRoot/DasTest.psm1" -Force
 $Das=Get-DasContext -Engine $Engine
 if(!$SkipBuild){
-    & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$($Das.Project)" `
-        -Module=DasRuntime -Module=DasEditor -Module=DasForUESmoke -NoEngineChanges -WaitMutex -NoXGE -MaxParallelActions=8
+    Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$($Das.Project)", '-Module=DasRuntime',
+    '-Module=DasEditor', '-Module=DasForUESmoke', '-NoEngineChanges', '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8')
     if($LASTEXITCODE){throw 'Handler references module build failed'}
 }
 function Get-InheritedHandlerHashes {
@@ -32,7 +34,7 @@ $Log=Invoke-DasCommandlet $Das -Run DasInheritedHandlers -Name 'inherited-handle
     -Arguments @('-Multiprocess') -Marker 'DAS_INHERITED_HANDLER_RESULT=PASS' `
     -FailPattern 'DAS_INHERITED_HANDLER_FAIL|Ensure condition failed|Fatal error:|Log[^:]+: Error:'
 $Text=Get-Content -LiteralPath $Log -Raw
-$Match=[regex]::Match($Text,'DAS_INHERITED_HANDLER_RESULT=PASS checks=(\d+)')
+$Match=(Get-DasResult -Text $Text -Pattern 'DAS_INHERITED_HANDLER_RESULT=PASS checks=(\d+)')
 if(!$Match.Success -or [int]$Match.Groups[1].Value -ne 34){throw 'Incomplete handler references probe'}
 if((Get-InheritedHandlerHashes) -ne $Before){throw 'Source or binary changed during handler references validation'}
 [ordered]@{state='PASS';checks=[int]$Match.Groups[1].Value;runtime_log=$Log;sha256=($Before|ConvertFrom-Json);

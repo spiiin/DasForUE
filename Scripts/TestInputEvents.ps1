@@ -1,8 +1,12 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild,[switch]$Publish)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot
 $Python='C:/Python312/python.exe';$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 & $Python "$PSScriptRoot/TestInputEventsGenerator.py";if($LASTEXITCODE){throw 'Input event generator tests failed'}
-if(!$SkipBuild){& "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/input-events-build.log" *> "$Repo/logs/input-events-build-stdout.log";if($LASTEXITCODE){throw 'Input events build failed'}}
+if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/input-events-build.log") *> "$Repo/logs/input-events-build-stdout.log";if($LASTEXITCODE){throw 'Input events build failed'}}
 $Hashes=@{};foreach($Name in @('DasRuntime','DasEditor')){$Path="$Repo/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$Name.dll";$Hashes[$Path]=(Get-FileHash $Path -Algorithm SHA256).Hash}
 $Manifest="$Engine/Engine/Binaries/Win64/UnrealEditor.modules";$BuildId=(Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/UMGInput.profile.json" -SkipBuild -Publish:$Publish|Tee-Object -Variable PackageOutput
@@ -17,7 +21,7 @@ if($Report.counts.generation_ready -lt 366){throw 'Unexpected UMG input-event co
 $Probe="$Stage/input-events.das";(Get-Content "$Repo/Tests/InputEvents/probe.template.das" -Raw).Replace('_MODULE_',$(if($Publish){'ue_api_umg_input'}else{$Report.staged_module}))|Set-Content $Probe -Encoding utf8
 $Log="$Stage/input-events.log"
 & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasInputEvents "-Script=$Probe" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Log" *> "$Stage/input-events-stdout.log"
-$Result=[regex]::Match((Get-Content $Log -Raw),'DAS_INPUT_EVENTS_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Input event native/runtime probe failed: $Log"}
+$Result=(Get-DasResult -Text (Get-Content $Log -Raw) -Pattern 'DAS_INPUT_EVENTS_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Input event native/runtime probe failed: $Log"}
 $CompileRejections=0
 foreach($Case in @(
  @{name='integer_constructor';body='let value=UEKeyEvent(uint64(1));return 0'},

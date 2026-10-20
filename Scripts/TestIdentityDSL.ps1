@@ -3,8 +3,10 @@ $ErrorActionPreference='Stop'
 Import-Module "$PSScriptRoot/DasTest.psm1" -Force
 $Das=Get-DasContext -Engine $Engine
 if(!$SkipBuild){
-    & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$($Das.Project)" `
-        -Module=DasRuntime -Module=DasEditor -Module=DasForUESmoke -NoEngineChanges -WaitMutex -NoXGE -MaxParallelActions=8
+    Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$($Das.Project)", '-Module=DasRuntime',
+    '-Module=DasEditor', '-Module=DasForUESmoke', '-NoEngineChanges', '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8')
     if($LASTEXITCODE){throw 'Identity DSL module build failed'}
 }
 function Get-IdentityHashes {
@@ -31,7 +33,7 @@ $Log=Invoke-DasCommandlet $Das -Run DasIdentityDSL -Name 'identity-dsl-runtime' 
     -FailPattern 'DAS_IDENTITY_DSL_FAIL|Ensure condition failed|Fatal error:|Log[^:]+: Error:'
 $Text=Get-Content -LiteralPath $Log -Raw
 if($Text -notmatch 'DAS_DSL_PATH_LITERAL'){throw 'Missing path-literal lint warning'}
-$Match=[regex]::Match($Text,'DAS_IDENTITY_DSL_RESULT=PASS checks=(\d+)')
+$Match=(Get-DasResult -Text $Text -Pattern 'DAS_IDENTITY_DSL_RESULT=PASS checks=(\d+)')
 if(!$Match.Success -or [int]$Match.Groups[1].Value -ne 42){throw 'Incomplete identity DSL probe'}
 if((Get-IdentityHashes) -ne $Before){throw 'Source or binary changed during identity validation'}
 [ordered]@{state='PASS';checks=[int]$Match.Groups[1].Value;runtime_log=$Log;sha256=($Before|ConvertFrom-Json);

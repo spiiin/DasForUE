@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests/DasForUESmoke/DasForUESmoke.uproject'
@@ -7,7 +9,9 @@ foreach($Test in @('TestBindingsGenerator.py','TestHitResultGenerator.py')){
  if($LASTEXITCODE){throw "$Test failed"}
 }
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/hit-transport-build.log" *> "$Repo/logs/hit-transport-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/hit-transport-build.log") *> "$Repo/logs/hit-transport-build-stdout.log"
  if($LASTEXITCODE){throw 'Hit transport build failed'}
 }
 $RuntimeDll=Join-Path $Repo 'Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-DasRuntime.dll'

@@ -3,8 +3,9 @@ $ErrorActionPreference='Stop'
 Import-Module "$PSScriptRoot/DasTest.psm1" -Force
 $Das=Get-DasContext -Engine $Engine
 if(!$SkipBuild){
-    & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$($Das.Project)" `
-        -Module=DasRuntime -Module=DasEditor -WaitMutex -NoXGE -MaxParallelActions=8
+    Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$($Das.Project)", '-Module=DasRuntime',
+    '-Module=DasEditor', '-WaitMutex', '-NoXGE', '-MaxParallelActions=8')
     if($LASTEXITCODE){throw 'Inline callback module build failed'}
 }
 function Get-CallbackHashes {
@@ -26,7 +27,7 @@ $Log=Invoke-DasCommandlet $Das -Run DasInlineCallbacks -Name 'inline-callback-ru
     -Arguments @('-Multiprocess') -Marker 'DAS_INLINE_CALLBACK_RESULT=PASS' `
     -FailPattern 'DAS_INLINE_CALLBACK_FAIL|Ensure condition failed|Fatal error:|Log[^:]+: Error:'
 $Text=Get-Content -LiteralPath $Log -Raw
-$Match=[regex]::Match($Text,'DAS_INLINE_CALLBACK_RESULT=PASS checks=(\d+)')
+$Match=(Get-DasResult -Text $Text -Pattern 'DAS_INLINE_CALLBACK_RESULT=PASS checks=(\d+)')
 if(!$Match.Success -or [int]$Match.Groups[1].Value -ne 26){throw 'Incomplete inline callback probe'}
 if((Get-CallbackHashes) -ne $Before){throw 'Source or binary changed during callback validation'}
 [ordered]@{state='PASS';checks=[int]$Match.Groups[1].Value;runtime_log=$Log;sha256=($Before|ConvertFrom-Json);
