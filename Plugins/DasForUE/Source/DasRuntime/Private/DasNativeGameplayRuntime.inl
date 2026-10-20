@@ -11,6 +11,34 @@ const TCHAR* NativeGameplaySnapshotKind(const char* Path, const char* Name, das:
         C->throw_error("native snapshot field not generated");
     return Row->Kind;
 }
+// Resolved generated receiver classes by path, and validated generated fields by (class path, field,
+// direction, kind, receiver class). Entries hold the strings they were made for (heap strings may reuse
+// addresses), weak classes and field paths, and the self site epoch (contexts, GC); a miss or a stale
+// entry takes the checked path, which reports every error.
+struct FDasNativeClassSite
+{
+    das::string Path;
+    uint64 Epoch = 0;
+    TWeakObjectPtr<UClass> Class;
+};
+UClass* DasNativeGameplayClass(const char* ClassPath)
+{
+    static FDasNativeClassSite Sites[64];
+    const UPTRINT Key = UPTRINT(ClassPath);
+    FDasNativeClassSite& S = Sites[((Key >> 4) ^ (Key >> 10)) & 63];
+    if (ClassPath && S.Epoch == GDasSelfSiteEpoch && FCStringAnsi::Strcmp(S.Path.c_str(), ClassPath) == 0)
+        if (UClass* Cached = S.Class.Get())
+            return Cached;
+    const FString Path = ClassPath ? UTF8_TO_TCHAR(ClassPath) : TEXT("");
+    UClass* Class = FindObject<UClass>(nullptr, *Path);
+    if (Class && ClassPath)
+    {
+        S.Path = ClassPath;
+        S.Epoch = GDasSelfSiteEpoch;
+        S.Class = Class;
+    }
+    return Class;
+}
 UObject* NativeGameplayObject(const FDasObjectHandle& H, const char* ClassPath, bool Write, das::Context* C)
 {
     auto* O = ResolveObject(H, C);
@@ -23,14 +51,55 @@ UObject* NativeGameplayObject(const FDasObjectHandle& H, const char* ClassPath, 
         C->throw_error("native access requires live receiver in owner's world");
     if (Write && (ActiveContext->bEnding || ActiveContext->bCollectingSubscriptions))
         C->throw_error("native mutation is forbidden in bind_events/EndPlay");
-    const FString Path = ClassPath ? UTF8_TO_TCHAR(ClassPath) : TEXT("");
-    auto* Class = FindObject<UClass>(nullptr, *Path);
+    auto* Class = DasNativeGameplayClass(ClassPath);
     if (!Class || !O->IsA(Class))
         C->throw_error("native gameplay receiver class mismatch");
     return O;
 }
+struct FDasNativeFieldSite
+{
+    das::string Path, Name;
+    const TCHAR* Kind = nullptr;
+    bool bWrite = false;
+    UClass* Class = nullptr;
+    uint64 Epoch = 0;
+    FProperty* Raw = nullptr;
+    TFieldPath<FProperty> Property;
+};
+FDasNativeFieldSite& DasNativeFieldSite(const char* ClassPath, const char* Name, bool Write)
+{
+    static FDasNativeFieldSite Sites[512];
+    // Reads and writes of one field use neighbouring slots so that they do not evict each other.
+    const UPTRINT Key = UPTRINT(Name) ^ (UPTRINT(ClassPath) << 1);
+    return Sites[((((Key >> 4) ^ (Key >> 13)) << 1) | UPTRINT(Write)) & 511];
+}
+FProperty* NativeGameplayPropertyChecked(UObject* O, const char* ClassPath, const char* Name, bool Write,
+                                         const TCHAR* Kind, das::Context* C);
 FProperty* NativeGameplayProperty(UObject* O, const char* ClassPath, const char* Name, bool Write, const TCHAR* Kind,
                                   das::Context* C)
+{
+    FDasNativeFieldSite& S = DasNativeFieldSite(ClassPath, Name, Write);
+    if (ClassPath && Name && Kind && S.Epoch == GDasSelfSiteEpoch && S.bWrite == Write && S.Class == O->GetClass() &&
+        S.Kind && FCString::Strcmp(S.Kind, Kind) == 0 && FCStringAnsi::Strcmp(S.Name.c_str(), Name) == 0 &&
+        FCStringAnsi::Strcmp(S.Path.c_str(), ClassPath) == 0)
+        if (FProperty* P = S.Property.Get(); P && P == S.Raw)
+            return P;
+    FProperty* P = NativeGameplayPropertyChecked(O, ClassPath, Name, Write, Kind, C);
+    if (ClassPath && Name && Kind)
+    {
+        S.Path = ClassPath;
+        S.Name = Name;
+        S.Kind = Kind;
+        S.bWrite = Write;
+        S.Class = O->GetClass();
+        S.Epoch = GDasSelfSiteEpoch;
+        S.Raw = P;
+        S.Property = TFieldPath<FProperty>(P);
+    }
+    return P;
+}
+FProperty* NativeGameplayPropertyChecked(UObject* O, const char* ClassPath, const char* Name, bool Write,
+                                         const TCHAR* Kind, das::Context* C)
 {
     const FString Class =
                       ClassPath ? UTF8_TO_TCHAR(ClassPath) : TEXT(""), Field = Name ? UTF8_TO_TCHAR(Name) : TEXT("");

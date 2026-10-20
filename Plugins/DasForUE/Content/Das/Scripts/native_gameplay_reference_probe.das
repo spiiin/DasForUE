@@ -163,3 +163,43 @@ def main():bool {
     // Defaults include the trailing bForce=false; return values keep native math.
     return velocity.x==movement.Velocity.x
 }
+
+// Informational benchmark (DasPlayableCharacterProbe): one native field write plus read per iteration.
+[export]
+def native_field_bench(count:int):int {
+    let movement=ue_character_self().CharacterMovement
+    let speed=movement.MaxWalkSpeed
+    var total=0.0f
+    for (i in range(count)) {
+        movement.MaxWalkSpeed=speed
+        total+=movement.MaxWalkSpeed
+    }
+    return int(total/speed+0.5f)
+}
+[export]
+def native_field_read_bench(count:int):int {
+    let movement=ue_character_self().CharacterMovement
+    var total=0.0f
+    for (i in range(count)) {
+        total+=movement.MaxWalkSpeed
+    }
+    return int(total/movement.MaxWalkSpeed+0.5f)
+}
+[export]
+def native_valid_bench(count:int):int {
+    let movement=ue_character_self().CharacterMovement
+    var total=0
+    for (i in range(count)) {
+        if (ue_object_valid(movement.handle)) { total+=1 }
+    }
+    return total
+}
+[export]
+def native_field_write_bench(count:int):int {
+    let movement=ue_character_self().CharacterMovement
+    let speed=movement.MaxWalkSpeed
+    for (i in range(count)) {
+        movement.MaxWalkSpeed=speed
+    }
+    return count
+}

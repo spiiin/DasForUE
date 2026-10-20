@@ -221,11 +221,24 @@ FDasObjectHandle ObjectProperty(const FDasObjectHandle& Handle, const char* Name
     auto* Property = ResolveProperty<FObjectProperty>(Object, Name, false, Context);
     return MakeObjectHandle(Property->GetObjectPropertyValue_InContainer(Object), Property->PropertyClass, Context);
 }
+// Classes already found to carry an authored identity, by (identity string, class). Entries hold the
+// string they were made for, the raw class and the self site epoch (contexts, GC); a miss walks the
+// hierarchy again.
+struct FDasAuthoredIdentitySite
+{
+    das::string Id;
+    const UClass* Class = nullptr;
+    uint64 Epoch = 0;
+};
 UObject* ResolveAuthoredObject(const FDasObjectHandle& Handle, const char* Id, das::Context* C)
 {
     auto* Object = ResolveObject(Handle, C);
-    const UObject* CDO = Object->GetClass()->GetDefaultObject();
-    const FString Actual = DasHostIdentity(CDO);
+    static FDasAuthoredIdentitySite Sites[256];
+    const UPTRINT Key = UPTRINT(Id) ^ (UPTRINT(Object->GetClass()) >> 4);
+    FDasAuthoredIdentitySite& Site = Sites[((Key >> 4) ^ (Key >> 12)) & 255];
+    if (Id && Site.Epoch == GDasSelfSiteEpoch && Site.Class == Object->GetClass() &&
+        FCStringAnsi::Strcmp(Site.Id.c_str(), Id) == 0)
+        return Object;
     bool Matches = false;
     if (Id)
         for (auto* Class = Object->GetClass(); Class; Class = Class->GetSuperClass())
@@ -240,6 +253,9 @@ UObject* ResolveAuthoredObject(const FDasObjectHandle& Handle, const char* Id, d
         }
     if (!Matches)
         C->throw_error("authored object identity mismatch");
+    Site.Id = Id;
+    Site.Class = Object->GetClass();
+    Site.Epoch = GDasSelfSiteEpoch;
     return Object;
 }
 bool LiveHashObject(UObject* O)

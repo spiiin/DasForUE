@@ -176,9 +176,8 @@ inline void DasNativeScalarWritePolicy(const char* Path, const char* Name, float
 {
     if (!FMath::IsFinite(V))
         C->throw_error("native numeric field must be finite");
-    if (FString(Path) == TEXT("/Script/Engine.CharacterMovementComponent") &&
-                              (FString(Name) == TEXT("MaxWalkSpeed") || FString(Name) == TEXT("JumpZVelocity")) &&
-                                                     V < 0)
+    if (V < 0 && Path && Name && FCStringAnsi::Strcmp(Path, "/Script/Engine.CharacterMovementComponent") == 0 &&
+        (FCStringAnsi::Strcmp(Name, "MaxWalkSpeed") == 0 || FCStringAnsi::Strcmp(Name, "JumpZVelocity") == 0))
         C->throw_error("movement speed/jump velocity must be nonnegative");
 }
 

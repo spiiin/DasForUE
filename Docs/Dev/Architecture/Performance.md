@@ -177,3 +177,22 @@ context, 30–45 ns, `extern_guard` in the breakdown, measured outside a script)
 `FActiveContextScope` and owner: Chaos sets the frozen flag only around whole PreSim callback dispatches
 (`FPhysicsSolverFrozenGTPreSimCallbacks`), and every script entry opens its own scope. The execution-role
 and isolated-VM checks still run on every call. This speeds up all extern calls, not only self access.
+
+## Generated native reference fields — 2026-10-20
+
+`DasForUE.Gameplay.RuntimePIE` prints informational timings from `native_gameplay_reference_probe.das`
+(`INFO native_*_ns`, 20000 iterations on the playable character's `CharacterMovement.MaxWalkSpeed`):
+
+| Loop body | before | after |
+| --- | --- | --- |
+| field write + read | 19 800 ns | 1 100 ns |
+| field read | — | 500–620 ns |
+| field write | — | 520–640 ns |
+| `ue_object_valid` (extern baseline) | — | 240–310 ns |
+
+Before, every access resolved the receiver class by path (`FindObject`) and revalidated the generated
+field (call shape string, declaring class path, access contract). Both are now cached per site
+(`DasNativeGameplayRuntime.inl`): the class by path string, the validated field by (class path, field,
+direction, kind, receiver class), with the stored strings compared, weak classes and field paths, and the
+self site epoch. Authored references cache the identity check per (identity, class)
+(`ResolveAuthoredObject`).

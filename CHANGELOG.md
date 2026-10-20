@@ -30,6 +30,8 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - Self scalar property reads and writes are about three times as fast again (a per-name site cache on
   top of the cached resolution), and every call into Unreal checks the frozen-physics state once per
   script entry instead of on each call.
+- Generated native reference fields (`movement.MaxWalkSpeed`) are about 17x faster: the receiver class
+  and the validated field are cached per access site. Authored references cache their identity check.
 - Reading and writing scalar members of authored self structs (`self.Stats.Count += 1`) no longer
   copies the whole struct.
 - Class values read or written through generated native references are validated like self and

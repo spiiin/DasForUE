@@ -180,6 +180,28 @@ bool RunDasPlayableCharacterProbe(ADasStaticLibraryProbe* Carrier, FString& Repo
         TEXT("native_generated_fields_methods_objects_math_defaults_out_free_function_enum_parent_upcasts_byte_text_struct_array"));
     if (!NativeAPI.bSucceeded)
         Report += NativeAPI.Error + TEXT("\n");
+    {
+        // Informational: one generated native field write plus read, after a warm-up call.
+        const FString Probe = Runtime.ScriptPath(TEXT("native_gameplay_reference_probe.das"));
+        const int32 Count = 20000;
+        const auto Warm = Runtime.RunNamedPersistent(Probe, TEXT("native_field_bench"), 1, C);
+        const double BenchStart = FPlatformTime::Seconds();
+        const auto Bench = Runtime.RunNamedPersistent(Probe, TEXT("native_field_bench"), Count, C);
+        const double Ns = (FPlatformTime::Seconds() - BenchStart) * 1e9 / Count;
+        Check(Warm.bSucceeded && Bench.bSucceeded && Bench.Value == Count, TEXT("native_field_benchmark_runs"));
+        Report += FString::Printf(TEXT("INFO native_field_write_read_ns=%.0f %s\n"), Ns, *Bench.Error);
+        for (const TCHAR* Entry :
+             {TEXT("native_field_read_bench"), TEXT("native_field_write_bench"), TEXT("native_valid_bench"),
+                                                                                      TEXT("native_field_bench")})
+        {
+            Runtime.RunNamedPersistent(Probe, Entry, 1, C);
+            const double EntryStart = FPlatformTime::Seconds();
+            const auto R = Runtime.RunNamedPersistent(Probe, Entry, Count, C);
+            Report += FString::Printf(TEXT("INFO %s_ns=%.0f ok=%d %s\n"), Entry,
+                                           (FPlatformTime::Seconds() - EntryStart) * 1e9 / Count,
+                                           R.bSucceeded && R.Value == Count, *R.Error);
+        }
+    }
     auto* Label = C->FindComponentByClass<UTextRenderComponent>();
     const auto Namespace = Label ? FTextInspector::GetNamespace(Label->Text) : TOptional<FString>();
     const auto TextKey = Label ? FTextInspector::GetKey(Label->Text) : TOptional<FString>();

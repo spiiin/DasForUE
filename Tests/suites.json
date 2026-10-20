@@ -17,6 +17,8 @@
       "comment": "Every DasForUE automation group except MethodValues.PIE, which needs the method-values assets.",
       "test": "DasForUE.ActorComponent+DasForUE.Actors+DasForUE.Callbacks+DasForUE.Components+DasForUE.Defaults+DasForUE.Delegates+DasForUE.DSL+DasForUE.FunctionLibraries+DasForUE.Gameplay+DasForUE.Lifecycle+DasForUE.MethodDispatch+DasForUE.Objects+DasForUE.Reload+DasForUE.SoftReferences+DasForUE.Types",
       "requires": ["components-prepare"] },
+    { "name": "gameplay-pie", "kind": "automation", "test": "DasForUE.Gameplay.RuntimePIE", "log": "gameplay-pie",
+      "minimum": 1, "comment": "Playable character, native references and their informational benchmark." },
     { "name": "native-defaults", "kind": "script", "script": "TestNativeDefaults.ps1",
       "probe": "native-defaults-probe-id.txt" },
     { "name": "computed-defaults", "kind": "script", "script": "TestComputedDefaults.ps1",
