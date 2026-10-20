@@ -915,6 +915,19 @@ FString DasKindManifest()
     return TEXT("{\n  \"kinds\": [\n") + FString::Join(Rows, TEXT(",\n")) + TEXT("\n  ]\n}\n");
 }
 
+// Informational: cost of the guard every UE extern call runs (foundation benchmark breakdown).
+void DasSetSelfSitesEnabled(bool bEnabled)
+{
+    GDasSelfSitesEnabled = bEnabled;
+}
+double DasExternGuardBenchmarkNs(int32 Iterations)
+{
+    const double Start = FPlatformTime::Seconds();
+    for (int32 I = 0; I < Iterations; ++I)
+        GuardUEExtern();
+    return (FPlatformTime::Seconds() - Start) * 1e9 / FMath::Max(1, Iterations);
+}
+
 #include "DasRuntimeModuleDispatch.inl"
 #include "DasRuntimeModuleExecution.inl"
 IMPLEMENT_MODULE(FDasRuntimeModule, DasRuntime)

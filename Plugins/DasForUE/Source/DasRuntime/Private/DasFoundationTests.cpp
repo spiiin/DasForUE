@@ -22,6 +22,8 @@
 
 FString DasFoundationExternManifest();
 FString DasKindManifest();
+double DasExternGuardBenchmarkNs(int32 Iterations);
+void DasSetSelfSitesEnabled(bool bEnabled);
 
 bool RunDasFoundationTests(FString& Report)
 {
@@ -140,7 +142,7 @@ bool RunDasFoundationTests(FString& Report)
     {
         // Informational: cost of one self int read plus write, compile time excluded by differencing.
         Fixture->health = 0;
-        const int32 Iterations = 20000;
+        const int32 Iterations = 200000;
         const double Start = FPlatformTime::Seconds();
         const auto Short = Runtime.RunFile(Runtime.ScriptPath(TEXT("self_access_benchmark.das")), 1, false, WeakSelf);
         const double Middle = FPlatformTime::Seconds();
@@ -151,6 +153,31 @@ bool RunDasFoundationTests(FString& Report)
         Expect(Short.bSucceeded && Long.bSucceeded && Long.Value == Iterations + 2,
                TEXT("self_int_read_write_benchmark"),
                     FString::Printf(TEXT("ns_per_read_write=%.0f %s"), NsPerAccess, *Long.Error));
+        // Same loop without externs and with reads only, and the per-call extern guard, to split the cost.
+        auto Measure = [&](const TCHAR* Script, double& Ns)
+        {
+            const double S0 = FPlatformTime::Seconds();
+            const auto A = Runtime.RunFile(Runtime.ScriptPath(Script), 1, false, WeakSelf);
+            const double S1 = FPlatformTime::Seconds();
+            const auto B = Runtime.RunFile(Runtime.ScriptPath(Script), Iterations, false, WeakSelf);
+            const double S2 = FPlatformTime::Seconds();
+            Ns = FMath::Max(0.0, (S2 - S1) - (S1 - S0)) * 1e9 / Iterations;
+            return A.bSucceeded && B.bSucceeded;
+        };
+        double LoopNs = 0, ReadNs = 0, ReadWriteNs = 0, CheckedReadNs = 0, CheckedReadWriteNs = 0;
+        bool Measured = Measure(TEXT("self_access_benchmark_local.das"), LoopNs) &&
+                                Measure(TEXT("self_access_benchmark_read.das"), ReadNs) &&
+                                        Measure(TEXT("self_access_benchmark.das"), ReadWriteNs);
+        // The checked path alone, without the self property site cache, under the same conditions.
+        DasSetSelfSitesEnabled(false);
+        Measured = Measure(TEXT("self_access_benchmark_read.das"), CheckedReadNs) &&
+                           Measure(TEXT("self_access_benchmark.das"), CheckedReadWriteNs) && Measured;
+        DasSetSelfSitesEnabled(true);
+        Expect(Measured, TEXT("self_access_benchmark_breakdown"),
+                              FString::Printf(
+                                  TEXT("loop=%.0f read=%.0f read_write=%.0f checked_read=%.0f checked_read_write=%.0f ")
+                                      TEXT("extern_guard=%.0f (ns per iteration)"), LoopNs, ReadNs, ReadWriteNs,
+                                           CheckedReadNs, CheckedReadWriteNs, DasExternGuardBenchmarkNs(100000)));
         Fixture->health = 105;
     }
     const auto WrongType = RunSelf(TEXT("self_wrong_type.das"));

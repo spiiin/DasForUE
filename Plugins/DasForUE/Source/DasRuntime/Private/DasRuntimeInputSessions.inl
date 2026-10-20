@@ -883,6 +883,7 @@ void DrainEvents()
 
 void PruneSessions()
 {
+    ++GDasSelfSiteEpoch;
     for (auto It = DSLPhysicsOwners.CreateIterator(); It; ++It)
         if (!It.Key().IsValid() || !It.Value().IsValid())
             It.RemoveCurrent();

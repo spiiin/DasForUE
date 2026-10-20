@@ -182,21 +182,100 @@ inline void DasNativeScalarWritePolicy(const char* Path, const char* Name, float
         C->throw_error("movement speed/jump velocity must be nonnegative");
 }
 
+// Self property sites: a small direct-mapped cache per (kind, read/write) keyed by the property name.
+// An entry is filled only after the checked path succeeded for a plain property (validated contract,
+// no accessor, writable for writes) and is used while the same self class, the same FProperty (field path
+// still resolves to it) and the cache epoch hold; everything else, including every error, takes the
+// checked path.
+struct FDasSelfSite
+{
+    das::string Name;
+    UClass* Class = nullptr;
+    uint64 Epoch = 0;
+    FProperty* Raw = nullptr;
+    TFieldPath<FProperty> Property;
+    bool bActor = false;
+};
+template <class K> constexpr bool DasPlainKind = !requires { &K::Read; };
+template <class K, bool bWrite> FDasSelfSite& DasSelfSite(const char* Name)
+{
+    static FDasSelfSite Sites[256];
+    const UPTRINT Key = UPTRINT(Name);
+    return Sites[((Key >> 4) ^ (Key >> 12)) & 255];
+}
+template <class K, bool bWrite> typename K::Property* DasFindSelfSite(const char* Name, das::Context* C, UObject*& Self)
+{
+    if (!GDasSelfSitesEnabled || !Name || !ActiveContext || C != ActiveContext || !IsInGameThread() ||
+        LibraryInvocationContract || ActiveContext->bLibraryScope ||
+        (bWrite && ActiveContext->bCollectingSubscriptions))
+        return nullptr;
+    const FDasSelfSite& S = DasSelfSite<K, bWrite>(Name);
+    // Names may be heap strings whose address is reused, so the content is compared too.
+    if (S.Epoch != GDasSelfSiteEpoch || FCStringAnsi::Strncmp(Name, S.Name.c_str(), S.Name.size() + 1) != 0)
+        return nullptr;
+    // A weak pointer resolves to null for garbage objects, which matches IsValid.
+    UObject* O = ActiveContext->Self.Get();
+    if (!O || O->GetClass() != S.Class || (S.bActor && static_cast<AActor*>(O)->IsActorBeingDestroyed()))
+        return nullptr;
+    FProperty* P = S.Property.Get();
+    if (!P || P != S.Raw)
+        return nullptr;
+    Self = O;
+    return static_cast<typename K::Property*>(P);
+}
+template <class K, bool bWrite>
+void DasStoreSelfSite(const char* Name, UObject* Self, typename K::Property* P, das::Context* C)
+{
+    if (!GDasSelfSitesEnabled || !DasPlainScalarAccess(P, Self, ObjectPropertyAccess(P, C), bWrite) ||
+        (bWrite && P->HasAnyPropertyFlags(CPF_BlueprintReadOnly)))
+        return;
+    FDasSelfSite& S = DasSelfSite<K, bWrite>(Name);
+    S.Name = Name;
+    S.Class = Self->GetClass();
+    S.Epoch = GDasSelfSiteEpoch;
+    S.Raw = P;
+    S.Property = TFieldPath<FProperty>(P);
+    S.bActor = Self->IsA<AActor>();
+}
+
 // self: properties of the running script owner.
 template <class K> typename K::Out GetSelfScalar(const char* Name, das::Context* C)
 {
+    if constexpr (DasPlainKind<K>)
+    {
+        UObject* Cached = nullptr;
+        if (auto* P = DasFindSelfSite<K, false>(Name, C, Cached))
+            return K::ToDas(P->GetPropertyValue_InContainer(Cached), C);
+    }
     UObject* Self = ResolveSelf(C);
     auto* P = ResolveProperty<typename K::Property>(Self, Name, false, C);
     K::Check(P, C);
+    if constexpr (DasPlainKind<K>)
+        DasStoreSelfSite<K, false>(Name, Self, P, C);
     return DasKindRead<K>(P, Self, C);
 }
 template <class K> void SetSelfScalar(const char* Name, typename K::In Value, das::Context* C)
 {
+    if constexpr (DasPlainKind<K>)
+    {
+        UObject* Cached = nullptr;
+        if (auto* P = DasFindSelfSite<K, true>(Name, C, Cached))
+        {
+            const auto Native = K::FromDas(Value, C);
+            if (DasFiniteScalar(Native))
+            {
+                P->SetPropertyValue_InContainer(Cached, Native);
+                return;
+            }
+        }
+    }
     if (ActiveContext && ActiveContext->bCollectingSubscriptions)
         C->throw_error("self writes are forbidden in bind_events");
     UObject* Self = ResolveSelf(C);
     auto* P = ResolveProperty<typename K::Property>(Self, Name, true, C);
     K::Check(P, C);
+    if constexpr (DasPlainKind<K>)
+        DasStoreSelfSite<K, true>(Name, Self, P, C);
     DasKindWrite<K>(P, Self, Value, C);
 }
 

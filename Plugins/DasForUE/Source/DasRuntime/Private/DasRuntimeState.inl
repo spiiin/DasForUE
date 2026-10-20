@@ -174,10 +174,15 @@ struct FDelegateValue
 uint64 NextCallHandle = 1;
 
 uint64 NextTraceScope = 1;
+// Generation of the self property site caches (DasScalarAccessors.inl); bumped when contexts come and go
+// and after garbage collection, which may reuse class addresses.
+uint64 GDasSelfSiteEpoch = 1;
+bool GDasSelfSitesEnabled = true; // foundation benchmark compares both paths
 class FUnrealDasContext final : public das::Context, public FGCObject
 {
 public:
-    explicit FUnrealDasContext(uint32 StackSize) : das::Context(StackSize) {}
+    explicit FUnrealDasContext(uint32 StackSize) : das::Context(StackSize) { ++GDasSelfSiteEpoch; }
+    virtual ~FUnrealDasContext() { ++GDasSelfSiteEpoch; }
     virtual void AddReferencedObjects(FReferenceCollector& Collector) override
     {
         for (auto& Value : StructValues)

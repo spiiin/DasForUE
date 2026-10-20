@@ -154,3 +154,23 @@ rerun native memory tracing. VM allocation counters retain their previous scope.
 See [SnapshotBatchEdits.md](SnapshotBatchEdits.md), raw reports
 `logs/batch-edit-editor.json`, `logs/batch-edit-packaged.json` and
 `logs/batch-edit-validation.json` for current evidence and limitations.
+
+## Self property access — 2026-10-20
+
+The foundation tests print an informational breakdown (`self_access_benchmark_breakdown`, ns per loop
+iteration, 200000 iterations, Development editor, figures vary ±20% between runs):
+
+| Path | read | read + write |
+| --- | --- | --- |
+| checked path (cached class/name resolution, validated contract) | 251 | 529 |
+| self property site cache | 110 | 248 |
+
+The site cache (`DasScalarAccessors.inl`) is a direct-mapped table per kind and direction keyed by the
+property-name string. An entry is used while the self class, the cache epoch (bumped when runtime contexts
+are created or destroyed and after garbage collection) and the field path to the same `FProperty` hold;
+the name content is compared, so reused heap strings cannot alias. Anything else takes the checked path,
+which reports every error.
+
+About a third of the remaining cost per call is the guard every UE extern runs
+(`GuardUEExtern`, `extern_guard` in the breakdown, 30–45 ns): it checks the frozen-physics state of the
+self world and of every engine world context.

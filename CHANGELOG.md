@@ -27,6 +27,8 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - Self, authored and native property access is much faster: registry lookups are indexed, property
   resolution and access contracts are cached (safe across recompilation and reinstancing) and plain
   scalars are accessed in place. A self int read plus write went from about 15 µs to about 0.5 µs.
+- Self scalar property reads and writes are about twice as fast again (a per-name site cache on top of
+  the cached resolution).
 - Reading and writing scalar members of authored self structs (`self.Stats.Count += 1`) no longer
   copies the whole struct.
 - Class values read or written through generated native references are validated like self and
