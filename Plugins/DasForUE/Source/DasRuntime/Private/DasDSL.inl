@@ -846,6 +846,7 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
     }
     return K;
 }
+#include "DasHandlerLookupDSL.inl"
 #include "DasCallbackFramesDSL.inl"
 #include "DasReflectionMacros.inl"
 #include "DasWidgetLayoutsDSL.inl"
@@ -865,6 +866,13 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
 bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObject* Self, FString& Wire,
                       FString& Error)
 {
+    if (Entry.StartsWith(TEXT("__ue_dispatch_")))
+        if (auto* F = Program->getThisModule()->findUniqueFunction(DSLUtf8(Entry)))
+            for (const auto* A : F->annotations)
+                if (F->generated && A->annotation->name == "__ue_handler_contract")
+                    if (const auto* Owner = A->arguments.find("owner_entry", das::Type::tString))
+                        if (Owner->sValue.find("ue_") == 0)
+                            return DSLValidateOwner(Program, DSLText(Owner->sValue), Self, Wire, Error);
     if (LibraryInvocationContract && Self)
     {
         bool Match = false;

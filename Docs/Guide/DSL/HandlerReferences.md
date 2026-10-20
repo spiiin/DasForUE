@@ -13,11 +13,40 @@ changed.AddUFunction(ue_self_object(), self.OnChanged)
 changed.RemoveUFunction(ue_self_object(), self.OnChanged)
 ```
 
-`self.QueryScore` and `self.OnChanged` must name instance methods declared on the current class. Their Unreal entry points are generated and hidden from the Blueprint palette automatically. A delegate handler may return a value and have the ref/out arguments allowed by its delegate contract; managed timer/input/event callbacks retain their own void/signature rules. An explicit `BlueprintCallable` keeps a handler visible in Blueprint.
+`self.QueryScore` and `self.OnChanged` name the nearest instance method in the authored class hierarchy, including required script modules. Their Unreal entry points are generated and hidden from the Blueprint palette automatically. A delegate handler may return a value and have the ref/out arguments allowed by its delegate contract; managed timer/input/event callbacks retain their own void/signature rules. An explicit `BlueprintCallable` keeps a handler visible in Blueprint.
 
 The delegate signature is checked at compilation: argument types, result and ref/out directions must match exactly. An unknown method fails before Apply. The explicit target must resolve to the current self object; a different object is rejected at runtime. String and FName forms remain available for existing reflected methods on other targets.
 
 Single-cast `BindUFunction` mutates a local delegate variable. For a reflected single-cast field use assignment: `self.Stored = ue_bind(type<FScoreQuery>, ue_self_object(), self.QueryScore)`. Multicast field views support Add/Remove. This is the existing direct UFunction delegate transport; use [dynamic event operators](DelegatesAndEvents.md#dynamic-subscriptions-without-strings) when the subscription should be owned and removed by the script session.
+
+## Inherited handlers
+
+```das
+[ue_class(Blueprintable)]
+class BaseCounter {
+    @ue_property=(BlueprintReadWrite)
+    Score:int=0
+    def Pulse():void { self.Score+=1 }
+    [ue_function(BlueprintCallable)]
+    def Start():void { ue_timer_next_tick("pulse",self.Pulse) }
+}
+
+[ue_class(Blueprintable)]
+class ChildCounter : BaseCounter {
+    def override Pulse():void {
+        Super.Pulse()
+        self.Score+=10
+    }
+}
+```
+
+`Start` inherited by `ChildCounter` delivers to `ChildCounter.Pulse`, including when registration executes in the base script's VM. `Super.Pulse()` calls the parent implementation once. The nearest declaration wins; a mismatched override is an error, not a reason to fall back to an ancestor.
+
+Hidden callback methods are internal, non-final Unreal events, so overrides do not need their own annotation. A referenced callback is virtual by default while explicit visibility stays intact; `BlueprintEvent=false` preserves an explicitly final callback. Visible reflected methods not used as callbacks keep their declared policy. A previously script-only inherited helper referenced from a child receives a child-owned hidden forwarding adapter; the imported parent's annotations and IR stay unchanged.
+
+Existing Blueprints with previously final hidden handlers need new Blueprint assets: Apply currently rejects changing callable/event roles before modifying the class. Apply the base declaration to a new asset path, then its descendants. Ordinary body-only reload of the new virtual handlers is supported.
+
+The same lookup covers timer payloads and multi-capture timers, input, widget clicks, effects, latent/async callbacks, dynamic events and typed delegate Bind/Add/Remove. Compile-time signature and lifecycle/static-method restrictions still apply. The existing rule requiring separate files for lifecycle inheritance is unchanged; same-file method hierarchies are supported without lifecycle hooks. Accepted reload uses the current override body through reflected dispatch; existing cancellation, input restoration and owner cleanup policies remain in force.
 
 ## Free functions
 

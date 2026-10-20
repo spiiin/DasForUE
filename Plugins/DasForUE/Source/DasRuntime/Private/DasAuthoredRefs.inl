@@ -576,6 +576,9 @@ bool DSLEmitProperty(das::Program* P, das::Module* M, const das::TypeDeclPtr& T,
                 Mod->structures.foreach (
                     [&](const das::StructurePtr& Structure)
                     {
+                        // Compiler views describe self/Super dispatch, not public component reference types.
+                        if (Structure->name.find("__ue_self_events_") == 0 || Structure->name.find("__ue_super_") == 0)
+                            return;
                         const auto* Annotation = DSLAnnotation(Structure->annotations, "ue_object_ref");
                         if (Component->NativeClass.IsEmpty())
                         {
@@ -791,10 +794,20 @@ das::TypeDeclPtr DSLMethodValueType(das::Program* Program, das::Module* Module, 
     }
     if (SourceName.empty())
         return DSLPropertyType(Declared.Kind, *Program->thisModuleGroup, Module, At);
+    // The in-progress anonymous module is not yet in thisModuleGroup. Resolve its ::Type locally.
+    const bool Local = SourceName.find("::") == 0;
+    const auto LookupName = Local ? SourceName.substr(2) : SourceName;
     das::TypeDeclPtr Type = nullptr;
     if (Declared.Kind == TEXT("enum"))
     {
-        auto Types = Program->thisModuleGroup->findEnum(SourceName, Module);
+        das::vector<das::EnumerationPtr> Types;
+        if (Local)
+        {
+            if (auto Found = Program->getThisModule()->findEnum(LookupName))
+                Types.push_back(Found);
+        }
+        else
+            Types = Program->thisModuleGroup->findEnum(LookupName, Module);
         if (Types.size() == 1)
         {
             Type = new das::TypeDecl(das::Type::tEnumeration, At);
@@ -808,7 +821,14 @@ das::TypeDeclPtr DSLMethodValueType(das::Program* Program, das::Module* Module, 
                                                               Declared.Kind == TEXT("event") ||
                                                                                     Declared.Kind == TEXT("delegate"))
     {
-        auto Types = Program->thisModuleGroup->findStructure(SourceName, Module);
+        das::vector<das::StructurePtr> Types;
+        if (Local)
+        {
+            if (auto Found = Program->getThisModule()->findStructure(LookupName))
+                Types.push_back(Found);
+        }
+        else
+            Types = Program->thisModuleGroup->findStructure(LookupName, Module);
         if (Types.size() == 1)
         {
             Type = new das::TypeDecl(das::Type::tStructure, At);

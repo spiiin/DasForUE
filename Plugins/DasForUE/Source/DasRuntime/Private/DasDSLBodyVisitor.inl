@@ -12,11 +12,6 @@ das::string DSLSelfAccessor(const char* Prefix, const FDasDeclaredType& Type)
         return das::string(Prefix) + "object";
     return das::string(Prefix) + "name";
 }
-// Unqualified name of a class method function (after the last ` or ' separator).
-das::string DSLMethodName(const das::FunctionPtr& F)
-{
-    return F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1);
-}
 // Index of the callback-method argument of managed APIs, or -1.
 int32 DSLCallbackArgument(const das::string& QualifiedName, size_t Count)
 {
@@ -74,14 +69,13 @@ void DSLHiddenCallback(const das::FunctionPtr& F, const das::StructurePtr& St, d
     if (DSLAnnotation(F->annotations, "ue_lifecycle") || DSLAnnotation(F->annotations, "ue_event") ||
         DSLStandardLifecycle(F))
         DSLFail(TEXT("A managed callback cannot also be a lifecycle/event handler: ") + DSLText(DSLMethodName(F)));
-    if (F->isStaticClassMethod || F->arguments.empty() || !F->result ||
+    if (F->isStaticClassMethod || F->arguments.empty() || !F->body || !F->result ||
         (RequireVoid && F->result->baseType != das::Type::tVoid))
         DSLFail(TEXT("Managed callback requires a void instance method: ") + DSLText(DSLMethodName(F)));
     auto* A = const_cast<das::AnnotationDeclaration*>(DSLAnnotation(F->annotations, "ue_function"));
-    if (A &&
-        (A->arguments.find("BlueprintCallable", das::Type::tBool) ||
-         A->arguments.find("BlueprintPure", das::Type::tBool) || A->arguments.find("BlueprintEvent", das::Type::tBool)))
-        return; // Explicit visibility is owned by the author.
+    const bool ExplicitVisibility = A && (A->arguments.find("BlueprintCallable", das::Type::tBool) ||
+                                          A->arguments.find("BlueprintPure", das::Type::tBool) ||
+                                          A->arguments.find("BlueprintEvent", das::Type::tBool));
     if (!A)
     {
         auto Types = Group.findAnnotation("ue_function", St->module);
@@ -93,8 +87,107 @@ void DSLHiddenCallback(const das::FunctionPtr& F, const das::StructurePtr& St, d
         A->at = F->at;
         F->annotations.push_back(A);
     }
+    if (!A->arguments.find("_ue_callback_target", das::Type::tBool))
+        A->arguments.push_back(das::AnnotationArgument("_ue_callback_target", true));
+    // A callback stays virtual when the author changes only its palette visibility.
+    if (!A->arguments.find("BlueprintEvent", das::Type::tBool))
+        A->arguments.push_back(das::AnnotationArgument("BlueprintEvent", true));
+    if (ExplicitVisibility)
+        return;
     A->arguments.push_back(das::AnnotationArgument("BlueprintCallable", true));
     A->arguments.push_back(das::AnnotationArgument("_ue_hidden_callback", true));
+}
+// An inherited script-only helper gets a child-owned reflected forwarding adapter.
+// Imported parent annotations and emitted models remain immutable.
+das::FunctionPtr DSLRequireHandlerMethod(const das::StructurePtr& St, das::ModuleGroup& Group, const FString& Name,
+                                         bool RequireVoid = true)
+{
+    auto F = DSLFindHandlerMethod(St, Name);
+    const auto* Field = St->findField(DSLUtf8(Name));
+    if (!F || (Field && !Field->classMethod))
+        DSLFail(TEXT("Unknown callback method self.") + Name);
+    if (F->classParent == St)
+    {
+        DSLHiddenCallback(F, St, Group, RequireVoid);
+        return F;
+    }
+    if (F->isStaticClassMethod || F->arguments.empty() || !F->body || !F->result ||
+        (RequireVoid && F->result->baseType != das::Type::tVoid) || DSLStandardLifecycle(F) ||
+        DSLAnnotation(F->annotations, "ue_event") || DSLAnnotation(F->annotations, "ue_lifecycle"))
+        DSLFail(TEXT("Inherited callback requires an ordinary instance method with the expected result: ") + Name);
+    if (DSLAnnotation(F->annotations, "ue_function"))
+        return F;
+    auto Bridge = F->clone();
+    Bridge->name = "__ue_inherited_" + St->name + "`" + DSLUtf8(Name);
+    Bridge->classParent = St;
+    Bridge->generated = true;
+    Bridge->exports = false;
+    Bridge->annotations.clear();
+    Bridge->arguments[0]->type = DSLCopyType(F->arguments[0]->type);
+    Bridge->arguments[0]->type->structType = St;
+    auto* Call = new das::ExprInvoke();
+    Call->at = F->at;
+    Call->isInvokeMethod = true;
+    Call->arguments.push_back(new das::ExprField(F->at, new das::ExprVar(F->at, "Super"), DSLUtf8(Name)));
+    Call->arguments.push_back(new das::ExprTypeDecl(F->at, new das::TypeDecl(das::Type::autoinfer, F->at)));
+    for (size_t I = 1; I < Bridge->arguments.size(); ++I)
+        Call->arguments.push_back(new das::ExprVar(F->at, Bridge->arguments[I]->name));
+    auto* Body = new das::ExprBlock();
+    Body->at = F->at;
+    if (F->result->baseType == das::Type::tVoid)
+        Body->list.push_back(Call);
+    else
+    {
+        auto* Ret = new das::ExprReturn(F->at, Call);
+        Ret->moveSemantics = DSLContainer(F->result);
+        Body->list.push_back(Ret);
+    }
+    Bridge->body = Body;
+    DSLHiddenCallback(Bridge, St, Group, RequireVoid);
+    if (!St->module->addFunction(Bridge, true))
+        DSLFail(TEXT("Inherited callback adapter collision: ") + Name);
+    return Bridge;
+}
+void DSLInheritCallbackOverrides(const das::StructurePtr& St, das::ModuleGroup& Group)
+{
+    if (!St->parent || !DSLNativeBasePath(St->parent).IsEmpty())
+        return;
+    das::vector<das::FunctionPtr> Own;
+    St->module->functions.foreach (
+        [&](const das::FunctionPtr& F)
+        {
+            if (F->classParent == St)
+                Own.push_back(F);
+        });
+    for (const auto& F : Own)
+    {
+        auto Parent = DSLFindHandlerMethod(St->parent, DSLText(DSLMethodName(F)));
+        const auto* A = Parent ? DSLAnnotation(Parent->annotations, "ue_function") : nullptr;
+        const auto* Virtual = A ? A->arguments.find("BlueprintEvent", das::Type::tBool) : nullptr;
+        if (A && (A->arguments.find("_ue_callback_target", das::Type::tBool) || (Virtual && DSLBool(*Virtual))))
+        {
+            auto* OwnAnnotation = const_cast<das::AnnotationDeclaration*>(DSLAnnotation(F->annotations, "ue_function"));
+            if (!OwnAnnotation && !A->arguments.find("_ue_hidden_callback", das::Type::tBool))
+            {
+                OwnAnnotation = new das::AnnotationDeclaration();
+                OwnAnnotation->flags = 0;
+                OwnAnnotation->annotation = A->annotation;
+                OwnAnnotation->at = F->at;
+                for (const auto& Arg : A->arguments)
+                    if (Arg.name != "id")
+                        OwnAnnotation->arguments.push_back(Arg);
+                F->annotations.push_back(OwnAnnotation);
+            }
+            if (OwnAnnotation && !A->arguments.find("_ue_hidden_callback", das::Type::tBool) &&
+                !OwnAnnotation->arguments.find("BlueprintCallable", das::Type::tBool) &&
+                !OwnAnnotation->arguments.find("BlueprintPure", das::Type::tBool) &&
+                !OwnAnnotation->arguments.find("BlueprintEvent", das::Type::tBool))
+                for (const auto& Arg : A->arguments)
+                    if (Arg.name == "BlueprintCallable" || Arg.name == "BlueprintPure" || Arg.name == "BlueprintEvent")
+                        OwnAnnotation->arguments.push_back(Arg);
+            DSLHiddenCallback(F, St, Group, false);
+        }
+    }
 }
 // Find references before replacing their syntax with callback names. Mutate annotations only after
 // enumerating functions: newly promoted methods can themselves register other callbacks.
@@ -129,23 +222,35 @@ void DSLNormalizeMethodReferences(const das::StructurePtr& St, das::ModuleGroup&
         });
     for (const auto& Name : Referenced)
     {
-        das::FunctionPtr Found = nullptr;
-        for (const auto& F : Sources)
-            if (DSLText(DSLMethodName(F)) == Name)
-            {
-                if (Found)
-                    DSLFail(TEXT("Ambiguous callback method: ") + Name);
-                Found = F;
-            }
-        if (!Found)
-            DSLFail(TEXT("Callback self.") + Name + TEXT(" must name a method declared on this class"));
-        DSLHiddenCallback(Found, St, Group);
+        DSLRequireHandlerMethod(St, Group, Name);
     }
     for (const auto& F : Sources)
     {
         FDSLMethodReferenceVisitor References(F->arguments[0]->name, St);
         F->body = F->body->visit(References);
     }
+}
+// Only referenced callback exports need a virtual dispatch adapter. Do not force
+// unused inherited method parameter types into a child's module.
+TSet<FString> DSLManagedHandlerNames(const das::StructurePtr& St)
+{
+    struct FNames : das::Visitor
+    {
+        TSet<FString> Names;
+        virtual void preVisit(das::ExprCall* E) override
+        {
+            const int32 I = DSLCallbackArgument(E->name, E->arguments.size());
+            if (I >= 0 && E->arguments[I]->__rtti == das::string("ExprConstString"))
+                Names.Add(DSLText(static_cast<das::ExprConstString*>(E->arguments[I])->text));
+        }
+    } Collect;
+    St->module->functions.foreach (
+        [&](const das::FunctionPtr& F)
+        {
+            if (F->classParent == St && F->body)
+                F->body->visit(Collect);
+        });
+    return MoveTemp(Collect.Names);
 }
 void DSLValidateDynamicEvent(das::ExprCall*, const FDasDeclaredClass&, const das::StructurePtr&, das::ModuleGroup&,
                              const FString&, const FString&);
@@ -1208,11 +1313,10 @@ struct FDSLBodyVisitor : das::Visitor
         const FString MethodName = DSLText(Name->text);
         bool Found = false;
         das::TypeDeclPtr CaptureType = nullptr;
-        Source->module->functions.foreach (
+        DSLVisitHandlerMethods(
+            Source,
             [&](const das::FunctionPtr& F)
             {
-                if (F->classParent != Source)
-                    return;
                 const FString N = DSLText(DSLMethodName(F));
                 if (N != MethodName || !DSLAnnotation(F->annotations, "ue_function") || F->isStaticClassMethod ||
                     !F->result || F->result->baseType != das::Type::tVoid ||
@@ -1254,7 +1358,7 @@ struct FDSLBodyVisitor : das::Visitor
             Error = TEXT("Timer callback requires an annotated void instance method matching zero/one supported value argument");
             return E;
         }
-        Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ MethodName);
+        Name->text = DSLCallbackEntry(Decl, MethodName);
         if (CaptureType && DSLTypedClass(CaptureType))
         {
             const FString Path = DSLTypedClassPath(CaptureType);
@@ -1295,11 +1399,10 @@ struct FDSLBodyVisitor : das::Visitor
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[HandlerIndex]);
         const FString Method = DSLText(Name->text);
         bool Found = false;
-        Source->module->functions.foreach (
+        DSLVisitHandlerMethods(
+            Source,
             [&](const das::FunctionPtr& F)
             {
-                if (F->classParent != Source)
-                    return;
                 const FString N = DSLText(DSLMethodName(F));
                 if (N != Method || !DSLAnnotation(F->annotations, "ue_function") || F->isStaticClassMethod ||
                     !F->result || F->result->baseType != das::Type::tVoid || F->arguments.size() != (Axis ? 2u : 1u))
@@ -1312,7 +1415,7 @@ struct FDSLBodyVisitor : das::Visitor
             Error = TEXT("Input requires annotated instance action():void or axis(value:float):void");
             return E;
         }
-        Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ Method);
+        Name->text = DSLCallbackEntry(Decl, Method);
         return E;
     }
     das::ExpressionPtr RewriteEnhancedInput(das::ExprCall* E)
@@ -1325,11 +1428,10 @@ struct FDSLBodyVisitor : das::Visitor
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[2]);
         const FString Method = DSLText(Name->text);
         bool Found = false;
-        Source->module->functions.foreach (
+        DSLVisitHandlerMethods(
+            Source,
             [&](const das::FunctionPtr& F)
             {
-                if (F->classParent != Source)
-                    return;
                 const FString N = DSLText(DSLMethodName(F));
                 if (N != Method || !DSLAnnotation(F->annotations, "ue_function") || F->isStaticClassMethod ||
                     !F->result || F->result->baseType != das::Type::tVoid || F->arguments.size() != 2)
@@ -1350,7 +1452,7 @@ struct FDSLBodyVisitor : das::Visitor
             Error = TEXT("Enhanced Input requires annotated void handler(value:InputActionValue/bool/float/UEVector2D/UEVector)");
             return E;
         }
-        Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ Method);
+        Name->text = DSLCallbackEntry(Decl, Method);
         return E;
     }
     das::ExpressionPtr RewriteLatent(das::ExprCall* E)
@@ -1363,22 +1465,21 @@ struct FDSLBodyVisitor : das::Visitor
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[2]);
         const FString Method = DSLText(Name->text);
         bool Found = false;
-        Source->module->functions.foreach (
-            [&](const das::FunctionPtr& F)
-            {
-                if (F->classParent != Source)
-                    return;
-                const FString N = DSLText(DSLMethodName(F));
-                if (N == Method && DSLAnnotation(F->annotations, "ue_function") && !F->isStaticClassMethod &&
-                    F->result && F->result->baseType == das::Type::tVoid && F->arguments.size() == 1)
-                    Found = true;
-            });
+        DSLVisitHandlerMethods(Source,
+                               [&](const das::FunctionPtr& F)
+                               {
+                                   const FString N = DSLText(DSLMethodName(F));
+                                   if (N == Method && DSLAnnotation(F->annotations, "ue_function") &&
+                                       !F->isStaticClassMethod && F->result &&
+                                       F->result->baseType == das::Type::tVoid && F->arguments.size() == 1)
+                                       Found = true;
+                               });
         if (!Found)
         {
             Error = TEXT("Latent completion requires annotated instance method():void");
             return E;
         }
-        Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ Method);
+        Name->text = DSLCallbackEntry(Decl, Method);
         return E;
     }
     das::ExpressionPtr RewriteEffect(das::ExprCall* E)
@@ -1397,20 +1498,20 @@ struct FDSLBodyVisitor : das::Visitor
         if (Name->text.empty())
             return E;
         bool Found = false;
-        Source->module->functions.foreach (
-            [&](const das::FunctionPtr& F)
-            {
-                if (F->classParent == Source && DSLAnnotation(F->annotations, "ue_function") &&
-                    !F->isStaticClassMethod && F->result && F->result->baseType == das::Type::tVoid &&
-                    F->arguments.size() == 1 && DSLMethodName(F) == Name->text)
-                    Found = true;
-            });
+        DSLVisitHandlerMethods(Source,
+                               [&](const das::FunctionPtr& F)
+                               {
+                                   if (DSLAnnotation(F->annotations, "ue_function") && !F->isStaticClassMethod &&
+                                       F->result && F->result->baseType == das::Type::tVoid &&
+                                       F->arguments.size() == 1 && DSLMethodName(F) == Name->text)
+                                       Found = true;
+                               });
         if (!Found)
         {
             Error = TEXT("Effect completion requires ue_function void Handler()");
             return E;
         }
-        Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ DSLText(Name->text));
+        Name->text = DSLCallbackEntry(Decl, DSLText(Name->text));
         return E;
     }
     das::ExpressionPtr RewriteAIMove(das::ExprCall* E)
@@ -1427,12 +1528,12 @@ struct FDSLBodyVisitor : das::Visitor
         }
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[3]);
         bool Found = false;
-        Source->module->functions.foreach (
+        DSLVisitHandlerMethods(
+            Source,
             [&](const das::FunctionPtr& F)
             {
-                if (F->classParent != Source || !DSLAnnotation(F->annotations, "ue_function") ||
-                    F->isStaticClassMethod || !F->result || F->result->baseType != das::Type::tVoid ||
-                    F->arguments.size() != 2)
+                if (!DSLAnnotation(F->annotations, "ue_function") || F->isStaticClassMethod || !F->result ||
+                    F->result->baseType != das::Type::tVoid || F->arguments.size() != 2)
                     return;
                 const FString N = DSLText(DSLMethodName(F));
                 const auto T = F->arguments[1]->type;
@@ -1445,7 +1546,7 @@ struct FDSLBodyVisitor : das::Visitor
             Error = TEXT("MoveTo callback requires ue_function void(result:MoveResult)");
             return E;
         }
-        Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ DSLText(Name->text));
+        Name->text = DSLCallbackEntry(Decl, DSLText(Name->text));
         return E;
     }
     das::ExpressionPtr RewriteMontage(das::ExprCall* E)
@@ -1457,12 +1558,12 @@ struct FDSLBodyVisitor : das::Visitor
         }
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[3]);
         bool Found = false;
-        Source->module->functions.foreach (
+        DSLVisitHandlerMethods(
+            Source,
             [&](const das::FunctionPtr& F)
             {
-                if (F->classParent != Source || !DSLAnnotation(F->annotations, "ue_function") ||
-                    F->isStaticClassMethod || !F->result || F->result->baseType != das::Type::tVoid ||
-                    F->arguments.size() != 2)
+                if (!DSLAnnotation(F->annotations, "ue_function") || F->isStaticClassMethod || !F->result ||
+                    F->result->baseType != das::Type::tVoid || F->arguments.size() != 2)
                     return;
                 const FString N = DSLText(DSLMethodName(F));
                 const auto T = F->arguments[1]->type;
@@ -1475,7 +1576,7 @@ struct FDSLBodyVisitor : das::Visitor
             Error = TEXT("Montage callback requires ue_function void(event:MontageEvent)");
             return E;
         }
-        Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ DSLText(Name->text));
+        Name->text = DSLCallbackEntry(Decl, DSLText(Name->text));
         return E;
     }
     // Button handlers are Blueprint functions found by name at runtime; check them here when known.
@@ -1487,14 +1588,14 @@ struct FDSLBodyVisitor : das::Visitor
         if (!Name)
             return E;
         bool Found = false;
-        Source->module->functions.foreach (
-            [&](const das::FunctionPtr& F)
-            {
-                if (F->classParent == Source && DSLMethodName(F) == Name->text &&
-                    DSLAnnotation(F->annotations, "ue_function") && !F->isStaticClassMethod && F->result &&
-                    F->result->baseType == das::Type::tVoid && F->arguments.size() == 1)
-                    Found = true;
-            });
+        DSLVisitHandlerMethods(Source,
+                               [&](const das::FunctionPtr& F)
+                               {
+                                   if (DSLMethodName(F) == Name->text && DSLAnnotation(F->annotations, "ue_function") &&
+                                       !F->isStaticClassMethod && F->result &&
+                                       F->result->baseType == das::Type::tVoid && F->arguments.size() == 1)
+                                       Found = true;
+                               });
         if (!Found)
             Error = TEXT("Button handler requires a void instance method without arguments");
         return E;
@@ -1509,25 +1610,24 @@ struct FDSLBodyVisitor : das::Visitor
         auto* Name = static_cast<das::ExprConstString*>(E->arguments[2]);
         const FString Method = DSLText(Name->text);
         FString Path;
-        Source->module->functions.foreach (
-            [&](const das::FunctionPtr& F)
-            {
-                if (F->classParent != Source)
-                    return;
-                const FString N = DSLText(DSLMethodName(F));
-                if (N != Method || !DSLAnnotation(F->annotations, "ue_function") || F->isStaticClassMethod ||
-                    !F->result || F->result->baseType != das::Type::tVoid || F->arguments.size() != 2)
-                    return;
-                const auto T = F->arguments[1]->type;
-                if (T && !T->ref && !F->arguments[1]->init && DSLTypedObject(T))
-                    Path = DSLTypedObjectPath(T);
-            });
+        DSLVisitHandlerMethods(Source,
+                               [&](const das::FunctionPtr& F)
+                               {
+                                   const FString N = DSLText(DSLMethodName(F));
+                                   if (N != Method || !DSLAnnotation(F->annotations, "ue_function") ||
+                                       F->isStaticClassMethod || !F->result ||
+                                       F->result->baseType != das::Type::tVoid || F->arguments.size() != 2)
+                                       return;
+                                   const auto T = F->arguments[1]->type;
+                                   if (T && !T->ref && !F->arguments[1]->init && DSLTypedObject(T))
+                                       Path = DSLTypedObjectPath(T);
+                               });
         if (Path.IsEmpty())
         {
             Error = TEXT("Async asset load requires annotated void callback with typed native object parameter");
             return E;
         }
-        Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ Method);
+        Name->text = DSLCallbackEntry(Decl, Method);
         E->name = "__ue_asset_load_async";
         E->arguments.push_back(new das::ExprConstString(E->at, DSLUtf8(Path)));
         return E;
@@ -1553,11 +1653,11 @@ struct FDSLBodyVisitor : das::Visitor
                 DSLFail(TEXT("Soft async callback requires a callback method (self.Method or its name)"));
             auto* Name = static_cast<das::ExprConstString*>(E->arguments[2]);
             bool Found = false;
-            Source->module->functions.foreach (
+            DSLVisitHandlerMethods(
+                Source,
                 [&](const das::FunctionPtr& F)
                 {
-                    if (F->classParent == Source && DSLMethodName(F) == Name->text &&
-                        DSLAnnotation(F->annotations, "ue_function") && F->result &&
+                    if (DSLMethodName(F) == Name->text && DSLAnnotation(F->annotations, "ue_function") && F->result &&
                         F->result->baseType == das::Type::tVoid && F->arguments.size() == 2 &&
                         !F->arguments[1]->type->ref &&
                         (DSLTypedClass(F->arguments[1]->type) || DSLTypedObject(F->arguments[1]->type)))
@@ -1565,7 +1665,7 @@ struct FDSLBodyVisitor : das::Visitor
                 });
             if (!Found)
                 DSLFail(TEXT("Soft async handler requires an annotated void method with typed object/class input"));
-            Name->text = DSLUtf8(TEXT("ue_")+ Decl.Name + TEXT("_")+ DSLText(Name->text));
+            Name->text = DSLCallbackEntry(Decl, DSLText(Name->text));
             return E;
         }
         if (E->name == "ue_widget_bind_click" || E->name == "ue_gameplay_services::ue_widget_bind_click")

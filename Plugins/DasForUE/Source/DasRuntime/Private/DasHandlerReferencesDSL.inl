@@ -126,17 +126,7 @@ void DSLNormalizeDelegateReferences(const das::StructurePtr& St, das::ModuleGrou
     }
     for (const auto& Name : Names)
     {
-        das::FunctionPtr Handler = nullptr;
-        for (const auto& F : Functions)
-            if (DSLText(DSLMethodName(F)) == Name)
-            {
-                if (Handler)
-                    DSLFail(TEXT("Ambiguous delegate handler: ")+ Name);
-                Handler = F;
-            }
-        if (!Handler)
-            DSLFail(TEXT("Unknown delegate handler self.")+ Name);
-        DSLHiddenCallback(Handler, St, Group, false);
+        DSLRequireHandlerMethod(St, Group, Name, false);
     }
 }
 FDasDeclaredMethod DSLHandlerMethod(das::Function* F, das::ModuleGroup& G)
@@ -259,8 +249,11 @@ das::ExpressionPtr DSLDelegateReferenceExpansion(das::Program* P, das::Module* M
                 DSLFail(Error);
             const auto* C = ClassModel.Classes.FindByPredicate([&](const auto& C)
                                                                { return C.Name == DSLText(Owner->structType->name); });
+            FDasDeclaredClass Effective;
+            if (C && !ClassModel.ResolveClass(C->Id, Effective, Error))
+                DSLFail(Error);
             const auto* Found =
-                C ? C->Methods.FindByPredicate([&](const auto& M) { return M.Name == DSLText(Name); }) : nullptr;
+                C ? Effective.Methods.FindByPredicate([&](const auto& M) { return M.Name == DSLText(Name); }) : nullptr;
             if (!Found)
                 DSLFail(TEXT("Unknown reflected delegate handler: ")+ DSLText(Name));
             DSLCheckHandlerContract(Method, *Found, Multi);

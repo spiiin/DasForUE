@@ -116,12 +116,14 @@ struct FUEClassAnnotation : das::StructureAnnotation
                                   St->module});
             TGuardValue<FString> NativeDefaultsHint(DSLNativeDefaultsParentHint, NativeHint);
             DSLExpandDeclarationGroups(St, true);
+            DSLInheritCallbackOverrides(St, Group);
             DSLNormalizeEventDeclarations(St, Group);
             DSLNormalizeDynamicEvents(St);
             DSLNormalizeDelegateReferences(St, Group);
             DSLNormalizeOperationKeys(St, Args);
             DSLNormalizeInlineCallbacks(St, Group);
             DSLNormalizeMethodReferences(St, Group);
+            const auto ManagedHandlers = DSLManagedHandlerNames(St);
             DSLNormalizeIdentityDefaults(St, Group);
             DSLPrepareComputedDefaults(St);
             const auto ComponentDefaults = DSLCollectComponentDefaults(St);
@@ -732,6 +734,12 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 TMap<FString, FString> Directions;
                 for (const auto& V : A->arguments)
                 {
+                    if (V.name == "_ue_callback_target")
+                    {
+                        if (V.at.fileInfo || !DSLBool(V))
+                            DSLFail(TEXT("Reserved callback compiler option"));
+                        continue;
+                    }
                     if (V.name == "_ue_hidden_callback")
                     {
                         if (V.at.fileInfo || !DSLBool(V))
@@ -965,8 +973,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             // Publish all method contracts before body rewriting opens mutually referring sources.
             DSLActiveRefDeclarations.Add(RefKey, C);
             das::TypeDeclPtr SelfEventReference = nullptr;
-            if (C.Methods.ContainsByPredicate([&](const auto& M)
-                                              { return DSLVirtualMethod(C, M) || M.ScriptFile != Script; }))
+            if (!C.Methods.IsEmpty())
             {
                 auto* Ref = new das::Structure();
                 Ref->name = DSLUtf8(TEXT("__ue_self_events_")+ C.Name);
@@ -1222,6 +1229,75 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 Wrapper->exports = true;
                 Generated.push_back(Wrapper);
                 Generated.push_back(Clone);
+            }
+            for (const auto& M : C.Methods)
+            {
+                if (!ManagedHandlers.Contains(M.Name) || M.Name.StartsWith(TEXT("__ue_cb_")))
+                    continue;
+                auto Source = DSLFindHandlerMethod(St, M.Name);
+                if (!Source)
+                    DSLFail(TEXT("Missing callback source signature: ") + M.Name);
+                auto Impl = Source->clone();
+                const auto Entry = DSLCallbackEntry(C, M.Name);
+                Impl->name = "__impl_" + Entry;
+                Impl->classParent = nullptr;
+                Impl->isClassMethod = false;
+                Impl->isStaticClassMethod = false;
+                Impl->isConstClassMethod = false;
+                Impl->generated = true;
+                Impl->exports = false;
+                Impl->privateFunction = false;
+                Impl->annotations.clear();
+                Impl->arguments.erase(Impl->arguments.begin());
+                auto* Call = new das::ExprInvoke();
+                Call->at = Source->at;
+                Call->isInvokeMethod = true;
+                auto Receiver =
+                    DSLReferenceValue(Source->at, SelfEventReference, DSLCall(Source->at, "ue_self_object", {}));
+                Call->arguments.push_back(new das::ExprField(Source->at, Receiver, DSLUtf8(M.Name)));
+                Call->arguments.push_back(
+                    new das::ExprTypeDecl(Source->at, new das::TypeDecl(das::Type::autoinfer, Source->at)));
+                for (const auto& A : Impl->arguments)
+                    Call->arguments.push_back(new das::ExprVar(Source->at, A->name));
+                auto* Body = new das::ExprBlock();
+                Body->at = Source->at;
+                if (M.ReturnType.Kind == TEXT("void"))
+                    Body->list.push_back(Call);
+                else
+                {
+                    auto* Ret = new das::ExprReturn(Source->at, Call);
+                    Ret->moveSemantics = DSLContainer(Source->result);
+                    Body->list.push_back(Ret);
+                }
+                Impl->body = Body;
+                auto Wrapper =
+                    DSLHandlerABI(Source, Impl, Impl->name, M, 1, Group, St->module, TypeFolder, TypeRegistry);
+                Wrapper->name = Entry;
+                Wrapper->exports = true;
+                FDasAuthoringModule ContractModel;
+                ContractModel.Id = TEXT("callback.dispatch");
+                FDasDeclaredClass ContractClass;
+                ContractClass.Id = TEXT("callback.dispatch.Adapter");
+                ContractClass.Name = TEXT("Adapter");
+                ContractClass.SourceScript = Script;
+                ContractClass.NativeParent = TEXT("/Script/Engine.Actor");
+                ContractClass.Methods.Add(M);
+                ContractModel.Classes.Add(ContractClass);
+                FString ContractWire, Issue;
+                if (!ContractModel.ToJson(ContractWire, Issue))
+                    DSLFail(Issue);
+                auto EvidenceTypes = Group.findAnnotation("__ue_handler_contract", St->module);
+                if (EvidenceTypes.size() != 1)
+                    DSLFail(TEXT("Missing callback dispatch contract annotation"));
+                auto* Evidence = new das::AnnotationDeclaration();
+                Evidence->flags = 0;
+                Evidence->annotation = EvidenceTypes[0];
+                Evidence->at = Source->at;
+                Evidence->arguments.push_back(das::AnnotationArgument("wire", DSLUtf8(ContractWire)));
+                Evidence->arguments.push_back(das::AnnotationArgument("owner_entry", DSLUtf8(M.EntryPoint)));
+                Wrapper->annotations.push_back(Evidence);
+                Generated.push_back(Impl);
+                Generated.push_back(Wrapper);
             }
             das::vector<das::FunctionPtr> Callbacks;
             St->module->functions.foreach (

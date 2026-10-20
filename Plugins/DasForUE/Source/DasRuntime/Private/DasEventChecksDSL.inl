@@ -266,13 +266,7 @@ void DSLValidateDynamicEvent(das::ExprCall* E, const FDasDeclaredClass& C, const
     Callback.Source = DSLText(static_cast<das::ExprConstString*>(E->arguments[0])->text);
     Callback.EventName = DSLText(static_cast<das::ExprConstString*>(E->arguments[1])->text);
     const auto Name = static_cast<das::ExprConstString*>(E->arguments[2])->text;
-    das::FunctionPtr Handler = nullptr;
-    St->module->functions.foreach (
-        [&](const das::FunctionPtr& F)
-        {
-            if (F->classParent == St && DSLMethodName(F) == Name)
-                Handler = F;
-        });
+    auto Handler = DSLFindHandlerMethod(St, DSLText(Name));
     if (!Handler)
         DSLFail(TEXT("Unknown dynamic event handler: ") + DSLText(Name));
     DSLValidateEventSignature(C, Callback, Handler, St, Group, Folder, Registry, {}, true);
