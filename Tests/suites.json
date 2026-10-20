@@ -25,6 +25,8 @@
       "probe": "native-defaults-probe-id.txt" },
     { "name": "computed-defaults", "kind": "script", "script": "TestComputedDefaults.ps1",
       "probe": "computed-defaults-probe-id.txt" },
+    { "name": "gameplay-tags", "kind": "script", "script": "TestGameplayTags.ps1",
+      "comment": "GameplayTag fields, map values, VM values and the dictionary checks behind the tag adapter." },
     { "name": "execution-roles", "kind": "script", "script": "TestExecutionRoles.ps1",
       "comment": "PhysicsPreSim role and frozen game-thread extern guard, sync and fixed-async." },
     { "name": "dsl-enum-names", "kind": "script", "script": "TestEnumNames.ps1" },

@@ -44,8 +44,16 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - Class values read or written through generated native references are validated like self and
   authored ones (base class, deprecated classes).
 
+### Fixed
+
+- Authored structs accept GameplayTag map values (`table<string;GameplayTag>`); they were refused
+  by `ue_struct` and the authored type validation ([GameplayTags](Docs/Guide/Data/GameplayTags.md)).
+
 ### Internal
 
+- Type adapters (`DasTypeAdapters.h`): one object per value type owns its identity and decisions;
+  scalar kinds and GameplayTag are ported, subsystems ask the registry
+  ([Type adapters](Docs/Dev/Design/TypeAdapters.md)).
 - One value kind table (`DasValueKinds.h`) maps kind names, actor field kinds and method signatures;
   DSL lowering compares `EDasTypeKind` values instead of kind strings
   ([Improvement plan](Docs/Dev/Plans/ImprovementPlan.md), phase 1).

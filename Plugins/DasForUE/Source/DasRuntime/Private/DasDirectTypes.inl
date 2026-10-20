@@ -27,7 +27,7 @@ bool DSLNativeStruct(const das::TypeDeclPtr& T)
 }
 bool DSLDirectStruct(const das::TypeDeclPtr& T)
 {
-    return DSLGameplay(T) || DSLSoft(T) ||
+    return DSLAdapted(T) || DSLSoft(T) ||
            (T && T->baseType == das::Type::tStructure && T->structType &&
             (DSLAnnotation(T->structType->annotations, "ue_struct") ||
              DSLAnnotation(T->structType->annotations, "ue_native_struct")));
@@ -101,8 +101,8 @@ FString DSLPropertySnapshotPath(FProperty* P)
 }
 FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FString& Registry)
 {
-    if (DSLGameplay(T))
-        return DSLGameplayPath(T);
+    if (DSLAdapted(T))
+        return DSLAdaptedPath(T);
     if (DSLSoft(T))
         return DSLSoftPath(T);
     if (DSLNativeStruct(T))
@@ -414,8 +414,8 @@ das::ExpressionPtr DSLDirectUnpack(const das::LineInfo& At, const das::TypeDeclP
         return DSLCall(At, "uint8", {V});
     if (DSLRawStruct(Type))
         return V;
-    if (DSLGameplay(Type))
-        return DSLGameplayUnpack(At, Type, V);
+    if (DSLAdapted(Type))
+        return DSLAdaptedUnpack(At, Type, V);
     if (DSLSoft(Type))
         return DSLSoftUnpack(At, Type, V);
     if (DSLTypedClass(Type))
@@ -449,8 +449,8 @@ das::ExpressionPtr DSLDirectPack(const das::LineInfo& At, const das::TypeDeclPtr
         return DSLCall(At, "int", {V});
     if (DSLRawStruct(Type))
         return V;
-    if (DSLGameplay(Type))
-        return DSLGameplayPack(At, Type, V);
+    if (DSLAdapted(Type))
+        return DSLAdaptedPack(At, Type, V);
     if (DSLSoft(Type))
         return DSLSoftPack(At, Type, V);
     if (DSLNativeEnum(Type))
@@ -504,7 +504,7 @@ das::FunctionPtr DSLHelper(const das::LineInfo& At, const das::string& Name, con
 void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Path, das::ModuleGroup& Group,
                             das::Module* Module, das::vector<das::FunctionPtr>& Generated, TSet<FString>& Helpers)
 {
-    if (DSLSoft(InputType) || DSLGameplay(InputType))
+    if (DSLSoft(InputType) || DSLAdapted(InputType))
         return;
     auto Type = DSLCopyType(InputType);
     Type->ref = false;

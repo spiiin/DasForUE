@@ -7,4 +7,6 @@ struct ItemTagRecord {
     Kind:GameplayTag
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Tags:GameplayTagContainer
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    TagsBySlot:table<string;GameplayTag>
 }

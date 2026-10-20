@@ -1,0 +1,40 @@
+// Part of DasRuntime.cpp: built-in type adapters (DasTypeAdapters.h). Included after the scalar kind table
+// and the DSL lowering, so kind traits and script facets are visible here.
+
+// Scalar kinds own their reflected property class: creating the property and recognising it.
+template <class K> class TDasScalarTypeAdapter final : public IDasTypeAdapter
+{
+public:
+    explicit TDasScalarTypeAdapter(EDasTypeKind InKind) : Kind(InKind) {}
+    virtual EDasTypeKind GetKind() const override { return Kind; }
+    virtual bool MatchesProperty(const FProperty* Property) const override
+    {
+        const auto* Typed = CastField<typename K::Property>(Property);
+        if constexpr (std::is_same_v<typename K::Property, FByteProperty>)
+            return Typed && !Typed->Enum; // enum bytes are enums
+        else
+            return Typed != nullptr;
+    }
+    virtual FProperty* MakeProperty(FFieldVariant Owner, FName Name, const FDasDeclaredType&,
+                                    EDasPropertyUsage) const override
+    {
+        auto* Property = new typename K::Property(Owner, Name);
+        if constexpr (std::is_same_v<typename K::Property, FBoolProperty>)
+            Property->SetBoolSize(sizeof(bool), true);
+        return Property;
+    }
+
+private:
+    EDasTypeKind Kind;
+};
+
+void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
+{
+#define DAS_REGISTER_SCALAR_ADAPTER(Suffix, SelfKind, RefKind)                                                         \
+    Registry.Register(MakeShared<TDasScalarTypeAdapter<SelfKind>>(DasTypeKind(TEXT(#Suffix))));
+    DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_SCALAR_ADAPTER)
+#undef DAS_REGISTER_SCALAR_ADAPTER
+    static const FDasGameplayTagScriptFacet TagScript(false), TagContainerScript(true);
+    Registry.Register(MakeDasGameplayTagAdapter(false), &TagScript);
+    Registry.Register(MakeDasGameplayTagAdapter(true), &TagContainerScript);
+}

@@ -1,38 +1,44 @@
-// Canonical opaque source views, using the existing owned UEStructValue table.
-bool DSLGameplay(const das::TypeDeclPtr& T)
+// Script facet of the GameplayTag adapters (DasGameplayTags.cpp): canonical opaque views from
+// ue_gameplay_tags over the existing owned UEStructValue table.
+class FDasGameplayTagScriptFacet final : public IDasScriptTypeFacet
 {
-    return T && T->baseType == das::Type::tStructure && T->structType &&
-           DSLAnnotation(T->structType->annotations, "ue_gameplay_value");
-}
-bool DSLGameplayContainer(const das::TypeDeclPtr& T)
-{
-    return T->structType->name == "GameplayTagContainer";
-}
-FString DSLGameplayPath(const das::TypeDeclPtr& T)
-{
-    return DSLGameplayContainer(T) ? TEXT("/Script/GameplayTags.GameplayTagContainer")
-                                   : TEXT("/Script/GameplayTags.GameplayTag");
-}
-das::ExpressionPtr DSLGameplayPack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V)
-{
-    return DSLCall(At, "__ue_tag_check",
-                   {new das::ExprField(At, V, "value"), new das::ExprConstBool(At, DSLGameplayContainer(T))});
-}
-das::ExpressionPtr DSLGameplayUnpack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V)
-{
-    auto* Make = new das::ExprMakeStruct(At);
-    Make->makeType = DSLObjectCopyType(T);
-    Make->makeType->ref = false;
-    Make->makeType->constant = false;
-    Make->useInitializer = true;
-    Make->alwaysUseInitializer = true;
-    auto* Fields = new das::MakeStruct();
-    Fields->push_back(new das::MakeFieldDecl(
-        At, "value", DSLCall(At, "__ue_tag_check", {V, new das::ExprConstBool(At, DSLGameplayContainer(T))}), false,
-        false));
-    Make->structs.push_back(Fields);
-    return Make;
-}
+public:
+    explicit FDasGameplayTagScriptFacet(bool bInContainer) : bContainer(bInContainer) {}
+    virtual bool MatchesScriptType(const das::TypeDeclPtr& T) const override
+    {
+        return T && T->baseType == das::Type::tStructure && T->structType &&
+               DSLAnnotation(T->structType->annotations, "ue_gameplay_value") &&
+               T->structType->name == (bContainer ? "GameplayTagContainer" : "GameplayTag");
+    }
+    virtual das::ExpressionPtr Pack(const das::LineInfo& At, das::ExpressionPtr V) const override
+    {
+        return DSLCall(At, "__ue_tag_check",
+                       {new das::ExprField(At, V, "value"), new das::ExprConstBool(At, bContainer)});
+    }
+    virtual das::ExpressionPtr Unpack(const das::LineInfo& At, const das::TypeDeclPtr& T,
+                                      das::ExpressionPtr V) const override
+    {
+        auto* Make = new das::ExprMakeStruct(At);
+        Make->makeType = DSLObjectCopyType(T);
+        Make->makeType->ref = false;
+        Make->makeType->constant = false;
+        Make->useInitializer = true;
+        Make->alwaysUseInitializer = true;
+        auto* Fields = new das::MakeStruct();
+        Fields->push_back(new das::MakeFieldDecl(
+            At, "value", DSLCall(At, "__ue_tag_check", {V, new das::ExprConstBool(At, bContainer)}), false, false));
+        Make->structs.push_back(Fields);
+        return Make;
+    }
+    virtual const char* GetViewType() const override
+    {
+        return bContainer ? "ue_gameplay_tags::GameplayTagContainer" : "ue_gameplay_tags::GameplayTag";
+    }
+    virtual const TCHAR* GetViewModule() const override { return TEXT("ue_gameplay_tags"); }
+
+private:
+    bool bContainer;
+};
 struct FUEGameplayValueAnnotation : das::StructureAnnotation
 {
     FUEGameplayValueAnnotation() : StructureAnnotation("ue_gameplay_value") {}

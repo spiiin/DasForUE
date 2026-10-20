@@ -1,7 +1,7 @@
 #include "DasBlueprintDefaults.h"
 #include "DasContainerTypes.h"
 #include "DasDefaultRoots.h"
-#include "DasGameplayTags.h"
+#include "DasTypeAdapters.h"
 #include "UObject/UnrealType.h"
 #include "UObject/NoExportTypes.h"
 namespace
@@ -30,8 +30,10 @@ FString PreciseDasStructDefault(const UScriptStruct* Type, const void* Memory)
 }
 FString BlueprintDasStructDefault(const UScriptStruct* Type, const void* Memory)
 {
-    // DSL tag fields are always default-constructed; the container text grammar rejects field-wise export.
-    if (DasIsGameplayTagType(Type))
+    // Implicit-empty fields (GameplayTag) are always default-constructed; the tag container text grammar
+    // rejects field-wise export.
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindStruct(Type);
+        Adapter && Adapter->GetDefaultPolicy() == EDasAdapterDefault::ImplicitEmpty)
         return FString();
     if (Type != TBaseStructure<FTransform>::Get())
         return PreciseDasStructDefault(Type, Memory);

@@ -13,6 +13,7 @@
 #include "DasSchema.h"
 #include "DasAuthoring.h"
 #include "DasValueKinds.h"
+#include "DasTypeAdapters.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "HAL/FileManager.h"
@@ -73,6 +74,10 @@ bool RunDasFoundationTests(FString& Report)
                 Bad += FString::Printf(TEXT("signature%d "), Signature);
         Expect(Bad.IsEmpty() && DasTypeKind(TEXT("number")) == EDasTypeKind::Invalid,
                                             TEXT("value_kind_table_round_trips"), Bad);
+    }
+    {
+        FString AdapterError;
+        Expect(CheckDasTypeAdapters(AdapterError), TEXT("type_adapters_reachable_by_identity"), AdapterError);
     }
 #if WITH_EDITOR
     {

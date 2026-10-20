@@ -53,6 +53,14 @@ int32 UDasGameplayTagsCommandlet::Main(const FString& Params)
     TArray<TStrongObjectPtr<UObject>> KeepTypes;
     for (auto* Type : Types)
         KeepTypes.Emplace(Type);
+    // Tags are leaf values in authored map values too (type adapters, Docs/Dev/Design/TypeAdapters.md).
+    bool TagMapValue = false;
+    if (auto* Record = Cast<UStruct>(Types[0]))
+        for (TFieldIterator<FMapProperty> It(Record); It; ++It)
+            if (auto* Value = CastField<FStructProperty>(It->ValueProp))
+                TagMapValue |= Value->Struct == FGameplayTag::StaticStruct();
+    if (!Check(TagMapValue, TEXT("authored_struct_tag_map_values")))
+        return 1;
     ON_SCOPE_EXIT
     {
         for (auto* Type : Types)

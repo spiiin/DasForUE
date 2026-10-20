@@ -353,6 +353,7 @@ struct FDSLTypeCallVisitor : das::Visitor
 #include "DasObjectTypes.inl"
 #include "DasClassTypes.inl"
 #include "DasSoftTypes.inl"
+#include "DasDSLTypeAdapters.inl"
 #include "DasGameplayTagsDSL.inl"
 das::ExpressionPtr DSLDirectPack(const das::LineInfo&, const das::TypeDeclPtr&, das::ExpressionPtr, const FString&);
 das::ExpressionPtr DSLDirectUnpack(const das::LineInfo&, const das::TypeDeclPtr&, das::ExpressionPtr, const FString&);
@@ -361,7 +362,7 @@ FString DSLTypeName(const das::TypeDeclPtr& T)
 {
     if (!T)
         return {};
-    if (DSLSoft(T) || DSLGameplay(T))
+    if (DSLSoft(T) || DSLAdapted(T))
         return TEXT("struct");
     if (DSLObjectKey(T))
         return TEXT("object_key");
@@ -483,8 +484,8 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
         First->TypePath = DSLDirectPath(T->firstType, Folder, Registry);
     if (D.GetKind() == EDasTypeKind::Array && First->GetKind() == EDasTypeKind::Struct)
     {
-        if (DSLGameplay(T->firstType))
-            First->TypePath = DSLGameplayPath(T->firstType);
+        if (DSLAdapted(T->firstType))
+            First->TypePath = DSLAdaptedPath(T->firstType);
         else if (DSLSoft(T->firstType))
             First->TypePath = DSLSoftPath(T->firstType);
         else if (!DSLMathPath(T->firstType).IsEmpty())
@@ -515,8 +516,8 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
         }
         if (Value->GetKind() == EDasTypeKind::Struct)
         {
-            if (DSLGameplay(T->secondType))
-                Value->TypePath = DSLGameplayPath(T->secondType);
+            if (DSLAdapted(T->secondType))
+                Value->TypePath = DSLAdaptedPath(T->secondType);
             else if (DSLSoft(T->secondType))
                 Value->TypePath = DSLSoftPath(T->secondType);
             else if (!DSLMathPath(T->secondType).IsEmpty())

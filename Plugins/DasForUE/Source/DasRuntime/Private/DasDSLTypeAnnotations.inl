@@ -242,11 +242,11 @@ struct FUEStructAnnotation : das::StructureAnnotation
                 P.Name = DSLText(F.name);
                 P.Id = D.Id + TEXT(".")+ P.Name;
                 P.Type.Kind = DSLTypeName(F.type);
-                if (DSLGameplay(F.type))
+                if (DSLAdapted(F.type))
                 {
-                    if (F.init)
-                        DSLFail(TEXT("GameplayTag struct fields use implicit empty defaults"));
-                    P.Type.TypePath = DSLGameplayPath(F.type);
+                    if (F.init && DSLAdaptedImplicitDefault(F.type))
+                        DSLFail(DSLText(F.type->structType->name) + TEXT(" struct fields use implicit empty defaults"));
+                    P.Type.TypePath = DSLAdaptedPath(F.type);
                 }
                 if (DSLSoft(F.type))
                 {
@@ -343,6 +343,8 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     {
                         if (DSLSoft(F.type->secondType))
                             V->TypePath = DSLSoftPath(F.type->secondType);
+                        else if (DSLAdapted(F.type->secondType))
+                            V->TypePath = DSLAdaptedPath(F.type->secondType);
                         else if (!DSLMathPath(F.type->secondType).IsEmpty())
                             V->TypePath = DSLMathPath(F.type->secondType);
                         else
@@ -400,8 +402,8 @@ struct FUEStructAnnotation : das::StructureAnnotation
                                                      Module + TEXT(".")+ DSLText(F.type->firstType->enumType->name));
                         E->TypePath = TEXT("/DasTypes/")+ FMD5::HashAnsiString(*Id) + TEXT(".Type");
                     }
-                    else if (DSLGameplay(F.type->firstType))
-                        E->TypePath = DSLGameplayPath(F.type->firstType);
+                    else if (DSLAdapted(F.type->firstType))
+                        E->TypePath = DSLAdaptedPath(F.type->firstType);
                     else if (DSLSoft(F.type->firstType))
                         E->TypePath = DSLSoftPath(F.type->firstType);
                     else if (!DSLMathPath(F.type->firstType).IsEmpty())
@@ -419,7 +421,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     P.Type.Kind = TEXT("array");
                     P.Type.Element = E;
                 }
-                if (DSLDirectStruct(F.type) && !DSLSoft(F.type) && !DSLGameplay(F.type))
+                if (DSLDirectStruct(F.type) && !DSLSoft(F.type) && !DSLAdapted(F.type))
                 {
                     const auto* Child = DSLAnnotation(F.type->structType->annotations, "ue_struct");
                     const FString Module =

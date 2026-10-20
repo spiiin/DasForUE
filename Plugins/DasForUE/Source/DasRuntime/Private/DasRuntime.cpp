@@ -1,6 +1,7 @@
 #include "Hash/CityHash.h"
 #include "UObject/FieldPath.h"
 #include "DasGameplayTags.h"
+#include "DasTypeAdapters.h"
 #include "Engine/CurveTable.h"
 #include "Engine/DataTable.h"
 #include "DasDataAssets.h"
@@ -178,6 +179,7 @@ THIRD_PARTY_INCLUDES_END
 #pragma pop_macro("check")
 #pragma pop_macro("ensure")
 #pragma pop_macro("verify")
+#include "DasScriptTypeFacet.h"
 
 MAKE_TYPE_FACTORY(UEPhysicsBodyToken, FDasPhysicsBodyToken);
 namespace das
@@ -547,6 +549,7 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeSceneComponents.inl"
 #include "DasRuntimeSubscriptionApi.inl"
 #include "DasRuntimeTypeAnnotations.inl"
+#include "DasTypeAdaptersBuiltin.inl"
 #include "DasPersistentGlobals.inl"
 #include "DasCollisionNames.inl"
 #include "DasFoundationModule.inl"
@@ -556,6 +559,11 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeInputSessions.inl"
 }
 
+// Declared by DasTypeAdapters.cpp; the adapters themselves live in the anonymous namespace.
+void DasRegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
+{
+    RegisterBuiltinTypeAdapters(Registry);
+}
 void FDasRuntimeModule::StartupModule()
 {
     FModuleManager::LoadModuleChecked<IModuleInterface>(TEXT("EnhancedInput"));

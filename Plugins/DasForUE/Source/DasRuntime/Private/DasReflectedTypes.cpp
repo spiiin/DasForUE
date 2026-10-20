@@ -1,6 +1,7 @@
 #include "UObject/Class.h"
 #include "UObject/UObjectGlobals.h"
 #include "DasReflectedTypes.h"
+#include "DasTypeAdapters.h"
 #include "DasSoftReferences.h"
 #include "Dom/JsonObject.h"
 #include "Misc/SecureHash.h"
@@ -11,11 +12,6 @@ bool IsDasMathStructPath(const FString& Path)
                         Path == TEXT("/Script/CoreUObject.Vector") ||
                                      Path == TEXT("/Script/CoreUObject.Rotator") ||
                                                   Path == TEXT("/Script/CoreUObject.Transform");
-}
-static bool IsDasGameplayTagPath(const FString& Path)
-{
-    return Path == TEXT("/Script/GameplayTags.GameplayTag") ||
-                        Path == TEXT("/Script/GameplayTags.GameplayTagContainer");
 }
 namespace
 {
@@ -261,7 +257,8 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                     }
                 }
                 if (P.Type.Value->Kind == TEXT("struct") && !DasSoftProperty(P.Type.Value->TypePath) &&
-                                               !IsDasMathStructPath(P.Type.Value->TypePath))
+                                               !IsDasMathStructPath(P.Type.Value->TypePath) &&
+                                               !DasLeafValueAdapter(P.Type.Value->TypePath))
                 {
                     const auto* Child = Refs.Find(P.Type.Value->TypePath);
                     if (!Child)
@@ -337,7 +334,7 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                     }
                     Ref = P.Type.Element.Get();
                     if (DasSoftProperty(Ref->TypePath) || IsDasMathStructPath(Ref->TypePath) ||
-                        IsDasGameplayTagPath(Ref->TypePath))
+                        DasLeafValueAdapter(Ref->TypePath))
                     {
                         if (++Leaves > 1024)
                         {
@@ -358,11 +355,12 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                         return false;
                     continue;
                 }
-                if (P.Type.Kind == TEXT("struct") && IsDasGameplayTagPath(Ref->TypePath))
+                if (const auto* Leaf =
+                        P.Type.GetKind() == EDasTypeKind::Struct ? DasLeafValueAdapter(Ref->TypePath) : nullptr)
                 {
-                    if (!P.Default.Kind.IsEmpty())
+                    if (!P.Default.Kind.IsEmpty() && Leaf->GetDefaultPolicy() == EDasAdapterDefault::ImplicitEmpty)
                     {
-                        Error = TEXT("GameplayTag struct fields use implicit empty defaults");
+                        Error = Leaf->GetStruct()->GetName() + TEXT(" struct fields use implicit empty defaults");
                         return false;
                     }
                     if (++Leaves > 1024)

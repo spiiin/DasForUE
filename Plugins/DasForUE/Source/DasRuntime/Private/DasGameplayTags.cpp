@@ -1,9 +1,6 @@
 #include "DasGameplayTags.h"
+#include "DasTypeAdapters.h"
 #include "UObject/Class.h"
-bool DasIsGameplayTagType(const UScriptStruct* Type)
-{
-    return Type == FGameplayTag::StaticStruct() || Type == FGameplayTagContainer::StaticStruct();
-}
 bool ValidateDasGameplayTagValue(const UScriptStruct* Type, const void* Data, FString& Error)
 {
     auto Registered = [](const FGameplayTag& Tag)
@@ -47,4 +44,31 @@ bool ValidateDasGameplayTagValue(const UScriptStruct* Type, const void* Data, FS
     }
     Error = TEXT("Expected GameplayTag or GameplayTagContainer");
     return false;
+}
+
+namespace
+{
+// GameplayTag and GameplayTagContainer: leaf values with implicit empty defaults whose values must be
+// registered tags (Docs/Dev/Design/TypeAdapters.md).
+class FDasGameplayTagAdapter final : public IDasTypeAdapter
+{
+public:
+    explicit FDasGameplayTagAdapter(const UScriptStruct* InStruct) : Struct(InStruct) {}
+    virtual EDasTypeKind GetKind() const override { return EDasTypeKind::Struct; }
+    virtual const UScriptStruct* GetStruct() const override { return Struct; }
+    virtual bool IsLeafValue() const override { return true; }
+    virtual EDasAdapterDefault GetDefaultPolicy() const override { return EDasAdapterDefault::ImplicitEmpty; }
+    virtual bool ValidateValue(const void* Data, FString& Error) const override
+    {
+        return ValidateDasGameplayTagValue(Struct, Data, Error);
+    }
+
+private:
+    const UScriptStruct* Struct;
+};
+}
+TSharedRef<const IDasTypeAdapter> MakeDasGameplayTagAdapter(bool bContainer)
+{
+    return MakeShared<FDasGameplayTagAdapter>(bContainer ? FGameplayTagContainer::StaticStruct()
+                                                         : FGameplayTag::StaticStruct());
 }

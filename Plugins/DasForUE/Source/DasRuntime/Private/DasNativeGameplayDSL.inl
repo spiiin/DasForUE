@@ -80,18 +80,8 @@ das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, 
     if (Type.GetKind() == EDasTypeKind::Struct)
     {
         const auto& Path = Type.TypePath;
-        if (Path == TEXT("/Script/GameplayTags.GameplayTag") ||
-                         Path == TEXT("/Script/GameplayTags.GameplayTagContainer"))
-        {
-            auto Views = Program->thisModuleGroup->findStructure(Path.EndsWith(
-                TEXT("Container")) ? "ue_gameplay_tags::GameplayTagContainer" : "ue_gameplay_tags::GameplayTag",
-                Module);
-            if (Views.size() != 1)
-                DSLFail(TEXT("Import ue_gameplay_tags for native tag properties"));
-            auto* T = new das::TypeDecl(das::Type::tStructure, At);
-            T->structType = Views[0];
-            return T;
-        }
+        if (auto View = DSLAdaptedNativeView(Path, *Program->thisModuleGroup, Module, At))
+            return View;
         const char* Name = Path == TEXT("/Script/CoreUObject.Vector")
                                         ? "UEVector"
                                         : Path == TEXT("/Script/CoreUObject.Vector2D")

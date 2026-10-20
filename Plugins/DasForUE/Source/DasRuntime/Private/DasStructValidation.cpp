@@ -1,4 +1,4 @@
-#include "DasGameplayTags.h"
+#include "DasTypeAdapters.h"
 #include "DasValueTraversal.h"
 #include "DasInputEvents.h"
 #include "DasGeometry.h"
@@ -228,7 +228,8 @@ bool ValidateDasStructSnapshot(const FInstancedStruct& Value, FString& Error)
         TArray<FKeys> Containers;
         bool Struct(const UScriptStruct* Type, const uint8* Data)
         {
-            if (DasIsGameplayTagType(Type) && !ValidateDasGameplayTagValue(Type, Data, Error))
+            if (const auto* Adapter = FDasTypeAdapters::Get().FindStruct(Type);
+                Adapter && !Adapter->ValidateValue(Data, Error))
                 return false;
             if ((Type == TBaseStructure<FVector2D>::Get() && reinterpret_cast<const FVector2D*>(Data)->ContainsNaN()) ||
                 (Type == TBaseStructure<FVector>::Get() && reinterpret_cast<const FVector*>(Data)->ContainsNaN()) ||

@@ -1,4 +1,5 @@
 #include "DasPropertyTypes.h"
+#include "DasTypeAdapters.h"
 #include "DasSoftReferences.h"
 #include "DasDefinedEnum.h"
 #include "UObject/UnrealType.h"
@@ -186,28 +187,12 @@ bool Describe(const FProperty* P, FDasDeclaredType& Out, FString& Error, int32 D
 }
 FProperty* Build(FFieldVariant Owner, FName Name, const FDasDeclaredType& T, EDasPropertyUsage Usage)
 {
+    // Scalar kinds (and any adapter with its own property) build through the type adapter.
+    if (const auto* Adapter = FDasTypeAdapters::Get().Find(T))
+        if (FProperty* P = Adapter->MakeProperty(Owner, Name, T, Usage))
+            return P;
     switch (T.GetKind())
     {
-    case EDasTypeKind::Byte:
-        return new FByteProperty(Owner, Name);
-    case EDasTypeKind::Text:
-        return new FTextProperty(Owner, Name);
-    case EDasTypeKind::Int:
-        return new FIntProperty(Owner, Name);
-    case EDasTypeKind::Float:
-        return new FFloatProperty(Owner, Name);
-    case EDasTypeKind::Double:
-        return new FDoubleProperty(Owner, Name);
-    case EDasTypeKind::Bool:
-    {
-        auto* P = new FBoolProperty(Owner, Name);
-        P->SetBoolSize(sizeof(bool), true);
-        return P;
-    }
-    case EDasTypeKind::String:
-        return new FStrProperty(Owner, Name);
-    case EDasTypeKind::Name:
-        return new FNameProperty(Owner, Name);
     case EDasTypeKind::Struct:
     {
         if (auto* Soft = DasSoftProperty(T.TypePath))
@@ -327,20 +312,8 @@ EDasTypeKind DasPropertyKind(const FProperty* P)
         return B->Enum ? EDasTypeKind::Enum : EDasTypeKind::Byte;
     if (CastField<FEnumProperty>(P))
         return EDasTypeKind::Enum;
-    if (CastField<FTextProperty>(P))
-        return EDasTypeKind::Text;
-    if (CastField<FIntProperty>(P))
-        return EDasTypeKind::Int;
-    if (CastField<FFloatProperty>(P))
-        return EDasTypeKind::Float;
-    if (CastField<FDoubleProperty>(P))
-        return EDasTypeKind::Double;
-    if (CastField<FBoolProperty>(P))
-        return EDasTypeKind::Bool;
-    if (CastField<FStrProperty>(P))
-        return EDasTypeKind::String;
-    if (CastField<FNameProperty>(P))
-        return EDasTypeKind::Name;
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P); Adapter && !Adapter->GetStruct())
+        return Adapter->GetKind();
     if (CastField<FClassProperty>(P))
         return EDasTypeKind::Class;
     if (CastField<FSoftObjectProperty>(P))
