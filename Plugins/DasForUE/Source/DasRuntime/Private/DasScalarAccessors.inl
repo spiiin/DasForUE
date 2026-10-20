@@ -400,3 +400,27 @@ struct FDasKindCallByte : FDasKindByteInt
     X(name, FDasKindName, FDasKindName)                                                                                \
     X(byte, FDasKindByte, FDasKindByteInt)                                                                             \
     X(text, FDasKindText, FDasKindText)
+
+// DSL lowering looks kinds up by declared type name ("int", "text", ...).
+// Suffix of a scalar kind with struct-leaf accessors, or nullptr.
+inline const char* DasScalarKindSuffix(const FString& Kind)
+{
+#define DAS_SCALAR_KIND_SUFFIX(Suffix, SelfKind, RefKind)                                                              \
+    if (Kind == TEXT(#Suffix))                                                                                         \
+        return #Suffix;
+    DAS_SCALAR_ACCESSOR_KINDS(DAS_SCALAR_KIND_SUFFIX)
+#undef DAS_SCALAR_KIND_SUFFIX
+    return nullptr;
+}
+// Suffix of any kind with self/authored/native accessors (scalars, enum, class), or nullptr.
+inline const char* DasAccessorKindSuffix(const FString& Kind)
+{
+    if (const char* Suffix = DasScalarKindSuffix(Kind))
+        return Suffix;
+#define DAS_REFERENCE_KIND_SUFFIX(Suffix, SelfKind, RefKind)                                                           \
+    if (Kind == TEXT(#Suffix))                                                                                         \
+        return #Suffix;
+    DAS_REFERENCE_ACCESSOR_KINDS(DAS_REFERENCE_KIND_SUFFIX)
+#undef DAS_REFERENCE_KIND_SUFFIX
+    return nullptr;
+}

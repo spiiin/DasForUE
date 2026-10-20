@@ -25,6 +25,7 @@ Effort is in focused working days.
 | 4.1 benchmark | Done | `self_int_read_write_benchmark` in foundation tests. |
 | 4.2–4.4 property access | Partly done | Registry index, cached (class, name) resolution with field paths, cached validated access contracts and in-place plain scalar access: self int read+write 14.9 us -> 0.54 us. Scalar members of authored self structs are read and written in place (no snapshot copies). Slot-based access remains. |
 | 5.1 test helpers | Partly done | `Scripts/DasTest.psm1`; `TestEditor`, native/computed defaults, 18 `*Asset.ps1` and 25 `*PIE.ps1` scripts use it. Other scripts and 5.2–5.4 remain. |
+| 5.3 suite manifest | Done | `Tests/suites.json` + `Scripts/RunDasTests.ps1` (`-Preset quick|editor|full`, `-Suite a,b`, dependencies via `requires`); `TestCombined*.ps1` are wrappers; build agent jobs `test-quick`, `test-suite`. |
 
 ## Phase 0 — make the code reviewable (3–4 days)
 
@@ -120,7 +121,7 @@ same `Check` lambda.
 | --- | --- | --- |
 | 5.1 | `Scripts/DasTest.psm1`: `Invoke-DasBuild`, `Invoke-DasCommandlet`, `Assert-DasResult`, `Write-DasValidation`, `Lock-SourceHashes`. Migrate scripts gradually. | New scripts are ≤ 20 lines; old ones migrated without behavior change. |
 | 5.2 | One `UDasTestCommandlet -Suite=<name>` with `DAS_TEST_SUITE(Name)` and a shared `FDasCheck`; or Automation Spec where PIE is involved. | New feature test = one suite file. |
-| 5.3 | `Tests/suites.json` (suite → fixture `.das`, modes `editor|asset|pie|packaged`) and one `Run-DasTests.ps1 -Suite X -Mode pie`; `TestCombined.ps1` reads the same manifest. | Full regression from the manifest. |
+| 5.3 | `Tests/suites.json` (suite → fixture `.das`, modes `editor|asset|pie|packaged`) and one `RunDasTests.ps1 -Suite X`; `TestCombined.ps1` reads the same manifest. | Full regression from the manifest. |
 | 5.4 | `Scripts/RenderValidation.py` builds `Docs/Dev/Validation/index.md` from `logs/*.json`; stop hand-writing `*Validation.md`. | Validation docs regenerate; old hand-written reports can be deleted. |
 
 ## Phase 6 — generator consolidation (3–5 days, after 1.4)
