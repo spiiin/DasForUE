@@ -22,7 +22,7 @@ function GetValidationDlls {
 $Before=GetValidationDlls
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/CollisionPhysics.profile.json" -SkipBuild | Tee-Object -Variable PackageOutput
 if(!$?){throw 'Collision preflight failed'}
-$Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+$Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
 if(!$Match.Success){throw 'Missing verified package report'}
 $ReportPath=$Match.Groups[1].Value.Trim();$Stage=Split-Path -Parent $ReportPath
 $Report=Get-Content -LiteralPath $ReportPath -Raw|ConvertFrom-Json

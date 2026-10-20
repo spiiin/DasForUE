@@ -11,7 +11,7 @@ $Dlls=@{};foreach($Name in @('DasRuntime','DasEditor')){$Path="$Repo/Tests/DasFo
 $Manifest="$Engine/Engine/Binaries/Win64/UnrealEditor.modules";$BuildId=(Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/UMGInput.profile.json" -SkipBuild -Publish:$Publish|Tee-Object -Variable Output
 if(!$?){throw 'Navigation API package generation failed'}
-$Match=[regex]::Match(($Output -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Navigation package report'}
+$Match=(Get-DasResult -Text ($Output -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Navigation package report'}
 $ReportPath=$Match.Groups[1].Value.Trim();$Stage=Split-Path -Parent $ReportPath;$Report=Get-Content $ReportPath -Raw|ConvertFrom-Json
 $Contract=Get-Content "$Repo/Bindings/InputNavigation.contract.json" -Raw|ConvertFrom-Json
 $Opened=@($Report.members|Where-Object {$_.status -eq 'generation_ready'}|ForEach-Object {$_.class+'.'+$_.function})

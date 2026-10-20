@@ -14,7 +14,7 @@ if(!$SkipBuild){
 if(!$Report){
  & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/PawnCharacterAINavigation.profile.json" -SkipBuild | Tee-Object -Variable PackageOutput
  if(!$?){throw 'Pawn AI package failed'}
- $Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+ $Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
  if(!$Match.Success){throw 'Missing successful package report'}
  $Report=$Match.Groups[1].Value.Trim()
 }
@@ -45,7 +45,7 @@ $Common=@($Project,'-Multiprocess','-unattended','-NullRHI','-nosplash','-stdout
 if($LASTEXITCODE){throw "Pawn AI runtime failed: $Validation/runtime.log"}
 $Text=Get-Content -LiteralPath "$Validation/runtime.log" -Raw
 if(!$Text.Contains('DAS_PAWN_AI_RUNTIME=PASS')){throw 'Missing Pawn AI runtime success marker'}
-$Passed=@([regex]::Matches($Text,'DAS_PAWN_AI_PASS ([A-Za-z0-9_]+)')|ForEach-Object {$_.Groups[1].Value}|Sort-Object -Unique)
+$Passed=@((Get-DasResult -Text $Text -Pattern 'DAS_PAWN_AI_PASS ([A-Za-z0-9_]+)' -All)|ForEach-Object {$_.Groups[1].Value}|Sort-Object -Unique)
 if($Passed.Count -ne 7){throw "Expected seven native runtime groups, got $($Passed.Count)"}
 if($Text.Contains('Ensure condition failed') -or $Text -match 'Log[^\r\n]*: Error:'){throw 'Engine error/ensure in Pawn AI runtime'}
 # Compile this package together with installed Math/World using explicit namespaces.

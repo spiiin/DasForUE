@@ -22,7 +22,7 @@ $Before=GetPackageHashes
 # One runtime probe, embedded in the profile; no extra commandlets or full suites.
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile $Profile -SkipBuild | Tee-Object -Variable PackageOutput
 if(!$?){throw 'UMG / Input package failed'}
-$Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+$Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
 if(!$Match.Success){throw 'Missing successful package report'}
 $Report=(Resolve-Path -LiteralPath $Match.Groups[1].Value.Trim()).Path
 $Definition=Get-Content -LiteralPath $Report -Raw|ConvertFrom-Json

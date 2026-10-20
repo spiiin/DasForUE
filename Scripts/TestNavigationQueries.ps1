@@ -13,7 +13,7 @@ if(!$SkipBuild){
 if(!$Report){
  & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/PawnCharacterAINavigation.profile.json" -SkipBuild | Tee-Object -Variable PackageOutput
  if(!$?){throw 'Pawn AI package failed'}
- $Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+ $Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
  if(!$Match.Success){throw 'Missing package report'}
  $Report=$Match.Groups[1].Value.Trim()
 }
@@ -41,6 +41,6 @@ $Checks=@('asset_compilation_navigation_unlock','recast_covers_start_goal_and_di
 foreach($Check in $Checks){if(!$Text.Contains("DAS_NAVIGATION_PASS $Check")){throw "Missing $Check"}}
 if(!$Text.Contains('DAS_NAVIGATION_RUNTIME=PASS') -or $Text.Contains('Ensure condition failed') -or $Text -match 'Log[^\r\n]*: Error:'){throw "Navigation errors or missing success: $Run/runtime.log"}
 if((GetNavigationHashes) -ne $Before){throw 'Navigation DLL, fixture or generated module changed during validation'}
-[ordered]@{state='PASS';native_metrics=([regex]::Match($Text,'DAS_NAVIGATION_METRICS ([^\r\n]+)').Groups[1].Value);report=$Report;runtime_log="$Run/runtime.log";checks=$Checks;hashes=($Before|ConvertFrom-Json);scope='transient Recast NavMesh, static generated queries, Editor Development commandlet';minimum_successful_random_samples_per_query=8;maximum_random_attempts_per_query=64;scene_saved=$false;PIE='not_run';packaged='not_run';movement_ticks='not_run';network='not_run';commit='not_created'}|ConvertTo-Json -Depth 6|Set-Content -LiteralPath "$Run/result.json" -Encoding utf8
+[ordered]@{state='PASS';native_metrics=((Get-DasResult -Text $Text -Pattern 'DAS_NAVIGATION_METRICS ([^\r\n]+)').Groups[1].Value);report=$Report;runtime_log="$Run/runtime.log";checks=$Checks;hashes=($Before|ConvertFrom-Json);scope='transient Recast NavMesh, static generated queries, Editor Development commandlet';minimum_successful_random_samples_per_query=8;maximum_random_attempts_per_query=64;scene_saved=$false;PIE='not_run';packaged='not_run';movement_ticks='not_run';network='not_run';commit='not_created'}|ConvertTo-Json -Depth 6|Set-Content -LiteralPath "$Run/result.json" -Encoding utf8
 Copy-Item -LiteralPath "$Run/result.json" -Destination "$Repo/logs/navigation-validation.json" -Force
 Write-Output "DAS_NAVIGATION_FOCUSED=PASS report=$Run/result.json"

@@ -12,7 +12,7 @@ $Hashes=@{};foreach($Name in @('DasRuntime','DasEditor')){$Path="$Repo/Tests/Das
 $Manifest="$Engine/Engine/Binaries/Win64/UnrealEditor.modules";$BuildId=(Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/UMGInput.profile.json" -SkipBuild -Publish:$Publish|Tee-Object -Variable PackageOutput
 if(!$?){throw 'ImageSoftBrush package generation failed'}
-$Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing UMG package report'}
+$Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing UMG package report'}
 $ReportPath=$Match.Groups[1].Value.Trim();$Stage=Split-Path -Parent $ReportPath;$Report=Get-Content $ReportPath -Raw|ConvertFrom-Json
 $Open=@($Report.members|Where-Object {$_.status -eq 'generation_ready'}|ForEach-Object {$_.class+'.'+$_.function})
 foreach($Name in @('/Script/UMG.Image.SetBrushFromSoftTexture','/Script/UMG.Image.SetBrushFromSoftMaterial')){if($Name -notin $Open){throw "Soft brush function not ready: $Name"}}
