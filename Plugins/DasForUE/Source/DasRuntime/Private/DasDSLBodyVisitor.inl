@@ -929,7 +929,7 @@ struct FDSLBodyVisitor : das::Visitor
                 auto* Body = new das::ExprBlock();
                 Body->at = E->at;
                 Body->list.push_back(
-                    DSLCall(E->at, "ue_dsl_commit_struct_member_" + Kind,
+                    DSLCall(E->at, "ue_dsl_commit_struct_member",
                             {new das::ExprVar(E->at, "property"), new das::ExprVar(E->at, "member"),
                              DSLDirectPack(E->at, Type, new das::ExprVar(E->at, "value"), ValuePath)}));
                 F->body = Body;
@@ -1669,7 +1669,7 @@ struct FDSLBodyVisitor : das::Visitor
                         ? DSLCall(E->at, "ue_set_self_struct",
                                   {new das::ExprVar(E->at, "property"),
                                    DSLDirectPack(E->at, Type, new das::ExprVar(E->at, "container"), Carrier)})
-                        : DSLCall(E->at, "ue_dsl_commit_struct_member_struct",
+                        : DSLCall(E->at, "ue_dsl_commit_struct_member",
                                   {new das::ExprVar(E->at, "property"), new das::ExprVar(E->at, "member"),
                                    DSLDirectPack(E->at, Type, new das::ExprVar(E->at, "container"), Carrier)}));
                 if (Result)
