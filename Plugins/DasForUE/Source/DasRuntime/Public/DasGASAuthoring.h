@@ -201,6 +201,16 @@ public:
     bool FinishAuthoredAbility(int32 Id);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     bool RemoveAuthoredAbility(int32 Id);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    int32 BeginAuthoredTargeting(const FDasGASTargetingQuery& Query);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool UpdateAuthoredTargeting(int32 Id, const FDasGASTargetingQuery& Query);
+    UFUNCTION(BlueprintPure, Category = "GAS")
+    FDasGASTargetingPreview PreviewAuthoredTargeting(int32 Id) const;
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    FDasGASTargetingResult ConfirmAuthoredTargeting(int32 Id);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool CancelAuthoredTargeting(int32 Id);
     int32 RegisterAuthoredTargetHit(const FHitResult& Hit);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     bool ReleaseAuthoredTargetHit(int32 Id);
@@ -255,6 +265,18 @@ private:
     bool InitializeAuthoredActorInfo();
     TMap<int32, FHitResult> TargetHits;
     int32 NextTargetHit = 1;
+    struct FTargetSelection
+    {
+        TArray<TWeakObjectPtr<AActor>> Actors;
+        TArray<FHitResult> Hits;
+    };
+    // Queries are GC-visible; selected actors/hit components remain weak until confirmation.
+    UPROPERTY(Transient)
+    TMap<int32, FDasGASTargetingQuery> TargetQueries;
+    TMap<int32, FTargetSelection> TargetSelections;
+    int32 NextTargetSelection = 1;
+    bool SelectTargets(const FDasGASTargetingQuery& Query, FTargetSelection& Out) const;
+    bool AcceptTarget(const FDasGASTargetingQuery& Query, AActor* Actor) const;
     FDasAuthoredEffectResult ApplyAuthoredSpecInternal(const FDasAuthoredEffectSpec& Spec, const FHitResult* Hit);
     FGameplayAttribute FindAttribute(FName Set, FName Name) const;
     void Changed(const FOnAttributeChangeData& Data, FName Set);

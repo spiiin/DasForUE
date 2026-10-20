@@ -1,5 +1,6 @@
 #include "DasGASAbilityTaskRelay.h"
 #include "DasGASAbility.h"
+#include "DasGASAuthoring.h"
 #include "Abilities/Tasks/AbilityTask_WaitDelay.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
@@ -157,6 +158,10 @@ bool UDasAuthoredGameplayAbility::CancelScriptTask(int32 Serial, int32 Id)
 }
 void UDasAuthoredGameplayAbility::ClearScriptTasks()
 {
+    if (auto* ASC = ScriptSystem.Get())
+        for (int32 Id : ScriptTargeting)
+            ASC->CancelAuthoredTargeting(Id);
+    ScriptTargeting.Empty();
     auto Pending = MoveTemp(ScriptTasks);
     ScriptTasks.Empty();
     for (auto& P : Pending)

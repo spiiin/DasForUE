@@ -346,6 +346,8 @@ void UDasAuthoredAbilitySystemComponent::EndPlay(const EEndPlayReason::Type Reas
     Definitions.Empty();
     ActiveEffects.Empty();
     TargetHits.Empty();
+    TargetQueries.Empty();
+    TargetSelections.Empty();
     Abilities.Empty();
     Super::EndPlay(Reason);
 }

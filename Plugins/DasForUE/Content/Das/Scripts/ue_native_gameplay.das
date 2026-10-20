@@ -1148,6 +1148,35 @@ struct DasGASTargetData {
     Source:AuthoredAbilitySystemComponentRef
 }
 
+[ue_native_struct(path="/Script/DasRuntime.DasGASTargetingPreview")]
+struct DasGASTargetingPreview {
+    Valid:bool
+    Actors:array<C_Actor_adf65d5b>
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasGASTargetingQuery")]
+struct DasGASTargetingQuery {
+    Mode:UENameValue
+    Start:UEVector
+    End:UEVector
+    Radius:float
+    Channel:int
+    TraceComplex:bool
+    IgnoreSelf:bool
+    RequireAbilitySystem:bool
+    MaxTargets:int
+    ActorClassPath:string
+    IgnoredActors:array<C_Actor_adf65d5b>
+    RequiredTags:array<UENameValue>
+    BlockedTags:array<UENameValue>
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasGASTargetingResult")]
+struct DasGASTargetingResult {
+    Confirmed:bool
+    Targets:DasGASTargetData
+}
+
 [ue_native_struct(path="/Script/DasRuntime.DasGameplayAttributeChange")]
 struct DasGameplayAttributeChange {
     Attribute:HealthAttribute

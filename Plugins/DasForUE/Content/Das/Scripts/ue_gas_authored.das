@@ -151,3 +151,88 @@ def ue_gas_captured(context:GASCalculationContext; name:string):float {
     verify(found,"Unknown captured GAS attribute")
     return result
 }
+
+// A query creates an explicit preview session; only confirm allocates owned hit snapshots.
+typedef GASTargetingQuery = DasGASTargetingQuery
+typedef GASTargetingPreview = DasGASTargetingPreview
+typedef GASTargetingResult = DasGASTargetingResult
+
+def ue_gas_trace(start:UEVector; finish:UEVector; channel:int=3; radius:float=0.0f):GASTargetingQuery {
+    var query:GASTargetingQuery
+    query.IgnoreSelf=true
+    query.RequireAbilitySystem=true
+    query.MaxTargets=16
+    query.Mode=ue_name_value("Trace")
+    query.Start=start
+    query.End=finish
+    query.Channel=channel
+    query.Radius=radius
+    return <-query
+}
+def ue_gas_overlap(center:UEVector; radius:float; channel:int=3):GASTargetingQuery {
+    var query:GASTargetingQuery
+    query.IgnoreSelf=true
+    query.RequireAbilitySystem=true
+    query.MaxTargets=16
+    query.Mode=ue_name_value("Overlap")
+    query.Start=center
+    query.Radius=radius
+    query.Channel=channel
+    return <-query
+}
+
+def ue_gas_targeting_begin(asc:AuthoredAbilitySystemComponentRef; query:GASTargetingQuery):int {
+    if(!(ue_is_valid(asc))) {return 0}
+    return asc.BeginAuthoredTargeting(query)
+}
+
+def ue_gas_targeting_update(asc:AuthoredAbilitySystemComponentRef; id:int; query:GASTargetingQuery):bool {
+    if(!(ue_is_valid(asc))) {return false}
+    return asc.UpdateAuthoredTargeting(id,query)
+}
+
+def ue_gas_targeting_preview(asc:AuthoredAbilitySystemComponentRef; id:int):GASTargetingPreview {
+    if(!(ue_is_valid(asc))) {return <-GASTargetingPreview()}
+    return <-asc.PreviewAuthoredTargeting(id)
+}
+
+def ue_gas_targeting_confirm(asc:AuthoredAbilitySystemComponentRef; id:int):GASTargetingResult {
+    if(!(ue_is_valid(asc))) {return <-GASTargetingResult()}
+    return <-asc.ConfirmAuthoredTargeting(id)
+}
+
+def ue_gas_targeting_cancel(asc:AuthoredAbilitySystemComponentRef; id:int):bool {
+    if(!(ue_is_valid(asc))) {return false}
+    return asc.CancelAuthoredTargeting(id)
+}
+
+def ue_gas_targeting_begin(context:GASAbilityContext; query:GASTargetingQuery):int {
+    if(!(ue_is_valid(context.Ability))) {return 0}
+    return context.Ability.BeginScriptTargeting(context.ActivationId,query)
+}
+
+def ue_gas_targeting_update(context:GASAbilityContext; id:int; query:GASTargetingQuery):bool {
+    if(!(ue_is_valid(context.Ability))) {return false}
+    return context.Ability.UpdateScriptTargeting(context.ActivationId,id,query)
+}
+
+def ue_gas_targeting_preview(context:GASAbilityContext; id:int):GASTargetingPreview {
+    if(!(ue_is_valid(context.Ability))) {return <-GASTargetingPreview()}
+    return <-context.Ability.PreviewScriptTargeting(context.ActivationId,id)
+}
+
+def ue_gas_targeting_confirm(context:GASAbilityContext; id:int):GASTargetingResult {
+    if(!(ue_is_valid(context.Ability))) {return <-GASTargetingResult()}
+    return <-context.Ability.ConfirmScriptTargeting(context.ActivationId,id)
+}
+
+def ue_gas_targeting_cancel(context:GASAbilityContext; id:int):bool {
+    if(!(ue_is_valid(context.Ability))) {return false}
+    return context.Ability.CancelScriptTargeting(context.ActivationId,id)
+}
+
+// Preserve a typed public API; the transport keeps only the already-loaded class path.
+def ue_gas_target_class(var query:GASTargetingQuery; kind:auto):void {
+    verify(ue_class_valid(kind),"Targeting class must be a loaded Actor class")
+    query.ActorClassPath=ue_class_path(kind)
+}

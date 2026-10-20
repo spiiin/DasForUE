@@ -43,6 +43,14 @@ public:
     FHitResult ReadProbeHit() const { return ProbeHit; }
 };
 UCLASS()
+class UDasGASTargetingCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
+public:
+    UDasGASTargetingCommandlet();
+    virtual int32 Main(const FString& Params) override;
+};
+UCLASS()
 class UDasGASAdvancedCommandlet : public UCommandlet
 {
     GENERATED_BODY()

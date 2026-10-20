@@ -80,8 +80,9 @@ application. Native attribute/capture compatibility is checked per target. This
 is not an atomic multi-target transaction: inspect every result. Empty input or
 invalid target membership returns an empty array.
 
-This increment accepts chosen actors/hits; reusable target-actor strategies,
-interactive confirmation and network TargetData transport are future work.
+Local trace/sweep/overlap selection and explicit confirmation/cancellation are
+available through [GAS targeting](GASTargeting.md). Native target-actor UI and
+network TargetData transport remain future work.
 
 ## Captures and DAS calculations
 

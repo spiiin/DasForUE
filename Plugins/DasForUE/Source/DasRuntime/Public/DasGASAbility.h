@@ -140,6 +140,16 @@ public:
     int32 PlayScriptMontage(int32 ActivationId, UAnimMontage* Montage, float Rate = 1.f, FName Section = NAME_None);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     bool CancelScriptTask(int32 ActivationId, int32 TaskId);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    int32 BeginScriptTargeting(int32 ActivationId, const FDasGASTargetingQuery& Query);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool UpdateScriptTargeting(int32 ActivationId, int32 Id, const FDasGASTargetingQuery& Query);
+    UFUNCTION(BlueprintPure, Category = "GAS")
+    FDasGASTargetingPreview PreviewScriptTargeting(int32 ActivationId, int32 Id) const;
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    FDasGASTargetingResult ConfirmScriptTargeting(int32 ActivationId, int32 Id);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool CancelScriptTargeting(int32 ActivationId, int32 Id);
     UFUNCTION(BlueprintPure, Category = "GAS")
     int32 ScriptTaskCount() const { return ScriptTasks.Num(); }
     void DeliverScriptTask(UDasGASAbilityTaskRelay* Relay, const FDasGASAbilityTaskResult& Result, bool Terminal);
@@ -168,6 +178,7 @@ private:
     UPROPERTY(Transient)
     TMap<int32, TObjectPtr<UDasGASAbilityTaskRelay>> ScriptTasks;
     int32 NextScriptTask = 1;
+    TSet<int32> ScriptTargeting;
     FDasGASAbilityTaskResult CurrentTask;
     UDasGASAbilityTaskRelay* NewScriptTask(int32 Serial, FName Kind);
     void ClearScriptTasks();
