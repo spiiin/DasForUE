@@ -257,14 +257,42 @@ struct FStructFrameRoots final : FGCObject
 };
 thread_local FUnrealDasContext* ActiveContext = nullptr;
 thread_local das::Context* RestrictedPhysicsContext = nullptr;
+// Every script entry opens its own FActiveContextScope with a fresh token. Chaos marks the game thread
+// frozen only around whole PreSim callback dispatches (FPhysicsSolverFrozenGTPreSimCallbacks), so the
+// frozen state cannot change while one scope runs for the same owner; the world scan is done once per
+// (scope, owner) instead of on every extern call.
+thread_local uint64 ActiveScopeToken = 0;
+thread_local uint64 NextActiveScopeToken = 1;
 void GuardUEExtern()
 {
     if (RestrictedPhysicsContext)
         RestrictedPhysicsContext->throw_error("UE extern is forbidden in isolated physics VM");
-    if (GetDasExecutionRole() == EDasExecutionRole::PhysicsPreSim ||
-        IsDasFrozenPhysicsWorld(ActiveContext ? (ActiveContext->bLibraryScope ? ActiveContext->LibraryWorld.Get()
-                                                                              : ActiveContext->Self.Get())
-                                              : nullptr))
+    bool bFrozen = false;
+    if (GetDasExecutionRole() != EDasExecutionRole::PhysicsPreSim)
+    {
+        struct FFrozenCache
+        {
+            uint64 Token = 0;
+            const FUnrealDasContext* Context = nullptr;
+            bool bLibrary = false;
+            TWeakObjectPtr<UObject> Owner;
+            bool bFrozen = false;
+        };
+        static thread_local FFrozenCache Cache;
+        if (ActiveContext && ActiveScopeToken)
+        {
+            const TWeakObjectPtr<UObject>& Owner =
+                ActiveContext->bLibraryScope ? ActiveContext->LibraryWorld : ActiveContext->Self;
+            if (Cache.Token != ActiveScopeToken || Cache.Context != ActiveContext ||
+                Cache.bLibrary != ActiveContext->bLibraryScope || Cache.Owner != Owner)
+                Cache = {ActiveScopeToken, ActiveContext, ActiveContext->bLibraryScope, Owner,
+                         IsDasFrozenPhysicsWorld(Owner.Get())};
+            bFrozen = Cache.bFrozen;
+        }
+        else
+            bFrozen = IsDasFrozenPhysicsWorld(nullptr);
+    }
+    if (GetDasExecutionRole() == EDasExecutionRole::PhysicsPreSim || bFrozen)
     {
         if (ActiveContext)
             ActiveContext->throw_error("UE extern is forbidden in PhysicsPreSim execution role");
@@ -299,8 +327,10 @@ struct FActiveContextScope
 {
     FUnrealDasContext* Previous;
     TSet<uint64> ExistingCalls;
+    uint64 PreviousToken = ActiveScopeToken;
     explicit FActiveContextScope(FUnrealDasContext& Context) : Previous(ActiveContext)
     {
+        ActiveScopeToken = NextActiveScopeToken++;
         for (const auto& Call : Context.Calls)
             ExistingCalls.Add(Call.Key);
         for (const auto& Query : Context.ObjectQueries)
@@ -317,6 +347,7 @@ struct FActiveContextScope
             if (!ExistingCalls.Contains(It.Key()))
                 It.RemoveCurrent();
         ActiveContext = Previous;
+        ActiveScopeToken = PreviousToken;
     }
 };
 

@@ -164,6 +164,7 @@ iteration, 200000 iterations, Development editor, figures vary ±20% between run
 | --- | --- | --- |
 | checked path (cached class/name resolution, validated contract) | 251 | 529 |
 | self property site cache | 110 | 248 |
+| site cache + guard cached per scope | 70 | 168 |
 
 The site cache (`DasScalarAccessors.inl`) is a direct-mapped table per kind and direction keyed by the
 property-name string. An entry is used while the self class, the cache epoch (bumped when runtime contexts
@@ -171,6 +172,8 @@ are created or destroyed and after garbage collection) and the field path to the
 the name content is compared, so reused heap strings cannot alias. Anything else takes the checked path,
 which reports every error.
 
-About a third of the remaining cost per call is the guard every UE extern runs
-(`GuardUEExtern`, `extern_guard` in the breakdown, 30–45 ns): it checks the frozen-physics state of the
-self world and of every engine world context.
+Every UE extern runs `GuardUEExtern`. Its frozen-physics check (self world and every engine world
+context, 30–45 ns, `extern_guard` in the breakdown, measured outside a script) is now done once per
+`FActiveContextScope` and owner: Chaos sets the frozen flag only around whole PreSim callback dispatches
+(`FPhysicsSolverFrozenGTPreSimCallbacks`), and every script entry opens its own scope. The execution-role
+and isolated-VM checks still run on every call. This speeds up all extern calls, not only self access.

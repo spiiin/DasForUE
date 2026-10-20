@@ -13,8 +13,10 @@ def main():
   if count:sites.append(dict(path=str(f.relative_to(a.repo)),registrations=count));hashes[str(f.relative_to(a.repo))]=hashlib.sha256(f.read_bytes()).hexdigest()
  if raw:raise ValueError('Unguarded native binding factory: '+', '.join(raw))
  text=factory.read_text(encoding='utf-8-sig')
- if '&TCheckedUEExtern<F>::template Invoke<Fn>' not in text or 'GuardUEExtern();return Fn(' not in text or 'Bound->noAot=true' not in text:raise ValueError('Missing guarded pointer/AOT contract')
- if '&TCheckedPhysicsDataExtern<F>::template Invoke<Fn>' not in text or 'GuardPhysicsDataExtern();return Fn(' not in text:raise ValueError('Missing isolated physics data guard')
+ # Contract checks ignore whitespace so clang-format layout does not matter.
+ flat=re.sub(r'\s+','',text);has=lambda needle:re.sub(r'\s+','',needle) in flat
+ if not has('&TCheckedUEExtern<F>::template Invoke<Fn>') or not has('GuardUEExtern();return Fn(') or not has('Bound->noAot=true'):raise ValueError('Missing guarded pointer/AOT contract')
+ if not has('&TCheckedPhysicsDataExtern<F>::template Invoke<Fn>') or not has('GuardPhysicsDataExtern();return Fn('):raise ValueError('Missing isolated physics data guard')
  if physics_sites!=4 or len(re.findall(r'\baddExtern\s*<',text))!=2:raise ValueError('Unexpected physics/native factory sites')
  count=sum(s['registrations'] for s in sites)
  if count<500:raise ValueError('Unexpectedly small UE extern coverage')

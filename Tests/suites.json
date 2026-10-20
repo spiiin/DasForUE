@@ -21,6 +21,8 @@
       "probe": "native-defaults-probe-id.txt" },
     { "name": "computed-defaults", "kind": "script", "script": "TestComputedDefaults.ps1",
       "probe": "computed-defaults-probe-id.txt" },
+    { "name": "execution-roles", "kind": "script", "script": "TestExecutionRoles.ps1",
+      "comment": "PhysicsPreSim role and frozen game-thread extern guard, sync and fixed-async." },
     { "name": "packaged", "kind": "packaged", "log": "combined-export",
       "requires": ["method-values", "native-defaults", "computed-defaults"],
       "maps": [
