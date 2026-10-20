@@ -40,7 +40,7 @@ foreach($Case in @('transport','scope')){
  $Source|Set-Content -LiteralPath $Probe -Encoding utf8
  $Extra=@();if($Case -eq 'scope'){$Extra+='-ProbeContextRoundtrip'}
  & $Editor @Common -GameWorld @Extra "-Probe=$Probe" "-abslog=$Log" *> "$Stage/constraint-$Case-stdout.log"
- if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw "Constraint $Case probe failed: $Log"}
+ if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw "Constraint $Case probe failed: $Log"}
 }
 # Refresh the blocker report from this exact export and a fresh native inventory.
 '{"schema_version":1,"modules":["Engine"],"subsystems":[{"id":"collision_physics","modules":["Engine"],"roots":[]}]}'|Set-Content -LiteralPath "$Stage/inventory-profile.json" -Encoding utf8

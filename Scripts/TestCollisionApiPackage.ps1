@@ -51,14 +51,14 @@ foreach($Check in $Checks){
  "options gen2`nrequire $($Report.staged_module)`n[export]`ndef main(input:int):int {`n$($Check.body)`nreturn 42`n}"|Set-Content -LiteralPath $Probe -Encoding utf8
  $Extra=@();if($Check.world){$Extra+='-GameWorld'}
  & $Editor @Common -run=DasExport -Modules=Engine @Extra "-Probe=$Probe" "-abslog=$Log" *> "$Log.stdout"
- if(!$LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch $Check.error -Quiet)){throw "Expected rejection $($Check.name) missing: $Log"}
+ if(!$LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch $Check.error -Quiet)){throw "Expected rejection $($Check.name) missing: $Log"}
  Write-Output "DAS_COLLISION_API_REJECTION=PASS $($Check.name)"
 }
 # Compile the entire staged module alongside installed World/Math using explicit namespaces.
 $Probe="$Stage/combined.das";$Log="$Stage/combined.log"
 "options gen2`nrequire $($Report.staged_module)`nrequire ue_api_world`nrequire ue_api_math`n[export]`ndef main(input:int):int {`nlet actor=ue_api_world::C_Actor_adf65d5b_from(ue_self_object())`nlet scale=ue_api_world::ue_actor_GetActorScale3D(actor)`nif(scale.x!=1.0lf) { return -1 }`nreturn 42`n}"|Set-Content -LiteralPath $Probe -Encoding utf8
 & $Editor @Common -run=DasExport -Modules=Engine -GameWorld "-Probe=$Probe" "-abslog=$Log" *> "$Log.stdout"
-if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw "Combined imports failed: $Log"}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw "Combined imports failed: $Log"}
 # Public imports resolve through the normal runtime plugin module search, not stage aliases.
 $PublicChecks=@()
 if($Publish){
@@ -70,7 +70,7 @@ if($Publish){
  foreach($Case in @(@{name='public_standalone';text="options gen2`nrequire ue_api_collision`n$($Definition.probe)"},@{name='public_world_math';text=$Combined})){
   $Probe=Join-Path $ProbeRoot ($Case.name+'.das');$Log=Join-Path $ProbeRoot ($Case.name+'.log');$Case.text|Set-Content -LiteralPath $Probe -Encoding utf8
   & $Editor @Common -run=DasExport -Modules=Engine -GameWorld "-Probe=$Probe" "-abslog=$Log" *> "$Log.stdout"
-  if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet) -or (Select-String -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet)){throw "Public require failed: $Log"}
+  if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet) -or (Test-DasResult -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet)){throw "Public require failed: $Log"}
   $PublicChecks+=$Case.name
  }
 }
@@ -87,7 +87,7 @@ $TraceFunctions=@($Summary.members|Where-Object {$_.class -eq '/Script/Engine.Ki
 if($TraceFunctions.Count -ne 24 -or @($TraceFunctions|Where-Object {$_.status -ne 'generation_ready'}).Count){throw 'Expected all 24 generated trace/sweep declarations'}
 if((Get-Content -LiteralPath $EngineManifest -Raw|ConvertFrom-Json).BuildId -ne $EngineBuildId){throw 'Engine BuildId changed during validation; rerun against the completed build'}
 foreach($Dll in $Dlls){if((Get-FileHash -LiteralPath $Dll -Algorithm SHA256).Hash -ne $DllHashes[$Dll]){throw 'DLL changed during Collision checks'}}
-foreach($LogName in @('preflight.log','combined.log','inventory.log')){if(Select-String -LiteralPath (Join-Path $Stage $LogName) -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Unexpected engine error: $LogName"}}
+foreach($LogName in @('preflight.log','combined.log','inventory.log')){if(Test-DasResult -LiteralPath (Join-Path $Stage $LogName) -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Unexpected engine error: $LogName"}}
 [ordered]@{state='PASS';build_receipt=$ReceiptState;dll_sha256=$DllHashes;public_require=$PublicChecks;dependencies=$Summary.dependencies;technical_blockers=$Summary.blockers.Count;policy_exclusions=$Summary.exclusions.Count;engine_build_id=$EngineBuildId;python_tests=27;whole_module='PASS';damping_gravity_collision_settings='PASS';overlap_actor_hit_miss_ignore='PASS';overlap_component_result_identity='PASS';combined_world_math='PASS';negative_checks=@($Checks|ForEach-Object {$_.name});counts=$Report.counts;source_sha256=$Report.source_sha256;report=$ReportPath;published=[bool]$Publish;trace_sweep='compiled_runtime_checked_by_TestHitResultTransport';physics_simulation='not_run';full_foundation='not_run';PIE='not_run';packaged='not_run';commit='not_created'}|ConvertTo-Json -Depth 20|Set-Content -LiteralPath "$Repo/logs/collision-api-package-validation.json" -Encoding utf8
 Write-Output "DAS_COLLISION_API_PACKAGE=PASS report=$ReportPath"
 exit 0

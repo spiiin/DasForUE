@@ -20,10 +20,10 @@ $ProbeId=[Guid]::NewGuid().ToString('N')
 $Map="/Game/DasCookedCalls/$ProbeId/Map"
 $ExportLog=Join-Path $Logs 'cooked-calls-export.log'
 & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') $Project -run=DasCookedCalls "-ProbeId=$ProbeId" -unattended -NullRHI -nosplash -stdout "-abslog=$ExportLog"
-if($LASTEXITCODE -or !(Select-String -LiteralPath $ExportLog -SimpleMatch 'DAS_COOKED_CALLS_EXPORT=PASS')){throw 'Cooked calls export failed'}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $ExportLog -SimpleMatch 'DAS_COOKED_CALLS_EXPORT=PASS')){throw 'Cooked calls export failed'}
 $ReopenLog=Join-Path $Logs 'class-methods-reopen.log'
 & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') $Project -run=DasCookedCalls "-ProbeId=$ProbeId" -Phase=Reopen -unattended -NullRHI -nosplash "-abslog=$ReopenLog"
-if($LASTEXITCODE -or !(Select-String -LiteralPath $ReopenLog -SimpleMatch 'DAS_CLASS_METHODS_REOPEN=PASS')){throw 'Class methods fresh-process reopen failed'}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $ReopenLog -SimpleMatch 'DAS_CLASS_METHODS_REOPEN=PASS')){throw 'Class methods fresh-process reopen failed'}
 & (Join-Path $PSScriptRoot 'TestPackaged.ps1') -Engine $Engine -AdditionalMaps $Map -SkipZenStore
 $Exe=Join-Path $Repo 'Build\Packaged\Windows\DasForUESmoke\Binaries\Win64\DasForUESmoke.exe'
 $Log=Join-Path $Logs 'cooked-calls-runtime.log'

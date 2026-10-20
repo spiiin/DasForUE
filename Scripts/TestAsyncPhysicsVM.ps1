@@ -24,7 +24,7 @@ foreach($Mode in @('sync','fixed-async')){
  & $Editor @Common -run=DasAsyncPhysicsVM @Extra "-Probe=$Probe" "-abslog=$Log" *> "$Stage/$Mode-stdout.log"
  $Match=(Get-DasResult -Text (Get-Content -LiteralPath $Log -Raw) -Pattern 'DAS_PHYSICS_VM_RESULT=PASS checks=(\d+)')
  if($LASTEXITCODE -or !$Match.Success -or [int]$Match.Groups[1].Value -lt 25){throw "Physics VM $Mode failed: $Log"}
- if(Select-String -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure during physics VM $Mode"}
+ if(Test-DasResult -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure during physics VM $Mode"}
  $Total += [int]$Match.Groups[1].Value;$Logs+=$Log
 }
 # Existing native bridge + UE extern role matrix only (no package/full suite).
@@ -34,7 +34,7 @@ foreach($Mode in @('sync','fixed-async')){
  $Log="$Stage/roles-$Mode.log";$Extra=@();if($Mode -eq 'fixed-async'){$Extra+='-AsyncFixed'}
  & $Editor @Common -run=DasExecutionRole @Extra "-Probe=$Probe" "-abslog=$Log" *> "$Stage/roles-$Mode-stdout.log"
  $Match=(Get-DasResult -Text (Get-Content -LiteralPath $Log -Raw) -Pattern 'DAS_EXECUTION_ROLES_RESULT=PASS checks=(\d+) externs=(\d+)')
- if($LASTEXITCODE -or !$Match.Success -or (Select-String -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet)){throw "Execution role regression $Mode failed: $Log"}
+ if($LASTEXITCODE -or !$Match.Success -or (Test-DasResult -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet)){throw "Execution role regression $Mode failed: $Log"}
  $RoleChecks += [int]$Match.Groups[1].Value;$Logs+=$Log
 }
 foreach($Dll in $Dlls){if((Get-FileHash $Dll -Algorithm SHA256).Hash -ne $Hashes[$Dll]){throw 'DLL changed during tests; rerun after build'}}

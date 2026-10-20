@@ -20,7 +20,7 @@ try {
  $Map="/Game/DasClassCallbacks/$Id/Map"
  $ExportLog=Join-Path $Logs 'class-callbacks-package-export.log'
  & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') $Project -run=DasClassCallbacks "-ProbeId=$Id" -unattended -NullRHI -nosplash "-abslog=$ExportLog"
- if($LASTEXITCODE -or !(Select-String -LiteralPath $ExportLog -SimpleMatch 'DAS_CLASS_CALLBACKS_EXPORT=PASS')){throw 'Class callbacks export failed'}
+ if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $ExportLog -SimpleMatch 'DAS_CLASS_CALLBACKS_EXPORT=PASS')){throw 'Class callbacks export failed'}
  & (Join-Path $Root 'Scripts\TestPackaged.ps1') -Engine $Engine -AdditionalMaps @($Map) -SkipZenStore
  $Exe=Join-Path $Root 'Build\Packaged\Windows\DasForUESmoke\Binaries\Win64\DasForUESmoke.exe'
  $Log=Join-Path $Logs 'class-callbacks-packaged.log'

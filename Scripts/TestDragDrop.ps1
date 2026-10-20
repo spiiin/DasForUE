@@ -27,7 +27,7 @@ try {
  & $Editor @Common -run=DasDrag "-Script=$Name" "-abslog=$Log" *> "$Stage/drag-stdout.log"
  $Result=(Get-DasResult -Text (Get-Content $Log -Raw) -Pattern 'DAS_DRAG_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Drag runtime probe failed: $Log"}
 }finally{Remove-Item -LiteralPath $Probe -ErrorAction SilentlyContinue;if($TemporaryModule){Remove-Item -LiteralPath $TemporaryModule}}
-foreach($File in @('export.log','preflight.log','drag.log')){if(Select-String "$Stage/$File" -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $File"}}
+foreach($File in @('export.log','preflight.log','drag.log')){if(Test-DasResult "$Stage/$File" -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $File"}}
 foreach($File in $Sources.Keys){if((Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash -ne $Sources[$File]){throw "Source changed during Drag verification: $File"}}
 foreach($Path in $Dlls.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Dlls[$Path]){throw 'DLL changed during Drag verification'}}
 if((Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during Drag verification'}

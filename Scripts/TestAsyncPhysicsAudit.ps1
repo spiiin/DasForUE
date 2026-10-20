@@ -22,8 +22,8 @@ $Logs=@()
 foreach($Mode in @('sync','fixed-async')){
  $Log="$Repo/logs/async-physics-audit-$Mode.log";$Extra=@();if($Mode -eq 'fixed-async'){$Extra+='-AsyncFixed'}
  & $Editor @Common -run=DasAsyncPhysicsAudit @Extra "-Probe=$Repo/Tests/AsyncPhysicsAudit/guard_probe.das" "-abslog=$Log" *> "$Repo/logs/async-physics-audit-$Mode-stdout.log"
- if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_ASYNC_PHYSICS_AUDIT=PASS checks=12' -Quiet)){throw "Async physics $Mode audit failed: $Log"}
- if(Select-String -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure during $Mode audit"}
+ if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_ASYNC_PHYSICS_AUDIT=PASS checks=12' -Quiet)){throw "Async physics $Mode audit failed: $Log"}
+ if(Test-DasResult -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure during $Mode audit"}
  $Logs+=$Log
 }
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/CollisionPhysics.profile.json" -SkipBuild | Tee-Object -Variable PackageOutput

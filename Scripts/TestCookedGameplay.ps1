@@ -13,7 +13,7 @@ $ProbeId=[Guid]::NewGuid().ToString('N')
 $Map="/Game/DasCookedGameplay/$ProbeId/Map"
 $ExportLog=Join-Path $Logs 'cooked-gameplay-export.log'
 & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') $Project -run=DasCookedGameplay "-ProbeId=$ProbeId" -unattended -NullRHI -nosplash -stdout "-abslog=$ExportLog"
-if($LASTEXITCODE -or !(Select-String -LiteralPath $ExportLog -SimpleMatch 'DAS_COOKED_GAMEPLAY_EXPORT=PASS')){throw 'Cooked gameplay export failed'}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $ExportLog -SimpleMatch 'DAS_COOKED_GAMEPLAY_EXPORT=PASS')){throw 'Cooked gameplay export failed'}
 & (Join-Path $PSScriptRoot 'TestPackaged.ps1') -Engine $Engine -AdditionalMaps @($Map,"/Game/DasCookedGameplay/$ProbeId/PlayableMap")
 $Exe=Join-Path $Repo 'Build\Packaged\Windows\DasForUESmoke\Binaries\Win64\DasForUESmoke.exe'
 $Log=Join-Path $Logs 'cooked-gameplay-runtime.log'
