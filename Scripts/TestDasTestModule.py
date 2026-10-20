@@ -79,6 +79,10 @@ if($M.Groups[2].Value -ne '3'){throw 'extra field lost'}
 try { Assert-DasResult -Log "$Temp/probe.log" -Pattern 'checks=(\d+)' -Checks 13; throw 'bad count accepted' }
 catch { if($_.Exception.Message -eq 'bad count accepted'){throw} }
 if((Get-DasResult -Text 'value=ABC' -Pattern 'value=abc').Success){throw 'regex case changed'}
+if(!(Test-DasResult "$Temp/probe.log" -Pattern 'checks=12' -Quiet)){throw 'positional path'}
+$Records=@(Get-DasResult -Text 'PASS a PASS b' -Pattern 'PASS (\w)' -All)
+if($Records.Count -ne 2 -or $Records[1].Groups[1].Value -ne 'b'){throw 'measurement collection changed'}
+if(@(Get-DasResult -Text 'none' -Pattern 'PASS (\w)' -All).Count -ne 0){throw 'empty collection changed'}
 """)
 
     def test_hash_freeze_and_validation_payload(self):
