@@ -9,14 +9,31 @@
 
 namespace
 {
-bool ValueType(FProperty* P, FDasDeclaredType& Type, FString& Error)
+// Validated value types by property. Describing a property builds a full type descriptor with path
+// strings, so successes are cached (game thread only) and kept while the field path still resolves to
+// the same FProperty; failures are not cached and report on every access. Entries are boxed because
+// nested reads may add entries while an outer caller holds a descriptor.
+const FDasDeclaredType* ValueType(FProperty* P, FString& Error)
 {
     if (!IsInGameThread())
     {
         Error = TEXT("Property values require the game thread");
-        return false;
+        return nullptr;
     }
-    return DescribeDasProperty(P, Type, Error) && ValidateDasPropertyType(Type, EDasPropertyUsage::Value, Error);
+    struct FEntry
+    {
+        TFieldPath<FProperty> Path;
+        FDasDeclaredType Type;
+    };
+    static TMap<FProperty*, TUniquePtr<FEntry>> Cache;
+    if (const TUniquePtr<FEntry>* Found = Cache.Find(P); Found && (*Found)->Path.Get() == P)
+        return &(*Found)->Type;
+    auto Entry = MakeUnique<FEntry>();
+    if (!DescribeDasProperty(P, Entry->Type, Error) ||
+        !ValidateDasPropertyType(Entry->Type, EDasPropertyUsage::Value, Error))
+        return nullptr;
+    Entry->Path = TFieldPath<FProperty>(P);
+    return &(Cache.Add(P, MoveTemp(Entry))->Type);
 }
 EDasMethodSignature FrameKind(EDasTypeKind Kind)
 {
@@ -106,9 +123,10 @@ struct FRemapValues
 bool ReadDasPropertyValue(FProperty* P, const void* Memory, FDasScalarValue& Out, FString& Error)
 {
     Error.Reset();
-    FDasDeclaredType Type;
-    if (!ValueType(P, Type, Error))
+    const FDasDeclaredType* TypeEntry = ValueType(P, Error);
+    if (!TypeEntry)
         return false;
+    const FDasDeclaredType& Type = *TypeEntry;
     if (!Memory)
     {
         Error = TEXT("Missing property value memory");
@@ -207,9 +225,10 @@ bool ReadDasPropertyValue(FProperty* P, const void* Memory, FDasScalarValue& Out
 bool WriteDasPropertyValue(FProperty* P, void* Memory, const FDasScalarValue& Value, FString& Error)
 {
     Error.Reset();
-    FDasDeclaredType Type;
-    if (!ValueType(P, Type, Error))
+    const FDasDeclaredType* TypeEntry = ValueType(P, Error);
+    if (!TypeEntry)
         return false;
+    const FDasDeclaredType& Type = *TypeEntry;
     if (!Memory)
     {
         Error = TEXT("Missing property value memory");
@@ -283,9 +302,10 @@ bool WriteDasPropertyValue(FProperty* P, void* Memory, const FDasScalarValue& Va
 bool WriteDasPropertySnapshot(FProperty* P, void* Memory, const FInstancedStruct& Snapshot, FString& Error)
 {
     Error.Reset();
-    FDasDeclaredType Type;
-    if (!ValueType(P, Type, Error))
+    const FDasDeclaredType* TypeEntry = ValueType(P, Error);
+    if (!TypeEntry)
         return false;
+    const FDasDeclaredType& Type = *TypeEntry;
     if (!Memory)
     {
         Error = TEXT("Missing property value memory");

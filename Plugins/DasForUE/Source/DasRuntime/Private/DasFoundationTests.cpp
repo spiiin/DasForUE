@@ -2,6 +2,7 @@
 #include "DasCallbackTypes.h"
 #include "DasRuntime.h"
 #include "DasPropertyTypes.h"
+#include "DasPropertyValues.h"
 #include "DasSoftReferences.h"
 #include "DasDefaultValueProbe.h"
 #include "DasSnapshotFields.h"
@@ -178,6 +179,31 @@ bool RunDasFoundationTests(FString& Report)
                                   TEXT("loop=%.0f read=%.0f read_write=%.0f checked_read=%.0f checked_read_write=%.0f ")
                                       TEXT("extern_guard=%.0f (ns per iteration)"), LoopNs, ReadNs, ReadWriteNs,
                                            CheckedReadNs, CheckedReadWriteNs, DasExternGuardBenchmarkNs(100000)));
+        {
+            // Value codec: describing a property per call versus the cached value type.
+            FProperty* Health = UDasObjectFixture::StaticClass()->FindPropertyByName(TEXT("health"));
+            const int32 N = 100000;
+            FString CodecError;
+            const double D0 = FPlatformTime::Seconds();
+            for (int32 I = 0; I < N; ++I)
+            {
+                FDasDeclaredType Described;
+                DescribeDasProperty(Health, Described, CodecError) &&
+                    ValidateDasPropertyType(Described, EDasPropertyUsage::Value, CodecError);
+            }
+            const double D1 = FPlatformTime::Seconds();
+            bool CodecOK = true;
+            for (int32 I = 0; I < N; ++I)
+            {
+                FDasScalarValue V;
+                CodecOK &=
+                    ReadDasPropertyValue(Health, Health->ContainerPtrToValuePtr<void>(Fixture.Get()), V, CodecError);
+            }
+            const double D2 = FPlatformTime::Seconds();
+            Expect(CodecOK, TEXT("value_codec_benchmark"),
+                                 FString::Printf(TEXT("describe_property_ns=%.0f read_value_ns=%.0f %s"),
+                                                      (D1 - D0) * 1e9 / N, (D2 - D1) * 1e9 / N, *CodecError));
+        }
         Fixture->health = 105;
     }
     const auto WrongType = RunSelf(TEXT("self_wrong_type.das"));

@@ -204,3 +204,13 @@ check. Class paths are resolved through one shared cache (`ResolveClass`, genera
 `ue_cast_nullable_object` behind typed views), and `MakeObjectHandle` finds existing handles through an
 (object, class) index verified against the handle table instead of scanning every handle. Self object and
 component properties (`self.Camera`) use the cached (class, name) lookup.
+
+## Value codec — 2026-10-20
+
+`ReadDasPropertyValue`/`WriteDasPropertyValue`/`WriteDasPropertySnapshot` (accessor properties, call
+frames, snapshots) described and validated the property on every call. The validated descriptor is now
+cached per property (field path checked, failures not cached). The foundation test prints
+`value_codec_benchmark`: describing an int property costs about 440 ns per call (object and struct
+properties more, since their descriptors carry path strings); a full cached int read is about 400 ns, most
+of which is constructing and moving the `FDasScalarValue` carrier. `DasPerformance` (`performance`
+suite) shows no measurable change for `vm_to_ue`: reflected UFunction calls spend their time elsewhere.

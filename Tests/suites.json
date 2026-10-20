@@ -19,6 +19,8 @@
       "requires": ["components-prepare"] },
     { "name": "gameplay-pie", "kind": "automation", "test": "DasForUE.Gameplay.RuntimePIE", "log": "gameplay-pie",
       "minimum": 1, "comment": "Playable character, native references and their informational benchmark." },
+    { "name": "performance", "kind": "script", "script": "TestPerformance.ps1",
+      "comment": "Informational benchmark (DasPerformance commandlet); writes logs/performance-editor.json." },
     { "name": "native-defaults", "kind": "script", "script": "TestNativeDefaults.ps1",
       "probe": "native-defaults-probe-id.txt" },
     { "name": "computed-defaults", "kind": "script", "script": "TestComputedDefaults.ps1",

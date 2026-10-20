@@ -33,6 +33,8 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - Generated native reference fields (`movement.MaxWalkSpeed`) are about 17x faster: the receiver class
   and the validated field are cached per access site. Authored references cache their identity check.
 - Object and component field reads (`character.CharacterMovement`, `self.Camera`) are about 9x faster.
+- Property values read or written through accessors, call frames and snapshots no longer rebuild the
+  property's type descriptor on every call.
 - Reading and writing scalar members of authored self structs (`self.Stats.Count += 1`) no longer
   copies the whole struct.
 - Class values read or written through generated native references are validated like self and
