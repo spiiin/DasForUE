@@ -8,6 +8,8 @@ from decimal import Decimal
 import re
 from pathlib import Path
 
+from DasKinds import property_classes
+
 
 def ident(value):
     result = re.sub(r'[^A-Za-z0-9_]', '_', value)
@@ -246,7 +248,7 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
                 enums[path] = members
 
     hash_containers = {}
-    scalar_properties = {'byte':'ByteProperty','text':'TextProperty','int':'IntProperty','float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty','string':'StrProperty','name':'NameProperty','enum':'EnumProperty'}
+    scalar_properties = property_classes()
     def register_hash(field):
         if (field.get('key',{}) if field['kind']=='map' else field.get('element',{})).get('kind') == 'text': raise ValueError('FText hash keys/elements are unsupported')
         children = [field.get('key',{}),field.get('value',{})] if field['kind']=='map' else [field.get('element',{})]
@@ -262,10 +264,7 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
         hash_containers[name]=field
     def validate_array_storage(field, message):
         element = field.get('element', {})
-        storage = {'byte':'ByteProperty','text':'TextProperty','int':'IntProperty',
-                   'float':'FloatProperty','double':'DoubleProperty','bool':'BoolProperty',
-                   'string':'StrProperty','name':'NameProperty','object':'ObjectProperty',
-                   'class':'ClassProperty','struct':'StructProperty','enum':'EnumProperty'}
+        storage = dict(property_classes('class'), object='ObjectProperty', struct='StructProperty')
         kind = element.get('kind')
         expected = ('EnumProperty', 'ByteProperty') if kind == 'enum' else (storage.get(kind),)
         if kind not in storage or field.get('type_path') not in expected or element.get('weak_reference', False):

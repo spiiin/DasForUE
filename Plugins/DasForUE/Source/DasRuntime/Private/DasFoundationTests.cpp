@@ -21,6 +21,7 @@
 #include "Engine/World.h"
 
 FString DasFoundationExternManifest();
+FString DasKindManifest();
 
 bool RunDasFoundationTests(FString& Report)
 {
@@ -43,20 +44,26 @@ bool RunDasFoundationTests(FString& Report)
     Expect(CallbacksOK, TEXT("shared_callback_capabilities_and_payload_validation"), CallbackError);
 #if WITH_EDITOR
     {
-        // Script-visible extern surface; the baseline is updated deliberately when the API changes.
-        const FString Manifest = DasFoundationExternManifest();
+        // Script-visible extern surface and the kind table used by the generators; baselines are
+        // updated deliberately when the API changes.
         const FString Repo = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("../.."));
-        const FString Baseline = Repo / TEXT("Bindings/FoundationExterns.txt");
-        if (IFileManager::Get().DirectoryExists(*(Repo / TEXT("logs"))))
-            FFileHelper::SaveStringToFile(Manifest, *(Repo / TEXT("logs/foundation-externs.txt")),
-                                                      FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
-        FString Expected;
-        if (FFileHelper::LoadFileToString(Expected, *Baseline))
+        auto CheckManifest = [&](const FString& Manifest, const TCHAR* Baseline, const TCHAR* Log, const TCHAR* Check)
         {
-            Expected.ReplaceInline(TEXT("\r\n"), TEXT("\n"));
-            Expect(Expected == Manifest, TEXT("foundation_extern_manifest_matches_baseline"),
-                                              TEXT("diff logs/foundation-externs.txt Bindings/FoundationExterns.txt"));
-        }
+            if (IFileManager::Get().DirectoryExists(*(Repo / TEXT("logs"))))
+                FFileHelper::SaveStringToFile(Manifest, *(Repo / TEXT("logs") / Log),
+                                                          FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+            FString Expected;
+            if (FFileHelper::LoadFileToString(Expected, *(Repo / Baseline)))
+            {
+                Expected.ReplaceInline(TEXT("\r\n"), TEXT("\n"));
+                Expect(Expected == Manifest, Check, FString::Printf(TEXT("diff logs/%s %s"), Log, Baseline));
+            }
+        };
+        CheckManifest(DasFoundationExternManifest(), TEXT("Bindings/FoundationExterns.txt"),
+                                                          TEXT("foundation-externs.txt"),
+                                                               TEXT("foundation_extern_manifest_matches_baseline"));
+        CheckManifest(DasKindManifest(), TEXT("Bindings/Kinds.json"), TEXT("kinds.json"),
+                                                                           TEXT("kind_manifest_matches_baseline"));
     }
 #endif
 #if WITH_EDITOR

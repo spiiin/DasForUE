@@ -38,6 +38,8 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
   scalar, enum and class accessor families are generated from one kind table; foundation tests guard the script-visible
   extern surface with `Bindings/FoundationExterns.txt`; test scripts share `Scripts/DasTest.psm1`
   ([Improvement plan](Docs/Dev/Plans/ImprovementPlan.md)).
+- `Bindings/Kinds.json` exports the value-kind table for the Python generators (`Scripts/DasKinds.py`);
+  foundation tests keep it in sync with the C++ table.
 - Regression suites are described in `Tests/suites.json` and run by `Scripts/RunDasTests.ps1`
   (`-Preset quick` skips MethodValues and packaging); `TestCombined.ps1` runs the `full` preset.
 

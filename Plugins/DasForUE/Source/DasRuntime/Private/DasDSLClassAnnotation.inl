@@ -935,7 +935,8 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     {
                         C.Methods.Add(M);
                         const auto* Owner = Model.Classes.FindByPredicate(
-                            [&](const auto& Cl) {
+                            [&](const auto& Cl)
+                            {
                                 return Cl.Methods.ContainsByPredicate([&](const auto& Method)
                                                                       { return Method.Id == M.Id; });
                             });
@@ -1721,17 +1722,20 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 Own.NativeParent.Reset();
                 Own.ParentId = BaseId;
                 Own.Properties.RemoveAll(
-                    [&](const auto& P) {
+                    [&](const auto& P)
+                    {
                         return BaseEffective.Properties.ContainsByPredicate([&](const auto& Base)
                                                                             { return Base.Id == P.Id; });
                     });
                 Own.Methods.RemoveAll(
-                    [&](const auto& M) {
+                    [&](const auto& M)
+                    {
                         return BaseEffective.Methods.ContainsByPredicate([&](const auto& Base)
                                                                          { return Base.Id == M.Id; });
                     });
                 Own.Components.RemoveAll(
-                    [&](const auto& P) {
+                    [&](const auto& P)
+                    {
                         return BaseEffective.Components.ContainsByPredicate([&](const auto& Base)
                                                                             { return Base.Id == P.Id; });
                     });

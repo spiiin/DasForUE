@@ -1,0 +1,14 @@
+{
+  "kinds": [
+    {"name": "int", "property": "IntProperty", "self": "int", "reference": "int", "struct_leaf": true},
+    {"name": "float", "property": "FloatProperty", "self": "float", "reference": "float", "struct_leaf": true},
+    {"name": "double", "property": "DoubleProperty", "self": "double", "reference": "double", "struct_leaf": true},
+    {"name": "bool", "property": "BoolProperty", "self": "bool", "reference": "bool", "struct_leaf": true},
+    {"name": "string", "property": "StrProperty", "self": "string", "reference": "string", "struct_leaf": true},
+    {"name": "name", "property": "NameProperty", "self": "UENameValue", "reference": "UENameValue", "struct_leaf": true},
+    {"name": "byte", "property": "ByteProperty", "self": "uint8", "reference": "int", "struct_leaf": true},
+    {"name": "text", "property": "TextProperty", "self": "UETextValue", "reference": "UETextValue", "struct_leaf": true},
+    {"name": "enum", "property": "EnumProperty", "self": "UEEnumValue", "reference": "UEEnumValue", "struct_leaf": false},
+    {"name": "class", "property": "ClassProperty", "self": "UEClassHandle", "reference": "UEClassHandle", "struct_leaf": false}
+  ]
+}

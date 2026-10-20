@@ -118,6 +118,7 @@ struct FDasKindEnum
     using In = FDasEnumValue;
     using Out = FDasEnumValue;
     static constexpr const TCHAR* Name = TEXT("enum");
+    static constexpr const TCHAR* PropertyName = TEXT("EnumProperty"); // FEnumProperty or an enum FByteProperty
     static void Check(Property*, das::Context*) {}
     static FDasEnumValue Read(Property* P, UObject* O, das::Context* C) { return ReadPropertyEnum(P, O, C); }
     static void Write(Property* P, UObject* O, FDasEnumValue V, das::Context* C) { WritePropertyEnum(P, O, V, C); }
@@ -423,4 +424,12 @@ inline const char* DasAccessorKindSuffix(const FString& Kind)
     DAS_REFERENCE_ACCESSOR_KINDS(DAS_REFERENCE_KIND_SUFFIX)
 #undef DAS_REFERENCE_KIND_SUFFIX
     return nullptr;
+}
+// Reflected property class of a kind as named in generator inputs ("IntProperty", ...).
+template <class K> FString DasKindPropertyName()
+{
+    if constexpr (requires { K::PropertyName; })
+        return K::PropertyName;
+    else
+        return K::Property::StaticClass()->GetName();
 }

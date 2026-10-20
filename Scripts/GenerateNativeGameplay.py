@@ -1,6 +1,7 @@
 """Generate the cooked allowlist and nominal dependency views from UE reflection."""
 import argparse,hashlib,json,re
 from DiscoverNativeGameplay import declarations
+from DasKinds import reference_type
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
 def generate(ir,script_dirs=None):
@@ -159,7 +160,7 @@ def generate(ir,script_dirs=None):
   if k=='struct':
    if path not in math and path not in structs:raise ValueError('Missing native struct definition')
    return math.get(path,path.rsplit('.',1)[-1])
-  return {'name':'UENameValue','class':'UEClassHandle','byte':'int','text':'UETextValue'}.get(k,k)
+  return reference_type(k) or k
  def keyname(t):return '$UEObjectKey<'+typename(t)+'>' if t['kind']=='object' else typename(t)
  header += ['struct FDasNativeGameplayStruct { const TCHAR *Path,*Source,*Signature; };','inline const FDasNativeGameplayStruct DasNativeGameplayStructs[] = {']
  active=set();done=set()
