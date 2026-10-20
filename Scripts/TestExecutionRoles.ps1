@@ -1,11 +1,15 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests/DasForUESmoke/DasForUESmoke.uproject'
 & C:\Python312\python.exe "$PSScriptRoot/AuditUEExternGuards.py" --repo $Repo --output "$Repo/logs/execution-role-coverage.json"
 if($LASTEXITCODE){throw 'Unguarded UE extern registration found'}
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/execution-role-build.log" *> "$Repo/logs/execution-role-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/execution-role-build.log") *> "$Repo/logs/execution-role-build-stdout.log"
  if($LASTEXITCODE){throw 'Execution roles build failed'}
 }
 $Dlls=@('DasRuntime','DasEditor')|ForEach-Object {Join-Path $Repo "Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$_.dll"}
@@ -18,7 +22,7 @@ foreach($Mode in @('sync','fixed-async')){
  $Probe="$Stage/$Mode.das";Copy-Item -LiteralPath "$Repo/Tests/ExecutionRoles/probe.das" -Destination $Probe
  $Log="$Stage/$Mode.log";$Extra=@();if($Mode -eq 'fixed-async'){$Extra+='-AsyncFixed'}
  & $Editor @Common -run=DasExecutionRole @Extra "-Probe=$Probe" "-abslog=$Log" *> "$Stage/$Mode-stdout.log"
- $Match=[regex]::Match((Get-Content -LiteralPath $Log -Raw),'DAS_EXECUTION_ROLES_RESULT=PASS checks=(\d+) externs=(\d+)')
+ $Match=(Get-DasResult -Text (Get-Content -LiteralPath $Log -Raw) -Pattern 'DAS_EXECUTION_ROLES_RESULT=PASS checks=(\d+) externs=(\d+)')
  if($LASTEXITCODE -or !$Match.Success -or [int]$Match.Groups[1].Value -lt 45){throw "Execution role $Mode checks failed: $Log"}
  if(Select-String -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure during $Mode role checks"}
  $Total += [int]$Match.Groups[1].Value;$Registrations=[int]$Match.Groups[2].Value;$Logs+=$Log

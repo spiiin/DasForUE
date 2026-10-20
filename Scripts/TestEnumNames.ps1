@@ -3,8 +3,10 @@ $ErrorActionPreference='Stop'
 Import-Module "$PSScriptRoot/DasTest.psm1" -Force
 $Das=Get-DasContext -Engine $Engine
 if(!$SkipBuild){
-    & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$($Das.Project)" `
-        -Module=DasRuntime -Module=DasEditor -Module=DasForUESmoke -NoEngineChanges -WaitMutex -NoXGE -MaxParallelActions=8
+    Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$($Das.Project)", '-Module=DasRuntime',
+    '-Module=DasEditor', '-Module=DasForUESmoke', '-NoEngineChanges', '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8')
     if($LASTEXITCODE){throw 'Enum names module build failed'}
 }
 function Get-EnumNameHashes {
@@ -31,7 +33,7 @@ $Log=Invoke-DasCommandlet $Das -Run DasEnumNames -Name 'enum-names-runtime' -NoZ
     -FailPattern 'DAS_ENUM_NAMES_FAIL|Ensure condition failed|Fatal error:|Log[^:]+: Error:'
 $Text=Get-Content -LiteralPath $Log -Raw
 if($Text -notmatch 'DAS_DSL_STRING_TRIGGER'){throw 'Missing string-trigger lint warning'}
-$Match=[regex]::Match($Text,'DAS_ENUM_NAMES_RESULT=PASS checks=(\d+)')
+$Match=(Get-DasResult -Text $Text -Pattern 'DAS_ENUM_NAMES_RESULT=PASS checks=(\d+)')
 if(!$Match.Success -or [int]$Match.Groups[1].Value -ne 15){throw 'Incomplete enum names probe'}
 if((Get-EnumNameHashes) -ne $Before){throw 'Source or binary changed during enum names validation'}
 [ordered]@{state='PASS';checks=[int]$Match.Groups[1].Value;runtime_log=$Log;sha256=($Before|ConvertFrom-Json);

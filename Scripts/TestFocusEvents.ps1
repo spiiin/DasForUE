@@ -1,6 +1,10 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot;$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
-if(!$SkipBuild){& "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/focus-build.log" *> "$Repo/logs/focus-build-stdout.log";if($LASTEXITCODE){throw 'Focus build failed'}}
+if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/focus-build.log") *> "$Repo/logs/focus-build-stdout.log";if($LASTEXITCODE){throw 'Focus build failed'}}
 $Sources=@{};foreach($File in @('Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyCalls.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp','Plugins/DasForUE/Source/DasRuntime/Public/DasRuntime.h','Plugins/DasForUE/Source/DasRuntime/Public/DasScriptUserWidget.h','Plugins/DasForUE/Source/DasEditor/Private/DasFocusEventsCommandlet.cpp','Plugins/DasForUE/Source/DasEditor/Public/DasFocusEventsCommandlet.h','Plugins/DasForUE/Content/Das/Scripts/ue_widget_events.das','Tests/FocusEvents/probe.das')){$Sources[$File]=(Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash}
 $Sources['Tests/EventReply/probe.das']=(Get-FileHash "$Repo/Tests/EventReply/probe.das" -Algorithm SHA256).Hash
 $Sources['Plugins/DasForUE/Content/Das/Scripts/ue_api_umg_input.das']=(Get-FileHash "$Repo/Plugins/DasForUE/Content/Das/Scripts/ue_api_umg_input.das" -Algorithm SHA256).Hash
@@ -11,14 +15,14 @@ $Name='focus_probe_'+[guid]::NewGuid().ToString('N')+'.das';$Probe="$Repo/Plugin
 try {
  Copy-Item "$Repo/Tests/FocusEvents/probe.das" $Probe
  & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch -run=DasFocusEvents "-Script=$Name" "-abslog=$Log" *> "$Stage/focus-stdout.log"
- $Result=[regex]::Match((Get-Content $Log -Raw),'DAS_FOCUS_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Focus runtime probe failed: $Log"}
+ $Result=(Get-DasResult -Text (Get-Content $Log -Raw) -Pattern 'DAS_FOCUS_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Focus runtime probe failed: $Log"}
 }finally{Remove-Item -LiteralPath $Probe -ErrorAction SilentlyContinue}
 if(Select-String $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Log"}
 $ReplyName='focus_reply_probe_'+[guid]::NewGuid().ToString('N')+'.das';$ReplyProbe="$Repo/Plugins/DasForUE/Content/Das/Scripts/$ReplyName";$ReplyLog="$Stage/related-event-reply.log"
 try {
  Copy-Item "$Repo/Tests/EventReply/probe.das" $ReplyProbe
  & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch -run=DasWidgetEvents -GeneratedReply "-Script=$ReplyName" "-abslog=$ReplyLog" *> "$Stage/related-event-reply-stdout.log"
- $ReplyResult=[regex]::Match((Get-Content $ReplyLog -Raw),'DAS_WIDGET_EVENTS_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$ReplyResult.Success){throw "Related EventReply regression failed: $ReplyLog"}
+ $ReplyResult=(Get-DasResult -Text (Get-Content $ReplyLog -Raw) -Pattern 'DAS_WIDGET_EVENTS_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$ReplyResult.Success){throw "Related EventReply regression failed: $ReplyLog"}
 }finally{Remove-Item -LiteralPath $ReplyProbe -ErrorAction SilentlyContinue}
 if(Select-String $ReplyLog -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $ReplyLog"}
 foreach($File in $Sources.Keys){if((Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash -ne $Sources[$File]){throw "Source changed during Focus verification: $File"}}
