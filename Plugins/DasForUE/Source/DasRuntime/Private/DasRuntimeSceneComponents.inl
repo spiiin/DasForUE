@@ -310,50 +310,6 @@ char* ClassPath(FDasClassHandle H, das::Context* C)
         C->throw_error("expected class reference");
     return CopyDSLString(Class->GetPathName(), C);
 }
-FDasClassHandle GetSelfClass(const char* Name, das::Context* C)
-{
-    auto* Self = ResolveSelf(C);
-    auto* P = ResolveProperty<FClassProperty>(Self, Name, false, C);
-    auto* Class = ReadPropertyClass(P, Self, C);
-    if (!Class)
-        return {};
-    CheckedClass(Class, TCHAR_TO_UTF8(*P->MetaClass->GetPathName()), "", C);
-    return {MakeObjectHandle(Class, UClass::StaticClass(), C).Token};
-}
-void SetSelfClass(const char* Name, FDasClassHandle Value, das::Context* C)
-{
-    auto* Self = ResolveSelf(C);
-    if (ActiveContext->bCollectingSubscriptions)
-        C->throw_error("class writes are forbidden in bind_events");
-    auto* P = ResolveProperty<FClassProperty>(Self, Name, true, C);
-    UClass* Class = nullptr;
-    if (Value.Token)
-        Class = CheckedClass(Cast<UClass>(ResolveObject(FDasObjectHandle{Value.Token}, C)),
-                             TCHAR_TO_UTF8(*P->MetaClass->GetPathName()), "", C);
-    WritePropertyClass(P, Self, Class, C);
-}
-FDasClassHandle AuthoredGetclass(const FDasObjectHandle& H, const char* Id, const char* Name, das::Context* C)
-{
-    auto* Object = ResolveAuthoredObject(H, Id, C);
-    auto* P = ResolveProperty<FClassProperty>(Object, Name, false, C);
-    auto* Class = ReadPropertyClass(P, Object, C);
-    if (!Class)
-        return {};
-    CheckedClass(Class, TCHAR_TO_UTF8(*P->MetaClass->GetPathName()), "", C);
-    return {MakeObjectHandle(Class, UClass::StaticClass(), C).Token};
-}
-void AuthoredSetclass(const FDasObjectHandle& H, const char* Id, const char* Name, FDasClassHandle V, das::Context* C)
-{
-    auto* Object = ResolveAuthoredObject(H, Id, C);
-    if (ActiveContext->bCollectingSubscriptions)
-        C->throw_error("class writes are forbidden in bind_events");
-    auto* P = ResolveProperty<FClassProperty>(Object, Name, true, C);
-    UClass* Class = nullptr;
-    if (V.Token)
-        Class = CheckedClass(Cast<UClass>(ResolveObject(FDasObjectHandle{V.Token}, C)),
-                             TCHAR_TO_UTF8(*P->MetaClass->GetPathName()), "", C);
-    WritePropertyClass(P, Object, Class, C);
-}
 FDasObjectHandle NativeComponentOperation(const FDasObjectHandle& H, const char* Path, const char* Name, int Mode,
                                           const char* Id, das::Context* C)
 {

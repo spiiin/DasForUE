@@ -5,6 +5,8 @@
 // property class, the daScript argument/result types and the conversions. The
 // accessor families below are templates over a kind; DAS_SCALAR_ACCESSOR_KINDS
 // registers every (family, kind) pair, so a new scalar kind is one row here.
+// Enum and class (DAS_REFERENCE_ACCESSOR_KINDS) share the self/authored/native
+// families through their own Read/Write.
 
 struct FDasKindInt
 {
@@ -109,6 +111,59 @@ struct FDasKindByteInt : FDasKindByte
     }
 };
 
+// Reference kinds: no FDasScalarValue slot, so the kind reads and writes the property itself.
+struct FDasKindEnum
+{
+    using Property = FProperty;
+    using In = FDasEnumValue;
+    using Out = FDasEnumValue;
+    static constexpr const TCHAR* Name = TEXT("enum");
+    static void Check(Property*, das::Context*) {}
+    static FDasEnumValue Read(Property* P, UObject* O, das::Context* C) { return ReadPropertyEnum(P, O, C); }
+    static void Write(Property* P, UObject* O, FDasEnumValue V, das::Context* C) { WritePropertyEnum(P, O, V, C); }
+};
+// Class values are checked against the property's MetaClass in both directions.
+struct FDasKindClass
+{
+    using Property = FClassProperty;
+    using In = FDasClassHandle;
+    using Out = FDasClassHandle;
+    static constexpr const TCHAR* Name = TEXT("class");
+    static void Check(Property*, das::Context*) {}
+    static FDasClassHandle Read(Property* P, UObject* O, das::Context* C)
+    {
+        auto* Class = ReadPropertyClass(P, O, C);
+        if (!Class)
+            return {};
+        CheckedClass(Class, TCHAR_TO_UTF8(*P->MetaClass->GetPathName()), "", C);
+        return {MakeObjectHandle(Class, UClass::StaticClass(), C).Token};
+    }
+    static void Write(Property* P, UObject* O, FDasClassHandle V, das::Context* C)
+    {
+        UClass* Class = nullptr;
+        if (V.Token)
+            Class = CheckedClass(Cast<UClass>(ResolveObject(FDasObjectHandle{V.Token}, C)),
+                                 TCHAR_TO_UTF8(*P->MetaClass->GetPathName()), "", C);
+        WritePropertyClass(P, O, Class, C);
+    }
+};
+
+// Scalar kinds go through ReadPropertyScalar/WritePropertyScalar; a kind with Read/Write handles the property itself.
+template <class K> typename K::Out DasKindRead(typename K::Property* P, UObject* O, das::Context* C)
+{
+    if constexpr (requires { &K::Read; })
+        return K::Read(P, O, C);
+    else
+        return K::ToDas(ReadPropertyScalar(P, O, C), C);
+}
+template <class K> void DasKindWrite(typename K::Property* P, UObject* O, typename K::In V, das::Context* C)
+{
+    if constexpr (requires { &K::Write; })
+        K::Write(P, O, V, C);
+    else
+        WritePropertyScalar(P, O, K::FromDas(V, C), C);
+}
+
 // Extra validation for writes through generated native references.
 template <class T> void DasNativeScalarWritePolicy(const char*, const char*, const T&, das::Context*) {}
 inline void DasNativeScalarWritePolicy(const char*, const char*, double V, das::Context* C)
@@ -132,7 +187,7 @@ template <class K> typename K::Out GetSelfScalar(const char* Name, das::Context*
     UObject* Self = ResolveSelf(C);
     auto* P = ResolveProperty<typename K::Property>(Self, Name, false, C);
     K::Check(P, C);
-    return K::ToDas(ReadPropertyScalar(P, Self, C), C);
+    return DasKindRead<K>(P, Self, C);
 }
 template <class K> void SetSelfScalar(const char* Name, typename K::In Value, das::Context* C)
 {
@@ -141,7 +196,7 @@ template <class K> void SetSelfScalar(const char* Name, typename K::In Value, da
     UObject* Self = ResolveSelf(C);
     auto* P = ResolveProperty<typename K::Property>(Self, Name, true, C);
     K::Check(P, C);
-    WritePropertyScalar(P, Self, K::FromDas(Value, C), C);
+    DasKindWrite<K>(P, Self, Value, C);
 }
 
 // Authored object references: properties of DSL-declared classes by stable type id.
@@ -151,7 +206,7 @@ typename K::Out AuthoredGetScalar(const FDasObjectHandle& H, const char* Id, con
     auto* O = ResolveAuthoredObject(H, Id, C);
     auto* P = ResolveProperty<typename K::Property>(O, Name, false, C);
     K::Check(P, C);
-    return K::ToDas(ReadPropertyScalar(P, O, C), C);
+    return DasKindRead<K>(P, O, C);
 }
 template <class K>
 void AuthoredSetScalar(const FDasObjectHandle& H, const char* Id, const char* Name, typename K::In Value,
@@ -162,7 +217,7 @@ void AuthoredSetScalar(const FDasObjectHandle& H, const char* Id, const char* Na
     auto* O = ResolveAuthoredObject(H, Id, C);
     auto* P = ResolveProperty<typename K::Property>(O, Name, true, C);
     K::Check(P, C);
-    WritePropertyScalar(P, O, K::FromDas(Value, C), C);
+    DasKindWrite<K>(P, O, Value, C);
 }
 
 // Generated native references: properties listed in the native gameplay registry.
@@ -172,7 +227,7 @@ typename K::Out NativeReferenceGetScalar(const FDasObjectHandle& H, const char* 
     auto* O = NativeGameplayObject(H, Path, false, C);
     auto* P = CastFieldChecked<typename K::Property>(NativeGameplayProperty(O, Path, Name, false, K::Name, C));
     K::Check(P, C);
-    return K::ToDas(ReadPropertyScalar(P, O, C), C);
+    return DasKindRead<K>(P, O, C);
 }
 template <class K>
 void NativeReferenceSetScalar(const FDasObjectHandle& H, const char* Path, const char* Name, typename K::In Value,
@@ -181,9 +236,14 @@ void NativeReferenceSetScalar(const FDasObjectHandle& H, const char* Path, const
     auto* O = NativeGameplayObject(H, Path, true, C);
     auto* P = CastFieldChecked<typename K::Property>(NativeGameplayProperty(O, Path, Name, true, K::Name, C));
     K::Check(P, C);
-    const auto Native = K::FromDas(Value, C);
-    DasNativeScalarWritePolicy(Path, Name, Native, C);
-    WritePropertyScalar(P, O, Native, C);
+    if constexpr (requires { &K::Write; })
+        K::Write(P, O, Value, C);
+    else
+    {
+        const auto Native = K::FromDas(Value, C);
+        DasNativeScalarWritePolicy(Path, Name, Native, C);
+        WritePropertyScalar(P, O, Native, C);
+    }
 }
 
 // Struct snapshots: scalar leaves addressed by field path.
@@ -324,6 +384,11 @@ struct FDasKindCallByte : FDasKindByteInt
     X("ue_arg_byte", "ue_result_byte", FDasKindCallByte)                                                               \
     X("__ue_method_arg_name", "__ue_method_result_name", FDasKindName)                                                 \
     X("__ue_method_arg_text", "__ue_method_result_text", FDasKindText)
+
+// (daScript suffix, kind): self, authored and native accessors only (no struct leaves).
+#define DAS_REFERENCE_ACCESSOR_KINDS(X)                                                                                \
+    X(enum, FDasKindEnum, FDasKindEnum)                                                                                \
+    X(class, FDasKindClass, FDasKindClass)
 
 // (daScript suffix, self and struct kind, reference kind)
 #define DAS_SCALAR_ACCESSOR_KINDS(X)                                                                                   \

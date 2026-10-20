@@ -29,11 +29,13 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
   scalars are accessed in place. A self int read plus write went from about 15 µs to about 0.5 µs.
 - Reading and writing scalar members of authored self structs (`self.Stats.Count += 1`) no longer
   copies the whole struct.
+- Class values read or written through generated native references are validated like self and
+  authored ones (base class, deprecated classes).
 
 ### Internal
 
 - C++ sources are clang-formatted; `DasRuntime.cpp` and `DasDSL.inl` are split into subsystem parts;
-  scalar accessor families are generated from one kind table; foundation tests guard the script-visible
+  scalar, enum and class accessor families are generated from one kind table; foundation tests guard the script-visible
   extern surface with `Bindings/FoundationExterns.txt`; test scripts share `Scripts/DasTest.psm1`
   ([Improvement plan](Docs/Dev/Plans/ImprovementPlan.md)).
 

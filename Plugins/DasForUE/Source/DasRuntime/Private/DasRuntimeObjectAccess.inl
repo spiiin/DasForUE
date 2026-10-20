@@ -570,20 +570,6 @@ void AuthoredSetstruct(const FDasObjectHandle& H, const char* Id, const char* Na
     auto* P = ResolveProperty<FProperty>(O, Name, true, C);
     WritePropertySnapshot(P, P->ContainerPtrToValuePtr<void>(O), Value, C);
 }
-FDasEnumValue AuthoredGetenum(const FDasObjectHandle& H, const char* Id, const char* Name, das::Context* C)
-{
-    auto* O = ResolveAuthoredObject(H, Id, C);
-    auto* P = ResolveProperty<FProperty>(O, Name, false, C);
-    return ReadPropertyEnum(P, O, C);
-}
-void AuthoredSetenum(const FDasObjectHandle& H, const char* Id, const char* Name, FDasEnumValue Value, das::Context* C)
-{
-    auto* O = ResolveAuthoredObject(H, Id, C);
-    if (ActiveContext->bCollectingSubscriptions)
-        C->throw_error("object writes are forbidden in bind_events");
-    auto* P = ResolveProperty<FProperty>(O, Name, true, C);
-    WritePropertyEnum(P, O, Value, C);
-}
 FDasObjectHandle AuthoredGetobject(const FDasObjectHandle& H, const char* Id, const char* Name, const char* Expected,
                                    das::Context* C)
 {

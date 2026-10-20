@@ -554,20 +554,6 @@ void WritePropertyEnum(FProperty* P, UObject* O, FDasEnumValue Input, das::Conte
     V.IntValue = E.Value;
     WriteOwnerProperty(P, O, V, C);
 }
-FDasEnumValue GetSelfEnum(const char* Name, das::Context* C)
-{
-    auto* Self = ResolveSelf(C);
-    auto* P = ResolveProperty<FProperty>(Self, Name, false, C);
-    return ReadPropertyEnum(P, Self, C);
-}
-void SetSelfEnum(const char* Name, FDasEnumValue V, das::Context* C)
-{
-    auto* Self = ResolveSelf(C);
-    if (ActiveContext->bCollectingSubscriptions)
-        C->throw_error("self writes are forbidden in bind_events");
-    auto* P = ResolveProperty<FProperty>(Self, Name, true, C);
-    WritePropertyEnum(P, Self, V, C);
-}
 bool FrameClassMatches(UClass* Value, const FString& BasePath)
 {
     auto* Base = FindObject<UClass>(nullptr, *BasePath);

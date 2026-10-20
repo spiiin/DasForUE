@@ -429,6 +429,7 @@ public:
     AddUEExtern<DAS_BIND_FUN(NativeReferenceSetScalar<RefKind>)>(                                                      \
         *this, Library, "__ue_native_set_" #Suffix, das::SideEffects::modifyExternal, "NativeReferenceSetScalar");
         DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_SCALAR_ACCESSORS)
+        DAS_REFERENCE_ACCESSOR_KINDS(DAS_REGISTER_SCALAR_ACCESSORS)
 #undef DAS_REGISTER_SCALAR_ACCESSORS
         AddUEExtern<DAS_BIND_FUN(DSLTextCreate)>(*this, Library, "ue_text", das::SideEffects::modifyExternal,
                                                  "DSLTextCreate");
@@ -442,14 +443,6 @@ public:
                                               "DSLTextKey");
         AddUEExtern<DAS_BIND_FUN(DSLTextIsInvariant)>(*this, Library, "ue_text_is_invariant",
                                                       das::SideEffects::modifyExternal, "DSLTextIsInvariant");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceGetenum)>(*this, Library, "__ue_native_get_enum",
-                                                          das::SideEffects::modifyExternal, "NativeReferenceGetenum");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceSetenum)>(*this, Library, "__ue_native_set_enum",
-                                                          das::SideEffects::modifyExternal, "NativeReferenceSetenum");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceGetclass)>(*this, Library, "__ue_native_get_class",
-                                                           das::SideEffects::modifyExternal, "NativeReferenceGetclass");
-        AddUEExtern<DAS_BIND_FUN(NativeReferenceSetclass)>(*this, Library, "__ue_native_set_class",
-                                                           das::SideEffects::modifyExternal, "NativeReferenceSetclass");
         AddUEExtern<DAS_BIND_FUN(NativeReferenceGetobject), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_native_get_object", das::SideEffects::modifyExternal, "NativeReferenceGetobject");
         AddUEExtern<DAS_BIND_FUN(NativeReferenceSetobject)>(
@@ -897,10 +890,6 @@ public:
                                                      das::SideEffects::accessExternal, "CheckedEnumNumber");
         AddUEExtern<DAS_BIND_FUN(RequireStructType)>(*this, Library, "__ue_require_struct_type",
                                                      das::SideEffects::accessExternal, "RequireStructType");
-        AddUEExtern<DAS_BIND_FUN(GetSelfEnum)>(*this, Library, "ue_get_self_enum", das::SideEffects::modifyExternal,
-                                               "GetSelfEnum");
-        AddUEExtern<DAS_BIND_FUN(SetSelfEnum)>(*this, Library, "ue_set_self_enum", das::SideEffects::modifyExternal,
-                                               "SetSelfEnum");
         AddUEExtern<DAS_BIND_FUN(LibraryScope)>(*this, Library, "__ue_library_scope", das::SideEffects::modifyExternal,
                                                 "LibraryScope");
         AddUEExtern<DAS_BIND_FUN(NullObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
@@ -923,10 +912,6 @@ public:
             *this, Library, "__ue_authored_nullable_check", das::SideEffects::accessExternal, "AuthoredNullableCheck");
         AddUEExtern<DAS_BIND_FUN(AuthoredObjectCheck), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_authored_object_check", das::SideEffects::accessExternal, "AuthoredObjectCheck");
-        AddUEExtern<DAS_BIND_FUN(AuthoredGetenum)>(*this, Library, "__ue_authored_get_enum",
-                                                   das::SideEffects::modifyExternal, "AuthoredGetenum");
-        AddUEExtern<DAS_BIND_FUN(AuthoredSetenum)>(*this, Library, "__ue_authored_set_enum",
-                                                   das::SideEffects::modifyExternal, "AuthoredSetenum");
         AddUEExtern<DAS_BIND_FUN(AuthoredGetstruct), das::SimNode_ExtFuncCallAndCopyOrMove>(
                         *this, Library, "__ue_authored_get_struct", das::SideEffects::modifyExternal,
                         "AuthoredGetstruct")
@@ -1008,14 +993,6 @@ public:
             *this, Library, "__ue_scene_get_or_create", das::SideEffects::modifyExternal, "SceneGetOrCreate");
         AddUEExtern<DAS_BIND_FUN(ClassLoaded)>(*this, Library, "__ue_class_loaded", das::SideEffects::accessExternal,
                                                "ClassLoaded");
-        AddUEExtern<DAS_BIND_FUN(AuthoredGetclass)>(*this, Library, "__ue_authored_get_class",
-                                                    das::SideEffects::accessExternal, "AuthoredGetclass");
-        AddUEExtern<DAS_BIND_FUN(AuthoredSetclass)>(*this, Library, "__ue_authored_set_class",
-                                                    das::SideEffects::modifyExternal, "AuthoredSetclass");
-        AddUEExtern<DAS_BIND_FUN(GetSelfClass)>(*this, Library, "ue_get_self_class", das::SideEffects::accessExternal,
-                                                "GetSelfClass");
-        AddUEExtern<DAS_BIND_FUN(SetSelfClass)>(*this, Library, "ue_set_self_class", das::SideEffects::modifyExternal,
-                                                "SetSelfClass");
         AddUEExtern<DAS_BIND_FUN(ActorSpawn), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_actor_spawn", das::SideEffects::modifyExternal, "ActorSpawn");
         AddUEExtern<DAS_BIND_FUN(ActorDestroy)>(*this, Library, "ue_actor_destroy_handle",

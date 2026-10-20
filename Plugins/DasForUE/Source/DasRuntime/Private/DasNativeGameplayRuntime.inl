@@ -127,33 +127,3 @@ void NativeReferenceSetobject(const FDasObjectHandle& H, const char* Path, const
         C->throw_error("native object field type mismatch");
     WritePropertyObject(P, O, Value, C);
 }
-FDasClassHandle NativeReferenceGetclass(const FDasObjectHandle& H, const char* Path, const char* Name, das::Context* C)
-{
-    auto* O = NativeGameplayObject(H, Path, false, C);
-    auto* P = CastFieldChecked<FClassProperty>(NativeGameplayProperty(O, Path, Name, false, TEXT("class"), C));
-    return {MakeObjectHandle(ReadPropertyClass(P, O, C), UClass::StaticClass(), C).Token};
-}
-void NativeReferenceSetclass(const FDasObjectHandle& H, const char* Path, const char* Name, FDasClassHandle Value,
-                             das::Context* C)
-{
-    auto* O = NativeGameplayObject(H, Path, true, C);
-    auto* P = CastFieldChecked<FClassProperty>(NativeGameplayProperty(O, Path, Name, true, TEXT("class"), C));
-    auto* K = Value.Token ? Cast<UClass>(ResolveObject(FDasObjectHandle{Value.Token}, C)) : nullptr;
-    if ((Value.Token && !K) || (K && !K->IsChildOf(P->MetaClass)))
-        C->throw_error("native class field constraint mismatch");
-    WritePropertyClass(P, O, K, C);
-}
-
-FDasEnumValue NativeReferenceGetenum(const FDasObjectHandle& H, const char* Path, const char* Name, das::Context* C)
-{
-    auto* O = NativeGameplayObject(H, Path, false, C);
-    auto* P = NativeGameplayProperty(O, Path, Name, false, TEXT("enum"), C);
-    return ReadPropertyEnum(P, O, C);
-}
-void NativeReferenceSetenum(const FDasObjectHandle& H, const char* Path, const char* Name, FDasEnumValue Value,
-                            das::Context* C)
-{
-    auto* O = NativeGameplayObject(H, Path, true, C);
-    auto* P = NativeGameplayProperty(O, Path, Name, true, TEXT("enum"), C);
-    WritePropertyEnum(P, O, Value, C);
-}
