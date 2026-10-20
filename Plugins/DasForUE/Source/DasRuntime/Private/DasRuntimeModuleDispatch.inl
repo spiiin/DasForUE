@@ -812,3 +812,63 @@ FDasExecutionResult FDasRuntimeModule::RunNamedVoidPersistent(const FString& Pat
 {
     return RunCallback(Path, EDasCallback::Main, 0, 0.f, Self, Entry, EDasMethodSignature::Void);
 }
+
+// Compile authoring descriptors without running script initializers or gameplay.
+bool FDasRuntimeModule::ReadGASScript(const FString& Path, FDasGASDeclarations& Out, FString& Error)
+{
+    Error.Reset();
+    Out = {};
+    if (!IsInGameThread() || !bInitialized)
+    {
+        Error = TEXT("GAS authoring requires initialized runtime on game thread");
+        return false;
+    }
+    try
+    {
+        das::TextWriter Output;
+        das::ModuleGroup Group;
+        auto Access = das::make_smart<FUnrealFileAccess>();
+        Access->addFileSystem(new FUnrealFileSystem(), true, false);
+        const FTCHARToUTF8 File(*Path);
+        auto Program = DSLCompile(File.Get(), Access, Output, Group);
+        if (!Program || Program->failed())
+        {
+            Error = Errors(Program, Output);
+            return false;
+        }
+        TArray<TSharedPtr<FJsonValue>> Declarations;
+        bool OK = true;
+        Program->getThisModule()->structures.foreach (
+            [&](const das::StructurePtr& S)
+            {
+                const auto* A = DSLAnnotation(S->annotations, "ue_attribute_set");
+                if (!A)
+                    A = DSLAnnotation(S->annotations, "ue_gameplay_effect");
+                if (!A || !OK)
+                    return;
+                const auto* Wire = A->arguments.find(DSLGASKey, das::Type::tString);
+                TSharedPtr<FJsonObject> D;
+                if (!Wire || !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(DSLText(Wire->sValue)), D))
+                {
+                    OK = false;
+                    return;
+                }
+                Declarations.Add(MakeShared<FJsonValueObject>(D));
+            });
+        if (!OK)
+        {
+            Error = TEXT("Missing compiled GAS declaration");
+            return false;
+        }
+        auto DeclarationsRoot = MakeShared<FJsonObject>();
+        DeclarationsRoot->SetArrayField(TEXT("declarations"), Declarations);
+        FString Json;
+        FJsonSerializer::Serialize(DeclarationsRoot, TJsonWriterFactory<>::Create(&Json));
+        return ParseDasGASDeclarations(Json, Out, Error);
+    }
+    catch (const std::exception& X)
+    {
+        Error = UTF8_TO_TCHAR(X.what());
+        return false;
+    }
+}

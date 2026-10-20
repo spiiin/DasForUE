@@ -4,6 +4,8 @@ Status: initial native implementation verified: editor build and one focused
 commandlet scenario passed 10 checks (see `logs/gas-validation.json`). The original proposed API below remains a design sketch. Implemented
 surface and deviations are recorded here; see [GAS guide](../../Guide/Gameplay/GAS.md).
 
+The next increment adds [authored data-only AttributeSets and instant GameplayEffects](../../Guide/Gameplay/GASAuthoring.md). Editor build passed; the focused scenario passed 9 checks on creation and 9 after reopening saved assets in another process. The original health scenario still passes all 10 checks.
+
 ## Initial implementation decisions
 
 - `ue_gas.das` exposes HealthAbilitySystemComponentRef, HealthAttribute,

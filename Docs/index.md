@@ -54,6 +54,7 @@ time are in the [changelog](../CHANGELOG.md).
 - [Input](Guide/Gameplay/Input.md)
 - [Gameplay services](Guide/Gameplay/GameplayServices.md)
 - [GAS health and instant effects](Guide/Gameplay/GAS.md)
+- [Authoring AttributeSets and GameplayEffects](Guide/Gameplay/GASAuthoring.md)
 - [AI and perception](Guide/Gameplay/AIAndPerception.md)
 - [Animation and effects](Guide/Gameplay/AnimationAndEffects.md)
 - [Async physics](Guide/Gameplay/AsyncPhysics.md)

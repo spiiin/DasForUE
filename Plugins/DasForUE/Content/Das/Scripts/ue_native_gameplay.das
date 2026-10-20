@@ -4,6 +4,7 @@ require ue_character_control public
 require ue_effects public
 require ue_enhanced_input public
 require ue_gameplay_services public
+require ue_gas_authored_types public
 require ue_gas_types public
 require ue_generated public
 require ue_native_hash_probe public
@@ -49,6 +50,10 @@ def Native_ChildActorComponentRef_405d4379_from(value:UObjectHandle):Native_Chil
 [ue_native_object(path="/Script/Engine.Controller")]
 struct Native_ControllerRef_78a9db5e { handle:UObjectHandle }
 def Native_ControllerRef_78a9db5e_from(value:UObjectHandle):Native_ControllerRef_78a9db5e { return Native_ControllerRef_78a9db5e(handle=ue_cast_nullable_object(value,"/Script/Engine.Controller")) }
+
+[ue_native_object(path="/Script/Engine.CurveTable")]
+struct Native_CurveTableRef_4055f623 { handle:UObjectHandle }
+def Native_CurveTableRef_4055f623_from(value:UObjectHandle):Native_CurveTableRef_4055f623 { return Native_CurveTableRef_4055f623(handle=ue_cast_nullable_object(value,"/Script/Engine.CurveTable")) }
 
 [ue_native_object(path="/Script/Engine.DataTable")]
 struct Native_DataTableRef_733a5dd1 { handle:UObjectHandle }
@@ -189,6 +194,14 @@ def Native_AttributeSetRef_21a737ee_from(value:UObjectHandle):Native_AttributeSe
 [ue_native_object(path="/Script/GameplayAbilities.GameplayEffect")]
 struct Native_GameplayEffectRef_77c7fc7b { handle:UObjectHandle }
 def Native_GameplayEffectRef_77c7fc7b_from(value:UObjectHandle):Native_GameplayEffectRef_77c7fc7b { return Native_GameplayEffectRef_77c7fc7b(handle=ue_cast_nullable_object(value,"/Script/GameplayAbilities.GameplayEffect")) }
+
+[ue_native_object(path="/Script/GameplayAbilities.GameplayEffectComponent")]
+struct Native_GameplayEffectComponentRef_48d8f122 { handle:UObjectHandle }
+def Native_GameplayEffectComponentRef_48d8f122_from(value:UObjectHandle):Native_GameplayEffectComponentRef_48d8f122 { return Native_GameplayEffectComponentRef_48d8f122(handle=ue_cast_nullable_object(value,"/Script/GameplayAbilities.GameplayEffectComponent")) }
+
+[ue_native_object(path="/Script/GameplayAbilities.GameplayEffectUIData")]
+struct Native_GameplayEffectUIDataRef_21cf1352 { handle:UObjectHandle }
+def Native_GameplayEffectUIDataRef_21cf1352_from(value:UObjectHandle):Native_GameplayEffectUIDataRef_21cf1352 { return Native_GameplayEffectUIDataRef_21cf1352(handle=ue_cast_nullable_object(value,"/Script/GameplayAbilities.GameplayEffectUIData")) }
 
 [ue_native_object(path="/Script/StaticMeshDescription.StaticMeshDescription")]
 struct Native_StaticMeshDescriptionRef_26792a74 { handle:UObjectHandle }
@@ -730,6 +743,40 @@ enum EPlayerMappableKeySettingBehaviors {
     IgnoreSettings=2
 }
 
+[ue_native_enum(path="/Script/GameplayAbilities.EGameplayEffectPeriodInhibitionRemovedPolicy")]
+enum EGameplayEffectPeriodInhibitionRemovedPolicy {
+    NeverReset=0
+    ResetPeriod=1
+    ExecuteAndResetPeriod=2
+}
+
+[ue_native_enum(path="/Script/GameplayAbilities.EGameplayEffectStackingDurationPolicy")]
+enum EGameplayEffectStackingDurationPolicy {
+    RefreshOnSuccessfulApplication=0
+    NeverRefresh=1
+    ExtendDuration=2
+}
+
+[ue_native_enum(path="/Script/GameplayAbilities.EGameplayEffectStackingExpirationPolicy")]
+enum EGameplayEffectStackingExpirationPolicy {
+    ClearEntireStack=0
+    RemoveSingleStackAndRefreshDuration=1
+    RefreshDuration=2
+}
+
+[ue_native_enum(path="/Script/GameplayAbilities.EGameplayEffectStackingPeriodPolicy")]
+enum EGameplayEffectStackingPeriodPolicy {
+    ResetOnSuccessfulApplication=0
+    NeverReset=1
+}
+
+[ue_native_enum(path="/Script/GameplayAbilities.EGameplayEffectStackingType")]
+enum EGameplayEffectStackingType {
+    None=0
+    AggregateBySource=1
+    AggregateByTarget=2
+}
+
 [ue_native_enum(path="/Script/InputCore.EControllerHand")]
 enum EControllerHand {
     Left=0
@@ -990,6 +1037,29 @@ struct Vector4 {
     W:double
 }
 
+[ue_native_struct(path="/Script/DasRuntime.DasAuthoredAttributeChange")]
+struct DasAuthoredAttributeChange {
+    Set:UENameValue
+    Attribute:UENameValue
+    OldValue:float
+    NewValue:float
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasAuthoredEffectResult")]
+struct DasAuthoredEffectResult {
+    Valid:bool
+    Applied:bool
+    HasActiveHandle:bool
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasAuthoredEffectSpec")]
+struct DasAuthoredEffectSpec {
+    Source:AuthoredAbilitySystemComponentRef
+    Definition:AuthoredGameplayEffectRef
+    Level:float
+    Magnitudes:table<UENameValue;float>
+}
+
 [ue_native_struct(path="/Script/DasRuntime.DasCallMetrics")]
 struct DasCallMetrics {
     Ratio:float
@@ -1057,6 +1127,17 @@ struct DasNativeSoftValue {
     ActorType:NativeSoftClass_Actor_ed297b28
     Items:array<NativeSoftObject_Object_f325c329>
     Classes:table<string;NativeSoftClass_Actor_ed297b28>
+}
+
+[ue_native_struct(path="/Script/DataRegistry.DataRegistryType")]
+struct DataRegistryType {
+    Name:UENameValue
+}
+
+[ue_native_struct(path="/Script/Engine.CurveTableRowHandle")]
+struct CurveTableRowHandle {
+    CurveTable:Native_CurveTableRef_4055f623
+    RowName:UENameValue
 }
 
 [ue_native_struct(path="/Script/Engine.LightingChannels")]
@@ -1173,6 +1254,20 @@ struct GameplayTag {
 struct GameplayTagContainer {
     GameplayTags:array<GameplayTag>
     ParentTags:array<GameplayTag>
+}
+
+[ue_native_struct(path="/Script/GameplayAbilities.InheritedTagContainer")]
+struct InheritedTagContainer {
+    CombinedTags:GameplayTagContainer
+    Added:GameplayTagContainer
+    Removed:GameplayTagContainer
+}
+
+[ue_native_struct(path="/Script/GameplayAbilities.ScalableFloat")]
+struct ScalableFloat {
+    Value:float
+    Curve:CurveTableRowHandle
+    RegistryType:DataRegistryType
 }
 
 [ue_native_struct(path="/Script/PhysicsCore.PhysicalMaterialDamageModifier")]

@@ -14,6 +14,8 @@ public:
         addAnnotation(new FUENativeEnumAnnotation());
         addAnnotation(new FUENativeStructAnnotation());
         addAnnotation(new FUEStructAnnotation());
+        addAnnotation(new FUEGASDeclarationAnnotation(false));
+        addAnnotation(new FUEGASDeclarationAnnotation(true));
         addAnnotation(new FUENativeInterfaceAnnotation());
         addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));
         addAnnotation(new FUESourceValueBinding());

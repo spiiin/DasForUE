@@ -1,6 +1,7 @@
 #include "Hash/CityHash.h"
 #include "UObject/FieldPath.h"
 #include "DasGameplayTags.h"
+#include "DasGASAuthoring.h"
 #include "Engine/CurveTable.h"
 #include "Engine/DataTable.h"
 #include "DasDataAssets.h"

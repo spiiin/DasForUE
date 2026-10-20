@@ -1,0 +1,23 @@
+param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild)
+$ErrorActionPreference='Stop'
+$Repo=Split-Path -Parent $PSScriptRoot
+$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
+New-Item -ItemType Directory -Path "$Repo/logs" -Force|Out-Null
+if(!$SkipBuild){
+ & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/gas-authored-build.log" *> "$Repo/logs/gas-authored-build-stdout.log"
+ if($LASTEXITCODE){throw 'Authored GAS build failed'}
+}
+$Log="$Repo/logs/gas-authored-runtime.log"
+& "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasGASAuthored "-Fixture=$Repo/Tests/GASAuthored/probe.template.das" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Log" *> "$Repo/logs/gas-authored-runtime-stdout.log"
+$Code=$LASTEXITCODE
+$Text=Get-Content -LiteralPath $Log -Raw
+$Match=[regex]::Match($Text,'DAS_GAS_AUTHORED_RESULT=PASS checks=(\d+) assets=(\S+)')
+if($Code -or !$Match.Success -or $Text -match 'Ensure condition failed|Log[^:]+: Error:'){throw "Authored GAS check failed: $Log"}
+$Folder=$Match.Groups[2].Value
+$ReopenLog="$Repo/logs/gas-authored-reopen.log"
+& "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasGASAuthored "-Fixture=$Repo/Tests/GASAuthored/probe.template.das" "-Reopen=$Folder" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$ReopenLog" *> "$Repo/logs/gas-authored-reopen-stdout.log"
+$ReopenCode=$LASTEXITCODE
+$ReopenText=Get-Content -LiteralPath $ReopenLog -Raw
+if($ReopenCode -or $ReopenText -notmatch 'DAS_GAS_AUTHORED_RESULT=PASS' -or $ReopenText -match 'Ensure condition failed|Log[^:]+: Error:'){throw "Authored GAS reopen failed: $ReopenLog"}
+[ordered]@{state='PASS';checks=[int]$Match.Groups[1].Value;assets=$Match.Groups[2].Value;runtime_log=$Log;reopen_log=$ReopenLog;reopen='PASS';PIE='not_run';packaged='not_run';commit='not_created'}|ConvertTo-Json|Set-Content "$Repo/logs/gas-authored-validation.json" -Encoding utf8
+Write-Output 'DAS_GAS_AUTHORED_FOCUSED=PASS'

@@ -16,6 +16,7 @@ struct FPointerEvent;
 struct FFocusEvent;
 class UDragDropOperation;
 struct FDasAuthoringModule;
+struct FDasGASDeclarations;
 struct FDasSourceCatalog;
 
 struct FDasTypeDeclaration
@@ -88,6 +89,7 @@ public:
     void EndPreserveContextsForReinstance(const FString& ApprovedDeclaration = FString());
 #endif
 
+    bool ReadGASScript(const FString& Path, FDasGASDeclarations& Out, FString& Error);
     virtual void StartupModule() override;
     virtual void ShutdownModule() override;
     virtual bool SupportsDynamicReloading() override { return false; }

@@ -69,3 +69,5 @@ The playable Character/pickup example heals 25 in addition to awarding score;
 full-health pickups are still consumed and respawn. Re-export its Blueprint/map
 with CreatePlayableCharacter.ps1 after updating the plugin and generated native
 registry; an old saved Blueprint does not acquire new components automatically.
+
+For user-defined sets and effects, see [GAS authoring](GASAuthoring.md).

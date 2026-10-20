@@ -1,6 +1,7 @@
 options gen2
 module ue_gas public
 require ue_gas_types public
+require ue_gas_authored public
 require ue_gameplay_tags public
 require ue_native_gameplay public
 
