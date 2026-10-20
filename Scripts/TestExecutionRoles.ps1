@@ -31,7 +31,7 @@ foreach($Mode in @('sync','fixed-async')){
 # changing the common registration factory; no broad Foundation suite is run.
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/CollisionPhysics.profile.json" -SkipBuild | Tee-Object -Variable PackageOutput
 if(!$?){throw 'Ordinary Collision module regression failed'}
-$PackageMatch=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+$PackageMatch=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
 if(!$PackageMatch.Success){throw 'Missing Collision preflight report'}
 foreach($Dll in $Dlls){if((Get-FileHash $Dll -Algorithm SHA256).Hash -ne $Hashes[$Dll]){throw 'DLL changed during execution-role checks; rerun against completed build'}}
 [ordered]@{state='PASS';runtime_checks=$Total;guarded_extern_registrations=$Registrations;coverage="$Repo/logs/execution-role-coverage.json";modes=@('sync','fixed_async_1_60');role_and_epoch='PASS';scalar_CMRES_low_level_UE_families='PASS';ordinary_gameplay_UE_ABI='PASS';unscoped_foreign_no_self_bypass='rejected';deferred_cancel_peer_and_error='PASS';reload_reject_preserved_accept_revoked='PASS';ReleaseObject_unregister_Destroy_GC_world_cleanup='PASS';runtime_logs=$Logs;collision_report=$PackageMatch.Groups[1].Value.Trim();dll_sha256=$Hashes;DAS_async_callback_syntax='not_exposed';body_handle_AddForce_transport='not_implemented';Foundation='not_run';PIE='not_run';packaged='not_run';commit='not_created'}|ConvertTo-Json -Depth 20|Set-Content -LiteralPath "$Repo/logs/execution-role-validation.json" -Encoding utf8

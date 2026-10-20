@@ -3,13 +3,15 @@ param(
  [string]$Report,
  [switch]$Regenerate
 )
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Python='C:\Python312\python.exe'
 if($Regenerate){
  & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/CollisionPhysics.profile.json" -SkipBuild | Tee-Object -Variable PackageOutput
  if(!$?){throw 'Collision regeneration failed'}
- $PackageMatch=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+ $PackageMatch=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
  if(!$PackageMatch.Success){throw 'Missing regenerated package report'}
  $Report=$PackageMatch.Groups[1].Value.Trim()
 }
@@ -55,7 +57,7 @@ try {
  $Text=Get-Content -LiteralPath "$Validation/runtime.log" -Raw
  if(!$Text.Contains('DAS_PACKAGE_PREFLIGHT=PASS value=42')){throw 'Missing runtime success marker'}
  $TraceOutput=Get-Content -LiteralPath "$Validation/stdout.log" -Raw
- $Passed=@([regex]::Matches($TraceOutput,'DAS_TRACE_MATRIX_PASS ([A-Za-z0-9_]+)')|ForEach-Object {$_.Groups[1].Value}|Sort-Object -Unique)
+ $Passed=@((Get-DasResult -Text $TraceOutput -Pattern 'DAS_TRACE_MATRIX_PASS ([A-Za-z0-9_]+)' -All)|ForEach-Object {$_.Groups[1].Value}|Sort-Object -Unique)
  if($Passed.Count -ne 24){throw "Expected 24 unique variants, got $($Passed.Count)"}
  if((GetValidationHashes) -ne $Before){throw 'Sources or DLL changed during validation; rerun on a stable build'}
  $Success=$true

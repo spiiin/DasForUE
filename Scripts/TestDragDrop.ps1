@@ -11,7 +11,7 @@ $Dlls=@{};foreach($Name in @('DasRuntime','DasEditor')){$Path="$Repo/Tests/DasFo
 $Manifest="$Engine/Engine/Binaries/Win64/UnrealEditor.modules";$BuildId=(Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/UMGInput.profile.json" -SkipBuild -Publish:$Publish|Tee-Object -Variable Output
 if(!$?){throw 'Drag API package generation failed'}
-$Match=[regex]::Match(($Output -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Drag package report'}
+$Match=(Get-DasResult -Text ($Output -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Drag package report'}
 $ReportPath=$Match.Groups[1].Value.Trim();$Stage=Split-Path -Parent $ReportPath;$Report=Get-Content $ReportPath -Raw|ConvertFrom-Json
 $Member=@($Report.members|Where-Object {$_.class -eq '/Script/UMG.WidgetBlueprintLibrary' -and $_.function -eq 'DetectDragIfPressed'})
 if($Member.Count -ne 1 -or $Member[0].status -ne 'generation_ready' -or $Report.counts.generation_ready -lt 404 -or $Report.counts.generation_blocked -ne 0){throw 'Unexpected Drag coverage'}
