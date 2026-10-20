@@ -15,18 +15,27 @@ written under `logs/`, packaged output under `Build/Packaged/Windows/`.
 - NullRHI runs and programmatically injected input do not prove rendering quality
   or physical-device input.
 
-## Full regression
+## Regression suites
+
+Suites are listed in `Tests/suites.json` and run by `RunDasTests.ps1`:
 
 ```powershell
-.\Scripts\TestCombined.ps1            # editor suite + packaged maps
-.\Scripts\TestCombined.ps1 -SkipEditor
-.\Scripts\TestCombinedEditor.ps1 [-SkipBuild]
+.\Scripts\RunDasTests.ps1 -List
+.\Scripts\RunDasTests.ps1 -Preset quick        # build, Python, Foundation, automation except MethodValues (~5 min)
+.\Scripts\RunDasTests.ps1 -Preset editor       # quick + MethodValues create/reopen and all automation
+.\Scripts\RunDasTests.ps1 -Preset full         # editor + native/computed defaults, cooked export, packaged maps
+.\Scripts\RunDasTests.ps1 -Suite method-values,automation -SkipBuild
 ```
 
-`TestCombined.ps1` runs `TestCombinedEditor.ps1` (all Python tests, editor
-Foundation, Unreal Automation tests including PIE, MethodValues create/reopen),
-then native/computed defaults, a cooked export and `TestPackaged.ps1` with the
-gameplay, playable, native-defaults, computed-defaults and method-values maps.
+A suite's `requires` are added automatically (`automation` needs `components-prepare`
+and `method-values`); `-NoDependencies` uses the probe ids of the previous run
+instead. Each suite prints `DAS_SUITE_<NAME>=PASS seconds=<n>`, the run ends with
+`DAS_SUITES=PASS`. A new suite is one entry in the manifest; the automation entries
+pin the expected minimum test count.
+
+`TestCombined.ps1` (`full`), `TestCombined.ps1 -SkipEditor` and
+`TestCombinedEditor.ps1 [-SkipBuild]` (`editor`) remain as wrappers. The build agent
+accepts `test-quick <id>` and `test-suite <id> <suite,suite>`.
 
 ## Foundation
 

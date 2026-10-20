@@ -1,0 +1,44 @@
+{
+  "comment": "Regression suites for Scripts/RunDasTests.ps1. Suites run in this order; 'requires' pulls in prerequisites unless -NoDependencies is given (then their probe files from an earlier run are used).",
+  "suites": [
+    { "name": "build", "kind": "build", "log": "combined-editor-build" },
+    { "name": "python", "kind": "python", "log": "combined-python-tests" },
+    { "name": "foundation", "kind": "commandlet", "run": "DasSmoke", "log": "combined-editor-foundation",
+      "marker": "DAS_FOUNDATION_RESULT=PASS failures=0" },
+    { "name": "components-prepare", "kind": "automation", "test": "DasForUE.Components.DynamicPIE",
+      "log": "combined-components-prepare", "minimum": 1,
+      "comment": "ClassReload loads assets that DynamicPIE saves in an earlier process." },
+    { "name": "method-values", "kind": "phases", "run": "DasMethodValues", "log": "combined-method-values",
+      "marker": "DAS_METHOD_VALUES_RESULT=PASS", "phases": ["Create", "Reopen"],
+      "probe": "combined-method-values-probe-id.txt" },
+    { "name": "automation", "kind": "automation", "test": "DasForUE", "log": "combined-all-automation", "minimum": 37,
+      "requires": ["components-prepare", "method-values"], "probeArgs": { "DasMethodValuesProbeId": "method-values" } },
+    { "name": "automation-quick", "kind": "automation", "log": "quick-automation", "minimum": 36,
+      "comment": "Every DasForUE automation group except MethodValues.PIE, which needs the method-values assets.",
+      "test": "DasForUE.ActorComponent+DasForUE.Actors+DasForUE.Callbacks+DasForUE.Components+DasForUE.Defaults+DasForUE.Delegates+DasForUE.DSL+DasForUE.FunctionLibraries+DasForUE.Gameplay+DasForUE.Lifecycle+DasForUE.MethodDispatch+DasForUE.Objects+DasForUE.Reload+DasForUE.SoftReferences+DasForUE.Types",
+      "requires": ["components-prepare"] },
+    { "name": "native-defaults", "kind": "script", "script": "TestNativeDefaults.ps1",
+      "probe": "native-defaults-probe-id.txt" },
+    { "name": "computed-defaults", "kind": "script", "script": "TestComputedDefaults.ps1",
+      "probe": "computed-defaults-probe-id.txt" },
+    { "name": "packaged", "kind": "packaged", "log": "combined-export",
+      "requires": ["method-values", "native-defaults", "computed-defaults"],
+      "maps": [
+        { "name": "gameplay", "map": "/Game/DasCookedGameplay/{export}/Map", "switch": "-DasCookedGameplay",
+          "marker": "DAS_COOKED_GAMEPLAY_RESULT=PASS" },
+        { "name": "playable", "map": "/Game/DasCookedGameplay/{export}/PlayableMap", "switch": "-DasPlayableMap",
+          "marker": "DAS_PLAYABLE_MAP_RESULT=PASS" },
+        { "name": "native", "map": "/Game/DasNativeDefaults/{native-defaults}/Map", "switch": "-DasNativeDefaults",
+          "marker": "DAS_NATIVE_DEFAULTS_PACKAGED=PASS" },
+        { "name": "computed", "map": "/Game/DasComputedDefaults/{computed-defaults}/Map",
+          "switch": "-DasComputedDefaults", "marker": "DAS_COMPUTED_DEFAULTS_PACKAGED=PASS" },
+        { "name": "method-values", "map": "/Game/DasMethodValues/{method-values}/Map", "switch": "-DasMethodValues",
+          "marker": "DAS_METHOD_VALUES_RESULT=PASS" }
+      ] }
+  ],
+  "presets": {
+    "quick": ["build", "python", "foundation", "automation-quick"],
+    "editor": ["build", "python", "foundation", "automation"],
+    "full": ["build", "python", "foundation", "automation", "packaged"]
+  }
+}

@@ -91,10 +91,11 @@ function Invoke-DasAssetPhases {
     return $Id
 }
 
-# Runs Unreal Automation tests in the editor and requires exactly Count successes without warnings.
+# Runs Unreal Automation tests in the editor and requires exactly Count (with -AtLeast: at least Count)
+# successes without warnings.
 function Invoke-DasAutomation {
     param([Parameter(Mandatory)]$Das, [Parameter(Mandatory)][string]$Test, [Parameter(Mandatory)][string]$Name,
-          [string]$Marker, [int]$Count = 1, [string[]]$Extra = @())
+          [string]$Marker, [int]$Count = 1, [string[]]$Extra = @(), [switch]$AtLeast)
     $Log = Join-Path $Das.Logs "$Name.log"
     $Report = Join-Path $Das.Logs "$Name-report"
     $Arguments = @(('"' + $Das.Project + '"'), '-unattended', '-NullRHI', '-nosplash', '-nosound', '-RenderOffscreen',
@@ -104,8 +105,11 @@ function Invoke-DasAutomation {
     if ($Process.ExitCode) { throw "$Name editor exited with $($Process.ExitCode)" }
     if ($Marker) { Assert-DasLog -Log $Log -Marker $Marker -Name $Name }
     $Result = Get-Content -LiteralPath (Join-Path $Report 'index.json') -Raw | ConvertFrom-Json
-    if ($Result.failed -ne 0 -or $Result.notRun -ne 0 -or $Result.succeeded -ne $Count -or $Result.succeededWithWarnings -ne 0) {
-        throw "$Name`: Unreal Automation did not report exactly $Count successful test(s) without warnings"
+    Write-Host ($Result | Select-Object succeeded, succeededWithWarnings, failed, notRun | ConvertTo-Json -Compress)
+    $CountOk = if ($AtLeast) { $Result.succeeded -ge $Count } else { $Result.succeeded -eq $Count }
+    if ($Result.failed -ne 0 -or $Result.notRun -ne 0 -or !$CountOk -or $Result.succeededWithWarnings -ne 0) {
+        $Expected = if ($AtLeast) { "at least $Count" } else { "exactly $Count" }
+        throw "$Name`: Unreal Automation did not report $Expected successful test(s) without warnings"
     }
 }
 
