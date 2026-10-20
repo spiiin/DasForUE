@@ -44,7 +44,7 @@ Register routes during actor/component setup. Creating a new route synchronously
 
 Watching installs a shared native UGameplayCueNotify_Static bridge for that exact tag in the current native runtime cue set, and enables delivery on this ASC. The bridge runs in Shipping too; it does not depend on the CueManager debug event. Repeated watch is idempotent. A tag already assigned to another native/asset notify is refused without modifying that entry. Use a dedicated cue namespace for DAS routes; a tag has one native notify route. The bridge does not override parent notify routes (IsOverride=false), and native GameplayCue tag hierarchy/translation/suppression remains in force. A parent route may receive a child cue; Tag preserves OriginalTag while MatchedTag identifies the bridge route.
 
-The global route persists for the cue manager's lifetime. Unwatch removes this ASC's interest, not a route shared with other actors. There are at most 64 watched tags per ASC and 1024 bridge routes per native cue set. New native cue-set instances need registration again. Calls do not modify project globals/configuration or create cue assets.
+The global route persists for the cue manager's lifetime. Unwatch removes this ASC's interest, not a route shared with other actors. There are at most 64 watched tags per ASC and 1024 bridge routes per native cue set. New native cue-set instances need registration again. The manual watch/send calls do not modify project configuration. For imported cue assets and effect-owned routes, see below.
 
 Sending does not require watch. Existing native/asset cue routes continue to run normally; those tags cannot also be claimed by the DAS bridge. A successful send means native submission, not proof that a visual/audio asset was played. This increment covers the current authoritative authored ASC lifecycle; network/prediction and client registration need a separate pass.
 
@@ -62,10 +62,46 @@ Add permits one manually added cue per tag on the ASC; duplicate adds and alread
 
 Remove a manually added active cue before unwatching its tag; unwatch is refused while it is still recorded as active. EndPlay removes the adapter's remaining manual cues and clears watches. It does not broadcast new DAS callbacks into a tearing-down actor. Native notify actors and the existing owned VFX helpers retain their normal lifecycle cleanup.
 
-This first block does not add author-defined cue-notify asset classes, automatic observation of unrelated existing notify assets, effect-DSL cue lists, full hit/context payloads, networking or prediction. Ordinary event handlers can already call the existing sound/Niagara APIs.
+Authored cue assets and effect cue lists are supported below. Full hit/context payloads, networking and prediction remain separate work. Unrelated existing notify assets are not automatically observed by the DAS bridge. Ordinary event handlers can call the existing sound/Niagara APIs.
 
 ## Focused verification
 
 The gas-cues suite builds and runs a single short commandlet via the build agent. It covers native execute/active/while-active/remove, queued callbacks, snapshot retention across GC, native callers bypassing the sending helper, validation, route-conflict preservation, subscription release and EndPlay cleanup. NullRHI does not verify rendered Niagara or audio playback. Full PIE and packaged tests are outside this step.
 
 Verified in agent job `gascues-run-2ecbc19c0f`: exit 0, Editor Development build, `DAS_GAS_CUES_RESULT=PASS checks=10` in one commandlet process (0.52 seconds for the commandlet logic). Callback registration guards and correct test-world EndPlay were included. Full PIE/packaged were not run for this block.
+
+## Cue assets and GameplayEffect authoring
+
+[gas_cue_assets.das](../../../Plugins/DasForUE/Content/Das/Scripts/gas_cue_assets.das) is a complete declaration/handler example:
+
+```das
+[ue_gameplay_cue(tag="GameplayCue.Das.Sample.Impact",min_level=1,max_level=5)]
+class ImpactCue {}
+[ue_gameplay_cue(tag="GameplayCue.Das.Sample.Aura",min_level=1,max_level=5)]
+class AuraCue {}
+
+[ue_attribute_set]
+class CueStats { Health:float=100.0f }
+
+[ue_gameplay_effect(attributes="CueStats",cue="ImpactCue")]
+class CueStrike { Health:float=-5.0f }
+
+[ue_gameplay_effect(attributes="CueStats",duration="Infinite",cue="ImpactCue",cue="AuraCue")]
+class CueAura {}
+```
+
+`Das.GASImport gas_cue_assets.das /Game/GAS` creates `GCN_ImpactCue` and `GCN_AuraCue` Blueprint assets derived from the native static notify bridge, plus the AttributeSet and effects. `cue=` resolves simple names or explicit stable IDs in this script's registry; repeat the option for multiple cues (up to 16). Unknown/repeated cues are rejected. Tags must be registered GameplayCue child tags and unique within the cue registry. A cue-only effect is permitted; the existing explicit `attributes=` registry is still required.
+
+The effect stores real `FGameplayEffectCue` entries and reflected hard references to generated notify classes. Cook can follow those references when the effect itself is included. No runtime JSON metadata, generated transient notify class or project config edit is used. Reimport into the same folder is idempotent; changed definitions require a new folder until schema migration is implemented. Use one asset route per cue tag: importing the same tag into another folder is not a hot-reload mechanism.
+
+Cue assets currently declare their tag and finite level bounds (`0 <= min_level < max_level`, defaults 0 and 1). They are shared static notifies, not per-actor DAS instances. Their declaration bodies are empty; cosmetic DAS logic uses the target's ordinary `[ue_event(source="Abilities",name="GameplayCueReceived")]` handler. No explicit `ue_gas_cue_watch` is required for an authored asset route. It still uses owned snapshots and the existing deferred dispatcher when the VM is busy. `min_level`/`max_level` map native effect level to NormalizedMagnitude; RawMagnitude is native GAS's modified-attribute magnitude, zero when no magnitude attribute is configured. EffectLevel carries the native spec level.
+
+`ue_gas_spec`/MakeAuthoredSpec and authored ability grants register referenced notify classes before native application. Registration preflights all references, refuses another notify assigned to that tag and does not install a partial batch on a conflict. Routes are shared for the manager lifetime. A manually watched tag already assigned to the plain bridge cannot then be claimed by a different cue asset. Prepare routes outside a synchronous cue callback. Native C++ callers bypassing the authored spec/ability helpers must call the effect's `PrepareCues()` themselves or use normal UE cue-library discovery.
+
+GAS controls event phases: instant/periodic execution emits Executed, persistent effects emit OnActive/WhileActive and removal emits Removed. A cue-only infinite effect needs no dummy attribute modifier. Remove the GameplayEffect using `ue_gas_remove`; do not remove its cues through the loose-cue helper. Authored asset callbacks remain eligible regardless of manual watch/unwatch state. GameplayCue suppression, tag hierarchy and stacking rules remain native GAS behavior.
+
+The `gas-cue-assets` suite is one short commandlet after an Editor Development build via the build agent. It checks DSL collection, saved native fields/class references, repeat import, route-conflict preflight, native effect execution/normalization, two active cues, effect-owned removal and a retained snapshot after GC. It does not validate rendered effects, network delivery, full PIE or packaged output.
+
+Multiple cues with identical level bounds share one native FGameplayEffectCue tag container. This avoids redundant whole-spec callbacks in UE 5.8's Full-replication add/remove path. Different bounds require separate native entries; that engine path can then deliver repeated static-notify phases. Cosmetic handlers should be idempotent, as with other native GAS repeated/join-in-progress delivery.
+
+Verified by build-agent job `gascueassets-4f3b765ddc`: Editor Development build and `DAS_GAS_CUE_ASSETS_RESULT=PASS checks=7` in one short commandlet (1.62 seconds of commandlet logic). Full PIE and packaged tests were not run for this increment.

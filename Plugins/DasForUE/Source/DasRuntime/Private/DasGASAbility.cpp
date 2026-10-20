@@ -130,7 +130,11 @@ void UDasAuthoredGameplayAbility::EndAbility(FGameplayAbilitySpecHandle Handle, 
 {
     const bool WasActive = IsActive();
     auto* ASC = Info ? Cast<UDasAuthoredAbilitySystemComponent>(Info->AbilitySystemComponent.Get()) : nullptr;
-    if (WasActive) { TGuardValue<bool> Ending(ScriptEnding,true); ClearScriptTasks(); }
+    if (WasActive)
+    {
+        TGuardValue<bool> Ending(ScriptEnding, true);
+        ClearScriptTasks();
+    }
     Super::EndAbility(Handle, Info, Activation, Replicate, Cancelled);
     if (WasActive && !IsActive() && ASC)
     {
@@ -158,6 +162,8 @@ UDasAuthoredAbilitySystemComponent::GiveAuthoredAbility(TSubclassOf<UDasAuthored
         if (EffectClass)
         {
             const auto* Def = EffectClass->GetDefaultObject<UDasAuthoredGameplayEffect>();
+            if (!Def->PrepareCues())
+                return Result;
             if (!Def->RequiredMagnitudes.IsEmpty())
                 return Result;
             for (const auto& Mod : Def->Modifiers)
@@ -384,7 +390,7 @@ bool UDasAuthoredGameplayAbility::RunScriptHook(const FString& Entry, FName Phas
         ScriptError = TEXT("DAS runtime is unavailable");
         return false;
     }
-    TGuardValue<bool> ExecutingHook(ScriptActivating,true);
+    TGuardValue<bool> ExecutingHook(ScriptActivating, true);
     TGuardValue<FName> PhaseScope(ScriptPhase, Phase);
     TGuardValue<bool> CancelScope(ScriptCancelled, Cancelled);
     const auto Result = Runtime->DispatchGASAbilityHook(this, Entry);

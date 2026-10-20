@@ -194,7 +194,8 @@ UDasAuthoredAbilitySystemComponent::MakeAuthoredSpec(TSubclassOf<UDasAuthoredGam
         !FMath::IsFinite(Level) || Level <= 0)
         return Value;
     auto* Def = Class->GetDefaultObject<UDasAuthoredGameplayEffect>();
-    if (Def->DefinitionId.IsEmpty() || (Def->Modifiers.IsEmpty() && Def->Executions.IsEmpty()))
+    if (Def->DefinitionId.IsEmpty() ||
+        (Def->Modifiers.IsEmpty() && Def->Executions.IsEmpty() && Def->GameplayCues.IsEmpty()) || !Def->PrepareCues())
         return Value;
     if (!Definitions.Contains(Def))
     {
@@ -260,6 +261,8 @@ UDasAuthoredAbilitySystemComponent::ApplyAuthoredSpecInternal(const FDasAuthored
         if (!Def->RequiredMagnitudes.Contains(Pair.Key) || !FMath::IsFinite(Pair.Value) ||
             !FGameplayTag::RequestGameplayTag(Pair.Key, false).IsValid())
             return Result;
+    if (!Def->PrepareCues())
+        return Result;
     PruneActiveEffects();
     if (Def->DurationPolicy != EGameplayEffectDurationType::Instant &&
         (ActiveEffects.Num() >= 1024 || NextActiveId == MAX_int32))

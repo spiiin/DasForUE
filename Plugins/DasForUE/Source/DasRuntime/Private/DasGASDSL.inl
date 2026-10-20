@@ -3,8 +3,12 @@ const char* DSLGASKey = "_ue_gas_declaration";
 struct FUEGASDeclarationAnnotation : das::StructureAnnotation
 {
     bool Effect;
-    explicit FUEGASDeclarationAnnotation(bool IsEffect)
-        : StructureAnnotation(IsEffect ? "ue_gameplay_effect" : "ue_attribute_set"), Effect(IsEffect)
+    bool Cue;
+    explicit FUEGASDeclarationAnnotation(bool IsEffect, bool IsCue = false)
+        : StructureAnnotation(IsCue      ? "ue_gameplay_cue"
+                              : IsEffect ? "ue_gameplay_effect"
+                                         : "ue_attribute_set"),
+          Effect(IsEffect), Cue(IsCue)
     {
     }
     virtual bool touch(const das::StructurePtr& S, das::ModuleGroup&, das::AnnotationArgumentList& Args,
@@ -18,30 +22,50 @@ struct FUEGASDeclarationAnnotation : das::StructureAnnotation
                     DSLFail(TEXT("Reserved GAS declaration argument"));
                 return true;
             }
-            DSLAnnotationArguments(Args);
+            DSLAnnotationArguments(Args, Effect ? TSet<FString>{TEXT("cue")} : TSet<FString>{});
             if (!S->isClass || S->parent)
                 DSLFail(TEXT("GAS declarations require a class without DAS inheritance"));
             for (const auto& A : Args)
-                if (A.name != "id" &&
-                    (!Effect || (A.name != "attributes" && A.name != "execution" && A.name != "duration" && A.name != "period" &&
-                                 A.name != "execute_on_application" && A.name != "stacking" &&
-                                 A.name != "stack_limit" && A.name != "stack_duration" && A.name != "stack_period" &&
-                                 A.name != "stack_expiration" && A.name != "deny_overflow")))
+                if (A.name != "id" && (!Cue || (A.name != "tag" && A.name != "min_level" && A.name != "max_level")) &&
+                    (!Effect ||
+                     (A.name != "cue" && A.name != "attributes" && A.name != "execution" && A.name != "duration" &&
+                      A.name != "period" && A.name != "execute_on_application" && A.name != "stacking" &&
+                      A.name != "stack_limit" && A.name != "stack_duration" && A.name != "stack_period" &&
+                      A.name != "stack_expiration" && A.name != "deny_overflow")))
                     DSLFail(TEXT("Unknown GAS declaration option"));
             const FString Name = DSLText(S->name), Module = FPaths::GetBaseFilename(DSLText(S->at.fileInfo->name));
             auto Object = MakeShared<FJsonObject>();
-            Object->SetStringField(TEXT("kind"), Effect ? TEXT("effect"): TEXT("attributes"));
+            Object->SetStringField(TEXT("kind"), Cue ? TEXT("cue") : Effect ? TEXT("effect"): TEXT("attributes"));
             Object->SetStringField(TEXT("name"), Name);
             Object->SetStringField(TEXT("id"), DSLString(Args, "id", Module + TEXT(".")+ Name));
+            if (Cue)
+            {
+                Object->SetStringField(TEXT("tag"), DSLString(Args, "tag"));
+                for (const auto& A : Args)
+                    if (A.name == "min_level" || A.name == "max_level")
+                    {
+                        if (A.type != das::Type::tInt && A.type != das::Type::tFloat)
+                            DSLFail(TEXT("Cue level bounds require numbers"));
+                        Object->SetNumberField(DSLText(A.name),
+                                               A.type == das::Type::tInt ? double(A.iValue) : double(A.fValue));
+                    }
+            }
             if (Effect)
             {
                 Object->SetStringField(TEXT("attributes"), DSLString(Args, "attributes"));
+                TArray<TSharedPtr<FJsonValue>> Cues;
                 for (const auto& A : Args)
                 {
                     const FString Key = DSLText(A.name);
                     if (Key == TEXT("id") || Key == TEXT("attributes"))
                         continue;
-                    if (Key == TEXT("duration") && (A.type == das::Type::tInt || A.type == das::Type::tFloat))
+                    if (Key == TEXT("cue"))
+                    {
+                        if (A.type != das::Type::tString)
+                            DSLFail(TEXT("cue requires a declaration name"));
+                        Cues.Add(MakeShared<FJsonValueString>(DSLText(A.sValue)));
+                    }
+                    else if (Key == TEXT("duration") && (A.type == das::Type::tInt || A.type == das::Type::tFloat))
                     {
                         Object->SetStringField(TEXT("duration"), TEXT("HasDuration"));
                         Object->SetNumberField(TEXT("seconds"),
@@ -67,12 +91,15 @@ struct FUEGASDeclarationAnnotation : das::StructureAnnotation
                         Object->SetStringField(Key, DSLText(A.sValue));
                     }
                 }
+                Object->SetArrayField(TEXT("cues"), Cues);
             }
             TArray<TSharedPtr<FJsonValue>> Fields;
             for (const auto& F : S->fields)
             {
                 if (F.generated || F.name == "__rtti")
                     continue;
+                if (Cue)
+                    DSLFail(TEXT("Cue assets have no DAS members; use GameplayCueReceived on the target"));
                 if (F.classMethod || !F.type || DSLTypeName(F.type) != TEXT("float"))
                     DSLFail(TEXT("GAS declarations support only float fields; unsupported member: ") + DSLText(F.name));
                 auto Value = DSLParameterDefault(F.init);
@@ -99,7 +126,8 @@ struct FUEGASDeclarationAnnotation : das::StructureAnnotation
                         else
                             DSLFail(TEXT("Attribute min/max requires a number; max also accepts a field name"));
                     }
-                    else if (Effect && (Key == TEXT("operation") || Key == TEXT("set_by_caller") || Key == TEXT("calculation")))
+                    else if (Effect &&
+                             (Key == TEXT("operation") || Key == TEXT("set_by_caller") || Key == TEXT("calculation")))
                     {
                         if (A.type != das::Type::tString)
                             DSLFail(TEXT("Modifier annotations require strings"));

@@ -54,6 +54,26 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             return Fail(TEXT("Invalid/duplicate GAS declaration or field count"));
         Names.Add(Name.ToLower());
         Ids.Add(Id);
+        if (Kind == TEXT("cue"))
+        {
+            FDasGASCueDeclaration D;
+            D.Name = Name;
+            D.Id = Id;
+            FString Tag;
+            if (!Fields->IsEmpty() ||
+                !Object->TryGetStringField(
+                    TEXT("tag"), Tag) || !FGameplayTag::IsValidGameplayTagString(Tag) ||
+                    !Tag.StartsWith(
+                        TEXT("GameplayCue.")) ||
+                        (Object->HasField(TEXT("min_level")) && !GASNumber(Object, TEXT("min_level"), D.MinLevel)) ||
+                         (Object->HasField(TEXT("max_level")) && !GASNumber(Object, TEXT("max_level"), D.MaxLevel)) ||
+                          D.MinLevel < 0 || D.MaxLevel <= D.MinLevel ||
+                          Candidate.Cues.ContainsByPredicate([&](const auto& C) { return C.Tag == FName(*Tag); }))
+                return Fail(TEXT("Cue requires unique GameplayCue child tag and finite 0 <= min_level < max_level"));
+            D.Tag = FName(*Tag);
+            Candidate.Cues.Add(MoveTemp(D));
+            continue;
+        }
         if (Kind == TEXT("calculation"))
         {
             FDasGASCalculationDeclaration D;
@@ -205,7 +225,8 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             Candidate.Abilities.Add(MoveTemp(Ability));
             continue;
         }
-        if (Fields->IsEmpty() && !(Kind == TEXT("effect")&& Object->HasField(TEXT("execution"))))
+        if (Fields->IsEmpty() &&
+            !(Kind == TEXT("effect") && (Object->HasField(TEXT("execution")) || Object->HasField(TEXT("cues")))))
             return Fail(TEXT("AttributeSet/GameplayEffect declarations require fields"));
         TSet<FName> FieldNames;
         FDasGASSetDeclaration Set;
@@ -219,6 +240,19 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             return Fail(TEXT("Effect requires an explicit attribute-set name and 1..32 modifiers"));
         if (Kind == TEXT("effect"))
         {
+            if (Object->HasField(TEXT("cues")))
+            {
+                const TArray<TSharedPtr<FJsonValue>>* Cues = nullptr;
+                if (!Object->TryGetArrayField(TEXT("cues"), Cues) || Cues->Num() > 16)
+                    return Fail(TEXT("Effect accepts at most 16 cue declarations"));
+                for (const auto& C : *Cues)
+                {
+                    FString Hint;
+                    if (!C->TryGetString(Hint) || Hint.IsEmpty())
+                        return Fail(TEXT("Invalid cue reference"));
+                    Effect.Cues.Add(Hint);
+                }
+            }
             if (Object->HasField(TEXT("execution")) &&
                                  (!Object->TryGetStringField(TEXT("execution"), Effect.Execution) ||
                                                              Effect.Execution.IsEmpty()))
@@ -400,6 +434,18 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
     }
     for (auto& Effect : Candidate.Effects)
     {
+        TSet<FString> SeenCues;
+        for (auto& Hint : Effect.Cues)
+        {
+            const auto* C =
+                Candidate.Cues.FindByPredicate([&](const auto& D) { return D.Name == Hint || D.Id == Hint; });
+            if (!C || SeenCues.Contains(C->Id))
+                return Fail(TEXT("Unknown or repeated cue in explicit registry"));
+            Hint = C->Id;
+            SeenCues.Add(Hint);
+        }
+        if (Effect.Modifiers.IsEmpty() && Effect.Execution.IsEmpty() && Effect.Cues.IsEmpty())
+            return Fail(TEXT("Effect requires modifiers, execution or cues"));
         const auto* Set = Candidate.Sets.FindByPredicate(
             [&](const auto& S) { return S.Name == Effect.Attributes || S.Id == Effect.Attributes; });
         if (!Set)

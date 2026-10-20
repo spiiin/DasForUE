@@ -76,3 +76,12 @@ public:
     UDasGASCuesCommandlet();
     virtual int32 Main(const FString& Params) override;
 };
+
+UCLASS()
+class UDasGASCueAssetsCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
+public:
+    UDasGASCueAssetsCommandlet();
+    virtual int32 Main(const FString& Params) override;
+};

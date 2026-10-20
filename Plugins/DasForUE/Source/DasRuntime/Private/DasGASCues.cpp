@@ -18,18 +18,24 @@ FGameplayTag CueTag(FName Name)
     const auto Root = FGameplayTag::RequestGameplayTag(TEXT("GameplayCue"), false);
     return Tag.IsValid() && Root.IsValid() && Tag != Root && Tag.MatchesTag(Root) ? Tag : FGameplayTag();
 }
-bool InstallBridge(FGameplayTag Tag)
+bool InstallBridge(FGameplayTag Tag, UClass* Class = UDasGameplayCueNotify::StaticClass())
 {
     auto* Manager = UAbilitySystemGlobals::Get().GetGameplayCueManager();
     auto* Set = Manager ? Manager->GetRuntimeCueSet() : nullptr;
     if (!Set)
         return false;
-    auto* Class = UDasGameplayCueNotify::StaticClass();
     const FSoftObjectPath Path(Class);
     auto* Existing = Set->GameplayCueData.FindByPredicate([&](const auto& D) { return D.GameplayCueTag == Tag; });
     if (Existing)
     {
         // Never take a tag away from another native/asset notify.
+        if (Class == UDasGameplayCueNotify::StaticClass() && Existing->LoadedGameplayCueClass &&
+            Existing->LoadedGameplayCueClass->IsChildOf(UDasGameplayCueNotify::StaticClass()))
+        {
+            const auto* Cue = Existing->LoadedGameplayCueClass->GetDefaultObject<UDasGameplayCueNotify>();
+            if (!Cue->DefinitionId.IsEmpty() && Cue->GameplayCueTag == Tag)
+                return true;
+        }
         if (Existing->GameplayCueNotifyObj != Path ||
             (Existing->LoadedGameplayCueClass && Existing->LoadedGameplayCueClass != Class))
             return false;
@@ -42,7 +48,11 @@ bool InstallBridge(FGameplayTag Tag)
         return false;
     int32 BridgeCount = 0;
     for (const auto& Data : Set->GameplayCueData)
-        BridgeCount += Data.GameplayCueNotifyObj == Path ? 1 : 0;
+        BridgeCount += Data.GameplayCueNotifyObj == FSoftObjectPath(UDasGameplayCueNotify::StaticClass()) ||
+                               (Data.LoadedGameplayCueClass &&
+                                Data.LoadedGameplayCueClass->IsChildOf(UDasGameplayCueNotify::StaticClass()))
+                           ? 1
+                           : 0;
     if (BridgeCount >= 1024)
         return false;
     Set->AddCues({FGameplayCueReferencePair(Tag, Path)});
@@ -53,6 +63,50 @@ bool InstallBridge(FGameplayTag Tag)
     return true;
 }
 }
+bool RegisterDasGASCueAssets(const TArray<TSubclassOf<UDasGameplayCueNotify>>& Classes)
+{
+    if (!IsInGameThread() || Classes.Num() > 16)
+        return false;
+    if (Classes.IsEmpty())
+        return true;
+    auto* Manager = UAbilitySystemGlobals::Get().GetGameplayCueManager();
+    auto* Set = Manager ? Manager->GetRuntimeCueSet() : nullptr;
+    if (!Set)
+        return false;
+    TSet<FName> Tags;
+    int32 NewRoutes = 0;
+    for (auto Class : Classes)
+    {
+        if (!Class || Class->HasAnyClassFlags(CLASS_Abstract | CLASS_NewerVersionExists))
+            return false;
+        const auto* Cue = Class->GetDefaultObject<UDasGameplayCueNotify>();
+        const auto Tag = CueTag(Cue->GameplayCueTag.GetTagName());
+        if (Cue->DefinitionId.IsEmpty() || !Tag.IsValid() || Tags.Contains(Tag.GetTagName()))
+            return false;
+        Tags.Add(Tag.GetTagName());
+        const auto* Existing =
+            Set->GameplayCueData.FindByPredicate([&](const auto& D) { return D.GameplayCueTag == Tag; });
+        if (Existing)
+        {
+            if (Existing->GameplayCueNotifyObj != FSoftObjectPath(Class.Get()) ||
+                (Existing->LoadedGameplayCueClass && Existing->LoadedGameplayCueClass != Class.Get()))
+                return false;
+        }
+        else
+            ++NewRoutes;
+    }
+    // Preflight every route before mutation; never replace unrelated notifies.
+    if ((NewRoutes && CueRouteDepth) || Set->GameplayCueData.Num() + NewRoutes > 1024)
+        return false;
+    for (auto Class : Classes)
+        if (!InstallBridge(Class->GetDefaultObject<UDasGameplayCueNotify>()->GameplayCueTag, Class.Get()))
+            return false;
+    return true;
+}
+bool UDasAuthoredGameplayEffect::PrepareCues() const
+{
+    return RegisterDasGASCueAssets(CueAssets);
+}
 UDasGameplayCueNotify::UDasGameplayCueNotify(const FObjectInitializer& Initializer) : Super(Initializer)
 {
     IsOverride = false;
@@ -61,6 +115,10 @@ void UDasGameplayCueNotify::HandleGameplayCue(AActor* Target, EGameplayCueEvent:
                                               const FGameplayCueParameters& P)
 {
     if (!IsInGameThread() || !IsValid(Target) || Target->IsActorBeingDestroyed())
+        return;
+    TGuardValue<int32> RouteScope(CueRouteDepth, CueRouteDepth + 1);
+    Super::HandleGameplayCue(Target, Event, P);
+    if (!IsValid(Target) || Target->IsActorBeingDestroyed())
         return;
     auto* ASC = Cast<UDasAuthoredAbilitySystemComponent>(
         UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Target, true));
@@ -84,8 +142,8 @@ void UDasGameplayCueNotify::HandleGameplayCue(AActor* Target, EGameplayCueEvent:
     default:
         return;
     }
-    TGuardValue<int32> RouteScope(CueRouteDepth, CueRouteDepth + 1);
-    ASC->ReceiveAuthoredCue(P.OriginalTag.GetTagName(), P.MatchedTagName.GetTagName(), Phase, P);
+    ASC->ReceiveAuthoredCue(P.OriginalTag.GetTagName(), P.MatchedTagName.GetTagName(), Phase, P,
+                            !DefinitionId.IsEmpty());
 }
 bool UDasAuthoredAbilitySystemComponent::WatchAuthoredCue(FName Name)
 {
@@ -169,10 +227,10 @@ void UDasAuthoredAbilitySystemComponent::ClearAuthoredCues()
     WatchedCues.Empty();
 }
 void UDasAuthoredAbilitySystemComponent::ReceiveAuthoredCue(FName Tag, FName Matched, FName Event,
-                                                            const FGameplayCueParameters& P)
+                                                            const FGameplayCueParameters& P, bool AuthoredAsset)
 {
     if (!IsInGameThread() || Ended || !IsValid(GetOwner()) || GetOwner()->IsActorBeingDestroyed() || !GetWorld() ||
-        !GetWorld()->IsGameWorld() || GetWorld()->bIsTearingDown || !WatchedCues.Contains(Matched))
+        !GetWorld()->IsGameWorld() || GetWorld()->bIsTearingDown || (!AuthoredAsset && !WatchedCues.Contains(Matched)))
         return;
     FDasGASCueEvent R;
     R.Tag = Tag;

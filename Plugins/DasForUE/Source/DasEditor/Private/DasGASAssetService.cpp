@@ -1,6 +1,10 @@
 #include "DasGASAssetService.h"
 #include "DasGASAuthoring.h"
 #include "DasGASCalculations.h"
+#include "DasGASCues.h"
+#include "AbilitySystemGlobals.h"
+#include "GameplayCueManager.h"
+#include "GameplayCueSet.h"
 #include "DasRuntime.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -89,6 +93,16 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
     };
     TArray<FWork> Work;
     TMap<FString, FString> Hashes;
+    for (const auto& Cue : Model.Cues)
+    {
+        if (!FGameplayTag::RequestGameplayTag(Cue.Tag, false).IsValid())
+            return Fail(TEXT("Cue tag is not registered: ")+ Cue.Tag.ToString());
+        const auto Hash = FMD5::HashAnsiString(*FString::Printf(
+            TEXT("%s|cue-v1|%s|%.9g|%.9g"), *Cue.Id, *Cue.Tag.ToString(), double(Cue.MinLevel), double(Cue.MaxLevel)));
+        Hashes.Add(Cue.Id, Hash);
+        Work.Add(
+            {Cue.Name, Cue.Id, Folder + TEXT("/GCN_")+ Cue.Name, Hash, UDasGameplayCueNotify::StaticClass(), nullptr});
+    }
     for (const auto& Set : Model.Sets)
     {
         const auto Hash = SetDigest(Set);
@@ -120,7 +134,9 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             if (!M.SetByCaller.IsNone() && !FGameplayTag::RequestGameplayTag(M.SetByCaller, false).IsValid())
                 return Fail(TEXT("SetByCaller tag is not registered: ")+ M.SetByCaller.ToString());
         FString Value = EffectDigest(Effect, Hashes.FindChecked(Effect.Attributes));
-        bool Calculated = false;
+        bool Calculated = !Effect.Cues.IsEmpty();
+        for (const auto& Cue : Effect.Cues)
+            Value += TEXT("|cue|")+ Hashes.FindChecked(Cue);
         if (!Effect.Execution.IsEmpty())
         {
             Value += TEXT("|")+ Hashes.FindChecked(Effect.Execution);
@@ -145,6 +161,24 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
                   Folder + TEXT("/GA_") + Ability.Name, AbilityDigest(Ability, Hashes),
                                 UDasAuthoredGameplayAbility::StaticClass(), nullptr});
     }
+    // AssetCreated can register native notify routes too: protect them before creating any cue asset.
+    if (!Model.Cues.IsEmpty())
+    {
+        auto* Manager = UAbilitySystemGlobals::Get().GetGameplayCueManager();
+        auto* Set = Manager ? Manager->GetRuntimeCueSet() : nullptr;
+        if (!Set)
+            return Fail(TEXT("GameplayCue runtime set is unavailable"));
+        for (const auto& Cue : Model.Cues)
+        {
+            const auto* W = Work.FindByPredicate([&](const auto& A) { return A.Id == Cue.Id; });
+            const auto* Existing = Set->GameplayCueData.FindByPredicate(
+                [&](const auto& D) { return D.GameplayCueTag.GetTagName() == Cue.Tag; });
+            const FSoftObjectPath Expected(W->Path + TEXT(".")+ FPackageName::GetLongPackageAssetName(W->Path) +
+                                                          TEXT("_C"));
+            if (Existing && Existing->GameplayCueNotifyObj != Expected)
+                return Fail(TEXT("Cue tag already belongs to another notify asset: ")+ Cue.Tag.ToString());
+        }
+    }
     // Check the entire batch before creating any UObject or changing an existing package.
     for (auto& W : Work)
     {
@@ -159,6 +193,11 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             return Fail(TEXT("GAS import target is not a compatible compiled Blueprint"));
         const auto* CDO = W.BP->GeneratedClass->GetDefaultObject();
         FString Id, Hash;
+        if (const auto* Cue = Cast<UDasGameplayCueNotify>(CDO))
+        {
+            Id = Cue->DefinitionId;
+            Hash = Cue->DefinitionHash;
+        }
         if (const auto* Set = Cast<UDasAuthoredAttributeSet>(CDO))
         {
             Id = Set->DefinitionId;
@@ -309,6 +348,30 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
         Calculations.Add(D.Id, W.BP->GeneratedClass.Get());
         Out.Add(D.Name, W.BP);
     }
+    for (const auto& Cue : Model.Cues)
+    {
+        auto& W = *Work.FindByPredicate([&](const auto& A) { return A.Id == Cue.Id; });
+        if (!W.BP)
+        {
+            W.BP = NewGASBlueprint(W.Path, W.Parent);
+            if (!W.BP)
+                return Fail(TEXT("Cannot create cue Blueprint"));
+            Created.Add(W.BP);
+            FKismetEditorUtilities::CompileBlueprint(W.BP);
+            if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
+                return Fail(TEXT("Cue Blueprint compilation failed"));
+            auto* CDO = CastChecked<UDasGameplayCueNotify>(W.BP->GeneratedClass->GetDefaultObject());
+            CDO->DefinitionId = Cue.Id;
+            CDO->DefinitionHash = W.Hash;
+            CDO->GameplayCueTag = FGameplayTag::RequestGameplayTag(Cue.Tag);
+            CDO->GameplayCueName = Cue.Tag;
+            CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
+                ->UpdateCustomPropertyListForPostConstruction();
+            FAssetRegistryModule::AssetCreated(W.BP);
+            W.BP->MarkPackageDirty();
+        }
+        Out.Add(Cue.Name, W.BP);
+    }
     for (const auto& Effect : Model.Effects)
     {
         auto& W = *Work.FindByPredicate([&](const auto& A) { return A.Id == Effect.Id; });
@@ -323,6 +386,24 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
                 return Fail(TEXT("GameplayEffect Blueprint compilation failed"));
             auto* CDO = CastChecked<UDasAuthoredGameplayEffect>(W.BP->GeneratedClass->GetDefaultObject());
             CDO->DefinitionId = Effect.Id;
+            CDO->GameplayCues.Empty();
+            CDO->CueAssets.Empty();
+            for (const auto& Id : Effect.Cues)
+            {
+                const auto* Cue = Model.Cues.FindByPredicate([&](const auto& C) { return C.Id == Id; });
+                auto* CueClass =
+                    Work.FindByPredicate([&](const auto& A) { return A.Id == Id; })->BP->GeneratedClass.Get();
+                CDO->CueAssets.Add(CueClass);
+                // A native cue entry already holds a tag container. Share it for identical bounds.
+                // UE 5.8 full replication dispatches the entire spec once per entry on add/remove.
+                auto* Entry = CDO->GameplayCues.FindByPredicate(
+                    [&](const auto& C) { return C.MinLevel == Cue->MinLevel && C.MaxLevel == Cue->MaxLevel; });
+                const auto Tag = FGameplayTag::RequestGameplayTag(Cue->Tag);
+                if (Entry)
+                    Entry->GameplayCueTags.AddTag(Tag);
+                else
+                    CDO->GameplayCues.Add(FGameplayEffectCue(Tag, Cue->MinLevel, Cue->MaxLevel));
+            }
             CDO->DefinitionHash = W.Hash;
             CDO->DurationPolicy =
                 Effect.Duration == TEXT("HasDuration")

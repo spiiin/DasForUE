@@ -790,33 +790,46 @@ FDasExecutionResult FDasRuntimeModule::DispatchInputEventSnapshots(const FString
     return RunNamedFramePersistent(Path, Entry, Args, EDasMethodSignature::Int, Self);
 }
 
-FDasExecutionResult FDasRuntimeModule::DispatchGASCalculation(UObject* Owner,const FString& Script,const FString& Entry,const FString& Contract,const FDasGASCalculationContext& Context, bool StructuredOutput)
+FDasExecutionResult FDasRuntimeModule::DispatchGASCalculation(UObject* Owner, const FString& Script,
+                                                              const FString& Entry, const FString& Contract,
+                                                              const FDasGASCalculationContext& Context,
+                                                              bool StructuredOutput)
 {
     FDasExecutionResult Rejected;
-    if(!IsInGameThread()||!IsValid(Owner)||AuthoredDispatchDepth>=32||ConstructingObject||Contract.Len()!=32||
-       (!Owner->IsA<UDasGASMagnitudeCalculation>()&&!Owner->IsA<UDasGASExecutionCalculation>())) {
-       Rejected.Error=TEXT("Invalid GAS calculation dispatch");return Rejected;}
-    FDasScalarValue A;A.Kind=12;A.ObjectClass=FDasGASCalculationContext::StaticStruct()->GetPathName();A.StructValue.InitializeAs<FDasGASCalculationContext>(Context);
-    TGuardValue<int32> Depth(AuthoredDispatchDepth,AuthoredDispatchDepth+1);
-    TGuardValue<const FString*> Scope(GASCalculationContract,&Contract);
-    return RunNamedFramePersistent(ScriptPath(Script),Entry,{A},
-        StructuredOutput ? EDasMethodSignature::Struct : EDasMethodSignature::Float,Owner,
-        StructuredOutput ? TEXT("/Script/DasRuntime.DasGASExecutionResult") : FString());
+    if (!IsInGameThread() || !IsValid(Owner) || AuthoredDispatchDepth >= 32 || ConstructingObject ||
+        Contract.Len() != 32 ||
+        (!Owner->IsA<UDasGASMagnitudeCalculation>() && !Owner->IsA<UDasGASExecutionCalculation>()))
+    {
+        Rejected.Error = TEXT("Invalid GAS calculation dispatch");
+        return Rejected;
+    }
+    FDasScalarValue A;
+    A.Kind = 12;
+    A.ObjectClass = FDasGASCalculationContext::StaticStruct()->GetPathName();
+    A.StructValue.InitializeAs<FDasGASCalculationContext>(Context);
+    TGuardValue<int32> Depth(AuthoredDispatchDepth, AuthoredDispatchDepth + 1);
+    TGuardValue<const FString*> Scope(GASCalculationContract, &Contract);
+    return RunNamedFramePersistent(ScriptPath(Script), Entry, {A},
+                                   StructuredOutput ? EDasMethodSignature::Struct : EDasMethodSignature::Float, Owner,
+                                   StructuredOutput ? TEXT("/Script/DasRuntime.DasGASExecutionResult") : FString());
 }
 
-FDasExecutionResult FDasRuntimeModule::DispatchGASAbilityHook(UDasAuthoredGameplayAbility* Ability, const FString& Entry)
+FDasExecutionResult FDasRuntimeModule::DispatchGASAbilityHook(UDasAuthoredGameplayAbility* Ability,
+                                                              const FString& Entry)
 {
     FDasExecutionResult Rejected;
     if (!IsInGameThread() || !IsValid(Ability) || Ability->IsTemplate() || Ability->ScriptFile.IsEmpty() ||
-        Entry.IsEmpty() || (Entry != Ability->ActivateEntry && Entry != Ability->EndEntry && Entry != Ability->CancelEntry && Entry != Ability->TaskEntry) ||
+        Entry.IsEmpty() ||
+        (Entry != Ability->ActivateEntry && Entry != Ability->EndEntry && Entry != Ability->CancelEntry &&
+         Entry != Ability->TaskEntry) ||
         ConstructingObject || AuthoredDispatchDepth >= 32)
     {
         Rejected.Error = TEXT("Invalid or recursive GAS ability hook dispatch");
         return Rejected;
     }
     const auto Context = Ability->ScriptAbilityContext();
-    if (Context.ActivationId <= 0 || Context.GrantId <= 0 || !IsValid(Context.Owner) ||
-        !IsValid(Context.System) || !Context.Owner->GetWorld() || Context.Owner->IsActorBeingDestroyed() ||
+    if (Context.ActivationId <= 0 || Context.GrantId <= 0 || !IsValid(Context.Owner) || !IsValid(Context.System) ||
+        !Context.Owner->GetWorld() || Context.Owner->IsActorBeingDestroyed() ||
         Context.Owner->GetWorld()->bIsTearingDown)
     {
         Rejected.Error = TEXT("GAS ability context has expired");
@@ -827,7 +840,8 @@ FDasExecutionResult FDasRuntimeModule::DispatchGASAbilityHook(UDasAuthoredGamepl
     Argument.ObjectClass = FDasAuthoredAbilityContext::StaticStruct()->GetPathName();
     Argument.StructValue.InitializeAs<FDasAuthoredAbilityContext>(Context);
     TGuardValue<int32> Depth(AuthoredDispatchDepth, AuthoredDispatchDepth + 1);
-    return RunNamedFramePersistent(ScriptPath(Ability->ScriptFile), Entry, {Argument}, EDasMethodSignature::Void, Ability);
+    return RunNamedFramePersistent(ScriptPath(Ability->ScriptFile), Entry, {Argument}, EDasMethodSignature::Void,
+                                   Ability);
 }
 
 FDasExecutionResult FDasRuntimeModule::RunNamedFramePersistent(const FString& Path, const FString& Entry,
@@ -886,7 +900,10 @@ bool FDasRuntimeModule::ReadGASScript(const FString& Path, FDasGASDeclarations& 
                     A = DSLAnnotation(S->annotations, "ue_gameplay_effect");
                 if (!A)
                     A = DSLAnnotation(S->annotations, "ue_gameplay_ability");
-                if(!A) A=DSLAnnotation(S->annotations,"ue_gas_calculation");
+                if (!A)
+                    A = DSLAnnotation(S->annotations, "ue_gas_calculation");
+                if (!A)
+                    A = DSLAnnotation(S->annotations, "ue_gameplay_cue");
                 if (!A || !OK)
                     return;
                 const auto* Wire = A->arguments.find(DSLGASKey, das::Type::tString);

@@ -4,6 +4,7 @@
 #include "AttributeSet.h"
 #include "GameplayEffect.h"
 #include "DasGASAbility.h"
+#include "DasGASCues.h"
 #include "DasGASAuthoring.generated.h"
 
 USTRUCT()
@@ -38,10 +39,17 @@ struct FDasGASModifierDeclaration
     FName SetByCaller;
     FString Calculation;
 };
+struct FDasGASCueDeclaration
+{
+    FString Name, Id;
+    FName Tag;
+    float MinLevel = 0, MaxLevel = 1;
+};
 struct FDasGASEffectDeclaration
 {
     FString Name, Id, Attributes;
     TArray<FDasGASModifierDeclaration> Modifiers;
+    TArray<FString> Cues;
     FString Execution;
     FString Duration = TEXT("Instant");
     float Seconds = 0;
@@ -92,6 +100,7 @@ struct FDasGASDeclarations
 {
     TArray<FDasGASCalculationDeclaration> Calculations;
     TArray<FDasGASSetDeclaration> Sets;
+    TArray<FDasGASCueDeclaration> Cues;
     TArray<FDasGASEffectDeclaration> Effects;
     TArray<FDasGASAbilityDeclaration> Abilities;
 };
@@ -131,6 +140,9 @@ public:
     FString DefinitionHash;
     UPROPERTY()
     TArray<FName> RequiredMagnitudes;
+    UPROPERTY()
+    TArray<TSubclassOf<UDasGameplayCueNotify>> CueAssets;
+    bool PrepareCues() const;
 };
 class UDasAuthoredAbilitySystemComponent;
 USTRUCT(BlueprintType)
@@ -220,7 +232,8 @@ public:
     bool AuthoredCueActive(FName Tag) const;
     UFUNCTION(BlueprintPure, Category = "GAS|Cues")
     FDasGASCueEvent EmptyAuthoredCueEvent() const { return {}; }
-    void ReceiveAuthoredCue(FName Tag, FName MatchedTag, FName Event, const FGameplayCueParameters& Parameters);
+    void ReceiveAuthoredCue(FName Tag, FName MatchedTag, FName Event, const FGameplayCueParameters& Parameters,
+                            bool AuthoredAsset = false);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     FDasAuthoredAbilityGrant GiveAuthoredAbility(TSubclassOf<UDasAuthoredGameplayAbility> Class, int32 Level = 1);
     UFUNCTION(BlueprintPure, Category = "GAS")
