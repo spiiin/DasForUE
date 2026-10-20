@@ -845,6 +845,7 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
     return K;
 }
 #include "DasCallbackFramesDSL.inl"
+#include "DasReflectionMacros.inl"
 #include "DasWidgetLayoutsDSL.inl"
 #include "DasWidgetLayoutUsesDSL.inl"
 #include "DasDSLBodyVisitor.inl"

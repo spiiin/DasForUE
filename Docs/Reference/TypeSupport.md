@@ -35,17 +35,17 @@ This page summarizes which value kinds can appear in which positions of authored
 
 ## Generated native API
 
-| Value kind | [`ue_generated`](GeneratedBindings.md) | [Native class bindings](NativeClassBindings.md) | [API packages](../Api/README.md) | [Low-level frames](LowLevelCalls.md) |
+| Value kind | [`ue_generated`](GeneratedBindings.md) | [Native class bindings](NativeClassBindings.md) | [API packages](../Api/README.md) | [Frame transport (developer)](../Dev/Runtime/LowLevelCalls.md) |
 | --- | --- | --- | --- | --- |
 | Scalars, FString | Yes | Yes | Yes | Yes |
-| `uint8` | — | Yes (0..255 checked) | Yes | `ue_arg_byte` |
-| FName | `UEName` | `UENameValue` | `UEName` | `ue_arg_name` |
+| `uint8` | — | Yes (0..255 checked) | Yes | Yes (0..255 checked) |
+| FName | `UEName` | `UENameValue` | `UEName` | Yes |
 | FText | — | `UETextValue` | `UETextValue` | — |
 | Enum | `E_*` enums | `[ue_native_enum]` types (0..254) | `E_*` enums | by symbol |
 | Vector / Rotator / Transform | `S_*` structs | canonical math | canonical math | field paths |
 | Other value structs | `S_*` structs | supported generated structs | `S_*` structs | field paths |
 | Object reference | `C_*` views | typed refs, automatic upcasts | `C_*` views + typedefs | `UObjectHandle` |
-| Class reference | — | Yes | Yes | `ue_arg_class` |
+| Class reference | — | Yes | Yes | Yes |
 | Soft object / class | — | Yes | No generic ABI (dedicated adapters only) | — |
 | Weak object fields | — | — | Yes (no strong pin) | — |
 | `TArray` | Yes | Yes | Yes | Yes |

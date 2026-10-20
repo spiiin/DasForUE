@@ -128,33 +128,26 @@ Use `return <- result` to return a moved local. Clone a const input before editi
 - Name members use context-owned `UENameValue` tokens. Use `ue_name_value`, `ue_name_text`, `ue_names_equal`.
 - Math members are validated recursively: non-finite values or unnormalized transforms are rejected before publication.
 
-## Native Unreal structs: `UEStructValue`
+## Native Unreal structs
 
-For a loaded native `UScriptStruct` that has no built-in type (for example `/Script/CoreUObject.LinearColor` or a game struct), use an immutable `UEStructValue` snapshot:
+Prefer the canonical typed native structs from generated modules:
 
 ```das
+require ue_native_gameplay
+
 @ue_property=(EditAnywhere, BlueprintReadWrite)
-Payload : UEStructValue = ue_struct_default("/Script/DasRuntime.DasCallPayload",
-                                            "(Count=10,Label=\"Initial\")")
+Payload : DasCallPayload = DasCallPayload(Count=10, Label="Initial")
 
 [ue_function(BlueprintCallable)]
 def Add(amount:int):int {
-    let next = ue_struct_get_int(self.Payload, "Count") + amount
-    self.Payload = ue_struct_with_int(self.Payload, "Count", next)
-    return next
+    var value = self.Payload
+    value.Count = ue_struct_get(value, Count) + amount
+    self.Payload = value
+    return value.Count
 }
-
-[ue_function(BlueprintCallable, return_struct="/Script/DasRuntime.DasCallPayload")]
-def Read():UEStructValue { return self.Payload }
 ```
 
-- `ue_struct_value(path)` uses the native constructor default. `ue_struct_default(path, text)` takes literal Unreal export text: named fields in parentheses, nested structs, quoted strings, scalar/name/enum values, up to 1 MiB. Unknown or duplicate fields, malformed text and trailing data are rejected before the Blueprint changes. Omitted fields keep the constructor default.
-- Read fields with `ue_struct_get_int/float/double/bool/string/name` and produce changed copies with the matching `ue_struct_with_*`. A write checks the exact `UScriptStruct` identity and read-only flags. Assigning a different struct type fails before the actor changes.
-- Signatures name the struct with `arg_<name>_struct="..."` and `return_struct="..."`.
-- Accepted structs contain supported scalar, name, enum, nested-struct, math and object leaves. Opaque structs, structs with weak/lazy/interface fields, and structs with custom reference collection are rejected.
-- Many engine structs (Quat, LinearColor, Box, ...) also have generated typed wrappers in `ue_api_math` and the other API packages. See [API packages](../../Api/README.md).
-
-The older `UEEnumValue`/`UEStructValue` path-based bridge for authored types (`ue_enum_value("/Game/MyTypes/State.State", "Idle")`, `arg_<name>_enum`, `return_enum`) still works. Prefer the natural typed syntax above. For details on snapshot APIs and lifetime, see [Struct snapshots](../../Reference/StructSnapshots.md).
+`ue_struct_get(value, Field)` checks field names and types during compilation and expands to ordinary typed field access. Nested reads compose. Generic `UEStructValue` snapshots remain available for structs without a generated source type; their path-based transport is described in the [developer reference](../../Dev/Runtime/StructSnapshots.md). See [API packages](../../Api/README.md) for generated engine structs.
 
 ## Changing a struct later
 

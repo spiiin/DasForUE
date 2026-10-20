@@ -246,14 +246,9 @@ Calls run on the game thread and require a reflected implementation on the
 receiver. Native C++ `Execute_*` implementations without a reflected function are
 not reachable through reflection.
 
-### Low-level calls
+### Explicit typed calls
 
-`ue_interface_call_int`, `ue_interface_call_string` and
-`ue_begin_interface_call(object, interfacePath, method)` give untyped access with
-explicit frames. The interface argument may be `ue_type(Name)` inside reflected
-methods. See [LowLevelCalls.md](../../Reference/LowLevelCalls.md) for the frame
-contract (membership and signature are validated when the frame is created and
-again before invocation).
+Use a typed interface reference with `ue_call(type<DasProbeInterface>, Query, target, 5)`. Names and argument types are checked during compilation; the normal reflected membership and signature checks still run at invocation. See [reflected call macros](../../Reference/LowLevelCalls.md).
 
 ### Natural source values in generated calls
 

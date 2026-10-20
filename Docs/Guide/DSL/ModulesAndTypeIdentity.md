@@ -100,7 +100,7 @@ def Supports(target:UObjectHandle):bool {
 | --- | --- |
 | `ue_object_value` | first: native class |
 | `ue_cast_object`, `ue_cast_nullable_object`, `ue_object_is_a` | second: native class |
-| `ue_begin_interface_call`, `ue_implements_interface`, `ue_interface_call_int/string` | second: interface |
+| `ue_implements_interface` | second: interface |
 | `ue_enum_value`, `ue_enum_from_number` | first: enum |
 | `ue_struct_value`, `ue_struct_default` | first: struct |
 

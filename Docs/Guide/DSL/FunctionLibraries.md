@@ -81,7 +81,7 @@ class GameQueries {
     // In Blueprint, context is hidden and supplied from the calling object.
     [ue_function(BlueprintPure, WorldContext="context")]
     def static Time(context:ObjectRef):double {
-        return ue_lib_Time()
+        return ue_static(GameplayStatics.GetTimeSeconds)
     }
 
     [ue_function(BlueprintCallable)]
@@ -161,13 +161,13 @@ See [Defaults](Defaults.md#parameter-defaults).
 
 Static `BlueprintCallable` functions of loaded `UBlueprintFunctionLibrary`
 subclasses (engine libraries and your own C++ libraries) can be exported into a
-generated module and called as free functions:
+generated module and called through compile-time macros:
 
 ```das
 require ue_library_generated
-let magnitude = ue_lib_Abs(-3.0lf)
-let seconds = ue_lib_Time()
-let total = ue_lib_Add(20,22)
+let magnitude = ue_static(KismetMathLibrary.Abs, -3.0lf)
+let seconds = ue_static(GameplayStatics.GetTimeSeconds)
+let total = ue_static(DasFunctionLibraryFixture.Add, 20,22)
 ```
 
 - Aliases come from `Bindings/FunctionLibraries.json`; use `class_rules` or explicit

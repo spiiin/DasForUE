@@ -248,6 +248,7 @@ struct S_Vector_NetQuantizeNormal_c54f8383 {
     f_z : double
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Abs", signature="v1;Abs;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Abs(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Abs", "")
     ue_expect_signature(call, "v1;Abs;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -259,6 +260,7 @@ def ue_math_Abs(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Abs_Int", signature="v1;Abs_Int;A:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Abs_Int(arg_a : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Abs_Int", "")
     ue_expect_signature(call, "v1;Abs_Int;A:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -270,6 +272,7 @@ def ue_math_Abs_Int(arg_a : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Acos", signature="v1;Acos;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Acos(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Acos", "")
     ue_expect_signature(call, "v1;Acos;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -281,6 +284,7 @@ def ue_math_Acos(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_ByteByte", signature="v1;Add_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")]
 def ue_math_Add_ByteByte(arg_a : uint8; arg_b : uint8) : uint8 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_ByteByte", "")
     ue_expect_signature(call, "v1;Add_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")
@@ -293,6 +297,7 @@ def ue_math_Add_ByteByte(arg_a : uint8; arg_b : uint8) : uint8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_DoubleDouble", signature="v1;Add_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Add_DoubleDouble(arg_a : double; arg_b : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_DoubleDouble", "")
     ue_expect_signature(call, "v1;Add_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -305,6 +310,7 @@ def ue_math_Add_DoubleDouble(arg_a : double; arg_b : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_IntInt", signature="v1;Add_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Add_IntInt(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_IntInt", "")
     ue_expect_signature(call, "v1;Add_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -317,6 +323,7 @@ def ue_math_Add_IntInt(arg_a : int; arg_b : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_IntPointInt", signature="v1;Add_IntPointInt;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Add_IntPointInt(arg_a : S_IntPoint_cb05a38b; arg_b : int) : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_IntPointInt", "")
     ue_expect_signature(call, "v1;Add_IntPointInt;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -330,6 +337,7 @@ def ue_math_Add_IntPointInt(arg_a : S_IntPoint_cb05a38b; arg_b : int) : S_IntPoi
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_IntPointIntPoint", signature="v1;Add_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Add_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPoint_cb05a38b) : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_IntPointIntPoint", "")
     ue_expect_signature(call, "v1;Add_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -344,6 +352,7 @@ def ue_math_Add_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPoint
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_LinearColorLinearColor", signature="v1;Add_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_Add_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;Add_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -362,6 +371,7 @@ def ue_math_Add_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_MatrixMatrix", signature="v1;Add_MatrixMatrix;A:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Add_MatrixMatrix(arg_a : S_Matrix_c85cbab4; arg_b : S_Matrix_c85cbab4) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_MatrixMatrix", "")
     ue_expect_signature(call, "v1;Add_MatrixMatrix;A:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -404,6 +414,7 @@ def ue_math_Add_MatrixMatrix(arg_a : S_Matrix_c85cbab4; arg_b : S_Matrix_c85cbab
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_QuatQuat", signature="v1;Add_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Add_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_QuatQuat", "")
     ue_expect_signature(call, "v1;Add_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -422,6 +433,7 @@ def ue_math_Add_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Q
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_Vector2DFloat", signature="v1;Add_Vector2DFloat;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Add_Vector2DFloat(arg_a : UEVector2D; arg_b : double) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_Vector2DFloat", "")
     ue_expect_signature(call, "v1;Add_Vector2DFloat;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -434,6 +446,7 @@ def ue_math_Add_Vector2DFloat(arg_a : UEVector2D; arg_b : double) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_Vector2DVector2D", signature="v1;Add_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Add_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_Vector2DVector2D", "")
     ue_expect_signature(call, "v1;Add_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -446,6 +459,7 @@ def ue_math_Add_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D) : UEVec
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_Vector4Vector4", signature="v1;Add_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Add_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_Vector4Vector4", "")
     ue_expect_signature(call, "v1;Add_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -464,6 +478,7 @@ def ue_math_Add_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_VectorFloat", signature="v1;Add_VectorFloat;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Add_VectorFloat(arg_a : UEVector; arg_b : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_VectorFloat", "")
     ue_expect_signature(call, "v1;Add_VectorFloat;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -476,6 +491,7 @@ def ue_math_Add_VectorFloat(arg_a : UEVector; arg_b : double) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_VectorInt", signature="v1;Add_VectorInt;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Add_VectorInt(arg_a : UEVector; arg_b : int) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_VectorInt", "")
     ue_expect_signature(call, "v1;Add_VectorInt;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -488,6 +504,7 @@ def ue_math_Add_VectorInt(arg_a : UEVector; arg_b : int) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_VectorVector", signature="v1;Add_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Add_VectorVector(arg_a : UEVector; arg_b : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_VectorVector", "")
     ue_expect_signature(call, "v1;Add_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -500,6 +517,7 @@ def ue_math_Add_VectorVector(arg_a : UEVector; arg_b : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="And_IntInt", signature="v1;And_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_And_IntInt(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "And_IntInt", "")
     ue_expect_signature(call, "v1;And_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -512,6 +530,7 @@ def ue_math_And_IntInt(arg_a : int; arg_b : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Asin", signature="v1;Asin;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Asin(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Asin", "")
     ue_expect_signature(call, "v1;Asin;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -523,6 +542,7 @@ def ue_math_Asin(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Atan", signature="v1;Atan;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Atan(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Atan", "")
     ue_expect_signature(call, "v1;Atan;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -534,6 +554,7 @@ def ue_math_Atan(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Atan2", signature="v1;Atan2;Y:DoubleProperty:128;X:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Atan2(arg_y : double; arg_x : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Atan2", "")
     ue_expect_signature(call, "v1;Atan2;Y:DoubleProperty:128;X:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -546,6 +567,7 @@ def ue_math_Atan2(arg_y : double; arg_x : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="AverageOfIntArray", signature="v1;AverageOfIntArray;IntArray:ArrayProperty:134218114[IntArray:IntProperty:0;];AverageValue:FloatProperty:384;")]
 def ue_math_AverageOfIntArray(arg_intarray : array<int>) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "AverageOfIntArray", "")
     ue_expect_signature(call, "v1;AverageOfIntArray;IntArray:ArrayProperty:134218114[IntArray:IntProperty:0;];AverageValue:FloatProperty:384;")
@@ -560,6 +582,7 @@ def ue_math_AverageOfIntArray(arg_intarray : array<int>) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BMax", signature="v1;BMax;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")]
 def ue_math_BMax(arg_a : uint8; arg_b : uint8) : uint8 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BMax", "")
     ue_expect_signature(call, "v1;BMax;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")
@@ -572,6 +595,7 @@ def ue_math_BMax(arg_a : uint8; arg_b : uint8) : uint8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BMin", signature="v1;BMin;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")]
 def ue_math_BMin(arg_a : uint8; arg_b : uint8) : uint8 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BMin", "")
     ue_expect_signature(call, "v1;BMin;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")
@@ -584,6 +608,7 @@ def ue_math_BMin(arg_a : uint8; arg_b : uint8) : uint8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BooleanAND", signature="v1;BooleanAND;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_BooleanAND(arg_a : bool; arg_b : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BooleanAND", "")
     ue_expect_signature(call, "v1;BooleanAND;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -596,6 +621,7 @@ def ue_math_BooleanAND(arg_a : bool; arg_b : bool) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BooleanNAND", signature="v1;BooleanNAND;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_BooleanNAND(arg_a : bool; arg_b : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BooleanNAND", "")
     ue_expect_signature(call, "v1;BooleanNAND;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -608,6 +634,7 @@ def ue_math_BooleanNAND(arg_a : bool; arg_b : bool) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BooleanNOR", signature="v1;BooleanNOR;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_BooleanNOR(arg_a : bool; arg_b : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BooleanNOR", "")
     ue_expect_signature(call, "v1;BooleanNOR;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -620,6 +647,7 @@ def ue_math_BooleanNOR(arg_a : bool; arg_b : bool) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BooleanOR", signature="v1;BooleanOR;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_BooleanOR(arg_a : bool; arg_b : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BooleanOR", "")
     ue_expect_signature(call, "v1;BooleanOR;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -632,6 +660,7 @@ def ue_math_BooleanOR(arg_a : bool; arg_b : bool) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BooleanXOR", signature="v1;BooleanXOR;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_BooleanXOR(arg_a : bool; arg_b : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BooleanXOR", "")
     ue_expect_signature(call, "v1;BooleanXOR;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -644,6 +673,7 @@ def ue_math_BooleanXOR(arg_a : bool; arg_b : bool) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Box_ExpandBy", signature="v1;Box_ExpandBy;Box:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};Negative:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Positive:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};")]
 def ue_math_Box_ExpandBy(arg_box : S_Box_79dc8c23; arg_negative : UEVector; arg_positive : UEVector) : S_Box_79dc8c23 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Box_ExpandBy", "")
     ue_expect_signature(call, "v1;Box_ExpandBy;Box:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};Negative:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Positive:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};")
@@ -659,6 +689,7 @@ def ue_math_Box_ExpandBy(arg_box : S_Box_79dc8c23; arg_negative : UEVector; arg_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Box_GetClosestPointTo", signature="v1;Box_GetClosestPointTo;Box:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};Point:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Box_GetClosestPointTo(arg_box : S_Box_79dc8c23; arg_point : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Box_GetClosestPointTo", "")
     ue_expect_signature(call, "v1;Box_GetClosestPointTo;Box:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};Point:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -673,6 +704,7 @@ def ue_math_Box_GetClosestPointTo(arg_box : S_Box_79dc8c23; arg_point : UEVector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Box_Intersects", signature="v1;Box_Intersects;A:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Box_Intersects(arg_a : S_Box_79dc8c23; arg_b : S_Box_79dc8c23) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Box_Intersects", "")
     ue_expect_signature(call, "v1;Box_Intersects;A:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -689,6 +721,7 @@ def ue_math_Box_Intersects(arg_a : S_Box_79dc8c23; arg_b : S_Box_79dc8c23) : boo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Box_IsInside", signature="v1;Box_IsInside;InnerTest:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};OuterTest:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Box_IsInside(arg_innertest : S_Box_79dc8c23; arg_outertest : S_Box_79dc8c23) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Box_IsInside", "")
     ue_expect_signature(call, "v1;Box_IsInside;InnerTest:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};OuterTest:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -705,6 +738,7 @@ def ue_math_Box_IsInside(arg_innertest : S_Box_79dc8c23; arg_outertest : S_Box_7
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Box_IsInsideOrOn", signature="v1;Box_IsInsideOrOn;InnerTest:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};OuterTest:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Box_IsInsideOrOn(arg_innertest : S_Box_79dc8c23; arg_outertest : S_Box_79dc8c23) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Box_IsInsideOrOn", "")
     ue_expect_signature(call, "v1;Box_IsInsideOrOn;InnerTest:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};OuterTest:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -721,6 +755,7 @@ def ue_math_Box_IsInsideOrOn(arg_innertest : S_Box_79dc8c23; arg_outertest : S_B
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Box_IsPointInside", signature="v1;Box_IsPointInside;Box:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};Point:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Box_IsPointInside(arg_box : S_Box_79dc8c23; arg_point : UEVector) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Box_IsPointInside", "")
     ue_expect_signature(call, "v1;Box_IsPointInside;Box:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};Point:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -735,6 +770,7 @@ def ue_math_Box_IsPointInside(arg_box : S_Box_79dc8c23; arg_point : UEVector) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Box_Overlap", signature="v1;Box_Overlap;A:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};")]
 def ue_math_Box_Overlap(arg_a : S_Box_79dc8c23; arg_b : S_Box_79dc8c23) : S_Box_79dc8c23 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Box_Overlap", "")
     ue_expect_signature(call, "v1;Box_Overlap;A:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};")
@@ -757,6 +793,7 @@ struct ue_math_BreakBoxSphereBounds_Result {
     out_sphereradius : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakBoxSphereBounds", signature="v1;BreakBoxSphereBounds;InBoxSphereBounds:StructProperty:134218114:/Script/CoreUObject.BoxSphereBounds\{Origin:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:DoubleProperty:0;\};Origin:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:FloatProperty:384;")]
 def ue_math_BreakBoxSphereBounds(arg_inboxspherebounds : S_BoxSphereBounds_cda0dc69) : ue_math_BreakBoxSphereBounds_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakBoxSphereBounds", "")
     ue_expect_signature(call, "v1;BreakBoxSphereBounds;InBoxSphereBounds:StructProperty:134218114:/Script/CoreUObject.BoxSphereBounds\{Origin:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:DoubleProperty:0;\};Origin:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:FloatProperty:384;")
@@ -777,6 +814,7 @@ struct ue_math_BreakColor_Result {
     out_a : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakColor", signature="v1;BreakColor;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};R:FloatProperty:384;G:FloatProperty:384;B:FloatProperty:384;A:FloatProperty:384;")]
 def ue_math_BreakColor(arg_incolor : S_LinearColor_f4abb14b) : ue_math_BreakColor_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakColor", "")
     ue_expect_signature(call, "v1;BreakColor;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};R:FloatProperty:384;G:FloatProperty:384;B:FloatProperty:384;A:FloatProperty:384;")
@@ -796,6 +834,7 @@ struct ue_math_BreakFrameRate_Result {
     out_denominator : int
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakFrameRate", signature="v1;BreakFrameRate;InFrameRate:StructProperty:134218114:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};Numerator:IntProperty:384;Denominator:IntProperty:384;")]
 def ue_math_BreakFrameRate(arg_inframerate : S_FrameRate_491c16ee) : ue_math_BreakFrameRate_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakFrameRate", "")
     ue_expect_signature(call, "v1;BreakFrameRate;InFrameRate:StructProperty:134218114:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};Numerator:IntProperty:384;Denominator:IntProperty:384;")
@@ -814,6 +853,7 @@ struct ue_math_BreakQualifiedFrameTime_Result {
     out_subframe : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakQualifiedFrameTime", signature="v1;BreakQualifiedFrameTime;InFrameTime:StructProperty:134218114:/Script/CoreUObject.QualifiedFrameTime\{Time:StructProperty:0:/Script/CoreUObject.FrameTime\{FrameNumber:StructProperty:0:/Script/CoreUObject.FrameNumber\{Value:IntProperty:0;\};SubFrame:FloatProperty:0;\};Rate:StructProperty:0:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};\};Frame:StructProperty:384:/Script/CoreUObject.FrameNumber\{Value:IntProperty:0;\};FrameRate:StructProperty:384:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};SubFrame:FloatProperty:384;")]
 def ue_math_BreakQualifiedFrameTime(arg_inframetime : S_QualifiedFrameTime_efb392be) : ue_math_BreakQualifiedFrameTime_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakQualifiedFrameTime", "")
     ue_expect_signature(call, "v1;BreakQualifiedFrameTime;InFrameTime:StructProperty:134218114:/Script/CoreUObject.QualifiedFrameTime\{Time:StructProperty:0:/Script/CoreUObject.FrameTime\{FrameNumber:StructProperty:0:/Script/CoreUObject.FrameNumber\{Value:IntProperty:0;\};SubFrame:FloatProperty:0;\};Rate:StructProperty:0:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};\};Frame:StructProperty:384:/Script/CoreUObject.FrameNumber\{Value:IntProperty:0;\};FrameRate:StructProperty:384:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};SubFrame:FloatProperty:384;")
@@ -835,6 +875,7 @@ struct ue_math_BreakQuat_Result {
     out_w : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakQuat", signature="v1;BreakQuat;InQuat:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:FloatProperty:384;Y:FloatProperty:384;Z:FloatProperty:384;W:FloatProperty:384;")]
 def ue_math_BreakQuat(arg_inquat : S_Quat_82f9549e) : ue_math_BreakQuat_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakQuat", "")
     ue_expect_signature(call, "v1;BreakQuat;InQuat:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:FloatProperty:384;Y:FloatProperty:384;Z:FloatProperty:384;W:FloatProperty:384;")
@@ -849,6 +890,7 @@ def ue_math_BreakQuat(arg_inquat : S_Quat_82f9549e) : ue_math_BreakQuat_Result {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakRandomStream", signature="v1;BreakRandomStream;InRandomStream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};InitialSeed:IntProperty:384;")]
 def ue_math_BreakRandomStream(arg_inrandomstream : S_RandomStream_7b64b757) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakRandomStream", "")
     ue_expect_signature(call, "v1;BreakRandomStream;InRandomStream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};InitialSeed:IntProperty:384;")
@@ -867,6 +909,7 @@ struct ue_math_BreakRotIntoAxes_Result {
     out_z : UEVector
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakRotIntoAxes", signature="v1;BreakRotIntoAxes;InRot:StructProperty:134218114:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};X:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_BreakRotIntoAxes(arg_inrot : UERotator) : ue_math_BreakRotIntoAxes_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakRotIntoAxes", "")
     ue_expect_signature(call, "v1;BreakRotIntoAxes;InRot:StructProperty:134218114:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};X:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -884,6 +927,7 @@ struct ue_math_BreakRotator_Result {
     out_yaw : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakRotator", signature="v1;BreakRotator;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Roll:FloatProperty:384;Pitch:FloatProperty:384;Yaw:FloatProperty:384;")]
 def ue_math_BreakRotator(arg_inrot : UERotator) : ue_math_BreakRotator_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakRotator", "")
     ue_expect_signature(call, "v1;BreakRotator;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Roll:FloatProperty:384;Pitch:FloatProperty:384;Yaw:FloatProperty:384;")
@@ -901,6 +945,7 @@ struct ue_math_BreakTransform_Result {
     out_scale : UEVector
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakTransform", signature="v1;BreakTransform;InTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Location:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:384:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Scale:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_BreakTransform(arg_intransform : UETransform) : ue_math_BreakTransform_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakTransform", "")
     ue_expect_signature(call, "v1;BreakTransform;InTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Location:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:384:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Scale:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -918,6 +963,7 @@ struct ue_math_BreakVector_Result {
     out_z : double
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakVector", signature="v1;BreakVector;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;")]
 def ue_math_BreakVector(arg_invec : UEVector) : ue_math_BreakVector_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakVector", "")
     ue_expect_signature(call, "v1;BreakVector;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;")
@@ -934,6 +980,7 @@ struct ue_math_BreakVector2D_Result {
     out_y : double
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakVector2D", signature="v1;BreakVector2D;InVec:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;")]
 def ue_math_BreakVector2D(arg_invec : UEVector2D) : ue_math_BreakVector2D_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakVector2D", "")
     ue_expect_signature(call, "v1;BreakVector2D;InVec:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;")
@@ -952,6 +999,7 @@ struct ue_math_BreakVector4_Result {
     out_w : double
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakVector4", signature="v1;BreakVector4;InVec:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;W:DoubleProperty:384;")]
 def ue_math_BreakVector4(arg_invec : S_Vector4_420fe7b1) : ue_math_BreakVector4_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakVector4", "")
     ue_expect_signature(call, "v1;BreakVector4;InVec:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;W:DoubleProperty:384;")
@@ -972,6 +1020,7 @@ struct ue_math_BreakVector_NetQuantize_Result {
     out_z : double
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakVector_NetQuantize", signature="v1;BreakVector_NetQuantize;InVec:StructProperty:128:/Script/Engine.Vector_NetQuantize\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;")]
 def ue_math_BreakVector_NetQuantize(arg_invec : S_Vector_NetQuantize_599bc23d) : ue_math_BreakVector_NetQuantize_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakVector_NetQuantize", "")
     ue_expect_signature(call, "v1;BreakVector_NetQuantize;InVec:StructProperty:128:/Script/Engine.Vector_NetQuantize\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;")
@@ -991,6 +1040,7 @@ struct ue_math_BreakVector_NetQuantize10_Result {
     out_z : double
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakVector_NetQuantize10", signature="v1;BreakVector_NetQuantize10;InVec:StructProperty:128:/Script/Engine.Vector_NetQuantize10\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;")]
 def ue_math_BreakVector_NetQuantize10(arg_invec : S_Vector_NetQuantize10_083af1d4) : ue_math_BreakVector_NetQuantize10_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakVector_NetQuantize10", "")
     ue_expect_signature(call, "v1;BreakVector_NetQuantize10;InVec:StructProperty:128:/Script/Engine.Vector_NetQuantize10\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;")
@@ -1010,6 +1060,7 @@ struct ue_math_BreakVector_NetQuantize100_Result {
     out_z : double
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakVector_NetQuantize100", signature="v1;BreakVector_NetQuantize100;InVec:StructProperty:128:/Script/Engine.Vector_NetQuantize100\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;")]
 def ue_math_BreakVector_NetQuantize100(arg_invec : S_Vector_NetQuantize100_868fbc88) : ue_math_BreakVector_NetQuantize100_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakVector_NetQuantize100", "")
     ue_expect_signature(call, "v1;BreakVector_NetQuantize100;InVec:StructProperty:128:/Script/Engine.Vector_NetQuantize100\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;")
@@ -1029,6 +1080,7 @@ struct ue_math_BreakVector_NetQuantizeNormal_Result {
     out_z : double
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakVector_NetQuantizeNormal", signature="v1;BreakVector_NetQuantizeNormal;InVec:StructProperty:128:/Script/Engine.Vector_NetQuantizeNormal\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;")]
 def ue_math_BreakVector_NetQuantizeNormal(arg_invec : S_Vector_NetQuantizeNormal_c54f8383) : ue_math_BreakVector_NetQuantizeNormal_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakVector_NetQuantizeNormal", "")
     ue_expect_signature(call, "v1;BreakVector_NetQuantizeNormal;InVec:StructProperty:128:/Script/Engine.Vector_NetQuantizeNormal\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;")
@@ -1042,6 +1094,7 @@ def ue_math_BreakVector_NetQuantizeNormal(arg_invec : S_Vector_NetQuantizeNormal
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="CInterpTo", signature="v1;CInterpTo;Current:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_CInterpTo(arg_current : S_LinearColor_f4abb14b; arg_target : S_LinearColor_f4abb14b; arg_deltatime : float; arg_interpspeed : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "CInterpTo", "")
     ue_expect_signature(call, "v1;CInterpTo;Current:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -1062,6 +1115,7 @@ def ue_math_CInterpTo(arg_current : S_LinearColor_f4abb14b; arg_target : S_Linea
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Clamp", signature="v1;Clamp;Value:IntProperty:128;Min:IntProperty:128;Max:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Clamp(arg_value : int; arg_min : int; arg_max : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Clamp", "")
     ue_expect_signature(call, "v1;Clamp;Value:IntProperty:128;Min:IntProperty:128;Max:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -1075,6 +1129,7 @@ def ue_math_Clamp(arg_value : int; arg_min : int; arg_max : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ClampAngle", signature="v1;ClampAngle;AngleDegrees:DoubleProperty:128;MinAngleDegrees:DoubleProperty:128;MaxAngleDegrees:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_ClampAngle(arg_angledegrees : double; arg_minangledegrees : double; arg_maxangledegrees : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ClampAngle", "")
     ue_expect_signature(call, "v1;ClampAngle;AngleDegrees:DoubleProperty:128;MinAngleDegrees:DoubleProperty:128;MaxAngleDegrees:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1088,6 +1143,7 @@ def ue_math_ClampAngle(arg_angledegrees : double; arg_minangledegrees : double; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ClampAxes2D", signature="v1;ClampAxes2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};MinAxisVal:DoubleProperty:128;MaxAxisVal:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_ClampAxes2D(arg_a : UEVector2D; arg_minaxisval : double; arg_maxaxisval : double) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ClampAxes2D", "")
     ue_expect_signature(call, "v1;ClampAxes2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};MinAxisVal:DoubleProperty:128;MaxAxisVal:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -1101,6 +1157,7 @@ def ue_math_ClampAxes2D(arg_a : UEVector2D; arg_minaxisval : double; arg_maxaxis
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ClampAxis", signature="v1;ClampAxis;Angle:FloatProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_math_ClampAxis(arg_angle : float) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ClampAxis", "")
     ue_expect_signature(call, "v1;ClampAxis;Angle:FloatProperty:128;ReturnValue:FloatProperty:1408;")
@@ -1112,6 +1169,7 @@ def ue_math_ClampAxis(arg_angle : float) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ClampVectorSize", signature="v1;ClampVectorSize;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Min:DoubleProperty:128;Max:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_ClampVectorSize(arg_a : UEVector; arg_min : double; arg_max : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ClampVectorSize", "")
     ue_expect_signature(call, "v1;ClampVectorSize;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Min:DoubleProperty:128;Max:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1125,6 +1183,7 @@ def ue_math_ClampVectorSize(arg_a : UEVector; arg_min : double; arg_max : double
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ClassIsChildOf", signature="v1;ClassIsChildOf;TestClass:ClassProperty:128:meta:/Script/CoreUObject.Object;ParentClass:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_math_ClassIsChildOf(arg_testclass : UEClassHandle; arg_parentclass : UEClassHandle) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ClassIsChildOf", "")
     ue_expect_signature(call, "v1;ClassIsChildOf;TestClass:ClassProperty:128:meta:/Script/CoreUObject.Object;ParentClass:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -1137,6 +1196,7 @@ def ue_math_ClassIsChildOf(arg_testclass : UEClassHandle; arg_parentclass : UECl
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ComposeRotators", signature="v1;ComposeRotators;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_ComposeRotators(arg_a : UERotator; arg_b : UERotator) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ComposeRotators", "")
     ue_expect_signature(call, "v1;ComposeRotators;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -1149,6 +1209,7 @@ def ue_math_ComposeRotators(arg_a : UERotator; arg_b : UERotator) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ComposeTransforms", signature="v1;ComposeTransforms;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_ComposeTransforms(arg_a : UETransform; arg_b : UETransform) : UETransform {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ComposeTransforms", "")
     ue_expect_signature(call, "v1;ComposeTransforms;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -1161,6 +1222,7 @@ def ue_math_ComposeTransforms(arg_a : UETransform; arg_b : UETransform) : UETran
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_BoolToByte", signature="v1;Conv_BoolToByte;InBool:BoolProperty:128;ReturnValue:ByteProperty:1408;")]
 def ue_math_Conv_BoolToByte(arg_inbool : bool) : uint8 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_BoolToByte", "")
     ue_expect_signature(call, "v1;Conv_BoolToByte;InBool:BoolProperty:128;ReturnValue:ByteProperty:1408;")
@@ -1172,6 +1234,7 @@ def ue_math_Conv_BoolToByte(arg_inbool : bool) : uint8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_BoolToDouble", signature="v1;Conv_BoolToDouble;InBool:BoolProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Conv_BoolToDouble(arg_inbool : bool) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_BoolToDouble", "")
     ue_expect_signature(call, "v1;Conv_BoolToDouble;InBool:BoolProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1183,6 +1246,7 @@ def ue_math_Conv_BoolToDouble(arg_inbool : bool) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_BoolToInt", signature="v1;Conv_BoolToInt;InBool:BoolProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Conv_BoolToInt(arg_inbool : bool) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_BoolToInt", "")
     ue_expect_signature(call, "v1;Conv_BoolToInt;InBool:BoolProperty:128;ReturnValue:IntProperty:1408;")
@@ -1194,6 +1258,7 @@ def ue_math_Conv_BoolToInt(arg_inbool : bool) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_ByteToDouble", signature="v1;Conv_ByteToDouble;InByte:ByteProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Conv_ByteToDouble(arg_inbyte : uint8) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_ByteToDouble", "")
     ue_expect_signature(call, "v1;Conv_ByteToDouble;InByte:ByteProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1205,6 +1270,7 @@ def ue_math_Conv_ByteToDouble(arg_inbyte : uint8) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_ByteToInt", signature="v1;Conv_ByteToInt;InByte:ByteProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Conv_ByteToInt(arg_inbyte : uint8) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_ByteToInt", "")
     ue_expect_signature(call, "v1;Conv_ByteToInt;InByte:ByteProperty:128;ReturnValue:IntProperty:1408;")
@@ -1216,6 +1282,7 @@ def ue_math_Conv_ByteToInt(arg_inbyte : uint8) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_ColorToLinearColor", signature="v1;Conv_ColorToLinearColor;InColor:StructProperty:128:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_Conv_ColorToLinearColor(arg_incolor : S_Color_1d162ca1) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_ColorToLinearColor", "")
     ue_expect_signature(call, "v1;Conv_ColorToLinearColor;InColor:StructProperty:128:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -1230,6 +1297,7 @@ def ue_math_Conv_ColorToLinearColor(arg_incolor : S_Color_1d162ca1) : S_LinearCo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_DoubleToLinearColor", signature="v1;Conv_DoubleToLinearColor;InDouble:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_Conv_DoubleToLinearColor(arg_indouble : double) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_DoubleToLinearColor", "")
     ue_expect_signature(call, "v1;Conv_DoubleToLinearColor;InDouble:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -1241,6 +1309,7 @@ def ue_math_Conv_DoubleToLinearColor(arg_indouble : double) : S_LinearColor_f4ab
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_DoubleToVector", signature="v1;Conv_DoubleToVector;InDouble:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Conv_DoubleToVector(arg_indouble : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_DoubleToVector", "")
     ue_expect_signature(call, "v1;Conv_DoubleToVector;InDouble:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1252,6 +1321,7 @@ def ue_math_Conv_DoubleToVector(arg_indouble : double) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_DoubleToVector2D", signature="v1;Conv_DoubleToVector2D;InDouble:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Conv_DoubleToVector2D(arg_indouble : double) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_DoubleToVector2D", "")
     ue_expect_signature(call, "v1;Conv_DoubleToVector2D;InDouble:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -1263,6 +1333,7 @@ def ue_math_Conv_DoubleToVector2D(arg_indouble : double) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_IntPointToVector2D", signature="v1;Conv_IntPointToVector2D;InIntPoint:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Conv_IntPointToVector2D(arg_inintpoint : S_IntPoint_cb05a38b) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_IntPointToVector2D", "")
     ue_expect_signature(call, "v1;Conv_IntPointToVector2D;InIntPoint:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -1275,6 +1346,7 @@ def ue_math_Conv_IntPointToVector2D(arg_inintpoint : S_IntPoint_cb05a38b) : UEVe
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_IntToBool", signature="v1;Conv_IntToBool;InInt:IntProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Conv_IntToBool(arg_inint : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_IntToBool", "")
     ue_expect_signature(call, "v1;Conv_IntToBool;InInt:IntProperty:128;ReturnValue:BoolProperty:1408;")
@@ -1286,6 +1358,7 @@ def ue_math_Conv_IntToBool(arg_inint : int) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_IntToByte", signature="v1;Conv_IntToByte;InInt:IntProperty:128;ReturnValue:ByteProperty:1408;")]
 def ue_math_Conv_IntToByte(arg_inint : int) : uint8 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_IntToByte", "")
     ue_expect_signature(call, "v1;Conv_IntToByte;InInt:IntProperty:128;ReturnValue:ByteProperty:1408;")
@@ -1297,6 +1370,7 @@ def ue_math_Conv_IntToByte(arg_inint : int) : uint8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_IntToDouble", signature="v1;Conv_IntToDouble;InInt:IntProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Conv_IntToDouble(arg_inint : int) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_IntToDouble", "")
     ue_expect_signature(call, "v1;Conv_IntToDouble;InInt:IntProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1308,6 +1382,7 @@ def ue_math_Conv_IntToDouble(arg_inint : int) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_IntToIntVector", signature="v1;Conv_IntToIntVector;InInt:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};")]
 def ue_math_Conv_IntToIntVector(arg_inint : int) : S_IntVector_1c5addc5 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_IntToIntVector", "")
     ue_expect_signature(call, "v1;Conv_IntToIntVector;InInt:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};")
@@ -1319,6 +1394,7 @@ def ue_math_Conv_IntToIntVector(arg_inint : int) : S_IntVector_1c5addc5 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_IntToIntVector2", signature="v1;Conv_IntToIntVector2;InInt:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector2\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Conv_IntToIntVector2(arg_inint : int) : S_IntVector2_5b68e073 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_IntToIntVector2", "")
     ue_expect_signature(call, "v1;Conv_IntToIntVector2;InInt:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector2\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -1330,6 +1406,7 @@ def ue_math_Conv_IntToIntVector2(arg_inint : int) : S_IntVector2_5b68e073 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_IntToVector", signature="v1;Conv_IntToVector;InInt:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Conv_IntToVector(arg_inint : int) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_IntToVector", "")
     ue_expect_signature(call, "v1;Conv_IntToVector;InInt:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1341,6 +1418,7 @@ def ue_math_Conv_IntToVector(arg_inint : int) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_IntVector2ToVector2D", signature="v1;Conv_IntVector2ToVector2D;InIntVector2:StructProperty:134218114:/Script/CoreUObject.IntVector2\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Conv_IntVector2ToVector2D(arg_inintvector2 : S_IntVector2_5b68e073) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_IntVector2ToVector2D", "")
     ue_expect_signature(call, "v1;Conv_IntVector2ToVector2D;InIntVector2:StructProperty:134218114:/Script/CoreUObject.IntVector2\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -1353,6 +1431,7 @@ def ue_math_Conv_IntVector2ToVector2D(arg_inintvector2 : S_IntVector2_5b68e073) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_IntVectorToVector", signature="v1;Conv_IntVectorToVector;InIntVector:StructProperty:134218114:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Conv_IntVectorToVector(arg_inintvector : S_IntVector_1c5addc5) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_IntVectorToVector", "")
     ue_expect_signature(call, "v1;Conv_IntVectorToVector;InIntVector:StructProperty:134218114:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1366,6 +1445,7 @@ def ue_math_Conv_IntVectorToVector(arg_inintvector : S_IntVector_1c5addc5) : UEV
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_LinearColorToColor", signature="v1;Conv_LinearColorToColor;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InUseSRGB:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")]
 def ue_math_Conv_LinearColorToColor(arg_inlinearcolor : S_LinearColor_f4abb14b; arg_inusesrgb : bool) : S_Color_1d162ca1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_LinearColorToColor", "")
     ue_expect_signature(call, "v1;Conv_LinearColorToColor;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InUseSRGB:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")
@@ -1381,6 +1461,7 @@ def ue_math_Conv_LinearColorToColor(arg_inlinearcolor : S_LinearColor_f4abb14b; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_LinearColorToVector", signature="v1;Conv_LinearColorToVector;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Conv_LinearColorToVector(arg_inlinearcolor : S_LinearColor_f4abb14b) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_LinearColorToVector", "")
     ue_expect_signature(call, "v1;Conv_LinearColorToVector;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1395,6 +1476,7 @@ def ue_math_Conv_LinearColorToVector(arg_inlinearcolor : S_LinearColor_f4abb14b)
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_MatrixToRotator", signature="v1;Conv_MatrixToRotator;InMatrix:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_Conv_MatrixToRotator(arg_inmatrix : S_Matrix_c85cbab4) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_MatrixToRotator", "")
     ue_expect_signature(call, "v1;Conv_MatrixToRotator;InMatrix:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -1421,6 +1503,7 @@ def ue_math_Conv_MatrixToRotator(arg_inmatrix : S_Matrix_c85cbab4) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_MatrixToTransform", signature="v1;Conv_MatrixToTransform;InMatrix:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Conv_MatrixToTransform(arg_inmatrix : S_Matrix_c85cbab4) : UETransform {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_MatrixToTransform", "")
     ue_expect_signature(call, "v1;Conv_MatrixToTransform;InMatrix:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -1447,6 +1530,7 @@ def ue_math_Conv_MatrixToTransform(arg_inmatrix : S_Matrix_c85cbab4) : UETransfo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_RotatorToQuaternion", signature="v1;Conv_RotatorToQuaternion;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Conv_RotatorToQuaternion(arg_inrot : UERotator) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_RotatorToQuaternion", "")
     ue_expect_signature(call, "v1;Conv_RotatorToQuaternion;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -1458,6 +1542,7 @@ def ue_math_Conv_RotatorToQuaternion(arg_inrot : UERotator) : S_Quat_82f9549e {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_RotatorToTransform", signature="v1;Conv_RotatorToTransform;InRotator:StructProperty:134218114:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Conv_RotatorToTransform(arg_inrotator : UERotator) : UETransform {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_RotatorToTransform", "")
     ue_expect_signature(call, "v1;Conv_RotatorToTransform;InRotator:StructProperty:134218114:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -1469,6 +1554,7 @@ def ue_math_Conv_RotatorToTransform(arg_inrotator : UERotator) : UETransform {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_RotatorToVector", signature="v1;Conv_RotatorToVector;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Conv_RotatorToVector(arg_inrot : UERotator) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_RotatorToVector", "")
     ue_expect_signature(call, "v1;Conv_RotatorToVector;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1480,6 +1566,7 @@ def ue_math_Conv_RotatorToVector(arg_inrot : UERotator) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_TransformToMatrix", signature="v1;Conv_TransformToMatrix;Transform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Conv_TransformToMatrix(arg_transform : UETransform) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_TransformToMatrix", "")
     ue_expect_signature(call, "v1;Conv_TransformToMatrix;Transform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -1491,6 +1578,7 @@ def ue_math_Conv_TransformToMatrix(arg_transform : UETransform) : S_Matrix_c85cb
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_Vector2DToIntPoint", signature="v1;Conv_Vector2DToIntPoint;InVector2D:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Conv_Vector2DToIntPoint(arg_invector2d : UEVector2D) : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_Vector2DToIntPoint", "")
     ue_expect_signature(call, "v1;Conv_Vector2DToIntPoint;InVector2D:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -1502,6 +1590,7 @@ def ue_math_Conv_Vector2DToIntPoint(arg_invector2d : UEVector2D) : S_IntPoint_cb
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_Vector2DToVector", signature="v1;Conv_Vector2DToVector;InVector2D:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Z:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Conv_Vector2DToVector(arg_invector2d : UEVector2D; arg_z : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_Vector2DToVector", "")
     ue_expect_signature(call, "v1;Conv_Vector2DToVector;InVector2D:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Z:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1514,6 +1603,7 @@ def ue_math_Conv_Vector2DToVector(arg_invector2d : UEVector2D; arg_z : float) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_Vector4ToQuaternion", signature="v1;Conv_Vector4ToQuaternion;InVec:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Conv_Vector4ToQuaternion(arg_invec : S_Vector4_420fe7b1) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_Vector4ToQuaternion", "")
     ue_expect_signature(call, "v1;Conv_Vector4ToQuaternion;InVec:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -1528,6 +1618,7 @@ def ue_math_Conv_Vector4ToQuaternion(arg_invec : S_Vector4_420fe7b1) : S_Quat_82
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_Vector4ToRotator", signature="v1;Conv_Vector4ToRotator;InVec:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_Conv_Vector4ToRotator(arg_invec : S_Vector4_420fe7b1) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_Vector4ToRotator", "")
     ue_expect_signature(call, "v1;Conv_Vector4ToRotator;InVec:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -1542,6 +1633,7 @@ def ue_math_Conv_Vector4ToRotator(arg_invec : S_Vector4_420fe7b1) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_Vector4ToVector", signature="v1;Conv_Vector4ToVector;InVector4:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Conv_Vector4ToVector(arg_invector4 : S_Vector4_420fe7b1) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_Vector4ToVector", "")
     ue_expect_signature(call, "v1;Conv_Vector4ToVector;InVector4:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1556,6 +1648,7 @@ def ue_math_Conv_Vector4ToVector(arg_invector4 : S_Vector4_420fe7b1) : UEVector 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_VectorToLinearColor", signature="v1;Conv_VectorToLinearColor;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_Conv_VectorToLinearColor(arg_invec : UEVector) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_VectorToLinearColor", "")
     ue_expect_signature(call, "v1;Conv_VectorToLinearColor;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -1567,6 +1660,7 @@ def ue_math_Conv_VectorToLinearColor(arg_invec : UEVector) : S_LinearColor_f4abb
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_VectorToQuaternion", signature="v1;Conv_VectorToQuaternion;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Conv_VectorToQuaternion(arg_invec : UEVector) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_VectorToQuaternion", "")
     ue_expect_signature(call, "v1;Conv_VectorToQuaternion;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -1578,6 +1672,7 @@ def ue_math_Conv_VectorToQuaternion(arg_invec : UEVector) : S_Quat_82f9549e {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_VectorToRotator", signature="v1;Conv_VectorToRotator;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_Conv_VectorToRotator(arg_invec : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_VectorToRotator", "")
     ue_expect_signature(call, "v1;Conv_VectorToRotator;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -1589,6 +1684,7 @@ def ue_math_Conv_VectorToRotator(arg_invec : UEVector) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_VectorToTransform", signature="v1;Conv_VectorToTransform;InLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Conv_VectorToTransform(arg_inlocation : UEVector) : UETransform {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_VectorToTransform", "")
     ue_expect_signature(call, "v1;Conv_VectorToTransform;InLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -1600,6 +1696,7 @@ def ue_math_Conv_VectorToTransform(arg_inlocation : UEVector) : UETransform {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_VectorToVector2D", signature="v1;Conv_VectorToVector2D;InVector:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Conv_VectorToVector2D(arg_invector : UEVector) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_VectorToVector2D", "")
     ue_expect_signature(call, "v1;Conv_VectorToVector2D;InVector:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -1611,6 +1708,7 @@ def ue_math_Conv_VectorToVector2D(arg_invector : UEVector) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Convert1DTo2D", signature="v1;Convert1DTo2D;Index1D:IntProperty:128;XSize:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Convert1DTo2D(arg_index1d : int; arg_xsize : int) : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Convert1DTo2D", "")
     ue_expect_signature(call, "v1;Convert1DTo2D;Index1D:IntProperty:128;XSize:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -1623,6 +1721,7 @@ def ue_math_Convert1DTo2D(arg_index1d : int; arg_xsize : int) : S_IntPoint_cb05a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Convert1DTo3D", signature="v1;Convert1DTo3D;Index1D:IntProperty:128;XSize:IntProperty:128;YSize:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};")]
 def ue_math_Convert1DTo3D(arg_index1d : int; arg_xsize : int; arg_ysize : int) : S_IntVector_1c5addc5 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Convert1DTo3D", "")
     ue_expect_signature(call, "v1;Convert1DTo3D;Index1D:IntProperty:128;XSize:IntProperty:128;YSize:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};")
@@ -1636,6 +1735,7 @@ def ue_math_Convert1DTo3D(arg_index1d : int; arg_xsize : int; arg_ysize : int) :
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Convert2DTo1D", signature="v1;Convert2DTo1D;Index2D:StructProperty:134218114:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};XSize:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Convert2DTo1D(arg_index2d : S_IntPoint_cb05a38b; arg_xsize : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Convert2DTo1D", "")
     ue_expect_signature(call, "v1;Convert2DTo1D;Index2D:StructProperty:134218114:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};XSize:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -1649,6 +1749,7 @@ def ue_math_Convert2DTo1D(arg_index2d : S_IntPoint_cb05a38b; arg_xsize : int) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Convert3DTo1D", signature="v1;Convert3DTo1D;Index3D:StructProperty:134218114:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};XSize:IntProperty:128;YSize:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Convert3DTo1D(arg_index3d : S_IntVector_1c5addc5; arg_xsize : int; arg_ysize : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Convert3DTo1D", "")
     ue_expect_signature(call, "v1;Convert3DTo1D;Index3D:StructProperty:134218114:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};XSize:IntProperty:128;YSize:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -1664,6 +1765,7 @@ def ue_math_Convert3DTo1D(arg_index3d : S_IntVector_1c5addc5; arg_xsize : int; a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Cos", signature="v1;Cos;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Cos(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Cos", "")
     ue_expect_signature(call, "v1;Cos;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1675,6 +1777,7 @@ def ue_math_Cos(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="CreateVectorFromYawPitch", signature="v1;CreateVectorFromYawPitch;Yaw:FloatProperty:128;Pitch:FloatProperty:128;Length:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_CreateVectorFromYawPitch(arg_yaw : float; arg_pitch : float; arg_length : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "CreateVectorFromYawPitch", "")
     ue_expect_signature(call, "v1;CreateVectorFromYawPitch;Yaw:FloatProperty:128;Pitch:FloatProperty:128;Length:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1688,6 +1791,7 @@ def ue_math_CreateVectorFromYawPitch(arg_yaw : float; arg_pitch : float; arg_len
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="CrossProduct2D", signature="v1;CrossProduct2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_CrossProduct2D(arg_a : UEVector2D; arg_b : UEVector2D) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "CrossProduct2D", "")
     ue_expect_signature(call, "v1;CrossProduct2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -1700,6 +1804,7 @@ def ue_math_CrossProduct2D(arg_a : UEVector2D; arg_b : UEVector2D) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Cross_VectorVector", signature="v1;Cross_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Cross_VectorVector(arg_a : UEVector; arg_b : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Cross_VectorVector", "")
     ue_expect_signature(call, "v1;Cross_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1712,6 +1817,7 @@ def ue_math_Cross_VectorVector(arg_a : UEVector; arg_b : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DaysInMonth", signature="v1;DaysInMonth;Year:IntProperty:128;Month:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_DaysInMonth(arg_year : int; arg_month : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DaysInMonth", "")
     ue_expect_signature(call, "v1;DaysInMonth;Year:IntProperty:128;Month:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -1724,6 +1830,7 @@ def ue_math_DaysInMonth(arg_year : int; arg_month : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DaysInYear", signature="v1;DaysInYear;Year:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_DaysInYear(arg_year : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DaysInYear", "")
     ue_expect_signature(call, "v1;DaysInYear;Year:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -1735,6 +1842,7 @@ def ue_math_DaysInYear(arg_year : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DegAcos", signature="v1;DegAcos;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_DegAcos(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DegAcos", "")
     ue_expect_signature(call, "v1;DegAcos;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1746,6 +1854,7 @@ def ue_math_DegAcos(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DegAsin", signature="v1;DegAsin;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_DegAsin(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DegAsin", "")
     ue_expect_signature(call, "v1;DegAsin;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1757,6 +1866,7 @@ def ue_math_DegAsin(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DegAtan", signature="v1;DegAtan;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_DegAtan(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DegAtan", "")
     ue_expect_signature(call, "v1;DegAtan;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1768,6 +1878,7 @@ def ue_math_DegAtan(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DegAtan2", signature="v1;DegAtan2;Y:DoubleProperty:128;X:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_DegAtan2(arg_y : double; arg_x : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DegAtan2", "")
     ue_expect_signature(call, "v1;DegAtan2;Y:DoubleProperty:128;X:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1780,6 +1891,7 @@ def ue_math_DegAtan2(arg_y : double; arg_x : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DegCos", signature="v1;DegCos;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_DegCos(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DegCos", "")
     ue_expect_signature(call, "v1;DegCos;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1791,6 +1903,7 @@ def ue_math_DegCos(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DegSin", signature="v1;DegSin;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_DegSin(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DegSin", "")
     ue_expect_signature(call, "v1;DegSin;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1802,6 +1915,7 @@ def ue_math_DegSin(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DegTan", signature="v1;DegTan;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_DegTan(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DegTan", "")
     ue_expect_signature(call, "v1;DegTan;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1813,6 +1927,7 @@ def ue_math_DegTan(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DegreesToRadians", signature="v1;DegreesToRadians;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_DegreesToRadians(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DegreesToRadians", "")
     ue_expect_signature(call, "v1;DegreesToRadians;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1824,6 +1939,7 @@ def ue_math_DegreesToRadians(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Distance2D", signature="v1;Distance2D;V1:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Distance2D(arg_v1 : UEVector2D; arg_v2 : UEVector2D) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Distance2D", "")
     ue_expect_signature(call, "v1;Distance2D;V1:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -1836,6 +1952,7 @@ def ue_math_Distance2D(arg_v1 : UEVector2D; arg_v2 : UEVector2D) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DistanceSquared2D", signature="v1;DistanceSquared2D;V1:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_DistanceSquared2D(arg_v1 : UEVector2D; arg_v2 : UEVector2D) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DistanceSquared2D", "")
     ue_expect_signature(call, "v1;DistanceSquared2D;V1:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -1848,6 +1965,7 @@ def ue_math_DistanceSquared2D(arg_v1 : UEVector2D; arg_v2 : UEVector2D) : double
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_ByteByte", signature="v1;Divide_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")]
 def ue_math_Divide_ByteByte(arg_a : uint8; arg_b : uint8) : uint8 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_ByteByte", "")
     ue_expect_signature(call, "v1;Divide_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")
@@ -1860,6 +1978,7 @@ def ue_math_Divide_ByteByte(arg_a : uint8; arg_b : uint8) : uint8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_DoubleDouble", signature="v1;Divide_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Divide_DoubleDouble(arg_a : double; arg_b : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_DoubleDouble", "")
     ue_expect_signature(call, "v1;Divide_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -1872,6 +1991,7 @@ def ue_math_Divide_DoubleDouble(arg_a : double; arg_b : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_IntInt", signature="v1;Divide_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Divide_IntInt(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_IntInt", "")
     ue_expect_signature(call, "v1;Divide_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -1884,6 +2004,7 @@ def ue_math_Divide_IntInt(arg_a : int; arg_b : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_IntPointInt", signature="v1;Divide_IntPointInt;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Divide_IntPointInt(arg_a : S_IntPoint_cb05a38b; arg_b : int) : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_IntPointInt", "")
     ue_expect_signature(call, "v1;Divide_IntPointInt;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -1897,6 +2018,7 @@ def ue_math_Divide_IntPointInt(arg_a : S_IntPoint_cb05a38b; arg_b : int) : S_Int
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_IntPointIntPoint", signature="v1;Divide_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Divide_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPoint_cb05a38b) : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_IntPointIntPoint", "")
     ue_expect_signature(call, "v1;Divide_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -1911,6 +2033,7 @@ def ue_math_Divide_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_LinearColorLinearColor", signature="v1;Divide_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_Divide_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;Divide_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -1929,6 +2052,7 @@ def ue_math_Divide_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_Vector2DFloat", signature="v1;Divide_Vector2DFloat;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Divide_Vector2DFloat(arg_a : UEVector2D; arg_b : double) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_Vector2DFloat", "")
     ue_expect_signature(call, "v1;Divide_Vector2DFloat;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -1941,6 +2065,7 @@ def ue_math_Divide_Vector2DFloat(arg_a : UEVector2D; arg_b : double) : UEVector2
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_Vector2DVector2D", signature="v1;Divide_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Divide_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_Vector2DVector2D", "")
     ue_expect_signature(call, "v1;Divide_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -1953,6 +2078,7 @@ def ue_math_Divide_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D) : UE
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_Vector4Vector4", signature="v1;Divide_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Divide_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_Vector4Vector4", "")
     ue_expect_signature(call, "v1;Divide_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -1971,6 +2097,7 @@ def ue_math_Divide_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_VectorFloat", signature="v1;Divide_VectorFloat;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Divide_VectorFloat(arg_a : UEVector; arg_b : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_VectorFloat", "")
     ue_expect_signature(call, "v1;Divide_VectorFloat;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1983,6 +2110,7 @@ def ue_math_Divide_VectorFloat(arg_a : UEVector; arg_b : double) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_VectorInt", signature="v1;Divide_VectorInt;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Divide_VectorInt(arg_a : UEVector; arg_b : int) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_VectorInt", "")
     ue_expect_signature(call, "v1;Divide_VectorInt;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -1995,6 +2123,7 @@ def ue_math_Divide_VectorInt(arg_a : UEVector; arg_b : int) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_VectorVector", signature="v1;Divide_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Divide_VectorVector(arg_a : UEVector; arg_b : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_VectorVector", "")
     ue_expect_signature(call, "v1;Divide_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2007,6 +2136,7 @@ def ue_math_Divide_VectorVector(arg_a : UEVector; arg_b : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DotProduct2D", signature="v1;DotProduct2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_DotProduct2D(arg_a : UEVector2D; arg_b : UEVector2D) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DotProduct2D", "")
     ue_expect_signature(call, "v1;DotProduct2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -2019,6 +2149,7 @@ def ue_math_DotProduct2D(arg_a : UEVector2D; arg_b : UEVector2D) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Dot_VectorVector", signature="v1;Dot_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Dot_VectorVector(arg_a : UEVector; arg_b : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Dot_VectorVector", "")
     ue_expect_signature(call, "v1;Dot_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -2031,6 +2162,7 @@ def ue_math_Dot_VectorVector(arg_a : UEVector; arg_b : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DynamicWeightedMovingAverage_FRotator", signature="v1;DynamicWeightedMovingAverage_FRotator;CurrentSample:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};PreviousSample:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};MaxDistance:FloatProperty:128;MinWeight:FloatProperty:128;MaxWeight:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_DynamicWeightedMovingAverage_FRotator(arg_currentsample : UERotator; arg_previoussample : UERotator; arg_maxdistance : float; arg_minweight : float; arg_maxweight : float) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DynamicWeightedMovingAverage_FRotator", "")
     ue_expect_signature(call, "v1;DynamicWeightedMovingAverage_FRotator;CurrentSample:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};PreviousSample:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};MaxDistance:FloatProperty:128;MinWeight:FloatProperty:128;MaxWeight:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -2046,6 +2178,7 @@ def ue_math_DynamicWeightedMovingAverage_FRotator(arg_currentsample : UERotator;
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DynamicWeightedMovingAverage_FVector", signature="v1;DynamicWeightedMovingAverage_FVector;CurrentSample:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PreviousSample:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaxDistance:FloatProperty:128;MinWeight:FloatProperty:128;MaxWeight:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_DynamicWeightedMovingAverage_FVector(arg_currentsample : UEVector; arg_previoussample : UEVector; arg_maxdistance : float; arg_minweight : float; arg_maxweight : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DynamicWeightedMovingAverage_FVector", "")
     ue_expect_signature(call, "v1;DynamicWeightedMovingAverage_FVector;CurrentSample:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PreviousSample:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaxDistance:FloatProperty:128;MinWeight:FloatProperty:128;MaxWeight:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2061,6 +2194,7 @@ def ue_math_DynamicWeightedMovingAverage_FVector(arg_currentsample : UEVector; a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="DynamicWeightedMovingAverage_Float", signature="v1;DynamicWeightedMovingAverage_Float;CurrentSample:FloatProperty:128;PreviousSample:FloatProperty:128;MaxDistance:FloatProperty:128;MinWeight:FloatProperty:128;MaxWeight:FloatProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_math_DynamicWeightedMovingAverage_Float(arg_currentsample : float; arg_previoussample : float; arg_maxdistance : float; arg_minweight : float; arg_maxweight : float) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "DynamicWeightedMovingAverage_Float", "")
     ue_expect_signature(call, "v1;DynamicWeightedMovingAverage_Float;CurrentSample:FloatProperty:128;PreviousSample:FloatProperty:128;MaxDistance:FloatProperty:128;MinWeight:FloatProperty:128;MaxWeight:FloatProperty:128;ReturnValue:FloatProperty:1408;")
@@ -2076,6 +2210,7 @@ def ue_math_DynamicWeightedMovingAverage_Float(arg_currentsample : float; arg_pr
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_BoolBool", signature="v1;EqualEqual_BoolBool;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_BoolBool(arg_a : bool; arg_b : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_BoolBool", "")
     ue_expect_signature(call, "v1;EqualEqual_BoolBool;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2088,6 +2223,7 @@ def ue_math_EqualEqual_BoolBool(arg_a : bool; arg_b : bool) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_ByteByte", signature="v1;EqualEqual_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_ByteByte", "")
     ue_expect_signature(call, "v1;EqualEqual_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2100,6 +2236,7 @@ def ue_math_EqualEqual_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_ClassClass", signature="v1;EqualEqual_ClassClass;A:ClassProperty:128:meta:/Script/CoreUObject.Object;B:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_ClassClass(arg_a : UEClassHandle; arg_b : UEClassHandle) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_ClassClass", "")
     ue_expect_signature(call, "v1;EqualEqual_ClassClass;A:ClassProperty:128:meta:/Script/CoreUObject.Object;B:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -2112,6 +2249,7 @@ def ue_math_EqualEqual_ClassClass(arg_a : UEClassHandle; arg_b : UEClassHandle) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_DoubleDouble", signature="v1;EqualEqual_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_DoubleDouble(arg_a : double; arg_b : double) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_DoubleDouble", "")
     ue_expect_signature(call, "v1;EqualEqual_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2124,6 +2262,7 @@ def ue_math_EqualEqual_DoubleDouble(arg_a : double; arg_b : double) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_IntInt", signature="v1;EqualEqual_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_IntInt(arg_a : int; arg_b : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_IntInt", "")
     ue_expect_signature(call, "v1;EqualEqual_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2136,6 +2275,7 @@ def ue_math_EqualEqual_IntInt(arg_a : int; arg_b : int) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_LinearColorLinearColor", signature="v1;EqualEqual_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;EqualEqual_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -2154,6 +2294,7 @@ def ue_math_EqualEqual_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; ar
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_MatrixMatrix", signature="v1;EqualEqual_MatrixMatrix;A:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_MatrixMatrix(arg_a : S_Matrix_c85cbab4; arg_b : S_Matrix_c85cbab4; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_MatrixMatrix", "")
     ue_expect_signature(call, "v1;EqualEqual_MatrixMatrix;A:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2197,6 +2338,7 @@ def ue_math_EqualEqual_MatrixMatrix(arg_a : S_Matrix_c85cbab4; arg_b : S_Matrix_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_NameName", signature="v1;EqualEqual_NameName;A:NameProperty:128;B:NameProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_NameName(arg_a : UEName; arg_b : UEName) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_NameName", "")
     ue_expect_signature(call, "v1;EqualEqual_NameName;A:NameProperty:128;B:NameProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2209,6 +2351,7 @@ def ue_math_EqualEqual_NameName(arg_a : UEName; arg_b : UEName) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_ObjectObject", signature="v1;EqualEqual_ObjectObject;A:ObjectProperty:128:/Script/CoreUObject.Object;B:ObjectProperty:128:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_ObjectObject(arg_a : C_Object_55c3753a; arg_b : C_Object_55c3753a) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_ObjectObject", "")
     ue_expect_signature(call, "v1;EqualEqual_ObjectObject;A:ObjectProperty:128:/Script/CoreUObject.Object;B:ObjectProperty:128:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -2221,6 +2364,7 @@ def ue_math_EqualEqual_ObjectObject(arg_a : C_Object_55c3753a; arg_b : C_Object_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_QuatQuat", signature="v1;EqualEqual_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_QuatQuat", "")
     ue_expect_signature(call, "v1;EqualEqual_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2240,6 +2384,7 @@ def ue_math_EqualEqual_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_RotatorRotator", signature="v1;EqualEqual_RotatorRotator;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_RotatorRotator(arg_a : UERotator; arg_b : UERotator; arg_errortolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_RotatorRotator", "")
     ue_expect_signature(call, "v1;EqualEqual_RotatorRotator;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2253,6 +2398,7 @@ def ue_math_EqualEqual_RotatorRotator(arg_a : UERotator; arg_b : UERotator; arg_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_TransformTransform", signature="v1;EqualEqual_TransformTransform;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_TransformTransform(arg_a : UETransform; arg_b : UETransform) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_TransformTransform", "")
     ue_expect_signature(call, "v1;EqualEqual_TransformTransform;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:BoolProperty:1408;")
@@ -2265,6 +2411,7 @@ def ue_math_EqualEqual_TransformTransform(arg_a : UETransform; arg_b : UETransfo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_Vector2DVector2D", signature="v1;EqualEqual_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D; arg_errortolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_Vector2DVector2D", "")
     ue_expect_signature(call, "v1;EqualEqual_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2278,6 +2425,7 @@ def ue_math_EqualEqual_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_Vector4Vector4", signature="v1;EqualEqual_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1; arg_errortolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_Vector4Vector4", "")
     ue_expect_signature(call, "v1;EqualEqual_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2297,6 +2445,7 @@ def ue_math_EqualEqual_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vect
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_VectorVector", signature="v1;EqualEqual_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualEqual_VectorVector(arg_a : UEVector; arg_b : UEVector; arg_errortolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_VectorVector", "")
     ue_expect_signature(call, "v1;EqualEqual_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2310,6 +2459,7 @@ def ue_math_EqualEqual_VectorVector(arg_a : UEVector; arg_b : UEVector; arg_erro
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualExactly_Vector2DVector2D", signature="v1;EqualExactly_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualExactly_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualExactly_Vector2DVector2D", "")
     ue_expect_signature(call, "v1;EqualExactly_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -2322,6 +2472,7 @@ def ue_math_EqualExactly_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualExactly_Vector4Vector4", signature="v1;EqualExactly_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualExactly_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualExactly_Vector4Vector4", "")
     ue_expect_signature(call, "v1;EqualExactly_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -2340,6 +2491,7 @@ def ue_math_EqualExactly_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Ve
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualExactly_VectorVector", signature="v1;EqualExactly_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_EqualExactly_VectorVector(arg_a : UEVector; arg_b : UEVector) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualExactly_VectorVector", "")
     ue_expect_signature(call, "v1;EqualExactly_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -2352,6 +2504,7 @@ def ue_math_EqualExactly_VectorVector(arg_a : UEVector; arg_b : UEVector) : bool
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Equal_IntPointIntPoint", signature="v1;Equal_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Equal_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPoint_cb05a38b) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Equal_IntPointIntPoint", "")
     ue_expect_signature(call, "v1;Equal_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -2366,6 +2519,7 @@ def ue_math_Equal_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPoi
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Exp", signature="v1;Exp;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Exp(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Exp", "")
     ue_expect_signature(call, "v1;Exp;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -2377,6 +2531,7 @@ def ue_math_Exp(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FCeil", signature="v1;FCeil;A:DoubleProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_FCeil(arg_a : double) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FCeil", "")
     ue_expect_signature(call, "v1;FCeil;A:DoubleProperty:128;ReturnValue:IntProperty:1408;")
@@ -2388,6 +2543,7 @@ def ue_math_FCeil(arg_a : double) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FClamp", signature="v1;FClamp;Value:DoubleProperty:128;Min:DoubleProperty:128;Max:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_FClamp(arg_value : double; arg_min : double; arg_max : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FClamp", "")
     ue_expect_signature(call, "v1;FClamp;Value:DoubleProperty:128;Min:DoubleProperty:128;Max:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -2401,6 +2557,7 @@ def ue_math_FClamp(arg_value : double; arg_min : double; arg_max : double) : dou
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FFloor", signature="v1;FFloor;A:DoubleProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_FFloor(arg_a : double) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FFloor", "")
     ue_expect_signature(call, "v1;FFloor;A:DoubleProperty:128;ReturnValue:IntProperty:1408;")
@@ -2412,6 +2569,7 @@ def ue_math_FFloor(arg_a : double) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FInterpEaseInOut", signature="v1;FInterpEaseInOut;A:DoubleProperty:128;B:DoubleProperty:128;Alpha:DoubleProperty:128;Exponent:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_FInterpEaseInOut(arg_a : double; arg_b : double; arg_alpha : double; arg_exponent : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FInterpEaseInOut", "")
     ue_expect_signature(call, "v1;FInterpEaseInOut;A:DoubleProperty:128;B:DoubleProperty:128;Alpha:DoubleProperty:128;Exponent:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -2426,6 +2584,7 @@ def ue_math_FInterpEaseInOut(arg_a : double; arg_b : double; arg_alpha : double;
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FInterpTo", signature="v1;FInterpTo;Current:DoubleProperty:128;Target:DoubleProperty:128;DeltaTime:DoubleProperty:128;InterpSpeed:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_FInterpTo(arg_current : double; arg_target : double; arg_deltatime : double; arg_interpspeed : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FInterpTo", "")
     ue_expect_signature(call, "v1;FInterpTo;Current:DoubleProperty:128;Target:DoubleProperty:128;DeltaTime:DoubleProperty:128;InterpSpeed:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -2440,6 +2599,7 @@ def ue_math_FInterpTo(arg_current : double; arg_target : double; arg_deltatime :
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FInterpTo_Constant", signature="v1;FInterpTo_Constant;Current:DoubleProperty:128;Target:DoubleProperty:128;DeltaTime:DoubleProperty:128;InterpSpeed:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_FInterpTo_Constant(arg_current : double; arg_target : double; arg_deltatime : double; arg_interpspeed : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FInterpTo_Constant", "")
     ue_expect_signature(call, "v1;FInterpTo_Constant;Current:DoubleProperty:128;Target:DoubleProperty:128;DeltaTime:DoubleProperty:128;InterpSpeed:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -2454,6 +2614,7 @@ def ue_math_FInterpTo_Constant(arg_current : double; arg_target : double; arg_de
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FMax", signature="v1;FMax;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_FMax(arg_a : double; arg_b : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FMax", "")
     ue_expect_signature(call, "v1;FMax;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -2466,6 +2627,7 @@ def ue_math_FMax(arg_a : double; arg_b : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FMin", signature="v1;FMin;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_FMin(arg_a : double; arg_b : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FMin", "")
     ue_expect_signature(call, "v1;FMin;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -2483,6 +2645,7 @@ struct ue_math_FMod_Result {
     out_returnvalue : int
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FMod", signature="v1;FMod;Dividend:DoubleProperty:128;Divisor:DoubleProperty:128;Remainder:DoubleProperty:384;ReturnValue:IntProperty:1408;")]
 def ue_math_FMod(arg_dividend : double; arg_divisor : double) : ue_math_FMod_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FMod", "")
     ue_expect_signature(call, "v1;FMod;Dividend:DoubleProperty:128;Divisor:DoubleProperty:128;Remainder:DoubleProperty:384;ReturnValue:IntProperty:1408;")
@@ -2495,6 +2658,7 @@ def ue_math_FMod(arg_dividend : double; arg_divisor : double) : ue_math_FMod_Res
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FTrunc", signature="v1;FTrunc;A:DoubleProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_FTrunc(arg_a : double) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FTrunc", "")
     ue_expect_signature(call, "v1;FTrunc;A:DoubleProperty:128;ReturnValue:IntProperty:1408;")
@@ -2506,6 +2670,7 @@ def ue_math_FTrunc(arg_a : double) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FTruncVector", signature="v1;FTruncVector;InVector:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};")]
 def ue_math_FTruncVector(arg_invector : UEVector) : S_IntVector_1c5addc5 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FTruncVector", "")
     ue_expect_signature(call, "v1;FTruncVector;InVector:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};")
@@ -2517,6 +2682,7 @@ def ue_math_FTruncVector(arg_invector : UEVector) : S_IntVector_1c5addc5 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FTruncVector2D", signature="v1;FTruncVector2D;InVector2D:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector2\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_FTruncVector2D(arg_invector2d : UEVector2D) : S_IntVector2_5b68e073 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FTruncVector2D", "")
     ue_expect_signature(call, "v1;FTruncVector2D;InVector2D:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector2\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -2528,6 +2694,7 @@ def ue_math_FTruncVector2D(arg_invector2d : UEVector2D) : S_IntVector2_5b68e073 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FWrap", signature="v1;FWrap;Value:DoubleProperty:128;Min:DoubleProperty:128;Max:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_FWrap(arg_value : double; arg_min : double; arg_max : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FWrap", "")
     ue_expect_signature(call, "v1;FWrap;Value:DoubleProperty:128;Min:DoubleProperty:128;Max:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -2541,6 +2708,7 @@ def ue_math_FWrap(arg_value : double; arg_min : double; arg_max : double) : doub
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FindClosestPointOnLine", signature="v1;FindClosestPointOnLine;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineOrigin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineDirection:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_FindClosestPointOnLine(arg_point : UEVector; arg_lineorigin : UEVector; arg_linedirection : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FindClosestPointOnLine", "")
     ue_expect_signature(call, "v1;FindClosestPointOnLine;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineOrigin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineDirection:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2554,6 +2722,7 @@ def ue_math_FindClosestPointOnLine(arg_point : UEVector; arg_lineorigin : UEVect
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FindClosestPointOnSegment", signature="v1;FindClosestPointOnSegment;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SegmentStart:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SegmentEnd:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_FindClosestPointOnSegment(arg_point : UEVector; arg_segmentstart : UEVector; arg_segmentend : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FindClosestPointOnSegment", "")
     ue_expect_signature(call, "v1;FindClosestPointOnSegment;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SegmentStart:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SegmentEnd:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2567,6 +2736,7 @@ def ue_math_FindClosestPointOnSegment(arg_point : UEVector; arg_segmentstart : U
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FindLookAtRotation", signature="v1;FindLookAtRotation;Start:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Target:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_FindLookAtRotation(arg_start : UEVector; arg_target : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FindLookAtRotation", "")
     ue_expect_signature(call, "v1;FindLookAtRotation;Start:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Target:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -2584,6 +2754,7 @@ struct ue_math_FindNearestPointsOnLineSegments_Result {
     out_segment2point : UEVector
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FindNearestPointsOnLineSegments", signature="v1;FindNearestPointsOnLineSegments;Segment1Start:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Segment1End:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Segment2Start:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Segment2End:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Segment1Point:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Segment2Point:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_FindNearestPointsOnLineSegments(arg_segment1start : UEVector; arg_segment1end : UEVector; arg_segment2start : UEVector; arg_segment2end : UEVector) : ue_math_FindNearestPointsOnLineSegments_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FindNearestPointsOnLineSegments", "")
     ue_expect_signature(call, "v1;FindNearestPointsOnLineSegments;Segment1Start:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Segment1End:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Segment2Start:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Segment2End:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Segment1Point:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Segment2Point:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2598,6 +2769,7 @@ def ue_math_FindNearestPointsOnLineSegments(arg_segment1start : UEVector; arg_se
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FindRelativeLookAtRotation", signature="v1;FindRelativeLookAtRotation;StartTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};TargetLocation:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_FindRelativeLookAtRotation(arg_starttransform : UETransform; arg_targetlocation : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FindRelativeLookAtRotation", "")
     ue_expect_signature(call, "v1;FindRelativeLookAtRotation;StartTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};TargetLocation:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -2610,6 +2782,7 @@ def ue_math_FindRelativeLookAtRotation(arg_starttransform : UETransform; arg_tar
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="FixedTurn", signature="v1;FixedTurn;InCurrent:FloatProperty:128;InDesired:FloatProperty:128;InDeltaRate:FloatProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_math_FixedTurn(arg_incurrent : float; arg_indesired : float; arg_indeltarate : float) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "FixedTurn", "")
     ue_expect_signature(call, "v1;FixedTurn;InCurrent:FloatProperty:128;InDesired:FloatProperty:128;InDeltaRate:FloatProperty:128;ReturnValue:FloatProperty:1408;")
@@ -2623,6 +2796,7 @@ def ue_math_FixedTurn(arg_incurrent : float; arg_indesired : float; arg_indeltar
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Fraction", signature="v1;Fraction;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Fraction(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Fraction", "")
     ue_expect_signature(call, "v1;Fraction;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -2634,6 +2808,7 @@ def ue_math_Fraction(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetAbs2D", signature="v1;GetAbs2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_GetAbs2D(arg_a : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetAbs2D", "")
     ue_expect_signature(call, "v1;GetAbs2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -2645,6 +2820,7 @@ def ue_math_GetAbs2D(arg_a : UEVector2D) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetAbsMax2D", signature="v1;GetAbsMax2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_GetAbsMax2D(arg_a : UEVector2D) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetAbsMax2D", "")
     ue_expect_signature(call, "v1;GetAbsMax2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -2662,6 +2838,7 @@ struct ue_math_GetAxes_Result {
     out_z : UEVector
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetAxes", signature="v1;GetAxes;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};X:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_GetAxes(arg_a : UERotator) : ue_math_GetAxes_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetAxes", "")
     ue_expect_signature(call, "v1;GetAxes;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};X:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2678,6 +2855,7 @@ struct ue_math_GetAzimuthAndElevation_Result {
     out_elevation : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetAzimuthAndElevation", signature="v1;GetAzimuthAndElevation;InDirection:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReferenceFrame:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Azimuth:FloatProperty:384;Elevation:FloatProperty:384;")]
 def ue_math_GetAzimuthAndElevation(arg_indirection : UEVector; arg_referenceframe : UETransform) : ue_math_GetAzimuthAndElevation_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetAzimuthAndElevation", "")
     ue_expect_signature(call, "v1;GetAzimuthAndElevation;InDirection:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReferenceFrame:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Azimuth:FloatProperty:384;Elevation:FloatProperty:384;")
@@ -2690,6 +2868,7 @@ def ue_math_GetAzimuthAndElevation(arg_indirection : UEVector; arg_referencefram
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetBoxCenter", signature="v1;GetBoxCenter;InBox:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_GetBoxCenter(arg_inbox : S_Box_79dc8c23) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetBoxCenter", "")
     ue_expect_signature(call, "v1;GetBoxCenter;InBox:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2703,6 +2882,7 @@ def ue_math_GetBoxCenter(arg_inbox : S_Box_79dc8c23) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetBoxSize", signature="v1;GetBoxSize;InBox:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_GetBoxSize(arg_inbox : S_Box_79dc8c23) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetBoxSize", "")
     ue_expect_signature(call, "v1;GetBoxSize;InBox:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2716,6 +2896,7 @@ def ue_math_GetBoxSize(arg_inbox : S_Box_79dc8c23) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetBoxVolume", signature="v1;GetBoxVolume;InBox:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_GetBoxVolume(arg_inbox : S_Box_79dc8c23) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetBoxVolume", "")
     ue_expect_signature(call, "v1;GetBoxVolume;InBox:StructProperty:134218114:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -2729,6 +2910,7 @@ def ue_math_GetBoxVolume(arg_inbox : S_Box_79dc8c23) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetDirectionUnitVector", signature="v1;GetDirectionUnitVector;From:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};To:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_GetDirectionUnitVector(arg_from : UEVector; arg_to : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetDirectionUnitVector", "")
     ue_expect_signature(call, "v1;GetDirectionUnitVector;From:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};To:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2741,6 +2923,7 @@ def ue_math_GetDirectionUnitVector(arg_from : UEVector; arg_to : UEVector) : UEV
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetForwardVector", signature="v1;GetForwardVector;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_GetForwardVector(arg_inrot : UERotator) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetForwardVector", "")
     ue_expect_signature(call, "v1;GetForwardVector;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2752,6 +2935,7 @@ def ue_math_GetForwardVector(arg_inrot : UERotator) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetMax2D", signature="v1;GetMax2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_GetMax2D(arg_a : UEVector2D) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetMax2D", "")
     ue_expect_signature(call, "v1;GetMax2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -2763,6 +2947,7 @@ def ue_math_GetMax2D(arg_a : UEVector2D) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetMaxElement", signature="v1;GetMaxElement;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_GetMaxElement(arg_a : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetMaxElement", "")
     ue_expect_signature(call, "v1;GetMaxElement;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -2774,6 +2959,7 @@ def ue_math_GetMaxElement(arg_a : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetMin2D", signature="v1;GetMin2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_GetMin2D(arg_a : UEVector2D) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetMin2D", "")
     ue_expect_signature(call, "v1;GetMin2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -2785,6 +2971,7 @@ def ue_math_GetMin2D(arg_a : UEVector2D) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetMinElement", signature="v1;GetMinElement;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_GetMinElement(arg_a : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetMinElement", "")
     ue_expect_signature(call, "v1;GetMinElement;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -2796,6 +2983,7 @@ def ue_math_GetMinElement(arg_a : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetPI", signature="v1;GetPI;ReturnValue:DoubleProperty:1408;")]
 def ue_math_GetPI() : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetPI", "")
     ue_expect_signature(call, "v1;GetPI;ReturnValue:DoubleProperty:1408;")
@@ -2806,6 +2994,7 @@ def ue_math_GetPI() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetPointDistanceToLine", signature="v1;GetPointDistanceToLine;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineOrigin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineDirection:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_GetPointDistanceToLine(arg_point : UEVector; arg_lineorigin : UEVector; arg_linedirection : UEVector) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetPointDistanceToLine", "")
     ue_expect_signature(call, "v1;GetPointDistanceToLine;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineOrigin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineDirection:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -2819,6 +3008,7 @@ def ue_math_GetPointDistanceToLine(arg_point : UEVector; arg_lineorigin : UEVect
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetPointDistanceToSegment", signature="v1;GetPointDistanceToSegment;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SegmentStart:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SegmentEnd:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_GetPointDistanceToSegment(arg_point : UEVector; arg_segmentstart : UEVector; arg_segmentend : UEVector) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetPointDistanceToSegment", "")
     ue_expect_signature(call, "v1;GetPointDistanceToSegment;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SegmentStart:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SegmentEnd:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -2832,6 +3022,7 @@ def ue_math_GetPointDistanceToSegment(arg_point : UEVector; arg_segmentstart : U
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetReflectionVector", signature="v1;GetReflectionVector;Direction:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SurfaceNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_GetReflectionVector(arg_direction : UEVector; arg_surfacenormal : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetReflectionVector", "")
     ue_expect_signature(call, "v1;GetReflectionVector;Direction:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SurfaceNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2844,6 +3035,7 @@ def ue_math_GetReflectionVector(arg_direction : UEVector; arg_surfacenormal : UE
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetRightVector", signature="v1;GetRightVector;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_GetRightVector(arg_inrot : UERotator) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetRightVector", "")
     ue_expect_signature(call, "v1;GetRightVector;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2855,6 +3047,7 @@ def ue_math_GetRightVector(arg_inrot : UERotator) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetRotated2D", signature="v1;GetRotated2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};AngleDeg:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_GetRotated2D(arg_a : UEVector2D; arg_angledeg : float) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetRotated2D", "")
     ue_expect_signature(call, "v1;GetRotated2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};AngleDeg:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -2872,6 +3065,7 @@ struct ue_math_GetSlopeDegreeAngles_Result {
     out_outsloperolldegreeangle : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetSlopeDegreeAngles", signature="v1;GetSlopeDegreeAngles;MyRightYAxis:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};FloorNormal:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};UpVector:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};OutSlopePitchDegreeAngle:FloatProperty:384;OutSlopeRollDegreeAngle:FloatProperty:384;")]
 def ue_math_GetSlopeDegreeAngles(arg_myrightyaxis : UEVector; arg_floornormal : UEVector; arg_upvector : UEVector) : ue_math_GetSlopeDegreeAngles_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetSlopeDegreeAngles", "")
     ue_expect_signature(call, "v1;GetSlopeDegreeAngles;MyRightYAxis:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};FloorNormal:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};UpVector:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};OutSlopePitchDegreeAngle:FloatProperty:384;OutSlopeRollDegreeAngle:FloatProperty:384;")
@@ -2885,6 +3079,7 @@ def ue_math_GetSlopeDegreeAngles(arg_myrightyaxis : UEVector; arg_floornormal : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetTAU", signature="v1;GetTAU;ReturnValue:DoubleProperty:1408;")]
 def ue_math_GetTAU() : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetTAU", "")
     ue_expect_signature(call, "v1;GetTAU;ReturnValue:DoubleProperty:1408;")
@@ -2895,6 +3090,7 @@ def ue_math_GetTAU() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetUpVector", signature="v1;GetUpVector;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_GetUpVector(arg_inrot : UERotator) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetUpVector", "")
     ue_expect_signature(call, "v1;GetUpVector;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2906,6 +3102,7 @@ def ue_math_GetUpVector(arg_inrot : UERotator) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetVectorArrayAverage", signature="v1;GetVectorArrayAverage;Vectors:ArrayProperty:134218114[Vectors:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};];ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_GetVectorArrayAverage(arg_vectors : array<UEVector>) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetVectorArrayAverage", "")
     ue_expect_signature(call, "v1;GetVectorArrayAverage;Vectors:ArrayProperty:134218114[Vectors:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};];ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2925,6 +3122,7 @@ struct ue_math_GetYawPitchFromVector_Result {
     out_pitch : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GetYawPitchFromVector", signature="v1;GetYawPitchFromVector;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Yaw:FloatProperty:384;Pitch:FloatProperty:384;")]
 def ue_math_GetYawPitchFromVector(arg_invec : UEVector) : ue_math_GetYawPitchFromVector_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GetYawPitchFromVector", "")
     ue_expect_signature(call, "v1;GetYawPitchFromVector;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Yaw:FloatProperty:384;Pitch:FloatProperty:384;")
@@ -2936,6 +3134,7 @@ def ue_math_GetYawPitchFromVector(arg_invec : UEVector) : ue_math_GetYawPitchFro
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GreaterEqual_ByteByte", signature="v1;GreaterEqual_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_GreaterEqual_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GreaterEqual_ByteByte", "")
     ue_expect_signature(call, "v1;GreaterEqual_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2948,6 +3147,7 @@ def ue_math_GreaterEqual_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GreaterEqual_DoubleDouble", signature="v1;GreaterEqual_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_GreaterEqual_DoubleDouble(arg_a : double; arg_b : double) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GreaterEqual_DoubleDouble", "")
     ue_expect_signature(call, "v1;GreaterEqual_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2960,6 +3160,7 @@ def ue_math_GreaterEqual_DoubleDouble(arg_a : double; arg_b : double) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GreaterEqual_IntInt", signature="v1;GreaterEqual_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_GreaterEqual_IntInt(arg_a : int; arg_b : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GreaterEqual_IntInt", "")
     ue_expect_signature(call, "v1;GreaterEqual_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2972,6 +3173,7 @@ def ue_math_GreaterEqual_IntInt(arg_a : int; arg_b : int) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GreaterGreater_VectorRotator", signature="v1;GreaterGreater_VectorRotator;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_GreaterGreater_VectorRotator(arg_a : UEVector; arg_b : UERotator) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GreaterGreater_VectorRotator", "")
     ue_expect_signature(call, "v1;GreaterGreater_VectorRotator;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -2984,6 +3186,7 @@ def ue_math_GreaterGreater_VectorRotator(arg_a : UEVector; arg_b : UERotator) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Greater_ByteByte", signature="v1;Greater_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Greater_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Greater_ByteByte", "")
     ue_expect_signature(call, "v1;Greater_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")
@@ -2996,6 +3199,7 @@ def ue_math_Greater_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Greater_DoubleDouble", signature="v1;Greater_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Greater_DoubleDouble(arg_a : double; arg_b : double) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Greater_DoubleDouble", "")
     ue_expect_signature(call, "v1;Greater_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3008,6 +3212,7 @@ def ue_math_Greater_DoubleDouble(arg_a : double; arg_b : double) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Greater_IntInt", signature="v1;Greater_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Greater_IntInt(arg_a : int; arg_b : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Greater_IntInt", "")
     ue_expect_signature(call, "v1;Greater_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3020,6 +3225,7 @@ def ue_math_Greater_IntInt(arg_a : int; arg_b : int) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="GridSnap_Float", signature="v1;GridSnap_Float;Location:DoubleProperty:128;GridSize:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_GridSnap_Float(arg_location : double; arg_gridsize : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "GridSnap_Float", "")
     ue_expect_signature(call, "v1;GridSnap_Float;Location:DoubleProperty:128;GridSize:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -3032,6 +3238,7 @@ def ue_math_GridSnap_Float(arg_location : double; arg_gridsize : double) : doubl
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="HSVToRGB", signature="v1;HSVToRGB;H:FloatProperty:128;S:FloatProperty:128;V:FloatProperty:128;A:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_HSVToRGB(arg_h : float; arg_s : float; arg_v : float; arg_a : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "HSVToRGB", "")
     ue_expect_signature(call, "v1;HSVToRGB;H:FloatProperty:128;S:FloatProperty:128;V:FloatProperty:128;A:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3046,6 +3253,7 @@ def ue_math_HSVToRGB(arg_h : float; arg_s : float; arg_v : float; arg_a : float)
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="HSVToRGBLinear", signature="v1;HSVToRGBLinear;HSV:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_HSVToRGBLinear(arg_hsv : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "HSVToRGBLinear", "")
     ue_expect_signature(call, "v1;HSVToRGBLinear;HSV:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3060,6 +3268,7 @@ def ue_math_HSVToRGBLinear(arg_hsv : S_LinearColor_f4abb14b) : S_LinearColor_f4a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="HSVToRGB_Vector", signature="v1;HSVToRGB_Vector;HSV:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};RGB:StructProperty:384:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_HSVToRGB_Vector(arg_hsv : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "HSVToRGB_Vector", "")
     ue_expect_signature(call, "v1;HSVToRGB_Vector;HSV:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};RGB:StructProperty:384:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3074,6 +3283,7 @@ def ue_math_HSVToRGB_Vector(arg_hsv : S_LinearColor_f4abb14b) : S_LinearColor_f4
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Hypotenuse", signature="v1;Hypotenuse;Width:DoubleProperty:128;Height:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Hypotenuse(arg_width : double; arg_height : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Hypotenuse", "")
     ue_expect_signature(call, "v1;Hypotenuse;Width:DoubleProperty:128;Height:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -3086,6 +3296,7 @@ def ue_math_Hypotenuse(arg_width : double; arg_height : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="InRange_FloatFloat", signature="v1;InRange_FloatFloat;Value:DoubleProperty:128;Min:DoubleProperty:128;Max:DoubleProperty:128;InclusiveMin:BoolProperty:128;InclusiveMax:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_InRange_FloatFloat(arg_value : double; arg_min : double; arg_max : double; arg_inclusivemin : bool; arg_inclusivemax : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "InRange_FloatFloat", "")
     ue_expect_signature(call, "v1;InRange_FloatFloat;Value:DoubleProperty:128;Min:DoubleProperty:128;Max:DoubleProperty:128;InclusiveMin:BoolProperty:128;InclusiveMax:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3101,6 +3312,7 @@ def ue_math_InRange_FloatFloat(arg_value : double; arg_min : double; arg_max : d
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="InRange_IntInt", signature="v1;InRange_IntInt;Value:IntProperty:128;Min:IntProperty:128;Max:IntProperty:128;InclusiveMin:BoolProperty:128;InclusiveMax:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_InRange_IntInt(arg_value : int; arg_min : int; arg_max : int; arg_inclusivemin : bool; arg_inclusivemax : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "InRange_IntInt", "")
     ue_expect_signature(call, "v1;InRange_IntInt;Value:IntProperty:128;Min:IntProperty:128;Max:IntProperty:128;InclusiveMin:BoolProperty:128;InclusiveMax:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3116,6 +3328,7 @@ def ue_math_InRange_IntInt(arg_value : int; arg_min : int; arg_max : int; arg_in
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IntPoint_Down", signature="v1;IntPoint_Down;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_IntPoint_Down() : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IntPoint_Down", "")
     ue_expect_signature(call, "v1;IntPoint_Down;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -3126,6 +3339,7 @@ def ue_math_IntPoint_Down() : S_IntPoint_cb05a38b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IntPoint_Left", signature="v1;IntPoint_Left;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_IntPoint_Left() : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IntPoint_Left", "")
     ue_expect_signature(call, "v1;IntPoint_Left;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -3136,6 +3350,7 @@ def ue_math_IntPoint_Left() : S_IntPoint_cb05a38b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IntPoint_One", signature="v1;IntPoint_One;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_IntPoint_One() : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IntPoint_One", "")
     ue_expect_signature(call, "v1;IntPoint_One;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -3146,6 +3361,7 @@ def ue_math_IntPoint_One() : S_IntPoint_cb05a38b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IntPoint_Right", signature="v1;IntPoint_Right;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_IntPoint_Right() : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IntPoint_Right", "")
     ue_expect_signature(call, "v1;IntPoint_Right;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -3156,6 +3372,7 @@ def ue_math_IntPoint_Right() : S_IntPoint_cb05a38b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IntPoint_Up", signature="v1;IntPoint_Up;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_IntPoint_Up() : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IntPoint_Up", "")
     ue_expect_signature(call, "v1;IntPoint_Up;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -3166,6 +3383,7 @@ def ue_math_IntPoint_Up() : S_IntPoint_cb05a38b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IntPoint_Zero", signature="v1;IntPoint_Zero;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_IntPoint_Zero() : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IntPoint_Zero", "")
     ue_expect_signature(call, "v1;IntPoint_Zero;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -3176,6 +3394,7 @@ def ue_math_IntPoint_Zero() : S_IntPoint_cb05a38b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="InverseTransformDirection", signature="v1;InverseTransformDirection;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Direction:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_InverseTransformDirection(arg_t : UETransform; arg_direction : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "InverseTransformDirection", "")
     ue_expect_signature(call, "v1;InverseTransformDirection;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Direction:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -3188,6 +3407,7 @@ def ue_math_InverseTransformDirection(arg_t : UETransform; arg_direction : UEVec
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="InverseTransformLocation", signature="v1;InverseTransformLocation;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_InverseTransformLocation(arg_t : UETransform; arg_location : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "InverseTransformLocation", "")
     ue_expect_signature(call, "v1;InverseTransformLocation;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -3200,6 +3420,7 @@ def ue_math_InverseTransformLocation(arg_t : UETransform; arg_location : UEVecto
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="InverseTransformRotation", signature="v1;InverseTransformRotation;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_InverseTransformRotation(arg_t : UETransform; arg_rotation : UERotator) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "InverseTransformRotation", "")
     ue_expect_signature(call, "v1;InverseTransformRotation;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -3212,6 +3433,7 @@ def ue_math_InverseTransformRotation(arg_t : UETransform; arg_rotation : UERotat
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="InvertTransform", signature="v1;InvertTransform;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_InvertTransform(arg_t : UETransform) : UETransform {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "InvertTransform", "")
     ue_expect_signature(call, "v1;InvertTransform;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -3223,6 +3445,7 @@ def ue_math_InvertTransform(arg_t : UETransform) : UETransform {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IsLeapYear", signature="v1;IsLeapYear;Year:IntProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_IsLeapYear(arg_year : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IsLeapYear", "")
     ue_expect_signature(call, "v1;IsLeapYear;Year:IntProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3234,6 +3457,7 @@ def ue_math_IsLeapYear(arg_year : int) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IsNearlyZero2D", signature="v1;IsNearlyZero2D;A:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_IsNearlyZero2D(arg_a : UEVector2D; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IsNearlyZero2D", "")
     ue_expect_signature(call, "v1;IsNearlyZero2D;A:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3246,6 +3470,7 @@ def ue_math_IsNearlyZero2D(arg_a : UEVector2D; arg_tolerance : float) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IsPointInBox", signature="v1;IsPointInBox;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxOrigin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_IsPointInBox(arg_point : UEVector; arg_boxorigin : UEVector; arg_boxextent : UEVector) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IsPointInBox", "")
     ue_expect_signature(call, "v1;IsPointInBox;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxOrigin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3259,6 +3484,7 @@ def ue_math_IsPointInBox(arg_point : UEVector; arg_boxorigin : UEVector; arg_box
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IsPointInBoxWithTransform", signature="v1;IsPointInBoxWithTransform;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxWorldTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};BoxExtent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_IsPointInBoxWithTransform(arg_point : UEVector; arg_boxworldtransform : UETransform; arg_boxextent : UEVector) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IsPointInBoxWithTransform", "")
     ue_expect_signature(call, "v1;IsPointInBoxWithTransform;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxWorldTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};BoxExtent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3272,6 +3498,7 @@ def ue_math_IsPointInBoxWithTransform(arg_point : UEVector; arg_boxworldtransfor
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IsPointInBoxWithTransform_Box", signature="v1;IsPointInBoxWithTransform_Box;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxWorldTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};BoxExtent:StructProperty:128:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_IsPointInBoxWithTransform_Box(arg_point : UEVector; arg_boxworldtransform : UETransform; arg_boxextent : S_Box_79dc8c23) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IsPointInBoxWithTransform_Box", "")
     ue_expect_signature(call, "v1;IsPointInBoxWithTransform_Box;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxWorldTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};BoxExtent:StructProperty:128:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3287,6 +3514,7 @@ def ue_math_IsPointInBoxWithTransform_Box(arg_point : UEVector; arg_boxworldtran
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IsPointInBox_Box", signature="v1;IsPointInBox_Box;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Box:StructProperty:128:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_IsPointInBox_Box(arg_point : UEVector; arg_box : S_Box_79dc8c23) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IsPointInBox_Box", "")
     ue_expect_signature(call, "v1;IsPointInBox_Box;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Box:StructProperty:128:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3301,6 +3529,7 @@ def ue_math_IsPointInBox_Box(arg_point : UEVector; arg_box : S_Box_79dc8c23) : b
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="IsZero2D", signature="v1;IsZero2D;A:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_IsZero2D(arg_a : UEVector2D) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "IsZero2D", "")
     ue_expect_signature(call, "v1;IsZero2D;A:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3312,6 +3541,7 @@ def ue_math_IsZero2D(arg_a : UEVector2D) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Lerp", signature="v1;Lerp;A:DoubleProperty:128;B:DoubleProperty:128;Alpha:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Lerp(arg_a : double; arg_b : double; arg_alpha : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Lerp", "")
     ue_expect_signature(call, "v1;Lerp;A:DoubleProperty:128;B:DoubleProperty:128;Alpha:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -3325,6 +3555,7 @@ def ue_math_Lerp(arg_a : double; arg_b : double; arg_alpha : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LessEqual_ByteByte", signature="v1;LessEqual_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_LessEqual_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LessEqual_ByteByte", "")
     ue_expect_signature(call, "v1;LessEqual_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3337,6 +3568,7 @@ def ue_math_LessEqual_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LessEqual_DoubleDouble", signature="v1;LessEqual_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_LessEqual_DoubleDouble(arg_a : double; arg_b : double) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LessEqual_DoubleDouble", "")
     ue_expect_signature(call, "v1;LessEqual_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3349,6 +3581,7 @@ def ue_math_LessEqual_DoubleDouble(arg_a : double; arg_b : double) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LessEqual_IntInt", signature="v1;LessEqual_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_LessEqual_IntInt(arg_a : int; arg_b : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LessEqual_IntInt", "")
     ue_expect_signature(call, "v1;LessEqual_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3361,6 +3594,7 @@ def ue_math_LessEqual_IntInt(arg_a : int; arg_b : int) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LessLess_VectorRotator", signature="v1;LessLess_VectorRotator;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_LessLess_VectorRotator(arg_a : UEVector; arg_b : UERotator) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LessLess_VectorRotator", "")
     ue_expect_signature(call, "v1;LessLess_VectorRotator;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -3373,6 +3607,7 @@ def ue_math_LessLess_VectorRotator(arg_a : UEVector; arg_b : UERotator) : UEVect
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Less_ByteByte", signature="v1;Less_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Less_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Less_ByteByte", "")
     ue_expect_signature(call, "v1;Less_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3385,6 +3620,7 @@ def ue_math_Less_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Less_DoubleDouble", signature="v1;Less_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Less_DoubleDouble(arg_a : double; arg_b : double) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Less_DoubleDouble", "")
     ue_expect_signature(call, "v1;Less_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3397,6 +3633,7 @@ def ue_math_Less_DoubleDouble(arg_a : double; arg_b : double) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Less_IntInt", signature="v1;Less_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Less_IntInt(arg_a : int; arg_b : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Less_IntInt", "")
     ue_expect_signature(call, "v1;Less_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3415,6 +3652,7 @@ struct ue_math_LinePlaneIntersection_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinePlaneIntersection", signature="v1;LinePlaneIntersection;LineStart:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};APlane:StructProperty:134218114:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};T:FloatProperty:384;Intersection:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_LinePlaneIntersection(arg_linestart : UEVector; arg_lineend : UEVector; arg_aplane : S_Plane_a3bdbfa8) : ue_math_LinePlaneIntersection_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinePlaneIntersection", "")
     ue_expect_signature(call, "v1;LinePlaneIntersection;LineStart:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};APlane:StructProperty:134218114:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};T:FloatProperty:384;Intersection:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3437,6 +3675,7 @@ struct ue_math_LinePlaneIntersection_OriginNormal_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinePlaneIntersection_OriginNormal", signature="v1;LinePlaneIntersection_OriginNormal;LineStart:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PlaneOrigin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PlaneNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};T:FloatProperty:384;Intersection:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_LinePlaneIntersection_OriginNormal(arg_linestart : UEVector; arg_lineend : UEVector; arg_planeorigin : UEVector; arg_planenormal : UEVector) : ue_math_LinePlaneIntersection_OriginNormal_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinePlaneIntersection_OriginNormal", "")
     ue_expect_signature(call, "v1;LinePlaneIntersection_OriginNormal;LineStart:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PlaneOrigin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PlaneNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};T:FloatProperty:384;Intersection:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3451,6 +3690,7 @@ def ue_math_LinePlaneIntersection_OriginNormal(arg_linestart : UEVector; arg_lin
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColorLerp", signature="v1;LinearColorLerp;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Alpha:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColorLerp(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b; arg_alpha : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColorLerp", "")
     ue_expect_signature(call, "v1;LinearColorLerp;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Alpha:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3470,6 +3710,7 @@ def ue_math_LinearColorLerp(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColorLerpUsingHSV", signature="v1;LinearColorLerpUsingHSV;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Alpha:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColorLerpUsingHSV(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b; arg_alpha : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColorLerpUsingHSV", "")
     ue_expect_signature(call, "v1;LinearColorLerpUsingHSV;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Alpha:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3489,6 +3730,7 @@ def ue_math_LinearColorLerpUsingHSV(arg_a : S_LinearColor_f4abb14b; arg_b : S_Li
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Black", signature="v1;LinearColor_Black;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_Black() : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Black", "")
     ue_expect_signature(call, "v1;LinearColor_Black;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3499,6 +3741,7 @@ def ue_math_LinearColor_Black() : S_LinearColor_f4abb14b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Blue", signature="v1;LinearColor_Blue;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_Blue() : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Blue", "")
     ue_expect_signature(call, "v1;LinearColor_Blue;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3509,6 +3752,7 @@ def ue_math_LinearColor_Blue() : S_LinearColor_f4abb14b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Desaturated", signature="v1;LinearColor_Desaturated;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InDesaturation:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_Desaturated(arg_incolor : S_LinearColor_f4abb14b; arg_indesaturation : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Desaturated", "")
     ue_expect_signature(call, "v1;LinearColor_Desaturated;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InDesaturation:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3524,6 +3768,7 @@ def ue_math_LinearColor_Desaturated(arg_incolor : S_LinearColor_f4abb14b; arg_in
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Distance", signature="v1;LinearColor_Distance;C1:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};C2:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_LinearColor_Distance(arg_c1 : S_LinearColor_f4abb14b; arg_c2 : S_LinearColor_f4abb14b) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Distance", "")
     ue_expect_signature(call, "v1;LinearColor_Distance;C1:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};C2:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -3542,6 +3787,7 @@ def ue_math_LinearColor_Distance(arg_c1 : S_LinearColor_f4abb14b; arg_c2 : S_Lin
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_GetLuminance", signature="v1;LinearColor_GetLuminance;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_LinearColor_GetLuminance(arg_incolor : S_LinearColor_f4abb14b) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_GetLuminance", "")
     ue_expect_signature(call, "v1;LinearColor_GetLuminance;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -3556,6 +3802,7 @@ def ue_math_LinearColor_GetLuminance(arg_incolor : S_LinearColor_f4abb14b) : flo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_GetMax", signature="v1;LinearColor_GetMax;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_LinearColor_GetMax(arg_incolor : S_LinearColor_f4abb14b) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_GetMax", "")
     ue_expect_signature(call, "v1;LinearColor_GetMax;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -3570,6 +3817,7 @@ def ue_math_LinearColor_GetMax(arg_incolor : S_LinearColor_f4abb14b) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_GetMin", signature="v1;LinearColor_GetMin;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_LinearColor_GetMin(arg_incolor : S_LinearColor_f4abb14b) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_GetMin", "")
     ue_expect_signature(call, "v1;LinearColor_GetMin;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -3584,6 +3832,7 @@ def ue_math_LinearColor_GetMin(arg_incolor : S_LinearColor_f4abb14b) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Gray", signature="v1;LinearColor_Gray;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_Gray() : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Gray", "")
     ue_expect_signature(call, "v1;LinearColor_Gray;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3594,6 +3843,7 @@ def ue_math_LinearColor_Gray() : S_LinearColor_f4abb14b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Green", signature="v1;LinearColor_Green;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_Green() : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Green", "")
     ue_expect_signature(call, "v1;LinearColor_Green;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3604,6 +3854,7 @@ def ue_math_LinearColor_Green() : S_LinearColor_f4abb14b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_IsNearEqual", signature="v1;LinearColor_IsNearEqual;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_LinearColor_IsNearEqual(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_IsNearEqual", "")
     ue_expect_signature(call, "v1;LinearColor_IsNearEqual;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3623,6 +3874,7 @@ def ue_math_LinearColor_IsNearEqual(arg_a : S_LinearColor_f4abb14b; arg_b : S_Li
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_QuantizeRound", signature="v1;LinearColor_QuantizeRound;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")]
 def ue_math_LinearColor_QuantizeRound(arg_incolor : S_LinearColor_f4abb14b) : S_Color_1d162ca1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_QuantizeRound", "")
     ue_expect_signature(call, "v1;LinearColor_QuantizeRound;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")
@@ -3637,6 +3889,7 @@ def ue_math_LinearColor_QuantizeRound(arg_incolor : S_LinearColor_f4abb14b) : S_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Red", signature="v1;LinearColor_Red;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_Red() : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Red", "")
     ue_expect_signature(call, "v1;LinearColor_Red;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3647,6 +3900,7 @@ def ue_math_LinearColor_Red() : S_LinearColor_f4abb14b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Set", signature="v1;LinearColor_Set;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_Set(arg_inoutcolor : S_LinearColor_f4abb14b; arg_incolor : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Set", "")
     ue_expect_signature(call, "v1;LinearColor_Set;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3665,6 +3919,7 @@ def ue_math_LinearColor_Set(arg_inoutcolor : S_LinearColor_f4abb14b; arg_incolor
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetFromHSV", signature="v1;LinearColor_SetFromHSV;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};H:FloatProperty:128;S:FloatProperty:128;V:FloatProperty:128;A:FloatProperty:128;")]
 def ue_math_LinearColor_SetFromHSV(arg_inoutcolor : S_LinearColor_f4abb14b; arg_h : float; arg_s : float; arg_v : float; arg_a : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetFromHSV", "")
     ue_expect_signature(call, "v1;LinearColor_SetFromHSV;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};H:FloatProperty:128;S:FloatProperty:128;V:FloatProperty:128;A:FloatProperty:128;")
@@ -3683,6 +3938,7 @@ def ue_math_LinearColor_SetFromHSV(arg_inoutcolor : S_LinearColor_f4abb14b; arg_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetFromPow22", signature="v1;LinearColor_SetFromPow22;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InColor:StructProperty:134218114:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")]
 def ue_math_LinearColor_SetFromPow22(arg_inoutcolor : S_LinearColor_f4abb14b; arg_incolor : S_Color_1d162ca1) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetFromPow22", "")
     ue_expect_signature(call, "v1;LinearColor_SetFromPow22;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InColor:StructProperty:134218114:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")
@@ -3701,6 +3957,7 @@ def ue_math_LinearColor_SetFromPow22(arg_inoutcolor : S_LinearColor_f4abb14b; ar
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetFromSRGB", signature="v1;LinearColor_SetFromSRGB;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InSRGB:StructProperty:134218114:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")]
 def ue_math_LinearColor_SetFromSRGB(arg_inoutcolor : S_LinearColor_f4abb14b; arg_insrgb : S_Color_1d162ca1) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetFromSRGB", "")
     ue_expect_signature(call, "v1;LinearColor_SetFromSRGB;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InSRGB:StructProperty:134218114:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")
@@ -3719,6 +3976,7 @@ def ue_math_LinearColor_SetFromSRGB(arg_inoutcolor : S_LinearColor_f4abb14b; arg
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetRGBA", signature="v1;LinearColor_SetRGBA;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};R:FloatProperty:128;G:FloatProperty:128;B:FloatProperty:128;A:FloatProperty:128;")]
 def ue_math_LinearColor_SetRGBA(arg_inoutcolor : S_LinearColor_f4abb14b; arg_r : float; arg_g : float; arg_b : float; arg_a : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetRGBA", "")
     ue_expect_signature(call, "v1;LinearColor_SetRGBA;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};R:FloatProperty:128;G:FloatProperty:128;B:FloatProperty:128;A:FloatProperty:128;")
@@ -3737,6 +3995,7 @@ def ue_math_LinearColor_SetRGBA(arg_inoutcolor : S_LinearColor_f4abb14b; arg_r :
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetRandomHue", signature="v1;LinearColor_SetRandomHue;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_SetRandomHue(arg_inoutcolor : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetRandomHue", "")
     ue_expect_signature(call, "v1;LinearColor_SetRandomHue;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3751,6 +4010,7 @@ def ue_math_LinearColor_SetRandomHue(arg_inoutcolor : S_LinearColor_f4abb14b) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetTemperature", signature="v1;LinearColor_SetTemperature;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InTemperature:FloatProperty:128;")]
 def ue_math_LinearColor_SetTemperature(arg_inoutcolor : S_LinearColor_f4abb14b; arg_intemperature : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetTemperature", "")
     ue_expect_signature(call, "v1;LinearColor_SetTemperature;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InTemperature:FloatProperty:128;")
@@ -3766,6 +4026,7 @@ def ue_math_LinearColor_SetTemperature(arg_inoutcolor : S_LinearColor_f4abb14b; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_ToNewOpacity", signature="v1;LinearColor_ToNewOpacity;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InOpacity:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_ToNewOpacity(arg_incolor : S_LinearColor_f4abb14b; arg_inopacity : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_ToNewOpacity", "")
     ue_expect_signature(call, "v1;LinearColor_ToNewOpacity;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InOpacity:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3781,6 +4042,7 @@ def ue_math_LinearColor_ToNewOpacity(arg_incolor : S_LinearColor_f4abb14b; arg_i
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_ToRGBE", signature="v1;LinearColor_ToRGBE;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")]
 def ue_math_LinearColor_ToRGBE(arg_inlinearcolor : S_LinearColor_f4abb14b) : S_Color_1d162ca1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_ToRGBE", "")
     ue_expect_signature(call, "v1;LinearColor_ToRGBE;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")
@@ -3795,6 +4057,7 @@ def ue_math_LinearColor_ToRGBE(arg_inlinearcolor : S_LinearColor_f4abb14b) : S_C
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Transparent", signature="v1;LinearColor_Transparent;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_Transparent() : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Transparent", "")
     ue_expect_signature(call, "v1;LinearColor_Transparent;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3805,6 +4068,7 @@ def ue_math_LinearColor_Transparent() : S_LinearColor_f4abb14b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_White", signature="v1;LinearColor_White;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_White() : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_White", "")
     ue_expect_signature(call, "v1;LinearColor_White;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3815,6 +4079,7 @@ def ue_math_LinearColor_White() : S_LinearColor_f4abb14b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Yellow", signature="v1;LinearColor_Yellow;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_LinearColor_Yellow() : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Yellow", "")
     ue_expect_signature(call, "v1;LinearColor_Yellow;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3825,6 +4090,7 @@ def ue_math_LinearColor_Yellow() : S_LinearColor_f4abb14b {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Log", signature="v1;Log;A:DoubleProperty:128;Base:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Log(arg_a : double; arg_base : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Log", "")
     ue_expect_signature(call, "v1;Log;A:DoubleProperty:128;Base:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -3837,6 +4103,7 @@ def ue_math_Log(arg_a : double; arg_base : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Loge", signature="v1;Loge;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Loge(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Loge", "")
     ue_expect_signature(call, "v1;Loge;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -3848,6 +4115,7 @@ def ue_math_Loge(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeBox", signature="v1;MakeBox;Min:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};")]
 def ue_math_MakeBox(arg_min : UEVector; arg_max : UEVector) : S_Box_79dc8c23 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeBox", "")
     ue_expect_signature(call, "v1;MakeBox;Min:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};")
@@ -3860,6 +4128,7 @@ def ue_math_MakeBox(arg_min : UEVector; arg_max : UEVector) : S_Box_79dc8c23 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeBox2D", signature="v1;MakeBox2D;Min:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Max:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Box2D\{Min:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bIsValid:BoolProperty:0;\};")]
 def ue_math_MakeBox2D(arg_min : UEVector2D; arg_max : UEVector2D) : S_Box2D_20cd7c6d {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeBox2D", "")
     ue_expect_signature(call, "v1;MakeBox2D;Min:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Max:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Box2D\{Min:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bIsValid:BoolProperty:0;\};")
@@ -3872,6 +4141,7 @@ def ue_math_MakeBox2D(arg_min : UEVector2D; arg_max : UEVector2D) : S_Box2D_20cd
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeBoxSphereBounds", signature="v1;MakeBoxSphereBounds;Origin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.BoxSphereBounds\{Origin:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:DoubleProperty:0;\};")]
 def ue_math_MakeBoxSphereBounds(arg_origin : UEVector; arg_boxextent : UEVector; arg_sphereradius : float) : S_BoxSphereBounds_cda0dc69 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeBoxSphereBounds", "")
     ue_expect_signature(call, "v1;MakeBoxSphereBounds;Origin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.BoxSphereBounds\{Origin:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:DoubleProperty:0;\};")
@@ -3885,6 +4155,7 @@ def ue_math_MakeBoxSphereBounds(arg_origin : UEVector; arg_boxextent : UEVector;
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeBoxWithOrigin", signature="v1;MakeBoxWithOrigin;Origin:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Extent:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};")]
 def ue_math_MakeBoxWithOrigin(arg_origin : UEVector; arg_extent : UEVector) : S_Box_79dc8c23 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeBoxWithOrigin", "")
     ue_expect_signature(call, "v1;MakeBoxWithOrigin;Origin:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Extent:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};")
@@ -3897,6 +4168,7 @@ def ue_math_MakeBoxWithOrigin(arg_origin : UEVector; arg_extent : UEVector) : S_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeColor", signature="v1;MakeColor;R:FloatProperty:128;G:FloatProperty:128;B:FloatProperty:128;A:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_MakeColor(arg_r : float; arg_g : float; arg_b : float; arg_a : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeColor", "")
     ue_expect_signature(call, "v1;MakeColor;R:FloatProperty:128;G:FloatProperty:128;B:FloatProperty:128;A:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -3911,6 +4183,7 @@ def ue_math_MakeColor(arg_r : float; arg_g : float; arg_b : float; arg_a : float
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeFrameRate", signature="v1;MakeFrameRate;Numerator:IntProperty:128;Denominator:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};")]
 def ue_math_MakeFrameRate(arg_numerator : int; arg_denominator : int) : S_FrameRate_491c16ee {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeFrameRate", "")
     ue_expect_signature(call, "v1;MakeFrameRate;Numerator:IntProperty:128;Denominator:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};")
@@ -3923,6 +4196,7 @@ def ue_math_MakeFrameRate(arg_numerator : int; arg_denominator : int) : S_FrameR
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeOrientedBox", signature="v1;MakeOrientedBox;Origin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Orientation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Extent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.OrientedBox\{Center:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AxisX:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AxisY:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AxisZ:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ExtentX:DoubleProperty:0;ExtentY:DoubleProperty:0;ExtentZ:DoubleProperty:0;\};")]
 def ue_math_MakeOrientedBox(arg_origin : UEVector; arg_orientation : UERotator; arg_extent : UEVector) : S_OrientedBox_017d0f89 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeOrientedBox", "")
     ue_expect_signature(call, "v1;MakeOrientedBox;Origin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Orientation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Extent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.OrientedBox\{Center:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AxisX:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AxisY:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AxisZ:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ExtentX:DoubleProperty:0;ExtentY:DoubleProperty:0;ExtentZ:DoubleProperty:0;\};")
@@ -3936,6 +4210,7 @@ def ue_math_MakeOrientedBox(arg_origin : UEVector; arg_orientation : UERotator; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakePlaneFromPointAndNormal", signature="v1;MakePlaneFromPointAndNormal;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Normal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_MakePlaneFromPointAndNormal(arg_point : UEVector; arg_normal : UEVector) : S_Plane_a3bdbfa8 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakePlaneFromPointAndNormal", "")
     ue_expect_signature(call, "v1;MakePlaneFromPointAndNormal;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Normal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -3948,6 +4223,7 @@ def ue_math_MakePlaneFromPointAndNormal(arg_point : UEVector; arg_normal : UEVec
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakePulsatingValue", signature="v1;MakePulsatingValue;InCurrentTime:FloatProperty:128;InPulsesPerSecond:FloatProperty:128;InPhase:FloatProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_math_MakePulsatingValue(arg_incurrenttime : float; arg_inpulsespersecond : float; arg_inphase : float) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakePulsatingValue", "")
     ue_expect_signature(call, "v1;MakePulsatingValue;InCurrentTime:FloatProperty:128;InPulsesPerSecond:FloatProperty:128;InPhase:FloatProperty:128;ReturnValue:FloatProperty:1408;")
@@ -3961,6 +4237,7 @@ def ue_math_MakePulsatingValue(arg_incurrenttime : float; arg_inpulsespersecond 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeQualifiedFrameTime", signature="v1;MakeQualifiedFrameTime;Frame:StructProperty:128:/Script/CoreUObject.FrameNumber\{Value:IntProperty:0;\};FrameRate:StructProperty:128:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};SubFrame:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.QualifiedFrameTime\{Time:StructProperty:0:/Script/CoreUObject.FrameTime\{FrameNumber:StructProperty:0:/Script/CoreUObject.FrameNumber\{Value:IntProperty:0;\};SubFrame:FloatProperty:0;\};Rate:StructProperty:0:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};\};")]
 def ue_math_MakeQualifiedFrameTime(arg_frame : S_FrameNumber_206b76b9; arg_framerate : S_FrameRate_491c16ee; arg_subframe : float) : S_QualifiedFrameTime_efb392be {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeQualifiedFrameTime", "")
     ue_expect_signature(call, "v1;MakeQualifiedFrameTime;Frame:StructProperty:128:/Script/CoreUObject.FrameNumber\{Value:IntProperty:0;\};FrameRate:StructProperty:128:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};SubFrame:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.QualifiedFrameTime\{Time:StructProperty:0:/Script/CoreUObject.FrameTime\{FrameNumber:StructProperty:0:/Script/CoreUObject.FrameNumber\{Value:IntProperty:0;\};SubFrame:FloatProperty:0;\};Rate:StructProperty:0:/Script/CoreUObject.FrameRate\{Numerator:IntProperty:0;Denominator:IntProperty:0;\};\};")
@@ -3975,6 +4252,7 @@ def ue_math_MakeQualifiedFrameTime(arg_frame : S_FrameNumber_206b76b9; arg_frame
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeQuat", signature="v1;MakeQuat;X:FloatProperty:128;Y:FloatProperty:128;Z:FloatProperty:128;W:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_MakeQuat(arg_x : float; arg_y : float; arg_z : float; arg_w : float) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeQuat", "")
     ue_expect_signature(call, "v1;MakeQuat;X:FloatProperty:128;Y:FloatProperty:128;Z:FloatProperty:128;W:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -3989,6 +4267,7 @@ def ue_math_MakeQuat(arg_x : float; arg_y : float; arg_z : float; arg_w : float)
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRandomStream", signature="v1;MakeRandomStream;InitialSeed:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};")]
 def ue_math_MakeRandomStream(arg_initialseed : int) : S_RandomStream_7b64b757 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRandomStream", "")
     ue_expect_signature(call, "v1;MakeRandomStream;InitialSeed:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};")
@@ -4000,6 +4279,7 @@ def ue_math_MakeRandomStream(arg_initialseed : int) : S_RandomStream_7b64b757 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRandomStreamFromLocation", signature="v1;MakeRandomStreamFromLocation;Location:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DistanceInterval:FloatProperty:128;bIncludeZ:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};")]
 def ue_math_MakeRandomStreamFromLocation(arg_location : UEVector; arg_distanceinterval : float; arg_bincludez : bool) : S_RandomStream_7b64b757 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRandomStreamFromLocation", "")
     ue_expect_signature(call, "v1;MakeRandomStreamFromLocation;Location:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DistanceInterval:FloatProperty:128;bIncludeZ:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};")
@@ -4013,6 +4293,7 @@ def ue_math_MakeRandomStreamFromLocation(arg_location : UEVector; arg_distancein
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRelativeTransform", signature="v1;MakeRelativeTransform;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};RelativeTo:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_MakeRelativeTransform(arg_a : UETransform; arg_relativeto : UETransform) : UETransform {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRelativeTransform", "")
     ue_expect_signature(call, "v1;MakeRelativeTransform;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};RelativeTo:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -4025,6 +4306,7 @@ def ue_math_MakeRelativeTransform(arg_a : UETransform; arg_relativeto : UETransf
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotFromX", signature="v1;MakeRotFromX;X:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotFromX(arg_x : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotFromX", "")
     ue_expect_signature(call, "v1;MakeRotFromX;X:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4036,6 +4318,7 @@ def ue_math_MakeRotFromX(arg_x : UEVector) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotFromXY", signature="v1;MakeRotFromXY;X:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotFromXY(arg_x : UEVector; arg_y : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotFromXY", "")
     ue_expect_signature(call, "v1;MakeRotFromXY;X:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4048,6 +4331,7 @@ def ue_math_MakeRotFromXY(arg_x : UEVector; arg_y : UEVector) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotFromXZ", signature="v1;MakeRotFromXZ;X:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotFromXZ(arg_x : UEVector; arg_z : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotFromXZ", "")
     ue_expect_signature(call, "v1;MakeRotFromXZ;X:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4060,6 +4344,7 @@ def ue_math_MakeRotFromXZ(arg_x : UEVector; arg_z : UEVector) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotFromY", signature="v1;MakeRotFromY;Y:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotFromY(arg_y : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotFromY", "")
     ue_expect_signature(call, "v1;MakeRotFromY;Y:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4071,6 +4356,7 @@ def ue_math_MakeRotFromY(arg_y : UEVector) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotFromYX", signature="v1;MakeRotFromYX;Y:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotFromYX(arg_y : UEVector; arg_x : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotFromYX", "")
     ue_expect_signature(call, "v1;MakeRotFromYX;Y:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4083,6 +4369,7 @@ def ue_math_MakeRotFromYX(arg_y : UEVector; arg_x : UEVector) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotFromYZ", signature="v1;MakeRotFromYZ;Y:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotFromYZ(arg_y : UEVector; arg_z : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotFromYZ", "")
     ue_expect_signature(call, "v1;MakeRotFromYZ;Y:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4095,6 +4382,7 @@ def ue_math_MakeRotFromYZ(arg_y : UEVector; arg_z : UEVector) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotFromZ", signature="v1;MakeRotFromZ;Z:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotFromZ(arg_z : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotFromZ", "")
     ue_expect_signature(call, "v1;MakeRotFromZ;Z:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4106,6 +4394,7 @@ def ue_math_MakeRotFromZ(arg_z : UEVector) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotFromZX", signature="v1;MakeRotFromZX;Z:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotFromZX(arg_z : UEVector; arg_x : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotFromZX", "")
     ue_expect_signature(call, "v1;MakeRotFromZX;Z:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4118,6 +4407,7 @@ def ue_math_MakeRotFromZX(arg_z : UEVector; arg_x : UEVector) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotFromZY", signature="v1;MakeRotFromZY;Z:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotFromZY(arg_z : UEVector; arg_y : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotFromZY", "")
     ue_expect_signature(call, "v1;MakeRotFromZY;Z:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4130,6 +4420,7 @@ def ue_math_MakeRotFromZY(arg_z : UEVector; arg_y : UEVector) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotationFromAxes", signature="v1;MakeRotationFromAxes;Forward:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Right:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Up:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotationFromAxes(arg_forward : UEVector; arg_right : UEVector; arg_up : UEVector) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotationFromAxes", "")
     ue_expect_signature(call, "v1;MakeRotationFromAxes;Forward:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Right:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Up:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4143,6 +4434,7 @@ def ue_math_MakeRotationFromAxes(arg_forward : UEVector; arg_right : UEVector; a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeRotator", signature="v1;MakeRotator;Roll:FloatProperty:128;Pitch:FloatProperty:128;Yaw:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_MakeRotator(arg_roll : float; arg_pitch : float; arg_yaw : float) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeRotator", "")
     ue_expect_signature(call, "v1;MakeRotator;Roll:FloatProperty:128;Pitch:FloatProperty:128;Yaw:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4156,6 +4448,7 @@ def ue_math_MakeRotator(arg_roll : float; arg_pitch : float; arg_yaw : float) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeTransform", signature="v1;MakeTransform;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Scale:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_MakeTransform(arg_location : UEVector; arg_rotation : UERotator; arg_scale : UEVector) : UETransform {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeTransform", "")
     ue_expect_signature(call, "v1;MakeTransform;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Scale:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -4169,6 +4462,7 @@ def ue_math_MakeTransform(arg_location : UEVector; arg_rotation : UERotator; arg
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeVector", signature="v1;MakeVector;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_MakeVector(arg_x : double; arg_y : double; arg_z : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeVector", "")
     ue_expect_signature(call, "v1;MakeVector;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4182,6 +4476,7 @@ def ue_math_MakeVector(arg_x : double; arg_y : double; arg_z : double) : UEVecto
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeVector2D", signature="v1;MakeVector2D;X:DoubleProperty:128;Y:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_MakeVector2D(arg_x : double; arg_y : double) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeVector2D", "")
     ue_expect_signature(call, "v1;MakeVector2D;X:DoubleProperty:128;Y:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -4194,6 +4489,7 @@ def ue_math_MakeVector2D(arg_x : double; arg_y : double) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeVector4", signature="v1;MakeVector4;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;W:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_MakeVector4(arg_x : double; arg_y : double; arg_z : double; arg_w : double) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeVector4", "")
     ue_expect_signature(call, "v1;MakeVector4;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;W:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -4208,6 +4504,7 @@ def ue_math_MakeVector4(arg_x : double; arg_y : double; arg_z : double; arg_w : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeVector_NetQuantize", signature="v1;MakeVector_NetQuantize;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/Engine.Vector_NetQuantize\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_MakeVector_NetQuantize(arg_x : double; arg_y : double; arg_z : double) : S_Vector_NetQuantize_599bc23d {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeVector_NetQuantize", "")
     ue_expect_signature(call, "v1;MakeVector_NetQuantize;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/Engine.Vector_NetQuantize\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4221,6 +4518,7 @@ def ue_math_MakeVector_NetQuantize(arg_x : double; arg_y : double; arg_z : doubl
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeVector_NetQuantize10", signature="v1;MakeVector_NetQuantize10;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/Engine.Vector_NetQuantize10\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_MakeVector_NetQuantize10(arg_x : double; arg_y : double; arg_z : double) : S_Vector_NetQuantize10_083af1d4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeVector_NetQuantize10", "")
     ue_expect_signature(call, "v1;MakeVector_NetQuantize10;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/Engine.Vector_NetQuantize10\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4234,6 +4532,7 @@ def ue_math_MakeVector_NetQuantize10(arg_x : double; arg_y : double; arg_z : dou
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeVector_NetQuantize100", signature="v1;MakeVector_NetQuantize100;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/Engine.Vector_NetQuantize100\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_MakeVector_NetQuantize100(arg_x : double; arg_y : double; arg_z : double) : S_Vector_NetQuantize100_868fbc88 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeVector_NetQuantize100", "")
     ue_expect_signature(call, "v1;MakeVector_NetQuantize100;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/Engine.Vector_NetQuantize100\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4247,6 +4546,7 @@ def ue_math_MakeVector_NetQuantize100(arg_x : double; arg_y : double; arg_z : do
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeVector_NetQuantizeNormal", signature="v1;MakeVector_NetQuantizeNormal;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/Engine.Vector_NetQuantizeNormal\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_MakeVector_NetQuantizeNormal(arg_x : double; arg_y : double; arg_z : double) : S_Vector_NetQuantizeNormal_c54f8383 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeVector_NetQuantizeNormal", "")
     ue_expect_signature(call, "v1;MakeVector_NetQuantizeNormal;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/Engine.Vector_NetQuantizeNormal\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4260,6 +4560,7 @@ def ue_math_MakeVector_NetQuantizeNormal(arg_x : double; arg_y : double; arg_z :
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MapRangeClamped", signature="v1;MapRangeClamped;Value:DoubleProperty:128;InRangeA:DoubleProperty:128;InRangeB:DoubleProperty:128;OutRangeA:DoubleProperty:128;OutRangeB:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_MapRangeClamped(arg_value : double; arg_inrangea : double; arg_inrangeb : double; arg_outrangea : double; arg_outrangeb : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MapRangeClamped", "")
     ue_expect_signature(call, "v1;MapRangeClamped;Value:DoubleProperty:128;InRangeA:DoubleProperty:128;InRangeB:DoubleProperty:128;OutRangeA:DoubleProperty:128;OutRangeB:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -4275,6 +4576,7 @@ def ue_math_MapRangeClamped(arg_value : double; arg_inrangea : double; arg_inran
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MapRangeUnclamped", signature="v1;MapRangeUnclamped;Value:DoubleProperty:128;InRangeA:DoubleProperty:128;InRangeB:DoubleProperty:128;OutRangeA:DoubleProperty:128;OutRangeB:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_MapRangeUnclamped(arg_value : double; arg_inrangea : double; arg_inrangeb : double; arg_outrangea : double; arg_outrangeb : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MapRangeUnclamped", "")
     ue_expect_signature(call, "v1;MapRangeUnclamped;Value:DoubleProperty:128;InRangeA:DoubleProperty:128;InRangeB:DoubleProperty:128;OutRangeA:DoubleProperty:128;OutRangeB:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -4290,6 +4592,7 @@ def ue_math_MapRangeUnclamped(arg_value : double; arg_inrangea : double; arg_inr
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_ApplyScale", signature="v1;Matrix_ApplyScale;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Scale:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Matrix_ApplyScale(arg_m : S_Matrix_c85cbab4; arg_scale : float) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_ApplyScale", "")
     ue_expect_signature(call, "v1;Matrix_ApplyScale;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Scale:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -4317,6 +4620,7 @@ def ue_math_Matrix_ApplyScale(arg_m : S_Matrix_c85cbab4; arg_scale : float) : S_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_ConcatenateTranslation", signature="v1;Matrix_ConcatenateTranslation;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Translation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Matrix_ConcatenateTranslation(arg_m : S_Matrix_c85cbab4; arg_translation : UEVector) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_ConcatenateTranslation", "")
     ue_expect_signature(call, "v1;Matrix_ConcatenateTranslation;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Translation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -4344,6 +4648,7 @@ def ue_math_Matrix_ConcatenateTranslation(arg_m : S_Matrix_c85cbab4; arg_transla
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_ContainsNaN", signature="v1;Matrix_ContainsNaN;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Matrix_ContainsNaN(arg_m : S_Matrix_c85cbab4) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_ContainsNaN", "")
     ue_expect_signature(call, "v1;Matrix_ContainsNaN;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:BoolProperty:1408;")
@@ -4370,6 +4675,7 @@ def ue_math_Matrix_ContainsNaN(arg_m : S_Matrix_c85cbab4) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetColumn", signature="v1;Matrix_GetColumn;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Column:ByteProperty:128:/Script/Engine.EMatrixColumns;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_GetColumn(arg_m : S_Matrix_c85cbab4; arg_column : E_EMatrixColumns_b7c25822) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetColumn", "")
     ue_expect_signature(call, "v1;Matrix_GetColumn;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Column:ByteProperty:128:/Script/Engine.EMatrixColumns;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4397,6 +4703,7 @@ def ue_math_Matrix_GetColumn(arg_m : S_Matrix_c85cbab4; arg_column : E_EMatrixCo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetDeterminant", signature="v1;Matrix_GetDeterminant;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:FloatProperty:1408;")]
 def ue_math_Matrix_GetDeterminant(arg_m : S_Matrix_c85cbab4) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetDeterminant", "")
     ue_expect_signature(call, "v1;Matrix_GetDeterminant;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:FloatProperty:1408;")
@@ -4428,6 +4735,7 @@ struct ue_math_Matrix_GetFrustumBottomPlane_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetFrustumBottomPlane", signature="v1;Matrix_GetFrustumBottomPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Matrix_GetFrustumBottomPlane(arg_m : S_Matrix_c85cbab4) : ue_math_Matrix_GetFrustumBottomPlane_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetFrustumBottomPlane", "")
     ue_expect_signature(call, "v1;Matrix_GetFrustumBottomPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4459,6 +4767,7 @@ struct ue_math_Matrix_GetFrustumFarPlane_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetFrustumFarPlane", signature="v1;Matrix_GetFrustumFarPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Matrix_GetFrustumFarPlane(arg_m : S_Matrix_c85cbab4) : ue_math_Matrix_GetFrustumFarPlane_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetFrustumFarPlane", "")
     ue_expect_signature(call, "v1;Matrix_GetFrustumFarPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4490,6 +4799,7 @@ struct ue_math_Matrix_GetFrustumLeftPlane_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetFrustumLeftPlane", signature="v1;Matrix_GetFrustumLeftPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Matrix_GetFrustumLeftPlane(arg_m : S_Matrix_c85cbab4) : ue_math_Matrix_GetFrustumLeftPlane_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetFrustumLeftPlane", "")
     ue_expect_signature(call, "v1;Matrix_GetFrustumLeftPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4521,6 +4831,7 @@ struct ue_math_Matrix_GetFrustumNearPlane_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetFrustumNearPlane", signature="v1;Matrix_GetFrustumNearPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Matrix_GetFrustumNearPlane(arg_m : S_Matrix_c85cbab4) : ue_math_Matrix_GetFrustumNearPlane_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetFrustumNearPlane", "")
     ue_expect_signature(call, "v1;Matrix_GetFrustumNearPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4552,6 +4863,7 @@ struct ue_math_Matrix_GetFrustumRightPlane_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetFrustumRightPlane", signature="v1;Matrix_GetFrustumRightPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Matrix_GetFrustumRightPlane(arg_m : S_Matrix_c85cbab4) : ue_math_Matrix_GetFrustumRightPlane_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetFrustumRightPlane", "")
     ue_expect_signature(call, "v1;Matrix_GetFrustumRightPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4583,6 +4895,7 @@ struct ue_math_Matrix_GetFrustumTopPlane_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetFrustumTopPlane", signature="v1;Matrix_GetFrustumTopPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Matrix_GetFrustumTopPlane(arg_m : S_Matrix_c85cbab4) : ue_math_Matrix_GetFrustumTopPlane_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetFrustumTopPlane", "")
     ue_expect_signature(call, "v1;Matrix_GetFrustumTopPlane;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};OutPlane:StructProperty:384:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4609,6 +4922,7 @@ def ue_math_Matrix_GetFrustumTopPlane(arg_m : S_Matrix_c85cbab4) : ue_math_Matri
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetInverse", signature="v1;Matrix_GetInverse;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Matrix_GetInverse(arg_m : S_Matrix_c85cbab4) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetInverse", "")
     ue_expect_signature(call, "v1;Matrix_GetInverse;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -4635,6 +4949,7 @@ def ue_math_Matrix_GetInverse(arg_m : S_Matrix_c85cbab4) : S_Matrix_c85cbab4 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetMatrixWithoutScale", signature="v1;Matrix_GetMatrixWithoutScale;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Matrix_GetMatrixWithoutScale(arg_m : S_Matrix_c85cbab4; arg_tolerance : float) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetMatrixWithoutScale", "")
     ue_expect_signature(call, "v1;Matrix_GetMatrixWithoutScale;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -4662,6 +4977,7 @@ def ue_math_Matrix_GetMatrixWithoutScale(arg_m : S_Matrix_c85cbab4; arg_toleranc
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetMaximumAxisScale", signature="v1;Matrix_GetMaximumAxisScale;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:FloatProperty:1408;")]
 def ue_math_Matrix_GetMaximumAxisScale(arg_m : S_Matrix_c85cbab4) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetMaximumAxisScale", "")
     ue_expect_signature(call, "v1;Matrix_GetMaximumAxisScale;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:FloatProperty:1408;")
@@ -4688,6 +5004,7 @@ def ue_math_Matrix_GetMaximumAxisScale(arg_m : S_Matrix_c85cbab4) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetOrigin", signature="v1;Matrix_GetOrigin;InMatrix:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_GetOrigin(arg_inmatrix : S_Matrix_c85cbab4) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetOrigin", "")
     ue_expect_signature(call, "v1;Matrix_GetOrigin;InMatrix:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4714,6 +5031,7 @@ def ue_math_Matrix_GetOrigin(arg_inmatrix : S_Matrix_c85cbab4) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetRotDeterminant", signature="v1;Matrix_GetRotDeterminant;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:FloatProperty:1408;")]
 def ue_math_Matrix_GetRotDeterminant(arg_m : S_Matrix_c85cbab4) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetRotDeterminant", "")
     ue_expect_signature(call, "v1;Matrix_GetRotDeterminant;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:FloatProperty:1408;")
@@ -4740,6 +5058,7 @@ def ue_math_Matrix_GetRotDeterminant(arg_m : S_Matrix_c85cbab4) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetRotator", signature="v1;Matrix_GetRotator;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_Matrix_GetRotator(arg_m : S_Matrix_c85cbab4) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetRotator", "")
     ue_expect_signature(call, "v1;Matrix_GetRotator;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -4766,6 +5085,7 @@ def ue_math_Matrix_GetRotator(arg_m : S_Matrix_c85cbab4) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetScaleVector", signature="v1;Matrix_GetScaleVector;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_GetScaleVector(arg_m : S_Matrix_c85cbab4; arg_tolerance : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetScaleVector", "")
     ue_expect_signature(call, "v1;Matrix_GetScaleVector;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4799,6 +5119,7 @@ struct ue_math_Matrix_GetScaledAxes_Result {
     out_z : UEVector
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetScaledAxes", signature="v1;Matrix_GetScaledAxes;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};X:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_GetScaledAxes(arg_m : S_Matrix_c85cbab4) : ue_math_Matrix_GetScaledAxes_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetScaledAxes", "")
     ue_expect_signature(call, "v1;Matrix_GetScaledAxes;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};X:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4825,6 +5146,7 @@ def ue_math_Matrix_GetScaledAxes(arg_m : S_Matrix_c85cbab4) : ue_math_Matrix_Get
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetScaledAxis", signature="v1;Matrix_GetScaledAxis;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Axis:ByteProperty:128:/Script/CoreUObject.EAxis;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_GetScaledAxis(arg_m : S_Matrix_c85cbab4; arg_axis : E_EAxis_bedbbadb) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetScaledAxis", "")
     ue_expect_signature(call, "v1;Matrix_GetScaledAxis;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Axis:ByteProperty:128:/Script/CoreUObject.EAxis;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4852,6 +5174,7 @@ def ue_math_Matrix_GetScaledAxis(arg_m : S_Matrix_c85cbab4; arg_axis : E_EAxis_b
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetTransposeAdjoint", signature="v1;Matrix_GetTransposeAdjoint;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Matrix_GetTransposeAdjoint(arg_m : S_Matrix_c85cbab4) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetTransposeAdjoint", "")
     ue_expect_signature(call, "v1;Matrix_GetTransposeAdjoint;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -4878,6 +5201,7 @@ def ue_math_Matrix_GetTransposeAdjoint(arg_m : S_Matrix_c85cbab4) : S_Matrix_c85
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetTransposed", signature="v1;Matrix_GetTransposed;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Matrix_GetTransposed(arg_m : S_Matrix_c85cbab4) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetTransposed", "")
     ue_expect_signature(call, "v1;Matrix_GetTransposed;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -4910,6 +5234,7 @@ struct ue_math_Matrix_GetUnitAxes_Result {
     out_z : UEVector
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetUnitAxes", signature="v1;Matrix_GetUnitAxes;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};X:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_GetUnitAxes(arg_m : S_Matrix_c85cbab4) : ue_math_Matrix_GetUnitAxes_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetUnitAxes", "")
     ue_expect_signature(call, "v1;Matrix_GetUnitAxes;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};X:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Y:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Z:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4936,6 +5261,7 @@ def ue_math_Matrix_GetUnitAxes(arg_m : S_Matrix_c85cbab4) : ue_math_Matrix_GetUn
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_GetUnitAxis", signature="v1;Matrix_GetUnitAxis;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Axis:ByteProperty:128:/Script/CoreUObject.EAxis;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_GetUnitAxis(arg_m : S_Matrix_c85cbab4; arg_axis : E_EAxis_bedbbadb) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_GetUnitAxis", "")
     ue_expect_signature(call, "v1;Matrix_GetUnitAxis;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Axis:ByteProperty:128:/Script/CoreUObject.EAxis;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4963,6 +5289,7 @@ def ue_math_Matrix_GetUnitAxis(arg_m : S_Matrix_c85cbab4; arg_axis : E_EAxis_bed
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_Identity", signature="v1;Matrix_Identity;ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Matrix_Identity() : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_Identity", "")
     ue_expect_signature(call, "v1;Matrix_Identity;ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -4973,6 +5300,7 @@ def ue_math_Matrix_Identity() : S_Matrix_c85cbab4 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_InverseTransformPosition", signature="v1;Matrix_InverseTransformPosition;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_InverseTransformPosition(arg_m : S_Matrix_c85cbab4; arg_v : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_InverseTransformPosition", "")
     ue_expect_signature(call, "v1;Matrix_InverseTransformPosition;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5000,6 +5328,7 @@ def ue_math_Matrix_InverseTransformPosition(arg_m : S_Matrix_c85cbab4; arg_v : U
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_InverseTransformVector", signature="v1;Matrix_InverseTransformVector;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_InverseTransformVector(arg_m : S_Matrix_c85cbab4; arg_v : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_InverseTransformVector", "")
     ue_expect_signature(call, "v1;Matrix_InverseTransformVector;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5027,6 +5356,7 @@ def ue_math_Matrix_InverseTransformVector(arg_m : S_Matrix_c85cbab4; arg_v : UEV
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_Mirror", signature="v1;Matrix_Mirror;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};MirrorAxis:ByteProperty:128:/Script/CoreUObject.EAxis;FlipAxis:ByteProperty:128:/Script/CoreUObject.EAxis;ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Matrix_Mirror(arg_m : S_Matrix_c85cbab4; arg_mirroraxis : E_EAxis_bedbbadb; arg_flipaxis : E_EAxis_bedbbadb) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_Mirror", "")
     ue_expect_signature(call, "v1;Matrix_Mirror;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};MirrorAxis:ByteProperty:128:/Script/CoreUObject.EAxis;FlipAxis:ByteProperty:128:/Script/CoreUObject.EAxis;ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -5055,6 +5385,7 @@ def ue_math_Matrix_Mirror(arg_m : S_Matrix_c85cbab4; arg_mirroraxis : E_EAxis_be
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_RemoveScaling", signature="v1;Matrix_RemoveScaling;M:StructProperty:134218112:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Tolerance:FloatProperty:128;")]
 def ue_math_Matrix_RemoveScaling(arg_m : S_Matrix_c85cbab4; arg_tolerance : float) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_RemoveScaling", "")
     ue_expect_signature(call, "v1;Matrix_RemoveScaling;M:StructProperty:134218112:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Tolerance:FloatProperty:128;")
@@ -5082,6 +5413,7 @@ def ue_math_Matrix_RemoveScaling(arg_m : S_Matrix_c85cbab4; arg_tolerance : floa
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_RemoveTranslation", signature="v1;Matrix_RemoveTranslation;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Matrix_RemoveTranslation(arg_m : S_Matrix_c85cbab4) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_RemoveTranslation", "")
     ue_expect_signature(call, "v1;Matrix_RemoveTranslation;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -5108,6 +5440,7 @@ def ue_math_Matrix_RemoveTranslation(arg_m : S_Matrix_c85cbab4) : S_Matrix_c85cb
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_ScaleTranslation", signature="v1;Matrix_ScaleTranslation;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Scale3D:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Matrix_ScaleTranslation(arg_m : S_Matrix_c85cbab4; arg_scale3d : UEVector) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_ScaleTranslation", "")
     ue_expect_signature(call, "v1;Matrix_ScaleTranslation;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Scale3D:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -5135,6 +5468,7 @@ def ue_math_Matrix_ScaleTranslation(arg_m : S_Matrix_c85cbab4; arg_scale3d : UEV
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_SetAxis", signature="v1;Matrix_SetAxis;M:StructProperty:134218112:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Axis:ByteProperty:128:/Script/CoreUObject.EAxis;AxisVector:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_SetAxis(arg_m : S_Matrix_c85cbab4; arg_axis : E_EAxis_bedbbadb; arg_axisvector : UEVector) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_SetAxis", "")
     ue_expect_signature(call, "v1;Matrix_SetAxis;M:StructProperty:134218112:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Axis:ByteProperty:128:/Script/CoreUObject.EAxis;AxisVector:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5163,6 +5497,7 @@ def ue_math_Matrix_SetAxis(arg_m : S_Matrix_c85cbab4; arg_axis : E_EAxis_bedbbad
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_SetColumn", signature="v1;Matrix_SetColumn;M:StructProperty:134218112:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Column:ByteProperty:128:/Script/Engine.EMatrixColumns;Value:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_SetColumn(arg_m : S_Matrix_c85cbab4; arg_column : E_EMatrixColumns_b7c25822; arg_value : UEVector) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_SetColumn", "")
     ue_expect_signature(call, "v1;Matrix_SetColumn;M:StructProperty:134218112:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Column:ByteProperty:128:/Script/Engine.EMatrixColumns;Value:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5191,6 +5526,7 @@ def ue_math_Matrix_SetColumn(arg_m : S_Matrix_c85cbab4; arg_column : E_EMatrixCo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_SetOrigin", signature="v1;Matrix_SetOrigin;M:StructProperty:134218112:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};NewOrigin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Matrix_SetOrigin(arg_m : S_Matrix_c85cbab4; arg_neworigin : UEVector) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_SetOrigin", "")
     ue_expect_signature(call, "v1;Matrix_SetOrigin;M:StructProperty:134218112:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};NewOrigin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5218,6 +5554,7 @@ def ue_math_Matrix_SetOrigin(arg_m : S_Matrix_c85cbab4; arg_neworigin : UEVector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_ToQuat", signature="v1;Matrix_ToQuat;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Matrix_ToQuat(arg_m : S_Matrix_c85cbab4) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_ToQuat", "")
     ue_expect_signature(call, "v1;Matrix_ToQuat;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -5244,6 +5581,7 @@ def ue_math_Matrix_ToQuat(arg_m : S_Matrix_c85cbab4) : S_Quat_82f9549e {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_TransformPosition", signature="v1;Matrix_TransformPosition;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Matrix_TransformPosition(arg_m : S_Matrix_c85cbab4; arg_v : UEVector) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_TransformPosition", "")
     ue_expect_signature(call, "v1;Matrix_TransformPosition;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -5271,6 +5609,7 @@ def ue_math_Matrix_TransformPosition(arg_m : S_Matrix_c85cbab4; arg_v : UEVector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_TransformVector", signature="v1;Matrix_TransformVector;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Matrix_TransformVector(arg_m : S_Matrix_c85cbab4; arg_v : UEVector) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_TransformVector", "")
     ue_expect_signature(call, "v1;Matrix_TransformVector;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -5298,6 +5637,7 @@ def ue_math_Matrix_TransformVector(arg_m : S_Matrix_c85cbab4; arg_v : UEVector) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_TransformVector4", signature="v1;Matrix_TransformVector4;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};V:StructProperty:128:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Matrix_TransformVector4(arg_m : S_Matrix_c85cbab4; arg_v : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_TransformVector4", "")
     ue_expect_signature(call, "v1;Matrix_TransformVector4;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};V:StructProperty:128:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -5328,6 +5668,7 @@ def ue_math_Matrix_TransformVector4(arg_m : S_Matrix_c85cbab4; arg_v : S_Vector4
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Max", signature="v1;Max;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Max(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Max", "")
     ue_expect_signature(call, "v1;Max;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -5345,6 +5686,7 @@ struct ue_math_MaxOfByteArray_Result {
     out_maxvalue : uint8
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MaxOfByteArray", signature="v1;MaxOfByteArray;ByteArray:ArrayProperty:134218114[ByteArray:ByteProperty:0;];IndexOfMaxValue:IntProperty:384;MaxValue:ByteProperty:384;")]
 def ue_math_MaxOfByteArray(arg_bytearray : array<uint8>) : ue_math_MaxOfByteArray_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MaxOfByteArray", "")
     ue_expect_signature(call, "v1;MaxOfByteArray;ByteArray:ArrayProperty:134218114[ByteArray:ByteProperty:0;];IndexOfMaxValue:IntProperty:384;MaxValue:ByteProperty:384;")
@@ -5364,6 +5706,7 @@ struct ue_math_MaxOfFloatArray_Result {
     out_maxvalue : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MaxOfFloatArray", signature="v1;MaxOfFloatArray;FloatArray:ArrayProperty:134218114[FloatArray:FloatProperty:0;];IndexOfMaxValue:IntProperty:384;MaxValue:FloatProperty:384;")]
 def ue_math_MaxOfFloatArray(arg_floatarray : array<float>) : ue_math_MaxOfFloatArray_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MaxOfFloatArray", "")
     ue_expect_signature(call, "v1;MaxOfFloatArray;FloatArray:ArrayProperty:134218114[FloatArray:FloatProperty:0;];IndexOfMaxValue:IntProperty:384;MaxValue:FloatProperty:384;")
@@ -5383,6 +5726,7 @@ struct ue_math_MaxOfIntArray_Result {
     out_maxvalue : int
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MaxOfIntArray", signature="v1;MaxOfIntArray;IntArray:ArrayProperty:134218114[IntArray:IntProperty:0;];IndexOfMaxValue:IntProperty:384;MaxValue:IntProperty:384;")]
 def ue_math_MaxOfIntArray(arg_intarray : array<int>) : ue_math_MaxOfIntArray_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MaxOfIntArray", "")
     ue_expect_signature(call, "v1;MaxOfIntArray;IntArray:ArrayProperty:134218114[IntArray:IntProperty:0;];IndexOfMaxValue:IntProperty:384;MaxValue:IntProperty:384;")
@@ -5397,6 +5741,7 @@ def ue_math_MaxOfIntArray(arg_intarray : array<int>) : ue_math_MaxOfIntArray_Res
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MedianOfIntArray", signature="v1;MedianOfIntArray;IntArray:ArrayProperty:128[IntArray:IntProperty:0;];MedianValue:FloatProperty:384;")]
 def ue_math_MedianOfIntArray(arg_intarray : array<int>) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MedianOfIntArray", "")
     ue_expect_signature(call, "v1;MedianOfIntArray;IntArray:ArrayProperty:128[IntArray:IntProperty:0;];MedianValue:FloatProperty:384;")
@@ -5411,6 +5756,7 @@ def ue_math_MedianOfIntArray(arg_intarray : array<int>) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Min", signature="v1;Min;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Min(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Min", "")
     ue_expect_signature(call, "v1;Min;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -5430,6 +5776,7 @@ struct ue_math_MinAreaRectangle_Result {
     out_outrectlengthy : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MinAreaRectangle", signature="v1;MinAreaRectangle;WorldContextObject:ObjectProperty:128:/Script/CoreUObject.Object;InPoints:ArrayProperty:134218114[InPoints:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};];SampleSurfaceNormal:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};OutRectCenter:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};OutRectRotation:StructProperty:384:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};OutRectLengthX:FloatProperty:384;OutRectLengthY:FloatProperty:384;bDebugDraw:BoolProperty:128;")]
 def ue_math_MinAreaRectangle(arg_inpoints : array<UEVector>; arg_samplesurfacenormal : UEVector; arg_bdebugdraw : bool) : ue_math_MinAreaRectangle_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MinAreaRectangle", "worldcontextobject")
     ue_expect_signature(call, "v1;MinAreaRectangle;WorldContextObject:ObjectProperty:128:/Script/CoreUObject.Object;InPoints:ArrayProperty:134218114[InPoints:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};];SampleSurfaceNormal:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};OutRectCenter:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};OutRectRotation:StructProperty:384:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};OutRectLengthX:FloatProperty:384;OutRectLengthY:FloatProperty:384;bDebugDraw:BoolProperty:128;")
@@ -5451,6 +5798,7 @@ struct ue_math_MinOfByteArray_Result {
     out_minvalue : uint8
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MinOfByteArray", signature="v1;MinOfByteArray;ByteArray:ArrayProperty:134218114[ByteArray:ByteProperty:0;];IndexOfMinValue:IntProperty:384;MinValue:ByteProperty:384;")]
 def ue_math_MinOfByteArray(arg_bytearray : array<uint8>) : ue_math_MinOfByteArray_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MinOfByteArray", "")
     ue_expect_signature(call, "v1;MinOfByteArray;ByteArray:ArrayProperty:134218114[ByteArray:ByteProperty:0;];IndexOfMinValue:IntProperty:384;MinValue:ByteProperty:384;")
@@ -5470,6 +5818,7 @@ struct ue_math_MinOfFloatArray_Result {
     out_minvalue : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MinOfFloatArray", signature="v1;MinOfFloatArray;FloatArray:ArrayProperty:134218114[FloatArray:FloatProperty:0;];IndexOfMinValue:IntProperty:384;MinValue:FloatProperty:384;")]
 def ue_math_MinOfFloatArray(arg_floatarray : array<float>) : ue_math_MinOfFloatArray_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MinOfFloatArray", "")
     ue_expect_signature(call, "v1;MinOfFloatArray;FloatArray:ArrayProperty:134218114[FloatArray:FloatProperty:0;];IndexOfMinValue:IntProperty:384;MinValue:FloatProperty:384;")
@@ -5489,6 +5838,7 @@ struct ue_math_MinOfIntArray_Result {
     out_minvalue : int
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MinOfIntArray", signature="v1;MinOfIntArray;IntArray:ArrayProperty:134218114[IntArray:IntProperty:0;];IndexOfMinValue:IntProperty:384;MinValue:IntProperty:384;")]
 def ue_math_MinOfIntArray(arg_intarray : array<int>) : ue_math_MinOfIntArray_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MinOfIntArray", "")
     ue_expect_signature(call, "v1;MinOfIntArray;IntArray:ArrayProperty:134218114[IntArray:IntProperty:0;];IndexOfMinValue:IntProperty:384;MinValue:IntProperty:384;")
@@ -5503,6 +5853,7 @@ def ue_math_MinOfIntArray(arg_intarray : array<int>) : ue_math_MinOfIntArray_Res
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MirrorVectorByNormal", signature="v1;MirrorVectorByNormal;InVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_MirrorVectorByNormal(arg_invect : UEVector; arg_innormal : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MirrorVectorByNormal", "")
     ue_expect_signature(call, "v1;MirrorVectorByNormal;InVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5515,6 +5866,7 @@ def ue_math_MirrorVectorByNormal(arg_invect : UEVector; arg_innormal : UEVector)
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MultiplyByPi", signature="v1;MultiplyByPi;Value:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_MultiplyByPi(arg_value : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MultiplyByPi", "")
     ue_expect_signature(call, "v1;MultiplyByPi;Value:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -5526,6 +5878,7 @@ def ue_math_MultiplyByPi(arg_value : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MultiplyMultiply_FloatFloat", signature="v1;MultiplyMultiply_FloatFloat;Base:DoubleProperty:128;Exp:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_MultiplyMultiply_FloatFloat(arg_base : double; arg_exp : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MultiplyMultiply_FloatFloat", "")
     ue_expect_signature(call, "v1;MultiplyMultiply_FloatFloat;Base:DoubleProperty:128;Exp:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -5538,6 +5891,7 @@ def ue_math_MultiplyMultiply_FloatFloat(arg_base : double; arg_exp : double) : d
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_ByteByte", signature="v1;Multiply_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")]
 def ue_math_Multiply_ByteByte(arg_a : uint8; arg_b : uint8) : uint8 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_ByteByte", "")
     ue_expect_signature(call, "v1;Multiply_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")
@@ -5550,6 +5904,7 @@ def ue_math_Multiply_ByteByte(arg_a : uint8; arg_b : uint8) : uint8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_DoubleDouble", signature="v1;Multiply_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Multiply_DoubleDouble(arg_a : double; arg_b : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_DoubleDouble", "")
     ue_expect_signature(call, "v1;Multiply_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -5562,6 +5917,7 @@ def ue_math_Multiply_DoubleDouble(arg_a : double; arg_b : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_IntFloat", signature="v1;Multiply_IntFloat;A:IntProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Multiply_IntFloat(arg_a : int; arg_b : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_IntFloat", "")
     ue_expect_signature(call, "v1;Multiply_IntFloat;A:IntProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -5574,6 +5930,7 @@ def ue_math_Multiply_IntFloat(arg_a : int; arg_b : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_IntInt", signature="v1;Multiply_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Multiply_IntInt(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_IntInt", "")
     ue_expect_signature(call, "v1;Multiply_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -5586,6 +5943,7 @@ def ue_math_Multiply_IntInt(arg_a : int; arg_b : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_IntPointInt", signature="v1;Multiply_IntPointInt;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Multiply_IntPointInt(arg_a : S_IntPoint_cb05a38b; arg_b : int) : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_IntPointInt", "")
     ue_expect_signature(call, "v1;Multiply_IntPointInt;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -5599,6 +5957,7 @@ def ue_math_Multiply_IntPointInt(arg_a : S_IntPoint_cb05a38b; arg_b : int) : S_I
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_IntPointIntPoint", signature="v1;Multiply_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Multiply_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPoint_cb05a38b) : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_IntPointIntPoint", "")
     ue_expect_signature(call, "v1;Multiply_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -5613,6 +5972,7 @@ def ue_math_Multiply_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_Int
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_LinearColorFloat", signature="v1;Multiply_LinearColorFloat;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_Multiply_LinearColorFloat(arg_a : S_LinearColor_f4abb14b; arg_b : float) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_LinearColorFloat", "")
     ue_expect_signature(call, "v1;Multiply_LinearColorFloat;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -5628,6 +5988,7 @@ def ue_math_Multiply_LinearColorFloat(arg_a : S_LinearColor_f4abb14b; arg_b : fl
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_LinearColorLinearColor", signature="v1;Multiply_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_Multiply_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;Multiply_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -5646,6 +6007,7 @@ def ue_math_Multiply_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_MatrixFloat", signature="v1;Multiply_MatrixFloat;A:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Multiply_MatrixFloat(arg_a : S_Matrix_c85cbab4; arg_b : double) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_MatrixFloat", "")
     ue_expect_signature(call, "v1;Multiply_MatrixFloat;A:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -5673,6 +6035,7 @@ def ue_math_Multiply_MatrixFloat(arg_a : S_Matrix_c85cbab4; arg_b : double) : S_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_MatrixMatrix", signature="v1;Multiply_MatrixMatrix;A:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_Multiply_MatrixMatrix(arg_a : S_Matrix_c85cbab4; arg_b : S_Matrix_c85cbab4) : S_Matrix_c85cbab4 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_MatrixMatrix", "")
     ue_expect_signature(call, "v1;Multiply_MatrixMatrix;A:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -5715,6 +6078,7 @@ def ue_math_Multiply_MatrixMatrix(arg_a : S_Matrix_c85cbab4; arg_b : S_Matrix_c8
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_QuatQuat", signature="v1;Multiply_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Multiply_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_QuatQuat", "")
     ue_expect_signature(call, "v1;Multiply_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -5733,6 +6097,7 @@ def ue_math_Multiply_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_RotatorFloat", signature="v1;Multiply_RotatorFloat;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_Multiply_RotatorFloat(arg_a : UERotator; arg_b : float) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_RotatorFloat", "")
     ue_expect_signature(call, "v1;Multiply_RotatorFloat;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -5745,6 +6110,7 @@ def ue_math_Multiply_RotatorFloat(arg_a : UERotator; arg_b : float) : UERotator 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_RotatorInt", signature="v1;Multiply_RotatorInt;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_Multiply_RotatorInt(arg_a : UERotator; arg_b : int) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_RotatorInt", "")
     ue_expect_signature(call, "v1;Multiply_RotatorInt;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -5757,6 +6123,7 @@ def ue_math_Multiply_RotatorInt(arg_a : UERotator; arg_b : int) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_Vector2DFloat", signature="v1;Multiply_Vector2DFloat;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Multiply_Vector2DFloat(arg_a : UEVector2D; arg_b : double) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_Vector2DFloat", "")
     ue_expect_signature(call, "v1;Multiply_Vector2DFloat;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5769,6 +6136,7 @@ def ue_math_Multiply_Vector2DFloat(arg_a : UEVector2D; arg_b : double) : UEVecto
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_Vector2DVector2D", signature="v1;Multiply_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Multiply_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_Vector2DVector2D", "")
     ue_expect_signature(call, "v1;Multiply_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5781,6 +6149,7 @@ def ue_math_Multiply_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_Vector4Vector4", signature="v1;Multiply_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Multiply_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_Vector4Vector4", "")
     ue_expect_signature(call, "v1;Multiply_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -5799,6 +6168,7 @@ def ue_math_Multiply_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_VectorFloat", signature="v1;Multiply_VectorFloat;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Multiply_VectorFloat(arg_a : UEVector; arg_b : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_VectorFloat", "")
     ue_expect_signature(call, "v1;Multiply_VectorFloat;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5811,6 +6181,7 @@ def ue_math_Multiply_VectorFloat(arg_a : UEVector; arg_b : double) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_VectorInt", signature="v1;Multiply_VectorInt;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Multiply_VectorInt(arg_a : UEVector; arg_b : int) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_VectorInt", "")
     ue_expect_signature(call, "v1;Multiply_VectorInt;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5823,6 +6194,7 @@ def ue_math_Multiply_VectorInt(arg_a : UEVector; arg_b : int) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_VectorVector", signature="v1;Multiply_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Multiply_VectorVector(arg_a : UEVector; arg_b : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_VectorVector", "")
     ue_expect_signature(call, "v1;Multiply_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5835,6 +6207,7 @@ def ue_math_Multiply_VectorVector(arg_a : UEVector; arg_b : UEVector) : UEVector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NearlyEqual_FloatFloat", signature="v1;NearlyEqual_FloatFloat;A:DoubleProperty:128;B:DoubleProperty:128;ErrorTolerance:DoubleProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NearlyEqual_FloatFloat(arg_a : double; arg_b : double; arg_errortolerance : double) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NearlyEqual_FloatFloat", "")
     ue_expect_signature(call, "v1;NearlyEqual_FloatFloat;A:DoubleProperty:128;B:DoubleProperty:128;ErrorTolerance:DoubleProperty:128;ReturnValue:BoolProperty:1408;")
@@ -5848,6 +6221,7 @@ def ue_math_NearlyEqual_FloatFloat(arg_a : double; arg_b : double; arg_errortole
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NearlyEqual_TransformTransform", signature="v1;NearlyEqual_TransformTransform;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};LocationTolerance:FloatProperty:128;RotationTolerance:FloatProperty:128;Scale3DTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NearlyEqual_TransformTransform(arg_a : UETransform; arg_b : UETransform; arg_locationtolerance : float; arg_rotationtolerance : float; arg_scale3dtolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NearlyEqual_TransformTransform", "")
     ue_expect_signature(call, "v1;NearlyEqual_TransformTransform;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};LocationTolerance:FloatProperty:128;RotationTolerance:FloatProperty:128;Scale3DTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -5863,6 +6237,7 @@ def ue_math_NearlyEqual_TransformTransform(arg_a : UETransform; arg_b : UETransf
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NegateRotator", signature="v1;NegateRotator;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_NegateRotator(arg_a : UERotator) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NegateRotator", "")
     ue_expect_signature(call, "v1;NegateRotator;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -5874,6 +6249,7 @@ def ue_math_NegateRotator(arg_a : UERotator) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NegateVector", signature="v1;NegateVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_NegateVector(arg_a : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NegateVector", "")
     ue_expect_signature(call, "v1;NegateVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5885,6 +6261,7 @@ def ue_math_NegateVector(arg_a : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Negated2D", signature="v1;Negated2D;A:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Negated2D(arg_a : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Negated2D", "")
     ue_expect_signature(call, "v1;Negated2D;A:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5896,6 +6273,7 @@ def ue_math_Negated2D(arg_a : UEVector2D) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Normal", signature="v1;Normal;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Normal(arg_a : UEVector; arg_tolerance : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Normal", "")
     ue_expect_signature(call, "v1;Normal;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -5908,6 +6286,7 @@ def ue_math_Normal(arg_a : UEVector; arg_tolerance : float) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Normal2D", signature="v1;Normal2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Normal2D(arg_a : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Normal2D", "")
     ue_expect_signature(call, "v1;Normal2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5919,6 +6298,7 @@ def ue_math_Normal2D(arg_a : UEVector2D) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NormalSafe2D", signature="v1;NormalSafe2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_NormalSafe2D(arg_a : UEVector2D; arg_tolerance : float) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NormalSafe2D", "")
     ue_expect_signature(call, "v1;NormalSafe2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5931,6 +6311,7 @@ def ue_math_NormalSafe2D(arg_a : UEVector2D; arg_tolerance : float) : UEVector2D
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Normalize2D", signature="v1;Normalize2D;A:StructProperty:134218112:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tolerance:FloatProperty:128;")]
 def ue_math_Normalize2D(arg_a : UEVector2D; arg_tolerance : float) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Normalize2D", "")
     ue_expect_signature(call, "v1;Normalize2D;A:StructProperty:134218112:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tolerance:FloatProperty:128;")
@@ -5943,6 +6324,7 @@ def ue_math_Normalize2D(arg_a : UEVector2D; arg_tolerance : float) : UEVector2D 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NormalizeAxis", signature="v1;NormalizeAxis;Angle:FloatProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_math_NormalizeAxis(arg_angle : float) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NormalizeAxis", "")
     ue_expect_signature(call, "v1;NormalizeAxis;Angle:FloatProperty:128;ReturnValue:FloatProperty:1408;")
@@ -5954,6 +6336,7 @@ def ue_math_NormalizeAxis(arg_angle : float) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NormalizeToRange", signature="v1;NormalizeToRange;Value:DoubleProperty:128;RangeMin:DoubleProperty:128;RangeMax:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_NormalizeToRange(arg_value : double; arg_rangemin : double; arg_rangemax : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NormalizeToRange", "")
     ue_expect_signature(call, "v1;NormalizeToRange;Value:DoubleProperty:128;RangeMin:DoubleProperty:128;RangeMax:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -5967,6 +6350,7 @@ def ue_math_NormalizeToRange(arg_value : double; arg_rangemin : double; arg_rang
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NormalizedDeltaRotator", signature="v1;NormalizedDeltaRotator;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_NormalizedDeltaRotator(arg_a : UERotator; arg_b : UERotator) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NormalizedDeltaRotator", "")
     ue_expect_signature(call, "v1;NormalizedDeltaRotator;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -5979,6 +6363,7 @@ def ue_math_NormalizedDeltaRotator(arg_a : UERotator; arg_b : UERotator) : UERot
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqualExactly_Vector2DVector2D", signature="v1;NotEqualExactly_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqualExactly_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqualExactly_Vector2DVector2D", "")
     ue_expect_signature(call, "v1;NotEqualExactly_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -5991,6 +6376,7 @@ def ue_math_NotEqualExactly_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVecto
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqualExactly_Vector4Vector4", signature="v1;NotEqualExactly_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqualExactly_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqualExactly_Vector4Vector4", "")
     ue_expect_signature(call, "v1;NotEqualExactly_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -6009,6 +6395,7 @@ def ue_math_NotEqualExactly_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqualExactly_VectorVector", signature="v1;NotEqualExactly_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqualExactly_VectorVector(arg_a : UEVector; arg_b : UEVector) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqualExactly_VectorVector", "")
     ue_expect_signature(call, "v1;NotEqualExactly_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -6021,6 +6408,7 @@ def ue_math_NotEqualExactly_VectorVector(arg_a : UEVector; arg_b : UEVector) : b
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_BoolBool", signature="v1;NotEqual_BoolBool;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_BoolBool(arg_a : bool; arg_b : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_BoolBool", "")
     ue_expect_signature(call, "v1;NotEqual_BoolBool;A:BoolProperty:128;B:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6033,6 +6421,7 @@ def ue_math_NotEqual_BoolBool(arg_a : bool; arg_b : bool) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_ByteByte", signature="v1;NotEqual_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_ByteByte", "")
     ue_expect_signature(call, "v1;NotEqual_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6045,6 +6434,7 @@ def ue_math_NotEqual_ByteByte(arg_a : uint8; arg_b : uint8) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_ClassClass", signature="v1;NotEqual_ClassClass;A:ClassProperty:128:meta:/Script/CoreUObject.Object;B:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_ClassClass(arg_a : UEClassHandle; arg_b : UEClassHandle) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_ClassClass", "")
     ue_expect_signature(call, "v1;NotEqual_ClassClass;A:ClassProperty:128:meta:/Script/CoreUObject.Object;B:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -6057,6 +6447,7 @@ def ue_math_NotEqual_ClassClass(arg_a : UEClassHandle; arg_b : UEClassHandle) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_DoubleDouble", signature="v1;NotEqual_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_DoubleDouble(arg_a : double; arg_b : double) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_DoubleDouble", "")
     ue_expect_signature(call, "v1;NotEqual_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6069,6 +6460,7 @@ def ue_math_NotEqual_DoubleDouble(arg_a : double; arg_b : double) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_IntInt", signature="v1;NotEqual_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_IntInt(arg_a : int; arg_b : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_IntInt", "")
     ue_expect_signature(call, "v1;NotEqual_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6081,6 +6473,7 @@ def ue_math_NotEqual_IntInt(arg_a : int; arg_b : int) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_IntPointIntPoint", signature="v1;NotEqual_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPoint_cb05a38b) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_IntPointIntPoint", "")
     ue_expect_signature(call, "v1;NotEqual_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -6095,6 +6488,7 @@ def ue_math_NotEqual_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_Int
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_LinearColorLinearColor", signature="v1;NotEqual_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;NotEqual_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -6113,6 +6507,7 @@ def ue_math_NotEqual_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_MatrixMatrix", signature="v1;NotEqual_MatrixMatrix;A:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_MatrixMatrix(arg_a : S_Matrix_c85cbab4; arg_b : S_Matrix_c85cbab4; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_MatrixMatrix", "")
     ue_expect_signature(call, "v1;NotEqual_MatrixMatrix;A:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6156,6 +6551,7 @@ def ue_math_NotEqual_MatrixMatrix(arg_a : S_Matrix_c85cbab4; arg_b : S_Matrix_c8
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_NameName", signature="v1;NotEqual_NameName;A:NameProperty:128;B:NameProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_NameName(arg_a : UEName; arg_b : UEName) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_NameName", "")
     ue_expect_signature(call, "v1;NotEqual_NameName;A:NameProperty:128;B:NameProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6168,6 +6564,7 @@ def ue_math_NotEqual_NameName(arg_a : UEName; arg_b : UEName) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_ObjectObject", signature="v1;NotEqual_ObjectObject;A:ObjectProperty:128:/Script/CoreUObject.Object;B:ObjectProperty:128:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_ObjectObject(arg_a : C_Object_55c3753a; arg_b : C_Object_55c3753a) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_ObjectObject", "")
     ue_expect_signature(call, "v1;NotEqual_ObjectObject;A:ObjectProperty:128:/Script/CoreUObject.Object;B:ObjectProperty:128:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -6180,6 +6577,7 @@ def ue_math_NotEqual_ObjectObject(arg_a : C_Object_55c3753a; arg_b : C_Object_55
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_QuatQuat", signature="v1;NotEqual_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e; arg_errortolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_QuatQuat", "")
     ue_expect_signature(call, "v1;NotEqual_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6199,6 +6597,7 @@ def ue_math_NotEqual_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_RotatorRotator", signature="v1;NotEqual_RotatorRotator;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_RotatorRotator(arg_a : UERotator; arg_b : UERotator; arg_errortolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_RotatorRotator", "")
     ue_expect_signature(call, "v1;NotEqual_RotatorRotator;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6212,6 +6611,7 @@ def ue_math_NotEqual_RotatorRotator(arg_a : UERotator; arg_b : UERotator; arg_er
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_Vector2DVector2D", signature="v1;NotEqual_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D; arg_errortolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_Vector2DVector2D", "")
     ue_expect_signature(call, "v1;NotEqual_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6225,6 +6625,7 @@ def ue_math_NotEqual_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D; ar
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_Vector4Vector4", signature="v1;NotEqual_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1; arg_errortolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_Vector4Vector4", "")
     ue_expect_signature(call, "v1;NotEqual_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6244,6 +6645,7 @@ def ue_math_NotEqual_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_VectorVector", signature="v1;NotEqual_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_NotEqual_VectorVector(arg_a : UEVector; arg_b : UEVector; arg_errortolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_VectorVector", "")
     ue_expect_signature(call, "v1;NotEqual_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6257,6 +6659,7 @@ def ue_math_NotEqual_VectorVector(arg_a : UEVector; arg_b : UEVector; arg_errort
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Not_Int", signature="v1;Not_Int;A:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Not_Int(arg_a : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Not_Int", "")
     ue_expect_signature(call, "v1;Not_Int;A:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -6268,6 +6671,7 @@ def ue_math_Not_Int(arg_a : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Not_PreBool", signature="v1;Not_PreBool;A:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Not_PreBool(arg_a : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Not_PreBool", "")
     ue_expect_signature(call, "v1;Not_PreBool;A:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6279,6 +6683,7 @@ def ue_math_Not_PreBool(arg_a : bool) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Or_IntInt", signature="v1;Or_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Or_IntInt(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Or_IntInt", "")
     ue_expect_signature(call, "v1;Or_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -6291,6 +6696,7 @@ def ue_math_Or_IntInt(arg_a : int; arg_b : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Percent_ByteByte", signature="v1;Percent_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")]
 def ue_math_Percent_ByteByte(arg_a : uint8; arg_b : uint8) : uint8 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Percent_ByteByte", "")
     ue_expect_signature(call, "v1;Percent_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")
@@ -6303,6 +6709,7 @@ def ue_math_Percent_ByteByte(arg_a : uint8; arg_b : uint8) : uint8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Percent_IntInt", signature="v1;Percent_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Percent_IntInt(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Percent_IntInt", "")
     ue_expect_signature(call, "v1;Percent_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -6315,6 +6722,7 @@ def ue_math_Percent_IntInt(arg_a : int; arg_b : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="PerlinNoise1D", signature="v1;PerlinNoise1D;Value:FloatProperty:130;ReturnValue:FloatProperty:1408;")]
 def ue_math_PerlinNoise1D(arg_value : float) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "PerlinNoise1D", "")
     ue_expect_signature(call, "v1;PerlinNoise1D;Value:FloatProperty:130;ReturnValue:FloatProperty:1408;")
@@ -6326,6 +6734,7 @@ def ue_math_PerlinNoise1D(arg_value : float) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="PointsAreCoplanar", signature="v1;PointsAreCoplanar;Points:ArrayProperty:134218114[Points:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};];Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_PointsAreCoplanar(arg_points : array<UEVector>; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "PointsAreCoplanar", "")
     ue_expect_signature(call, "v1;PointsAreCoplanar;Points:ArrayProperty:134218114[Points:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};];Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6341,6 +6750,7 @@ def ue_math_PointsAreCoplanar(arg_points : array<UEVector>; arg_tolerance : floa
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ProjectPointOnToPlane", signature="v1;ProjectPointOnToPlane;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PlaneBase:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PlaneNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_ProjectPointOnToPlane(arg_point : UEVector; arg_planebase : UEVector; arg_planenormal : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ProjectPointOnToPlane", "")
     ue_expect_signature(call, "v1;ProjectPointOnToPlane;Point:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PlaneBase:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PlaneNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6354,6 +6764,7 @@ def ue_math_ProjectPointOnToPlane(arg_point : UEVector; arg_planebase : UEVector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ProjectVectorOnToPlane", signature="v1;ProjectVectorOnToPlane;V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PlaneNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_ProjectVectorOnToPlane(arg_v : UEVector; arg_planenormal : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ProjectVectorOnToPlane", "")
     ue_expect_signature(call, "v1;ProjectVectorOnToPlane;V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PlaneNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6366,6 +6777,7 @@ def ue_math_ProjectVectorOnToPlane(arg_v : UEVector; arg_planenormal : UEVector)
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ProjectVectorOnToVector", signature="v1;ProjectVectorOnToVector;V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_ProjectVectorOnToVector(arg_v : UEVector; arg_target : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ProjectVectorOnToVector", "")
     ue_expect_signature(call, "v1;ProjectVectorOnToVector;V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6378,6 +6790,7 @@ def ue_math_ProjectVectorOnToVector(arg_v : UEVector; arg_target : UEVector) : U
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_AngularDistance", signature="v1;Quat_AngularDistance;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_Quat_AngularDistance(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_AngularDistance", "")
     ue_expect_signature(call, "v1;Quat_AngularDistance;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -6396,6 +6809,7 @@ def ue_math_Quat_AngularDistance(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_EnforceShortestArcWith", signature="v1;Quat_EnforceShortestArcWith;A:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_EnforceShortestArcWith(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_EnforceShortestArcWith", "")
     ue_expect_signature(call, "v1;Quat_EnforceShortestArcWith;A:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6414,6 +6828,7 @@ def ue_math_Quat_EnforceShortestArcWith(arg_a : S_Quat_82f9549e; arg_b : S_Quat_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Euler", signature="v1;Quat_Euler;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_Euler(arg_q : S_Quat_82f9549e) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Euler", "")
     ue_expect_signature(call, "v1;Quat_Euler;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6428,6 +6843,7 @@ def ue_math_Quat_Euler(arg_q : S_Quat_82f9549e) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Exp", signature="v1;Quat_Exp;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_Exp(arg_q : S_Quat_82f9549e) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Exp", "")
     ue_expect_signature(call, "v1;Quat_Exp;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6442,6 +6858,7 @@ def ue_math_Quat_Exp(arg_q : S_Quat_82f9549e) : S_Quat_82f9549e {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_FindBetweenNormals", signature="v1;Quat_FindBetweenNormals;StartNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};EndNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_FindBetweenNormals(arg_startnormal : UEVector; arg_endnormal : UEVector) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_FindBetweenNormals", "")
     ue_expect_signature(call, "v1;Quat_FindBetweenNormals;StartNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};EndNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6454,6 +6871,7 @@ def ue_math_Quat_FindBetweenNormals(arg_startnormal : UEVector; arg_endnormal : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_FindBetweenVectors", signature="v1;Quat_FindBetweenVectors;Start:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};End:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_FindBetweenVectors(arg_start : UEVector; arg_end : UEVector) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_FindBetweenVectors", "")
     ue_expect_signature(call, "v1;Quat_FindBetweenVectors;Start:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};End:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6466,6 +6884,7 @@ def ue_math_Quat_FindBetweenVectors(arg_start : UEVector; arg_end : UEVector) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetAngle", signature="v1;Quat_GetAngle;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_Quat_GetAngle(arg_q : S_Quat_82f9549e) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetAngle", "")
     ue_expect_signature(call, "v1;Quat_GetAngle;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -6480,6 +6899,7 @@ def ue_math_Quat_GetAngle(arg_q : S_Quat_82f9549e) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetAxisX", signature="v1;Quat_GetAxisX;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_GetAxisX(arg_q : S_Quat_82f9549e) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetAxisX", "")
     ue_expect_signature(call, "v1;Quat_GetAxisX;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6494,6 +6914,7 @@ def ue_math_Quat_GetAxisX(arg_q : S_Quat_82f9549e) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetAxisY", signature="v1;Quat_GetAxisY;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_GetAxisY(arg_q : S_Quat_82f9549e) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetAxisY", "")
     ue_expect_signature(call, "v1;Quat_GetAxisY;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6508,6 +6929,7 @@ def ue_math_Quat_GetAxisY(arg_q : S_Quat_82f9549e) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetAxisZ", signature="v1;Quat_GetAxisZ;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_GetAxisZ(arg_q : S_Quat_82f9549e) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetAxisZ", "")
     ue_expect_signature(call, "v1;Quat_GetAxisZ;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6522,6 +6944,7 @@ def ue_math_Quat_GetAxisZ(arg_q : S_Quat_82f9549e) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetRotationAxis", signature="v1;Quat_GetRotationAxis;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_GetRotationAxis(arg_q : S_Quat_82f9549e) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetRotationAxis", "")
     ue_expect_signature(call, "v1;Quat_GetRotationAxis;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6536,6 +6959,7 @@ def ue_math_Quat_GetRotationAxis(arg_q : S_Quat_82f9549e) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetShortestArcWith", signature="v1;Quat_GetShortestArcWith;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_GetShortestArcWith(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetShortestArcWith", "")
     ue_expect_signature(call, "v1;Quat_GetShortestArcWith;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6554,6 +6978,7 @@ def ue_math_Quat_GetShortestArcWith(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Identity", signature="v1;Quat_Identity;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_Identity() : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Identity", "")
     ue_expect_signature(call, "v1;Quat_Identity;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6564,6 +6989,7 @@ def ue_math_Quat_Identity() : S_Quat_82f9549e {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Inversed", signature="v1;Quat_Inversed;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_Inversed(arg_q : S_Quat_82f9549e) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Inversed", "")
     ue_expect_signature(call, "v1;Quat_Inversed;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6578,6 +7004,7 @@ def ue_math_Quat_Inversed(arg_q : S_Quat_82f9549e) : S_Quat_82f9549e {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_IsFinite", signature="v1;Quat_IsFinite;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Quat_IsFinite(arg_q : S_Quat_82f9549e) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_IsFinite", "")
     ue_expect_signature(call, "v1;Quat_IsFinite;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -6592,6 +7019,7 @@ def ue_math_Quat_IsFinite(arg_q : S_Quat_82f9549e) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_IsIdentity", signature="v1;Quat_IsIdentity;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Quat_IsIdentity(arg_q : S_Quat_82f9549e; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_IsIdentity", "")
     ue_expect_signature(call, "v1;Quat_IsIdentity;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6607,6 +7035,7 @@ def ue_math_Quat_IsIdentity(arg_q : S_Quat_82f9549e; arg_tolerance : float) : bo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_IsNonFinite", signature="v1;Quat_IsNonFinite;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Quat_IsNonFinite(arg_q : S_Quat_82f9549e) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_IsNonFinite", "")
     ue_expect_signature(call, "v1;Quat_IsNonFinite;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -6621,6 +7050,7 @@ def ue_math_Quat_IsNonFinite(arg_q : S_Quat_82f9549e) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_IsNormalized", signature="v1;Quat_IsNormalized;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Quat_IsNormalized(arg_q : S_Quat_82f9549e) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_IsNormalized", "")
     ue_expect_signature(call, "v1;Quat_IsNormalized;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -6635,6 +7065,7 @@ def ue_math_Quat_IsNormalized(arg_q : S_Quat_82f9549e) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Log", signature="v1;Quat_Log;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_Log(arg_q : S_Quat_82f9549e) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Log", "")
     ue_expect_signature(call, "v1;Quat_Log;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6649,6 +7080,7 @@ def ue_math_Quat_Log(arg_q : S_Quat_82f9549e) : S_Quat_82f9549e {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_MakeFromEuler", signature="v1;Quat_MakeFromEuler;Euler:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_MakeFromEuler(arg_euler : UEVector) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_MakeFromEuler", "")
     ue_expect_signature(call, "v1;Quat_MakeFromEuler;Euler:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6660,6 +7092,7 @@ def ue_math_Quat_MakeFromEuler(arg_euler : UEVector) : S_Quat_82f9549e {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_MakeFromRotationVector", signature="v1;Quat_MakeFromRotationVector;V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_MakeFromRotationVector(arg_v : UEVector) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_MakeFromRotationVector", "")
     ue_expect_signature(call, "v1;Quat_MakeFromRotationVector;V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6671,6 +7104,7 @@ def ue_math_Quat_MakeFromRotationVector(arg_v : UEVector) : S_Quat_82f9549e {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Normalize", signature="v1;Quat_Normalize;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;")]
 def ue_math_Quat_Normalize(arg_q : S_Quat_82f9549e; arg_tolerance : float) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Normalize", "")
     ue_expect_signature(call, "v1;Quat_Normalize;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;")
@@ -6686,6 +7120,7 @@ def ue_math_Quat_Normalize(arg_q : S_Quat_82f9549e; arg_tolerance : float) : S_Q
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Normalized", signature="v1;Quat_Normalized;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_Normalized(arg_q : S_Quat_82f9549e; arg_tolerance : float) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Normalized", "")
     ue_expect_signature(call, "v1;Quat_Normalized;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6701,6 +7136,7 @@ def ue_math_Quat_Normalized(arg_q : S_Quat_82f9549e; arg_tolerance : float) : S_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_RotateVector", signature="v1;Quat_RotateVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_RotateVector(arg_q : S_Quat_82f9549e; arg_v : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_RotateVector", "")
     ue_expect_signature(call, "v1;Quat_RotateVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6716,6 +7152,7 @@ def ue_math_Quat_RotateVector(arg_q : S_Quat_82f9549e; arg_v : UEVector) : UEVec
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Rotator", signature="v1;Quat_Rotator;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_Quat_Rotator(arg_q : S_Quat_82f9549e) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Rotator", "")
     ue_expect_signature(call, "v1;Quat_Rotator;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -6730,6 +7167,7 @@ def ue_math_Quat_Rotator(arg_q : S_Quat_82f9549e) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_SetComponents", signature="v1;Quat_SetComponents;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:FloatProperty:128;Y:FloatProperty:128;Z:FloatProperty:128;W:FloatProperty:128;")]
 def ue_math_Quat_SetComponents(arg_q : S_Quat_82f9549e; arg_x : float; arg_y : float; arg_z : float; arg_w : float) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_SetComponents", "")
     ue_expect_signature(call, "v1;Quat_SetComponents;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:FloatProperty:128;Y:FloatProperty:128;Z:FloatProperty:128;W:FloatProperty:128;")
@@ -6748,6 +7186,7 @@ def ue_math_Quat_SetComponents(arg_q : S_Quat_82f9549e; arg_x : float; arg_y : f
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_SetFromEuler", signature="v1;Quat_SetFromEuler;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Euler:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_SetFromEuler(arg_q : S_Quat_82f9549e; arg_euler : UEVector) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_SetFromEuler", "")
     ue_expect_signature(call, "v1;Quat_SetFromEuler;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Euler:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6763,6 +7202,7 @@ def ue_math_Quat_SetFromEuler(arg_q : S_Quat_82f9549e; arg_euler : UEVector) : S
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Size", signature="v1;Quat_Size;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_Quat_Size(arg_q : S_Quat_82f9549e) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Size", "")
     ue_expect_signature(call, "v1;Quat_Size;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -6777,6 +7217,7 @@ def ue_math_Quat_Size(arg_q : S_Quat_82f9549e) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_SizeSquared", signature="v1;Quat_SizeSquared;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_Quat_SizeSquared(arg_q : S_Quat_82f9549e) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_SizeSquared", "")
     ue_expect_signature(call, "v1;Quat_SizeSquared;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -6791,6 +7232,7 @@ def ue_math_Quat_SizeSquared(arg_q : S_Quat_82f9549e) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Slerp", signature="v1;Quat_Slerp;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Alpha:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Quat_Slerp(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e; arg_alpha : double) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Slerp", "")
     ue_expect_signature(call, "v1;Quat_Slerp;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Alpha:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -6810,6 +7252,7 @@ def ue_math_Quat_Slerp(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e; arg_alp
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_ToRotationVector", signature="v1;Quat_ToRotationVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_ToRotationVector(arg_q : S_Quat_82f9549e) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_ToRotationVector", "")
     ue_expect_signature(call, "v1;Quat_ToRotationVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6824,6 +7267,7 @@ def ue_math_Quat_ToRotationVector(arg_q : S_Quat_82f9549e) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_UnrotateVector", signature="v1;Quat_UnrotateVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_UnrotateVector(arg_q : S_Quat_82f9549e; arg_v : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_UnrotateVector", "")
     ue_expect_signature(call, "v1;Quat_UnrotateVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6839,6 +7283,7 @@ def ue_math_Quat_UnrotateVector(arg_q : S_Quat_82f9549e; arg_v : UEVector) : UEV
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_VectorForward", signature="v1;Quat_VectorForward;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_VectorForward(arg_q : S_Quat_82f9549e) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_VectorForward", "")
     ue_expect_signature(call, "v1;Quat_VectorForward;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6853,6 +7298,7 @@ def ue_math_Quat_VectorForward(arg_q : S_Quat_82f9549e) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_VectorRight", signature="v1;Quat_VectorRight;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_VectorRight(arg_q : S_Quat_82f9549e) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_VectorRight", "")
     ue_expect_signature(call, "v1;Quat_VectorRight;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6867,6 +7313,7 @@ def ue_math_Quat_VectorRight(arg_q : S_Quat_82f9549e) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_VectorUp", signature="v1;Quat_VectorUp;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Quat_VectorUp(arg_q : S_Quat_82f9549e) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_VectorUp", "")
     ue_expect_signature(call, "v1;Quat_VectorUp;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -6881,6 +7328,7 @@ def ue_math_Quat_VectorUp(arg_q : S_Quat_82f9549e) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RGBLinearToHSV", signature="v1;RGBLinearToHSV;RGB:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_RGBLinearToHSV(arg_rgb : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RGBLinearToHSV", "")
     ue_expect_signature(call, "v1;RGBLinearToHSV;RGB:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -6902,6 +7350,7 @@ struct ue_math_RGBToHSV_Result {
     out_a : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RGBToHSV", signature="v1;RGBToHSV;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};H:FloatProperty:384;S:FloatProperty:384;V:FloatProperty:384;A:FloatProperty:384;")]
 def ue_math_RGBToHSV(arg_incolor : S_LinearColor_f4abb14b) : ue_math_RGBToHSV_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RGBToHSV", "")
     ue_expect_signature(call, "v1;RGBToHSV;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};H:FloatProperty:384;S:FloatProperty:384;V:FloatProperty:384;A:FloatProperty:384;")
@@ -6916,6 +7365,7 @@ def ue_math_RGBToHSV(arg_incolor : S_LinearColor_f4abb14b) : ue_math_RGBToHSV_Re
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RGBToHSV_Vector", signature="v1;RGBToHSV_Vector;RGB:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};HSV:StructProperty:384:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_RGBToHSV_Vector(arg_rgb : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RGBToHSV_Vector", "")
     ue_expect_signature(call, "v1;RGBToHSV_Vector;RGB:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};HSV:StructProperty:384:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -6930,6 +7380,7 @@ def ue_math_RGBToHSV_Vector(arg_rgb : S_LinearColor_f4abb14b) : S_LinearColor_f4
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RInterpTo", signature="v1;RInterpTo;Current:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_RInterpTo(arg_current : UERotator; arg_target : UERotator; arg_deltatime : float; arg_interpspeed : float) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RInterpTo", "")
     ue_expect_signature(call, "v1;RInterpTo;Current:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -6944,6 +7395,7 @@ def ue_math_RInterpTo(arg_current : UERotator; arg_target : UERotator; arg_delta
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RInterpTo_Constant", signature="v1;RInterpTo_Constant;Current:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_RInterpTo_Constant(arg_current : UERotator; arg_target : UERotator; arg_deltatime : float; arg_interpspeed : float) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RInterpTo_Constant", "")
     ue_expect_signature(call, "v1;RInterpTo_Constant;Current:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -6958,6 +7410,7 @@ def ue_math_RInterpTo_Constant(arg_current : UERotator; arg_target : UERotator; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RLerp", signature="v1;RLerp;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Alpha:FloatProperty:128;bShortestPath:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_RLerp(arg_a : UERotator; arg_b : UERotator; arg_alpha : float; arg_bshortestpath : bool) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RLerp", "")
     ue_expect_signature(call, "v1;RLerp;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Alpha:FloatProperty:128;bShortestPath:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -6972,6 +7425,7 @@ def ue_math_RLerp(arg_a : UERotator; arg_b : UERotator; arg_alpha : float; arg_b
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RadiansToDegrees", signature="v1;RadiansToDegrees;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_RadiansToDegrees(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RadiansToDegrees", "")
     ue_expect_signature(call, "v1;RadiansToDegrees;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -6983,6 +7437,7 @@ def ue_math_RadiansToDegrees(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomBool", signature="v1;RandomBool;ReturnValue:BoolProperty:1408;")]
 def ue_math_RandomBool() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomBool", "")
     ue_expect_signature(call, "v1;RandomBool;ReturnValue:BoolProperty:1408;")
@@ -6993,6 +7448,7 @@ def ue_math_RandomBool() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomBoolFromStream", signature="v1;RandomBoolFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_RandomBoolFromStream(arg_stream : S_RandomStream_7b64b757) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomBoolFromStream", "")
     ue_expect_signature(call, "v1;RandomBoolFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -7005,6 +7461,7 @@ def ue_math_RandomBoolFromStream(arg_stream : S_RandomStream_7b64b757) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomBoolWithWeight", signature="v1;RandomBoolWithWeight;Weight:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_RandomBoolWithWeight(arg_weight : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomBoolWithWeight", "")
     ue_expect_signature(call, "v1;RandomBoolWithWeight;Weight:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -7016,6 +7473,7 @@ def ue_math_RandomBoolWithWeight(arg_weight : float) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomBoolWithWeightFromStream", signature="v1;RandomBoolWithWeightFromStream;RandomStream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Weight:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_RandomBoolWithWeightFromStream(arg_randomstream : S_RandomStream_7b64b757; arg_weight : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomBoolWithWeightFromStream", "")
     ue_expect_signature(call, "v1;RandomBoolWithWeightFromStream;RandomStream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Weight:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -7029,6 +7487,7 @@ def ue_math_RandomBoolWithWeightFromStream(arg_randomstream : S_RandomStream_7b6
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomFloat", signature="v1;RandomFloat;ReturnValue:DoubleProperty:1408;")]
 def ue_math_RandomFloat() : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomFloat", "")
     ue_expect_signature(call, "v1;RandomFloat;ReturnValue:DoubleProperty:1408;")
@@ -7039,6 +7498,7 @@ def ue_math_RandomFloat() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomFloatFromStream", signature="v1;RandomFloatFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ReturnValue:FloatProperty:1408;")]
 def ue_math_RandomFloatFromStream(arg_stream : S_RandomStream_7b64b757) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomFloatFromStream", "")
     ue_expect_signature(call, "v1;RandomFloatFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ReturnValue:FloatProperty:1408;")
@@ -7051,6 +7511,7 @@ def ue_math_RandomFloatFromStream(arg_stream : S_RandomStream_7b64b757) : float 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomFloatInRange", signature="v1;RandomFloatInRange;Min:DoubleProperty:128;Max:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_RandomFloatInRange(arg_min : double; arg_max : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomFloatInRange", "")
     ue_expect_signature(call, "v1;RandomFloatInRange;Min:DoubleProperty:128;Max:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -7063,6 +7524,7 @@ def ue_math_RandomFloatInRange(arg_min : double; arg_max : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomFloatInRangeFromStream", signature="v1;RandomFloatInRangeFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Min:FloatProperty:128;Max:FloatProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_math_RandomFloatInRangeFromStream(arg_stream : S_RandomStream_7b64b757; arg_min : float; arg_max : float) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomFloatInRangeFromStream", "")
     ue_expect_signature(call, "v1;RandomFloatInRangeFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Min:FloatProperty:128;Max:FloatProperty:128;ReturnValue:FloatProperty:1408;")
@@ -7077,6 +7539,7 @@ def ue_math_RandomFloatInRangeFromStream(arg_stream : S_RandomStream_7b64b757; a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomInteger", signature="v1;RandomInteger;Max:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_RandomInteger(arg_max : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomInteger", "")
     ue_expect_signature(call, "v1;RandomInteger;Max:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -7088,6 +7551,7 @@ def ue_math_RandomInteger(arg_max : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomIntegerFromStream", signature="v1;RandomIntegerFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Max:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_RandomIntegerFromStream(arg_stream : S_RandomStream_7b64b757; arg_max : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomIntegerFromStream", "")
     ue_expect_signature(call, "v1;RandomIntegerFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Max:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -7101,6 +7565,7 @@ def ue_math_RandomIntegerFromStream(arg_stream : S_RandomStream_7b64b757; arg_ma
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomIntegerInRange", signature="v1;RandomIntegerInRange;Min:IntProperty:128;Max:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_RandomIntegerInRange(arg_min : int; arg_max : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomIntegerInRange", "")
     ue_expect_signature(call, "v1;RandomIntegerInRange;Min:IntProperty:128;Max:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -7113,6 +7578,7 @@ def ue_math_RandomIntegerInRange(arg_min : int; arg_max : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomIntegerInRangeFromStream", signature="v1;RandomIntegerInRangeFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Min:IntProperty:128;Max:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_RandomIntegerInRangeFromStream(arg_stream : S_RandomStream_7b64b757; arg_min : int; arg_max : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomIntegerInRangeFromStream", "")
     ue_expect_signature(call, "v1;RandomIntegerInRangeFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Min:IntProperty:128;Max:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -7127,6 +7593,7 @@ def ue_math_RandomIntegerInRangeFromStream(arg_stream : S_RandomStream_7b64b757;
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomPointInBoundingBox", signature="v1;RandomPointInBoundingBox;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};HalfSize:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomPointInBoundingBox(arg_center : UEVector; arg_halfsize : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomPointInBoundingBox", "")
     ue_expect_signature(call, "v1;RandomPointInBoundingBox;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};HalfSize:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7139,6 +7606,7 @@ def ue_math_RandomPointInBoundingBox(arg_center : UEVector; arg_halfsize : UEVec
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomPointInBoundingBoxFromStream", signature="v1;RandomPointInBoundingBoxFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};HalfSize:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomPointInBoundingBoxFromStream(arg_stream : S_RandomStream_7b64b757; arg_center : UEVector; arg_halfsize : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomPointInBoundingBoxFromStream", "")
     ue_expect_signature(call, "v1;RandomPointInBoundingBoxFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};HalfSize:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7153,6 +7621,7 @@ def ue_math_RandomPointInBoundingBoxFromStream(arg_stream : S_RandomStream_7b64b
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomPointInBoundingBoxFromStream_Box", signature="v1;RandomPointInBoundingBoxFromStream_Box;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Box:StructProperty:130:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomPointInBoundingBoxFromStream_Box(arg_stream : S_RandomStream_7b64b757; arg_box : S_Box_79dc8c23) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomPointInBoundingBoxFromStream_Box", "")
     ue_expect_signature(call, "v1;RandomPointInBoundingBoxFromStream_Box;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};Box:StructProperty:130:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7168,6 +7637,7 @@ def ue_math_RandomPointInBoundingBoxFromStream_Box(arg_stream : S_RandomStream_7
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomPointInBoundingBox_Box", signature="v1;RandomPointInBoundingBox_Box;Box:StructProperty:130:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomPointInBoundingBox_Box(arg_box : S_Box_79dc8c23) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomPointInBoundingBox_Box", "")
     ue_expect_signature(call, "v1;RandomPointInBoundingBox_Box;Box:StructProperty:130:/Script/CoreUObject.Box\{Min:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};IsValid:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7181,6 +7651,7 @@ def ue_math_RandomPointInBoundingBox_Box(arg_box : S_Box_79dc8c23) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomRotator", signature="v1;RandomRotator;bRoll:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_RandomRotator(arg_broll : bool) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomRotator", "")
     ue_expect_signature(call, "v1;RandomRotator;bRoll:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -7192,6 +7663,7 @@ def ue_math_RandomRotator(arg_broll : bool) : UERotator {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomRotatorFromStream", signature="v1;RandomRotatorFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};bRoll:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_RandomRotatorFromStream(arg_stream : S_RandomStream_7b64b757; arg_broll : bool) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomRotatorFromStream", "")
     ue_expect_signature(call, "v1;RandomRotatorFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};bRoll:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -7205,6 +7677,7 @@ def ue_math_RandomRotatorFromStream(arg_stream : S_RandomStream_7b64b757; arg_br
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomUnitVector", signature="v1;RandomUnitVector;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomUnitVector() : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomUnitVector", "")
     ue_expect_signature(call, "v1;RandomUnitVector;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7215,6 +7688,7 @@ def ue_math_RandomUnitVector() : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomUnitVectorFromStream", signature="v1;RandomUnitVectorFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomUnitVectorFromStream(arg_stream : S_RandomStream_7b64b757) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomUnitVectorFromStream", "")
     ue_expect_signature(call, "v1;RandomUnitVectorFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7227,6 +7701,7 @@ def ue_math_RandomUnitVectorFromStream(arg_stream : S_RandomStream_7b64b757) : U
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomUnitVectorInConeInDegrees", signature="v1;RandomUnitVectorInConeInDegrees;ConeDir:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ConeHalfAngleInDegrees:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomUnitVectorInConeInDegrees(arg_conedir : UEVector; arg_conehalfangleindegrees : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomUnitVectorInConeInDegrees", "")
     ue_expect_signature(call, "v1;RandomUnitVectorInConeInDegrees;ConeDir:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ConeHalfAngleInDegrees:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7239,6 +7714,7 @@ def ue_math_RandomUnitVectorInConeInDegrees(arg_conedir : UEVector; arg_conehalf
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomUnitVectorInConeInDegreesFromStream", signature="v1;RandomUnitVectorInConeInDegreesFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ConeDir:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ConeHalfAngleInDegrees:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomUnitVectorInConeInDegreesFromStream(arg_stream : S_RandomStream_7b64b757; arg_conedir : UEVector; arg_conehalfangleindegrees : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomUnitVectorInConeInDegreesFromStream", "")
     ue_expect_signature(call, "v1;RandomUnitVectorInConeInDegreesFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ConeDir:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ConeHalfAngleInDegrees:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7253,6 +7729,7 @@ def ue_math_RandomUnitVectorInConeInDegreesFromStream(arg_stream : S_RandomStrea
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomUnitVectorInConeInRadians", signature="v1;RandomUnitVectorInConeInRadians;ConeDir:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ConeHalfAngleInRadians:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomUnitVectorInConeInRadians(arg_conedir : UEVector; arg_conehalfangleinradians : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomUnitVectorInConeInRadians", "")
     ue_expect_signature(call, "v1;RandomUnitVectorInConeInRadians;ConeDir:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ConeHalfAngleInRadians:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7265,6 +7742,7 @@ def ue_math_RandomUnitVectorInConeInRadians(arg_conedir : UEVector; arg_conehalf
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomUnitVectorInConeInRadiansFromStream", signature="v1;RandomUnitVectorInConeInRadiansFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ConeDir:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ConeHalfAngleInRadians:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomUnitVectorInConeInRadiansFromStream(arg_stream : S_RandomStream_7b64b757; arg_conedir : UEVector; arg_conehalfangleinradians : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomUnitVectorInConeInRadiansFromStream", "")
     ue_expect_signature(call, "v1;RandomUnitVectorInConeInRadiansFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ConeDir:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ConeHalfAngleInRadians:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7279,6 +7757,7 @@ def ue_math_RandomUnitVectorInConeInRadiansFromStream(arg_stream : S_RandomStrea
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomUnitVectorInEllipticalConeInDegrees", signature="v1;RandomUnitVectorInEllipticalConeInDegrees;ConeDir:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaxYawInDegrees:FloatProperty:128;MaxPitchInDegrees:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomUnitVectorInEllipticalConeInDegrees(arg_conedir : UEVector; arg_maxyawindegrees : float; arg_maxpitchindegrees : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomUnitVectorInEllipticalConeInDegrees", "")
     ue_expect_signature(call, "v1;RandomUnitVectorInEllipticalConeInDegrees;ConeDir:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaxYawInDegrees:FloatProperty:128;MaxPitchInDegrees:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7292,6 +7771,7 @@ def ue_math_RandomUnitVectorInEllipticalConeInDegrees(arg_conedir : UEVector; ar
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomUnitVectorInEllipticalConeInDegreesFromStream", signature="v1;RandomUnitVectorInEllipticalConeInDegreesFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ConeDir:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaxYawInDegrees:FloatProperty:128;MaxPitchInDegrees:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomUnitVectorInEllipticalConeInDegreesFromStream(arg_stream : S_RandomStream_7b64b757; arg_conedir : UEVector; arg_maxyawindegrees : float; arg_maxpitchindegrees : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomUnitVectorInEllipticalConeInDegreesFromStream", "")
     ue_expect_signature(call, "v1;RandomUnitVectorInEllipticalConeInDegreesFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ConeDir:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaxYawInDegrees:FloatProperty:128;MaxPitchInDegrees:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7307,6 +7787,7 @@ def ue_math_RandomUnitVectorInEllipticalConeInDegreesFromStream(arg_stream : S_R
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomUnitVectorInEllipticalConeInRadians", signature="v1;RandomUnitVectorInEllipticalConeInRadians;ConeDir:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaxYawInRadians:FloatProperty:128;MaxPitchInRadians:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomUnitVectorInEllipticalConeInRadians(arg_conedir : UEVector; arg_maxyawinradians : float; arg_maxpitchinradians : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomUnitVectorInEllipticalConeInRadians", "")
     ue_expect_signature(call, "v1;RandomUnitVectorInEllipticalConeInRadians;ConeDir:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaxYawInRadians:FloatProperty:128;MaxPitchInRadians:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7320,6 +7801,7 @@ def ue_math_RandomUnitVectorInEllipticalConeInRadians(arg_conedir : UEVector; ar
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RandomUnitVectorInEllipticalConeInRadiansFromStream", signature="v1;RandomUnitVectorInEllipticalConeInRadiansFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ConeDir:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaxYawInRadians:FloatProperty:128;MaxPitchInRadians:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RandomUnitVectorInEllipticalConeInRadiansFromStream(arg_stream : S_RandomStream_7b64b757; arg_conedir : UEVector; arg_maxyawinradians : float; arg_maxpitchinradians : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RandomUnitVectorInEllipticalConeInRadiansFromStream", "")
     ue_expect_signature(call, "v1;RandomUnitVectorInEllipticalConeInRadiansFromStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};ConeDir:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaxYawInRadians:FloatProperty:128;MaxPitchInRadians:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7335,6 +7817,7 @@ def ue_math_RandomUnitVectorInEllipticalConeInRadiansFromStream(arg_stream : S_R
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ResetRandomStream", signature="v1;ResetRandomStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};")]
 def ue_math_ResetRandomStream(arg_stream : S_RandomStream_7b64b757) {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ResetRandomStream", "")
     ue_expect_signature(call, "v1;ResetRandomStream;Stream:StructProperty:134218114:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};")
@@ -7345,6 +7828,7 @@ def ue_math_ResetRandomStream(arg_stream : S_RandomStream_7b64b757) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RotateAngleAxis", signature="v1;RotateAngleAxis;InVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AngleDeg:FloatProperty:128;Axis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_RotateAngleAxis(arg_invect : UEVector; arg_angledeg : float; arg_axis : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RotateAngleAxis", "")
     ue_expect_signature(call, "v1;RotateAngleAxis;InVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AngleDeg:FloatProperty:128;Axis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7358,6 +7842,7 @@ def ue_math_RotateAngleAxis(arg_invect : UEVector; arg_angledeg : float; arg_axi
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RotatorFromAxisAndAngle", signature="v1;RotatorFromAxisAndAngle;Axis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Angle:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_RotatorFromAxisAndAngle(arg_axis : UEVector; arg_angle : float) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RotatorFromAxisAndAngle", "")
     ue_expect_signature(call, "v1;RotatorFromAxisAndAngle;Axis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Angle:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -7370,6 +7855,7 @@ def ue_math_RotatorFromAxisAndAngle(arg_axis : UEVector; arg_angle : float) : UE
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Round", signature="v1;Round;A:DoubleProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Round(arg_a : double) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Round", "")
     ue_expect_signature(call, "v1;Round;A:DoubleProperty:128;ReturnValue:IntProperty:1408;")
@@ -7381,6 +7867,7 @@ def ue_math_Round(arg_a : double) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SafeDivide", signature="v1;SafeDivide;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_SafeDivide(arg_a : double; arg_b : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SafeDivide", "")
     ue_expect_signature(call, "v1;SafeDivide;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -7393,6 +7880,7 @@ def ue_math_SafeDivide(arg_a : double; arg_b : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SeedRandomStream", signature="v1;SeedRandomStream;Stream:StructProperty:134218112:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};")]
 def ue_math_SeedRandomStream(arg_stream : S_RandomStream_7b64b757) : S_RandomStream_7b64b757 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SeedRandomStream", "")
     ue_expect_signature(call, "v1;SeedRandomStream;Stream:StructProperty:134218112:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};")
@@ -7405,6 +7893,7 @@ def ue_math_SeedRandomStream(arg_stream : S_RandomStream_7b64b757) : S_RandomStr
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectClass", signature="v1;SelectClass;A:ClassProperty:128:meta:/Script/CoreUObject.Object;B:ClassProperty:128:meta:/Script/CoreUObject.Object;bSelectA:BoolProperty:128;ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")]
 def ue_math_SelectClass(arg_a : UEClassHandle; arg_b : UEClassHandle; arg_bselecta : bool) : UEClassHandle {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectClass", "")
     ue_expect_signature(call, "v1;SelectClass;A:ClassProperty:128:meta:/Script/CoreUObject.Object;B:ClassProperty:128:meta:/Script/CoreUObject.Object;bSelectA:BoolProperty:128;ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")
@@ -7418,6 +7907,7 @@ def ue_math_SelectClass(arg_a : UEClassHandle; arg_b : UEClassHandle; arg_bselec
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectColor", signature="v1;SelectColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bPickA:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_SelectColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b; arg_bpicka : bool) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectColor", "")
     ue_expect_signature(call, "v1;SelectColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bPickA:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -7437,6 +7927,7 @@ def ue_math_SelectColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectFloat", signature="v1;SelectFloat;A:DoubleProperty:128;B:DoubleProperty:128;bPickA:BoolProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_SelectFloat(arg_a : double; arg_b : double; arg_bpicka : bool) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectFloat", "")
     ue_expect_signature(call, "v1;SelectFloat;A:DoubleProperty:128;B:DoubleProperty:128;bPickA:BoolProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -7450,6 +7941,7 @@ def ue_math_SelectFloat(arg_a : double; arg_b : double; arg_bpicka : bool) : dou
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectInt", signature="v1;SelectInt;A:IntProperty:128;B:IntProperty:128;bPickA:BoolProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_SelectInt(arg_a : int; arg_b : int; arg_bpicka : bool) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectInt", "")
     ue_expect_signature(call, "v1;SelectInt;A:IntProperty:128;B:IntProperty:128;bPickA:BoolProperty:128;ReturnValue:IntProperty:1408;")
@@ -7463,6 +7955,7 @@ def ue_math_SelectInt(arg_a : int; arg_b : int; arg_bpicka : bool) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectName", signature="v1;SelectName;A:NameProperty:130;B:NameProperty:130;bPickA:BoolProperty:128;ReturnValue:NameProperty:1408;")]
 def ue_math_SelectName(arg_a : UEName; arg_b : UEName; arg_bpicka : bool) : UEName {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectName", "")
     ue_expect_signature(call, "v1;SelectName;A:NameProperty:130;B:NameProperty:130;bPickA:BoolProperty:128;ReturnValue:NameProperty:1408;")
@@ -7476,6 +7969,7 @@ def ue_math_SelectName(arg_a : UEName; arg_b : UEName; arg_bpicka : bool) : UENa
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectObject", signature="v1;SelectObject;A:ObjectProperty:128:/Script/CoreUObject.Object;B:ObjectProperty:128:/Script/CoreUObject.Object;bSelectA:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")]
 def ue_math_SelectObject(arg_a : C_Object_55c3753a; arg_b : C_Object_55c3753a; arg_bselecta : bool) : C_Object_55c3753a {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectObject", "")
     ue_expect_signature(call, "v1;SelectObject;A:ObjectProperty:128:/Script/CoreUObject.Object;B:ObjectProperty:128:/Script/CoreUObject.Object;bSelectA:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")
@@ -7489,6 +7983,7 @@ def ue_math_SelectObject(arg_a : C_Object_55c3753a; arg_b : C_Object_55c3753a; a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectRotator", signature="v1;SelectRotator;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};bPickA:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_SelectRotator(arg_a : UERotator; arg_b : UERotator; arg_bpicka : bool) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectRotator", "")
     ue_expect_signature(call, "v1;SelectRotator;A:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};bPickA:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -7502,6 +7997,7 @@ def ue_math_SelectRotator(arg_a : UERotator; arg_b : UERotator; arg_bpicka : boo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectString", signature="v1;SelectString;A:StrProperty:128;B:StrProperty:128;bPickA:BoolProperty:128;ReturnValue:StrProperty:1408;")]
 def ue_math_SelectString(arg_a : string; arg_b : string; arg_bpicka : bool) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectString", "")
     ue_expect_signature(call, "v1;SelectString;A:StrProperty:128;B:StrProperty:128;bPickA:BoolProperty:128;ReturnValue:StrProperty:1408;")
@@ -7515,6 +8011,7 @@ def ue_math_SelectString(arg_a : string; arg_b : string; arg_bpicka : bool) : st
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectText", signature="v1;SelectText;A:TextProperty:130;B:TextProperty:130;bPickA:BoolProperty:128;ReturnValue:TextProperty:1408;")]
 def ue_math_SelectText(arg_a : UETextValue; arg_b : UETextValue; arg_bpicka : bool) : UETextValue {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectText", "")
     ue_expect_signature(call, "v1;SelectText;A:TextProperty:130;B:TextProperty:130;bPickA:BoolProperty:128;ReturnValue:TextProperty:1408;")
@@ -7528,6 +8025,7 @@ def ue_math_SelectText(arg_a : UETextValue; arg_b : UETextValue; arg_bpicka : bo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectTransform", signature="v1;SelectTransform;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};bPickA:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_SelectTransform(arg_a : UETransform; arg_b : UETransform; arg_bpicka : bool) : UETransform {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectTransform", "")
     ue_expect_signature(call, "v1;SelectTransform;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};bPickA:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -7541,6 +8039,7 @@ def ue_math_SelectTransform(arg_a : UETransform; arg_b : UETransform; arg_bpicka
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectVector", signature="v1;SelectVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};bPickA:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_SelectVector(arg_a : UEVector; arg_b : UEVector; arg_bpicka : bool) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectVector", "")
     ue_expect_signature(call, "v1;SelectVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};bPickA:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7554,6 +8053,7 @@ def ue_math_SelectVector(arg_a : UEVector; arg_b : UEVector; arg_bpicka : bool) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Set2D", signature="v1;Set2D;A:StructProperty:134218112:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};X:DoubleProperty:128;Y:DoubleProperty:128;")]
 def ue_math_Set2D(arg_a : UEVector2D; arg_x : double; arg_y : double) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Set2D", "")
     ue_expect_signature(call, "v1;Set2D;A:StructProperty:134218112:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};X:DoubleProperty:128;Y:DoubleProperty:128;")
@@ -7567,6 +8067,7 @@ def ue_math_Set2D(arg_a : UEVector2D; arg_x : double; arg_y : double) : UEVector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SetRandomStreamSeed", signature="v1;SetRandomStreamSeed;Stream:StructProperty:134218112:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};NewSeed:IntProperty:128;")]
 def ue_math_SetRandomStreamSeed(arg_stream : S_RandomStream_7b64b757; arg_newseed : int) : S_RandomStream_7b64b757 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SetRandomStreamSeed", "")
     ue_expect_signature(call, "v1;SetRandomStreamSeed;Stream:StructProperty:134218112:/Script/CoreUObject.RandomStream\{InitialSeed:IntProperty:0;Seed:IntProperty:0;\};NewSeed:IntProperty:128;")
@@ -7580,6 +8081,7 @@ def ue_math_SetRandomStreamSeed(arg_stream : S_RandomStream_7b64b757; arg_newsee
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SignOfFloat", signature="v1;SignOfFloat;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_SignOfFloat(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SignOfFloat", "")
     ue_expect_signature(call, "v1;SignOfFloat;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -7591,6 +8093,7 @@ def ue_math_SignOfFloat(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SignOfInteger", signature="v1;SignOfInteger;A:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_SignOfInteger(arg_a : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SignOfInteger", "")
     ue_expect_signature(call, "v1;SignOfInteger;A:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -7602,6 +8105,7 @@ def ue_math_SignOfInteger(arg_a : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Sin", signature="v1;Sin;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Sin(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Sin", "")
     ue_expect_signature(call, "v1;Sin;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -7613,6 +8117,7 @@ def ue_math_Sin(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Spherical2DToUnitCartesian", signature="v1;Spherical2DToUnitCartesian;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Spherical2DToUnitCartesian(arg_a : UEVector2D) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Spherical2DToUnitCartesian", "")
     ue_expect_signature(call, "v1;Spherical2DToUnitCartesian;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7624,6 +8129,7 @@ def ue_math_Spherical2DToUnitCartesian(arg_a : UEVector2D) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Sqrt", signature="v1;Sqrt;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Sqrt(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Sqrt", "")
     ue_expect_signature(call, "v1;Sqrt;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -7635,6 +8141,7 @@ def ue_math_Sqrt(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Square", signature="v1;Square;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Square(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Square", "")
     ue_expect_signature(call, "v1;Square;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -7646,6 +8153,7 @@ def ue_math_Square(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_ByteByte", signature="v1;Subtract_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")]
 def ue_math_Subtract_ByteByte(arg_a : uint8; arg_b : uint8) : uint8 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_ByteByte", "")
     ue_expect_signature(call, "v1;Subtract_ByteByte;A:ByteProperty:128;B:ByteProperty:128;ReturnValue:ByteProperty:1408;")
@@ -7658,6 +8166,7 @@ def ue_math_Subtract_ByteByte(arg_a : uint8; arg_b : uint8) : uint8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_DoubleDouble", signature="v1;Subtract_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Subtract_DoubleDouble(arg_a : double; arg_b : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_DoubleDouble", "")
     ue_expect_signature(call, "v1;Subtract_DoubleDouble;A:DoubleProperty:128;B:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -7670,6 +8179,7 @@ def ue_math_Subtract_DoubleDouble(arg_a : double; arg_b : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_IntInt", signature="v1;Subtract_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Subtract_IntInt(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_IntInt", "")
     ue_expect_signature(call, "v1;Subtract_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -7682,6 +8192,7 @@ def ue_math_Subtract_IntInt(arg_a : int; arg_b : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_IntPointInt", signature="v1;Subtract_IntPointInt;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Subtract_IntPointInt(arg_a : S_IntPoint_cb05a38b; arg_b : int) : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_IntPointInt", "")
     ue_expect_signature(call, "v1;Subtract_IntPointInt;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -7695,6 +8206,7 @@ def ue_math_Subtract_IntPointInt(arg_a : S_IntPoint_cb05a38b; arg_b : int) : S_I
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_IntPointIntPoint", signature="v1;Subtract_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")]
 def ue_math_Subtract_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPoint_cb05a38b) : S_IntPoint_cb05a38b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_IntPointIntPoint", "")
     ue_expect_signature(call, "v1;Subtract_IntPointIntPoint;A:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};B:StructProperty:128:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};")
@@ -7709,6 +8221,7 @@ def ue_math_Subtract_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_Int
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_LinearColorLinearColor", signature="v1;Subtract_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_math_Subtract_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;Subtract_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -7727,6 +8240,7 @@ def ue_math_Subtract_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_QuatQuat", signature="v1;Subtract_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Subtract_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Quat_82f9549e {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_QuatQuat", "")
     ue_expect_signature(call, "v1;Subtract_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -7745,6 +8259,7 @@ def ue_math_Subtract_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_Vector2DFloat", signature="v1;Subtract_Vector2DFloat;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Subtract_Vector2DFloat(arg_a : UEVector2D; arg_b : double) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_Vector2DFloat", "")
     ue_expect_signature(call, "v1;Subtract_Vector2DFloat;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -7757,6 +8272,7 @@ def ue_math_Subtract_Vector2DFloat(arg_a : UEVector2D; arg_b : double) : UEVecto
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_Vector2DVector2D", signature="v1;Subtract_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Subtract_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_Vector2DVector2D", "")
     ue_expect_signature(call, "v1;Subtract_Vector2DVector2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -7769,6 +8285,7 @@ def ue_math_Subtract_Vector2DVector2D(arg_a : UEVector2D; arg_b : UEVector2D) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_Vector4Vector4", signature="v1;Subtract_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Subtract_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_Vector4Vector4", "")
     ue_expect_signature(call, "v1;Subtract_Vector4Vector4;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -7787,6 +8304,7 @@ def ue_math_Subtract_Vector4Vector4(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_VectorFloat", signature="v1;Subtract_VectorFloat;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Subtract_VectorFloat(arg_a : UEVector; arg_b : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_VectorFloat", "")
     ue_expect_signature(call, "v1;Subtract_VectorFloat;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7799,6 +8317,7 @@ def ue_math_Subtract_VectorFloat(arg_a : UEVector; arg_b : double) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_VectorInt", signature="v1;Subtract_VectorInt;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Subtract_VectorInt(arg_a : UEVector; arg_b : int) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_VectorInt", "")
     ue_expect_signature(call, "v1;Subtract_VectorInt;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:IntProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7811,6 +8330,7 @@ def ue_math_Subtract_VectorInt(arg_a : UEVector; arg_b : int) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_VectorVector", signature="v1;Subtract_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Subtract_VectorVector(arg_a : UEVector; arg_b : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_VectorVector", "")
     ue_expect_signature(call, "v1;Subtract_VectorVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7823,6 +8343,7 @@ def ue_math_Subtract_VectorVector(arg_a : UEVector; arg_b : UEVector) : UEVector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="TInterpTo", signature="v1;TInterpTo;Current:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Target:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_TInterpTo(arg_current : UETransform; arg_target : UETransform; arg_deltatime : float; arg_interpspeed : float) : UETransform {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "TInterpTo", "")
     ue_expect_signature(call, "v1;TInterpTo;Current:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Target:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -7837,6 +8358,7 @@ def ue_math_TInterpTo(arg_current : UETransform; arg_target : UETransform; arg_d
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="TLerp", signature="v1;TLerp;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Alpha:FloatProperty:128;InterpMode:ByteProperty:128:/Script/Engine.ELerpInterpolationMode;ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")]
 def ue_math_TLerp(arg_a : UETransform; arg_b : UETransform; arg_alpha : float; arg_interpmode : E_ELerpInterpolationMode_bcd99fa2) : UETransform {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "TLerp", "")
     ue_expect_signature(call, "v1;TLerp;A:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};B:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Alpha:FloatProperty:128;InterpMode:ByteProperty:128:/Script/Engine.ELerpInterpolationMode;ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};")
@@ -7851,6 +8373,7 @@ def ue_math_TLerp(arg_a : UETransform; arg_b : UETransform; arg_alpha : float; a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Tan", signature="v1;Tan;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_math_Tan(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Tan", "")
     ue_expect_signature(call, "v1;Tan;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -7867,6 +8390,7 @@ struct ue_math_ToDirectionAndLength2D_Result {
     out_outlength : double
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ToDirectionAndLength2D", signature="v1;ToDirectionAndLength2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};OutDir:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};OutLength:DoubleProperty:384;")]
 def ue_math_ToDirectionAndLength2D(arg_a : UEVector2D) : ue_math_ToDirectionAndLength2D_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ToDirectionAndLength2D", "")
     ue_expect_signature(call, "v1;ToDirectionAndLength2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};OutDir:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};OutLength:DoubleProperty:384;")
@@ -7878,6 +8402,7 @@ def ue_math_ToDirectionAndLength2D(arg_a : UEVector2D) : ue_math_ToDirectionAndL
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ToHex_LinearColor", signature="v1;ToHex_LinearColor;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StrProperty:1408;")]
 def ue_math_ToHex_LinearColor(arg_incolor : S_LinearColor_f4abb14b) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ToHex_LinearColor", "")
     ue_expect_signature(call, "v1;ToHex_LinearColor;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StrProperty:1408;")
@@ -7892,6 +8417,7 @@ def ue_math_ToHex_LinearColor(arg_incolor : S_LinearColor_f4abb14b) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ToRounded2D", signature="v1;ToRounded2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_ToRounded2D(arg_a : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ToRounded2D", "")
     ue_expect_signature(call, "v1;ToRounded2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -7903,6 +8429,7 @@ def ue_math_ToRounded2D(arg_a : UEVector2D) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ToSign2D", signature="v1;ToSign2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_ToSign2D(arg_a : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ToSign2D", "")
     ue_expect_signature(call, "v1;ToSign2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -7914,6 +8441,7 @@ def ue_math_ToSign2D(arg_a : UEVector2D) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="TransformDirection", signature="v1;TransformDirection;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Direction:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_TransformDirection(arg_t : UETransform; arg_direction : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "TransformDirection", "")
     ue_expect_signature(call, "v1;TransformDirection;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Direction:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7926,6 +8454,7 @@ def ue_math_TransformDirection(arg_t : UETransform; arg_direction : UEVector) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="TransformLocation", signature="v1;TransformLocation;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_TransformLocation(arg_t : UETransform; arg_location : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "TransformLocation", "")
     ue_expect_signature(call, "v1;TransformLocation;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -7938,6 +8467,7 @@ def ue_math_TransformLocation(arg_t : UETransform; arg_location : UEVector) : UE
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="TransformRotation", signature="v1;TransformRotation;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_TransformRotation(arg_t : UETransform; arg_rotation : UERotator) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "TransformRotation", "")
     ue_expect_signature(call, "v1;TransformRotation;T:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -7950,6 +8480,7 @@ def ue_math_TransformRotation(arg_t : UETransform; arg_rotation : UERotator) : U
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="TransformVector4", signature="v1;TransformVector4;Matrix:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Vec4:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_TransformVector4(arg_matrix : S_Matrix_c85cbab4; arg_vec4 : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "TransformVector4", "")
     ue_expect_signature(call, "v1;TransformVector4;Matrix:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};Vec4:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -7980,6 +8511,7 @@ def ue_math_TransformVector4(arg_matrix : S_Matrix_c85cbab4; arg_vec4 : S_Vector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Transform_Determinant", signature="v1;Transform_Determinant;Transform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:FloatProperty:1408;")]
 def ue_math_Transform_Determinant(arg_transform : UETransform) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Transform_Determinant", "")
     ue_expect_signature(call, "v1;Transform_Determinant;Transform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:FloatProperty:1408;")
@@ -7991,6 +8523,7 @@ def ue_math_Transform_Determinant(arg_transform : UETransform) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="VInterpTo", signature="v1;VInterpTo;Current:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_VInterpTo(arg_current : UEVector; arg_target : UEVector; arg_deltatime : float; arg_interpspeed : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "VInterpTo", "")
     ue_expect_signature(call, "v1;VInterpTo;Current:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8005,6 +8538,7 @@ def ue_math_VInterpTo(arg_current : UEVector; arg_target : UEVector; arg_deltati
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="VInterpTo_Constant", signature="v1;VInterpTo_Constant;Current:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_VInterpTo_Constant(arg_current : UEVector; arg_target : UEVector; arg_deltatime : float; arg_interpspeed : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "VInterpTo_Constant", "")
     ue_expect_signature(call, "v1;VInterpTo_Constant;Current:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8019,6 +8553,7 @@ def ue_math_VInterpTo_Constant(arg_current : UEVector; arg_target : UEVector; ar
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="VLerp", signature="v1;VLerp;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Alpha:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_VLerp(arg_a : UEVector; arg_b : UEVector; arg_alpha : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "VLerp", "")
     ue_expect_signature(call, "v1;VLerp;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Alpha:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8032,6 +8567,7 @@ def ue_math_VLerp(arg_a : UEVector; arg_b : UEVector; arg_alpha : float) : UEVec
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="VSize", signature="v1;VSize;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_VSize(arg_a : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "VSize", "")
     ue_expect_signature(call, "v1;VSize;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8043,6 +8579,7 @@ def ue_math_VSize(arg_a : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="VSize2D", signature="v1;VSize2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_VSize2D(arg_a : UEVector2D) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "VSize2D", "")
     ue_expect_signature(call, "v1;VSize2D;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8054,6 +8591,7 @@ def ue_math_VSize2D(arg_a : UEVector2D) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="VSize2DSquared", signature="v1;VSize2DSquared;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_VSize2DSquared(arg_a : UEVector2D) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "VSize2DSquared", "")
     ue_expect_signature(call, "v1;VSize2DSquared;A:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8065,6 +8603,7 @@ def ue_math_VSize2DSquared(arg_a : UEVector2D) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="VSizeSquared", signature="v1;VSizeSquared;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_VSizeSquared(arg_a : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "VSizeSquared", "")
     ue_expect_signature(call, "v1;VSizeSquared;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8076,6 +8615,7 @@ def ue_math_VSizeSquared(arg_a : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="VSizeXY", signature="v1;VSizeXY;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_VSizeXY(arg_a : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "VSizeXY", "")
     ue_expect_signature(call, "v1;VSizeXY;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8087,6 +8627,7 @@ def ue_math_VSizeXY(arg_a : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="VSizeXYSquared", signature="v1;VSizeXYSquared;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_VSizeXYSquared(arg_a : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "VSizeXYSquared", "")
     ue_expect_signature(call, "v1;VSizeXYSquared;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8098,6 +8639,7 @@ def ue_math_VSizeXYSquared(arg_a : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector2DInterpTo", signature="v1;Vector2DInterpTo;Current:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Vector2DInterpTo(arg_current : UEVector2D; arg_target : UEVector2D; arg_deltatime : float; arg_interpspeed : float) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector2DInterpTo", "")
     ue_expect_signature(call, "v1;Vector2DInterpTo;Current:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -8112,6 +8654,7 @@ def ue_math_Vector2DInterpTo(arg_current : UEVector2D; arg_target : UEVector2D; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector2DInterpTo_Constant", signature="v1;Vector2DInterpTo_Constant;Current:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Vector2DInterpTo_Constant(arg_current : UEVector2D; arg_target : UEVector2D; arg_deltatime : float; arg_interpspeed : float) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector2DInterpTo_Constant", "")
     ue_expect_signature(call, "v1;Vector2DInterpTo_Constant;Current:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -8126,6 +8669,7 @@ def ue_math_Vector2DInterpTo_Constant(arg_current : UEVector2D; arg_target : UEV
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector2D_One", signature="v1;Vector2D_One;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Vector2D_One() : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector2D_One", "")
     ue_expect_signature(call, "v1;Vector2D_One;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -8136,6 +8680,7 @@ def ue_math_Vector2D_One() : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector2D_Unit45Deg", signature="v1;Vector2D_Unit45Deg;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Vector2D_Unit45Deg() : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector2D_Unit45Deg", "")
     ue_expect_signature(call, "v1;Vector2D_Unit45Deg;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -8146,6 +8691,7 @@ def ue_math_Vector2D_Unit45Deg() : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector2D_Zero", signature="v1;Vector2D_Zero;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Vector2D_Zero() : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector2D_Zero", "")
     ue_expect_signature(call, "v1;Vector2D_Zero;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -8156,6 +8702,7 @@ def ue_math_Vector2D_Zero() : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_Assign", signature="v1;Vector4_Assign;A:StructProperty:134218112:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};InVector:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Vector4_Assign(arg_a : S_Vector4_420fe7b1; arg_invector : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_Assign", "")
     ue_expect_signature(call, "v1;Vector4_Assign;A:StructProperty:134218112:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};InVector:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -8174,6 +8721,7 @@ def ue_math_Vector4_Assign(arg_a : S_Vector4_420fe7b1; arg_invector : S_Vector4_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_CrossProduct3", signature="v1;Vector4_CrossProduct3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Vector4_CrossProduct3(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_CrossProduct3", "")
     ue_expect_signature(call, "v1;Vector4_CrossProduct3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -8192,6 +8740,7 @@ def ue_math_Vector4_CrossProduct3(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_DotProduct", signature="v1;Vector4_DotProduct;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector4_DotProduct(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_DotProduct", "")
     ue_expect_signature(call, "v1;Vector4_DotProduct;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8210,6 +8759,7 @@ def ue_math_Vector4_DotProduct(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_DotProduct3", signature="v1;Vector4_DotProduct3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector4_DotProduct3(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_420fe7b1) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_DotProduct3", "")
     ue_expect_signature(call, "v1;Vector4_DotProduct3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8228,6 +8778,7 @@ def ue_math_Vector4_DotProduct3(arg_a : S_Vector4_420fe7b1; arg_b : S_Vector4_42
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_IsNAN", signature="v1;Vector4_IsNAN;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector4_IsNAN(arg_a : S_Vector4_420fe7b1) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_IsNAN", "")
     ue_expect_signature(call, "v1;Vector4_IsNAN;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -8242,6 +8793,7 @@ def ue_math_Vector4_IsNAN(arg_a : S_Vector4_420fe7b1) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_IsNearlyZero3", signature="v1;Vector4_IsNearlyZero3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector4_IsNearlyZero3(arg_a : S_Vector4_420fe7b1; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_IsNearlyZero3", "")
     ue_expect_signature(call, "v1;Vector4_IsNearlyZero3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -8257,6 +8809,7 @@ def ue_math_Vector4_IsNearlyZero3(arg_a : S_Vector4_420fe7b1; arg_tolerance : fl
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_IsNormal3", signature="v1;Vector4_IsNormal3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector4_IsNormal3(arg_a : S_Vector4_420fe7b1) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_IsNormal3", "")
     ue_expect_signature(call, "v1;Vector4_IsNormal3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -8271,6 +8824,7 @@ def ue_math_Vector4_IsNormal3(arg_a : S_Vector4_420fe7b1) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_IsUnit3", signature="v1;Vector4_IsUnit3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};SquaredLenthTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector4_IsUnit3(arg_a : S_Vector4_420fe7b1; arg_squaredlenthtolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_IsUnit3", "")
     ue_expect_signature(call, "v1;Vector4_IsUnit3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};SquaredLenthTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -8286,6 +8840,7 @@ def ue_math_Vector4_IsUnit3(arg_a : S_Vector4_420fe7b1; arg_squaredlenthtoleranc
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_IsZero", signature="v1;Vector4_IsZero;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector4_IsZero(arg_a : S_Vector4_420fe7b1) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_IsZero", "")
     ue_expect_signature(call, "v1;Vector4_IsZero;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -8300,6 +8855,7 @@ def ue_math_Vector4_IsZero(arg_a : S_Vector4_420fe7b1) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_MirrorByVector3", signature="v1;Vector4_MirrorByVector3;Direction:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};SurfaceNormal:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Vector4_MirrorByVector3(arg_direction : S_Vector4_420fe7b1; arg_surfacenormal : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_MirrorByVector3", "")
     ue_expect_signature(call, "v1;Vector4_MirrorByVector3;Direction:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};SurfaceNormal:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -8318,6 +8874,7 @@ def ue_math_Vector4_MirrorByVector3(arg_direction : S_Vector4_420fe7b1; arg_surf
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_Negated", signature="v1;Vector4_Negated;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Vector4_Negated(arg_a : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_Negated", "")
     ue_expect_signature(call, "v1;Vector4_Negated;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -8332,6 +8889,7 @@ def ue_math_Vector4_Negated(arg_a : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_Normal3", signature="v1;Vector4_Normal3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Vector4_Normal3(arg_a : S_Vector4_420fe7b1; arg_tolerance : float) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_Normal3", "")
     ue_expect_signature(call, "v1;Vector4_Normal3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -8347,6 +8905,7 @@ def ue_math_Vector4_Normal3(arg_a : S_Vector4_420fe7b1; arg_tolerance : float) :
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_NormalUnsafe3", signature="v1;Vector4_NormalUnsafe3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Vector4_NormalUnsafe3(arg_a : S_Vector4_420fe7b1) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_NormalUnsafe3", "")
     ue_expect_signature(call, "v1;Vector4_NormalUnsafe3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -8361,6 +8920,7 @@ def ue_math_Vector4_NormalUnsafe3(arg_a : S_Vector4_420fe7b1) : S_Vector4_420fe7
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_Normalize3", signature="v1;Vector4_Normalize3;A:StructProperty:134218112:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;")]
 def ue_math_Vector4_Normalize3(arg_a : S_Vector4_420fe7b1; arg_tolerance : float) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_Normalize3", "")
     ue_expect_signature(call, "v1;Vector4_Normalize3;A:StructProperty:134218112:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;")
@@ -8376,6 +8936,7 @@ def ue_math_Vector4_Normalize3(arg_a : S_Vector4_420fe7b1; arg_tolerance : float
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_Set", signature="v1;Vector4_Set;A:StructProperty:134218112:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;W:DoubleProperty:128;")]
 def ue_math_Vector4_Set(arg_a : S_Vector4_420fe7b1; arg_x : double; arg_y : double; arg_z : double; arg_w : double) : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_Set", "")
     ue_expect_signature(call, "v1;Vector4_Set;A:StructProperty:134218112:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;W:DoubleProperty:128;")
@@ -8394,6 +8955,7 @@ def ue_math_Vector4_Set(arg_a : S_Vector4_420fe7b1; arg_x : double; arg_y : doub
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_Size", signature="v1;Vector4_Size;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector4_Size(arg_a : S_Vector4_420fe7b1) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_Size", "")
     ue_expect_signature(call, "v1;Vector4_Size;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8408,6 +8970,7 @@ def ue_math_Vector4_Size(arg_a : S_Vector4_420fe7b1) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_Size3", signature="v1;Vector4_Size3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector4_Size3(arg_a : S_Vector4_420fe7b1) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_Size3", "")
     ue_expect_signature(call, "v1;Vector4_Size3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8422,6 +8985,7 @@ def ue_math_Vector4_Size3(arg_a : S_Vector4_420fe7b1) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_SizeSquared", signature="v1;Vector4_SizeSquared;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector4_SizeSquared(arg_a : S_Vector4_420fe7b1) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_SizeSquared", "")
     ue_expect_signature(call, "v1;Vector4_SizeSquared;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8436,6 +9000,7 @@ def ue_math_Vector4_SizeSquared(arg_a : S_Vector4_420fe7b1) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_SizeSquared3", signature="v1;Vector4_SizeSquared3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector4_SizeSquared3(arg_a : S_Vector4_420fe7b1) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_SizeSquared3", "")
     ue_expect_signature(call, "v1;Vector4_SizeSquared3;A:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8450,6 +9015,7 @@ def ue_math_Vector4_SizeSquared3(arg_a : S_Vector4_420fe7b1) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector4_Zero", signature="v1;Vector4_Zero;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_math_Vector4_Zero() : S_Vector4_420fe7b1 {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector4_Zero", "")
     ue_expect_signature(call, "v1;Vector4_Zero;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -8460,6 +9026,7 @@ def ue_math_Vector4_Zero() : S_Vector4_420fe7b1 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_AddBounded", signature="v1;Vector_AddBounded;A:StructProperty:134218112:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InAddVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InRadius:FloatProperty:128;")]
 def ue_math_Vector_AddBounded(arg_a : UEVector; arg_inaddvect : UEVector; arg_inradius : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_AddBounded", "")
     ue_expect_signature(call, "v1;Vector_AddBounded;A:StructProperty:134218112:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InAddVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InRadius:FloatProperty:128;")
@@ -8473,6 +9040,7 @@ def ue_math_Vector_AddBounded(arg_a : UEVector; arg_inaddvect : UEVector; arg_in
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Assign", signature="v1;Vector_Assign;A:StructProperty:134218112:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InVector:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_Assign(arg_a : UEVector; arg_invector : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Assign", "")
     ue_expect_signature(call, "v1;Vector_Assign;A:StructProperty:134218112:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InVector:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8485,6 +9053,7 @@ def ue_math_Vector_Assign(arg_a : UEVector; arg_invector : UEVector) : UEVector 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Backward", signature="v1;Vector_Backward;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_Backward() : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Backward", "")
     ue_expect_signature(call, "v1;Vector_Backward;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8495,6 +9064,7 @@ def ue_math_Vector_Backward() : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_BoundedToBox", signature="v1;Vector_BoundedToBox;InVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InBoxMin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InBoxMax:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_BoundedToBox(arg_invect : UEVector; arg_inboxmin : UEVector; arg_inboxmax : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_BoundedToBox", "")
     ue_expect_signature(call, "v1;Vector_BoundedToBox;InVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InBoxMin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InBoxMax:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8508,6 +9078,7 @@ def ue_math_Vector_BoundedToBox(arg_invect : UEVector; arg_inboxmin : UEVector; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_BoundedToCube", signature="v1;Vector_BoundedToCube;InVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InRadius:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_BoundedToCube(arg_invect : UEVector; arg_inradius : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_BoundedToCube", "")
     ue_expect_signature(call, "v1;Vector_BoundedToCube;InVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InRadius:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8520,6 +9091,7 @@ def ue_math_Vector_BoundedToCube(arg_invect : UEVector; arg_inradius : float) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_ClampSize2D", signature="v1;Vector_ClampSize2D;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Min:DoubleProperty:128;Max:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_ClampSize2D(arg_a : UEVector; arg_min : double; arg_max : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_ClampSize2D", "")
     ue_expect_signature(call, "v1;Vector_ClampSize2D;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Min:DoubleProperty:128;Max:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8533,6 +9105,7 @@ def ue_math_Vector_ClampSize2D(arg_a : UEVector; arg_min : double; arg_max : dou
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_ClampSizeMax", signature="v1;Vector_ClampSizeMax;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_ClampSizeMax(arg_a : UEVector; arg_max : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_ClampSizeMax", "")
     ue_expect_signature(call, "v1;Vector_ClampSizeMax;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8545,6 +9118,7 @@ def ue_math_Vector_ClampSizeMax(arg_a : UEVector; arg_max : double) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_ClampSizeMax2D", signature="v1;Vector_ClampSizeMax2D;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_ClampSizeMax2D(arg_a : UEVector; arg_max : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_ClampSizeMax2D", "")
     ue_expect_signature(call, "v1;Vector_ClampSizeMax2D;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Max:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8557,6 +9131,7 @@ def ue_math_Vector_ClampSizeMax2D(arg_a : UEVector; arg_max : double) : UEVector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_ComponentMax", signature="v1;Vector_ComponentMax;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_ComponentMax(arg_a : UEVector; arg_b : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_ComponentMax", "")
     ue_expect_signature(call, "v1;Vector_ComponentMax;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8569,6 +9144,7 @@ def ue_math_Vector_ComponentMax(arg_a : UEVector; arg_b : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_ComponentMin", signature="v1;Vector_ComponentMin;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_ComponentMin(arg_a : UEVector; arg_b : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_ComponentMin", "")
     ue_expect_signature(call, "v1;Vector_ComponentMin;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8581,6 +9157,7 @@ def ue_math_Vector_ComponentMin(arg_a : UEVector; arg_b : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_CosineAngle2D", signature="v1;Vector_CosineAngle2D;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector_CosineAngle2D(arg_a : UEVector; arg_b : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_CosineAngle2D", "")
     ue_expect_signature(call, "v1;Vector_CosineAngle2D;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};B:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8593,6 +9170,7 @@ def ue_math_Vector_CosineAngle2D(arg_a : UEVector; arg_b : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Distance", signature="v1;Vector_Distance;V1:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector_Distance(arg_v1 : UEVector; arg_v2 : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Distance", "")
     ue_expect_signature(call, "v1;Vector_Distance;V1:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8605,6 +9183,7 @@ def ue_math_Vector_Distance(arg_v1 : UEVector; arg_v2 : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Distance2D", signature="v1;Vector_Distance2D;V1:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector_Distance2D(arg_v1 : UEVector; arg_v2 : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Distance2D", "")
     ue_expect_signature(call, "v1;Vector_Distance2D;V1:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8617,6 +9196,7 @@ def ue_math_Vector_Distance2D(arg_v1 : UEVector; arg_v2 : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Distance2DSquared", signature="v1;Vector_Distance2DSquared;V1:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector_Distance2DSquared(arg_v1 : UEVector; arg_v2 : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Distance2DSquared", "")
     ue_expect_signature(call, "v1;Vector_Distance2DSquared;V1:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8629,6 +9209,7 @@ def ue_math_Vector_Distance2DSquared(arg_v1 : UEVector; arg_v2 : UEVector) : dou
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_DistanceSquared", signature="v1;Vector_DistanceSquared;V1:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector_DistanceSquared(arg_v1 : UEVector; arg_v2 : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_DistanceSquared", "")
     ue_expect_signature(call, "v1;Vector_DistanceSquared;V1:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};V2:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8641,6 +9222,7 @@ def ue_math_Vector_DistanceSquared(arg_v1 : UEVector; arg_v2 : UEVector) : doubl
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Down", signature="v1;Vector_Down;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_Down() : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Down", "")
     ue_expect_signature(call, "v1;Vector_Down;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8651,6 +9233,7 @@ def ue_math_Vector_Down() : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Forward", signature="v1;Vector_Forward;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_Forward() : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Forward", "")
     ue_expect_signature(call, "v1;Vector_Forward;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8661,6 +9244,7 @@ def ue_math_Vector_Forward() : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_GetAbs", signature="v1;Vector_GetAbs;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_GetAbs(arg_a : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_GetAbs", "")
     ue_expect_signature(call, "v1;Vector_GetAbs;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8672,6 +9256,7 @@ def ue_math_Vector_GetAbs(arg_a : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_GetAbsMax", signature="v1;Vector_GetAbsMax;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector_GetAbsMax(arg_a : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_GetAbsMax", "")
     ue_expect_signature(call, "v1;Vector_GetAbsMax;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8683,6 +9268,7 @@ def ue_math_Vector_GetAbsMax(arg_a : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_GetAbsMin", signature="v1;Vector_GetAbsMin;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector_GetAbsMin(arg_a : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_GetAbsMin", "")
     ue_expect_signature(call, "v1;Vector_GetAbsMin;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8694,6 +9280,7 @@ def ue_math_Vector_GetAbsMin(arg_a : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_GetProjection", signature="v1;Vector_GetProjection;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_GetProjection(arg_a : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_GetProjection", "")
     ue_expect_signature(call, "v1;Vector_GetProjection;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8705,6 +9292,7 @@ def ue_math_Vector_GetProjection(arg_a : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_GetSignVector", signature="v1;Vector_GetSignVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_GetSignVector(arg_a : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_GetSignVector", "")
     ue_expect_signature(call, "v1;Vector_GetSignVector;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8716,6 +9304,7 @@ def ue_math_Vector_GetSignVector(arg_a : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_HeadingAngle", signature="v1;Vector_HeadingAngle;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")]
 def ue_math_Vector_HeadingAngle(arg_a : UEVector) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_HeadingAngle", "")
     ue_expect_signature(call, "v1;Vector_HeadingAngle;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:DoubleProperty:1408;")
@@ -8727,6 +9316,7 @@ def ue_math_Vector_HeadingAngle(arg_a : UEVector) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_IsNAN", signature="v1;Vector_IsNAN;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector_IsNAN(arg_a : UEVector) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_IsNAN", "")
     ue_expect_signature(call, "v1;Vector_IsNAN;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -8738,6 +9328,7 @@ def ue_math_Vector_IsNAN(arg_a : UEVector) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_IsNearlyZero", signature="v1;Vector_IsNearlyZero;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector_IsNearlyZero(arg_a : UEVector; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_IsNearlyZero", "")
     ue_expect_signature(call, "v1;Vector_IsNearlyZero;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -8750,6 +9341,7 @@ def ue_math_Vector_IsNearlyZero(arg_a : UEVector; arg_tolerance : float) : bool 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_IsNormal", signature="v1;Vector_IsNormal;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector_IsNormal(arg_a : UEVector) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_IsNormal", "")
     ue_expect_signature(call, "v1;Vector_IsNormal;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -8761,6 +9353,7 @@ def ue_math_Vector_IsNormal(arg_a : UEVector) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_IsUniform", signature="v1;Vector_IsUniform;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector_IsUniform(arg_a : UEVector; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_IsUniform", "")
     ue_expect_signature(call, "v1;Vector_IsUniform;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -8773,6 +9366,7 @@ def ue_math_Vector_IsUniform(arg_a : UEVector; arg_tolerance : float) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_IsUnit", signature="v1;Vector_IsUnit;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SquaredLenthTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector_IsUnit(arg_a : UEVector; arg_squaredlenthtolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_IsUnit", "")
     ue_expect_signature(call, "v1;Vector_IsUnit;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SquaredLenthTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -8785,6 +9379,7 @@ def ue_math_Vector_IsUnit(arg_a : UEVector; arg_squaredlenthtolerance : float) :
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_IsZero", signature="v1;Vector_IsZero;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_math_Vector_IsZero(arg_a : UEVector) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_IsZero", "")
     ue_expect_signature(call, "v1;Vector_IsZero;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -8796,6 +9391,7 @@ def ue_math_Vector_IsZero(arg_a : UEVector) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Left", signature="v1;Vector_Left;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_Left() : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Left", "")
     ue_expect_signature(call, "v1;Vector_Left;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8806,6 +9402,7 @@ def ue_math_Vector_Left() : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_MirrorByPlane", signature="v1;Vector_MirrorByPlane;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InPlane:StructProperty:134218114:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_MirrorByPlane(arg_a : UEVector; arg_inplane : S_Plane_a3bdbfa8) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_MirrorByPlane", "")
     ue_expect_signature(call, "v1;Vector_MirrorByPlane;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InPlane:StructProperty:134218114:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8821,6 +9418,7 @@ def ue_math_Vector_MirrorByPlane(arg_a : UEVector; arg_inplane : S_Plane_a3bdbfa
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Normal2D", signature="v1;Vector_Normal2D;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_Normal2D(arg_a : UEVector; arg_tolerance : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Normal2D", "")
     ue_expect_signature(call, "v1;Vector_Normal2D;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8833,6 +9431,7 @@ def ue_math_Vector_Normal2D(arg_a : UEVector; arg_tolerance : float) : UEVector 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_NormalUnsafe", signature="v1;Vector_NormalUnsafe;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_NormalUnsafe(arg_a : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_NormalUnsafe", "")
     ue_expect_signature(call, "v1;Vector_NormalUnsafe;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8844,6 +9443,7 @@ def ue_math_Vector_NormalUnsafe(arg_a : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Normalize", signature="v1;Vector_Normalize;A:StructProperty:134218112:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Tolerance:FloatProperty:128;")]
 def ue_math_Vector_Normalize(arg_a : UEVector; arg_tolerance : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Normalize", "")
     ue_expect_signature(call, "v1;Vector_Normalize;A:StructProperty:134218112:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Tolerance:FloatProperty:128;")
@@ -8856,6 +9456,7 @@ def ue_math_Vector_Normalize(arg_a : UEVector; arg_tolerance : float) : UEVector
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_One", signature="v1;Vector_One;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_One() : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_One", "")
     ue_expect_signature(call, "v1;Vector_One;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8866,6 +9467,7 @@ def ue_math_Vector_One() : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_ProjectOnToNormal", signature="v1;Vector_ProjectOnToNormal;V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_ProjectOnToNormal(arg_v : UEVector; arg_innormal : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_ProjectOnToNormal", "")
     ue_expect_signature(call, "v1;Vector_ProjectOnToNormal;V:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8878,6 +9480,7 @@ def ue_math_Vector_ProjectOnToNormal(arg_v : UEVector; arg_innormal : UEVector) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Reciprocal", signature="v1;Vector_Reciprocal;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_Reciprocal(arg_a : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Reciprocal", "")
     ue_expect_signature(call, "v1;Vector_Reciprocal;A:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8889,6 +9492,7 @@ def ue_math_Vector_Reciprocal(arg_a : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Right", signature="v1;Vector_Right;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_Right() : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Right", "")
     ue_expect_signature(call, "v1;Vector_Right;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8899,6 +9503,7 @@ def ue_math_Vector_Right() : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Set", signature="v1;Vector_Set;A:StructProperty:134218112:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;")]
 def ue_math_Vector_Set(arg_a : UEVector; arg_x : double; arg_y : double; arg_z : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Set", "")
     ue_expect_signature(call, "v1;Vector_Set;A:StructProperty:134218112:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;")
@@ -8913,6 +9518,7 @@ def ue_math_Vector_Set(arg_a : UEVector; arg_x : double; arg_y : double; arg_z :
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_SlerpNormals", signature="v1;Vector_SlerpNormals;NormalA:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};NormalB:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Alpha:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_SlerpNormals(arg_normala : UEVector; arg_normalb : UEVector; arg_alpha : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_SlerpNormals", "")
     ue_expect_signature(call, "v1;Vector_SlerpNormals;NormalA:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};NormalB:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Alpha:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8926,6 +9532,7 @@ def ue_math_Vector_SlerpNormals(arg_normala : UEVector; arg_normalb : UEVector; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_SlerpVectorToDirection", signature="v1;Vector_SlerpVectorToDirection;Vector:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Direction:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Alpha:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_SlerpVectorToDirection(arg_vector : UEVector; arg_direction : UEVector; arg_alpha : double) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_SlerpVectorToDirection", "")
     ue_expect_signature(call, "v1;Vector_SlerpVectorToDirection;Vector:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Direction:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Alpha:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8939,6 +9546,7 @@ def ue_math_Vector_SlerpVectorToDirection(arg_vector : UEVector; arg_direction :
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_SnappedToGrid", signature="v1;Vector_SnappedToGrid;InVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InGridSize:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_SnappedToGrid(arg_invect : UEVector; arg_ingridsize : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_SnappedToGrid", "")
     ue_expect_signature(call, "v1;Vector_SnappedToGrid;InVect:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InGridSize:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8951,6 +9559,7 @@ def ue_math_Vector_SnappedToGrid(arg_invect : UEVector; arg_ingridsize : float) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_ToDegrees", signature="v1;Vector_ToDegrees;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_ToDegrees(arg_a : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_ToDegrees", "")
     ue_expect_signature(call, "v1;Vector_ToDegrees;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8962,6 +9571,7 @@ def ue_math_Vector_ToDegrees(arg_a : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_ToRadians", signature="v1;Vector_ToRadians;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_ToRadians(arg_a : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_ToRadians", "")
     ue_expect_signature(call, "v1;Vector_ToRadians;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8973,6 +9583,7 @@ def ue_math_Vector_ToRadians(arg_a : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_UnitCartesianToSpherical", signature="v1;Vector_UnitCartesianToSpherical;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_math_Vector_UnitCartesianToSpherical(arg_a : UEVector) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_UnitCartesianToSpherical", "")
     ue_expect_signature(call, "v1;Vector_UnitCartesianToSpherical;A:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -8984,6 +9595,7 @@ def ue_math_Vector_UnitCartesianToSpherical(arg_a : UEVector) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_UnwindEuler", signature="v1;Vector_UnwindEuler;A:StructProperty:134218112:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_UnwindEuler(arg_a : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_UnwindEuler", "")
     ue_expect_signature(call, "v1;Vector_UnwindEuler;A:StructProperty:134218112:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -8995,6 +9607,7 @@ def ue_math_Vector_UnwindEuler(arg_a : UEVector) : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Up", signature="v1;Vector_Up;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_Up() : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Up", "")
     ue_expect_signature(call, "v1;Vector_Up;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -9005,6 +9618,7 @@ def ue_math_Vector_Up() : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Vector_Zero", signature="v1;Vector_Zero;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_Vector_Zero() : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Vector_Zero", "")
     ue_expect_signature(call, "v1;Vector_Zero;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -9015,6 +9629,7 @@ def ue_math_Vector_Zero() : UEVector {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="WeightedMovingAverage_FRotator", signature="v1;WeightedMovingAverage_FRotator;CurrentSample:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};PreviousSample:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Weight:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
 def ue_math_WeightedMovingAverage_FRotator(arg_currentsample : UERotator; arg_previoussample : UERotator; arg_weight : float) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "WeightedMovingAverage_FRotator", "")
     ue_expect_signature(call, "v1;WeightedMovingAverage_FRotator;CurrentSample:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};PreviousSample:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Weight:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
@@ -9028,6 +9643,7 @@ def ue_math_WeightedMovingAverage_FRotator(arg_currentsample : UERotator; arg_pr
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="WeightedMovingAverage_FVector", signature="v1;WeightedMovingAverage_FVector;CurrentSample:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PreviousSample:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Weight:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_math_WeightedMovingAverage_FVector(arg_currentsample : UEVector; arg_previoussample : UEVector; arg_weight : float) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "WeightedMovingAverage_FVector", "")
     ue_expect_signature(call, "v1;WeightedMovingAverage_FVector;CurrentSample:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};PreviousSample:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Weight:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -9041,6 +9657,7 @@ def ue_math_WeightedMovingAverage_FVector(arg_currentsample : UEVector; arg_prev
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="WeightedMovingAverage_Float", signature="v1;WeightedMovingAverage_Float;CurrentSample:FloatProperty:128;PreviousSample:FloatProperty:128;Weight:FloatProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_math_WeightedMovingAverage_Float(arg_currentsample : float; arg_previoussample : float; arg_weight : float) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "WeightedMovingAverage_Float", "")
     ue_expect_signature(call, "v1;WeightedMovingAverage_Float;CurrentSample:FloatProperty:128;PreviousSample:FloatProperty:128;Weight:FloatProperty:128;ReturnValue:FloatProperty:1408;")
@@ -9054,6 +9671,7 @@ def ue_math_WeightedMovingAverage_Float(arg_currentsample : float; arg_previouss
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Wrap", signature="v1;Wrap;Value:IntProperty:128;Min:IntProperty:128;Max:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Wrap(arg_value : int; arg_min : int; arg_max : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Wrap", "")
     ue_expect_signature(call, "v1;Wrap;Value:IntProperty:128;Min:IntProperty:128;Max:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -9067,6 +9685,7 @@ def ue_math_Wrap(arg_value : int; arg_min : int; arg_max : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Xor_IntInt", signature="v1;Xor_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_math_Xor_IntInt(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Xor_IntInt", "")
     ue_expect_signature(call, "v1;Xor_IntInt;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")

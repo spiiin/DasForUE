@@ -94,6 +94,7 @@ def C_KismetMathLibrary_0d6e9948_as_C_BlueprintFunctionLibrary_a62507e5(value : 
 
 def C_KismetMathLibrary_0d6e9948_as_C_Object_55c3753a(value : C_KismetMathLibrary_0d6e9948) : C_Object_55c3753a { return C_Object_55c3753a_from(C_KismetMathLibrary_0d6e9948_raw(value)) }
 
+[ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Abs", signature="v1;Abs;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_lib_Abs(arg_a : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Abs", "")
     ue_expect_signature(call, "v1;Abs;A:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -104,6 +105,7 @@ def ue_lib_Abs(arg_a : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/DasRuntime.DasFunctionLibraryFixture", method="Add", signature="v1;Add;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_lib_Add(arg_a : int; arg_b : int) : int {
     let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "Add", "")
     ue_expect_signature(call, "v1;Add;A:IntProperty:128;B:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -115,6 +117,7 @@ def ue_lib_Add(arg_a : int; arg_b : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/DasRuntime.DasFunctionLibraryFixture", method="ClassOutputs", signature="v1;ClassOutputs;Value:ClassProperty:128:meta:/Script/Engine.Actor;Output:ClassProperty:384:meta:/Script/Engine.Actor;")]
 def ue_lib_ClassOutputs(arg_value : UEClassHandle) : UEClassHandle {
     let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "ClassOutputs", "")
     ue_expect_signature(call, "v1;ClassOutputs;Value:ClassProperty:128:meta:/Script/Engine.Actor;Output:ClassProperty:384:meta:/Script/Engine.Actor;")
@@ -125,6 +128,7 @@ def ue_lib_ClassOutputs(arg_value : UEClassHandle) : UEClassHandle {
     return result
 }
 
+[ue_reflected_call(owner="/Script/DasRuntime.DasFunctionLibraryFixture", method="IsContextActor", signature="v1;IsContextActor;Context:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_lib_Context() : bool {
     let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "IsContextActor", "context")
     ue_expect_signature(call, "v1;IsContextActor;Context:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -134,6 +138,7 @@ def ue_lib_Context() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/DasRuntime.DasFunctionLibraryFixture", method="EchoActorClass", signature="v1;EchoActorClass;Value:ClassProperty:128:meta:/Script/Engine.Actor;ReturnValue:ClassProperty:1408:meta:/Script/Engine.Actor;")]
 def ue_lib_EchoActorClass(arg_value : UEClassHandle) : UEClassHandle {
     let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "EchoActorClass", "")
     ue_expect_signature(call, "v1;EchoActorClass;Value:ClassProperty:128:meta:/Script/Engine.Actor;ReturnValue:ClassProperty:1408:meta:/Script/Engine.Actor;")
@@ -144,6 +149,7 @@ def ue_lib_EchoActorClass(arg_value : UEClassHandle) : UEClassHandle {
     return result
 }
 
+[ue_reflected_call(owner="/Script/DasRuntime.DasFunctionLibraryFixture", method="EchoAnyClass", signature="v1;EchoAnyClass;Value:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")]
 def ue_lib_EchoAnyClass(arg_value : UEClassHandle) : UEClassHandle {
     let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "EchoAnyClass", "")
     ue_expect_signature(call, "v1;EchoAnyClass;Value:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")
@@ -154,6 +160,7 @@ def ue_lib_EchoAnyClass(arg_value : UEClassHandle) : UEClassHandle {
     return result
 }
 
+[ue_reflected_call(owner="/Script/DasRuntime.DasFunctionLibraryFixture", method="EchoClassArray", signature="v1;EchoClassArray;Values:ArrayProperty:134218114[Values:ClassProperty:0:meta:/Script/Engine.Actor;];ReturnValue:ArrayProperty:1408[ReturnValue:ClassProperty:0:meta:/Script/Engine.Actor;];")]
 def ue_lib_EchoClassArray(arg_values : array<UEClassHandle>) : array<UEClassHandle> {
     let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "EchoClassArray", "")
     ue_expect_signature(call, "v1;EchoClassArray;Values:ArrayProperty:134218114[Values:ClassProperty:0:meta:/Script/Engine.Actor;];ReturnValue:ArrayProperty:1408[ReturnValue:ClassProperty:0:meta:/Script/Engine.Actor;];")
@@ -171,6 +178,7 @@ def ue_lib_EchoClassArray(arg_values : array<UEClassHandle>) : array<UEClassHand
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetActorOfClass", signature="v1;GetActorOfClass;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ActorClass:ClassProperty:128:meta:/Script/Engine.Actor;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;")]
 def ue_lib_GetActorOfClass(arg_actorclass : UEClassHandle) : C_Actor_adf65d5b {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetActorOfClass", "worldcontextobject")
     ue_expect_signature(call, "v1;GetActorOfClass;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ActorClass:ClassProperty:128:meta:/Script/Engine.Actor;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;")
@@ -196,6 +204,7 @@ def ue_lib_GetComponentsByClass(target : C_Actor_adf65d5b; arg_componentclass : 
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetTimeSeconds", signature="v1;GetTimeSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")]
 def ue_lib_Time() : double {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetTimeSeconds", "worldcontextobject")
     ue_expect_signature(call, "v1;GetTimeSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")
@@ -205,6 +214,7 @@ def ue_lib_Time() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/DasRuntime.DasFunctionLibraryFixture", method="ContextWorldId", signature="v1;ContextWorldId;Context:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")]
 def ue_lib_WorldId() : int {
     let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "ContextWorldId", "context")
     ue_expect_signature(call, "v1;ContextWorldId;Context:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")
