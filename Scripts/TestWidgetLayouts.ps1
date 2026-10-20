@@ -22,7 +22,7 @@ $Log=Invoke-DasCommandlet $Das -Run DasWidgetLayouts -Name 'widget-layout-runtim
     -Arguments @('-Multiprocess') -Marker 'DAS_WIDGET_LAYOUT_RESULT=PASS' `
     -FailPattern 'DAS_WIDGET_LAYOUT_FAIL|Ensure condition failed|Fatal error:|Log[^:]+: Error:'
 $Text=Get-Content -LiteralPath $Log -Raw
-$Match=[regex]::Match($Text,'DAS_WIDGET_LAYOUT_RESULT=PASS checks=(\d+)')
+$Match=(Get-DasResult -Text $Text -Pattern 'DAS_WIDGET_LAYOUT_RESULT=PASS checks=(\d+)')
 if(!$Match.Success -or [int]$Match.Groups[1].Value -ne 30){throw 'Incomplete widget-layout probe'}
 if((Get-LayoutHashes) -ne $Before){throw 'Source or binary changed during widget-layout validation'}
 [ordered]@{state='PASS';checks=[int]$Match.Groups[1].Value;runtime_log=$Log;sha256=($Before|ConvertFrom-Json);

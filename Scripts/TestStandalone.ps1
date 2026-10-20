@@ -1,4 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$Project,[string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=[IO.Path]::GetFullPath($Project)
@@ -12,7 +14,7 @@ if(!$SkipBuild){
 if($LASTEXITCODE -or !(Select-String -LiteralPath "$Logs/export.log" -SimpleMatch 'DAS_STARTER_EXPORT=PASS')){throw "Starter export failed: $Logs/export.log"}
 $File=Join-Path $ProjectRoot 'Content/Das/Scripts/starter_values.das';$Before=(Get-FileHash -LiteralPath $File).Hash
 & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project /Game/Starter/StarterMap -game -DasStarterProbe -Multiprocess -unattended -NullRHI -nosplash -stdout "-abslog=$Logs/game.log" -ddc=NoZenLocalFallback -NoZenAutoLaunch *> "$Logs/game-stdout.log"
-if($LASTEXITCODE -or !(Select-String -LiteralPath "$Logs/game.log" -SimpleMatch 'DAS_STARTER_RESULT=PASS')){throw "Starter game failed: $Logs/game.log"}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath "$Logs/game.log" -SimpleMatch 'DAS_STARTER_RESULT=PASS')){throw "Starter game failed: $Logs/game.log"}
 if((Get-FileHash -LiteralPath $File).Hash -ne $Before){throw 'Reload check did not restore project helper'}
 & "$PSScriptRoot/GenerateNativeGameplay.ps1" -Project $Project -Engine $Engine -Check -SkipBuild *> "$Logs/reproduce.log"
 if(!$?){throw 'Project native bindings are not reproducible'}

@@ -1,4 +1,6 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
@@ -17,7 +19,9 @@ function Assert-WidgetSourceHashes($Expected) {
 }
 $Sources=Read-WidgetSourceHashes
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/widget-events-build.log" *> "$Repo/logs/widget-events-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/widget-events-build.log") *> "$Repo/logs/widget-events-build-stdout.log"
  if($LASTEXITCODE){throw 'Widget events build failed'}
 }
 Assert-WidgetSourceHashes $Sources
@@ -32,7 +36,7 @@ Copy-Item "$Repo/Tests/WidgetEvents/probe.das" $Probe
 try {
  & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasWidgetEvents -Geometry "-Script=$Name" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Log" *> "$Repo/logs/widget-events-runtime-stdout.log"
  $Code=$LASTEXITCODE;$Text=Get-Content $Log -Raw
- $Result=[regex]::Match($Text,'DAS_WIDGET_EVENTS_RESULT=PASS checks=(\d+)')
+ $Result=(Get-DasResult -Text $Text -Pattern 'DAS_WIDGET_EVENTS_RESULT=PASS checks=(\d+)')
  if($Code -or !$Result.Success){throw "Widget input runtime probe failed: $Log"}
  if($Text -match 'Ensure condition failed|Log[^:]+: Error:'){throw 'Engine error/ensure in widget input probe'}
  foreach($Path in $Hashes.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Hashes[$Path]){throw 'DLL changed during probe'}}

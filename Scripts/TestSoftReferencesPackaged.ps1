@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipEditorBuild,[string]$DDC='')
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $DDCArgs=@();if($DDC){$DDCArgs=@("-DDC=$DDC")}
 $Root=Split-Path -Parent $PSScriptRoot
@@ -9,7 +11,9 @@ $Previous=$env:UE_SKIP_UBT_SDK_SETUP
 try {
  $env:UE_SKIP_UBT_SDK_SETUP='1'
  if(!$SkipEditorBuild){
-  & (Join-Path $Engine 'Engine\Build\BatchFiles\Build.bat') DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12 "-Log=$Logs\soft-references-package-editor-build.log"
+  Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=12', "-Log=$Logs\soft-references-package-editor-build.log")
   if($LASTEXITCODE){throw 'Soft reference exporter build failed'}
  }
  $Id=[Guid]::NewGuid().ToString('N')
@@ -23,6 +27,6 @@ try {
  $Log=Join-Path $Logs 'soft-references-packaged.log'
  $P=Start-Process -FilePath $Exe -ArgumentList $Map,'-DasSoftReferences','-nullrhi','-unattended','-nosplash',"-abslog=$Log" -WindowStyle Hidden -PassThru
  $P.WaitForExit()
- if($P.ExitCode -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_SOFT_REFERENCES_PACKAGED_RESULT=PASS')){throw "Packaged soft references failed; exit=$($P.ExitCode)"}
+ if($P.ExitCode -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_SOFT_REFERENCES_PACKAGED_RESULT=PASS')){throw "Packaged soft references failed; exit=$($P.ExitCode)"}
  Write-Output "DAS_SOFT_REFERENCES_DEVELOPMENT_PACKAGE=PASS map=$Map"
 } finally { $env:UE_SKIP_UBT_SDK_SETUP=$Previous }
