@@ -1,4 +1,5 @@
 options gen2
+// Negative probe: a raw generated call whose receiver path does not match self (path literal on purpose).
 require ue_native_gameplay
 [export]
 def main():bool {

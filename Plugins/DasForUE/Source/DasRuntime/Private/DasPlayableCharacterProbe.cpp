@@ -249,7 +249,7 @@ bool RunDasPlayableCharacterProbe(ADasStaticLibraryProbe* Carrier, FString& Repo
         Report += StaleHash.Error + TEXT("\n");
     HashProbe->DestroyComponent();
     const auto WrongReceiver = Runtime.RunNamedFramePersistent(
-        Runtime.ScriptPath(TEXT("native_gameplay_wrong_receiver.das")), TEXT("main"), {}, EDasMethodSignature::Bool, C);
+        Runtime.ScriptPath(TEXT("native_gameplay_wrong_receiver_probe.das")), TEXT("main"), {}, EDasMethodSignature::Bool, C);
     Check(!WrongReceiver.bSucceeded && WrongReceiver.Error.Contains(TEXT("receiver class mismatch")),
                                                                     TEXT("native_generated_receiver_class_enforced"));
     const auto Rejection =
