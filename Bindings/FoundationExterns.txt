@@ -361,18 +361,22 @@ __ue_widget_bind_input	@ue_foundation::__ue_widget_bind_input CIH<ue_foundation:
 __ue_widget_capture	@ue_foundation::__ue_widget_capture CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UEEventReply	4
 __ue_widget_clear_focus	@ue_foundation::__ue_widget_clear_focus CIH<ue_foundation::UEEventReply> Cb C_c	ue_foundation::UEEventReply	4
 __ue_widget_click	@ue_foundation::__ue_widget_click CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+__ue_widget_click_ref	@ue_foundation::__ue_widget_click_ref CIH<ue_foundation::UObjectHandle> CIs C_c	void	4
 __ue_widget_create	@ue_foundation::__ue_widget_create C&IH<ue_foundation::UEClassHandle> CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
 __ue_widget_drag	@ue_foundation::__ue_widget_drag CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UEEventReply	4
 __ue_widget_end_drag	@ue_foundation::__ue_widget_end_drag CIH<ue_foundation::UEEventReply> C_c	ue_foundation::UEEventReply	4
 __ue_widget_focus	@ue_foundation::__ue_widget_focus CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> Cb C_c	ue_foundation::UEEventReply	4
 __ue_widget_handled	@ue_foundation::__ue_widget_handled C_c	ue_foundation::UEEventReply	4
 __ue_widget_input	@ue_foundation::__ue_widget_input CIH<ue_foundation::UObjectHandle> Cb C_c	void	4
+__ue_widget_layout_field	@ue_foundation::__ue_widget_layout_field CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_widget_layout_resolve	@ue_foundation::__ue_widget_layout_resolve CIH<ue_foundation::UObjectHandle> CIs C_c	void	4
 __ue_widget_lock	@ue_foundation::__ue_widget_lock CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UEEventReply	4
 __ue_widget_position	@ue_foundation::__ue_widget_position CIH<ue_foundation::UEEventReply> Ci Ci C_c	ue_foundation::UEEventReply	4
 __ue_widget_release	@ue_foundation::__ue_widget_release CIH<ue_foundation::UEEventReply> C_c	ue_foundation::UEEventReply	4
 __ue_widget_remove	@ue_foundation::__ue_widget_remove CIH<ue_foundation::UObjectHandle> C_c	void	4
 __ue_widget_show	@ue_foundation::__ue_widget_show CIH<ue_foundation::UObjectHandle> Ci C_c	bool const	4
 __ue_widget_text	@ue_foundation::__ue_widget_text CIH<ue_foundation::UObjectHandle> CIs CH<ue_foundation::UETextValue> C_c	void	4
+__ue_widget_text_ref	@ue_foundation::__ue_widget_text_ref CIH<ue_foundation::UObjectHandle> CH<ue_foundation::UETextValue> C_c	void	4
 __ue_widget_unhandled	@ue_foundation::__ue_widget_unhandled C_c	ue_foundation::UEEventReply	4
 __ue_widget_unlock	@ue_foundation::__ue_widget_unlock CIH<ue_foundation::UEEventReply> C_c	ue_foundation::UEEventReply	4
 __ue_widget_visible	@ue_foundation::__ue_widget_visible CIH<ue_foundation::UObjectHandle> C_c	bool const	4

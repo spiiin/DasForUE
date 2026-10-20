@@ -62,12 +62,39 @@ Multi-hit traces, box/capsule sweeps, object-type/profile queries and the full g
 
 ## Simple HUD
 
+Declare the named widget fields once, using typed references:
+
+```das
+[ue_widget_layout]
+struct HUDView {
+    Score:TextBlockRef
+    Damage:ButtonRef
+}
+```
+
+Create the view after constructing/displaying the HUD (normally after `ue_widget_show`).
+`ue_widget_view` resolves and validates every field when the view is created. Its receiver is
+evaluated once. The result contains weak object references: it does not keep the HUD alive.
+A missing field or a wrong widget type reports the layout, field, expected type and actual WBP type.
+When Apply can trace the receiver to a known Widget Blueprint class (including an authored
+HUDClass default), it checks the compiled WBP tree before creating or modifying the actor Blueprint.
+Compile a modified WBP before Apply. Classes selected dynamically and native trees built at runtime
+are checked when the view is created.
+
+Layouts are plain, non-inherited structs with 1–256 typed UWidget reference fields and no initializers.
+The curated module provides `TextBlockRef` and `ButtonRef`; other nominal native widget references
+can be used as layout fields too. Names are case-insensitive in Unreal and must be unique.
+The typed text/click helpers operate on members of a HUD created by the current script context.
+After removing the HUD, destroying its owner, or replacing the context on hot reload, resolve a fresh
+view; expired or foreign references are rejected. Removing the HUD unbinds its managed click handlers.
+
 ```das
 // HUDClass is $UEClass<UserWidgetRef> (alias UserWidgetClass); it may reference a Widget Blueprint.
 self.HUD=ue_widget_create(self.HUDClass,player)
 verify(ue_widget_show(self.HUD),"HUD cannot be shown")
-ue_widget_set_text(self.HUD,"Score",ue_text_invariant("Score: {self.Score}"))
-ue_widget_bind_click(self.HUD,"Damage",self.HurtFromHUD)
+let view=ue_widget_view(type<HUDView>,self.HUD)
+ue_widget_set_text(view.Score,ue_text_invariant("Score: {self.Score}"))
+ue_widget_bind_click(view.Damage,self.HurtFromHUD)
 ue_widget_input(self.HUD,true)
 // Later:
 ue_widget_remove(self.HUD)
@@ -77,8 +104,8 @@ ue_widget_remove(self.HUD)
 | --- | --- |
 | `ue_widget_create(kind:UserWidgetClass, player:PlayerControllerRef):UserWidgetRef` | Needs a live game world and a local PlayerController; refused on a dedicated server. |
 | `ue_widget_show(widget, z_order=0):bool`, `ue_widget_visible(widget):bool`, `ue_widget_remove(widget)` | Viewport management. |
-| `ue_widget_set_text(widget, name, text)` | `name` must find a `TextBlock`; FText semantics are kept. |
-| `ue_widget_bind_click(widget, name, handler)` | `name` must find a `Button`; handler (`self.Method` or its name; inside `ue_class` it is checked at compile time) is a `BlueprintCallable` method of the context owner with no parameters and no result. |
+| `ue_widget_set_text(view.Score, text)` | `Score` is a `TextBlockRef`; FText semantics are kept. |
+| `ue_widget_bind_click(view.Damage, handler)` | `Damage` is a `ButtonRef`; handler (`self.Method` or its name; inside `ue_class` it is checked at compile time) is a `BlueprintCallable` method of the context owner with no parameters and no result. |
 | `ue_widget_input(widget, enabled)` | `true` switches to GameAndUI with a cursor; `false`/cleanup restores GameOnly and the previous cursor visibility. |
 
 - The context keeps created widgets alive against GC. Binding the same button again replaces the previous handler.
