@@ -97,12 +97,13 @@ function Invoke-DasAssetPhases {
 # successes without warnings.
 function Invoke-DasAutomation {
     param([Parameter(Mandatory)]$Das, [Parameter(Mandatory)][string]$Test, [Parameter(Mandatory)][string]$Name,
-          [string]$Marker, [int]$Count = 1, [string[]]$Extra = @(), [switch]$AtLeast)
+          [string]$Marker, [int]$Count = 1, [string[]]$Extra = @(), [switch]$AtLeast, [switch]$Rendering)
     $Log = Join-Path $Das.Logs "$Name.log"
     $Report = Join-Path $Das.Logs "$Name-report"
-    $Arguments = @(('"' + $Das.Project + '"'), '-unattended', '-NullRHI', '-nosplash', '-nosound', '-RenderOffscreen',
+    $Arguments = @(('"' + $Das.Project + '"'), '-unattended', '-nosplash', '-RenderOffscreen',
         ('-ExecCmds="Automation RunTests ' + $Test + '"'), '-TestExit="Automation Test Queue Empty"',
         ('-ReportExportPath="' + $Report + '"'), ('-abslog="' + $Log + '"')) + $Extra
+    if (!$Rendering) { $Arguments += @('-NullRHI', '-nosound') }
     $Process = Start-Process -FilePath $Das.Editor -ArgumentList $Arguments @DasWindowStyle -PassThru -Wait
     if ($Process.ExitCode) { throw "$Name editor exited with $($Process.ExitCode)" }
     if ($Marker) { Assert-DasLog -Log $Log -Marker $Marker -Name $Name }

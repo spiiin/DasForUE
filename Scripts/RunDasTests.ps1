@@ -79,7 +79,7 @@ $Steps = @{
         if ($S.probeArgs) {
             foreach ($A in $S.probeArgs.PSObject.Properties) { $Extra += "-$($A.Name)=$(Get-DasProbe $A.Value)" }
         }
-        Invoke-DasAutomation $Das -Test $S.test -Name $S.log -Count $S.minimum -AtLeast -Extra $Extra
+        Invoke-DasAutomation $Das -Test $S.test -Name $S.log -Count $S.minimum -AtLeast -Extra $Extra -Rendering:([bool]$S.rendering)
     }
     script     = { param($S)
         & (Join-Path $PSScriptRoot $S.script) -Engine $Engine -SkipBuild

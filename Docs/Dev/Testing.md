@@ -148,3 +148,18 @@ Submit `test-suite <unique-id> gas-cue-assets repo=C:\src\DasForUE2\Build\GASAut
 The gas-cue-playground suite builds first, then runs one offscreen commandlet with real sound/Niagara assets. Its Tests/suites.json entry opts into rendering=true: the commandlet runner uses -AllowCommandletRendering, -AllowCommandletAudio and -RenderOffscreen instead of -NullRHI. Niagara's native IsReadyToRun rejects NullRHI. Other commandlet suites keep their default NullRHI mode. This is component/lifecycle verification, not full PIE, packaged or perceptual audio/visual QA.
 
 The gas-ability-playground suite uses the same opt-in offscreen mode and demo assets, but runs a single end-to-end ability scenario: BeginAim, cancel, confirm a real physics hit, apply damage plus timed aura, expire the native effect, reject a freshly aimed miss, and release all contexts on EndPlay. It does not require running gas-cue-playground first; the asset preparation is shared and each suite remains independently runnable through the build agent.
+
+
+## GAS playable map PIE
+
+Queue `test-suite <unique-id> gas-ability-pie repo=C:\src\DasForUE2\Build\GASAuthoringWorktree`
+through the shared build agent. This builds Editor Development and runs only
+`DasForUE.GAS.AbilityPlaygroundPIE`, with real rendering/audio and a real PIE
+world. It generates the saved `/Game/DasExamples/GASCues/GASAbilityMap`, feeds
+mapped input to the local PlayerController, checks ability/cue lifetimes and
+EndPIE cleanup, and captures `logs/gas-ability-pie.png`. The test requires a
+non-null RHI and is excluded from NullRHI runs. Reports are under
+`logs/gas-ability-pie-report`. No packaged suite is selected.
+
+Automation suites can opt into `rendering: true` (or Invoke-DasAutomation
+`-Rendering`). The default remains NullRHI/no audio for existing suites.

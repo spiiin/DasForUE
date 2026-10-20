@@ -255,3 +255,60 @@ Hit and aura are separate native effect applications, not a transactional pair. 
 The single focused offscreen runtime scenario checks actual trace preview, harmless cancel, confirmation/commit and separate source/target attributes, real sound/Niagara components at the native hit point, aura retention after ability end and GC, native timed expiry/Removed cleanup, re-querying aim before confirmation, and EndPlay cleanup. It builds first through the shared agent; full PIE, packaged/cook validation and perceptual audio/visual QA are outside this step. The fixed sound/Niagara soft paths still require explicit cook inclusion as documented for the cue playground.
 
 Verified by build-agent job `gasstrike-20261020b`: Editor Development build and `DAS_GAS_ABILITY_PLAYGROUND_RESULT=PASS checks=9` in one offscreen runtime scenario (8.75 seconds of commandlet logic). The scenario uses real native physics hits, GameplayAbility tasks, effects and sound/Niagara components; full PIE/packaged/network and perceptual audio/visual checks were not run. Cancellation is checked through the DAS Cancel hook counter, inactive/uncommitted state and released tasks: the State query does not retain the Cancelled bit from terminal notification snapshots.
+
+
+## Playable map and real PIE
+
+The `gas-ability-pie` build-agent suite generates and saves
+`/Game/DasExamples/GASCues/GASAbilityMap` in the smoke project. Open that map
+in the editor and use Play. The map selects its own GameMode; project defaults
+are not changed. Generated assets stay in the dedicated example folder.
+
+`dsl_gas_playground_player.das` is the first-person DAS Character. Its typed
+`Caster` reference points to the map's `BP_AbilityPlayground` actor. Each tick,
+and immediately before input actions, that actor follows the camera transform,
+so the existing ability traces from the player's viewpoint. The Character's
+capsule ignores Visibility so it does not block its own aim. Two target spheres
+have independent authored AttributeSets. A small native HUD draws a reticle,
+controls and the last selected target's health; input and ability behavior live
+in DAS.
+
+| Control | Action |
+|---|---|
+| WASD / mouse / Space | Move / look / jump |
+| Hold right mouse or Q | Begin targeting |
+| Left mouse or E while aiming | Confirm the current trace |
+| C or release aim before confirmation | Cancel |
+| Escape | Leave PIE |
+
+Aim preview is captured on activation; confirmation repeats the current camera
+trace. A hit subtracts one health point, plays the native impact sound/Niagara,
+and applies `PlaygroundMapAura`, a five-second effect. Native expiry calls
+Removed and destroys its aura component. The older commandlet keeps its separate
+two-second `PlaygroundTimedAura`. This remains local authoritative gameplay;
+networking and prediction are deferred.
+
+The focused PIE suite opts into a real RHI/audio instead of NullRHI. It drives
+mapped keyboard/mouse events through PlayerController, checks movement, jumping,
+camera rotation, aim/cancel/confirm, native sound/Niagara components, duration
+expiry and EndPIE context release. It saves `logs/gas-ability-pie.png`. No
+packaged run is included. This automated check proves input routing and native
+component lifecycle; it does not establish perceptual audio quality.
+
+
+Input action/mapping references are stored on the placed Character instance,
+not in its Blueprint CDO. This keeps generated class defaults consistent with
+the DSL and allows preparing the same map again. The preparation normalizes
+only input fields of the dedicated generated demo Blueprint from earlier runs.
+The screenshot is requested after Niagara has advanced for several frames.
+Gameplay waits use the native PIE world clock; a separate 240-second wall limit
+bounds startup/render-readback stalls.
+
+Verified by build-agent job `gasmap-20261020e`: Editor Development build and
+`DAS_GAS_ABILITY_PIE_RESULT=PASS checks=10`; Unreal Automation reports one
+success, zero failed tests and zero tests with warnings
+(16.86 seconds). The PIE check covers mapped input,
+camera aim, harmless cancellation, confirmed target damage, sound/Niagara
+components, native timed expiry/Removed, viewport capture and complete session
+release after EndPIE. Results/source hashes are recorded in
+`logs/gas-ability-pie-validation.json`. Packaged/network checks were not run.

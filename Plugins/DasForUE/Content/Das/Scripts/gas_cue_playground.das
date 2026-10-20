@@ -45,3 +45,7 @@ class PlaygroundAura {}
 // The targeted ability uses the same cue but lets native duration expiry invoke Removed.
 [ue_gameplay_effect(attributes="PlaygroundStats",duration=2.0f,cue="PlaygroundAuraCue")]
 class PlaygroundTimedAura {}
+
+// Longer display window for the playable map; the focused commandlet keeps its two-second variant.
+[ue_gameplay_effect(attributes="PlaygroundStats",duration=5.0f,cue="PlaygroundAuraCue")]
+class PlaygroundMapAura {}
