@@ -51,12 +51,12 @@ Examples: `ue_inheritance_base.das`, `dsl_inheritance_child.das`,
 
 | Method kind | Overridable? |
 | --- | --- |
-| `[ue_function(BlueprintCallable)]` | No: callable functions are final |
+| `[ue_function(BlueprintCallable)]` | Final unless used as a callback in its declaring class (see [handler references](HandlerReferences.md)); `BlueprintEvent=false` keeps a callback explicitly final |
 | `[ue_function(BlueprintEvent)]` (optionally with `BlueprintPure`) | Yes, by an authored child (`def override`) or a Blueprint child |
 | lifecycle hooks | Yes, with `def override` |
 | unannotated script-only helpers | Yes, within the compiled script (see below) |
 
-An override must keep `BlueprintEvent`, parameter names, types, directions,
+Callback overrides inherit the reflected event contract and Blueprint visibility automatically; ordinary reflected overrides still declare their annotation. An override must keep `BlueprintEvent`, parameter names, types, directions,
 return type, purity and `const`:
 
 ```das

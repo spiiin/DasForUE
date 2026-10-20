@@ -32,6 +32,8 @@
     { "name": "delegate-values", "kind": "phases", "run": "DasDelegate", "log": "handler-delegate-values",
       "marker": "DAS_AUTHORED_DELEGATES_RESULT=PASS", "phases": ["Create", "Reopen"],
       "probe": "handler-delegate-values-probe-id.txt" },
+    { "name": "dsl-inherited-handlers", "kind": "script", "script": "TestInheritedHandlers.ps1" },
+    { "name": "dsl-hidden-callbacks", "kind": "script", "script": "TestHiddenCallbacks.ps1" },
     { "name": "dsl-handler-references", "kind": "script", "script": "TestHandlerReferences.ps1" },
     { "name": "dsl-event-checks", "kind": "script", "script": "TestEventChecks.ps1" },
     { "name": "dsl-inline-callbacks", "kind": "script", "script": "TestInlineCallbacks.ps1" },

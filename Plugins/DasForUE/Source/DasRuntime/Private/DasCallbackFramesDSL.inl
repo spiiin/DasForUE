@@ -146,13 +146,13 @@ das::ExpressionPtr DSLMultiTimer(das::ExprCall* E, const das::StructurePtr& Sour
         DSLFail(TEXT("Class timer requires a literal callback name"));
     das::FunctionPtr Method = nullptr;
     const FString Name = DSLText(Literal->text);
-    Source->module->functions.foreach (
+    DSLVisitHandlerMethods(
+        Source,
         [&](const das::FunctionPtr& F)
         {
             const FString N =
                 DSLText(F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
-            if (F->classParent == Source && N == Name && DSLAnnotation(F->annotations, "ue_function") &&
-                !F->isStaticClassMethod && F->result &&
+            if (N == Name && DSLAnnotation(F->annotations, "ue_function") && !F->isStaticClassMethod && F->result &&
                 DSLTypeName(F->result) == TEXT("void") && F->arguments.size() == E->arguments.size() - Base + 1)
                 Method = F;
         });
@@ -193,7 +193,7 @@ das::ExpressionPtr DSLMultiTimer(das::ExprCall* E, const das::StructurePtr& Sour
         Fn->result = new das::TypeDecl(das::Type::tVoid, E->at);
         auto* Body = new das::ExprBlock();
         Body->at = E->at;
-        auto* Invoke = DSLCall(E->at, DSLUtf8(TEXT("__impl_ue_")+ Decl.Name + TEXT("_")+ Name), {});
+        auto* Invoke = DSLCall(E->at, "__impl_" + DSLCallbackEntry(Decl, Name), {});
         for (size_t I = 1; I < Method->arguments.size(); ++I)
         {
             AddArg(Fn, Method->arguments[I]->name, Method->arguments[I]->type);

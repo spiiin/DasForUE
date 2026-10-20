@@ -227,6 +227,8 @@ int32 UDasHiddenCallbacksCommandlet::Main(const FString& Params)
     Write(Source.Replace(TEXT("def Pulse():void"), TEXT("[ue_function(BlueprintCallable)]\ndef Pulse():void")));
     Check(FDasDSLService::Apply(File, Asset, TEXT("hiddencallbacks.HiddenActor"), BP, Error) &&
                                 Visible(TEXT("Pulse")), TEXT("reapply_can_expose_callback_explicitly"), Error);
+    if (!BP)
+        return 1; // Preserve the Apply failure instead of compiling a null Blueprint.
     FKismetEditorUtilities::CompileBlueprint(BP);
     Write(Source);
     Check(FDasDSLService::Apply(File, Asset, TEXT("hiddencallbacks.HiddenActor"), BP, Error) &&
