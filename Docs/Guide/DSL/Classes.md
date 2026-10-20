@@ -272,7 +272,7 @@ Fixtures: `dsl_comment_tooltips.das`, `dsl_comment_types.das`.
 | `def const F()` | Const method (readonly `self`), combinable with any of the above |
 | `[ue_function(BlueprintEvent)] def F()` | Overridable event with a default body |
 | `def BeginPlay()`, `def Tick(delta:float)`, ... | Lifecycle hook, not a UFunction |
-| `[ue_event(source="owner", name="OnDasSignal")] def F(...)` | Delegate subscription |
+| `[ue_event(source=owner, source_type=ProbeActorRef, name=OnDasSignal)] def F(...)` | Delegate subscription |
 | unannotated `def F()` | Script-only helper, no Blueprint node |
 
 See [Functions](Functions.md), [Lifecycle](Lifecycle.md) and

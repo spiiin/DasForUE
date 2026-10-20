@@ -17,6 +17,7 @@
 #include "Misc/FileHelper.h"
 #include "Misc/ScopeExit.h"
 #include "Misc/Paths.h"
+#include "Misc/Parse.h"
 #include "HAL/FileManager.h"
 #include "UObject/StrongObjectPtr.h"
 #include "UObject/Script.h"
@@ -39,8 +40,10 @@ int32 UDasHiddenCallbacksCommandlet::Main(const FString& Params)
     };
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     const FString Repo = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("../.."));
+    const bool OperationKeys = FParse::Param(*Params, TEXT("OperationKeys"));
     FString Source, Error;
-    if (!FFileHelper::LoadFileToString(Source, *(Repo / TEXT("Tests/HiddenCallbacks/probe.das"))))
+    if (!FFileHelper::LoadFileToString(Source, *(Repo / (OperationKeys ? TEXT("Tests/OperationKeys/probe.das")
+                                                                       : TEXT("Tests/HiddenCallbacks/probe.das")))))
         return 2;
     const FString Id = FGuid::NewGuid().ToString(EGuidFormats::Digits);
     const FString File = TEXT("hidden_callbacks_")+ Id + TEXT(".das"), Path = Runtime.ScriptPath(File);
@@ -174,6 +177,17 @@ int32 UDasHiddenCallbacksCommandlet::Main(const FString& Params)
     Check(Actor->LastDasError.IsEmpty() &&
           Value(TEXT("TimerHits")) > 0 && Value(TEXT("InputHits")) == 2,
                                                 TEXT("hidden_timer_and_enhanced_input_execute"), Actor->LastDasError);
+    if (OperationKeys)
+    {
+        struct
+        {
+            int32 Result = 0;
+        } Output;
+        Actor->ProcessEvent(Actor->FindFunctionChecked(TEXT("ExerciseKeys")), &Output);
+        Check(Output.Result == 1 && Runtime.ScriptTimerCount(Actor) == 0,
+              TEXT("typed_pause_resume_cancel_and_family_isolation"), Actor->LastDasError);
+        Call(TEXT("Start"));
+    }
     int32 Before = Value(TEXT("TimerHits"));
     Call(TEXT("Direct"));
     Check(Value(TEXT("TimerHits")) == Before + 1, TEXT("direct_call_to_promoted_method_executes"), Actor->LastDasError);

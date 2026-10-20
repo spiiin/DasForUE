@@ -2,6 +2,41 @@
 
 Scripts schedule deferred work through owner-managed, named timers backed by the world's TimerManager, and through a latent delay backed by the Latent Action Manager. Both call an ordinary method of your class, clean up automatically with the owner, and never hold pointers into the VM.
 
+## Keys from callbacks
+
+Inside an authored class, omit the key when starting an operation with a named handler:
+
+```das
+ue_timer_start(1.0f, self.Pulse, true)
+ue_timer_next_tick(self.ApplyScore, 5)
+ue_timer_pause(self.Pulse)
+ue_timer_resume(self.Pulse)
+ue_timer_cancel(self.Pulse)
+ue_latent_delay(0.5f, self.Finished)
+ue_latent_cancel(self.Finished)
+```
+
+The compiler derives a stable UTF-8 key from the class identity, API family and callback method. Timer queries (`is_active`, `is_paused`, `remaining`, `elapsed`) and latent `is_pending` accept the same method reference. Editing the handler body does not change its key. State still belongs to the existing owner/session; reload and cleanup policies are unchanged. This does not add preservation of named timer schedules across reload.
+
+The same form works for effects and montage:
+
+```das
+ue_sound_play(sound, location, self.SoundFinished)
+ue_niagara_spawn(system, location, self.EffectFinished)
+ue_effect_at(sound, system, location, self.EffectFinished)
+ue_effect_play(sound, system, transform, self.EffectFinished)
+ue_effect_stop(self.EffectFinished)
+ue_effect_active(self.EffectFinished)
+ue_montage_play(mesh, montage, self.MontageUpdate)
+ue_montage_stop(self.MontageUpdate)
+ue_montage_cancel(self.MontageUpdate)
+ue_montage_playing(self.MontageUpdate)
+```
+
+One callback identifies one operation per family. Reusing it replaces that operation under the existing API rules; sound and Niagara share the effect family. To run independent instances with the same callback, supply explicit keys. Existing string/dynamic-key forms remain accepted. Keyless starts currently require `self.Method`; inline blocks keep their explicit key.
+
+`DAS_DSL_UNKNOWN_OPERATION_KEY` warns when a literal cancel/query key has no statically declared start in the class. It is a conservative compile-time warning: dynamically supplied keys may still create such an operation at runtime. A misspelled method reference is a compile error.
+
 ## Interval and repeating timers
 
 ```das

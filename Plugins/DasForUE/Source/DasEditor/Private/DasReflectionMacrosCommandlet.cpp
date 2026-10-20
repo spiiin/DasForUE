@@ -1,3 +1,4 @@
+#include "DasAuthoring.h"
 #include "DasReflectionMacrosCommandlet.h"
 #include "DasRuntime.h"
 #include "Engine/Engine.h"

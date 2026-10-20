@@ -205,12 +205,13 @@ Methods annotated with `ue_event` subscribe to multicast delegates for the
 lifetime of the play session:
 
 ```das
+require ue_probe_actor
 [ue_class(Blueprintable)]
 class Behavior : ActorComponent {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     SignalTotal : int = 0
 
-    [ue_event(source="owner", name="OnDasSignal")]
+    [ue_event(source=owner, source_type=ProbeActorRef, name=OnDasSignal)]
     def OnOwnerSignal(amount:int) { self.SignalTotal += amount }
 }
 ```

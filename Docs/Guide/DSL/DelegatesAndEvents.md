@@ -190,6 +190,21 @@ event.Clear()
   existing reflected multicast property. Binding requires `BlueprintAssignable`;
   broadcasting also requires `BlueprintCallable`.
 
+## Declarative subscriptions without strings
+
+```das
+def BindEvents():void {
+    self.OnDasSignal += self.OnSignal
+    self.Health.Changed += self.OnHealthChanged
+}
+def OnSignal(value:int):void { self.Score += value }
+def OnHealthChanged(current:float; maximum:float):void { self.RefreshHUD() }
+```
+
+`BindEvents` is a reserved, unannotated declaration method with no parameters or result. Its body accepts only top-level `+=` declarations. These become ordinary `ue_event` contracts and are collected against the candidate VM before it is accepted. They are not imperative subscriptions executed by calling `BindEvents`. Conditions, loops, arbitrary statements, `-=` and handlers already carrying annotations are rejected. Each handler names one source; use separate forwarding handlers for multiple sources. Native self events and declared native/authored components are supported.
+
+This keeps the existing queued delivery, reload replacement, rejection and owner/source cleanup rules. It does not introduce direct native delegate bindings that outlive the script context. An `+=` expression in an ordinary gameplay method is not this declaration syntax.
+
 ## Subscribing to events: `ue_event`
 
 `ue_event` binds a class method to an existing reflected dynamic multicast
@@ -213,7 +228,7 @@ class ScalarEventActor {
 }
 ```
 
-- `source="self"` is the default; `source="owner"` is available in ActorComponents;
+- `source=self` is the default; `source=owner` is available in ActorComponents and requires `source_type=OwnerRef`;
   a component name subscribes to one of the object's own components.
 - When the source is native (self of a class with a native parent, or a native
   component), the delegate is checked while the script compiles: a misspelled name or
@@ -245,6 +260,18 @@ payloads to the usual snapshot limits (4096 elements / 16 MiB). At most 1024 que
 or recursive events and 256 declarations per class. Full details on payload
 ownership, multiple arguments and timers are in
 [CallbackArguments.md](../Gameplay/CallbackArguments.md).
+
+Names may be identifiers: `[ue_event(source=Health, name=Changed)]`. Quoted names remain accepted. Every declared event is checked before Apply: name, arity, payload types, enum/struct/container identity and source parameter direction. Compatible object/class widening follows the queued callback-frame policy; narrowing and mutable ref/out sources are rejected. Native sources use reflected signatures; authored sources use their source declarations, so they do not require an already-generated Blueprint.
+
+An owner is dynamically assigned to a component, so state its contract explicitly:
+
+```das
+[ue_event(source=owner, source_type=ActorRef, name=OnTakeAnyDamage)]
+def OnDamage(damaged:ActorRef; amount:float; kind:ObjectRef;
+             instigator:ObjectRef; source:ActorRef):void { /* ... */ }
+```
+
+`source_type` names a native or authored object reference type available in the module. The actual owner is checked against that type during binding. Existing owner annotations must add this option; an unknown owner contract is no longer deferred to PIE. `ProbeActorRef` in internal examples describes the test host's custom `OnDasSignal`; it is not a general Actor contract.
 
 Subscriptions are removed on EndPlay, owner or source destruction, world cleanup
 and runtime context release. An accepted hot reload re-binds; a rejected reload keeps

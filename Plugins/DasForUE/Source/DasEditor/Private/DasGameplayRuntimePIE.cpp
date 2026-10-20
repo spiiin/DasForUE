@@ -1,3 +1,4 @@
+#include "DasScriptComponent.h"
 #include "DasLibraryTestTypes.h"
 #include "DasInstanceDefaultsGameFixtures.h"
 #include "DasPawnCharacterFixtures.h"

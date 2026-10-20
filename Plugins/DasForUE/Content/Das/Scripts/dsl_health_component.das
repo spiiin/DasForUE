@@ -16,7 +16,7 @@ class HealthComponent : ActorComponent {
         verify(self.Maximum>0.0f && self.Maximum<=3.402823466e38f,"Maximum health must be finite and positive")
         self.Current=self.Maximum
     }
-    [ue_event(source="owner",name="OnTakeAnyDamage")]
+    [ue_event(source=owner,source_type=ActorRef,name=OnTakeAnyDamage)]
     def OnDamage(damaged:ActorRef; amount:float; kind:ObjectRef; instigator:ObjectRef; source:ActorRef):void {
         if(!(amount>0.0f && amount<=3.402823466e38f) || self.Current<=0.0f) { return }
         self.DamageEvents+=1

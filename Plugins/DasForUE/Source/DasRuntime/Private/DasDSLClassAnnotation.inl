@@ -116,6 +116,8 @@ struct FUEClassAnnotation : das::StructureAnnotation
                                   St->module});
             TGuardValue<FString> NativeDefaultsHint(DSLNativeDefaultsParentHint, NativeHint);
             DSLExpandDeclarationGroups(St, true);
+            DSLNormalizeEventDeclarations(St, Group);
+            DSLNormalizeOperationKeys(St, Args);
             DSLNormalizeInlineCallbacks(St, Group);
             DSLNormalizeMethodReferences(St, Group);
             DSLNormalizeIdentityDefaults(St, Group);
@@ -1583,17 +1585,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                         DSLFail(TEXT("Event source must be self, owner or a declared component"));
                     if (Callback.Source == TEXT("owner") && C.NativeParent != TEXT("/Script/Engine.ActorComponent"))
                         DSLFail(TEXT("Owner event source requires ActorComponent"));
-                    // Native sources are known while compiling: check the delegate and its arity here
-                    // instead of at subscription time. Authored sources keep the runtime check.
-                    if (UClass* EventClass = DSLEventSourceClass(C, Callback.Source))
-                    {
-                        const bool AuthoredEvent = C.Properties.ContainsByPredicate(
-                            [&](const auto& P) { return P.Name == Callback.EventName; });
-                        const int32 Arity = int32(F->arguments.size()) - 1;
-                        if (!AuthoredEvent && !DSLNativeEventMatches(EventClass, Callback.EventName, Arity))
-                            DSLFail(FString::Printf(TEXT("ue_event %s: %s has no BlueprintAssignable multicast delegate %s with %d parameter(s)"),
-                                *Callback.Name, *EventClass->GetName(), *Callback.EventName, Arity));
-                    }
+                    DSLValidateEventSignature(C, Callback, F, St, Group, TypeFolder, TypeRegistry, Event->arguments);
                     auto* SelfObject = DSLCall(F->at, "ue_self_object", {});
                     das::ExpressionPtr Source =
                         Callback.Source ==
@@ -1604,6 +1596,13 @@ struct FUEClassAnnotation : das::StructureAnnotation
                                                : static_cast<das::ExpressionPtr>(DSLCall(
                                                      F->at, "ue_get_self_object",
                                                      {new das::ExprConstString(F->at, DSLUtf8(Callback.Source))}));
+                    if (Callback.Source == TEXT("owner"))
+                    {
+                        auto OwnerType = DSLEventOwnerType(Event->arguments, F, St, Group);
+                        Source = new das::ExprField(
+                            F->at, DSLDirectUnpack(F->at, OwnerType, Source, DSLTypedReferencePath(OwnerType)),
+                            "handle");
+                    }
                     auto* Subscribe =
                         DSLCall(F->at, DSLUtf8(TEXT("ue_subscribe_object_")+ Callback.ParameterKind),
                                                {Source, new das::ExprConstString(F->at, DSLUtf8(Callback.EventName)),

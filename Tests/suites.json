@@ -21,6 +21,9 @@
       "probe": "native-defaults-probe-id.txt" },
     { "name": "computed-defaults", "kind": "script", "script": "TestComputedDefaults.ps1",
       "probe": "computed-defaults-probe-id.txt" },
+    { "name": "dsl-operation-keys", "kind": "script", "script": "TestOperationKeys.ps1" },
+    { "name": "dsl-event-checks", "kind": "script", "script": "TestEventChecks.ps1" },
+    { "name": "dsl-inline-callbacks", "kind": "script", "script": "TestInlineCallbacks.ps1" },
     { "name": "packaged", "kind": "packaged", "log": "combined-export",
       "requires": ["method-values", "native-defaults", "computed-defaults"],
       "maps": [

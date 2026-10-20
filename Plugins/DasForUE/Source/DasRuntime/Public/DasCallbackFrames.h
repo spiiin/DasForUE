@@ -13,3 +13,6 @@ DASRUNTIME_API bool CaptureDasCallbackFrame(UFunction* Signature, const void* Me
 DASRUNTIME_API void ResetDasCallbackFrames();
 
 DASRUNTIME_API bool CheckDasCallbackFrames(FString& Error);
+
+DASRUNTIME_API bool ValidateDasCallbackSignature(UFunction* Signature, const TArray<FDasDeclaredType>& Arguments,
+                                                 FString& Error);

@@ -76,7 +76,8 @@ struct FUECallbackAnnotation : das::FunctionAnnotation
             if (Event)
             {
                 for (const auto& A : Args)
-                    if ((A.name != "source" && A.name != "name") || A.type != das::Type::tString)
+                    if ((A.name != "source" && A.name != "name" && A.name != "source_type") ||
+                        A.type != das::Type::tString)
                         DSLFail(TEXT("Expected ue_event(source=self|owner, name=DelegateName)"));
                 if (DSLString(Args, "name").IsEmpty())
                     DSLFail(TEXT("ue_event requires delegate name"));
