@@ -1,6 +1,7 @@
 #include "DasGASAuthoring.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
+#include "Misc/Paths.h"
 namespace
 {
 bool GASName(const FString& Name)
@@ -61,7 +62,7 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             FString Tag;
             if (!Fields->IsEmpty() ||
                 !Object->TryGetStringField(
-                    TEXT("effect"), Ability.Effect) || Ability.Effect.IsEmpty() ||
+                    TEXT("effect"), Ability.Effect) ||
                     (Object->HasField(TEXT("cost")) && !Object->TryGetStringField(TEXT("cost"), Ability.Cost)) ||
                      (Object->HasField(TEXT("cooldown")) && !GASNumber(Object, TEXT("cooldown"), Ability.Cooldown)) ||
                       (Object->HasField(TEXT("auto_end")) &&
@@ -72,6 +73,32 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             if (Ability.Cooldown < 0 || (Ability.Cooldown > 0 && Ability.Cooldown < 0.01f) ||
                 (Ability.Cooldown > 0 ? !FGameplayTag::IsValidGameplayTagString(Tag) : !Tag.IsEmpty()))
                 return Fail(TEXT("Positive ability cooldown requires a valid tag and at least 0.01 seconds"));
+            auto ReadHook = [&](const TCHAR* Field, FString& Value)
+            {
+                return !Object->HasField(Field) || Object->TryGetStringField(Field, Value);
+            };
+            if (!ReadHook(TEXT("script"), Ability.ScriptFile) ||
+                          !ReadHook(TEXT("contract"), Ability.ScriptContract) ||
+                                    !ReadHook(TEXT("activate"), Ability.ActivateEntry) ||
+                                              !ReadHook(TEXT("end"), Ability.EndEntry) ||
+                                                        !ReadHook(TEXT("cancel"), Ability.CancelEntry))
+                return Fail(TEXT("Invalid ability script metadata"));
+            const FString Prefix = TEXT("__ue_ability_") + Name + TEXT("_");
+            if (!Ability.ActivateEntry.IsEmpty())
+            {
+                if (FPaths::GetCleanFilename(Ability.ScriptFile) != Ability.ScriptFile ||
+                    FPaths::GetExtension(Ability.ScriptFile) !=
+                        TEXT("das") || Ability.ScriptContract.Len() != 32 ||
+                             Ability.ActivateEntry != Prefix + TEXT("Activate") ||
+                                                                    (!Ability.EndEntry.IsEmpty() &&
+                                                                         Ability.EndEntry != Prefix + TEXT("End")) ||
+                                                                     (!Ability.CancelEntry.IsEmpty() &&
+                                                                      Ability.CancelEntry != Prefix + TEXT("Cancel")))
+                    return Fail(TEXT("Invalid generated ability hook identity"));
+            }
+            else if (Ability.Effect.IsEmpty() || !Ability.ScriptFile.IsEmpty() || !Ability.ScriptContract.IsEmpty() ||
+                     !Ability.EndEntry.IsEmpty() || !Ability.CancelEntry.IsEmpty())
+                return Fail(TEXT("Ability requires an effect or an Activate method"));
             Ability.CooldownTag = FName(*Tag);
             Candidate.Abilities.Add(MoveTemp(Ability));
             continue;
@@ -251,9 +278,9 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             return Candidate.Effects.FindByPredicate([&](const auto& E)
                                                      { return E.Name == Reference || E.Id == Reference; });
         };
-        const auto* Effect = Resolve(Ability.Effect);
+        const auto* Effect = Ability.Effect.IsEmpty() ? nullptr : Resolve(Ability.Effect);
         const auto* Cost = Ability.Cost.IsEmpty() ? nullptr : Resolve(Ability.Cost);
-        if (!Effect || (!Ability.Cost.IsEmpty() && !Cost))
+        if ((!Ability.Effect.IsEmpty() && !Effect) || (!Ability.Cost.IsEmpty() && !Cost))
             return Fail(TEXT("Ability effect/cost is not in this script's explicit effect registry"));
         for (const auto* E : {Effect, Cost})
             if (E)
@@ -268,7 +295,8 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
                 if (Mod.Operation != TEXT("Add") || Mod.Magnitude >= 0)
                     return Fail(TEXT("Ability costs require strictly negative Add modifiers"));
         }
-        Ability.Effect = Effect->Id;
+        if (Effect)
+            Ability.Effect = Effect->Id;
         if (Cost)
             Ability.Cost = Cost->Id;
     }

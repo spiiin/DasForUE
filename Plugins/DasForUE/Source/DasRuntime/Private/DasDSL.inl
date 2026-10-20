@@ -858,6 +858,28 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
 bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObject* Self, FString& Wire,
                       FString& Error)
 {
+    if (const auto* Ability = Cast<UDasAuthoredGameplayAbility>(Self); Ability && !Ability->ActivateEntry.IsEmpty())
+    {
+        bool Match = false;
+        Program->getThisModule()->structures.foreach([&](const das::StructurePtr& S)
+        {
+            const auto* A = DSLAnnotation(S->annotations, "ue_gameplay_ability");
+            const auto* Data = A ? A->arguments.find(DSLGASKey, das::Type::tString) : nullptr;
+            TSharedPtr<FJsonObject> Object;
+            FString Contract, Id;
+            if (Data && FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(DSLText(Data->sValue)), Object) &&
+                Object->TryGetStringField(TEXT("contract"), Contract) && Object->TryGetStringField(TEXT("id"), Id) &&
+                Id == Ability->DefinitionId && Contract == Ability->ScriptContract &&
+                (Entry == Ability->ActivateEntry || Entry == Ability->EndEntry || Entry == Ability->CancelEntry))
+            {
+                // The native CDO validates this contract; this is not an Actor/Library schema.
+                Wire.Reset();
+                Match = true;
+            }
+        });
+        if (!Match) Error = TEXT("Ability script contract differs from saved asset; reimport into a new folder");
+        return Match;
+    }
     if (LibraryInvocationContract && Self)
     {
         bool Match = false;

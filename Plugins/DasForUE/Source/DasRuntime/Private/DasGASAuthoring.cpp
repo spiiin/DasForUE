@@ -91,6 +91,19 @@ bool UDasAuthoredAbilitySystemComponent::Live() const
     return IsInGameThread() && !Ended && IsValid(Owner) && Owner->HasAuthority() && !Owner->IsActorBeingDestroyed() &&
            !IsBeingDestroyed() && !IsTemplate() && World && World->IsGameWorld() && !World->bIsTearingDown;
 }
+bool UDasAuthoredAbilitySystemComponent::InitializeAuthoredActorInfo()
+{
+    if (!Live())
+        return false;
+    TArray<UAbilitySystemComponent*> Components;
+    GetOwner()->GetComponents(Components);
+    if (Components.Num() != 1 || Components[0] != this)
+        return false;
+    if (GetOwnerActor())
+        return GetOwnerActor() == GetOwner() && GetAvatarActor() == GetOwner();
+    InitAbilityActorInfo(GetOwner(), GetOwner());
+    return true;
+}
 bool UDasAuthoredAbilitySystemComponent::AddAuthoredAttributes(TSubclassOf<UDasAuthoredAttributeSet> Class)
 {
     if (!Live() || !Class || Class->HasAnyClassFlags(CLASS_Abstract | CLASS_NewerVersionExists))
@@ -102,13 +115,8 @@ bool UDasAuthoredAbilitySystemComponent::AddAuthoredAttributes(TSubclassOf<UDasA
         return (*Existing)->GetClass() == Class;
     if (Sets.Num() >= 16)
         return false;
-    TArray<UAbilitySystemComponent*> Components;
-    GetOwner()->GetComponents(Components);
-    if (Components.Num() != 1 || Components[0] != this)
+    if (!InitializeAuthoredActorInfo())
         return false;
-    if (GetOwnerActor() && (GetOwnerActor() != GetOwner() || GetAvatarActor() != GetOwner()))
-        return false;
-    InitAbilityActorInfo(GetOwner(), GetOwner());
     auto* Set = NewObject<UDasAuthoredAttributeSet>(GetOwner(), Class);
     for (const auto& Rule : Set->Rules)
         if (!Set->Attribute(Rule.Name).IsValid())

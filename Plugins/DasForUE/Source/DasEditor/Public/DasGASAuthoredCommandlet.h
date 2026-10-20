@@ -20,3 +20,12 @@ public:
     UDasGASAuthoredCommandlet();
     virtual int32 Main(const FString& Params) override;
 };
+
+UCLASS()
+class UDasGASHooksCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
+public:
+    UDasGASHooksCommandlet();
+    virtual int32 Main(const FString& Params) override;
+};

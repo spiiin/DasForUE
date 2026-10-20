@@ -5,7 +5,31 @@
 #include "DasGASAbility.generated.h"
 class UDasAuthoredAbilitySystemComponent;
 class UDasAuthoredGameplayEffect;
+class UDasAuthoredGameplayAbility;
 
+USTRUCT(BlueprintType)
+struct DASRUNTIME_API FDasAuthoredAbilityContext
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<UDasAuthoredGameplayAbility> Ability = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<AActor> Owner = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<AActor> Avatar = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<UDasAuthoredAbilitySystemComponent> System = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    int32 GrantId = 0;
+    UPROPERTY(BlueprintReadWrite)
+    int32 ActivationId = 0;
+    UPROPERTY(BlueprintReadWrite)
+    int32 Level = 0;
+    UPROPERTY(BlueprintReadWrite)
+    FName Phase;
+    UPROPERTY(BlueprintReadWrite)
+    bool Cancelled = false;
+};
 USTRUCT(BlueprintType)
 struct DASRUNTIME_API FDasAuthoredAbilityGrant
 {
@@ -37,6 +61,10 @@ struct DASRUNTIME_API FDasAuthoredAbilityState
     int32 Level = 0;
     UPROPERTY(BlueprintReadWrite)
     float CooldownRemaining = 0;
+    UPROPERTY(BlueprintReadWrite)
+    bool Committed = false;
+    UPROPERTY(BlueprintReadWrite)
+    FString Error;
 };
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasAuthoredAbilityChanged, FDasAuthoredAbilityState, Change);
 
@@ -75,9 +103,37 @@ public:
     FGameplayTagContainer CooldownTags;
     UPROPERTY()
     bool AutoEnd = true;
+    UPROPERTY()
+    FString ScriptFile;
+    UPROPERTY()
+    FString ScriptContract;
+    UPROPERTY()
+    FString ActivateEntry;
+    UPROPERTY()
+    FString EndEntry;
+    UPROPERTY()
+    FString CancelEntry;
+    UFUNCTION(BlueprintPure, Category = "GAS")
+    FDasAuthoredAbilityContext ScriptAbilityContext() const;
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool CommitScriptAbility(int32 ActivationId);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool EndScriptAbility(int32 ActivationId);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool CancelScriptAbility(int32 ActivationId);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool ApplyScriptAbilityEffect(int32 ActivationId);
+    bool IsAuthoredCommitted() const { return CommittedForActivation; }
+    const FString& GetScriptError() const { return ScriptError; }
+    virtual void OnRemoveAbility(const FGameplayAbilityActorInfo* Info, const FGameplayAbilitySpec& Spec) override;
+    virtual void BeginDestroy() override;
     virtual UGameplayEffect* GetCostGameplayEffect() const override;
     virtual UGameplayEffect* GetCooldownGameplayEffect() const override;
     virtual const FGameplayTagContainer* GetCooldownTags() const override;
+    virtual bool CanActivateAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* Info,
+                                    const FGameplayTagContainer* SourceTags = nullptr,
+                                    const FGameplayTagContainer* TargetTags = nullptr,
+                                    FGameplayTagContainer* RelevantTags = nullptr) const override;
     virtual bool CheckCost(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* Info,
                            FGameplayTagContainer* RelevantTags = nullptr) const override;
     virtual void ApplyCooldown(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* Info,
@@ -86,4 +142,21 @@ public:
                                  FGameplayAbilityActivationInfo Activation, const FGameplayEventData* Event) override;
     virtual void EndAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* Info,
                             FGameplayAbilityActivationInfo Activation, bool Replicate, bool Cancelled) override;
+
+private:
+    int32 ActivationSerial = 0;
+    int32 ScriptGrantId = 0;
+    int32 ScriptLevel = 0;
+    bool CommittedForActivation = false;
+    bool ScriptEnding = false;
+    bool ScriptActivating = false;
+    bool ScriptCancelled = false;
+    FName ScriptPhase;
+    FString ScriptError;
+    TWeakObjectPtr<AActor> ScriptOwner;
+    TWeakObjectPtr<AActor> ScriptAvatar;
+    TWeakObjectPtr<UDasAuthoredAbilitySystemComponent> ScriptSystem;
+    bool ValidScriptActivation(int32 Id) const;
+    bool RunScriptHook(const FString& Entry, FName Phase, bool Cancelled = false);
+    void ReleaseScript();
 };

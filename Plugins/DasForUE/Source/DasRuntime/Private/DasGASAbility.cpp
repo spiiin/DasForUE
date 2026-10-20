@@ -1,5 +1,8 @@
 #include "DasGASAbility.h"
 #include "DasGASAuthoring.h"
+#include "DasRuntime.h"
+#include "Modules/ModuleManager.h"
+#include "GameFramework/Actor.h"
 #include "Engine/World.h"
 
 UDasAuthoredAbilityCooldown::UDasAuthoredAbilityCooldown()
@@ -23,6 +26,15 @@ UGameplayEffect* UDasAuthoredGameplayAbility::GetCooldownGameplayEffect() const
 const FGameplayTagContainer* UDasAuthoredGameplayAbility::GetCooldownTags() const
 {
     return &CooldownTags;
+}
+bool UDasAuthoredGameplayAbility::CanActivateAbility(FGameplayAbilitySpecHandle Handle,
+                                                     const FGameplayAbilityActorInfo* Info,
+                                                     const FGameplayTagContainer* SourceTags,
+                                                     const FGameplayTagContainer* TargetTags,
+                                                     FGameplayTagContainer* RelevantTags) const
+{
+    return !ScriptEnding && !ScriptActivating &&
+           Super::CanActivateAbility(Handle, Info, SourceTags, TargetTags, RelevantTags);
 }
 bool UDasAuthoredGameplayAbility::CheckCost(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* Info,
                                             FGameplayTagContainer* RelevantTags) const
@@ -77,16 +89,38 @@ void UDasAuthoredGameplayAbility::ActivateAbility(FGameplayAbilitySpecHandle Han
                                                   FGameplayAbilityActivationInfo Activation, const FGameplayEventData*)
 {
     auto* ASC = Info ? Cast<UDasAuthoredAbilitySystemComponent>(Info->AbilitySystemComponent.Get()) : nullptr;
-    if (!ASC || !Effect || !CommitAbility(Handle, Info, Activation))
+    if (!ASC || ActivationSerial == MAX_int32)
     {
-        if (ASC)
-            ASC->NotifyAuthoredAbility(Handle, TEXT("Rejected"));
         EndAbility(Handle, Info, Activation, false, true);
         return;
     }
-    const auto Spec = MakeOutgoingGameplayEffectSpec(Handle, Info, Activation, Effect, GetAbilityLevel(Handle, Info));
-    const bool Applied =
-        Spec.IsValid() && ApplyGameplayEffectSpecToOwner(Handle, Info, Activation, Spec).WasSuccessfullyApplied();
+    TGuardValue<bool> Activating(ScriptActivating, true);
+    ++ActivationSerial;
+    CommittedForActivation = false;
+    ScriptError.Empty();
+    ScriptOwner = Info->OwnerActor;
+    ScriptAvatar = Info->AvatarActor;
+    ScriptSystem = ASC;
+    ScriptGrantId = ASC->AuthoredAbilityId(Handle);
+    ScriptLevel = GetAbilityLevel(Handle, Info);
+    if (!ActivateEntry.IsEmpty())
+    {
+        ASC->NotifyAuthoredAbility(Handle, TEXT("Activated"), true);
+        if (!RunScriptHook(ActivateEntry, TEXT("Activate")))
+        {
+            ASC->NotifyAuthoredAbility(Handle, TEXT("Rejected"));
+            if (IsActive())
+                EndAbility(Handle, Info, Activation, false, true);
+        }
+        return;
+    }
+    if (!Effect || !CommitScriptAbility(ActivationSerial))
+    {
+        ASC->NotifyAuthoredAbility(Handle, TEXT("Rejected"));
+        EndAbility(Handle, Info, Activation, false, true);
+        return;
+    }
+    const bool Applied = ApplyScriptAbilityEffect(ActivationSerial);
     ASC->NotifyAuthoredAbility(Handle, Applied ? FName(TEXT("Activated")) : FName(TEXT("Rejected")), Applied);
     if (!Applied || AutoEnd)
         EndAbility(Handle, Info, Activation, false, !Applied);
@@ -98,17 +132,26 @@ void UDasAuthoredGameplayAbility::EndAbility(FGameplayAbilitySpecHandle Handle, 
     auto* ASC = Info ? Cast<UDasAuthoredAbilitySystemComponent>(Info->AbilitySystemComponent.Get()) : nullptr;
     Super::EndAbility(Handle, Info, Activation, Replicate, Cancelled);
     if (WasActive && !IsActive() && ASC)
+    {
+        TGuardValue<bool> Ending(ScriptEnding, true);
+        if (!ActivateEntry.IsEmpty())
+        {
+            if (Cancelled)
+                RunScriptHook(CancelEntry, TEXT("Cancel"), true);
+            RunScriptHook(EndEntry, TEXT("End"), Cancelled);
+        }
         ASC->NotifyAuthoredAbility(Handle, Cancelled ? FName(TEXT("Cancelled")) : FName(TEXT("Ended")));
+    }
 }
 FDasAuthoredAbilityGrant
 UDasAuthoredAbilitySystemComponent::GiveAuthoredAbility(TSubclassOf<UDasAuthoredGameplayAbility> Class, int32 Level)
 {
     FDasAuthoredAbilityGrant Result;
-    if (!Live() || Sets.IsEmpty() || !Class || Level < 1 || Level > 10000 ||
+    if (!InitializeAuthoredActorInfo() || !Class || Level < 1 || Level > 10000 ||
         Class->HasAnyClassFlags(CLASS_Abstract | CLASS_NewerVersionExists))
         return Result;
     const auto* CDO = Class->GetDefaultObject<UDasAuthoredGameplayAbility>();
-    if (CDO->DefinitionId.IsEmpty() || CDO->DefinitionName.IsNone() || !CDO->Effect)
+    if (CDO->DefinitionId.IsEmpty() || CDO->DefinitionName.IsNone() || (!CDO->Effect && CDO->ActivateEntry.IsEmpty()))
         return Result;
     for (UClass* EffectClass : {CDO->Effect.Get(), CDO->Cost.Get()})
         if (EffectClass)
@@ -162,12 +205,16 @@ FDasAuthoredAbilityState UDasAuthoredAbilitySystemComponent::AuthoredAbilityStat
         return Result;
     Result.Phase = TEXT("State");
     Result.GrantId = Id;
+    const auto* Instance = Cast<UDasAuthoredGameplayAbility>(Spec->GetPrimaryInstance());
+    Result.Committed = Instance && Instance->IsAuthoredCommitted();
+    Result.Error = Instance ? Instance->GetScriptError() : FString();
     Result.Granted = true;
     Result.Active = Spec->IsActive();
     Result.Ability = Record->Name;
     Result.Level = Spec->Level;
     Result.CooldownRemaining = FMath::Max(0.f, Ability->GetCooldownTimeRemaining(AbilityActorInfo.Get()));
-    Result.CanActivate = !Result.Active && Ability->CanActivateAbility(Record->Handle, AbilityActorInfo.Get());
+    const auto* Source = Instance ? Instance : Ability;
+    Result.CanActivate = !Result.Active && Source->CanActivateAbility(Record->Handle, AbilityActorInfo.Get());
     return Result;
 }
 bool UDasAuthoredAbilitySystemComponent::ActivateAuthoredAbility(int32 Id)
@@ -178,12 +225,15 @@ bool UDasAuthoredAbilitySystemComponent::ActivateAuthoredAbility(int32 Id)
     if (!Record || !FindAbilitySpecFromHandle(Record->Handle))
         return false;
     const auto Handle = Record->Handle;
-    Record->Committed = false;
+    const bool PreviousSuccess = Record->ActivationSucceeded;
+    Record->ActivationSucceeded = false;
     const bool Accepted = TryActivateAbility(Handle, false);
     if (!Accepted)
         NotifyAuthoredAbility(Handle, TEXT("Blocked"));
-    const auto* After = Abilities.Find(Id);
-    return Accepted && After && After->Committed;
+    auto* After = Abilities.Find(Id);
+    if (!Accepted && After)
+        After->ActivationSucceeded = PreviousSuccess;
+    return Accepted && After && After->ActivationSucceeded;
 }
 bool UDasAuthoredAbilitySystemComponent::CancelAuthoredAbility(int32 Id)
 {
@@ -230,15 +280,17 @@ bool UDasAuthoredAbilitySystemComponent::RemoveAuthoredAbility(int32 Id)
     return true;
 }
 void UDasAuthoredAbilitySystemComponent::NotifyAuthoredAbility(FGameplayAbilitySpecHandle Handle, FName Phase,
-                                                               bool Committed)
+                                                               bool Succeeded)
 {
     if (!Live())
         return;
     for (auto& Pair : Abilities)
         if (Pair.Value.Handle == Handle)
         {
-            if (Committed)
-                Pair.Value.Committed = true;
+            if (Succeeded)
+                Pair.Value.ActivationSucceeded = true;
+            if (Phase == TEXT("Rejected"))
+                Pair.Value.ActivationSucceeded = false;
             auto Change = AuthoredAbilityState(Pair.Key);
             Change.Ability = Pair.Value.Name;
             Change.GrantId = Pair.Key;
@@ -249,4 +301,113 @@ void UDasAuthoredAbilitySystemComponent::NotifyAuthoredAbility(FGameplayAbilityS
             AbilityChanged.Broadcast(Change);
             return;
         }
+}
+
+int32 UDasAuthoredAbilitySystemComponent::AuthoredAbilityId(FGameplayAbilitySpecHandle Handle) const
+{
+    if (!Live() || !FindAbilitySpecFromHandle(Handle))
+        return 0;
+    for (const auto& Pair : Abilities)
+        if (Pair.Value.Handle == Handle)
+            return Pair.Key;
+    return 0;
+}
+FDasAuthoredAbilityContext UDasAuthoredGameplayAbility::ScriptAbilityContext() const
+{
+    FDasAuthoredAbilityContext Result;
+    if (IsTemplate() || ActivationSerial <= 0)
+        return Result;
+    Result.Ability = const_cast<UDasAuthoredGameplayAbility*>(this);
+    Result.Owner = ScriptOwner.Get();
+    Result.Avatar = ScriptAvatar.Get();
+    Result.System = ScriptSystem.Get();
+    Result.GrantId = ScriptGrantId;
+    Result.ActivationId = ActivationSerial;
+    Result.Level = ScriptLevel;
+    Result.Phase = ScriptPhase;
+    Result.Cancelled = ScriptCancelled;
+    return Result;
+}
+bool UDasAuthoredGameplayAbility::ValidScriptActivation(int32 Id) const
+{
+    auto* ASC = ScriptSystem.Get();
+    auto* Owner = ScriptOwner.Get();
+    return IsInGameThread() && !IsTemplate() && IsActive() && !ScriptEnding && Id > 0 && Id == ActivationSerial &&
+           IsValid(Owner) && !Owner->IsActorBeingDestroyed() && ASC &&
+           ASC->AuthoredAbilityId(GetCurrentAbilitySpecHandle()) == ScriptGrantId && ScriptGrantId > 0;
+}
+bool UDasAuthoredGameplayAbility::CommitScriptAbility(int32 Id)
+{
+    if (!ValidScriptActivation(Id))
+        return false;
+    if (CommittedForActivation)
+        return true;
+    CommittedForActivation =
+        CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
+    return CommittedForActivation;
+}
+bool UDasAuthoredGameplayAbility::ApplyScriptAbilityEffect(int32 Id)
+{
+    if (!ValidScriptActivation(Id) || !CommittedForActivation || !Effect)
+        return false;
+    const auto Spec = MakeOutgoingGameplayEffectSpec(Effect, GetAbilityLevel());
+    return Spec.IsValid() && ApplyGameplayEffectSpecToOwner(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(),
+                                                            GetCurrentActivationInfo(), Spec)
+                                 .WasSuccessfullyApplied();
+}
+bool UDasAuthoredGameplayAbility::EndScriptAbility(int32 Id)
+{
+    if (!ValidScriptActivation(Id))
+        return false;
+    Finish();
+    return !IsActive();
+}
+bool UDasAuthoredGameplayAbility::CancelScriptAbility(int32 Id)
+{
+    if (!ValidScriptActivation(Id))
+        return false;
+    CancelAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), false);
+    return !IsActive();
+}
+bool UDasAuthoredGameplayAbility::RunScriptHook(const FString& Entry, FName Phase, bool Cancelled)
+{
+    if (Entry.IsEmpty())
+        return true;
+    auto* Owner = ScriptOwner.Get();
+    if (!IsValid(Owner) || Owner->IsActorBeingDestroyed() || !Owner->GetWorld() || Owner->GetWorld()->bIsTearingDown)
+        return true; // teardown revokes execution; no new VM is started on a dead owner.
+    auto* Runtime = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"));
+    if (!Runtime)
+    {
+        ScriptError = TEXT("DAS runtime is unavailable");
+        return false;
+    }
+    TGuardValue<FName> PhaseScope(ScriptPhase, Phase);
+    TGuardValue<bool> CancelScope(ScriptCancelled, Cancelled);
+    const auto Result = Runtime->DispatchGASAbilityHook(this, Entry);
+    if (!Result.bSucceeded)
+    {
+        ScriptError = Result.Error;
+        UE_LOG(LogTemp, Warning,
+               TEXT("DAS_GAS_ABILITY_HOOK_FAILED %s %s: %s"), *DefinitionName.ToString(), *Phase.ToString(),
+                    *ScriptError);
+    }
+    return Result.bSucceeded;
+}
+void UDasAuthoredGameplayAbility::ReleaseScript()
+{
+    if (IsInGameThread())
+        if (auto* Runtime = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))
+            Runtime->ReleaseObject(this);
+}
+void UDasAuthoredGameplayAbility::OnRemoveAbility(const FGameplayAbilityActorInfo* Info,
+                                                  const FGameplayAbilitySpec& Spec)
+{
+    Super::OnRemoveAbility(Info, Spec);
+    ReleaseScript();
+}
+void UDasAuthoredGameplayAbility::BeginDestroy()
+{
+    ReleaseScript();
+    Super::BeginDestroy();
 }

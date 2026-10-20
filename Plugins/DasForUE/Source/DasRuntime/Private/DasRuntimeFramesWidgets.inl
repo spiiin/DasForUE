@@ -289,6 +289,31 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
                    C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
                    C.InputClasses[0] == UTF8_TO_TCHAR(P->sValue.c_str()) && FindDasCallbackFrame(C.InputClasses[0]);
         }
+    // Like authored UFunction entries, the compiler-owned ability descriptor is
+    // an explicit registry for this otherwise non-public struct-frame ABI.
+    if (F->generated && C.ReturnKind == EDasMethodSignature::Void && C.InputDirections.IsEmpty() &&
+        C.Inputs.Num() == 1 && C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
+        C.InputClasses[0] == TEXT("/Script/DasRuntime.DasAuthoredAbilityContext"))
+    {
+        bool Declared = false;
+        Program->getThisModule()->structures.foreach([&](const das::StructurePtr& S)
+        {
+            for (auto* A : S->annotations)
+                if (A->annotation->name == "ue_gameplay_ability")
+                {
+                    auto* Wire = A->arguments.find("_ue_gas_declaration", das::Type::tString);
+                    TSharedPtr<FJsonObject> Object;
+                    if (!Wire || !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(UTF8_TO_TCHAR(Wire->sValue.c_str())), Object))
+                        continue;
+                    for (const auto* Key : {TEXT("activate"), TEXT("end"), TEXT("cancel")})
+                    {
+                        FString Value;
+                        Declared |= Object->TryGetStringField(Key, Value) && Value == Entry;
+                    }
+                }
+        });
+        if (Declared) return true;
+    }
     bool Objects = C.ReturnKind == EDasMethodSignature::Delegate || C.ReturnKind == EDasMethodSignature::Object ||
                    C.ReturnKind == EDasMethodSignature::Struct || C.ReturnKind == EDasMethodSignature::Enum;
     for (auto K : C.Inputs)

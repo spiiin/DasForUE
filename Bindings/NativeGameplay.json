@@ -2530,6 +2530,57 @@
 			]
 		},
 		{
+			"path": "/Script/DasRuntime.DasAuthoredAbilityContext",
+			"signature": "Ability:ObjectProperty:0:/Script/DasRuntime.DasAuthoredGameplayAbility;Owner:ObjectProperty:0:/Script/Engine.Actor;Avatar:ObjectProperty:0:/Script/Engine.Actor;System:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;GrantId:IntProperty:0;ActivationId:IntProperty:0;Level:IntProperty:0;Phase:NameProperty:0;Cancelled:BoolProperty:0;",
+			"fields": [
+				{
+					"kind": "object",
+					"type_path": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"name": "Ability"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "Owner"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "Avatar"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"name": "System"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "GrantId"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "ActivationId"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "Level"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "Phase"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "Cancelled"
+				}
+			]
+		},
+		{
 			"path": "/Script/DasRuntime.DasAuthoredAbilityGrant",
 			"signature": "Target:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;Id:IntProperty:0;",
 			"fields": [
@@ -2547,7 +2598,7 @@
 		},
 		{
 			"path": "/Script/DasRuntime.DasAuthoredAbilityState",
-			"signature": "Phase:NameProperty:0;GrantId:IntProperty:0;Cancelled:BoolProperty:0;Granted:BoolProperty:0;Active:BoolProperty:0;CanActivate:BoolProperty:0;Ability:NameProperty:0;Level:IntProperty:0;CooldownRemaining:FloatProperty:0;",
+			"signature": "Phase:NameProperty:0;GrantId:IntProperty:0;Cancelled:BoolProperty:0;Granted:BoolProperty:0;Active:BoolProperty:0;CanActivate:BoolProperty:0;Ability:NameProperty:0;Level:IntProperty:0;CooldownRemaining:FloatProperty:0;Committed:BoolProperty:0;Error:StrProperty:0;",
 			"fields": [
 				{
 					"kind": "name",
@@ -2593,6 +2644,16 @@
 					"kind": "float",
 					"type_path": "",
 					"name": "CooldownRemaining"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "Committed"
+				},
+				{
+					"kind": "string",
+					"type_path": "",
+					"name": "Error"
 				}
 			]
 		},
@@ -3893,7 +3954,7 @@
 				{
 					"name": "AuthoredAbilityState",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
-					"signature": "v1;AuthoredAbilityState;Id:IntProperty:128;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredAbilityState{Phase:NameProperty:0;GrantId:IntProperty:0;Cancelled:BoolProperty:0;Granted:BoolProperty:0;Active:BoolProperty:0;CanActivate:BoolProperty:0;Ability:NameProperty:0;Level:IntProperty:0;CooldownRemaining:FloatProperty:0;};",
+					"signature": "v1;AuthoredAbilityState;Id:IntProperty:128;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredAbilityState{Phase:NameProperty:0;GrantId:IntProperty:0;Cancelled:BoolProperty:0;Granted:BoolProperty:0;Active:BoolProperty:0;CanActivate:BoolProperty:0;Ability:NameProperty:0;Level:IntProperty:0;CooldownRemaining:FloatProperty:0;Committed:BoolProperty:0;Error:StrProperty:0;};",
 					"const": true,
 					"construction_unsafe": false,
 					"parameters": [
@@ -5730,6 +5791,90 @@
 			"fields": [],
 			"methods": [
 				{
+					"name": "ApplyScriptAbilityEffect",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;ApplyScriptAbilityEffect;ActivationId:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ActivationId",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "CancelScriptAbility",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;CancelScriptAbility;ActivationId:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ActivationId",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "CommitScriptAbility",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;CommitScriptAbility;ActivationId:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ActivationId",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "EndScriptAbility",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;EndScriptAbility;ActivationId:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ActivationId",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "GetAbilityLevel",
 					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
 					"signature": "v1;GetAbilityLevel;ReturnValue:IntProperty:1408;",
@@ -6000,6 +6145,21 @@
 					"parameters": []
 				},
 				{
+					"name": "ScriptAbilityContext",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;ScriptAbilityContext;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredAbilityContext{Ability:ObjectProperty:0:/Script/DasRuntime.DasAuthoredGameplayAbility;Owner:ObjectProperty:0:/Script/Engine.Actor;Avatar:ObjectProperty:0:/Script/Engine.Actor;System:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;GrantId:IntProperty:0;ActivationId:IntProperty:0;Level:IntProperty:0;Phase:NameProperty:0;Cancelled:BoolProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasAuthoredAbilityContext",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "SetCanBeCanceled",
 					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
 					"signature": "v1;SetCanBeCanceled;bCanBeCanceled:BoolProperty:128;",
@@ -6039,6 +6199,11 @@
 				{
 					"domain": "field",
 					"name": "AbilityTriggers",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ActivateEntry",
 					"reason": "hidden_editor_or_deprecated"
 				},
 				{
@@ -6113,6 +6278,11 @@
 				},
 				{
 					"domain": "field",
+					"name": "CancelEntry",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
 					"name": "CooldownGameplayEffectClass",
 					"reason": "hidden_editor_or_deprecated"
 				},
@@ -6173,6 +6343,11 @@
 				},
 				{
 					"domain": "field",
+					"name": "EndEntry",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
 					"name": "InstancingPolicy",
 					"reason": "hidden_editor_or_deprecated"
 				},
@@ -6194,6 +6369,16 @@
 				{
 					"domain": "field",
 					"name": "ReplicationPolicy",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ScriptContract",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ScriptFile",
 					"reason": "hidden_editor_or_deprecated"
 				},
 				{

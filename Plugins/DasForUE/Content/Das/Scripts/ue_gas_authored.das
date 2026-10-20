@@ -82,3 +82,19 @@ def ue_gas_remove_ability(grant:GASAbilityGrant):bool {
     if(!ue_is_valid(grant.Target) || grant.Id<=0) {return false}
     return grant.Target.RemoveAuthoredAbility(grant.Id)
 }
+
+// A snapshot belongs to one native activation. Old serials cannot affect a later activation.
+typedef GASAbilityContext = DasAuthoredAbilityContext
+
+def ue_gas_commit(context:GASAbilityContext):bool {
+    return ue_is_valid(context.Ability) && context.Ability.CommitScriptAbility(context.ActivationId)
+}
+def ue_gas_end(context:GASAbilityContext):bool {
+    return ue_is_valid(context.Ability) && context.Ability.EndScriptAbility(context.ActivationId)
+}
+def ue_gas_cancel(context:GASAbilityContext):bool {
+    return ue_is_valid(context.Ability) && context.Ability.CancelScriptAbility(context.ActivationId)
+}
+def ue_gas_apply_ability_effect(context:GASAbilityContext):bool {
+    return ue_is_valid(context.Ability) && context.Ability.ApplyScriptAbilityEffect(context.ActivationId)
+}

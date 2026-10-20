@@ -1037,6 +1037,19 @@ struct Vector4 {
     W:double
 }
 
+[ue_native_struct(path="/Script/DasRuntime.DasAuthoredAbilityContext")]
+struct DasAuthoredAbilityContext {
+    Ability:AuthoredGameplayAbilityRef
+    Owner:C_Actor_adf65d5b
+    Avatar:C_Actor_adf65d5b
+    System:AuthoredAbilitySystemComponentRef
+    GrantId:int
+    ActivationId:int
+    Level:int
+    Phase:UENameValue
+    Cancelled:bool
+}
+
 [ue_native_struct(path="/Script/DasRuntime.DasAuthoredAbilityGrant")]
 struct DasAuthoredAbilityGrant {
     Target:AuthoredAbilitySystemComponentRef
@@ -1054,6 +1067,8 @@ struct DasAuthoredAbilityState {
     Ability:UENameValue
     Level:int
     CooldownRemaining:float
+    Committed:bool
+    Error:string
 }
 
 [ue_native_struct(path="/Script/DasRuntime.DasAuthoredAttributeChange")]

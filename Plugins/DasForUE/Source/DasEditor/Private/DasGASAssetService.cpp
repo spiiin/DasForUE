@@ -40,10 +40,12 @@ FString EffectDigest(const FDasGASEffectDeclaration& D, const FString& SetHash)
 }
 FString AbilityDigest(const FDasGASAbilityDeclaration& D, const TMap<FString, FString>& Hashes)
 {
-    const FString Value =
-        D.Id + TEXT("|ability-v1|") + Hashes.FindChecked(D.Effect) +
+    FString Value =
+        D.Id + TEXT("|ability-v1|") + (D.Effect.IsEmpty() ? FString() : Hashes.FindChecked(D.Effect)) +
                     TEXT("|") + (D.Cost.IsEmpty() ? FString() : Hashes.FindChecked(D.Cost)) +
                          FString::Printf(TEXT("|%.9g|%s|%d"), double(D.Cooldown), *D.CooldownTag.ToString(), D.AutoEnd);
+    if (!D.ActivateEntry.IsEmpty())
+        Value += TEXT("|script-v1|") + D.ScriptFile + TEXT("|") + D.ScriptContract;
     return FMD5::HashAnsiString(*Value);
 }
 UBlueprint* NewGASBlueprint(const FString& Path, UClass* Parent)
@@ -310,6 +312,11 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             if (!Ability.CooldownTag.IsNone())
                 CDO->CooldownTags.AddTag(FGameplayTag::RequestGameplayTag(Ability.CooldownTag, false));
             CDO->AutoEnd = Ability.AutoEnd;
+            CDO->ScriptFile = Ability.ScriptFile;
+            CDO->ScriptContract = Ability.ScriptContract;
+            CDO->ActivateEntry = Ability.ActivateEntry;
+            CDO->EndEntry = Ability.EndEntry;
+            CDO->CancelEntry = Ability.CancelEntry;
             CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
                 ->UpdateCustomPropertyListForPostConstruction();
             FAssetRegistryModule::AssetCreated(W.BP);

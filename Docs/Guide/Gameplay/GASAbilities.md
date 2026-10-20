@@ -1,10 +1,10 @@
-# Declarative GameplayAbilities
+# GameplayAbilities with DAS logic
 
 `[ue_gameplay_ability]` creates a Blueprint class deriving from the native
-UDasAuthoredGameplayAbility. This first increment describes an effect action, an
-optional resource cost and tag-based cooldown. Activation and commit use the
-standard GameplayAbility lifecycle. Ability declarations have no user fields,
-DAS inheritance or DAS methods yet; reactions use managed ASC events.
+UDasAuthoredGameplayAbility. It supports declarative effect actions and ordinary DAS ability methods,
+with an optional resource cost and tag-based cooldown. Activation, commit and
+completion use the native GameplayAbility lifecycle. DAS inheritance and
+UE-reflected fields/methods on the ability are not supported yet.
 
 Keep definitions alongside their AttributeSet and effects in the same module:
 
@@ -87,8 +87,8 @@ non-reused ID; revoke and regrant produce a different ID.
 | Helper | Behavior |
 |---|---|
 | ue_gas_give_ability(asc, kind, level=1) | Give or retrieve the same grant; invalid input is refused |
-| ue_gas_activate_ability(grant) | Check native activation requirements, commit cost/cooldown and apply the action; returns false when blocked |
-| ue_gas_ability_state(grant) | Owned snapshot: Granted, Active, CanActivate, Ability, Level, CooldownRemaining, GrantId and Phase |
+| ue_gas_activate_ability(grant) | Check native activation requirements and execute Activate, or the declarative action; false when blocked/activation fails |
+| ue_gas_ability_state(grant) | Owned snapshot: Granted, Active, CanActivate, Ability, Level, CooldownRemaining, GrantId, Phase, Committed and Error |
 | ue_gas_cancel_ability(grant) | Cancel an active ability |
 | ue_gas_finish_ability(grant) | End an active ability normally |
 | ue_gas_remove_ability(grant) | Cancel if active and revoke the grant |
@@ -128,8 +128,8 @@ GC. Releasing the script owner removes subscriptions, while native gameplay stat
 continues until explicitly ended/revoked or the ASC owner ends play.
 
 This is a local authority-only, non-replicated adapter with one ASC per owner.
-Arbitrary DAS ability bodies/overrides, target data, gameplay-event activation,
-ability tasks, prediction/replication and attribute-capture calculations remain
+Target data, gameplay-event activation, ability tasks, prediction/replication
+and attribute-capture calculations remain
 future increments.
 
 Validation: the focused authoring commandlet built with DasRuntime/DasEditor and
@@ -137,3 +137,98 @@ passed 14 checks on creation plus 14 on reopening the same saved assets in a new
 process. It checks real cost/cooldown tags and world ticks, manual and automatic
 lifecycle, stale grant IDs, callback snapshots after GC and actor DSL compilation.
 No full PIE or packaged run was performed. See logs/gas-ability-validation.json.
+
+
+## Ordinary DAS ability methods
+
+See `Plugins/DasForUE/Content/Das/Scripts/gas_scripted_abilities.das` for the
+complete AttributeSet/effects/ability example. Require `ue_gas` and use:
+
+```das
+[ue_gameplay_ability(effect="ScriptHeal",cost="ScriptCost",
+    cooldown=0.4f,cooldown_tag="Ability.Cooldown.Restore")]
+class ScriptedRestore {
+    Activations:int=0
+
+    def Activate(context:GASAbilityContext) {
+        self.Activations+=1
+        if(!ue_gas_commit(context)) {
+            ue_gas_cancel(context)
+            return
+        }
+        if(!ue_gas_apply_ability_effect(context)) {
+            ue_gas_cancel(context)
+            return
+        }
+        ue_gas_end(context)
+    }
+    def Cancel(context:GASAbilityContext) {
+        // Cancellation-specific cleanup.
+    }
+    def End(context:GASAbilityContext) {
+        // Cleanup shared by normal completion and cancellation.
+    }
+}
+```
+
+`Activate` is required for a scripted ability. `End` and `Cancel` are optional.
+These are unique ordinary instance methods returning void and taking one
+by-value `GASAbilityContext`. They need no `ue_function` annotation. Ordinary
+DAS helper methods and fields are allowed. Fields are private script state,
+not UPROPERTY fields. One native InstancedPerActor ability owns one persistent
+DAS context; separate owners/ability instances do not share these fields.
+
+| Context field | Meaning |
+|---|---|
+| Ability | Checked reference to the native ability instance |
+| Owner / Avatar | Typed ActorRef values from native GAS actor info |
+| System | Typed AuthoredAbilitySystemComponentRef |
+| GrantId / ActivationId | ASC-local grant ID and per-instance activation serial |
+| Level | Native ability spec level |
+| Phase | Activate, Cancel or End |
+| Cancelled | True for cancellation, including its subsequent End hook |
+
+The context is an owned snapshot. Copying or retaining it is safe; object
+references remain checked. `ue_gas_commit(context)`, `ue_gas_end(context)` and
+`ue_gas_cancel(context)` validate the live native ability and activation serial.
+An ended/revoked instance or a context from a previous activation returns false.
+Mutating a snapshot does not change native actor info. It is not an authorization
+token: explicitly using the current activation's serial targets that activation.
+
+Scripted mode never auto-commits, auto-applies the preset effect or auto-ends;
+`auto_end` applies only to declarative abilities. Omitting `effect` is allowed
+when Activate exists, allowing the body to perform its own gameplay work through
+the owner/avatar/System. No AttributeSet is required when both preset and cost are omitted.
+An active ability stays active when Activate returns
+until it explicitly ends, is cancelled or is revoked. Repeated commit succeeds
+without spending cost or starting cooldown twice during the same activation.
+`ue_gas_apply_ability_effect(context)` applies the optional preset action to the
+owner only after successful commit. Each call applies the effect again, so call
+it once for a single action. Costs/cooldowns are never refunded by end/cancel.
+
+Normal completion invokes End. Cancellation invokes Cancel and then End. Native
+termination happens before those cleanup hooks: commit/end/cancel from them
+return false, and a new activation is blocked until the current hook returns.
+The hooks are synchronous and can execute inside Activate. ASC AbilityChanged
+notifications retain their separate managed, deferred delivery semantics.
+
+`ue_gas_activate_ability(grant)` reports accepted script activation, which can
+finish synchronously without committing. Inspect state.Committed for actual
+commit success and state.Error for hook failures. A failed Activate records the
+error and cancels the remaining active ability. Cleanup errors are recorded too;
+they do not restore ended native state. Owner/world teardown skips new script
+execution. Revoking/destroying the ability releases its persistent context.
+
+Saved ability CDOs carry the script filename and generated declaration contract.
+Hook signatures/options must agree with the loaded source. Body-only edits use
+the runtime's existing safe reload path; a replacement context resets DAS fields.
+Contract changes require import into a new asset folder while migration is
+deferred. Package the source modules along with other DAS scripts.
+
+Focused validation for these hooks uses `Scripts/TestGASHooks.ps1`: one process
+with a real ASC and native ability, explicit and external completion/cancellation,
+exactly-once cost, stale activation snapshots, persistent fields and VM release.
+No full PIE, reopening or packaged run is part of this check. Its current result
+is recorded in `logs/gas-hooks-validation.json`.
+
+The latest focused hooks run passed all 12 checks (exit code 0).

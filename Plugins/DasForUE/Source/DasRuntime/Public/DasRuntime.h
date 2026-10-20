@@ -8,6 +8,7 @@
 #include "UObject/WeakObjectPtrTemplates.h"
 
 class USaveGame;
+class UDasAuthoredGameplayAbility;
 class UDasScriptUserWidget;
 class FReply;
 struct FGeometry;
@@ -105,6 +106,7 @@ public:
     FDasExecutionResult RunLibraryFrame(const FString& Contract, const FString& Script, const FString& Entry,
                                         const TArray<FDasScalarValue>& Arguments, EDasMethodSignature ReturnKind,
                                         const FString& ReturnClass);
+    FDasExecutionResult DispatchGASAbilityHook(UDasAuthoredGameplayAbility* Ability, const FString& EntryPoint);
     FDasExecutionResult RunNamedFramePersistent(const FString& Path, const FString& EntryPoint,
                                                 const TArray<FDasScalarValue>& Arguments,
                                                 EDasMethodSignature ReturnKind, TWeakObjectPtr<UObject> Self,

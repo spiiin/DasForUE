@@ -55,6 +55,7 @@ struct FDasGASEffectDeclaration
 struct FDasGASAbilityDeclaration
 {
     FString Name, Id, Effect, Cost;
+    FString ScriptFile, ScriptContract, ActivateEntry, EndEntry, CancelEntry;
     float Cooldown = 0;
     FName CooldownTag;
     bool AutoEnd = true;
@@ -184,7 +185,8 @@ public:
     bool FinishAuthoredAbility(int32 Id);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     bool RemoveAuthoredAbility(int32 Id);
-    void NotifyAuthoredAbility(FGameplayAbilitySpecHandle Handle, FName Phase, bool Committed = false);
+    void NotifyAuthoredAbility(FGameplayAbilitySpecHandle Handle, FName Phase, bool Succeeded = false);
+    int32 AuthoredAbilityId(FGameplayAbilitySpecHandle Handle) const;
     UFUNCTION(BlueprintCallable, Category = "GAS")
     bool AddAuthoredAttributes(TSubclassOf<UDasAuthoredAttributeSet> Class);
     UFUNCTION(BlueprintPure, Category = "GAS")
@@ -217,13 +219,14 @@ private:
     {
         FGameplayAbilitySpecHandle Handle;
         FName Name;
-        bool Committed = false;
+        bool ActivationSucceeded = false;
     };
     TMap<int32, FGrantedAbility> Abilities;
     int32 NextAbilityId = 1;
     bool Ended = false;
     void PruneActiveEffects();
     bool Live() const;
+    bool InitializeAuthoredActorInfo();
     FGameplayAttribute FindAttribute(FName Set, FName Name) const;
     void Changed(const FOnAttributeChangeData& Data, FName Set);
     void Detach();
