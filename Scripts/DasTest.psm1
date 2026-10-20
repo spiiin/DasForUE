@@ -48,9 +48,11 @@ function Assert-DasLog {
 function Invoke-DasCommandlet {
     param([Parameter(Mandatory)]$Das, [Parameter(Mandatory)][string]$Run, [Parameter(Mandatory)][string]$Name,
           [Parameter(Mandatory)][string]$Marker, [string[]]$Arguments = @(), [string]$FailPattern,
-          [switch]$NoZen, [switch]$FullStdOut)
+          [switch]$NoZen, [switch]$FullStdOut, [switch]$Rendering)
     $Log = Join-Path $Das.Logs "$Name.log"
-    $All = @($Das.Project, "-run=$Run") + $Arguments + @('-unattended', '-NullRHI', '-nosplash', '-stdout')
+    $All = @($Das.Project, "-run=$Run") + $Arguments + @('-unattended', '-nosplash', '-stdout')
+    if ($Rendering) { $All += @('-AllowCommandletRendering', '-AllowCommandletAudio', '-RenderOffscreen') }
+    else { $All += '-NullRHI' }
     if ($FullStdOut) { $All += '-FullStdOutLogOutput' }
     $All += "-abslog=$Log"
     if ($NoZen) { $All += @('-ddc=NoZenLocalFallback', '-NoZenAutoLaunch') }

@@ -94,3 +94,12 @@ public:
     UDasGASCueHooksCommandlet();
     virtual int32 Main(const FString& Params) override;
 };
+
+UCLASS()
+class UDasGASCuePlaygroundCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
+public:
+    UDasGASCuePlaygroundCommandlet();
+    virtual int32 Main(const FString& Params) override;
+};

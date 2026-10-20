@@ -68,7 +68,7 @@ $Steps = @{
         finally { $ErrorActionPreference = $Previous; Pop-Location }
         if ($Code) { throw "Generator tests failed; see $($S.log).log" }
     }
-    commandlet = { param($S) Invoke-DasCommandlet $Das -Run $S.run -Name $S.log -Marker $S.marker | Out-Null }
+    commandlet = { param($S) Invoke-DasCommandlet $Das -Run $S.run -Name $S.log -Marker $S.marker -Rendering:([bool]$S.rendering) | Out-Null }
     phases     = { param($S)
         $Id = Invoke-DasAssetPhases $Das -Run $S.run -Name $S.log -Marker $S.marker -Phases @($S.phases)
         Set-Content -LiteralPath (Join-Path $Das.Logs $S.probe) -Value $Id
