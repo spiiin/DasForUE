@@ -474,21 +474,11 @@ das::ExpressionPtr DSLDirectPack(const das::LineInfo& At, const das::TypeDeclPtr
                        {new das::ExprConstString(At, DSLUtf8(Path)), DSLCall(At, "int", {V})});
     return DSLCall(At, DSLUtf8(TEXT("__ue_pack_")+ FMD5::HashAnsiString(*DSLSourceValueKey(Type, Path))), {V});
 }
+// Struct-leaf accessor suffix of a scalar kind; name is the remaining reflected scalar.
 const char* DSLScalarSuffix(const FString& K)
 {
-    return K == TEXT("byte")
-                     ? "byte"
-                     : K == TEXT("text")
-                                 ? "text"
-                                 : K == TEXT("int")
-                                             ? "int"
-                                             : K == TEXT("float")
-                                                         ? "float"
-                                                         : K == TEXT("double")
-                                                                     ? "double"
-                                                                     : K == TEXT("bool")? "bool"
-                                                                                        : K == TEXT("string")? "string"
-                                                                                                             : "name";
+    const char* Suffix = DasScalarKindSuffix(K);
+    return Suffix ? Suffix : "name";
 }
 das::FunctionPtr DSLHelper(const das::LineInfo& At, const das::string& Name, const das::TypeDeclPtr& Input,
                            const das::TypeDeclPtr& Output, das::ExpressionPtr Value)

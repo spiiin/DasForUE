@@ -4,18 +4,12 @@
 // structs and container carriers and name as the remaining reflected kind.
 das::string DSLSelfAccessor(const char* Prefix, const FDasDeclaredType& Type)
 {
-    static const TCHAR* const Scalars[] = {
-        TEXT("byte"),  TEXT("text"), TEXT("class"),  TEXT("int"),
-                                                          TEXT("float"), TEXT("bool"), TEXT("double"), TEXT("string")};
-    for (const TCHAR* Kind : Scalars)
-        if (Type.Kind == Kind)
-            return das::string(Prefix) + TCHAR_TO_UTF8(Kind);
+    if (const char* Suffix = DasAccessorKindSuffix(Type.Kind))
+        return das::string(Prefix) + Suffix;
     if (Type.Kind == TEXT("struct") || DasContainerCarrier(Type))
         return das::string(Prefix) + "struct";
     if (Type.Kind == TEXT("object"))
         return das::string(Prefix) + "object";
-    if (Type.Kind == TEXT("enum"))
-        return das::string(Prefix) + "enum";
     return das::string(Prefix) + "name";
 }
 // Unqualified name of a class method function (after the last ` or ' separator).
@@ -529,15 +523,11 @@ struct FDSLBodyVisitor : das::Visitor
         }
         if (!Type || DSLContainer(Type) || DSLDirectStruct(Type) || DSLDirectEnum(Type) || !DSLMathPath(Type).IsEmpty())
             return false;
-        const FString Kind = DSLTypeName(Type);
-        for (const TCHAR* Scalar :
-             {TEXT("int"), TEXT("float"), TEXT("double"), TEXT("bool"), TEXT("string"), TEXT("byte"), TEXT("text")})
-            if (Kind == Scalar)
-            {
-                Out = {Root->name, Path, TCHAR_TO_UTF8(Scalar)};
-                return true;
-            }
-        return false;
+        const char* Suffix = DasScalarKindSuffix(DSLTypeName(Type));
+        if (!Suffix)
+            return false;
+        Out = {Root->name, Path, Suffix};
+        return true;
     }
     virtual void preVisit(das::ExprField* F) override
     {
