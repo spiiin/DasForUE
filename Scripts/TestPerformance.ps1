@@ -7,6 +7,8 @@ param(
     [string]$PackagedExe='',
     [string]$LogPrefix='performance'
 )
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 if($LogPrefix -notmatch '^[a-zA-Z0-9_-]+$'){throw 'Invalid log prefix'}
 $Repo=Split-Path -Parent $PSScriptRoot
@@ -24,13 +26,15 @@ if($PackagedExe){
     if($Process.ExitCode){throw 'Packaged benchmark failed'}
 }else{
     if(!$SkipBuild){
-        & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12
+        Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=12')
         if($LASTEXITCODE){throw 'Editor benchmark build failed'}
     }
     & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasPerformance "-PerfIterations=$Iterations" "-PerfSamples=$Samples" "-PerfOutput=$Output" -Multiprocess -unattended -NullRHI -nosplash -stdout "-abslog=$Log" -ddc=NoZenLocalFallback -NoZenAutoLaunch @TraceArgs *> "$Logs/$LogPrefix-$Mode-stdout.log"
     if($LASTEXITCODE){throw 'Editor benchmark failed'}
 }
-if(!(Test-Path -LiteralPath $Output) -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_PERFORMANCE_RESULT=PASS')){throw 'Missing benchmark report or PASS marker'}
+if(!(Test-Path -LiteralPath $Output) -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_PERFORMANCE_RESULT=PASS')){throw 'Missing benchmark report or PASS marker'}
 $Result=Get-Content -LiteralPath $Output -Raw|ConvertFrom-Json
 if($Result.result -ne 'PASS' -or $Result.cases.Count -ne 33 -or $Result.sample_count -ne $Samples){throw 'Incomplete benchmark results'}
 if($TraceMemory -and (!(Test-Path -LiteralPath $Trace) -or (Get-Item -LiteralPath $Trace).Length -eq 0)){throw 'Memory trace file missing or empty'}

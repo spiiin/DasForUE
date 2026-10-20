@@ -1,4 +1,6 @@
 param([string]$Engine = 'C:\src\unreal\UnrealEngine',[string[]]$AdditionalMaps=@(),[switch]$SkipZenStore,[string]$DDC='')
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference = 'Stop'
 $DDCArgs=@();if($DDC){$DDCArgs=@("-DDC=$DDC")}
 $Repo = Split-Path -Parent $PSScriptRoot
@@ -13,8 +15,9 @@ if (Test-Path -LiteralPath $TargetMakefile -PathType Leaf) {
     Remove-Item -LiteralPath $TargetMakefile
 }
 # BuildConfiguration switches must be top-level UBT arguments, not nested UAT -Target arguments.
-& (Join-Path $Engine 'Engine\Build\BatchFiles\Build.bat') DasForUESmoke Win64 Development `
-    "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12 -NoUBTMakefiles -ForceRulesCompile "-Log=$Logs\build-packaged.log"
+Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmoke', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=12', '-NoUBTMakefiles', '-ForceRulesCompile', "-Log=$Logs\build-packaged.log")
 if ($LASTEXITCODE) { throw 'Packaged target build failed' }
 $Receipt = Get-Content -LiteralPath (Join-Path $Repo 'Tests\DasForUESmoke\Binaries\Win64\DasForUESmoke.target') -Raw | ConvertFrom-Json
 $DeclaredFiles = @($Receipt.RuntimeDependencies | ForEach-Object { $_.Path })
@@ -35,6 +38,6 @@ $Log = Join-Path $Logs 'smoke-packaged.log'
 $Process = Start-Process -FilePath $Executable -ArgumentList '-DasSmoke','-nullrhi','-unattended','-nosplash',"-abslog=$Log" `
     -WindowStyle Hidden -PassThru -Wait
 if ($Process.ExitCode) { throw "Packaged smoke failed: $($Process.ExitCode)" }
-if (!(Select-String -LiteralPath $Log -SimpleMatch 'DAS_FOUNDATION_RESULT=PASS')) {
+if (!(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_FOUNDATION_RESULT=PASS')) {
     throw 'Packaged game exited without a PASS marker'
 }

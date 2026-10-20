@@ -3,8 +3,10 @@ $ErrorActionPreference='Stop'
 Import-Module "$PSScriptRoot/DasTest.psm1" -Force
 $Das=Get-DasContext -Engine $Engine
 if(!$SkipBuild){
-    & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$($Das.Project)" `
-        -Module=DasRuntime -Module=DasEditor -Module=DasForUESmoke -NoEngineChanges -WaitMutex -NoXGE -MaxParallelActions=8
+    Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$($Das.Project)", '-Module=DasRuntime',
+    '-Module=DasEditor', '-Module=DasForUESmoke', '-NoEngineChanges', '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8')
     if($LASTEXITCODE){throw 'Hidden callbacks module build failed'}
 }
 function Get-HiddenHashes {
@@ -30,7 +32,7 @@ $Log=Invoke-DasCommandlet $Das -Run DasHiddenCallbacks -Name 'operation-key-runt
     -FailPattern 'DAS_HIDDEN_CALLBACK_FAIL|Ensure condition failed|Fatal error:|Log[^:]+: Error:'
 $Text=Get-Content -LiteralPath $Log -Raw
 if($Text -notmatch 'DAS_DSL_UNKNOWN_OPERATION_KEY'){throw 'Missing unknown-key warning'}
-$Match=[regex]::Match($Text,'DAS_HIDDEN_CALLBACK_RESULT=PASS checks=(\d+)')
+$Match=(Get-DasResult -Text $Text -Pattern 'DAS_HIDDEN_CALLBACK_RESULT=PASS checks=(\d+)')
 if(!$Match.Success -or [int]$Match.Groups[1].Value -ne 26){throw 'Incomplete operation key probe'}
 if((Get-HiddenHashes) -ne $Before){throw 'Source or binary changed during operation key validation'}
 [ordered]@{state='PASS';checks=[int]$Match.Groups[1].Value;runtime_log=$Log;sha256=($Before|ConvertFrom-Json);

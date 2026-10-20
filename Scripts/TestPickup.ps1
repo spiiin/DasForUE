@@ -3,6 +3,8 @@ param(
     [switch]$SkipBuild,
     [string]$Project
 )
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Logs=Join-Path $Repo 'logs';New-Item -ItemType Directory -Path $Logs -Force|Out-Null
@@ -10,7 +12,9 @@ if(!$Project){$Project=Join-Path $Repo 'Tests/DasForUESmoke/DasForUESmoke.uproje
 & C:/Python312/python.exe "$PSScriptRoot/TestNativeGameplayGenerator.py" *> "$Logs/pickup-generator.log"
 if($LASTEXITCODE){throw 'Native gameplay generator checks failed'}
 if(!$SkipBuild){
-    & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12 "-Log=$Logs/pickup-editor-build.log" *> "$Logs/pickup-editor-build-stdout.log"
+    Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=12', "-Log=$Logs/pickup-editor-build.log") *> "$Logs/pickup-editor-build-stdout.log"
     if($LASTEXITCODE){throw 'Pickup Editor build failed'}
 }
 & "$PSScriptRoot/CreatePlayableCharacter.ps1" -Engine $Engine -SkipBuild -Project $Project *> "$Logs/pickup-create.log"
@@ -18,7 +22,7 @@ if(!$?){throw 'Pickup example export failed'}
 $Example=Get-Content -LiteralPath "$Logs/playable-example.json" -Raw|ConvertFrom-Json
 $Log=Join-Path $Logs 'pickup-game.log'
 & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project $Example.map -game -DasPickup -Multiprocess -unattended -NullRHI -nosplash -stdout "-abslog=$Log" -ddc=NoZenLocalFallback -NoZenAutoLaunch *> "$Logs/pickup-game-stdout.log"
-if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_PICKUP_RESULT=PASS')){throw "Pickup game check failed: $Log"}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_PICKUP_RESULT=PASS')){throw "Pickup game check failed: $Log"}
 $Checks=@('pickup_real_non_recipient_overlap_ignored','pickup_real_overlap_score_mesh_collision_timer','pickup_duplicate_callback_guard','pickup_timer_restores_mesh_collision_availability','pickup_reenter_awards_again','pickup_occupied_respawn_reentrant_overlap','pickup_destroy_revokes_timer_and_subscription','pickup_async_cold_mesh_loaded','pickup_async_pending_gate_and_replacement','pickup_async_empty_mesh_unavailable','pickup_async_missing_mesh_unavailable','pickup_async_destroy_suppresses_late_completion')
 foreach($Check in $Checks){if(!(Select-String -LiteralPath $Log -SimpleMatch "PASS $Check")){throw "Missing pickup check: $Check"}}
 $Folder=Join-Path (Join-Path (Split-Path -Parent $Project) 'Content') ($Example.map -replace '^/Game/','' -replace '/PlayableMap$','')

@@ -1,9 +1,13 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[string]$Report,[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/perception-build.log" *> "$Repo/logs/perception-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/perception-build.log") *> "$Repo/logs/perception-build-stdout.log"
  if($LASTEXITCODE){throw 'Perception fixture build failed'}
 }
 if(!$Report){
