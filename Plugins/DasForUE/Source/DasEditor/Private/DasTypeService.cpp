@@ -108,6 +108,12 @@ FString TypeFieldDefault(const FDasDeclaredProperty& P)
             const auto& V = Value.Get<FRotator>();
             return FString::Printf(TEXT("%.17g,%.17g,%.17g"), V.Pitch, V.Yaw, V.Roll);
         }
+        // Vector2D uses its struct pin grammar; it used to fall through to the Transform branch.
+        if (P.Type.TypePath == TEXT("/Script/CoreUObject.Vector2D"))
+        {
+            const auto& V = Value.Get<FVector2D>();
+            return FString::Printf(TEXT("(X=%.17g,Y=%.17g)"), V.X, V.Y);
+        }
         return Value.Get<FTransform>().ToString();
     }
     if (P.Type.Kind == TEXT("object"))
