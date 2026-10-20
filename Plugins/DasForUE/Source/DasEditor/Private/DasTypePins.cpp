@@ -1,4 +1,5 @@
 #include "DasTypePins.h"
+#include "DasValueKinds.h"
 #include "DasPropertyTypes.h"
 #include "DasContainerTypes.h"
 #include "EdGraphSchema_K2.h"
@@ -141,72 +142,28 @@ bool DescribeDasPin(const FEdGraphPinType& Pin, FDasDeclaredType& Out, FString& 
 bool DasSchemaType(EDasMethodSignature Kind, const FString& Path, FDasDeclaredType& Out, FString& Error)
 {
     Error.Reset();
-    FDasDeclaredType Type;
-    switch (Kind)
+    const EDasTypeKind TypeKind = DasTypeKindOf(Kind);
+    if (TypeKind == EDasTypeKind::Invalid || TypeKind == EDasTypeKind::Void)
     {
-    case EDasMethodSignature::Int:
-        Type.Kind = TEXT("int");
-        break;
-    case EDasMethodSignature::Float:
-        Type.Kind = TEXT("float");
-        break;
-    case EDasMethodSignature::Double:
-        Type.Kind = TEXT("double");
-        break;
-    case EDasMethodSignature::Bool:
-        Type.Kind = TEXT("bool");
-        break;
-    case EDasMethodSignature::String:
-        Type.Kind = TEXT("string");
-        break;
-    case EDasMethodSignature::Name:
-        Type.Kind = TEXT("name");
-        break;
-    case EDasMethodSignature::Byte:
-        Type.Kind = TEXT("byte");
-        break;
-    case EDasMethodSignature::Text:
-        Type.Kind = TEXT("text");
-        break;
-    case EDasMethodSignature::Object:
-        Type.Kind = TEXT("object");
-        Type.TypePath = Path;
-        break;
-    case EDasMethodSignature::Class:
-        Type.Kind = TEXT("class");
-        Type.TypePath = Path;
-        break;
-    case EDasMethodSignature::Enum:
-        Type.Kind = TEXT("enum");
-        Type.TypePath = Path;
-        break;
-    case EDasMethodSignature::Delegate:
-        Type.Kind = TEXT("delegate");
-        Type.DelegateWire = Path;
-        break;
-    case EDasMethodSignature::Vector:
-        Type.Kind = TEXT("struct");
-        Type.TypePath = TBaseStructure<FVector>::Get()->GetPathName();
-        break;
-    case EDasMethodSignature::Rotator:
-        Type.Kind = TEXT("struct");
-        Type.TypePath = TBaseStructure<FRotator>::Get()->GetPathName();
-        break;
-    case EDasMethodSignature::Transform:
-        Type.Kind = TEXT("struct");
-        Type.TypePath = TBaseStructure<FTransform>::Get()->GetPathName();
-        break;
-    case EDasMethodSignature::Struct:
-        if (!Path.IsEmpty())
-            if (auto* Property = DasContainerProperty(Path))
-                return DescribeDasProperty(Property, Out, Error);
-        Type.Kind = TEXT("struct");
-        Type.TypePath = Path;
-        break;
-    default:
         Error = TEXT("Schema kind has no pin value type");
         return false;
     }
+    if (Kind == EDasMethodSignature::Struct && !Path.IsEmpty())
+        if (auto* Property = DasContainerProperty(Path))
+            return DescribeDasProperty(Property, Out, Error);
+    FDasDeclaredType Type;
+    Type.Kind = DasTypeKindName(TypeKind);
+    if (Kind == EDasMethodSignature::Vector)
+        Type.TypePath = TBaseStructure<FVector>::Get()->GetPathName();
+    else if (Kind == EDasMethodSignature::Rotator)
+        Type.TypePath = TBaseStructure<FRotator>::Get()->GetPathName();
+    else if (Kind == EDasMethodSignature::Transform)
+        Type.TypePath = TBaseStructure<FTransform>::Get()->GetPathName();
+    else if (Kind == EDasMethodSignature::Delegate)
+        Type.DelegateWire = Path;
+    else if (TypeKind == EDasTypeKind::Object || TypeKind == EDasTypeKind::Class || TypeKind == EDasTypeKind::Enum ||
+             TypeKind == EDasTypeKind::Struct)
+        Type.TypePath = Path;
     Out = MoveTemp(Type);
     return true;
 }

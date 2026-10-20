@@ -2,6 +2,7 @@
 #include "DasCallbackTypes.h"
 #include "DasScriptHosts.h"
 #include "DasAuthoring.h"
+#include "DasValueKinds.h"
 #include "Components/ActorComponent.h"
 #include "DasNativeDefaults.h"
 #include "DasContainerTypes.h"
@@ -1563,62 +1564,17 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
                                                            M.Parameters[0].Type.Kind == K &&
                                                            M.Parameters[0].Direction ==
                                                                TEXT("in") && M.Parameters[0].Name == TEXT("Input");
+        // Scalars by the kind table; struct and container parameters are resolved by ValueKind.
         auto Kind = [](const FString& T)
         {
-            return T ==
-                   TEXT("byte")
-                       ? EDasMethodSignature::Byte
-                       : T ==
-                             TEXT("text")
-                                 ? EDasMethodSignature::Text
-                                 : T ==
-                                       TEXT("int")
-                                           ? EDasMethodSignature::Int
-                                           : T ==
-                                                 TEXT("float")
-                                                     ? EDasMethodSignature::Float
-                                                     : T ==
-                                                           TEXT("bool")
-                                                               ? EDasMethodSignature::Bool
-                                                               : T ==
-                                                                     TEXT("void")
-                                                                         ? EDasMethodSignature::
-                                                                               Void
-                                                                         : T ==
-                                                                               TEXT("string")
-                                                                                   ? EDasMethodSignature::String
-                                                                                   : T ==
-                                                                                         TEXT("double")
-                                                                                             ? EDasMethodSignature::
-                                                                                                   Double
-                                                                                             : T ==
-                                                                                                   TEXT("name")
-                                                                                                       ? EDasMethodSignature::
-                                                                                                             Name
-                                                                                                       : T ==
-                                                                                                             TEXT("class")
-                                                                                                                 ? EDasMethodSignature::
-                                                                                                                       Class
-                                                                                                                 : T ==
-                                                                                                                       TEXT("object")
-                                                                                                                           ? EDasMethodSignature::
-                                                                                                                                 Object
-                                                                                                                           : T ==
-                                                                                                                                 TEXT("delegate")
-                                                                                                                                     ? EDasMethodSignature::
-                                                                                                                                           Delegate
-                                                                                                                                     : T ==
-                                                                                                                                           TEXT("enum")
-                                                                                                                                               ? EDasMethodSignature::
-                                                                                                                                                     Enum
-                                                                                                                                               : EDasMethodSignature::
-                                                                                                                                                     Frame;
+            return DasSignatureKind(DasTypeKind(T)).Get(EDasMethodSignature::Frame);
         };
         auto ValueKind = [&](const FDasDeclaredType& T)
         {
-            if (T.Kind == TEXT("array") || T.Kind == TEXT("map") || T.Kind == TEXT("set"))
+            const EDasTypeKind K = T.GetKind();
+            if (K == EDasTypeKind::Array || K == EDasTypeKind::Map || K == EDasTypeKind::Set)
                 return DasContainerCarrier(T) ? EDasMethodSignature::Struct : EDasMethodSignature::Frame;
-            if (T.Kind == TEXT("struct"))
+            if (K == EDasTypeKind::Struct)
             {
                 if (T.TypePath == TEXT("/Script/CoreUObject.Vector"))
                     return EDasMethodSignature::Vector;
@@ -1723,89 +1679,18 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
     for (const auto* Ptr : Properties)
     {
         const auto& P = *Ptr;
-        if ((P.Type.Kind !=
-             TEXT("byte") &&
-                 P.Type.Kind !=
-                     TEXT("text") &&
-                         P.Type.Kind !=
-                             TEXT("int") &&
-                                 P.Type.Kind !=
-                                     TEXT("float") &&
-                                         P.Type.Kind !=
-                                             TEXT("bool") &&
-                                                 P.Type.Kind !=
-                                                     TEXT("string") &&
-                                                         P.Type.Kind !=
-                                                             TEXT("double") &&
-                                                                 P.Type.Kind !=
-                                                                     TEXT("name") &&
-                                                                         P.Type.Kind !=
-                                                                             TEXT("struct") &&
-                                                                                 P.Type.Kind !=
-                                                                                     TEXT("object") &&
-                                                                                         P.Type.Kind !=
-                                                                                             TEXT("enum") &&
-                                                                                                 P.Type.Kind !=
-                                                                                                     TEXT("event") &&
-                                                                                                         P.Type.Kind !=
-                                                                                                             TEXT("delegate") &&
-                                                                                                                 P.Type.Kind !=
-                                                                                                                     TEXT("class") &&
-                                                                                                                         !DasContainerCarrier(
-                                                                                                                             P.Type)))
+        // Every kind with an actor field kind; containers only through their carrier struct.
+        const EDasTypeKind TypeKind = P.Type.GetKind();
+        const TOptional<EDasScalarKind> FieldKind = DasFieldKind(TypeKind);
+        if (!FieldKind ||
+            ((TypeKind == EDasTypeKind::Array || TypeKind == EDasTypeKind::Set || TypeKind == EDasTypeKind::Map) &&
+             !DasContainerCarrier(P.Type)))
             return Fail(Error, TEXT("Actor adapter property capability missing: ")+ P.Name);
         FDasFieldSchema F;
         F.StableId = P.Id;
         F.Name = *P.Name;
         F.DelegateWire = P.DelegateWire;
-        F.Kind =
-            P.Type.Kind ==
-            TEXT("byte")
-                ? EDasScalarKind::Byte
-                : P.Type.Kind ==
-                      TEXT("text")
-                          ? EDasScalarKind::Text
-                          : P.Type.Kind ==
-                                TEXT("delegate")
-                                    ? EDasScalarKind::Delegate
-                                    : P.Type.Kind ==
-                                          TEXT("class")
-                                              ? EDasScalarKind::Class
-                                              : P.Type.Kind ==
-                                                    TEXT("event")
-                                                        ? EDasScalarKind::Event
-                                                        : P.Type.Kind ==
-                                                              TEXT("int")
-                                                                  ? EDasScalarKind::Int32
-                                                                  : P.Type.Kind ==
-                                                                        TEXT("float")
-                                                                            ? EDasScalarKind::Float32
-                                                                            : P.Type.Kind ==
-                                                                                  TEXT("bool")
-                                                                                      ? EDasScalarKind::Bool
-                                                                                      : P.Type.Kind ==
-                                                                                            TEXT("string")
-                                                                                                ? EDasScalarKind::String
-                                                                                                : P.Type.Kind ==
-                                                                                                      TEXT("double")
-                                                                                                          ? EDasScalarKind::
-                                                                                                                Double
-                                                                                                          : (P.Type.Kind ==
-                                                                                                                     TEXT("struct") ||
-                                                                                                                         DasContainerCarrier(
-                                                                                                                             P.Type))
-                                                                                                             ? EDasScalarKind::
-                                                                                                                   Struct
-                                                                                                             : P.Type.Kind ==
-                                                                                                                   TEXT("object")
-                                                                                                                       ? EDasScalarKind::
-                                                                                                                             Object
-                                                                                                                       : P.Type.Kind ==
-                                                                                                                             TEXT("enum")
-                                                                                                                                 ? EDasScalarKind::
-                                                                                                                                       Enum
-                                                                                                                                 : EDasScalarKind::
-                                                                                                                                       Name;
+        F.Kind = *FieldKind;
         F.bInstanceEditable = P.bEditable;
         F.bReadOnly = P.bReadOnly;
         F.Metadata = P.Metadata;

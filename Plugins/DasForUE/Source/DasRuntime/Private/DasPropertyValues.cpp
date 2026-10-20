@@ -1,4 +1,5 @@
 #include "DasPropertyValues.h"
+#include "DasValueKinds.h"
 #include "DasValueTraversal.h"
 #include "DasPropertyTypes.h"
 #include "DasContainerTypes.h"
@@ -35,35 +36,12 @@ const FDasDeclaredType* ValueType(FProperty* P, FString& Error)
     Entry->Path = TFieldPath<FProperty>(P);
     return &(Cache.Add(P, MoveTemp(Entry))->Type);
 }
+// Scalars, enums and references travel as themselves; every other value as a struct snapshot.
 EDasMethodSignature FrameKind(EDasTypeKind Kind)
 {
-    switch (Kind)
-    {
-    case EDasTypeKind::Byte:
-        return EDasMethodSignature::Byte;
-    case EDasTypeKind::Text:
-        return EDasMethodSignature::Text;
-    case EDasTypeKind::Int:
-        return EDasMethodSignature::Int;
-    case EDasTypeKind::Float:
-        return EDasMethodSignature::Float;
-    case EDasTypeKind::Double:
-        return EDasMethodSignature::Double;
-    case EDasTypeKind::Bool:
-        return EDasMethodSignature::Bool;
-    case EDasTypeKind::String:
-        return EDasMethodSignature::String;
-    case EDasTypeKind::Name:
-        return EDasMethodSignature::Name;
-    case EDasTypeKind::Enum:
-        return EDasMethodSignature::Enum;
-    case EDasTypeKind::Object:
-        return EDasMethodSignature::Object;
-    case EDasTypeKind::Class:
-        return EDasMethodSignature::Class;
-    default:
-        return EDasMethodSignature::Struct;
-    }
+    const auto Signature = DasSignatureKind(Kind);
+    return Signature && Kind != EDasTypeKind::Void && Kind != EDasTypeKind::Delegate ? *Signature
+                                                                                     : EDasMethodSignature::Struct;
 }
 UScriptStruct* SnapshotType(FProperty* P)
 {

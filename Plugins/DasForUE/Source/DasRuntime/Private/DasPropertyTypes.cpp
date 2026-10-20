@@ -7,20 +7,6 @@
 
 namespace
 {
-struct FKindName
-{
-    const TCHAR* Name;
-    EDasTypeKind Kind;
-};
-const FKindName Names[] = {{TEXT("void"), EDasTypeKind::Void},         {TEXT("byte"), EDasTypeKind::Byte},
-                                                                        {TEXT("text"), EDasTypeKind::Text},         {TEXT("int"), EDasTypeKind::Int},
-                                                                                                                     {TEXT("float"), EDasTypeKind::Float},       {TEXT("double"), EDasTypeKind::Double},
-                                                                                                                                                                  {TEXT("bool"), EDasTypeKind::Bool},         {TEXT("string"), EDasTypeKind::String},
-                                                                                                                                                                                                               {TEXT("name"), EDasTypeKind::Name},         {TEXT("object"), EDasTypeKind::Object},
-                                                                                                                                                                                                                                                            {TEXT("class"), EDasTypeKind::Class},       {TEXT("struct"), EDasTypeKind::Struct},
-                                                                                                                                                                                                                                                                                                         {TEXT("enum"), EDasTypeKind::Enum},         {TEXT("array"), EDasTypeKind::Array},
-                                                                                                                                                                                                                                                                                                                                                      {TEXT("set"), EDasTypeKind::Set},           {TEXT("map"), EDasTypeKind::Map},
-                                                                                                                                                                                                                                                                                                                                                                                                   {TEXT("delegate"), EDasTypeKind::Delegate}, {TEXT("event"), EDasTypeKind::Event}};
 bool HashKey(EDasTypeKind K)
 {
     return K == EDasTypeKind::Int || K == EDasTypeKind::Byte || K == EDasTypeKind::String || K == EDasTypeKind::Name ||
@@ -297,13 +283,6 @@ FProperty* Build(FFieldVariant Owner, FName Name, const FDasDeclaredType& T, EDa
     }
 }
 }
-EDasTypeKind DasTypeKind(const FString& Name)
-{
-    for (const auto& Entry : Names)
-        if (Name == Entry.Name)
-            return Entry.Kind;
-    return EDasTypeKind::Invalid;
-}
 EDasEnumStorage DasResolvedEnumStorage(const FDasDeclaredType& Type)
 {
     if (Type.GetKind() != EDasTypeKind::Enum)
@@ -314,13 +293,6 @@ EDasEnumStorage DasResolvedEnumStorage(const FDasDeclaredType& Type)
     return Enum && !Enum->IsA<UDasDefinedEnum>() && Enum->GetCppForm() == UEnum::ECppForm::EnumClass
                ? EDasEnumStorage::Enum8
                : EDasEnumStorage::Byte;
-}
-FString DasTypeKindName(EDasTypeKind Kind)
-{
-    for (const auto& Entry : Names)
-        if (Kind == Entry.Kind)
-            return Entry.Name;
-    return {};
 }
 FString FDasDeclaredType::StorageIdentity() const
 {

@@ -12,6 +12,7 @@
 #include <limits>
 #include "DasSchema.h"
 #include "DasAuthoring.h"
+#include "DasValueKinds.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "HAL/FileManager.h"
@@ -45,6 +46,34 @@ bool RunDasFoundationTests(FString& Report)
     FString CallbackError;
     const bool CallbacksOK = CheckDasCallbackTypes(CallbackError) && CheckDasCallbackFrames(CallbackError);
     Expect(CallbacksOK, TEXT("shared_callback_capabilities_and_payload_validation"), CallbackError);
+    {
+        // The value kind table: names, field kinds and signatures map back to the same kind, and every
+        // persisted field kind and method signature has a value kind (Frame is the only exception).
+        FString Bad;
+        for (const auto& Row : DasValueKinds())
+        {
+            const bool Container =
+                Row.Kind == EDasTypeKind::Array || Row.Kind == EDasTypeKind::Set || Row.Kind == EDasTypeKind::Map;
+            const EDasTypeKind Carrier = Container ? EDasTypeKind::Struct : Row.Kind;
+            if (DasTypeKind(Row.Name) != Row.Kind || DasTypeKindName(Row.Kind) != Row.Name ||
+                (Row.Field && DasTypeKindOf(*Row.Field) != Carrier) ||
+                (Row.Signature && DasTypeKindOf(*Row.Signature) != Carrier))
+                Bad += FString(Row.Name) + TEXT(" ");
+        }
+        for (EDasScalarKind Field :
+             {EDasScalarKind::Int32, EDasScalarKind::Float32, EDasScalarKind::Bool, EDasScalarKind::String,
+              EDasScalarKind::Double, EDasScalarKind::Name, EDasScalarKind::Object, EDasScalarKind::Struct,
+              EDasScalarKind::Enum, EDasScalarKind::Event, EDasScalarKind::Class, EDasScalarKind::Delegate,
+              EDasScalarKind::Byte, EDasScalarKind::Text})
+            if (DasFieldKind(DasTypeKindOf(Field)) != Field)
+                Bad += FString::Printf(TEXT("field%d "), int32(Field));
+        for (int32 Signature = 0; Signature <= int32(EDasMethodSignature::Text); ++Signature)
+            if (Signature != 14 && Signature != int32(EDasMethodSignature::Frame) &&
+                DasTypeKindOf(EDasMethodSignature(Signature)) == EDasTypeKind::Invalid)
+                Bad += FString::Printf(TEXT("signature%d "), Signature);
+        Expect(Bad.IsEmpty() && DasTypeKind(TEXT("number")) == EDasTypeKind::Invalid,
+                                            TEXT("value_kind_table_round_trips"), Bad);
+    }
 #if WITH_EDITOR
     {
         // Script-visible extern surface and the kind table used by the generators; baselines are
