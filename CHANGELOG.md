@@ -18,18 +18,23 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
   checked at compile time, including button handlers ([Functions](Docs/Guide/DSL/Functions.md#methods-as-callbacks)).
 - `TriggerEvent` enum for Enhanced Input bindings; trigger strings are still accepted
   ([Input](Docs/Guide/Gameplay/Input.md)).
+- `ue_event` handlers on native sources (self of a class with a native parent, native components)
+  are checked at compile time: an unknown delegate name or a wrong number of parameters is a
+  compile error ([Delegates and events](Docs/Guide/DSL/DelegatesAndEvents.md)).
 
 ### Changed
 
 - Self, authored and native property access is much faster: registry lookups are indexed, property
   resolution and access contracts are cached (safe across recompilation and reinstancing) and plain
   scalars are accessed in place. A self int read plus write went from about 15 µs to about 0.5 µs.
+- Reading and writing scalar members of authored self structs (`self.Stats.Count += 1`) no longer
+  copies the whole struct.
 
 ### Internal
 
 - C++ sources are clang-formatted; `DasRuntime.cpp` and `DasDSL.inl` are split into subsystem parts;
   scalar accessor families are generated from one kind table; foundation tests guard the script-visible
-  extern surface with `Bindings/FoundationExterns.txt`
+  extern surface with `Bindings/FoundationExterns.txt`; test scripts share `Scripts/DasTest.psm1`
   ([Improvement plan](Docs/Dev/Plans/ImprovementPlan.md)).
 
 ## 2026-10-19
