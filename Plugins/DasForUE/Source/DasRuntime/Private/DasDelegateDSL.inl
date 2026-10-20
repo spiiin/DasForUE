@@ -425,14 +425,10 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                     if (D.Direction == TEXT("out"))
                         continue;
                     const das::string Kind = DSLMethodAdapterKind(D.Type.Kind, T);
-                    const das::string Prefix =
-                        (Kind == "text" || Kind == "name" || Kind == "enum" || Kind == "struct" || Kind == "vector" ||
-                         Kind == "rotator" || Kind == "transform")
-                            ? "__ue_method_arg_"
-                            : "ue_arg_";
+                    const das::string Bridge = DSLMethodBridge(Kind, false);
                     auto* V = new das::ExprVar(S->at, N);
                     B->list.push_back(
-                        DSLCall(S->at, Prefix + Kind,
+                        DSLCall(S->at, Bridge,
                                 {Handle(), Str(D.Name),
                                  T->baseType == das::Type::tUInt8 || DSLTypedClass(T) || DSLTypedReference(T) ||
                                      DSLDirectEnum(T) || DSLDirectStruct(T) || DSLContainer(T) ||
@@ -446,12 +442,8 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                 {
                     const auto& T = Signature->firstType;
                     const auto Kind = DSLMethodAdapterKind(Method.ReturnType.Kind, T);
-                    const das::string Prefix =
-                        (Kind == "text" || Kind == "name" || Kind == "enum" || Kind == "struct" || Kind == "vector" ||
-                         Kind == "rotator" || Kind == "transform")
-                            ? "__ue_method_result_"
-                            : "ue_result_";
-                    das::ExpressionPtr Value = DSLCall(S->at, Prefix + Kind, {Handle(), Str(TEXT("ReturnValue"))});
+                    const das::string Bridge = DSLMethodBridge(Kind, true);
+                    das::ExpressionPtr Value = DSLCall(S->at, Bridge, {Handle(), Str(TEXT("ReturnValue"))});
                     if (T->baseType == das::Type::tUInt8 || DSLTypedClass(T) || DSLTypedReference(T) ||
                         DSLDirectEnum(T) || DSLDirectStruct(T) || DSLContainer(T) ||
                         DSLMathPath(T) == TEXT("/Script/CoreUObject.Vector2D"))
@@ -465,12 +457,8 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                         continue;
                     const auto& T = Signature->argTypes[I];
                     const auto Kind = DSLMethodAdapterKind(D.Type.Kind, T);
-                    const das::string Prefix =
-                        (Kind == "text" || Kind == "name" || Kind == "enum" || Kind == "struct" || Kind == "vector" ||
-                         Kind == "rotator" || Kind == "transform")
-                            ? "__ue_method_result_"
-                            : "ue_result_";
-                    das::ExpressionPtr Value = DSLCall(S->at, Prefix + Kind, {Handle(), Str(D.Name)});
+                    const das::string Bridge = DSLMethodBridge(Kind, true);
+                    das::ExpressionPtr Value = DSLCall(S->at, Bridge, {Handle(), Str(D.Name)});
                     if (T->baseType == das::Type::tUInt8 || DSLTypedClass(T) || DSLTypedReference(T) ||
                         DSLDirectEnum(T) || DSLDirectStruct(T) || DSLContainer(T) ||
                         DSLMathPath(T) == TEXT("/Script/CoreUObject.Vector2D"))

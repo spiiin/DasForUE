@@ -897,12 +897,26 @@ das::string DSLMethodNativeKind(const FString& Kind)
 das::string DSLMethodAdapterKind(const FString& Kind, const das::TypeDeclPtr& Type)
 {
     const FString Path = DSLMathPath(Type);
+    if (Path == TEXT("/Script/EnhancedInput.InputActionValue"))
+        return "input_value";
     return Path == TEXT("/Script/CoreUObject.Vector")
                         ? "vector"
                         : Path == TEXT("/Script/CoreUObject.Rotator")
                                        ? "rotator"
                                        : Path == TEXT("/Script/CoreUObject.Transform")? "transform"
                                                                                       : DSLMethodNativeKind(Kind);
+}
+// Call frame bridge for an argument or result of an adapter kind. InputActionValue has its own native
+// transport; text, name, enum, struct and the math structs use the __ue_method_* family.
+das::string DSLMethodBridge(const das::string& Kind, bool bResult)
+{
+    if (Kind == "input_value")
+        return bResult ? "__ue_result_input_value" : "__ue_arg_input_value";
+    const bool Method = Kind == "text" || Kind == "name" || Kind == "enum" || Kind == "struct" || Kind == "vector" ||
+                        Kind == "rotator" || Kind == "transform";
+    return das::string(Method ? (bResult ? "__ue_method_result_" : "__ue_method_arg_")
+                              : (bResult ? "ue_result_" : "ue_arg_")) +
+           Kind;
 }
 bool DSLMethodSourceConversion(const das::string& Descriptor)
 {
@@ -1037,14 +1051,11 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
     auto Read = [&](const FString& DeclaredKind, const FString& Path, const das::TypeDeclPtr& Type)
     {
         const das::string Kind = DSLMethodAdapterKind(DeclaredKind, Type);
-        const das::string BridgePrefix = (Kind == "text" || Kind == "name" || Kind == "enum" || Kind == "struct" ||
-                                          Kind == "vector" || Kind == "rotator" || Kind == "transform")
-                                             ? "__ue_method_result_"
-                                             : "ue_result_";
+        const das::string Bridge = DSLMethodBridge(Kind, true);
         if (Kind == "delegate")
             return DSLCall(At, "__ue_method_result_delegate",
                            {CallHandle(), Str(Path), Str(Method->ReturnType.DelegateWire)});
-        return DSLCall(At, BridgePrefix + Kind, {CallHandle(), Str(Path)});
+        return DSLCall(At, Bridge, {CallHandle(), Str(Path)});
     };
     for (int32 Index = 0; Index < Method->Parameters.Num(); ++Index)
     {
@@ -1071,10 +1082,7 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
         if (Param.Direction != TEXT("out"))
         {
             const das::string Kind = DSLMethodAdapterKind(Param.Type.Kind, Type);
-            const das::string BridgePrefix = (Kind == "text" || Kind == "name" || Kind == "enum" || Kind == "struct" ||
-                                              Kind == "vector" || Kind == "rotator" || Kind == "transform")
-                                                 ? "__ue_method_arg_"
-                                                 : "ue_arg_";
+            const das::string Bridge = DSLMethodBridge(Kind, false);
             if (Kind == "delegate")
                 Block->list.push_back(
                     DSLCall(At, "__ue_method_arg_delegate",
@@ -1082,7 +1090,7 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
                              DSLDirectPack(At, Type, new das::ExprVar(At, ArgName), Param.Type.TypePath)}));
             else
                 Block->list.push_back(DSLCall(
-                    At, BridgePrefix + Kind,
+                    At, Bridge,
                     {CallHandle(), Str(Param.Name),
                      (DSLMethodSourceConversion(Descriptor->Parameters[size_t(Index)])
                           ? DSLDirectPack(At, Type, new das::ExprVar(At, ArgName), DSLMethodValuePath(Param.Type))
