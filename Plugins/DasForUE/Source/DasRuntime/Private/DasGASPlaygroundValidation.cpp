@@ -1,5 +1,5 @@
 #include "DasGASPlaygroundGame.h"
-#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING || DAS_GAS_SHIPPING_VALIDATION
 #include "DasGASAuthoring.h"
 #include "DasGASAbility.h"
 #include "DasRuntime.h"
@@ -44,9 +44,19 @@ struct FDasGASPackagedProbe
     double Began = FPlatformTime::Seconds(), ChangedGame = 0;
     FVector Before;
     TWeakObjectPtr<UNiagaraComponent> Aura;
-    FString Screenshot;
+    FString Screenshot, Report;
     explicit FDasGASPackagedProbe(UWorld* W) : World(W)
     {
+        FParse::Value(FCommandLine::Get(), TEXT("DasGASReport="), Report);
+        if (!Report.IsEmpty())
+        {
+            Report = FPaths::ConvertRelativePathToFull(Report);
+            IFileManager::Get().MakeDirectory(*FPaths::GetPath(Report), true);
+            FFileHelper::SaveStringToFile(
+                FString::Printf(TEXT("DAS_GAS_PACKAGE_CONFIGURATION=%s\nDAS_GAS_EXECUTION=VM\n"),
+                                     UE_BUILD_SHIPPING ? TEXT("Shipping") : TEXT("Development")), *Report,
+                                     FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        }
         FParse::Value(FCommandLine::Get(), TEXT("DasGASScreenshot="), Screenshot);
         if (Screenshot.IsEmpty())
             Screenshot = FPaths::ProjectSavedDir() / TEXT("gas-ability-packaged.png");
@@ -54,15 +64,24 @@ struct FDasGASPackagedProbe
         IFileManager::Get().MakeDirectory(*FPaths::GetPath(Screenshot), true);
         IFileManager::Get().Delete(*Screenshot);
     }
+    void WriteReport(const FString& Line)
+    {
+        if (!Report.IsEmpty())
+            FFileHelper::SaveStringToFile(Line + TEXT("\n"), *Report,
+                                                      FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM,
+                                                      &IFileManager::Get(), FILEWRITE_Append);
+    }
     void Check(bool OK, const TCHAR* N)
     {
         ++Checks;
         Good &= OK;
+        WriteReport(FString::Printf(TEXT("DAS_GAS_ABILITY_PACKAGED_%s %s"), OK ? TEXT("PASS") : TEXT("FAIL"), N));
         UE_LOG(LogTemp, Display, TEXT("DAS_GAS_ABILITY_PACKAGED_%s %s"), OK ? TEXT("PASS") : TEXT("FAIL"), N);
     }
     void Next(int32 P)
     {
         Phase = P;
+        WriteReport(FString::Printf(TEXT("DAS_GAS_PACKAGE_PHASE=%d"), P));
         if (World.IsValid())
             ChangedGame = World->GetTimeSeconds();
         UE_LOG(LogTemp, Display, TEXT("DAS_GAS_ABILITY_PACKAGED_PHASE=%d"), Phase);
@@ -99,6 +118,8 @@ struct FDasGASPackagedProbe
             Check(Runtime.PersistentContextCount(W) == 0, TEXT("destroyed map actors release DAS contexts"));
             UE_LOG(LogTemp, Display,
                    TEXT("DAS_GAS_ABILITY_PACKAGED_RESULT=%s checks=%d"), Good ? TEXT("PASS") : TEXT("FAIL"), Checks);
+            WriteReport(FString::Printf(TEXT("DAS_GAS_ABILITY_PACKAGED_RESULT=%s checks=%d"),
+                                             Good ? TEXT("PASS") : TEXT("FAIL"), Checks));
             FPlatformMisc::RequestExitWithStatus(false, Good ? 0 : 1);
             return false;
         }
@@ -154,9 +175,19 @@ struct FDasGASPackagedProbe
                     Path, FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT(".."))) &&
                     FFileHelper::LoadFileToString(Text, *Path) && !Text.IsEmpty();
                 UE_LOG(LogTemp, Display, TEXT("DAS_GAS_BUNDLED_SCRIPT %s"), *Path);
+                WriteReport(TEXT("DAS_GAS_BUNDLED_SCRIPT ") + Path);
             }
             Check(FPlatformProperties::RequiresCookedData() && !GIsEditor && Bundled,
                   TEXT("DAS modules read from the packaged project"));
+#if UE_BUILD_SHIPPING
+            // Verify a real linked native AOT function, not merely successful VM fallback.
+            const auto Aot = Runtime.RunFile(Runtime.ScriptPath(TEXT("aot_smoke.das")), 40, true);
+            Check(Aot.bSucceeded && Aot.Value == 42 && Aot.bUsedAot,
+                  TEXT("linked pure DAS AOT executes without VM fallback"));
+            WriteReport(TEXT("DAS_GAS_AOT_SCOPE=pure-smoke; GAS hooks remain VM (UE externs noAot)"));
+            if (!Aot.bSucceeded)
+                WriteReport(TEXT("DAS_GAS_AOT_ERROR=") + Aot.Error);
+#endif
             bool Configured = true;
             for (const auto* Field :
                  {TEXT("Controls"), TEXT("MoveAction"), TEXT("LookAction"), TEXT("JumpAction"),
@@ -277,16 +308,20 @@ struct FDasGASPackagedProbe
             Next(9);
             break;
         case 9:
+#if !UE_BUILD_SHIPPING
             if (Elapsed > 0.6 && !ScreenshotRequested)
             {
                 FScreenshotRequest::RequestScreenshot(Screenshot, false, false);
                 ScreenshotRequested = true;
             }
+#endif
             if (Victim->IsGameplayCueActive(AuraTag))
                 break;
             Check(Health() == 99 && (!Aura.IsValid() || Aura->IsBeingDestroyed()),
                   TEXT("native effect expiry calls Removed and destroys aura"));
+#if !UE_BUILD_SHIPPING
             Check(IFileManager::Get().FileExists(*Screenshot), TEXT("packaged viewport screenshot saved"));
+#endif
             Stop(PC);
             break;
         }

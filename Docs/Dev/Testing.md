@@ -191,4 +191,42 @@ native aura expiry/Removed and actor/session cleanup. Inputs traverse
 PlayerController/Enhanced Input; no ability methods are invoked directly by the
 probe. Startup/runtime has an outer process deadline as well as a bounded
 in-game probe deadline. The probe is enabled only by `-DasGASAbilityPackaged`
-and omitted from Shipping.
+and omitted from ordinary Shipping; the opt-in Shipping acceptance build is described below.
+
+
+## GAS map in Shipping and AOT scope
+
+Queue `test-suite <unique-id> gas-ability-shipping repo=C:\src\DasForUE2\Build\GASAuthoringWorktree`
+through the shared build agent. The runner exports the same map, builds Win64
+Shipping, cooks/stages/archives to `Build/PackagedShipping`, then launches the
+archived Shipping executable with real rendering/audio and mapped input.
+Development output is retained separately. The test does not change engine
+Shipping logging/optimization settings.
+
+Shipping ignores the positional startup-map override by default. The runner
+therefore stages GASAbilityMap as GameDefaultMap in the isolated smoke project
+only during packaging, then restores the config's exact original bytes and
+timestamp in finally. The archive retains the GAS default map; source project
+defaults stay on Entry. Do not enable engine map-override flags for this test.
+
+`DAS_GAS_SHIPPING_VALIDATION=1` is a process-scoped build opt-in for a probe in
+the DasRuntime module only. The runner restores the previous environment value
+after packaging. Ordinary Shipping excludes the probe. At runtime the test flag
+and `-DasGASReport=<absolute path>` select its file report, because ordinary
+Shipping logging is disabled. Do not ship the instrumented acceptance binary
+as an end-user release. A future normal Shipping build must run without this
+opt-in and regenerate its target makefile (the common runner already does so).
+
+`logs/gas-ability-shipping.txt` records the compiled configuration, bundled DAS
+paths, input/GAS/cue checks, expiry and cleanup. The strict native AOT check runs
+the linked `aot_smoke.das` function with AOT enabled and requires `bUsedAot`;
+success through VM fallback fails this check. Screenshot capture is omitted
+in Shipping and does not affect the Development screenshot check.
+
+**Full GAS AOT is not supported yet.** UE externs deliberately use `noAot` to
+prevent emitted raw C++ calls from bypassing execution guards. Authored
+gameplay/cue callbacks use the VM path. A Shipping map pass plus the pure AOT
+check proves those two capabilities separately; it does not prove that the
+ability, character or cue hooks have been translated to native code. Adding
+guard-preserving AOT wrappers and an authored-callback AOT build/link pipeline
+remains a separate implementation milestone. Networking is not tested here.

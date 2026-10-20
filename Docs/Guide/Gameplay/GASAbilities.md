@@ -349,3 +349,20 @@ now compares FName identity and rejects ambiguous declarations; generated
 native schema/call signature checks ignore identifier casing while preserving
 field/type/flag checks. Export also reloads existing input assets before saving
 and fully replaces only the dedicated generated example map.
+
+## Shipping acceptance and AOT limitation
+
+Build-agent job `gasship-20261020b` passed the same map in actual Win64 Shipping,
+with 12 checks, including a pure native AOT check that requires `bUsedAot`.
+The Shipping executable is under `Build/PackagedShipping/Windows`; logs and
+hashes are `logs/gas-ability-shipping.txt` and
+`logs/gas-ability-shipping-validation.json`. The probe is explicitly enabled
+only in this acceptance build; engine Shipping optimization and logging remain
+unchanged. It checks bundled DAS/cooked assets, mapped controls, targeting,
+cancel/commit/damage, sound/Niagara, native expiry/Removed and context cleanup.
+
+The map's DAS gameplay and cue hooks still execute in the VM. The separate
+pure `aot_smoke` function executes linked native code without fallback.
+UE externs remain `noAot` until an AOT bridge preserves their execution guards;
+this result must not be described as full AOT of the GAS map. Networking was
+not tested. See [Shipping test setup](../../Dev/Testing.md#gas-map-in-shipping-and-aot-scope).

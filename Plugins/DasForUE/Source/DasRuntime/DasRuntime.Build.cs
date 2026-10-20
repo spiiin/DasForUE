@@ -7,6 +7,10 @@ public class DasRuntime : ModuleRules
     {
         if (Target.Platform != UnrealTargetPlatform.Win64)
             throw new BuildException("DasRuntime foundation currently supports Win64 only.");
+        // Explicit opt-in for the build-agent Shipping probe; ordinary Shipping excludes it.
+        bool ShippingProbe = Target.Configuration == UnrealTargetConfiguration.Shipping &&
+            System.Environment.GetEnvironmentVariable("DAS_GAS_SHIPPING_VALIDATION") == "1";
+        PrivateDefinitions.Add("DAS_GAS_SHIPPING_VALIDATION=" + (ShippingProbe ? "1" : "0"));
         PCHUsage = PCHUsageMode.NoPCHs;
         bUseUnity = false;
         bEnableExceptions = true;
