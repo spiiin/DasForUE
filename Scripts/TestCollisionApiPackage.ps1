@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild,[switch]$Publish)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $EngineManifest=Join-Path $Engine 'Engine/Binaries/Win64/UnrealEditor.modules'
@@ -17,7 +19,9 @@ $Report=Get-Content -LiteralPath $ReportPath -Raw|ConvertFrom-Json
 $ReceiptState='not_checked'
 if($Publish){
  if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject" -WaitMutex -SkipBuild "-Log=$Stage/receipt.log" *> "$Stage/receipt-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject",
+    '-WaitMutex', '-SkipBuild', "-Log=$Stage/receipt.log") *> "$Stage/receipt-stdout.log"
  if($LASTEXITCODE){throw 'Receipt metadata refresh failed'}
  }
  $Receipt=Get-Content "$Repo/Tests/DasForUESmoke/Binaries/Win64/DasForUESmokeEditor.target" -Raw|ConvertFrom-Json

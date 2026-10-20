@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests/DasForUESmoke/DasForUESmoke.uproject'
@@ -7,7 +9,9 @@ foreach($Test in @('TestBindingsGenerator.py','TestApiPackage.py')){
  if($LASTEXITCODE){throw "$Test failed"}
 }
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/collision-profile-adapter-build.log" *> "$Repo/logs/collision-profile-adapter-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/collision-profile-adapter-build.log") *> "$Repo/logs/collision-profile-adapter-build-stdout.log"
  if($LASTEXITCODE){throw 'Collision profile adapter build failed'}
 }
 $Dlls=@('DasRuntime','DasEditor')|ForEach-Object {Join-Path $Repo "Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$_.dll"}
@@ -31,7 +35,7 @@ foreach($Case in @('probe','bind')){
 }
 $Log="$Stage/collision-profile-runtime.log"
 & $Editor @Common -run=DasCollisionProfile "-Probe=$Stage/collision-profile-probe.das" "-BindProbe=$Stage/collision-profile-bind.das" "-abslog=$Log" *> "$Stage/collision-profile-runtime-stdout.log"
-if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_COLLISION_PROFILE_RESULT=PASS checks=22' -Quiet)){throw "Collision profile runtime checks failed: $Log"}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_COLLISION_PROFILE_RESULT=PASS checks=22' -Quiet)){throw "Collision profile runtime checks failed: $Log"}
 '{"schema_version":1,"modules":["Engine"],"subsystems":[{"id":"collision_physics","modules":["Engine"],"roots":[]}]}'|Set-Content -LiteralPath "$Stage/inventory-profile.json" -Encoding utf8
 & $Editor @Common -run=DasNativeGameplay -Coverage "-Profile=$Stage/inventory-profile.json" "-Output=$Stage/inventory.json" "-abslog=$Stage/inventory.log" *> "$Stage/inventory-stdout.log"
 if($LASTEXITCODE){throw 'Fresh collision inventory failed'}

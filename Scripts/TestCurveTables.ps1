@@ -1,4 +1,6 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
@@ -19,7 +21,9 @@ function Assert-CurveTablesSourceHashes($Expected) {
 }
 $Sources=Read-CurveTablesSourceHashes
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/curve-tables-build.log" *> "$Repo/logs/curve-tables-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/curve-tables-build.log") *> "$Repo/logs/curve-tables-build-stdout.log"
  if($LASTEXITCODE){throw 'CurveTables build failed'}
 }
 Assert-CurveTablesSourceHashes $Sources
@@ -31,7 +35,7 @@ $Log="$Repo/logs/curve-tables-runtime.log"
 try {
  & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasCurveTables "-Fixture=$Repo/Tests/CurveTables/probe.das" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Log" *> "$Repo/logs/curve-tables-runtime-stdout.log"
  $Code=$LASTEXITCODE;$Text=Get-Content $Log -Raw
- $Result=[regex]::Match($Text,'DAS_CURVE_TABLES_RESULT=PASS checks=(\d+)')
+ $Result=(Get-DasResult -Text $Text -Pattern 'DAS_CURVE_TABLES_RESULT=PASS checks=(\d+)')
  if($Code -or !$Result.Success){throw "CurveTables runtime probe failed: $Log"}
  if($Text -match 'Ensure condition failed|Log[^:]+: Error:'){throw 'Engine error/ensure in CurveTables probe'}
  foreach($Path in $Hashes.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Hashes[$Path]){throw 'DLL changed during probe'}}

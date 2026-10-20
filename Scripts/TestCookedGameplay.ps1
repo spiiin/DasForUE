@@ -1,9 +1,13 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine')
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests\DasForUESmoke\DasForUESmoke.uproject'
 $Logs=Join-Path $Repo 'logs'
-& (Join-Path $Engine 'Engine\Build\BatchFiles\Build.bat') DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12
+Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=12')
 if($LASTEXITCODE){throw 'Cooked gameplay editor build failed'}
 $ProbeId=[Guid]::NewGuid().ToString('N')
 $Map="/Game/DasCookedGameplay/$ProbeId/Map"
@@ -14,11 +18,11 @@ if($LASTEXITCODE -or !(Select-String -LiteralPath $ExportLog -SimpleMatch 'DAS_C
 $Exe=Join-Path $Repo 'Build\Packaged\Windows\DasForUESmoke\Binaries\Win64\DasForUESmoke.exe'
 $Log=Join-Path $Logs 'cooked-gameplay-runtime.log'
 $Process=Start-Process -FilePath $Exe -ArgumentList $Map,'-DasCookedGameplay','-nullrhi','-unattended','-nosplash',"-abslog=$Log" -WindowStyle Hidden -PassThru -Wait
-if($Process.ExitCode -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_COOKED_GAMEPLAY_RESULT=PASS')){throw "Cooked gameplay failed ($($Process.ExitCode))"}
+if($Process.ExitCode -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_COOKED_GAMEPLAY_RESULT=PASS')){throw "Cooked gameplay failed ($($Process.ExitCode))"}
 Write-Output "DAS_COOKED_GAMEPLAY_PROBE=PASS map=$Map"
 
 $PlayableMap="/Game/DasCookedGameplay/$ProbeId/PlayableMap"
 $PlayableLog=Join-Path $Logs 'playable-map-runtime.log'
 $Demo=Start-Process -FilePath $Exe -ArgumentList $PlayableMap,'-DasPlayableMap','-nullrhi','-unattended','-nosplash',"-abslog=$PlayableLog" -WindowStyle Hidden -PassThru -Wait
-if($Demo.ExitCode -or !(Select-String -LiteralPath $PlayableLog -SimpleMatch 'DAS_PLAYABLE_MAP_RESULT=PASS')){throw "Playable map failed ($($Demo.ExitCode))"}
+if($Demo.ExitCode -or !(Test-DasResult -LiteralPath $PlayableLog -SimpleMatch 'DAS_PLAYABLE_MAP_RESULT=PASS')){throw "Playable map failed ($($Demo.ExitCode))"}
 Write-Output "DAS_PLAYABLE_MAP=PASS map=$PlayableMap"
