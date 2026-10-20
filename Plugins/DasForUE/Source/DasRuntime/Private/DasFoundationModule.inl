@@ -5,6 +5,8 @@ class FUnrealFoundationModule final : public das::Module
 public:
     FUnrealFoundationModule() : das::Module("ue_foundation")
     {
+        AddCollisionProfileEnum(*this);
+        globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEInputNameLint()));
         addCommentReader(new FUECommentReader());
         addAnnotation(new FUENativeBaseAnnotation());
         addAnnotation(new FUEClassAnnotation());
@@ -1564,6 +1566,8 @@ public:
         AddUEExtern<DAS_BIND_FUN(StructWithObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
                         *this, Library, "ue_struct_with_object", das::SideEffects::modifyExternal, "StructWithObject")
                         ->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(CollisionProfileName)>(*this, Library, "__ue_collision_profile_name",
+                                                        das::SideEffects::modifyExternal, "CollisionProfileName");
         AddUEExtern<DAS_BIND_FUN(DSLNameFromString)>(*this, Library, "ue_name_value", das::SideEffects::modifyExternal,
                                                      "DSLNameFromString");
         AddUEExtern<DAS_BIND_FUN(DSLNameToString)>(*this, Library, "ue_name_text", das::SideEffects::modifyExternal,

@@ -43,7 +43,7 @@ class Player : Character {
 | `ue_enhanced_is_available():bool` | Does the owner have an EnhancedInputComponent? (Does not prove that assets/contexts/routing are configured.) |
 | `ue_input_unbind_all():int` | Remove all legacy and Enhanced bindings of the session. |
 
-Triggers: `Triggered`, `Started`, `Ongoing`, `Canceled`, `Completed`.
+Triggers: `Triggered`, `Started`, `Ongoing`, `Canceled`, `Completed`. Prefer `TriggerEvent.Member`; string literals now produce `DAS_DSL_STRING_TRIGGER` while the old overloads remain available.
 
 ### Handler value types
 
@@ -57,7 +57,7 @@ The handler signature selects the transport:
 | `UEVector2D` | Axis2D actions |
 | `UEVector` | Axis3D actions |
 
-Class handlers are `[ue_function]` methods returning `void`, passed as `self.Method` (a string literal with the method name also works; forward declarations are resolved). Plain `[export] def handler(value:InputActionValue):void` functions are also accepted. With a scalar/vector handler, a runtime value of the wrong kind is dropped. The native proxy checks the SourceAction and finite values and delivers an owned copy; you may store it in an array.
+Class handlers return `void`. Pass `self.Method` to generate a hidden entry point automatically; methods declared later in the class are resolved. String handler names require explicitly reflected methods. Add `[ue_function(BlueprintCallable)]` when a handler should also appear in the Blueprint palette. Plain `[export] def handler(value:InputActionValue):void` functions remain accepted. With a scalar/vector handler, a runtime value of the wrong kind is dropped. The native proxy checks SourceAction and finite values and delivers an owned copy; you may store it in an array.
 
 ### InputActionValue
 

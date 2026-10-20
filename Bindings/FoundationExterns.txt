@@ -60,6 +60,7 @@ __ue_class_component_operation	@ue_foundation::__ue_class_component_operation CI
 __ue_class_component_operation	@ue_foundation::__ue_class_component_operation CIH<ue_foundation::UObjectHandle> CIs CIs Ci CIs CIs C_c	ue_foundation::UObjectHandle	4
 __ue_class_default_object	@ue_foundation::__ue_class_default_object CIs CH<ue_foundation::UEClassHandle> CIs Cb C_c	ue_foundation::UObjectHandle	4
 __ue_class_loaded	@ue_foundation::__ue_class_loaded CIs CIs CIs C_c	ue_foundation::UEClassHandle	4
+__ue_collision_profile_name	@ue_foundation::__ue_collision_profile_name Ci64 C_c	ue_foundation::UENameValue	4
 __ue_curve_table_eval	@ue_foundation::__ue_curve_table_eval CIH<ue_foundation::UObjectHandle> CIs Cf Cf C_c	float const	4
 __ue_curve_table_has	@ue_foundation::__ue_curve_table_has CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
 __ue_curve_table_names	@ue_foundation::__ue_curve_table_names CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4

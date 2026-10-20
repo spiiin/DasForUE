@@ -170,6 +170,7 @@ THIRD_PARTY_INCLUDES_START
 #include "daScript/ast/ast_handle.h"
 #include "daScript/ast/ast_visitor.h"
 #include "daScript/ast/ast_generate.h"
+#include "daScript/simulate/aot_builtin_ast.h"
 #include "daScript/simulate/data_walker.h"
 THIRD_PARTY_INCLUDES_END
 #pragma pack(pop)
@@ -546,6 +547,7 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeSubscriptionApi.inl"
 #include "DasRuntimeTypeAnnotations.inl"
 #include "DasPersistentGlobals.inl"
+#include "DasCollisionNames.inl"
 #include "DasFoundationModule.inl"
 #include "DasRuntimeTimers.inl"
 #include "DasRuntimeInputSessions.inl"
@@ -1053,3 +1055,8 @@ FDasExecutionResult FDasRuntimeModule::RunLibraryFrame(const FString& Contract, 
 #include "DasExecutionGuardProbe.inl"
 
 #include "DasAsyncPhysicsVM.inl"
+
+TMap<FString, FName> DasCollisionProfileConstants()
+{
+    return CollisionProfileSymbols;
+}

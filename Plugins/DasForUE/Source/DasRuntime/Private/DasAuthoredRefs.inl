@@ -18,10 +18,12 @@ struct FDSLPropertySourceSignature
 };
 TMap<FString, FDSLPropertySourceSignature> DSLPropertySourceSignatures;
 void DSLResetIdentityLint();
+void DSLResetInputNameLint();
 void DSLResetReferenceDeclarations()
 {
     DSLResetDocComments();
     DSLResetIdentityLint();
+    DSLResetInputNameLint();
     DSLSourceCatalogExpectedIds.Reset();
     DSLActiveRefDeclarations.Reset();
     DSLMethodSourceSignatures.Reset();
