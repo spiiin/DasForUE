@@ -49,11 +49,35 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
                 !Object->TryGetStringField(
                     TEXT("name"), Name) || !GASName(Name) || Names.Contains(Name.ToLower()) ||
                     !Object->TryGetStringField(TEXT("id"), Id) || Id.IsEmpty() || Id.Len() > 256 || Ids.Contains(Id) ||
-                                               !Object->TryGetArrayField(TEXT("fields"), Fields) || Fields->IsEmpty() ||
-                                                                         Fields->Num() > 64)
+                                               !Object->TryGetArrayField(TEXT("fields"), Fields) || Fields->Num() > 64)
             return Fail(TEXT("Invalid/duplicate GAS declaration or field count"));
         Names.Add(Name.ToLower());
         Ids.Add(Id);
+        if (Kind == TEXT("ability"))
+        {
+            FDasGASAbilityDeclaration Ability;
+            Ability.Name = Name;
+            Ability.Id = Id;
+            FString Tag;
+            if (!Fields->IsEmpty() ||
+                !Object->TryGetStringField(
+                    TEXT("effect"), Ability.Effect) || Ability.Effect.IsEmpty() ||
+                    (Object->HasField(TEXT("cost")) && !Object->TryGetStringField(TEXT("cost"), Ability.Cost)) ||
+                     (Object->HasField(TEXT("cooldown")) && !GASNumber(Object, TEXT("cooldown"), Ability.Cooldown)) ||
+                      (Object->HasField(TEXT("auto_end")) &&
+                                        !Object->TryGetBoolField(TEXT("auto_end"), Ability.AutoEnd)) ||
+                       (Object->HasField(TEXT("cooldown_tag")) &&
+                                         !Object->TryGetStringField(TEXT("cooldown_tag"), Tag)))
+                return Fail(TEXT("Invalid GameplayAbility options; an effect name is required"));
+            if (Ability.Cooldown < 0 || (Ability.Cooldown > 0 && Ability.Cooldown < 0.01f) ||
+                (Ability.Cooldown > 0 ? !FGameplayTag::IsValidGameplayTagString(Tag) : !Tag.IsEmpty()))
+                return Fail(TEXT("Positive ability cooldown requires a valid tag and at least 0.01 seconds"));
+            Ability.CooldownTag = FName(*Tag);
+            Candidate.Abilities.Add(MoveTemp(Ability));
+            continue;
+        }
+        if (Fields->IsEmpty())
+            return Fail(TEXT("AttributeSet/GameplayEffect declarations require fields"));
         TSet<FName> FieldNames;
         FDasGASSetDeclaration Set;
         Set.Name = Name;
@@ -219,6 +243,34 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
         for (const auto& Mod : Effect.Modifiers)
             if (!Set->Attributes.ContainsByPredicate([&](const auto& A) { return A.Name == Mod.Attribute; }))
                 return Fail(TEXT("Effect modifies an unknown attribute"));
+    }
+    for (auto& Ability : Candidate.Abilities)
+    {
+        auto Resolve = [&](const FString& Reference) -> const FDasGASEffectDeclaration*
+        {
+            return Candidate.Effects.FindByPredicate([&](const auto& E)
+                                                     { return E.Name == Reference || E.Id == Reference; });
+        };
+        const auto* Effect = Resolve(Ability.Effect);
+        const auto* Cost = Ability.Cost.IsEmpty() ? nullptr : Resolve(Ability.Cost);
+        if (!Effect || (!Ability.Cost.IsEmpty() && !Cost))
+            return Fail(TEXT("Ability effect/cost is not in this script's explicit effect registry"));
+        for (const auto* E : {Effect, Cost})
+            if (E)
+                for (const auto& Mod : E->Modifiers)
+                    if (!Mod.SetByCaller.IsNone())
+                        return Fail(TEXT("Declarative abilities require constant effect magnitudes"));
+        if (Cost)
+        {
+            if (Cost->Duration != TEXT("Instant"))
+                return Fail(TEXT("Ability cost must be an Instant GameplayEffect"));
+            for (const auto& Mod : Cost->Modifiers)
+                if (Mod.Operation != TEXT("Add") || Mod.Magnitude >= 0)
+                    return Fail(TEXT("Ability costs require strictly negative Add modifiers"));
+        }
+        Ability.Effect = Effect->Id;
+        if (Cost)
+            Ability.Cost = Cost->Id;
     }
     Out = MoveTemp(Candidate);
     return true;

@@ -3,6 +3,12 @@ require ue_gas
 
 var saved:GASAttributeChange
 var changes:int=0
+var restore:GASAbilityGrant
+var held:GASAbilityGrant
+var abilitySnapshot:GASAbilityChange
+var abilityEvents:int=0
+var cancelledEvents:int=0
+var endedEvents:int=0
 var fortitude:GASEffectResult
 var aura:GASEffectResult
 var regen:GASEffectResult
@@ -12,6 +18,13 @@ var stackSnapshot:GASEffectState
 class AuthoredGASProbe : Actor {
     @ue_component
     Abilities:AuthoredAbilitySystemComponentRef
+    [ue_event(source="Abilities",name="AbilityChanged")]
+    def OnAbility(change:GASAbilityChange):void {
+        abilityEvents+=1
+        if(ue_name_text(change.Phase)=="Activated" && abilitySnapshot.GrantId==0) {abilitySnapshot=change}
+        if(change.Cancelled) {cancelledEvents+=1}
+        if(ue_name_text(change.Phase)=="Ended") {endedEvents+=1}
+    }
     [ue_event(source="Abilities",name="AttributeChanged")]
     def OnChange(change:GASAttributeChange):void {
         if(changes==0) {saved=change}
@@ -99,6 +112,57 @@ def main(phase:int):int {
         verify(!ue_gas_remove_effect(fortitude) && ue_gas_effect_state(layers).Active,"Expired IDs cannot remove later effects")
     } elif(phase==9) {
         verify(!ue_gas_effect_state(layers).Active && ue_gas_value(asc,"CombatAttributes","MaxHealth")==100.0f,"Final timed stack expires")
+    } elif(phase==10) {
+        let kind=AuthoredGameplayAbilityClass(handle=ue_class_loaded(type<AuthoredGameplayAbilityRef>,"@ASSET_FOLDER@/GA_RestoreHealth.GA_RestoreHealth_C"))
+        let hit=AuthoredGameplayEffectClass(handle=ue_class_loaded(type<AuthoredGameplayEffectRef>,"@ASSET_FOLDER@/GE_Hit.GE_Hit_C"))
+        verify(ue_gas_apply(asc,ue_gas_make_spec(asc,hit)).Applied,"Prepare Health for ability action")
+        let before=abilityEvents
+        restore=ue_gas_give_ability(asc,kind)
+        verify(ue_gas_give_ability(asc,kind).Id==restore.Id,"Grant is idempotent for same class and level")
+        let state=ue_gas_ability_state(restore)
+        verify(state.Granted && state.CanActivate && !state.Active && state.Level==1,"Granted ability is activatable")
+        verify(ue_gas_activate_ability(restore),"Native ability commits and applies its effect")
+        verify(ue_gas_value(asc,"CombatAttributes","Mana")==4.0f && ue_gas_value(asc,"CombatAttributes","Health")==65.0f,"Ability cost and action are real GameplayEffects")
+        let cooldown=ue_gas_ability_state(restore)
+        verify(!cooldown.Active && !cooldown.CanActivate && cooldown.CooldownRemaining>0.3f,"Auto-ended ability remains on native cooldown")
+        verify(!ue_gas_activate_ability(restore) && ue_gas_value(asc,"CombatAttributes","Mana")==4.0f,"Cooldown blocks without charging again")
+        verify(abilityEvents==before,"Ability callbacks must not re-enter active VM")
+    } elif(phase==11) {
+        verify(ue_gas_ability_state(restore).CooldownRemaining==0.0f,"Native cooldown expires with world time")
+        verify(!ue_gas_activate_ability(restore),"Insufficient Mana rejects activation")
+        let auraClass=AuthoredGameplayEffectClass(handle=ue_class_loaded(type<AuthoredGameplayEffectRef>,"@ASSET_FOLDER@/GE_ManaAura.GE_ManaAura_C"))
+        let temporary=ue_gas_apply(asc,ue_gas_make_spec(asc,auraClass))
+        verify(ue_gas_value(asc,"CombatAttributes","Mana")==7.0f && !ue_gas_activate_ability(restore),"Temporary Mana bonus cannot hide insufficient spendable base")
+        verify(ue_gas_remove_effect(temporary) && ue_gas_value(asc,"CombatAttributes","Mana")==4.0f,"Failed activation preserves base Mana")
+        let refill=AuthoredGameplayEffectClass(handle=ue_class_loaded(type<AuthoredGameplayEffectRef>,"@ASSET_FOLDER@/GE_SetMana.GE_SetMana_C"))
+        verify(ue_gas_apply(asc,ue_gas_make_spec(asc,refill)).Applied && ue_gas_activate_ability(restore),"Ability reactivates after cooldown and resource refill")
+        verify(ue_gas_value(asc,"CombatAttributes","Mana")==2.0f && ue_gas_value(asc,"CombatAttributes","Health")==90.0f,"Second activation pays exactly once")
+        let kind=AuthoredGameplayAbilityClass(handle=ue_class_loaded(type<AuthoredGameplayAbilityRef>,"@ASSET_FOLDER@/GA_HeldHeal.GA_HeldHeal_C"))
+        held=ue_gas_give_ability(asc,kind)
+        verify(ue_gas_activate_ability(held) && ue_gas_ability_state(held).Active,"Manual-lifecycle ability stays active")
+        verify(!ue_gas_activate_ability(held),"An active instanced ability cannot retrigger")
+        verify(ue_gas_cancel_ability(held) && !ue_gas_ability_state(held).Active && !ue_gas_cancel_ability(held),"Cancel an active ability only once")
+    } elif(phase==12) {
+        verify(abilitySnapshot.GrantId==restore.Id && abilitySnapshot.Active && !abilitySnapshot.Cancelled && ue_name_text(abilitySnapshot.Ability)=="RestoreHealth","Owned activation snapshot survives callback, end and GC")
+        verify(cancelledEvents==1 && endedEvents==2,"Cancelled and normal-ended lifecycles are distinct")
+        verify(ue_gas_activate_ability(held) && ue_gas_finish_ability(held) && !ue_gas_ability_state(held).Active,"Manual normal completion")
+    } elif(phase==13) {
+        let old=held
+        verify(ue_gas_remove_ability(old) && !ue_gas_remove_ability(old) && !ue_gas_ability_state(old).Granted,"Revoke grant and reject repeated removal")
+        let kind=AuthoredGameplayAbilityClass(handle=ue_class_loaded(type<AuthoredGameplayAbilityRef>,"@ASSET_FOLDER@/GA_HeldHeal.GA_HeldHeal_C"))
+        held=ue_gas_give_ability(asc,kind)
+        verify(held.Id!=old.Id && ue_gas_activate_ability(held),"Regrant uses a fresh non-reused ID")
+        verify(!ue_gas_cancel_ability(old) && !ue_gas_finish_ability(old) && ue_gas_ability_state(held).Active,"Stale grant cannot affect a later instance")
+    } elif(phase==14) {
+        verify(ue_gas_remove_ability(held) && !ue_gas_ability_state(held).Granted,"Revoking an active grant cancels and removes it")
+        verify(ue_gas_remove_ability(restore),"Revoke auto-ended ability")
+        let kind=AuthoredGameplayAbilityClass(handle=ue_class_loaded(type<AuthoredGameplayAbilityRef>,"@ASSET_FOLDER@/GA_RestoreHealth.GA_RestoreHealth_C"))
+        let replacement=ue_gas_give_ability(asc,kind)
+        verify(replacement.Id!=restore.Id && ue_gas_ability_state(replacement).CooldownRemaining>0.3f,"Revoking/regranting cannot bypass an existing tag cooldown")
+        verify(ue_gas_remove_ability(replacement),"Clean up replacement grant")
+    } elif(phase==15) {
+        verify(!ue_gas_ability_state(restore).Granted && !ue_gas_ability_state(held).Granted,"Removed grants remain stale after cooldown expires")
+        verify(cancelledEvents==2 && endedEvents==3,"Final cancellation and normal completion events delivered")
     } else {return -1}
     return 42
 }

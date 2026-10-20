@@ -213,7 +213,7 @@ void DSLDeclarationKind(const das::AnnotationList& Args)
             Name == "ue_interface" || Name == "ue_struct" || Name == "ue_native_struct" || Name == "ue_class_ref" ||
             Name == "ue_native_object" || Name == "ue_native_interface" || Name == "ue_interface_ref" ||
             Name == "ue_delegate" || Name == "ue_multicast" || Name == "ue_attribute_set" ||
-            Name == "ue_gameplay_effect")
+            Name == "ue_gameplay_effect" || Name == "ue_gameplay_ability")
             Kinds.Add(DSLText(Name));
     }
     if (Kinds.Num() > 1)
@@ -852,6 +852,7 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
 #include "DasDSLInterfaceAnnotation.inl"
 #include "DasDSLTypeAnnotations.inl"
 #include "DasGASDSL.inl"
+#include "DasGASAbilityDSL.inl"
 #include "DasStaticLibraryDSL.inl"
 
 bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObject* Self, FString& Wire,

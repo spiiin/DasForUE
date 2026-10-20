@@ -63,3 +63,14 @@ class ManaRegen {
 class LayeredFortitude {
     MaxHealth:float=5.0f
 }
+
+[ue_gameplay_effect(attributes="CombatAttributes")]
+class ManaCost { Mana:float= -5.0f }
+
+[ue_gameplay_ability(effect="PotionHeal",cost="ManaCost",
+    cooldown=0.4f,cooldown_tag="Ability.Cooldown.Restore")]
+class RestoreHealth {}
+
+// Demonstrates an ability which remains active until finished or cancelled.
+[ue_gameplay_ability(effect="PotionHeal",auto_end=false)]
+class HeldHeal {}

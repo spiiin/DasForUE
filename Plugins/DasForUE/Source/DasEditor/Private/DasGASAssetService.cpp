@@ -38,6 +38,14 @@ FString EffectDigest(const FDasGASEffectDeclaration& D, const FString& SetHash)
                                       *M.SetByCaller.ToString());
     return FMD5::HashAnsiString(*Value);
 }
+FString AbilityDigest(const FDasGASAbilityDeclaration& D, const TMap<FString, FString>& Hashes)
+{
+    const FString Value =
+        D.Id + TEXT("|ability-v1|") + Hashes.FindChecked(D.Effect) +
+                    TEXT("|") + (D.Cost.IsEmpty() ? FString() : Hashes.FindChecked(D.Cost)) +
+                         FString::Printf(TEXT("|%.9g|%s|%d"), double(D.Cooldown), *D.CooldownTag.ToString(), D.AutoEnd);
+    return FMD5::HashAnsiString(*Value);
+}
 UBlueprint* NewGASBlueprint(const FString& Path, UClass* Parent)
 {
     return FKismetEditorUtilities::CreateBlueprint(Parent, CreatePackage(*Path),
@@ -85,9 +93,18 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
         for (const auto& M : Effect.Modifiers)
             if (!M.SetByCaller.IsNone() && !FGameplayTag::RequestGameplayTag(M.SetByCaller, false).IsValid())
                 return Fail(TEXT("SetByCaller tag is not registered: ")+ M.SetByCaller.ToString());
+        const auto Hash = EffectDigest(Effect, Hashes.FindChecked(Effect.Attributes));
+        Hashes.Add(Effect.Id, Hash);
         Work.Add({Effect.Name, Effect.Id,
-                  Folder + TEXT("/GE_")+ Effect.Name, EffectDigest(Effect, Hashes.FindChecked(Effect.Attributes)),
-                                UDasAuthoredGameplayEffect::StaticClass(), nullptr});
+                  Folder + TEXT("/GE_") + Effect.Name, Hash, UDasAuthoredGameplayEffect::StaticClass(), nullptr});
+    }
+    for (const auto& Ability : Model.Abilities)
+    {
+        if (!Ability.CooldownTag.IsNone() && !FGameplayTag::RequestGameplayTag(Ability.CooldownTag, false).IsValid())
+            return Fail(TEXT("Ability cooldown tag is not registered: ") + Ability.CooldownTag.ToString());
+        Work.Add({Ability.Name, Ability.Id,
+                  Folder + TEXT("/GA_") + Ability.Name, AbilityDigest(Ability, Hashes),
+                                UDasAuthoredGameplayAbility::StaticClass(), nullptr});
     }
     // Check the entire batch before creating any UObject or changing an existing package.
     for (auto& W : Work)
@@ -112,6 +129,11 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
         {
             Id = Effect->DefinitionId;
             Hash = Effect->DefinitionHash;
+        }
+        if (const auto* Ability = Cast<UDasAuthoredGameplayAbility>(CDO))
+        {
+            Id = Ability->DefinitionId;
+            Hash = Ability->DefinitionHash;
         }
         if (Id != W.Id || Hash != W.Hash)
             return Fail(TEXT("GAS schema changed; live structural migration is deferred. Import into a new folder."));
@@ -259,6 +281,42 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
         }
         Out.Add(Effect.Name, W.BP);
     }
+    for (const auto& Ability : Model.Abilities)
+    {
+        auto& W = *Work.FindByPredicate([&](const auto& A) { return A.Id == Ability.Id; });
+        if (!W.BP)
+        {
+            W.BP = NewGASBlueprint(W.Path, W.Parent);
+            if (!W.BP)
+                return Fail(TEXT("Cannot create GameplayAbility Blueprint"));
+            Created.Add(W.BP);
+            FKismetEditorUtilities::CompileBlueprint(W.BP);
+            if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
+                return Fail(TEXT("GameplayAbility Blueprint compilation failed"));
+            auto* CDO = CastChecked<UDasAuthoredGameplayAbility>(W.BP->GeneratedClass->GetDefaultObject());
+            auto FindEffect = [&](const FString& Id) -> UClass*
+            {
+                if (Id.IsEmpty())
+                    return nullptr;
+                return Work.FindByPredicate([&](const auto& A) { return A.Id == Id; })->BP->GeneratedClass.Get();
+            };
+            CDO->DefinitionId = Ability.Id;
+            CDO->DefinitionName = FName(*Ability.Name);
+            CDO->DefinitionHash = W.Hash;
+            CDO->Effect = FindEffect(Ability.Effect);
+            CDO->Cost = FindEffect(Ability.Cost);
+            CDO->CooldownSeconds = Ability.Cooldown;
+            CDO->CooldownTags.Reset();
+            if (!Ability.CooldownTag.IsNone())
+                CDO->CooldownTags.AddTag(FGameplayTag::RequestGameplayTag(Ability.CooldownTag, false));
+            CDO->AutoEnd = Ability.AutoEnd;
+            CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
+                ->UpdateCustomPropertyListForPostConstruction();
+            FAssetRegistryModule::AssetCreated(W.BP);
+            W.BP->MarkPackageDirty();
+        }
+        Out.Add(Ability.Name, W.BP);
+    }
     if (SaveAssets)
         for (auto* BP : Created)
         {
@@ -273,20 +331,19 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
     Success = true;
     return true;
 }
-static FAutoConsoleCommand DasGASImportCommand(
-    TEXT("Das.GASImport"),
-         TEXT("Das.GASImport Script.das /Game/Folder : import authored AttributeSets and GameplayEffects"),
-              FConsoleCommandWithArgsDelegate::CreateLambda(
-                  [](const TArray<FString>& Args)
-                  {
-                      TMap<FString, UBlueprint*> Assets;
-                      FString Error;
-                      if (Args.Num() != 2 || !FDasGASAssetService::Apply(Args[0], Args[1], Assets, Error))
-                      {
-                          UE_LOG(LogTemp, Error, TEXT("DAS_GAS_IMPORT=FAIL %s"), *Error);
-                          return;
-                      }
-                      for (const auto& Pair : Assets)
-                          UE_LOG(LogTemp, Display, TEXT("DAS_GAS_ASSET %s %s"), *Pair.Key, *Pair.Value->GetPathName());
-                      UE_LOG(LogTemp, Display, TEXT("DAS_GAS_IMPORT=PASS assets=%d"), Assets.Num());
-                  }));
+static FAutoConsoleCommand DasGASImportCommand(TEXT("Das.GASImport"),
+    TEXT("Das.GASImport Script.das /Game/Folder : import authored AttributeSets, GameplayEffects and GameplayAbilities"),
+        FConsoleCommandWithArgsDelegate::CreateLambda(
+            [](const TArray<FString>& Args)
+            {
+                TMap<FString, UBlueprint*> Assets;
+                FString Error;
+                if (Args.Num() != 2 || !FDasGASAssetService::Apply(Args[0], Args[1], Assets, Error))
+                {
+                    UE_LOG(LogTemp, Error, TEXT("DAS_GAS_IMPORT=FAIL %s"), *Error);
+                    return;
+                }
+                for (const auto& Pair : Assets)
+                    UE_LOG(LogTemp, Display, TEXT("DAS_GAS_ASSET %s %s"), *Pair.Key, *Pair.Value->GetPathName());
+                UE_LOG(LogTemp, Display, TEXT("DAS_GAS_IMPORT=PASS assets=%d"), Assets.Num());
+            }));

@@ -36,12 +36,13 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
     FDasGASDeclarations Model;
     FString Error;
     if (!Check(R.ReadGASScript(R.ScriptPath(TEXT("gas_combat_definitions.das")), Model, Error) &&
-                               Model.Sets.Num() == 1 && Model.Effects.Num() == 9,
+                               Model.Sets.Num() == 1 && Model.Effects.Num() == 10 && Model.Abilities.Num() == 2,
                                TEXT("declarations_compile")))
     {
         UE_LOG(LogTemp, Error, TEXT("%s"), *Error);
         return 1;
     }
+    const auto Expected = Model;
     if (!Check(!R.ReadGASScript(R.ScriptPath(TEXT("gas_authored_invalid.das")), Model, Error),
                                 TEXT("invalid_linked_limit_refused")))
         return 1;
@@ -61,6 +62,13 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
             return 1;
     if (!Check(true, TEXT("invalid_duration_period_and_stack_policies_refused")))
         return 1;
+    const bool MissingEffectRejected = !R.ReadGASScript(R.ScriptPath(TEXT("gas_ability_invalid.das")), Model, Error);
+    const FString PositiveCost =
+        Prefix +
+        TEXT("\"duration\":\"Instant\"},{\"kind\":\"ability\",\"name\":\"Ability\",\"id\":\"test.Ability\",\"effect\":\"Effect\",\"cost\":\"Effect\",\"fields\":[]}]}");
+    if (!Check(MissingEffectRejected && !ParseDasGASDeclarations(PositiveCost, Model, Error),
+               TEXT("ability_unknown_effect_and_positive_cost_refused")))
+        return 1;
     FString Folder;
     const bool Reopen = FParse::Value(*Params, TEXT("Reopen="), Folder);
     TMap<FString, UBlueprint*> Assets;
@@ -68,24 +76,23 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
     {
         if (!Folder.StartsWith(TEXT("/Game/Tests/GASAuthored/")))
             return 2;
-        for (const auto& Name :
-             {TEXT("CombatAttributes"),
-                   TEXT("PotionHeal"), TEXT("Hit"), TEXT("CallerHeal"),
-                                                         TEXT("ManaBoost"),
-                                                              TEXT("SetMana"), TEXT("Fortitude"),
-                                                                                    TEXT("ManaAura"),
-                                                                                         TEXT("ManaRegen"),
-                                                                                              TEXT("LayeredFortitude")})
+        TArray<TPair<FString, FString>> ExpectedAssets;
+        for (const auto& Set : Expected.Sets)
+            ExpectedAssets.Emplace(Set.Name, TEXT("AS_"));
+        for (const auto& Effect : Expected.Effects)
+            ExpectedAssets.Emplace(Effect.Name, TEXT("GE_"));
+        for (const auto& Ability : Expected.Abilities)
+            ExpectedAssets.Emplace(Ability.Name, TEXT("GA_"));
+        for (const auto& Pair : ExpectedAssets)
         {
-            const FString AssetName =
-                FString(Name == FString(TEXT("CombatAttributes")) ? TEXT("AS_"): TEXT("GE_")) + Name;
-            auto* BP = LoadObject<UBlueprint>(nullptr, *(Folder + TEXT("/")+ AssetName + TEXT(".")+ AssetName));
+            const FString AssetName = Pair.Value + Pair.Key;
+            auto* BP = LoadObject<UBlueprint>(nullptr, *(Folder + TEXT("/") + AssetName + TEXT(".") + AssetName));
             if (!BP)
             {
                 UE_LOG(LogTemp, Error, TEXT("Cannot reopen GAS Blueprint %s"), *AssetName);
                 return 1;
             }
-            Assets.Add(Name, BP);
+            Assets.Add(Pair.Key, BP);
         }
     }
     else
@@ -100,7 +107,7 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
     TArray<TStrongObjectPtr<UBlueprint>> Keep;
     for (const auto& P : Assets)
         Keep.Emplace(P.Value);
-    if (!Check(Assets.Num() == 10, TEXT("real_attribute_and_effect_blueprints_saved")))
+    if (!Check(Assets.Num() == 13, TEXT("real_attribute_and_effect_blueprints_saved")))
         return 1;
     auto* AttrClass = Assets.FindChecked(TEXT("CombatAttributes"))->GeneratedClass.Get();
     auto* P = FindFProperty<FStructProperty>(AttrClass, TEXT("Health"));
@@ -164,9 +171,9 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
             World->Tick(LEVELTICK_All, 0.01f);
         }
     };
-    for (int32 Phase = 0; Phase < 10; ++Phase)
+    for (int32 Phase = 0; Phase < 16; ++Phase)
     {
-        if (Phase == 1 || Phase == 5)
+        if (Phase == 1 || Phase == 5 || Phase == 12)
             CollectGarbage(RF_NoFlags);
         if (Phase == 5)
             Advance(0.2f);
@@ -176,17 +183,25 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
             Advance(0.3f);
         if (Phase == 8 || Phase == 9)
             Advance(0.31f);
+        if (Phase == 11 || Phase == 15)
+            Advance(0.45f);
         const auto Result = R.RunPersistent(Probe, Phase, Host);
         if (!Result.bSucceeded || Result.Value != 42)
         {
             UE_LOG(LogTemp, Error, TEXT("GAS phase=%d %s"), Phase, *Result.Error);
             return 1;
         }
+        if ((Phase == 10 || Phase == 15) &&
+            !Check(Host->Abilities->HasMatchingGameplayTag(
+                FGameplayTag::RequestGameplayTag(TEXT("Ability.Cooldown.Restore"))) == (Phase == 10),
+                Phase == 10 ? TEXT("native_cooldown_tag_granted") : TEXT("native_cooldown_tag_expired")))
+            return 1;
     }
-    if (!Check(true, TEXT("native_effects_callbacks_gc_clamps_setbycaller_duration_period_stacks_removal")))
+    if (!Check(true, TEXT("native_effects_abilities_cost_cooldown_lifecycle_snapshots")))
         return 1;
     R.ReleaseObject(Host);
-    if (!Check(R.SubscriptionCount(Host) == 0 && !Host->Abilities->AttributeChanged.IsBound(),
+    if (!Check(R.SubscriptionCount(Host) == 0 && !Host->Abilities->AttributeChanged.IsBound() &&
+                   !Host->Abilities->AbilityChanged.IsBound(),
                TEXT("released_owner_unsubscribed")))
         return 1;
     FDasAuthoringModule ActorModel;

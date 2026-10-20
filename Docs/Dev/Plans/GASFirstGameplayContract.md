@@ -10,6 +10,10 @@ A further authored-DSL increment adds native duration, period and stacking polic
 plus checked active-effect queries/removal; see the authoring guide for its current
 surface. The initial starter scope below is retained as historical context.
 
+[Declarative GameplayAbility authoring](../../Guide/Gameplay/GASAbilities.md) now
+adds standard GAS cost/cooldown, grant/activate/cancel/end/revoke and typed managed
+lifecycle snapshots. Arbitrary DAS activation bodies and ability tasks are deferred.
+
 ## Initial implementation decisions
 
 - `ue_gas.das` exposes HealthAbilitySystemComponentRef, HealthAttribute,

@@ -46,3 +46,39 @@ def ue_gas_remove_effect(effect:GASEffectResult; stacks:int= -1):bool {
     if(!ue_is_valid(effect.Target) || effect.ActiveId<=0) { return false }
     return effect.Target.RemoveAuthoredEffect(effect.ActiveId,stacks)
 }
+
+typedef GASAbilityGrant = DasAuthoredAbilityGrant
+typedef GASAbilityState = DasAuthoredAbilityState
+typedef GASAbilityChange = DasAuthoredAbilityState
+
+def ue_gas_give_ability(asc:AuthoredAbilitySystemComponentRef; kind:AuthoredGameplayAbilityClass; level:int=1):GASAbilityGrant {
+    verify(level>=1 && level<=10000,"Ability level must be in 1..10000")
+    let grant=asc.GiveAuthoredAbility(ue_class_handle(kind),level)
+    verify(ue_is_valid(grant.Target) && grant.Id>0,"Cannot grant authored ability on this ASC")
+    return grant
+}
+
+def ue_gas_ability_state(grant:GASAbilityGrant):GASAbilityState {
+    if(!ue_is_valid(grant.Target) || grant.Id<=0) {return GASAbilityState()}
+    return grant.Target.AuthoredAbilityState(grant.Id)
+}
+
+def ue_gas_activate_ability(grant:GASAbilityGrant):bool {
+    if(!ue_is_valid(grant.Target) || grant.Id<=0) {return false}
+    return grant.Target.ActivateAuthoredAbility(grant.Id)
+}
+
+def ue_gas_cancel_ability(grant:GASAbilityGrant):bool {
+    if(!ue_is_valid(grant.Target) || grant.Id<=0) {return false}
+    return grant.Target.CancelAuthoredAbility(grant.Id)
+}
+
+def ue_gas_finish_ability(grant:GASAbilityGrant):bool {
+    if(!ue_is_valid(grant.Target) || grant.Id<=0) {return false}
+    return grant.Target.FinishAuthoredAbility(grant.Id)
+}
+
+def ue_gas_remove_ability(grant:GASAbilityGrant):bool {
+    if(!ue_is_valid(grant.Target) || grant.Id<=0) {return false}
+    return grant.Target.RemoveAuthoredAbility(grant.Id)
+}

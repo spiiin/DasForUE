@@ -5,6 +5,9 @@ a managed native ASC adapter. Definitions become Blueprint classes with real
 FGameplayAttributeData properties and UGameplayEffect modifiers. They are not DAS
 object memory exposed as Unreal properties.
 
+Declarative GameplayAbility actions, costs and cooldowns are described in
+[GameplayAbilities](GASAbilities.md).
+
 Keep definitions in one local Scripts module. No inheritance or user methods are
 supported in these data-only declarations yet. Values use float, as GAS does.
 
@@ -179,7 +182,7 @@ One ASC is allowed per owner in this adapter; use it instead of the fixed-health
 ASC on that actor. Registration is idempotent for the same set class, capped at
 16 sets; the source ASC retains at most 32 effect definitions for recipe lifetime.
 Current/base values are clamped by native hooks, including dependent attributes
-when a linked maximum decreases. Network replication, GameplayAbility authoring and attribute capture calculations remain future work.
+when a linked maximum decreases. Network replication, arbitrary DAS ability bodies/tasks and attribute capture calculations remain future work.
 
 Validation: Scripts/TestGASAuthored.ps1 builds and runs a focused commandlet
 with real native attributes/effects and typed DAS callbacks, then reopens the saved

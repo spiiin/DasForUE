@@ -40,6 +40,11 @@
 				"name": "AttributeSetRef"
 			},
 			{
+				"path": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+				"module": "ue_gas_authored_types",
+				"name": "AuthoredGameplayAbilityRef"
+			},
+			{
 				"path": "/Script/DasRuntime.DasAuthoredGameplayEffect",
 				"module": "ue_gas_authored_types",
 				"name": "AuthoredGameplayEffectRef"
@@ -2525,6 +2530,73 @@
 			]
 		},
 		{
+			"path": "/Script/DasRuntime.DasAuthoredAbilityGrant",
+			"signature": "Target:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;Id:IntProperty:0;",
+			"fields": [
+				{
+					"kind": "object",
+					"type_path": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"name": "Target"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "Id"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasAuthoredAbilityState",
+			"signature": "Phase:NameProperty:0;GrantId:IntProperty:0;Cancelled:BoolProperty:0;Granted:BoolProperty:0;Active:BoolProperty:0;CanActivate:BoolProperty:0;Ability:NameProperty:0;Level:IntProperty:0;CooldownRemaining:FloatProperty:0;",
+			"fields": [
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "Phase"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "GrantId"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "Cancelled"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "Granted"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "Active"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "CanActivate"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "Ability"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "Level"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "CooldownRemaining"
+				}
+			]
+		},
+		{
 			"path": "/Script/DasRuntime.DasAuthoredAttributeChange",
 			"signature": "Set:NameProperty:0;Attribute:NameProperty:0;OldValue:FloatProperty:0;NewValue:FloatProperty:0;",
 			"fields": [
@@ -3705,6 +3777,27 @@
 					]
 				},
 				{
+					"name": "ActivateAuthoredAbility",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;ActivateAuthoredAbility;Id:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Id",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "AddAuthoredAttributes",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
 					"signature": "v1;AddAuthoredAttributes;Class:ClassProperty:128:meta:/Script/DasRuntime.DasAuthoredAttributeSet;ReturnValue:BoolProperty:1408;",
@@ -3798,6 +3891,27 @@
 					]
 				},
 				{
+					"name": "AuthoredAbilityState",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;AuthoredAbilityState;Id:IntProperty:128;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredAbilityState{Phase:NameProperty:0;GrantId:IntProperty:0;Cancelled:BoolProperty:0;Granted:BoolProperty:0;Active:BoolProperty:0;CanActivate:BoolProperty:0;Ability:NameProperty:0;Level:IntProperty:0;CooldownRemaining:FloatProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Id",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasAuthoredAbilityState",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "AuthoredAttributeSnapshot",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
 					"signature": "v1;AuthoredAttributeSnapshot;Set:NameProperty:128;Name:NameProperty:128;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredAttributeChange{Set:NameProperty:0;Attribute:NameProperty:0;OldValue:FloatProperty:0;NewValue:FloatProperty:0;};",
@@ -3840,6 +3954,27 @@
 						{
 							"kind": "struct",
 							"type_path": "/Script/DasRuntime.DasAuthoredEffectState",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "CancelAuthoredAbility",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;CancelAuthoredAbility;Id:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Id",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
 							"name": "ReturnValue",
 							"direction": "return"
 						}
@@ -3970,6 +4105,27 @@
 							"name": "bExactMatch",
 							"direction": "in",
 							"default_text": "true"
+						}
+					]
+				},
+				{
+					"name": "FinishAuthoredAbility",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;FinishAuthoredAbility;Id:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Id",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
 						}
 					]
 				},
@@ -4148,6 +4304,34 @@
 						{
 							"kind": "bool",
 							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GiveAuthoredAbility",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;GiveAuthoredAbility;Class:ClassProperty:128:meta:/Script/DasRuntime.DasAuthoredGameplayAbility;Level:IntProperty:128;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredAbilityGrant{Target:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;Id:IntProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "class",
+							"type_path": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+							"name": "Class",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Level",
+							"direction": "in",
+							"default_text": "1"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasAuthoredAbilityGrant",
 							"name": "ReturnValue",
 							"direction": "return"
 						}
@@ -4565,6 +4749,27 @@
 					]
 				},
 				{
+					"name": "RemoveAuthoredAbility",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;RemoveAuthoredAbility;Id:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Id",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "RemoveAuthoredEffect",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
 					"signature": "v1;RemoveAuthoredEffect;ActiveId:IntProperty:128;Stacks:IntProperty:128;ReturnValue:BoolProperty:1408;",
@@ -4874,6 +5079,11 @@
 				}
 			],
 			"skipped": [
+				{
+					"domain": "field",
+					"name": "AbilityChanged",
+					"reason": "hidden_editor_or_deprecated"
+				},
 				{
 					"domain": "field",
 					"name": "ActivatableAbilities",
@@ -5511,6 +5721,690 @@
 					"domain": "method",
 					"name": "ExecuteUbergraph",
 					"reason": "requires_adapter_or_nonpublic_policy"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+			"fixture": false,
+			"fields": [],
+			"methods": [
+				{
+					"name": "GetAbilityLevel",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetAbilityLevel;ReturnValue:IntProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetAbilitySystemComponentFromActorInfo",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetAbilitySystemComponentFromActorInfo;ReturnValue:ObjectProperty:1408:/Script/GameplayAbilities.AbilitySystemComponent;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/GameplayAbilities.AbilitySystemComponent",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetAvatarActorFromActorInfo",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetAvatarActorFromActorInfo;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetCooldownTimeRemaining",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetCooldownTimeRemaining;ReturnValue:FloatProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetCurrentMontage",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetCurrentMontage;ReturnValue:ObjectProperty:1408:/Script/Engine.AnimMontage;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.AnimMontage",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetCurrentSourceObject",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetCurrentSourceObject;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/CoreUObject.Object",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetOwningActorFromActorInfo",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetOwningActorFromActorInfo;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetOwningComponentFromActorInfo",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetOwningComponentFromActorInfo;ReturnValue:ObjectProperty:1408:/Script/Engine.SkeletalMeshComponent;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.SkeletalMeshComponent",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "InvalidateClientPredictionKey",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;InvalidateClientPredictionKey;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "IsLocallyControlled",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;IsLocallyControlled;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_CancelAbility",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;K2_CancelAbility;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "K2_CheckAbilityCooldown",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;K2_CheckAbilityCooldown;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_CheckAbilityCost",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;K2_CheckAbilityCost;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_CommitAbility",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;K2_CommitAbility;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_CommitAbilityCooldown",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;K2_CommitAbilityCooldown;BroadcastCommitEvent:BoolProperty:128;ForceCooldown:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "BroadcastCommitEvent",
+							"direction": "in",
+							"default_text": "false"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ForceCooldown",
+							"direction": "in",
+							"default_text": "false"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_CommitAbilityCost",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;K2_CommitAbilityCost;BroadcastCommitEvent:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "BroadcastCommitEvent",
+							"direction": "in",
+							"default_text": "false"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_HasAuthority",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;K2_HasAuthority;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "RemoveGrantedByEffect",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;RemoveGrantedByEffect;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "SetCanBeCanceled",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;SetCanBeCanceled;bCanBeCanceled:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bCanBeCanceled",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetShouldBlockOtherAbilities",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;SetShouldBlockOtherAbilities;bShouldBlockAbilities:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bShouldBlockAbilities",
+							"direction": "in"
+						}
+					]
+				}
+			],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "AbilityTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AbilityTriggers",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ActivationBlockedTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ActivationOwnedTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ActivationRequiredTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ActiveTasks",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AutoEnd",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsAbilityEnding",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsActive",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsBlockingOtherAbilities",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsCancelable",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "BlockAbilitiesWithTag",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bReplicateInputDirectly",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bRetriggerInstancedAbility",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bServerRespectsRemoteAbilityCancellation",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CancelAbilitiesWithTag",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CooldownGameplayEffectClass",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CooldownSeconds",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CooldownTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "Cost",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CostGameplayEffectClass",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CurrentActivationInfo",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "CurrentEventData",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "CurrentMontage",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DefinitionHash",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DefinitionId",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DefinitionName",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "Effect",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "InstancingPolicy",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "NetExecutionPolicy",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "NetSecurityPolicy",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "RemoteInstanceEnded",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ReplicationPolicy",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SourceBlockedTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SourceRequiredTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "TargetBlockedTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "TargetRequiredTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "method",
+					"name": "BP_ApplyGameplayEffectToOwner",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "BP_ApplyGameplayEffectToTarget",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "BP_EditSpecValues",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "BP_RemoveGameplayEffectFromOwnerWithAssetTags",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "BP_RemoveGameplayEffectFromOwnerWithGrantedTags",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "BP_RemoveGameplayEffectFromOwnerWithHandle",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "CancelTaskByInstanceName",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ConfirmTaskByInstanceName",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "EndAbilityState",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "EndTaskByInstanceName",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "GetAbilityLevel_BP",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetActorInfo",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetContextFromOwner",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetGrantedByEffectContext",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetSourceObject_BP",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_ActivateAbility",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_ActivateAbilityFromEvent",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddGameplayCue",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddGameplayCueWithParams",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_ApplyGameplayEffectSpecToOwner",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_ApplyGameplayEffectSpecToTarget",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_CanActivateAbility",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_CommitExecute",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_EndAbility",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_EndAbilityLocally",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_ExecuteGameplayCue",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_ExecuteGameplayCueWithParams",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_OnEndAbility",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_RemoveGameplayCue",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_ShouldAbilityRespondToEvent",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "MakeOutgoingGameplayEffectSpec",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "MakeTargetLocationInfoFromOwnerActor",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "MakeTargetLocationInfoFromOwnerSkeletalMeshComponent",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "MontageJumpToSection",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "MontageSetNextSectionName",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "MontageStop",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "SendGameplayEvent",
+					"reason": "unsupported_parameter_type"
 				}
 			]
 		},

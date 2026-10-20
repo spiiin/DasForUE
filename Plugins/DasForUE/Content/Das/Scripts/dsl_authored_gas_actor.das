@@ -10,6 +10,7 @@ class AuthoredGASActor : Actor {
     settings=ue_properties(EditAnywhere,BlueprintReadOnly) {
         var Attributes:AttributeSetClass
         var Healing:AuthoredGameplayEffectClass
+        var Restoration:AuthoredGameplayAbilityClass
     }
     state=ue_properties(BlueprintReadWrite) {
         var LastHealth:float=0.0f
@@ -22,6 +23,10 @@ class AuthoredGASActor : Actor {
     [ue_function(BlueprintCallable)]
     def Heal():bool {
         return ue_gas_apply(self.Abilities,ue_gas_make_spec(self.Abilities,self.Healing)).Applied
+    }
+    [ue_function(BlueprintCallable)]
+    def RestoreWithCostAndCooldown():bool {
+        return ue_gas_activate_ability(ue_gas_give_ability(self.Abilities,self.Restoration))
     }
     [ue_event(source="Abilities",name="AttributeChanged")]
     def OnAttribute(change:GASAttributeChange):void {

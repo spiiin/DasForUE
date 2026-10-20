@@ -271,6 +271,7 @@ void UDasAuthoredAbilitySystemComponent::EndPlay(const EEndPlayReason::Type Reas
     Detach();
     Definitions.Empty();
     ActiveEffects.Empty();
+    Abilities.Empty();
     Super::EndPlay(Reason);
 }
 void UDasAuthoredAbilitySystemComponent::BeginDestroy()

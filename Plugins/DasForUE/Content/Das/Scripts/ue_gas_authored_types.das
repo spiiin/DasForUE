@@ -20,3 +20,11 @@ def AuthoredGameplayEffectRef_from(value:UObjectHandle):AuthoredGameplayEffectRe
 }
 typedef AttributeSetClass = $UEClass<AttributeSetRef>
 typedef AuthoredGameplayEffectClass = $UEClass<AuthoredGameplayEffectRef>
+
+[ue_native_object(path="/Script/DasRuntime.DasAuthoredGameplayAbility")]
+struct AuthoredGameplayAbilityRef { handle:UObjectHandle }
+
+def AuthoredGameplayAbilityRef_from(value:UObjectHandle):AuthoredGameplayAbilityRef {
+    return AuthoredGameplayAbilityRef(handle=ue_cast_nullable_object(value,"/Script/DasRuntime.DasAuthoredGameplayAbility"))
+}
+typedef AuthoredGameplayAbilityClass = $UEClass<AuthoredGameplayAbilityRef>

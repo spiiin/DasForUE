@@ -3,6 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
 #include "GameplayEffect.h"
+#include "DasGASAbility.h"
 #include "DasGASAuthoring.generated.h"
 
 USTRUCT()
@@ -51,10 +52,18 @@ struct FDasGASEffectDeclaration
     FString StackExpiration = TEXT("ClearEntireStack");
     bool DenyOverflow = true;
 };
+struct FDasGASAbilityDeclaration
+{
+    FString Name, Id, Effect, Cost;
+    float Cooldown = 0;
+    FName CooldownTag;
+    bool AutoEnd = true;
+};
 struct FDasGASDeclarations
 {
     TArray<FDasGASSetDeclaration> Sets;
     TArray<FDasGASEffectDeclaration> Effects;
+    TArray<FDasGASAbilityDeclaration> Abilities;
 };
 DASRUNTIME_API bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FString& Error);
 
@@ -161,6 +170,21 @@ public:
     UDasAuthoredAbilitySystemComponent();
     UPROPERTY(BlueprintAssignable, Category = "GAS")
     FDasAuthoredAttributeChanged AttributeChanged;
+    UPROPERTY(BlueprintAssignable, Category = "GAS")
+    FDasAuthoredAbilityChanged AbilityChanged;
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    FDasAuthoredAbilityGrant GiveAuthoredAbility(TSubclassOf<UDasAuthoredGameplayAbility> Class, int32 Level = 1);
+    UFUNCTION(BlueprintPure, Category = "GAS")
+    FDasAuthoredAbilityState AuthoredAbilityState(int32 Id) const;
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool ActivateAuthoredAbility(int32 Id);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool CancelAuthoredAbility(int32 Id);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool FinishAuthoredAbility(int32 Id);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool RemoveAuthoredAbility(int32 Id);
+    void NotifyAuthoredAbility(FGameplayAbilitySpecHandle Handle, FName Phase, bool Committed = false);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     bool AddAuthoredAttributes(TSubclassOf<UDasAuthoredAttributeSet> Class);
     UFUNCTION(BlueprintPure, Category = "GAS")
@@ -189,6 +213,14 @@ private:
     // Only native GAS handles are retained here; IDs are never reused on this ASC.
     TMap<int32, FActiveGameplayEffectHandle> ActiveEffects;
     int32 NextActiveId = 1;
+    struct FGrantedAbility
+    {
+        FGameplayAbilitySpecHandle Handle;
+        FName Name;
+        bool Committed = false;
+    };
+    TMap<int32, FGrantedAbility> Abilities;
+    int32 NextAbilityId = 1;
     bool Ended = false;
     void PruneActiveEffects();
     bool Live() const;

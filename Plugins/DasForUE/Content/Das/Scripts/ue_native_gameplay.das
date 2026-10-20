@@ -1037,6 +1037,25 @@ struct Vector4 {
     W:double
 }
 
+[ue_native_struct(path="/Script/DasRuntime.DasAuthoredAbilityGrant")]
+struct DasAuthoredAbilityGrant {
+    Target:AuthoredAbilitySystemComponentRef
+    Id:int
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasAuthoredAbilityState")]
+struct DasAuthoredAbilityState {
+    Phase:UENameValue
+    GrantId:int
+    Cancelled:bool
+    Granted:bool
+    Active:bool
+    CanActivate:bool
+    Ability:UENameValue
+    Level:int
+    CooldownRemaining:float
+}
+
 [ue_native_struct(path="/Script/DasRuntime.DasAuthoredAttributeChange")]
 struct DasAuthoredAttributeChange {
     Set:UENameValue

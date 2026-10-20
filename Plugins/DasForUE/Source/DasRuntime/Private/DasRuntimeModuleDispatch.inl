@@ -844,6 +844,8 @@ bool FDasRuntimeModule::ReadGASScript(const FString& Path, FDasGASDeclarations& 
                 const auto* A = DSLAnnotation(S->annotations, "ue_attribute_set");
                 if (!A)
                     A = DSLAnnotation(S->annotations, "ue_gameplay_effect");
+                if (!A)
+                    A = DSLAnnotation(S->annotations, "ue_gameplay_ability");
                 if (!A || !OK)
                     return;
                 const auto* Wire = A->arguments.find(DSLGASKey, das::Type::tString);
