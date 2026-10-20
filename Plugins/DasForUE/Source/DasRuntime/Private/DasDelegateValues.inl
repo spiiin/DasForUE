@@ -47,7 +47,8 @@ uint64 StoreDelegateValue(FDelegateValue V, das::Context* C)
 }
 bool LiveDelegateObject(UObject* O)
 {
-    return IsValid(O) && !(Cast<AActor>(O) && CastChecked<AActor>(O)->IsActorBeingDestroyed()) &&
+    return (!Cast<UDasScriptDelegateProxy>(O) || CastChecked<UDasScriptDelegateProxy>(O)->IsActive()) && IsValid(O) &&
+           !(Cast<AActor>(O) && CastChecked<AActor>(O)->IsActorBeingDestroyed()) &&
            !(Cast<UActorComponent>(O) && CastChecked<UActorComponent>(O)->IsBeingDestroyed());
 }
 bool DelegateFrameMatches(UFunction* A, UFunction* B)
@@ -216,6 +217,8 @@ FDasCallHandle BeginDelegateCall(uint64 Token, const char* Wire, bool Multi, boo
                 DelegateHandler(O, D.GetFunctionName(), V.Signature.Get(), C);
                 TStrongObjectPtr<UObject> Keep(O);
                 D.ProcessDelegate<UObject>(Params);
+                if (auto* Proxy = Cast<UDasScriptDelegateProxy>(O); Proxy && !Proxy->LastError.IsEmpty())
+                    C->throw_error(TCHAR_TO_UTF8(*Proxy->LastError));
                 if (AuthoredDispatchFailure && !AuthoredDispatchFailure->IsEmpty())
                     break;
             }
@@ -232,6 +235,8 @@ FDasCallHandle BeginDelegateCall(uint64 Token, const char* Wire, bool Multi, boo
             DelegateHandler(O, V.Single.GetFunctionName(), V.Signature.Get(), C);
             TStrongObjectPtr<UObject> Keep(O);
             V.Single.ProcessDelegate<UObject>(Params);
+            if (auto* Proxy = Cast<UDasScriptDelegateProxy>(O); Proxy && !Proxy->LastError.IsEmpty())
+                C->throw_error(TCHAR_TO_UTF8(*Proxy->LastError));
         }
     };
     const uint64 Id = NextCallHandle++;

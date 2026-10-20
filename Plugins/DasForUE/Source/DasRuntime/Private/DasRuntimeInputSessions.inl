@@ -667,6 +667,8 @@ void RevokeSession(FPersistentSession& Session)
     Session.ContextRecipes.Empty();
     if (Session.Live)
     {
+        Session.Live->Context->DelegateLease->Active = false;
+        Session.Live->Context->OwnedScriptDelegateEvents.Empty();
         Session.Live->Context->DragLifetime.Revoke();
         Session.Live->Context->ImageBrushes.Revoke();
     }

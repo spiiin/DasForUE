@@ -131,6 +131,7 @@
 #include "DasProbeActor.h"
 #include "DasScriptComponent.h"
 #include "DasIntDelegateProxy.h"
+#include "DasScriptDelegateProxy.h"
 #include "UObject/StrongObjectPtr.h"
 #include "UObject/GCObject.h"
 #include "UObject/StructOnScope.h"
@@ -551,6 +552,7 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasFoundationModule.inl"
 #include "DasRuntimeTimers.inl"
 #include "DasDynamicEvents.inl"
+#include "DasScriptDelegateBindings.inl"
 #include "DasRuntimeInputSessions.inl"
 }
 
@@ -617,6 +619,12 @@ void FDasRuntimeModule::StartupModule()
                     for (auto& Declaration : C.Subscriptions)
                         if (UObject* const* New = Map.Find(Declaration.Source.GetEvenIfUnreachable()))
                             Declaration.Source = *New;
+                    for (auto& Pair : C.ScriptDelegateProxies)
+                        if (UObject* const* New = Map.Find(Pair.Value->Owner.GetEvenIfUnreachable()))
+                            Pair.Value->Owner = *New;
+                    for (auto& Binding : C.OwnedScriptDelegateEvents)
+                        if (UObject* const* New = Map.Find(Binding->Source.GetEvenIfUnreachable()))
+                            Binding->Source = *New;
                     for (auto& Pair : C.DelegateValues)
                     {
                         auto& V = Pair.Value;
@@ -696,6 +704,7 @@ void FDasRuntimeModule::ShutdownModule()
         PendingEvents.Empty();
         CreatedScriptScenes.Empty();
         UDasIntDelegateProxy::ResetDynamicReceivers();
+        UDasScriptDelegateProxy::ResetReceivers();
         ResetDasCallbackFrames();
         ResetDasContainerCarriers();
         das::Module::Shutdown();
@@ -1060,4 +1069,26 @@ FDasExecutionResult FDasRuntimeModule::RunLibraryFrame(const FString& Contract, 
 TMap<FString, FName> DasCollisionProfileConstants()
 {
     return CollisionProfileSymbols;
+}
+
+FDasExecutionResult FDasRuntimeModule::RunScriptDelegateFrame(const TSharedPtr<FDasScriptDelegateLease>& Generation,
+                                                              const FString& Path, const FString& Entry,
+                                                              const TArray<FDasScalarValue>& Arguments,
+                                                              EDasMethodSignature ReturnKind,
+                                                              TWeakObjectPtr<UObject> Owner, const FString& ReturnClass)
+{
+    if (!IsInGameThread())
+    {
+        FDasExecutionResult R;
+        R.Error = TEXT("Script delegates require the game thread");
+        return R;
+    }
+    if (!Generation.IsValid() || !Generation->Active)
+    {
+        FDasExecutionResult R;
+        R.Error = TEXT("Script delegate VM generation was revoked");
+        return R;
+    }
+    TGuardValue<const FDasScriptDelegateLease*> Guard(ExpectedDelegateGeneration, Generation.Get());
+    return RunNamedFramePersistent(Path, Entry, Arguments, ReturnKind, Owner, ReturnClass);
 }

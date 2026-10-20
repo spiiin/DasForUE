@@ -636,6 +636,7 @@ das::ExpressionPtr DSLDelegateFieldWrite(const das::LineInfo&, const das::TypeDe
                                          const FString&, das::ExpressionPtr);
 #include "DasComputedDefaultsState.inl"
 #include "DasAuthoredRefs.inl"
+#include "DasHandlerABI.inl"
 #include "DasDelegateDSL.inl"
 #include "DasComponentFields.inl"
 #include "DasDeclarationGroups.inl"
@@ -854,6 +855,7 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
 #include "DasInputNamesDSL.inl"
 #include "DasDSLInlineCallbacks.inl"
 #include "DasDSLMemberAnnotations.inl"
+#include "DasHandlerReferencesDSL.inl"
 #include "DasEventChecksDSL.inl"
 #include "DasDSLClassAnnotation.inl"
 #include "DasDSLInterfaceAnnotation.inl"

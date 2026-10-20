@@ -251,6 +251,9 @@ public:
     TMap<FObjectKey, uint64> ObjectKeyTokens;
     TMap<uint64, TWeakObjectPtr<UObject>> ObjectKeys;
     TMap<uint64, TSharedPtr<FMarshalledCall>> Calls;
+    TSharedPtr<FDasScriptDelegateLease> DelegateLease = MakeShared<FDasScriptDelegateLease>();
+    TMap<FString, TStrongObjectPtr<UDasScriptDelegateProxy>> ScriptDelegateProxies;
+    TArray<TUniquePtr<FDasOwnedScriptDelegate>> OwnedScriptDelegateEvents;
     TMap<uint64, FDelegateValue> DelegateValues;
     TMap<FString, TStrongObjectPtr<UFunction>> DelegateSignatures;
 };
@@ -268,6 +271,7 @@ struct FStructFrameRoots final : FGCObject
     virtual FString GetReferencerName() const override { return TEXT("daScript native input frame snapshots"); }
 };
 thread_local FUnrealDasContext* ActiveContext = nullptr;
+thread_local const FDasScriptDelegateLease* ExpectedDelegateGeneration = nullptr;
 thread_local das::Context* RestrictedPhysicsContext = nullptr;
 void GuardUEExtern()
 {

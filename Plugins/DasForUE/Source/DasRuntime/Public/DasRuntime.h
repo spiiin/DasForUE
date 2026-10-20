@@ -17,6 +17,7 @@ struct FFocusEvent;
 class UDragDropOperation;
 struct FDasAuthoringModule;
 struct FDasSourceCatalog;
+struct FDasScriptDelegateLease;
 
 struct FDasTypeDeclaration
 {
@@ -107,6 +108,11 @@ public:
                                                 const TArray<FDasScalarValue>& Arguments,
                                                 EDasMethodSignature ReturnKind, TWeakObjectPtr<UObject> Self,
                                                 const FString& ReturnClass = FString());
+    // Internal generation-checked synchronous free delegate bridge.
+    FDasExecutionResult RunScriptDelegateFrame(const TSharedPtr<FDasScriptDelegateLease>& Generation,
+                                               const FString& Path, const FString& Entry,
+                                               const TArray<FDasScalarValue>& Arguments, EDasMethodSignature ReturnKind,
+                                               TWeakObjectPtr<UObject> Owner, const FString& ReturnClass);
     bool ValidateScalarMethod(const FString& Path, FString& Error, const FString& EntryPoint,
                               EDasMethodSignature Signature);
     bool ValidateIntMethod(const FString& Path, FString& Error, const FString& EntryPoint = TEXT("main"));

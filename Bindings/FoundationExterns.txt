@@ -69,12 +69,14 @@ __ue_data_table_names	@ue_foundation::__ue_data_table_names CIH<ue_foundation::U
 __ue_data_table_row	@ue_foundation::__ue_data_table_row CIH<ue_foundation::UObjectHandle> CIs CIs C_c C_l	ue_foundation::UEStructValue	4
 __ue_delegate_begin_call	@ue_foundation::__ue_delegate_begin_call Cu64 CIs Cb Cb C_c	ue_foundation::UCallHandle	4
 __ue_delegate_bind	@ue_foundation::__ue_delegate_bind Cu64 CIs Cb CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
+__ue_delegate_bind_script	@ue_foundation::__ue_delegate_bind_script Cu64 CIs Cb CIH<ue_foundation::UObjectHandle> CIs Cb C_c	uint64 const	4
 __ue_delegate_clear	@ue_foundation::__ue_delegate_clear Cu64 CIs Cb C_c	uint64 const	4
 __ue_delegate_create	@ue_foundation::__ue_delegate_create CIs C_c	uint64 const	4
 __ue_delegate_event_view	@ue_foundation::__ue_delegate_event_view CIs CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
 __ue_delegate_get_field	@ue_foundation::__ue_delegate_get_field CIs CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
 __ue_delegate_is_bound	@ue_foundation::__ue_delegate_is_bound Cu64 CIs Cb C_c	bool const	4
 __ue_delegate_remove	@ue_foundation::__ue_delegate_remove Cu64 CIs Cb CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
+__ue_delegate_self_target	@ue_foundation::__ue_delegate_self_target CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
 __ue_delegate_set_field	@ue_foundation::__ue_delegate_set_field CIs CIH<ue_foundation::UObjectHandle> CIs Cu64 C_c	void	4
 __ue_drag_create	@ue_foundation::__ue_drag_create CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs Ci CIH<ue_foundation::UEVector2D> C_c	ue_foundation::UObjectHandle	4
 __ue_drag_payload	@ue_foundation::__ue_drag_payload CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4

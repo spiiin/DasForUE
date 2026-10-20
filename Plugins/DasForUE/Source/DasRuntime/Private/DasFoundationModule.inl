@@ -11,6 +11,19 @@ public:
         addCommentReader(new FUECommentReader());
         addAnnotation(new FUENativeBaseAnnotation());
         addAnnotation(new FUEClassAnnotation());
+        {
+            auto* Macro = new FUEDelegateReferenceMacro();
+            ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));
+            Macro->module = this;
+            addCallMacro(Macro->name,
+                         [Macro](const das::LineInfo& At) -> das::ExprLooksLikeCall*
+                         {
+                             auto* E = new das::ExprCallMacro(At, Macro->name);
+                             E->macro = Macro;
+                             return E;
+                         });
+        }
+        inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEFunctionReferencePass()));
         for (const auto& Pair : {std::pair<const char*, int>{"ue_static", 0}, {"ue_call", 1}, {"ue_struct_get", 2}})
         {
             auto* Macro = new FUEReflectionMacro(Pair.first, Pair.second);
@@ -99,6 +112,7 @@ public:
         addAnnotation(new FUEDelegateAnnotation(false));
         addAnnotation(new FUEDelegateAnnotation(true));
         addAnnotation(new FUECallbackFrameAnnotation());
+        addAnnotation(new FUEHandlerContractAnnotation());
         addAnnotation(new FUEFunctionAnnotation());
         addAnnotation(new FUECallbackAnnotation(false));
         addAnnotation(new FUECallbackAnnotation(true));
@@ -780,6 +794,10 @@ public:
                                                   das::SideEffects::modifyExternal, "DelegateCreate");
         AddUEExtern<DAS_BIND_FUN(DynamicEventListen)>(*this, Library, "__ue_dynamic_event",
                                                       das::SideEffects::modifyExternal, "DynamicEventListen");
+        AddUEExtern<DAS_BIND_FUN(DelegateSelfTarget), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_delegate_self_target", das::SideEffects::modifyExternal, "DelegateSelfTarget");
+        AddUEExtern<DAS_BIND_FUN(DelegateBindScript)>(*this, Library, "__ue_delegate_bind_script",
+                                                      das::SideEffects::modifyExternal, "DelegateBindScript");
         AddUEExtern<DAS_BIND_FUN(DelegateBind)>(*this, Library, "__ue_delegate_bind", das::SideEffects::modifyExternal,
                                                 "DelegateBind");
         AddUEExtern<DAS_BIND_FUN(DelegateRemove)>(*this, Library, "__ue_delegate_remove",

@@ -29,6 +29,8 @@ int32 DSLCallbackArgument(const das::string& QualifiedName, size_t Count)
     const auto Separator = QualifiedName.rfind("::");
     const das::string Name = Separator == das::string::npos ? QualifiedName : QualifiedName.substr(Separator + 2);
     int32 Index = -1;
+    if (Name.find("ue_subscribe_object_") == 0 && Count >= 3)
+        return 2;
     if (Name == "__ue_dynamic_event" && Count == 4)
         return 2;
     if (Name == "ue_widget_bind_click" && Count == 2)
@@ -72,12 +74,14 @@ struct FDSLMethodReferenceVisitor : das::Visitor
 };
 bool DSLStandardLifecycle(const das::FunctionPtr& F);
 // Implicit callbacks use the existing reflected transport but are internal Blueprint functions.
-void DSLHiddenCallback(const das::FunctionPtr& F, const das::StructurePtr& St, das::ModuleGroup& Group)
+void DSLHiddenCallback(const das::FunctionPtr& F, const das::StructurePtr& St, das::ModuleGroup& Group,
+                       bool RequireVoid = true)
 {
     if (DSLAnnotation(F->annotations, "ue_lifecycle") || DSLAnnotation(F->annotations, "ue_event") ||
         DSLStandardLifecycle(F))
         DSLFail(TEXT("A managed callback cannot also be a lifecycle/event handler: ") + DSLText(DSLMethodName(F)));
-    if (F->isStaticClassMethod || F->arguments.empty() || !F->result || F->result->baseType != das::Type::tVoid)
+    if (F->isStaticClassMethod || F->arguments.empty() || !F->result ||
+        (RequireVoid && F->result->baseType != das::Type::tVoid))
         DSLFail(TEXT("Managed callback requires a void instance method: ") + DSLText(DSLMethodName(F)));
     auto* A = const_cast<das::AnnotationDeclaration*>(DSLAnnotation(F->annotations, "ue_function"));
     if (A &&

@@ -282,6 +282,21 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
         if (C.Inputs[I] == EDasMethodSignature::Void || !Matches(F->arguments[I]->type, C.Inputs[I]))
             return false;
     for (const auto* A : F->annotations)
+        if (F->generated && A->annotation->name == "__ue_handler_contract")
+        {
+            const auto* Wire = A->arguments.find("wire", das::Type::tString);
+            FDasAuthoringModule Model;
+            FDasClassSchema Schema;
+            FString Error;
+            if (!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire->sValue.c_str()), Model, Error) ||
+                Model.Classes.Num() != 1 || !Model.ToActorSchema(Model.Classes[0].Id, Schema, Error) ||
+                Schema.Methods.Num() != 1)
+                return false;
+            auto Method = Schema.Methods[0];
+            Method.Signature = EDasMethodSignature::Frame;
+            return Method.Contract() == C;
+        }
+    for (const auto* A : F->annotations)
         if (F->generated && A->annotation->name == "__ue_callback_frame")
         {
             auto* P = A->arguments.find("path", das::Type::tString);

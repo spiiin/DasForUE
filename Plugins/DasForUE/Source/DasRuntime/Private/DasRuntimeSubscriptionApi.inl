@@ -341,3 +341,6 @@ bool ScriptTimerActive(const char*, das::Context*);
 float ScriptTimerRemaining(const char*, das::Context*);
 
 void DynamicEventListen(const char*, const char*, const char*, bool, das::Context*);
+
+FDasObjectHandle DelegateSelfTarget(const FDasObjectHandle&, das::Context*);
+uint64 DelegateBindScript(uint64, const char*, bool, const FDasObjectHandle&, const char*, bool, das::Context*);

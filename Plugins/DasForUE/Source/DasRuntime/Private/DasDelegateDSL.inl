@@ -1,3 +1,25 @@
+FDasDeclaredType DSLDelegateDeclaredType(const das::TypeDeclPtr& T, const FString& Folder, const FString& Registry)
+{
+    FDasDeclaredType D;
+    D.Kind = DSLTypeName(T);
+    if (!T)
+        DSLFail(TEXT("Missing delegate signature type"));
+    if (DSLTypedClass(T))
+        D.TypePath = DSLTypedClassPath(T);
+    else if (DSLTypedReference(T))
+        D.TypePath = DSLTypedReferencePath(T);
+    else if (D.Kind == TEXT("object"))
+        D.TypePath = TEXT("/Script/CoreUObject.Object");
+    else if (DSLContainer(T))
+        D = DSLContainerType(T, Folder, Registry);
+    else if (DSLDirectEnum(T) || DSLDirectStruct(T))
+        D.TypePath = DSLDirectPath(T, Folder, Registry);
+    else if (!DSLMathPath(T).IsEmpty())
+        D.TypePath = DSLMathPath(T);
+    else if (D.Kind == TEXT("struct") || D.Kind == TEXT("enum"))
+        DSLFail(TEXT("Delegate snapshot types require a concrete authored/native type"));
+    return D;
+}
 bool DSLDelegate(const das::TypeDeclPtr& T)
 {
     return T && T->baseType == das::Type::tStructure && T->structType &&
@@ -178,25 +200,7 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
             const FString Folder = DSLString(Args, "type_folder"), Registry = DSLString(Args, "type_registry");
             auto Declared = [&](const das::TypeDeclPtr& T)
             {
-                FDasDeclaredType D;
-                D.Kind = DSLTypeName(T);
-                if (!T)
-                    DSLFail(TEXT("Missing delegate signature type"));
-                if (DSLTypedClass(T))
-                    D.TypePath = DSLTypedClassPath(T);
-                else if (DSLTypedReference(T))
-                    D.TypePath = DSLTypedReferencePath(T);
-                else if (D.Kind == TEXT("object"))
-                    D.TypePath = TEXT("/Script/CoreUObject.Object");
-                else if (DSLContainer(T))
-                    D = DSLContainerType(T, Folder, Registry);
-                else if (DSLDirectEnum(T) || DSLDirectStruct(T))
-                    D.TypePath = DSLDirectPath(T, Folder, Registry);
-                else if (!DSLMathPath(T).IsEmpty())
-                    D.TypePath = DSLMathPath(T);
-                else if (D.Kind == TEXT("struct") || D.Kind == TEXT("enum"))
-                    DSLFail(TEXT("Delegate snapshot types require a concrete authored/native type"));
-                return D;
+                return DSLDelegateDeclaredType(T, Folder, Registry);
             };
             Method.ReturnType = Declared(Signature->firstType);
             if (Multi && Method.ReturnType.Kind != TEXT("void"))
@@ -336,6 +340,22 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                      new das::ExprVar(S->at, "method")});
                 B->list.push_back(Multi ? static_cast<das::ExpressionPtr>(Op)
                                         : static_cast<das::ExpressionPtr>(new das::ExprCopy(S->at, TokenExpr(), Op)));
+                Publish(F);
+            }
+            for (const auto* Name :
+                 Multi ? std::initializer_list<const char*>{"__ue_bind_script_value", "__ue_remove_script_value"}
+                       : std::initializer_list<const char*>{"__ue_bind_script_value"})
+            {
+                auto* F = Function(Name, Void, !Multi);
+                Add(F, "target", DSLHandleType(Group, S->module, "UObjectHandle"));
+                Add(F, "entry", String);
+                auto* Op =
+                    DSLCall(S->at, "__ue_delegate_bind_script",
+                            {TokenExpr(), Str(Wire), Bool(Multi), new das::ExprVar(S->at, "target"),
+                             new das::ExprVar(S->at, "entry"), Bool(Name == das::string("__ue_remove_script_value"))});
+                static_cast<das::ExprBlock*>(F->body)->list.push_back(
+                    Multi ? static_cast<das::ExpressionPtr>(Op)
+                          : static_cast<das::ExpressionPtr>(new das::ExprCopy(S->at, TokenExpr(), Op)));
                 Publish(F);
             }
             auto* Bound = Function("IsBound", new das::TypeDecl(das::Type::tBool, S->at), false);
@@ -519,6 +539,37 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
     }
 };
 
+das::ExpressionPtr DSLDelegateReferenceExpansion(das::Program*, das::Module*, das::ExprCallMacro*);
+struct FUEDelegateReferenceMacro : das::CallMacro
+{
+    FUEDelegateReferenceMacro() : CallMacro("__ue_delegate_reference") {}
+    virtual bool canVisitArguments(das::ExprCallMacro* E, int I) override
+    {
+        return I != 3 && (I != 0 || !E->arguments[0]->rtti_isTypeDecl());
+    }
+    virtual das::ExpressionPtr visit(das::Program* P, das::Module* M, das::ExprCallMacro* E) override
+    {
+        try
+        {
+            return DSLDelegateReferenceExpansion(P, M, E);
+        }
+        catch (const std::exception& X)
+        {
+            P->error("Delegate handler reference failed", X.what(), "", E->at, das::CompilationError::invalid_type);
+            return nullptr;
+        }
+    }
+};
+das::ExprCallMacro* DSLHandlerCall(const das::LineInfo& At, const das::vector<das::ExpressionPtr>& Args)
+{
+    auto* Foundation = das::Module::require("ue_foundation");
+    auto Factory = Foundation->callThis.find("__ue_delegate_reference");
+    if (Factory == Foundation->callThis.end())
+        DSLFail(TEXT("Missing handler reference macro"));
+    auto* E = static_cast<das::ExprCallMacro*>(Factory->second(At));
+    E->arguments = Args;
+    return E;
+}
 struct FUEBoundDelegateFactory : das::CallMacro
 {
     FUEBoundDelegateFactory() : CallMacro("ue_bind") {}
@@ -529,6 +580,10 @@ struct FUEBoundDelegateFactory : das::CallMacro
         {
             if (E->arguments.size() != 3 || !E->arguments[0]->rtti_isTypeDecl())
                 DSLFail(TEXT("Expected ue_bind(type<Delegate>, target, method)"));
+            if (E->arguments[2]->rtti_isAddr())
+                return DSLHandlerCall(E->at, {E->arguments[0], E->arguments[1], E->arguments[2],
+                                              new das::ExprTypeDecl(E->at, new das::TypeDecl(das::Type::tVoid, E->at)),
+                                              new das::ExprConstInt(E->at, 0)});
             auto T =
                 DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(E->arguments[0])->typeexpr, *P->thisModuleGroup, M);
             if (!DSLDelegate(T) || !DSLAnnotation(T->structType->annotations, "ue_delegate"))

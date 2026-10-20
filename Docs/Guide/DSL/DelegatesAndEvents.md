@@ -59,8 +59,8 @@ reference and native enum representations are not converted silently.
 ```das
 var stored = FObjectValueDelegate()
 
-var ready = ue_bind(type<FObjectValueDelegate>, ue_self_object(), "OnDelegateExecuted")
-stored.BindUFunction(ue_self_object(), "OnDelegateExecuted")
+var ready = ue_bind(type<FObjectValueDelegate>, ue_self_object(), self.OnDelegateExecuted)
+stored.BindUFunction(ue_self_object(), self.OnDelegateExecuted)
 if (stored.IsBound()) {
     stored.Execute(ue_self_object(), 1.0)
 }
@@ -72,8 +72,9 @@ stored.Unbind()
   types, directions and layout (parameter names may differ). Native handlers do not
   need `BlueprintCallable`; DSL handlers are normal `ue_function` methods. Static,
   network and signature functions cannot be handlers.
-- The target may be a `UObjectHandle` or a typed object reference; the method name
-  a string or `UENameValue`.
+- The target may be a `UObjectHandle` or a typed object reference. Handler arguments
+  accept checked `self.Method`, `@@function`, or an existing string/`UENameValue` name.
+  See [handler references](HandlerReferences.md) for target and lifetime rules.
 - `Execute` returns the handler's result; executing an unbound delegate fails.
   `ExecuteIfBound` exists for `void` signatures.
 - Delegates are values: copying one and then rebinding or unbinding a copy does
@@ -155,7 +156,7 @@ class DelegateExample {
     [ue_function(BlueprintCallable)]
     def FirstHandler(counter:int):void { self.Score += counter }
     [ue_function(BlueprintCallable)]
-    def BindHandlers():void { self.OnExampleEvent.AddUFunction(ue_self_object(), "FirstHandler") }
+    def BindHandlers():void { self.OnExampleEvent.AddUFunction(ue_self_object(), self.FirstHandler) }
     [ue_function(BlueprintCallable)]
     def Emit(counter:int):void { self.OnExampleEvent.Broadcast(counter) }
 }
