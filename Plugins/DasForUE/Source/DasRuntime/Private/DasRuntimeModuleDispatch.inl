@@ -814,6 +814,44 @@ FDasExecutionResult FDasRuntimeModule::DispatchGASCalculation(UObject* Owner, co
                                    StructuredOutput ? TEXT("/Script/DasRuntime.DasGASExecutionResult") : FString());
 }
 
+void FDasRuntimeModule::QueueGASCueHook(UDasGASCueSession* Session, const FDasGASCueEvent& Event)
+{
+    if (!IsInGameThread() || !IsValid(Session) || !Session->Live() || !Session->Definition->Hooks.Contains(Event.Event))
+        return;
+    if (Session->Pending.Num() >= 64 ||
+        (PendingGASCueSessions.Num() >= 1024 && !PendingGASCueSessions.Contains(Session)))
+    {
+        UE_LOG(LogDasRuntime, Warning, TEXT("DAS_GAS_CUE_QUEUE_LIMIT"));
+        return;
+    }
+    Session->Pending.Add(Event);
+    PendingGASCueSessions.AddUnique(Session);
+    DrainEvents();
+}
+FDasExecutionResult FDasRuntimeModule::DispatchGASCueHook(UDasGASCueSession* Session, const FDasGASCueEvent& Event)
+{
+    FDasExecutionResult Rejected;
+    if (!IsInGameThread() || !IsValid(Session) || !Session->Live() || ActiveContext || ConstructingObject ||
+        AuthoredDispatchDepth >= 32)
+    {
+        Rejected.Error = TEXT("Invalid or recursive cue hook dispatch");
+        return Rejected;
+    }
+    const auto* Cue = Session->Definition.Get();
+    const auto* Entry = Cue->Hooks.Find(Event.Event);
+    if (!Entry || Cue->ScriptFile.IsEmpty() || Cue->ScriptContract.Len() != 32 || Event.Target != Session->Target.Get())
+    {
+        Rejected.Error = TEXT("Invalid cue hook contract or target");
+        return Rejected;
+    }
+    FDasScalarValue Arg;
+    Arg.Kind = 12;
+    Arg.ObjectClass = FDasGASCueEvent::StaticStruct()->GetPathName();
+    Arg.StructValue.InitializeAs<FDasGASCueEvent>(Event);
+    TGuardValue<int32> Depth(AuthoredDispatchDepth, AuthoredDispatchDepth + 1);
+    return RunNamedFramePersistent(ScriptPath(Cue->ScriptFile), *Entry, {Arg}, EDasMethodSignature::Void, Session);
+}
+
 FDasExecutionResult FDasRuntimeModule::DispatchGASAbilityHook(UDasAuthoredGameplayAbility* Ability,
                                                               const FString& Entry)
 {

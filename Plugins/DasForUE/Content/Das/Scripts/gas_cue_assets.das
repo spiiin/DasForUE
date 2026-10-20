@@ -31,7 +31,7 @@ class CueAssetExample : Actor {
     def OnCue(cue:GASCueEvent) {
         let phase=ue_name_text(cue.Event)
         print("CUE_ASSET_EVENT {phase} {ue_name_text(cue.Tag)}\n")
-        if(phase=="Executed") { first=cue; executed+=1 }
+        if(phase=="Executed") { first <- clone(cue); executed+=1 }
         elif(phase=="OnActive") { active+=1 }
         elif(phase=="WhileActive") { ongoing+=1 }
         elif(phase=="Removed") { removed+=1 }

@@ -2952,8 +2952,69 @@
 			]
 		},
 		{
+			"path": "/Script/DasRuntime.DasGASCueEffectContext",
+			"signature": "Valid:BoolProperty:0;Instigator:ObjectProperty:0:/Script/Engine.Actor;OriginalInstigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;Actors:ArrayProperty:0[Actors:ObjectProperty:0:/Script/Engine.Actor;];HasOrigin:BoolProperty:0;Origin:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};HasHit:BoolProperty:0;Hit:StructProperty:0:/Script/DasRuntime.DasGASCueHit{BlockingHit:BoolProperty:0;StartPenetrating:BoolProperty:0;Time:FloatProperty:0;Distance:FloatProperty:0;PenetrationDepth:FloatProperty:0;FaceIndex:IntProperty:0;Item:IntProperty:0;MyItem:IntProperty:0;ElementIndex:IntProperty:0;BoneName:NameProperty:0;MyBoneName:NameProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactPoint:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactNormal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceStart:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceEnd:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Actor:WeakObjectProperty:0:/Script/Engine.Actor;Component:WeakObjectProperty:0:/Script/Engine.PrimitiveComponent;PhysMaterial:WeakObjectProperty:0:/Script/PhysicsCore.PhysicalMaterial;};",
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "Valid"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "Instigator"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "OriginalInstigator"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "EffectCauser"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/CoreUObject.Object",
+					"name": "SourceObject"
+				},
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "object",
+						"type_path": "/Script/Engine.Actor"
+					},
+					"name": "Actors"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "HasOrigin"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "Origin"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "HasHit"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasGASCueHit",
+					"name": "Hit"
+				}
+			]
+		},
+		{
 			"path": "/Script/DasRuntime.DasGASCueEvent",
-			"signature": "Tag:NameProperty:0;MatchedTag:NameProperty:0;Event:NameProperty:0;Target:ObjectProperty:0:/Script/Engine.Actor;Parameters:StructProperty:0:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;};",
+			"signature": "Tag:NameProperty:0;MatchedTag:NameProperty:0;Event:NameProperty:0;Target:ObjectProperty:0:/Script/Engine.Actor;Parameters:StructProperty:0:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;SourceTags:StructProperty:0:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};TargetTags:StructProperty:0:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};Context:StructProperty:0:/Script/DasRuntime.DasGASCueEffectContext{Valid:BoolProperty:0;Instigator:ObjectProperty:0:/Script/Engine.Actor;OriginalInstigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;Actors:ArrayProperty:0[Actors:ObjectProperty:0:/Script/Engine.Actor;];HasOrigin:BoolProperty:0;Origin:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};HasHit:BoolProperty:0;Hit:StructProperty:0:/Script/DasRuntime.DasGASCueHit{BlockingHit:BoolProperty:0;StartPenetrating:BoolProperty:0;Time:FloatProperty:0;Distance:FloatProperty:0;PenetrationDepth:FloatProperty:0;FaceIndex:IntProperty:0;Item:IntProperty:0;MyItem:IntProperty:0;ElementIndex:IntProperty:0;BoneName:NameProperty:0;MyBoneName:NameProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactPoint:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactNormal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceStart:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceEnd:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Actor:WeakObjectProperty:0:/Script/Engine.Actor;Component:WeakObjectProperty:0:/Script/Engine.PrimitiveComponent;PhysMaterial:WeakObjectProperty:0:/Script/PhysicsCore.PhysicalMaterial;};};};",
 			"fields": [
 				{
 					"kind": "name",
@@ -2983,8 +3044,117 @@
 			]
 		},
 		{
+			"path": "/Script/DasRuntime.DasGASCueHit",
+			"signature": "BlockingHit:BoolProperty:0;StartPenetrating:BoolProperty:0;Time:FloatProperty:0;Distance:FloatProperty:0;PenetrationDepth:FloatProperty:0;FaceIndex:IntProperty:0;Item:IntProperty:0;MyItem:IntProperty:0;ElementIndex:IntProperty:0;BoneName:NameProperty:0;MyBoneName:NameProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactPoint:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactNormal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceStart:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceEnd:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Actor:WeakObjectProperty:0:/Script/Engine.Actor;Component:WeakObjectProperty:0:/Script/Engine.PrimitiveComponent;PhysMaterial:WeakObjectProperty:0:/Script/PhysicsCore.PhysicalMaterial;",
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "BlockingHit"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "StartPenetrating"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Time"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Distance"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "PenetrationDepth"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "FaceIndex"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "Item"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "MyItem"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "ElementIndex"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "BoneName"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "MyBoneName"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "Location"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "ImpactPoint"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "Normal"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "ImpactNormal"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "TraceStart"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "TraceEnd"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"weak_reference": true,
+					"name": "Actor"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.PrimitiveComponent",
+					"weak_reference": true,
+					"name": "Component"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/PhysicsCore.PhysicalMaterial",
+					"weak_reference": true,
+					"name": "PhysMaterial"
+				}
+			]
+		},
+		{
 			"path": "/Script/DasRuntime.DasGASCueParameters",
-			"signature": "RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;",
+			"signature": "RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;SourceTags:StructProperty:0:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};TargetTags:StructProperty:0:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};Context:StructProperty:0:/Script/DasRuntime.DasGASCueEffectContext{Valid:BoolProperty:0;Instigator:ObjectProperty:0:/Script/Engine.Actor;OriginalInstigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;Actors:ArrayProperty:0[Actors:ObjectProperty:0:/Script/Engine.Actor;];HasOrigin:BoolProperty:0;Origin:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};HasHit:BoolProperty:0;Hit:StructProperty:0:/Script/DasRuntime.DasGASCueHit{BlockingHit:BoolProperty:0;StartPenetrating:BoolProperty:0;Time:FloatProperty:0;Distance:FloatProperty:0;PenetrationDepth:FloatProperty:0;FaceIndex:IntProperty:0;Item:IntProperty:0;MyItem:IntProperty:0;ElementIndex:IntProperty:0;BoneName:NameProperty:0;MyBoneName:NameProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactPoint:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactNormal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceStart:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceEnd:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Actor:WeakObjectProperty:0:/Script/Engine.Actor;Component:WeakObjectProperty:0:/Script/Engine.PrimitiveComponent;PhysMaterial:WeakObjectProperty:0:/Script/PhysicsCore.PhysicalMaterial;};};",
 			"fields": [
 				{
 					"kind": "float",
@@ -3030,6 +3200,21 @@
 					"kind": "int",
 					"type_path": "",
 					"name": "EffectLevel"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/GameplayTags.GameplayTagContainer",
+					"name": "SourceTags"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/GameplayTags.GameplayTagContainer",
+					"name": "TargetTags"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasGASCueEffectContext",
+					"name": "Context"
 				}
 			]
 		},
@@ -3836,6 +4021,81 @@
 			]
 		},
 		{
+			"path": "/Script/GameplayAbilities.ActiveGameplayEffectHandle",
+			"signature": "WeakOwningASC:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;Handle:IntProperty:0;bPassedFiltersAndWasExecuted:BoolProperty:0;",
+			"fields": [
+				{
+					"kind": "object",
+					"type_path": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"weak_reference": true,
+					"name": "WeakOwningASC"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "Handle"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bPassedFiltersAndWasExecuted"
+				}
+			]
+		},
+		{
+			"path": "/Script/GameplayAbilities.GameplayAbilityActorInfo",
+			"signature": "OwnerActor:WeakObjectProperty:0:/Script/Engine.Actor;AvatarActor:WeakObjectProperty:0:/Script/Engine.Actor;PlayerController:WeakObjectProperty:0:/Script/Engine.PlayerController;AbilitySystemComponent:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;SkeletalMeshComponent:WeakObjectProperty:0:/Script/Engine.SkeletalMeshComponent;AnimInstance:WeakObjectProperty:0:/Script/Engine.AnimInstance;MovementComponent:WeakObjectProperty:0:/Script/Engine.MovementComponent;AffectedAnimInstanceTag:NameProperty:0;",
+			"fields": [
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"weak_reference": true,
+					"name": "OwnerActor"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"weak_reference": true,
+					"name": "AvatarActor"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.PlayerController",
+					"weak_reference": true,
+					"name": "PlayerController"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"weak_reference": true,
+					"name": "AbilitySystemComponent"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.SkeletalMeshComponent",
+					"weak_reference": true,
+					"name": "SkeletalMeshComponent"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.AnimInstance",
+					"weak_reference": true,
+					"name": "AnimInstance"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.MovementComponent",
+					"weak_reference": true,
+					"name": "MovementComponent"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "AffectedAnimInstanceTag"
+				}
+			]
+		},
+		{
 			"path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle",
 			"signature": "Handle:IntProperty:0;",
 			"fields": [
@@ -4241,7 +4501,7 @@
 				{
 					"name": "AddAuthoredCue",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
-					"signature": "v1;AddAuthoredCue;Tag:NameProperty:128;Parameters:StructProperty:134218114:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;};ReturnValue:BoolProperty:1408;",
+					"signature": "v1;AddAuthoredCue;Tag:NameProperty:128;Parameters:StructProperty:134218114:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;SourceTags:StructProperty:0:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};TargetTags:StructProperty:0:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};Context:StructProperty:0:/Script/DasRuntime.DasGASCueEffectContext{Valid:BoolProperty:0;Instigator:ObjectProperty:0:/Script/Engine.Actor;OriginalInstigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;Actors:ArrayProperty:0[Actors:ObjectProperty:0:/Script/Engine.Actor;];HasOrigin:BoolProperty:0;Origin:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};HasHit:BoolProperty:0;Hit:StructProperty:0:/Script/DasRuntime.DasGASCueHit{BlockingHit:BoolProperty:0;StartPenetrating:BoolProperty:0;Time:FloatProperty:0;Distance:FloatProperty:0;PenetrationDepth:FloatProperty:0;FaceIndex:IntProperty:0;Item:IntProperty:0;MyItem:IntProperty:0;ElementIndex:IntProperty:0;BoneName:NameProperty:0;MyBoneName:NameProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactPoint:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactNormal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceStart:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceEnd:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Actor:WeakObjectProperty:0:/Script/Engine.Actor;Component:WeakObjectProperty:0:/Script/Engine.PrimitiveComponent;PhysMaterial:WeakObjectProperty:0:/Script/PhysicsCore.PhysicalMaterial;};};};ReturnValue:BoolProperty:1408;",
 					"const": false,
 					"construction_unsafe": false,
 					"parameters": [
@@ -4614,7 +4874,7 @@
 				{
 					"name": "EmptyAuthoredCueEvent",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
-					"signature": "v1;EmptyAuthoredCueEvent;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasGASCueEvent{Tag:NameProperty:0;MatchedTag:NameProperty:0;Event:NameProperty:0;Target:ObjectProperty:0:/Script/Engine.Actor;Parameters:StructProperty:0:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;};};",
+					"signature": "v1;EmptyAuthoredCueEvent;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasGASCueEvent{Tag:NameProperty:0;MatchedTag:NameProperty:0;Event:NameProperty:0;Target:ObjectProperty:0:/Script/Engine.Actor;Parameters:StructProperty:0:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;SourceTags:StructProperty:0:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};TargetTags:StructProperty:0:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};Context:StructProperty:0:/Script/DasRuntime.DasGASCueEffectContext{Valid:BoolProperty:0;Instigator:ObjectProperty:0:/Script/Engine.Actor;OriginalInstigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;Actors:ArrayProperty:0[Actors:ObjectProperty:0:/Script/Engine.Actor;];HasOrigin:BoolProperty:0;Origin:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};HasHit:BoolProperty:0;Hit:StructProperty:0:/Script/DasRuntime.DasGASCueHit{BlockingHit:BoolProperty:0;StartPenetrating:BoolProperty:0;Time:FloatProperty:0;Distance:FloatProperty:0;PenetrationDepth:FloatProperty:0;FaceIndex:IntProperty:0;Item:IntProperty:0;MyItem:IntProperty:0;ElementIndex:IntProperty:0;BoneName:NameProperty:0;MyBoneName:NameProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactPoint:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactNormal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceStart:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceEnd:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Actor:WeakObjectProperty:0:/Script/Engine.Actor;Component:WeakObjectProperty:0:/Script/Engine.PrimitiveComponent;PhysMaterial:WeakObjectProperty:0:/Script/PhysicsCore.PhysicalMaterial;};};};};",
 					"const": true,
 					"construction_unsafe": false,
 					"parameters": [
@@ -4629,7 +4889,7 @@
 				{
 					"name": "ExecuteAuthoredCue",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
-					"signature": "v1;ExecuteAuthoredCue;Tag:NameProperty:128;Parameters:StructProperty:134218114:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;};ReturnValue:BoolProperty:1408;",
+					"signature": "v1;ExecuteAuthoredCue;Tag:NameProperty:128;Parameters:StructProperty:134218114:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;SourceTags:StructProperty:0:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};TargetTags:StructProperty:0:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};Context:StructProperty:0:/Script/DasRuntime.DasGASCueEffectContext{Valid:BoolProperty:0;Instigator:ObjectProperty:0:/Script/Engine.Actor;OriginalInstigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;Actors:ArrayProperty:0[Actors:ObjectProperty:0:/Script/Engine.Actor;];HasOrigin:BoolProperty:0;Origin:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};HasHit:BoolProperty:0;Hit:StructProperty:0:/Script/DasRuntime.DasGASCueHit{BlockingHit:BoolProperty:0;StartPenetrating:BoolProperty:0;Time:FloatProperty:0;Distance:FloatProperty:0;PenetrationDepth:FloatProperty:0;FaceIndex:IntProperty:0;Item:IntProperty:0;MyItem:IntProperty:0;ElementIndex:IntProperty:0;BoneName:NameProperty:0;MyBoneName:NameProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactPoint:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};ImpactNormal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceStart:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};TraceEnd:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Actor:WeakObjectProperty:0:/Script/Engine.Actor;Component:WeakObjectProperty:0:/Script/Engine.PrimitiveComponent;PhysMaterial:WeakObjectProperty:0:/Script/PhysicsCore.PhysicalMaterial;};};};ReturnValue:BoolProperty:1408;",
 					"const": false,
 					"construction_unsafe": false,
 					"parameters": [
@@ -4729,6 +4989,32 @@
 						{
 							"kind": "bool",
 							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetActiveEffectsWithAllTags",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;GetActiveEffectsWithAllTags;Tags:StructProperty:128:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};ReturnValue:ArrayProperty:1408[ReturnValue:StructProperty:0:/Script/GameplayAbilities.ActiveGameplayEffectHandle{WeakOwningASC:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;Handle:IntProperty:0;bPassedFiltersAndWasExecuted:BoolProperty:0;};];",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTagContainer",
+							"name": "Tags",
+							"direction": "in"
+						},
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "struct",
+								"type_path": "/Script/GameplayAbilities.ActiveGameplayEffectHandle"
+							},
 							"name": "ReturnValue",
 							"direction": "return"
 						}
@@ -5405,6 +5691,34 @@
 					]
 				},
 				{
+					"name": "RemoveActiveGameplayEffect",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;RemoveActiveGameplayEffect;Handle:StructProperty:128:/Script/GameplayAbilities.ActiveGameplayEffectHandle{WeakOwningASC:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;Handle:IntProperty:0;bPassedFiltersAndWasExecuted:BoolProperty:0;};StacksToRemove:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.ActiveGameplayEffectHandle",
+							"name": "Handle",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "StacksToRemove",
+							"direction": "in",
+							"default_text": "-1"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "RemoveActiveGameplayEffectBySourceEffect",
 					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
 					"signature": "v1;RemoveActiveGameplayEffectBySourceEffect;GameplayEffect:ClassProperty:128:meta:/Script/GameplayAbilities.GameplayEffect;InstigatorAbilitySystemComponent:ObjectProperty:128:/Script/GameplayAbilities.AbilitySystemComponent;StacksToRemove:IntProperty:128;",
@@ -5590,6 +5904,27 @@
 							"name": "bReset",
 							"direction": "in",
 							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "SetActiveGameplayEffectLevel",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;SetActiveGameplayEffectLevel;ActiveHandle:StructProperty:128:/Script/GameplayAbilities.ActiveGameplayEffectHandle{WeakOwningASC:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;Handle:IntProperty:0;bPassedFiltersAndWasExecuted:BoolProperty:0;};NewLevel:IntProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.ActiveGameplayEffectHandle",
+							"name": "ActiveHandle",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "NewLevel",
+							"direction": "in"
 						}
 					]
 				},
@@ -5843,6 +6178,33 @@
 					]
 				},
 				{
+					"name": "UpdateActiveGameplayEffectSetByCallerMagnitude",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;UpdateActiveGameplayEffectSetByCallerMagnitude;ActiveHandle:StructProperty:128:/Script/GameplayAbilities.ActiveGameplayEffectHandle{WeakOwningASC:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;Handle:IntProperty:0;bPassedFiltersAndWasExecuted:BoolProperty:0;};SetByCallerTag:StructProperty:128:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};NewValue:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.ActiveGameplayEffectHandle",
+							"name": "ActiveHandle",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTag",
+							"name": "SetByCallerTag",
+							"direction": "in"
+						},
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "NewValue",
+							"direction": "in"
+						}
+					]
+				},
+				{
 					"name": "UpdateAuthoredTargeting",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
 					"signature": "v1;UpdateAuthoredTargeting;Id:IntProperty:128;Query:StructProperty:134218114:/Script/DasRuntime.DasGASTargetingQuery{Mode:NameProperty:0;Start:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};End:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Radius:FloatProperty:0;Channel:IntProperty:0;TraceComplex:BoolProperty:0;IgnoreSelf:BoolProperty:0;RequireAbilitySystem:BoolProperty:0;MaxTargets:IntProperty:0;ActorClassPath:StrProperty:0;IgnoredActors:ArrayProperty:0[IgnoredActors:ObjectProperty:0:/Script/Engine.Actor;];RequiredTags:ArrayProperty:0[RequiredTags:NameProperty:0;];BlockedTags:ArrayProperty:0[BlockedTags:NameProperty:0;];};ReturnValue:BoolProperty:1408;",
@@ -6010,6 +6372,11 @@
 				{
 					"domain": "field",
 					"name": "CreationMethod",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CueSessions",
 					"reason": "hidden_editor_or_deprecated"
 				},
 				{
@@ -6249,11 +6616,6 @@
 				},
 				{
 					"domain": "method",
-					"name": "GetActiveEffectsWithAllTags",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "GetAllAttributes",
 					"reason": "unsupported_parameter_type"
 				},
@@ -6409,11 +6771,6 @@
 				},
 				{
 					"domain": "method",
-					"name": "RemoveActiveGameplayEffect",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "ServerAbilityRPCBatch",
 					"reason": "unsupported_parameter_type"
 				},
@@ -6494,17 +6851,7 @@
 				},
 				{
 					"domain": "method",
-					"name": "SetActiveGameplayEffectLevel",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "SetActiveGameplayEffectLevelUsingQuery",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "UpdateActiveGameplayEffectSetByCallerMagnitude",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -6760,6 +7107,33 @@
 					]
 				},
 				{
+					"name": "GetAbilityLevel_BP",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetAbilityLevel_BP;Handle:StructProperty:128:/Script/GameplayAbilities.GameplayAbilitySpecHandle{Handle:IntProperty:0;};ActorInfo:StructProperty:134218114:/Script/GameplayAbilities.GameplayAbilityActorInfo{OwnerActor:WeakObjectProperty:0:/Script/Engine.Actor;AvatarActor:WeakObjectProperty:0:/Script/Engine.Actor;PlayerController:WeakObjectProperty:0:/Script/Engine.PlayerController;AbilitySystemComponent:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;SkeletalMeshComponent:WeakObjectProperty:0:/Script/Engine.SkeletalMeshComponent;AnimInstance:WeakObjectProperty:0:/Script/Engine.AnimInstance;MovementComponent:WeakObjectProperty:0:/Script/Engine.MovementComponent;AffectedAnimInstanceTag:NameProperty:0;};ReturnValue:IntProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle",
+							"name": "Handle",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.GameplayAbilityActorInfo",
+							"name": "ActorInfo",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "GetAbilitySystemComponentFromActorInfo",
 					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
 					"signature": "v1;GetAbilitySystemComponentFromActorInfo;ReturnValue:ObjectProperty:1408:/Script/GameplayAbilities.AbilitySystemComponent;",
@@ -6769,6 +7143,21 @@
 						{
 							"kind": "object",
 							"type_path": "/Script/GameplayAbilities.AbilitySystemComponent",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetActorInfo",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetActorInfo;ReturnValue:StructProperty:1408:/Script/GameplayAbilities.GameplayAbilityActorInfo{OwnerActor:WeakObjectProperty:0:/Script/Engine.Actor;AvatarActor:WeakObjectProperty:0:/Script/Engine.Actor;PlayerController:WeakObjectProperty:0:/Script/Engine.PlayerController;AbilitySystemComponent:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;SkeletalMeshComponent:WeakObjectProperty:0:/Script/Engine.SkeletalMeshComponent;AnimInstance:WeakObjectProperty:0:/Script/Engine.AnimInstance;MovementComponent:WeakObjectProperty:0:/Script/Engine.MovementComponent;AffectedAnimInstanceTag:NameProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.GameplayAbilityActorInfo",
 							"name": "ReturnValue",
 							"direction": "return"
 						}
@@ -6859,6 +7248,33 @@
 						{
 							"kind": "object",
 							"type_path": "/Script/Engine.SkeletalMeshComponent",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetSourceObject_BP",
+					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
+					"signature": "v1;GetSourceObject_BP;Handle:StructProperty:128:/Script/GameplayAbilities.GameplayAbilitySpecHandle{Handle:IntProperty:0;};ActorInfo:StructProperty:134218114:/Script/GameplayAbilities.GameplayAbilityActorInfo{OwnerActor:WeakObjectProperty:0:/Script/Engine.Actor;AvatarActor:WeakObjectProperty:0:/Script/Engine.Actor;PlayerController:WeakObjectProperty:0:/Script/Engine.PlayerController;AbilitySystemComponent:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;SkeletalMeshComponent:WeakObjectProperty:0:/Script/Engine.SkeletalMeshComponent;AnimInstance:WeakObjectProperty:0:/Script/Engine.AnimInstance;MovementComponent:WeakObjectProperty:0:/Script/Engine.MovementComponent;AffectedAnimInstanceTag:NameProperty:0;};ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle",
+							"name": "Handle",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.GameplayAbilityActorInfo",
+							"name": "ActorInfo",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/CoreUObject.Object",
 							"name": "ReturnValue",
 							"direction": "return"
 						}
@@ -7504,7 +7920,7 @@
 				{
 					"domain": "method",
 					"name": "BP_ApplyGameplayEffectToOwner",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -7529,7 +7945,7 @@
 				{
 					"domain": "method",
 					"name": "BP_RemoveGameplayEffectFromOwnerWithHandle",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -7558,27 +7974,12 @@
 				},
 				{
 					"domain": "method",
-					"name": "GetAbilityLevel_BP",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "GetActorInfo",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "GetContextFromOwner",
 					"reason": "unsupported_parameter_type"
 				},
 				{
 					"domain": "method",
 					"name": "GetGrantedByEffectContext",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "GetSourceObject_BP",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -7614,7 +8015,7 @@
 				{
 					"domain": "method",
 					"name": "K2_CanActivateAbility",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -8035,6 +8436,11 @@
 					"domain": "field",
 					"name": "ConditionalGameplayEffects",
 					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "CueAssets",
+					"reason": "hidden_editor_or_deprecated"
 				},
 				{
 					"domain": "field",
@@ -8578,6 +8984,32 @@
 							"name": "bExactMatch",
 							"direction": "in",
 							"default_text": "true"
+						}
+					]
+				},
+				{
+					"name": "GetActiveEffectsWithAllTags",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;GetActiveEffectsWithAllTags;Tags:StructProperty:128:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};ReturnValue:ArrayProperty:1408[ReturnValue:StructProperty:0:/Script/GameplayAbilities.ActiveGameplayEffectHandle{WeakOwningASC:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;Handle:IntProperty:0;bPassedFiltersAndWasExecuted:BoolProperty:0;};];",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTagContainer",
+							"name": "Tags",
+							"direction": "in"
+						},
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "struct",
+								"type_path": "/Script/GameplayAbilities.ActiveGameplayEffectHandle"
+							},
+							"name": "ReturnValue",
+							"direction": "return"
 						}
 					]
 				},
@@ -9169,6 +9601,34 @@
 					]
 				},
 				{
+					"name": "RemoveActiveGameplayEffect",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;RemoveActiveGameplayEffect;Handle:StructProperty:128:/Script/GameplayAbilities.ActiveGameplayEffectHandle{WeakOwningASC:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;Handle:IntProperty:0;bPassedFiltersAndWasExecuted:BoolProperty:0;};StacksToRemove:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.ActiveGameplayEffectHandle",
+							"name": "Handle",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "StacksToRemove",
+							"direction": "in",
+							"default_text": "-1"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "RemoveActiveGameplayEffectBySourceEffect",
 					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
 					"signature": "v1;RemoveActiveGameplayEffectBySourceEffect;GameplayEffect:ClassProperty:128:meta:/Script/GameplayAbilities.GameplayEffect;InstigatorAbilitySystemComponent:ObjectProperty:128:/Script/GameplayAbilities.AbilitySystemComponent;StacksToRemove:IntProperty:128;",
@@ -9245,6 +9705,27 @@
 							"name": "bReset",
 							"direction": "in",
 							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "SetActiveGameplayEffectLevel",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;SetActiveGameplayEffectLevel;ActiveHandle:StructProperty:128:/Script/GameplayAbilities.ActiveGameplayEffectHandle{WeakOwningASC:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;Handle:IntProperty:0;bPassedFiltersAndWasExecuted:BoolProperty:0;};NewLevel:IntProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.ActiveGameplayEffectHandle",
+							"name": "ActiveHandle",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "NewLevel",
+							"direction": "in"
 						}
 					]
 				},
@@ -9473,6 +9954,33 @@
 							"type_path": "",
 							"name": "ReturnValue",
 							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "UpdateActiveGameplayEffectSetByCallerMagnitude",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;UpdateActiveGameplayEffectSetByCallerMagnitude;ActiveHandle:StructProperty:128:/Script/GameplayAbilities.ActiveGameplayEffectHandle{WeakOwningASC:WeakObjectProperty:0:/Script/GameplayAbilities.AbilitySystemComponent;Handle:IntProperty:0;bPassedFiltersAndWasExecuted:BoolProperty:0;};SetByCallerTag:StructProperty:128:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};NewValue:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.ActiveGameplayEffectHandle",
+							"name": "ActiveHandle",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTag",
+							"name": "SetByCallerTag",
+							"direction": "in"
+						},
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "NewValue",
+							"direction": "in"
 						}
 					]
 				}
@@ -9815,11 +10323,6 @@
 				},
 				{
 					"domain": "method",
-					"name": "GetActiveEffectsWithAllTags",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "GetAllAttributes",
 					"reason": "unsupported_parameter_type"
 				},
@@ -9980,11 +10483,6 @@
 				},
 				{
 					"domain": "method",
-					"name": "RemoveActiveGameplayEffect",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "ServerAbilityRPCBatch",
 					"reason": "unsupported_parameter_type"
 				},
@@ -10065,17 +10563,7 @@
 				},
 				{
 					"domain": "method",
-					"name": "SetActiveGameplayEffectLevel",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
 					"name": "SetActiveGameplayEffectLevelUsingQuery",
-					"reason": "unsupported_parameter_type"
-				},
-				{
-					"domain": "method",
-					"name": "UpdateActiveGameplayEffectSetByCallerMagnitude",
 					"reason": "unsupported_parameter_type"
 				},
 				{
@@ -53163,6 +53651,24 @@
 					"signature": "LDMaxDrawDistance:FloatProperty:0;"
 				},
 				{
+					"kind": "object",
+					"type_path": "/Script/Engine.SkinnedMeshComponent",
+					"weak_reference": true,
+					"name": "LeaderPoseComponent",
+					"declaring_class": "/Script/Engine.SkinnedMeshComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "LeaderPoseComponent:WeakObjectProperty:0:/Script/Engine.SkinnedMeshComponent;"
+				},
+				{
 					"kind": "struct",
 					"type_path": "/Script/Engine.LightingChannels",
 					"name": "LightingChannels",
@@ -62018,11 +62524,6 @@
 					"domain": "field",
 					"name": "LastPoseTickFrame",
 					"reason": "hidden_editor_or_deprecated"
-				},
-				{
-					"domain": "field",
-					"name": "LeaderPoseComponent",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "field",

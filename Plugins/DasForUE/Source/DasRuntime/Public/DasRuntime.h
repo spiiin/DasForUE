@@ -9,6 +9,8 @@
 
 class USaveGame;
 class UDasAuthoredGameplayAbility;
+class UDasGASCueSession;
+struct FDasGASCueEvent;
 class UDasScriptUserWidget;
 class FReply;
 struct FGeometry;
@@ -107,7 +109,11 @@ public:
     FDasExecutionResult RunLibraryFrame(const FString& Contract, const FString& Script, const FString& Entry,
                                         const TArray<FDasScalarValue>& Arguments, EDasMethodSignature ReturnKind,
                                         const FString& ReturnClass);
-    FDasExecutionResult DispatchGASCalculation(UObject* Owner,const FString& Script,const FString& Entry,const FString& Contract,const FDasGASCalculationContext& Context, bool StructuredOutput = false);
+    FDasExecutionResult DispatchGASCalculation(UObject* Owner, const FString& Script, const FString& Entry,
+                                               const FString& Contract, const FDasGASCalculationContext& Context,
+                                               bool StructuredOutput = false);
+    void QueueGASCueHook(UDasGASCueSession* Session, const FDasGASCueEvent& Event);
+    FDasExecutionResult DispatchGASCueHook(UDasGASCueSession* Session, const FDasGASCueEvent& Event);
     FDasExecutionResult DispatchGASAbilityHook(UDasAuthoredGameplayAbility* Ability, const FString& EntryPoint);
     FDasExecutionResult RunNamedFramePersistent(const FString& Path, const FString& EntryPoint,
                                                 const TArray<FDasScalarValue>& Arguments,

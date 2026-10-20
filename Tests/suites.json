@@ -5,6 +5,8 @@
     { "name": "gas-native-generate", "kind": "script", "script": "GenerateNativeGameplay.ps1" },
     { "name": "gas-execution", "kind": "commandlet", "run": "DasGASExecution", "log": "gas-execution-runtime",
       "marker": "DAS_GAS_EXECUTION_RESULT=PASS" },
+    { "name": "gas-cue-hooks", "kind": "commandlet", "run": "DasGASCueHooks", "log": "gas-cue-hooks-runtime",
+      "marker": "DAS_GAS_CUE_HOOKS_RESULT=PASS" },
     { "name": "gas-cue-assets", "kind": "commandlet", "run": "DasGASCueAssets", "log": "gas-cue-assets-runtime",
       "marker": "DAS_GAS_CUE_ASSETS_RESULT=PASS" },
     { "name": "gas-cues", "kind": "commandlet", "run": "DasGASCues", "log": "gas-cues-runtime",

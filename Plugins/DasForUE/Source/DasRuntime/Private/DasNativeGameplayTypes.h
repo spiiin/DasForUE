@@ -63,7 +63,8 @@ inline FString DasNativeGameplayKind(FProperty* P, FString& Path)
         Path = K->MetaClass->GetPathName();
         return TEXT("class");
     }
-    if (auto* O = CastField<FObjectProperty>(P))
+    if (auto* O = CastField<FObjectPropertyBase>(P);
+        O && (CastField<FObjectProperty>(P) || CastField<FWeakObjectProperty>(P)))
     {
         if (O->PropertyClass->HasAnyClassFlags(CLASS_Interface))
             return {};

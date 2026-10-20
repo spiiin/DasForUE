@@ -1,5 +1,8 @@
 #include "DasGASCues.h"
 #include "DasGASAuthoring.h"
+#include "DasRuntime.h"
+#include "Components/PrimitiveComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "AbilitySystemGlobals.h"
 #include "GameplayCueManager.h"
 #include "GameplayCueSet.h"
@@ -9,6 +12,53 @@
 
 UE_DEFINE_GAMEPLAY_TAG_STATIC(DasSampleImpactCue, "GameplayCue.Das.Sample.Impact");
 UE_DEFINE_GAMEPLAY_TAG_STATIC(DasSampleAuraCue, "GameplayCue.Das.Sample.Aura");
+UE_DEFINE_GAMEPLAY_TAG_STATIC(DasSampleHooksCue, "GameplayCue.Das.Sample.Hooks");
+FDasGASCueHit::FDasGASCueHit(const FHitResult& H)
+{
+    BlockingHit = H.bBlockingHit;
+    StartPenetrating = H.bStartPenetrating;
+    Time = H.Time;
+    Distance = H.Distance;
+    PenetrationDepth = H.PenetrationDepth;
+    FaceIndex = H.FaceIndex;
+    Item = H.Item;
+    MyItem = H.MyItem;
+    ElementIndex = H.ElementIndex;
+    BoneName = H.BoneName;
+    MyBoneName = H.MyBoneName;
+    Location = H.Location;
+    ImpactPoint = H.ImpactPoint;
+    Normal = H.Normal;
+    ImpactNormal = H.ImpactNormal;
+    TraceStart = H.TraceStart;
+    TraceEnd = H.TraceEnd;
+    Actor = H.GetActor();
+    Component = H.Component;
+    PhysMaterial = H.PhysMaterial;
+}
+FHitResult FDasGASCueHit::ToNative() const
+{
+    FHitResult H(Actor.Get(), Component.Get(), ImpactPoint, ImpactNormal);
+    H.bBlockingHit = BlockingHit;
+    H.bStartPenetrating = StartPenetrating;
+    H.Time = Time;
+    H.Distance = Distance;
+    H.PenetrationDepth = PenetrationDepth;
+    H.FaceIndex = FaceIndex;
+    H.Item = Item;
+    H.MyItem = MyItem;
+    H.ElementIndex = uint8(ElementIndex);
+    H.BoneName = BoneName;
+    H.MyBoneName = MyBoneName;
+    H.Location = Location;
+    H.ImpactPoint = ImpactPoint;
+    H.Normal = Normal;
+    H.ImpactNormal = ImpactNormal;
+    H.TraceStart = TraceStart;
+    H.TraceEnd = TraceEnd;
+    H.PhysMaterial = PhysMaterial;
+    return H;
+}
 namespace
 {
 int32 CueRouteDepth = 0;
@@ -103,6 +153,32 @@ bool RegisterDasGASCueAssets(const TArray<TSubclassOf<UDasGameplayCueNotify>>& C
             return false;
     return true;
 }
+bool UDasGASCueSession::Live() const
+{
+    const auto* Actor = Target.Get();
+    return !Closed && IsValid(Definition) && IsValid(Actor) && !Actor->IsActorBeingDestroyed() && Actor->GetWorld() &&
+           Actor->GetWorld()->IsGameWorld() && !Actor->GetWorld()->bIsTearingDown;
+}
+void UDasGASCueSession::Close()
+{
+    if (Closed)
+        return;
+    Closed = true;
+    Pending.Reset();
+    if (IsInGameThread())
+        if (auto* R = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))
+            R->ReleaseObject(this);
+}
+void UDasGASCueSession::EndPlay(const EEndPlayReason::Type Reason)
+{
+    Close();
+    Super::EndPlay(Reason);
+}
+void UDasGASCueSession::BeginDestroy()
+{
+    Close();
+    Super::BeginDestroy();
+}
 bool UDasAuthoredGameplayEffect::PrepareCues() const
 {
     return RegisterDasGASCueAssets(CueAssets);
@@ -143,7 +219,7 @@ void UDasGameplayCueNotify::HandleGameplayCue(AActor* Target, EGameplayCueEvent:
         return;
     }
     ASC->ReceiveAuthoredCue(P.OriginalTag.GetTagName(), P.MatchedTagName.GetTagName(), Phase, P,
-                            !DefinitionId.IsEmpty());
+                            DefinitionId.IsEmpty() ? nullptr : this);
 }
 bool UDasAuthoredAbilitySystemComponent::WatchAuthoredCue(FName Name)
 {
@@ -174,6 +250,40 @@ bool UDasAuthoredAbilitySystemComponent::MakeAuthoredCueParameters(const FDasGAS
     auto* Source = In.SourceObject.Get();
     if (Source && (!IsValid(Source) || (Source->GetWorld() && Source->GetWorld() != GetWorld())))
         return false;
+    if (In.SourceTags.Num() > 128 || In.TargetTags.Num() > 128 || In.Context.Actors.Num() > 64 ||
+        (In.Context.HasOrigin && In.Context.Origin.ContainsNaN()))
+        return false;
+    for (const auto* Tags : {&In.SourceTags, &In.TargetTags})
+        for (const auto Tag : *Tags)
+            if (!Tag.IsValid() || !FGameplayTag::RequestGameplayTag(Tag.GetTagName(), false).IsValid())
+                return false;
+    auto ValidActor = [&](AActor* A)
+    {
+        return !A || (IsValid(A) && !A->IsActorBeingDestroyed() && A->GetWorld() == GetWorld());
+    };
+    for (auto* A : {In.Context.Instigator.Get(), In.Context.OriginalInstigator.Get(), In.Context.EffectCauser.Get()})
+        if (!ValidActor(A))
+            return false;
+    for (auto A : In.Context.Actors)
+        if (!A || !ValidActor(A))
+            return false;
+    auto* ContextSource = In.Context.SourceObject.Get();
+    if (ContextSource &&
+        (!IsValid(ContextSource) || (ContextSource->GetWorld() && ContextSource->GetWorld() != GetWorld())))
+        return false;
+    if (In.Context.HasHit)
+    {
+        if (In.Context.Hit.ElementIndex < 0 || In.Context.Hit.ElementIndex > 255 ||
+            !FMath::IsFinite(In.Context.Hit.PenetrationDepth))
+            return false;
+        const auto H = In.Context.Hit.ToNative();
+        if (H.Location.ContainsNaN() || H.ImpactPoint.ContainsNaN() || H.Normal.ContainsNaN() ||
+            H.ImpactNormal.ContainsNaN() || H.TraceStart.ContainsNaN() || H.TraceEnd.ContainsNaN() ||
+            !FMath::IsFinite(H.Time) || H.Time < 0 || H.Time > 1 || !FMath::IsFinite(H.Distance) ||
+            !ValidActor(H.GetActor()) ||
+            (H.GetComponent() && (!IsValid(H.GetComponent()) || H.GetComponent()->GetWorld() != GetWorld())))
+            return false;
+    }
     Out.RawMagnitude = In.RawMagnitude;
     Out.NormalizedMagnitude = In.NormalizedMagnitude;
     Out.Location = In.Location;
@@ -183,7 +293,28 @@ bool UDasAuthoredAbilitySystemComponent::MakeAuthoredCueParameters(const FDasGAS
     Out.SourceObject = Source;
     Out.AbilityLevel = In.AbilityLevel;
     Out.GameplayEffectLevel = In.EffectLevel;
+    Out.AggregatedSourceTags = In.SourceTags;
+    Out.AggregatedTargetTags = In.TargetTags;
     Out.EffectContext = MakeEffectContext();
+    if (In.Context.Valid)
+    {
+        Out.EffectContext.AddInstigator(In.Context.Instigator, In.Context.EffectCauser);
+        Out.EffectContext.AddSourceObject(ContextSource);
+    }
+    else
+    {
+        Out.EffectContext.AddInstigator(Out.Instigator.Get(), Out.EffectCauser.Get());
+        Out.EffectContext.AddSourceObject(Source);
+    }
+    TArray<TWeakObjectPtr<AActor>> Actors;
+    for (auto A : In.Context.Actors)
+        Actors.Add(A.Get());
+    if (!Actors.IsEmpty())
+        Out.EffectContext.AddActors(Actors);
+    if (In.Context.HasOrigin)
+        Out.EffectContext.AddOrigin(In.Context.Origin);
+    if (In.Context.HasHit)
+        Out.EffectContext.AddHitResult(In.Context.Hit.ToNative(), true);
     return true;
 }
 bool UDasAuthoredAbilitySystemComponent::ExecuteAuthoredCue(FName Name, const FDasGASCueParameters& In)
@@ -225,12 +356,21 @@ void UDasAuthoredAbilitySystemComponent::ClearAuthoredCues()
     for (auto Name : Pending)
         RemoveGameplayCue(CueTag(Name));
     WatchedCues.Empty();
+    auto Sessions = MoveTemp(CueSessions);
+    CueSessions.Empty();
+    for (auto& Pair : Sessions)
+        if (IsValid(Pair.Value))
+        {
+            Pair.Value->Close();
+            Pair.Value->DestroyComponent();
+        }
 }
 void UDasAuthoredAbilitySystemComponent::ReceiveAuthoredCue(FName Tag, FName Matched, FName Event,
-                                                            const FGameplayCueParameters& P, bool AuthoredAsset)
+                                                            const FGameplayCueParameters& P,
+                                                            UDasGameplayCueNotify* Asset)
 {
     if (!IsInGameThread() || Ended || !IsValid(GetOwner()) || GetOwner()->IsActorBeingDestroyed() || !GetWorld() ||
-        !GetWorld()->IsGameWorld() || GetWorld()->bIsTearingDown || (!AuthoredAsset && !WatchedCues.Contains(Matched)))
+        !GetWorld()->IsGameWorld() || GetWorld()->bIsTearingDown || (!Asset && !WatchedCues.Contains(Matched)))
         return;
     FDasGASCueEvent R;
     R.Tag = Tag;
@@ -246,5 +386,51 @@ void UDasAuthoredAbilitySystemComponent::ReceiveAuthoredCue(FName Tag, FName Mat
     R.Parameters.SourceObject = const_cast<UObject*>(P.SourceObject.Get());
     R.Parameters.AbilityLevel = P.AbilityLevel;
     R.Parameters.EffectLevel = P.GameplayEffectLevel;
-    GameplayCueReceived.Broadcast(R);
+    R.Parameters.SourceTags = P.AggregatedSourceTags;
+    R.Parameters.TargetTags = P.AggregatedTargetTags;
+    if (P.EffectContext.IsValid())
+    {
+        const auto& C = P.EffectContext;
+        auto& D = R.Parameters.Context;
+        D.Valid = true;
+        D.Instigator = C.GetInstigator();
+        D.OriginalInstigator = C.GetOriginalInstigator();
+        D.EffectCauser = C.GetEffectCauser();
+        D.SourceObject = C.GetSourceObject();
+        for (auto A : C.Get()->GetActors())
+            if (A.IsValid())
+                D.Actors.Add(A.Get());
+        D.HasOrigin = C.HasOrigin();
+        if (D.HasOrigin)
+            D.Origin = C.GetOrigin();
+        if (const auto* Hit = C.GetHitResult())
+        {
+            D.HasHit = true;
+            D.Hit = *Hit;
+        }
+    }
+    // Publish event snapshots independently of whether this asset declares its own DAS methods.
+    if (Asset && !Asset->Hooks.IsEmpty())
+    {
+        auto& Session = CueSessions.FindOrAdd(Asset->GetClass());
+        if (!IsValid(Session))
+        {
+            if (CueSessions.Num() > 64)
+            {
+                CueSessions.Remove(Asset->GetClass());
+                UE_LOG(LogTemp, Warning, TEXT("DAS_GAS_CUE_SESSION_LIMIT"));
+                GameplayCueReceived.Broadcast(R);
+                return;
+            }
+            Session = NewObject<UDasGASCueSession>(GetOwner(), NAME_None, RF_Transient);
+            Session->Target = GetAvatarActor();
+            Session->Definition = Asset;
+            GetOwner()->AddInstanceComponent(Session);
+            Session->RegisterComponent();
+        }
+        if (auto* Runtime = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))
+            Runtime->QueueGASCueHook(Session, R);
+    }
+    if (!Ended && IsValid(GetOwner()) && !GetOwner()->IsActorBeingDestroyed())
+        GameplayCueReceived.Broadcast(R);
 }

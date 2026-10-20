@@ -253,13 +253,17 @@ def ue_gas_caller(context:GASCalculationContext; alias:string):float {
 // Cue callbacks use [ue_event(source="Abilities",name="GameplayCueReceived")].
 typedef GASCueParameters = DasGASCueParameters
 typedef GASCueEvent = DasGASCueEvent
+typedef GASCueEffectContext = DasGASCueEffectContext
+typedef GASCueHit = DasGASCueHit
 
 def ue_gas_cue_params(magnitude:float=0.0f):GASCueParameters {
     var params:GASCueParameters
+    params.SourceTags=ue_tags()
+    params.TargetTags=ue_tags()
     params.RawMagnitude=magnitude
     params.AbilityLevel=1
     params.EffectLevel=1
-    return params
+    return <- params
 }
 def ue_gas_cue_watch(asc:AuthoredAbilitySystemComponentRef; tag:ue_gameplay_tags::GameplayTag):bool {
     return asc.WatchAuthoredCue(ue_name_value(ue_tag_name(tag)))

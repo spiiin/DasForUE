@@ -16,7 +16,7 @@ public:
         addAnnotation(new FUEStructAnnotation());
         addAnnotation(new FUEGASDeclarationAnnotation(false));
         addAnnotation(new FUEGASDeclarationAnnotation(true));
-        addAnnotation(new FUEGASDeclarationAnnotation(false, true));
+        addAnnotation(new FUEGASCueAnnotation());
         addAnnotation(new FUEGASAbilityAnnotation());
         addAnnotation(new FUEGASCalculationAnnotation());
         addAnnotation(new FUENativeInterfaceAnnotation());

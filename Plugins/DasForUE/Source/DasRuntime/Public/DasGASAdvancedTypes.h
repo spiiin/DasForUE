@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Engine/HitResult.h"
+#include "GameplayTagContainer.h"
 #include "DasGASAdvancedTypes.generated.h"
 USTRUCT(BlueprintType)
 struct DASRUNTIME_API FDasGASAbilityTaskResult
@@ -84,6 +85,82 @@ struct DASRUNTIME_API FDasGASTargetingResult
     UPROPERTY(BlueprintReadWrite)
     FDasGASTargetData Targets;
 };
+class UPrimitiveComponent;
+class UPhysicalMaterial;
+// Reflected, owned view of HitResult; native instance/physics internals never enter DAS.
+USTRUCT(BlueprintType)
+struct DASRUNTIME_API FDasGASCueHit
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite)
+    bool BlockingHit = false;
+    UPROPERTY(BlueprintReadWrite)
+    bool StartPenetrating = false;
+    UPROPERTY(BlueprintReadWrite)
+    float Time = 0;
+    UPROPERTY(BlueprintReadWrite)
+    float Distance = 0;
+    UPROPERTY(BlueprintReadWrite)
+    float PenetrationDepth = 0;
+    UPROPERTY(BlueprintReadWrite)
+    int32 FaceIndex = -1;
+    UPROPERTY(BlueprintReadWrite)
+    int32 Item = -1;
+    UPROPERTY(BlueprintReadWrite)
+    int32 MyItem = -1;
+    UPROPERTY(BlueprintReadWrite)
+    int32 ElementIndex = 0;
+    UPROPERTY(BlueprintReadWrite)
+    FName BoneName;
+    UPROPERTY(BlueprintReadWrite)
+    FName MyBoneName;
+    UPROPERTY(BlueprintReadWrite)
+    FVector Location = FVector::ZeroVector;
+    UPROPERTY(BlueprintReadWrite)
+    FVector ImpactPoint = FVector::ZeroVector;
+    UPROPERTY(BlueprintReadWrite)
+    FVector Normal = FVector::ZeroVector;
+    UPROPERTY(BlueprintReadWrite)
+    FVector ImpactNormal = FVector::ZeroVector;
+    UPROPERTY(BlueprintReadWrite)
+    FVector TraceStart = FVector::ZeroVector;
+    UPROPERTY(BlueprintReadWrite)
+    FVector TraceEnd = FVector::ZeroVector;
+    UPROPERTY(BlueprintReadWrite)
+    TWeakObjectPtr<AActor> Actor;
+    UPROPERTY(BlueprintReadWrite)
+    TWeakObjectPtr<UPrimitiveComponent> Component;
+    UPROPERTY(BlueprintReadWrite)
+    TWeakObjectPtr<UPhysicalMaterial> PhysMaterial;
+    FDasGASCueHit() = default;
+    FDasGASCueHit(const FHitResult& Hit);
+    FHitResult ToNative() const;
+};
+USTRUCT(BlueprintType)
+struct DASRUNTIME_API FDasGASCueEffectContext
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite)
+    bool Valid = false;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<AActor> Instigator = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<AActor> OriginalInstigator = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<AActor> EffectCauser = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<UObject> SourceObject = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    TArray<TObjectPtr<AActor>> Actors;
+    UPROPERTY(BlueprintReadWrite)
+    bool HasOrigin = false;
+    UPROPERTY(BlueprintReadWrite)
+    FVector Origin = FVector::ZeroVector;
+    UPROPERTY(BlueprintReadWrite)
+    bool HasHit = false;
+    UPROPERTY(BlueprintReadWrite)
+    FDasGASCueHit Hit;
+};
 USTRUCT(BlueprintType)
 struct DASRUNTIME_API FDasGASCueParameters
 {
@@ -106,6 +183,12 @@ struct DASRUNTIME_API FDasGASCueParameters
     int32 AbilityLevel = 1;
     UPROPERTY(BlueprintReadWrite)
     int32 EffectLevel = 1;
+    UPROPERTY(BlueprintReadWrite)
+    FGameplayTagContainer SourceTags;
+    UPROPERTY(BlueprintReadWrite)
+    FGameplayTagContainer TargetTags;
+    UPROPERTY(BlueprintReadWrite)
+    FDasGASCueEffectContext Context;
 };
 USTRUCT(BlueprintType)
 struct DASRUNTIME_API FDasGASCueEvent

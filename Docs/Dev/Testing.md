@@ -140,3 +140,5 @@ The script uses `clang-format` from PATH or from the Visual Studio LLVM tools.
 ## Focused GAS cue assets
 
 Submit `test-suite <unique-id> gas-cue-assets repo=C:\src\DasForUE2\Build\GASAuthoringWorktree` through the main checkout build-agent queue described above. The suite builds Editor Development and runs one DasGASCueAssets commandlet. It imports the sample into `/Game/Tests/GASAuthored/CueAssets`, checks repeat import and native route-conflict preflight, applies/removes real GameplayEffects and checks owned DAS cue snapshots after GC. The fixed generated test folder avoids creating duplicate cue assets for the same registered tags on every run. It is not a PIE or packaged suite.
+
+`gas-cue-hooks` is the corresponding focused suite for scripted cue assets and extended owned payloads. Queue it through the same build agent; the single DasGASCueHooks commandlet uses `/Game/Tests/GASAuthored/CueHooks` and verifies callback-return/GC ownership, per-target state and cleanup. Regenerate native gameplay artifacts through the agent's `gas-native-generate` suite after changes to these reflected payloads.

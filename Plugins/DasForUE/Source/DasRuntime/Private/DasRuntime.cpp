@@ -546,6 +546,7 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeTypeAnnotations.inl"
 #include "DasFoundationModule.inl"
 #include "DasRuntimeTimers.inl"
+#include "DasRuntimeGASCueSessions.inl"
 #include "DasRuntimeInputSessions.inl"
 }
 
@@ -689,6 +690,7 @@ void FDasRuntimeModule::ShutdownModule()
         PendingScriptTimers.Empty();
         Sessions.Empty();
         PendingEvents.Empty();
+        DropPendingGASCueHooks();
         CreatedScriptScenes.Empty();
         UDasIntDelegateProxy::ResetDynamicReceivers();
         ResetDasCallbackFrames();

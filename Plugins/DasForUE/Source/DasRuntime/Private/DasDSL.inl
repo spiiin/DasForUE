@@ -854,6 +854,7 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
 #include "DasDSLTypeAnnotations.inl"
 #include "DasGASDSL.inl"
 #include "DasGASAbilityDSL.inl"
+#include "DasGASCueDSL.inl"
 #include "DasGASCalculationDSL.inl"
 #include "DasStaticLibraryDSL.inl"
 
@@ -879,6 +880,30 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
         Wire.Reset();
         if (!Match)
             Error = TEXT("GAS calculation source contract differs from saved asset");
+        return Match;
+    }
+    if (const auto* Session = Cast<UDasGASCueSession>(Self))
+    {
+        bool Match = false;
+        const auto* Cue = Session->Definition.Get();
+        Program->getThisModule()->structures.foreach (
+            [&](const das::StructurePtr& S)
+            {
+                const auto* A = DSLAnnotation(S->annotations, "ue_gameplay_cue");
+                const auto* Data = A ? A->arguments.find(DSLGASKey, das::Type::tString) : nullptr;
+                TSharedPtr<FJsonObject> O;
+                FString Contract, Id;
+                if (Cue && Data &&
+                    FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(DSLText(Data->sValue)), O) &&
+                    O->TryGetStringField(TEXT("contract"), Contract) &&
+                                         O->TryGetStringField(TEXT("id"), Id) && Id == Cue->DefinitionId &&
+                                                              Contract == Cue->ScriptContract)
+                    for (const auto& H : Cue->Hooks)
+                        Match |= H.Value == Entry;
+            });
+        Wire.Reset();
+        if (!Match)
+            Error = TEXT("Cue source contract differs from saved notify asset");
         return Match;
     }
     if (const auto* Ability = Cast<UDasAuthoredGameplayAbility>(Self); Ability && !Ability->ActivateEntry.IsEmpty())

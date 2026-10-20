@@ -19,7 +19,7 @@ class GASCueExample : Actor {
             if(cue.Parameters.RawMagnitude==21.0f) {
                 verify(!ue_gas_cue_watch(self.Abilities,ue_tag("GameplayCue.Das.Sample")),"new route refused during synchronous native cue callback")
             }
-            if(executed==0) { first=cue }
+            if(executed==0) { first <- clone(cue) }
             executed+=1
         } elif(event=="OnActive") { active+=1 }
         elif(event=="WhileActive") { ongoing+=1 }

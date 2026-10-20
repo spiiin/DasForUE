@@ -3,12 +3,8 @@ const char* DSLGASKey = "_ue_gas_declaration";
 struct FUEGASDeclarationAnnotation : das::StructureAnnotation
 {
     bool Effect;
-    bool Cue;
-    explicit FUEGASDeclarationAnnotation(bool IsEffect, bool IsCue = false)
-        : StructureAnnotation(IsCue      ? "ue_gameplay_cue"
-                              : IsEffect ? "ue_gameplay_effect"
-                                         : "ue_attribute_set"),
-          Effect(IsEffect), Cue(IsCue)
+    explicit FUEGASDeclarationAnnotation(bool IsEffect)
+        : StructureAnnotation(IsEffect ? "ue_gameplay_effect" : "ue_attribute_set"), Effect(IsEffect)
     {
     }
     virtual bool touch(const das::StructurePtr& S, das::ModuleGroup&, das::AnnotationArgumentList& Args,
@@ -26,7 +22,7 @@ struct FUEGASDeclarationAnnotation : das::StructureAnnotation
             if (!S->isClass || S->parent)
                 DSLFail(TEXT("GAS declarations require a class without DAS inheritance"));
             for (const auto& A : Args)
-                if (A.name != "id" && (!Cue || (A.name != "tag" && A.name != "min_level" && A.name != "max_level")) &&
+                if (A.name != "id" &&
                     (!Effect ||
                      (A.name != "cue" && A.name != "attributes" && A.name != "execution" && A.name != "duration" &&
                       A.name != "period" && A.name != "execute_on_application" && A.name != "stacking" &&
@@ -35,21 +31,9 @@ struct FUEGASDeclarationAnnotation : das::StructureAnnotation
                     DSLFail(TEXT("Unknown GAS declaration option"));
             const FString Name = DSLText(S->name), Module = FPaths::GetBaseFilename(DSLText(S->at.fileInfo->name));
             auto Object = MakeShared<FJsonObject>();
-            Object->SetStringField(TEXT("kind"), Cue ? TEXT("cue") : Effect ? TEXT("effect"): TEXT("attributes"));
+            Object->SetStringField(TEXT("kind"), Effect ? TEXT("effect"): TEXT("attributes"));
             Object->SetStringField(TEXT("name"), Name);
             Object->SetStringField(TEXT("id"), DSLString(Args, "id", Module + TEXT(".")+ Name));
-            if (Cue)
-            {
-                Object->SetStringField(TEXT("tag"), DSLString(Args, "tag"));
-                for (const auto& A : Args)
-                    if (A.name == "min_level" || A.name == "max_level")
-                    {
-                        if (A.type != das::Type::tInt && A.type != das::Type::tFloat)
-                            DSLFail(TEXT("Cue level bounds require numbers"));
-                        Object->SetNumberField(DSLText(A.name),
-                                               A.type == das::Type::tInt ? double(A.iValue) : double(A.fValue));
-                    }
-            }
             if (Effect)
             {
                 Object->SetStringField(TEXT("attributes"), DSLString(Args, "attributes"));
@@ -98,8 +82,6 @@ struct FUEGASDeclarationAnnotation : das::StructureAnnotation
             {
                 if (F.generated || F.name == "__rtti")
                     continue;
-                if (Cue)
-                    DSLFail(TEXT("Cue assets have no DAS members; use GameplayCueReceived on the target"));
                 if (F.classMethod || !F.type || DSLTypeName(F.type) != TEXT("float"))
                     DSLFail(TEXT("GAS declarations support only float fields; unsupported member: ") + DSLText(F.name));
                 auto Value = DSLParameterDefault(F.init);

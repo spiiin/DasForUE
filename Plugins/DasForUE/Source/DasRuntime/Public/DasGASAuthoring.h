@@ -44,6 +44,8 @@ struct FDasGASCueDeclaration
     FString Name, Id;
     FName Tag;
     float MinLevel = 0, MaxLevel = 1;
+    FString ScriptFile, ScriptContract;
+    TMap<FName, FString> Hooks;
 };
 struct FDasGASEffectDeclaration
 {
@@ -233,7 +235,7 @@ public:
     UFUNCTION(BlueprintPure, Category = "GAS|Cues")
     FDasGASCueEvent EmptyAuthoredCueEvent() const { return {}; }
     void ReceiveAuthoredCue(FName Tag, FName MatchedTag, FName Event, const FGameplayCueParameters& Parameters,
-                            bool AuthoredAsset = false);
+                            UDasGameplayCueNotify* Asset = nullptr);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     FDasAuthoredAbilityGrant GiveAuthoredAbility(TSubclassOf<UDasAuthoredGameplayAbility> Class, int32 Level = 1);
     UFUNCTION(BlueprintPure, Category = "GAS")
@@ -326,6 +328,8 @@ private:
     FGameplayAttribute FindAttribute(FName Set, FName Name) const;
     void Changed(const FOnAttributeChangeData& Data, FName Set);
     void Detach();
+    UPROPERTY(Transient)
+    TMap<TObjectPtr<UClass>, TObjectPtr<UDasGASCueSession>> CueSessions;
     TSet<FName> WatchedCues;
     TSet<FName> AddedCues;
     void ClearAuthoredCues();

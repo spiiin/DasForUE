@@ -52,7 +52,7 @@ Sending does not require watch. Existing native/asset cue routes continue to run
 
 GASCueParameters carries RawMagnitude, NormalizedMagnitude, Location, Normal, Instigator, EffectCauser, SourceObject, AbilityLevel and EffectLevel. The helper sets levels to 1; optional object refs default to null. Native sending supplies the current avatar as default Instigator/EffectCauser and creates a native effect context. The callback snapshots the native parameters into owned storage; it never retains a borrowed FGameplayCueParameters pointer.
 
-Magnitudes/coordinates must be finite, normalized magnitude is 0..1, Normal must be zero or unit length, levels are 0..10000. Optional actors and objects must be live; objects associated with another world are refused. Source assets with no world are accepted. This does not yet expose full effect-context/hit/tag-container payloads.
+Magnitudes/coordinates must be finite, normalized magnitude is 0..1, Normal must be zero or unit length, levels are 0..10000. Optional actors and objects must be live; objects associated with another world are refused. Source assets with no world are accepted. Owned context/hit and canonical source/target tag-container snapshots are described below.
 
 GASCueEvent adds Tag, MatchedTag, Event and Target. Event is Executed, OnActive, WhileActive or Removed. Native events that occur while the owning DAS VM is executing are queued using the existing event dispatcher; no synchronous VM re-entry is introduced. Stored snapshots remain independent of subsequent input mutations/events; object refs retain the binding's checked-reference semantics. Releasing the VM removes its subscription and discards obsolete callbacks.
 
@@ -62,7 +62,7 @@ Add permits one manually added cue per tag on the ASC; duplicate adds and alread
 
 Remove a manually added active cue before unwatching its tag; unwatch is refused while it is still recorded as active. EndPlay removes the adapter's remaining manual cues and clears watches. It does not broadcast new DAS callbacks into a tearing-down actor. Native notify actors and the existing owned VFX helpers retain their normal lifecycle cleanup.
 
-Authored cue assets and effect cue lists are supported below. Full hit/context payloads, networking and prediction remain separate work. Unrelated existing notify assets are not automatically observed by the DAS bridge. Ordinary event handlers can call the existing sound/Niagara APIs.
+Authored cue assets and effect cue lists are supported below. Networking and prediction remain separate work. Unrelated existing notify assets are not automatically observed by the DAS bridge. Ordinary event handlers can call the existing sound/Niagara APIs.
 
 ## Focused verification
 
@@ -94,7 +94,7 @@ class CueAura {}
 
 The effect stores real `FGameplayEffectCue` entries and reflected hard references to generated notify classes. Cook can follow those references when the effect itself is included. No runtime JSON metadata, generated transient notify class or project config edit is used. Reimport into the same folder is idempotent; changed definitions require a new folder until schema migration is implemented. Use one asset route per cue tag: importing the same tag into another folder is not a hot-reload mechanism.
 
-Cue assets currently declare their tag and finite level bounds (`0 <= min_level < max_level`, defaults 0 and 1). They are shared static notifies, not per-actor DAS instances. Their declaration bodies are empty; cosmetic DAS logic uses the target's ordinary `[ue_event(source="Abilities",name="GameplayCueReceived")]` handler. No explicit `ue_gas_cue_watch` is required for an authored asset route. It still uses owned snapshots and the existing deferred dispatcher when the VM is busy. `min_level`/`max_level` map native effect level to NormalizedMagnitude; RawMagnitude is native GAS's modified-attribute magnitude, zero when no magnitude attribute is configured. EffectLevel carries the native spec level.
+Cue assets currently declare their tag and finite level bounds (`0 <= min_level < max_level`, defaults 0 and 1). The native static notify is shared. Optional ordinary DAS methods run on a separate instance for each target ASC and cue class (see below); an empty declaration body remains supported. Cosmetic DAS logic can also use the target's ordinary `[ue_event(source="Abilities",name="GameplayCueReceived")]` handler. No explicit `ue_gas_cue_watch` is required for an authored asset route. It still uses owned snapshots and the existing deferred dispatcher when the VM is busy. `min_level`/`max_level` map native effect level to NormalizedMagnitude; RawMagnitude is native GAS's modified-attribute magnitude, zero when no magnitude attribute is configured. EffectLevel carries the native spec level.
 
 `ue_gas_spec`/MakeAuthoredSpec and authored ability grants register referenced notify classes before native application. Registration preflights all references, refuses another notify assigned to that tag and does not install a partial batch on a conflict. Routes are shared for the manager lifetime. A manually watched tag already assigned to the plain bridge cannot then be claimed by a different cue asset. Prepare routes outside a synchronous cue callback. Native C++ callers bypassing the authored spec/ability helpers must call the effect's `PrepareCues()` themselves or use normal UE cue-library discovery.
 
@@ -105,3 +105,43 @@ The `gas-cue-assets` suite is one short commandlet after an Editor Development b
 Multiple cues with identical level bounds share one native FGameplayEffectCue tag container. This avoids redundant whole-spec callbacks in UE 5.8's Full-replication add/remove path. Different bounds require separate native entries; that engine path can then deliver repeated static-notify phases. Cosmetic handlers should be idempotent, as with other native GAS repeated/join-in-progress delivery.
 
 Verified by build-agent job `gascueassets-4f3b765ddc`: Editor Development build and `DAS_GAS_CUE_ASSETS_RESULT=PASS checks=7` in one short commandlet (1.62 seconds of commandlet logic). Full PIE and packaged tests were not run for this increment.
+
+## Owned extended payloads and cue methods
+
+[gas_cue_hooks.das](../../../Plugins/DasForUE/Content/Das/Scripts/gas_cue_hooks.das) is the combined example and focused probe. The same cue declaration can contain ordinary instance methods:
+
+```das
+[ue_gameplay_cue(tag="GameplayCue.Das.Sample.Hooks")]
+class ImpactCue {
+    Count:int=0
+    First:GASCueEvent
+
+    def Execute(cue:GASCueEvent) {
+        self.Count+=1
+        if(self.Count==1) { self.First <- clone(cue) }
+        if(cue.Parameters.Context.HasHit) {
+            let point=cue.Parameters.Context.Hit.ImpactPoint
+            // Use point and your loaded sound/Niagara assets for cosmetic logic.
+        }
+    }
+    def OnActive(cue:GASCueEvent) { }
+    def WhileActive(cue:GASCueEvent) { }
+    def Removed(cue:GASCueEvent) { }
+}
+```
+
+Each method is optional, returns void and accepts one by-value GASCueEvent. Execute receives native Executed; the other names match native phases. No ue_function/event annotation is required on these methods. Own fields retain state for that target/notify pair until target EndPlay. A second target has a separate VM and instance. Shared static notify CDOs never hold mutable DAS instance state. Lifecycle methods can run more than once under native GAS rules, so looping cosmetic logic should be idempotent.
+
+Instances use transient native components owned by the target, allowing the existing effect/timer owner rules to apply. `cue.Target` explicitly names the recipient; `self` is the DAS cue instance. Pending hook payloads live in GC-visible owned storage, share the dispatcher budget with ordinary events and never re-enter an executing VM. Calls made from a hook queue subsequent cue hooks until that hook returns. EndPlay closes the session, discards pending work, releases its VM and owned helpers. A failing hook reports DAS_GAS_CUE_HOOK_FAILED and closes that session.
+
+GASCueParameters adds SourceTags and TargetTags using the canonical ue_gameplay_tags::GameplayTagContainer type; normal `ue_tags_has`, `ue_tags_names` and other helpers work directly. Context is a GASCueEffectContext snapshot with Valid, Instigator, OriginalInstigator, EffectCauser, SourceObject, Actors, HasOrigin/Origin and HasHit/Hit. It contains no borrowed native FGameplayEffectContextHandle or HitResult pointer. Copies survive callback return, changes to the caller's input and later GC; object access retains the binding's checked-reference rules.
+
+GASCueHit is the reflected HitResult adapter: BlockingHit, StartPenetrating, Time, Distance, PenetrationDepth, FaceIndex, Item/MyItem, ElementIndex, BoneName/MyBoneName, Location, ImpactPoint, Normal, ImpactNormal, TraceStart/TraceEnd and weak Actor/Component/PhysMaterial. Native physics/instance-handle internals are intentionally not exposed. Check Context.HasHit before using these fields. Normal calls/effect TargetData populate this adapter from the real native context.
+
+The execute/add helpers accept the same owned parameter type. SourceTags/TargetTags round-trip as explicit cue parameters; they do not grant tags to the ASC. Context.Valid reconstructs its native instigator/causer/source provenance; OriginalInstigator is informational and is derived by native GAS. Actors, origin and the supported hit fields reconstruct a fresh native context. This does not clone arbitrary custom context subclasses or serialized native internals. Inputs must reference live same-world actors/components (worldless source assets are permitted), have finite coordinates and valid registered tags; arrays/tag containers are bounded. `ue_gas_cue_params()` initializes empty canonical containers. Parameters captured from a GameplayEffect preserve that effect's native captured tags and hit provenance.
+
+The focused `gas-cue-hooks` build-agent suite builds and runs one short commandlet covering four saved methods, per-target state, deferred nested delivery, native effect TargetData/captured tags, ordinary event compatibility, snapshot retention after GC and EndPlay cleanup. Full PIE, packaged and network checks are separate work.
+
+Because context now contains an Actors array, use normal DAS deep-clone/move syntax when retaining or copying the complete event: `self.First <- clone(cue)` or `var copy <- clone(cue.Parameters)`. The examples and cue-parameter constructor use these semantics.
+
+Verified by build-agent job `gascuehooks-run-93bc5ca9`: Editor Development build and `DAS_GAS_CUE_HOOKS_RESULT=PASS checks=9` in one short runtime process. The scenario includes native effect TargetData/captured tags, deferred nested hooks, per-target state, snapshots after GC and EndPlay cleanup. Full PIE/packaged/network checks were not run for this increment.

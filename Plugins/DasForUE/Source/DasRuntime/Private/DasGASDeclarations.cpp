@@ -70,6 +70,28 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
                           D.MinLevel < 0 || D.MaxLevel <= D.MinLevel ||
                           Candidate.Cues.ContainsByPredicate([&](const auto& C) { return C.Tag == FName(*Tag); }))
                 return Fail(TEXT("Cue requires unique GameplayCue child tag and finite 0 <= min_level < max_level"));
+            auto ReadString = [&](const TCHAR* Key, FString& Value)
+            {
+                return !Object->HasField(Key) || Object->TryGetStringField(Key, Value);
+            };
+            if (!ReadString(TEXT("script"), D.ScriptFile) || !ReadString(TEXT("contract"), D.ScriptContract))
+                return Fail(TEXT("Invalid cue script descriptor"));
+            for (const auto* Key : {TEXT("Execute"), TEXT("OnActive"), TEXT("WhileActive"), TEXT("Removed")})
+            {
+                FString Entry;
+                if (!ReadString(*FString(Key).ToLower(), Entry))
+                    return Fail(TEXT("Invalid cue hook entry"));
+                if (!Entry.IsEmpty())
+                {
+                    if (Entry != TEXT("__ue_cue_")+ Name + TEXT("_")+ Key)
+                        return Fail(TEXT("Invalid generated cue hook identity"));
+                    D.Hooks.Add(FString(Key) == TEXT("Execute") ? FName(TEXT("Executed")) : FName(Key), Entry);
+                }
+            }
+            if (D.Hooks.IsEmpty() ? (!D.ScriptFile.IsEmpty() || !D.ScriptContract.IsEmpty())
+                                  : (FPaths::GetCleanFilename(D.ScriptFile) != D.ScriptFile ||
+                                     FPaths::GetExtension(D.ScriptFile) != TEXT("das") || D.ScriptContract.Len() != 32))
+                return Fail(TEXT("Invalid cue script identity"));
             D.Tag = FName(*Tag);
             Candidate.Cues.Add(MoveTemp(D));
             continue;

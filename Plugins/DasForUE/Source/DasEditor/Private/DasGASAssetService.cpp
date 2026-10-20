@@ -97,8 +97,9 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
     {
         if (!FGameplayTag::RequestGameplayTag(Cue.Tag, false).IsValid())
             return Fail(TEXT("Cue tag is not registered: ")+ Cue.Tag.ToString());
-        const auto Hash = FMD5::HashAnsiString(*FString::Printf(
-            TEXT("%s|cue-v1|%s|%.9g|%.9g"), *Cue.Id, *Cue.Tag.ToString(), double(Cue.MinLevel), double(Cue.MaxLevel)));
+        const auto Hash = FMD5::HashAnsiString(
+            *(Cue.ScriptContract + FString::Printf(TEXT("%s|cue-v1|%s|%.9g|%.9g"), *Cue.Id, *Cue.Tag.ToString(),
+                                                        double(Cue.MinLevel), double(Cue.MaxLevel))));
         Hashes.Add(Cue.Id, Hash);
         Work.Add(
             {Cue.Name, Cue.Id, Folder + TEXT("/GCN_")+ Cue.Name, Hash, UDasGameplayCueNotify::StaticClass(), nullptr});
@@ -362,6 +363,9 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
                 return Fail(TEXT("Cue Blueprint compilation failed"));
             auto* CDO = CastChecked<UDasGameplayCueNotify>(W.BP->GeneratedClass->GetDefaultObject());
             CDO->DefinitionId = Cue.Id;
+            CDO->ScriptFile = Cue.ScriptFile;
+            CDO->ScriptContract = Cue.ScriptContract;
+            CDO->Hooks = Cue.Hooks;
             CDO->DefinitionHash = W.Hash;
             CDO->GameplayCueTag = FGameplayTag::RequestGameplayTag(Cue.Tag);
             CDO->GameplayCueName = Cue.Tag;

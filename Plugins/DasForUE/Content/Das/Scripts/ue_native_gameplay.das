@@ -4,6 +4,7 @@ require ue_character_control public
 require ue_effects public
 require ue_enhanced_input public
 require ue_gameplay_services public
+require ue_gameplay_tags public
 require ue_gas_authored_types public
 require ue_gas_types public
 require ue_generated public
@@ -106,6 +107,10 @@ def Native_MeshDeformerInstanceRef_1f839542_from(value:UObjectHandle):Native_Mes
 [ue_native_object(path="/Script/Engine.MeshDeformerInstanceSettings")]
 struct Native_MeshDeformerInstanceSettingsRef_14d5c797 { handle:UObjectHandle }
 def Native_MeshDeformerInstanceSettingsRef_14d5c797_from(value:UObjectHandle):Native_MeshDeformerInstanceSettingsRef_14d5c797 { return Native_MeshDeformerInstanceSettingsRef_14d5c797(handle=ue_cast_nullable_object(value,"/Script/Engine.MeshDeformerInstanceSettings")) }
+
+[ue_native_object(path="/Script/Engine.MovementComponent")]
+struct Native_MovementComponentRef_83cb39c9 { handle:UObjectHandle }
+def Native_MovementComponentRef_83cb39c9_from(value:UObjectHandle):Native_MovementComponentRef_83cb39c9 { return Native_MovementComponentRef_83cb39c9(handle=ue_cast_nullable_object(value,"/Script/Engine.MovementComponent")) }
 
 [ue_native_object(path="/Script/Engine.PawnMovementComponent")]
 struct Native_PawnMovementComponentRef_653cf1d0 { handle:UObjectHandle }
@@ -1141,6 +1146,44 @@ struct DasGASCalculationContext {
     Target:C_Actor_adf65d5b
 }
 
+[ue_native_struct(path="/Script/DasRuntime.DasGASCueHit")]
+struct DasGASCueHit {
+    BlockingHit:bool
+    StartPenetrating:bool
+    Time:float
+    Distance:float
+    PenetrationDepth:float
+    FaceIndex:int
+    Item:int
+    MyItem:int
+    ElementIndex:int
+    BoneName:UENameValue
+    MyBoneName:UENameValue
+    Location:UEVector
+    ImpactPoint:UEVector
+    Normal:UEVector
+    ImpactNormal:UEVector
+    TraceStart:UEVector
+    TraceEnd:UEVector
+    Actor:C_Actor_adf65d5b
+    Component:TraceComponentRef
+    PhysMaterial:PhysicalMaterialRef
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasGASCueEffectContext")]
+struct DasGASCueEffectContext {
+    Valid:bool
+    Instigator:C_Actor_adf65d5b
+    OriginalInstigator:C_Actor_adf65d5b
+    EffectCauser:C_Actor_adf65d5b
+    SourceObject:C_Object_55c3753a
+    Actors:array<C_Actor_adf65d5b>
+    HasOrigin:bool
+    Origin:UEVector
+    HasHit:bool
+    Hit:DasGASCueHit
+}
+
 [ue_native_struct(path="/Script/DasRuntime.DasGASCueParameters")]
 struct DasGASCueParameters {
     RawMagnitude:float
@@ -1152,6 +1195,9 @@ struct DasGASCueParameters {
     SourceObject:C_Object_55c3753a
     AbilityLevel:int
     EffectLevel:int
+    SourceTags:ue_gameplay_tags::GameplayTagContainer
+    TargetTags:ue_gameplay_tags::GameplayTagContainer
+    Context:DasGASCueEffectContext
 }
 
 [ue_native_struct(path="/Script/DasRuntime.DasGASCueEvent")]
@@ -1370,27 +1416,35 @@ struct InputMappingContextMappingData {
     Mappings:array<EnhancedActionKeyMapping>
 }
 
+[ue_native_struct(path="/Script/GameplayAbilities.ActiveGameplayEffectHandle")]
+struct ActiveGameplayEffectHandle {
+    WeakOwningASC:Native_AbilitySystemComponentRef_4c40231b
+    Handle:int
+    bPassedFiltersAndWasExecuted:bool
+}
+
+[ue_native_struct(path="/Script/GameplayAbilities.GameplayAbilityActorInfo")]
+struct GameplayAbilityActorInfo {
+    OwnerActor:C_Actor_adf65d5b
+    AvatarActor:C_Actor_adf65d5b
+    PlayerController:PlayerControllerRef
+    AbilitySystemComponent:Native_AbilitySystemComponentRef_4c40231b
+    SkeletalMeshComponent:SkeletalMeshComponentRef
+    AnimInstance:Native_AnimInstanceRef_b5f8c607
+    MovementComponent:Native_MovementComponentRef_83cb39c9
+    AffectedAnimInstanceTag:UENameValue
+}
+
 [ue_native_struct(path="/Script/GameplayAbilities.GameplayAbilitySpecHandle")]
 struct GameplayAbilitySpecHandle {
     Handle:int
 }
 
-[ue_native_struct(path="/Script/GameplayTags.GameplayTag")]
-struct GameplayTag {
-    TagName:UENameValue
-}
-
-[ue_native_struct(path="/Script/GameplayTags.GameplayTagContainer")]
-struct GameplayTagContainer {
-    GameplayTags:array<GameplayTag>
-    ParentTags:array<GameplayTag>
-}
-
 [ue_native_struct(path="/Script/GameplayAbilities.InheritedTagContainer")]
 struct InheritedTagContainer {
-    CombinedTags:GameplayTagContainer
-    Added:GameplayTagContainer
-    Removed:GameplayTagContainer
+    CombinedTags:ue_gameplay_tags::GameplayTagContainer
+    Added:ue_gameplay_tags::GameplayTagContainer
+    Removed:ue_gameplay_tags::GameplayTagContainer
 }
 
 [ue_native_struct(path="/Script/GameplayAbilities.ScalableFloat")]
