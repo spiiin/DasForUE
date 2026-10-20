@@ -25,6 +25,12 @@ class GeneratorTests(unittest.TestCase):
         self.ir['classes'].extend([dict(type_path='/Script/Engine.BlueprintFunctionLibrary', parent='/Script/CoreUObject.Object'), dict(type_path=library, parent='/Script/Engine.BlueprintFunctionLibrary')])
         fn.update({'static': True, 'world_context': '', 'class': library})
         return fn
+    def test_static_reflection_macro_descriptor(self):
+        fn = self.static_fixture()
+        text = generate(self.ir)
+        expected = '[ue_reflected_call(owner="' + fn['class'] + '", method="' + fn['function'] + '", signature="' + fn['signature'].replace('\\', '\\\\').replace('"', '\\"').replace('{', '\\{').replace('}', '\\}') + '")]'
+        self.assertIn(expected + '\ndef ' + fn['alias'] + '(', text)
+
     def test_static_library_has_no_receiver(self):
         fn = self.static_fixture()
         body = generate(self.ir).split('def ' + fn['alias'] + '(', 1)[1].split('\n}\n', 1)[0]

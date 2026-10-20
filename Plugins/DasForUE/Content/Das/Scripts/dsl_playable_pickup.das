@@ -1,5 +1,6 @@
 options gen2
 require ue_native_gameplay
+require ue_collision_profiles
 require ue_pickup_refs
 require ue_interaction
 require ue_effects
@@ -40,7 +41,7 @@ class PlayablePickup : Actor {
     def BeginPlay():void {
         verify(self.Points>0 && self.RespawnSeconds>0.0f,"Pickup points and respawn delay must be positive")
         self.Visual.SetCollisionEnabled(ECollisionEnabled.NoCollision)
-        self.Trigger.SetCollisionProfileName(ue_name_value("OverlapOnlyPawn"),true)
+        self.Trigger.SetCollisionProfileName(ue_collision_profile_name(CollisionProfile.OverlapOnlyPawn),true)
         self.Trigger.SetCollisionResponseToChannel(ECollisionChannel.ECC_Visibility,ECollisionResponse.ECR_Block)
         self.Trigger.SetSphereRadius(75.0f,true)
         self.Trigger.SetGenerateOverlapEvents(true)

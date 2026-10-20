@@ -427,7 +427,7 @@ das::ExpressionPtr DSLDirectUnpack(const das::LineInfo& At, const das::TypeDeclP
     if (DSLAuthoredView(Type))
         return DSLAuthoredUnpack(At, Type, V);
     if (DSLTypedReference(Type))
-        return DSLCall(At, Type->structType->module->name + "::" + Type->structType->name + "_from", {V});
+        return DSLNativeReferenceUnpack(At, Type, V);
     if (DSLDirectEnum(Type))
     {
         auto T = DSLCopyType(Type);

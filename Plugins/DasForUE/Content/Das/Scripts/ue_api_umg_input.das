@@ -2714,6 +2714,7 @@ struct ue_enhanced_api_BreakInputActionValue_Result {
     out_type : E_EInputActionValueType_9254fc67
 }
 
+[ue_reflected_call(owner="/Script/EnhancedInput.EnhancedInputLibrary", method="BreakInputActionValue", signature="v1;BreakInputActionValue;InActionValue:StructProperty:128:/Script/EnhancedInput.InputActionValue\{\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;Type:EnumProperty:384:/Script/EnhancedInput.EInputActionValueType;")]
 def ue_enhanced_api_BreakInputActionValue(arg_inactionvalue : InputActionValue) : ue_enhanced_api_BreakInputActionValue_Result {
     let call = ue_begin_static_call("/Script/EnhancedInput.EnhancedInputLibrary", "BreakInputActionValue", "")
     ue_expect_signature(call, "v1;BreakInputActionValue;InActionValue:StructProperty:128:/Script/EnhancedInput.InputActionValue\{\};X:DoubleProperty:384;Y:DoubleProperty:384;Z:DoubleProperty:384;Type:EnumProperty:384:/Script/EnhancedInput.EInputActionValueType;")
@@ -2725,6 +2726,7 @@ def ue_enhanced_api_BreakInputActionValue(arg_inactionvalue : InputActionValue) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/EnhancedInput.EnhancedInputLibrary", method="Conv_InputActionValueToString", signature="v1;Conv_InputActionValueToString;ActionValue:StructProperty:128:/Script/EnhancedInput.InputActionValue\{\};ReturnValue:StrProperty:1408;")]
 def ue_enhanced_api_Conv_InputActionValueToString(arg_actionvalue : InputActionValue) : string {
     let call = ue_begin_static_call("/Script/EnhancedInput.EnhancedInputLibrary", "Conv_InputActionValueToString", "")
     ue_expect_signature(call, "v1;Conv_InputActionValueToString;ActionValue:StructProperty:128:/Script/EnhancedInput.InputActionValue\{\};ReturnValue:StrProperty:1408;")
@@ -2736,6 +2738,7 @@ def ue_enhanced_api_Conv_InputActionValueToString(arg_actionvalue : InputActionV
     return result
 }
 
+[ue_reflected_call(owner="/Script/EnhancedInput.EnhancedInputLibrary", method="Conv_TriggerEventValueToString", signature="v1;Conv_TriggerEventValueToString;TriggerEvent:EnumProperty:130:/Script/EnhancedInput.ETriggerEvent;ReturnValue:StrProperty:1408;")]
 def ue_enhanced_api_Conv_TriggerEventValueToString(arg_triggerevent : E_ETriggerEvent_3af87cca) : string {
     let call = ue_begin_static_call("/Script/EnhancedInput.EnhancedInputLibrary", "Conv_TriggerEventValueToString", "")
     ue_expect_signature(call, "v1;Conv_TriggerEventValueToString;TriggerEvent:EnumProperty:130:/Script/EnhancedInput.ETriggerEvent;ReturnValue:StrProperty:1408;")
@@ -2747,6 +2750,7 @@ def ue_enhanced_api_Conv_TriggerEventValueToString(arg_triggerevent : E_ETrigger
     return result
 }
 
+[ue_reflected_call(owner="/Script/EnhancedInput.EnhancedInputLibrary", method="FlushPlayerInput", signature="v1;FlushPlayerInput;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;")]
 def ue_enhanced_api_FlushPlayerInput(arg_playercontroller : C_PlayerController_fb3d8846) {
     let call = ue_begin_static_call("/Script/EnhancedInput.EnhancedInputLibrary", "FlushPlayerInput", "")
     ue_expect_signature(call, "v1;FlushPlayerInput;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;")
@@ -2756,6 +2760,7 @@ def ue_enhanced_api_FlushPlayerInput(arg_playercontroller : C_PlayerController_f
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/EnhancedInput.EnhancedInputLibrary", method="GetMappingName", signature="v1;GetMappingName;ActionKeyMapping:StructProperty:134218114:/Script/EnhancedInput.EnhancedActionKeyMapping\{Triggers:ArrayProperty:0[Triggers:ObjectProperty:0:/Script/EnhancedInput.InputTrigger;];Modifiers:ArrayProperty:0[Modifiers:ObjectProperty:0:/Script/EnhancedInput.InputModifier;];Action:ObjectProperty:0:/Script/EnhancedInput.InputAction;Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShouldBeIgnored:BoolProperty:0;bHasAlwaysTickTrigger:BoolProperty:0;SettingBehavior:EnumProperty:0:/Script/EnhancedInput.EPlayerMappableKeySettingBehaviors;PlayerMappableKeySettings:ObjectProperty:0:/Script/EnhancedInput.PlayerMappableKeySettings;\};ReturnValue:NameProperty:1408;")]
 def ue_enhanced_api_GetMappingName(arg_actionkeymapping : S_EnhancedActionKeyMapping_bbfb2051) : UEName {
     let call = ue_begin_static_call("/Script/EnhancedInput.EnhancedInputLibrary", "GetMappingName", "")
     ue_expect_signature(call, "v1;GetMappingName;ActionKeyMapping:StructProperty:134218114:/Script/EnhancedInput.EnhancedActionKeyMapping\{Triggers:ArrayProperty:0[Triggers:ObjectProperty:0:/Script/EnhancedInput.InputTrigger;];Modifiers:ArrayProperty:0[Modifiers:ObjectProperty:0:/Script/EnhancedInput.InputModifier;];Action:ObjectProperty:0:/Script/EnhancedInput.InputAction;Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShouldBeIgnored:BoolProperty:0;bHasAlwaysTickTrigger:BoolProperty:0;SettingBehavior:EnumProperty:0:/Script/EnhancedInput.EPlayerMappableKeySettingBehaviors;PlayerMappableKeySettings:ObjectProperty:0:/Script/EnhancedInput.PlayerMappableKeySettings;\};ReturnValue:NameProperty:1408;")
@@ -2780,6 +2785,7 @@ def ue_enhanced_api_GetMappingName(arg_actionkeymapping : S_EnhancedActionKeyMap
     return result
 }
 
+[ue_reflected_call(owner="/Script/EnhancedInput.EnhancedInputLibrary", method="GetPlayerMappableKeySettings", signature="v1;GetPlayerMappableKeySettings;ActionKeyMapping:StructProperty:134218114:/Script/EnhancedInput.EnhancedActionKeyMapping\{Triggers:ArrayProperty:0[Triggers:ObjectProperty:0:/Script/EnhancedInput.InputTrigger;];Modifiers:ArrayProperty:0[Modifiers:ObjectProperty:0:/Script/EnhancedInput.InputModifier;];Action:ObjectProperty:0:/Script/EnhancedInput.InputAction;Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShouldBeIgnored:BoolProperty:0;bHasAlwaysTickTrigger:BoolProperty:0;SettingBehavior:EnumProperty:0:/Script/EnhancedInput.EPlayerMappableKeySettingBehaviors;PlayerMappableKeySettings:ObjectProperty:0:/Script/EnhancedInput.PlayerMappableKeySettings;\};ReturnValue:ObjectProperty:1408:/Script/EnhancedInput.PlayerMappableKeySettings;")]
 def ue_enhanced_api_GetPlayerMappableKeySettings(arg_actionkeymapping : S_EnhancedActionKeyMapping_bbfb2051) : C_PlayerMappableKeySettings_585857fd {
     let call = ue_begin_static_call("/Script/EnhancedInput.EnhancedInputLibrary", "GetPlayerMappableKeySettings", "")
     ue_expect_signature(call, "v1;GetPlayerMappableKeySettings;ActionKeyMapping:StructProperty:134218114:/Script/EnhancedInput.EnhancedActionKeyMapping\{Triggers:ArrayProperty:0[Triggers:ObjectProperty:0:/Script/EnhancedInput.InputTrigger;];Modifiers:ArrayProperty:0[Modifiers:ObjectProperty:0:/Script/EnhancedInput.InputModifier;];Action:ObjectProperty:0:/Script/EnhancedInput.InputAction;Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShouldBeIgnored:BoolProperty:0;bHasAlwaysTickTrigger:BoolProperty:0;SettingBehavior:EnumProperty:0:/Script/EnhancedInput.EPlayerMappableKeySettingBehaviors;PlayerMappableKeySettings:ObjectProperty:0:/Script/EnhancedInput.PlayerMappableKeySettings;\};ReturnValue:ObjectProperty:1408:/Script/EnhancedInput.PlayerMappableKeySettings;")
@@ -2804,6 +2810,7 @@ def ue_enhanced_api_GetPlayerMappableKeySettings(arg_actionkeymapping : S_Enhanc
     return result
 }
 
+[ue_reflected_call(owner="/Script/EnhancedInput.EnhancedInputLibrary", method="IsActionKeyMappingPlayerMappable", signature="v1;IsActionKeyMappingPlayerMappable;ActionKeyMapping:StructProperty:134218114:/Script/EnhancedInput.EnhancedActionKeyMapping\{Triggers:ArrayProperty:0[Triggers:ObjectProperty:0:/Script/EnhancedInput.InputTrigger;];Modifiers:ArrayProperty:0[Modifiers:ObjectProperty:0:/Script/EnhancedInput.InputModifier;];Action:ObjectProperty:0:/Script/EnhancedInput.InputAction;Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShouldBeIgnored:BoolProperty:0;bHasAlwaysTickTrigger:BoolProperty:0;SettingBehavior:EnumProperty:0:/Script/EnhancedInput.EPlayerMappableKeySettingBehaviors;PlayerMappableKeySettings:ObjectProperty:0:/Script/EnhancedInput.PlayerMappableKeySettings;\};ReturnValue:BoolProperty:1408;")]
 def ue_enhanced_api_IsActionKeyMappingPlayerMappable(arg_actionkeymapping : S_EnhancedActionKeyMapping_bbfb2051) : bool {
     let call = ue_begin_static_call("/Script/EnhancedInput.EnhancedInputLibrary", "IsActionKeyMappingPlayerMappable", "")
     ue_expect_signature(call, "v1;IsActionKeyMappingPlayerMappable;ActionKeyMapping:StructProperty:134218114:/Script/EnhancedInput.EnhancedActionKeyMapping\{Triggers:ArrayProperty:0[Triggers:ObjectProperty:0:/Script/EnhancedInput.InputTrigger;];Modifiers:ArrayProperty:0[Modifiers:ObjectProperty:0:/Script/EnhancedInput.InputModifier;];Action:ObjectProperty:0:/Script/EnhancedInput.InputAction;Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShouldBeIgnored:BoolProperty:0;bHasAlwaysTickTrigger:BoolProperty:0;SettingBehavior:EnumProperty:0:/Script/EnhancedInput.EPlayerMappableKeySettingBehaviors;PlayerMappableKeySettings:ObjectProperty:0:/Script/EnhancedInput.PlayerMappableKeySettings;\};ReturnValue:BoolProperty:1408;")
@@ -2828,6 +2835,7 @@ def ue_enhanced_api_IsActionKeyMappingPlayerMappable(arg_actionkeymapping : S_En
     return result
 }
 
+[ue_reflected_call(owner="/Script/EnhancedInput.EnhancedInputLibrary", method="MakeInputActionValueOfType", signature="v1;MakeInputActionValueOfType;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ValueType:EnumProperty:130:/Script/EnhancedInput.EInputActionValueType;ReturnValue:StructProperty:1408:/Script/EnhancedInput.InputActionValue\{\};")]
 def ue_enhanced_api_MakeInputActionValueOfType(arg_x : double; arg_y : double; arg_z : double; arg_valuetype : E_EInputActionValueType_9254fc67) : InputActionValue {
     let call = ue_begin_static_call("/Script/EnhancedInput.EnhancedInputLibrary", "MakeInputActionValueOfType", "")
     ue_expect_signature(call, "v1;MakeInputActionValueOfType;X:DoubleProperty:128;Y:DoubleProperty:128;Z:DoubleProperty:128;ValueType:EnumProperty:130:/Script/EnhancedInput.EInputActionValueType;ReturnValue:StructProperty:1408:/Script/EnhancedInput.InputActionValue\{\};")
@@ -2842,6 +2850,7 @@ def ue_enhanced_api_MakeInputActionValueOfType(arg_x : double; arg_y : double; a
     return result
 }
 
+[ue_reflected_call(owner="/Script/EnhancedInput.EnhancedInputLibrary", method="RequestRebuildControlMappingsUsingContext", signature="v1;RequestRebuildControlMappingsUsingContext;Context:ObjectProperty:130:/Script/EnhancedInput.InputMappingContext;bForceImmediately:BoolProperty:128;")]
 def ue_enhanced_api_RequestRebuildControlMappingsUsingContext(arg_context : C_InputMappingContext_05da3ade; arg_bforceimmediately : bool) {
     let call = ue_begin_static_call("/Script/EnhancedInput.EnhancedInputLibrary", "RequestRebuildControlMappingsUsingContext", "")
     ue_expect_signature(call, "v1;RequestRebuildControlMappingsUsingContext;Context:ObjectProperty:130:/Script/EnhancedInput.InputMappingContext;bForceImmediately:BoolProperty:128;")
@@ -3043,6 +3052,7 @@ def ue_image_SetOpacity(target : C_Image_61e460fb; arg_inopacity : float) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="CalibrateTilt", signature="v1;CalibrateTilt;")]
 def ue_input_key_CalibrateTilt() {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "CalibrateTilt", "")
     ue_expect_signature(call, "v1;CalibrateTilt;")
@@ -3051,6 +3061,7 @@ def ue_input_key_CalibrateTilt() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="EqualEqual_InputChordInputChord", signature="v1;EqualEqual_InputChordInputChord;A:StructProperty:128:/Script/Slate.InputChord\{Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShift:BoolProperty:0;bCtrl:BoolProperty:0;bAlt:BoolProperty:0;bCmd:BoolProperty:0;\};B:StructProperty:128:/Script/Slate.InputChord\{Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShift:BoolProperty:0;bCtrl:BoolProperty:0;bAlt:BoolProperty:0;bCmd:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_EqualEqual_InputChordInputChord(arg_a : S_InputChord_72a2a539; arg_b : S_InputChord_72a2a539) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "EqualEqual_InputChordInputChord", "")
     ue_expect_signature(call, "v1;EqualEqual_InputChordInputChord;A:StructProperty:128:/Script/Slate.InputChord\{Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShift:BoolProperty:0;bCtrl:BoolProperty:0;bAlt:BoolProperty:0;bCmd:BoolProperty:0;\};B:StructProperty:128:/Script/Slate.InputChord\{Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShift:BoolProperty:0;bCtrl:BoolProperty:0;bAlt:BoolProperty:0;bCmd:BoolProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3071,6 +3082,7 @@ def ue_input_key_EqualEqual_InputChordInputChord(arg_a : S_InputChord_72a2a539; 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="EqualEqual_KeyKey", signature="v1;EqualEqual_KeyKey;A:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};B:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_EqualEqual_KeyKey(arg_a : S_Key_a8a0a14c; arg_b : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "EqualEqual_KeyKey", "")
     ue_expect_signature(call, "v1;EqualEqual_KeyKey;A:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};B:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3083,6 +3095,7 @@ def ue_input_key_EqualEqual_KeyKey(arg_a : S_Key_a8a0a14c; arg_b : S_Key_a8a0a14
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="GetAnalogValue", signature="v1;GetAnalogValue;Input:StructProperty:134218114:/Script/SlateCore.AnalogInputEvent\{\};ReturnValue:FloatProperty:1408;")]
 def ue_input_key_GetAnalogValue(arg_input : UEAnalogInputEvent) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "GetAnalogValue", "")
     ue_expect_signature(call, "v1;GetAnalogValue;Input:StructProperty:134218114:/Script/SlateCore.AnalogInputEvent\{\};ReturnValue:FloatProperty:1408;")
@@ -3094,6 +3107,7 @@ def ue_input_key_GetAnalogValue(arg_input : UEAnalogInputEvent) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="GetKey", signature="v1;GetKey;Input:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:StructProperty:1408:/Script/InputCore.Key\{KeyName:NameProperty:0;\};")]
 def ue_input_key_GetKey(arg_input : UEKeyEvent) : S_Key_a8a0a14c {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "GetKey", "")
     ue_expect_signature(call, "v1;GetKey;Input:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:StructProperty:1408:/Script/InputCore.Key\{KeyName:NameProperty:0;\};")
@@ -3105,6 +3119,7 @@ def ue_input_key_GetKey(arg_input : UEKeyEvent) : S_Key_a8a0a14c {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="GetModifierKeysState", signature="v1;GetModifierKeysState;ReturnValue:StructProperty:1408:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};")]
 def ue_input_key_GetModifierKeysState() : S_SlateModifierKeysState_586c3eb8 {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "GetModifierKeysState", "")
     ue_expect_signature(call, "v1;GetModifierKeysState;ReturnValue:StructProperty:1408:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};")
@@ -3115,6 +3130,7 @@ def ue_input_key_GetModifierKeysState() : S_SlateModifierKeysState_586c3eb8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="GetUserIndex", signature="v1;GetUserIndex;Input:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:IntProperty:1408;")]
 def ue_input_key_GetUserIndex(arg_input : UEKeyEvent) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "GetUserIndex", "")
     ue_expect_signature(call, "v1;GetUserIndex;Input:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:IntProperty:1408;")
@@ -3126,6 +3142,7 @@ def ue_input_key_GetUserIndex(arg_input : UEKeyEvent) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputChord_GetDisplayName", signature="v1;InputChord_GetDisplayName;Key:StructProperty:134218114:/Script/Slate.InputChord\{Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShift:BoolProperty:0;bCtrl:BoolProperty:0;bAlt:BoolProperty:0;bCmd:BoolProperty:0;\};ReturnValue:TextProperty:1408;")]
 def ue_input_key_InputChord_GetDisplayName(arg_key : S_InputChord_72a2a539) : UETextValue {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputChord_GetDisplayName", "")
     ue_expect_signature(call, "v1;InputChord_GetDisplayName;Key:StructProperty:134218114:/Script/Slate.InputChord\{Key:StructProperty:0:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bShift:BoolProperty:0;bCtrl:BoolProperty:0;bAlt:BoolProperty:0;bCmd:BoolProperty:0;\};ReturnValue:TextProperty:1408;")
@@ -3141,6 +3158,7 @@ def ue_input_key_InputChord_GetDisplayName(arg_key : S_InputChord_72a2a539) : UE
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsAltDown", signature="v1;InputEvent_IsAltDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsAltDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsAltDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsAltDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3152,6 +3170,7 @@ def ue_input_key_InputEvent_IsAltDown(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsCommandDown", signature="v1;InputEvent_IsCommandDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsCommandDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsCommandDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsCommandDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3163,6 +3182,7 @@ def ue_input_key_InputEvent_IsCommandDown(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsControlDown", signature="v1;InputEvent_IsControlDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsControlDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsControlDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsControlDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3174,6 +3194,7 @@ def ue_input_key_InputEvent_IsControlDown(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsLeftAltDown", signature="v1;InputEvent_IsLeftAltDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsLeftAltDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsLeftAltDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsLeftAltDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3185,6 +3206,7 @@ def ue_input_key_InputEvent_IsLeftAltDown(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsLeftCommandDown", signature="v1;InputEvent_IsLeftCommandDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsLeftCommandDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsLeftCommandDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsLeftCommandDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3196,6 +3218,7 @@ def ue_input_key_InputEvent_IsLeftCommandDown(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsLeftControlDown", signature="v1;InputEvent_IsLeftControlDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsLeftControlDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsLeftControlDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsLeftControlDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3207,6 +3230,7 @@ def ue_input_key_InputEvent_IsLeftControlDown(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsLeftShiftDown", signature="v1;InputEvent_IsLeftShiftDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsLeftShiftDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsLeftShiftDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsLeftShiftDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3218,6 +3242,7 @@ def ue_input_key_InputEvent_IsLeftShiftDown(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsRepeat", signature="v1;InputEvent_IsRepeat;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsRepeat(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsRepeat", "")
     ue_expect_signature(call, "v1;InputEvent_IsRepeat;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3229,6 +3254,7 @@ def ue_input_key_InputEvent_IsRepeat(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsRightAltDown", signature="v1;InputEvent_IsRightAltDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsRightAltDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsRightAltDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsRightAltDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3240,6 +3266,7 @@ def ue_input_key_InputEvent_IsRightAltDown(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsRightCommandDown", signature="v1;InputEvent_IsRightCommandDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsRightCommandDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsRightCommandDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsRightCommandDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3251,6 +3278,7 @@ def ue_input_key_InputEvent_IsRightCommandDown(arg_input : UEInputEvent) : bool 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsRightControlDown", signature="v1;InputEvent_IsRightControlDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsRightControlDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsRightControlDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsRightControlDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3262,6 +3290,7 @@ def ue_input_key_InputEvent_IsRightControlDown(arg_input : UEInputEvent) : bool 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsRightShiftDown", signature="v1;InputEvent_IsRightShiftDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsRightShiftDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsRightShiftDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsRightShiftDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3273,6 +3302,7 @@ def ue_input_key_InputEvent_IsRightShiftDown(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="InputEvent_IsShiftDown", signature="v1;InputEvent_IsShiftDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_InputEvent_IsShiftDown(arg_input : UEInputEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "InputEvent_IsShiftDown", "")
     ue_expect_signature(call, "v1;InputEvent_IsShiftDown;Input:StructProperty:134218114:/Script/SlateCore.InputEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3284,6 +3314,7 @@ def ue_input_key_InputEvent_IsShiftDown(arg_input : UEInputEvent) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_GetDisplayName", signature="v1;Key_GetDisplayName;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bLongDisplayName:BoolProperty:128;ReturnValue:TextProperty:1408;")]
 def ue_input_key_Key_GetDisplayName(arg_key : S_Key_a8a0a14c; arg_blongdisplayname : bool) : UETextValue {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_GetDisplayName", "")
     ue_expect_signature(call, "v1;Key_GetDisplayName;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};bLongDisplayName:BoolProperty:128;ReturnValue:TextProperty:1408;")
@@ -3296,6 +3327,7 @@ def ue_input_key_Key_GetDisplayName(arg_key : S_Key_a8a0a14c; arg_blongdisplayna
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_GetNavigationActionFromKey", signature="v1;Key_GetNavigationActionFromKey;InKeyEvent:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:EnumProperty:1408:/Script/SlateCore.EUINavigationAction;")]
 def ue_input_key_Key_GetNavigationActionFromKey(arg_inkeyevent : UEKeyEvent) : E_EUINavigationAction_4a0ae499 {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_GetNavigationActionFromKey", "")
     ue_expect_signature(call, "v1;Key_GetNavigationActionFromKey;InKeyEvent:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:EnumProperty:1408:/Script/SlateCore.EUINavigationAction;")
@@ -3307,6 +3339,7 @@ def ue_input_key_Key_GetNavigationActionFromKey(arg_inkeyevent : UEKeyEvent) : E
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_GetNavigationDirectionFromAnalog", signature="v1;Key_GetNavigationDirectionFromAnalog;InAnalogEvent:StructProperty:134218114:/Script/SlateCore.AnalogInputEvent\{\};ReturnValue:EnumProperty:1408:/Script/SlateCore.EUINavigation;")]
 def ue_input_key_Key_GetNavigationDirectionFromAnalog(arg_inanalogevent : UEAnalogInputEvent) : E_EUINavigation_e4554eeb {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_GetNavigationDirectionFromAnalog", "")
     ue_expect_signature(call, "v1;Key_GetNavigationDirectionFromAnalog;InAnalogEvent:StructProperty:134218114:/Script/SlateCore.AnalogInputEvent\{\};ReturnValue:EnumProperty:1408:/Script/SlateCore.EUINavigation;")
@@ -3318,6 +3351,7 @@ def ue_input_key_Key_GetNavigationDirectionFromAnalog(arg_inanalogevent : UEAnal
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_GetNavigationDirectionFromKey", signature="v1;Key_GetNavigationDirectionFromKey;InKeyEvent:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:EnumProperty:1408:/Script/SlateCore.EUINavigation;")]
 def ue_input_key_Key_GetNavigationDirectionFromKey(arg_inkeyevent : UEKeyEvent) : E_EUINavigation_e4554eeb {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_GetNavigationDirectionFromKey", "")
     ue_expect_signature(call, "v1;Key_GetNavigationDirectionFromKey;InKeyEvent:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:EnumProperty:1408:/Script/SlateCore.EUINavigation;")
@@ -3329,6 +3363,7 @@ def ue_input_key_Key_GetNavigationDirectionFromKey(arg_inkeyevent : UEKeyEvent) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsAnalog", signature="v1;Key_IsAnalog;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsAnalog(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsAnalog", "")
     ue_expect_signature(call, "v1;Key_IsAnalog;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3340,6 +3375,7 @@ def ue_input_key_Key_IsAnalog(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsAxis1D", signature="v1;Key_IsAxis1D;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsAxis1D(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsAxis1D", "")
     ue_expect_signature(call, "v1;Key_IsAxis1D;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3351,6 +3387,7 @@ def ue_input_key_Key_IsAxis1D(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsAxis2D", signature="v1;Key_IsAxis2D;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsAxis2D(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsAxis2D", "")
     ue_expect_signature(call, "v1;Key_IsAxis2D;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3362,6 +3399,7 @@ def ue_input_key_Key_IsAxis2D(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsAxis3D", signature="v1;Key_IsAxis3D;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsAxis3D(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsAxis3D", "")
     ue_expect_signature(call, "v1;Key_IsAxis3D;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3373,6 +3411,7 @@ def ue_input_key_Key_IsAxis3D(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsButtonAxis", signature="v1;Key_IsButtonAxis;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsButtonAxis(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsButtonAxis", "")
     ue_expect_signature(call, "v1;Key_IsButtonAxis;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3384,6 +3423,7 @@ def ue_input_key_Key_IsButtonAxis(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsDigital", signature="v1;Key_IsDigital;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsDigital(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsDigital", "")
     ue_expect_signature(call, "v1;Key_IsDigital;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3395,6 +3435,7 @@ def ue_input_key_Key_IsDigital(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsGamepadKey", signature="v1;Key_IsGamepadKey;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsGamepadKey(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsGamepadKey", "")
     ue_expect_signature(call, "v1;Key_IsGamepadKey;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3406,6 +3447,7 @@ def ue_input_key_Key_IsGamepadKey(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsKeyboardKey", signature="v1;Key_IsKeyboardKey;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsKeyboardKey(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsKeyboardKey", "")
     ue_expect_signature(call, "v1;Key_IsKeyboardKey;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3417,6 +3459,7 @@ def ue_input_key_Key_IsKeyboardKey(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsModifierKey", signature="v1;Key_IsModifierKey;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsModifierKey(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsModifierKey", "")
     ue_expect_signature(call, "v1;Key_IsModifierKey;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3428,6 +3471,7 @@ def ue_input_key_Key_IsModifierKey(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsMouseButton", signature="v1;Key_IsMouseButton;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsMouseButton(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsMouseButton", "")
     ue_expect_signature(call, "v1;Key_IsMouseButton;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3439,6 +3483,7 @@ def ue_input_key_Key_IsMouseButton(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="Key_IsValid", signature="v1;Key_IsValid;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_Key_IsValid(arg_key : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "Key_IsValid", "")
     ue_expect_signature(call, "v1;Key_IsValid;Key:StructProperty:134218114:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3450,6 +3495,7 @@ def ue_input_key_Key_IsValid(arg_key : S_Key_a8a0a14c) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="ModifierKeysState_IsAltDown", signature="v1;ModifierKeysState_IsAltDown;KeysState:StructProperty:134218114:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_ModifierKeysState_IsAltDown(arg_keysstate : S_SlateModifierKeysState_586c3eb8) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "ModifierKeysState_IsAltDown", "")
     ue_expect_signature(call, "v1;ModifierKeysState_IsAltDown;KeysState:StructProperty:134218114:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3461,6 +3507,7 @@ def ue_input_key_ModifierKeysState_IsAltDown(arg_keysstate : S_SlateModifierKeys
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="ModifierKeysState_IsCommandDown", signature="v1;ModifierKeysState_IsCommandDown;KeysState:StructProperty:134218114:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_ModifierKeysState_IsCommandDown(arg_keysstate : S_SlateModifierKeysState_586c3eb8) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "ModifierKeysState_IsCommandDown", "")
     ue_expect_signature(call, "v1;ModifierKeysState_IsCommandDown;KeysState:StructProperty:134218114:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3472,6 +3519,7 @@ def ue_input_key_ModifierKeysState_IsCommandDown(arg_keysstate : S_SlateModifier
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="ModifierKeysState_IsControlDown", signature="v1;ModifierKeysState_IsControlDown;KeysState:StructProperty:134218114:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_ModifierKeysState_IsControlDown(arg_keysstate : S_SlateModifierKeysState_586c3eb8) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "ModifierKeysState_IsControlDown", "")
     ue_expect_signature(call, "v1;ModifierKeysState_IsControlDown;KeysState:StructProperty:134218114:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3483,6 +3531,7 @@ def ue_input_key_ModifierKeysState_IsControlDown(arg_keysstate : S_SlateModifier
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="ModifierKeysState_IsShiftDown", signature="v1;ModifierKeysState_IsShiftDown;KeysState:StructProperty:134218114:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_ModifierKeysState_IsShiftDown(arg_keysstate : S_SlateModifierKeysState_586c3eb8) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "ModifierKeysState_IsShiftDown", "")
     ue_expect_signature(call, "v1;ModifierKeysState_IsShiftDown;KeysState:StructProperty:134218114:/Script/Engine.SlateModifierKeysState\{ModifierKeysStateMask:ByteProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3494,6 +3543,7 @@ def ue_input_key_ModifierKeysState_IsShiftDown(arg_keysstate : S_SlateModifierKe
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_GetCursorDelta", signature="v1;PointerEvent_GetCursorDelta;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_input_key_PointerEvent_GetCursorDelta(arg_input : UEPointerEvent) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetCursorDelta", "")
     ue_expect_signature(call, "v1;PointerEvent_GetCursorDelta;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -3505,6 +3555,7 @@ def ue_input_key_PointerEvent_GetCursorDelta(arg_input : UEPointerEvent) : UEVec
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_GetEffectingButton", signature="v1;PointerEvent_GetEffectingButton;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/InputCore.Key\{KeyName:NameProperty:0;\};")]
 def ue_input_key_PointerEvent_GetEffectingButton(arg_input : UEPointerEvent) : S_Key_a8a0a14c {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetEffectingButton", "")
     ue_expect_signature(call, "v1;PointerEvent_GetEffectingButton;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/InputCore.Key\{KeyName:NameProperty:0;\};")
@@ -3516,6 +3567,7 @@ def ue_input_key_PointerEvent_GetEffectingButton(arg_input : UEPointerEvent) : S
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_GetGestureDelta", signature="v1;PointerEvent_GetGestureDelta;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_input_key_PointerEvent_GetGestureDelta(arg_input : UEPointerEvent) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetGestureDelta", "")
     ue_expect_signature(call, "v1;PointerEvent_GetGestureDelta;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -3527,6 +3579,7 @@ def ue_input_key_PointerEvent_GetGestureDelta(arg_input : UEPointerEvent) : UEVe
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_GetGestureType", signature="v1;PointerEvent_GetGestureType;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:EnumProperty:1408:/Script/Engine.ESlateGesture;")]
 def ue_input_key_PointerEvent_GetGestureType(arg_input : UEPointerEvent) : E_ESlateGesture_2bc39bcf {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetGestureType", "")
     ue_expect_signature(call, "v1;PointerEvent_GetGestureType;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:EnumProperty:1408:/Script/Engine.ESlateGesture;")
@@ -3538,6 +3591,7 @@ def ue_input_key_PointerEvent_GetGestureType(arg_input : UEPointerEvent) : E_ESl
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_GetLastScreenSpacePosition", signature="v1;PointerEvent_GetLastScreenSpacePosition;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_input_key_PointerEvent_GetLastScreenSpacePosition(arg_input : UEPointerEvent) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetLastScreenSpacePosition", "")
     ue_expect_signature(call, "v1;PointerEvent_GetLastScreenSpacePosition;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -3549,6 +3603,7 @@ def ue_input_key_PointerEvent_GetLastScreenSpacePosition(arg_input : UEPointerEv
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_GetPointerIndex", signature="v1;PointerEvent_GetPointerIndex;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:IntProperty:1408;")]
 def ue_input_key_PointerEvent_GetPointerIndex(arg_input : UEPointerEvent) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetPointerIndex", "")
     ue_expect_signature(call, "v1;PointerEvent_GetPointerIndex;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:IntProperty:1408;")
@@ -3560,6 +3615,7 @@ def ue_input_key_PointerEvent_GetPointerIndex(arg_input : UEPointerEvent) : int 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_GetScreenSpacePosition", signature="v1;PointerEvent_GetScreenSpacePosition;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_input_key_PointerEvent_GetScreenSpacePosition(arg_input : UEPointerEvent) : UEVector2D {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetScreenSpacePosition", "")
     ue_expect_signature(call, "v1;PointerEvent_GetScreenSpacePosition;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -3571,6 +3627,7 @@ def ue_input_key_PointerEvent_GetScreenSpacePosition(arg_input : UEPointerEvent)
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_GetTouchpadIndex", signature="v1;PointerEvent_GetTouchpadIndex;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:IntProperty:1408;")]
 def ue_input_key_PointerEvent_GetTouchpadIndex(arg_input : UEPointerEvent) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetTouchpadIndex", "")
     ue_expect_signature(call, "v1;PointerEvent_GetTouchpadIndex;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:IntProperty:1408;")
@@ -3582,6 +3639,7 @@ def ue_input_key_PointerEvent_GetTouchpadIndex(arg_input : UEPointerEvent) : int
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_GetUserIndex", signature="v1;PointerEvent_GetUserIndex;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:IntProperty:1408;")]
 def ue_input_key_PointerEvent_GetUserIndex(arg_input : UEPointerEvent) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetUserIndex", "")
     ue_expect_signature(call, "v1;PointerEvent_GetUserIndex;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:IntProperty:1408;")
@@ -3593,6 +3651,7 @@ def ue_input_key_PointerEvent_GetUserIndex(arg_input : UEPointerEvent) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_GetWheelDelta", signature="v1;PointerEvent_GetWheelDelta;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:FloatProperty:1408;")]
 def ue_input_key_PointerEvent_GetWheelDelta(arg_input : UEPointerEvent) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_GetWheelDelta", "")
     ue_expect_signature(call, "v1;PointerEvent_GetWheelDelta;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:FloatProperty:1408;")
@@ -3604,6 +3663,7 @@ def ue_input_key_PointerEvent_GetWheelDelta(arg_input : UEPointerEvent) : float 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_IsMouseButtonDown", signature="v1;PointerEvent_IsMouseButtonDown;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};MouseButton:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_PointerEvent_IsMouseButtonDown(arg_input : UEPointerEvent; arg_mousebutton : S_Key_a8a0a14c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_IsMouseButtonDown", "")
     ue_expect_signature(call, "v1;PointerEvent_IsMouseButtonDown;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};MouseButton:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -3616,6 +3676,7 @@ def ue_input_key_PointerEvent_IsMouseButtonDown(arg_input : UEPointerEvent; arg_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetInputLibrary", method="PointerEvent_IsTouchEvent", signature="v1;PointerEvent_IsTouchEvent;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:BoolProperty:1408;")]
 def ue_input_key_PointerEvent_IsTouchEvent(arg_input : UEPointerEvent) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetInputLibrary", "PointerEvent_IsTouchEvent", "")
     ue_expect_signature(call, "v1;PointerEvent_IsTouchEvent;Input:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:BoolProperty:1408;")
@@ -3727,6 +3788,7 @@ def ue_input_settings_GetAxisNames(target : C_InputSettings_77d10dfe) : array<UE
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.InputSettings", method="GetInputSettings", signature="v1;GetInputSettings;ReturnValue:ObjectProperty:1408:/Script/Engine.InputSettings;")]
 def ue_input_settings_GetInputSettings() : C_InputSettings_77d10dfe {
     let call = ue_begin_static_call("/Script/Engine.InputSettings", "GetInputSettings", "")
     ue_expect_signature(call, "v1;GetInputSettings;ReturnValue:ObjectProperty:1408:/Script/Engine.InputSettings;")
@@ -4763,6 +4825,7 @@ def ue_text_block_SetTextTransformPolicy(target : C_TextBlock_d2a443cc; arg_intr
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="CancelDragDrop", signature="v1;CancelDragDrop;")]
 def ue_ui_CancelDragDrop() {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "CancelDragDrop", "")
     ue_expect_signature(call, "v1;CancelDragDrop;")
@@ -4776,6 +4839,7 @@ struct ue_ui_CaptureMouse_Result {
     out_returnvalue : UEEventReply
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="CaptureMouse", signature="v1;CaptureMouse;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};CapturingWidget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_CaptureMouse(arg_reply : UEEventReply; arg_capturingwidget : C_Widget_f2421369) : ue_ui_CaptureMouse_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "CaptureMouse", "")
     ue_expect_signature(call, "v1;CaptureMouse;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};CapturingWidget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -4793,6 +4857,7 @@ struct ue_ui_ClearUserFocus_Result {
     out_returnvalue : UEEventReply
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="ClearUserFocus", signature="v1;ClearUserFocus;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};bInAllUsers:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_ClearUserFocus(arg_reply : UEEventReply; arg_binallusers : bool) : ue_ui_ClearUserFocus_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "ClearUserFocus", "")
     ue_expect_signature(call, "v1;ClearUserFocus;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};bInAllUsers:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -4810,6 +4875,7 @@ struct ue_ui_DetectDrag_Result {
     out_returnvalue : UEEventReply
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DetectDrag", signature="v1;DetectDrag;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};WidgetDetectingDrag:ObjectProperty:128:/Script/UMG.Widget;DragKey:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_DetectDrag(arg_reply : UEEventReply; arg_widgetdetectingdrag : C_Widget_f2421369; arg_dragkey : S_Key_a8a0a14c) : ue_ui_DetectDrag_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DetectDrag", "")
     ue_expect_signature(call, "v1;DetectDrag;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};WidgetDetectingDrag:ObjectProperty:128:/Script/UMG.Widget;DragKey:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -4823,6 +4889,7 @@ def ue_ui_DetectDrag(arg_reply : UEEventReply; arg_widgetdetectingdrag : C_Widge
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DetectDragIfPressed", signature="v1;DetectDragIfPressed;PointerEvent:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};WidgetDetectingDrag:ObjectProperty:128:/Script/UMG.Widget;DragKey:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_DetectDragIfPressed(arg_pointerevent : UEPointerEvent; arg_widgetdetectingdrag : C_Widget_f2421369; arg_dragkey : S_Key_a8a0a14c) : UEEventReply {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DetectDragIfPressed", "")
     ue_expect_signature(call, "v1;DetectDragIfPressed;PointerEvent:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};WidgetDetectingDrag:ObjectProperty:128:/Script/UMG.Widget;DragKey:StructProperty:128:/Script/InputCore.Key\{KeyName:NameProperty:0;\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -4836,6 +4903,7 @@ def ue_ui_DetectDragIfPressed(arg_pointerevent : UEPointerEvent; arg_widgetdetec
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DismissAllMenus", signature="v1;DismissAllMenus;")]
 def ue_ui_DismissAllMenus() {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DismissAllMenus", "")
     ue_expect_signature(call, "v1;DismissAllMenus;")
@@ -4844,6 +4912,7 @@ def ue_ui_DismissAllMenus() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DrawBox", signature="v1;DrawBox;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Position:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Size:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Brush:ObjectProperty:128:/Script/Engine.SlateBrushAsset;Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_ui_DrawBox(arg_context : UEPaintContext; arg_position : UEVector2D; arg_size : UEVector2D; arg_brush : C_SlateBrushAsset_c9451dbb; arg_tint : S_LinearColor_f4abb14b) : UEPaintContext {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawBox", "")
     ue_expect_signature(call, "v1;DrawBox;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Position:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Size:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Brush:ObjectProperty:128:/Script/Engine.SlateBrushAsset;Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -4862,6 +4931,7 @@ def ue_ui_DrawBox(arg_context : UEPaintContext; arg_position : UEVector2D; arg_s
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DrawLine", signature="v1;DrawLine;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};PositionA:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};PositionB:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bAntiAlias:BoolProperty:128;Thickness:FloatProperty:128;")]
 def ue_ui_DrawLine(arg_context : UEPaintContext; arg_positiona : UEVector2D; arg_positionb : UEVector2D; arg_tint : S_LinearColor_f4abb14b; arg_bantialias : bool; arg_thickness : float) : UEPaintContext {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawLine", "")
     ue_expect_signature(call, "v1;DrawLine;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};PositionA:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};PositionB:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bAntiAlias:BoolProperty:128;Thickness:FloatProperty:128;")
@@ -4881,6 +4951,7 @@ def ue_ui_DrawLine(arg_context : UEPaintContext; arg_positiona : UEVector2D; arg
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DrawLines", signature="v1;DrawLines;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Points:ArrayProperty:134218114[Points:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};];Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bAntiAlias:BoolProperty:128;Thickness:FloatProperty:128;")]
 def ue_ui_DrawLines(arg_context : UEPaintContext; arg_points : array<UEVector2D>; arg_tint : S_LinearColor_f4abb14b; arg_bantialias : bool; arg_thickness : float) : UEPaintContext {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawLines", "")
     ue_expect_signature(call, "v1;DrawLines;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Points:ArrayProperty:134218114[Points:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};];Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bAntiAlias:BoolProperty:128;Thickness:FloatProperty:128;")
@@ -4902,6 +4973,7 @@ def ue_ui_DrawLines(arg_context : UEPaintContext; arg_points : array<UEVector2D>
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DrawSpline", signature="v1;DrawSpline;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Start:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};StartDir:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};End:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};EndDir:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Thickness:FloatProperty:128;")]
 def ue_ui_DrawSpline(arg_context : UEPaintContext; arg_start : UEVector2D; arg_startdir : UEVector2D; arg_end : UEVector2D; arg_enddir : UEVector2D; arg_tint : S_LinearColor_f4abb14b; arg_thickness : float) : UEPaintContext {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawSpline", "")
     ue_expect_signature(call, "v1;DrawSpline;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Start:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};StartDir:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};End:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};EndDir:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Thickness:FloatProperty:128;")
@@ -4922,6 +4994,7 @@ def ue_ui_DrawSpline(arg_context : UEPaintContext; arg_start : UEVector2D; arg_s
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DrawTextFormatted", signature="v1;DrawTextFormatted;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Text:TextProperty:134218114;Position:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Font:ObjectProperty:128:/Script/Engine.Font;FontSize:FloatProperty:128;FontTypeFace:NameProperty:128;Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
 def ue_ui_DrawTextFormatted(arg_context : UEPaintContext; arg_text : UETextValue; arg_position : UEVector2D; arg_font : C_Font_684a8ec8; arg_fontsize : float; arg_fonttypeface : UEName; arg_tint : S_LinearColor_f4abb14b) : UEPaintContext {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawTextFormatted", "")
     ue_expect_signature(call, "v1;DrawTextFormatted;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Text:TextProperty:134218114;Position:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Font:ObjectProperty:128:/Script/Engine.Font;FontSize:FloatProperty:128;FontTypeFace:NameProperty:128;Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
@@ -4947,6 +5020,7 @@ struct ue_ui_EndDragDrop_Result {
     out_returnvalue : UEEventReply
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="EndDragDrop", signature="v1;EndDragDrop;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_EndDragDrop(arg_reply : UEEventReply) : ue_ui_EndDragDrop_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "EndDragDrop", "")
     ue_expect_signature(call, "v1;EndDragDrop;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -4958,6 +5032,7 @@ def ue_ui_EndDragDrop(arg_reply : UEEventReply) : ue_ui_EndDragDrop_Result {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetAllWidgetsOfClass", signature="v1;GetAllWidgetsOfClass;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FoundWidgets:ArrayProperty:384[FoundWidgets:ObjectProperty:0:/Script/UMG.UserWidget;];WidgetClass:ClassProperty:128:meta:/Script/UMG.UserWidget;TopLevelOnly:BoolProperty:128;")]
 def ue_ui_GetAllWidgetsOfClass(arg_widgetclass : UEClassHandle; arg_toplevelonly : bool) : array<C_UserWidget_a3d12281> {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetAllWidgetsOfClass", "worldcontextobject")
     ue_expect_signature(call, "v1;GetAllWidgetsOfClass;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FoundWidgets:ArrayProperty:384[FoundWidgets:ObjectProperty:0:/Script/UMG.UserWidget;];WidgetClass:ClassProperty:128:meta:/Script/UMG.UserWidget;TopLevelOnly:BoolProperty:128;")
@@ -4974,6 +5049,7 @@ def ue_ui_GetAllWidgetsOfClass(arg_widgetclass : UEClassHandle; arg_toplevelonly
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetAllWidgetsWithInterface", signature="v1;GetAllWidgetsWithInterface;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FoundWidgets:ArrayProperty:384[FoundWidgets:ObjectProperty:0:/Script/UMG.UserWidget;];Interface:ClassProperty:128:meta:/Script/CoreUObject.Interface;TopLevelOnly:BoolProperty:128;")]
 def ue_ui_GetAllWidgetsWithInterface(arg_interface : UEClassHandle; arg_toplevelonly : bool) : array<C_UserWidget_a3d12281> {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetAllWidgetsWithInterface", "worldcontextobject")
     ue_expect_signature(call, "v1;GetAllWidgetsWithInterface;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FoundWidgets:ArrayProperty:384[FoundWidgets:ObjectProperty:0:/Script/UMG.UserWidget;];Interface:ClassProperty:128:meta:/Script/CoreUObject.Interface;TopLevelOnly:BoolProperty:128;")
@@ -4990,6 +5066,7 @@ def ue_ui_GetAllWidgetsWithInterface(arg_interface : UEClassHandle; arg_toplevel
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetBrushResource", signature="v1;GetBrushResource;Brush:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")]
 def ue_ui_GetBrushResource(arg_brush : S_SlateBrush_e5037ad8) : C_Object_55c3753a {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetBrushResource", "")
     ue_expect_signature(call, "v1;GetBrushResource;Brush:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")
@@ -5040,6 +5117,7 @@ def ue_ui_GetBrushResource(arg_brush : S_SlateBrush_e5037ad8) : C_Object_55c3753
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetBrushResourceAsMaterial", signature="v1;GetBrushResourceAsMaterial;Brush:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.MaterialInterface;")]
 def ue_ui_GetBrushResourceAsMaterial(arg_brush : S_SlateBrush_e5037ad8) : C_MaterialInterface_d64f3063 {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetBrushResourceAsMaterial", "")
     ue_expect_signature(call, "v1;GetBrushResourceAsMaterial;Brush:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.MaterialInterface;")
@@ -5090,6 +5168,7 @@ def ue_ui_GetBrushResourceAsMaterial(arg_brush : S_SlateBrush_e5037ad8) : C_Mate
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetBrushResourceAsTexture2D", signature="v1;GetBrushResourceAsTexture2D;Brush:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.Texture2D;")]
 def ue_ui_GetBrushResourceAsTexture2D(arg_brush : S_SlateBrush_e5037ad8) : C_Texture2D_2db8ea5c {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetBrushResourceAsTexture2D", "")
     ue_expect_signature(call, "v1;GetBrushResourceAsTexture2D;Brush:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.Texture2D;")
@@ -5140,6 +5219,7 @@ def ue_ui_GetBrushResourceAsTexture2D(arg_brush : S_SlateBrush_e5037ad8) : C_Tex
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetDragDroppingContent", signature="v1;GetDragDroppingContent;ReturnValue:ObjectProperty:1408:/Script/UMG.DragDropOperation;")]
 def ue_ui_GetDragDroppingContent() : C_DragDropOperation_d99d6e2d {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetDragDroppingContent", "")
     ue_expect_signature(call, "v1;GetDragDroppingContent;ReturnValue:ObjectProperty:1408:/Script/UMG.DragDropOperation;")
@@ -5155,6 +5235,7 @@ struct ue_ui_GetDynamicMaterial_Result {
     out_returnvalue : C_MaterialInstanceDynamic_65b20eca
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetDynamicMaterial", signature="v1;GetDynamicMaterial;Brush:StructProperty:134218112:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.MaterialInstanceDynamic;")]
 def ue_ui_GetDynamicMaterial(arg_brush : S_SlateBrush_e5037ad8) : ue_ui_GetDynamicMaterial_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetDynamicMaterial", "")
     ue_expect_signature(call, "v1;GetDynamicMaterial;Brush:StructProperty:134218112:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.MaterialInstanceDynamic;")
@@ -5205,6 +5286,7 @@ def ue_ui_GetDynamicMaterial(arg_brush : S_SlateBrush_e5037ad8) : ue_ui_GetDynam
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetInputEventFromCharacterEvent", signature="v1;GetInputEventFromCharacterEvent;Event:StructProperty:134218114:/Script/SlateCore.CharacterEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")]
 def ue_ui_GetInputEventFromCharacterEvent(arg_event : UECharacterEvent) : UEInputEvent {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetInputEventFromCharacterEvent", "")
     ue_expect_signature(call, "v1;GetInputEventFromCharacterEvent;Event:StructProperty:134218114:/Script/SlateCore.CharacterEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")
@@ -5216,6 +5298,7 @@ def ue_ui_GetInputEventFromCharacterEvent(arg_event : UECharacterEvent) : UEInpu
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetInputEventFromKeyEvent", signature="v1;GetInputEventFromKeyEvent;Event:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")]
 def ue_ui_GetInputEventFromKeyEvent(arg_event : UEKeyEvent) : UEInputEvent {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetInputEventFromKeyEvent", "")
     ue_expect_signature(call, "v1;GetInputEventFromKeyEvent;Event:StructProperty:134218114:/Script/SlateCore.KeyEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")
@@ -5227,6 +5310,7 @@ def ue_ui_GetInputEventFromKeyEvent(arg_event : UEKeyEvent) : UEInputEvent {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetInputEventFromNavigationEvent", signature="v1;GetInputEventFromNavigationEvent;Event:StructProperty:134218114:/Script/SlateCore.NavigationEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")]
 def ue_ui_GetInputEventFromNavigationEvent(arg_event : UENavigationEvent) : UEInputEvent {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetInputEventFromNavigationEvent", "")
     ue_expect_signature(call, "v1;GetInputEventFromNavigationEvent;Event:StructProperty:134218114:/Script/SlateCore.NavigationEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")
@@ -5238,6 +5322,7 @@ def ue_ui_GetInputEventFromNavigationEvent(arg_event : UENavigationEvent) : UEIn
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetInputEventFromPointerEvent", signature="v1;GetInputEventFromPointerEvent;Event:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")]
 def ue_ui_GetInputEventFromPointerEvent(arg_event : UEPointerEvent) : UEInputEvent {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetInputEventFromPointerEvent", "")
     ue_expect_signature(call, "v1;GetInputEventFromPointerEvent;Event:StructProperty:134218114:/Script/SlateCore.PointerEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.InputEvent\{\};")
@@ -5249,6 +5334,7 @@ def ue_ui_GetInputEventFromPointerEvent(arg_event : UEPointerEvent) : UEInputEve
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetKeyEventFromAnalogInputEvent", signature="v1;GetKeyEventFromAnalogInputEvent;Event:StructProperty:134218114:/Script/SlateCore.AnalogInputEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.KeyEvent\{\};")]
 def ue_ui_GetKeyEventFromAnalogInputEvent(arg_event : UEAnalogInputEvent) : UEKeyEvent {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetKeyEventFromAnalogInputEvent", "")
     ue_expect_signature(call, "v1;GetKeyEventFromAnalogInputEvent;Event:StructProperty:134218114:/Script/SlateCore.AnalogInputEvent\{\};ReturnValue:StructProperty:1408:/Script/SlateCore.KeyEvent\{\};")
@@ -5266,6 +5352,7 @@ struct ue_ui_GetSafeZonePadding_Result {
     out_spilloverpadding : S_Vector4_420fe7b1
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="GetSafeZonePadding", signature="v1;GetSafeZonePadding;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;SafePadding:StructProperty:384:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};SafePaddingScale:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};SpillOverPadding:StructProperty:384:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
 def ue_ui_GetSafeZonePadding() : ue_ui_GetSafeZonePadding_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetSafeZonePadding", "worldcontextobject")
     ue_expect_signature(call, "v1;GetSafeZonePadding;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;SafePadding:StructProperty:384:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};SafePaddingScale:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};SpillOverPadding:StructProperty:384:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
@@ -5276,6 +5363,7 @@ def ue_ui_GetSafeZonePadding() : ue_ui_GetSafeZonePadding_Result {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="Handled", signature="v1;Handled;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_Handled() : UEEventReply {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "Handled", "")
     ue_expect_signature(call, "v1;Handled;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -5286,6 +5374,7 @@ def ue_ui_Handled() : UEEventReply {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="IsDragDropping", signature="v1;IsDragDropping;ReturnValue:BoolProperty:1408;")]
 def ue_ui_IsDragDropping() : bool {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "IsDragDropping", "")
     ue_expect_signature(call, "v1;IsDragDropping;ReturnValue:BoolProperty:1408;")
@@ -5301,6 +5390,7 @@ struct ue_ui_LockMouse_Result {
     out_returnvalue : UEEventReply
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="LockMouse", signature="v1;LockMouse;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};CapturingWidget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_LockMouse(arg_reply : UEEventReply; arg_capturingwidget : C_Widget_f2421369) : ue_ui_LockMouse_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "LockMouse", "")
     ue_expect_signature(call, "v1;LockMouse;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};CapturingWidget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -5313,6 +5403,7 @@ def ue_ui_LockMouse(arg_reply : UEEventReply; arg_capturingwidget : C_Widget_f24
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="MakeBrushFromAsset", signature="v1;MakeBrushFromAsset;BrushAsset:ObjectProperty:128:/Script/Engine.SlateBrushAsset;ReturnValue:StructProperty:1408:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")]
 def ue_ui_MakeBrushFromAsset(arg_brushasset : C_SlateBrushAsset_c9451dbb) : S_SlateBrush_e5037ad8 {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "MakeBrushFromAsset", "")
     ue_expect_signature(call, "v1;MakeBrushFromAsset;BrushAsset:ObjectProperty:128:/Script/Engine.SlateBrushAsset;ReturnValue:StructProperty:1408:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")
@@ -5324,6 +5415,7 @@ def ue_ui_MakeBrushFromAsset(arg_brushasset : C_SlateBrushAsset_c9451dbb) : S_Sl
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="MakeBrushFromMaterial", signature="v1;MakeBrushFromMaterial;Material:ObjectProperty:128:/Script/Engine.MaterialInterface;Width:IntProperty:128;Height:IntProperty:128;ReturnValue:StructProperty:1408:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")]
 def ue_ui_MakeBrushFromMaterial(arg_material : C_MaterialInterface_d64f3063; arg_width : int; arg_height : int) : S_SlateBrush_e5037ad8 {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "MakeBrushFromMaterial", "")
     ue_expect_signature(call, "v1;MakeBrushFromMaterial;Material:ObjectProperty:128:/Script/Engine.MaterialInterface;Width:IntProperty:128;Height:IntProperty:128;ReturnValue:StructProperty:1408:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")
@@ -5337,6 +5429,7 @@ def ue_ui_MakeBrushFromMaterial(arg_material : C_MaterialInterface_d64f3063; arg
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="MakeBrushFromTexture", signature="v1;MakeBrushFromTexture;Texture:ObjectProperty:128:/Script/Engine.Texture2D;Width:IntProperty:128;Height:IntProperty:128;ReturnValue:StructProperty:1408:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")]
 def ue_ui_MakeBrushFromTexture(arg_texture : C_Texture2D_2db8ea5c; arg_width : int; arg_height : int) : S_SlateBrush_e5037ad8 {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "MakeBrushFromTexture", "")
     ue_expect_signature(call, "v1;MakeBrushFromTexture;Texture:ObjectProperty:128:/Script/Engine.Texture2D;Width:IntProperty:128;Height:IntProperty:128;ReturnValue:StructProperty:1408:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")
@@ -5350,6 +5443,7 @@ def ue_ui_MakeBrushFromTexture(arg_texture : C_Texture2D_2db8ea5c; arg_width : i
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="NoResourceBrush", signature="v1;NoResourceBrush;ReturnValue:StructProperty:1408:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")]
 def ue_ui_NoResourceBrush() : S_SlateBrush_e5037ad8 {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "NoResourceBrush", "")
     ue_expect_signature(call, "v1;NoResourceBrush;ReturnValue:StructProperty:1408:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")
@@ -5365,6 +5459,7 @@ struct ue_ui_ReleaseMouseCapture_Result {
     out_returnvalue : UEEventReply
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="ReleaseMouseCapture", signature="v1;ReleaseMouseCapture;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_ReleaseMouseCapture(arg_reply : UEEventReply) : ue_ui_ReleaseMouseCapture_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "ReleaseMouseCapture", "")
     ue_expect_signature(call, "v1;ReleaseMouseCapture;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -5376,6 +5471,7 @@ def ue_ui_ReleaseMouseCapture(arg_reply : UEEventReply) : ue_ui_ReleaseMouseCapt
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="RestorePreviousWindowTitleBarState", signature="v1;RestorePreviousWindowTitleBarState;")]
 def ue_ui_RestorePreviousWindowTitleBarState() {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "RestorePreviousWindowTitleBarState", "")
     ue_expect_signature(call, "v1;RestorePreviousWindowTitleBarState;")
@@ -5384,6 +5480,7 @@ def ue_ui_RestorePreviousWindowTitleBarState() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetBrushResourceToMaterial", signature="v1;SetBrushResourceToMaterial;Brush:StructProperty:134218112:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};Material:ObjectProperty:128:/Script/Engine.MaterialInterface;")]
 def ue_ui_SetBrushResourceToMaterial(arg_brush : S_SlateBrush_e5037ad8; arg_material : C_MaterialInterface_d64f3063) : S_SlateBrush_e5037ad8 {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetBrushResourceToMaterial", "")
     ue_expect_signature(call, "v1;SetBrushResourceToMaterial;Brush:StructProperty:134218112:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};Material:ObjectProperty:128:/Script/Engine.MaterialInterface;")
@@ -5435,6 +5532,7 @@ def ue_ui_SetBrushResourceToMaterial(arg_brush : S_SlateBrush_e5037ad8; arg_mate
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetBrushResourceToTexture", signature="v1;SetBrushResourceToTexture;Brush:StructProperty:134218112:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};Texture:ObjectProperty:128:/Script/Engine.Texture2D;")]
 def ue_ui_SetBrushResourceToTexture(arg_brush : S_SlateBrush_e5037ad8; arg_texture : C_Texture2D_2db8ea5c) : S_SlateBrush_e5037ad8 {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetBrushResourceToTexture", "")
     ue_expect_signature(call, "v1;SetBrushResourceToTexture;Brush:StructProperty:134218112:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};Texture:ObjectProperty:128:/Script/Engine.Texture2D;")
@@ -5486,6 +5584,7 @@ def ue_ui_SetBrushResourceToTexture(arg_brush : S_SlateBrush_e5037ad8; arg_textu
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetColorVisionDeficiencyType", signature="v1;SetColorVisionDeficiencyType;Type:EnumProperty:128:/Script/SlateCore.EColorVisionDeficiency;Severity:FloatProperty:128;CorrectDeficiency:BoolProperty:128;ShowCorrectionWithDeficiency:BoolProperty:128;")]
 def ue_ui_SetColorVisionDeficiencyType(arg_type : E_EColorVisionDeficiency_befce2c5; arg_severity : float; arg_correctdeficiency : bool; arg_showcorrectionwithdeficiency : bool) {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetColorVisionDeficiencyType", "")
     ue_expect_signature(call, "v1;SetColorVisionDeficiencyType;Type:EnumProperty:128:/Script/SlateCore.EColorVisionDeficiency;Severity:FloatProperty:128;CorrectDeficiency:BoolProperty:128;ShowCorrectionWithDeficiency:BoolProperty:128;")
@@ -5498,6 +5597,7 @@ def ue_ui_SetColorVisionDeficiencyType(arg_type : E_EColorVisionDeficiency_befce
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetFocusToGameViewport", signature="v1;SetFocusToGameViewport;")]
 def ue_ui_SetFocusToGameViewport() {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetFocusToGameViewport", "")
     ue_expect_signature(call, "v1;SetFocusToGameViewport;")
@@ -5506,6 +5606,7 @@ def ue_ui_SetFocusToGameViewport() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetHardwareCursor", signature="v1;SetHardwareCursor;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;CursorShape:ByteProperty:128:/Script/CoreUObject.EMouseCursor;CursorName:NameProperty:128;HotSpot:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_ui_SetHardwareCursor(arg_cursorshape : E_EMouseCursor_322f5ea9; arg_cursorname : UEName; arg_hotspot : UEVector2D) : bool {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetHardwareCursor", "worldcontextobject")
     ue_expect_signature(call, "v1;SetHardwareCursor;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;CursorShape:ByteProperty:128:/Script/CoreUObject.EMouseCursor;CursorName:NameProperty:128;HotSpot:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -5519,6 +5620,7 @@ def ue_ui_SetHardwareCursor(arg_cursorshape : E_EMouseCursor_322f5ea9; arg_curso
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetInputMode_GameAndUIEx", signature="v1;SetInputMode_GameAndUIEx;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;InWidgetToFocus:ObjectProperty:128:/Script/UMG.Widget;InMouseLockMode:EnumProperty:128:/Script/Engine.EMouseLockMode;bHideCursorDuringCapture:BoolProperty:128;bFlushInput:BoolProperty:130;")]
 def ue_ui_SetInputMode_GameAndUIEx(arg_playercontroller : C_PlayerController_fb3d8846; arg_inwidgettofocus : C_Widget_f2421369; arg_inmouselockmode : E_EMouseLockMode_2cbaa146; arg_bhidecursorduringcapture : bool; arg_bflushinput : bool) {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetInputMode_GameAndUIEx", "")
     ue_expect_signature(call, "v1;SetInputMode_GameAndUIEx;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;InWidgetToFocus:ObjectProperty:128:/Script/UMG.Widget;InMouseLockMode:EnumProperty:128:/Script/Engine.EMouseLockMode;bHideCursorDuringCapture:BoolProperty:128;bFlushInput:BoolProperty:130;")
@@ -5532,6 +5634,7 @@ def ue_ui_SetInputMode_GameAndUIEx(arg_playercontroller : C_PlayerController_fb3
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetInputMode_GameOnly", signature="v1;SetInputMode_GameOnly;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;bFlushInput:BoolProperty:130;")]
 def ue_ui_SetInputMode_GameOnly(arg_playercontroller : C_PlayerController_fb3d8846; arg_bflushinput : bool) {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetInputMode_GameOnly", "")
     ue_expect_signature(call, "v1;SetInputMode_GameOnly;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;bFlushInput:BoolProperty:130;")
@@ -5542,6 +5645,7 @@ def ue_ui_SetInputMode_GameOnly(arg_playercontroller : C_PlayerController_fb3d88
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetInputMode_UIOnlyEx", signature="v1;SetInputMode_UIOnlyEx;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;InWidgetToFocus:ObjectProperty:128:/Script/UMG.Widget;InMouseLockMode:EnumProperty:128:/Script/Engine.EMouseLockMode;bFlushInput:BoolProperty:130;")]
 def ue_ui_SetInputMode_UIOnlyEx(arg_playercontroller : C_PlayerController_fb3d8846; arg_inwidgettofocus : C_Widget_f2421369; arg_inmouselockmode : E_EMouseLockMode_2cbaa146; arg_bflushinput : bool) {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetInputMode_UIOnlyEx", "")
     ue_expect_signature(call, "v1;SetInputMode_UIOnlyEx;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;InWidgetToFocus:ObjectProperty:128:/Script/UMG.Widget;InMouseLockMode:EnumProperty:128:/Script/Engine.EMouseLockMode;bFlushInput:BoolProperty:130;")
@@ -5559,6 +5663,7 @@ struct ue_ui_SetMousePosition_Result {
     out_returnvalue : UEEventReply
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetMousePosition", signature="v1;SetMousePosition;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};NewMousePosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_SetMousePosition(arg_reply : UEEventReply; arg_newmouseposition : UEVector2D) : ue_ui_SetMousePosition_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetMousePosition", "")
     ue_expect_signature(call, "v1;SetMousePosition;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};NewMousePosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -5576,6 +5681,7 @@ struct ue_ui_SetUserFocus_Result {
     out_returnvalue : UEEventReply
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetUserFocus", signature="v1;SetUserFocus;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};FocusWidget:ObjectProperty:128:/Script/UMG.Widget;bInAllUsers:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_SetUserFocus(arg_reply : UEEventReply; arg_focuswidget : C_Widget_f2421369; arg_binallusers : bool) : ue_ui_SetUserFocus_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetUserFocus", "")
     ue_expect_signature(call, "v1;SetUserFocus;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};FocusWidget:ObjectProperty:128:/Script/UMG.Widget;bInAllUsers:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -5589,6 +5695,7 @@ def ue_ui_SetUserFocus(arg_reply : UEEventReply; arg_focuswidget : C_Widget_f242
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetWindowTitleBarCloseButtonActive", signature="v1;SetWindowTitleBarCloseButtonActive;bActive:BoolProperty:128;")]
 def ue_ui_SetWindowTitleBarCloseButtonActive(arg_bactive : bool) {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetWindowTitleBarCloseButtonActive", "")
     ue_expect_signature(call, "v1;SetWindowTitleBarCloseButtonActive;bActive:BoolProperty:128;")
@@ -5598,6 +5705,7 @@ def ue_ui_SetWindowTitleBarCloseButtonActive(arg_bactive : bool) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetWindowTitleBarOnCloseClickedDelegate", signature="v1;SetWindowTitleBarOnCloseClickedDelegate;Delegate:DelegateProperty:128:/Script/UMG.WidgetBlueprintLibrary:OnGameWindowCloseButtonClickedDelegate__DelegateSignature;")]
 def ue_ui_SetWindowTitleBarOnCloseClickedDelegate(arg_delegate : UEFunctionDelegate) {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetWindowTitleBarOnCloseClickedDelegate", "")
     ue_expect_signature(call, "v1;SetWindowTitleBarOnCloseClickedDelegate;Delegate:DelegateProperty:128:/Script/UMG.WidgetBlueprintLibrary:OnGameWindowCloseButtonClickedDelegate__DelegateSignature;")
@@ -5607,6 +5715,7 @@ def ue_ui_SetWindowTitleBarOnCloseClickedDelegate(arg_delegate : UEFunctionDeleg
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="SetWindowTitleBarState", signature="v1;SetWindowTitleBarState;TitleBarContent:ObjectProperty:128:/Script/UMG.Widget;Mode:EnumProperty:128:/Script/Engine.EWindowTitleBarMode;bTitleBarDragEnabled:BoolProperty:128;bWindowButtonsVisible:BoolProperty:128;bTitleBarVisible:BoolProperty:128;")]
 def ue_ui_SetWindowTitleBarState(arg_titlebarcontent : C_Widget_f2421369; arg_mode : E_EWindowTitleBarMode_694e7f5d; arg_btitlebardragenabled : bool; arg_bwindowbuttonsvisible : bool; arg_btitlebarvisible : bool) {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetWindowTitleBarState", "")
     ue_expect_signature(call, "v1;SetWindowTitleBarState;TitleBarContent:ObjectProperty:128:/Script/UMG.Widget;Mode:EnumProperty:128:/Script/Engine.EWindowTitleBarMode;bTitleBarDragEnabled:BoolProperty:128;bWindowButtonsVisible:BoolProperty:128;bTitleBarVisible:BoolProperty:128;")
@@ -5620,6 +5729,7 @@ def ue_ui_SetWindowTitleBarState(arg_titlebarcontent : C_Widget_f2421369; arg_mo
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="Unhandled", signature="v1;Unhandled;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_Unhandled() : UEEventReply {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "Unhandled", "")
     ue_expect_signature(call, "v1;Unhandled;ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -5635,6 +5745,7 @@ struct ue_ui_UnlockMouse_Result {
     out_returnvalue : UEEventReply
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="UnlockMouse", signature="v1;UnlockMouse;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")]
 def ue_ui_UnlockMouse(arg_reply : UEEventReply) : ue_ui_UnlockMouse_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "UnlockMouse", "")
     ue_expect_signature(call, "v1;UnlockMouse;Reply:StructProperty:134218112:/Script/UMG.EventReply\{\};ReturnValue:StructProperty:1408:/Script/UMG.EventReply\{\};")
@@ -5646,6 +5757,7 @@ def ue_ui_UnlockMouse(arg_reply : UEEventReply) : ue_ui_UnlockMouse_Result {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="AbsoluteToLocal", signature="v1;AbsoluteToLocal;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_geometry_AbsoluteToLocal(arg_geometry : UEGeometry; arg_absolutecoordinate : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "AbsoluteToLocal", "")
     ue_expect_signature(call, "v1;AbsoluteToLocal;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5663,6 +5775,7 @@ struct ue_ui_geometry_AbsoluteToViewport_Result {
     out_viewportposition : UEVector2D
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="AbsoluteToViewport", signature="v1;AbsoluteToViewport;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;AbsoluteDesktopCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};PixelPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ViewportPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_geometry_AbsoluteToViewport(arg_absolutedesktopcoordinate : UEVector2D) : ue_ui_geometry_AbsoluteToViewport_Result {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "AbsoluteToViewport", "worldcontextobject")
     ue_expect_signature(call, "v1;AbsoluteToViewport;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;AbsoluteDesktopCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};PixelPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ViewportPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5674,6 +5787,7 @@ def ue_ui_geometry_AbsoluteToViewport(arg_absolutedesktopcoordinate : UEVector2D
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="EqualEqual_SlateBrush", signature="v1;EqualEqual_SlateBrush;A:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};B:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_ui_geometry_EqualEqual_SlateBrush(arg_a : S_SlateBrush_e5037ad8; arg_b : S_SlateBrush_e5037ad8) : bool {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "EqualEqual_SlateBrush", "")
     ue_expect_signature(call, "v1;EqualEqual_SlateBrush;A:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};B:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -5764,6 +5878,7 @@ def ue_ui_geometry_EqualEqual_SlateBrush(arg_a : S_SlateBrush_e5037ad8; arg_b : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="GetAbsoluteSize", signature="v1;GetAbsoluteSize;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_geometry_GetAbsoluteSize(arg_geometry : UEGeometry) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "GetAbsoluteSize", "")
     ue_expect_signature(call, "v1;GetAbsoluteSize;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5775,6 +5890,7 @@ def ue_ui_geometry_GetAbsoluteSize(arg_geometry : UEGeometry) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="GetLocalSize", signature="v1;GetLocalSize;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_geometry_GetLocalSize(arg_geometry : UEGeometry) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "GetLocalSize", "")
     ue_expect_signature(call, "v1;GetLocalSize;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5786,6 +5902,7 @@ def ue_ui_geometry_GetLocalSize(arg_geometry : UEGeometry) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="GetLocalTopLeft", signature="v1;GetLocalTopLeft;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_geometry_GetLocalTopLeft(arg_geometry : UEGeometry) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "GetLocalTopLeft", "")
     ue_expect_signature(call, "v1;GetLocalTopLeft;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5797,6 +5914,7 @@ def ue_ui_geometry_GetLocalTopLeft(arg_geometry : UEGeometry) : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="IsUnderLocation", signature="v1;IsUnderLocation;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteCoordinate:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_ui_geometry_IsUnderLocation(arg_geometry : UEGeometry; arg_absolutecoordinate : UEVector2D) : bool {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "IsUnderLocation", "")
     ue_expect_signature(call, "v1;IsUnderLocation;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteCoordinate:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -5809,6 +5927,7 @@ def ue_ui_geometry_IsUnderLocation(arg_geometry : UEGeometry; arg_absolutecoordi
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="LocalToAbsolute", signature="v1;LocalToAbsolute;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_geometry_LocalToAbsolute(arg_geometry : UEGeometry; arg_localcoordinate : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "LocalToAbsolute", "")
     ue_expect_signature(call, "v1;LocalToAbsolute;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5826,6 +5945,7 @@ struct ue_ui_geometry_LocalToViewport_Result {
     out_viewportposition : UEVector2D
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="LocalToViewport", signature="v1;LocalToViewport;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};PixelPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ViewportPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_geometry_LocalToViewport(arg_geometry : UEGeometry; arg_localcoordinate : UEVector2D) : ue_ui_geometry_LocalToViewport_Result {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "LocalToViewport", "worldcontextobject")
     ue_expect_signature(call, "v1;LocalToViewport;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalCoordinate:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};PixelPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ViewportPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5838,6 +5958,7 @@ def ue_ui_geometry_LocalToViewport(arg_geometry : UEGeometry; arg_localcoordinat
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="Scalar_AbsoluteToLocal", signature="v1;Scalar_AbsoluteToLocal;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteScalar:FloatProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_ui_geometry_Scalar_AbsoluteToLocal(arg_geometry : UEGeometry; arg_absolutescalar : float) : float {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "Scalar_AbsoluteToLocal", "")
     ue_expect_signature(call, "v1;Scalar_AbsoluteToLocal;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteScalar:FloatProperty:128;ReturnValue:FloatProperty:1408;")
@@ -5850,6 +5971,7 @@ def ue_ui_geometry_Scalar_AbsoluteToLocal(arg_geometry : UEGeometry; arg_absolut
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="Scalar_LocalToAbsolute", signature="v1;Scalar_LocalToAbsolute;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalScalar:FloatProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_ui_geometry_Scalar_LocalToAbsolute(arg_geometry : UEGeometry; arg_localscalar : float) : float {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "Scalar_LocalToAbsolute", "")
     ue_expect_signature(call, "v1;Scalar_LocalToAbsolute;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalScalar:FloatProperty:128;ReturnValue:FloatProperty:1408;")
@@ -5862,6 +5984,7 @@ def ue_ui_geometry_Scalar_LocalToAbsolute(arg_geometry : UEGeometry; arg_localsc
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="ScreenToViewport", signature="v1;ScreenToViewport;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ScreenPosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ViewportPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_geometry_ScreenToViewport(arg_screenposition : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "ScreenToViewport", "worldcontextobject")
     ue_expect_signature(call, "v1;ScreenToViewport;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ScreenPosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ViewportPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5873,6 +5996,7 @@ def ue_ui_geometry_ScreenToViewport(arg_screenposition : UEVector2D) : UEVector2
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="ScreenToWidgetAbsolute", signature="v1;ScreenToWidgetAbsolute;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ScreenPosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};AbsoluteCoordinate:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bIncludeWindowPosition:BoolProperty:128;")]
 def ue_ui_geometry_ScreenToWidgetAbsolute(arg_screenposition : UEVector2D; arg_bincludewindowposition : bool) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "ScreenToWidgetAbsolute", "worldcontextobject")
     ue_expect_signature(call, "v1;ScreenToWidgetAbsolute;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ScreenPosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};AbsoluteCoordinate:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bIncludeWindowPosition:BoolProperty:128;")
@@ -5885,6 +6009,7 @@ def ue_ui_geometry_ScreenToWidgetAbsolute(arg_screenposition : UEVector2D; arg_b
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="ScreenToWidgetLocal", signature="v1;ScreenToWidgetLocal;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ScreenPosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};LocalCoordinate:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bIncludeWindowPosition:BoolProperty:128;")]
 def ue_ui_geometry_ScreenToWidgetLocal(arg_geometry : UEGeometry; arg_screenposition : UEVector2D; arg_bincludewindowposition : bool) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "ScreenToWidgetLocal", "worldcontextobject")
     ue_expect_signature(call, "v1;ScreenToWidgetLocal;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};ScreenPosition:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};LocalCoordinate:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bIncludeWindowPosition:BoolProperty:128;")
@@ -5898,6 +6023,7 @@ def ue_ui_geometry_ScreenToWidgetLocal(arg_geometry : UEGeometry; arg_screenposi
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="Vector_AbsoluteToLocal", signature="v1;Vector_AbsoluteToLocal;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteVector:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_geometry_Vector_AbsoluteToLocal(arg_geometry : UEGeometry; arg_absolutevector : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "Vector_AbsoluteToLocal", "")
     ue_expect_signature(call, "v1;Vector_AbsoluteToLocal;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};AbsoluteVector:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5910,6 +6036,7 @@ def ue_ui_geometry_Vector_AbsoluteToLocal(arg_geometry : UEGeometry; arg_absolut
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.SlateBlueprintLibrary", method="Vector_LocalToAbsolute", signature="v1;Vector_LocalToAbsolute;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalVector:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_geometry_Vector_LocalToAbsolute(arg_geometry : UEGeometry; arg_localvector : UEVector2D) : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "Vector_LocalToAbsolute", "")
     ue_expect_signature(call, "v1;Vector_LocalToAbsolute;Geometry:StructProperty:134218114:/Script/SlateCore.Geometry\{\};LocalVector:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5922,6 +6049,7 @@ def ue_ui_geometry_Vector_LocalToAbsolute(arg_geometry : UEGeometry; arg_localve
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="GetDesignTimeInfo", signature="v1;GetDesignTimeInfo;Widget:ObjectProperty:130:/Script/UMG.Widget;ReturnValue:StructProperty:1408:/Script/UMG.WidgetDesignTimeInfo\{PreviewSize:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bIsPortrait:BoolProperty:0;\};")]
 def ue_ui_layout_GetDesignTimeInfo(arg_widget : C_Widget_f2421369) : S_WidgetDesignTimeInfo_097df7f6 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetDesignTimeInfo", "")
     ue_expect_signature(call, "v1;GetDesignTimeInfo;Widget:ObjectProperty:130:/Script/UMG.Widget;ReturnValue:StructProperty:1408:/Script/UMG.WidgetDesignTimeInfo\{PreviewSize:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bIsPortrait:BoolProperty:0;\};")
@@ -5933,6 +6061,7 @@ def ue_ui_layout_GetDesignTimeInfo(arg_widget : C_Widget_f2421369) : S_WidgetDes
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="GetMousePositionOnPlatform", signature="v1;GetMousePositionOnPlatform;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_layout_GetMousePositionOnPlatform() : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetMousePositionOnPlatform", "")
     ue_expect_signature(call, "v1;GetMousePositionOnPlatform;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5943,6 +6072,7 @@ def ue_ui_layout_GetMousePositionOnPlatform() : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="GetMousePositionOnViewport", signature="v1;GetMousePositionOnViewport;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_layout_GetMousePositionOnViewport() : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetMousePositionOnViewport", "worldcontextobject")
     ue_expect_signature(call, "v1;GetMousePositionOnViewport;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -5959,6 +6089,7 @@ struct ue_ui_layout_GetMousePositionScaledByDPI_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="GetMousePositionScaledByDPI", signature="v1;GetMousePositionScaledByDPI;Player:ObjectProperty:130:/Script/Engine.PlayerController;LocationX:FloatProperty:384;LocationY:FloatProperty:384;ReturnValue:BoolProperty:1408;")]
 def ue_ui_layout_GetMousePositionScaledByDPI(arg_player : C_PlayerController_fb3d8846) : ue_ui_layout_GetMousePositionScaledByDPI_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetMousePositionScaledByDPI", "")
     ue_expect_signature(call, "v1;GetMousePositionScaledByDPI;Player:ObjectProperty:130:/Script/Engine.PlayerController;LocationX:FloatProperty:384;LocationY:FloatProperty:384;ReturnValue:BoolProperty:1408;")
@@ -5970,6 +6101,7 @@ def ue_ui_layout_GetMousePositionScaledByDPI(arg_player : C_PlayerController_fb3
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="GetPlayerScreenWidgetGeometry", signature="v1;GetPlayerScreenWidgetGeometry;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;ReturnValue:StructProperty:1408:/Script/SlateCore.Geometry\{\};")]
 def ue_ui_layout_GetPlayerScreenWidgetGeometry(arg_playercontroller : C_PlayerController_fb3d8846) : UEGeometry {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetPlayerScreenWidgetGeometry", "")
     ue_expect_signature(call, "v1;GetPlayerScreenWidgetGeometry;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;ReturnValue:StructProperty:1408:/Script/SlateCore.Geometry\{\};")
@@ -5981,6 +6113,7 @@ def ue_ui_layout_GetPlayerScreenWidgetGeometry(arg_playercontroller : C_PlayerCo
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="GetViewportScale", signature="v1;GetViewportScale;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:FloatProperty:1408;")]
 def ue_ui_layout_GetViewportScale() : float {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetViewportScale", "worldcontextobject")
     ue_expect_signature(call, "v1;GetViewportScale;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:FloatProperty:1408;")
@@ -5991,6 +6124,7 @@ def ue_ui_layout_GetViewportScale() : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="GetViewportSize", signature="v1;GetViewportSize;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")]
 def ue_ui_layout_GetViewportSize() : UEVector2D {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetViewportSize", "worldcontextobject")
     ue_expect_signature(call, "v1;GetViewportSize;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};")
@@ -6001,6 +6135,7 @@ def ue_ui_layout_GetViewportSize() : UEVector2D {
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="GetViewportWidgetGeometry", signature="v1;GetViewportWidgetGeometry;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/SlateCore.Geometry\{\};")]
 def ue_ui_layout_GetViewportWidgetGeometry() : UEGeometry {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "GetViewportWidgetGeometry", "worldcontextobject")
     ue_expect_signature(call, "v1;GetViewportWidgetGeometry;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/SlateCore.Geometry\{\};")
@@ -6016,6 +6151,7 @@ struct ue_ui_layout_ProjectWorldLocationToWidgetPosition_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="ProjectWorldLocationToWidgetPosition", signature="v1;ProjectWorldLocationToWidgetPosition;PlayerController:ObjectProperty:130:/Script/Engine.PlayerController;WorldLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ScreenPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bPlayerViewportRelative:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_ui_layout_ProjectWorldLocationToWidgetPosition(arg_playercontroller : C_PlayerController_fb3d8846; arg_worldlocation : UEVector; arg_bplayerviewportrelative : bool) : ue_ui_layout_ProjectWorldLocationToWidgetPosition_Result {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "ProjectWorldLocationToWidgetPosition", "")
     ue_expect_signature(call, "v1;ProjectWorldLocationToWidgetPosition;PlayerController:ObjectProperty:130:/Script/Engine.PlayerController;WorldLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ScreenPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bPlayerViewportRelative:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -6029,6 +6165,7 @@ def ue_ui_layout_ProjectWorldLocationToWidgetPosition(arg_playercontroller : C_P
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="RemoveAllWidgets", signature="v1;RemoveAllWidgets;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;")]
 def ue_ui_layout_RemoveAllWidgets() {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "RemoveAllWidgets", "worldcontextobject")
     ue_expect_signature(call, "v1;RemoveAllWidgets;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;")
@@ -6037,6 +6174,7 @@ def ue_ui_layout_RemoveAllWidgets() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsBorderSlot", signature="v1;SlotAsBorderSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.BorderSlot;")]
 def ue_ui_layout_SlotAsBorderSlot(arg_widget : C_Widget_f2421369) : C_BorderSlot_f8a3a520 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsBorderSlot", "")
     ue_expect_signature(call, "v1;SlotAsBorderSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.BorderSlot;")
@@ -6048,6 +6186,7 @@ def ue_ui_layout_SlotAsBorderSlot(arg_widget : C_Widget_f2421369) : C_BorderSlot
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsCanvasSlot", signature="v1;SlotAsCanvasSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.CanvasPanelSlot;")]
 def ue_ui_layout_SlotAsCanvasSlot(arg_widget : C_Widget_f2421369) : C_CanvasPanelSlot_fe2505d1 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsCanvasSlot", "")
     ue_expect_signature(call, "v1;SlotAsCanvasSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.CanvasPanelSlot;")
@@ -6059,6 +6198,7 @@ def ue_ui_layout_SlotAsCanvasSlot(arg_widget : C_Widget_f2421369) : C_CanvasPane
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsGridSlot", signature="v1;SlotAsGridSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.GridSlot;")]
 def ue_ui_layout_SlotAsGridSlot(arg_widget : C_Widget_f2421369) : C_GridSlot_50f32788 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsGridSlot", "")
     ue_expect_signature(call, "v1;SlotAsGridSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.GridSlot;")
@@ -6070,6 +6210,7 @@ def ue_ui_layout_SlotAsGridSlot(arg_widget : C_Widget_f2421369) : C_GridSlot_50f
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsHorizontalBoxSlot", signature="v1;SlotAsHorizontalBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.HorizontalBoxSlot;")]
 def ue_ui_layout_SlotAsHorizontalBoxSlot(arg_widget : C_Widget_f2421369) : C_HorizontalBoxSlot_7f79e562 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsHorizontalBoxSlot", "")
     ue_expect_signature(call, "v1;SlotAsHorizontalBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.HorizontalBoxSlot;")
@@ -6081,6 +6222,7 @@ def ue_ui_layout_SlotAsHorizontalBoxSlot(arg_widget : C_Widget_f2421369) : C_Hor
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsOverlaySlot", signature="v1;SlotAsOverlaySlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.OverlaySlot;")]
 def ue_ui_layout_SlotAsOverlaySlot(arg_widget : C_Widget_f2421369) : C_OverlaySlot_79dbddd4 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsOverlaySlot", "")
     ue_expect_signature(call, "v1;SlotAsOverlaySlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.OverlaySlot;")
@@ -6092,6 +6234,7 @@ def ue_ui_layout_SlotAsOverlaySlot(arg_widget : C_Widget_f2421369) : C_OverlaySl
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsSafeBoxSlot", signature="v1;SlotAsSafeBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.SafeZoneSlot;")]
 def ue_ui_layout_SlotAsSafeBoxSlot(arg_widget : C_Widget_f2421369) : C_SafeZoneSlot_a85b5324 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsSafeBoxSlot", "")
     ue_expect_signature(call, "v1;SlotAsSafeBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.SafeZoneSlot;")
@@ -6103,6 +6246,7 @@ def ue_ui_layout_SlotAsSafeBoxSlot(arg_widget : C_Widget_f2421369) : C_SafeZoneS
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsScaleBoxSlot", signature="v1;SlotAsScaleBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.ScaleBoxSlot;")]
 def ue_ui_layout_SlotAsScaleBoxSlot(arg_widget : C_Widget_f2421369) : C_ScaleBoxSlot_53fe3d96 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsScaleBoxSlot", "")
     ue_expect_signature(call, "v1;SlotAsScaleBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.ScaleBoxSlot;")
@@ -6114,6 +6258,7 @@ def ue_ui_layout_SlotAsScaleBoxSlot(arg_widget : C_Widget_f2421369) : C_ScaleBox
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsScrollBoxSlot", signature="v1;SlotAsScrollBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.ScrollBoxSlot;")]
 def ue_ui_layout_SlotAsScrollBoxSlot(arg_widget : C_Widget_f2421369) : C_ScrollBoxSlot_20c10cd3 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsScrollBoxSlot", "")
     ue_expect_signature(call, "v1;SlotAsScrollBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.ScrollBoxSlot;")
@@ -6125,6 +6270,7 @@ def ue_ui_layout_SlotAsScrollBoxSlot(arg_widget : C_Widget_f2421369) : C_ScrollB
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsSizeBoxSlot", signature="v1;SlotAsSizeBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.SizeBoxSlot;")]
 def ue_ui_layout_SlotAsSizeBoxSlot(arg_widget : C_Widget_f2421369) : C_SizeBoxSlot_ac4ab84e {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsSizeBoxSlot", "")
     ue_expect_signature(call, "v1;SlotAsSizeBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.SizeBoxSlot;")
@@ -6136,6 +6282,7 @@ def ue_ui_layout_SlotAsSizeBoxSlot(arg_widget : C_Widget_f2421369) : C_SizeBoxSl
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsStackBoxSlot", signature="v1;SlotAsStackBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.StackBoxSlot;")]
 def ue_ui_layout_SlotAsStackBoxSlot(arg_widget : C_Widget_f2421369) : C_StackBoxSlot_2b5eb13e {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsStackBoxSlot", "")
     ue_expect_signature(call, "v1;SlotAsStackBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.StackBoxSlot;")
@@ -6147,6 +6294,7 @@ def ue_ui_layout_SlotAsStackBoxSlot(arg_widget : C_Widget_f2421369) : C_StackBox
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsUniformGridSlot", signature="v1;SlotAsUniformGridSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.UniformGridSlot;")]
 def ue_ui_layout_SlotAsUniformGridSlot(arg_widget : C_Widget_f2421369) : C_UniformGridSlot_2a7a9800 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsUniformGridSlot", "")
     ue_expect_signature(call, "v1;SlotAsUniformGridSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.UniformGridSlot;")
@@ -6158,6 +6306,7 @@ def ue_ui_layout_SlotAsUniformGridSlot(arg_widget : C_Widget_f2421369) : C_Unifo
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsVerticalBoxSlot", signature="v1;SlotAsVerticalBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.VerticalBoxSlot;")]
 def ue_ui_layout_SlotAsVerticalBoxSlot(arg_widget : C_Widget_f2421369) : C_VerticalBoxSlot_ebcabfa1 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsVerticalBoxSlot", "")
     ue_expect_signature(call, "v1;SlotAsVerticalBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.VerticalBoxSlot;")
@@ -6169,6 +6318,7 @@ def ue_ui_layout_SlotAsVerticalBoxSlot(arg_widget : C_Widget_f2421369) : C_Verti
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsWidgetSwitcherSlot", signature="v1;SlotAsWidgetSwitcherSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.WidgetSwitcherSlot;")]
 def ue_ui_layout_SlotAsWidgetSwitcherSlot(arg_widget : C_Widget_f2421369) : C_WidgetSwitcherSlot_744830c2 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsWidgetSwitcherSlot", "")
     ue_expect_signature(call, "v1;SlotAsWidgetSwitcherSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.WidgetSwitcherSlot;")
@@ -6180,6 +6330,7 @@ def ue_ui_layout_SlotAsWidgetSwitcherSlot(arg_widget : C_Widget_f2421369) : C_Wi
     return result
 }
 
+[ue_reflected_call(owner="/Script/UMG.WidgetLayoutLibrary", method="SlotAsWrapBoxSlot", signature="v1;SlotAsWrapBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.WrapBoxSlot;")]
 def ue_ui_layout_SlotAsWrapBoxSlot(arg_widget : C_Widget_f2421369) : C_WrapBoxSlot_68305a89 {
     let call = ue_begin_static_call("/Script/UMG.WidgetLayoutLibrary", "SlotAsWrapBoxSlot", "")
     ue_expect_signature(call, "v1;SlotAsWrapBoxSlot;Widget:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.WrapBoxSlot;")

@@ -23,9 +23,15 @@ int32 DSLCallbackArgument(const das::string& QualifiedName, size_t Count)
     const auto Separator = QualifiedName.rfind("::");
     const das::string Name = Separator == das::string::npos ? QualifiedName : QualifiedName.substr(Separator + 2);
     int32 Index = -1;
+    if (Name.find("ue_subscribe_object_") == 0 && Count >= 3)
+        return 2;
+    if (Name == "__ue_dynamic_event" && Count == 4)
+        return 2;
+    if (Name == "ue_widget_bind_click" && Count == 2)
+        return 1;
     if (Name == "ue_timer_start" || Name == "ue_input_bind_action" || Name == "ue_enhanced_bind" ||
         Name == "ue_latent_delay" || Name == "ue_asset_load_async" || Name == "ue_soft_load_async" ||
-        Name == "ue_widget_bind_click")
+        (Name == "ue_widget_bind_click" && Count == 3))
         Index = 2;
     else if (Name == "ue_timer_next_tick" || Name == "ue_input_bind_axis")
         Index = 1;
@@ -35,30 +41,6 @@ int32 DSLCallbackArgument(const das::string& QualifiedName, size_t Count)
     else if (Name == "ue_effect_play" || Name == "ue_effect_at")
         Index = 4;
     return Index >= 0 && size_t(Index) < Count ? Index : -1;
-}
-// Native class of a ue_event source when it is known at compile time: self of a class with a native
-// parent (its script host) or a native component. Owner and authored sources return null.
-UClass* DSLEventSourceClass(const FDasDeclaredClass& C, const FString& Source)
-{
-    if (Source == TEXT("self"))
-        return C.ParentId.IsEmpty() ? DasNativeScriptHost(C.NativeParent) : nullptr;
-    if (Source == TEXT("owner"))
-        return nullptr;
-    const auto* Component = C.Components.FindByPredicate([&](const auto& X) { return X.Name == Source; });
-    return Component && !Component->NativeClass.IsEmpty() ? FindObject<UClass>(nullptr, *Component->NativeClass)
-                                                          : nullptr;
-}
-// A BlueprintAssignable multicast delegate with the given number of parameters.
-bool DSLNativeEventMatches(UClass* Class, const FString& Name, int32 Arity)
-{
-    auto* P = FindFProperty<FMulticastDelegateProperty>(Class, FName(*Name));
-    if (!P || !P->HasAnyPropertyFlags(CPF_BlueprintAssignable) || !P->SignatureFunction)
-        return false;
-    int32 Parameters = 0;
-    for (TFieldIterator<FProperty> It(P->SignatureFunction); It; ++It)
-        if (It->HasAnyPropertyFlags(CPF_Parm) && !It->HasAnyPropertyFlags(CPF_ReturnParm))
-            ++Parameters;
-    return Parameters == Arity;
 }
 // Rewrites self.Method callback arguments in the declared class methods to the method name, so the
 // methods themselves type-check against the name-based managed APIs. The generated entry points
@@ -84,18 +66,89 @@ struct FDSLMethodReferenceVisitor : das::Visitor
             E->arguments[Index] = new das::ExprConstString(Field->at, Field->name);
     }
 };
-// Applies FDSLMethodReferenceVisitor to every method declared by the class.
-void DSLNormalizeMethodReferences(const das::StructurePtr& St)
+bool DSLStandardLifecycle(const das::FunctionPtr& F);
+// Implicit callbacks use the existing reflected transport but are internal Blueprint functions.
+void DSLHiddenCallback(const das::FunctionPtr& F, const das::StructurePtr& St, das::ModuleGroup& Group,
+                       bool RequireVoid = true)
 {
+    if (DSLAnnotation(F->annotations, "ue_lifecycle") || DSLAnnotation(F->annotations, "ue_event") ||
+        DSLStandardLifecycle(F))
+        DSLFail(TEXT("A managed callback cannot also be a lifecycle/event handler: ") + DSLText(DSLMethodName(F)));
+    if (F->isStaticClassMethod || F->arguments.empty() || !F->result ||
+        (RequireVoid && F->result->baseType != das::Type::tVoid))
+        DSLFail(TEXT("Managed callback requires a void instance method: ") + DSLText(DSLMethodName(F)));
+    auto* A = const_cast<das::AnnotationDeclaration*>(DSLAnnotation(F->annotations, "ue_function"));
+    if (A &&
+        (A->arguments.find("BlueprintCallable", das::Type::tBool) ||
+         A->arguments.find("BlueprintPure", das::Type::tBool) || A->arguments.find("BlueprintEvent", das::Type::tBool)))
+        return; // Explicit visibility is owned by the author.
+    if (!A)
+    {
+        auto Types = Group.findAnnotation("ue_function", St->module);
+        if (Types.size() != 1)
+            DSLFail(TEXT("Missing ue_function annotation"));
+        A = new das::AnnotationDeclaration();
+        A->flags = 0;
+        A->annotation = Types[0];
+        A->at = F->at;
+        F->annotations.push_back(A);
+    }
+    A->arguments.push_back(das::AnnotationArgument("BlueprintCallable", true));
+    A->arguments.push_back(das::AnnotationArgument("_ue_hidden_callback", true));
+}
+// Find references before replacing their syntax with callback names. Mutate annotations only after
+// enumerating functions: newly promoted methods can themselves register other callbacks.
+void DSLNormalizeMethodReferences(const das::StructurePtr& St, das::ModuleGroup& Group)
+{
+    TSet<FString> Referenced;
+    struct FCollect : das::Visitor
+    {
+        das::string Self;
+        TSet<FString>& Names;
+        FCollect(const das::string& S, TSet<FString>& N) : Self(S), Names(N) {}
+        virtual void preVisit(das::ExprCall* E) override
+        {
+            const int32 I = DSLCallbackArgument(E->name, E->arguments.size());
+            if (I < 0 || !E->arguments[I] || !E->arguments[I]->rtti_isField())
+                return;
+            auto* Field = static_cast<das::ExprField*>(E->arguments[I]);
+            if (Field->value && Field->value->rtti_isVar() && static_cast<das::ExprVar*>(Field->value)->name == Self)
+                Names.Add(DSLText(Field->name));
+        }
+    };
+    das::vector<das::FunctionPtr> Sources;
     St->module->functions.foreach (
         [&](const das::FunctionPtr& F)
         {
-            if (F->classParent != St || !F->body || F->arguments.empty())
-                return;
-            FDSLMethodReferenceVisitor References(F->arguments[0]->name, St);
-            F->body = F->body->visit(References);
+            if (F->classParent == St && F->body && !F->arguments.empty())
+            {
+                Sources.push_back(F);
+                FCollect Collect(F->arguments[0]->name, Referenced);
+                F->body->visit(Collect);
+            }
         });
+    for (const auto& Name : Referenced)
+    {
+        das::FunctionPtr Found = nullptr;
+        for (const auto& F : Sources)
+            if (DSLText(DSLMethodName(F)) == Name)
+            {
+                if (Found)
+                    DSLFail(TEXT("Ambiguous callback method: ") + Name);
+                Found = F;
+            }
+        if (!Found)
+            DSLFail(TEXT("Callback self.") + Name + TEXT(" must name a method declared on this class"));
+        DSLHiddenCallback(Found, St, Group);
+    }
+    for (const auto& F : Sources)
+    {
+        FDSLMethodReferenceVisitor References(F->arguments[0]->name, St);
+        F->body = F->body->visit(References);
+    }
 }
+void DSLValidateDynamicEvent(das::ExprCall*, const FDasDeclaredClass&, const das::StructurePtr&, das::ModuleGroup&,
+                             const FString&, const FString&);
 struct FDSLBodyVisitor : das::Visitor
 {
     const FDasDeclaredClass& Decl;
@@ -346,7 +399,7 @@ struct FDSLBodyVisitor : das::Visitor
         }
         if (P->Type.Kind == TEXT("event"))
         {
-            Error = TEXT("Cannot assign an event; use AddUFunction/RemoveUFunction");
+            Error = TEXT("Event updates require += or -= with self.Method");
             return E;
         }
         if (P->bReadOnly)
@@ -1428,9 +1481,9 @@ struct FDSLBodyVisitor : das::Visitor
     // Button handlers are Blueprint functions found by name at runtime; check them here when known.
     das::ExpressionPtr RewriteWidgetClick(das::ExprCall* E)
     {
-        if (E->arguments.size() != 3)
+        if (E->arguments.size() != 2 && E->arguments.size() != 3)
             return E;
-        auto* Name = CallbackName(E->arguments[2]);
+        auto* Name = CallbackName(E->arguments.back());
         if (!Name)
             return E;
         bool Found = false;
@@ -1443,7 +1496,7 @@ struct FDSLBodyVisitor : das::Visitor
                     Found = true;
             });
         if (!Found)
-            Error = TEXT("Button handler requires ue_function(BlueprintCallable) void Handler()");
+            Error = TEXT("Button handler requires a void instance method without arguments");
         return E;
     }
     das::ExpressionPtr RewriteAssetLoad(das::ExprCall* E)
@@ -1481,6 +1534,8 @@ struct FDSLBodyVisitor : das::Visitor
     }
     virtual das::ExpressionPtr visit(das::ExprCall* E) override
     {
+        if (!NativeOnly && (E->name == "__ue_dynamic_event" || E->name == "ue_foundation::__ue_dynamic_event"))
+            DSLValidateDynamicEvent(E, Decl, Source, Group, Folder, Registry);
         if (const auto* Local = QualifiedLocals.Find(DSLText(E->name));
             Local && !E->arguments.empty() && E->arguments[0]->rtti_isVar() &&
             static_cast<das::ExprVar*>(E->arguments[0])->name == Self)

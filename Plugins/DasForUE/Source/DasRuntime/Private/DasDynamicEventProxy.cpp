@@ -1,3 +1,4 @@
+#include "DasNativeDelegateReceiver.h"
 #include "DasIntDelegateProxy.h"
 #include "DasCallbackTypes.h"
 #include "DasRuntime.h"
@@ -11,27 +12,6 @@
 
 namespace
 {
-TArray<TStrongObjectPtr<UFunction>> DynamicReceivers;
-// Duplication clears CPF_ComputedFlags. Linking container properties does not
-// restore every native UHT flag (notably array ZeroConstructor), so retain the
-// source's computed traits on this otherwise identical signature clone.
-void RestoreReceiverTraits(const FProperty* Source, FProperty* Target)
-{
-    if (!Source || !Target || !Source->SameType(Target))
-        return;
-    Target->ClearPropertyFlags(CPF_ComputedFlags);
-    Target->SetPropertyFlags(Source->PropertyFlags & CPF_ComputedFlags);
-    if (auto* A = CastField<FArrayProperty>(Source))
-        RestoreReceiverTraits(A->Inner, CastFieldChecked<FArrayProperty>(Target)->Inner);
-    else if (auto* S = CastField<FSetProperty>(Source))
-        RestoreReceiverTraits(S->ElementProp, CastFieldChecked<FSetProperty>(Target)->ElementProp);
-    else if (auto* M = CastField<FMapProperty>(Source))
-    {
-        auto* T = CastFieldChecked<FMapProperty>(Target);
-        RestoreReceiverTraits(M->KeyProp, T->KeyProp);
-        RestoreReceiverTraits(M->ValueProp, T->ValueProp);
-    }
-}
 
 FProperty* ReceiverParameter(UFunction* F)
 {
@@ -86,65 +66,19 @@ FName UDasIntDelegateProxy::ConfigureDynamic(UFunction* Signature, const FString
         }
     }
     auto* Parameter = ReceiverParameter(Signature);
-    for (const auto& Existing : DynamicReceivers)
-        if (Existing->IsSignatureCompatibleWith(Signature, 0))
-        {
-            DynamicKind = int32(Kind);
-            DynamicPath = Path;
-            return Existing->GetFName();
-        }
-    if (DynamicReceivers.Num() >= 1024)
-    {
-        Error = TEXT("Dynamic event receiver signature limit exceeded");
+    auto* Function =
+        MakeDasNativeDelegateReceiver(StaticClass(), Signature, &UDasIntDelegateProxy::execReceiveDynamic, Error);
+    if (!Function)
         return NAME_None;
-    }
-    auto* Class = StaticClass();
-    const FName Name = MakeUniqueObjectName(Class, UFunction::StaticClass(), TEXT("__DasValueEvent"));
-    auto* Function = DuplicateObject<UFunction>(Signature, Class, Name);
-    Function->SetFlags(RF_Transient);
-    Function->Script.Empty();
-#if UE_BLUEPRINT_EVENTGRAPH_FASTCALLS
-    Function->EventGraphFunction = nullptr;
-    Function->EventGraphCallOffset = 0;
-#endif
-    Function->FunctionFlags = FUNC_Public | FUNC_Native | (Signature->FunctionFlags & FUNC_HasOutParms);
-    Function->StaticLink(true);
-    Function->InitializeDerivedMembers();
-    {
-        TFieldIterator<FProperty> A(Signature), B(Function);
-        for (; A && B; ++A, ++B)
-            RestoreReceiverTraits(*A, *B);
-    }
-    Function->SetNativeFunc(&UDasIntDelegateProxy::execReceiveDynamic);
-    if (Function->GetPropertiesSize() < Function->ParmsSize || Function->ParmsSize != Signature->ParmsSize ||
-        !Function->IsSignatureCompatibleWith(Signature, 0))
-    {
-        auto* Receiver = ReceiverParameter(Function);
-        Error = FString::Printf(TEXT("Dynamic event receiver layout mismatch for %s: property-size=%d frame=%d/%d flags=%llx/%llx compatible=%d"),
-            *Signature->GetPathName(), Function->GetPropertiesSize(), Function->ParmsSize, Signature->ParmsSize,
-            Receiver ? uint64(Receiver->PropertyFlags) : 0, uint64(Parameter->PropertyFlags),
-            Function->IsSignatureCompatibleWith(Signature, 0));
-        return NAME_None;
-    }
-    // The native proxy class may be in the cooked DisregardForGC pool; its
-    // dynamic function-map targets must be explicitly rooted, not merely strong.
-    Function->AddToRoot();
-    Class->AddFunctionToFunctionMap(Function, Name);
-    DynamicReceivers.Emplace(Function);
     DynamicKind = int32(Kind);
     DynamicPath = Path;
-    return Name;
+    return Function->GetFName();
 }
 void UDasIntDelegateProxy::ResetDynamicReceivers()
 {
-    check(IsInGameThread());
-    for (const auto& Function : DynamicReceivers)
-    {
-        StaticClass()->RemoveFunctionFromFunctionMap(Function.Get());
-        Function->RemoveFromRoot();
-    }
-    DynamicReceivers.Empty();
+    ResetDasNativeDelegateReceivers(StaticClass());
 }
+
 DEFINE_FUNCTION(UDasIntDelegateProxy::execReceiveDynamic)
 {
     // Native delegate calls already provide a linked parameter frame. Unlike

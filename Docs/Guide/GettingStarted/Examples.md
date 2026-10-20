@@ -52,7 +52,7 @@ text label and a `Health` component. Native fields and reflected methods are use
 
 ```das
 def BeginPlay():void {
-    self.Label.K2_SetText(ue_text("DasForUE","PlayerLabel","Player"))
+    self.Label.K2_SetText(ue_loctext(PlayerLabel, "Player"))
     self.CharacterMovement.MaxWalkSpeed=450.0f
     self.CharacterMovement.JumpZVelocity=500.0f
 }

@@ -7,15 +7,14 @@ class TimerCounter {
     Score:int=0
 
     def BeginPlay():void {
-        ue_timer_start("score",1.0,"Pulse",true)
+        ue_timer_start("score",1.0,self.Pulse,true)
     }
-    [ue_function(BlueprintCallable)]
     def Pulse():void {
         self.Score += 1
     }
     [ue_function(BlueprintCallable)]
     def Start():void {
-        ue_timer_start("score",1.0,"Pulse",true)
+        ue_timer_start("score",1.0,self.Pulse,true)
     }
     [ue_function(BlueprintCallable)]
     def Stop():bool { return ue_timer_cancel("score") }

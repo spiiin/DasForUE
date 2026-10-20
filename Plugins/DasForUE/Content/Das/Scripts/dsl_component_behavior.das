@@ -1,5 +1,6 @@
 options gen2
 require ue_dsl
+require ue_probe_actor
 require ue_actor_refs
 require ue_component_types
 [ue_class(Blueprintable)]
@@ -53,7 +54,7 @@ class ScoreBehavior : ActorComponent {
     def FailAfterWrite(var value:int&):void { value=999; panic("method fixture failure") }
     [ue_function(BlueprintCallable)]
     def EchoComponent(value:ScoreComponent):ScoreComponent { return value }
-    [ue_event(source="owner", name="OnDasSignal")]
+    [ue_event(source=owner,source_type=ProbeActorRef, name="OnDasSignal")]
     def OnOwnerSignal(amount:int) { self.SignalTotal += amount }
     def BeginPlay() { self.BeginCount += 1 }
     def Tick(delta:float) {

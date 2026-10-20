@@ -58,7 +58,9 @@ __ue_checked_enum_number	@ue_foundation::__ue_checked_enum_number CH<ue_foundati
 __ue_class_check	@ue_foundation::__ue_class_check CH<ue_foundation::UEClassHandle> CIs C_c	ue_foundation::UEClassHandle	4
 __ue_class_component_operation	@ue_foundation::__ue_class_component_operation CIH<ue_foundation::UObjectHandle> CH<ue_foundation::UEClassHandle> CIs Ci CIs CIs C_c	ue_foundation::UObjectHandle	4
 __ue_class_component_operation	@ue_foundation::__ue_class_component_operation CIH<ue_foundation::UObjectHandle> CIs CIs Ci CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_class_default_object	@ue_foundation::__ue_class_default_object CIs CH<ue_foundation::UEClassHandle> CIs Cb C_c	ue_foundation::UObjectHandle	4
 __ue_class_loaded	@ue_foundation::__ue_class_loaded CIs CIs CIs C_c	ue_foundation::UEClassHandle	4
+__ue_collision_profile_name	@ue_foundation::__ue_collision_profile_name Ci64 C_c	ue_foundation::UENameValue	4
 __ue_curve_table_eval	@ue_foundation::__ue_curve_table_eval CIH<ue_foundation::UObjectHandle> CIs Cf Cf C_c	float const	4
 __ue_curve_table_has	@ue_foundation::__ue_curve_table_has CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
 __ue_curve_table_names	@ue_foundation::__ue_curve_table_names CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
@@ -67,18 +69,21 @@ __ue_data_table_names	@ue_foundation::__ue_data_table_names CIH<ue_foundation::U
 __ue_data_table_row	@ue_foundation::__ue_data_table_row CIH<ue_foundation::UObjectHandle> CIs CIs C_c C_l	ue_foundation::UEStructValue	4
 __ue_delegate_begin_call	@ue_foundation::__ue_delegate_begin_call Cu64 CIs Cb Cb C_c	ue_foundation::UCallHandle	4
 __ue_delegate_bind	@ue_foundation::__ue_delegate_bind Cu64 CIs Cb CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
+__ue_delegate_bind_script	@ue_foundation::__ue_delegate_bind_script Cu64 CIs Cb CIH<ue_foundation::UObjectHandle> CIs Cb C_c	uint64 const	4
 __ue_delegate_clear	@ue_foundation::__ue_delegate_clear Cu64 CIs Cb C_c	uint64 const	4
 __ue_delegate_create	@ue_foundation::__ue_delegate_create CIs C_c	uint64 const	4
 __ue_delegate_event_view	@ue_foundation::__ue_delegate_event_view CIs CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
 __ue_delegate_get_field	@ue_foundation::__ue_delegate_get_field CIs CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
 __ue_delegate_is_bound	@ue_foundation::__ue_delegate_is_bound Cu64 CIs Cb C_c	bool const	4
 __ue_delegate_remove	@ue_foundation::__ue_delegate_remove Cu64 CIs Cb CIH<ue_foundation::UObjectHandle> CIs C_c	uint64 const	4
+__ue_delegate_self_target	@ue_foundation::__ue_delegate_self_target CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
 __ue_delegate_set_field	@ue_foundation::__ue_delegate_set_field CIs CIH<ue_foundation::UObjectHandle> CIs Cu64 C_c	void	4
 __ue_drag_create	@ue_foundation::__ue_drag_create CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs Ci CIH<ue_foundation::UEVector2D> C_c	ue_foundation::UObjectHandle	4
 __ue_drag_payload	@ue_foundation::__ue_drag_payload CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
 __ue_drag_tag	@ue_foundation::__ue_drag_tag CIH<ue_foundation::UObjectHandle> C_c	string const	4
 __ue_drag_valid	@ue_foundation::__ue_drag_valid CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 __ue_drag_visual	@ue_foundation::__ue_drag_visual CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_dynamic_event	@ue_foundation::__ue_dynamic_event CIs CIs CIs Cb C_c	void	4
 __ue_effect_active	@ue_foundation::__ue_effect_active CIs C_c	bool const	4
 __ue_effect_play	@ue_foundation::__ue_effect_play CIs CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UETransform> CIs Cf Cf C_c	bool const	4
 __ue_effect_stop	@ue_foundation::__ue_effect_stop CIs C_c	bool const	4
@@ -246,6 +251,11 @@ __ue_soft_make	@ue_foundation::__ue_soft_make CIs CIs C_c	ue_foundation::UEStruc
 __ue_soft_null	@ue_foundation::__ue_soft_null CIH<ue_foundation::UEStructValue> C_c	bool const	4
 __ue_soft_path	@ue_foundation::__ue_soft_path CIH<ue_foundation::UEStructValue> C_c	string const	4
 __ue_soft_upcast	@ue_foundation::__ue_soft_upcast CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UEStructValue	4
+__ue_state_init_bool	@ue_foundation::__ue_state_init_bool CIs Cb C_c	bool const	4
+__ue_state_init_double	@ue_foundation::__ue_state_init_double CIs Cd C_c	double const	4
+__ue_state_init_float	@ue_foundation::__ue_state_init_float CIs Cf C_c	float const	4
+__ue_state_init_int	@ue_foundation::__ue_state_init_int CIs Ci C_c	int const	4
+__ue_state_init_string	@ue_foundation::__ue_state_init_string CIs CIs C_c	string const	4
 __ue_struct_get_class	@ue_foundation::__ue_struct_get_class CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UEClassHandle	4
 __ue_struct_get_enum_value	@ue_foundation::__ue_struct_get_enum_value CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UEEnumValue	4
 __ue_struct_map_get_byte_enum	@ue_foundation::__ue_struct_map_get_byte_enum CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	ue_foundation::UEEnumValue	4
@@ -361,18 +371,22 @@ __ue_widget_bind_input	@ue_foundation::__ue_widget_bind_input CIH<ue_foundation:
 __ue_widget_capture	@ue_foundation::__ue_widget_capture CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UEEventReply	4
 __ue_widget_clear_focus	@ue_foundation::__ue_widget_clear_focus CIH<ue_foundation::UEEventReply> Cb C_c	ue_foundation::UEEventReply	4
 __ue_widget_click	@ue_foundation::__ue_widget_click CIH<ue_foundation::UObjectHandle> CIs CIs C_c	void	4
+__ue_widget_click_ref	@ue_foundation::__ue_widget_click_ref CIH<ue_foundation::UObjectHandle> CIs C_c	void	4
 __ue_widget_create	@ue_foundation::__ue_widget_create C&IH<ue_foundation::UEClassHandle> CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
 __ue_widget_drag	@ue_foundation::__ue_widget_drag CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UEEventReply	4
 __ue_widget_end_drag	@ue_foundation::__ue_widget_end_drag CIH<ue_foundation::UEEventReply> C_c	ue_foundation::UEEventReply	4
 __ue_widget_focus	@ue_foundation::__ue_widget_focus CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> Cb C_c	ue_foundation::UEEventReply	4
 __ue_widget_handled	@ue_foundation::__ue_widget_handled C_c	ue_foundation::UEEventReply	4
 __ue_widget_input	@ue_foundation::__ue_widget_input CIH<ue_foundation::UObjectHandle> Cb C_c	void	4
+__ue_widget_layout_field	@ue_foundation::__ue_widget_layout_field CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_widget_layout_resolve	@ue_foundation::__ue_widget_layout_resolve CIH<ue_foundation::UObjectHandle> CIs C_c	void	4
 __ue_widget_lock	@ue_foundation::__ue_widget_lock CIH<ue_foundation::UEEventReply> CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UEEventReply	4
 __ue_widget_position	@ue_foundation::__ue_widget_position CIH<ue_foundation::UEEventReply> Ci Ci C_c	ue_foundation::UEEventReply	4
 __ue_widget_release	@ue_foundation::__ue_widget_release CIH<ue_foundation::UEEventReply> C_c	ue_foundation::UEEventReply	4
 __ue_widget_remove	@ue_foundation::__ue_widget_remove CIH<ue_foundation::UObjectHandle> C_c	void	4
 __ue_widget_show	@ue_foundation::__ue_widget_show CIH<ue_foundation::UObjectHandle> Ci C_c	bool const	4
 __ue_widget_text	@ue_foundation::__ue_widget_text CIH<ue_foundation::UObjectHandle> CIs CH<ue_foundation::UETextValue> C_c	void	4
+__ue_widget_text_ref	@ue_foundation::__ue_widget_text_ref CIH<ue_foundation::UObjectHandle> CH<ue_foundation::UETextValue> C_c	void	4
 __ue_widget_unhandled	@ue_foundation::__ue_widget_unhandled C_c	ue_foundation::UEEventReply	4
 __ue_widget_unlock	@ue_foundation::__ue_widget_unlock CIH<ue_foundation::UEEventReply> C_c	ue_foundation::UEEventReply	4
 __ue_widget_visible	@ue_foundation::__ue_widget_visible CIH<ue_foundation::UObjectHandle> C_c	bool const	4

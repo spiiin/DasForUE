@@ -1,6 +1,7 @@
 options gen2
 module ue_life_behavior_base public
 require ue_dsl public
+require ue_probe_actor
 [ue_class(module_id="lifefamily",Blueprintable)]
 class BaseBehavior : ActorComponent {
     @ue_property=(BlueprintReadWrite)
@@ -21,7 +22,7 @@ class BaseBehavior : ActorComponent {
         self.ConstructionValue=self.Bonus*2
         self.ConstructionTrace=1
     }
-    [ue_event(source="owner",name="OnDasSignal")]
+    [ue_event(source=owner,source_type=ProbeActorRef,name="OnDasSignal")]
     def ParentSignal(value:int):void { self.BaseSignals+=value }
     [ue_lifecycle]
     def BeginPlay():void { self.BaseBegins+=1 }

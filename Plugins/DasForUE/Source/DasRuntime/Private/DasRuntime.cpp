@@ -23,6 +23,8 @@
 #include "Animation/Skeleton.h"
 #include "Engine/SkeletalMesh.h"
 #include "DasWidgetLifetime.h"
+#include "DasWidgetLayouts.h"
+#include "Blueprint/WidgetTree.h"
 #include "DasImageSoftBrush.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -106,6 +108,7 @@
 #include "DasDefinedEnum.h"
 #include "DasTypeRegistry.h"
 #include "DasRuntime.h"
+#include "DasFoundationManifest.h"
 #include "DasExecutionRole.h"
 #include "DasAsyncPhysicsBridge.h"
 #include "DasExecutionGuardProbe.h"
@@ -128,6 +131,7 @@
 #include "DasProbeActor.h"
 #include "DasScriptComponent.h"
 #include "DasIntDelegateProxy.h"
+#include "DasScriptDelegateProxy.h"
 #include "UObject/StrongObjectPtr.h"
 #include "UObject/GCObject.h"
 #include "UObject/StructOnScope.h"
@@ -166,6 +170,8 @@ THIRD_PARTY_INCLUDES_START
 #include "daScript/daScript.h"
 #include "daScript/ast/ast_handle.h"
 #include "daScript/ast/ast_visitor.h"
+#include "daScript/ast/ast_generate.h"
+#include "daScript/simulate/aot_builtin_ast.h"
 #include "daScript/simulate/data_walker.h"
 THIRD_PARTY_INCLUDES_END
 #pragma pack(pop)
@@ -541,8 +547,12 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeSceneComponents.inl"
 #include "DasRuntimeSubscriptionApi.inl"
 #include "DasRuntimeTypeAnnotations.inl"
+#include "DasPersistentGlobals.inl"
+#include "DasCollisionNames.inl"
 #include "DasFoundationModule.inl"
 #include "DasRuntimeTimers.inl"
+#include "DasDynamicEvents.inl"
+#include "DasScriptDelegateBindings.inl"
 #include "DasRuntimeInputSessions.inl"
 }
 
@@ -609,6 +619,12 @@ void FDasRuntimeModule::StartupModule()
                     for (auto& Declaration : C.Subscriptions)
                         if (UObject* const* New = Map.Find(Declaration.Source.GetEvenIfUnreachable()))
                             Declaration.Source = *New;
+                    for (auto& Pair : C.ScriptDelegateProxies)
+                        if (UObject* const* New = Map.Find(Pair.Value->Owner.GetEvenIfUnreachable()))
+                            Pair.Value->Owner = *New;
+                    for (auto& Binding : C.OwnedScriptDelegateEvents)
+                        if (UObject* const* New = Map.Find(Binding->Source.GetEvenIfUnreachable()))
+                            Binding->Source = *New;
                     for (auto& Pair : C.DelegateValues)
                     {
                         auto& V = Pair.Value;
@@ -688,6 +704,7 @@ void FDasRuntimeModule::ShutdownModule()
         PendingEvents.Empty();
         CreatedScriptScenes.Empty();
         UDasIntDelegateProxy::ResetDynamicReceivers();
+        UDasScriptDelegateProxy::ResetReceivers();
         ResetDasCallbackFrames();
         ResetDasContainerCarriers();
         das::Module::Shutdown();
@@ -1097,3 +1114,30 @@ FDasExecutionResult FDasRuntimeModule::RunLibraryFrame(const FString& Contract, 
 #include "DasExecutionGuardProbe.inl"
 
 #include "DasAsyncPhysicsVM.inl"
+
+TMap<FString, FName> DasCollisionProfileConstants()
+{
+    return CollisionProfileSymbols;
+}
+
+FDasExecutionResult FDasRuntimeModule::RunScriptDelegateFrame(const TSharedPtr<FDasScriptDelegateLease>& Generation,
+                                                              const FString& Path, const FString& Entry,
+                                                              const TArray<FDasScalarValue>& Arguments,
+                                                              EDasMethodSignature ReturnKind,
+                                                              TWeakObjectPtr<UObject> Owner, const FString& ReturnClass)
+{
+    if (!IsInGameThread())
+    {
+        FDasExecutionResult R;
+        R.Error = TEXT("Script delegates require the game thread");
+        return R;
+    }
+    if (!Generation.IsValid() || !Generation->Active)
+    {
+        FDasExecutionResult R;
+        R.Error = TEXT("Script delegate VM generation was revoked");
+        return R;
+    }
+    TGuardValue<const FDasScriptDelegateLease*> Guard(ExpectedDelegateGeneration, Generation.Get());
+    return RunNamedFramePersistent(Path, Entry, Arguments, ReturnKind, Owner, ReturnClass);
+}

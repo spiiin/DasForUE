@@ -146,31 +146,32 @@ background file watcher: the update happens on the next call.
 | State | After accepted logic reload |
 | --- | --- |
 | UPROPERTY values on the actor/component | Kept (the object is unchanged) |
-| Named state `ue_state_set_int` / `ue_state_get_int` | Transferred to the new version |
+| Annotated globals `var @ue_state Name:Type` | Owned scalar/string values restored before candidate global initialization |
 | Ordinary daScript globals | Kept between calls of one version; re-initialized on reload |
 | BeginPlay / Initialize delivery | Remembered; not replayed |
 | Declared delegate/event subscriptions | Old subscriptions removed, the new version's set installed |
-| Timers | Cancelled; start them again from an explicit setup method |
+| Named-method timers | Cancelled; start them again from an explicit setup method |
+| Inline `$` callback timers | Unchanged generated identity and verified signature: native schedule, pause state and payload kept; handler runs in the new VM |
 | Latent actions and async loads | Cancelled; restart them explicitly (e.g. a `StartLoad` method) |
 | Input bindings and mapping contexts | Old bindings revoked; the last successfully installed configuration is restored against the new handlers on a following world tick |
 | Widget handlers, replies, paint/drag/animation tokens | Old context released; tokens from it are invalid |
-| Arbitrary VM memory, strings, containers, pointers | Not copied |
+| Unmarked VM memory, strings, containers, pointers | Not copied |
 
 A rejected reload changes none of the above: old code, state, subscriptions, timers and bindings stay.
 During Apply/Reimport and migrations, idle VM contexts, lifecycle state and managed subscriptions are
 preserved across Blueprint reinstancing (see [Migrations](Migrations.md#runtime-state-during-migrations)).
 
-### Named state example
+### Annotated state example
 
 ```das
 options gen2
 require ue_foundation
 
 // Explicit state survives logic reload. Each Actor owns its own counter.
+var @ue_state count:int = 0
 [export]
 def main(input:int):int {
-    let count = ue_state_get_int("count", 0) + input
-    ue_state_set_int("count", count)
+    count += input
     return count // Change to count + 100 while playing to observe hot reload.
 }
 ```
@@ -179,6 +180,8 @@ Two calls with input `1` return `1`, then `2`; a second actor starts at `1`. Aft
 line to `return count + 100`, the next calls return `103` and `102` respectively. A syntax error keeps
 the previous version running with the same counters. Example:
 `Plugins/DasForUE/Content/Das/Scripts/persistent_counter.das`.
+
+See [typed identities and persistent state](../DSL/IdentitiesAndState.md) for supported types, module identity and type-change rejection.
 
 ### Ownership and cleanup
 

@@ -178,11 +178,26 @@ uint64 NextTraceScope = 1;
 // and after garbage collection, which may reuse class addresses.
 uint64 GDasSelfSiteEpoch = 1;
 bool GDasSelfSitesEnabled = true; // foundation benchmark compares both paths
+struct FDasPersistentGlobalValue
+{
+    das::Type Kind = das::Type::tVoid;
+    int32 Int = 0;
+    double Number = 0;
+    bool Bool = false;
+    FString String;
+};
 class FUnrealDasContext final : public das::Context, public FGCObject
 {
 public:
     explicit FUnrealDasContext(uint32 StackSize) : das::Context(StackSize) { ++GDasSelfSiteEpoch; }
     virtual ~FUnrealDasContext() { ++GDasSelfSiteEpoch; }
+    void* PersistentGlobalStorage(uint64 Hash)
+    {
+        for (int I = 0; I < totalVariables; ++I)
+            if (globalVariables[I].mangledNameHash == Hash)
+                return getVariable(I);
+        return nullptr;
+    }
     virtual void AddReferencedObjects(FReferenceCollector& Collector) override
     {
         for (auto& Value : StructValues)
@@ -193,6 +208,7 @@ public:
     virtual FString GetReferencerName() const override { return TEXT("FUnrealDasContext snapshots"); }
     uint64 TraceScope = NextTraceScope++;
     FDasWidgetLifetime WidgetLifetime;
+    TMap<FString, FDasResolvedWidgetLayout> WidgetLayouts;
     FDasImageSoftBrushLifetime ImageBrushes;
     FDasDragLifetime DragLifetime;
     TArray<TStrongObjectPtr<USaveGame>> SaveGames;
@@ -221,6 +237,7 @@ public:
     TMap<uint64, FName> DSLNames;
     TMap<FName, uint64> DSLNameTokens;
     TMap<FString, int32> PersistentInts;
+    TMap<FString, FDasPersistentGlobalValue> PersistentGlobals;
     int32 ExecutionDepth = 0;
     bool bEnding = false;
     bool bCollectingSubscriptions = false;
@@ -241,6 +258,9 @@ public:
     TMap<FObjectKey, uint64> ObjectKeyTokens;
     TMap<uint64, TWeakObjectPtr<UObject>> ObjectKeys;
     TMap<uint64, TSharedPtr<FMarshalledCall>> Calls;
+    TSharedPtr<FDasScriptDelegateLease> DelegateLease = MakeShared<FDasScriptDelegateLease>();
+    TMap<FString, TStrongObjectPtr<UDasScriptDelegateProxy>> ScriptDelegateProxies;
+    TArray<TUniquePtr<FDasOwnedScriptDelegate>> OwnedScriptDelegateEvents;
     TMap<uint64, FDelegateValue> DelegateValues;
     TMap<FString, TStrongObjectPtr<UFunction>> DelegateSignatures;
 };
@@ -258,6 +278,7 @@ struct FStructFrameRoots final : FGCObject
     virtual FString GetReferencerName() const override { return TEXT("daScript native input frame snapshots"); }
 };
 thread_local FUnrealDasContext* ActiveContext = nullptr;
+thread_local const FDasScriptDelegateLease* ExpectedDelegateGeneration = nullptr;
 thread_local das::Context* RestrictedPhysicsContext = nullptr;
 // Every script entry opens its own FActiveContextScope with a fresh token. Chaos marks the game thread
 // frozen only around whole PreSim callback dispatches (FPhysicsSolverFrozenGTPreSimCallbacks), so the

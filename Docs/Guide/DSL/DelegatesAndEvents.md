@@ -59,8 +59,8 @@ reference and native enum representations are not converted silently.
 ```das
 var stored = FObjectValueDelegate()
 
-var ready = ue_bind(type<FObjectValueDelegate>, ue_self_object(), "OnDelegateExecuted")
-stored.BindUFunction(ue_self_object(), "OnDelegateExecuted")
+var ready = ue_bind(type<FObjectValueDelegate>, ue_self_object(), self.OnDelegateExecuted)
+stored.BindUFunction(ue_self_object(), self.OnDelegateExecuted)
 if (stored.IsBound()) {
     stored.Execute(ue_self_object(), 1.0)
 }
@@ -72,8 +72,9 @@ stored.Unbind()
   types, directions and layout (parameter names may differ). Native handlers do not
   need `BlueprintCallable`; DSL handlers are normal `ue_function` methods. Static,
   network and signature functions cannot be handlers.
-- The target may be a `UObjectHandle` or a typed object reference; the method name
-  a string or `UENameValue`.
+- The target may be a `UObjectHandle` or a typed object reference. Handler arguments
+  accept checked `self.Method`, `@@function`, or an existing string/`UENameValue` name.
+  See [handler references](HandlerReferences.md) for target and lifetime rules.
 - `Execute` returns the handler's result; executing an unbound delegate fails.
   `ExecuteIfBound` exists for `void` signatures.
 - Delegates are values: copying one and then rebinding or unbinding a copy does
@@ -155,7 +156,7 @@ class DelegateExample {
     [ue_function(BlueprintCallable)]
     def FirstHandler(counter:int):void { self.Score += counter }
     [ue_function(BlueprintCallable)]
-    def BindHandlers():void { self.OnExampleEvent.AddUFunction(ue_self_object(), "FirstHandler") }
+    def BindHandlers():void { self.OnExampleEvent.AddUFunction(ue_self_object(), self.FirstHandler) }
     [ue_function(BlueprintCallable)]
     def Emit(counter:int):void { self.OnExampleEvent.Broadcast(counter) }
 }
@@ -190,6 +191,50 @@ event.Clear()
   existing reflected multicast property. Binding requires `BlueprintAssignable`;
   broadcasting also requires `BlueprintCallable`.
 
+## Dynamic subscriptions without strings
+
+Inside ordinary class methods, use `+=` and `-=` to subscribe and unsubscribe at runtime:
+
+```das
+[ue_function(BlueprintCallable)]
+def Listen(enabled:bool):void {
+    if (enabled) {
+        self.Changed += self.OnChanged
+        self.Health.Changed += self.OnHealthChanged
+    }
+}
+
+[ue_function(BlueprintCallable)]
+def StopListening():void {
+    self.Changed -= self.OnChanged
+    self.Health.Changed -= self.OnHealthChanged
+}
+
+def OnChanged(value:int):void { self.Score += value }
+def OnHealthChanged(current:float; maximum:float):void { self.RefreshHUD() }
+```
+
+The source is a native/authored event on self or a declared component. The handler must be a `void` instance method declared on the same class. It becomes a hidden reflected callback automatically; add an explicit `BlueprintCallable` only to expose it in Blueprint. Event names, argument count and exact UE parameter types are checked before Apply, and the actual property/function contract is checked again when binding. Direct calls require exact types; use the declarative queued form below when you need its supported object/class widening. Mutable ref/out event payloads are not supported by this syntax.
+
+These are synchronous Unreal multicast subscriptions, so handlers run during broadcast and may make nested calls. Conditions and repeated calls are allowed. Repeating `+=` for the same source/event/handler has no effect. Repeating `-=` is harmless and leaves other handlers on the event untouched. Ordinary arithmetic such as `self.Score += self.Increment` retains its normal meaning.
+
+The persistent owner session tracks subscriptions using weak source/target references. EndPlay, Destroy, context release and an accepted hot reload revoke them. **After a successful reload, call the subscription method again when appropriate**; dynamic subscriptions are not automatically replayed. A rejected reload keeps the working bindings. Updates require the game thread and a live session; construction, declaration collection and EndPlay cannot install new subscriptions. Removal during EndPlay is a harmless no-op because lifecycle teardown already detached the bindings. `BindEvents` remains the separate declaration form below. Arbitrary object variables, owner expressions, inherited handler references and inline blocks are outside the dynamic operator syntax.
+
+## Declarative subscriptions without strings
+
+```das
+def BindEvents():void {
+    self.OnDasSignal += self.OnSignal
+    self.Health.Changed += self.OnHealthChanged
+}
+def OnSignal(value:int):void { self.Score += value }
+def OnHealthChanged(current:float; maximum:float):void { self.RefreshHUD() }
+```
+
+`BindEvents` is a reserved, unannotated declaration method with no parameters or result. Its body accepts only top-level `+=` declarations. These become ordinary `ue_event` contracts and are collected against the candidate VM before it is accepted. They are not imperative subscriptions executed by calling `BindEvents`. Conditions, loops, arbitrary statements, `-=` and handlers already carrying annotations are rejected. Each handler names one source; use separate forwarding handlers for multiple sources. Native self events and declared native/authored components are supported.
+
+This keeps the existing queued delivery, reload replacement, rejection and owner/source cleanup rules. It does not introduce direct native delegate bindings that outlive the script context. An `+=` expression in an ordinary gameplay method uses the synchronous, session-owned dynamic form above.
+
 ## Subscribing to events: `ue_event`
 
 `ue_event` binds a class method to an existing reflected dynamic multicast
@@ -213,12 +258,13 @@ class ScalarEventActor {
 }
 ```
 
-- `source="self"` is the default; `source="owner"` is available in ActorComponents;
+- `source=self` is the default; `source=owner` is available in ActorComponents and requires `source_type=OwnerRef`;
   a component name subscribes to one of the object's own components.
 - When the source is native (self of a class with a native parent, or a native
   component), the delegate is checked while the script compiles: a misspelled name or
-  a handler with the wrong number of parameters is a compile error. Owner and authored
-  sources are checked when `bind_events` subscribes.
+  a handler with the wrong parameter count/types is a compile error. Authored source
+  declarations and explicit owner contracts are checked before Apply; the actual
+  owner is checked again when binding.
 - Handlers return `void` and take 0–16 by-value parameters (`var` allows local
   mutation of the copy); no `ref`/`out`/defaults, and not combined with
   `BlueprintCallable`. Several handlers per class are allowed; duplicates are
@@ -245,6 +291,18 @@ payloads to the usual snapshot limits (4096 elements / 16 MiB). At most 1024 que
 or recursive events and 256 declarations per class. Full details on payload
 ownership, multiple arguments and timers are in
 [CallbackArguments.md](../Gameplay/CallbackArguments.md).
+
+Names may be identifiers: `[ue_event(source=Health, name=Changed)]`. Quoted names remain accepted. Every declared event is checked before Apply: name, arity, payload types, enum/struct/container identity and source parameter direction. Compatible object/class widening follows the queued callback-frame policy; narrowing and mutable ref/out sources are rejected. Native sources use reflected signatures; authored sources use their source declarations, so they do not require an already-generated Blueprint.
+
+An owner is dynamically assigned to a component, so state its contract explicitly:
+
+```das
+[ue_event(source=owner, source_type=ActorRef, name=OnTakeAnyDamage)]
+def OnDamage(damaged:ActorRef; amount:float; kind:ObjectRef;
+             instigator:ObjectRef; source:ActorRef):void { /* ... */ }
+```
+
+`source_type` names a native or authored object reference type available in the module. The actual owner is checked against that type during binding. Existing owner annotations must add this option; an unknown owner contract is no longer deferred to PIE. `ProbeActorRef` in internal examples describes the test host's custom `OnDasSignal`; it is not a general Actor contract.
 
 Subscriptions are removed on EndPlay, owner or source destruction, world cleanup
 and runtime context release. An accepted hot reload re-binds; a rejected reload keeps

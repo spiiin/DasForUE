@@ -22,7 +22,7 @@ class Example : Actor {
     }
     defaults = ue_defaults() {
         self.Score = 31
-        self.SpawnType = ue_class_default("/Script/Engine.StaticMeshActor")
+        self.SpawnType = ue_class_default(type<ActorRef>)
         self.Visual = ue_asset_default("/Engine/BasicShapes/Cube.Cube")
         self.Pose = ue_transform(ue_vector(10.0lf,20.0lf,30.0lf),
             ue_rotator(0.0lf,45.0lf,0.0lf), ue_vector(2.0lf,2.0lf,2.0lf))
@@ -60,12 +60,11 @@ Try it: `Scripts/TestExtendedDefaults.ps1` (add `-PIE` or `-Package`).
 | Vector, Vector2D, Rotator, Transform | `ue_vector(...)`, `ue_vector2d(...)`, `ue_rotator(...)`, `ue_transform(t,r,s)`, `ue_transform_identity()` |
 | typed reflected struct | `ue_default_text("(Field=Value,...)")` (type taken from the property) |
 | `UEStructValue` property | `ue_struct_default("/Script/Module.Type", "(...)")` |
-| class reference | `ue_class_default("/Script/Engine.Pawn")` |
+| class reference | `ue_class_default(type<ActorRef>)` |
 | asset reference | `ue_asset_default("/Game/Folder/Asset.Asset")`; `""` means null |
 | arrays, sets, maps | gen2 literals, see [containers](#container-defaults) |
 
-- `ue_class_default` and `ue_asset_default` are **declaration markers**, not loading
-  functions. Import loads and validates the target against the property's class or
+- In declaration defaults, `ue_class_default(type<T>)` and `ue_asset_default` are interpreted as data. Ordinary `ue_class_default(type<T>)` calls return the typed CDO view; see [typed identities](IdentitiesAndState.md). Import validates the target against the property's class or
   MetaClass. Asset defaults must be top-level assets (not Actors, components, CDOs
   or classes); class defaults may be abstract.
 - The result is a normal hard reference on the CDO/template, so Unreal saves it and
@@ -142,7 +141,7 @@ class ChildCounter : BaseCounter {
     defaults=ue_defaults() {
         self.Score=20
         self.Position=ue_vector(4.0lf,5.0lf,6.0lf)
-        self.SpawnType=ue_class_default("/Script/Engine.Pawn")
+        self.SpawnType=ue_class_default(type<ActorRef>)
     }
 }
 ```

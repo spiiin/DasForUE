@@ -1,5 +1,6 @@
 options gen2
 require ue_life_behavior_base
+require ue_probe_actor
 [ue_class(module_id="lifefamily",Blueprintable)]
 class ChildBehavior : BaseBehavior {
     @ue_property=(BlueprintReadWrite)
@@ -15,7 +16,7 @@ class ChildBehavior : BaseBehavior {
         self.ConstructionValue+=3
         self.ConstructionTrace=self.ConstructionTrace*10+2
     }
-    [ue_event(source="owner",name="OnDasSignal")]
+    [ue_event(source=owner,source_type=ProbeActorRef,name="OnDasSignal")]
     def ChildSignal(value:int):void { self.ChildSignals+=value*10 }
     [ue_lifecycle]
     def override BeginPlay():void { Super.BeginPlay();self.ChildBegins+=1 }

@@ -177,6 +177,7 @@ void NextCallbackFrameTimer(const char*, const char*, const FDasCallHandle&, das
 #include "DasSoftRuntime.inl"
 #include "DasDSL.inl"
 #include "DasGameplayServices.inl"
+#include "DasWidgetLayoutsRuntime.inl"
 #include "DasImageSoftBrushRuntime.inl"
 #include "DasInputActionValue.inl"
 #include "DasInputEventsRuntime.inl"

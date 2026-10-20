@@ -74,9 +74,6 @@ declare your own:
 ```das
 [ue_native_object(path="/Script/Engine.RotatingMovementComponent")]
 struct RotatingComponentRef { handle:UObjectHandle }
-def RotatingComponentRef_from(value:UObjectHandle):RotatingComponentRef {
-    return RotatingComponentRef(handle=ue_cast_nullable_object(value,"/Script/Engine.RotatingMovementComponent"))
-}
 ```
 
 For authored components, keep the reference type in a **declaration-only module**

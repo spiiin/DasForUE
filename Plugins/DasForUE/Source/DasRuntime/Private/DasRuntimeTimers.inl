@@ -38,6 +38,8 @@ struct FManagedSubscription
     FString PayloadPath;
     TStrongObjectPtr<UDasIntDelegateProxy> Proxy;
     FName ProxyFunction;
+    FName DirectFunction;
+    TWeakObjectPtr<UObject> DirectTarget;
     int32 SaveGameKind = 0;
     FString SaveGameName;
     TStrongObjectPtr<UDasSaveGameProxy> SaveGameProxy;
@@ -65,6 +67,17 @@ struct FManagedSubscription
     TStrongObjectPtr<UDasMontageProxy> MontageProxy;
     ~FManagedSubscription()
     {
+        if (!DirectFunction.IsNone())
+        {
+            if (auto* O = Source.Get())
+                if (auto* P = FindFProperty<FMulticastDelegateProperty>(O->GetClass(), Event))
+                {
+                    FScriptDelegate D;
+                    D.BindUFunction(DirectTarget.Get(), DirectFunction);
+                    P->RemoveDelegate(D, O, P->ContainerPtrToValuePtr<void>(O));
+                }
+            return;
+        }
         if (AIMoveProxy.IsValid())
         {
             AIMoveProxy->Deactivate();
@@ -236,13 +249,38 @@ TArray<uint64> PendingScriptTimers;
 uint64 NextScriptTimer = 1;
 bool bDrainingScriptTimers = false;
 void DrainEvents();
-void ClearSessionTimers(FPersistentSession& S)
+void ClearSessionTimers(FPersistentSession& S, FUnrealDasContext* InlineReplacement = nullptr)
 {
     if (!S.Live)
         return;
+    TSet<FString> InlineEntries;
+    TArray<FString> InlineFramePrefixes;
+    if (InlineReplacement)
+    {
+        FDasAuthoringModule Model;
+        FString Issue;
+        if (FDasAuthoringModule::FromJson(S.Live->DSLDeclaration, Model, Issue))
+            for (const auto& Class : Model.Classes)
+                for (const auto& Method : Class.Methods)
+                    if (Method.Name.StartsWith(TEXT("__ue_cb_")))
+                    {
+                        InlineEntries.Add(Method.EntryPoint);
+                        InlineFramePrefixes.Add(Method.Name + TEXT("_frame_"));
+                    }
+    }
     for (auto I = ScriptTimers.CreateIterator(); I; ++I)
         if (I.Value()->Context == S.Live->Context.Get())
-            I.RemoveCurrent();
+        {
+            // Candidate RequiredEntries were verified before commit. Inline entries keep no stack closure;
+            // their native payload, timer handle, pause state and queued ID can outlive the old VM.
+            if (InlineReplacement && S.RequiredEntries.Contains(I.Value()->Handler) &&
+                (InlineEntries.Contains(I.Value()->Handler) ||
+                 InlineFramePrefixes.ContainsByPredicate([&](const FString& Prefix)
+                                                         { return I.Value()->Handler.StartsWith(Prefix); })))
+                I.Value()->Context = InlineReplacement;
+            else
+                I.RemoveCurrent();
+        }
 }
 FPersistentSession* ManagedOwnerSession(das::Context* C)
 {

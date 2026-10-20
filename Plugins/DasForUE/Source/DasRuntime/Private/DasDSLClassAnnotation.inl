@@ -116,7 +116,13 @@ struct FUEClassAnnotation : das::StructureAnnotation
                                   St->module});
             TGuardValue<FString> NativeDefaultsHint(DSLNativeDefaultsParentHint, NativeHint);
             DSLExpandDeclarationGroups(St, true);
-            DSLNormalizeMethodReferences(St);
+            DSLNormalizeEventDeclarations(St, Group);
+            DSLNormalizeDynamicEvents(St);
+            DSLNormalizeDelegateReferences(St, Group);
+            DSLNormalizeOperationKeys(St, Args);
+            DSLNormalizeInlineCallbacks(St, Group);
+            DSLNormalizeMethodReferences(St, Group);
+            DSLNormalizeIdentityDefaults(St, Group);
             DSLPrepareComputedDefaults(St);
             const auto ComponentDefaults = DSLCollectComponentDefaults(St);
             DSLCommentTooltip(St->at, Args);
@@ -699,6 +705,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             const FString RefKey = Script + TEXT("::")+ C.Name;
             DSLActiveRefDeclarations.Add(RefKey, C);
             DSLRememberPropertySources(RefKey, St, C, TypeScope);
+            DSLCollectWidgetLayoutUses(St, Group, C);
             das::vector<das::FunctionPtr> Functions, Generated;
             St->module->functions.foreach (
                 [&](const das::FunctionPtr& F)
@@ -725,6 +732,13 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 TMap<FString, FString> Directions;
                 for (const auto& V : A->arguments)
                 {
+                    if (V.name == "_ue_hidden_callback")
+                    {
+                        if (V.at.fileInfo || !DSLBool(V))
+                            DSLFail(TEXT("Reserved callback compiler option"));
+                        M.Metadata.Add(TEXT("BlueprintInternalUseOnly"), TEXT("true"));
+                        continue;
+                    }
                     if (V.name == "id")
                     {
                         M.Id = DSLString(A->arguments, "id");
@@ -1200,157 +1214,13 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 Clone->arguments.erase(Clone->arguments.begin());
                 if (!Rewrite.Error.IsEmpty())
                     DSLFail(Rewrite.Error);
-                bool HasOutputs = false;
-                for (const auto& P : M.Parameters)
-                    HasOutputs |= P.Direction != TEXT("in");
-                bool Direct = true;
-                if (Direct)
-                {
-                    auto Wrapper = Clone->clone();
-                    Clone->name = DSLUtf8(TEXT("__impl_")+ M.EntryPoint);
-                    Clone->exports = false;
-                    auto* Call = new das::ExprCall(F->at, Clone->name);
-                    auto* Block = new das::ExprBlock();
-                    Block->at = F->at;
-                    auto Local = [&](const das::string& Name, const das::TypeDeclPtr& Type, das::ExpressionPtr Init)
-                    {
-                        auto* V = new das::Variable();
-                        V->at = F->at;
-                        V->name = Name;
-                        V->type = DSLCopyType(Type);
-                        V->type->ref = false;
-                        V->type->constant = false;
-                        V->init = Init;
-                        V->init_via_move = DSLContainer(Type);
-                        auto* Let = new das::ExprLet();
-                        Let->at = F->at;
-                        Let->variables.push_back(V);
-                        Block->list.push_back(Let);
-                    };
-                    for (size_t I = 0; I < Wrapper->arguments.size(); ++I)
-                    {
-                        auto& Arg = Wrapper->arguments[I];
-                        Arg->init = nullptr;
-                        auto Original = F->arguments[I + 1]->type;
-                        Arg->type = DSLCopyType(Arg->type);
-                        Arg->type->ref = false;
-                        Arg->type->constant = true;
-                        das::ExpressionPtr Value = new das::ExprVar(F->at, Arg->name);
-                        if (DSLDelegate(Original))
-                        {
-                            Arg->type = new das::TypeDecl(das::Type::tUInt64, F->at);
-                            Value = DSLDirectUnpack(F->at, Original, Value, FString());
-                        }
-                        if (DSLTypedClass(Original) || DSLContainer(Original) || DSLDirectEnum(Original) ||
-                            (DSLDirectStruct(Original) ||
-                             (DSLMathPath(Original) == TEXT("/Script/CoreUObject.Vector2D") ||
-                                                            DSLMathPath(Original) ==
-                                                                TEXT("/Script/EnhancedInput.InputActionValue"))) ||
-                             DSLTypedReference(Original))
-                        {
-                            Arg->type = DSLHandleType(Group, St->module,
-                                                      DSLTypedClass(Original)       ? "UEClassHandle"
-                                                      : DSLTypedReference(Original) ? "UObjectHandle"
-                                                      : DSLDirectEnum(Original)     ? "UEEnumValue"
-                                                                                    : "UEStructValue");
-                            Value = DSLDirectUnpack(F->at, Original, Value,
-                                                    DSLContainer(Original)
-                                                        ? DSLDirectPath(Original, TypeFolder, TypeRegistry)
-                                                        : M.Parameters[int32(I)].Type.TypePath);
-                        }
-                        if (M.Parameters[int32(I)].Direction != TEXT("in"))
-                        {
-                            const das::string Name = "__ue_ref_" + das::to_string(I);
-                            Local(Name, Original, Value);
-                            Value = new das::ExprVar(F->at, Name);
-                        }
-                        Call->arguments.push_back(Value);
-                    }
-                    das::ExpressionPtr Value = Call;
-                    if (HasOutputs)
-                    {
-                        if (ResultType == TEXT("void"))
-                        {
-                            Block->list.push_back(Call);
-                            Value = nullptr;
-                        }
-                        else
-                        {
-                            Local("__ue_return", F->result, Call);
-                            Value = new das::ExprVar(F->at, "__ue_return");
-                        }
-                        for (int32 I = 0; I < M.Parameters.Num(); ++I)
-                            if (M.Parameters[I].Direction != TEXT("in"))
-                            {
-                                auto Original = F->arguments[size_t(I) + 1]->type;
-                                das::ExpressionPtr Updated = new das::ExprVar(F->at, "__ue_ref_" + das::to_string(I));
-                                const FString Kind = M.Parameters[I].Type.Kind;
-                                const das::string Math = DSLUtf8(DSLMathPath(Original));
-                                const das::string Suffix =
-                                    Kind ==
-                                    TEXT("class")
-                                         ? "class"
-                                         : Kind ==
-                                               TEXT("object")
-                                                    ? "object"
-                                                    : Kind ==
-                                                          TEXT("enum")
-                                                               ? "enum"
-                                                               : Kind ==
-                                                                     TEXT("struct")
-                                                                          ? (Math == "/Script/CoreUObject.Vector"
-                                                                                 ? "vector"
-                                                                             : Math == "/Script/CoreUObject.Rotator"
-                                                                                 ? "rotator"
-                                                                             : Math == "/Script/CoreUObject.Transform"
-                                                                                 ? "transform"
-                                                                                 : "struct")
-                                                                      : DSLContainer(Original) ? "struct"
-                                                                                               : DSLScalarSuffix(Kind);
-                                if (DSLTypedClass(Original) || DSLContainer(Original) ||
-                                    (DSLDirectStruct(Original) ||
-                                     (DSLMathPath(Original) ==
-                                          TEXT("/Script/CoreUObject.Vector2D") ||
-                                               DSLMathPath(Original) ==
-                                                   TEXT("/Script/EnhancedInput.InputActionValue"))) ||
-                                     DSLDirectEnum(Original) || DSLTypedReference(Original))
-                                    Updated = DSLDirectPack(F->at, Original, Updated,
-                                                            DSLContainer(Original)
-                                                                ? DSLDirectPath(Original, TypeFolder, TypeRegistry)
-                                                                : M.Parameters[I].Type.TypePath);
-                                Block->list.push_back(DSLCall(F->at, "ue_frame_out_" + Suffix,
-                                                              {new das::ExprConstInt(F->at, I), Updated}));
-                            }
-                    }
-                    if (DSLDelegate(F->result))
-                    {
-                        Wrapper->result = new das::TypeDecl(das::Type::tUInt64, F->at);
-                        Value = DSLDirectPack(F->at, F->result, Value, FString());
-                    }
-                    if (DSLTypedClass(F->result) || DSLContainer(F->result) || DSLDirectEnum(F->result) ||
-                        (DSLDirectStruct(F->result) ||
-                         (DSLMathPath(F->result) == TEXT("/Script/CoreUObject.Vector2D") ||
-                                                         DSLMathPath(F->result) ==
-                                                             TEXT("/Script/EnhancedInput.InputActionValue"))) ||
-                         DSLTypedReference(F->result))
-                    {
-                        Wrapper->result = DSLHandleType(Group, St->module,
-                                                        DSLTypedClass(F->result)       ? "UEClassHandle"
-                                                        : DSLTypedReference(F->result) ? "UObjectHandle"
-                                                        : DSLDirectEnum(F->result)     ? "UEEnumValue"
-                                                                                       : "UEStructValue");
-                        Value =
-                            DSLDirectPack(F->at, F->result, Value,
-                                          DSLContainer(F->result) ? DSLDirectPath(F->result, TypeFolder, TypeRegistry)
-                                                                  : M.ReturnType.TypePath);
-                    }
-                    if (Value)
-                        Block->list.push_back(
-                            M.ReturnType.Kind ==
-                            TEXT("void")? Value : static_cast<das::ExpressionPtr>(new das::ExprReturn(F->at, Value)));
-                    Wrapper->body = Block;
-                    Generated.push_back(Wrapper);
-                }
+                const auto PublicName = Clone->name;
+                Clone->name = DSLUtf8(TEXT("__impl_") + M.EntryPoint);
+                Clone->exports = false;
+                auto Wrapper = DSLHandlerABI(F, Clone, Clone->name, M, 1, Group, St->module, TypeFolder, TypeRegistry);
+                Wrapper->name = PublicName;
+                Wrapper->exports = true;
+                Generated.push_back(Wrapper);
                 Generated.push_back(Clone);
             }
             das::vector<das::FunctionPtr> Callbacks;
@@ -1573,17 +1443,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                         DSLFail(TEXT("Event source must be self, owner or a declared component"));
                     if (Callback.Source == TEXT("owner") && C.NativeParent != TEXT("/Script/Engine.ActorComponent"))
                         DSLFail(TEXT("Owner event source requires ActorComponent"));
-                    // Native sources are known while compiling: check the delegate and its arity here
-                    // instead of at subscription time. Authored sources keep the runtime check.
-                    if (UClass* EventClass = DSLEventSourceClass(C, Callback.Source))
-                    {
-                        const bool AuthoredEvent = C.Properties.ContainsByPredicate(
-                            [&](const auto& P) { return P.Name == Callback.EventName; });
-                        const int32 Arity = int32(F->arguments.size()) - 1;
-                        if (!AuthoredEvent && !DSLNativeEventMatches(EventClass, Callback.EventName, Arity))
-                            DSLFail(FString::Printf(TEXT("ue_event %s: %s has no BlueprintAssignable multicast delegate %s with %d parameter(s)"),
-                                *Callback.Name, *EventClass->GetName(), *Callback.EventName, Arity));
-                    }
+                    DSLValidateEventSignature(C, Callback, F, St, Group, TypeFolder, TypeRegistry, Event->arguments);
                     auto* SelfObject = DSLCall(F->at, "ue_self_object", {});
                     das::ExpressionPtr Source =
                         Callback.Source ==
@@ -1594,6 +1454,13 @@ struct FUEClassAnnotation : das::StructureAnnotation
                                                : static_cast<das::ExpressionPtr>(DSLCall(
                                                      F->at, "ue_get_self_object",
                                                      {new das::ExprConstString(F->at, DSLUtf8(Callback.Source))}));
+                    if (Callback.Source == TEXT("owner"))
+                    {
+                        auto OwnerType = DSLEventOwnerType(Event->arguments, F, St, Group);
+                        Source = new das::ExprField(
+                            F->at, DSLDirectUnpack(F->at, OwnerType, Source, DSLTypedReferencePath(OwnerType)),
+                            "handle");
+                    }
                     auto* Subscribe =
                         DSLCall(F->at, DSLUtf8(TEXT("ue_subscribe_object_")+ Callback.ParameterKind),
                                                {Source, new das::ExprConstString(F->at, DSLUtf8(Callback.EventName)),

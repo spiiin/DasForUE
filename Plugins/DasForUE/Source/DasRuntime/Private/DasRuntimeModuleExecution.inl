@@ -457,6 +457,9 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             else
             {
                 Candidate->Context = MakeUnique<FUnrealDasContext>(Candidate->Program->getContextStackSize());
+                if (Session->Live)
+                    Candidate->Context->PersistentGlobals =
+                        SnapshotPersistentGlobals(Session->Live->Program, *Session->Live->Context);
                 FActiveContextScope Scope(*Candidate->Context);
                 // No self during initialization: rejected code cannot alter the live Actor.
                 if (!Candidate->Program->simulate(*Candidate->Context, Output))
@@ -573,7 +576,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                               ParentLifecycle, Session->bBeginDelivered && DSLPhysicsOwnerReady(Owner), CandidateError);
         if (CandidateError.IsEmpty() && Candidate->Context && Candidate->Program && !Candidate->Program->failed())
         {
-            ClearSessionTimers(*Session);
+            ClearSessionTimers(*Session, Candidate->Context.Get());
             Session->Bindings.Empty();
             Session->InputContexts.Empty(); // Revoke old IDs before destroying any old VM state.
             Candidate->Context->Self = Self;
@@ -583,6 +586,11 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 UDasAsyncPhysicsBridge::RevokeOwnerExcept(Session->Owner.Get(), NewPhysicsRevision);
             if (Session->Live)
                 Session->Live->Context->ImageBrushes.Revoke();
+            if (Session->Live)
+            {
+                Session->Live->Context->DelegateLease->Active = false;
+                Session->Live->Context->OwnedScriptDelegateEvents.Empty();
+            }
             Session->Live = MoveTemp(Candidate);
             if (Session->Live->bPhysicsOwner)
             {
@@ -610,6 +618,11 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     Result.ReloadError = Session->ReloadError;
     if (Event == EDasCallback::EndPlay && (!Session->Live || !Session->bBeginDelivered || Session->bEndDelivered))
     {
+        if (Session->Live)
+        {
+            Session->Live->Context->DelegateLease->Active = false;
+            Session->Live->Context->OwnedScriptDelegateEvents.Empty();
+        }
         ClearSessionTimers(*Session);
         Session->Bindings.Empty();
         Session->InputContexts.Empty();
@@ -630,6 +643,12 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         return Result;
     }
     auto& Context = *Session->Live->Context;
+    if (ExpectedDelegateGeneration &&
+        (Context.DelegateLease.Get() != ExpectedDelegateGeneration || !ExpectedDelegateGeneration->Active))
+    {
+        Result.Error = TEXT("Script delegate VM generation was revoked during reload");
+        return Result;
+    }
     if (!Reentering)
     {
         Context.restart();
@@ -783,6 +802,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         else if (Event == EDasCallback::EndPlay)
         {
             ClearSessionTimers(*Session);
+            Session->Live->Context->DelegateLease->Active = false;
+            Session->Live->Context->OwnedScriptDelegateEvents.Empty();
             Session->Live->Context->DragLifetime.Revoke();
             Session->Live->Context->ImageBrushes.Revoke();
             Session->bEndDelivered = true;

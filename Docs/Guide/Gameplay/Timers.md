@@ -2,6 +2,41 @@
 
 Scripts schedule deferred work through owner-managed, named timers backed by the world's TimerManager, and through a latent delay backed by the Latent Action Manager. Both call an ordinary method of your class, clean up automatically with the owner, and never hold pointers into the VM.
 
+## Keys from callbacks
+
+Inside an authored class, omit the key when starting an operation with a named handler:
+
+```das
+ue_timer_start(1.0f, self.Pulse, true)
+ue_timer_next_tick(self.ApplyScore, 5)
+ue_timer_pause(self.Pulse)
+ue_timer_resume(self.Pulse)
+ue_timer_cancel(self.Pulse)
+ue_latent_delay(0.5f, self.Finished)
+ue_latent_cancel(self.Finished)
+```
+
+The compiler derives a stable UTF-8 key from the class identity, API family and callback method. Timer queries (`is_active`, `is_paused`, `remaining`, `elapsed`) and latent `is_pending` accept the same method reference. Editing the handler body does not change its key. State still belongs to the existing owner/session; reload and cleanup policies are unchanged. This does not add preservation of named timer schedules across reload.
+
+The same form works for effects and montage:
+
+```das
+ue_sound_play(sound, location, self.SoundFinished)
+ue_niagara_spawn(system, location, self.EffectFinished)
+ue_effect_at(sound, system, location, self.EffectFinished)
+ue_effect_play(sound, system, transform, self.EffectFinished)
+ue_effect_stop(self.EffectFinished)
+ue_effect_active(self.EffectFinished)
+ue_montage_play(mesh, montage, self.MontageUpdate)
+ue_montage_stop(self.MontageUpdate)
+ue_montage_cancel(self.MontageUpdate)
+ue_montage_playing(self.MontageUpdate)
+```
+
+One callback identifies one operation per family. Reusing it replaces that operation under the existing API rules; sound and Niagara share the effect family. To run independent instances with the same callback, supply explicit keys. Existing string/dynamic-key forms remain accepted. Keyless starts currently require `self.Method`; inline blocks keep their explicit key.
+
+`DAS_DSL_UNKNOWN_OPERATION_KEY` warns when a literal cancel/query key has no statically declared start in the class. It is a conservative compile-time warning: dynamically supplied keys may still create such an operation at runtime. A misspelled method reference is a compile error.
+
 ## Interval and repeating timers
 
 ```das
@@ -16,7 +51,6 @@ class TimerCounter {
     def BeginPlay():void {
         ue_timer_start("score",1.0,self.Pulse,true)
     }
-    [ue_function(BlueprintCallable)]
     def Pulse():void {
         self.Score+=1
     }
@@ -39,7 +73,7 @@ Example: `Plugins/DasForUE/Content/Das/Scripts/dsl_managed_timers.das`. For plai
 | `ue_timer_remaining(name)` | Seconds, or `-1` when absent. |
 | `ue_timer_elapsed(name)` | UE elapsed seconds, or `-1` when absent. |
 
-- The handler is an annotated instance method returning `void`, passed as `self.Method` (or its name as a string literal); methods declared later in the class are resolved. A misspelled or mismatched handler is a compile error. No extra callback annotation is needed.
+- The handler is an instance method returning `void`, passed as `self.Method`; methods declared later in the class are resolved and receive hidden entry points automatically. String names require explicitly reflected handlers. A misspelled or mismatched handler is a compile error. No `ue_function` annotation is needed for `self.Method`; add `BlueprintCallable` only to expose the handler to Blueprint.
 - `interval` must be a positive finite float.
 - Queries follow TimerManager semantics, including those of pending next-tick handles. A fired one-shot timer has no record.
 
@@ -48,12 +82,10 @@ Example: `Plugins/DasForUE/Content/Das/Scripts/dsl_managed_timers.das`. For plai
 Trailing arguments after `repeat` (or after `handler` for next-tick) are captured at start and delivered to the handler:
 
 ```das
-ue_timer_start("score",1.0,"AddScore",true,5)
-ue_timer_next_tick("priority","SetPriority",uint8(255))   // uint8 needs an explicit cast
+ue_timer_start("score",1.0,self.AddScore,true,5)
+ue_timer_next_tick("priority",self.SetPriority,uint8(255))   // uint8 needs an explicit cast
 
-[ue_function(BlueprintCallable)]
 def AddScore(amount:int):void { self.Score+=amount }
-[ue_function(BlueprintCallable)]
 def SetPriority(value:uint8):void { self.Priority=value }
 ```
 
@@ -86,8 +118,8 @@ A callback error cancels that timer, logs the error, and updates the Actor/Compo
 
 - Timers require a persistent owner session and its live game world. Standalone `RunFile` and global initializers cannot create timers; starting timers during EndPlay or event binding is refused.
 - EndPlay, owner/session release, Destroy, world cleanup, shutdown and editor reinstancing cancel timers. Structural reinstancing cancels them even if contexts are preserved; schedules are not migrated. In EndPlay, rely on automatic cancellation rather than querying the session.
-- **Accepted** logic reload cancels existing timers and their captures; a callback tick that discovers new code may invoke the new handler once. **Rejected** reload keeps the old VM and timers.
-- `BeginPlay` is not replayed after reload. Provide an explicit method (for example `Start` or `ResumeBrain`) to recreate timers.
+- **Accepted** logic reload cancels named-method timers and their captures; a callback tick that discovers new code may invoke the new handler once. Inline `$` callback timers with an unchanged generated identity and a verified signature keep their native schedule, pause state and payload, and dispatch through the new VM. This includes multi-value payloads. **Rejected** reload keeps the old VM and timers.
+- `BeginPlay` is not replayed after reload. Provide an explicit method (for example `Start` or `ResumeBrain`) to recreate named-method timers. Changing an inline block changes its generated identity and requires Apply/reimport; structural reinstancing still cancels its timer.
 
 ## Latent delay
 

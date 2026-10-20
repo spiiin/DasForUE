@@ -1,6 +1,8 @@
 #include "DasCallbackFrames.h"
 #include "DasPerceptionTypes.h"
 #include "DasCallbackTypes.h"
+#include "DasDelegateSignatures.h"
+#include "UObject/StrongObjectPtr.h"
 #include "DasContainerRegistry.h"
 #include "DasPropertyTypes.h"
 #include "DasPropertyValues.h"
@@ -202,4 +204,48 @@ void ResetDasCallbackFrames()
             T->RemoveFromRoot();
     }
     Frames.Empty();
+}
+
+bool ValidateDasCallbackSignature(UFunction* Signature, const TArray<FDasDeclaredType>& Arguments, FString& Error)
+{
+    const auto Source = Parameters(Signature);
+    if (!Signature || Signature->GetReturnProperty() || Source.Num() != Arguments.Num() || Source.Num() > 16)
+    {
+        Error = TEXT("Callback argument count/return differs from source");
+        return false;
+    }
+    FDasDeclaredMethod M;
+    M.ReturnType.Kind = TEXT("void");
+    for (int32 I = 0; I < Arguments.Num(); ++I)
+    {
+        FDasDeclaredParameter P;
+        P.Name = FString::Printf(TEXT("arg_%d"), I);
+        P.Type = Arguments[I];
+        M.Parameters.Add(P);
+    }
+    TStrongObjectPtr<UFunction> Expected(MakeDasDelegateSignature(M, false, GetTransientPackage(), NAME_None, Error));
+    if (!Expected.IsValid())
+        return false;
+    int32 I = 0;
+    for (TFieldIterator<FProperty> Target(Expected.Get()); Target; ++Target, ++I)
+    {
+        const auto* Capability = Source.IsValidIndex(I) ? DasCallbackTypeForProperty(Source[I]) : nullptr;
+        const bool Ref = Source.IsValidIndex(I) && Source[I]->HasAnyPropertyFlags(CPF_OutParm | CPF_ReferenceParm);
+        if (Capability && !Capability->bDynamic &&
+            (Ref ? Capability->ConstRefProxy.IsNone() : Capability->ValueProxy.IsNone()))
+        {
+            Error = FString::Printf(TEXT("Callback argument %d has no queued receiver"), I);
+            return false;
+        }
+        if (!Source.IsValidIndex(I) ||
+            (Source[I]->HasAnyPropertyFlags(CPF_OutParm | CPF_ReferenceParm) &&
+             !Source[I]->HasAnyPropertyFlags(CPF_ConstParm)) ||
+            !DasCallbackTypeForProperty(Source[I]) || !Compatible(Source[I], *Target))
+        {
+            Error = FString::Printf(TEXT("Callback argument %d (%s) type/direction differs from source"), I,
+                                         Source.IsValidIndex(I) ? *Source[I]->GetName() : TEXT("?"));
+            return false;
+        }
+    }
+    return true;
 }

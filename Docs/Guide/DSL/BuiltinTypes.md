@@ -114,7 +114,7 @@ require ue_text
 class Example : Actor {
     properties = ue_properties(EditAnywhere, BlueprintReadWrite) {
         var Priority:uint8 = uint8(255)
-        var Title:FText = ue_text("MyGame", "ExampleTitle", "Example")
+        var Title:FText = ue_loctext(ExampleTitle, "Example")
     }
 
     [ue_function(BlueprintCallable)]
@@ -125,8 +125,8 @@ class Example : Actor {
 }
 ```
 
-- `ue_text(namespace, key, source)` creates localized text. The namespace and key must not be empty. `ue_text_invariant(source)` creates culture-invariant text. `ue_text_to_string(value)` returns the display string. Use it only when you really need a string.
-- A text default must be a literal `ue_text(...)` or `ue_text_invariant(...)`. Defaults are stored as `NSLOCTEXT(...)` / `INVTEXT(...)`, so the localization identity survives save, reopen and cook. Translation gathering is a separate Unreal localization step. Declaring text does not create translations.
+- `ue_loctext(Key, "source")` creates localized text using the module namespace and an identifier key. `ue_text_invariant(source)` creates culture-invariant text. `ue_text_to_string(value)` returns the display string. Use it only when you really need a string.
+- A text default must be a literal `ue_loctext(...)` or `ue_text_invariant(...)`. Defaults are stored as `NSLOCTEXT(...)` / `INVTEXT(...)`, so the localization identity survives save, reopen and cook. Translation gathering is a separate Unreal localization step. Declaring text does not create translations.
 - Blueprint frames carry a real native `FText` that the frame owns, never a display-only string.
 
 ## Bytes (`uint8`)

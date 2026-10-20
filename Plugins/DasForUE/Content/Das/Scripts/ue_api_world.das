@@ -3796,6 +3796,7 @@ def ue_controller_UnPossess(target : C_Controller_78a9db5e) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="ActivateReverbEffect", signature="v1;ActivateReverbEffect;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReverbEffect:ObjectProperty:128:/Script/Engine.ReverbEffect;TagName:NameProperty:128;Priority:FloatProperty:128;Volume:FloatProperty:128;FadeTime:FloatProperty:128;")]
 def ue_gameplay_ActivateReverbEffect(arg_reverbeffect : C_ReverbEffect_72af60f2; arg_tagname : UEName; arg_priority : float; arg_volume : float; arg_fadetime : float) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "ActivateReverbEffect", "worldcontextobject")
     ue_expect_signature(call, "v1;ActivateReverbEffect;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReverbEffect:ObjectProperty:128:/Script/Engine.ReverbEffect;TagName:NameProperty:128;Priority:FloatProperty:128;Volume:FloatProperty:128;FadeTime:FloatProperty:128;")
@@ -3809,6 +3810,7 @@ def ue_gameplay_ActivateReverbEffect(arg_reverbeffect : C_ReverbEffect_72af60f2;
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="AnnounceAccessibleString", signature="v1;AnnounceAccessibleString;AnnouncementString:StrProperty:128;")]
 def ue_gameplay_AnnounceAccessibleString(arg_announcementstring : string) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "AnnounceAccessibleString", "")
     ue_expect_signature(call, "v1;AnnounceAccessibleString;AnnouncementString:StrProperty:128;")
@@ -3818,6 +3820,7 @@ def ue_gameplay_AnnounceAccessibleString(arg_announcementstring : string) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="ApplyDamage", signature="v1;ApplyDamage;DamagedActor:ObjectProperty:128:/Script/Engine.Actor;BaseDamage:FloatProperty:128;EventInstigator:ObjectProperty:128:/Script/Engine.Controller;DamageCauser:ObjectProperty:128:/Script/Engine.Actor;DamageTypeClass:ClassProperty:128:meta:/Script/Engine.DamageType;ReturnValue:FloatProperty:1408;")]
 def ue_gameplay_ApplyDamage(arg_damagedactor : C_Actor_adf65d5b; arg_basedamage : float; arg_eventinstigator : C_Controller_78a9db5e; arg_damagecauser : C_Actor_adf65d5b; arg_damagetypeclass : UEClassHandle) : float {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "ApplyDamage", "")
     ue_expect_signature(call, "v1;ApplyDamage;DamagedActor:ObjectProperty:128:/Script/Engine.Actor;BaseDamage:FloatProperty:128;EventInstigator:ObjectProperty:128:/Script/Engine.Controller;DamageCauser:ObjectProperty:128:/Script/Engine.Actor;DamageTypeClass:ClassProperty:128:meta:/Script/Engine.DamageType;ReturnValue:FloatProperty:1408;")
@@ -3833,6 +3836,7 @@ def ue_gameplay_ApplyDamage(arg_damagedactor : C_Actor_adf65d5b; arg_basedamage 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="ApplyRadialDamage", signature="v1;ApplyRadialDamage;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BaseDamage:FloatProperty:128;Origin:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DamageRadius:FloatProperty:128;DamageTypeClass:ClassProperty:128:meta:/Script/Engine.DamageType;IgnoreActors:ArrayProperty:134218114[IgnoreActors:ObjectProperty:0:/Script/Engine.Actor;];DamageCauser:ObjectProperty:128:/Script/Engine.Actor;InstigatedByController:ObjectProperty:128:/Script/Engine.Controller;bDoFullDamage:BoolProperty:128;DamagePreventionChannel:ByteProperty:128:/Script/Engine.ECollisionChannel;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_ApplyRadialDamage(arg_basedamage : float; arg_origin : UEVector; arg_damageradius : float; arg_damagetypeclass : UEClassHandle; arg_ignoreactors : array<C_Actor_adf65d5b>; arg_damagecauser : C_Actor_adf65d5b; arg_instigatedbycontroller : C_Controller_78a9db5e; arg_bdofulldamage : bool; arg_damagepreventionchannel : E_ECollisionChannel_30305169) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "ApplyRadialDamage", "worldcontextobject")
     ue_expect_signature(call, "v1;ApplyRadialDamage;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BaseDamage:FloatProperty:128;Origin:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DamageRadius:FloatProperty:128;DamageTypeClass:ClassProperty:128:meta:/Script/Engine.DamageType;IgnoreActors:ArrayProperty:134218114[IgnoreActors:ObjectProperty:0:/Script/Engine.Actor;];DamageCauser:ObjectProperty:128:/Script/Engine.Actor;InstigatedByController:ObjectProperty:128:/Script/Engine.Controller;bDoFullDamage:BoolProperty:128;DamagePreventionChannel:ByteProperty:128:/Script/Engine.ECollisionChannel;ReturnValue:BoolProperty:1408;")
@@ -3855,6 +3859,7 @@ def ue_gameplay_ApplyRadialDamage(arg_basedamage : float; arg_origin : UEVector;
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="ApplyRadialDamageWithFalloff", signature="v1;ApplyRadialDamageWithFalloff;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BaseDamage:FloatProperty:128;MinimumDamage:FloatProperty:128;Origin:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DamageInnerRadius:FloatProperty:128;DamageOuterRadius:FloatProperty:128;DamageFalloff:FloatProperty:128;DamageTypeClass:ClassProperty:128:meta:/Script/Engine.DamageType;IgnoreActors:ArrayProperty:134218114[IgnoreActors:ObjectProperty:0:/Script/Engine.Actor;];DamageCauser:ObjectProperty:128:/Script/Engine.Actor;InstigatedByController:ObjectProperty:128:/Script/Engine.Controller;DamagePreventionChannel:ByteProperty:128:/Script/Engine.ECollisionChannel;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_ApplyRadialDamageWithFalloff(arg_basedamage : float; arg_minimumdamage : float; arg_origin : UEVector; arg_damageinnerradius : float; arg_damageouterradius : float; arg_damagefalloff : float; arg_damagetypeclass : UEClassHandle; arg_ignoreactors : array<C_Actor_adf65d5b>; arg_damagecauser : C_Actor_adf65d5b; arg_instigatedbycontroller : C_Controller_78a9db5e; arg_damagepreventionchannel : E_ECollisionChannel_30305169) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "ApplyRadialDamageWithFalloff", "worldcontextobject")
     ue_expect_signature(call, "v1;ApplyRadialDamageWithFalloff;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BaseDamage:FloatProperty:128;MinimumDamage:FloatProperty:128;Origin:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DamageInnerRadius:FloatProperty:128;DamageOuterRadius:FloatProperty:128;DamageFalloff:FloatProperty:128;DamageTypeClass:ClassProperty:128:meta:/Script/Engine.DamageType;IgnoreActors:ArrayProperty:134218114[IgnoreActors:ObjectProperty:0:/Script/Engine.Actor;];DamageCauser:ObjectProperty:128:/Script/Engine.Actor;InstigatedByController:ObjectProperty:128:/Script/Engine.Controller;DamagePreventionChannel:ByteProperty:128:/Script/Engine.ECollisionChannel;ReturnValue:BoolProperty:1408;")
@@ -3879,6 +3884,7 @@ def ue_gameplay_ApplyRadialDamageWithFalloff(arg_basedamage : float; arg_minimum
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="AreAnyListenersWithinRange", signature="v1;AreAnyListenersWithinRange;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Location:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaximumRange:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_AreAnyListenersWithinRange(arg_location : UEVector; arg_maximumrange : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "AreAnyListenersWithinRange", "worldcontextobject")
     ue_expect_signature(call, "v1;AreAnyListenersWithinRange;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Location:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaximumRange:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3891,6 +3897,7 @@ def ue_gameplay_AreAnyListenersWithinRange(arg_location : UEVector; arg_maximumr
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="AreSubtitlesEnabled", signature="v1;AreSubtitlesEnabled;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_AreSubtitlesEnabled() : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "AreSubtitlesEnabled", "")
     ue_expect_signature(call, "v1;AreSubtitlesEnabled;ReturnValue:BoolProperty:1408;")
@@ -3906,6 +3913,7 @@ struct ue_gameplay_BlueprintSuggestProjectileVelocity_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="BlueprintSuggestProjectileVelocity", signature="v1;BlueprintSuggestProjectileVelocity;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;TossVelocity:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};StartLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};EndLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LaunchSpeed:FloatProperty:128;OverrideGravityZ:FloatProperty:128;TraceOption:ByteProperty:128:/Script/Engine.ESuggestProjVelocityTraceOption;CollisionRadius:FloatProperty:128;bFavorHighArc:BoolProperty:128;bDrawDebug:BoolProperty:128;bAcceptClosestOnNoSolutions:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_BlueprintSuggestProjectileVelocity(arg_startlocation : UEVector; arg_endlocation : UEVector; arg_launchspeed : float; arg_overridegravityz : float; arg_traceoption : E_ESuggestProjVelocityTraceOption_93d4a972; arg_collisionradius : float; arg_bfavorhigharc : bool; arg_bdrawdebug : bool; arg_bacceptclosestonnosolutions : bool) : ue_gameplay_BlueprintSuggestProjectileVelocity_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "BlueprintSuggestProjectileVelocity", "worldcontextobject")
     ue_expect_signature(call, "v1;BlueprintSuggestProjectileVelocity;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;TossVelocity:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};StartLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};EndLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LaunchSpeed:FloatProperty:128;OverrideGravityZ:FloatProperty:128;TraceOption:ByteProperty:128:/Script/Engine.ESuggestProjVelocityTraceOption;CollisionRadius:FloatProperty:128;bFavorHighArc:BoolProperty:128;bDrawDebug:BoolProperty:128;bAcceptClosestOnNoSolutions:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -3925,6 +3933,7 @@ def ue_gameplay_BlueprintSuggestProjectileVelocity(arg_startlocation : UEVector;
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="ClearSoundMixClassOverride", signature="v1;ClearSoundMixClassOverride;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InSoundMixModifier:ObjectProperty:128:/Script/Engine.SoundMix;InSoundClass:ObjectProperty:128:/Script/Engine.SoundClass;FadeOutTime:FloatProperty:128;")]
 def ue_gameplay_ClearSoundMixClassOverride(arg_insoundmixmodifier : C_SoundMix_4765d7d6; arg_insoundclass : C_SoundClass_dbf04ee6; arg_fadeouttime : float) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "ClearSoundMixClassOverride", "worldcontextobject")
     ue_expect_signature(call, "v1;ClearSoundMixClassOverride;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InSoundMixModifier:ObjectProperty:128:/Script/Engine.SoundMix;InSoundClass:ObjectProperty:128:/Script/Engine.SoundClass;FadeOutTime:FloatProperty:128;")
@@ -3936,6 +3945,7 @@ def ue_gameplay_ClearSoundMixClassOverride(arg_insoundmixmodifier : C_SoundMix_4
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="ClearSoundMixModifiers", signature="v1;ClearSoundMixModifiers;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;")]
 def ue_gameplay_ClearSoundMixModifiers() {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "ClearSoundMixModifiers", "worldcontextobject")
     ue_expect_signature(call, "v1;ClearSoundMixModifiers;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;")
@@ -3944,6 +3954,7 @@ def ue_gameplay_ClearSoundMixModifiers() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="CreatePlayer", signature="v1;CreatePlayer;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ControllerId:IntProperty:128;bSpawnPlayerController:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;")]
 def ue_gameplay_CreatePlayer(arg_controllerid : int; arg_bspawnplayercontroller : bool) : C_PlayerController_fb3d8846 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "CreatePlayer", "worldcontextobject")
     ue_expect_signature(call, "v1;CreatePlayer;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ControllerId:IntProperty:128;bSpawnPlayerController:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;")
@@ -3956,6 +3967,7 @@ def ue_gameplay_CreatePlayer(arg_controllerid : int; arg_bspawnplayercontroller 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="CreatePlayerFromPlatformUser", signature="v1;CreatePlayerFromPlatformUser;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;UserId:StructProperty:128:/Script/CoreUObject.PlatformUserId\{InternalId:IntProperty:0;\};bSpawnPlayerController:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;")]
 def ue_gameplay_CreatePlayerFromPlatformUser(arg_userid : S_PlatformUserId_184c4653; arg_bspawnplayercontroller : bool) : C_PlayerController_fb3d8846 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "CreatePlayerFromPlatformUser", "worldcontextobject")
     ue_expect_signature(call, "v1;CreatePlayerFromPlatformUser;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;UserId:StructProperty:128:/Script/CoreUObject.PlatformUserId\{InternalId:IntProperty:0;\};bSpawnPlayerController:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;")
@@ -3968,6 +3980,7 @@ def ue_gameplay_CreatePlayerFromPlatformUser(arg_userid : S_PlatformUserId_184c4
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="CreateSaveGameObject", signature="v1;CreateSaveGameObject;SaveGameClass:ClassProperty:128:meta:/Script/Engine.SaveGame;ReturnValue:ObjectProperty:1408:/Script/Engine.SaveGame;")]
 def ue_gameplay_CreateSaveGameObject(arg_savegameclass : UEClassHandle) : C_SaveGame_c484e27d {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "CreateSaveGameObject", "")
     ue_expect_signature(call, "v1;CreateSaveGameObject;SaveGameClass:ClassProperty:128:meta:/Script/Engine.SaveGame;ReturnValue:ObjectProperty:1408:/Script/Engine.SaveGame;")
@@ -3979,6 +3992,7 @@ def ue_gameplay_CreateSaveGameObject(arg_savegameclass : UEClassHandle) : C_Save
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="CreateSound2D", signature="v1;CreateSound2D;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Sound:ObjectProperty:128:/Script/Engine.SoundBase;VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;bPersistAcrossLevelTransition:BoolProperty:128;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.AudioComponent;")]
 def ue_gameplay_CreateSound2D(arg_sound : C_SoundBase_07301ff0; arg_volumemultiplier : float; arg_pitchmultiplier : float; arg_starttime : float; arg_concurrencysettings : C_SoundConcurrency_36fc67f9; arg_bpersistacrossleveltransition : bool; arg_bautodestroy : bool) : C_AudioComponent_86ff3f82 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "CreateSound2D", "worldcontextobject")
     ue_expect_signature(call, "v1;CreateSound2D;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Sound:ObjectProperty:128:/Script/Engine.SoundBase;VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;bPersistAcrossLevelTransition:BoolProperty:128;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.AudioComponent;")
@@ -3996,6 +4010,7 @@ def ue_gameplay_CreateSound2D(arg_sound : C_SoundBase_07301ff0; arg_volumemultip
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="DeactivateReverbEffect", signature="v1;DeactivateReverbEffect;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;TagName:NameProperty:128;")]
 def ue_gameplay_DeactivateReverbEffect(arg_tagname : UEName) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "DeactivateReverbEffect", "worldcontextobject")
     ue_expect_signature(call, "v1;DeactivateReverbEffect;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;TagName:NameProperty:128;")
@@ -4005,6 +4020,7 @@ def ue_gameplay_DeactivateReverbEffect(arg_tagname : UEName) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="DeleteGameInSlot", signature="v1;DeleteGameInSlot;SlotName:StrProperty:128;UserIndex:IntProperty:130;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_DeleteGameInSlot(arg_slotname : string; arg_userindex : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "DeleteGameInSlot", "")
     ue_expect_signature(call, "v1;DeleteGameInSlot;SlotName:StrProperty:128;UserIndex:IntProperty:130;ReturnValue:BoolProperty:1408;")
@@ -4023,6 +4039,7 @@ struct ue_gameplay_DeprojectSceneCaptureComponentToWorld_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="DeprojectSceneCaptureComponentToWorld", signature="v1;DeprojectSceneCaptureComponentToWorld;SceneCaptureComponent2D:ObjectProperty:128:/Script/Engine.SceneCaptureComponent2D;TargetUV:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};WorldPosition:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WorldDirection:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_DeprojectSceneCaptureComponentToWorld(arg_scenecapturecomponent2d : C_SceneCaptureComponent2D_fa96627e; arg_targetuv : UEVector2D) : ue_gameplay_DeprojectSceneCaptureComponentToWorld_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "DeprojectSceneCaptureComponentToWorld", "")
     ue_expect_signature(call, "v1;DeprojectSceneCaptureComponentToWorld;SceneCaptureComponent2D:ObjectProperty:128:/Script/Engine.SceneCaptureComponent2D;TargetUV:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};WorldPosition:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WorldDirection:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4041,6 +4058,7 @@ struct ue_gameplay_DeprojectSceneCaptureToWorld_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="DeprojectSceneCaptureToWorld", signature="v1;DeprojectSceneCaptureToWorld;SceneCapture2D:ObjectProperty:128:/Script/Engine.SceneCapture2D;TargetUV:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};WorldPosition:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WorldDirection:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_DeprojectSceneCaptureToWorld(arg_scenecapture2d : C_SceneCapture2D_94be61ea; arg_targetuv : UEVector2D) : ue_gameplay_DeprojectSceneCaptureToWorld_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "DeprojectSceneCaptureToWorld", "")
     ue_expect_signature(call, "v1;DeprojectSceneCaptureToWorld;SceneCapture2D:ObjectProperty:128:/Script/Engine.SceneCapture2D;TargetUV:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};WorldPosition:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WorldDirection:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4059,6 +4077,7 @@ struct ue_gameplay_DeprojectScreenToWorld_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="DeprojectScreenToWorld", signature="v1;DeprojectScreenToWorld;Player:ObjectProperty:128:/Script/Engine.PlayerController;ScreenPosition:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};WorldPosition:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WorldDirection:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_DeprojectScreenToWorld(arg_player : C_PlayerController_fb3d8846; arg_screenposition : UEVector2D) : ue_gameplay_DeprojectScreenToWorld_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "DeprojectScreenToWorld", "")
     ue_expect_signature(call, "v1;DeprojectScreenToWorld;Player:ObjectProperty:128:/Script/Engine.PlayerController;ScreenPosition:StructProperty:134218114:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};WorldPosition:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WorldDirection:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4071,6 +4090,7 @@ def ue_gameplay_DeprojectScreenToWorld(arg_player : C_PlayerController_fb3d8846;
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="DoesSaveGameExist", signature="v1;DoesSaveGameExist;SlotName:StrProperty:128;UserIndex:IntProperty:130;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_DoesSaveGameExist(arg_slotname : string; arg_userindex : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "DoesSaveGameExist", "")
     ue_expect_signature(call, "v1;DoesSaveGameExist;SlotName:StrProperty:128;UserIndex:IntProperty:130;ReturnValue:BoolProperty:1408;")
@@ -4083,6 +4103,7 @@ def ue_gameplay_DoesSaveGameExist(arg_slotname : string; arg_userindex : int) : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="EnableLiveStreaming", signature="v1;EnableLiveStreaming;Enable:BoolProperty:128;")]
 def ue_gameplay_EnableLiveStreaming(arg_enable : bool) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "EnableLiveStreaming", "")
     ue_expect_signature(call, "v1;EnableLiveStreaming;Enable:BoolProperty:128;")
@@ -4097,6 +4118,7 @@ struct ue_gameplay_FindNearestActor_Result {
     out_returnvalue : C_Actor_adf65d5b
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="FindNearestActor", signature="v1;FindNearestActor;Origin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ActorsToCheck:ArrayProperty:134218114[ActorsToCheck:ObjectProperty:0:/Script/Engine.Actor;];Distance:FloatProperty:384;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;")]
 def ue_gameplay_FindNearestActor(arg_origin : UEVector; arg_actorstocheck : array<C_Actor_adf65d5b>) : ue_gameplay_FindNearestActor_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "FindNearestActor", "")
     ue_expect_signature(call, "v1;FindNearestActor;Origin:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ActorsToCheck:ArrayProperty:134218114[ActorsToCheck:ObjectProperty:0:/Script/Engine.Actor;];Distance:FloatProperty:384;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;")
@@ -4112,6 +4134,7 @@ def ue_gameplay_FindNearestActor(arg_origin : UEVector; arg_actorstocheck : arra
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="FlushLevelStreaming", signature="v1;FlushLevelStreaming;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;")]
 def ue_gameplay_FlushLevelStreaming() {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "FlushLevelStreaming", "worldcontextobject")
     ue_expect_signature(call, "v1;FlushLevelStreaming;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;")
@@ -4125,6 +4148,7 @@ struct ue_gameplay_GetAccurateRealTime_Result {
     out_partialseconds : double
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetAccurateRealTime", signature="v1;GetAccurateRealTime;Seconds:IntProperty:384;PartialSeconds:DoubleProperty:384;")]
 def ue_gameplay_GetAccurateRealTime() : ue_gameplay_GetAccurateRealTime_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetAccurateRealTime", "")
     ue_expect_signature(call, "v1;GetAccurateRealTime;Seconds:IntProperty:384;PartialSeconds:DoubleProperty:384;")
@@ -4135,6 +4159,7 @@ def ue_gameplay_GetAccurateRealTime() : ue_gameplay_GetAccurateRealTime_Result {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetActiveSpatialPluginName", signature="v1;GetActiveSpatialPluginName;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:NameProperty:1408;")]
 def ue_gameplay_GetActiveSpatialPluginName() : UEName {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetActiveSpatialPluginName", "worldcontextobject")
     ue_expect_signature(call, "v1;GetActiveSpatialPluginName;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:NameProperty:1408;")
@@ -4145,6 +4170,7 @@ def ue_gameplay_GetActiveSpatialPluginName() : UEName {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetActorArrayAverageLocation", signature="v1;GetActorArrayAverageLocation;Actors:ArrayProperty:134218114[Actors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_gameplay_GetActorArrayAverageLocation(arg_actors : array<C_Actor_adf65d5b>) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetActorArrayAverageLocation", "")
     ue_expect_signature(call, "v1;GetActorArrayAverageLocation;Actors:ArrayProperty:134218114[Actors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4164,6 +4190,7 @@ struct ue_gameplay_GetActorArrayBounds_Result {
     out_boxextent : UEVector
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetActorArrayBounds", signature="v1;GetActorArrayBounds;Actors:ArrayProperty:134218114[Actors:ObjectProperty:0:/Script/Engine.Actor;];bOnlyCollidingComponents:BoolProperty:128;Center:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_gameplay_GetActorArrayBounds(arg_actors : array<C_Actor_adf65d5b>; arg_bonlycollidingcomponents : bool) : ue_gameplay_GetActorArrayBounds_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetActorArrayBounds", "")
     ue_expect_signature(call, "v1;GetActorArrayBounds;Actors:ArrayProperty:134218114[Actors:ObjectProperty:0:/Script/Engine.Actor;];bOnlyCollidingComponents:BoolProperty:128;Center:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4179,6 +4206,7 @@ def ue_gameplay_GetActorArrayBounds(arg_actors : array<C_Actor_adf65d5b>; arg_bo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetActorOfClass", signature="v1;GetActorOfClass;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ActorClass:ClassProperty:128:meta:/Script/Engine.Actor;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;")]
 def ue_gameplay_GetActorOfClass(arg_actorclass : UEClassHandle) : C_Actor_adf65d5b {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetActorOfClass", "worldcontextobject")
     ue_expect_signature(call, "v1;GetActorOfClass;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ActorClass:ClassProperty:128:meta:/Script/Engine.Actor;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;")
@@ -4190,6 +4218,7 @@ def ue_gameplay_GetActorOfClass(arg_actorclass : UEClassHandle) : C_Actor_adf65d
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetAllActorsOfClass", signature="v1;GetAllActorsOfClass;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ActorClass:ClassProperty:128:meta:/Script/Engine.Actor;OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];")]
 def ue_gameplay_GetAllActorsOfClass(arg_actorclass : UEClassHandle) : array<C_Actor_adf65d5b> {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetAllActorsOfClass", "worldcontextobject")
     ue_expect_signature(call, "v1;GetAllActorsOfClass;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ActorClass:ClassProperty:128:meta:/Script/Engine.Actor;OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];")
@@ -4205,6 +4234,7 @@ def ue_gameplay_GetAllActorsOfClass(arg_actorclass : UEClassHandle) : array<C_Ac
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetAllActorsOfClassWithTag", signature="v1;GetAllActorsOfClassWithTag;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ActorClass:ClassProperty:128:meta:/Script/Engine.Actor;Tag:NameProperty:128;OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];")]
 def ue_gameplay_GetAllActorsOfClassWithTag(arg_actorclass : UEClassHandle; arg_tag : UEName) : array<C_Actor_adf65d5b> {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetAllActorsOfClassWithTag", "worldcontextobject")
     ue_expect_signature(call, "v1;GetAllActorsOfClassWithTag;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ActorClass:ClassProperty:128:meta:/Script/Engine.Actor;Tag:NameProperty:128;OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];")
@@ -4221,6 +4251,7 @@ def ue_gameplay_GetAllActorsOfClassWithTag(arg_actorclass : UEClassHandle; arg_t
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetAllActorsWithInterface", signature="v1;GetAllActorsWithInterface;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Interface:ClassProperty:128:meta:/Script/CoreUObject.Interface;OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];")]
 def ue_gameplay_GetAllActorsWithInterface(arg_interface : UEClassHandle) : array<C_Actor_adf65d5b> {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetAllActorsWithInterface", "worldcontextobject")
     ue_expect_signature(call, "v1;GetAllActorsWithInterface;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Interface:ClassProperty:128:meta:/Script/CoreUObject.Interface;OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];")
@@ -4236,6 +4267,7 @@ def ue_gameplay_GetAllActorsWithInterface(arg_interface : UEClassHandle) : array
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetAllActorsWithTag", signature="v1;GetAllActorsWithTag;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Tag:NameProperty:128;OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];")]
 def ue_gameplay_GetAllActorsWithTag(arg_tag : UEName) : array<C_Actor_adf65d5b> {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetAllActorsWithTag", "worldcontextobject")
     ue_expect_signature(call, "v1;GetAllActorsWithTag;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Tag:NameProperty:128;OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];")
@@ -4251,6 +4283,7 @@ def ue_gameplay_GetAllActorsWithTag(arg_tag : UEName) : array<C_Actor_adf65d5b> 
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetAudioTimeSeconds", signature="v1;GetAudioTimeSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")]
 def ue_gameplay_GetAudioTimeSeconds() : double {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetAudioTimeSeconds", "worldcontextobject")
     ue_expect_signature(call, "v1;GetAudioTimeSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")
@@ -4261,6 +4294,7 @@ def ue_gameplay_GetAudioTimeSeconds() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetAvailableSpatialPluginNames", signature="v1;GetAvailableSpatialPluginNames;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ArrayProperty:1408[ReturnValue:NameProperty:0;];")]
 def ue_gameplay_GetAvailableSpatialPluginNames() : array<UEName> {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetAvailableSpatialPluginNames", "worldcontextobject")
     ue_expect_signature(call, "v1;GetAvailableSpatialPluginNames;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ArrayProperty:1408[ReturnValue:NameProperty:0;];")
@@ -4280,6 +4314,7 @@ struct ue_gameplay_GetClosestListenerLocation_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetClosestListenerLocation", signature="v1;GetClosestListenerLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Location:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaximumRange:FloatProperty:128;bAllowAttenuationOverride:BoolProperty:130;ListenerPosition:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_GetClosestListenerLocation(arg_location : UEVector; arg_maximumrange : float; arg_ballowattenuationoverride : bool) : ue_gameplay_GetClosestListenerLocation_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetClosestListenerLocation", "worldcontextobject")
     ue_expect_signature(call, "v1;GetClosestListenerLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Location:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaximumRange:FloatProperty:128;bAllowAttenuationOverride:BoolProperty:130;ListenerPosition:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -4293,6 +4328,7 @@ def ue_gameplay_GetClosestListenerLocation(arg_location : UEVector; arg_maximumr
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetCurrentLevelName", signature="v1;GetCurrentLevelName;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;bRemovePrefixString:BoolProperty:128;ReturnValue:StrProperty:1408;")]
 def ue_gameplay_GetCurrentLevelName(arg_bremoveprefixstring : bool) : string {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetCurrentLevelName", "worldcontextobject")
     ue_expect_signature(call, "v1;GetCurrentLevelName;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;bRemovePrefixString:BoolProperty:128;ReturnValue:StrProperty:1408;")
@@ -4304,6 +4340,7 @@ def ue_gameplay_GetCurrentLevelName(arg_bremoveprefixstring : bool) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetCurrentReverbEffect", signature="v1;GetCurrentReverbEffect;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/Engine.ReverbEffect;")]
 def ue_gameplay_GetCurrentReverbEffect() : C_ReverbEffect_72af60f2 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetCurrentReverbEffect", "worldcontextobject")
     ue_expect_signature(call, "v1;GetCurrentReverbEffect;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/Engine.ReverbEffect;")
@@ -4314,6 +4351,7 @@ def ue_gameplay_GetCurrentReverbEffect() : C_ReverbEffect_72af60f2 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetEnableWorldRendering", signature="v1;GetEnableWorldRendering;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_GetEnableWorldRendering() : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetEnableWorldRendering", "worldcontextobject")
     ue_expect_signature(call, "v1;GetEnableWorldRendering;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -4324,6 +4362,7 @@ def ue_gameplay_GetEnableWorldRendering() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetGameInstance", signature="v1;GetGameInstance;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/Engine.GameInstance;")]
 def ue_gameplay_GetGameInstance() : C_GameInstance_c6fa677d {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetGameInstance", "worldcontextobject")
     ue_expect_signature(call, "v1;GetGameInstance;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/Engine.GameInstance;")
@@ -4334,6 +4373,7 @@ def ue_gameplay_GetGameInstance() : C_GameInstance_c6fa677d {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetGameMode", signature="v1;GetGameMode;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/Engine.GameModeBase;")]
 def ue_gameplay_GetGameMode() : C_GameModeBase_b500be5e {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetGameMode", "worldcontextobject")
     ue_expect_signature(call, "v1;GetGameMode;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/Engine.GameModeBase;")
@@ -4344,6 +4384,7 @@ def ue_gameplay_GetGameMode() : C_GameModeBase_b500be5e {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetGameState", signature="v1;GetGameState;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/Engine.GameStateBase;")]
 def ue_gameplay_GetGameState() : C_GameStateBase_910cc2be {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetGameState", "worldcontextobject")
     ue_expect_signature(call, "v1;GetGameState;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/Engine.GameStateBase;")
@@ -4354,6 +4395,7 @@ def ue_gameplay_GetGameState() : C_GameStateBase_910cc2be {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetGlobalTimeDilation", signature="v1;GetGlobalTimeDilation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:FloatProperty:1408;")]
 def ue_gameplay_GetGlobalTimeDilation() : float {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetGlobalTimeDilation", "worldcontextobject")
     ue_expect_signature(call, "v1;GetGlobalTimeDilation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:FloatProperty:1408;")
@@ -4364,6 +4406,7 @@ def ue_gameplay_GetGlobalTimeDilation() : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetIntOption", signature="v1;GetIntOption;Options:StrProperty:128;Key:StrProperty:128;DefaultValue:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_gameplay_GetIntOption(arg_options : string; arg_key : string; arg_defaultvalue : int) : int {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetIntOption", "")
     ue_expect_signature(call, "v1;GetIntOption;Options:StrProperty:128;Key:StrProperty:128;DefaultValue:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -4382,6 +4425,7 @@ struct ue_gameplay_GetKeyValue_Result {
     out_value : string
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetKeyValue", signature="v1;GetKeyValue;Pair:StrProperty:128;Key:StrProperty:384;Value:StrProperty:384;")]
 def ue_gameplay_GetKeyValue(arg_pair : string) : ue_gameplay_GetKeyValue_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetKeyValue", "")
     ue_expect_signature(call, "v1;GetKeyValue;Pair:StrProperty:128;Key:StrProperty:384;Value:StrProperty:384;")
@@ -4393,6 +4437,7 @@ def ue_gameplay_GetKeyValue(arg_pair : string) : ue_gameplay_GetKeyValue_Result 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetMaxAudioChannelCount", signature="v1;GetMaxAudioChannelCount;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")]
 def ue_gameplay_GetMaxAudioChannelCount() : int {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetMaxAudioChannelCount", "worldcontextobject")
     ue_expect_signature(call, "v1;GetMaxAudioChannelCount;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")
@@ -4403,6 +4448,7 @@ def ue_gameplay_GetMaxAudioChannelCount() : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetNumLocalPlayerControllers", signature="v1;GetNumLocalPlayerControllers;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")]
 def ue_gameplay_GetNumLocalPlayerControllers() : int {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetNumLocalPlayerControllers", "worldcontextobject")
     ue_expect_signature(call, "v1;GetNumLocalPlayerControllers;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")
@@ -4413,6 +4459,7 @@ def ue_gameplay_GetNumLocalPlayerControllers() : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetNumPlayerControllers", signature="v1;GetNumPlayerControllers;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")]
 def ue_gameplay_GetNumPlayerControllers() : int {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetNumPlayerControllers", "worldcontextobject")
     ue_expect_signature(call, "v1;GetNumPlayerControllers;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")
@@ -4423,6 +4470,7 @@ def ue_gameplay_GetNumPlayerControllers() : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetNumPlayerStates", signature="v1;GetNumPlayerStates;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")]
 def ue_gameplay_GetNumPlayerStates() : int {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetNumPlayerStates", "worldcontextobject")
     ue_expect_signature(call, "v1;GetNumPlayerStates;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")
@@ -4433,6 +4481,7 @@ def ue_gameplay_GetNumPlayerStates() : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetObjectClass", signature="v1;GetObjectClass;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")]
 def ue_gameplay_GetObjectClass(arg_object : C_Object_55c3753a) : UEClassHandle {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetObjectClass", "")
     ue_expect_signature(call, "v1;GetObjectClass;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")
@@ -4444,6 +4493,7 @@ def ue_gameplay_GetObjectClass(arg_object : C_Object_55c3753a) : UEClassHandle {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetPlatformName", signature="v1;GetPlatformName;ReturnValue:StrProperty:1408;")]
 def ue_gameplay_GetPlatformName() : string {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetPlatformName", "")
     ue_expect_signature(call, "v1;GetPlatformName;ReturnValue:StrProperty:1408;")
@@ -4454,6 +4504,7 @@ def ue_gameplay_GetPlatformName() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetPlayerCameraManager", signature="v1;GetPlayerCameraManager;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlayerIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerCameraManager;")]
 def ue_gameplay_GetPlayerCameraManager(arg_playerindex : int) : C_PlayerCameraManager_7d85a11d {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetPlayerCameraManager", "worldcontextobject")
     ue_expect_signature(call, "v1;GetPlayerCameraManager;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlayerIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerCameraManager;")
@@ -4465,6 +4516,7 @@ def ue_gameplay_GetPlayerCameraManager(arg_playerindex : int) : C_PlayerCameraMa
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetPlayerCharacter", signature="v1;GetPlayerCharacter;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlayerIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.Character;")]
 def ue_gameplay_GetPlayerCharacter(arg_playerindex : int) : C_Character_ab4a5baa {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetPlayerCharacter", "worldcontextobject")
     ue_expect_signature(call, "v1;GetPlayerCharacter;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlayerIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.Character;")
@@ -4476,6 +4528,7 @@ def ue_gameplay_GetPlayerCharacter(arg_playerindex : int) : C_Character_ab4a5baa
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetPlayerController", signature="v1;GetPlayerController;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlayerIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;")]
 def ue_gameplay_GetPlayerController(arg_playerindex : int) : C_PlayerController_fb3d8846 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetPlayerController", "worldcontextobject")
     ue_expect_signature(call, "v1;GetPlayerController;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlayerIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;")
@@ -4487,6 +4540,7 @@ def ue_gameplay_GetPlayerController(arg_playerindex : int) : C_PlayerController_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetPlayerControllerFromID", signature="v1;GetPlayerControllerFromID;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ControllerID:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;")]
 def ue_gameplay_GetPlayerControllerFromID(arg_controllerid : int) : C_PlayerController_fb3d8846 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetPlayerControllerFromID", "worldcontextobject")
     ue_expect_signature(call, "v1;GetPlayerControllerFromID;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ControllerID:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;")
@@ -4498,6 +4552,7 @@ def ue_gameplay_GetPlayerControllerFromID(arg_controllerid : int) : C_PlayerCont
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetPlayerControllerFromPlatformUser", signature="v1;GetPlayerControllerFromPlatformUser;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;UserId:StructProperty:128:/Script/CoreUObject.PlatformUserId\{InternalId:IntProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;")]
 def ue_gameplay_GetPlayerControllerFromPlatformUser(arg_userid : S_PlatformUserId_184c4653) : C_PlayerController_fb3d8846 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetPlayerControllerFromPlatformUser", "worldcontextobject")
     ue_expect_signature(call, "v1;GetPlayerControllerFromPlatformUser;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;UserId:StructProperty:128:/Script/CoreUObject.PlatformUserId\{InternalId:IntProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;")
@@ -4509,6 +4564,7 @@ def ue_gameplay_GetPlayerControllerFromPlatformUser(arg_userid : S_PlatformUserI
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetPlayerControllerID", signature="v1;GetPlayerControllerID;Player:ObjectProperty:128:/Script/Engine.PlayerController;ReturnValue:IntProperty:1408;")]
 def ue_gameplay_GetPlayerControllerID(arg_player : C_PlayerController_fb3d8846) : int {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetPlayerControllerID", "")
     ue_expect_signature(call, "v1;GetPlayerControllerID;Player:ObjectProperty:128:/Script/Engine.PlayerController;ReturnValue:IntProperty:1408;")
@@ -4520,6 +4576,7 @@ def ue_gameplay_GetPlayerControllerID(arg_player : C_PlayerController_fb3d8846) 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetPlayerPawn", signature="v1;GetPlayerPawn;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlayerIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.Pawn;")]
 def ue_gameplay_GetPlayerPawn(arg_playerindex : int) : C_Pawn_ba3732bb {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetPlayerPawn", "worldcontextobject")
     ue_expect_signature(call, "v1;GetPlayerPawn;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlayerIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.Pawn;")
@@ -4531,6 +4588,7 @@ def ue_gameplay_GetPlayerPawn(arg_playerindex : int) : C_Pawn_ba3732bb {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetPlayerState", signature="v1;GetPlayerState;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlayerStateIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerState;")]
 def ue_gameplay_GetPlayerState(arg_playerstateindex : int) : C_PlayerState_bd340396 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetPlayerState", "worldcontextobject")
     ue_expect_signature(call, "v1;GetPlayerState;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlayerStateIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerState;")
@@ -4542,6 +4600,7 @@ def ue_gameplay_GetPlayerState(arg_playerstateindex : int) : C_PlayerState_bd340
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetPlayerStateFromUniqueNetId", signature="v1;GetPlayerStateFromUniqueNetId;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;UniqueId:StructProperty:134218114:/Script/Engine.UniqueNetIdRepl\{ReplicationBytes:ArrayProperty:0[ReplicationBytes:ByteProperty:0;];\};ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerState;")]
 def ue_gameplay_GetPlayerStateFromUniqueNetId(arg_uniqueid : S_UniqueNetIdRepl_566b1c5c) : C_PlayerState_bd340396 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetPlayerStateFromUniqueNetId", "worldcontextobject")
     ue_expect_signature(call, "v1;GetPlayerStateFromUniqueNetId;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;UniqueId:StructProperty:134218114:/Script/Engine.UniqueNetIdRepl\{ReplicationBytes:ArrayProperty:0[ReplicationBytes:ByteProperty:0;];\};ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerState;")
@@ -4556,6 +4615,7 @@ def ue_gameplay_GetPlayerStateFromUniqueNetId(arg_uniqueid : S_UniqueNetIdRepl_5
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetRealTimeSeconds", signature="v1;GetRealTimeSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")]
 def ue_gameplay_GetRealTimeSeconds() : double {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetRealTimeSeconds", "worldcontextobject")
     ue_expect_signature(call, "v1;GetRealTimeSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")
@@ -4566,6 +4626,7 @@ def ue_gameplay_GetRealTimeSeconds() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetStreamingLevel", signature="v1;GetStreamingLevel;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PackageName:NameProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.LevelStreaming;")]
 def ue_gameplay_GetStreamingLevel(arg_packagename : UEName) : C_LevelStreaming_5e5fb98d {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetStreamingLevel", "worldcontextobject")
     ue_expect_signature(call, "v1;GetStreamingLevel;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PackageName:NameProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.LevelStreaming;")
@@ -4577,6 +4638,7 @@ def ue_gameplay_GetStreamingLevel(arg_packagename : UEName) : C_LevelStreaming_5
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetTimeSeconds", signature="v1;GetTimeSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")]
 def ue_gameplay_GetTimeSeconds() : double {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetTimeSeconds", "worldcontextobject")
     ue_expect_signature(call, "v1;GetTimeSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")
@@ -4587,6 +4649,7 @@ def ue_gameplay_GetTimeSeconds() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetUnpausedTimeSeconds", signature="v1;GetUnpausedTimeSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")]
 def ue_gameplay_GetUnpausedTimeSeconds() : double {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetUnpausedTimeSeconds", "worldcontextobject")
     ue_expect_signature(call, "v1;GetUnpausedTimeSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")
@@ -4597,6 +4660,7 @@ def ue_gameplay_GetUnpausedTimeSeconds() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetViewportMouseCaptureMode", signature="v1;GetViewportMouseCaptureMode;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:EnumProperty:1408:/Script/Engine.EMouseCaptureMode;")]
 def ue_gameplay_GetViewportMouseCaptureMode() : E_EMouseCaptureMode_d9b54030 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetViewportMouseCaptureMode", "worldcontextobject")
     ue_expect_signature(call, "v1;GetViewportMouseCaptureMode;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:EnumProperty:1408:/Script/Engine.EMouseCaptureMode;")
@@ -4607,6 +4671,7 @@ def ue_gameplay_GetViewportMouseCaptureMode() : E_EMouseCaptureMode_d9b54030 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetWorldDeltaSeconds", signature="v1;GetWorldDeltaSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")]
 def ue_gameplay_GetWorldDeltaSeconds() : double {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetWorldDeltaSeconds", "worldcontextobject")
     ue_expect_signature(call, "v1;GetWorldDeltaSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")
@@ -4617,6 +4682,7 @@ def ue_gameplay_GetWorldDeltaSeconds() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GetWorldOriginLocation", signature="v1;GetWorldOriginLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};")]
 def ue_gameplay_GetWorldOriginLocation() : S_IntVector_1c5addc5 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GetWorldOriginLocation", "worldcontextobject")
     ue_expect_signature(call, "v1;GetWorldOriginLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};")
@@ -4627,6 +4693,7 @@ def ue_gameplay_GetWorldOriginLocation() : S_IntVector_1c5addc5 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="GrassOverlappingSphereCount", signature="v1;GrassOverlappingSphereCount;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;StaticMesh:ObjectProperty:130:/Script/Engine.StaticMesh;CenterPosition:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_gameplay_GrassOverlappingSphereCount(arg_staticmesh : C_StaticMesh_e744e4f0; arg_centerposition : UEVector; arg_radius : float) : int {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "GrassOverlappingSphereCount", "worldcontextobject")
     ue_expect_signature(call, "v1;GrassOverlappingSphereCount;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;StaticMesh:ObjectProperty:130:/Script/Engine.StaticMesh;CenterPosition:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;ReturnValue:IntProperty:1408;")
@@ -4640,6 +4707,7 @@ def ue_gameplay_GrassOverlappingSphereCount(arg_staticmesh : C_StaticMesh_e744e4
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="HasLaunchOption", signature="v1;HasLaunchOption;OptionToCheck:StrProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_HasLaunchOption(arg_optiontocheck : string) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "HasLaunchOption", "")
     ue_expect_signature(call, "v1;HasLaunchOption;OptionToCheck:StrProperty:128;ReturnValue:BoolProperty:1408;")
@@ -4651,6 +4719,7 @@ def ue_gameplay_HasLaunchOption(arg_optiontocheck : string) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="HasOption", signature="v1;HasOption;Options:StrProperty:128;InKey:StrProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_HasOption(arg_options : string; arg_inkey : string) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "HasOption", "")
     ue_expect_signature(call, "v1;HasOption;Options:StrProperty:128;InKey:StrProperty:128;ReturnValue:BoolProperty:1408;")
@@ -4663,6 +4732,7 @@ def ue_gameplay_HasOption(arg_options : string; arg_inkey : string) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="IsAnyLocalPlayerCameraWithinRange", signature="v1;IsAnyLocalPlayerCameraWithinRange;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Location:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaximumRange:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_IsAnyLocalPlayerCameraWithinRange(arg_location : UEVector; arg_maximumrange : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "IsAnyLocalPlayerCameraWithinRange", "worldcontextobject")
     ue_expect_signature(call, "v1;IsAnyLocalPlayerCameraWithinRange;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Location:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};MaximumRange:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -4675,6 +4745,7 @@ def ue_gameplay_IsAnyLocalPlayerCameraWithinRange(arg_location : UEVector; arg_m
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="IsGamePaused", signature="v1;IsGamePaused;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_IsGamePaused() : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "IsGamePaused", "worldcontextobject")
     ue_expect_signature(call, "v1;IsGamePaused;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -4685,6 +4756,7 @@ def ue_gameplay_IsGamePaused() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="IsSplitscreenForceDisabled", signature="v1;IsSplitscreenForceDisabled;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_IsSplitscreenForceDisabled() : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "IsSplitscreenForceDisabled", "worldcontextobject")
     ue_expect_signature(call, "v1;IsSplitscreenForceDisabled;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -4695,6 +4767,7 @@ def ue_gameplay_IsSplitscreenForceDisabled() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="LoadGameFromSlot", signature="v1;LoadGameFromSlot;SlotName:StrProperty:128;UserIndex:IntProperty:130;ReturnValue:ObjectProperty:1408:/Script/Engine.SaveGame;")]
 def ue_gameplay_LoadGameFromSlot(arg_slotname : string; arg_userindex : int) : C_SaveGame_c484e27d {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "LoadGameFromSlot", "")
     ue_expect_signature(call, "v1;LoadGameFromSlot;SlotName:StrProperty:128;UserIndex:IntProperty:130;ReturnValue:ObjectProperty:1408:/Script/Engine.SaveGame;")
@@ -4707,6 +4780,7 @@ def ue_gameplay_LoadGameFromSlot(arg_slotname : string; arg_userindex : int) : C
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="ObjectIsA", signature="v1;ObjectIsA;Object:ObjectProperty:130:/Script/CoreUObject.Object;ObjectClass:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_ObjectIsA(arg_object : C_Object_55c3753a; arg_objectclass : UEClassHandle) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "ObjectIsA", "")
     ue_expect_signature(call, "v1;ObjectIsA;Object:ObjectProperty:130:/Script/CoreUObject.Object;ObjectClass:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -4719,6 +4793,7 @@ def ue_gameplay_ObjectIsA(arg_object : C_Object_55c3753a; arg_objectclass : UECl
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="OpenLevel", signature="v1;OpenLevel;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;LevelName:NameProperty:128;bAbsolute:BoolProperty:128;Options:StrProperty:128;")]
 def ue_gameplay_OpenLevel(arg_levelname : UEName; arg_babsolute : bool; arg_options : string) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "OpenLevel", "worldcontextobject")
     ue_expect_signature(call, "v1;OpenLevel;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;LevelName:NameProperty:128;bAbsolute:BoolProperty:128;Options:StrProperty:128;")
@@ -4730,6 +4805,7 @@ def ue_gameplay_OpenLevel(arg_levelname : UEName; arg_babsolute : bool; arg_opti
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="ParseOption", signature="v1;ParseOption;Options:StrProperty:128;Key:StrProperty:128;ReturnValue:StrProperty:1408;")]
 def ue_gameplay_ParseOption(arg_options : string; arg_key : string) : string {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "ParseOption", "")
     ue_expect_signature(call, "v1;ParseOption;Options:StrProperty:128;Key:StrProperty:128;ReturnValue:StrProperty:1408;")
@@ -4742,6 +4818,7 @@ def ue_gameplay_ParseOption(arg_options : string; arg_key : string) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="PlaySound2D", signature="v1;PlaySound2D;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Sound:ObjectProperty:128:/Script/Engine.SoundBase;VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;OwningActor:ObjectProperty:130:/Script/Engine.Actor;bIsUISound:BoolProperty:128;")]
 def ue_gameplay_PlaySound2D(arg_sound : C_SoundBase_07301ff0; arg_volumemultiplier : float; arg_pitchmultiplier : float; arg_starttime : float; arg_concurrencysettings : C_SoundConcurrency_36fc67f9; arg_owningactor : C_Actor_adf65d5b; arg_bisuisound : bool) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "PlaySound2D", "worldcontextobject")
     ue_expect_signature(call, "v1;PlaySound2D;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Sound:ObjectProperty:128:/Script/Engine.SoundBase;VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;OwningActor:ObjectProperty:130:/Script/Engine.Actor;bIsUISound:BoolProperty:128;")
@@ -4757,6 +4834,7 @@ def ue_gameplay_PlaySound2D(arg_sound : C_SoundBase_07301ff0; arg_volumemultipli
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="PlaySoundAtLocation", signature="v1;PlaySoundAtLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Sound:ObjectProperty:128:/Script/Engine.SoundBase;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;AttenuationSettings:ObjectProperty:128:/Script/Engine.SoundAttenuation;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;OwningActor:ObjectProperty:130:/Script/Engine.Actor;InitialParams:ObjectProperty:130:/Script/Engine.InitialActiveSoundParams;")]
 def ue_gameplay_PlaySoundAtLocation(arg_sound : C_SoundBase_07301ff0; arg_location : UEVector; arg_rotation : UERotator; arg_volumemultiplier : float; arg_pitchmultiplier : float; arg_starttime : float; arg_attenuationsettings : C_SoundAttenuation_d1991af4; arg_concurrencysettings : C_SoundConcurrency_36fc67f9; arg_owningactor : C_Actor_adf65d5b; arg_initialparams : C_InitialActiveSoundParams_526c30ce) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "PlaySoundAtLocation", "worldcontextobject")
     ue_expect_signature(call, "v1;PlaySoundAtLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Sound:ObjectProperty:128:/Script/Engine.SoundBase;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;AttenuationSettings:ObjectProperty:128:/Script/Engine.SoundAttenuation;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;OwningActor:ObjectProperty:130:/Script/Engine.Actor;InitialParams:ObjectProperty:130:/Script/Engine.InitialActiveSoundParams;")
@@ -4775,6 +4853,7 @@ def ue_gameplay_PlaySoundAtLocation(arg_sound : C_SoundBase_07301ff0; arg_locati
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="PlayWorldCameraShake", signature="v1;PlayWorldCameraShake;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Shake:ClassProperty:128:meta:/Script/Engine.CameraShakeBase;Epicenter:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InnerRadius:FloatProperty:128;OuterRadius:FloatProperty:128;Falloff:FloatProperty:128;bOrientShakeTowardsEpicenter:BoolProperty:128;")]
 def ue_gameplay_PlayWorldCameraShake(arg_shake : UEClassHandle; arg_epicenter : UEVector; arg_innerradius : float; arg_outerradius : float; arg_falloff : float; arg_borientshaketowardsepicenter : bool) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "PlayWorldCameraShake", "worldcontextobject")
     ue_expect_signature(call, "v1;PlayWorldCameraShake;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Shake:ClassProperty:128:meta:/Script/Engine.CameraShakeBase;Epicenter:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};InnerRadius:FloatProperty:128;OuterRadius:FloatProperty:128;Falloff:FloatProperty:128;bOrientShakeTowardsEpicenter:BoolProperty:128;")
@@ -4789,6 +4868,7 @@ def ue_gameplay_PlayWorldCameraShake(arg_shake : UEClassHandle; arg_epicenter : 
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="PopSoundMixModifier", signature="v1;PopSoundMixModifier;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InSoundMixModifier:ObjectProperty:128:/Script/Engine.SoundMix;")]
 def ue_gameplay_PopSoundMixModifier(arg_insoundmixmodifier : C_SoundMix_4765d7d6) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "PopSoundMixModifier", "worldcontextobject")
     ue_expect_signature(call, "v1;PopSoundMixModifier;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InSoundMixModifier:ObjectProperty:128:/Script/Engine.SoundMix;")
@@ -4798,6 +4878,7 @@ def ue_gameplay_PopSoundMixModifier(arg_insoundmixmodifier : C_SoundMix_4765d7d6
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="PrimeAllSoundsInSoundClass", signature="v1;PrimeAllSoundsInSoundClass;InSoundClass:ObjectProperty:128:/Script/Engine.SoundClass;")]
 def ue_gameplay_PrimeAllSoundsInSoundClass(arg_insoundclass : C_SoundClass_dbf04ee6) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "PrimeAllSoundsInSoundClass", "")
     ue_expect_signature(call, "v1;PrimeAllSoundsInSoundClass;InSoundClass:ObjectProperty:128:/Script/Engine.SoundClass;")
@@ -4807,6 +4888,7 @@ def ue_gameplay_PrimeAllSoundsInSoundClass(arg_insoundclass : C_SoundClass_dbf04
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="PrimeSound", signature="v1;PrimeSound;InSound:ObjectProperty:128:/Script/Engine.SoundBase;")]
 def ue_gameplay_PrimeSound(arg_insound : C_SoundBase_07301ff0) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "PrimeSound", "")
     ue_expect_signature(call, "v1;PrimeSound;InSound:ObjectProperty:128:/Script/Engine.SoundBase;")
@@ -4821,6 +4903,7 @@ struct ue_gameplay_ProjectWorldToScreen_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="ProjectWorldToScreen", signature="v1;ProjectWorldToScreen;Player:ObjectProperty:128:/Script/Engine.PlayerController;WorldPosition:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ScreenPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bPlayerViewportRelative:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_ProjectWorldToScreen(arg_player : C_PlayerController_fb3d8846; arg_worldposition : UEVector; arg_bplayerviewportrelative : bool) : ue_gameplay_ProjectWorldToScreen_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "ProjectWorldToScreen", "")
     ue_expect_signature(call, "v1;ProjectWorldToScreen;Player:ObjectProperty:128:/Script/Engine.PlayerController;WorldPosition:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ScreenPosition:StructProperty:384:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};bPlayerViewportRelative:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -4834,6 +4917,7 @@ def ue_gameplay_ProjectWorldToScreen(arg_player : C_PlayerController_fb3d8846; a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="PushSoundMixModifier", signature="v1;PushSoundMixModifier;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InSoundMixModifier:ObjectProperty:128:/Script/Engine.SoundMix;")]
 def ue_gameplay_PushSoundMixModifier(arg_insoundmixmodifier : C_SoundMix_4765d7d6) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "PushSoundMixModifier", "worldcontextobject")
     ue_expect_signature(call, "v1;PushSoundMixModifier;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InSoundMixModifier:ObjectProperty:128:/Script/Engine.SoundMix;")
@@ -4843,6 +4927,7 @@ def ue_gameplay_PushSoundMixModifier(arg_insoundmixmodifier : C_SoundMix_4765d7d
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="RebaseLocalOriginOntoZero", signature="v1;RebaseLocalOriginOntoZero;WorldContextObject:ObjectProperty:128:/Script/CoreUObject.Object;WorldLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_gameplay_RebaseLocalOriginOntoZero(arg_worldlocation : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "RebaseLocalOriginOntoZero", "worldcontextobject")
     ue_expect_signature(call, "v1;RebaseLocalOriginOntoZero;WorldContextObject:ObjectProperty:128:/Script/CoreUObject.Object;WorldLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4854,6 +4939,7 @@ def ue_gameplay_RebaseLocalOriginOntoZero(arg_worldlocation : UEVector) : UEVect
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="RebaseZeroOriginOntoLocal", signature="v1;RebaseZeroOriginOntoLocal;WorldContextObject:ObjectProperty:128:/Script/CoreUObject.Object;WorldLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
 def ue_gameplay_RebaseZeroOriginOntoLocal(arg_worldlocation : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "RebaseZeroOriginOntoLocal", "worldcontextobject")
     ue_expect_signature(call, "v1;RebaseZeroOriginOntoLocal;WorldContextObject:ObjectProperty:128:/Script/CoreUObject.Object;WorldLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
@@ -4865,6 +4951,7 @@ def ue_gameplay_RebaseZeroOriginOntoLocal(arg_worldlocation : UEVector) : UEVect
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="RemovePlayer", signature="v1;RemovePlayer;Player:ObjectProperty:128:/Script/Engine.PlayerController;bDestroyPawn:BoolProperty:128;")]
 def ue_gameplay_RemovePlayer(arg_player : C_PlayerController_fb3d8846; arg_bdestroypawn : bool) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "RemovePlayer", "")
     ue_expect_signature(call, "v1;RemovePlayer;Player:ObjectProperty:128:/Script/Engine.PlayerController;bDestroyPawn:BoolProperty:128;")
@@ -4875,6 +4962,7 @@ def ue_gameplay_RemovePlayer(arg_player : C_PlayerController_fb3d8846; arg_bdest
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SaveGameToSlot", signature="v1;SaveGameToSlot;SaveGameObject:ObjectProperty:128:/Script/Engine.SaveGame;SlotName:StrProperty:128;UserIndex:IntProperty:130;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_SaveGameToSlot(arg_savegameobject : C_SaveGame_c484e27d; arg_slotname : string; arg_userindex : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SaveGameToSlot", "")
     ue_expect_signature(call, "v1;SaveGameToSlot;SaveGameObject:ObjectProperty:128:/Script/Engine.SaveGame;SlotName:StrProperty:128;UserIndex:IntProperty:130;ReturnValue:BoolProperty:1408;")
@@ -4888,6 +4976,7 @@ def ue_gameplay_SaveGameToSlot(arg_savegameobject : C_SaveGame_c484e27d; arg_slo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetActiveSpatialPluginByName", signature="v1;SetActiveSpatialPluginByName;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InPluginName:NameProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_SetActiveSpatialPluginByName(arg_inpluginname : UEName) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetActiveSpatialPluginByName", "worldcontextobject")
     ue_expect_signature(call, "v1;SetActiveSpatialPluginByName;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InPluginName:NameProperty:128;ReturnValue:BoolProperty:1408;")
@@ -4899,6 +4988,7 @@ def ue_gameplay_SetActiveSpatialPluginByName(arg_inpluginname : UEName) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetBaseSoundMix", signature="v1;SetBaseSoundMix;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InSoundMix:ObjectProperty:128:/Script/Engine.SoundMix;")]
 def ue_gameplay_SetBaseSoundMix(arg_insoundmix : C_SoundMix_4765d7d6) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetBaseSoundMix", "worldcontextobject")
     ue_expect_signature(call, "v1;SetBaseSoundMix;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InSoundMix:ObjectProperty:128:/Script/Engine.SoundMix;")
@@ -4908,6 +4998,7 @@ def ue_gameplay_SetBaseSoundMix(arg_insoundmix : C_SoundMix_4765d7d6) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetEnableWorldRendering", signature="v1;SetEnableWorldRendering;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;bEnable:BoolProperty:128;")]
 def ue_gameplay_SetEnableWorldRendering(arg_benable : bool) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetEnableWorldRendering", "worldcontextobject")
     ue_expect_signature(call, "v1;SetEnableWorldRendering;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;bEnable:BoolProperty:128;")
@@ -4917,6 +5008,7 @@ def ue_gameplay_SetEnableWorldRendering(arg_benable : bool) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetForceDisableSplitscreen", signature="v1;SetForceDisableSplitscreen;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;bDisable:BoolProperty:128;")]
 def ue_gameplay_SetForceDisableSplitscreen(arg_bdisable : bool) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetForceDisableSplitscreen", "worldcontextobject")
     ue_expect_signature(call, "v1;SetForceDisableSplitscreen;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;bDisable:BoolProperty:128;")
@@ -4926,6 +5018,7 @@ def ue_gameplay_SetForceDisableSplitscreen(arg_bdisable : bool) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetGamePaused", signature="v1;SetGamePaused;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;bPaused:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_SetGamePaused(arg_bpaused : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetGamePaused", "worldcontextobject")
     ue_expect_signature(call, "v1;SetGamePaused;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;bPaused:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -4937,6 +5030,7 @@ def ue_gameplay_SetGamePaused(arg_bpaused : bool) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetGlobalListenerFocusParameters", signature="v1;SetGlobalListenerFocusParameters;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FocusAzimuthScale:FloatProperty:128;NonFocusAzimuthScale:FloatProperty:128;FocusDistanceScale:FloatProperty:128;NonFocusDistanceScale:FloatProperty:128;FocusVolumeScale:FloatProperty:128;NonFocusVolumeScale:FloatProperty:128;FocusPriorityScale:FloatProperty:128;NonFocusPriorityScale:FloatProperty:128;")]
 def ue_gameplay_SetGlobalListenerFocusParameters(arg_focusazimuthscale : float; arg_nonfocusazimuthscale : float; arg_focusdistancescale : float; arg_nonfocusdistancescale : float; arg_focusvolumescale : float; arg_nonfocusvolumescale : float; arg_focuspriorityscale : float; arg_nonfocuspriorityscale : float) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetGlobalListenerFocusParameters", "worldcontextobject")
     ue_expect_signature(call, "v1;SetGlobalListenerFocusParameters;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FocusAzimuthScale:FloatProperty:128;NonFocusAzimuthScale:FloatProperty:128;FocusDistanceScale:FloatProperty:128;NonFocusDistanceScale:FloatProperty:128;FocusVolumeScale:FloatProperty:128;NonFocusVolumeScale:FloatProperty:128;FocusPriorityScale:FloatProperty:128;NonFocusPriorityScale:FloatProperty:128;")
@@ -4953,6 +5047,7 @@ def ue_gameplay_SetGlobalListenerFocusParameters(arg_focusazimuthscale : float; 
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetGlobalPitchModulation", signature="v1;SetGlobalPitchModulation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PitchModulation:FloatProperty:128;TimeSec:FloatProperty:128;")]
 def ue_gameplay_SetGlobalPitchModulation(arg_pitchmodulation : float; arg_timesec : float) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetGlobalPitchModulation", "worldcontextobject")
     ue_expect_signature(call, "v1;SetGlobalPitchModulation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PitchModulation:FloatProperty:128;TimeSec:FloatProperty:128;")
@@ -4963,6 +5058,7 @@ def ue_gameplay_SetGlobalPitchModulation(arg_pitchmodulation : float; arg_timese
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetGlobalTimeDilation", signature="v1;SetGlobalTimeDilation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;TimeDilation:FloatProperty:128;")]
 def ue_gameplay_SetGlobalTimeDilation(arg_timedilation : float) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetGlobalTimeDilation", "worldcontextobject")
     ue_expect_signature(call, "v1;SetGlobalTimeDilation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;TimeDilation:FloatProperty:128;")
@@ -4972,6 +5068,7 @@ def ue_gameplay_SetGlobalTimeDilation(arg_timedilation : float) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetMaxAudioChannelsScaled", signature="v1;SetMaxAudioChannelsScaled;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;MaxChannelCountScale:FloatProperty:128;")]
 def ue_gameplay_SetMaxAudioChannelsScaled(arg_maxchannelcountscale : float) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetMaxAudioChannelsScaled", "worldcontextobject")
     ue_expect_signature(call, "v1;SetMaxAudioChannelsScaled;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;MaxChannelCountScale:FloatProperty:128;")
@@ -4981,6 +5078,7 @@ def ue_gameplay_SetMaxAudioChannelsScaled(arg_maxchannelcountscale : float) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetPlayerControllerID", signature="v1;SetPlayerControllerID;Player:ObjectProperty:128:/Script/Engine.PlayerController;ControllerId:IntProperty:128;")]
 def ue_gameplay_SetPlayerControllerID(arg_player : C_PlayerController_fb3d8846; arg_controllerid : int) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetPlayerControllerID", "")
     ue_expect_signature(call, "v1;SetPlayerControllerID;Player:ObjectProperty:128:/Script/Engine.PlayerController;ControllerId:IntProperty:128;")
@@ -4991,6 +5089,7 @@ def ue_gameplay_SetPlayerControllerID(arg_player : C_PlayerController_fb3d8846; 
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetPlayerPlatformUserId", signature="v1;SetPlayerPlatformUserId;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;UserId:StructProperty:128:/Script/CoreUObject.PlatformUserId\{InternalId:IntProperty:0;\};")]
 def ue_gameplay_SetPlayerPlatformUserId(arg_playercontroller : C_PlayerController_fb3d8846; arg_userid : S_PlatformUserId_184c4653) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetPlayerPlatformUserId", "")
     ue_expect_signature(call, "v1;SetPlayerPlatformUserId;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;UserId:StructProperty:128:/Script/CoreUObject.PlatformUserId\{InternalId:IntProperty:0;\};")
@@ -5001,6 +5100,7 @@ def ue_gameplay_SetPlayerPlatformUserId(arg_playercontroller : C_PlayerControlle
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetSoundClassDistanceScale", signature="v1;SetSoundClassDistanceScale;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;SoundClass:ObjectProperty:128:/Script/Engine.SoundClass;DistanceAttenuationScale:FloatProperty:128;TimeSec:FloatProperty:128;")]
 def ue_gameplay_SetSoundClassDistanceScale(arg_soundclass : C_SoundClass_dbf04ee6; arg_distanceattenuationscale : float; arg_timesec : float) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetSoundClassDistanceScale", "worldcontextobject")
     ue_expect_signature(call, "v1;SetSoundClassDistanceScale;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;SoundClass:ObjectProperty:128:/Script/Engine.SoundClass;DistanceAttenuationScale:FloatProperty:128;TimeSec:FloatProperty:128;")
@@ -5012,6 +5112,7 @@ def ue_gameplay_SetSoundClassDistanceScale(arg_soundclass : C_SoundClass_dbf04ee
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetSoundMixClassOverride", signature="v1;SetSoundMixClassOverride;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InSoundMixModifier:ObjectProperty:128:/Script/Engine.SoundMix;InSoundClass:ObjectProperty:128:/Script/Engine.SoundClass;Volume:FloatProperty:128;Pitch:FloatProperty:128;FadeInTime:FloatProperty:128;bApplyToChildren:BoolProperty:128;")]
 def ue_gameplay_SetSoundMixClassOverride(arg_insoundmixmodifier : C_SoundMix_4765d7d6; arg_insoundclass : C_SoundClass_dbf04ee6; arg_volume : float; arg_pitch : float; arg_fadeintime : float; arg_bapplytochildren : bool) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetSoundMixClassOverride", "worldcontextobject")
     ue_expect_signature(call, "v1;SetSoundMixClassOverride;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InSoundMixModifier:ObjectProperty:128:/Script/Engine.SoundMix;InSoundClass:ObjectProperty:128:/Script/Engine.SoundClass;Volume:FloatProperty:128;Pitch:FloatProperty:128;FadeInTime:FloatProperty:128;bApplyToChildren:BoolProperty:128;")
@@ -5026,6 +5127,7 @@ def ue_gameplay_SetSoundMixClassOverride(arg_insoundmixmodifier : C_SoundMix_476
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetSubtitlesEnabled", signature="v1;SetSubtitlesEnabled;bEnabled:BoolProperty:128;")]
 def ue_gameplay_SetSubtitlesEnabled(arg_benabled : bool) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetSubtitlesEnabled", "")
     ue_expect_signature(call, "v1;SetSubtitlesEnabled;bEnabled:BoolProperty:128;")
@@ -5035,6 +5137,7 @@ def ue_gameplay_SetSubtitlesEnabled(arg_benabled : bool) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetViewportMouseCaptureMode", signature="v1;SetViewportMouseCaptureMode;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;MouseCaptureMode:EnumProperty:130:/Script/Engine.EMouseCaptureMode;")]
 def ue_gameplay_SetViewportMouseCaptureMode(arg_mousecapturemode : E_EMouseCaptureMode_d9b54030) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetViewportMouseCaptureMode", "worldcontextobject")
     ue_expect_signature(call, "v1;SetViewportMouseCaptureMode;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;MouseCaptureMode:EnumProperty:130:/Script/Engine.EMouseCaptureMode;")
@@ -5044,6 +5147,7 @@ def ue_gameplay_SetViewportMouseCaptureMode(arg_mousecapturemode : E_EMouseCaptu
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SetWorldOriginLocation", signature="v1;SetWorldOriginLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;NewLocation:StructProperty:128:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};")]
 def ue_gameplay_SetWorldOriginLocation(arg_newlocation : S_IntVector_1c5addc5) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SetWorldOriginLocation", "worldcontextobject")
     ue_expect_signature(call, "v1;SetWorldOriginLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;NewLocation:StructProperty:128:/Script/CoreUObject.IntVector\{X:IntProperty:0;Y:IntProperty:0;Z:IntProperty:0;\};")
@@ -5055,6 +5159,7 @@ def ue_gameplay_SetWorldOriginLocation(arg_newlocation : S_IntVector_1c5addc5) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SpawnDecalAtLocation", signature="v1;SpawnDecalAtLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;DecalMaterial:ObjectProperty:128:/Script/Engine.MaterialInterface;DecalSize:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LifeSpan:FloatProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.DecalComponent;")]
 def ue_gameplay_SpawnDecalAtLocation(arg_decalmaterial : C_MaterialInterface_d64f3063; arg_decalsize : UEVector; arg_location : UEVector; arg_rotation : UERotator; arg_lifespan : float) : C_DecalComponent_e3526391 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnDecalAtLocation", "worldcontextobject")
     ue_expect_signature(call, "v1;SpawnDecalAtLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;DecalMaterial:ObjectProperty:128:/Script/Engine.MaterialInterface;DecalSize:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LifeSpan:FloatProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.DecalComponent;")
@@ -5070,6 +5175,7 @@ def ue_gameplay_SpawnDecalAtLocation(arg_decalmaterial : C_MaterialInterface_d64
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SpawnDecalAttached", signature="v1;SpawnDecalAttached;DecalMaterial:ObjectProperty:128:/Script/Engine.MaterialInterface;DecalSize:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AttachToComponent:ObjectProperty:128:/Script/Engine.SceneComponent;AttachPointName:NameProperty:128;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LocationType:ByteProperty:128:/Script/Engine.EAttachLocation;LifeSpan:FloatProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.DecalComponent;")]
 def ue_gameplay_SpawnDecalAttached(arg_decalmaterial : C_MaterialInterface_d64f3063; arg_decalsize : UEVector; arg_attachtocomponent : C_SceneComponent_6f0751c1; arg_attachpointname : UEName; arg_location : UEVector; arg_rotation : UERotator; arg_locationtype : E_EAttachLocation_2d8dff9b; arg_lifespan : float) : C_DecalComponent_e3526391 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnDecalAttached", "")
     ue_expect_signature(call, "v1;SpawnDecalAttached;DecalMaterial:ObjectProperty:128:/Script/Engine.MaterialInterface;DecalSize:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AttachToComponent:ObjectProperty:128:/Script/Engine.SceneComponent;AttachPointName:NameProperty:128;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LocationType:ByteProperty:128:/Script/Engine.EAttachLocation;LifeSpan:FloatProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.DecalComponent;")
@@ -5088,6 +5194,7 @@ def ue_gameplay_SpawnDecalAttached(arg_decalmaterial : C_MaterialInterface_d64f3
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SpawnEmitterAtLocation", signature="v1;SpawnEmitterAtLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;EmitterTemplate:ObjectProperty:128:/Script/Engine.ParticleSystem;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Scale:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};bAutoDestroy:BoolProperty:128;PoolingMethod:EnumProperty:128:/Script/Engine.EPSCPoolMethod;bAutoActivateSystem:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.ParticleSystemComponent;")]
 def ue_gameplay_SpawnEmitterAtLocation(arg_emittertemplate : C_ParticleSystem_fc843ad6; arg_location : UEVector; arg_rotation : UERotator; arg_scale : UEVector; arg_bautodestroy : bool; arg_poolingmethod : E_EPSCPoolMethod_f4aa4a6d; arg_bautoactivatesystem : bool) : C_ParticleSystemComponent_c9254c05 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnEmitterAtLocation", "worldcontextobject")
     ue_expect_signature(call, "v1;SpawnEmitterAtLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;EmitterTemplate:ObjectProperty:128:/Script/Engine.ParticleSystem;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Scale:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};bAutoDestroy:BoolProperty:128;PoolingMethod:EnumProperty:128:/Script/Engine.EPSCPoolMethod;bAutoActivateSystem:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.ParticleSystemComponent;")
@@ -5105,6 +5212,7 @@ def ue_gameplay_SpawnEmitterAtLocation(arg_emittertemplate : C_ParticleSystem_fc
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SpawnEmitterAttached", signature="v1;SpawnEmitterAttached;EmitterTemplate:ObjectProperty:128:/Script/Engine.ParticleSystem;AttachToComponent:ObjectProperty:128:/Script/Engine.SceneComponent;AttachPointName:NameProperty:128;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Scale:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LocationType:ByteProperty:128:/Script/Engine.EAttachLocation;bAutoDestroy:BoolProperty:128;PoolingMethod:EnumProperty:128:/Script/Engine.EPSCPoolMethod;bAutoActivate:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.ParticleSystemComponent;")]
 def ue_gameplay_SpawnEmitterAttached(arg_emittertemplate : C_ParticleSystem_fc843ad6; arg_attachtocomponent : C_SceneComponent_6f0751c1; arg_attachpointname : UEName; arg_location : UEVector; arg_rotation : UERotator; arg_scale : UEVector; arg_locationtype : E_EAttachLocation_2d8dff9b; arg_bautodestroy : bool; arg_poolingmethod : E_EPSCPoolMethod_f4aa4a6d; arg_bautoactivate : bool) : C_ParticleSystemComponent_c9254c05 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnEmitterAttached", "")
     ue_expect_signature(call, "v1;SpawnEmitterAttached;EmitterTemplate:ObjectProperty:128:/Script/Engine.ParticleSystem;AttachToComponent:ObjectProperty:128:/Script/Engine.SceneComponent;AttachPointName:NameProperty:128;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Scale:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LocationType:ByteProperty:128:/Script/Engine.EAttachLocation;bAutoDestroy:BoolProperty:128;PoolingMethod:EnumProperty:128:/Script/Engine.EPSCPoolMethod;bAutoActivate:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.ParticleSystemComponent;")
@@ -5125,6 +5233,7 @@ def ue_gameplay_SpawnEmitterAttached(arg_emittertemplate : C_ParticleSystem_fc84
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SpawnForceFeedbackAtLocation", signature="v1;SpawnForceFeedbackAtLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ForceFeedbackEffect:ObjectProperty:128:/Script/Engine.ForceFeedbackEffect;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};bLooping:BoolProperty:128;IntensityMultiplier:FloatProperty:128;StartTime:FloatProperty:128;AttenuationSettings:ObjectProperty:128:/Script/Engine.ForceFeedbackAttenuation;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.ForceFeedbackComponent;")]
 def ue_gameplay_SpawnForceFeedbackAtLocation(arg_forcefeedbackeffect : C_ForceFeedbackEffect_551fc643; arg_location : UEVector; arg_rotation : UERotator; arg_blooping : bool; arg_intensitymultiplier : float; arg_starttime : float; arg_attenuationsettings : C_ForceFeedbackAttenuation_433e867f; arg_bautodestroy : bool) : C_ForceFeedbackComponent_ca7b1c8d {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnForceFeedbackAtLocation", "worldcontextobject")
     ue_expect_signature(call, "v1;SpawnForceFeedbackAtLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ForceFeedbackEffect:ObjectProperty:128:/Script/Engine.ForceFeedbackEffect;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};bLooping:BoolProperty:128;IntensityMultiplier:FloatProperty:128;StartTime:FloatProperty:128;AttenuationSettings:ObjectProperty:128:/Script/Engine.ForceFeedbackAttenuation;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.ForceFeedbackComponent;")
@@ -5143,6 +5252,7 @@ def ue_gameplay_SpawnForceFeedbackAtLocation(arg_forcefeedbackeffect : C_ForceFe
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SpawnForceFeedbackAttached", signature="v1;SpawnForceFeedbackAttached;ForceFeedbackEffect:ObjectProperty:128:/Script/Engine.ForceFeedbackEffect;AttachToComponent:ObjectProperty:128:/Script/Engine.SceneComponent;AttachPointName:NameProperty:128;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LocationType:ByteProperty:128:/Script/Engine.EAttachLocation;bStopWhenAttachedToDestroyed:BoolProperty:128;bLooping:BoolProperty:128;IntensityMultiplier:FloatProperty:128;StartTime:FloatProperty:128;AttenuationSettings:ObjectProperty:128:/Script/Engine.ForceFeedbackAttenuation;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.ForceFeedbackComponent;")]
 def ue_gameplay_SpawnForceFeedbackAttached(arg_forcefeedbackeffect : C_ForceFeedbackEffect_551fc643; arg_attachtocomponent : C_SceneComponent_6f0751c1; arg_attachpointname : UEName; arg_location : UEVector; arg_rotation : UERotator; arg_locationtype : E_EAttachLocation_2d8dff9b; arg_bstopwhenattachedtodestroyed : bool; arg_blooping : bool; arg_intensitymultiplier : float; arg_starttime : float; arg_attenuationsettings : C_ForceFeedbackAttenuation_433e867f; arg_bautodestroy : bool) : C_ForceFeedbackComponent_ca7b1c8d {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnForceFeedbackAttached", "")
     ue_expect_signature(call, "v1;SpawnForceFeedbackAttached;ForceFeedbackEffect:ObjectProperty:128:/Script/Engine.ForceFeedbackEffect;AttachToComponent:ObjectProperty:128:/Script/Engine.SceneComponent;AttachPointName:NameProperty:128;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LocationType:ByteProperty:128:/Script/Engine.EAttachLocation;bStopWhenAttachedToDestroyed:BoolProperty:128;bLooping:BoolProperty:128;IntensityMultiplier:FloatProperty:128;StartTime:FloatProperty:128;AttenuationSettings:ObjectProperty:128:/Script/Engine.ForceFeedbackAttenuation;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.ForceFeedbackComponent;")
@@ -5165,6 +5275,7 @@ def ue_gameplay_SpawnForceFeedbackAttached(arg_forcefeedbackeffect : C_ForceFeed
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SpawnSound2D", signature="v1;SpawnSound2D;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Sound:ObjectProperty:128:/Script/Engine.SoundBase;VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;bPersistAcrossLevelTransition:BoolProperty:128;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.AudioComponent;")]
 def ue_gameplay_SpawnSound2D(arg_sound : C_SoundBase_07301ff0; arg_volumemultiplier : float; arg_pitchmultiplier : float; arg_starttime : float; arg_concurrencysettings : C_SoundConcurrency_36fc67f9; arg_bpersistacrossleveltransition : bool; arg_bautodestroy : bool) : C_AudioComponent_86ff3f82 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnSound2D", "worldcontextobject")
     ue_expect_signature(call, "v1;SpawnSound2D;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Sound:ObjectProperty:128:/Script/Engine.SoundBase;VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;bPersistAcrossLevelTransition:BoolProperty:128;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.AudioComponent;")
@@ -5182,6 +5293,7 @@ def ue_gameplay_SpawnSound2D(arg_sound : C_SoundBase_07301ff0; arg_volumemultipl
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SpawnSoundAtLocation", signature="v1;SpawnSoundAtLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Sound:ObjectProperty:128:/Script/Engine.SoundBase;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;AttenuationSettings:ObjectProperty:128:/Script/Engine.SoundAttenuation;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.AudioComponent;")]
 def ue_gameplay_SpawnSoundAtLocation(arg_sound : C_SoundBase_07301ff0; arg_location : UEVector; arg_rotation : UERotator; arg_volumemultiplier : float; arg_pitchmultiplier : float; arg_starttime : float; arg_attenuationsettings : C_SoundAttenuation_d1991af4; arg_concurrencysettings : C_SoundConcurrency_36fc67f9; arg_bautodestroy : bool) : C_AudioComponent_86ff3f82 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnSoundAtLocation", "worldcontextobject")
     ue_expect_signature(call, "v1;SpawnSoundAtLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Sound:ObjectProperty:128:/Script/Engine.SoundBase;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;AttenuationSettings:ObjectProperty:128:/Script/Engine.SoundAttenuation;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.AudioComponent;")
@@ -5201,6 +5313,7 @@ def ue_gameplay_SpawnSoundAtLocation(arg_sound : C_SoundBase_07301ff0; arg_locat
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SpawnSoundAttached", signature="v1;SpawnSoundAttached;Sound:ObjectProperty:128:/Script/Engine.SoundBase;AttachToComponent:ObjectProperty:128:/Script/Engine.SceneComponent;AttachPointName:NameProperty:128;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LocationType:ByteProperty:128:/Script/Engine.EAttachLocation;bStopWhenAttachedToDestroyed:BoolProperty:128;VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;AttenuationSettings:ObjectProperty:128:/Script/Engine.SoundAttenuation;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.AudioComponent;")]
 def ue_gameplay_SpawnSoundAttached(arg_sound : C_SoundBase_07301ff0; arg_attachtocomponent : C_SceneComponent_6f0751c1; arg_attachpointname : UEName; arg_location : UEVector; arg_rotation : UERotator; arg_locationtype : E_EAttachLocation_2d8dff9b; arg_bstopwhenattachedtodestroyed : bool; arg_volumemultiplier : float; arg_pitchmultiplier : float; arg_starttime : float; arg_attenuationsettings : C_SoundAttenuation_d1991af4; arg_concurrencysettings : C_SoundConcurrency_36fc67f9; arg_bautodestroy : bool) : C_AudioComponent_86ff3f82 {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnSoundAttached", "")
     ue_expect_signature(call, "v1;SpawnSoundAttached;Sound:ObjectProperty:128:/Script/Engine.SoundBase;AttachToComponent:ObjectProperty:128:/Script/Engine.SceneComponent;AttachPointName:NameProperty:128;Location:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Rotation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LocationType:ByteProperty:128:/Script/Engine.EAttachLocation;bStopWhenAttachedToDestroyed:BoolProperty:128;VolumeMultiplier:FloatProperty:128;PitchMultiplier:FloatProperty:128;StartTime:FloatProperty:128;AttenuationSettings:ObjectProperty:128:/Script/Engine.SoundAttenuation;ConcurrencySettings:ObjectProperty:128:/Script/Engine.SoundConcurrency;bAutoDestroy:BoolProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.AudioComponent;")
@@ -5229,6 +5342,7 @@ struct ue_gameplay_SuggestProjectileVelocity_CustomArc_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SuggestProjectileVelocity_CustomArc", signature="v1;SuggestProjectileVelocity_CustomArc;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;OutLaunchVelocity:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};StartPos:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};EndPos:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};OverrideGravityZ:FloatProperty:128;ArcParam:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_SuggestProjectileVelocity_CustomArc(arg_startpos : UEVector; arg_endpos : UEVector; arg_overridegravityz : float; arg_arcparam : float) : ue_gameplay_SuggestProjectileVelocity_CustomArc_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SuggestProjectileVelocity_CustomArc", "worldcontextobject")
     ue_expect_signature(call, "v1;SuggestProjectileVelocity_CustomArc;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;OutLaunchVelocity:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};StartPos:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};EndPos:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};OverrideGravityZ:FloatProperty:128;ArcParam:FloatProperty:128;ReturnValue:BoolProperty:1408;")
@@ -5248,6 +5362,7 @@ struct ue_gameplay_SuggestProjectileVelocity_MovingTarget_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SuggestProjectileVelocity_MovingTarget", signature="v1;SuggestProjectileVelocity_MovingTarget;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;OutLaunchVelocity:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ProjectileStartLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};TargetActor:ObjectProperty:128:/Script/Engine.Actor;TargetLocationOffset:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};GravityZOverride:DoubleProperty:128;TimeToTarget:DoubleProperty:128;DrawDebugType:ByteProperty:128:/Script/Engine.EDrawDebugTrace;DrawDebugTime:FloatProperty:128;DrawDebugColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_gameplay_SuggestProjectileVelocity_MovingTarget(arg_projectilestartlocation : UEVector; arg_targetactor : C_Actor_adf65d5b; arg_targetlocationoffset : UEVector; arg_gravityzoverride : double; arg_timetotarget : double; arg_drawdebugtype : E_EDrawDebugTrace_59edfe33; arg_drawdebugtime : float; arg_drawdebugcolor : S_LinearColor_f4abb14b) : ue_gameplay_SuggestProjectileVelocity_MovingTarget_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SuggestProjectileVelocity_MovingTarget", "worldcontextobject")
     ue_expect_signature(call, "v1;SuggestProjectileVelocity_MovingTarget;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;OutLaunchVelocity:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ProjectileStartLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};TargetActor:ObjectProperty:128:/Script/Engine.Actor;TargetLocationOffset:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};GravityZOverride:DoubleProperty:128;TimeToTarget:DoubleProperty:128;DrawDebugType:ByteProperty:128:/Script/Engine.EDrawDebugTrace;DrawDebugTime:FloatProperty:128;DrawDebugColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -5269,6 +5384,7 @@ def ue_gameplay_SuggestProjectileVelocity_MovingTarget(arg_projectilestartlocati
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="UnRetainAllSoundsInSoundClass", signature="v1;UnRetainAllSoundsInSoundClass;InSoundClass:ObjectProperty:128:/Script/Engine.SoundClass;")]
 def ue_gameplay_UnRetainAllSoundsInSoundClass(arg_insoundclass : C_SoundClass_dbf04ee6) {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "UnRetainAllSoundsInSoundClass", "")
     ue_expect_signature(call, "v1;UnRetainAllSoundsInSoundClass;InSoundClass:ObjectProperty:128:/Script/Engine.SoundClass;")
@@ -7648,6 +7764,7 @@ def ue_scene_ToggleVisibility(target : C_SceneComponent_6f0751c1; arg_bpropagate
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="AddFloatHistorySample", signature="v1;AddFloatHistorySample;Value:FloatProperty:128;FloatHistory:StructProperty:134218114:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};")]
 def ue_system_AddFloatHistorySample(arg_value : float; arg_floathistory : S_DebugFloatHistory_f7f88be1) : S_DebugFloatHistory_f7f88be1 {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "AddFloatHistorySample", "")
     ue_expect_signature(call, "v1;AddFloatHistorySample;Value:FloatProperty:128;FloatHistory:StructProperty:134218114:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};ReturnValue:StructProperty:1408:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};")
@@ -7675,6 +7792,7 @@ def ue_system_AddFloatHistorySample(arg_value : float; arg_floathistory : S_Debu
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="BeginTransaction", signature="v1;BeginTransaction;Context:StrProperty:128;Description:TextProperty:128;PrimaryObject:ObjectProperty:128:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")]
 def ue_system_BeginTransaction(arg_context : string; arg_description : UETextValue; arg_primaryobject : C_Object_55c3753a) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "BeginTransaction", "")
     ue_expect_signature(call, "v1;BeginTransaction;Context:StrProperty:128;Description:TextProperty:128;PrimaryObject:ObjectProperty:128:/Script/CoreUObject.Object;ReturnValue:IntProperty:1408;")
@@ -7693,6 +7811,7 @@ struct ue_system_BoxOverlapActors_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="BoxOverlapActors", signature="v1;BoxOverlapActors;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BoxPos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")]
 def ue_system_BoxOverlapActors(arg_boxpos : UEVector; arg_boxextent : UEVector; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_actorclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_BoxOverlapActors_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "BoxOverlapActors", "worldcontextobject")
     ue_expect_signature(call, "v1;BoxOverlapActors;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BoxPos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")
@@ -7724,6 +7843,7 @@ struct ue_system_BoxOverlapActorsWithOrientation_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="BoxOverlapActorsWithOrientation", signature="v1;BoxOverlapActorsWithOrientation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BoxPos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Orientation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")]
 def ue_system_BoxOverlapActorsWithOrientation(arg_boxpos : UEVector; arg_boxextent : UEVector; arg_orientation : UERotator; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_actorclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_BoxOverlapActorsWithOrientation_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "BoxOverlapActorsWithOrientation", "worldcontextobject")
     ue_expect_signature(call, "v1;BoxOverlapActorsWithOrientation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BoxPos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Orientation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")
@@ -7756,6 +7876,7 @@ struct ue_system_BoxOverlapComponents_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="BoxOverlapComponents", signature="v1;BoxOverlapComponents;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BoxPos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Extent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")]
 def ue_system_BoxOverlapComponents(arg_boxpos : UEVector; arg_extent : UEVector; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_componentclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_BoxOverlapComponents_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "BoxOverlapComponents", "worldcontextobject")
     ue_expect_signature(call, "v1;BoxOverlapComponents;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BoxPos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Extent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")
@@ -7787,6 +7908,7 @@ struct ue_system_BoxOverlapComponentsWithOrientation_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="BoxOverlapComponentsWithOrientation", signature="v1;BoxOverlapComponentsWithOrientation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BoxPos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Extent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Orientation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")]
 def ue_system_BoxOverlapComponentsWithOrientation(arg_boxpos : UEVector; arg_extent : UEVector; arg_orientation : UERotator; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_componentclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_BoxOverlapComponentsWithOrientation_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "BoxOverlapComponentsWithOrientation", "worldcontextobject")
     ue_expect_signature(call, "v1;BoxOverlapComponentsWithOrientation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;BoxPos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Extent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Orientation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")
@@ -7814,6 +7936,7 @@ def ue_system_BoxOverlapComponentsWithOrientation(arg_boxpos : UEVector; arg_ext
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="BreakTopLevelAssetPath", signature="v1;BreakTopLevelAssetPath;TopLevelAssetPath:StructProperty:134218114:/Script/CoreUObject.TopLevelAssetPath\{PackageName:NameProperty:0;AssetName:NameProperty:0;\};PathString:StrProperty:384;")]
 def ue_system_BreakTopLevelAssetPath(arg_toplevelassetpath : S_TopLevelAssetPath_16fe4d56) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "BreakTopLevelAssetPath", "")
     ue_expect_signature(call, "v1;BreakTopLevelAssetPath;TopLevelAssetPath:StructProperty:134218114:/Script/CoreUObject.TopLevelAssetPath\{PackageName:NameProperty:0;AssetName:NameProperty:0;\};PathString:StrProperty:384;")
@@ -7826,6 +7949,7 @@ def ue_system_BreakTopLevelAssetPath(arg_toplevelassetpath : S_TopLevelAssetPath
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="CanLaunchURL", signature="v1;CanLaunchURL;URL:StrProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_system_CanLaunchURL(arg_url : string) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "CanLaunchURL", "")
     ue_expect_signature(call, "v1;CanLaunchURL;URL:StrProperty:128;ReturnValue:BoolProperty:1408;")
@@ -7837,6 +7961,7 @@ def ue_system_CanLaunchURL(arg_url : string) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="CancelTransaction", signature="v1;CancelTransaction;Index:IntProperty:130;")]
 def ue_system_CancelTransaction(arg_index : int) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "CancelTransaction", "")
     ue_expect_signature(call, "v1;CancelTransaction;Index:IntProperty:130;")
@@ -7851,6 +7976,7 @@ struct ue_system_CapsuleOverlapActors_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="CapsuleOverlapActors", signature="v1;CapsuleOverlapActors;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;CapsulePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;HalfHeight:FloatProperty:128;ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")]
 def ue_system_CapsuleOverlapActors(arg_capsulepos : UEVector; arg_radius : float; arg_halfheight : float; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_actorclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_CapsuleOverlapActors_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "CapsuleOverlapActors", "worldcontextobject")
     ue_expect_signature(call, "v1;CapsuleOverlapActors;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;CapsulePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;HalfHeight:FloatProperty:128;ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")
@@ -7883,6 +8009,7 @@ struct ue_system_CapsuleOverlapActorsWithOrientation_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="CapsuleOverlapActorsWithOrientation", signature="v1;CapsuleOverlapActorsWithOrientation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;CapsulePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;HalfHeight:FloatProperty:128;Orientation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")]
 def ue_system_CapsuleOverlapActorsWithOrientation(arg_capsulepos : UEVector; arg_radius : float; arg_halfheight : float; arg_orientation : UERotator; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_actorclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_CapsuleOverlapActorsWithOrientation_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "CapsuleOverlapActorsWithOrientation", "worldcontextobject")
     ue_expect_signature(call, "v1;CapsuleOverlapActorsWithOrientation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;CapsulePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;HalfHeight:FloatProperty:128;Orientation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")
@@ -7916,6 +8043,7 @@ struct ue_system_CapsuleOverlapComponents_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="CapsuleOverlapComponents", signature="v1;CapsuleOverlapComponents;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;CapsulePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;HalfHeight:FloatProperty:128;ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")]
 def ue_system_CapsuleOverlapComponents(arg_capsulepos : UEVector; arg_radius : float; arg_halfheight : float; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_componentclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_CapsuleOverlapComponents_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "CapsuleOverlapComponents", "worldcontextobject")
     ue_expect_signature(call, "v1;CapsuleOverlapComponents;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;CapsulePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;HalfHeight:FloatProperty:128;ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")
@@ -7948,6 +8076,7 @@ struct ue_system_CapsuleOverlapComponentsWithOrientation_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="CapsuleOverlapComponentsWithOrientation", signature="v1;CapsuleOverlapComponentsWithOrientation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;CapsulePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;HalfHeight:FloatProperty:128;Orientation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")]
 def ue_system_CapsuleOverlapComponentsWithOrientation(arg_capsulepos : UEVector; arg_radius : float; arg_halfheight : float; arg_orientation : UERotator; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_componentclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_CapsuleOverlapComponentsWithOrientation_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "CapsuleOverlapComponentsWithOrientation", "worldcontextobject")
     ue_expect_signature(call, "v1;CapsuleOverlapComponentsWithOrientation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;CapsulePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;HalfHeight:FloatProperty:128;Orientation:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")
@@ -7976,6 +8105,7 @@ def ue_system_CapsuleOverlapComponentsWithOrientation(arg_capsulepos : UEVector;
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="CollectGarbage", signature="v1;CollectGarbage;")]
 def ue_system_CollectGarbage() {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "CollectGarbage", "")
     ue_expect_signature(call, "v1;CollectGarbage;")
@@ -7989,6 +8119,7 @@ struct ue_system_ComponentOverlapActors_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ComponentOverlapActors", signature="v1;ComponentOverlapActors;Component:ObjectProperty:128:/Script/Engine.PrimitiveComponent;ComponentTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")]
 def ue_system_ComponentOverlapActors(arg_component : C_PrimitiveComponent_5efdd477; arg_componenttransform : UETransform; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_actorclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_ComponentOverlapActors_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ComponentOverlapActors", "")
     ue_expect_signature(call, "v1;ComponentOverlapActors;Component:ObjectProperty:128:/Script/Engine.PrimitiveComponent;ComponentTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")
@@ -8020,6 +8151,7 @@ struct ue_system_ComponentOverlapComponents_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ComponentOverlapComponents", signature="v1;ComponentOverlapComponents;Component:ObjectProperty:128:/Script/Engine.PrimitiveComponent;ComponentTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")]
 def ue_system_ComponentOverlapComponents(arg_component : C_PrimitiveComponent_5efdd477; arg_componenttransform : UETransform; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_componentclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_ComponentOverlapComponents_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ComponentOverlapComponents", "")
     ue_expect_signature(call, "v1;ComponentOverlapComponents;Component:ObjectProperty:128:/Script/Engine.PrimitiveComponent;ComponentTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")
@@ -8046,6 +8178,7 @@ def ue_system_ComponentOverlapComponents(arg_component : C_PrimitiveComponent_5e
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ControlScreensaver", signature="v1;ControlScreensaver;bAllowScreenSaver:BoolProperty:128;")]
 def ue_system_ControlScreensaver(arg_ballowscreensaver : bool) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ControlScreensaver", "")
     ue_expect_signature(call, "v1;ControlScreensaver;bAllowScreenSaver:BoolProperty:128;")
@@ -8055,6 +8188,7 @@ def ue_system_ControlScreensaver(arg_ballowscreensaver : bool) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="Conv_InterfaceToObject", signature="v1;Conv_InterfaceToObject;Interface:InterfaceProperty:134218114:/Script/CoreUObject.Interface;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")]
 def ue_system_Conv_InterfaceToObject(arg_interface : C_Interface_479883b5) : C_Object_55c3753a {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "Conv_InterfaceToObject", "")
     ue_expect_signature(call, "v1;Conv_InterfaceToObject;Interface:InterfaceProperty:134218114:/Script/CoreUObject.Interface;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")
@@ -8066,6 +8200,7 @@ def ue_system_Conv_InterfaceToObject(arg_interface : C_Interface_479883b5) : C_O
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="Conv_ObjectToClass", signature="v1;Conv_ObjectToClass;Object:ObjectProperty:128:/Script/CoreUObject.Object;Class:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")]
 def ue_system_Conv_ObjectToClass(arg_object : C_Object_55c3753a; arg_class : UEClassHandle) : UEClassHandle {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "Conv_ObjectToClass", "")
     ue_expect_signature(call, "v1;Conv_ObjectToClass;Object:ObjectProperty:128:/Script/CoreUObject.Object;Class:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")
@@ -8078,6 +8213,7 @@ def ue_system_Conv_ObjectToClass(arg_object : C_Object_55c3753a; arg_class : UEC
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="Conv_PrimaryAssetIdToString", signature="v1;Conv_PrimaryAssetIdToString;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:StrProperty:1408;")]
 def ue_system_Conv_PrimaryAssetIdToString(arg_primaryassetid : S_PrimaryAssetId_ea64396c) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "Conv_PrimaryAssetIdToString", "")
     ue_expect_signature(call, "v1;Conv_PrimaryAssetIdToString;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:StrProperty:1408;")
@@ -8090,6 +8226,7 @@ def ue_system_Conv_PrimaryAssetIdToString(arg_primaryassetid : S_PrimaryAssetId_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="Conv_PrimaryAssetTypeToString", signature="v1;Conv_PrimaryAssetTypeToString;PrimaryAssetType:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};ReturnValue:StrProperty:1408;")]
 def ue_system_Conv_PrimaryAssetTypeToString(arg_primaryassettype : S_PrimaryAssetType_b65c189d) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "Conv_PrimaryAssetTypeToString", "")
     ue_expect_signature(call, "v1;Conv_PrimaryAssetTypeToString;PrimaryAssetType:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};ReturnValue:StrProperty:1408;")
@@ -8101,6 +8238,7 @@ def ue_system_Conv_PrimaryAssetTypeToString(arg_primaryassettype : S_PrimaryAsse
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ConvertToAbsolutePath", signature="v1;ConvertToAbsolutePath;Filename:StrProperty:128;ReturnValue:StrProperty:1408;")]
 def ue_system_ConvertToAbsolutePath(arg_filename : string) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ConvertToAbsolutePath", "")
     ue_expect_signature(call, "v1;ConvertToAbsolutePath;Filename:StrProperty:128;ReturnValue:StrProperty:1408;")
@@ -8112,6 +8250,7 @@ def ue_system_ConvertToAbsolutePath(arg_filename : string) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ConvertToRelativePath", signature="v1;ConvertToRelativePath;Filename:StrProperty:128;ReturnValue:StrProperty:1408;")]
 def ue_system_ConvertToRelativePath(arg_filename : string) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ConvertToRelativePath", "")
     ue_expect_signature(call, "v1;ConvertToRelativePath;Filename:StrProperty:128;ReturnValue:StrProperty:1408;")
@@ -8123,6 +8262,7 @@ def ue_system_ConvertToRelativePath(arg_filename : string) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="CreateCopyForUndoBuffer", signature="v1;CreateCopyForUndoBuffer;ObjectToModify:ObjectProperty:128:/Script/CoreUObject.Object;")]
 def ue_system_CreateCopyForUndoBuffer(arg_objecttomodify : C_Object_55c3753a) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "CreateCopyForUndoBuffer", "")
     ue_expect_signature(call, "v1;CreateCopyForUndoBuffer;ObjectToModify:ObjectProperty:128:/Script/CoreUObject.Object;")
@@ -8132,6 +8272,7 @@ def ue_system_CreateCopyForUndoBuffer(arg_objecttomodify : C_Object_55c3753a) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DoesClassImplementInterface", signature="v1;DoesClassImplementInterface;TestClass:ClassProperty:130:meta:/Script/CoreUObject.Object;Interface:ClassProperty:128:meta:/Script/CoreUObject.Interface;ReturnValue:BoolProperty:1408;")]
 def ue_system_DoesClassImplementInterface(arg_testclass : UEClassHandle; arg_interface : UEClassHandle) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DoesClassImplementInterface", "")
     ue_expect_signature(call, "v1;DoesClassImplementInterface;TestClass:ClassProperty:130:meta:/Script/CoreUObject.Object;Interface:ClassProperty:128:meta:/Script/CoreUObject.Interface;ReturnValue:BoolProperty:1408;")
@@ -8144,6 +8285,7 @@ def ue_system_DoesClassImplementInterface(arg_testclass : UEClassHandle; arg_int
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DoesImplementInterface", signature="v1;DoesImplementInterface;TestObject:ObjectProperty:130:/Script/CoreUObject.Object;Interface:ClassProperty:128:meta:/Script/CoreUObject.Interface;ReturnValue:BoolProperty:1408;")]
 def ue_system_DoesImplementInterface(arg_testobject : C_Object_55c3753a; arg_interface : UEClassHandle) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DoesImplementInterface", "")
     ue_expect_signature(call, "v1;DoesImplementInterface;TestObject:ObjectProperty:130:/Script/CoreUObject.Object;Interface:ClassProperty:128:meta:/Script/CoreUObject.Interface;ReturnValue:BoolProperty:1408;")
@@ -8156,6 +8298,7 @@ def ue_system_DoesImplementInterface(arg_testobject : C_Object_55c3753a; arg_int
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugArrow", signature="v1;DrawDebugArrow;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;LineStart:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ArrowSize:FloatProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugArrow(arg_linestart : UEVector; arg_lineend : UEVector; arg_arrowsize : float; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugArrow", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugArrow;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;LineStart:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ArrowSize:FloatProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8174,6 +8317,7 @@ def ue_system_DrawDebugArrow(arg_linestart : UEVector; arg_lineend : UEVector; a
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugBox", signature="v1;DrawDebugBox;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Extent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Rotation:StructProperty:130:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugBox(arg_center : UEVector; arg_extent : UEVector; arg_linecolor : S_LinearColor_f4abb14b; arg_rotation : UERotator; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugBox", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugBox;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Extent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Rotation:StructProperty:130:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8192,6 +8336,7 @@ def ue_system_DrawDebugBox(arg_center : UEVector; arg_extent : UEVector; arg_lin
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugCamera", signature="v1;DrawDebugCamera;CameraActor:ObjectProperty:130:/Script/Engine.CameraActor;CameraColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")]
 def ue_system_DrawDebugCamera(arg_cameraactor : C_CameraActor_cb891975; arg_cameracolor : S_LinearColor_f4abb14b; arg_duration : float) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugCamera", "")
     ue_expect_signature(call, "v1;DrawDebugCamera;CameraActor:ObjectProperty:130:/Script/Engine.CameraActor;CameraColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")
@@ -8206,6 +8351,7 @@ def ue_system_DrawDebugCamera(arg_cameraactor : C_CameraActor_cb891975; arg_came
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugCapsule", signature="v1;DrawDebugCapsule;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};HalfHeight:FloatProperty:128;Radius:FloatProperty:128;Rotation:StructProperty:130:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugCapsule(arg_center : UEVector; arg_halfheight : float; arg_radius : float; arg_rotation : UERotator; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugCapsule", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugCapsule;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};HalfHeight:FloatProperty:128;Radius:FloatProperty:128;Rotation:StructProperty:130:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8225,6 +8371,7 @@ def ue_system_DrawDebugCapsule(arg_center : UEVector; arg_halfheight : float; ar
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugCircle", signature="v1;DrawDebugCircle;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;NumSegments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;YAxis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZAxis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};bDrawAxis:BoolProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugCircle(arg_center : UEVector; arg_radius : float; arg_numsegments : int; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_yaxis : UEVector; arg_zaxis : UEVector; arg_bdrawaxis : bool; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugCircle", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugCircle;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;NumSegments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;YAxis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZAxis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};bDrawAxis:BoolProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8246,6 +8393,7 @@ def ue_system_DrawDebugCircle(arg_center : UEVector; arg_radius : float; arg_num
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugConeInDegrees", signature="v1;DrawDebugConeInDegrees;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Origin:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Direction:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Length:FloatProperty:128;AngleWidth:FloatProperty:128;AngleHeight:FloatProperty:128;NumSides:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugConeInDegrees(arg_origin : UEVector; arg_direction : UEVector; arg_length : float; arg_anglewidth : float; arg_angleheight : float; arg_numsides : int; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugConeInDegrees", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugConeInDegrees;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Origin:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Direction:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Length:FloatProperty:128;AngleWidth:FloatProperty:128;AngleHeight:FloatProperty:128;NumSides:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8267,6 +8415,7 @@ def ue_system_DrawDebugConeInDegrees(arg_origin : UEVector; arg_direction : UEVe
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugCoordinateSystem", signature="v1;DrawDebugCoordinateSystem;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;AxisLoc:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AxisRot:StructProperty:130:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Scale:FloatProperty:128;Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugCoordinateSystem(arg_axisloc : UEVector; arg_axisrot : UERotator; arg_scale : float; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugCoordinateSystem", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugCoordinateSystem;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;AxisLoc:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};AxisRot:StructProperty:130:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Scale:FloatProperty:128;Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8281,6 +8430,7 @@ def ue_system_DrawDebugCoordinateSystem(arg_axisloc : UEVector; arg_axisrot : UE
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugCylinder", signature="v1;DrawDebugCylinder;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Start:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};End:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;Segments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugCylinder(arg_start : UEVector; arg_end : UEVector; arg_radius : float; arg_segments : int; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugCylinder", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugCylinder;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Start:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};End:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;Segments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8300,6 +8450,7 @@ def ue_system_DrawDebugCylinder(arg_start : UEVector; arg_end : UEVector; arg_ra
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugFloatHistoryLocation", signature="v1;DrawDebugFloatHistoryLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FloatHistory:StructProperty:134218114:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};DrawLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DrawSize:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DrawColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")]
 def ue_system_DrawDebugFloatHistoryLocation(arg_floathistory : S_DebugFloatHistory_f7f88be1; arg_drawlocation : UEVector; arg_drawsize : UEVector2D; arg_drawcolor : S_LinearColor_f4abb14b; arg_duration : float) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugFloatHistoryLocation", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugFloatHistoryLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FloatHistory:StructProperty:134218114:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};DrawLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DrawSize:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DrawColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")
@@ -8323,6 +8474,7 @@ def ue_system_DrawDebugFloatHistoryLocation(arg_floathistory : S_DebugFloatHisto
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugFloatHistoryTransform", signature="v1;DrawDebugFloatHistoryTransform;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FloatHistory:StructProperty:134218114:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};DrawTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};DrawSize:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DrawColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")]
 def ue_system_DrawDebugFloatHistoryTransform(arg_floathistory : S_DebugFloatHistory_f7f88be1; arg_drawtransform : UETransform; arg_drawsize : UEVector2D; arg_drawcolor : S_LinearColor_f4abb14b; arg_duration : float) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugFloatHistoryTransform", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugFloatHistoryTransform;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FloatHistory:StructProperty:134218114:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};DrawTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};DrawSize:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DrawColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")
@@ -8346,6 +8498,7 @@ def ue_system_DrawDebugFloatHistoryTransform(arg_floathistory : S_DebugFloatHist
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugFrustum", signature="v1;DrawDebugFrustum;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FrustumTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};FrustumColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;")]
 def ue_system_DrawDebugFrustum(arg_frustumtransform : UETransform; arg_frustumcolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugFrustum", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugFrustum;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FrustumTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};FrustumColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;")
@@ -8361,6 +8514,7 @@ def ue_system_DrawDebugFrustum(arg_frustumtransform : UETransform; arg_frustumco
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugLine", signature="v1;DrawDebugLine;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;LineStart:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugLine(arg_linestart : UEVector; arg_lineend : UEVector; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugLine", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugLine;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;LineStart:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8378,6 +8532,7 @@ def ue_system_DrawDebugLine(arg_linestart : UEVector; arg_lineend : UEVector; ar
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugPlane", signature="v1;DrawDebugPlane;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlaneCoordinates:StructProperty:134218114:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Location:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Size:FloatProperty:128;PlaneColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugPlane(arg_planecoordinates : S_Plane_a3bdbfa8; arg_location : UEVector; arg_size : float; arg_planecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugPlane", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugPlane;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlaneCoordinates:StructProperty:134218114:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Location:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Size:FloatProperty:128;PlaneColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8398,6 +8553,7 @@ def ue_system_DrawDebugPlane(arg_planecoordinates : S_Plane_a3bdbfa8; arg_locati
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugPoint", signature="v1;DrawDebugPoint;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Position:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Size:FloatProperty:128;PointColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugPoint(arg_position : UEVector; arg_size : float; arg_pointcolor : S_LinearColor_f4abb14b; arg_duration : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugPoint", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugPoint;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Position:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Size:FloatProperty:128;PointColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8414,6 +8570,7 @@ def ue_system_DrawDebugPoint(arg_position : UEVector; arg_size : float; arg_poin
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugSphere", signature="v1;DrawDebugSphere;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;Segments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
 def ue_system_DrawDebugSphere(arg_center : UEVector; arg_radius : float; arg_segments : int; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugSphere", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugSphere;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;Segments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
@@ -8432,6 +8589,7 @@ def ue_system_DrawDebugSphere(arg_center : UEVector; arg_radius : float; arg_seg
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugString", signature="v1;DrawDebugString;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;TextLocation:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Text:StrProperty:128;TestBaseActor:ObjectProperty:128:/Script/Engine.Actor;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")]
 def ue_system_DrawDebugString(arg_textlocation : UEVector; arg_text : string; arg_testbaseactor : C_Actor_adf65d5b; arg_textcolor : S_LinearColor_f4abb14b; arg_duration : float) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugString", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugString;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;TextLocation:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Text:StrProperty:128;TestBaseActor:ObjectProperty:128:/Script/Engine.Actor;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")
@@ -8448,6 +8606,7 @@ def ue_system_DrawDebugString(arg_textlocation : UEVector; arg_text : string; ar
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DuplicateObject", signature="v1;DuplicateObject;SourceObject:ObjectProperty:130:/Script/CoreUObject.Object;Outer:ObjectProperty:128:/Script/CoreUObject.Object;Name:NameProperty:130;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")]
 def ue_system_DuplicateObject(arg_sourceobject : C_Object_55c3753a; arg_outer : C_Object_55c3753a; arg_name : UEName) : C_Object_55c3753a {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DuplicateObject", "")
     ue_expect_signature(call, "v1;DuplicateObject;SourceObject:ObjectProperty:130:/Script/CoreUObject.Object;Outer:ObjectProperty:128:/Script/CoreUObject.Object;Name:NameProperty:130;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")
@@ -8461,6 +8620,7 @@ def ue_system_DuplicateObject(arg_sourceobject : C_Object_55c3753a; arg_outer : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="EndTransaction", signature="v1;EndTransaction;ReturnValue:IntProperty:1408;")]
 def ue_system_EndTransaction() : int {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "EndTransaction", "")
     ue_expect_signature(call, "v1;EndTransaction;ReturnValue:IntProperty:1408;")
@@ -8471,6 +8631,7 @@ def ue_system_EndTransaction() : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="EqualEqual_PrimaryAssetId", signature="v1;EqualEqual_PrimaryAssetId;A:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};B:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_system_EqualEqual_PrimaryAssetId(arg_a : S_PrimaryAssetId_ea64396c; arg_b : S_PrimaryAssetId_ea64396c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "EqualEqual_PrimaryAssetId", "")
     ue_expect_signature(call, "v1;EqualEqual_PrimaryAssetId;A:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};B:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -8485,6 +8646,7 @@ def ue_system_EqualEqual_PrimaryAssetId(arg_a : S_PrimaryAssetId_ea64396c; arg_b
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="EqualEqual_PrimaryAssetType", signature="v1;EqualEqual_PrimaryAssetType;A:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};B:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_system_EqualEqual_PrimaryAssetType(arg_a : S_PrimaryAssetType_b65c189d; arg_b : S_PrimaryAssetType_b65c189d) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "EqualEqual_PrimaryAssetType", "")
     ue_expect_signature(call, "v1;EqualEqual_PrimaryAssetType;A:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};B:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -8497,6 +8659,7 @@ def ue_system_EqualEqual_PrimaryAssetType(arg_a : S_PrimaryAssetType_b65c189d; a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ExecuteConsoleCommand", signature="v1;ExecuteConsoleCommand;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Command:StrProperty:128;SpecificPlayer:ObjectProperty:128:/Script/Engine.PlayerController;")]
 def ue_system_ExecuteConsoleCommand(arg_command : string; arg_specificplayer : C_PlayerController_fb3d8846) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ExecuteConsoleCommand", "worldcontextobject")
     ue_expect_signature(call, "v1;ExecuteConsoleCommand;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Command:StrProperty:128;SpecificPlayer:ObjectProperty:128:/Script/Engine.PlayerController;")
@@ -8507,6 +8670,7 @@ def ue_system_ExecuteConsoleCommand(arg_command : string; arg_specificplayer : C
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="FlushDebugStrings", signature="v1;FlushDebugStrings;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;")]
 def ue_system_FlushDebugStrings() {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "FlushDebugStrings", "worldcontextobject")
     ue_expect_signature(call, "v1;FlushDebugStrings;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;")
@@ -8515,6 +8679,7 @@ def ue_system_FlushDebugStrings() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="FlushPersistentDebugLines", signature="v1;FlushPersistentDebugLines;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;")]
 def ue_system_FlushPersistentDebugLines() {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "FlushPersistentDebugLines", "worldcontextobject")
     ue_expect_signature(call, "v1;FlushPersistentDebugLines;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;")
@@ -8523,6 +8688,7 @@ def ue_system_FlushPersistentDebugLines() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ForceCloseAdBanner", signature="v1;ForceCloseAdBanner;")]
 def ue_system_ForceCloseAdBanner() {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ForceCloseAdBanner", "")
     ue_expect_signature(call, "v1;ForceCloseAdBanner;")
@@ -8531,6 +8697,7 @@ def ue_system_ForceCloseAdBanner() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetActorListFromComponentList", signature="v1;GetActorListFromComponentList;ComponentList:ArrayProperty:134218114[ComponentList:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;OutActorList:ArrayProperty:384[OutActorList:ObjectProperty:0:/Script/Engine.Actor;];")]
 def ue_system_GetActorListFromComponentList(arg_componentlist : array<C_PrimitiveComponent_5efdd477>; arg_actorclassfilter : UEClassHandle) : array<C_Actor_adf65d5b> {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetActorListFromComponentList", "")
     ue_expect_signature(call, "v1;GetActorListFromComponentList;ComponentList:ArrayProperty:134218114[ComponentList:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;OutActorList:ArrayProperty:384[OutActorList:ObjectProperty:0:/Script/Engine.Actor;];")
@@ -8550,6 +8717,7 @@ def ue_system_GetActorListFromComponentList(arg_componentlist : array<C_Primitiv
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetAdIDCount", signature="v1;GetAdIDCount;ReturnValue:IntProperty:1408;")]
 def ue_system_GetAdIDCount() : int {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetAdIDCount", "")
     ue_expect_signature(call, "v1;GetAdIDCount;ReturnValue:IntProperty:1408;")
@@ -8560,6 +8728,7 @@ def ue_system_GetAdIDCount() : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetBuildConfiguration", signature="v1;GetBuildConfiguration;ReturnValue:StrProperty:1408;")]
 def ue_system_GetBuildConfiguration() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetBuildConfiguration", "")
     ue_expect_signature(call, "v1;GetBuildConfiguration;ReturnValue:StrProperty:1408;")
@@ -8570,6 +8739,7 @@ def ue_system_GetBuildConfiguration() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetBuildVersion", signature="v1;GetBuildVersion;ReturnValue:StrProperty:1408;")]
 def ue_system_GetBuildVersion() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetBuildVersion", "")
     ue_expect_signature(call, "v1;GetBuildVersion;ReturnValue:StrProperty:1408;")
@@ -8580,6 +8750,7 @@ def ue_system_GetBuildVersion() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetClassDisplayName", signature="v1;GetClassDisplayName;Class:ClassProperty:130:meta:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;")]
 def ue_system_GetClassDisplayName(arg_class : UEClassHandle) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetClassDisplayName", "")
     ue_expect_signature(call, "v1;GetClassDisplayName;Class:ClassProperty:130:meta:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;")
@@ -8591,6 +8762,7 @@ def ue_system_GetClassDisplayName(arg_class : UEClassHandle) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetClassFromPrimaryAssetId", signature="v1;GetClassFromPrimaryAssetId;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")]
 def ue_system_GetClassFromPrimaryAssetId(arg_primaryassetid : S_PrimaryAssetId_ea64396c) : UEClassHandle {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetClassFromPrimaryAssetId", "")
     ue_expect_signature(call, "v1;GetClassFromPrimaryAssetId;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:ClassProperty:1408:meta:/Script/CoreUObject.Object;")
@@ -8603,6 +8775,7 @@ def ue_system_GetClassFromPrimaryAssetId(arg_primaryassetid : S_PrimaryAssetId_e
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetClassTopLevelAssetPath", signature="v1;GetClassTopLevelAssetPath;Class:ClassProperty:130:meta:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.TopLevelAssetPath\{PackageName:NameProperty:0;AssetName:NameProperty:0;\};")]
 def ue_system_GetClassTopLevelAssetPath(arg_class : UEClassHandle) : S_TopLevelAssetPath_16fe4d56 {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetClassTopLevelAssetPath", "")
     ue_expect_signature(call, "v1;GetClassTopLevelAssetPath;Class:ClassProperty:130:meta:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.TopLevelAssetPath\{PackageName:NameProperty:0;AssetName:NameProperty:0;\};")
@@ -8614,6 +8787,7 @@ def ue_system_GetClassTopLevelAssetPath(arg_class : UEClassHandle) : S_TopLevelA
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetCommandLine", signature="v1;GetCommandLine;ReturnValue:StrProperty:1408;")]
 def ue_system_GetCommandLine() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetCommandLine", "")
     ue_expect_signature(call, "v1;GetCommandLine;ReturnValue:StrProperty:1408;")
@@ -8630,6 +8804,7 @@ struct ue_system_GetComponentBounds_Result {
     out_sphereradius : float
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetComponentBounds", signature="v1;GetComponentBounds;Component:ObjectProperty:130:/Script/Engine.SceneComponent;Origin:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:FloatProperty:384;")]
 def ue_system_GetComponentBounds(arg_component : C_SceneComponent_6f0751c1) : ue_system_GetComponentBounds_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetComponentBounds", "")
     ue_expect_signature(call, "v1;GetComponentBounds;Component:ObjectProperty:130:/Script/Engine.SceneComponent;Origin:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};BoxExtent:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:FloatProperty:384;")
@@ -8641,6 +8816,7 @@ def ue_system_GetComponentBounds(arg_component : C_SceneComponent_6f0751c1) : ue
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetConsoleVariableBoolValue", signature="v1;GetConsoleVariableBoolValue;VariableName:StrProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_system_GetConsoleVariableBoolValue(arg_variablename : string) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetConsoleVariableBoolValue", "")
     ue_expect_signature(call, "v1;GetConsoleVariableBoolValue;VariableName:StrProperty:128;ReturnValue:BoolProperty:1408;")
@@ -8652,6 +8828,7 @@ def ue_system_GetConsoleVariableBoolValue(arg_variablename : string) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetConsoleVariableFloatValue", signature="v1;GetConsoleVariableFloatValue;VariableName:StrProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_system_GetConsoleVariableFloatValue(arg_variablename : string) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetConsoleVariableFloatValue", "")
     ue_expect_signature(call, "v1;GetConsoleVariableFloatValue;VariableName:StrProperty:128;ReturnValue:FloatProperty:1408;")
@@ -8663,6 +8840,7 @@ def ue_system_GetConsoleVariableFloatValue(arg_variablename : string) : float {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetConsoleVariableIntValue", signature="v1;GetConsoleVariableIntValue;VariableName:StrProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_system_GetConsoleVariableIntValue(arg_variablename : string) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetConsoleVariableIntValue", "")
     ue_expect_signature(call, "v1;GetConsoleVariableIntValue;VariableName:StrProperty:128;ReturnValue:IntProperty:1408;")
@@ -8674,6 +8852,7 @@ def ue_system_GetConsoleVariableIntValue(arg_variablename : string) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetConsoleVariableStringValue", signature="v1;GetConsoleVariableStringValue;VariableName:StrProperty:128;ReturnValue:StrProperty:1408;")]
 def ue_system_GetConsoleVariableStringValue(arg_variablename : string) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetConsoleVariableStringValue", "")
     ue_expect_signature(call, "v1;GetConsoleVariableStringValue;VariableName:StrProperty:128;ReturnValue:StrProperty:1408;")
@@ -8690,6 +8869,7 @@ struct ue_system_GetConvenientWindowedResolutions_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetConvenientWindowedResolutions", signature="v1;GetConvenientWindowedResolutions;Resolutions:ArrayProperty:384[Resolutions:StructProperty:0:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};];ReturnValue:BoolProperty:1408;")]
 def ue_system_GetConvenientWindowedResolutions() : ue_system_GetConvenientWindowedResolutions_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetConvenientWindowedResolutions", "")
     ue_expect_signature(call, "v1;GetConvenientWindowedResolutions;Resolutions:ArrayProperty:384[Resolutions:StructProperty:0:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};];ReturnValue:BoolProperty:1408;")
@@ -8710,6 +8890,7 @@ struct ue_system_GetCurrentBundleState_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetCurrentBundleState", signature="v1;GetCurrentBundleState;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};bForceCurrentState:BoolProperty:128;OutBundles:ArrayProperty:384[OutBundles:NameProperty:0;];ReturnValue:BoolProperty:1408;")]
 def ue_system_GetCurrentBundleState(arg_primaryassetid : S_PrimaryAssetId_ea64396c; arg_bforcecurrentstate : bool) : ue_system_GetCurrentBundleState_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetCurrentBundleState", "")
     ue_expect_signature(call, "v1;GetCurrentBundleState;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};bForceCurrentState:BoolProperty:128;OutBundles:ArrayProperty:384[OutBundles:NameProperty:0;];ReturnValue:BoolProperty:1408;")
@@ -8728,6 +8909,7 @@ def ue_system_GetCurrentBundleState(arg_primaryassetid : S_PrimaryAssetId_ea6439
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetDefaultLanguage", signature="v1;GetDefaultLanguage;ReturnValue:StrProperty:1408;")]
 def ue_system_GetDefaultLanguage() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetDefaultLanguage", "")
     ue_expect_signature(call, "v1;GetDefaultLanguage;ReturnValue:StrProperty:1408;")
@@ -8738,6 +8920,7 @@ def ue_system_GetDefaultLanguage() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetDefaultLocale", signature="v1;GetDefaultLocale;ReturnValue:StrProperty:1408;")]
 def ue_system_GetDefaultLocale() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetDefaultLocale", "")
     ue_expect_signature(call, "v1;GetDefaultLocale;ReturnValue:StrProperty:1408;")
@@ -8748,6 +8931,7 @@ def ue_system_GetDefaultLocale() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetDeviceId", signature="v1;GetDeviceId;ReturnValue:StrProperty:1408;")]
 def ue_system_GetDeviceId() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetDeviceId", "")
     ue_expect_signature(call, "v1;GetDeviceId;ReturnValue:StrProperty:1408;")
@@ -8758,6 +8942,7 @@ def ue_system_GetDeviceId() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetDisplayName", signature="v1;GetDisplayName;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;")]
 def ue_system_GetDisplayName(arg_object : C_Object_55c3753a) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetDisplayName", "")
     ue_expect_signature(call, "v1;GetDisplayName;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;")
@@ -8769,6 +8954,7 @@ def ue_system_GetDisplayName(arg_object : C_Object_55c3753a) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetEngineVersion", signature="v1;GetEngineVersion;ReturnValue:StrProperty:1408;")]
 def ue_system_GetEngineVersion() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetEngineVersion", "")
     ue_expect_signature(call, "v1;GetEngineVersion;ReturnValue:StrProperty:1408;")
@@ -8779,6 +8965,7 @@ def ue_system_GetEngineVersion() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetEnumTopLevelAssetPath", signature="v1;GetEnumTopLevelAssetPath;Enum:ObjectProperty:130:/Script/CoreUObject.Enum;ReturnValue:StructProperty:1408:/Script/CoreUObject.TopLevelAssetPath\{PackageName:NameProperty:0;AssetName:NameProperty:0;\};")]
 def ue_system_GetEnumTopLevelAssetPath(arg_enum : C_Enum_db27fab3) : S_TopLevelAssetPath_16fe4d56 {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetEnumTopLevelAssetPath", "")
     ue_expect_signature(call, "v1;GetEnumTopLevelAssetPath;Enum:ObjectProperty:130:/Script/CoreUObject.Enum;ReturnValue:StructProperty:1408:/Script/CoreUObject.TopLevelAssetPath\{PackageName:NameProperty:0;AssetName:NameProperty:0;\};")
@@ -8790,6 +8977,7 @@ def ue_system_GetEnumTopLevelAssetPath(arg_enum : C_Enum_db27fab3) : S_TopLevelA
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetGameBundleId", signature="v1;GetGameBundleId;ReturnValue:StrProperty:1408;")]
 def ue_system_GetGameBundleId() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetGameBundleId", "")
     ue_expect_signature(call, "v1;GetGameBundleId;ReturnValue:StrProperty:1408;")
@@ -8800,6 +8988,7 @@ def ue_system_GetGameBundleId() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetGameName", signature="v1;GetGameName;ReturnValue:StrProperty:1408;")]
 def ue_system_GetGameName() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetGameName", "")
     ue_expect_signature(call, "v1;GetGameName;ReturnValue:StrProperty:1408;")
@@ -8810,6 +8999,7 @@ def ue_system_GetGameName() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetGameTimeInSeconds", signature="v1;GetGameTimeInSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")]
 def ue_system_GetGameTimeInSeconds() : double {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetGameTimeInSeconds", "worldcontextobject")
     ue_expect_signature(call, "v1;GetGameTimeInSeconds;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:DoubleProperty:1408;")
@@ -8820,6 +9010,7 @@ def ue_system_GetGameTimeInSeconds() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetGamepadButtonGlyph", signature="v1;GetGamepadButtonGlyph;ButtonKey:StrProperty:128;ControllerIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.Texture2D;")]
 def ue_system_GetGamepadButtonGlyph(arg_buttonkey : string; arg_controllerindex : int) : C_Texture2D_2db8ea5c {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetGamepadButtonGlyph", "")
     ue_expect_signature(call, "v1;GetGamepadButtonGlyph;ButtonKey:StrProperty:128;ControllerIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.Texture2D;")
@@ -8832,6 +9023,7 @@ def ue_system_GetGamepadButtonGlyph(arg_buttonkey : string; arg_controllerindex 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetGamepadControllerName", signature="v1;GetGamepadControllerName;ControllerId:IntProperty:128;ReturnValue:StrProperty:1408;")]
 def ue_system_GetGamepadControllerName(arg_controllerid : int) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetGamepadControllerName", "")
     ue_expect_signature(call, "v1;GetGamepadControllerName;ControllerId:IntProperty:128;ReturnValue:StrProperty:1408;")
@@ -8843,6 +9035,7 @@ def ue_system_GetGamepadControllerName(arg_controllerid : int) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetLocalCurrencyCode", signature="v1;GetLocalCurrencyCode;ReturnValue:StrProperty:1408;")]
 def ue_system_GetLocalCurrencyCode() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetLocalCurrencyCode", "")
     ue_expect_signature(call, "v1;GetLocalCurrencyCode;ReturnValue:StrProperty:1408;")
@@ -8853,6 +9046,7 @@ def ue_system_GetLocalCurrencyCode() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetLocalCurrencySymbol", signature="v1;GetLocalCurrencySymbol;ReturnValue:StrProperty:1408;")]
 def ue_system_GetLocalCurrencySymbol() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetLocalCurrencySymbol", "")
     ue_expect_signature(call, "v1;GetLocalCurrencySymbol;ReturnValue:StrProperty:1408;")
@@ -8863,6 +9057,7 @@ def ue_system_GetLocalCurrencySymbol() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetMinYResolutionFor3DView", signature="v1;GetMinYResolutionFor3DView;ReturnValue:IntProperty:1408;")]
 def ue_system_GetMinYResolutionFor3DView() : int {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetMinYResolutionFor3DView", "")
     ue_expect_signature(call, "v1;GetMinYResolutionFor3DView;ReturnValue:IntProperty:1408;")
@@ -8873,6 +9068,7 @@ def ue_system_GetMinYResolutionFor3DView() : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetMinYResolutionForUI", signature="v1;GetMinYResolutionForUI;ReturnValue:IntProperty:1408;")]
 def ue_system_GetMinYResolutionForUI() : int {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetMinYResolutionForUI", "")
     ue_expect_signature(call, "v1;GetMinYResolutionForUI;ReturnValue:IntProperty:1408;")
@@ -8883,6 +9079,7 @@ def ue_system_GetMinYResolutionForUI() : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetObjectFromPrimaryAssetId", signature="v1;GetObjectFromPrimaryAssetId;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")]
 def ue_system_GetObjectFromPrimaryAssetId(arg_primaryassetid : S_PrimaryAssetId_ea64396c) : C_Object_55c3753a {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetObjectFromPrimaryAssetId", "")
     ue_expect_signature(call, "v1;GetObjectFromPrimaryAssetId;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")
@@ -8895,6 +9092,7 @@ def ue_system_GetObjectFromPrimaryAssetId(arg_primaryassetid : S_PrimaryAssetId_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetObjectName", signature="v1;GetObjectName;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;")]
 def ue_system_GetObjectName(arg_object : C_Object_55c3753a) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetObjectName", "")
     ue_expect_signature(call, "v1;GetObjectName;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;")
@@ -8906,6 +9104,7 @@ def ue_system_GetObjectName(arg_object : C_Object_55c3753a) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetOuterObject", signature="v1;GetOuterObject;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")]
 def ue_system_GetOuterObject(arg_object : C_Object_55c3753a) : C_Object_55c3753a {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetOuterObject", "")
     ue_expect_signature(call, "v1;GetOuterObject;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")
@@ -8917,6 +9116,7 @@ def ue_system_GetOuterObject(arg_object : C_Object_55c3753a) : C_Object_55c3753a
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetPathName", signature="v1;GetPathName;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;")]
 def ue_system_GetPathName(arg_object : C_Object_55c3753a) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetPathName", "")
     ue_expect_signature(call, "v1;GetPathName;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;")
@@ -8928,6 +9128,7 @@ def ue_system_GetPathName(arg_object : C_Object_55c3753a) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetPlatformTime_Seconds", signature="v1;GetPlatformTime_Seconds;ReturnValue:DoubleProperty:1408;")]
 def ue_system_GetPlatformTime_Seconds() : double {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetPlatformTime_Seconds", "")
     ue_expect_signature(call, "v1;GetPlatformTime_Seconds;ReturnValue:DoubleProperty:1408;")
@@ -8938,6 +9139,7 @@ def ue_system_GetPlatformTime_Seconds() : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetPlatformUserDir", signature="v1;GetPlatformUserDir;ReturnValue:StrProperty:1408;")]
 def ue_system_GetPlatformUserDir() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetPlatformUserDir", "")
     ue_expect_signature(call, "v1;GetPlatformUserDir;ReturnValue:StrProperty:1408;")
@@ -8948,6 +9150,7 @@ def ue_system_GetPlatformUserDir() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetPlatformUserName", signature="v1;GetPlatformUserName;ReturnValue:StrProperty:1408;")]
 def ue_system_GetPlatformUserName() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetPlatformUserName", "")
     ue_expect_signature(call, "v1;GetPlatformUserName;ReturnValue:StrProperty:1408;")
@@ -8958,6 +9161,7 @@ def ue_system_GetPlatformUserName() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetPreferredLanguages", signature="v1;GetPreferredLanguages;ReturnValue:ArrayProperty:1408[ReturnValue:StrProperty:0;];")]
 def ue_system_GetPreferredLanguages() : array<string> {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetPreferredLanguages", "")
     ue_expect_signature(call, "v1;GetPreferredLanguages;ReturnValue:ArrayProperty:1408[ReturnValue:StrProperty:0;];")
@@ -8972,6 +9176,7 @@ def ue_system_GetPreferredLanguages() : array<string> {
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetPrimaryAssetIdFromClass", signature="v1;GetPrimaryAssetIdFromClass;Class:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};")]
 def ue_system_GetPrimaryAssetIdFromClass(arg_class : UEClassHandle) : S_PrimaryAssetId_ea64396c {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetPrimaryAssetIdFromClass", "")
     ue_expect_signature(call, "v1;GetPrimaryAssetIdFromClass;Class:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};")
@@ -8983,6 +9188,7 @@ def ue_system_GetPrimaryAssetIdFromClass(arg_class : UEClassHandle) : S_PrimaryA
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetPrimaryAssetIdFromObject", signature="v1;GetPrimaryAssetIdFromObject;Object:ObjectProperty:128:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};")]
 def ue_system_GetPrimaryAssetIdFromObject(arg_object : C_Object_55c3753a) : S_PrimaryAssetId_ea64396c {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetPrimaryAssetIdFromObject", "")
     ue_expect_signature(call, "v1;GetPrimaryAssetIdFromObject;Object:ObjectProperty:128:/Script/CoreUObject.Object;ReturnValue:StructProperty:1408:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};")
@@ -8994,6 +9200,7 @@ def ue_system_GetPrimaryAssetIdFromObject(arg_object : C_Object_55c3753a) : S_Pr
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetPrimaryAssetIdList", signature="v1;GetPrimaryAssetIdList;PrimaryAssetType:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};OutPrimaryAssetIdList:ArrayProperty:384[OutPrimaryAssetIdList:StructProperty:0:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};];")]
 def ue_system_GetPrimaryAssetIdList(arg_primaryassettype : S_PrimaryAssetType_b65c189d) : array<S_PrimaryAssetId_ea64396c> {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetPrimaryAssetIdList", "")
     ue_expect_signature(call, "v1;GetPrimaryAssetIdList;PrimaryAssetType:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};OutPrimaryAssetIdList:ArrayProperty:384[OutPrimaryAssetIdList:StructProperty:0:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};];")
@@ -9009,6 +9216,7 @@ def ue_system_GetPrimaryAssetIdList(arg_primaryassettype : S_PrimaryAssetType_b6
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetPrimaryAssetsWithBundleState", signature="v1;GetPrimaryAssetsWithBundleState;RequiredBundles:ArrayProperty:134218114[RequiredBundles:NameProperty:0;];ExcludedBundles:ArrayProperty:134218114[ExcludedBundles:NameProperty:0;];ValidTypes:ArrayProperty:134218114[ValidTypes:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};];bForceCurrentState:BoolProperty:128;OutPrimaryAssetIdList:ArrayProperty:384[OutPrimaryAssetIdList:StructProperty:0:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};];")]
 def ue_system_GetPrimaryAssetsWithBundleState(arg_requiredbundles : array<UEName>; arg_excludedbundles : array<UEName>; arg_validtypes : array<S_PrimaryAssetType_b65c189d>; arg_bforcecurrentstate : bool) : array<S_PrimaryAssetId_ea64396c> {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetPrimaryAssetsWithBundleState", "")
     ue_expect_signature(call, "v1;GetPrimaryAssetsWithBundleState;RequiredBundles:ArrayProperty:134218114[RequiredBundles:NameProperty:0;];ExcludedBundles:ArrayProperty:134218114[ExcludedBundles:NameProperty:0;];ValidTypes:ArrayProperty:134218114[ValidTypes:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};];bForceCurrentState:BoolProperty:128;OutPrimaryAssetIdList:ArrayProperty:384[OutPrimaryAssetIdList:StructProperty:0:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};];")
@@ -9036,6 +9244,7 @@ def ue_system_GetPrimaryAssetsWithBundleState(arg_requiredbundles : array<UEName
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetProjectContentDirectory", signature="v1;GetProjectContentDirectory;ReturnValue:StrProperty:1408;")]
 def ue_system_GetProjectContentDirectory() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetProjectContentDirectory", "")
     ue_expect_signature(call, "v1;GetProjectContentDirectory;ReturnValue:StrProperty:1408;")
@@ -9046,6 +9255,7 @@ def ue_system_GetProjectContentDirectory() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetProjectDirectory", signature="v1;GetProjectDirectory;ReturnValue:StrProperty:1408;")]
 def ue_system_GetProjectDirectory() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetProjectDirectory", "")
     ue_expect_signature(call, "v1;GetProjectDirectory;ReturnValue:StrProperty:1408;")
@@ -9056,6 +9266,7 @@ def ue_system_GetProjectDirectory() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetProjectSavedDirectory", signature="v1;GetProjectSavedDirectory;ReturnValue:StrProperty:1408;")]
 def ue_system_GetProjectSavedDirectory() : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetProjectSavedDirectory", "")
     ue_expect_signature(call, "v1;GetProjectSavedDirectory;ReturnValue:StrProperty:1408;")
@@ -9066,6 +9277,7 @@ def ue_system_GetProjectSavedDirectory() : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetRenderingDetailMode", signature="v1;GetRenderingDetailMode;ReturnValue:IntProperty:1408;")]
 def ue_system_GetRenderingDetailMode() : int {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetRenderingDetailMode", "")
     ue_expect_signature(call, "v1;GetRenderingDetailMode;ReturnValue:IntProperty:1408;")
@@ -9076,6 +9288,7 @@ def ue_system_GetRenderingDetailMode() : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetRenderingMaterialQualityLevel", signature="v1;GetRenderingMaterialQualityLevel;ReturnValue:IntProperty:1408;")]
 def ue_system_GetRenderingMaterialQualityLevel() : int {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetRenderingMaterialQualityLevel", "")
     ue_expect_signature(call, "v1;GetRenderingMaterialQualityLevel;ReturnValue:IntProperty:1408;")
@@ -9086,6 +9299,7 @@ def ue_system_GetRenderingMaterialQualityLevel() : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetStructTopLevelAssetPath", signature="v1;GetStructTopLevelAssetPath;Struct:ObjectProperty:130:/Script/CoreUObject.ScriptStruct;ReturnValue:StructProperty:1408:/Script/CoreUObject.TopLevelAssetPath\{PackageName:NameProperty:0;AssetName:NameProperty:0;\};")]
 def ue_system_GetStructTopLevelAssetPath(arg_struct : C_ScriptStruct_efcc540e) : S_TopLevelAssetPath_16fe4d56 {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetStructTopLevelAssetPath", "")
     ue_expect_signature(call, "v1;GetStructTopLevelAssetPath;Struct:ObjectProperty:130:/Script/CoreUObject.ScriptStruct;ReturnValue:StructProperty:1408:/Script/CoreUObject.TopLevelAssetPath\{PackageName:NameProperty:0;AssetName:NameProperty:0;\};")
@@ -9102,6 +9316,7 @@ struct ue_system_GetSupportedFullscreenResolutions_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetSupportedFullscreenResolutions", signature="v1;GetSupportedFullscreenResolutions;Resolutions:ArrayProperty:384[Resolutions:StructProperty:0:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};];ReturnValue:BoolProperty:1408;")]
 def ue_system_GetSupportedFullscreenResolutions() : ue_system_GetSupportedFullscreenResolutions_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetSupportedFullscreenResolutions", "")
     ue_expect_signature(call, "v1;GetSupportedFullscreenResolutions;Resolutions:ArrayProperty:384[Resolutions:StructProperty:0:/Script/CoreUObject.IntPoint\{X:IntProperty:0;Y:IntProperty:0;\};];ReturnValue:BoolProperty:1408;")
@@ -9117,6 +9332,7 @@ def ue_system_GetSupportedFullscreenResolutions() : ue_system_GetSupportedFullsc
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetSystemPath", signature="v1;GetSystemPath;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;")]
 def ue_system_GetSystemPath(arg_object : C_Object_55c3753a) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetSystemPath", "")
     ue_expect_signature(call, "v1;GetSystemPath;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:StrProperty:1408;")
@@ -9128,6 +9344,7 @@ def ue_system_GetSystemPath(arg_object : C_Object_55c3753a) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="GetVolumeButtonsHandledBySystem", signature="v1;GetVolumeButtonsHandledBySystem;ReturnValue:BoolProperty:1408;")]
 def ue_system_GetVolumeButtonsHandledBySystem() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetVolumeButtonsHandledBySystem", "")
     ue_expect_signature(call, "v1;GetVolumeButtonsHandledBySystem;ReturnValue:BoolProperty:1408;")
@@ -9138,6 +9355,7 @@ def ue_system_GetVolumeButtonsHandledBySystem() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="HasMultipleLocalPlayers", signature="v1;HasMultipleLocalPlayers;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_system_HasMultipleLocalPlayers() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "HasMultipleLocalPlayers", "worldcontextobject")
     ue_expect_signature(call, "v1;HasMultipleLocalPlayers;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -9148,6 +9366,7 @@ def ue_system_HasMultipleLocalPlayers() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="HideAdBanner", signature="v1;HideAdBanner;")]
 def ue_system_HideAdBanner() {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "HideAdBanner", "")
     ue_expect_signature(call, "v1;HideAdBanner;")
@@ -9156,6 +9375,7 @@ def ue_system_HideAdBanner() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsControllerAssignedToGamepad", signature="v1;IsControllerAssignedToGamepad;ControllerId:IntProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsControllerAssignedToGamepad(arg_controllerid : int) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsControllerAssignedToGamepad", "")
     ue_expect_signature(call, "v1;IsControllerAssignedToGamepad;ControllerId:IntProperty:128;ReturnValue:BoolProperty:1408;")
@@ -9167,6 +9387,7 @@ def ue_system_IsControllerAssignedToGamepad(arg_controllerid : int) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsDedicatedServer", signature="v1;IsDedicatedServer;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsDedicatedServer() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsDedicatedServer", "worldcontextobject")
     ue_expect_signature(call, "v1;IsDedicatedServer;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -9177,6 +9398,7 @@ def ue_system_IsDedicatedServer() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsEditorPropertyOverridden", signature="v1;IsEditorPropertyOverridden;Object:ObjectProperty:128:/Script/CoreUObject.Object;PropertyName:NameProperty:130;ReturnValue:EnumProperty:1408:/Script/Engine.EEditorPropertyValueState;")]
 def ue_system_IsEditorPropertyOverridden(arg_object : C_Object_55c3753a; arg_propertyname : UEName) : E_EEditorPropertyValueState_ec0f1951 {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsEditorPropertyOverridden", "")
     ue_expect_signature(call, "v1;IsEditorPropertyOverridden;Object:ObjectProperty:128:/Script/CoreUObject.Object;PropertyName:NameProperty:130;ReturnValue:EnumProperty:1408:/Script/Engine.EEditorPropertyValueState;")
@@ -9189,6 +9411,7 @@ def ue_system_IsEditorPropertyOverridden(arg_object : C_Object_55c3753a; arg_pro
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsInterstitialAdAvailable", signature="v1;IsInterstitialAdAvailable;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsInterstitialAdAvailable() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsInterstitialAdAvailable", "")
     ue_expect_signature(call, "v1;IsInterstitialAdAvailable;ReturnValue:BoolProperty:1408;")
@@ -9199,6 +9422,7 @@ def ue_system_IsInterstitialAdAvailable() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsInterstitialAdRequested", signature="v1;IsInterstitialAdRequested;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsInterstitialAdRequested() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsInterstitialAdRequested", "")
     ue_expect_signature(call, "v1;IsInterstitialAdRequested;ReturnValue:BoolProperty:1408;")
@@ -9209,6 +9433,7 @@ def ue_system_IsInterstitialAdRequested() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsLoggedIn", signature="v1;IsLoggedIn;SpecificPlayer:ObjectProperty:130:/Script/Engine.PlayerController;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsLoggedIn(arg_specificplayer : C_PlayerController_fb3d8846) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsLoggedIn", "")
     ue_expect_signature(call, "v1;IsLoggedIn;SpecificPlayer:ObjectProperty:130:/Script/Engine.PlayerController;ReturnValue:BoolProperty:1408;")
@@ -9220,6 +9445,7 @@ def ue_system_IsLoggedIn(arg_specificplayer : C_PlayerController_fb3d8846) : boo
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsObjectCooked", signature="v1;IsObjectCooked;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsObjectCooked(arg_object : C_Object_55c3753a) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsObjectCooked", "")
     ue_expect_signature(call, "v1;IsObjectCooked;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -9231,6 +9457,7 @@ def ue_system_IsObjectCooked(arg_object : C_Object_55c3753a) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsPackagedForDistribution", signature="v1;IsPackagedForDistribution;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsPackagedForDistribution() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsPackagedForDistribution", "")
     ue_expect_signature(call, "v1;IsPackagedForDistribution;ReturnValue:BoolProperty:1408;")
@@ -9241,6 +9468,7 @@ def ue_system_IsPackagedForDistribution() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsScreensaverEnabled", signature="v1;IsScreensaverEnabled;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsScreensaverEnabled() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsScreensaverEnabled", "")
     ue_expect_signature(call, "v1;IsScreensaverEnabled;ReturnValue:BoolProperty:1408;")
@@ -9251,6 +9479,7 @@ def ue_system_IsScreensaverEnabled() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsServer", signature="v1;IsServer;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsServer() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsServer", "worldcontextobject")
     ue_expect_signature(call, "v1;IsServer;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -9261,6 +9490,7 @@ def ue_system_IsServer() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsStandalone", signature="v1;IsStandalone;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsStandalone() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsStandalone", "worldcontextobject")
     ue_expect_signature(call, "v1;IsStandalone;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -9271,6 +9501,7 @@ def ue_system_IsStandalone() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsUnattended", signature="v1;IsUnattended;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsUnattended() : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsUnattended", "")
     ue_expect_signature(call, "v1;IsUnattended;ReturnValue:BoolProperty:1408;")
@@ -9281,6 +9512,7 @@ def ue_system_IsUnattended() : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsValid", signature="v1;IsValid;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsValid(arg_object : C_Object_55c3753a) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsValid", "")
     ue_expect_signature(call, "v1;IsValid;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -9292,6 +9524,7 @@ def ue_system_IsValid(arg_object : C_Object_55c3753a) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsValidClass", signature="v1;IsValidClass;Class:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsValidClass(arg_class : UEClassHandle) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsValidClass", "")
     ue_expect_signature(call, "v1;IsValidClass;Class:ClassProperty:128:meta:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -9303,6 +9536,7 @@ def ue_system_IsValidClass(arg_class : UEClassHandle) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsValidInterface", signature="v1;IsValidInterface;Interface:InterfaceProperty:134218114:/Script/CoreUObject.Interface;ReturnValue:BoolProperty:1408;")]
 def ue_system_IsValidInterface(arg_interface : C_Interface_479883b5) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsValidInterface", "")
     ue_expect_signature(call, "v1;IsValidInterface;Interface:InterfaceProperty:134218114:/Script/CoreUObject.Interface;ReturnValue:BoolProperty:1408;")
@@ -9314,6 +9548,7 @@ def ue_system_IsValidInterface(arg_interface : C_Interface_479883b5) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsValidPrimaryAssetId", signature="v1;IsValidPrimaryAssetId;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_system_IsValidPrimaryAssetId(arg_primaryassetid : S_PrimaryAssetId_ea64396c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsValidPrimaryAssetId", "")
     ue_expect_signature(call, "v1;IsValidPrimaryAssetId;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -9326,6 +9561,7 @@ def ue_system_IsValidPrimaryAssetId(arg_primaryassetid : S_PrimaryAssetId_ea6439
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="IsValidPrimaryAssetType", signature="v1;IsValidPrimaryAssetType;PrimaryAssetType:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_system_IsValidPrimaryAssetType(arg_primaryassettype : S_PrimaryAssetType_b65c189d) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "IsValidPrimaryAssetType", "")
     ue_expect_signature(call, "v1;IsValidPrimaryAssetType;PrimaryAssetType:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -9337,6 +9573,7 @@ def ue_system_IsValidPrimaryAssetType(arg_primaryassettype : S_PrimaryAssetType_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="K2_ClearTimer", signature="v1;K2_ClearTimer;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;")]
 def ue_system_K2_ClearTimer(arg_object : C_Object_55c3753a; arg_functionname : string) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "K2_ClearTimer", "")
     ue_expect_signature(call, "v1;K2_ClearTimer;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;")
@@ -9347,6 +9584,7 @@ def ue_system_K2_ClearTimer(arg_object : C_Object_55c3753a; arg_functionname : s
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="K2_GetTimerElapsedTime", signature="v1;K2_GetTimerElapsedTime;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_system_K2_GetTimerElapsedTime(arg_object : C_Object_55c3753a; arg_functionname : string) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "K2_GetTimerElapsedTime", "")
     ue_expect_signature(call, "v1;K2_GetTimerElapsedTime;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;ReturnValue:FloatProperty:1408;")
@@ -9359,6 +9597,7 @@ def ue_system_K2_GetTimerElapsedTime(arg_object : C_Object_55c3753a; arg_functio
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="K2_GetTimerRemainingTime", signature="v1;K2_GetTimerRemainingTime;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;ReturnValue:FloatProperty:1408;")]
 def ue_system_K2_GetTimerRemainingTime(arg_object : C_Object_55c3753a; arg_functionname : string) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "K2_GetTimerRemainingTime", "")
     ue_expect_signature(call, "v1;K2_GetTimerRemainingTime;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;ReturnValue:FloatProperty:1408;")
@@ -9371,6 +9610,7 @@ def ue_system_K2_GetTimerRemainingTime(arg_object : C_Object_55c3753a; arg_funct
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="K2_IsTimerActive", signature="v1;K2_IsTimerActive;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_system_K2_IsTimerActive(arg_object : C_Object_55c3753a; arg_functionname : string) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "K2_IsTimerActive", "")
     ue_expect_signature(call, "v1;K2_IsTimerActive;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;ReturnValue:BoolProperty:1408;")
@@ -9383,6 +9623,7 @@ def ue_system_K2_IsTimerActive(arg_object : C_Object_55c3753a; arg_functionname 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="K2_IsTimerPaused", signature="v1;K2_IsTimerPaused;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_system_K2_IsTimerPaused(arg_object : C_Object_55c3753a; arg_functionname : string) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "K2_IsTimerPaused", "")
     ue_expect_signature(call, "v1;K2_IsTimerPaused;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;ReturnValue:BoolProperty:1408;")
@@ -9395,6 +9636,7 @@ def ue_system_K2_IsTimerPaused(arg_object : C_Object_55c3753a; arg_functionname 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="K2_PauseTimer", signature="v1;K2_PauseTimer;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;")]
 def ue_system_K2_PauseTimer(arg_object : C_Object_55c3753a; arg_functionname : string) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "K2_PauseTimer", "")
     ue_expect_signature(call, "v1;K2_PauseTimer;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;")
@@ -9405,6 +9647,7 @@ def ue_system_K2_PauseTimer(arg_object : C_Object_55c3753a; arg_functionname : s
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="K2_TimerExists", signature="v1;K2_TimerExists;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_system_K2_TimerExists(arg_object : C_Object_55c3753a; arg_functionname : string) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "K2_TimerExists", "")
     ue_expect_signature(call, "v1;K2_TimerExists;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;ReturnValue:BoolProperty:1408;")
@@ -9417,6 +9660,7 @@ def ue_system_K2_TimerExists(arg_object : C_Object_55c3753a; arg_functionname : 
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="K2_UnPauseTimer", signature="v1;K2_UnPauseTimer;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;")]
 def ue_system_K2_UnPauseTimer(arg_object : C_Object_55c3753a; arg_functionname : string) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "K2_UnPauseTimer", "")
     ue_expect_signature(call, "v1;K2_UnPauseTimer;Object:ObjectProperty:128:/Script/CoreUObject.Object;FunctionName:StrProperty:128;")
@@ -9427,6 +9671,7 @@ def ue_system_K2_UnPauseTimer(arg_object : C_Object_55c3753a; arg_functionname :
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="LaunchExternalUrl", signature="v1;LaunchExternalUrl;InDomainStrings:ArrayProperty:134218114[InDomainStrings:StrProperty:0;];URL:StrProperty:128;")]
 def ue_system_LaunchExternalUrl(arg_indomainstrings : array<string>; arg_url : string) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "LaunchExternalUrl", "")
     ue_expect_signature(call, "v1;LaunchExternalUrl;InDomainStrings:ArrayProperty:134218114[InDomainStrings:StrProperty:0;];URL:StrProperty:128;")
@@ -9440,6 +9685,7 @@ def ue_system_LaunchExternalUrl(arg_indomainstrings : array<string>; arg_url : s
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="LaunchURL", signature="v1;LaunchURL;URL:StrProperty:128;")]
 def ue_system_LaunchURL(arg_url : string) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "LaunchURL", "")
     ue_expect_signature(call, "v1;LaunchURL;URL:StrProperty:128;")
@@ -9449,6 +9695,7 @@ def ue_system_LaunchURL(arg_url : string) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="LoadInterstitialAd", signature="v1;LoadInterstitialAd;AdIdIndex:IntProperty:128;")]
 def ue_system_LoadInterstitialAd(arg_adidindex : int) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "LoadInterstitialAd", "")
     ue_expect_signature(call, "v1;LoadInterstitialAd;AdIdIndex:IntProperty:128;")
@@ -9458,6 +9705,7 @@ def ue_system_LoadInterstitialAd(arg_adidindex : int) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="LogString", signature="v1;LogString;InString:StrProperty:128;bPrintToLog:BoolProperty:128;")]
 def ue_system_LogString(arg_instring : string; arg_bprinttolog : bool) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "LogString", "")
     ue_expect_signature(call, "v1;LogString;InString:StrProperty:128;bPrintToLog:BoolProperty:128;")
@@ -9468,6 +9716,7 @@ def ue_system_LogString(arg_instring : string; arg_bprinttolog : bool) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="MakeLiteralBool", signature="v1;MakeLiteralBool;Value:BoolProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_system_MakeLiteralBool(arg_value : bool) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "MakeLiteralBool", "")
     ue_expect_signature(call, "v1;MakeLiteralBool;Value:BoolProperty:128;ReturnValue:BoolProperty:1408;")
@@ -9479,6 +9728,7 @@ def ue_system_MakeLiteralBool(arg_value : bool) : bool {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="MakeLiteralByte", signature="v1;MakeLiteralByte;Value:ByteProperty:128;ReturnValue:ByteProperty:1408;")]
 def ue_system_MakeLiteralByte(arg_value : uint8) : uint8 {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "MakeLiteralByte", "")
     ue_expect_signature(call, "v1;MakeLiteralByte;Value:ByteProperty:128;ReturnValue:ByteProperty:1408;")
@@ -9490,6 +9740,7 @@ def ue_system_MakeLiteralByte(arg_value : uint8) : uint8 {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="MakeLiteralDouble", signature="v1;MakeLiteralDouble;Value:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")]
 def ue_system_MakeLiteralDouble(arg_value : double) : double {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "MakeLiteralDouble", "")
     ue_expect_signature(call, "v1;MakeLiteralDouble;Value:DoubleProperty:128;ReturnValue:DoubleProperty:1408;")
@@ -9501,6 +9752,7 @@ def ue_system_MakeLiteralDouble(arg_value : double) : double {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="MakeLiteralInt", signature="v1;MakeLiteralInt;Value:IntProperty:128;ReturnValue:IntProperty:1408;")]
 def ue_system_MakeLiteralInt(arg_value : int) : int {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "MakeLiteralInt", "")
     ue_expect_signature(call, "v1;MakeLiteralInt;Value:IntProperty:128;ReturnValue:IntProperty:1408;")
@@ -9512,6 +9764,7 @@ def ue_system_MakeLiteralInt(arg_value : int) : int {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="MakeLiteralName", signature="v1;MakeLiteralName;Value:NameProperty:128;ReturnValue:NameProperty:1408;")]
 def ue_system_MakeLiteralName(arg_value : UEName) : UEName {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "MakeLiteralName", "")
     ue_expect_signature(call, "v1;MakeLiteralName;Value:NameProperty:128;ReturnValue:NameProperty:1408;")
@@ -9523,6 +9776,7 @@ def ue_system_MakeLiteralName(arg_value : UEName) : UEName {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="MakeLiteralString", signature="v1;MakeLiteralString;Value:StrProperty:128;ReturnValue:StrProperty:1408;")]
 def ue_system_MakeLiteralString(arg_value : string) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "MakeLiteralString", "")
     ue_expect_signature(call, "v1;MakeLiteralString;Value:StrProperty:128;ReturnValue:StrProperty:1408;")
@@ -9534,6 +9788,7 @@ def ue_system_MakeLiteralString(arg_value : string) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="MakeLiteralText", signature="v1;MakeLiteralText;Value:TextProperty:128;ReturnValue:TextProperty:1408;")]
 def ue_system_MakeLiteralText(arg_value : UETextValue) : UETextValue {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "MakeLiteralText", "")
     ue_expect_signature(call, "v1;MakeLiteralText;Value:TextProperty:128;ReturnValue:TextProperty:1408;")
@@ -9545,6 +9800,7 @@ def ue_system_MakeLiteralText(arg_value : UETextValue) : UETextValue {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="MakeTopLevelAssetPath", signature="v1;MakeTopLevelAssetPath;PackageName:StrProperty:128;AssetName:StrProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.TopLevelAssetPath\{PackageName:NameProperty:0;AssetName:NameProperty:0;\};")]
 def ue_system_MakeTopLevelAssetPath(arg_packagename : string; arg_assetname : string) : S_TopLevelAssetPath_16fe4d56 {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "MakeTopLevelAssetPath", "")
     ue_expect_signature(call, "v1;MakeTopLevelAssetPath;PackageName:StrProperty:128;AssetName:StrProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.TopLevelAssetPath\{PackageName:NameProperty:0;AssetName:NameProperty:0;\};")
@@ -9557,6 +9813,7 @@ def ue_system_MakeTopLevelAssetPath(arg_packagename : string; arg_assetname : st
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="NormalizeFilename", signature="v1;NormalizeFilename;InFilename:StrProperty:128;ReturnValue:StrProperty:1408;")]
 def ue_system_NormalizeFilename(arg_infilename : string) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "NormalizeFilename", "")
     ue_expect_signature(call, "v1;NormalizeFilename;InFilename:StrProperty:128;ReturnValue:StrProperty:1408;")
@@ -9568,6 +9825,7 @@ def ue_system_NormalizeFilename(arg_infilename : string) : string {
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="NotEqual_PrimaryAssetId", signature="v1;NotEqual_PrimaryAssetId;A:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};B:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_system_NotEqual_PrimaryAssetId(arg_a : S_PrimaryAssetId_ea64396c; arg_b : S_PrimaryAssetId_ea64396c) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "NotEqual_PrimaryAssetId", "")
     ue_expect_signature(call, "v1;NotEqual_PrimaryAssetId;A:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};B:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -9582,6 +9840,7 @@ def ue_system_NotEqual_PrimaryAssetId(arg_a : S_PrimaryAssetId_ea64396c; arg_b :
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="NotEqual_PrimaryAssetType", signature="v1;NotEqual_PrimaryAssetType;A:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};B:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};ReturnValue:BoolProperty:1408;")]
 def ue_system_NotEqual_PrimaryAssetType(arg_a : S_PrimaryAssetType_b65c189d; arg_b : S_PrimaryAssetType_b65c189d) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "NotEqual_PrimaryAssetType", "")
     ue_expect_signature(call, "v1;NotEqual_PrimaryAssetType;A:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};B:StructProperty:128:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
@@ -9594,6 +9853,7 @@ def ue_system_NotEqual_PrimaryAssetType(arg_a : S_PrimaryAssetType_b65c189d; arg
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ObjectHasEditorOnlyData", signature="v1;ObjectHasEditorOnlyData;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")]
 def ue_system_ObjectHasEditorOnlyData(arg_object : C_Object_55c3753a) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ObjectHasEditorOnlyData", "")
     ue_expect_signature(call, "v1;ObjectHasEditorOnlyData;Object:ObjectProperty:130:/Script/CoreUObject.Object;ReturnValue:BoolProperty:1408;")
@@ -9611,6 +9871,7 @@ struct ue_system_ParseCommandLine_Result {
     out_outparams : H_Map_string_string_8a2bb4cf
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ParseCommandLine", signature="v1;ParseCommandLine;InCmdLine:StrProperty:128;OutTokens:ArrayProperty:384[OutTokens:StrProperty:0;];OutSwitches:ArrayProperty:384[OutSwitches:StrProperty:0;];OutParams:MapProperty:384[OutParams_Key:StrProperty:0;OutParams:StrProperty:0;];")]
 def ue_system_ParseCommandLine(arg_incmdline : string) : ue_system_ParseCommandLine_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ParseCommandLine", "")
     ue_expect_signature(call, "v1;ParseCommandLine;InCmdLine:StrProperty:128;OutTokens:ArrayProperty:384[OutTokens:StrProperty:0;];OutSwitches:ArrayProperty:384[OutSwitches:StrProperty:0;];OutParams:MapProperty:384[OutParams_Key:StrProperty:0;OutParams:StrProperty:0;];")
@@ -9634,6 +9895,7 @@ def ue_system_ParseCommandLine(arg_incmdline : string) : ue_system_ParseCommandL
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ParseParam", signature="v1;ParseParam;InString:StrProperty:128;InParam:StrProperty:128;ReturnValue:BoolProperty:1408;")]
 def ue_system_ParseParam(arg_instring : string; arg_inparam : string) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ParseParam", "")
     ue_expect_signature(call, "v1;ParseParam;InString:StrProperty:128;InParam:StrProperty:128;ReturnValue:BoolProperty:1408;")
@@ -9651,6 +9913,7 @@ struct ue_system_ParseParamValue_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ParseParamValue", signature="v1;ParseParamValue;InString:StrProperty:128;InParam:StrProperty:128;OutValue:StrProperty:384;ReturnValue:BoolProperty:1408;")]
 def ue_system_ParseParamValue(arg_instring : string; arg_inparam : string) : ue_system_ParseParamValue_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ParseParamValue", "")
     ue_expect_signature(call, "v1;ParseParamValue;InString:StrProperty:128;InParam:StrProperty:128;OutValue:StrProperty:384;ReturnValue:BoolProperty:1408;")
@@ -9663,6 +9926,7 @@ def ue_system_ParseParamValue(arg_instring : string; arg_inparam : string) : ue_
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="PrintString", signature="v1;PrintString;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InString:StrProperty:128;bPrintToScreen:BoolProperty:128;bPrintToLog:BoolProperty:128;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Key:NameProperty:130;")]
 def ue_system_PrintString(arg_instring : string; arg_bprinttoscreen : bool; arg_bprinttolog : bool; arg_textcolor : S_LinearColor_f4abb14b; arg_duration : float; arg_key : UEName) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "PrintString", "worldcontextobject")
     ue_expect_signature(call, "v1;PrintString;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InString:StrProperty:128;bPrintToScreen:BoolProperty:128;bPrintToLog:BoolProperty:128;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Key:NameProperty:130;")
@@ -9680,6 +9944,7 @@ def ue_system_PrintString(arg_instring : string; arg_bprinttoscreen : bool; arg_
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="PrintText", signature="v1;PrintText;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InText:TextProperty:130;bPrintToScreen:BoolProperty:128;bPrintToLog:BoolProperty:128;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Key:NameProperty:130;")]
 def ue_system_PrintText(arg_intext : UETextValue; arg_bprinttoscreen : bool; arg_bprinttolog : bool; arg_textcolor : S_LinearColor_f4abb14b; arg_duration : float; arg_key : UEName) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "PrintText", "worldcontextobject")
     ue_expect_signature(call, "v1;PrintText;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InText:TextProperty:130;bPrintToScreen:BoolProperty:128;bPrintToLog:BoolProperty:128;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Key:NameProperty:130;")
@@ -9697,6 +9962,7 @@ def ue_system_PrintText(arg_intext : UETextValue; arg_bprinttoscreen : bool; arg
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="QuitEditor", signature="v1;QuitEditor;")]
 def ue_system_QuitEditor() {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "QuitEditor", "")
     ue_expect_signature(call, "v1;QuitEditor;")
@@ -9705,6 +9971,7 @@ def ue_system_QuitEditor() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="QuitGame", signature="v1;QuitGame;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;SpecificPlayer:ObjectProperty:128:/Script/Engine.PlayerController;QuitPreference:ByteProperty:128:/Script/Engine.EQuitPreference;bIgnorePlatformRestrictions:BoolProperty:128;")]
 def ue_system_QuitGame(arg_specificplayer : C_PlayerController_fb3d8846; arg_quitpreference : E_EQuitPreference_88498313; arg_bignoreplatformrestrictions : bool) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "QuitGame", "worldcontextobject")
     ue_expect_signature(call, "v1;QuitGame;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;SpecificPlayer:ObjectProperty:128:/Script/Engine.PlayerController;QuitPreference:ByteProperty:128:/Script/Engine.EQuitPreference;bIgnorePlatformRestrictions:BoolProperty:128;")
@@ -9716,6 +9983,7 @@ def ue_system_QuitGame(arg_specificplayer : C_PlayerController_fb3d8846; arg_qui
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="RaiseScriptError", signature="v1;RaiseScriptError;ErrorMessage:StrProperty:128;")]
 def ue_system_RaiseScriptError(arg_errormessage : string) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "RaiseScriptError", "")
     ue_expect_signature(call, "v1;RaiseScriptError;ErrorMessage:StrProperty:128;")
@@ -9725,6 +9993,7 @@ def ue_system_RaiseScriptError(arg_errormessage : string) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="RegisterForRemoteNotifications", signature="v1;RegisterForRemoteNotifications;")]
 def ue_system_RegisterForRemoteNotifications() {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "RegisterForRemoteNotifications", "")
     ue_expect_signature(call, "v1;RegisterForRemoteNotifications;")
@@ -9733,6 +10002,7 @@ def ue_system_RegisterForRemoteNotifications() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ResetEditorProperty", signature="v1;ResetEditorProperty;Object:ObjectProperty:128:/Script/CoreUObject.Object;PropertyName:NameProperty:130;ChangeNotifyMode:EnumProperty:130:/Script/CoreUObject.EPropertyAccessChangeNotifyMode;ReturnValue:BoolProperty:1408;")]
 def ue_system_ResetEditorProperty(arg_object : C_Object_55c3753a; arg_propertyname : UEName; arg_changenotifymode : E_EPropertyAccessChangeNotifyMode_ad8bb9d7) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ResetEditorProperty", "")
     ue_expect_signature(call, "v1;ResetEditorProperty;Object:ObjectProperty:128:/Script/CoreUObject.Object;PropertyName:NameProperty:130;ChangeNotifyMode:EnumProperty:130:/Script/CoreUObject.EPropertyAccessChangeNotifyMode;ReturnValue:BoolProperty:1408;")
@@ -9746,6 +10016,7 @@ def ue_system_ResetEditorProperty(arg_object : C_Object_55c3753a; arg_propertyna
     return result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ResetGamepadAssignmentToController", signature="v1;ResetGamepadAssignmentToController;ControllerId:IntProperty:128;")]
 def ue_system_ResetGamepadAssignmentToController(arg_controllerid : int) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ResetGamepadAssignmentToController", "")
     ue_expect_signature(call, "v1;ResetGamepadAssignmentToController;ControllerId:IntProperty:128;")
@@ -9755,6 +10026,7 @@ def ue_system_ResetGamepadAssignmentToController(arg_controllerid : int) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ResetGamepadAssignments", signature="v1;ResetGamepadAssignments;")]
 def ue_system_ResetGamepadAssignments() {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ResetGamepadAssignments", "")
     ue_expect_signature(call, "v1;ResetGamepadAssignments;")
@@ -9763,6 +10035,7 @@ def ue_system_ResetGamepadAssignments() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="SetGamepadsBlockDeviceFeedback", signature="v1;SetGamepadsBlockDeviceFeedback;bBlock:BoolProperty:128;")]
 def ue_system_SetGamepadsBlockDeviceFeedback(arg_bblock : bool) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "SetGamepadsBlockDeviceFeedback", "")
     ue_expect_signature(call, "v1;SetGamepadsBlockDeviceFeedback;bBlock:BoolProperty:128;")
@@ -9772,6 +10045,7 @@ def ue_system_SetGamepadsBlockDeviceFeedback(arg_bblock : bool) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="SetSuppressViewportTransitionMessage", signature="v1;SetSuppressViewportTransitionMessage;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;bState:BoolProperty:128;")]
 def ue_system_SetSuppressViewportTransitionMessage(arg_bstate : bool) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "SetSuppressViewportTransitionMessage", "worldcontextobject")
     ue_expect_signature(call, "v1;SetSuppressViewportTransitionMessage;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;bState:BoolProperty:128;")
@@ -9781,6 +10055,7 @@ def ue_system_SetSuppressViewportTransitionMessage(arg_bstate : bool) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="SetUserActivity", signature="v1;SetUserActivity;UserActivity:StructProperty:134218114:/Script/Engine.UserActivity\{ActionName:StrProperty:0;\};")]
 def ue_system_SetUserActivity(arg_useractivity : S_UserActivity_18dc5b91) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "SetUserActivity", "")
     ue_expect_signature(call, "v1;SetUserActivity;UserActivity:StructProperty:134218114:/Script/Engine.UserActivity\{ActionName:StrProperty:0;\};")
@@ -9790,6 +10065,7 @@ def ue_system_SetUserActivity(arg_useractivity : S_UserActivity_18dc5b91) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="SetVolumeButtonsHandledBySystem", signature="v1;SetVolumeButtonsHandledBySystem;bEnabled:BoolProperty:128;")]
 def ue_system_SetVolumeButtonsHandledBySystem(arg_benabled : bool) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "SetVolumeButtonsHandledBySystem", "")
     ue_expect_signature(call, "v1;SetVolumeButtonsHandledBySystem;bEnabled:BoolProperty:128;")
@@ -9799,6 +10075,7 @@ def ue_system_SetVolumeButtonsHandledBySystem(arg_benabled : bool) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="SetWindowTitle", signature="v1;SetWindowTitle;Title:TextProperty:134218114;")]
 def ue_system_SetWindowTitle(arg_title : UETextValue) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "SetWindowTitle", "")
     ue_expect_signature(call, "v1;SetWindowTitle;Title:TextProperty:134218114;")
@@ -9808,6 +10085,7 @@ def ue_system_SetWindowTitle(arg_title : UETextValue) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ShowAdBanner", signature="v1;ShowAdBanner;AdIdIndex:IntProperty:128;bShowOnBottomOfScreen:BoolProperty:128;")]
 def ue_system_ShowAdBanner(arg_adidindex : int; arg_bshowonbottomofscreen : bool) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ShowAdBanner", "")
     ue_expect_signature(call, "v1;ShowAdBanner;AdIdIndex:IntProperty:128;bShowOnBottomOfScreen:BoolProperty:128;")
@@ -9818,6 +10096,7 @@ def ue_system_ShowAdBanner(arg_adidindex : int; arg_bshowonbottomofscreen : bool
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ShowInterstitialAd", signature="v1;ShowInterstitialAd;")]
 def ue_system_ShowInterstitialAd() {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ShowInterstitialAd", "")
     ue_expect_signature(call, "v1;ShowInterstitialAd;")
@@ -9826,6 +10105,7 @@ def ue_system_ShowInterstitialAd() {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ShowPlatformSpecificAchievementsScreen", signature="v1;ShowPlatformSpecificAchievementsScreen;SpecificPlayer:ObjectProperty:130:/Script/Engine.PlayerController;")]
 def ue_system_ShowPlatformSpecificAchievementsScreen(arg_specificplayer : C_PlayerController_fb3d8846) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ShowPlatformSpecificAchievementsScreen", "")
     ue_expect_signature(call, "v1;ShowPlatformSpecificAchievementsScreen;SpecificPlayer:ObjectProperty:130:/Script/Engine.PlayerController;")
@@ -9835,6 +10115,7 @@ def ue_system_ShowPlatformSpecificAchievementsScreen(arg_specificplayer : C_Play
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="ShowPlatformSpecificLeaderboardScreen", signature="v1;ShowPlatformSpecificLeaderboardScreen;CategoryName:StrProperty:128;")]
 def ue_system_ShowPlatformSpecificLeaderboardScreen(arg_categoryname : string) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "ShowPlatformSpecificLeaderboardScreen", "")
     ue_expect_signature(call, "v1;ShowPlatformSpecificLeaderboardScreen;CategoryName:StrProperty:128;")
@@ -9844,6 +10125,7 @@ def ue_system_ShowPlatformSpecificLeaderboardScreen(arg_categoryname : string) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="SnapshotObject", signature="v1;SnapshotObject;Object:ObjectProperty:128:/Script/CoreUObject.Object;")]
 def ue_system_SnapshotObject(arg_object : C_Object_55c3753a) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "SnapshotObject", "")
     ue_expect_signature(call, "v1;SnapshotObject;Object:ObjectProperty:128:/Script/CoreUObject.Object;")
@@ -9858,6 +10140,7 @@ struct ue_system_SphereOverlapActors_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="SphereOverlapActors", signature="v1;SphereOverlapActors;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;SpherePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:FloatProperty:128;ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")]
 def ue_system_SphereOverlapActors(arg_spherepos : UEVector; arg_sphereradius : float; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_actorclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_SphereOverlapActors_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "SphereOverlapActors", "worldcontextobject")
     ue_expect_signature(call, "v1;SphereOverlapActors;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;SpherePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:FloatProperty:128;ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ActorClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutActors:ArrayProperty:384[OutActors:ObjectProperty:0:/Script/Engine.Actor;];ReturnValue:BoolProperty:1408;")
@@ -9889,6 +10172,7 @@ struct ue_system_SphereOverlapComponents_Result {
     out_returnvalue : bool
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="SphereOverlapComponents", signature="v1;SphereOverlapComponents;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;SpherePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:FloatProperty:128;ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")]
 def ue_system_SphereOverlapComponents(arg_spherepos : UEVector; arg_sphereradius : float; arg_objecttypes : array<E_EObjectTypeQuery_e6df5ae8>; arg_componentclassfilter : UEClassHandle; arg_actorstoignore : array<C_Actor_adf65d5b>) : ue_system_SphereOverlapComponents_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "SphereOverlapComponents", "worldcontextobject")
     ue_expect_signature(call, "v1;SphereOverlapComponents;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;SpherePos:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};SphereRadius:FloatProperty:128;ObjectTypes:ArrayProperty:134218114[ObjectTypes:ByteProperty:0:/Script/Engine.EObjectTypeQuery;];ComponentClassFilter:ClassProperty:128:meta:/Script/CoreUObject.Object;ActorsToIgnore:ArrayProperty:134218114[ActorsToIgnore:ObjectProperty:0:/Script/Engine.Actor;];OutComponents:ArrayProperty:384[OutComponents:ObjectProperty:0:/Script/Engine.PrimitiveComponent;];ReturnValue:BoolProperty:1408;")
@@ -9915,6 +10199,7 @@ def ue_system_SphereOverlapComponents(arg_spherepos : UEVector; arg_sphereradius
     return <- result
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="TransactObject", signature="v1;TransactObject;Object:ObjectProperty:128:/Script/CoreUObject.Object;")]
 def ue_system_TransactObject(arg_object : C_Object_55c3753a) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "TransactObject", "")
     ue_expect_signature(call, "v1;TransactObject;Object:ObjectProperty:128:/Script/CoreUObject.Object;")
@@ -9924,6 +10209,7 @@ def ue_system_TransactObject(arg_object : C_Object_55c3753a) {
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="UnloadPrimaryAsset", signature="v1;UnloadPrimaryAsset;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};")]
 def ue_system_UnloadPrimaryAsset(arg_primaryassetid : S_PrimaryAssetId_ea64396c) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "UnloadPrimaryAsset", "")
     ue_expect_signature(call, "v1;UnloadPrimaryAsset;PrimaryAssetId:StructProperty:128:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};")
@@ -9934,6 +10220,7 @@ def ue_system_UnloadPrimaryAsset(arg_primaryassetid : S_PrimaryAssetId_ea64396c)
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="UnloadPrimaryAssetList", signature="v1;UnloadPrimaryAssetList;PrimaryAssetIdList:ArrayProperty:134218114[PrimaryAssetIdList:StructProperty:0:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};];")]
 def ue_system_UnloadPrimaryAssetList(arg_primaryassetidlist : array<S_PrimaryAssetId_ea64396c>) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "UnloadPrimaryAssetList", "")
     ue_expect_signature(call, "v1;UnloadPrimaryAssetList;PrimaryAssetIdList:ArrayProperty:134218114[PrimaryAssetIdList:StructProperty:0:/Script/CoreUObject.PrimaryAssetId\{PrimaryAssetType:StructProperty:0:/Script/CoreUObject.PrimaryAssetType\{Name:NameProperty:0;\};PrimaryAssetName:NameProperty:0;\};];")
@@ -9947,6 +10234,7 @@ def ue_system_UnloadPrimaryAssetList(arg_primaryassetidlist : array<S_PrimaryAss
     ue_release_call(call)
 }
 
+[ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="UnregisterForRemoteNotifications", signature="v1;UnregisterForRemoteNotifications;")]
 def ue_system_UnregisterForRemoteNotifications() {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "UnregisterForRemoteNotifications", "")
     ue_expect_signature(call, "v1;UnregisterForRemoteNotifications;")

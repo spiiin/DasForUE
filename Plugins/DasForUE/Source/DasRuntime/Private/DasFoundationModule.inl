@@ -5,9 +5,52 @@ class FUnrealFoundationModule final : public das::Module
 public:
     FUnrealFoundationModule() : das::Module("ue_foundation")
     {
+        AddCollisionProfileEnum(*this);
+
+        globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEInputNameLint()));
         addCommentReader(new FUECommentReader());
         addAnnotation(new FUENativeBaseAnnotation());
         addAnnotation(new FUEClassAnnotation());
+        {
+            auto* Macro = new FUEDelegateReferenceMacro();
+            ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));
+            Macro->module = this;
+            addCallMacro(Macro->name,
+                         [Macro](const das::LineInfo& At) -> das::ExprLooksLikeCall*
+                         {
+                             auto* E = new das::ExprCallMacro(At, Macro->name);
+                             E->macro = Macro;
+                             return E;
+                         });
+        }
+        inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEFunctionReferencePass()));
+        for (const auto& Pair : {std::pair<const char*, int>{"ue_static", 0}, {"ue_call", 1}, {"ue_struct_get", 2}})
+        {
+            auto* Macro = new FUEReflectionMacro(Pair.first, Pair.second);
+            ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));
+            Macro->module = this;
+            addCallMacro(Macro->name,
+                         [Macro](const das::LineInfo& At) -> das::ExprLooksLikeCall*
+                         {
+                             auto* E = new das::ExprCallMacro(At, Macro->name);
+                             E->macro = Macro;
+                             return E;
+                         });
+        }
+        addAnnotation(new FUEReflectedCallAnnotation());
+        addAnnotation(new FUEWidgetLayoutAnnotation());
+        {
+            auto* Macro = new FUEWidgetViewMacro();
+            ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));
+            Macro->module = this;
+            addCallMacro(Macro->name,
+                         [Macro](const das::LineInfo& At) -> das::ExprLooksLikeCall*
+                         {
+                             auto* E = new das::ExprCallMacro(At, Macro->name);
+                             E->macro = Macro;
+                             return E;
+                         });
+        }
         addAnnotation(new FUEAsyncPhysicsAnnotation());
         addAnnotation(new FUELibraryAnnotation());
         addAnnotation(new FUEEnumAnnotation());
@@ -69,6 +112,7 @@ public:
         addAnnotation(new FUEDelegateAnnotation(false));
         addAnnotation(new FUEDelegateAnnotation(true));
         addAnnotation(new FUECallbackFrameAnnotation());
+        addAnnotation(new FUEHandlerContractAnnotation());
         addAnnotation(new FUEFunctionAnnotation());
         addAnnotation(new FUECallbackAnnotation(false));
         addAnnotation(new FUECallbackAnnotation(true));
@@ -164,6 +208,22 @@ public:
                          });
         }
         inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEPropertyPass()));
+        inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEStatePass()));
+        globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEPathLintPass()));
+        for (bool Text : {false, true})
+        {
+            auto* Macro = new FUEIdentityMacro(Text);
+            ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));
+            Macro->module = this;
+            addCallMacro(Macro->name,
+                         [Macro](const das::LineInfo& At) -> das::ExprLooksLikeCall*
+                         {
+                             auto* E = new das::ExprCallMacro(At, Macro->name);
+                             E->macro = Macro;
+                             return E;
+                         });
+        }
+
         for (bool Owner : {false, true})
         {
             auto* Macro = new FUEReferenceFactory(Owner);
@@ -402,6 +462,14 @@ public:
                                                         das::SideEffects::modifyExternal, "RemoveGameplayWidget");
         AddUEExtern<DAS_BIND_FUN(GameplayWidgetText)>(*this, Library, "__ue_widget_text",
                                                       das::SideEffects::modifyExternal, "GameplayWidgetText");
+        AddUEExtern<DAS_BIND_FUN(ResolveWidgetLayout)>(*this, Library, "__ue_widget_layout_resolve",
+                                                       das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN(WidgetLayoutField), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_widget_layout_field", das::SideEffects::accessExternal);
+        AddUEExtern<DAS_BIND_FUN(GameplayWidgetClickRef)>(*this, Library, "__ue_widget_click_ref",
+                                                          das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN(GameplayWidgetTextRef)>(*this, Library, "__ue_widget_text_ref",
+                                                         das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN(GameplayWidgetClick)>(*this, Library, "__ue_widget_click",
                                                        das::SideEffects::modifyExternal, "GameplayWidgetClick");
         AddUEExtern<DAS_BIND_FUN(GameplayWidgetInput)>(*this, Library, "__ue_widget_input",
@@ -724,6 +792,12 @@ public:
                                                     das::SideEffects::modifyExternal, "DelegateSetField");
         AddUEExtern<DAS_BIND_FUN(DelegateCreate)>(*this, Library, "__ue_delegate_create",
                                                   das::SideEffects::modifyExternal, "DelegateCreate");
+        AddUEExtern<DAS_BIND_FUN(DynamicEventListen)>(*this, Library, "__ue_dynamic_event",
+                                                      das::SideEffects::modifyExternal, "DynamicEventListen");
+        AddUEExtern<DAS_BIND_FUN(DelegateSelfTarget), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_delegate_self_target", das::SideEffects::modifyExternal, "DelegateSelfTarget");
+        AddUEExtern<DAS_BIND_FUN(DelegateBindScript)>(*this, Library, "__ue_delegate_bind_script",
+                                                      das::SideEffects::modifyExternal, "DelegateBindScript");
         AddUEExtern<DAS_BIND_FUN(DelegateBind)>(*this, Library, "__ue_delegate_bind", das::SideEffects::modifyExternal,
                                                 "DelegateBind");
         AddUEExtern<DAS_BIND_FUN(DelegateRemove)>(*this, Library, "__ue_delegate_remove",
@@ -1068,6 +1142,18 @@ public:
                                                 "SubscribeInt");
         AddUEExtern<DAS_BIND_FUN(EmitSignal)>(*this, Library, "ue_emit_signal", das::SideEffects::modifyExternal,
                                               "EmitSignal");
+        AddUEExtern<DAS_BIND_FUN(ClassDefaultObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_class_default_object", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<int32,das::Type::tInt>))>(
+            *this, Library, "__ue_state_init_int", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<bool,das::Type::tBool>))>(
+            *this, Library, "__ue_state_init_bool", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<float,das::Type::tFloat>))>(
+            *this, Library, "__ue_state_init_float", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<double,das::Type::tDouble>))>(
+            *this, Library, "__ue_state_init_double", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN(InitializePersistentString)>(*this, Library, "__ue_state_init_string",
+                                                              das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN(GetStateInt)>(*this, Library, "ue_state_get_int", das::SideEffects::modifyExternal,
                                                "GetStateInt");
         AddUEExtern<DAS_BIND_FUN(SetStateInt)>(*this, Library, "ue_state_set_int", das::SideEffects::modifyExternal,
@@ -1501,6 +1587,8 @@ public:
         AddUEExtern<DAS_BIND_FUN(StructWithObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
                         *this, Library, "ue_struct_with_object", das::SideEffects::modifyExternal, "StructWithObject")
                         ->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(CollisionProfileName)>(*this, Library, "__ue_collision_profile_name",
+                                                        das::SideEffects::modifyExternal, "CollisionProfileName");
         AddUEExtern<DAS_BIND_FUN(DSLNameFromString)>(*this, Library, "ue_name_value", das::SideEffects::modifyExternal,
                                                      "DSLNameFromString");
         AddUEExtern<DAS_BIND_FUN(DSLNameToString)>(*this, Library, "ue_name_text", das::SideEffects::modifyExternal,

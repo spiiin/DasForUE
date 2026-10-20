@@ -636,10 +636,12 @@ das::ExpressionPtr DSLDelegateFieldWrite(const das::LineInfo&, const das::TypeDe
                                          const FString&, das::ExpressionPtr);
 #include "DasComputedDefaultsState.inl"
 #include "DasAuthoredRefs.inl"
+#include "DasHandlerABI.inl"
 #include "DasDelegateDSL.inl"
 #include "DasComponentFields.inl"
 #include "DasDeclarationGroups.inl"
 #include "DasComputedDefaults.inl"
+#include "DasIdentityDSL.inl"
 #include "DasComponentDefaults.inl"
 #include "DasContainerDefaultsDSL.inl"
 bool DSLVirtualMethod(const FDasDeclaredClass& C, const FDasDeclaredMethod& M)
@@ -845,8 +847,16 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
     return K;
 }
 #include "DasCallbackFramesDSL.inl"
+#include "DasReflectionMacros.inl"
+#include "DasWidgetLayoutsDSL.inl"
+#include "DasWidgetLayoutUsesDSL.inl"
 #include "DasDSLBodyVisitor.inl"
+#include "DasOperationKeysDSL.inl"
+#include "DasInputNamesDSL.inl"
+#include "DasDSLInlineCallbacks.inl"
 #include "DasDSLMemberAnnotations.inl"
+#include "DasHandlerReferencesDSL.inl"
+#include "DasEventChecksDSL.inl"
 #include "DasDSLClassAnnotation.inl"
 #include "DasDSLInterfaceAnnotation.inl"
 #include "DasDSLTypeAnnotations.inl"

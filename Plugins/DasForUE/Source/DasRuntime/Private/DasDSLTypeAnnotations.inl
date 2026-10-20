@@ -201,13 +201,14 @@ struct FUEStructAnnotation : das::StructureAnnotation
             return false;
         }
     }
-    virtual bool touch(const das::StructurePtr& S, das::ModuleGroup&, das::AnnotationArgumentList& Args,
+    virtual bool touch(const das::StructurePtr& S, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
         try
         {
             DSLCommentTooltip(S->at, Args);
             DSLExpandDeclarationGroups(S, false);
+            DSLNormalizeIdentityDefaults(S, Group);
             for (auto& Field : S->fields)
                 if (!Field.generated)
                     DSLCommentTooltip(Field.at, Field.annotation);

@@ -167,8 +167,9 @@ das::ExpressionPtr DSLMultiTimer(das::ExprCall* E, const das::StructurePtr& Sour
             DSLEnsureStructHelpers(T, D.TypePath, Group, Source->module, Generated, Helpers);
     }
     const das::string Key = DSLUtf8(FMD5::HashAnsiString(*(Decl.Id + TEXT(".")+ Name + Path))),
-                                    Bridge = "__ue_timer_frame_" + Key,
-                                    Helper = "__ue_capture_" + Key + (Next ? "_next" : "_interval");
+                                    Bridge = Name.StartsWith(
+                                        TEXT("__ue_cb_")) ? DSLUtf8(Name) + "_frame_" + Key : "__ue_timer_frame_" + Key,
+                                        Helper = "__ue_capture_" + Key + (Next ? "_next" : "_interval");
     auto AddArg = [&](das::Function* F, const das::string& N, const das::TypeDeclPtr& T)
     {
         auto* A = new das::Variable();

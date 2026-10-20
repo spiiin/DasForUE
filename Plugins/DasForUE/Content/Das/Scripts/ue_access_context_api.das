@@ -79,6 +79,7 @@ def ue_context_UnsafeContextBump(target : C_DasNativeHashProbeComponent_8c9611a8
     return result
 }
 
+[ue_reflected_call(owner="/Script/DasRuntime.DasFunctionLibraryFixture", method="UnsafeContextProbe", signature="v1;UnsafeContextProbe;ReturnValue:IntProperty:1408;")]
 def ue_context_static_UnsafeContextProbe() : int {
     let call = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "UnsafeContextProbe", "")
     ue_expect_signature(call, "v1;UnsafeContextProbe;ReturnValue:IntProperty:1408;")

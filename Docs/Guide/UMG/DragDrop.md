@@ -23,7 +23,7 @@ require ue_drag_drop
 [export]
 def mouse_down(geometry:UEGeometry; event:UEPointerEvent):UEEventReply {
     return ue_ui_DetectDragIfPressed(event,
-        C_Widget_f2421369_from(ue_self_object()),
+        ue_ref(type<C_Widget_f2421369>, ue_self_object()),
         ue_input_key_PointerEvent_GetEffectingButton(event))
 }
 

@@ -740,6 +740,8 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
         if len(outputs) > 1:
             lines += [f'struct {result_type} {{'] + [f'    out_{ident(p["path"])} : {typ(p)}' for p in outputs] + ['}', '']
         params = ([] if fn.get('static', False) else ['target : ' + class_name(fn['class'])]) + [f'arg_{ident(p["path"])} : {typ(p)}' + (' = ' + defaults[(alias, p['path'])] if (alias, p['path']) in defaults else '') for p in inputs]
+        if fn.get('static', False):
+            lines += [f'[ue_reflected_call(owner={quote(fn["class"])}, method={quote(fn["function"])}, signature={quote(fn["signature"])})]']
         lines += [f'def {alias}(' + '; '.join(params) + ')' + (f' : {result_type}' if result_type else '') + ' {']
         if fn.get('static', False):
             lines += [f'    let call = ue_begin_static_call({quote(fn["class"])}, {quote(fn["function"])}, {quote(fn.get("world_context", ""))})',

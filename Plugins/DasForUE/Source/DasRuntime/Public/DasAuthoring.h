@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "DasSchema.h"
+#include "DasWidgetLayouts.h"
 
 enum class EDasTypeKind : uint8
 {
@@ -166,6 +167,7 @@ struct FDasDeclaredClass
     TArray<FDasDeclaredCallback> Callbacks;
     TArray<FDasDeclaredProperty> Properties;
     TArray<FDasDeclaredMethod> Methods;
+    TArray<FDasWidgetLayoutUse> WidgetLayouts;
     TMap<FString, FString> Metadata;
 };
 struct FDasAuthoringDelta

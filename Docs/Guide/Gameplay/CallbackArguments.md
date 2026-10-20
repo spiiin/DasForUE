@@ -4,12 +4,66 @@ Queued callbacks, meaning managed timers (interval, repeat, next-tick) and `ue_e
 
 ## Handler rules
 
-- The handler is an annotated, non-static instance method of the same authored class (`[ue_function] def Name(...):void`), named by a string literal. It may be declared later in the class.
+- A named managed handler is a non-static instance method of the same authored class, passed as `self.Name`. It may be declared later in the class. No annotation is needed: the compiler generates its checked entry point and marks it `BlueprintInternalUseOnly`, hiding it from the Blueprint palette. An annotation-only `[ue_function]` also stays hidden when used this way.
+- Explicit `[ue_function(BlueprintCallable)]` retains public Blueprint visibility. String callback names still require an explicitly reflected method; use `self.Name` for automatic hidden exports. Ordinary helpers that are never used as callbacks remain script-only.
+- Lifecycle and `ue_event` methods keep their own entry points and cannot also be managed callback targets. Automatic promotion currently resolves methods declared on the same class; inherited method references are not added by this step.
 - It returns `void` and takes **0 to 16** by-value arguments, in the same order and types as the capture (timers) or the event signature (events).
 - `var` on a parameter allows editing the delivery's local copy. `&`, ref/out parameters and argument defaults are rejected.
 - Handler signature and payload are validated **before** an existing named timer is replaced. A mismatch keeps the previous timer.
 
+```das
+[ue_class]
+class Counter : Actor {
+    @ue_property=(BlueprintReadWrite)
+    Score:int = 0
+    [ue_function(BlueprintCallable)]
+    def Start():void { ue_timer_start("pulse", 1.0f, self.Pulse, true) }
+    def Pulse():void { self.Score += 1 } // Hidden from the Blueprint palette.
+}
+```
+
+Hidden handlers still have reflected transport functions for widget binding and runtime dispatch. They use the same payload validation, hot reload and owner cleanup as explicit handlers. Reapplying after adding/removing an explicit `BlueprintCallable` updates the visibility.
+
 Plain exported (non-class) DAS functions can use the scalar timer overloads with their exported callback name; array packing, typed enums/structs and multiple arguments are generated only for authored class callbacks.
+
+## Inline managed callbacks
+
+Inside a `[ue_class]` instance method, managed callback arguments also accept a `$` block:
+
+```das
+ue_timer_start("pulse",1.0f,$ { self.Score+=1 },true)
+ue_enhanced_bind(self.MoveAction,TriggerEvent.Triggered,$(value:float) {
+    self.Speed=value
+})
+```
+
+The block is lifted into a generated hidden `__ue_cb_<hash>` instance method and then uses the same
+signature checks, queuing and cleanup as a named callback. Parameters need explicit types,
+and the result must be `void`. Locals declared **inside** the block are allowed.
+This form applies to the managed timer, input, Enhanced Input, latent, async asset/soft-load,
+widget click, effects, montage and AI move callback arguments. It does not change ordinary
+daScript function/block arguments or the `[ue_event]` declaration syntax.
+
+Only `self` is captured implicitly. Capturing an enclosing local variable, method parameter
+or loop iterator is a compile error, including `let` constants. Supply a timer payload instead:
+
+```das
+let amount=3
+ue_timer_start("award",1.0f,$(payload:int) {
+    self.Score+=payload
+},false,amount)
+```
+
+Here `amount` is evaluated when the timer starts and copied through the existing checked payload
+transport; the block receives it as `payload`. No closure retaining a daScript stack frame is created.
+Module globals remain ordinary global accesses, with their existing reload/state semantics.
+
+Names are derived from the class, containing method, ordinal of the managed callback call in that
+method, and canonical block AST encoded as UTF-8. They contain no memory addresses, absolute file
+paths or line numbers. Moving the file, adding comments/blank lines or editing unrelated code keeps
+the callback identity. Editing the block or inserting/reordering earlier callback calls may change
+its identity and require Apply/reimport of the generated Blueprint methods. Compatible runtime
+reload preserves existing timer/input recipes; an invalid candidate keeps the working revision.
 
 ## Supported argument types
 
@@ -86,7 +140,7 @@ Multiple arguments, including a native five-argument event:
 ```das
 def Schedule():void {
     var weights:array<int> = [3,7]
-    let title=ue_text("Example","Saved","Saved")
+    let title=ue_loctext(Saved, "Saved")
     ue_timer_next_tick("update","UpdateScore",17,title,weights)
     ue_timer_start("repeat",0.1f,"UpdateScore",true,17,title,weights)
     clear(weights)

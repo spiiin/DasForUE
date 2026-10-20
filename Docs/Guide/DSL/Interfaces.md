@@ -177,7 +177,7 @@ compile time.
 require ue_foundation
 require ue_contract_bindings
 
-let api = ue_interface(type<CounterContract>, target)   // or CounterContract_from(target)
+let api = ue_ref(type<CounterContract>, target)
 if (CounterContract_valid(api)) {
     let answer = api.Query(5)
 
@@ -189,7 +189,7 @@ if (CounterContract_valid(api)) {
 
 | Helper | Behavior |
 | --- | --- |
-| `ue_interface(type<T>, obj)`, `T_from(obj)` | Checked construction; null allowed; a non-null expired or non-implementing object is rejected |
+| `ue_ref(type<T>, obj)` | Checked construction; null allowed; a non-null expired or non-implementing object is rejected |
 | `T_null()` | Empty reference |
 | `T_valid(ref)` | False for null, expired or non-implementing objects |
 | `T_raw(ref)` | Underlying handle |
@@ -234,8 +234,8 @@ require ue_text
 require ue_text_byte_interface_bindings
 
 def UpdateExample(target:UObjectHandle):void {
-    let api = TextByteContract_from(target)
-    let title = api.EchoText(ue_text("MyGame", "Title", "Example"))
+    let api = ue_ref(type<TextByteContract>, target)
+    let title = api.EchoText(ue_loctext(Title, "Example"))
     var bytes:array<uint8> = [uint8(0)]
     var messages:array<FText>
     api.ChangeArrays(bytes, messages)
@@ -246,14 +246,9 @@ Calls run on the game thread and require a reflected implementation on the
 receiver. Native C++ `Execute_*` implementations without a reflected function are
 not reachable through reflection.
 
-### Low-level calls
+### Explicit typed calls
 
-`ue_interface_call_int`, `ue_interface_call_string` and
-`ue_begin_interface_call(object, interfacePath, method)` give untyped access with
-explicit frames. The interface argument may be `ue_type(Name)` inside reflected
-methods. See [LowLevelCalls.md](../../Reference/LowLevelCalls.md) for the frame
-contract (membership and signature are validated when the frame is created and
-again before invocation).
+Use a typed interface reference with `ue_call(type<DasProbeInterface>, Query, target, 5)`. Names and argument types are checked during compilation; the normal reflected membership and signature checks still run at invocation. See [reflected call macros](../../Reference/LowLevelCalls.md).
 
 ### Natural source values in generated calls
 

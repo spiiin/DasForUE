@@ -151,7 +151,7 @@ next callback do not change a stored value; call a getter again for current layo
 
 ```das
 require ue_api_umg_input
-let widget = C_Widget_f2421369_from(ue_self_object())
+let widget = ue_ref(type<C_Widget_f2421369>, ue_self_object())
 let geometry = ue_widget_GetTickSpaceGeometry(widget)
 let size = ue_ui_geometry_GetLocalSize(geometry)
 let absolute = ue_ui_geometry_LocalToAbsolute(geometry, ue_vector2d(4.0lf, 6.0lf))
@@ -193,7 +193,7 @@ require ue_api_umg_input
 
 [export]
 def mouse_down(geometry:UEGeometry; event:UEPointerEvent):UEEventReply {
-    let widget=C_Widget_f2421369_from(ue_self_object())
+    let widget=ue_ref(type<C_Widget_f2421369>, ue_self_object())
     let capture=ue_ui_CaptureMouse(ue_ui_Handled(),widget)
     return capture.out_returnvalue
 }

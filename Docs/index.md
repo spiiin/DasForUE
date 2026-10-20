@@ -31,6 +31,8 @@ time are in the [changelog](../CHANGELOG.md).
 - [Structs](Guide/DSL/Structs.md)
 - [Enums](Guide/DSL/Enums.md)
 - [Built-in types](Guide/DSL/BuiltinTypes.md)
+- [Typed input and collision names](Guide/DSL/EnumNames.md)
+- [Handler references](Guide/DSL/HandlerReferences.md)
 - [Containers](Guide/DSL/Containers.md)
 - [Functions](Guide/DSL/Functions.md)
 - [Defaults](Guide/DSL/Defaults.md)

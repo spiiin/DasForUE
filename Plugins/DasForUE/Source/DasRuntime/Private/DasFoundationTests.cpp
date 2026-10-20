@@ -21,7 +21,7 @@
 #include "Modules/ModuleManager.h"
 #include "Engine/World.h"
 
-FString DasFoundationExternManifest();
+#include "DasFoundationManifest.h"
 FString DasKindManifest();
 double DasExternGuardBenchmarkNs(int32 Iterations);
 void DasSetSelfSitesEnabled(bool bEnabled);
@@ -82,12 +82,14 @@ bool RunDasFoundationTests(FString& Report)
         Expect(!Authoring(TEXT("dsl_method_refs_bad.das"), BadRefError) && !BadRefError.IsEmpty(),
                           TEXT("dsl_method_reference_to_field_rejected"));
         Expect(!Authoring(TEXT("dsl_event_unknown.das"), UnknownError) &&
-                          UnknownError.Contains(TEXT("multicast delegate OnTakeAnyDamagee")),
+                          UnknownError.Contains(TEXT("Unknown BlueprintAssignable event self.OnTakeAnyDamagee")),
                                                 TEXT("dsl_unknown_native_event_rejected_at_compile_time"),
                                                      UnknownError);
-        Expect(!Authoring(TEXT("dsl_event_arity.das"), ArityError) &&
-                          ArityError.Contains(TEXT("with 1 parameter")),
-                                              TEXT("dsl_native_event_arity_rejected_at_compile_time"), ArityError);
+        Expect(
+            !Authoring(TEXT("dsl_event_arity.das"), ArityError) &&
+                       ArityError.Contains(
+                           TEXT("ue_event self.OnTakeAnyDamage: Callback argument count/return differs from source")),
+                           TEXT("dsl_native_event_arity_rejected_at_compile_time"), ArityError);
     }
 #endif
     auto Run = [&](const TCHAR* Name)

@@ -28,9 +28,6 @@ require ue_object_types public
 [ue_native_object(path="/Script/Engine.PointLightComponent")]
 struct PointLightRef { handle:UObjectHandle }
 
-def PointLightRef_from(value:UObjectHandle):PointLightRef {
-    return PointLightRef(handle=ue_cast_nullable_object(value,"/Script/Engine.PointLightComponent"))
-}
 ```
 
 Import it together with `ue_native_gameplay` in gameplay code:
@@ -99,7 +96,7 @@ Full example: `Plugins/DasForUE/Content/Das/Scripts/native_accessors_example.das
 
 ```das
 let character=ue_character_self()
-let player=PlayerControllerRef_from(character.GetController().handle)
+let player=ue_ref(type<PlayerControllerRef>, character.GetController().handle)
 player.Possess(character)            // CharacterRef -> NativePawnRef, automatic upcast
 let camera=ue_component_get(type<CameraComponentRef>, ue_ref(type<ActorRef>,character.handle), "Camera")
 camera.SetProjectionMode(ECameraProjectionMode.Orthographic)
@@ -159,7 +156,7 @@ Snapshot limits: 4096 aggregate container elements and 16 MiB payload per value.
 
 | Function | Meaning |
 | --- | --- |
-| `ue_text(namespace,key,source)` | Keyed, localizable text (namespace and key required) |
+| `ue_loctext(Key, "source")` | Localizable text; namespace comes from the defining module |
 | `ue_text_invariant(value)` | Culture-invariant text |
 | `ue_text_to_string(value)` | Current display string (never used to send text back) |
 | `ue_text_namespace(value)`, `ue_text_key(value)` | Identity, or empty |
@@ -167,7 +164,7 @@ Snapshot limits: 4096 aggregate container elements and 16 MiB payload per value.
 
 ```das
 let label=ue_component_get(type<TextRenderComponentRef>,ue_ref(type<ActorRef>,ue_self_object()),"Label")
-label.K2_SetText(ue_text("MyGame","PlayerLabel","Player"))   // Text itself is BlueprintReadOnly
+label.K2_SetText(ue_loctext(PlayerLabel, "Player"))   // Text itself is BlueprintReadOnly
 let shown=ue_text_to_string(label.Text)
 ```
 

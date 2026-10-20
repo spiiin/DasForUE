@@ -160,7 +160,7 @@ authored object (`api` below is an authored reference, see
 ```das
 let actor = api.NativeActor                 // ActorRef
 api.NativeActor = anotherActor
-api.NativeEvents = DasEventInterface_from(api.handle)
+api.NativeEvents = ue_ref(type<DasEventInterface>, api.handle)
 api.NativeActor = default<ActorRef>
 ```
 
@@ -279,12 +279,11 @@ Generated native calls also accept class arguments; for example
 require ue_library_generated
 require ue_object_types
 let klass = ue_class_loaded(type<ActorRef>, "/Script/Engine.Actor")
-let actor = ue_lib_GetActorOfClass(klass)
+let actor = ue_static(GameplayStatics.GetActorOfClass, klass)
 ```
 
 See [FunctionLibraries.md](FunctionLibraries.md) and
-[LowLevelCalls.md](../../Reference/LowLevelCalls.md) (`ue_arg_class`,
-`ue_result_class`).
+[reflected call macros](../../Reference/LowLevelCalls.md).
 
 ### Classes in delegates, interfaces, events and timers
 

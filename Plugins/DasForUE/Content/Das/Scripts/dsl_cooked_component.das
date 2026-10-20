@@ -1,5 +1,6 @@
 options gen2
 require ue_dsl
+require ue_probe_actor
 [ue_class(module_id="cookedcomponent",parent="ActorComponent",Blueprintable)]
 class CookedBehavior {
     properties=ue_properties(BlueprintReadWrite) {
@@ -12,7 +13,7 @@ class CookedBehavior {
     def BeginPlay():void { self.Begins+=1 }
     def Tick(delta:float):void { self.Ticks+=1 }
     def EndPlay(reason:int):void { self.Ends+=1 }
-    [ue_event(source="owner",name="OnDasSignal")]
+    [ue_event(source=owner,source_type=ProbeActorRef,name="OnDasSignal")]
     def Signal(value:int):void { self.Signals+=value }
     [ue_function(BlueprintCallable)]
     def GetBonus(input:int):int { return self.Bonus+input }

@@ -24,7 +24,7 @@ This page summarizes which value kinds can appear in which positions of authored
 
 - **Fields.** Become real reflected `UPROPERTY`s with normal Blueprint pins, serialization and cook rules. Writes through `self` validate type and `BlueprintReadOnly`. See [Structs](../Guide/DSL/Structs.md), [Containers](../Guide/DSL/Containers.md), [Self access](../Guide/DSL/SelfAccess.md).
 - **Parameters and returns.** Up to 16 parameters per method or delegate frame. `var x:T&` is inout, `@ue_out var x:T&` is output-only; const references with direction markers are rejected. Output-only values start as the type's default (zero/empty, null reference, first valid enum member, struct default, zero vector/rotator, identity transform). See [Functions](../Guide/DSL/Functions.md).
-- **Parameter defaults.** Only trailing input literals on authored methods: `int`, `float`, `double`, `bool`, `string`, plus byte (`uint8(n)`) and text (`ue_text(...)`, `ue_text_invariant(...)`) literals. Out/ref, `WorldContext`, complex types and computed expressions are rejected; authored interface stubs have no defaults. See [Defaults](../Guide/DSL/Defaults.md).
+- **Parameter defaults.** Only trailing input literals on authored methods: `int`, `float`, `double`, `bool`, `string`, plus byte (`uint8(n)`) and text (`ue_loctext(...)`, `ue_text_invariant(...)`) literals. Out/ref, `WorldContext`, complex types and computed expressions are rejected; authored interface stubs have no defaults. See [Defaults](../Guide/DSL/Defaults.md).
 - **Property defaults.** Use one recursive materializer for scalars, names, text, enums, math, structs, assets, classes and containers (array/set/map literals, `ue_defaults()` blocks and audited computed scalar leaves). Persisted object references must be top-level assets or classes, not actors or subobjects. Nonempty soft-reference members inside authored structs are rejected. Shared limits: depth 16, 8192 typed nodes, 4096 container entries, 16 MiB, 1 MiB input JSON.
 - **Hash keys / set elements.** Restricted to byte, int, string, FName, supported enums and object keys. Float, bool, FText, struct, math, class, soft and interface keys are rejected. FName keys follow Unreal equality (case-insensitive). Containers inside an authored `ue_struct` use a narrower key policy (int, string, `uint8`); Actor class fields support all key families.
 - **Class references.** Supported for class fields, method parameters and results, and inside generated struct arrays of native API calls. Containers of class references, class references in the authored interface DSL, delegates, events and timers are not supported.
@@ -35,17 +35,17 @@ This page summarizes which value kinds can appear in which positions of authored
 
 ## Generated native API
 
-| Value kind | [`ue_generated`](GeneratedBindings.md) | [Native class bindings](NativeClassBindings.md) | [API packages](../Api/README.md) | [Low-level frames](LowLevelCalls.md) |
+| Value kind | [`ue_generated`](GeneratedBindings.md) | [Native class bindings](NativeClassBindings.md) | [API packages](../Api/README.md) | [Frame transport (developer)](../Dev/Runtime/LowLevelCalls.md) |
 | --- | --- | --- | --- | --- |
 | Scalars, FString | Yes | Yes | Yes | Yes |
-| `uint8` | — | Yes (0..255 checked) | Yes | `ue_arg_byte` |
-| FName | `UEName` | `UENameValue` | `UEName` | `ue_arg_name` |
+| `uint8` | — | Yes (0..255 checked) | Yes | Yes (0..255 checked) |
+| FName | `UEName` | `UENameValue` | `UEName` | Yes |
 | FText | — | `UETextValue` | `UETextValue` | — |
 | Enum | `E_*` enums | `[ue_native_enum]` types (0..254) | `E_*` enums | by symbol |
 | Vector / Rotator / Transform | `S_*` structs | canonical math | canonical math | field paths |
 | Other value structs | `S_*` structs | supported generated structs | `S_*` structs | field paths |
 | Object reference | `C_*` views | typed refs, automatic upcasts | `C_*` views + typedefs | `UObjectHandle` |
-| Class reference | — | Yes | Yes | `ue_arg_class` |
+| Class reference | — | Yes | Yes | Yes |
 | Soft object / class | — | Yes | No generic ABI (dedicated adapters only) | — |
 | Weak object fields | — | — | Yes (no strong pin) | — |
 | `TArray` | Yes | Yes | Yes | Yes |
