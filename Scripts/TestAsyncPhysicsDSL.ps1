@@ -1,6 +1,10 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild,[switch]$SkipRegression,[switch]$SyncOnly)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot;$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
-if(!$SkipBuild){& "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/async-dsl-build.log" *> "$Repo/logs/async-dsl-build-stdout.log";if($LASTEXITCODE){throw 'Async DSL build failed'}}
+if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/async-dsl-build.log") *> "$Repo/logs/async-dsl-build-stdout.log";if($LASTEXITCODE){throw 'Async DSL build failed'}}
 $Dlls=@('DasRuntime','DasEditor')|ForEach-Object {"$Repo/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$_.dll"};$Hashes=@{};foreach($Dll in $Dlls){$Hashes[$Dll]=(Get-FileHash $Dll -Algorithm SHA256).Hash}
 $Stage="$Repo/Build/AsyncPhysicsDSL/$([guid]::NewGuid().ToString('N'))";New-Item -ItemType Directory -Path $Stage -Force|Out-Null
 $Scripts="$Repo/Tests/DasForUESmoke/Content/Das/Scripts";New-Item -ItemType Directory -Path $Scripts -Force|Out-Null
@@ -13,7 +17,7 @@ $Modes=if($SyncOnly){@('sync')}else{@('sync','fixed-async')};foreach($Mode in $M
   $Artifact="$Repo/Tests/DasForUESmoke/Content/DasTests/AsyncPhysicsDSL_$Id";if(Test-Path -LiteralPath $Artifact){throw "Preexisting test asset directory: $Artifact"}
   $Extra=@();if($Mode -eq 'fixed-async'){$Extra+='-AsyncFixed'};$Log="$Stage/$Mode.log"
   & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasAsyncPhysicsDSL "-Script=$Game" "-Physics=$Physics" "-Package=/Game/DasTests/AsyncPhysicsDSL_$Id/BP_Thruster" @Extra -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Log" *> "$Stage/$Mode-stdout.log"
-  $Match=[regex]::Match((Get-Content $Log -Raw),'DAS_ASYNC_DSL_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Match.Success){throw "Async DSL $Mode failed: $Log"}
+  $Match=(Get-DasResult -Text (Get-Content $Log -Raw) -Pattern 'DAS_ASYNC_DSL_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Match.Success){throw "Async DSL $Mode failed: $Log"}
   if(Select-String -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Log"};$Checks += [int]$Match.Groups[1].Value;$Logs+=$Log
  }finally{
   if($Artifact -and (Test-Path -LiteralPath $Artifact)){$AssetRoot=[IO.Path]::GetFullPath("$Repo/Tests/DasForUESmoke/Content/DasTests")+[IO.Path]::DirectorySeparatorChar;$Resolved=[IO.Path]::GetFullPath($Artifact);if(!$Resolved.StartsWith($AssetRoot,[StringComparison]::OrdinalIgnoreCase) -or [IO.Path]::GetFileName($Resolved) -ne "AsyncPhysicsDSL_$Id"){throw 'Unexpected test asset cleanup path'};Remove-Item -LiteralPath $Resolved -Recurse}

@@ -1,10 +1,14 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Profile="$Repo/Bindings/Packages/AnimationAudioVFX.profile.json"
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/animation-audio-vfx-build.log" *> "$Repo/logs/animation-audio-vfx-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/animation-audio-vfx-build.log") *> "$Repo/logs/animation-audio-vfx-build-stdout.log"
  if($LASTEXITCODE){throw 'Animation / Audio / VFX Editor build failed'}
 }
 function GetPackageHashes {

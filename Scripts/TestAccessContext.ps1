@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests/DasForUESmoke/DasForUESmoke.uproject'
@@ -14,7 +16,7 @@ if($LASTEXITCODE){throw 'Construction fixture wrapper export failed'}
 & C:\Python312\python.exe "$PSScriptRoot/GenerateBindings.py" "$Repo/Bindings/AccessContext.json" "$Repo/Plugins/DasForUE/Content/Das/Scripts/ue_access_context_api.das" --module ue_access_context_api --canonical-math
 if($LASTEXITCODE){throw 'Construction fixture wrapper generation failed'}
 & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasAccessContext -Multiprocess -unattended -NullRHI -nosplash -stdout "-abslog=$Logs/access-context-runtime.log" -ddc=NoZenLocalFallback -NoZenAutoLaunch *> "$Logs/access-context-runtime-stdout.log"
-if($LASTEXITCODE -or !(Select-String -LiteralPath "$Logs/access-context-runtime.log" -SimpleMatch 'DAS_ACCESS_CONTEXT_RESULT=PASS' -Quiet)){
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath "$Logs/access-context-runtime.log" -SimpleMatch 'DAS_ACCESS_CONTEXT_RESULT=PASS' -Quiet)){
  throw "Accessor/context checks failed: $Logs/access-context-runtime.log"
 }
 & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasExport -Modules=Engine -GameWorld "-Probe=$Repo/Plugins/DasForUE/Content/Das/Scripts/native_accessors_example.das" -Multiprocess -unattended -NullRHI -nosplash -stdout "-abslog=$Logs/access-context-engine.log" -ddc=NoZenLocalFallback -NoZenAutoLaunch *> "$Logs/access-context-engine-stdout.log"

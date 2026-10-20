@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests/DasForUESmoke/DasForUESmoke.uproject'
@@ -7,7 +9,9 @@ if($LASTEXITCODE){throw 'API execution-context report tests failed'}
 & C:\Python312\python.exe "$PSScriptRoot/AuditAsyncPhysics.py" --engine $Engine --output "$Repo/logs/async-physics-source-audit.json"
 if($LASTEXITCODE){throw 'Async physics source audit failed'}
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/async-physics-audit-build.log" *> "$Repo/logs/async-physics-audit-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/async-physics-audit-build.log") *> "$Repo/logs/async-physics-audit-build-stdout.log"
  if($LASTEXITCODE){throw 'Async physics audit build failed'}
 }
 $Dlls=@('DasRuntime','DasEditor')|ForEach-Object {Join-Path $Repo "Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$_.dll"}

@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipEditorBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Root=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Root 'Tests\DasForUESmoke\DasForUESmoke.uproject'
@@ -8,7 +10,9 @@ $Previous=$env:UE_SKIP_UBT_SDK_SETUP
 try {
  $env:UE_SKIP_UBT_SDK_SETUP='1'
  if(!$SkipEditorBuild){
-  & (Join-Path $Engine 'Engine\Build\BatchFiles\Build.bat') DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12 "-Log=$Logs\class-callbacks-package-editor-build.log"
+  Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=12', "-Log=$Logs\class-callbacks-package-editor-build.log")
   if($LASTEXITCODE){throw 'Class callback exporter build failed'}
  }
  $Id=[Guid]::NewGuid().ToString('N')
@@ -22,6 +26,6 @@ try {
  $Log=Join-Path $Logs 'class-callbacks-packaged.log'
  $P=Start-Process -FilePath $Exe -ArgumentList $Map,'-DasClassCallbacks','-nullrhi','-unattended','-nosplash',"-abslog=$Log" -WindowStyle Hidden -PassThru
  $P.WaitForExit()
- if($P.ExitCode -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_CLASS_CALLBACKS_PACKAGED_RESULT=PASS')){throw "Packaged class callbacks failed; exit=$($P.ExitCode)"}
+ if($P.ExitCode -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_CLASS_CALLBACKS_PACKAGED_RESULT=PASS')){throw "Packaged class callbacks failed; exit=$($P.ExitCode)"}
  Write-Output "DAS_CLASS_CALLBACKS_DEVELOPMENT_PACKAGE=PASS map=$Map"
 } finally { $env:UE_SKIP_UBT_SDK_SETUP=$Previous }
