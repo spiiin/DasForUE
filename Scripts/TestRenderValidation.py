@@ -102,6 +102,20 @@ class TestRenderValidation(unittest.TestCase):
             self.assertEqual(self.cli(), 2)
             self.assertEqual(self.output.read_bytes(), original)
 
+    def test_ubt_json_lines_are_logs_even_with_validation_suffix(self):
+        log = self.logs / "build-game-validation.json"
+        event = {"time": "2026-10-10T19:28:21", "level": "Debug", "message": "building"}
+        log.write_text(json.dumps(event) + "\n" + json.dumps(event) + "\n")
+        self.assertEqual(renderer.render(self.logs, self.output)[1], 0)
+        log.write_text(json.dumps(event))
+        self.assertEqual(renderer.render(self.logs, self.output)[1], 0)
+
+    def test_legacy_utc_dates_and_unknown_aggregate_state(self):
+        self.receipt("aggregate-validation.json", {"checked_at_utc": "2026-10-17T13:57:57.886915Z"})
+        text, count = renderer.render(self.logs, self.output)
+        self.assertEqual(count, 1)
+        self.assertIn("| UNKNOWN | — | 2026-10-17T13:57:57+00:00 |", text)
+
     def test_empty_logs_and_timestamp_without_zone(self):
         self.assertEqual(self.cli(), 0)
         self.assertIn("No local validation receipts", self.output.read_text(encoding="utf-8"))

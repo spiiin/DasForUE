@@ -51,7 +51,7 @@ def check_count(data: dict) -> str:
 
 
 def receipt_date(data: dict, source: Path) -> str:
-    for key in ("completed_at", "timestamp", "generated_at", "date"):
+    for key in ("completed_at", "verified_at_utc", "checked_at_utc", "timestamp", "generated_at", "date"):
         value = data.get(key)
         if isinstance(value, str) and value:
             try:
@@ -80,6 +80,16 @@ def log_links(data: dict, source: Path, output: Path) -> str:
     return ", ".join(links) or "—"
 
 
+def is_build_log(raw: bytes) -> bool:
+    # UBT also writes *-validation.json, but as JSON Lines diagnostic events, not receipts.
+    try:
+        records = [json.loads(line) for line in raw.decode("utf-8-sig").splitlines() if line.strip()]
+    except (UnicodeError, json.JSONDecodeError):
+        return False
+    return bool(records) and all(isinstance(record, dict) and
+                                 {"time", "level", "message"}.issubset(record) for record in records)
+
+
 def render(logs: Path, output: Path) -> tuple[str, int]:
     rows, fingerprints = [], []
     for source in sorted(logs.glob("*.json"), key=lambda p: p.name.casefold()):
@@ -88,8 +98,10 @@ def render(logs: Path, output: Path) -> tuple[str, int]:
         try:
             data = json.loads(raw.decode("utf-8-sig"))
         except (UnicodeError, json.JSONDecodeError) as exc:
-            if candidate:
+            if candidate and not is_build_log(raw):
                 raise ValueError(f"{source.name}: malformed validation JSON: {exc}") from exc
+            continue
+        if isinstance(data, dict) and {"time", "level", "message"}.issubset(data):
             continue
         if not isinstance(data, dict):
             if candidate:
