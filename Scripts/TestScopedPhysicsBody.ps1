@@ -24,7 +24,7 @@ foreach($Mode in @('sync','fixed-async')){
  & $Editor @Common -run=DasScopedPhysicsBody @Extra "-Probe=$Probe" "-abslog=$Log" *> "$Stage/$Mode-stdout.log"
  $Match=(Get-DasResult -Text (Get-Content -LiteralPath $Log -Raw) -Pattern 'DAS_SCOPED_BODY_RESULT=PASS checks=(\d+)')
  if($LASTEXITCODE -or !$Match.Success -or [int]$Match.Groups[1].Value -lt 35){throw "Scoped body $Mode failed: $Log"}
- if(Select-String -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure during scoped body $Mode"}
+ if(Test-DasResult -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure during scoped body $Mode"}
  $Total += [int]$Match.Groups[1].Value;$Logs+=$Log
 }
 # Isolated VM/mailbox and existing role/lifecycle regression only.

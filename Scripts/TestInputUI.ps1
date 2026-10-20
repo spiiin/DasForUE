@@ -47,7 +47,7 @@ if(!$?){throw 'Input/UI example refresh failed'}
 $Example=Get-Content "$Repo/logs/playable-example.json" -Raw|ConvertFrom-Json
 $Log="$Repo/logs/input-ui-game.log"
 & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project $Example.map -game -DasInputUI -Multiprocess -unattended -NullRHI -nosplash -stdout "-abslog=$Log" -ddc=NoZenLocalFallback -NoZenAutoLaunch *> "$Repo/logs/input-ui-game-stdout.log"
-if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_INPUT_UI=PASS' -Quiet)){throw "Input/UI runtime failed: $Log"}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_INPUT_UI=PASS' -Quiet)){throw "Input/UI runtime failed: $Log"}
 $Text=Get-Content $Log -Raw
 if($Text.Contains('Ensure condition failed') -or $Text -match 'Log[^\r\n]*: Error:'){throw 'Engine error/ensure in Input/UI run'}
 if((GetInputUIHashes) -ne $Before){throw 'Input/UI source or DLL changed during validation'}

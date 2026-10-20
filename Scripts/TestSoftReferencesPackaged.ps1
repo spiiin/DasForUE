@@ -21,7 +21,7 @@ try {
  $Map="/Game/DasSoftReferences/$Id/Map"
  $ExportLog=Join-Path $Logs 'soft-references-package-export.log'
  & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') $Project -run=DasSoftReferences "-ProbeId=$Id" -unattended -NullRHI -nosplash "-abslog=$ExportLog" @DDCArgs
- if($LASTEXITCODE -or !(Select-String -LiteralPath $ExportLog -SimpleMatch 'DAS_SOFT_REFERENCES_EXPORT=PASS')){throw 'Soft references export failed'}
+ if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $ExportLog -SimpleMatch 'DAS_SOFT_REFERENCES_EXPORT=PASS')){throw 'Soft references export failed'}
  & (Join-Path $Root 'Scripts\TestPackaged.ps1') -Engine $Engine -AdditionalMaps @($Map) -SkipZenStore -DDC $DDC
  $Exe=Join-Path $Root 'Build\Packaged\Windows\DasForUESmoke\Binaries\Win64\DasForUESmoke.exe'
  $Log=Join-Path $Logs 'soft-references-packaged.log'

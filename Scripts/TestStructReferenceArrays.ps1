@@ -44,7 +44,7 @@ foreach($Key in @('ACTOR','ENVELOPE')){$Source=$Source.Replace('@'+$Key+'@',$Sym
 $Source|Set-Content -LiteralPath "$Stage/reference-arrays-probe.das" -Encoding utf8
 $Log=Join-Path $Stage 'reference-arrays-runtime.log'
 & $Editor @Common -GameWorld "-Probe=$Stage/reference-arrays-probe.das" "-abslog=$Log" *> "$Stage/reference-arrays-runtime-stdout.log"
-if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw "Reference array runtime probe failed: $Log"}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw "Reference array runtime probe failed: $Log"}
 if((GetValidationDlls) -ne $Before){throw 'DLL changed during validation; rerun against the completed build'}
 [ordered]@{state='PASS';python_tests=113;report=$ReportPath;runtime_log=$Log;generated_module='PASS';advanced_projectile='PASS';nested_object_class_arrays='PASS';nested_struct_arrays='PASS';null_duplicates_empty_resize='PASS';detached_result='PASS';wrong_object_metaclass_missing_element='PASS';dll_sha256=($Before|ConvertFrom-Json);counts=$Report.counts;published=$false;full_foundation='not_run';PIE='not_run';packaged='not_run';commit='not_created'}|ConvertTo-Json -Depth 15|Set-Content -LiteralPath "$Repo/logs/struct-reference-arrays-validation.json" -Encoding utf8
 Write-Output "DAS_STRUCT_REFERENCE_ARRAYS=PASS report=$ReportPath"

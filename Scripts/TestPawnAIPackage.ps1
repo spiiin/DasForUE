@@ -52,7 +52,7 @@ if($Text.Contains('Ensure condition failed') -or $Text -match 'Log[^\r\n]*: Erro
 $Combined="options gen2`nrequire $($Definition.staged_module)`nrequire ue_api_world`nrequire ue_api_math`n[export]`ndef main(input:int):int {`nlet pawn=$($Definition.staged_module)::C_Pawn_ba3732bb_null()`nif($($Definition.staged_module)::C_Pawn_ba3732bb_valid(pawn)) { return -1 }`nlet actor=ue_api_world::C_Actor_adf65d5b_null()`nif(ue_api_world::C_Actor_adf65d5b_valid(actor)) { return -2 }`nreturn 42`n}"
 $Combined|Set-Content -LiteralPath "$Validation/combined.das" -Encoding utf8
 & $Editor @Common -run=DasExport "-Modules=Engine,AIModule,NavigationSystem" "-Probe=$Validation/combined.das" "-abslog=$Validation/combined.log" *> "$Validation/combined-stdout.log"
-if($LASTEXITCODE -or !(Select-String -LiteralPath "$Validation/combined.log" -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw 'Combined Pawn AI / World / Math imports failed'}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath "$Validation/combined.log" -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw 'Combined Pawn AI / World / Math imports failed'}
 # Independent native policy evidence explains every rejected declaration.
 '{"schema_version":1,"modules":["Engine","AIModule","NavigationSystem"],"subsystems":[{"id":"pawn_ai_navigation","modules":["Engine","AIModule","NavigationSystem"],"roots":[]}]}'|Set-Content -LiteralPath "$Validation/inventory-profile.json" -Encoding utf8
 & $Editor @Common -run=DasNativeGameplay -Coverage "-Profile=$Validation/inventory-profile.json" "-Output=$Validation/inventory.json" "-abslog=$Validation/inventory.log" *> "$Validation/inventory-stdout.log"
