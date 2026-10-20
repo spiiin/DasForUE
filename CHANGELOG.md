@@ -35,6 +35,10 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - Object and component field reads (`character.CharacterMovement`, `self.Camera`) are about 9x faster.
 - Property values read or written through accessors, call frames and snapshots no longer rebuild the
   property's type descriptor on every call.
+- Operations on self containers with scalar elements (`push`, `pop`, `erase`, `insert`, `clear`,
+  `self.Items[i] = v`, `self.Scores[k] += v`) change the property in place instead of copying the whole
+  container: push+pop on 1024 ints went from about 200 us to about 0.25 us. Nested container paths and
+  struct, enum, object and math elements are unchanged.
 - Reading and writing scalar members of authored self structs (`self.Stats.Count += 1`) no longer
   copies the whole struct.
 - Class values read or written through generated native references are validated like self and

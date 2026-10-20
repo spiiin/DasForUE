@@ -214,3 +214,20 @@ cached per property (field path checked, failures not cached). The foundation te
 properties more, since their descriptors carry path strings); a full cached int read is about 400 ns, most
 of which is constructing and moving the `FDasScalarValue` carrier. `DasPerformance` (`performance`
 suite) shows no measurable change for `vm_to_ue`: reflected UFunction calls spend their time elsewhere.
+
+## Self container operations — 2026-10-20
+
+Operations on self containers with scalar elements used to run a generated helper that read the whole
+container as a snapshot (`ue_get_self_struct`), converted it to a VM array or table, changed it there and
+converted and wrote it back (`ue_set_self_struct`). The DSL now lowers them to in-place externs
+(`DasScalarAccessors.inl`): `__ue_self_array_get/set/push/insert_<kind>`, `__ue_self_array_pop/erase`,
+`__ue_self_container_clear`, `__ue_self_map_get/set_<key>_<value>`, `__ue_self_map_erase_<key>` and
+`__ue_self_set_insert/erase_<key>`. They work on the property memory through `FScriptArrayHelper`,
+`FScriptMapHelper` and `FScriptSetHelper`, check bounds, element kinds, readonly and `bind_events` like the
+other self writes, and keep the snapshot limit of 4096 elements on growth. Nested paths and struct, enum,
+object and math elements still use the snapshot helpers.
+
+The foundation test prints `self_container_benchmark` for push+pop on a 1024-element int array: about
+220–270 ns per in-place operation, against 190–230 us for one snapshot read and write of the same array.
+The snapshot figure is a lower bound for the former path, which also converted the container to and from
+a VM value. After `erase` a map keeps the native element order; before, it was rebuilt from the VM table.

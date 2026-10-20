@@ -534,4 +534,15 @@ public:
     int32 health = 100;
     UPROPERTY(BlueprintReadOnly, Category = "Probe")
     int32 readOnly = 7;
+    // Self containers changed in place (DasSelfContainerTests.inl).
+    UPROPERTY(BlueprintReadWrite, Category = "Probe")
+    TArray<int32> SelfInts;
+    UPROPERTY(BlueprintReadWrite, Category = "Probe")
+    TArray<FString> SelfStrings;
+    UPROPERTY(BlueprintReadWrite, Category = "Probe")
+    TMap<FName, double> SelfScores;
+    UPROPERTY(BlueprintReadWrite, Category = "Probe")
+    TSet<int32> SelfIds;
+    UPROPERTY(BlueprintReadOnly, Category = "Probe")
+    TArray<int32> SelfLockedInts;
 };

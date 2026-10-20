@@ -408,6 +408,168 @@ void SetSelfStructMember(const char* Property, const char* Member, typename K::I
     WritePropertyScalarValue(P, F.Memory, Native, C);
 }
 
+// Self containers with scalar elements (arrays, map/set keys, map values), changed in place. The former
+// lowering copied the whole container into a VM value, changed it there and wrote a snapshot back. Element
+// memory has no accessors, and the snapshot writer copied the container directly as well. Growth keeps the
+// snapshot element limit of ValidateDasStructSnapshot, so the container can still be read as a snapshot.
+constexpr int32 DasSelfContainerLimit = 4096;
+template <class P> P* SelfContainer(UObject*& Self, const char* Name, bool bWrite, das::Context* C)
+{
+    if (bWrite && ActiveContext && ActiveContext->bCollectingSubscriptions)
+        C->throw_error("self writes are forbidden in bind_events");
+    Self = ResolveSelf(C);
+    return ResolveProperty<P>(Self, Name, bWrite, C);
+}
+template <class K> typename K::Property* SelfContainerElement(FProperty* P, das::Context* C)
+{
+    auto* Typed = CastField<typename K::Property>(P);
+    if (!Typed)
+        C->throw_error("self container element type mismatch");
+    K::Check(Typed, C);
+    return Typed;
+}
+template <class K> using TDasKindNative = TPropertyScalarType<typename K::Property>;
+inline void SelfContainerGrow(int32 Num, bool bArray, das::Context* C)
+{
+    if (Num >= DasSelfContainerLimit)
+        C->throw_error(bArray ? "Struct array snapshot exceeds element/byte limit"
+                              : "Snapshot container limit exceeded");
+}
+inline int32 SelfArrayIndex(int64 Index, int32 Num, das::Context* C)
+{
+    if (Index < 0 || Index >= Num)
+        C->throw_error("self array index out of range");
+    return int32(Index);
+}
+template <class K> typename K::Out SelfArrayGet(const char* Name, int64 Index, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* A = SelfContainer<FArrayProperty>(Self, Name, false, C);
+    auto* E = SelfContainerElement<K>(A->Inner, C);
+    FScriptArrayHelper H(A, A->ContainerPtrToValuePtr<void>(Self));
+    return K::ToDas(E->GetPropertyValue(H.GetRawPtr(SelfArrayIndex(Index, H.Num(), C))), C);
+}
+template <class K> void SelfArraySet(const char* Name, int64 Index, typename K::In Value, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* A = SelfContainer<FArrayProperty>(Self, Name, true, C);
+    auto* E = SelfContainerElement<K>(A->Inner, C);
+    const TDasKindNative<K> Native = K::FromDas(Value, C);
+    FScriptArrayHelper H(A, A->ContainerPtrToValuePtr<void>(Self));
+    E->SetPropertyValue(H.GetRawPtr(SelfArrayIndex(Index, H.Num(), C)), Native);
+}
+// push(value) appends (At < 0); push(value, at) inserts before at (0..length).
+template <class K> void SelfArrayAdd(const char* Name, typename K::In Value, int64 At, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* A = SelfContainer<FArrayProperty>(Self, Name, true, C);
+    auto* E = SelfContainerElement<K>(A->Inner, C);
+    const TDasKindNative<K> Native = K::FromDas(Value, C);
+    FScriptArrayHelper H(A, A->ContainerPtrToValuePtr<void>(Self));
+    if (At > H.Num())
+        C->throw_error("self array index out of range");
+    SelfContainerGrow(H.Num(), true, C);
+    const int32 Index = At < 0 ? H.AddValue() : (H.InsertValues(int32(At)), int32(At));
+    E->SetPropertyValue(H.GetRawPtr(Index), Native);
+}
+template <class K> void SelfArrayPush(const char* Name, typename K::In Value, das::Context* C)
+{
+    SelfArrayAdd<K>(Name, Value, -1, C);
+}
+template <class K> void SelfArrayInsert(const char* Name, typename K::In Value, int64 At, das::Context* C)
+{
+    if (At < 0)
+        C->throw_error("self array index out of range");
+    SelfArrayAdd<K>(Name, Value, At, C);
+}
+inline void SelfArrayPop(const char* Name, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* A = SelfContainer<FArrayProperty>(Self, Name, true, C);
+    FScriptArrayHelper H(A, A->ContainerPtrToValuePtr<void>(Self));
+    if (H.Num() == 0)
+        C->throw_error("self array is empty");
+    H.RemoveValues(H.Num() - 1);
+}
+inline void SelfArrayErase(const char* Name, int64 Index, int64 Count, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* A = SelfContainer<FArrayProperty>(Self, Name, true, C);
+    FScriptArrayHelper H(A, A->ContainerPtrToValuePtr<void>(Self));
+    if (Index < 0 || Count < 0 || Index + Count > H.Num())
+        C->throw_error("self array index out of range");
+    if (Count > 0)
+        H.RemoveValues(int32(Index), int32(Count));
+}
+inline void SelfContainerClear(const char* Name, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* P = SelfContainer<FProperty>(Self, Name, true, C);
+    void* Memory = P->ContainerPtrToValuePtr<void>(Self);
+    if (auto* A = CastField<FArrayProperty>(P))
+        FScriptArrayHelper(A, Memory).EmptyValues();
+    else if (auto* M = CastField<FMapProperty>(P))
+        FScriptMapHelper(M, Memory).EmptyValues();
+    else if (auto* S = CastField<FSetProperty>(P))
+        FScriptSetHelper(S, Memory).EmptyElements();
+    else
+        C->throw_error("self property is not a container");
+}
+// A missing key reads as the default value: daScript adds it on a compound assignment, which then writes it.
+template <class KK, class VK> typename VK::Out SelfMapGet(const char* Name, typename KK::In Key, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* M = SelfContainer<FMapProperty>(Self, Name, false, C);
+    SelfContainerElement<KK>(M->KeyProp, C);
+    auto* V = SelfContainerElement<VK>(M->ValueProp, C);
+    const TDasKindNative<KK> NativeKey = KK::FromDas(Key, C);
+    FScriptMapHelper H(M, M->ContainerPtrToValuePtr<void>(Self));
+    if (const uint8* Found = H.FindValueFromHash(&NativeKey))
+        return VK::ToDas(V->GetPropertyValue(Found), C);
+    return VK::ToDas(TDasKindNative<VK>(), C);
+}
+template <class KK, class VK>
+void SelfMapSet(const char* Name, typename KK::In Key, typename VK::In Value, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* M = SelfContainer<FMapProperty>(Self, Name, true, C);
+    SelfContainerElement<KK>(M->KeyProp, C);
+    SelfContainerElement<VK>(M->ValueProp, C);
+    const TDasKindNative<KK> NativeKey = KK::FromDas(Key, C);
+    const TDasKindNative<VK> NativeValue = VK::FromDas(Value, C);
+    FScriptMapHelper H(M, M->ContainerPtrToValuePtr<void>(Self));
+    if (!H.FindValueFromHash(&NativeKey))
+        SelfContainerGrow(H.Num(), false, C);
+    H.AddPair(&NativeKey, &NativeValue);
+}
+template <class KK> bool SelfMapErase(const char* Name, typename KK::In Key, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* M = SelfContainer<FMapProperty>(Self, Name, true, C);
+    SelfContainerElement<KK>(M->KeyProp, C);
+    const TDasKindNative<KK> NativeKey = KK::FromDas(Key, C);
+    return FScriptMapHelper(M, M->ContainerPtrToValuePtr<void>(Self)).RemovePair(&NativeKey);
+}
+template <class KK> void SelfSetInsert(const char* Name, typename KK::In Key, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* S = SelfContainer<FSetProperty>(Self, Name, true, C);
+    SelfContainerElement<KK>(S->ElementProp, C);
+    const TDasKindNative<KK> NativeKey = KK::FromDas(Key, C);
+    FScriptSetHelper H(S, S->ContainerPtrToValuePtr<void>(Self));
+    if (H.FindElementIndexFromHash(&NativeKey) == INDEX_NONE)
+        SelfContainerGrow(H.Num(), false, C);
+    H.AddElement(&NativeKey);
+}
+template <class KK> bool SelfSetErase(const char* Name, typename KK::In Key, das::Context* C)
+{
+    UObject* Self = nullptr;
+    auto* S = SelfContainer<FSetProperty>(Self, Name, true, C);
+    SelfContainerElement<KK>(S->ElementProp, C);
+    const TDasKindNative<KK> NativeKey = KK::FromDas(Key, C);
+    return FScriptSetHelper(S, S->ContainerPtrToValuePtr<void>(Self)).RemoveElement(&NativeKey);
+}
+
 // Timer payloads: one scalar argument delivered to the handler.
 void ScriptTimerStartImpl(const char* Name, float Seconds, const char* Handler, bool Repeat, das::Context* C,
                           FDasScalarValue* Argument, bool NextTick);
@@ -480,6 +642,29 @@ struct FDasKindCallByte : FDasKindByteInt
     X(byte, FDasKindByte, FDasKindByteInt)                                                                             \
     X(text, FDasKindText, FDasKindText)
 
+// (daScript suffix, kind): scalar map keys and set elements with in-place self container access.
+#define DAS_CONTAINER_KEY_KINDS(X)                                                                                     \
+    X(int, FDasKindInt)                                                                                                \
+    X(string, FDasKindString)                                                                                          \
+    X(name, FDasKindName)                                                                                              \
+    X(byte, FDasKindByte)
+// ", Kind" per scalar kind, to list the kinds as template arguments.
+#define DAS_SCALAR_KIND_TYPE(Suffix, SelfKind, RefKind) , SelfKind
+
+// __ue_self_map_get/set_<key>_<value> for every scalar value kind.
+template <class KK, class... VK>
+void AddSelfMapAccessors(das::Module& Module, const das::ModuleLibrary& Library, const char* Key)
+{
+    (AddUEExtern<DAS_BIND_FUN((SelfMapGet<KK, VK>))>(
+         Module, Library, (das::string("__ue_self_map_get_") + Key + "_" + TCHAR_TO_UTF8(VK::Name)).c_str(),
+         das::SideEffects::modifyExternal, "SelfMapGet"),
+                 ...);
+    (AddUEExtern<DAS_BIND_FUN((SelfMapSet<KK, VK>))>(
+         Module, Library, (das::string("__ue_self_map_set_") + Key + "_" + TCHAR_TO_UTF8(VK::Name)).c_str(),
+         das::SideEffects::modifyExternal, "SelfMapSet"),
+                 ...);
+}
+
 // DSL lowering looks kinds up by declared type name ("int", "text", ...).
 // Suffix of a scalar kind with struct-leaf accessors, or nullptr.
 inline const char* DasScalarKindSuffix(const FString& Kind)
@@ -489,6 +674,16 @@ inline const char* DasScalarKindSuffix(const FString& Kind)
         return #Suffix;
     DAS_SCALAR_ACCESSOR_KINDS(DAS_SCALAR_KIND_SUFFIX)
 #undef DAS_SCALAR_KIND_SUFFIX
+    return nullptr;
+}
+// Suffix of a scalar map key / set element kind with in-place self container access, or nullptr.
+inline const char* DasContainerKeyKindSuffix(const FString& Kind)
+{
+#define DAS_CONTAINER_KEY_SUFFIX(Suffix, KeyKind)                                                                      \
+    if (Kind == TEXT(#Suffix))                                                                                         \
+        return #Suffix;
+    DAS_CONTAINER_KEY_KINDS(DAS_CONTAINER_KEY_SUFFIX)
+#undef DAS_CONTAINER_KEY_SUFFIX
     return nullptr;
 }
 // Suffix of any kind with self/authored/native accessors (scalars, enum, class), or nullptr.

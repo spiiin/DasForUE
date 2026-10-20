@@ -688,6 +688,7 @@ bool RunDasFoundationTests(FString& Report)
            TEXT("marshal_multiarg_constref_struct_unicode"), Marshalled.Error);
 #include "DasReflectedValueTests.inl"
 #include "DasSelfValueTests.inl"
+#include "DasSelfContainerTests.inl"
 #include "DasSnapshotValueTests.inl"
     {
         const int32 Before = First->MarshalledCalls;
@@ -2578,6 +2579,15 @@ bool RunDasFoundationTests(FString& Report)
             Invalid.Structs[0].Properties[0].Type.Key = Key;
             Expect(!Invalid.Validate(Issue), TEXT("scalar_map_IR_unsupported_key_refused"));
         }
+    }
+    {
+        // Every in-place self container shape and a snapshot fallback compile to typed helpers.
+        FDasAuthoringModule SelfContainers;
+        FString Issue;
+        const bool Compiled =
+            Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_self_containers.das")), SelfContainers, Issue);
+        Expect(Compiled && SelfContainers.Classes.Num() == 1 && SelfContainers.Classes[0].Methods.Num() == 3,
+               TEXT("self_container_operations_compile"), Issue);
     }
     {
         FDasAuthoringModule Containers, Roundtrip;

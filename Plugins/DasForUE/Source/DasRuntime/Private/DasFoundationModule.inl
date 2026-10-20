@@ -908,6 +908,34 @@ public:
                     ->needCallerStackFrame = true;
         DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_SELF_STRUCT_MEMBERS)
 #undef DAS_REGISTER_SELF_STRUCT_MEMBERS
+        // In-place self containers with scalar elements (DasScalarAccessors.inl).
+#define DAS_REGISTER_SELF_ARRAY(Suffix, SelfKind, RefKind)                                                             \
+    AddUEExtern<DAS_BIND_FUN(SelfArrayGet<SelfKind>)>(*this, Library, "__ue_self_array_get_" #Suffix,                  \
+                                                      das::SideEffects::modifyExternal, "SelfArrayGet");               \
+    AddUEExtern<DAS_BIND_FUN(SelfArraySet<SelfKind>)>(*this, Library, "__ue_self_array_set_" #Suffix,                  \
+                                                      das::SideEffects::modifyExternal, "SelfArraySet");               \
+    AddUEExtern<DAS_BIND_FUN(SelfArrayPush<SelfKind>)>(*this, Library, "__ue_self_array_push_" #Suffix,                \
+                                                       das::SideEffects::modifyExternal, "SelfArrayPush");             \
+    AddUEExtern<DAS_BIND_FUN(SelfArrayInsert<SelfKind>)>(*this, Library, "__ue_self_array_insert_" #Suffix,            \
+                                                         das::SideEffects::modifyExternal, "SelfArrayInsert");
+        DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_SELF_ARRAY)
+#undef DAS_REGISTER_SELF_ARRAY
+        AddUEExtern<DAS_BIND_FUN(SelfArrayPop)>(*this, Library, "__ue_self_array_pop", das::SideEffects::modifyExternal,
+                                                "SelfArrayPop");
+        AddUEExtern<DAS_BIND_FUN(SelfArrayErase)>(*this, Library, "__ue_self_array_erase",
+                                                  das::SideEffects::modifyExternal, "SelfArrayErase");
+        AddUEExtern<DAS_BIND_FUN(SelfContainerClear)>(*this, Library, "__ue_self_container_clear",
+                                                      das::SideEffects::modifyExternal, "SelfContainerClear");
+#define DAS_REGISTER_SELF_KEYS(Key, KeyKind)                                                                           \
+    AddUEExtern<DAS_BIND_FUN(SelfMapErase<KeyKind>)>(*this, Library, "__ue_self_map_erase_" #Key,                      \
+                                                     das::SideEffects::modifyExternal, "SelfMapErase");                \
+    AddUEExtern<DAS_BIND_FUN(SelfSetInsert<KeyKind>)>(*this, Library, "__ue_self_set_insert_" #Key,                    \
+                                                      das::SideEffects::modifyExternal, "SelfSetInsert");              \
+    AddUEExtern<DAS_BIND_FUN(SelfSetErase<KeyKind>)>(*this, Library, "__ue_self_set_erase_" #Key,                      \
+                                                     das::SideEffects::modifyExternal, "SelfSetErase");                \
+    AddSelfMapAccessors<KeyKind DAS_SCALAR_ACCESSOR_KINDS(DAS_SCALAR_KIND_TYPE)>(*this, Library, #Key);
+        DAS_CONTAINER_KEY_KINDS(DAS_REGISTER_SELF_KEYS)
+#undef DAS_REGISTER_SELF_KEYS
 #define DAS_REGISTER_CALL_SCALARS(ArgName, ResultName, Kind)                                                           \
     AddUEExtern<DAS_BIND_FUN(SetCallKind<Kind>)>(*this, Library, ArgName, das::SideEffects::modifyExternal,            \
                                                  "SetCallKind");                                                       \

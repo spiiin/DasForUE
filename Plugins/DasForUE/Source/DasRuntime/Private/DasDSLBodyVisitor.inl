@@ -691,6 +691,38 @@ struct FDSLBodyVisitor : das::Visitor
                 Current = static_cast<das::ExprField*>(Current)->value;
             }
     }
+    // Self containers of scalar kinds (array elements, map/set keys, map values) are changed in place by the
+    // __ue_self_array_* / __ue_self_map_* / __ue_self_set_* externs; other shapes keep snapshot helpers.
+    struct FInPlaceContainer
+    {
+        das::string Element, Key;
+        bool bArray = false, bSet = false;
+    };
+    static const char* InPlaceScalar(const das::TypeDeclPtr& T)
+    {
+        if (!T || DSLContainer(T) || DSLDirectStruct(T) || DSLDirectEnum(T) || !DSLMathPath(T).IsEmpty())
+            return nullptr;
+        return DasScalarKindSuffix(DSLTypeName(T));
+    }
+    static bool InPlaceContainer(const das::TypeDeclPtr& T, FInPlaceContainer& Out)
+    {
+        if (!DSLContainer(T))
+            return false;
+        Out = {};
+        Out.bArray = T->baseType == das::Type::tArray;
+        Out.bSet = DSLSet(T);
+        if (Out.bArray)
+        {
+            const char* Element = InPlaceScalar(T->firstType);
+            Out.Element = Element ? Element : "";
+            return Element != nullptr;
+        }
+        const char* Key = InPlaceScalar(T->firstType) ? DasContainerKeyKindSuffix(DSLTypeName(T->firstType)) : nullptr;
+        const char* Value = Out.bSet ? "" : InPlaceScalar(T->secondType);
+        Out.Key = Key ? Key : "";
+        Out.Element = Value ? Value : "";
+        return Key && Value;
+    }
     das::ExpressionPtr MutateIndexed(das::Expression* Original, das::Expression* Target, das::ExprOp2* Assignment,
                                      das::ExprCall* Operation)
     {
@@ -738,6 +770,42 @@ struct FDSLBodyVisitor : das::Visitor
                 return T;
             };
             Add("property", new das::TypeDecl(das::Type::tString, Original->at), nullptr);
+            FInPlaceContainer InPlace;
+            if (Assignment && Steps.size() == 1 && Steps[0]->rtti_isAt() && InPlaceContainer(RootType, InPlace) &&
+                !InPlace.bSet)
+            {
+                // self.Items[i] = v / self.Scores[key] += v on a scalar container: one element in place.
+                if (Assignment->__rtti == das::string("ExprMove"))
+                    DSLFail(TEXT("Indexed native writes use copy or clone, not consuming move"));
+                const auto At = Original->at;
+                Add("index_1", InPlace.bArray ? static_cast<das::TypeDeclPtr>(IndexType()) : RootType->firstType,
+                    static_cast<das::ExprAt*>(Steps[0])->index);
+                Add("value", InPlace.bArray ? RootType->firstType : RootType->secondType, Assignment->right);
+                auto Index = [&]() -> das::ExpressionPtr
+                {
+                    auto* I = new das::ExprVar(At, "index_1");
+                    return InPlace.bArray ? static_cast<das::ExpressionPtr>(DSLCall(At, "int64", {I})) : I;
+                };
+                auto Accessor = [&](const char* Verb)
+                {
+                    return InPlace.bArray
+                               ? "__ue_self_array_" + das::string(Verb) + "_" + InPlace.Element
+                               : "__ue_self_map_" + das::string(Verb) + "_" + InPlace.Key + "_" + InPlace.Element;
+                };
+                das::ExpressionPtr Value = new das::ExprVar(At, "value");
+                if (!Assignment->rtti_isCopy() && !Assignment->rtti_isClone())
+                    Value = new das::ExprOp2(At, Assignment->op.substr(0, Assignment->op.size() - 1),
+                                             DSLCall(At, Accessor("get"), {new das::ExprVar(At, "property"), Index()}),
+                                             Value);
+                Fn->result = new das::TypeDecl(das::Type::tVoid, At);
+                auto* Body = new das::ExprBlock();
+                Body->at = At;
+                Body->list.push_back(DSLCall(At, Accessor("set"), {new das::ExprVar(At, "property"), Index(), Value}));
+                Fn->body = Body;
+                if (!(Fn->isGeneric() ? Source->module->addGeneric(Fn, true) : Source->module->addFunction(Fn, true)))
+                    DSLFail(TEXT("Indexed mutation helper collision"));
+                return Call;
+            }
             das::ExpressionPtr Left = new das::ExprVar(Original->at, "snapshot");
             for (auto It = Steps.rbegin(); It != Steps.rend(); ++It)
             {
@@ -1639,7 +1707,10 @@ struct FDSLBodyVisitor : das::Visitor
                      : (Array ? (Count != 2 && Count != 3) : Count != 2)))
                 DSLFail(TEXT("Unsupported self container operation/arity"));
             const FString Carrier = Path.empty() ? PropertyPath(P) : DSLDirectPath(Type, Folder, Registry);
-            DSLEnsureStructHelpers(Type, Carrier, Group, Source->module, GeneratedHelpers, HelperPaths);
+            FInPlaceContainer InPlace;
+            const bool bInPlace = Path.empty() && InPlaceContainer(Type, InPlace);
+            if (!bInPlace)
+                DSLEnsureStructHelpers(Type, Carrier, Group, Source->module, GeneratedHelpers, HelperPaths);
             const das::string Name =
                 DSLUtf8(TEXT("__ue_container_op_")+
                              FMD5::HashAnsiString(*(DSLSourceValueKey(Type, Carrier) +
@@ -1675,6 +1746,42 @@ struct FDSLBodyVisitor : das::Visitor
                                     : Type->secondType);
                 auto* Body = new das::ExprBlock();
                 Body->at = E->at;
+                if (bInPlace)
+                {
+                    const auto At = E->at;
+                    auto Arg = [&](size_t I)
+                    {
+                        return new das::ExprVar(At, "arg_" + das::to_string(I));
+                    };
+                    auto Int64 = [&](das::ExpressionPtr X)
+                    {
+                        return DSLCall(At, "int64", {X});
+                    };
+                    auto* Property = new das::ExprVar(At, "property");
+                    const bool Insert = E->name == "insert" || E->name == "insert_clone";
+                    das::ExpressionPtr Op;
+                    if (E->name == "clear")
+                        Op = DSLCall(At, "__ue_self_container_clear", {Property});
+                    else if (Array && Push)
+                        Op = Count == 2 ? DSLCall(At, "__ue_self_array_push_" + InPlace.Element, {Property, Arg(1)})
+                                        : DSLCall(At, "__ue_self_array_insert_" + InPlace.Element,
+                                                  {Property, Arg(1), Int64(Arg(2))});
+                    else if (Array && E->name == "pop")
+                        Op = DSLCall(At, "__ue_self_array_pop", {Property});
+                    else if (Array)
+                        Op = DSLCall(At, "__ue_self_array_erase",
+                                     {Property, Int64(Arg(1)),
+                                      Count == 3 ? static_cast<das::ExpressionPtr>(Int64(Arg(2)))
+                                                 : static_cast<das::ExpressionPtr>(new das::ExprConstInt64(At, 1))});
+                    else if (Set)
+                        Op = DSLCall(At, (Insert ? "__ue_self_set_insert_" : "__ue_self_set_erase_") + InPlace.Key,
+                                     {Property, Arg(1)});
+                    else
+                        Op = Insert ? DSLCall(At, "__ue_self_map_set_" + InPlace.Key + "_" + InPlace.Element,
+                                              {Property, Arg(1), Arg(2)})
+                                    : DSLCall(At, "__ue_self_map_erase_" + InPlace.Key, {Property, Arg(1)});
+                    Body->list.push_back(Result ? static_cast<das::ExpressionPtr>(new das::ExprReturn(At, Op)) : Op);
+                }
                 auto Local = [&](const das::string& N, const das::TypeDeclPtr& T, das::ExpressionPtr Init, bool Move)
                 {
                     auto* V = new das::Variable();
@@ -1690,35 +1797,38 @@ struct FDSLBodyVisitor : das::Visitor
                     L->variables.push_back(V);
                     Body->list.push_back(L);
                 };
-                Local("container", Type,
-                      DSLDirectUnpack(
-                          E->at, Type,
-                          Path.empty()
-                              ? static_cast<das::ExpressionPtr>(
-                                    DSLCall(E->at, "ue_get_self_struct", {new das::ExprVar(E->at, "property")}))
-                              : static_cast<das::ExpressionPtr>(DSLCall(
-                                    E->at, "ue_struct_nested_get",
-                                    {DSLCall(E->at, "ue_get_self_struct", {new das::ExprVar(E->at, "property")}),
-                                     new das::ExprVar(E->at, "member"), new das::ExprConstInt(E->at, -1)})),
-                          Carrier),
-                      true);
-                auto* Op = DSLCall(E->at, E->name, {new das::ExprVar(E->at, "container")});
-                for (size_t I = 1; I < Count; ++I)
-                    Op->arguments.push_back(new das::ExprVar(E->at, "arg_" + das::to_string(I)));
-                if (Result)
-                    Local("result", Fn->result, Op, false);
-                else
-                    Body->list.push_back(Op);
-                Body->list.push_back(
-                    Path.empty()
-                        ? DSLCall(E->at, "ue_set_self_struct",
-                                  {new das::ExprVar(E->at, "property"),
-                                   DSLDirectPack(E->at, Type, new das::ExprVar(E->at, "container"), Carrier)})
-                        : DSLCall(E->at, "ue_dsl_commit_struct_member",
-                                  {new das::ExprVar(E->at, "property"), new das::ExprVar(E->at, "member"),
-                                   DSLDirectPack(E->at, Type, new das::ExprVar(E->at, "container"), Carrier)}));
-                if (Result)
-                    Body->list.push_back(new das::ExprReturn(E->at, new das::ExprVar(E->at, "result")));
+                if (!bInPlace)
+                {
+                    Local("container", Type,
+                          DSLDirectUnpack(
+                              E->at, Type,
+                              Path.empty()
+                                  ? static_cast<das::ExpressionPtr>(
+                                        DSLCall(E->at, "ue_get_self_struct", {new das::ExprVar(E->at, "property")}))
+                                  : static_cast<das::ExpressionPtr>(DSLCall(
+                                        E->at, "ue_struct_nested_get",
+                                        {DSLCall(E->at, "ue_get_self_struct", {new das::ExprVar(E->at, "property")}),
+                                         new das::ExprVar(E->at, "member"), new das::ExprConstInt(E->at, -1)})),
+                              Carrier),
+                          true);
+                    auto* Op = DSLCall(E->at, E->name, {new das::ExprVar(E->at, "container")});
+                    for (size_t I = 1; I < Count; ++I)
+                        Op->arguments.push_back(new das::ExprVar(E->at, "arg_" + das::to_string(I)));
+                    if (Result)
+                        Local("result", Fn->result, Op, false);
+                    else
+                        Body->list.push_back(Op);
+                    Body->list.push_back(
+                        Path.empty()
+                            ? DSLCall(E->at, "ue_set_self_struct",
+                                      {new das::ExprVar(E->at, "property"),
+                                       DSLDirectPack(E->at, Type, new das::ExprVar(E->at, "container"), Carrier)})
+                            : DSLCall(E->at, "ue_dsl_commit_struct_member",
+                                      {new das::ExprVar(E->at, "property"), new das::ExprVar(E->at, "member"),
+                                       DSLDirectPack(E->at, Type, new das::ExprVar(E->at, "container"), Carrier)}));
+                    if (Result)
+                        Body->list.push_back(new das::ExprReturn(E->at, new das::ExprVar(E->at, "result")));
+                }
                 Fn->body = Body;
                 if (!Source->module->addFunction(Fn, true))
                     DSLFail(TEXT("Self container operation helper collision"));
