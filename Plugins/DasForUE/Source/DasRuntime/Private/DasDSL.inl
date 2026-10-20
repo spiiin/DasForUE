@@ -848,6 +848,7 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
 #include "DasWidgetLayoutsDSL.inl"
 #include "DasWidgetLayoutUsesDSL.inl"
 #include "DasDSLBodyVisitor.inl"
+#include "DasDSLInlineCallbacks.inl"
 #include "DasDSLMemberAnnotations.inl"
 #include "DasDSLClassAnnotation.inl"
 #include "DasDSLInterfaceAnnotation.inl"

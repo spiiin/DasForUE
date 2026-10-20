@@ -573,7 +573,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                               ParentLifecycle, Session->bBeginDelivered && DSLPhysicsOwnerReady(Owner), CandidateError);
         if (CandidateError.IsEmpty() && Candidate->Context && Candidate->Program && !Candidate->Program->failed())
         {
-            ClearSessionTimers(*Session);
+            ClearSessionTimers(*Session, Candidate->Context.Get());
             Session->Bindings.Empty();
             Session->InputContexts.Empty(); // Revoke old IDs before destroying any old VM state.
             Candidate->Context->Self = Self;

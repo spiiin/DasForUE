@@ -168,6 +168,7 @@ THIRD_PARTY_INCLUDES_START
 #include "daScript/daScript.h"
 #include "daScript/ast/ast_handle.h"
 #include "daScript/ast/ast_visitor.h"
+#include "daScript/ast/ast_generate.h"
 #include "daScript/simulate/data_walker.h"
 THIRD_PARTY_INCLUDES_END
 #pragma pack(pop)

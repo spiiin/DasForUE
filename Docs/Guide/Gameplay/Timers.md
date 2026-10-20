@@ -86,8 +86,8 @@ A callback error cancels that timer, logs the error, and updates the Actor/Compo
 
 - Timers require a persistent owner session and its live game world. Standalone `RunFile` and global initializers cannot create timers; starting timers during EndPlay or event binding is refused.
 - EndPlay, owner/session release, Destroy, world cleanup, shutdown and editor reinstancing cancel timers. Structural reinstancing cancels them even if contexts are preserved; schedules are not migrated. In EndPlay, rely on automatic cancellation rather than querying the session.
-- **Accepted** logic reload cancels existing timers and their captures; a callback tick that discovers new code may invoke the new handler once. **Rejected** reload keeps the old VM and timers.
-- `BeginPlay` is not replayed after reload. Provide an explicit method (for example `Start` or `ResumeBrain`) to recreate timers.
+- **Accepted** logic reload cancels named-method timers and their captures; a callback tick that discovers new code may invoke the new handler once. Inline `$` callback timers with an unchanged generated identity and a verified signature keep their native schedule, pause state and payload, and dispatch through the new VM. This includes multi-value payloads. **Rejected** reload keeps the old VM and timers.
+- `BeginPlay` is not replayed after reload. Provide an explicit method (for example `Start` or `ResumeBrain`) to recreate named-method timers. Changing an inline block changes its generated identity and requires Apply/reimport; structural reinstancing still cancels its timer.
 
 ## Latent delay
 

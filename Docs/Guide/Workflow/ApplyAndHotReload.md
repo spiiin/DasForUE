@@ -150,7 +150,8 @@ background file watcher: the update happens on the next call.
 | Ordinary daScript globals | Kept between calls of one version; re-initialized on reload |
 | BeginPlay / Initialize delivery | Remembered; not replayed |
 | Declared delegate/event subscriptions | Old subscriptions removed, the new version's set installed |
-| Timers | Cancelled; start them again from an explicit setup method |
+| Named-method timers | Cancelled; start them again from an explicit setup method |
+| Inline `$` callback timers | Unchanged generated identity and verified signature: native schedule, pause state and payload kept; handler runs in the new VM |
 | Latent actions and async loads | Cancelled; restart them explicitly (e.g. a `StartLoad` method) |
 | Input bindings and mapping contexts | Old bindings revoked; the last successfully installed configuration is restored against the new handlers on a following world tick |
 | Widget handlers, replies, paint/drag/animation tokens | Old context released; tokens from it are invalid |
