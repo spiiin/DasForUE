@@ -269,6 +269,30 @@ void SetSelfStructMember(const char* Property, const char* Member, typename K::I
     WritePropertyScalarValue(P, F.Memory, Native, C);
 }
 
+// Timer payloads: one scalar argument delivered to the handler.
+void ScriptTimerStartImpl(const char* Name, float Seconds, const char* Handler, bool Repeat, das::Context* C,
+                          FDasScalarValue* Argument, bool NextTick);
+template <class K> FDasScalarValue DasTimerPayload(typename K::In Value, das::Context* C)
+{
+    using FSlot = TPropertyScalarSlot<typename K::Property>;
+    FDasScalarValue V;
+    V.Kind = int32(FSlot::Kind);
+    V.*FSlot::Member = K::FromDas(Value, C);
+    return V;
+}
+template <class K>
+void ScriptTimerStartKind(const char* N, float Seconds, const char* H, bool Repeat, typename K::In Value,
+                          das::Context* C)
+{
+    auto V = DasTimerPayload<K>(Value, C);
+    ScriptTimerStartImpl(N, Seconds, H, Repeat, C, &V, false);
+}
+template <class K> void ScriptTimerNextTickKind(const char* N, const char* H, typename K::In Value, das::Context* C)
+{
+    auto V = DasTimerPayload<K>(Value, C);
+    ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
+}
+
 // Reflected call frames: named arguments and results.
 template <class K> void SetCallKind(const FDasCallHandle& H, const char* Path, typename K::In V, das::Context* C)
 {

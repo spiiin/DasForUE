@@ -470,79 +470,6 @@ void ScriptTimerNextTickEnum(const char* N, const char* H, FDasEnumValue Value, 
     V.ObjectClass = E.Type->GetPathName();
     ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
 }
-void ScriptTimerStartByte(const char* N, float Seconds, const char* H, bool Repeat, uint8 Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 17;
-    V.ByteValue = Value;
-    ScriptTimerStartImpl(N, Seconds, H, Repeat, C, &V);
-}
-void ScriptTimerNextTickByte(const char* N, const char* H, uint8 Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 17;
-    V.ByteValue = Value;
-    ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
-}
-void ScriptTimerStartText(const char* N, float Seconds, const char* H, bool Repeat, FDasTextValue Value,
-                          das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 18;
-    V.TextValue = ResolveDSLText(Value, C);
-    ScriptTimerStartImpl(N, Seconds, H, Repeat, C, &V);
-}
-void ScriptTimerNextTickText(const char* N, const char* H, FDasTextValue Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 18;
-    V.TextValue = ResolveDSLText(Value, C);
-    ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
-}
-void ScriptTimerStartInt(const char* N, float Seconds, const char* H, bool Repeat, int32 Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 0;
-    V.IntValue = Value;
-    ScriptTimerStartImpl(N, Seconds, H, Repeat, C, &V);
-}
-void ScriptTimerStartFloat(const char* N, float Seconds, const char* H, bool Repeat, float Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 1;
-    V.FloatValue = Value;
-    ScriptTimerStartImpl(N, Seconds, H, Repeat, C, &V);
-}
-void ScriptTimerStartBool(const char* N, float Seconds, const char* H, bool Repeat, bool Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 2;
-    V.BoolValue = Value;
-    ScriptTimerStartImpl(N, Seconds, H, Repeat, C, &V);
-}
-void ScriptTimerStartDouble(const char* N, float Seconds, const char* H, bool Repeat, double Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 6;
-    V.DoubleValue = Value;
-    ScriptTimerStartImpl(N, Seconds, H, Repeat, C, &V);
-}
-void ScriptTimerStartString(const char* N, float Seconds, const char* H, bool Repeat, const char* Value,
-                            das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 5;
-    V.StringValue = Value ? UTF8_TO_TCHAR(Value) : TEXT("");
-    ScriptTimerStartImpl(N, Seconds, H, Repeat, C, &V);
-}
-void ScriptTimerStartName(const char* N, float Seconds, const char* H, bool Repeat, FDasNameValue Value,
-                          das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 7;
-    V.NameValue = ResolveDSLName(Value, C);
-    ScriptTimerStartImpl(N, Seconds, H, Repeat, C, &V);
-}
 void ScriptTimerStartVector(const char* N, float Seconds, const char* H, bool Repeat, const FVector& Value,
                             das::Context* C)
 {
@@ -577,48 +504,6 @@ void ScriptTimerNextTickArray(const char* N, const char* H, const FDasStructValu
     V.Kind = 12;
     V.StructValue = ResolveStructValue(Value, C);
     V.ObjectClass = V.StructValue.GetScriptStruct()->GetPathName();
-    ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
-}
-void ScriptTimerNextTickInt(const char* N, const char* H, int32 Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 0;
-    V.IntValue = Value;
-    ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
-}
-void ScriptTimerNextTickFloat(const char* N, const char* H, float Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 1;
-    V.FloatValue = Value;
-    ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
-}
-void ScriptTimerNextTickBool(const char* N, const char* H, bool Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 2;
-    V.BoolValue = Value;
-    ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
-}
-void ScriptTimerNextTickDouble(const char* N, const char* H, double Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 6;
-    V.DoubleValue = Value;
-    ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
-}
-void ScriptTimerNextTickString(const char* N, const char* H, const char* Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 5;
-    V.StringValue = Value ? UTF8_TO_TCHAR(Value) : TEXT("");
-    ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
-}
-void ScriptTimerNextTickName(const char* N, const char* H, FDasNameValue Value, das::Context* C)
-{
-    FDasScalarValue V;
-    V.Kind = 7;
-    V.NameValue = ResolveDSLName(Value, C);
     ScriptTimerStartImpl(N, 0.f, H, false, C, &V, true);
 }
 void ScriptTimerNextTickVector(const char* N, const char* H, const FVector& Value, das::Context* C)

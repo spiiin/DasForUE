@@ -70,6 +70,30 @@ whole-module preflight; it installs the module only with `-Publish`.
 
 See also: [Roadmap](Plans/Roadmap.md), [validation records](Validation/).
 
+## Writing test scripts
+
+`Scripts/DasTest.psm1` holds the shared steps; a test script is a short list of them:
+
+```powershell
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+$Das = Get-DasContext -Engine $Engine
+Invoke-DasBuild $Das -Name 'My feature'
+Invoke-DasCommandlet $Das -Run DasFrame -Name 'my-feature-Create' -Marker 'DAS_MY_RESULT=PASS' -Arguments @('-Phase=Create')
+Invoke-DasAutomation $Das -Test 'DasForUE.DSL.MyPIE' -Name 'my-feature-pie' -Marker 'DAS_MY_PIE_RESULT=PASS'
+```
+
+| Function | Does |
+| --- | --- |
+| `Get-DasContext` | Repository, logs, smoke project and editor/packaged executable paths |
+| `Invoke-DasBuild` | Builds the editor target |
+| `Invoke-DasCommandlet` | Runs `UnrealEditor-Cmd -run=...`, checks the exit code, PASS marker and optional failure pattern; log in `logs/<Name>.log` |
+| `Invoke-DasAssetPhases` | Runs Create/Reopen/... phases of an asset probe with one probe id and returns the id |
+| `Invoke-DasAutomation` | Runs Automation tests and requires exactly `-Count` successes without warnings |
+| `Invoke-DasPackaged` | Runs the packaged smoke game with a map/switch and checks its marker |
+
+Every helper throws on failure. `TestEditor.ps1`, the native/computed defaults tests and the
+`*Asset.ps1` / `*PIE.ps1` scripts use it.
+
 ## Formatting
 
 C++ sources follow `.clang-format` (4 spaces, Allman braces, 120 columns).

@@ -663,26 +663,21 @@ public:
                                                         das::SideEffects::modifyExternal, "ScriptTimerStartEnum");
         AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickEnum)>(*this, Library, "ue_timer_next_tick",
                                                            das::SideEffects::modifyExternal, "ScriptTimerNextTickEnum");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerStartByte)>(*this, Library, "ue_timer_start",
-                                                        das::SideEffects::modifyExternal, "ScriptTimerStartByte");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickByte)>(*this, Library, "ue_timer_next_tick",
-                                                           das::SideEffects::modifyExternal, "ScriptTimerNextTickByte");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerStartText)>(*this, Library, "ue_timer_start",
-                                                        das::SideEffects::modifyExternal, "ScriptTimerStartText");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickText)>(*this, Library, "ue_timer_next_tick",
-                                                           das::SideEffects::modifyExternal, "ScriptTimerNextTickText");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerStartInt)>(*this, Library, "ue_timer_start",
-                                                       das::SideEffects::modifyExternal, "ScriptTimerStartInt");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerStartFloat)>(*this, Library, "ue_timer_start",
-                                                         das::SideEffects::modifyExternal, "ScriptTimerStartFloat");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerStartBool)>(*this, Library, "ue_timer_start",
-                                                        das::SideEffects::modifyExternal, "ScriptTimerStartBool");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerStartDouble)>(*this, Library, "ue_timer_start",
-                                                          das::SideEffects::modifyExternal, "ScriptTimerStartDouble");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerStartString)>(*this, Library, "ue_timer_start",
-                                                          das::SideEffects::modifyExternal, "ScriptTimerStartString");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerStartName)>(*this, Library, "ue_timer_start",
-                                                        das::SideEffects::modifyExternal, "ScriptTimerStartName");
+        // Scalar timer payloads (DasScalarAccessors.inl).
+#define DAS_REGISTER_TIMER_SCALARS(Kind)                                                                               \
+    AddUEExtern<DAS_BIND_FUN(ScriptTimerStartKind<Kind>)>(*this, Library, "ue_timer_start",                            \
+                                                          das::SideEffects::modifyExternal, "ScriptTimerStartKind");   \
+    AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickKind<Kind>)>(                                                          \
+        *this, Library, "ue_timer_next_tick", das::SideEffects::modifyExternal, "ScriptTimerNextTickKind");
+        DAS_REGISTER_TIMER_SCALARS(FDasKindInt)
+        DAS_REGISTER_TIMER_SCALARS(FDasKindFloat)
+        DAS_REGISTER_TIMER_SCALARS(FDasKindBool)
+        DAS_REGISTER_TIMER_SCALARS(FDasKindDouble)
+        DAS_REGISTER_TIMER_SCALARS(FDasKindString)
+        DAS_REGISTER_TIMER_SCALARS(FDasKindName)
+        DAS_REGISTER_TIMER_SCALARS(FDasKindByte)
+        DAS_REGISTER_TIMER_SCALARS(FDasKindText)
+#undef DAS_REGISTER_TIMER_SCALARS
         AddUEExtern<DAS_BIND_FUN(ScriptTimerStartVector)>(*this, Library, "ue_timer_start",
                                                           das::SideEffects::modifyExternal, "ScriptTimerStartVector");
         AddUEExtern<DAS_BIND_FUN(ScriptTimerStartRotator)>(*this, Library, "ue_timer_start",
@@ -699,18 +694,6 @@ public:
                                                       das::SideEffects::modifyExternal, "ScriptTimerElapsed");
         AddUEExtern<DAS_BIND_FUN(ScriptTimerCancelAll)>(*this, Library, "ue_timer_cancel_all",
                                                         das::SideEffects::modifyExternal, "ScriptTimerCancelAll");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickInt)>(*this, Library, "ue_timer_next_tick",
-                                                          das::SideEffects::modifyExternal, "ScriptTimerNextTickInt");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickFloat)>(
-            *this, Library, "ue_timer_next_tick", das::SideEffects::modifyExternal, "ScriptTimerNextTickFloat");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickBool)>(*this, Library, "ue_timer_next_tick",
-                                                           das::SideEffects::modifyExternal, "ScriptTimerNextTickBool");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickDouble)>(
-            *this, Library, "ue_timer_next_tick", das::SideEffects::modifyExternal, "ScriptTimerNextTickDouble");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickString)>(
-            *this, Library, "ue_timer_next_tick", das::SideEffects::modifyExternal, "ScriptTimerNextTickString");
-        AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickName)>(*this, Library, "ue_timer_next_tick",
-                                                           das::SideEffects::modifyExternal, "ScriptTimerNextTickName");
         AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickVector)>(
             *this, Library, "ue_timer_next_tick", das::SideEffects::modifyExternal, "ScriptTimerNextTickVector");
         AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickRotator)>(

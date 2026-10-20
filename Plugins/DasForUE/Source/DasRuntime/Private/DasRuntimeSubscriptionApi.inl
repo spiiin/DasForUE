@@ -323,17 +323,6 @@ void ScriptTimerStartObject(const char*, float, const char*, bool, const FDasObj
 void ScriptTimerNextTickObject(const char*, const char*, const FDasObjectHandle&, const char*, das::Context*);
 void ScriptTimerStartEnum(const char*, float, const char*, bool, FDasEnumValue, das::Context*);
 void ScriptTimerNextTickEnum(const char*, const char*, FDasEnumValue, das::Context*);
-void ScriptTimerStartByte(const char* N, float Seconds, const char* H, bool Repeat, uint8 Value, das::Context* C);
-void ScriptTimerNextTickByte(const char* N, const char* H, uint8 Value, das::Context* C);
-void ScriptTimerStartText(const char* N, float Seconds, const char* H, bool Repeat, FDasTextValue Value,
-                          das::Context* C);
-void ScriptTimerNextTickText(const char* N, const char* H, FDasTextValue Value, das::Context* C);
-void ScriptTimerStartInt(const char*, float, const char*, bool, int32, das::Context*);
-void ScriptTimerStartFloat(const char*, float, const char*, bool, float, das::Context*);
-void ScriptTimerStartBool(const char*, float, const char*, bool, bool, das::Context*);
-void ScriptTimerStartDouble(const char*, float, const char*, bool, double, das::Context*);
-void ScriptTimerStartString(const char*, float, const char*, bool, const char*, das::Context*);
-void ScriptTimerStartName(const char*, float, const char*, bool, FDasNameValue, das::Context*);
 void ScriptTimerStartVector(const char*, float, const char*, bool, const FVector&, das::Context*);
 void ScriptTimerStartRotator(const char*, float, const char*, bool, const FRotator&, das::Context*);
 void ScriptTimerStartTransform(const char*, float, const char*, bool, const FTransform&, das::Context*);
@@ -342,12 +331,6 @@ void ScriptTimerNextTickArray(const char*, const char*, const FDasStructValue&, 
 bool ScriptTimerPaused(const char*, das::Context*);
 float ScriptTimerElapsed(const char*, das::Context*);
 int32 ScriptTimerCancelAll(das::Context*);
-void ScriptTimerNextTickInt(const char*, const char*, int32, das::Context*);
-void ScriptTimerNextTickFloat(const char*, const char*, float, das::Context*);
-void ScriptTimerNextTickBool(const char*, const char*, bool, das::Context*);
-void ScriptTimerNextTickDouble(const char*, const char*, double, das::Context*);
-void ScriptTimerNextTickString(const char*, const char*, const char*, das::Context*);
-void ScriptTimerNextTickName(const char*, const char*, FDasNameValue, das::Context*);
 void ScriptTimerNextTickVector(const char*, const char*, const FVector&, das::Context*);
 void ScriptTimerNextTickRotator(const char*, const char*, const FRotator&, das::Context*);
 void ScriptTimerNextTickTransform(const char*, const char*, const FTransform&, das::Context*);
