@@ -79,7 +79,7 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                 D.Kind = DSLTypeName(T);
                 if (DSLContainer(T))
                     return DSLContainerType(T, Folder, Registry);
-                if (D.Kind == TEXT("object"))
+                if (D.GetKind() == EDasTypeKind::Object)
                 {
                     D.TypePath = DSLConstraint(
                         Constraints,
@@ -88,7 +88,7 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                     if (D.TypePath.IsEmpty())
                         D.TypePath = TEXT("/Script/CoreUObject.Object");
                 }
-                else if (D.Kind == TEXT("class"))
+                else if (D.GetKind() == EDasTypeKind::Class)
                 {
                     D.TypePath = DSLConstraint(
                         Constraints, Prefix + TEXT("class"), EDSLTypeKind::Class,
@@ -96,7 +96,7 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                     if (D.TypePath.IsEmpty())
                         DSLFail(TEXT("Interface class requires UEClass<T> or an explicit base constraint"));
                 }
-                else if (D.Kind == TEXT("enum"))
+                else if (D.GetKind() == EDasTypeKind::Enum)
                 {
                     D.TypePath = DSLConstraint(
                         Constraints, Prefix + TEXT("enum"), EDSLTypeKind::Enum,
@@ -105,7 +105,7 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                     if (D.TypePath.IsEmpty())
                         DSLFail(TEXT("Interface enum requires an explicit type constraint"));
                 }
-                else if (D.Kind == TEXT("struct"))
+                else if (D.GetKind() == EDasTypeKind::Struct)
                 {
                     const FString Inferred = DSLDirectStruct(T) ? DSLDirectPath(T, Folder, Registry)
                                              : T->annotation && T->annotation->name != "UEStructValue" ? DSLMathPath(T)
@@ -115,23 +115,11 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                     if (D.TypePath.IsEmpty())
                         DSLFail(TEXT("Interface snapshot requires an explicit struct constraint"));
                 }
-                else if (D.Kind != TEXT("byte") &&
-                                        D.Kind !=
-                                            TEXT("text") &&
-                                                 D.Kind !=
-                                                     TEXT("int") &&
-                                                          D.Kind !=
-                                                              TEXT("float") &&
-                                                                   D.Kind !=
-                                                                       TEXT("double") &&
-                                                                            D.Kind !=
-                                                                                TEXT("bool") &&
-                                                                                     D.Kind !=
-                                                                                         TEXT("string") &&
-                                                                                              D.Kind !=
-                                                                                                  TEXT("name") &&
-                                                                                                       D.Kind !=
-                                                                                                           TEXT("void"))
+                else if (D.GetKind() != EDasTypeKind::Byte && D.GetKind() != EDasTypeKind::Text &&
+                         D.GetKind() != EDasTypeKind::Int && D.GetKind() != EDasTypeKind::Float &&
+                         D.GetKind() != EDasTypeKind::Double && D.GetKind() != EDasTypeKind::Bool &&
+                         D.GetKind() != EDasTypeKind::String && D.GetKind() != EDasTypeKind::Name &&
+                         D.GetKind() != EDasTypeKind::Void)
                     DSLFail(TEXT("Unsupported authored interface signature type"));
                 return D;
             };
@@ -289,7 +277,7 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                     P.Name = DSLText(Names[I]);
                     P.Id = M.Id + TEXT(".")+ P.Name;
                     P.Type = Type(T, Constraints, TEXT("arg_")+ P.Name + TEXT("_"));
-                    if (!T || P.Type.Kind == TEXT("void") || (T->ref && T->constant))
+                    if (!T || P.Type.GetKind() == EDasTypeKind::Void || (T->ref && T->constant))
                         DSLFail(TEXT("Interface parameters require value or var mutable reference types"));
                     const FString Key = M.Name + TEXT(".")+ P.Name;
                     const bool LegacyOut = LegacyOuts.Contains(Key);
@@ -318,7 +306,7 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                     DSLFail(TEXT("Unknown interface out/ref parameter name"));
                 if (M.Parameters.Num() > 16)
                     DSLFail(TEXT("Interface parameter count exceeds 16"));
-                bool Output = M.ReturnType.Kind != TEXT("void");
+                bool Output = M.ReturnType.GetKind() != EDasTypeKind::Void;
                 for (const auto& P : M.Parameters)
                     Output |= P.Direction != TEXT("in");
                 C.Methods.Add(M);
@@ -332,7 +320,7 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                         DSLCall(Function->at, "panic",
                                 {new das::ExprConstString(Function->at,
                                                           "ue_interface declaration stub cannot be called directly")}));
-                    if (M.ReturnType.Kind != TEXT("void"))
+                    if (M.ReturnType.GetKind() != EDasTypeKind::Void)
                     {
                         auto* Default = new das::ExprMakeStruct(Function->at);
                         Default->makeType = DSLCopyType(Return);

@@ -650,7 +650,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                         P.Default.Kind = TEXT("string");
                         P.Default.String = DSLText(static_cast<das::ExprConstString*>(F.init)->text);
                     }
-                    else if (P.Type.Kind == TEXT("name") && F.init->rtti_isCall())
+                    else if (P.Type.GetKind() == EDasTypeKind::Name && F.init->rtti_isCall())
                     {
                         auto* Call = static_cast<das::ExprCall*>(F.init);
                         if (Call->name != "ue_name_value" || Call->arguments.size() != 1 ||
@@ -1266,7 +1266,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     {
                         const auto T = F->arguments[I]->type;
                         const auto D = DSLCallbackField(T, TypeFolder, TypeRegistry);
-                        if (D.Kind == TEXT("struct"))
+                        if (D.GetKind() == EDasTypeKind::Struct)
                             DSLEnsureStructHelpers(T, D.TypePath, Group, St->module, HelpersGenerated, Helpers);
                     }
                 }
@@ -1278,7 +1278,8 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     Callback.ParameterKind = Parameter.IsEmpty() ? TEXT("void"): Parameter;
                     if (!FindDasCallbackType(Callback.ParameterKind))
                         DSLFail(TEXT("Unsupported event callback payload"));
-                    if (Callback.ParameterKind == TEXT("enum") || Callback.ParameterKind == TEXT("struct"))
+                    if (DasTypeKind(Callback.ParameterKind) == EDasTypeKind::Enum ||
+                        DasTypeKind(Callback.ParameterKind) == EDasTypeKind::Struct)
                     {
                         const auto T = F->arguments[1]->type;
                         if (!DSLDirectEnum(T) && !DSLDirectStruct(T) && !DSLContainer(T))

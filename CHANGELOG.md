@@ -46,6 +46,9 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Internal
 
+- One value kind table (`DasValueKinds.h`) maps kind names, actor field kinds and method signatures;
+  DSL lowering compares `EDasTypeKind` values instead of kind strings
+  ([Improvement plan](Docs/Dev/Plans/ImprovementPlan.md), phase 1).
 - C++ sources are clang-formatted; `DasRuntime.cpp` and `DasDSL.inl` are split into subsystem parts;
   scalar, enum and class accessor families are generated from one kind table; foundation tests guard the script-visible
   extern surface with `Bindings/FoundationExterns.txt`; test scripts share `Scripts/DasTest.psm1`

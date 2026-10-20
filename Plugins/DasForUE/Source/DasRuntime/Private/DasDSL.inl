@@ -152,19 +152,19 @@ das::ExpressionPtr DSLParameterDefaultExpression(const FDasDeclaredParameter& P,
 {
     if (P.Default.Kind.IsEmpty())
         return nullptr;
-    if (P.Type.Kind == TEXT("text"))
+    if (P.Type.GetKind() == EDasTypeKind::Text)
         return DSLTextDefaultExpression(P.Default, At);
-    if (P.Type.Kind == TEXT("byte"))
+    if (P.Type.GetKind() == EDasTypeKind::Byte)
         return new das::ExprConstUInt8(At, uint8(P.Default.Number));
-    if (P.Type.Kind == TEXT("int"))
+    if (P.Type.GetKind() == EDasTypeKind::Int)
         return new das::ExprConstInt(At, int32(P.Default.Number));
-    if (P.Type.Kind == TEXT("float"))
+    if (P.Type.GetKind() == EDasTypeKind::Float)
         return new das::ExprConstFloat(At, float(P.Default.Number));
-    if (P.Type.Kind == TEXT("double"))
+    if (P.Type.GetKind() == EDasTypeKind::Double)
         return new das::ExprConstDouble(At, P.Default.Number);
-    if (P.Type.Kind == TEXT("bool"))
+    if (P.Type.GetKind() == EDasTypeKind::Bool)
         return new das::ExprConstBool(At, P.Default.Boolean);
-    if (P.Type.Kind == TEXT("string"))
+    if (P.Type.GetKind() == EDasTypeKind::String)
         return new das::ExprConstString(At, DSLUtf8(P.Default.String));
     DSLFail(TEXT("Unsupported parameter default type"));
     return nullptr;
@@ -460,16 +460,17 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
     First->Kind = DSLTypeName(T->firstType);
     if (DSLObjectKey(T->firstType))
     {
-        if (D.Kind != TEXT("set") && D.Kind != TEXT("map"))
+        if (D.GetKind() != EDasTypeKind::Set && D.GetKind() != EDasTypeKind::Map)
             DSLFail(TEXT("Object keys are only supported as map keys or set elements"));
         const auto* Key = DSLKeyAnnotation(T->firstType);
         First->Kind = TEXT("object");
         First->TypePath = Key->ClassPath;
         First->AuthoredId = Key->AuthoredId;
     }
-    else if ((D.Kind == TEXT("set") || D.Kind == TEXT("map")) && First->Kind == TEXT("object"))
+    else if ((D.GetKind() == EDasTypeKind::Set || D.GetKind() == EDasTypeKind::Map) &&
+             First->GetKind() == EDasTypeKind::Object)
         DSLFail(TEXT("Use UEObjectKey<Reference> for UObject table keys"));
-    if (D.Kind == TEXT("array") && DSLTypedReference(T->firstType))
+    if (D.GetKind() == EDasTypeKind::Array && DSLTypedReference(T->firstType))
     {
         if (DSLAuthoredView(T->firstType))
             First->AuthoredId = DSLReferenceDeclaration(T->firstType).Id;
@@ -477,9 +478,10 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
         if (!First->TypePath.StartsWith(TEXT("/Script/")))
             DSLFail(TEXT("Reference arrays require native object/interface types"));
     }
-    if ((D.Kind == TEXT("array") || D.Kind == TEXT("set") || D.Kind == TEXT("map")) && DSLDirectEnum(T->firstType))
+    if ((D.GetKind() == EDasTypeKind::Array || D.GetKind() == EDasTypeKind::Set || D.GetKind() == EDasTypeKind::Map) &&
+        DSLDirectEnum(T->firstType))
         First->TypePath = DSLDirectPath(T->firstType, Folder, Registry);
-    if (D.Kind == TEXT("array") && First->Kind == TEXT("struct"))
+    if (D.GetKind() == EDasTypeKind::Array && First->GetKind() == EDasTypeKind::Struct)
     {
         if (DSLGameplay(T->firstType))
             First->TypePath = DSLGameplayPath(T->firstType);
@@ -496,7 +498,7 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
             First->TypePath = DSLDirectPath(T->firstType, Folder, Registry);
         }
     }
-    if (D.Kind == TEXT("map"))
+    if (D.GetKind() == EDasTypeKind::Map)
     {
         D.Key = First;
         auto Value = MakeShared<FDasDeclaredType>();
@@ -511,7 +513,7 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
             if (!Value->TypePath.StartsWith(TEXT("/Script/")))
                 DSLFail(TEXT("Reference maps require native object/interface hosts"));
         }
-        if (Value->Kind == TEXT("struct"))
+        if (Value->GetKind() == EDasTypeKind::Struct)
         {
             if (DSLGameplay(T->secondType))
                 Value->TypePath = DSLGameplayPath(T->secondType);
@@ -574,9 +576,10 @@ struct FUESourceValueBinding : das::FunctionAnnotation
                 Source = Function->arguments[0]->type;
             }
             if (DSLNativeEnum(Source) ||
-                (Kind == TEXT("enum")? !DSLDirectEnum(Source)
-                                     : Kind == TEXT("struct")? !DSLDirectStruct(Source) : true) ||
-                              Registry.IsEmpty())
+                (DasTypeKind(Kind) == EDasTypeKind::Enum     ? !DSLDirectEnum(Source)
+                 : DasTypeKind(Kind) == EDasTypeKind::Struct ? !DSLDirectStruct(Source)
+                                                             : true) ||
+                Registry.IsEmpty())
                 DSLFail(TEXT("Source value binding type/kind mismatch"));
             const auto* A = DSLDirectEnum(Source) ? DSLAnnotation(Source->enumType->annotations, "ue_enum")
                                                   : DSLAnnotation(Source->structType->annotations, "ue_struct");
@@ -585,7 +588,8 @@ struct FUESourceValueBinding : das::FunctionAnnotation
             FString Issue;
             if (!Wire || !FDasReflectedTypes::FromJson(DSLText(Wire->sValue), Declared, Issue, true))
                 DSLFail(TEXT("Source binding has no declaration identity"));
-            const FString ActualId = Kind == TEXT("enum")? Declared.Enums[0].Id : Declared.Structs[0].Id;
+            const FString ActualId =
+                DasTypeKind(Kind) == EDasTypeKind::Enum ? Declared.Enums[0].Id : Declared.Structs[0].Id;
             if (ActualId != Id || DSLDirectPath(Source, FString(), Registry) != Path)
                 DSLFail(TEXT("Source value binding identity/layout mismatch"));
             return true;
@@ -771,28 +775,23 @@ FDasDeclaredProperty DSLNativeSelfProperty(const FDasDeclaredClass& C, const das
         D.Type.Kind = TEXT("map");
         D.Type.Key = NativeValue(Map->KeyProp);
         D.Type.Value = NativeValue(Map->ValueProp);
-        if ((D.Type.Key->Kind !=
-             TEXT("int") && D.Type.Key->Kind != TEXT("string") &&
-                                                     D.Type.Key->Kind != TEXT("name") &&
-                                                                              D.Type.Key->Kind !=
-                                                                                  TEXT("enum") && D.Type.Key->Kind !=
-                                                                                                      TEXT("object")) ||
-                                                                                  D.Type.Value->Kind.IsEmpty())
+        if ((D.Type.Key->GetKind() != EDasTypeKind::Int && D.Type.Key->GetKind() != EDasTypeKind::String &&
+             D.Type.Key->GetKind() != EDasTypeKind::Name && D.Type.Key->GetKind() != EDasTypeKind::Enum &&
+             D.Type.Key->GetKind() != EDasTypeKind::Object) ||
+            D.Type.Value->Kind.IsEmpty())
             DSLFail(TEXT("Native maps require int/string/name/enum/object keys and supported values"));
     }
     if (auto* Set = CastField<FSetProperty>(P))
     {
         D.Type.Kind = TEXT("set");
         D.Type.Element = NativeValue(Set->ElementProp);
-        if (D.Type.Element->Kind !=
-            TEXT("int") && D.Type.Element->Kind != TEXT("string") &&
-                                                        D.Type.Element->Kind !=
-                                                            TEXT("name") && D.Type.Element->Kind !=
-                                                                                TEXT("enum") && D.Type.Element->Kind !=
-                                                                                                    TEXT("object"))
+        if (D.Type.Element->GetKind() != EDasTypeKind::Int && D.Type.Element->GetKind() != EDasTypeKind::String &&
+            D.Type.Element->GetKind() != EDasTypeKind::Name && D.Type.Element->GetKind() != EDasTypeKind::Enum &&
+            D.Type.Element->GetKind() != EDasTypeKind::Object)
             DSLFail(TEXT("Native sets require int/string/name/enum/object elements"));
     }
-    if (D.Type.Kind == TEXT("array") || D.Type.Kind == TEXT("map") || D.Type.Kind == TEXT("set"))
+    if (D.Type.GetKind() == EDasTypeKind::Array || D.Type.GetKind() == EDasTypeKind::Map ||
+        D.Type.GetKind() == EDasTypeKind::Set)
     {
         auto* Carrier = DasContainerCarrierForProperty(P);
         auto* Values = Carrier ? Carrier->FindPropertyByName(TEXT("Values")) : nullptr;
@@ -1005,7 +1004,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             }
                             continue;
                         }
-                        if (P.Type.Kind == TEXT("delegate"))
+                        if (P.Type.GetKind() == EDasTypeKind::Delegate)
                         {
                             auto* D = CastField<FDelegateProperty>(Actual);
                             FDasAuthoringModule Definition;
@@ -1027,7 +1026,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             }
                             continue;
                         }
-                        if (P.Type.Kind == TEXT("event"))
+                        if (P.Type.GetKind() == EDasTypeKind::Event)
                         {
                             auto* Event = CastField<FMulticastDelegateProperty>(Actual);
                             FDasAuthoringModule Definition;
@@ -1077,7 +1076,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             OK = false;
                             return;
                         }
-                        if (P.Type.Kind == TEXT("class"))
+                        if (P.Type.GetKind() == EDasTypeKind::Class)
                         {
                             auto* Class = CastField<FClassProperty>(Actual);
                             if (!Class || !Class->MetaClass || Class->MetaClass->GetPathName() != P.Type.TypePath ||
@@ -1092,7 +1091,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             }
                             continue;
                         }
-                        if (P.Type.Kind == TEXT("enum"))
+                        if (P.Type.GetKind() == EDasTypeKind::Enum)
                         {
                             auto* Type = ResolveDasEnum(P.Type.TypePath, Error);
                             if (!Type || DasEnumPropertyType(Actual) != Type ||
@@ -1106,7 +1105,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             }
                             continue;
                         }
-                        if (P.Type.Kind == TEXT("object"))
+                        if (P.Type.GetKind() == EDasTypeKind::Object)
                         {
                             auto* ReferenceClass = DasReferencePropertyClass(Actual);
                             if (ReferenceClass->GetPathName() != P.Type.TypePath ||
@@ -1123,7 +1122,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             }
                             continue;
                         }
-                        if (P.Type.Kind == TEXT("struct"))
+                        if (P.Type.GetKind() == EDasTypeKind::Struct)
                         {
                             auto* Struct = CastField<FStructProperty>(Actual);
                             FInstancedStruct Default;
@@ -1141,7 +1140,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             }
                             continue;
                         }
-                        if (P.Type.Kind == TEXT("byte"))
+                        if (P.Type.GetKind() == EDasTypeKind::Byte)
                         {
                             if (CheckCDODefault &&
                                 CastFieldChecked<FByteProperty>(Actual)->GetPropertyValue_InContainer(DeclaringCDO) !=
@@ -1153,7 +1152,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             }
                             continue;
                         }
-                        if (P.Type.Kind == TEXT("text"))
+                        if (P.Type.GetKind() == EDasTypeKind::Text)
                         {
                             FText Expected;
                             if (!ParseDasTextDefault(P.Default.String, Expected, Error) ||
@@ -1172,33 +1171,23 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                         {
                             UObject* CDO = DeclaringCDO;
                             const bool DefaultMatches =
-                                P.Type.Kind ==
-                                TEXT("int")
+                                P.Type.GetKind() == EDasTypeKind::Int
                                     ? CastField<FIntProperty>(Actual)->GetPropertyValue_InContainer(CDO) ==
                                           static_cast<int32>(P.Default.Number)
-                                    : P.Type.Kind ==
-                                          TEXT("float")
-                                              ? CastField<FFloatProperty>(Actual)->GetPropertyValue_InContainer(CDO) ==
-                                                    static_cast<float>(P.Default.Number)
-                                              : P.Type.Kind ==
-                                                    TEXT("bool")
-                                                         ? CastField<FBoolProperty>(Actual)
-                                                                   ->GetPropertyValue_InContainer(CDO) ==
-                                                               P.Default.Boolean
-                                                         : P.Type.Kind ==
-                                                               TEXT("double")
-                                                                    ? CastField<FDoubleProperty>(Actual)
-                                                                              ->GetPropertyValue_InContainer(CDO) ==
-                                                                          P.Default.Number
-                                                                    : P.Type.Kind ==
-                                                                          TEXT("string")
-                                                                               ? CastField<FStrProperty>(Actual)
-                                                                                         ->GetPropertyValue_InContainer(
-                                                                                             CDO) == P.Default.String
-                                                                               : CastField<FNameProperty>(Actual)
-                                                                                         ->GetPropertyValue_InContainer(
-                                                                                             CDO) ==
-                                                                                     FName(*P.Default.String);
+                                : P.Type.GetKind() == EDasTypeKind::Float
+                                    ? CastField<FFloatProperty>(Actual)->GetPropertyValue_InContainer(CDO) ==
+                                          static_cast<float>(P.Default.Number)
+                                : P.Type.GetKind() == EDasTypeKind::Bool
+                                    ? CastField<FBoolProperty>(Actual)->GetPropertyValue_InContainer(CDO) ==
+                                          P.Default.Boolean
+                                : P.Type.GetKind() == EDasTypeKind::Double
+                                    ? CastField<FDoubleProperty>(Actual)->GetPropertyValue_InContainer(CDO) ==
+                                          P.Default.Number
+                                : P.Type.GetKind() == EDasTypeKind::String
+                                    ? CastField<FStrProperty>(Actual)->GetPropertyValue_InContainer(CDO) ==
+                                          P.Default.String
+                                    : CastField<FNameProperty>(Actual)->GetPropertyValue_InContainer(CDO) ==
+                                          FName(*P.Default.String);
                             if (!DefaultMatches)
                             {
                                 Error = TEXT("DSL default differs from owner; apply/reimport Blueprint: ")+ P.Name;
@@ -1224,7 +1213,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             UFunction* Method = Self->FindFunction(*M.Name);
                             auto Matches = [](FProperty* P, const FDasDeclaredType& T)
                             {
-                                if (T.Kind == TEXT("delegate"))
+                                if (T.GetKind() == EDasTypeKind::Delegate)
                                 {
                                     FString Error;
                                     TStrongObjectPtr<UFunction> Sig(
@@ -1237,10 +1226,10 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                                     return P && Carrier->FindPropertyByName(TEXT("Values"))->SameType(P);
                                 return DSLPropertyMatches(P, T.Kind);
                             };
-                            bool Fits =
-                                Method && Method->HasAnyFunctionFlags(FUNC_BlueprintPure) == M.bPure &&
-                                Method->HasAnyFunctionFlags(FUNC_Const) == M.bConst &&
-                                Method->NumParms == M.Parameters.Num() + (M.ReturnType.Kind == TEXT("void")? 0 : 1);
+                            bool Fits = Method && Method->HasAnyFunctionFlags(FUNC_BlueprintPure) == M.bPure &&
+                                        Method->HasAnyFunctionFlags(FUNC_Const) == M.bConst &&
+                                        Method->NumParms ==
+                                            M.Parameters.Num() + (M.ReturnType.GetKind() == EDasTypeKind::Void ? 0 : 1);
                             bool Directed = false;
                             for (const auto& P : M.Parameters)
                                 Directed |= P.Direction != TEXT("in");
@@ -1260,48 +1249,49 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                                 for (const auto& P : M.Parameters)
                                 {
                                     auto* Actual = Method->FindPropertyByName(*P.Name);
-                                    Fits &=
-                                        Matches(Actual, P.Type) &&
-                                        (P.Direction ==
-                                         TEXT("out")
-                                              ? Actual->HasAnyPropertyFlags(CPF_OutParm) &&
-                                                    !Actual->HasAnyPropertyFlags(CPF_ReferenceParm)
-                                              : P.Direction ==
-                                                    TEXT("inout")
-                                                         ? Actual->HasAllPropertyFlags(CPF_OutParm | CPF_ReferenceParm)
-                                                         : (Actual->HasAnyPropertyFlags(CPF_ConstParm) ||
-                                                            P.Type.Kind == TEXT("array") ||
-                                                                                !Actual->HasAnyPropertyFlags(
-                                                                                    CPF_OutParm | CPF_ReferenceParm)));
-                                    if (Fits && P.Type.Kind == TEXT("enum"))
+                                    Fits &= Matches(Actual, P.Type) &&
+                                            (P.Direction ==
+                                             TEXT("out")
+                                                  ? Actual->HasAnyPropertyFlags(CPF_OutParm) &&
+                                                        !Actual->HasAnyPropertyFlags(CPF_ReferenceParm)
+                                                  : P.Direction == TEXT("inout")
+                                                                        ? Actual->HasAllPropertyFlags(CPF_OutParm |
+                                                                                                      CPF_ReferenceParm)
+                                                                        : (Actual->HasAnyPropertyFlags(CPF_ConstParm) ||
+                                                                           P.Type.GetKind() == EDasTypeKind::Array ||
+                                                                           !Actual->HasAnyPropertyFlags(
+                                                                               CPF_OutParm | CPF_ReferenceParm)));
+                                    if (Fits && P.Type.GetKind() == EDasTypeKind::Enum)
                                         Fits = DasEnumPropertyType(Actual)->GetPathName() == P.Type.TypePath;
-                                    if (Fits && P.Type.Kind == TEXT("struct") && !DasContainerCarrier(P.Type))
+                                    if (Fits && P.Type.GetKind() == EDasTypeKind::Struct &&
+                                        !DasContainerCarrier(P.Type))
                                     {
                                         auto* NativeStruct = CastField<FStructProperty>(Actual);
                                         Fits = NativeStruct && NativeStruct->Struct->GetPathName() == P.Type.TypePath;
                                     }
-                                    if (Fits && P.Type.Kind == TEXT("class"))
+                                    if (Fits && P.Type.GetKind() == EDasTypeKind::Class)
                                         Fits = CastFieldChecked<FClassProperty>(Actual)->MetaClass->GetPathName() ==
                                                P.Type.TypePath;
-                                    if (Fits && P.Type.Kind == TEXT("object"))
+                                    if (Fits && P.Type.GetKind() == EDasTypeKind::Object)
                                         Fits = DasReferencePropertyClass(Actual)->GetPathName() == P.Type.TypePath;
                                 }
                             if (Fits)
-                                Fits = M.ReturnType.Kind == TEXT("void")
-                                                                 ? !Method->GetReturnProperty()
-                                                                 : Matches(Method->GetReturnProperty(), M.ReturnType);
-                            if (Fits && M.ReturnType.Kind == TEXT("enum"))
+                                Fits = M.ReturnType.GetKind() == EDasTypeKind::Void
+                                           ? !Method->GetReturnProperty()
+                                           : Matches(Method->GetReturnProperty(), M.ReturnType);
+                            if (Fits && M.ReturnType.GetKind() == EDasTypeKind::Enum)
                                 Fits = DasEnumPropertyType(Method->GetReturnProperty())->GetPathName() ==
                                        M.ReturnType.TypePath;
-                            if (Fits && M.ReturnType.Kind == TEXT("struct") && !DasContainerCarrier(M.ReturnType))
+                            if (Fits && M.ReturnType.GetKind() == EDasTypeKind::Struct &&
+                                !DasContainerCarrier(M.ReturnType))
                             {
                                 auto* NativeStruct = CastField<FStructProperty>(Method->GetReturnProperty());
                                 Fits = NativeStruct && NativeStruct->Struct->GetPathName() == M.ReturnType.TypePath;
                             }
-                            if (Fits && M.ReturnType.Kind == TEXT("class"))
+                            if (Fits && M.ReturnType.GetKind() == EDasTypeKind::Class)
                                 Fits = CastFieldChecked<FClassProperty>(Method->GetReturnProperty())
                                            ->MetaClass->GetPathName() == M.ReturnType.TypePath;
-                            if (Fits && M.ReturnType.Kind == TEXT("object"))
+                            if (Fits && M.ReturnType.GetKind() == EDasTypeKind::Object)
                                 Fits = DasReferencePropertyClass(Method->GetReturnProperty())->GetPathName() ==
                                        M.ReturnType.TypePath;
                             if (!Fits)

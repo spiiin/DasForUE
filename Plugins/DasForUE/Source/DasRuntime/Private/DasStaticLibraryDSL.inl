@@ -86,9 +86,9 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                     if (DSLDirectStruct(T) || DSLMathPath(T) == TEXT("/Script/CoreUObject.Vector2D"))
                         DSLEnsureStructHelpers(T, D.TypePath, Group, St->module, HelpersGenerated, Helpers);
                 }
-                else if (D.Kind == TEXT("object") || D.Kind == TEXT("class"))
+                else if (D.GetKind() == EDasTypeKind::Object || D.GetKind() == EDasTypeKind::Class)
                     D.TypePath = TEXT("/Script/CoreUObject.Object");
-                else if (D.Kind == TEXT("struct") || D.Kind == TEXT("enum"))
+                else if (D.GetKind() == EDasTypeKind::Struct || D.GetKind() == EDasTypeKind::Enum)
                     DSLFail(TEXT("Use a typed struct/enum instead of an untyped value token"));
                 return D;
             };
@@ -155,7 +155,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                     P.Id = M.Id + TEXT(".")+ P.Name;
                     P.Type = DeclaredType(Arg->type);
                     P.Direction = DSLParameterDirection(Arg, FString());
-                    if (P.Type.Kind == TEXT("void"))
+                    if (P.Type.GetKind() == EDasTypeKind::Void)
                         DSLFail(TEXT("Void static parameter"));
                     P.Default = DSLParameterDefault(Arg->init);
                     if (DSLDelegate(Arg->type) && P.Direction != TEXT("in"))
@@ -181,10 +181,10 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                 {
                     const auto* W =
                         M.Parameters.FindByPredicate([&](const auto& P) { return P.Name == M.WorldContext; });
-                    if (!W || W->Type.Kind != TEXT("object") ||
-                                                   W->Direction != TEXT("in") ||
-                                                                        FindObject<UClass>(nullptr, *W->Type.TypePath)
-                                                                            ->HasAnyClassFlags(CLASS_Interface))
+                    if (!W || W->Type.GetKind() != EDasTypeKind::Object ||
+                        W->Direction !=
+                            TEXT("in") ||
+                                 FindObject<UClass>(nullptr, *W->Type.TypePath)->HasAnyClassFlags(CLASS_Interface))
                         DSLFail(TEXT("WorldContext must name an input UObject reference"));
                 }
                 FDSLTypeCallVisitor TypeCalls(TypeScope);
@@ -207,7 +207,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                 auto* Inner = new das::ExprCall(F->at, Impl->name);
                 for (const auto& Arg : F->arguments)
                     Inner->arguments.push_back(new das::ExprVar(F->at, Arg->name));
-                if (M.ReturnType.Kind != TEXT("void"))
+                if (M.ReturnType.GetKind() != EDasTypeKind::Void)
                 {
                     auto* V = new das::Variable();
                     V->at = F->at;
@@ -227,7 +227,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                 Closure->at = F->at;
                 Closure->isClosure = true;
                 Closure->returnType = new das::TypeDecl(das::Type::tVoid, F->at);
-                if (M.ReturnType.Kind == TEXT("void"))
+                if (M.ReturnType.GetKind() == EDasTypeKind::Void)
                     Closure->list.push_back(Inner);
                 else
                     Closure->list.push_back(DSLContainer(F->result)
@@ -248,7 +248,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                 SourceBody->list.push_back(DSLCall(F->at, "__ue_library_scope",
                                                    {World, new das::ExprConstBool(F->at, !M.WorldContext.IsEmpty()),
                                                     new das::ExprMakeBlock(F->at, Closure)}));
-                if (M.ReturnType.Kind != TEXT("void"))
+                if (M.ReturnType.GetKind() != EDasTypeKind::Void)
                 {
                     auto* Ret = new das::ExprReturn(F->at, new das::ExprVar(F->at, "__ue_scoped_result"));
                     Ret->moveSemantics = DSLContainer(F->result);
@@ -314,7 +314,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                 das::ExpressionPtr ReturnValue = Call;
                 if (Outputs)
                 {
-                    if (M.ReturnType.Kind == TEXT("void"))
+                    if (M.ReturnType.GetKind() == EDasTypeKind::Void)
                     {
                         Block->list.push_back(Call);
                         ReturnValue = nullptr;
@@ -372,10 +372,10 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                                                               : M.ReturnType.TypePath);
                 }
                 if (ReturnValue)
-                    Block->list.push_back(M.ReturnType.Kind == TEXT("void")
-                                                                    ? ReturnValue
-                                                                    : static_cast<das::ExpressionPtr>(
-                                                                          new das::ExprReturn(F->at, ReturnValue)));
+                    Block->list.push_back(
+                        M.ReturnType.GetKind() == EDasTypeKind::Void
+                            ? ReturnValue
+                            : static_cast<das::ExpressionPtr>(new das::ExprReturn(F->at, ReturnValue)));
                 Wrapper->body = Block;
                 Generated.push_back(Wrapper);
                 C.Methods.Add(MoveTemp(M));

@@ -32,25 +32,25 @@ FDasDeclaredType DSLCallbackField(const das::TypeDeclPtr& T, const FString& Fold
         D.Kind = TEXT("struct");
         D.TypePath = DSLDirectPath(T, Folder, Registry);
     }
-    else if (D.Kind == TEXT("struct"))
+    else if (D.GetKind() == EDasTypeKind::Struct)
     {
         if (!DSLDirectStruct(T) && DSLMathPath(T).IsEmpty())
             DSLFail(TEXT("Callback structs require registered concrete types"));
         D.TypePath = DSLDirectPath(T, Folder, Registry);
     }
-    else if (D.Kind == TEXT("enum"))
+    else if (D.GetKind() == EDasTypeKind::Enum)
     {
         if (!DSLDirectEnum(T))
             DSLFail(TEXT("Callback enums require concrete types"));
         D.TypePath = DSLDirectPath(T, Folder, Registry);
     }
-    else if (D.Kind == TEXT("class"))
+    else if (D.GetKind() == EDasTypeKind::Class)
     {
         if (!DSLTypedClass(T))
             DSLFail(TEXT("Callback classes require UEClass<T>"));
         D.TypePath = DSLTypedClassPath(T);
     }
-    else if (D.Kind == TEXT("object"))
+    else if (D.GetKind() == EDasTypeKind::Object)
     {
         if (!DSLTypedReference(T))
             DSLFail(TEXT("Callback objects require typed wrappers"));
@@ -88,20 +88,21 @@ das::ExpressionPtr DSLCallbackFieldGet(const das::LineInfo& At, const das::TypeD
     {
         return new das::ExprConstString(At, DSLUtf8(FString::Printf(TEXT("arg_%d"), Index)));
     };
-    if (D.Kind == TEXT("struct"))
+    if (D.GetKind() == EDasTypeKind::Struct)
         return DSLDirectUnpack(
             At, T, DSLCall(At, "ue_struct_nested_get", {Value(), Name(), new das::ExprConstInt(At, -1)}), D.TypePath);
-    if (D.Kind == TEXT("enum"))
+    if (D.GetKind() == EDasTypeKind::Enum)
         return DSLDirectUnpack(At, T,
                                DSLCall(At, "__ue_struct_get_enum_value",
                                        {Value(), Name(), new das::ExprConstString(At, DSLUtf8(D.TypePath))}),
                                D.TypePath);
-    if (D.Kind == TEXT("class"))
+    if (D.GetKind() == EDasTypeKind::Class)
         return DSLClassUnpack(At, T, DSLCall(At, "__ue_struct_get_class", {Value(), Name()}));
-    if (D.Kind == TEXT("object"))
+    if (D.GetKind() == EDasTypeKind::Object)
         return DSLDirectUnpack(At, T, DSLCall(At, "ue_struct_get_object", {Value(), Name()}), D.TypePath);
     auto* Get = DSLCall(At, das::string("ue_struct_get_") + DSLScalarSuffix(D.Kind), {Value(), Name()});
-    return D.Kind == TEXT("byte")? DSLDirectUnpack(At, T, Get, FString()) : static_cast<das::ExpressionPtr>(Get);
+    return D.GetKind() == EDasTypeKind::Byte ? DSLDirectUnpack(At, T, Get, FString())
+                                             : static_cast<das::ExpressionPtr>(Get);
 }
 void DSLCallbackUnpackArguments(const das::FunctionPtr& Clone, const FString& Folder, const FString& Registry,
                                 das::ModuleGroup& Group, das::Module* Module)
@@ -163,7 +164,7 @@ das::ExpressionPtr DSLMultiTimer(das::ExprCall* E, const das::StructurePtr& Sour
     {
         const auto T = Method->arguments[I]->type;
         const auto D = DSLCallbackField(T, Folder, Registry);
-        if (D.Kind == TEXT("struct"))
+        if (D.GetKind() == EDasTypeKind::Struct)
             DSLEnsureStructHelpers(T, D.TypePath, Group, Source->module, Generated, Helpers);
     }
     const das::string Key = DSLUtf8(FMD5::HashAnsiString(*(Decl.Id + TEXT(".")+ Name + Path))),
@@ -245,15 +246,14 @@ das::ExpressionPtr DSLMultiTimer(das::ExprCall* E, const das::StructurePtr& Sour
             const das::string Arg = "capture_" + das::to_string(I);
             AddArg(Fn, Arg, T);
             das::ExpressionPtr Value = new das::ExprVar(E->at, Arg);
-            if (D.Kind == TEXT("byte") || D.Kind == TEXT("struct") ||
-                                                         D.Kind == TEXT("enum") ||
-                                                                        D.Kind == TEXT("class") ||
-                                                                                       D.Kind == TEXT("object"))
+            if (D.GetKind() == EDasTypeKind::Byte || D.GetKind() == EDasTypeKind::Struct ||
+                D.GetKind() == EDasTypeKind::Enum || D.GetKind() == EDasTypeKind::Class ||
+                D.GetKind() == EDasTypeKind::Object)
                 Value = DSLDirectPack(E->at, T, Value, D.TypePath);
-            const das::string Prefix =
-                (D.Kind == TEXT("struct") || D.Kind == TEXT("enum") || D.Kind == TEXT("name") || D.Kind == TEXT("text"))
-                                                                           ? "__ue_method_arg_"
-                                                                           : "ue_arg_";
+            const das::string Prefix = (D.GetKind() == EDasTypeKind::Struct || D.GetKind() == EDasTypeKind::Enum ||
+                                        D.GetKind() == EDasTypeKind::Name || D.GetKind() == EDasTypeKind::Text)
+                                           ? "__ue_method_arg_"
+                                           : "ue_arg_";
             Body->list.push_back(DSLCall(E->at, Prefix + DSLUtf8(D.Kind),
                                          {new das::ExprVar(E->at, Frame->name),
                                           new das::ExprConstString(E->at, "arg_" + das::to_string(I - 1)), Value}));

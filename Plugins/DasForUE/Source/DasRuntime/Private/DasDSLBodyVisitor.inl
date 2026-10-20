@@ -6,9 +6,9 @@ das::string DSLSelfAccessor(const char* Prefix, const FDasDeclaredType& Type)
 {
     if (const char* Suffix = DasAccessorKindSuffix(Type.Kind))
         return das::string(Prefix) + Suffix;
-    if (Type.Kind == TEXT("struct") || DasContainerCarrier(Type))
+    if (Type.GetKind() == EDasTypeKind::Struct || DasContainerCarrier(Type))
         return das::string(Prefix) + "struct";
-    if (Type.Kind == TEXT("object"))
+    if (Type.GetKind() == EDasTypeKind::Object)
         return das::string(Prefix) + "object";
     return das::string(Prefix) + "name";
 }
@@ -203,7 +203,7 @@ struct FDSLBodyVisitor : das::Visitor
     {
         if (const auto* Field = Source->findField(F->name))
             return Field->type;
-        if (P->Type.Kind == TEXT("map") || P->Type.Kind == TEXT("set"))
+        if (P->Type.GetKind() == EDasTypeKind::Map || P->Type.GetKind() == EDasTypeKind::Set)
         {
             auto* Type = new das::TypeDecl(das::Type::tTable, F->at);
             auto Convert = [&](const auto& Value)
@@ -213,16 +213,17 @@ struct FDSLBodyVisitor : das::Visitor
                 auto Result = SelfPropertyType(F, &Child);
                 return Result ? Result : DSLPropertyType(Value->Kind, Group, Source->module, F->at);
             };
-            Type->firstType = Convert(P->Type.Kind == TEXT("map")? P->Type.Key : P->Type.Element);
-            if ((P->Type.Kind == TEXT("map")? P->Type.Key : P->Type.Element)->Kind == TEXT("object"))
+            Type->firstType = Convert(P->Type.GetKind() == EDasTypeKind::Map ? P->Type.Key : P->Type.Element);
+            if ((P->Type.GetKind() == EDasTypeKind::Map ? P->Type.Key : P->Type.Element)->GetKind() ==
+                EDasTypeKind::Object)
                 Type->firstType = DSLMakeObjectKeyType(Type->firstType, Group, Source->module, F->at);
-            Type->secondType =
-                P->Type.Kind == TEXT("map")? Convert(P->Type.Value)
-                                           : static_cast<das::TypeDeclPtr>(new das::TypeDecl(das::Type::tVoid, F->at));
+            Type->secondType = P->Type.GetKind() == EDasTypeKind::Map
+                                   ? Convert(P->Type.Value)
+                                   : static_cast<das::TypeDeclPtr>(new das::TypeDecl(das::Type::tVoid, F->at));
             DSLEnsureStructHelpers(Type, PropertyPath(P), Group, Source->module, GeneratedHelpers, HelperPaths);
             return Type;
         }
-        if (P->Type.Kind == TEXT("array"))
+        if (P->Type.GetKind() == EDasTypeKind::Array)
         {
             auto* Type = new das::TypeDecl(das::Type::tArray, F->at);
             FDasDeclaredProperty Element;
@@ -233,7 +234,7 @@ struct FDSLBodyVisitor : das::Visitor
             DSLEnsureStructHelpers(Type, PropertyPath(P), Group, Source->module, GeneratedHelpers, HelperPaths);
             return Type;
         }
-        if (P->Type.Kind == TEXT("struct"))
+        if (P->Type.GetKind() == EDasTypeKind::Struct)
             return DSLHandleType(Group, Source->module,
                                  P->Type.TypePath ==
                                      TEXT("/Script/CoreUObject.Vector")
@@ -248,7 +249,7 @@ struct FDSLBodyVisitor : das::Visitor
                                                                       TEXT("/Script/CoreUObject.Transform")
                                                                            ? "UETransform"
                                                                            : "UEStructValue");
-        if (P->Type.Kind == TEXT("enum"))
+        if (P->Type.GetKind() == EDasTypeKind::Enum)
         {
             das::EnumerationPtr Match = nullptr;
             TSet<das::Module*> Seen;
@@ -279,7 +280,7 @@ struct FDSLBodyVisitor : das::Visitor
             Type->enumType = Match;
             return Type;
         }
-        if (P->Type.Kind != TEXT("object") && P->Type.Kind != TEXT("class"))
+        if (P->Type.GetKind() != EDasTypeKind::Object && P->Type.GetKind() != EDasTypeKind::Class)
             return nullptr;
         das::StructurePtr Match = nullptr;
         TSet<das::Module*> Seen;
@@ -293,8 +294,8 @@ struct FDSLBodyVisitor : das::Visitor
                 {
                     if (S->privateStructure && Module != Source->module)
                         return;
-                    const auto* A = DSLAnnotation(S->annotations,
-                                                  P->Type.Kind == TEXT("class")? "ue_class_ref" : "ue_native_object");
+                    const auto* A = DSLAnnotation(
+                        S->annotations, P->Type.GetKind() == EDasTypeKind::Class ? "ue_class_ref" : "ue_native_object");
                     if (!A || DSLString(A->arguments, "path") != P->Type.TypePath)
                         return;
                     if (Match && Match != S)
@@ -327,7 +328,8 @@ struct FDSLBodyVisitor : das::Visitor
     FString PropertyPath(const FDasDeclaredProperty* P)
     {
         if (!Source->findField(DSLUtf8(P->Name)) &&
-            (P->Type.Kind == TEXT("array") || P->Type.Kind == TEXT("map") || P->Type.Kind == TEXT("set")))
+            (P->Type.GetKind() == EDasTypeKind::Array || P->Type.GetKind() == EDasTypeKind::Map ||
+             P->Type.GetKind() == EDasTypeKind::Set))
         {
             auto* Carrier = DasContainerCarrierForProperty(DSLNativeSelfField(Decl, DSLUtf8(P->Name)));
             if (!Carrier)
@@ -359,12 +361,12 @@ struct FDSLBodyVisitor : das::Visitor
             return DSLDirectUnpack(F->at, SelfPropertyType(F, P),
                                    DSLCall(F->at, "__ue_actor_owner", {DSLCall(F->at, "ue_self_object", {})}),
                                    P->Type.TypePath);
-        if (P->Type.Kind == TEXT("delegate"))
+        if (P->Type.GetKind() == EDasTypeKind::Delegate)
         {
             const auto* Field = Source->findField(F->name);
             return DSLDelegateFieldRead(F->at, Field->type, DSLCall(F->at, "ue_self_object", {}), P->Name);
         }
-        if (P->Type.Kind == TEXT("event"))
+        if (P->Type.GetKind() == EDasTypeKind::Event)
         {
             const auto* Field = Source->findField(F->name);
             return DSLDelegateView(F->at, Field->type, DSLCall(F->at, "ue_self_object", {}), P->Name);
@@ -382,7 +384,7 @@ struct FDSLBodyVisitor : das::Visitor
         const auto* P = Property(F);
         if (!P)
             return E;
-        if (P->Type.Kind == TEXT("delegate"))
+        if (P->Type.GetKind() == EDasTypeKind::Delegate)
         {
             if (P->bReadOnly)
             {
@@ -397,7 +399,7 @@ struct FDSLBodyVisitor : das::Visitor
             const auto* Field = Source->findField(F->name);
             return DSLDelegateFieldWrite(E->at, Field->type, DSLCall(E->at, "ue_self_object", {}), P->Name, E->right);
         }
-        if (P->Type.Kind == TEXT("event"))
+        if (P->Type.GetKind() == EDasTypeKind::Event)
         {
             Error = TEXT("Event updates require += or -= with self.Method");
             return E;
@@ -463,7 +465,8 @@ struct FDSLBodyVisitor : das::Visitor
             return DSLCall(E->at, Name, {new das::ExprConstString(E->at, DSLUtf8(P->Name)), Value});
         }
         const auto Type = SelfPropertyType(F, P);
-        if (!Field && Compound && (P->Type.Kind == TEXT("object") || P->Type.Kind == TEXT("class")))
+        if (!Field && Compound &&
+            (P->Type.GetKind() == EDasTypeKind::Object || P->Type.GetKind() == EDasTypeKind::Class))
             DSLFail(TEXT("Native reference fields support assignment only"));
         // Keep a nominal parameter boundary before DSLDirectPack extracts
         // .handle. Native field assignment must not become an implicit cast.

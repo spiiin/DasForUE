@@ -268,7 +268,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                 }
                 if (DSLAuthoredView(F.type))
                     DSLFail(TEXT("Authored reference struct fields require a separate ownership adapter"));
-                if (P.Type.Kind == TEXT("object"))
+                if (P.Type.GetKind() == EDasTypeKind::Object)
                 {
                     if (!DSLTypedReference(F.type) || F.init)
                         DSLFail(TEXT("Struct object fields require typed native wrappers and implicit null defaults"));
@@ -477,11 +477,11 @@ struct FUEStructAnnotation : das::StructureAnnotation
                 }
                 if (!Marked || !F.type || F.type->ref)
                     DSLFail(TEXT("Struct fields require ue_property and by-value scalar type"));
-                if (P.Type.Kind == TEXT("text"))
+                if (P.Type.GetKind() == EDasTypeKind::Text)
                     P.Default = DSLTextDefault(F.init);
-                else if (P.Type.Kind == TEXT("byte"))
+                else if (P.Type.GetKind() == EDasTypeKind::Byte)
                     P.Default = DSLByteDefault(F.init);
-                else if (F.init && P.Type.Kind != TEXT("struct") && P.Type.Kind != TEXT("enum"))
+                else if (F.init && P.Type.GetKind() != EDasTypeKind::Struct && P.Type.GetKind() != EDasTypeKind::Enum)
                 {
                     if (F.init->__rtti == das::string("ExprConstInt"))
                     {

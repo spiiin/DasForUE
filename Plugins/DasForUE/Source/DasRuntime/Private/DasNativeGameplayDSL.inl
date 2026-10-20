@@ -1,20 +1,21 @@
 das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, const FDasDeclaredType& Type,
                                     const das::LineInfo& At)
 {
-    if (Type.Kind == TEXT("map") || Type.Kind == TEXT("set"))
+    if (Type.GetKind() == EDasTypeKind::Map || Type.GetKind() == EDasTypeKind::Set)
     {
         auto* T = new das::TypeDecl(das::Type::tTable, At);
-        const auto Key = Type.Kind == TEXT("map")? Type.Key : Type.Element;
-        if (!Key || (Type.Kind == TEXT("map") && !Type.Value))
+        const auto Key = Type.GetKind() == EDasTypeKind::Map ? Type.Key : Type.Element;
+        if (!Key || (Type.GetKind() == EDasTypeKind::Map && !Type.Value))
             DSLFail(TEXT("Missing native hash container descriptor"));
         T->firstType = DSLNativeValueType(Program, Module, *Key, At);
-        if (Key->Kind == TEXT("object"))
+        if (Key->GetKind() == EDasTypeKind::Object)
             T->firstType = DSLMakeObjectKeyType(T->firstType, *Program->thisModuleGroup, Module, At);
-        T->secondType = Type.Kind == TEXT("set")? static_cast<das::TypeDeclPtr>(new das::TypeDecl(das::Type::tVoid, At))
-                                                : DSLNativeValueType(Program, Module, *Type.Value, At);
+        T->secondType = Type.GetKind() == EDasTypeKind::Set
+                            ? static_cast<das::TypeDeclPtr>(new das::TypeDecl(das::Type::tVoid, At))
+                            : DSLNativeValueType(Program, Module, *Type.Value, At);
         return T;
     }
-    if (Type.Kind == TEXT("array"))
+    if (Type.GetKind() == EDasTypeKind::Array)
     {
         if (!Type.Element)
             DSLFail(TEXT("Missing native array element"));
@@ -22,7 +23,7 @@ das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, 
         T->firstType = DSLNativeValueType(Program, Module, *Type.Element, At);
         return T;
     }
-    if (Type.Kind == TEXT("object"))
+    if (Type.GetKind() == EDasTypeKind::Object)
     {
         const TCHAR* Source = nullptr;
         for (const auto& V : DasNativeGameplayViews)
@@ -40,7 +41,7 @@ das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, 
         T->structType = Types[0];
         return T;
     }
-    if (Type.Kind == TEXT("enum"))
+    if (Type.GetKind() == EDasTypeKind::Enum)
     {
         const TCHAR* Source = nullptr;
         for (const auto& V : DasNativeGameplayEnums)
@@ -58,7 +59,7 @@ das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, 
         T->enumType = Types[0];
         return T;
     }
-    if (Type.Kind == TEXT("struct") && DasSoftProperty(Type.TypePath))
+    if (Type.GetKind() == EDasTypeKind::Struct && DasSoftProperty(Type.TypePath))
     {
         const TCHAR* Source = nullptr;
         for (const auto& V : DasNativeGameplaySoftTypes)
@@ -76,7 +77,7 @@ das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, 
             DSLFail(TEXT("Import ue_native_gameplay for native soft type: ")+ Type.TypePath);
         return T;
     }
-    if (Type.Kind == TEXT("struct"))
+    if (Type.GetKind() == EDasTypeKind::Struct)
     {
         const auto& Path = Type.TypePath;
         if (Path == TEXT("/Script/GameplayTags.GameplayTag") ||
@@ -153,23 +154,23 @@ FDasDeclaredProperty DSLNativeReferenceProperty(const das::TypeDeclPtr& Receiver
 FDasDeclaredLiteral DSLNativeDefault(const FString& Class, const FString& Method, const FString& Name,
                                      const FDasDeclaredType& Type)
 {
-    const FString& Kind = Type.Kind;
+    const EDasTypeKind Kind = Type.GetKind();
     FDasDeclaredLiteral D;
     for (const auto& Row : DasNativeGameplayDefaults)
         if (Class == Row.Class && Method == Row.Method && Name == Row.Name)
         {
             const FString Text = Row.Text;
-            if (Kind == TEXT("bool") && (Text == TEXT("true") || Text == TEXT("false")))
+            if (Kind == EDasTypeKind::Bool && (Text == TEXT("true") || Text == TEXT("false")))
             {
                 D.Kind = TEXT("bool");
                 D.Boolean = Text == TEXT("true");
             }
-            else if (Kind == TEXT("string"))
+            else if (Kind == EDasTypeKind::String)
             {
                 D.Kind = TEXT("string");
                 D.String = Text;
             }
-            else if (Kind == TEXT("enum"))
+            else if (Kind == EDasTypeKind::Enum)
             {
                 auto* E = FindObject<UEnum>(nullptr, *Type.TypePath);
                 int64 Value = E ? E->GetValueByNameString(Text) : -1;
@@ -180,16 +181,16 @@ FDasDeclaredLiteral DSLNativeDefault(const FString& Class, const FString& Method
                     D.String = E->GetNameStringByIndex(E->GetIndexByValue(Value));
                 }
             }
-            else if (Kind == TEXT("int") || Kind == TEXT("byte"))
+            else if (Kind == EDasTypeKind::Int || Kind == EDasTypeKind::Byte)
             {
                 int32 Value = 0;
-                if (LexTryParseString(Value, *Text) && (Kind != TEXT("byte") || (Value >= 0 && Value <= 255)))
+                if (LexTryParseString(Value, *Text) && (Kind != EDasTypeKind::Byte || (Value >= 0 && Value <= 255)))
                 {
                     D.Kind = TEXT("number");
                     D.Number = Value;
                 }
             }
-            else if (Kind == TEXT("float") || Kind == TEXT("double"))
+            else if (Kind == EDasTypeKind::Float || Kind == EDasTypeKind::Double)
             {
                 double Value = 0;
                 if (LexTryParseString(Value, *Text) && FMath::IsFinite(Value))

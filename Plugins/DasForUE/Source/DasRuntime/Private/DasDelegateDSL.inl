@@ -8,7 +8,7 @@ FDasDeclaredType DSLDelegateDeclaredType(const das::TypeDeclPtr& T, const FStrin
         D.TypePath = DSLTypedClassPath(T);
     else if (DSLTypedReference(T))
         D.TypePath = DSLTypedReferencePath(T);
-    else if (D.Kind == TEXT("object"))
+    else if (D.GetKind() == EDasTypeKind::Object)
         D.TypePath = TEXT("/Script/CoreUObject.Object");
     else if (DSLContainer(T))
         D = DSLContainerType(T, Folder, Registry);
@@ -16,7 +16,7 @@ FDasDeclaredType DSLDelegateDeclaredType(const das::TypeDeclPtr& T, const FStrin
         D.TypePath = DSLDirectPath(T, Folder, Registry);
     else if (!DSLMathPath(T).IsEmpty())
         D.TypePath = DSLMathPath(T);
-    else if (D.Kind == TEXT("struct") || D.Kind == TEXT("enum"))
+    else if (D.GetKind() == EDasTypeKind::Struct || D.GetKind() == EDasTypeKind::Enum)
         DSLFail(TEXT("Delegate snapshot types require a concrete authored/native type"));
     return D;
 }
@@ -203,7 +203,7 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                 return DSLDelegateDeclaredType(T, Folder, Registry);
             };
             Method.ReturnType = Declared(Signature->firstType);
-            if (Multi && Method.ReturnType.Kind != TEXT("void"))
+            if (Multi && Method.ReturnType.GetKind() != EDasTypeKind::Void)
                 DSLFail(TEXT("Multicast events cannot return a value"));
             for (size_t I = 0; I < Signature->argTypes.size(); ++I)
             {
@@ -241,7 +241,7 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                 Trap->list.push_back(DSLCall(
                     Stub->at, "panic",
                     {new das::ExprConstString(Stub->at, "Delegate signature is a declaration and cannot be called")}));
-                if (Method.ReturnType.Kind != TEXT("void"))
+                if (Method.ReturnType.GetKind() != EDasTypeKind::Void)
                 {
                     auto* Default = new das::ExprMakeStruct(Stub->at);
                     Default->makeType = DSLCopyType(Signature->firstType);
@@ -374,7 +374,7 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                                           : std::initializer_list<const char*>{"Execute", "ExecuteIfBound"})
             {
                 const bool Optional = Name == das::string("ExecuteIfBound");
-                if (Optional && Method.ReturnType.Kind != TEXT("void"))
+                if (Optional && Method.ReturnType.GetKind() != EDasTypeKind::Void)
                     continue;
                 auto* F = Function(Name, Signature->firstType, false);
                 auto* B = static_cast<das::ExprBlock*>(F->body);
@@ -442,7 +442,7 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                 }
                 B->list.push_back(DSLCall(S->at, "ue_invoke_call", {Handle()}));
                 B->finalList.push_back(DSLCall(S->at, "__ue_release_authored_call", {Handle()}));
-                if (Method.ReturnType.Kind != TEXT("void"))
+                if (Method.ReturnType.GetKind() != EDasTypeKind::Void)
                 {
                     const auto& T = Signature->firstType;
                     const auto Kind = DSLMethodAdapterKind(Method.ReturnType.Kind, T);
@@ -487,7 +487,7 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                                               ? static_cast<das::ExpressionPtr>(new das::ExprMove(S->at, L, R))
                                               : static_cast<das::ExpressionPtr>(new das::ExprCopy(S->at, L, R)));
                     }
-                if (Method.ReturnType.Kind != TEXT("void"))
+                if (Method.ReturnType.GetKind() != EDasTypeKind::Void)
                 {
                     const auto& T = Signature->firstType;
                     auto* R = new das::ExprReturn(S->at, new das::ExprVar(S->at, "result"));
