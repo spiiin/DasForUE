@@ -231,16 +231,6 @@ bool ValidateDasStructSnapshot(const FInstancedStruct& Value, FString& Error)
             if (const auto* Adapter = FDasTypeAdapters::Get().FindStruct(Type);
                 Adapter && !Adapter->ValidateValue(Data, Error))
                 return false;
-            if ((Type == TBaseStructure<FVector2D>::Get() && reinterpret_cast<const FVector2D*>(Data)->ContainsNaN()) ||
-                (Type == TBaseStructure<FVector>::Get() && reinterpret_cast<const FVector*>(Data)->ContainsNaN()) ||
-                (Type == TBaseStructure<FRotator>::Get() && reinterpret_cast<const FRotator*>(Data)->ContainsNaN()) ||
-                (Type == TBaseStructure<FTransform>::Get() &&
-                 (reinterpret_cast<const FTransform*>(Data)->ContainsNaN() ||
-                  !reinterpret_cast<const FTransform*>(Data)->IsRotationNormalized())))
-            {
-                Error = TEXT("Invalid nested math snapshot value");
-                return false;
-            }
             return true;
         }
         bool Begin(FProperty* P, const uint8*, int32 Count, int64 Size)

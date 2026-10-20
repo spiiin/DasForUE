@@ -246,16 +246,7 @@ struct FStructCollectOnExit
 // This roots its reflected objects and lets UE clear destroyed references in native memory.
 bool MathSnapshotValid(const FInstancedStruct& Snapshot)
 {
-    const auto* Type = Snapshot.GetScriptStruct();
-    if (Type == TBaseStructure<FVector2D>::Get())
-        return !Snapshot.Get<FVector2D>().ContainsNaN();
-    if (Type == TBaseStructure<FVector>::Get())
-        return !Snapshot.Get<FVector>().ContainsNaN();
-    if (Type == TBaseStructure<FRotator>::Get())
-        return !Snapshot.Get<FRotator>().ContainsNaN();
-    if (Type == TBaseStructure<FTransform>::Get())
-        return !Snapshot.Get<FTransform>().ContainsNaN() && Snapshot.Get<FTransform>().IsRotationNormalized();
-    return true;
+    return DasMathValueValid(Snapshot.GetScriptStruct(), Snapshot.GetMemory());
 }
 // Borrowed snapshots copy only on insertion. Owned temporaries transfer their
 // buffer after validation/deduplication; all routes share one token counter.

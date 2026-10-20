@@ -37,4 +37,16 @@ void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
     static const FDasGameplayTagScriptFacet TagScript(false), TagContainerScript(true);
     Registry.Register(MakeDasGameplayTagAdapter(false), &TagScript);
     Registry.Register(MakeDasGameplayTagAdapter(true), &TagContainerScript);
+    // Math structs and InputActionValue; the view uses keep the existing per-type asymmetries as data.
+    using EUse = EDasScriptViewUse;
+    const EUse AllUses = EUse::NativeProperty | EUse::SelfProperty | EUse::AuthoredReference;
+    static const FDasMathScriptFacet VectorScript("UEVector", "vector", AllUses),
+        Vector2DScript("UEVector2D", "vector2d", EUse::NativeProperty | EUse::SelfProperty),
+        RotatorScript("UERotator", "rotator", AllUses), TransformScript("UETransform", "transform", AllUses),
+        InputValueScript("InputActionValue", "input_value", EUse::None);
+    Registry.Register(MakeDasVectorAdapter(), &VectorScript);
+    Registry.Register(MakeDasVector2DAdapter(), &Vector2DScript);
+    Registry.Register(MakeDasRotatorAdapter(), &RotatorScript);
+    Registry.Register(MakeDasTransformAdapter(), &TransformScript);
+    Registry.Register(MakeDasInputActionValueAdapter(), &InputValueScript);
 }

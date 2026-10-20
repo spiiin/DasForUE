@@ -30,9 +30,17 @@ public:
         Make->structs.push_back(Fields);
         return Make;
     }
-    virtual const char* GetViewType() const override
+    virtual EDasScriptViewUse GetViewUses() const override { return EDasScriptViewUse::NativeProperty; }
+    virtual das::TypeDeclPtr MakeView(das::ModuleGroup& Group, das::Module* Module,
+                                      const das::LineInfo& At) const override
     {
-        return bContainer ? "ue_gameplay_tags::GameplayTagContainer" : "ue_gameplay_tags::GameplayTag";
+        auto Views = Group.findStructure(
+            bContainer ? "ue_gameplay_tags::GameplayTagContainer" : "ue_gameplay_tags::GameplayTag", Module);
+        if (Views.size() != 1)
+            return nullptr;
+        auto* T = new das::TypeDecl(das::Type::tStructure, At);
+        T->structType = Views[0];
+        return T;
     }
     virtual const TCHAR* GetViewModule() const override { return TEXT("ue_gameplay_tags"); }
 

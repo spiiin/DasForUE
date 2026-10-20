@@ -28,22 +28,33 @@ das::ExpressionPtr DSLAdaptedUnpack(const das::LineInfo& At, const das::TypeDecl
 {
     return DSLAdapted(T)->Script->Unpack(At, T, V);
 }
-// View of a native struct property whose struct has a script facet; nullptr when the struct is not adapted.
+// Handle views (math structs, InputActionValue); DSLAdapted keeps to struct views.
+const FDasTypeAdapters::FEntry* DSLAdaptedHandle(const das::TypeDeclPtr& T)
+{
+    if (!T || T->baseType != das::Type::tHandle || !T->annotation)
+        return nullptr;
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+        if (Entry.Script && Entry.Script->MatchesScriptType(T))
+            return &Entry;
+    return nullptr;
+}
+// View type of an adapted struct property for one use, or nullptr when the struct has no view there.
+das::TypeDeclPtr DSLAdaptedView(const FString& Path, EDasScriptViewUse Use, das::ModuleGroup& Group,
+                                das::Module* Module, const das::LineInfo& At)
+{
+    const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(Path);
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+        if (&*Entry.Adapter == Adapter && Entry.Script && EnumHasAnyFlags(Entry.Script->GetViewUses(), Use))
+        {
+            if (auto View = Entry.Script->MakeView(Group, Module, At))
+                return View;
+            DSLFail(FString::Printf(TEXT("Import %s for native %s properties"), Entry.Script->GetViewModule(),
+                                         *Adapter->GetStruct()->GetName()));
+        }
+    return nullptr;
+}
 das::TypeDeclPtr DSLAdaptedNativeView(const FString& Path, das::ModuleGroup& Group, das::Module* Module,
                                       const das::LineInfo& At)
 {
-    const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(Path);
-    const IDasScriptTypeFacet* Script = nullptr;
-    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
-        if (&*Entry.Adapter == Adapter)
-            Script = Entry.Script;
-    if (!Script)
-        return nullptr;
-    auto Views = Group.findStructure(Script->GetViewType(), Module);
-    if (Views.size() != 1)
-        DSLFail(FString::Printf(TEXT("Import %s for native %s properties"), Script->GetViewModule(),
-                                     *Adapter->GetStruct()->GetName()));
-    auto* T = new das::TypeDecl(das::Type::tStructure, At);
-    T->structType = Views[0];
-    return T;
+    return DSLAdaptedView(Path, EDasScriptViewUse::NativeProperty, Group, Module, At);
 }

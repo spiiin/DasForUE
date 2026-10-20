@@ -423,20 +423,11 @@ FString DSLTypeName(const das::TypeDeclPtr& T)
     }
     return {};
 }
+// Struct path of an adapted handle view (math structs, InputActionValue), or empty.
 FString DSLMathPath(const das::TypeDeclPtr& T)
 {
-    if (!T || !T->annotation)
-        return {};
-    return T->annotation->name == "InputActionValue" ? TEXT("/Script/EnhancedInput.InputActionValue")
-                                                     : T->annotation->name == "UEVector2D"
-        ? TEXT("/Script/CoreUObject.Vector2D")
-        : T->annotation->name == "UEVector"
-        ? TEXT("/Script/CoreUObject.Vector")
-        : T->annotation->name == "UERotator"
-        ? TEXT("/Script/CoreUObject.Rotator")
-        : T->annotation->name == "UETransform"
-        ? TEXT("/Script/CoreUObject.Transform")
-        : FString();
+    const auto* Entry = DSLAdaptedHandle(T);
+    return Entry ? Entry->Adapter->GetStruct()->GetPathName() : FString();
 }
 bool DSLPropertyMatches(FProperty* P, const FString& K)
 {
@@ -545,6 +536,7 @@ bool DSLDelegate(const das::TypeDeclPtr&);
 das::ExpressionPtr DSLDelegateSnapshot(const das::LineInfo&, const das::TypeDeclPtr&, das::ExpressionPtr);
 #include "DasAdapterValueTypes.inl"
 #include "DasDirectTypes.inl"
+#include "DasMathTypesDSL.inl"
 struct FUESourceValueBinding : das::FunctionAnnotation
 {
     FUESourceValueBinding() : FunctionAnnotation("ue_source_value_binding") {}

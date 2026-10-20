@@ -340,20 +340,12 @@ struct FDSLBodyVisitor : das::Visitor
             return Type;
         }
         if (P->Type.GetKind() == EDasTypeKind::Struct)
-            return DSLHandleType(Group, Source->module,
-                                 P->Type.TypePath ==
-                                     TEXT("/Script/CoreUObject.Vector")
-                                          ? "UEVector"
-                                          : P->Type.TypePath ==
-                                                TEXT("/Script/CoreUObject.Vector2D")
-                                                     ? "UEVector2D"
-                                                     : P->Type.TypePath ==
-                                                           TEXT("/Script/CoreUObject.Rotator")
-                                                                ? "UERotator"
-                                                                : P->Type.TypePath ==
-                                                                      TEXT("/Script/CoreUObject.Transform")
-                                                                           ? "UETransform"
-                                                                           : "UEStructValue");
+        {
+            if (auto View =
+                    DSLAdaptedView(P->Type.TypePath, EDasScriptViewUse::SelfProperty, Group, Source->module, F->at))
+                return View;
+            return DSLHandleType(Group, Source->module, "UEStructValue");
+        }
         if (P->Type.GetKind() == EDasTypeKind::Enum)
         {
             das::EnumerationPtr Match = nullptr;

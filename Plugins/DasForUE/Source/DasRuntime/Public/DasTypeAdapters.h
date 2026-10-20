@@ -23,6 +23,8 @@ public:
 
     // A leaf value is never expanded as an authored child struct.
     virtual bool IsLeafValue() const { return false; }
+    // Math value structs (Vector, Vector2D, Rotator, Transform): text literal defaults, finite values.
+    virtual bool IsMath() const { return false; }
     virtual EDasAdapterDefault GetDefaultPolicy() const { return EDasAdapterDefault::Explicit; }
     // nullptr leaves property creation to the generic builder of the kind.
     virtual FProperty* MakeProperty(FFieldVariant Owner, FName Name, const FDasDeclaredType& Type,

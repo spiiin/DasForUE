@@ -365,19 +365,19 @@ FTransform MathUnpacktransform(const FDasStructValue& V, das::Context* C)
 }
 bool MethodMathValid(const FVector2D& Value)
 {
-    return !Value.ContainsNaN();
+    return DasMathValueValid(TBaseStructure<FVector2D>::Get(), &Value);
 }
 bool MethodMathValid(const FVector& Value)
 {
-    return !Value.ContainsNaN();
+    return DasMathValueValid(TBaseStructure<FVector>::Get(), &Value);
 }
 bool MethodMathValid(const FRotator& Value)
 {
-    return !Value.ContainsNaN();
+    return DasMathValueValid(TBaseStructure<FRotator>::Get(), &Value);
 }
 bool MethodMathValid(const FTransform& Value)
 {
-    return !Value.ContainsNaN() && Value.IsRotationNormalized();
+    return DasMathValueValid(TBaseStructure<FTransform>::Get(), &Value);
 }
 // Concrete leaf assignments also cover aggregate writes to elements of arrays.
 void MarkMathCallLeaves(FMarshalledCall& Call, FProperty* Property, const FString& Path)

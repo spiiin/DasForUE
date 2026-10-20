@@ -613,18 +613,11 @@ bool DSLEmitProperty(das::Program* P, das::Module* M, const das::TypeDeclPtr& T,
         ValueType = DSLNativeValueType(P, M, Prop->Type, At);
     else if (Descriptor && !Descriptor->Name.empty())
         ValueType = DSLMethodValueType(P, M, Prop->Type, Descriptor->Name, Descriptor->Scope, At);
-    else if (Prop->Type.Kind ==
-             TEXT("struct") &&
-                  (Prop->Type.TypePath == TEXT("/Script/CoreUObject.Vector") ||
-                                               Prop->Type.TypePath == TEXT("/Script/CoreUObject.Rotator") ||
-                                                                           Prop->Type.TypePath ==
-                                                                               TEXT("/Script/CoreUObject.Transform")))
-        ValueType = DSLHandleType(*P->thisModuleGroup, M,
-                                  Prop->Type.TypePath == TEXT("/Script/CoreUObject.Vector")
-                                                              ? "UEVector"
-                                                              : Prop->Type.TypePath ==
-                                                                    TEXT("/Script/CoreUObject.Rotator")? "UERotator"
-                                                                                                       : "UETransform");
+    else if (auto View = Prop->Type.GetKind() == EDasTypeKind::Struct
+                             ? DSLAdaptedView(Prop->Type.TypePath, EDasScriptViewUse::AuthoredReference,
+                                              *P->thisModuleGroup, M, At)
+                             : nullptr)
+        ValueType = View;
     else
         ValueType = DSLPropertyType(Prop->Type.Kind, *P->thisModuleGroup, M, At);
     if (ValueType->baseType == das::Type::tVoid)

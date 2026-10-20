@@ -8,10 +8,8 @@
 #include "Serialization/JsonSerializer.h"
 bool IsDasMathStructPath(const FString& Path)
 {
-    return Path == TEXT("/Script/CoreUObject.Vector2D") ||
-                        Path == TEXT("/Script/CoreUObject.Vector") ||
-                                     Path == TEXT("/Script/CoreUObject.Rotator") ||
-                                                  Path == TEXT("/Script/CoreUObject.Transform");
+    const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(Path);
+    return Adapter && Adapter->IsMath();
 }
 namespace
 {

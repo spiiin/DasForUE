@@ -9,6 +9,7 @@
 #include "DasExecutionRolePrivate.h"
 #include "DasGASAuthoring.h"
 #include "DasGASCalculations.h"
+#include "DasMathAdapters.h"
 #include "Engine/CurveTable.h"
 #include "Engine/DataTable.h"
 #include "DasDataAssets.h"

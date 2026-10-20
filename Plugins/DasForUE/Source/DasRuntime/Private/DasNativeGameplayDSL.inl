@@ -82,37 +82,24 @@ das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, 
         const auto& Path = Type.TypePath;
         if (auto View = DSLAdaptedNativeView(Path, *Program->thisModuleGroup, Module, At))
             return View;
-        const char* Name = Path == TEXT("/Script/CoreUObject.Vector")
-                                        ? "UEVector"
-                                        : Path == TEXT("/Script/CoreUObject.Vector2D")
-                                                       ? "UEVector2D"
-                                                       : Path == TEXT("/Script/CoreUObject.Rotator")
-                                                                      ? "UERotator"
-                                                                      : Path == TEXT("/Script/CoreUObject.Transform")
-                                                                                     ? "UETransform"
-                                                                                     : nullptr;
-        if (!Name)
-        {
-            const TCHAR* Source = nullptr;
-            for (const auto& V : DasNativeGameplayStructs)
-                if (Path == V.Path)
-                {
-                    Source = V.Source;
-                    break;
-                }
-            if (!Source)
-                if (const auto* Adapter = DasAdapterValueStruct(FindObject<UScriptStruct>(nullptr, *Path)))
-                    Source = Adapter->Source;
-            if (!Source)
-                DSLFail(TEXT("Native struct not generated: ")+ Path);
-            auto Types = Program->thisModuleGroup->findStructure(DSLUtf8(Source), Module);
-            if (Types.size() != 1)
-                DSLFail(TEXT("Import ue_native_gameplay for native struct: ")+ Path);
-            auto* T = new das::TypeDecl(das::Type::tStructure, At);
-            T->structType = Types[0];
-            return T;
-        }
-        return DSLHandleType(*Program->thisModuleGroup, Module, Name);
+        const TCHAR* Source = nullptr;
+        for (const auto& V : DasNativeGameplayStructs)
+            if (Path == V.Path)
+            {
+                Source = V.Source;
+                break;
+            }
+        if (!Source)
+            if (const auto* Adapter = DasAdapterValueStruct(FindObject<UScriptStruct>(nullptr, *Path)))
+                Source = Adapter->Source;
+        if (!Source)
+            DSLFail(TEXT("Native struct not generated: ")+ Path);
+        auto Types = Program->thisModuleGroup->findStructure(DSLUtf8(Source), Module);
+        if (Types.size() != 1)
+            DSLFail(TEXT("Import ue_native_gameplay for native struct: ")+ Path);
+        auto* T = new das::TypeDecl(das::Type::tStructure, At);
+        T->structType = Types[0];
+        return T;
     }
     return DSLPropertyType(Type.Kind, *Program->thisModuleGroup, Module, At);
 }
