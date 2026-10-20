@@ -30,9 +30,11 @@ function Get-DasContext {
 # Builds the editor target of the smoke project.
 function Invoke-DasBuild {
     param([Parameter(Mandatory)]$Das, [string]$Name = 'editor', [string]$Log, [int]$Parallel = 12,
-          [string[]]$BuildArguments)
+          [string[]]$BuildArguments, [string[]]$Modules = @(), [switch]$NoEngineChanges)
     $Arguments = @('DasForUESmokeEditor', 'Win64', 'Development', "-Project=$($Das.Project)", '-WaitMutex', '-NoXGE',
                    "-MaxParallelActions=$Parallel")
+    if ($Modules) { $Arguments += @($Modules | ForEach-Object { "-Module=$_" }) }
+    if ($NoEngineChanges) { $Arguments += '-NoEngineChanges' }
     if ($Log) { $Arguments += "-Log=$Log" }
     if ($PSBoundParameters.ContainsKey("BuildArguments")) { $Arguments = $BuildArguments }
     & (Join-Path $Das.Engine 'Engine\Build\BatchFiles\Build.bat') @Arguments | ForEach-Object { Write-Host $_ }
@@ -163,6 +165,44 @@ function Write-DasValidation {
     $Data | ConvertTo-Json -Depth $Depth | Set-Content -LiteralPath $Path -Encoding utf8
 }
 
+
+# Common freeze scope used by narrow DSL commandlet runners; Extra retains each runner's fixtures.
+function Get-DasValidationPaths {
+    param([Parameter(Mandatory)]$Das, [string[]]$Extra = @())
+    Get-ChildItem "$($Das.Repo)/Plugins/DasForUE/Source" -Recurse -File |
+        Where-Object Extension -in '.h','.cpp','.inl','.cs' | ForEach-Object FullName
+    Get-ChildItem "$($Das.Repo)/Plugins/DasForUE/Content/Das/Scripts" -File -Filter '*.das' |
+        ForEach-Object FullName
+    'DasRuntime','DasEditor' | ForEach-Object {
+        "$($Das.Repo)/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$_.dll"
+    }
+    "$($Das.Engine)/Engine/Binaries/Win64/UnrealEditor.modules"
+    $Extra | ForEach-Object { "$($Das.Repo)/$_" }
+}
+
+# One scoped commandlet receipt. Re-enumerate paths after the probe to catch additions/removals too.
+function Invoke-DasValidation {
+    param([Parameter(Mandatory)]$Das, [Parameter(Mandatory)][string]$Run,
+          [Parameter(Mandatory)][string]$Name, [Parameter(Mandatory)][string]$Marker,
+          [Parameter(Mandatory)][int]$Checks, [Parameter(Mandatory)][scriptblock]$SourcePaths,
+          [Parameter(Mandatory)][string]$Output, [Parameter(Mandatory)][string]$Mode,
+          [Parameter(Mandatory)][string]$SuccessMarker, [string]$FailPattern,
+          [string[]]$Arguments = @('-Multiprocess'), [string]$RequiredPattern)
+    $Before = Lock-SourceHashes -Paths @(& $SourcePaths)
+    $Log = Invoke-DasCommandlet $Das -Run $Run -Name $Name -Marker $Marker -NoZen `
+        -Arguments $Arguments -FailPattern $FailPattern
+    $Record = Assert-DasResult -Log $Log -Pattern ([regex]::Escape($Marker) + ' checks=(\d+)') -Checks $Checks
+    if ($RequiredPattern -and (Get-Content -LiteralPath $Log -Raw) -notmatch $RequiredPattern) {
+        throw "Missing required diagnostic $RequiredPattern in $Log"
+    }
+    if ((Lock-SourceHashes -Paths @(& $SourcePaths)) -cne $Before) { throw "Source or binary changed during $Name" }
+    Write-DasValidation -Path (Join-Path $Das.Logs $Output) -Depth 8 -Data ([ordered]@{
+        state='PASS'; checks=[int]$Record.Groups[1].Value; runtime_log=$Log; sha256=($Before|ConvertFrom-Json)
+        mode=$Mode; PIE='not_run'; packaged='not_run'; full_suites='not_run'
+    })
+    Write-Output "$SuccessMarker checks=$Checks"
+}
+
 Export-ModuleMember -Function Get-DasContext, Invoke-DasBuild, Assert-DasLog, Invoke-DasCommandlet, Invoke-DasAutomation,
     Invoke-DasPackaged, Invoke-DasAssetPhases, Test-DasResult, Get-DasResult, Assert-DasResult,
-    Lock-SourceHashes, Write-DasValidation -Variable DasEngineErrorPattern
+    Lock-SourceHashes, Write-DasValidation, Get-DasValidationPaths, Invoke-DasValidation -Variable DasEngineErrorPattern

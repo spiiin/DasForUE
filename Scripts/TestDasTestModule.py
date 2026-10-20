@@ -22,7 +22,7 @@ class TestDasTestModule(unittest.TestCase):
         module = str(ROOT / "Scripts/DasTest.psm1").replace("'", "''")
         directory = str(self.root).replace("'", "''")
         script = (f"$ErrorActionPreference='Stop'; Import-Module '{module}' -Force; "
-                  f"$Temp='{directory}'; " + body)
+                  f"$Temp='{directory}'; " + body + "\nexit 0")
         environment = {**os.environ, **environment}
         # A PS7 parent module path must not select PS7 utility modules in Windows PowerShell.
         environment.pop("PSModulePath", None)
@@ -91,6 +91,48 @@ if($Before -ceq (Lock-SourceHashes -Paths @("$Temp/a","$Temp/b"))){throw 'mutati
 Write-DasValidation -Path "$Temp/receipt.json" -Data ([ordered]@{state='PASS';checks=2;sha256=($Before|ConvertFrom-Json)})
 $Data=Get-Content "$Temp/receipt.json" -Raw|ConvertFrom-Json
 if($Data.state -ne 'PASS' -or $Data.checks -ne 2 -or @($Data.sha256.PSObject.Properties).Count -ne 2){throw 'payload changed'}
+""")
+
+
+    def test_validation_freeze_count_and_required_warning(self):
+        self.ps(r"""
+'fixture' | Set-Content "$Temp/source.das"
+$Das=[pscustomobject]@{Logs=$Temp;Mutate=$false}
+& (Get-Module DasTest) {
+    function script:Invoke-DasCommandlet {
+        param($Das,$Run,$Name,$Marker,$Arguments,$FailPattern,[switch]$NoZen)
+        if($Arguments -notcontains '-Multiprocess' -or !$NoZen){throw 'probe flags changed'}
+        "$Marker checks=2`nEXPECTED_WARNING" | Set-Content "$($Das.Logs)/$Name.log"
+        if($Das.Mutate){'new' | Set-Content "$($Das.Logs)/extra.das"}
+        return "$($Das.Logs)/$Name.log"
+    }
+}
+$Parameters=@{Das=$Das;Run='Fake';Name='fake';Marker='DAS_FAKE_RESULT=PASS';Checks=2
+    SourcePaths={Get-ChildItem $Temp -Filter '*.das'|ForEach-Object FullName}
+    Output='validation.json';Mode='mock';SuccessMarker='DAS_FAKE_VALIDATION=PASS';RequiredPattern='EXPECTED_WARNING'}
+Invoke-DasValidation @Parameters | Out-Null
+$Data=Get-Content "$Temp/validation.json" -Raw|ConvertFrom-Json
+if($Data.checks -ne 2 -or $Data.PIE -ne 'not_run' -or @($Data.sha256.PSObject.Properties).Count -ne 1){throw 'receipt'}
+$Parameters.RequiredPattern='ABSENT'
+try { Invoke-DasValidation @Parameters; throw 'warning not checked' }
+catch { if($_.Exception.Message -notlike 'Missing required diagnostic*'){throw} }
+$Parameters.RequiredPattern='EXPECTED_WARNING';$Das.Mutate=$true
+try { Invoke-DasValidation @Parameters; throw 'source additions not checked' }
+catch { if($_.Exception.Message -notlike 'Source or binary changed*'){throw} }
+""")
+
+    def test_all_runners_parse_and_keep_build_result_logic_in_module(self):
+        for runner in (ROOT / "Scripts").glob("Test*.ps1"):
+            source = runner.read_text(encoding="utf-8-sig")
+            self.assertNotIn("Build.bat", source, runner.name)
+            self.assertNotIn("Select-String", source, runner.name)
+            self.assertNotRegex(source, r"\[regex\]::(?:Match|Matches)\([^\n]*_RESULT=", runner.name)
+        directory = str(ROOT / "Scripts").replace("'", "''")
+        self.ps("foreach($File in Get-ChildItem '" + directory + r"""' -Filter 'Test*.ps1') {
+    $Tokens=$null;$Errors=$null
+    [void][System.Management.Automation.Language.Parser]::ParseFile($File.FullName,[ref]$Tokens,[ref]$Errors)
+    if($Errors){throw ($File.Name+': '+($Errors -join '; '))}
+}
 """)
 
 
