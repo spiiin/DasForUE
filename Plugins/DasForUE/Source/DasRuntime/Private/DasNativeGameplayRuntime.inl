@@ -15,28 +15,14 @@ const TCHAR* NativeGameplaySnapshotKind(const char* Path, const char* Name, das:
 // direction, kind, receiver class). Entries hold the strings they were made for (heap strings may reuse
 // addresses), weak classes and field paths, and the self site epoch (contexts, GC); a miss or a stale
 // entry takes the checked path, which reports every error.
-struct FDasNativeClassSite
-{
-    das::string Path;
-    uint64 Epoch = 0;
-    TWeakObjectPtr<UClass> Class;
-};
+// Generated receiver classes by path (shared class path cache in DasRuntimeObjectAccess.inl).
 UClass* DasNativeGameplayClass(const char* ClassPath)
 {
-    static FDasNativeClassSite Sites[64];
-    const UPTRINT Key = UPTRINT(ClassPath);
-    FDasNativeClassSite& S = Sites[((Key >> 4) ^ (Key >> 10)) & 63];
-    if (ClassPath && S.Epoch == GDasSelfSiteEpoch && FCStringAnsi::Strcmp(S.Path.c_str(), ClassPath) == 0)
-        if (UClass* Cached = S.Class.Get())
-            return Cached;
+    if (UClass* Cached = DasCachedClassByPath(ClassPath))
+        return Cached;
     const FString Path = ClassPath ? UTF8_TO_TCHAR(ClassPath) : TEXT("");
     UClass* Class = FindObject<UClass>(nullptr, *Path);
-    if (Class && ClassPath)
-    {
-        S.Path = ClassPath;
-        S.Epoch = GDasSelfSiteEpoch;
-        S.Class = Class;
-    }
+    DasStoreClassByPath(ClassPath, Class);
     return Class;
 }
 UObject* NativeGameplayObject(const FDasObjectHandle& H, const char* ClassPath, bool Write, das::Context* C)
@@ -182,7 +168,8 @@ FDasObjectHandle NativeReferenceGetobject(const FDasObjectHandle& H, const char*
 {
     auto* O = NativeGameplayObject(H, Path, false, C);
     auto* P = CastFieldChecked<FObjectProperty>(NativeGameplayProperty(O, Path, Name, false, TEXT("object"), C));
-    if (P->PropertyClass->GetPathName() != UTF8_TO_TCHAR(Expected))
+    // A loaded class's full path names it uniquely, so comparing classes matches comparing paths.
+    if (!Expected || P->PropertyClass != DasNativeGameplayClass(Expected))
         C->throw_error("native object field type mismatch");
     return ReadPropertyObject(P, O, C);
 }
@@ -192,7 +179,7 @@ void NativeReferenceSetobject(const FDasObjectHandle& H, const char* Path, const
     auto* O = NativeGameplayObject(H, Path, true, C);
     auto* P = CastFieldChecked<FObjectProperty>(NativeGameplayProperty(O, Path, Name, true, TEXT("object"), C));
     auto* V = Value.Token ? ResolveObject(Value, C) : nullptr;
-    if (P->PropertyClass->GetPathName() != UTF8_TO_TCHAR(Expected) || (V && !V->IsA(P->PropertyClass)))
+    if (!Expected || P->PropertyClass != DasNativeGameplayClass(Expected) || (V && !V->IsA(P->PropertyClass)))
         C->throw_error("native object field type mismatch");
     WritePropertyObject(P, O, Value, C);
 }

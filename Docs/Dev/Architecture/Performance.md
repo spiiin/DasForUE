@@ -189,6 +189,7 @@ and isolated-VM checks still run on every call. This speeds up all extern calls,
 | field read | — | 500–620 ns |
 | field write | — | 520–640 ns |
 | `ue_object_valid` (extern baseline) | — | 240–310 ns |
+| object field read (`character.CharacterMovement`) | 12 400 ns | 1 400 ns |
 
 Before, every access resolved the receiver class by path (`FindObject`) and revalidated the generated
 field (call shape string, declaring class path, access contract). Both are now cached per site
@@ -196,3 +197,10 @@ field (call shape string, declaring class path, access contract). Both are now c
 direction, kind, receiver class), with the stored strings compared, weak classes and field paths, and the
 self site epoch. Authored references cache the identity check per (identity, class)
 (`ResolveAuthoredObject`).
+
+Object fields were dominated by the generic value codec, which builds a full type descriptor (with path
+strings) on every read; reference properties now return the object they already read after the same type
+check. Class paths are resolved through one shared cache (`ResolveClass`, generated receivers, the
+`ue_cast_nullable_object` behind typed views), and `MakeObjectHandle` finds existing handles through an
+(object, class) index verified against the handle table instead of scanning every handle. Self object and
+component properties (`self.Camera`) use the cached (class, name) lookup.

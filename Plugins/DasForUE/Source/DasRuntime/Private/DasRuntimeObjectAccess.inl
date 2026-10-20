@@ -13,6 +13,16 @@ FDasObjectHandle MakeObjectHandle(UObject* Object, UClass* Expected, das::Contex
         Expected = UObject::StaticClass();
     if (!IsValid(Object) || (Object->IsA<AActor>() && CastChecked<AActor>(Object)->IsActorBeingDestroyed()))
         return {};
+    // Hits are verified against the handle table: reinstancing remaps entries in place and dead objects'
+    // addresses may be reused, so only an entry that still names this object and class is returned.
+    const TPair<const UObject*, const UClass*> Key(Object, Expected);
+    if (const uint64* Indexed = ActiveContext->ObjectHandleIndex.Find(Key))
+    {
+        if (const auto* Entry = ActiveContext->ObjectHandles.Find(*Indexed);
+            Entry && Entry->Object.Get() == Object && Entry->ExpectedClass.Get() == Expected)
+            return {*Indexed};
+        ActiveContext->ObjectHandleIndex.Remove(Key);
+    }
     for (auto It = ActiveContext->ObjectHandles.CreateIterator(); It; ++It)
     {
         if (!It.Value().Object.IsValid() || !It.Value().ExpectedClass.IsValid())
@@ -21,10 +31,19 @@ FDasObjectHandle MakeObjectHandle(UObject* Object, UClass* Expected, das::Contex
             continue;
         }
         if (It.Value().Object.Get() == Object && It.Value().ExpectedClass.Get() == Expected)
+        {
+            ActiveContext->ObjectHandleIndex.Add(Key, It.Key());
             return {It.Key()};
+        }
     }
+    // The scan above pruned dead handles; drop index entries that no longer name a live handle.
+    if (ActiveContext->ObjectHandleIndex.Num() > 2 * ActiveContext->ObjectHandles.Num() + 64)
+        for (auto It = ActiveContext->ObjectHandleIndex.CreateIterator(); It; ++It)
+            if (!ActiveContext->ObjectHandles.Contains(It.Value()))
+                It.RemoveCurrent();
     const uint64 Token = NextObjectHandle++;
     ActiveContext->ObjectHandles.Add(Token, {Object, Expected});
+    ActiveContext->ObjectHandleIndex.Add(Key, Token);
     return {Token};
 }
 
@@ -93,8 +112,42 @@ bool ObjectValid(const FDasObjectHandle& Handle, das::Context* Context)
 {
     return TryObject(Handle, Context) != nullptr;
 }
+// Loaded classes by full path string. Entries hold the path they were made for (heap strings may reuse
+// addresses), a weak class and the self site epoch (contexts, GC); a miss runs FindObject.
+struct FDasClassPathSite
+{
+    das::string Path;
+    uint64 Epoch = 0;
+    TWeakObjectPtr<UClass> Class;
+};
+FDasClassPathSite& DasClassPathSite(const char* Path)
+{
+    static FDasClassPathSite Sites[256];
+    const UPTRINT Key = UPTRINT(Path);
+    return Sites[((Key >> 4) ^ (Key >> 12)) & 255];
+}
+UClass* DasCachedClassByPath(const char* Path)
+{
+    if (!Path)
+        return nullptr;
+    const FDasClassPathSite& S = DasClassPathSite(Path);
+    if (S.Epoch == GDasSelfSiteEpoch && FCStringAnsi::Strcmp(S.Path.c_str(), Path) == 0)
+        return S.Class.Get();
+    return nullptr;
+}
+void DasStoreClassByPath(const char* Path, UClass* Class)
+{
+    if (!Path || !Class)
+        return;
+    FDasClassPathSite& S = DasClassPathSite(Path);
+    S.Path = Path;
+    S.Epoch = GDasSelfSiteEpoch;
+    S.Class = Class;
+}
 UClass* ResolveClass(const char* Path, das::Context* Context)
 {
+    if (UClass* Cached = DasCachedClassByPath(Path))
+        return Cached;
     if (!Path || !*Path)
         Context->throw_error("a loaded full class path is required");
     const FString Name(UTF8_TO_TCHAR(Path));
@@ -103,6 +156,7 @@ UClass* ResolveClass(const char* Path, das::Context* Context)
     UClass* Class = FindObject<UClass>(nullptr, *Name);
     if (!Class)
         Context->throw_error("class is not loaded");
+    DasStoreClassByPath(Path, Class);
     return Class;
 }
 FDasObjectHandle ObjectValue(const char* Path, das::Context* C)
@@ -116,7 +170,7 @@ FDasObjectHandle ObjectValue(const char* Path, das::Context* C)
 FProperty* SelfObjectProperty(const char* N, bool Write, das::Context* C)
 {
     auto* S = ResolveSelf(C);
-    auto* P = S->GetClass()->FindPropertyByName(FName(UTF8_TO_TCHAR(N)));
+    auto* P = N && *N ? FindSelfPropertyCached(S->GetClass(), N, C) : nullptr;
     if (!P || P->ArrayDim != 1 || !DasReferencePropertyClass(P))
         C->throw_error(TCHAR_TO_UTF8(*(FString(TEXT("self reference property type mismatch: ")) + UTF8_TO_TCHAR(N))));
     if (!P->HasAnyPropertyFlags(CPF_BlueprintVisible) || (Write && P->HasAnyPropertyFlags(CPF_BlueprintReadOnly)))
@@ -131,6 +185,13 @@ FDasObjectHandle ReadNullablePropertyObject(FProperty* P, const void* Memory, da
     auto* Object = DasReferenceGet(P, Memory);
     if (Object && (!IsValid(Object) || (Cast<AActor>(Object) && CastChecked<AActor>(Object)->IsActorBeingDestroyed())))
         return {};
+    // Reference properties need no value codec: the object is already read; apply its type check.
+    if (UClass* Reference = DasReferencePropertyClass(P))
+    {
+        if (Object && !DasReferenceMatches(Object, Reference))
+            C->throw_error("Incompatible object/interface value");
+        return MakeObjectHandle(Object, Reference, C);
+    }
     const auto V = ReadNativePropertyValue(P, Memory, C);
     if (V.Kind != int32(EDasMethodSignature::Object))
         C->throw_error("Expected object/interface property");

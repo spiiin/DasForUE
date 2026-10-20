@@ -203,3 +203,12 @@ def native_field_write_bench(count:int):int {
     }
     return count
 }
+[export]
+def native_object_field_bench(count:int):int {
+    let character=ue_character_self()
+    var total=0
+    for (i in range(count)) {
+        if (ue_object_valid(character.CharacterMovement.handle)) { total+=1 }
+    }
+    return total
+}

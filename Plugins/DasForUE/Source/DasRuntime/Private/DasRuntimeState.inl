@@ -236,6 +236,8 @@ public:
     };
     TMap<uint64, FObjectQuery> ObjectQueries;
     TMap<uint64, FObjectHandleEntry> ObjectHandles;
+    // (object, expected class) -> token, a lookup cache over ObjectHandles; MakeObjectHandle verifies hits.
+    TMap<TPair<const UObject*, const UClass*>, uint64> ObjectHandleIndex;
     TMap<FObjectKey, uint64> ObjectKeyTokens;
     TMap<uint64, TWeakObjectPtr<UObject>> ObjectKeys;
     TMap<uint64, TSharedPtr<FMarshalledCall>> Calls;

@@ -192,7 +192,8 @@ bool RunDasPlayableCharacterProbe(ADasStaticLibraryProbe* Carrier, FString& Repo
         Report += FString::Printf(TEXT("INFO native_field_write_read_ns=%.0f %s\n"), Ns, *Bench.Error);
         for (const TCHAR* Entry :
              {TEXT("native_field_read_bench"), TEXT("native_field_write_bench"), TEXT("native_valid_bench"),
-                                                                                      TEXT("native_field_bench")})
+                                                                                      TEXT("native_object_field_bench"),
+                                                                                           TEXT("native_field_bench")})
         {
             Runtime.RunNamedPersistent(Probe, Entry, 1, C);
             const double EntryStart = FPlatformTime::Seconds();
