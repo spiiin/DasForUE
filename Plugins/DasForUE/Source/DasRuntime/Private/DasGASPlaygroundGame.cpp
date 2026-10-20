@@ -3,6 +3,13 @@
 #include "Engine/Canvas.h"
 #include "EngineUtils.h"
 #include "UObject/UnrealType.h"
+#include "AbilitySystemGlobals.h"
+#include "GameplayAbilitiesDeveloperSettings.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#if !UE_BUILD_SHIPPING
+void StartDasGASPlaygroundValidation(UWorld* World);
+#endif
 
 ADasGASPlaygroundGameMode::ADasGASPlaygroundGameMode()
 {
@@ -47,4 +54,21 @@ void ADasGASPlaygroundHUD::DrawHUD()
         DrawText(Status, Aiming ? FLinearColor(0.2f, 1.f, 0.5f) : FLinearColor::White, 24, 144, nullptr, 1.2f);
         break;
     }
+}
+
+void ADasGASPlaygroundGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+    // The example's cue assets must be discoverable in both editor and cooked games.
+    GetMutableDefault<UGameplayAbilitiesDeveloperSettings>()->GameplayCueNotifyPaths.AddUnique(
+        TEXT("/Game/DasExamples/GASCues"));
+    UAbilitySystemGlobals::Get().AddGameplayCueNotifyPath(TEXT("/Game/DasExamples/GASCues"));
+    Super::InitGame(MapName, Options, ErrorMessage);
+}
+void ADasGASPlaygroundGameMode::BeginPlay()
+{
+    Super::BeginPlay();
+#if !UE_BUILD_SHIPPING
+    if (FParse::Param(FCommandLine::Get(), TEXT("DasGASAbilityPackaged")))
+        StartDasGASPlaygroundValidation(GetWorld());
+#endif
 }

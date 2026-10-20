@@ -163,3 +163,32 @@ non-null RHI and is excluded from NullRHI runs. Reports are under
 
 Automation suites can opt into `rendering: true` (or Invoke-DasAutomation
 `-Rendering`). The default remains NullRHI/no audio for existing suites.
+
+
+## GAS map in packaged Development
+
+Queue `test-suite <unique-id> gas-ability-packaged repo=C:\src\DasForUE2\Build\GASAuthoringWorktree`
+through the shared agent. The suite builds Editor, exports the map with
+`DasGASPlaygroundMap`, builds Win64 Development, cooks/stages/archives it and
+runs the archived game with real rendering/audio. It does not run broad editor
+or Foundation suites. Logs: `gas-ability-package-export.log`,
+`build-packaged.log`, agent/UAT output, `gas-ability-packaged.log`;
+viewport: `gas-ability-packaged.png`.
+
+PIE and commandlet export share `DasGASPlaygroundMap.h`. Input/GAS setup is
+reproducible from source; generated assets remain in the dedicated demo folder.
+`TestPackaged.ps1 -AdditionalCookDirectories` passes explicit physical cook roots
+to UAT, and `-SkipSmoke` skips its default Foundation launch only when requested.
+Other callers retain their existing behavior. The GAS runner cooks the demo
+folder and engine sounds because cue script soft paths and discovery-only
+Blueprints are not guaranteed dependencies of the map. The receipt must still
+contain every DAS script before packaging.
+
+The packaged-only probe checks cooked runtime identity, bundled script paths,
+saved input/GAS/mesh references, a live audio device, mapped movement/look/jump,
+aim/cancel/confirm, native damage, playing sound and ready Niagara systems,
+native aura expiry/Removed and actor/session cleanup. Inputs traverse
+PlayerController/Enhanced Input; no ability methods are invoked directly by the
+probe. Startup/runtime has an outer process deadline as well as a bounded
+in-game probe deadline. The probe is enabled only by `-DasGASAbilityPackaged`
+and omitted from Shipping.

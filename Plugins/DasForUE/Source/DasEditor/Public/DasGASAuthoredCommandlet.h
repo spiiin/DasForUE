@@ -112,3 +112,12 @@ public:
     UDasGASAbilityPlaygroundCommandlet();
     virtual int32 Main(const FString& Params) override;
 };
+
+UCLASS()
+class UDasGASPlaygroundMapCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
+public:
+    UDasGASPlaygroundMapCommandlet();
+    virtual int32 Main(const FString& Params) override;
+};

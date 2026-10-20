@@ -312,3 +312,40 @@ camera aim, harmless cancellation, confirmed target damage, sound/Niagara
 components, native timed expiry/Removed, viewport capture and complete session
 release after EndPIE. Results/source hashes are recorded in
 `logs/gas-ability-pie-validation.json`. Packaged/network checks were not run.
+
+
+## Packaged map
+
+The `gas-ability-packaged` agent suite regenerates the same map and packages it
+in Win64 Development. Cue Niagara assets and cue-notify Blueprints must be
+cooked even when they are found by script soft paths or GAS discovery. The
+runner includes their demo folder and engine sounds explicitly. The example's
+GameMode registers its cue search path in both editor and cooked games; it does
+not persist changes to project configuration.
+
+The archived game is under `Build/Packaged/Windows`. For ordinary interactive
+play, launch its DasForUESmoke executable with map argument
+`/Game/DasExamples/GASCues/GASAbilityMap`. Controls are the same as PIE. The
+`-DasGASAbilityPackaged` switch instead starts the automated mapped-input probe
+and exits after its result. This validates the dynamic DAS runtime in a cooked
+Development game; it does not establish Shipping, AOT or networking support.
+
+Verified by build-agent job `gaspackage-20261020e` on 2026-10-20:
+Editor/game builds, cook/stage/archive and actual Win64 Development launch
+passed. The runtime reports `DAS_GAS_ABILITY_PACKAGED_RESULT=PASS checks=12`;
+the complete focused suite took 182 seconds after engine build caches were warm.
+The six DAS modules were read from the archive's `RemappedPlugins` tree.
+Checks cover cooked input/GAS/mesh assets, possession/HUD, mapped move/jump/look,
+aim preview/cancel/confirm, target damage, a playing audio component on a live
+audio device, Niagara systems, native aura expiry/Removed, viewport capture and
+release of DAS contexts. The captured image shows impact/aura particles and
+target health 99. Audio playback state was checked; listening quality was not.
+Proof and hashes are in `logs/gas-ability-packaged-validation.json`, runtime log
+in `logs/gas-ability-packaged.log`, image in `logs/gas-ability-packaged.png`.
+
+This run caught a cooked-build portability bug: UE FNames can expose `ID`
+where Editor-generated DAS declarations use `Id`. Native struct field lookup
+now compares FName identity and rejects ambiguous declarations; generated
+native schema/call signature checks ignore identifier casing while preserving
+field/type/flag checks. Export also reloads existing input assets before saving
+and fully replaces only the dedicated generated example map.

@@ -18,4 +18,8 @@ class DASRUNTIME_API ADasGASPlaygroundGameMode : public AGameModeBase
     GENERATED_BODY()
 public:
     ADasGASPlaygroundGameMode();
+    virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
+protected:
+    virtual void BeginPlay() override;
 };

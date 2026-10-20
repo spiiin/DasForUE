@@ -530,7 +530,7 @@ void RequireCallContext(const FDasCallHandle& Handle, bool ConstructionUnsafe, d
 void ExpectCallSignature(const FDasCallHandle& Handle, const char* Expected, das::Context* Context)
 {
     auto& Call = ResolveCall(Handle, Context);
-    if (Call.bExecuted || !Expected || Call.SignatureKey != UTF8_TO_TCHAR(Expected))
+    if (Call.bExecuted || !Expected || !Call.SignatureKey.Equals(UTF8_TO_TCHAR(Expected), ESearchCase::IgnoreCase))
         Context->throw_error("generated binding signature changed; regenerate bindings");
 }
 
