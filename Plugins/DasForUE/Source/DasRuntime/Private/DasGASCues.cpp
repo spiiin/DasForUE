@@ -15,6 +15,7 @@ UE_DEFINE_GAMEPLAY_TAG_STATIC(DasSampleAuraCue, "GameplayCue.Das.Sample.Aura");
 UE_DEFINE_GAMEPLAY_TAG_STATIC(DasSampleHooksCue, "GameplayCue.Das.Sample.Hooks");
 UE_DEFINE_GAMEPLAY_TAG_STATIC(DasPlaygroundImpactCue, "GameplayCue.Das.Sample.Playground.Impact");
 UE_DEFINE_GAMEPLAY_TAG_STATIC(DasPlaygroundAuraCue, "GameplayCue.Das.Sample.Playground.Aura");
+UE_DEFINE_GAMEPLAY_TAG_STATIC(DasStrikeConfirmEvent, "GameplayEvent.Das.Sample.StrikeConfirm");
 FDasGASCueHit::FDasGASCueHit(const FHitResult& H)
 {
     BlockingHit = H.bBlockingHit;

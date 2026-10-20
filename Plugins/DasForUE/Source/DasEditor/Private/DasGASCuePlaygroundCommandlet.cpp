@@ -1,5 +1,6 @@
 #include "DasGASAuthoredCommandlet.h"
 #include "DasGASAssetService.h"
+#include "DasGASCueExampleAssets.h"
 #include "DasDSLService.h"
 #include "DasGASCues.h"
 #include "DasRuntime.h"
@@ -44,35 +45,8 @@ int32 UDasGASCuePlaygroundCommandlet::Main(const FString& Params)
         return OK;
     };
     const FString Folder = TEXT("/Game/DasExamples/GASCues");
-    auto Save = [](UObject* Object)
-    {
-        const FString File = FPackageName::LongPackageNameToFilename(Object->GetOutermost()->GetName(),
-                                                                     FPackageName::GetAssetPackageExtension());
-        IFileManager::Get().MakeDirectory(*FPaths::GetPath(File), true);
-        FSavePackageArgs Args;
-        Args.TopLevelFlags = RF_Public | RF_Standalone;
-        return UPackage::SavePackage(Object->GetOutermost(), Object, *File, Args);
-    };
-    auto Prepare = [&](const TCHAR* TemplateName, const TCHAR* Name)
-    {
-        const FString Path = Folder + TEXT("/") + Name;
-        if (auto* Existing = LoadObject<UNiagaraSystem>(nullptr, *(Path + TEXT(".") + Name), nullptr, LOAD_NoWarn))
-        {
-            Existing->WaitForCompilationComplete(true, false);
-            return Existing;
-        }
-        const FString Source =
-            FString(TEXT("/Niagara/DefaultAssets/Templates/Systems/")) + TemplateName + TEXT(".") + TemplateName;
-        auto* Template = LoadObject<UNiagaraSystem>(nullptr, *Source);
-        if (!Template)
-            return static_cast<UNiagaraSystem*>(nullptr);
-        auto* System = DuplicateObject<UNiagaraSystem>(Template, CreatePackage(*Path), Name);
-        System->SetFlags(RF_Public | RF_Standalone);
-        System->WaitForCompilationComplete(true, false);
-        return Save(System) ? System : nullptr;
-    };
-    auto* Burst = Prepare(TEXT("RadialBurst"), TEXT("NS_Impact"));
-    auto* Fountain = Prepare(TEXT("FountainLightweight"), TEXT("NS_Aura"));
+    auto* Burst = PrepareDasCueExampleSystem(Folder, TEXT("RadialBurst"), TEXT("NS_Impact"));
+    auto* Fountain = PrepareDasCueExampleSystem(Folder, TEXT("FountainLightweight"), TEXT("NS_Aura"));
     auto* Sound = LoadObject<USoundBase>(nullptr, TEXT("/Engine/EngineSounds/1kSineTonePing.1kSineTonePing"));
     if (!Check(Burst && Fountain && Sound && Burst->IsReadyToRun() && Fountain->IsReadyToRun(),
                TEXT("real_sound_and_saved_niagara_assets_ready")))
@@ -106,7 +80,7 @@ int32 UDasGASCuePlaygroundCommandlet::Main(const FString& Params)
         Property->SetObjectPropertyValue_InContainer(CDO, Assets.FindChecked(Pair.Value)->GeneratedClass);
     }
     BP->MarkPackageDirty();
-    if (!Check(Save(BP), TEXT("placeable_blueprint_saved_with_effect_classes")))
+    if (!Check(SaveDasCueExampleAsset(BP), TEXT("placeable_blueprint_saved_with_effect_classes")))
         return 1;
     TStrongObjectPtr<UWorld> World(UWorld::CreateWorld(EWorldType::Game, false));
     // UWorld::CreateFXSystem skips every commandlet, including AllowCommandletRendering.

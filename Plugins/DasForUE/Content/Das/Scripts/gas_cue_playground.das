@@ -41,3 +41,7 @@ class PlaygroundAuraCue {
 class PlaygroundHit { Health:float=-1.0f }
 [ue_gameplay_effect(attributes="PlaygroundStats",duration="Infinite",cue="PlaygroundAuraCue")]
 class PlaygroundAura {}
+
+// The targeted ability uses the same cue but lets native duration expiry invoke Removed.
+[ue_gameplay_effect(attributes="PlaygroundStats",duration=2.0f,cue="PlaygroundAuraCue")]
+class PlaygroundTimedAura {}

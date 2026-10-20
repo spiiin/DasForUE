@@ -103,3 +103,12 @@ public:
     UDasGASCuePlaygroundCommandlet();
     virtual int32 Main(const FString& Params) override;
 };
+
+UCLASS()
+class UDasGASAbilityPlaygroundCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
+public:
+    UDasGASAbilityPlaygroundCommandlet();
+    virtual int32 Main(const FString& Params) override;
+};

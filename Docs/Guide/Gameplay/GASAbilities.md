@@ -234,3 +234,24 @@ is recorded in `logs/gas-hooks-validation.json`.
 The latest focused hooks run passed all 12 checks (exit code 0).
 
 Tasks, targets and calculations are covered in [GASAdvanced.md](GASAdvanced.md).
+
+## Targeted strike with impact and a timed aura
+
+[gas_targeted_strike.das](../../../Plugins/DasForUE/Content/Das/Scripts/gas_targeted_strike.das) combines activation-owned targeting, a native gameplay-event task, commit, target effect application and cue assets. It reads editable effect classes through the typed AbilityPlaygroundRef, rather than hard-coding effect class paths. The declaration-only reference lives in ue_gas_playground_refs.das.
+
+The `gas-ability-playground` build-agent suite prepares two placeable Blueprints under `/Game/DasExamples/GASCues`: BP_AbilityPlayground (caster) and BP_AbilityTarget (visible sphere target). It also imports the existing cue definitions, GA_TargetedStrike and GE_PlaygroundTimedAura. The target receives PlaygroundStats; the caster's Attributes/HitEffect/AuraEffect/StrikeAbility class properties are assigned automatically. Existing demo Niagara copies are reused. These are generated demo assets, separate from user maps/projects.
+
+Place the caster facing a target within its Range (600 by default). Connect your input Blueprint to these methods:
+
+1. BeginAim activates the ability, performs a Visibility sphere sweep (Radius 5) and exposes PreviewTarget. No damage, cue or commit happens yet.
+2. ConfirmAim sends the registered GameplayEvent.Das.Sample.StrikeConfirm event. The ability repeats the current actor-position/forward-vector query, confirms exactly one target, commits and applies PlaygroundHit and PlaygroundTimedAura to that target. Hit damage is one point. The real native TargetData hit positions the sound/Niagara burst at ImpactPoint.
+3. The ability ends and releases its wait tasks. The target's two-second native duration effect remains alive independently, producing OnActive/WhileActive for the fountain. Native expiry invokes Removed, which destroys the owned aura component.
+4. CancelAim cancels an outstanding aim without effects. A miss at confirmation cancels too. AimTimeout (five seconds by default) bounds an unanswered aim.
+
+The caster actor's transform is the ray origin/direction; a player input graph can update that transform from its camera before BeginAim/ConfirmAim. PreviewTarget is an initial preview, not a continuously updated reticle. LastTarget, Shots and CancelledShots expose the result to UI/Blueprints. The visible target blocks Visibility and requires the authored ASC/compatible AttributeSet. This is local authoritative gameplay; networking/prediction remain deferred.
+
+Hit and aura are separate native effect applications, not a transactional pair. Both class references are checked/specs prepared before applying. Application failure cancels the ability but does not roll back an already-applied hit. Committed effects belong to the target after the ability ends; cancelling a later activation does not undo them. The sample uses the same bounded named impact and idempotent aura helpers as [GASCues.md](GASCues.md). General effect stacking/cue aggregation policy is native GAS, not a new transaction/stacking layer in this example.
+
+The single focused offscreen runtime scenario checks actual trace preview, harmless cancel, confirmation/commit and separate source/target attributes, real sound/Niagara components at the native hit point, aura retention after ability end and GC, native timed expiry/Removed cleanup, re-querying aim before confirmation, and EndPlay cleanup. It builds first through the shared agent; full PIE, packaged/cook validation and perceptual audio/visual QA are outside this step. The fixed sound/Niagara soft paths still require explicit cook inclusion as documented for the cue playground.
+
+Verified by build-agent job `gasstrike-20261020b`: Editor Development build and `DAS_GAS_ABILITY_PLAYGROUND_RESULT=PASS checks=9` in one offscreen runtime scenario (8.75 seconds of commandlet logic). The scenario uses real native physics hits, GameplayAbility tasks, effects and sound/Niagara components; full PIE/packaged/network and perceptual audio/visual checks were not run. Cancellation is checked through the DAS Cancel hook counter, inactive/uncommitted state and released tasks: the State query does not retain the Cancelled bit from terminal notification snapshots.
