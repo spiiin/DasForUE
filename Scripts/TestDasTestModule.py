@@ -125,6 +125,13 @@ try { Invoke-DasValidation @Parameters; throw 'source additions not checked' }
 catch { if($_.Exception.Message -notlike 'Source or binary changed*'){throw} }
 """)
 
+    def test_validation_paths_include_the_shared_helper_implementation(self):
+        self.ps(r"""
+$Das=Get-DasContext
+$Paths=@(Get-DasValidationPaths $Das)
+if($Paths -notcontains (Get-Module DasTest).Path){throw 'shared helper source is not frozen'}
+""")
+
     def test_all_runners_parse_and_keep_build_result_logic_in_module(self):
         for runner in (ROOT / "Scripts").glob("Test*.ps1"):
             source = runner.read_text(encoding="utf-8-sig")

@@ -177,6 +177,7 @@ function Get-DasValidationPaths {
         "$($Das.Repo)/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$_.dll"
     }
     "$($Das.Engine)/Engine/Binaries/Win64/UnrealEditor.modules"
+    Join-Path $PSScriptRoot 'DasTest.psm1'
     $Extra | ForEach-Object { "$($Das.Repo)/$_" }
 }
 
