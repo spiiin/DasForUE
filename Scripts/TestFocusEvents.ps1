@@ -17,14 +17,14 @@ try {
  & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch -run=DasFocusEvents "-Script=$Name" "-abslog=$Log" *> "$Stage/focus-stdout.log"
  $Result=(Get-DasResult -Text (Get-Content $Log -Raw) -Pattern 'DAS_FOCUS_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Focus runtime probe failed: $Log"}
 }finally{Remove-Item -LiteralPath $Probe -ErrorAction SilentlyContinue}
-if(Select-String $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Log"}
+if(Test-DasResult $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Log"}
 $ReplyName='focus_reply_probe_'+[guid]::NewGuid().ToString('N')+'.das';$ReplyProbe="$Repo/Plugins/DasForUE/Content/Das/Scripts/$ReplyName";$ReplyLog="$Stage/related-event-reply.log"
 try {
  Copy-Item "$Repo/Tests/EventReply/probe.das" $ReplyProbe
  & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch -run=DasWidgetEvents -GeneratedReply "-Script=$ReplyName" "-abslog=$ReplyLog" *> "$Stage/related-event-reply-stdout.log"
  $ReplyResult=(Get-DasResult -Text (Get-Content $ReplyLog -Raw) -Pattern 'DAS_WIDGET_EVENTS_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$ReplyResult.Success){throw "Related EventReply regression failed: $ReplyLog"}
 }finally{Remove-Item -LiteralPath $ReplyProbe -ErrorAction SilentlyContinue}
-if(Select-String $ReplyLog -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $ReplyLog"}
+if(Test-DasResult $ReplyLog -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $ReplyLog"}
 foreach($File in $Sources.Keys){if((Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash -ne $Sources[$File]){throw "Source changed during Focus verification: $File"}}
 foreach($Path in $Dlls.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Dlls[$Path]){throw 'DLL changed during Focus verification'}}
 if((Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during Focus verification'}

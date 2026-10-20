@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine')
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests\DasForUESmoke\DasForUESmoke.uproject'
@@ -17,7 +19,7 @@ try {
  foreach($Case in $Cases){
   $Log=Join-Path $Repo "logs\source-$Case.log"; $FixtureArgs=@(); if($Case -eq 'dsl_authored_object_events'){$FixtureArgs=@('-StructMapFixtures')}
   & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') $Project -run=DasGameplaySourceTest @FixtureArgs "-Scripts=$Case.das" "-Output=$Output" "-Module=$Module" -unattended -NullRHI -nosplash "-abslog=$Log" *> (Join-Path $Repo "logs\source-$Case-console.log")
-  if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_SOURCE_CATALOG PASS')){$Failures+=$Case;Write-Output "FAIL $Case"}else{Write-Output "PASS $Case"}
+  if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_SOURCE_CATALOG PASS')){$Failures+=$Case;Write-Output "FAIL $Case"}else{Write-Output "PASS $Case"}
  }
 }finally{
  # Only the two unique outputs created by this test; never remove source fixtures.

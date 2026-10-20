@@ -32,7 +32,7 @@ foreach($Case in @(
  & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasExport -Modules=Engine "-Probe=$Bad" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$BadLog" *> "$BadLog.stdout"
  $BadText=Get-Content $BadLog -Raw;if(!$LASTEXITCODE -or !$BadText.Contains('error[') -or !$BadText.Contains('UEKeyEvent')){throw "Expected compile-time token rejection: $BadLog"};$CompileRejections++
 }
-foreach($Name in @('export.log','preflight.log','input-events.log')){if(Select-String (Join-Path $Stage $Name) -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Name"}}
+foreach($Name in @('export.log','preflight.log','input-events.log')){if(Test-DasResult (Join-Path $Stage $Name) -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Name"}}
 foreach($Path in $Hashes.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Hashes[$Path]){throw 'DLL changed during tests'}}
 if((Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during tests'}
 if($Publish){$Report|ConvertTo-Json -Depth 100|Set-Content "$Repo/Bindings/Packages/ue_api_umg_input.summary.json" -Encoding utf8}

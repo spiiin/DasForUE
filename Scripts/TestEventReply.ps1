@@ -43,7 +43,7 @@ foreach($Case in @(
  & $Editor @Common -run=DasExport "-Modules=Engine,UMG" "-Probe=$Bad" "-abslog=$BadLog" *> "$BadLog.stdout"
  $Text=Get-Content $BadLog -Raw;if(!$LASTEXITCODE -or !$Text.Contains('error[') -or !$Text.Contains('UEEventReply')){throw "Expected EventReply compile rejection: $BadLog"};$Rejections++
 }
-foreach($File in @('export.log','preflight.log','event-reply.log')){if(Select-String "$Stage/$File" -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $File"}}
+foreach($File in @('export.log','preflight.log','event-reply.log')){if(Test-DasResult "$Stage/$File" -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $File"}}
 foreach($File in $Sources.Keys){if((Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash -ne $Sources[$File]){throw "Source changed during EventReply verification: $File"}}
 foreach($Path in $Hashes.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Hashes[$Path]){throw 'DLL changed during EventReply verification'}}
 if((Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during EventReply verification'}

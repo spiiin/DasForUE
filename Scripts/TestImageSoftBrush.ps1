@@ -22,7 +22,7 @@ $Text=(Get-Content "$Repo/Tests/ImageSoftBrush/probe.template.das" -Raw).Replace
 $Log="$Stage/image-soft-brush.log"
 & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasImageSoftBrush "-Script=$Probe" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Log" *> "$Stage/image-soft-brush-stdout.log"
 $Result=(Get-DasResult -Text (Get-Content $Log -Raw) -Pattern 'DAS_IMAGE_SOFT_BRUSH_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "ImageSoftBrush runtime probe failed: $Log"}
-foreach($Name in @('preflight.log','image-soft-brush.log')){if(Select-String (Join-Path $Stage $Name) -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Name"}}
+foreach($Name in @('preflight.log','image-soft-brush.log')){if(Test-DasResult (Join-Path $Stage $Name) -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Name"}}
 foreach($File in $Sources.Keys){if((Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash -ne $Sources[$File]){throw "Source changed during ImageSoftBrush tests: $File"}}
 foreach($Path in $Hashes.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Hashes[$Path]){throw 'DLL changed during ImageSoftBrush tests'}}
 if((Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during ImageSoftBrush tests'}

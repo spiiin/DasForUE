@@ -24,7 +24,7 @@ foreach($Mode in @('sync','fixed-async')){
  & $Editor @Common -run=DasExecutionRole @Extra "-Probe=$Probe" "-abslog=$Log" *> "$Stage/$Mode-stdout.log"
  $Match=(Get-DasResult -Text (Get-Content -LiteralPath $Log -Raw) -Pattern 'DAS_EXECUTION_ROLES_RESULT=PASS checks=(\d+) externs=(\d+)')
  if($LASTEXITCODE -or !$Match.Success -or [int]$Match.Groups[1].Value -lt 45){throw "Execution role $Mode checks failed: $Log"}
- if(Select-String -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure during $Mode role checks"}
+ if(Test-DasResult -LiteralPath $Log -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure during $Mode role checks"}
  $Total += [int]$Match.Groups[1].Value;$Registrations=[int]$Match.Groups[2].Value;$Logs+=$Log
 }
 # One module preflight exercises the normal reflection/struct/container ABI after

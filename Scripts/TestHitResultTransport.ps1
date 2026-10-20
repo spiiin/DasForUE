@@ -34,7 +34,7 @@ $Source=$Source.Replace('@COLLISION@',$Report.staged_module).Replace('@ENVELOPE@
 $Probe=Join-Path $Stage 'hit-transport-probe.das';$Log=Join-Path $Stage 'hit-transport-runtime.log'
 $Source|Set-Content -LiteralPath $Probe -Encoding utf8
 & $Editor @Common -GameWorld -CollisionWorld "-Probe=$Probe" "-abslog=$Log" *> "$Stage/hit-transport-runtime-stdout.log"
-if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw "Hit transport runtime probe failed: $Log"}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw "Hit transport runtime probe failed: $Log"}
 if((Get-FileHash $RuntimeDll -Algorithm SHA256).Hash -ne $RuntimeHash){throw 'Runtime DLL changed during validation; rerun against the completed build'}
 [ordered]@{state='PASS';python_tests=127;whole_collision_module='PASS';generated_line_sphere_box_capsule='PASS';multi_sweep_array='PASS';native_consumer_and_actor_instance_roundtrip='PASS';nested_array_ref_transport='PASS';weak_snapshot_input_output_GC='PASS';destroyed_references='PASS';wrong_type_direction_unassigned_private_path='PASS';snapshot_root_collection='PASS';runtime_sha256=$RuntimeHash.ToLower();report=$Package.report;runtime_log=$Log;counts=$Report.counts;published=$false;full_foundation='not_run';PIE='not_run';packaged='not_run';commit='not_created'}|ConvertTo-Json -Depth 20|Set-Content -LiteralPath "$Repo/logs/hit-transport-validation.json" -Encoding utf8
 Write-Output "DAS_HIT_TRANSPORT=PASS report=$($Package.report)"

@@ -22,7 +22,7 @@ if($PIE){
   ('-ReportExportPath="'+$Report+'"'),('-abslog="'+$Log+'"'))
  $Process=Start-Process -FilePath (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') -ArgumentList $Arguments -WindowStyle Hidden -PassThru
  $Process.WaitForExit()
- if($Process.ExitCode -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_EXTENDED_DEFAULTS_PIE=PASS')){throw 'Defaults PIE failed'}
+ if($Process.ExitCode -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_EXTENDED_DEFAULTS_PIE=PASS')){throw 'Defaults PIE failed'}
  $Result=Get-Content -LiteralPath (Join-Path $Report 'index.json') -Raw | ConvertFrom-Json
  if($Result.failed -ne 0 -or $Result.notRun -ne 0 -or $Result.succeeded -ne 1 -or $Result.succeededWithWarnings -ne 0){throw 'Defaults PIE automation did not pass cleanly'}
 }
@@ -32,6 +32,6 @@ if($Package){
  $Exe=Join-Path $Repo 'Build\Packaged\Windows\DasForUESmoke\Binaries\Win64\DasForUESmoke.exe'
  $Log=Join-Path $Repo 'logs\extended-defaults-packaged.log'
  $Process=Start-Process -FilePath $Exe -ArgumentList $Map,'-DasExtendedDefaults','-nullrhi','-unattended','-nosplash',"-abslog=$Log" -WindowStyle Hidden -PassThru -Wait
- if($Process.ExitCode -or (Select-String -LiteralPath $Log -Pattern ':\s+Error:|Fatal error:') -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_EXTENDED_DEFAULTS_PACKAGED=PASS')){throw 'Packaged defaults failed'}
+ if($Process.ExitCode -or (Test-DasResult -LiteralPath $Log -Pattern ':\s+Error:|Fatal error:') -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_EXTENDED_DEFAULTS_PACKAGED=PASS')){throw 'Packaged defaults failed'}
 }
 Write-Output "DAS_EXTENDED_DEFAULTS_PROBE=PASS map=/Game/DasExtendedDefaults/$Id/Map"
