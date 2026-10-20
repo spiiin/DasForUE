@@ -14,6 +14,7 @@
 			"ue_effects",
 			"ue_enhanced_input",
 			"ue_gameplay_services",
+			"ue_gas_types",
 			"ue_generated",
 			"ue_native_hash_probe",
 			"ue_native_self_refs",
@@ -26,6 +27,11 @@
 				"path": "/Script/CoreUObject.Object",
 				"module": "ue_generated",
 				"name": "C_Object_55c3753a"
+			},
+			{
+				"path": "/Script/DasRuntime.DasHealthAbilitySystemComponent",
+				"module": "ue_gas_types",
+				"name": "HealthAbilitySystemComponentRef"
 			},
 			{
 				"path": "/Script/DasRuntime.DasNativeHashProbeComponent",
@@ -138,7 +144,18 @@
 				"name": "UserWidgetRef"
 			}
 		],
-		"enums": []
+		"enums": [
+			{
+				"path": "/Script/DasRuntime.EDasHealthAttribute",
+				"module": "ue_gas_types",
+				"name": "HealthAttribute"
+			},
+			{
+				"path": "/Script/DasRuntime.EDasHealthEffect",
+				"module": "ue_gas_types",
+				"name": "HealthEffect"
+			}
+		]
 	},
 	"enums": [
 		{
@@ -241,6 +258,32 @@
 				{
 					"name": "Paused",
 					"value": 42
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.EDasHealthAttribute",
+			"entries": [
+				{
+					"name": "Health",
+					"value": 0
+				},
+				{
+					"name": "MaxHealth",
+					"value": 1
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.EDasHealthEffect",
+			"entries": [
+				{
+					"name": "Heal",
+					"value": 0
+				},
+				{
+					"name": "Damage",
+					"value": 1
 				}
 			]
 		},
@@ -2427,6 +2470,27 @@
 			]
 		},
 		{
+			"path": "/Script/DasRuntime.DasGameplayAttributeChange",
+			"signature": "Attribute:EnumProperty:0:/Script/DasRuntime.EDasHealthAttribute;OldValue:FloatProperty:0;NewValue:FloatProperty:0;",
+			"fields": [
+				{
+					"kind": "enum",
+					"type_path": "/Script/DasRuntime.EDasHealthAttribute",
+					"name": "Attribute"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "OldValue"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "NewValue"
+				}
+			]
+		},
+		{
 			"path": "/Script/DasRuntime.DasHashContainerSnapshot",
 			"signature": "Items:ArrayProperty:0[Items:StructProperty:0:/Script/DasRuntime.DasHashSnapshot{Values:MapProperty:0[Values_Key:IntProperty:0;Values:StrProperty:0;];Tags:SetProperty:0[Tags:StrProperty:0;];};];",
 			"fields": [
@@ -2470,6 +2534,63 @@
 						"type_path": ""
 					},
 					"name": "Tags"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasHealthEffectResult",
+			"signature": "Valid:BoolProperty:0;Applied:BoolProperty:0;HasActiveHandle:BoolProperty:0;",
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "Valid"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "Applied"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "HasActiveHandle"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasHealthEffectSpec",
+			"signature": "Source:ObjectProperty:0:/Script/DasRuntime.DasHealthAbilitySystemComponent;Effect:EnumProperty:0:/Script/DasRuntime.EDasHealthEffect;Level:FloatProperty:0;MagnitudeTag:NameProperty:0;Magnitude:FloatProperty:0;HasMagnitude:BoolProperty:0;",
+			"fields": [
+				{
+					"kind": "object",
+					"type_path": "/Script/DasRuntime.DasHealthAbilitySystemComponent",
+					"name": "Source"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/DasRuntime.EDasHealthEffect",
+					"name": "Effect"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Level"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "MagnitudeTag"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Magnitude"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "HasMagnitude"
 				}
 			]
 		},
@@ -2970,6 +3091,54 @@
 			]
 		},
 		{
+			"path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle",
+			"signature": "Handle:IntProperty:0;",
+			"fields": [
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "Handle"
+				}
+			]
+		},
+		{
+			"path": "/Script/GameplayTags.GameplayTag",
+			"signature": "TagName:NameProperty:0;",
+			"fields": [
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "TagName"
+				}
+			]
+		},
+		{
+			"path": "/Script/GameplayTags.GameplayTagContainer",
+			"signature": "GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];",
+			"fields": [
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "struct",
+						"type_path": "/Script/GameplayTags.GameplayTag"
+					},
+					"name": "GameplayTags"
+				},
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "struct",
+						"type_path": "/Script/GameplayTags.GameplayTag"
+					},
+					"name": "ParentTags"
+				}
+			]
+		},
+		{
 			"path": "/Script/InputCore.Key",
 			"signature": "KeyName:NameProperty:0;",
 			"fields": [
@@ -3108,6 +3277,1839 @@
 					"domain": "method",
 					"name": "ExecuteUbergraph",
 					"reason": "requires_adapter_or_nonpublic_policy"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasHealthAbilitySystemComponent",
+			"fixture": false,
+			"fields": [
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "AffectedAnimInstanceTag",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "AffectedAnimInstanceTag:NameProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bAutoActivate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bAutoActivate:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bIsEditorOnly",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bIsEditorOnly:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bReplicates",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bReplicates:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bReplicateUsingRegisteredSubObjectList",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bReplicateUsingRegisteredSubObjectList:BoolProperty:0;"
+				},
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "name",
+						"type_path": ""
+					},
+					"name": "ComponentTags",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "ComponentTags:ArrayProperty:0[ComponentTags:NameProperty:0;];"
+				}
+			],
+			"methods": [
+				{
+					"name": "Activate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;Activate;bReset:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bReset",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "AddTickPrerequisiteActor",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;AddTickPrerequisiteActor;PrerequisiteActor:ObjectProperty:128:/Script/Engine.Actor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "PrerequisiteActor",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "AddTickPrerequisiteComponent",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;AddTickPrerequisiteComponent;PrerequisiteComponent:ObjectProperty:128:/Script/Engine.ActorComponent;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.ActorComponent",
+							"name": "PrerequisiteComponent",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "ApplyHealthSpec",
+					"declaring_class": "/Script/DasRuntime.DasHealthAbilitySystemComponent",
+					"signature": "v1;ApplyHealthSpec;Spec:StructProperty:134218114:/Script/DasRuntime.DasHealthEffectSpec{Source:ObjectProperty:0:/Script/DasRuntime.DasHealthAbilitySystemComponent;Effect:EnumProperty:0:/Script/DasRuntime.EDasHealthEffect;Level:FloatProperty:0;MagnitudeTag:NameProperty:0;Magnitude:FloatProperty:0;HasMagnitude:BoolProperty:0;};ReturnValue:StructProperty:1408:/Script/DasRuntime.DasHealthEffectResult{Valid:BoolProperty:0;Applied:BoolProperty:0;HasActiveHandle:BoolProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasHealthEffectSpec",
+							"name": "Spec",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasHealthEffectResult",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "AreAbilityTagsBlocked",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;AreAbilityTagsBlocked;Tags:StructProperty:134218114:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTagContainer",
+							"name": "Tags",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "ClearAbility",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;ClearAbility;Handle:StructProperty:134218114:/Script/GameplayAbilities.GameplayAbilitySpecHandle{Handle:IntProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle",
+							"name": "Handle",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "ClearAllAbilities",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;ClearAllAbilities;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "ClearAllAbilitiesWithInputID",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;ClearAllAbilitiesWithInputID;InputID:IntProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "InputID",
+							"direction": "in",
+							"default_text": "0"
+						}
+					]
+				},
+				{
+					"name": "ComponentHasTag",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;ComponentHasTag;Tag:NameProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "Deactivate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;Deactivate;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": []
+				},
+				{
+					"name": "FindAllAbilitiesWithInputID",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;FindAllAbilitiesWithInputID;OutAbilityHandles:ArrayProperty:384[OutAbilityHandles:StructProperty:0:/Script/GameplayAbilities.GameplayAbilitySpecHandle{Handle:IntProperty:0;};];InputID:IntProperty:128;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "struct",
+								"type_path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle"
+							},
+							"name": "OutAbilityHandles",
+							"direction": "out"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "InputID",
+							"direction": "in",
+							"default_text": "0"
+						}
+					]
+				},
+				{
+					"name": "FindAllAbilitiesWithTags",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;FindAllAbilitiesWithTags;OutAbilityHandles:ArrayProperty:384[OutAbilityHandles:StructProperty:0:/Script/GameplayAbilities.GameplayAbilitySpecHandle{Handle:IntProperty:0;};];Tags:StructProperty:128:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};bExactMatch:BoolProperty:128;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "struct",
+								"type_path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle"
+							},
+							"name": "OutAbilityHandles",
+							"direction": "out"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTagContainer",
+							"name": "Tags",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bExactMatch",
+							"direction": "in",
+							"default_text": "true"
+						}
+					]
+				},
+				{
+					"name": "GetAllAbilities",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;GetAllAbilities;OutAbilityHandles:ArrayProperty:384[OutAbilityHandles:StructProperty:0:/Script/GameplayAbilities.GameplayAbilitySpecHandle{Handle:IntProperty:0;};];",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "struct",
+								"type_path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle"
+							},
+							"name": "OutAbilityHandles",
+							"direction": "out"
+						}
+					]
+				},
+				{
+					"name": "GetAttributeSet",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;GetAttributeSet;AttributeSetClass:ClassProperty:128:meta:/Script/GameplayAbilities.AttributeSet;ReturnValue:ObjectProperty:1410:/Script/GameplayAbilities.AttributeSet;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "class",
+							"type_path": "/Script/GameplayAbilities.AttributeSet",
+							"name": "AttributeSetClass",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/GameplayAbilities.AttributeSet",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetComponentTickInterval",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;GetComponentTickInterval;ReturnValue:FloatProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetGameplayEffectCount",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;GetGameplayEffectCount;SourceGameplayEffect:ClassProperty:128:meta:/Script/GameplayAbilities.GameplayEffect;OptionalInstigatorFilterComponent:ObjectProperty:128:/Script/GameplayAbilities.AbilitySystemComponent;bEnforceOnGoingCheck:BoolProperty:128;ReturnValue:IntProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "class",
+							"type_path": "/Script/GameplayAbilities.GameplayEffect",
+							"name": "SourceGameplayEffect",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/GameplayAbilities.AbilitySystemComponent",
+							"name": "OptionalInstigatorFilterComponent",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bEnforceOnGoingCheck",
+							"direction": "in",
+							"default_text": "true"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetGameplayEffectCount_IfLoaded",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;GetGameplayEffectCount_IfLoaded;SoftSourceGameplayEffect:SoftClassProperty:128:soft:/Script/GameplayAbilities.GameplayEffect;OptionalInstigatorFilterComponent:ObjectProperty:128:/Script/GameplayAbilities.AbilitySystemComponent;bEnforceOnGoingCheck:BoolProperty:128;ReturnValue:IntProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasSoftClass_54171b28df3af163ef1a57a7ed50afe9",
+							"soft_reference":
+							{
+								"base": "/Script/GameplayAbilities.GameplayEffect",
+								"class_ref": true
+							},
+							"name": "SoftSourceGameplayEffect",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/GameplayAbilities.AbilitySystemComponent",
+							"name": "OptionalInstigatorFilterComponent",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bEnforceOnGoingCheck",
+							"direction": "in",
+							"default_text": "true"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetGameplayTagCount",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;GetGameplayTagCount;GameplayTag:StructProperty:128:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};ReturnValue:IntProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTag",
+							"name": "GameplayTag",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetOwner",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;GetOwner;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetUserAbilityActivationInhibited",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;GetUserAbilityActivationInhibited;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HealthReady",
+					"declaring_class": "/Script/DasRuntime.DasHealthAbilitySystemComponent",
+					"signature": "v1;HealthReady;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HealthSnapshot",
+					"declaring_class": "/Script/DasRuntime.DasHealthAbilitySystemComponent",
+					"signature": "v1;HealthSnapshot;Attribute:EnumProperty:128:/Script/DasRuntime.EDasHealthAttribute;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasGameplayAttributeChange{Attribute:EnumProperty:0:/Script/DasRuntime.EDasHealthAttribute;OldValue:FloatProperty:0;NewValue:FloatProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/DasRuntime.EDasHealthAttribute",
+							"name": "Attribute",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasGameplayAttributeChange",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "InitializeHealth",
+					"declaring_class": "/Script/DasRuntime.DasHealthAbilitySystemComponent",
+					"signature": "v1;InitializeHealth;Maximum:FloatProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "Maximum",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "InputCancel",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;InputCancel;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "InputConfirm",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;InputConfirm;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "IsActive",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;IsActive;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": true,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsBeingDestroyed",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;IsBeingDestroyed;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsComponentTickEnabled",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;IsComponentTickEnabled;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsGameplayCueActive",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;IsGameplayCueActive;GameplayCueTag:StructProperty:130:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTag",
+							"name": "GameplayCueTag",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_DestroyComponent",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;K2_DestroyComponent;Object:ObjectProperty:128:/Script/CoreUObject.Object;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/CoreUObject.Object",
+							"name": "Object",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "K2_GiveAbility",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;K2_GiveAbility;AbilityClass:ClassProperty:128:meta:/Script/GameplayAbilities.GameplayAbility;Level:IntProperty:128;InputID:IntProperty:128;ReturnValue:StructProperty:1408:/Script/GameplayAbilities.GameplayAbilitySpecHandle{Handle:IntProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "class",
+							"type_path": "/Script/GameplayAbilities.GameplayAbility",
+							"name": "AbilityClass",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Level",
+							"direction": "in",
+							"default_text": "0"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "InputID",
+							"direction": "in",
+							"default_text": "-1"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_GiveAbilityAndActivateOnce",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;K2_GiveAbilityAndActivateOnce;AbilityClass:ClassProperty:128:meta:/Script/GameplayAbilities.GameplayAbility;Level:IntProperty:128;InputID:IntProperty:128;ReturnValue:StructProperty:1408:/Script/GameplayAbilities.GameplayAbilitySpecHandle{Handle:IntProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "class",
+							"type_path": "/Script/GameplayAbilities.GameplayAbility",
+							"name": "AbilityClass",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Level",
+							"direction": "in",
+							"default_text": "0"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "InputID",
+							"direction": "in",
+							"default_text": "-1"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_InitStats",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;K2_InitStats;Attributes:ClassProperty:128:meta:/Script/GameplayAbilities.AttributeSet;DataTable:ObjectProperty:130:/Script/Engine.DataTable;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "class",
+							"type_path": "/Script/GameplayAbilities.AttributeSet",
+							"name": "Attributes",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.DataTable",
+							"name": "DataTable",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "MakeHealthSpec",
+					"declaring_class": "/Script/DasRuntime.DasHealthAbilitySystemComponent",
+					"signature": "v1;MakeHealthSpec;Effect:EnumProperty:128:/Script/DasRuntime.EDasHealthEffect;Level:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasHealthEffectSpec{Source:ObjectProperty:0:/Script/DasRuntime.DasHealthAbilitySystemComponent;Effect:EnumProperty:0:/Script/DasRuntime.EDasHealthEffect;Level:FloatProperty:0;MagnitudeTag:NameProperty:0;Magnitude:FloatProperty:0;HasMagnitude:BoolProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/DasRuntime.EDasHealthEffect",
+							"name": "Effect",
+							"direction": "in"
+						},
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "Level",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasHealthEffectSpec",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "PressInputID",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;PressInputID;InputID:IntProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "InputID",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "ReadHealthAttribute",
+					"declaring_class": "/Script/DasRuntime.DasHealthAbilitySystemComponent",
+					"signature": "v1;ReadHealthAttribute;Attribute:EnumProperty:128:/Script/DasRuntime.EDasHealthAttribute;ReturnValue:FloatProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/DasRuntime.EDasHealthAttribute",
+							"name": "Attribute",
+							"direction": "in"
+						},
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "ReleaseInputID",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;ReleaseInputID;InputID:IntProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "InputID",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "RemoveActiveEffectsWithAppliedTags",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;RemoveActiveEffectsWithAppliedTags;Tags:StructProperty:128:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};ReturnValue:IntProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTagContainer",
+							"name": "Tags",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "RemoveActiveEffectsWithGrantedTags",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;RemoveActiveEffectsWithGrantedTags;Tags:StructProperty:128:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};ReturnValue:IntProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTagContainer",
+							"name": "Tags",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "RemoveActiveEffectsWithSourceTags",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;RemoveActiveEffectsWithSourceTags;Tags:StructProperty:128:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};ReturnValue:IntProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTagContainer",
+							"name": "Tags",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "RemoveActiveEffectsWithTags",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;RemoveActiveEffectsWithTags;Tags:StructProperty:128:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};ReturnValue:IntProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTagContainer",
+							"name": "Tags",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "RemoveActiveGameplayEffectBySourceEffect",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;RemoveActiveGameplayEffectBySourceEffect;GameplayEffect:ClassProperty:128:meta:/Script/GameplayAbilities.GameplayEffect;InstigatorAbilitySystemComponent:ObjectProperty:128:/Script/GameplayAbilities.AbilitySystemComponent;StacksToRemove:IntProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "class",
+							"type_path": "/Script/GameplayAbilities.GameplayEffect",
+							"name": "GameplayEffect",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/GameplayAbilities.AbilitySystemComponent",
+							"name": "InstigatorAbilitySystemComponent",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "StacksToRemove",
+							"direction": "in",
+							"default_text": "-1"
+						}
+					]
+				},
+				{
+					"name": "RemoveTickPrerequisiteActor",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;RemoveTickPrerequisiteActor;PrerequisiteActor:ObjectProperty:128:/Script/Engine.Actor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "PrerequisiteActor",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "RemoveTickPrerequisiteComponent",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;RemoveTickPrerequisiteComponent;PrerequisiteComponent:ObjectProperty:128:/Script/Engine.ActorComponent;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.ActorComponent",
+							"name": "PrerequisiteComponent",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetActive",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetActive;bNewActive:BoolProperty:128;bReset:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bNewActive",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bReset",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "SetAutoActivate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetAutoActivate;bNewAutoActivate:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bNewAutoActivate",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetComponentTickEnabled",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetComponentTickEnabled;bEnabled:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bEnabled",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetComponentTickInterval",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetComponentTickInterval;TickInterval:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "TickInterval",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetComponentTickIntervalAndCooldown",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetComponentTickIntervalAndCooldown;TickInterval:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "TickInterval",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetIsReplicated",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetIsReplicated;ShouldReplicate:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ShouldReplicate",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTickableWhenPaused",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetTickableWhenPaused;bTickableWhenPaused:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bTickableWhenPaused",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTickGroup",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetTickGroup;NewTickGroup:ByteProperty:128:/Script/Engine.ETickingGroup;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.ETickingGroup",
+							"name": "NewTickGroup",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetUserAbilityActivationInhibited",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;SetUserAbilityActivationInhibited;NewInhibit:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "NewInhibit",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "TargetCancel",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;TargetCancel;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "TargetConfirm",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;TargetConfirm;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "ToggleActive",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;ToggleActive;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": []
+				},
+				{
+					"name": "TryActivateAbilitiesByTag",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;TryActivateAbilitiesByTag;GameplayTagContainer:StructProperty:134218114:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};bAllowRemoteActivation:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayTags.GameplayTagContainer",
+							"name": "GameplayTagContainer",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bAllowRemoteActivation",
+							"direction": "in",
+							"default_text": "true"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "TryActivateAbility",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;TryActivateAbility;AbilityToActivate:StructProperty:128:/Script/GameplayAbilities.GameplayAbilitySpecHandle{Handle:IntProperty:0;};bAllowRemoteActivation:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/GameplayAbilities.GameplayAbilitySpecHandle",
+							"name": "AbilityToActivate",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bAllowRemoteActivation",
+							"direction": "in",
+							"default_text": "true"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "TryActivateAbilityByClass",
+					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
+					"signature": "v1;TryActivateAbilityByClass;InAbilityToActivate:ClassProperty:128:meta:/Script/GameplayAbilities.GameplayAbility;bAllowRemoteActivation:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "class",
+							"type_path": "/Script/GameplayAbilities.GameplayAbility",
+							"name": "InAbilityToActivate",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bAllowRemoteActivation",
+							"direction": "in",
+							"default_text": "true"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				}
+			],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "ActivatableAbilities",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "ActiveGameplayCues",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ActiveGameplayEffects",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AllReplicatedInstancedAbilities",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AssetUserData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AssetUserDataEditorOnly",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AttributeChanged",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AvatarActor",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCachedIsNetSimulated",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCanEverAffectNavigation",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCreatedByConstructionScript",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bEditableWhenInherited",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bInstanceComponent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsActive",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsVisualizationComponent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "BlockedAbilityBindings",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bNeedsUCSSerializationIndexEvaluted",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bNetAddressable",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bPendingMontageRep",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bSuppressGameplayCues",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bSuppressGrantAbility",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ClientDebugStrings",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CreationMethod",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DefaultStartingData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "GameplayTagCountContainer",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "HealthSet",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "IncomingDuration",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "KnownTasks",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "LocalAnimMontageInfo",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "MinimalReplicationGameplayCues",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "MinimalReplicationTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnClaimedResourcesChange",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "OnComponentActivated",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnComponentDeactivated",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OutgoingDuration",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OwnerActor",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "PrimaryComponentTick",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "RepAnimMontageInfo",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ReplicatedLooseTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ReplicatedPredictionKeyMap",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ReplicationProxyEnabled",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ServerDebugStrings",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SimulatedTasks",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SpawnedAttributes",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SpawnedTargetActors",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "TaskPriorityQueue",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "TickingTasks",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "UCSModifiedProperties",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "UCSSerializationIndex",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "UserAbilityActivationInhibited",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "method",
+					"name": "AbilityAbilityKey__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "AbilityConfirmOrCancel__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "BP_ApplyGameplayEffectSpecToSelf",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "BP_ApplyGameplayEffectSpecToTarget",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "BP_ApplyGameplayEffectToSelf",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "BP_ApplyGameplayEffectToTarget",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ClientActivateAbilityFailed",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ClientActivateAbilitySucceed",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ClientActivateAbilitySucceedWithEventData",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ClientCancelAbility",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ClientEndAbility",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ClientPrintDebug_Response",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ClientSetReplicatedEvent",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ClientTryActivateAbility",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "FindAllAbilitiesMatchingQuery",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetActiveEffects",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetActiveEffectsWithAllTags",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetAllAttributes",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetGameplayAttributeValue",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetGameplayEffectMagnitude",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_RunGameplayTask",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "MakeEffectContext",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "MakeOutgoingSpec",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "NetMulticast_InvokeGameplayCueAdded",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "NetMulticast_InvokeGameplayCueAdded_WithParams",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "NetMulticast_InvokeGameplayCueAddedAndWhileActive_FromSpec",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "NetMulticast_InvokeGameplayCueAddedAndWhileActive_WithParams",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "NetMulticast_InvokeGameplayCueExecuted",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "NetMulticast_InvokeGameplayCueExecuted_FromSpec",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "NetMulticast_InvokeGameplayCueExecuted_WithParams",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "NetMulticast_InvokeGameplayCuesAddedAndWhileActive_WithParams",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "NetMulticast_InvokeGameplayCuesExecuted",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "NetMulticast_InvokeGameplayCuesExecuted_WithParams",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "OnAvatarActorDestroyed",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnOwnerActorDestroyed",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnOwnerDamage",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_ActivateAbilities",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_ClientDebugString",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_IsActive",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_OwningActor",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_ReplicatedAnimMontage",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_ServerDebugString",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_SimulatedTasks",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_SpawnedAttributes",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnSpawnedAttributesEndPlayed",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveAsyncPhysicsTick",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveBeginPlay",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveEndPlay",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveTick",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "RemoveActiveGameplayEffect",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ServerAbilityRPCBatch",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ServerCancelAbility",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ServerCurrentMontageJumpToSectionName",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ServerCurrentMontageSetNextSectionName",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ServerCurrentMontageSetPlayRate",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ServerEndAbility",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ServerPrintDebug_Request",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ServerPrintDebug_RequestWithStrings",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ServerSetInputPressed",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ServerSetInputReleased",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ServerSetReplicatedEvent",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ServerSetReplicatedEventWithPayload",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ServerSetReplicatedTargetData",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ServerSetReplicatedTargetDataCancelled",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ServerTryActivateAbility",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ServerTryActivateAbilityWithEventData",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "SetActiveGameplayEffectLevel",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "SetActiveGameplayEffectLevelUsingQuery",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "UpdateActiveGameplayEffectSetByCallerMagnitude",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "UpdateActiveGameplayEffectSetByCallerMagnitudes",
+					"reason": "unsupported_parameter_type"
 				}
 			]
 		},

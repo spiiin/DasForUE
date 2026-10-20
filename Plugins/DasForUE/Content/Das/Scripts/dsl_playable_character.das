@@ -2,7 +2,7 @@ options gen2
 module dsl_playable_character public
 require ue_native_gameplay public
 require ue_gameplay_services public
-require ue_health_refs public
+require ue_gas public
 require ue_interaction public
 require ue_effects public
 
@@ -46,7 +46,7 @@ class PlayableCharacter : Character {
     components=ue_components(VisibleAnywhere,BlueprintReadOnly) {
         var Camera:CameraComponentRef
         var Label:TextRenderComponentRef
-        var Health:HealthComponentRef
+        var Abilities:HealthAbilitySystemComponentRef
     }
     defaults=ue_defaults() {
         self.HUDClass=ue_class_default("/Script/DasRuntime.DasGameplayHUD")
@@ -56,6 +56,7 @@ class PlayableCharacter : Character {
         self.Label.RelativeLocation=ue_vector(0.0lf,0.0lf,130.0lf)
     }
     def BeginPlay():void {
+        ue_gas_initialize_health(self.Abilities,100.0f)
         self.Label.K2_SetText(ue_text("DasForUE","PlayerLabel","Player"))
         self.CharacterMovement.MaxWalkSpeed=450.0f
         self.CharacterMovement.JumpZVelocity=500.0f
@@ -122,10 +123,10 @@ class PlayableCharacter : Character {
     def RefreshHUD():void {
         if(!ue_widget_visible(self.HUD)) { return }
         ue_widget_set_text(self.HUD,"Score",ue_text_invariant("Score: {self.Score}"))
-        ue_widget_set_text(self.HUD,"Health",ue_text_invariant("Health: {self.Health.Current} / {self.Health.Maximum}"))
+        ue_widget_set_text(self.HUD,"Health",ue_text_invariant("Health: {ue_gas_value(self.Abilities,HealthAttribute.Health)} / {ue_gas_value(self.Abilities,HealthAttribute.MaxHealth)}"))
     }
-    [ue_event(source="Health",name="Changed")]
-    def OnHealthChanged(current:float; maximum:float):void { self.HealthChanges+=1;self.RefreshHUD() }
+    [ue_event(source="Abilities",name="AttributeChanged")]
+    def OnHealthChanged(change:GameplayAttributeChange):void { self.HealthChanges+=1;self.RefreshHUD() }
     [ue_event(name="OnTakeAnyDamage")]
     def OnDamageFeedback(damaged:ActorRef; amount:float; kind:ObjectRef; instigator:ObjectRef; source:ActorRef):void {
         if(!(amount>0.0f && amount<=3.402823466e38f)) { return }
@@ -138,6 +139,8 @@ class PlayableCharacter : Character {
     def OnHurtEffectFinished():void { self.HurtEffectsFinished+=1 }
     [ue_function(BlueprintCallable)]
     def HurtFromHUD():void { self.HUDClicks+=1;self.ReceiveDamage(25.0f) }
+    [ue_function(BlueprintCallable)]
+    def Heal(amount:float):bool { return ue_gas_heal(self.Abilities,amount) }
     [ue_function(BlueprintCallable)]
     def ReceiveDamage(amount:float):void {
         ue_apply_damage(ue_self_actor(),amount,ue_self_actor(),ue_pawn_controller(ue_character_self()))

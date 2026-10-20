@@ -51,7 +51,8 @@ These gates come from the original plan (after the NimForUE audit) and are still
 
 ### Additional integrations (on demand)
 
-- GAS (attributes, effects, abilities, replication).
+- GAS: extend the verified [starter health/instant-effect adapter](../../Guide/Gameplay/GAS.md)
+  to arbitrary AttributeSets/GameplayEffects, authored abilities and eventually replication.
 - UMG MVVM / FieldNotify; Slate and editor UI extensions.
 - GameplayMessageRouter typed messages with listener lifetime.
 - PCG adapters and daScript kernels with explicit threading rules.

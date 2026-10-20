@@ -4,6 +4,7 @@ require ue_character_control public
 require ue_effects public
 require ue_enhanced_input public
 require ue_gameplay_services public
+require ue_gas_types public
 require ue_generated public
 require ue_native_hash_probe public
 require ue_native_self_refs public
@@ -48,6 +49,10 @@ def Native_ChildActorComponentRef_405d4379_from(value:UObjectHandle):Native_Chil
 [ue_native_object(path="/Script/Engine.Controller")]
 struct Native_ControllerRef_78a9db5e { handle:UObjectHandle }
 def Native_ControllerRef_78a9db5e_from(value:UObjectHandle):Native_ControllerRef_78a9db5e { return Native_ControllerRef_78a9db5e(handle=ue_cast_nullable_object(value,"/Script/Engine.Controller")) }
+
+[ue_native_object(path="/Script/Engine.DataTable")]
+struct Native_DataTableRef_733a5dd1 { handle:UObjectHandle }
+def Native_DataTableRef_733a5dd1_from(value:UObjectHandle):Native_DataTableRef_733a5dd1 { return Native_DataTableRef_733a5dd1(handle=ue_cast_nullable_object(value,"/Script/Engine.DataTable")) }
 
 [ue_native_object(path="/Script/Engine.Font")]
 struct Native_FontRef_684a8ec8 { handle:UObjectHandle }
@@ -173,6 +178,18 @@ def Native_InputTriggerRef_9095301f_from(value:UObjectHandle):Native_InputTrigge
 struct Native_PlayerMappableKeySettingsRef_585857fd { handle:UObjectHandle }
 def Native_PlayerMappableKeySettingsRef_585857fd_from(value:UObjectHandle):Native_PlayerMappableKeySettingsRef_585857fd { return Native_PlayerMappableKeySettingsRef_585857fd(handle=ue_cast_nullable_object(value,"/Script/EnhancedInput.PlayerMappableKeySettings")) }
 
+[ue_native_object(path="/Script/GameplayAbilities.AbilitySystemComponent")]
+struct Native_AbilitySystemComponentRef_4c40231b { handle:UObjectHandle }
+def Native_AbilitySystemComponentRef_4c40231b_from(value:UObjectHandle):Native_AbilitySystemComponentRef_4c40231b { return Native_AbilitySystemComponentRef_4c40231b(handle=ue_cast_nullable_object(value,"/Script/GameplayAbilities.AbilitySystemComponent")) }
+
+[ue_native_object(path="/Script/GameplayAbilities.AttributeSet")]
+struct Native_AttributeSetRef_21a737ee { handle:UObjectHandle }
+def Native_AttributeSetRef_21a737ee_from(value:UObjectHandle):Native_AttributeSetRef_21a737ee { return Native_AttributeSetRef_21a737ee(handle=ue_cast_nullable_object(value,"/Script/GameplayAbilities.AttributeSet")) }
+
+[ue_native_object(path="/Script/GameplayAbilities.GameplayEffect")]
+struct Native_GameplayEffectRef_77c7fc7b { handle:UObjectHandle }
+def Native_GameplayEffectRef_77c7fc7b_from(value:UObjectHandle):Native_GameplayEffectRef_77c7fc7b { return Native_GameplayEffectRef_77c7fc7b(handle=ue_cast_nullable_object(value,"/Script/GameplayAbilities.GameplayEffect")) }
+
 [ue_native_object(path="/Script/StaticMeshDescription.StaticMeshDescription")]
 struct Native_StaticMeshDescriptionRef_26792a74 { handle:UObjectHandle }
 def Native_StaticMeshDescriptionRef_26792a74_from(value:UObjectHandle):Native_StaticMeshDescriptionRef_26792a74 { return Native_StaticMeshDescriptionRef_26792a74(handle=ue_cast_nullable_object(value,"/Script/StaticMeshDescription.StaticMeshDescription")) }
@@ -200,6 +217,8 @@ def Native_WidgetAnimationRef_462f92b4_from(value:UObjectHandle):Native_WidgetAn
 [ue_native_object(path="/Script/UMG.WidgetNavigation")]
 struct Native_WidgetNavigationRef_8de38c28 { handle:UObjectHandle }
 def Native_WidgetNavigationRef_8de38c28_from(value:UObjectHandle):Native_WidgetNavigationRef_8de38c28 { return Native_WidgetNavigationRef_8de38c28(handle=ue_cast_nullable_object(value,"/Script/UMG.WidgetNavigation")) }
+
+typedef NativeSoftClass_GameplayEffect_06e0d8b0 = $UESoftClass<Native_GameplayEffectRef_77c7fc7b>
 
 typedef NativeSoftClass_Actor_ed297b28 = $UESoftClass<C_Actor_adf65d5b>
 
@@ -985,6 +1004,13 @@ struct DasCallPayload {
     Weight:double
 }
 
+[ue_native_struct(path="/Script/DasRuntime.DasGameplayAttributeChange")]
+struct DasGameplayAttributeChange {
+    Attribute:HealthAttribute
+    OldValue:float
+    NewValue:float
+}
+
 [ue_native_struct(path="/Script/DasRuntime.DasHashSnapshot")]
 struct DasHashSnapshot {
     Values:table<int;string>
@@ -994,6 +1020,23 @@ struct DasHashSnapshot {
 [ue_native_struct(path="/Script/DasRuntime.DasHashContainerSnapshot")]
 struct DasHashContainerSnapshot {
     Items:array<DasHashSnapshot>
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasHealthEffectResult")]
+struct DasHealthEffectResult {
+    Valid:bool
+    Applied:bool
+    HasActiveHandle:bool
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasHealthEffectSpec")]
+struct DasHealthEffectSpec {
+    Source:HealthAbilitySystemComponentRef
+    Effect:HealthEffect
+    Level:float
+    MagnitudeTag:UENameValue
+    Magnitude:float
+    HasMagnitude:bool
 }
 
 [ue_native_struct(path="/Script/DasRuntime.DasNamedMode")]
@@ -1114,6 +1157,22 @@ struct EnhancedActionKeyMapping {
 [ue_native_struct(path="/Script/EnhancedInput.InputMappingContextMappingData")]
 struct InputMappingContextMappingData {
     Mappings:array<EnhancedActionKeyMapping>
+}
+
+[ue_native_struct(path="/Script/GameplayAbilities.GameplayAbilitySpecHandle")]
+struct GameplayAbilitySpecHandle {
+    Handle:int
+}
+
+[ue_native_struct(path="/Script/GameplayTags.GameplayTag")]
+struct GameplayTag {
+    TagName:UENameValue
+}
+
+[ue_native_struct(path="/Script/GameplayTags.GameplayTagContainer")]
+struct GameplayTagContainer {
+    GameplayTags:array<GameplayTag>
+    ParentTags:array<GameplayTag>
 }
 
 [ue_native_struct(path="/Script/PhysicsCore.PhysicalMaterialDamageModifier")]

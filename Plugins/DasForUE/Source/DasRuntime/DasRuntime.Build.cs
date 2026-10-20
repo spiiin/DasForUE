@@ -10,7 +10,7 @@ public class DasRuntime : ModuleRules
         PCHUsage = PCHUsageMode.NoPCHs;
         bUseUnity = false;
         bEnableExceptions = true;
-        PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "GameplayTags", "UMG", "MovieScene", "AIModule" });
+        PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "GameplayTags", "GameplayAbilities", "GameplayTasks", "UMG", "MovieScene", "AIModule" });
         PrivateDependencyModuleNames.AddRange(new[] { "Projects", "Json", "AssetRegistry", "InputCore", "EnhancedInput", "Slate", "SlateCore", "Niagara", "NavigationSystem", "PhysicsCore", "Chaos" });
         string Root = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../.."));
         string Das = Path.Combine(Root, "ThirdParty", "daScript");
