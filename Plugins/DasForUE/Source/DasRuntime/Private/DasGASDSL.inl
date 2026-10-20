@@ -22,17 +22,52 @@ struct FUEGASDeclarationAnnotation : das::StructureAnnotation
             if (!S->isClass || S->parent)
                 DSLFail(TEXT("GAS declarations require a class without DAS inheritance"));
             for (const auto& A : Args)
-                if (A.name != "id" && (!Effect || (A.name != "attributes" && A.name != "duration")))
+                if (A.name != "id" &&
+                    (!Effect || (A.name != "attributes" && A.name != "duration" && A.name != "period" &&
+                                 A.name != "execute_on_application" && A.name != "stacking" &&
+                                 A.name != "stack_limit" && A.name != "stack_duration" && A.name != "stack_period" &&
+                                 A.name != "stack_expiration" && A.name != "deny_overflow")))
                     DSLFail(TEXT("Unknown GAS declaration option"));
-            if (Effect && DSLString(Args, "duration", TEXT("Instant")) != TEXT("Instant"))
-                DSLFail(TEXT("Only Instant authored effects are supported in this increment"));
             const FString Name = DSLText(S->name), Module = FPaths::GetBaseFilename(DSLText(S->at.fileInfo->name));
             auto Object = MakeShared<FJsonObject>();
             Object->SetStringField(TEXT("kind"), Effect ? TEXT("effect"): TEXT("attributes"));
             Object->SetStringField(TEXT("name"), Name);
             Object->SetStringField(TEXT("id"), DSLString(Args, "id", Module + TEXT(".")+ Name));
             if (Effect)
+            {
                 Object->SetStringField(TEXT("attributes"), DSLString(Args, "attributes"));
+                for (const auto& A : Args)
+                {
+                    const FString Key = DSLText(A.name);
+                    if (Key == TEXT("id") || Key == TEXT("attributes"))
+                        continue;
+                    if (Key == TEXT("duration") && (A.type == das::Type::tInt || A.type == das::Type::tFloat))
+                    {
+                        Object->SetStringField(TEXT("duration"), TEXT("HasDuration"));
+                        Object->SetNumberField(TEXT("seconds"),
+                                                    A.type == das::Type::tInt ? double(A.iValue) : double(A.fValue));
+                    }
+                    else if (Key == TEXT("period") || Key == TEXT("stack_limit"))
+                    {
+                        if ((Key == TEXT("stack_limit") && A.type != das::Type::tInt) ||
+                             (A.type != das::Type::tInt && A.type != das::Type::tFloat))
+                            DSLFail(TEXT("GAS period requires a number; stack_limit requires an integer"));
+                        Object->SetNumberField(Key, A.type == das::Type::tInt ? double(A.iValue) : double(A.fValue));
+                    }
+                    else if (Key == TEXT("execute_on_application") || Key == TEXT("deny_overflow"))
+                    {
+                        if (A.type != das::Type::tBool)
+                            DSLFail(TEXT("GAS execution and overflow options require booleans"));
+                        Object->SetBoolField(Key, A.bValue);
+                    }
+                    else
+                    {
+                        if (A.type != das::Type::tString)
+                            DSLFail(TEXT("GAS duration/stacking policies require strings"));
+                        Object->SetStringField(Key, DSLText(A.sValue));
+                    }
+                }
+            }
             TArray<TSharedPtr<FJsonValue>> Fields;
             for (const auto& F : S->fields)
             {

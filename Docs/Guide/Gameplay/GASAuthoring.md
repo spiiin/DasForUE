@@ -1,4 +1,4 @@
-# Authoring AttributeSets and instant GameplayEffects
+# Authoring AttributeSets and GameplayEffects
 
 The first authoring increment uses declaration annotations, an editor importer and
 a managed native ASC adapter. Definitions become Blueprint classes with real
@@ -39,7 +39,11 @@ An effect field names the attribute it modifies. Its default is the constant
 magnitude. `@operation="Add"` is the default; Multiply and Override are also
 supported. A SetByCaller modifier takes its magnitude from the spec instead of
 using the field default. Signed finite magnitudes are allowed; negative Add is
-useful for damage. Only Instant duration is accepted in this increment.
+useful for damage. Omitting duration preserves Instant behavior. A positive numeric
+`duration` creates a HasDuration effect in seconds; `duration="Infinite"` stays active
+until removed. Active non-periodic modifiers affect the current aggregate and
+revert when removed. Periodic modifiers execute into the base value, so their
+completed changes survive removal.
 
 The attributes option resolves a simple class name or its inferred definition ID
 within the explicit registry of declarations in that source file. It does not
@@ -47,6 +51,45 @@ accept an arbitrary UObject path. Initial values must satisfy their limits;
 linked maxima must exist, form an acyclic graph and remain compatible with minima.
 Unknown names/annotations, conflicting declaration annotations, unsupported field
 types and methods are rejected. New public APIs do not need a C++ class list entry.
+
+## Duration, periods and stacks
+
+```das
+[ue_gameplay_effect(attributes="CombatAttributes",duration=5.0f)]
+class Fortitude { MaxHealth:float=20.0f }
+
+[ue_gameplay_effect(attributes="CombatAttributes",duration="Infinite",
+    stacking="AggregateByTarget",stack_limit=3)]
+class ManaAura { Mana:float=3.0f }
+
+[ue_gameplay_effect(attributes="CombatAttributes",duration=5.0f,
+    period=1.0f,execute_on_application=false)]
+class ManaRegen { Mana:float=2.0f }
+```
+
+Period is zero by default. A nonzero period must be at least 0.01 seconds and
+requires HasDuration or Infinite. `execute_on_application` defaults to true and
+can only be set explicitly for periodic effects. Numeric duration must be finite
+and positive; use the Infinite policy instead of a negative number.
+
+Stacking is None by default. AggregateBySource combines applications from the same
+source ASC; AggregateByTarget combines them on the target regardless of source.
+Both require an explicit `stack_limit` in 1..128. `deny_overflow=true` by default:
+an application above that limit reports Applied=false without clearing the
+existing stack. `deny_overflow=false` uses GAS's capped application behavior.
+
+Optional policies use the Unreal enum names:
+
+| Option | Values | Default |
+|---|---|---|
+| stack_duration | RefreshOnSuccessfulApplication, NeverRefresh, ExtendDuration | RefreshOnSuccessfulApplication |
+| stack_period | ResetOnSuccessfulApplication, NeverReset | ResetOnSuccessfulApplication |
+| stack_expiration | ClearEntireStack, RemoveSingleStackAndRefreshDuration, RefreshDuration | ClearEntireStack |
+
+Duration and expiration policies require a timed stacking effect; period reset
+requires a periodic stacking effect. Options which cannot affect the chosen policy
+are rejected instead of silently ignored. GAS controls its timers, aggregators,
+stack scaling and expiration; the bridge does not implement a parallel scheduler.
 
 ## Import in the editor
 
@@ -106,6 +149,26 @@ provided. Missing attributes or magnitudes, non-finite values, foreign worlds an
 dead sources are refused before applying the effect. An instant effect can have
 Applied=true and HasActiveHandle=false.
 
+For an active effect:
+
+```das
+let result=ue_gas_apply(self.Abilities,ue_gas_make_spec(self.Abilities,self.AuraEffect))
+let state=ue_gas_effect_state(result)
+if(state.Active && state.Stacks>1) {
+    ue_gas_remove_effect(result,1) // remove one stack
+}
+ue_gas_remove_effect(result) // remove all remaining stacks
+```
+
+State is an owned snapshot with Active, Infinite, Stacks, Duration, Remaining and
+Period. Infinite effects report Remaining=-1. Removed/expired effects return an
+inactive state; repeated removal returns false. HasActiveHandle records the apply
+result, so query Active for current liveness. The result carries a checked target
+reference and a local int32 ID; the target retains the real native GAS handle.
+IDs are never reused on that ASC, and the handle table is bounded to 1024 tracked
+active effects. EndPlay invalidates it. Script release removes subscriptions but
+does not cancel gameplay effects. Existing fixed-health APIs remain unchanged.
+
 Use `[ue_event(source="Abilities",name="AttributeChanged")]` on a method taking
 GASAttributeChange. The owned snapshot contains Set and Attribute (UENameValue),
 OldValue and NewValue. Delivery uses the existing queue and never re-enters the
@@ -116,12 +179,15 @@ One ASC is allowed per owner in this adapter; use it instead of the fixed-health
 ASC on that actor. Registration is idempotent for the same set class, capped at
 16 sets; the source ASC retains at most 32 effect definitions for recipe lifetime.
 Current/base values are clamped by native hooks, including dependent attributes
-when a linked maximum decreases. Network replication, durations/stacking,
-GameplayAbility authoring and attribute capture calculations remain future work.
+when a linked maximum decreases. Network replication, GameplayAbility authoring and attribute capture calculations remain future work.
 
 Validation: Scripts/TestGASAuthored.ps1 builds and runs a focused commandlet
 with real native attributes/effects and typed DAS callbacks, then reopens the saved
-assets in a second process. Both runs passed 9 checks; the original health scenario
-also passed all 10 checks. See logs/gas-authored-validation.json and
+assets in a second process. The duration/stacking extension is covered by the same focused scenario, including
+real world ticks, overflow, partial removal, expiration and detached snapshots.
+The extended scenario passed 11 checks on creation and 11 on reopening saved assets.
+The two plugin modules (DasRuntime and DasEditor) built successfully; the full
+engine target was not rebuilt because another chat was using shared engine DLLs.
+The original health scenario is tested separately. See logs/gas-authored-validation.json and
 logs/gas-validation.json. No full PIE or packaged run was performed. The initial
 post-refactor check is preserved in logs/gas-after-refactor-validation.json.

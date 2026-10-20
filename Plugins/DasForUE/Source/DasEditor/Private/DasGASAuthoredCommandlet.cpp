@@ -36,7 +36,7 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
     FDasGASDeclarations Model;
     FString Error;
     if (!Check(R.ReadGASScript(R.ScriptPath(TEXT("gas_combat_definitions.das")), Model, Error) &&
-                               Model.Sets.Num() == 1 && Model.Effects.Num() == 5,
+                               Model.Sets.Num() == 1 && Model.Effects.Num() == 9,
                                TEXT("declarations_compile")))
     {
         UE_LOG(LogTemp, Error, TEXT("%s"), *Error);
@@ -44,6 +44,22 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
     }
     if (!Check(!R.ReadGASScript(R.ScriptPath(TEXT("gas_authored_invalid.das")), Model, Error),
                                 TEXT("invalid_linked_limit_refused")))
+        return 1;
+    if (!Check(!R.ReadGASScript(R.ScriptPath(TEXT("gas_duration_invalid.das")), Model, Error),
+                                TEXT("negative_duration_refused_before_asset_creation")))
+        return 1;
+    // Exercise policy validation without creating assets or starting another scenario.
+    const FString Prefix = TEXT("{\"declarations\":[{\"kind\":\"attributes\",\"name\":\"Values\",\"id\":\"test.Values\",\"fields\":[{\"name\":\"Value\",\"value\":0}]},{\"kind\":\"effect\",\"name\":\"Effect\",\"id\":\"test.Effect\",\"attributes\":\"Values\",\"fields\":[{\"name\":\"Value\",\"value\":1}],");
+    for (
+        const auto* Options : {TEXT("\"duration\":\"Instant\",\"period\":0.1"),
+            TEXT("\"duration\":\"Infinite\",\"stacking\":\"AggregateByTarget\",\"stack_limit\":0"),
+                TEXT("\"duration\":\"Infinite\",\"stacking\":\"AggregateByTarget\",\"stack_limit\":2,\"stack_duration\":\"NeverRefresh\""),
+                    TEXT("\"duration\":\"HasDuration\",\"seconds\":0.5,\"stacking\":\"AggregateByTarget\",\"stack_limit\":2,\"stack_expiration\":\"Unknown\"")})
+        if (!ParseDasGASDeclarations(Prefix + Options + TEXT("}]}"), Model, Error))
+            continue;
+        else
+            return 1;
+    if (!Check(true, TEXT("invalid_duration_period_and_stack_policies_refused")))
         return 1;
     FString Folder;
     const bool Reopen = FParse::Value(*Params, TEXT("Reopen="), Folder);
@@ -53,8 +69,13 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
         if (!Folder.StartsWith(TEXT("/Game/Tests/GASAuthored/")))
             return 2;
         for (const auto& Name :
-             {TEXT("CombatAttributes"), TEXT("PotionHeal"), TEXT("Hit"), TEXT("CallerHeal"), TEXT("ManaBoost"),
-                                                                                                  TEXT("SetMana")})
+             {TEXT("CombatAttributes"),
+                   TEXT("PotionHeal"), TEXT("Hit"), TEXT("CallerHeal"),
+                                                         TEXT("ManaBoost"),
+                                                              TEXT("SetMana"), TEXT("Fortitude"),
+                                                                                    TEXT("ManaAura"),
+                                                                                         TEXT("ManaRegen"),
+                                                                                              TEXT("LayeredFortitude")})
         {
             const FString AssetName =
                 FString(Name == FString(TEXT("CombatAttributes")) ? TEXT("AS_"): TEXT("GE_")) + Name;
@@ -79,7 +100,7 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
     TArray<TStrongObjectPtr<UBlueprint>> Keep;
     for (const auto& P : Assets)
         Keep.Emplace(P.Value);
-    if (!Check(Assets.Num() == 6, TEXT("real_attribute_and_effect_blueprints_saved")))
+    if (!Check(Assets.Num() == 10, TEXT("real_attribute_and_effect_blueprints_saved")))
         return 1;
     auto* AttrClass = Assets.FindChecked(TEXT("CombatAttributes"))->GeneratedClass.Get();
     auto* P = FindFProperty<FStructProperty>(AttrClass, TEXT("Health"));
@@ -119,18 +140,42 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
         GEngine->DestroyWorldContext(World.Get());
         World->DestroyWorld(false);
     };
-    const bool Added=Host->Abilities->AddAuthoredAttributes(AttrClass);
-    const auto* Defaults=CastChecked<UDasAuthoredAttributeSet>(AttrClass->GetDefaultObject());
-    UE_LOG(LogTemp,Display,TEXT("GAS_REGISTER added=%d cdo=%s rules=%d owner=%s"),Added,*Defaults->DefinitionName.ToString(),Defaults->Rules.Num(),*Host->GetName());
-    for(const auto* Spawned:Host->Abilities->GetSpawnedAttributes())
-        if(const auto* Set=Cast<UDasAuthoredAttributeSet>(Spawned))
-            UE_LOG(LogTemp,Display,TEXT("GAS_SET class=%s name=%s rules=%d health=%d"),*Set->GetClass()->GetName(),*Set->DefinitionName.ToString(),Set->Rules.Num(),Set->Attribute(TEXT("Health")).IsValid());
-    if(!Check(Added && Host->Abilities->HasAuthoredAttribute(TEXT("CombatAttributes"),TEXT("Health")),TEXT("native_attribute_registration_and_lookup")))return 1;
+    const bool Added = Host->Abilities->AddAuthoredAttributes(AttrClass);
+    const auto* Defaults = CastChecked<UDasAuthoredAttributeSet>(AttrClass->GetDefaultObject());
+    UE_LOG(LogTemp, Display,
+           TEXT("GAS_REGISTER added=%d cdo=%s rules=%d owner=%s"), Added, *Defaults->DefinitionName.ToString(),
+                Defaults->Rules.Num(), *Host->GetName());
+    for (const auto* Spawned : Host->Abilities->GetSpawnedAttributes())
+        if (const auto* Set = Cast<UDasAuthoredAttributeSet>(Spawned))
+            UE_LOG(LogTemp, Display,
+                   TEXT("GAS_SET class=%s name=%s rules=%d health=%d"), *Set->GetClass()->GetName(),
+                        *Set->DefinitionName.ToString(), Set->Rules.Num(), Set->Attribute(TEXT("Health")).IsValid());
+    if (!Check(Added && Host->Abilities->HasAuthoredAttribute(TEXT("CombatAttributes"), TEXT("Health")),
+                                                              TEXT("native_attribute_registration_and_lookup")))
+        return 1;
     FEditorScriptExecutionGuard Guard;
-    for (int32 Phase = 0; Phase < 4; ++Phase)
+    auto Advance = [&](float Seconds)
     {
-        if (Phase == 1)
+        // A real world/TimerManager tick, not direct execution of an effect.
+        const int32 Frames = FMath::RoundToInt(Seconds / 0.01f);
+        for (int32 Frame = 0; Frame < Frames; ++Frame)
+        {
+            ++GFrameCounter;
+            World->Tick(LEVELTICK_All, 0.01f);
+        }
+    };
+    for (int32 Phase = 0; Phase < 10; ++Phase)
+    {
+        if (Phase == 1 || Phase == 5)
             CollectGarbage(RF_NoFlags);
+        if (Phase == 5)
+            Advance(0.2f);
+        if (Phase == 6)
+            Advance(0.12f);
+        if (Phase == 7)
+            Advance(0.3f);
+        if (Phase == 8 || Phase == 9)
+            Advance(0.31f);
         const auto Result = R.RunPersistent(Probe, Phase, Host);
         if (!Result.bSucceeded || Result.Value != 42)
         {
@@ -138,7 +183,7 @@ int32 UDasGASAuthoredCommandlet::Main(const FString& Params)
             return 1;
         }
     }
-    if (!Check(true, TEXT("native_effects_callbacks_gc_clamps_setbycaller_multiply_override")))
+    if (!Check(true, TEXT("native_effects_callbacks_gc_clamps_setbycaller_duration_period_stacks_removal")))
         return 1;
     R.ReleaseObject(Host);
     if (!Check(R.SubscriptionCount(Host) == 0 && !Host->Abilities->AttributeChanged.IsBound(),

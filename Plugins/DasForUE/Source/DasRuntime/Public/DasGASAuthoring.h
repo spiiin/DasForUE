@@ -40,6 +40,16 @@ struct FDasGASEffectDeclaration
 {
     FString Name, Id, Attributes;
     TArray<FDasGASModifierDeclaration> Modifiers;
+    FString Duration = TEXT("Instant");
+    float Seconds = 0;
+    float Period = 0;
+    bool ExecuteOnApplication = true;
+    FString Stacking = TEXT("None");
+    int32 StackLimit = 0;
+    FString StackDuration = TEXT("RefreshOnSuccessfulApplication");
+    FString StackPeriod = TEXT("ResetOnSuccessfulApplication");
+    FString StackExpiration = TEXT("ClearEntireStack");
+    bool DenyOverflow = true;
 };
 struct FDasGASDeclarations
 {
@@ -120,6 +130,27 @@ struct DASRUNTIME_API FDasAuthoredEffectResult
     bool Applied = false;
     UPROPERTY(BlueprintReadWrite)
     bool HasActiveHandle = false;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<UDasAuthoredAbilitySystemComponent> Target = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    int32 ActiveId = 0;
+};
+USTRUCT(BlueprintType)
+struct DASRUNTIME_API FDasAuthoredEffectState
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite)
+    bool Active = false;
+    UPROPERTY(BlueprintReadWrite)
+    bool Infinite = false;
+    UPROPERTY(BlueprintReadWrite)
+    int32 Stacks = 0;
+    UPROPERTY(BlueprintReadWrite)
+    float Duration = 0;
+    UPROPERTY(BlueprintReadWrite)
+    float Remaining = 0;
+    UPROPERTY(BlueprintReadWrite)
+    float Period = 0;
 };
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasAuthoredAttributeChanged, FDasAuthoredAttributeChange, Change);
 UCLASS(ClassGroup = (Das), meta = (BlueprintSpawnableComponent))
@@ -142,6 +173,10 @@ public:
     FDasAuthoredEffectSpec MakeAuthoredSpec(TSubclassOf<UDasAuthoredGameplayEffect> Class, float Level);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     FDasAuthoredEffectResult ApplyAuthoredSpec(const FDasAuthoredEffectSpec& Spec);
+    UFUNCTION(BlueprintPure, Category = "GAS")
+    FDasAuthoredEffectState AuthoredEffectState(int32 ActiveId) const;
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool RemoveAuthoredEffect(int32 ActiveId, int32 Stacks = -1);
     virtual void EndPlay(const EEndPlayReason::Type Reason) override;
     virtual void BeginDestroy() override;
 
@@ -151,7 +186,11 @@ private:
     UPROPERTY(Transient)
     TArray<TObjectPtr<UDasAuthoredGameplayEffect>> Definitions;
     TMap<FGameplayAttribute, FDelegateHandle> ChangeHandles;
+    // Only native GAS handles are retained here; IDs are never reused on this ASC.
+    TMap<int32, FActiveGameplayEffectHandle> ActiveEffects;
+    int32 NextActiveId = 1;
     bool Ended = false;
+    void PruneActiveEffects();
     bool Live() const;
     FGameplayAttribute FindAttribute(FName Set, FName Name) const;
     void Changed(const FOnAttributeChangeData& Data, FName Set);

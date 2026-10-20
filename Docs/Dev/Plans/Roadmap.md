@@ -51,7 +51,7 @@ These gates come from the original plan (after the NimForUE audit) and are still
 
 ### Additional integrations (on demand)
 
-- GAS: the [authored data-only AttributeSet / instant GameplayEffect DSL](../../Guide/Gameplay/GASAuthoring.md) now imports real native attributes and effects. Next: durations/stacking, capture calculations, authored abilities and eventually replication.
+- GAS: the [authored data-only AttributeSet / GameplayEffect DSL](../../Guide/Gameplay/GASAuthoring.md) now imports real native attributes and effects. Duration, periodic execution and stacking now use native GAS policies. Next: capture calculations, authored abilities and eventually replication.
 - UMG MVVM / FieldNotify; Slate and editor UI extensions.
 - GameplayMessageRouter typed messages with listener lifetime.
 - PCG adapters and daScript kernels with explicit threading rules.

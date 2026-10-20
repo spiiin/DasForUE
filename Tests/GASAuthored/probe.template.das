@@ -3,6 +3,11 @@ require ue_gas
 
 var saved:GASAttributeChange
 var changes:int=0
+var fortitude:GASEffectResult
+var aura:GASEffectResult
+var regen:GASEffectResult
+var layers:GASEffectResult
+var stackSnapshot:GASEffectState
 [ue_class]
 class AuthoredGASProbe : Actor {
     @ue_component
@@ -49,6 +54,51 @@ def main(phase:int):int {
         let assign=AuthoredGameplayEffectClass(handle=ue_class_loaded(type<AuthoredGameplayEffectRef>,"@ASSET_FOLDER@/GE_SetMana.GE_SetMana_C"))
         verify(ue_gas_apply(asc,ue_gas_make_spec(asc,assign)).Applied,"Override operation")
         verify(ue_gas_value(asc,"CombatAttributes","Mana")==7.0f,"Mana override")
+    } elif(phase==4) {
+        let effect=AuthoredGameplayEffectClass(handle=ue_class_loaded(type<AuthoredGameplayEffectRef>,"@ASSET_FOLDER@/GE_Fortitude.GE_Fortitude_C"))
+        fortitude=ue_gas_apply(asc,ue_gas_make_spec(asc,effect))
+        let state=ue_gas_effect_state(fortitude)
+        verify(fortitude.Applied,"Timed effect applied")
+        verify(fortitude.HasActiveHandle,"Timed effect returned a native handle")
+        verify(state.Active,"Timed handle resolves on its target")
+        verify(!state.Infinite,"Timed effect is finite")
+        verify(state.Stacks==1,"Timed effect has one stack")
+        verify(state.Duration==0.5f && state.Remaining>0.4f && ue_gas_value(asc,"CombatAttributes","MaxHealth")==120.0f,"Timed aggregate applies immediately")
+        let mana=AuthoredGameplayEffectClass(handle=ue_class_loaded(type<AuthoredGameplayEffectRef>,"@ASSET_FOLDER@/GE_ManaAura.GE_ManaAura_C"))
+        for(i in range(3)) {
+            let next=ue_gas_apply(asc,ue_gas_make_spec(asc,mana))
+            verify(next.Applied && (i==0 || next.ActiveId==aura.ActiveId),"Stack applications share one active handle")
+            aura=next
+        }
+        stackSnapshot=ue_gas_effect_state(aura)
+        verify(stackSnapshot.Active && stackSnapshot.Infinite && stackSnapshot.Remaining== -1.0f && stackSnapshot.Stacks==3,"Infinite three-stack state")
+        verify(ue_gas_value(asc,"CombatAttributes","Mana")==16.0f,"Native stack magnitude scaling")
+        let overflow=ue_gas_apply(asc,ue_gas_make_spec(asc,mana))
+        verify(!overflow.Applied && !overflow.HasActiveHandle && ue_gas_effect_state(aura).Stacks==3,"Overflow denied without removing existing stacks")
+        verify(ue_gas_remove_effect(aura,1) && ue_gas_effect_state(aura).Stacks==2,"Remove one stack")
+        verify(ue_gas_value(asc,"CombatAttributes","Mana")==13.0f && stackSnapshot.Stacks==3,"State snapshot is detached from later changes")
+    } elif(phase==5) {
+        let state=ue_gas_effect_state(fortitude)
+        verify(state.Active && state.Remaining<0.4f && state.Remaining>0.2f,"World time advances a duration effect")
+        verify(ue_gas_remove_effect(aura) && !ue_gas_effect_state(aura).Active && !ue_gas_remove_effect(aura),"Remove all stacks; stale removal is harmless")
+        verify(ue_gas_value(asc,"CombatAttributes","Mana")==7.0f,"Infinite aggregate is reversible")
+        let effect=AuthoredGameplayEffectClass(handle=ue_class_loaded(type<AuthoredGameplayEffectRef>,"@ASSET_FOLDER@/GE_ManaRegen.GE_ManaRegen_C"))
+        regen=ue_gas_apply(asc,ue_gas_make_spec(asc,effect))
+        verify(ue_gas_effect_state(regen).Period==0.1f && ue_gas_value(asc,"CombatAttributes","Mana")==7.0f,"Periodic effect has no application tick when disabled")
+    } elif(phase==6) {
+        verify(ue_gas_value(asc,"CombatAttributes","Mana")==9.0f,"Real GAS timer executes the periodic modifier once")
+        verify(ue_gas_remove_effect(regen) && ue_gas_value(asc,"CombatAttributes","Mana")==9.0f,"Periodic base gains survive removal")
+    } elif(phase==7) {
+        verify(!ue_gas_effect_state(fortitude).Active && ue_gas_value(asc,"CombatAttributes","MaxHealth")==100.0f,"Timed aggregate expires automatically")
+        let effect=AuthoredGameplayEffectClass(handle=ue_class_loaded(type<AuthoredGameplayEffectRef>,"@ASSET_FOLDER@/GE_LayeredFortitude.GE_LayeredFortitude_C"))
+        layers=ue_gas_apply(asc,ue_gas_make_spec(asc,effect))
+        verify(ue_gas_apply(asc,ue_gas_make_spec(asc,effect)).Applied && ue_gas_effect_state(layers).Stacks==2,"AggregateBySource stacking")
+        verify(ue_gas_value(asc,"CombatAttributes","MaxHealth")==110.0f,"Two timed source stacks")
+    } elif(phase==8) {
+        verify(ue_gas_effect_state(layers).Active && ue_gas_effect_state(layers).Stacks==1 && ue_gas_value(asc,"CombatAttributes","MaxHealth")==105.0f,"Native expiration removes a single stack and refreshes duration")
+        verify(!ue_gas_remove_effect(fortitude) && ue_gas_effect_state(layers).Active,"Expired IDs cannot remove later effects")
+    } elif(phase==9) {
+        verify(!ue_gas_effect_state(layers).Active && ue_gas_value(asc,"CombatAttributes","MaxHealth")==100.0f,"Final timed stack expires")
     } else {return -1}
     return 42
 }

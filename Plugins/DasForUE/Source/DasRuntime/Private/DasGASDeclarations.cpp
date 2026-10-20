@@ -64,6 +64,76 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
         if (Kind == TEXT("effect") && (!Object->TryGetStringField(TEXT("attributes"), Effect.Attributes) ||
                                                                   Effect.Attributes.IsEmpty() || Fields->Num() > 32))
             return Fail(TEXT("Effect requires an explicit attribute-set name and 1..32 modifiers"));
+        if (Kind == TEXT("effect"))
+        {
+            auto StringOption = [&](const TCHAR* Key, FString& Value)
+            {
+                return !Object->HasField(Key) || Object->TryGetStringField(Key, Value);
+            };
+            auto NumberOption = [&](const TCHAR* Key, float& Value)
+            {
+                return !Object->HasField(Key) || GASNumber(Object, Key, Value);
+            };
+            auto BoolOption = [&](const TCHAR* Key, bool& Value)
+            {
+                return !Object->HasField(Key) || Object->TryGetBoolField(Key, Value);
+            };
+            double Limit = 0;
+            if (!StringOption(
+                    TEXT("duration"), Effect.Duration) ||
+                    !NumberOption(
+                        TEXT("seconds"), Effect.Seconds) ||
+                        !NumberOption(
+                            TEXT("period"), Effect.Period) ||
+                            !BoolOption(TEXT("execute_on_application"), Effect.ExecuteOnApplication) ||
+                                        !BoolOption(TEXT("deny_overflow"), Effect.DenyOverflow) ||
+                                                    !StringOption(
+                                                        TEXT("stacking"), Effect.Stacking) ||
+                                                        !StringOption(
+                                                            TEXT("stack_duration"), Effect.StackDuration) ||
+                                                            !StringOption(
+                                                                TEXT("stack_period"), Effect.StackPeriod) ||
+                                                                !StringOption(
+                                                                    TEXT("stack_expiration"), Effect.StackExpiration) ||
+                                                                    (Object->HasField(TEXT("stack_limit")) &&
+                                                                                      !Object->TryGetNumberField(TEXT("stack_limit"), Limit)) ||
+                                                                     !FMath::IsFinite(Limit) || Limit < 0 ||
+                                                                     Limit > 128 ||
+                                                                     Limit != FMath::FloorToDouble(Limit))
+                return Fail(TEXT("Invalid GAS duration/stacking option types or stack limit (1..128)"));
+            Effect.StackLimit = int32(Limit);
+            const bool Timed = Effect.Duration == TEXT("HasDuration");
+            const bool Instant = Effect.Duration == TEXT("Instant");
+            const bool Stacking = Effect.Stacking != TEXT("None");
+            if ((!Instant && !Timed && Effect.Duration != TEXT("Infinite")) ||
+                 (Timed ? Effect.Seconds <= 0 : Object->HasField(TEXT("seconds"))) || Effect.Period < 0 ||
+                      (Effect.Period > 0 && Effect.Period < 0.01f) || (Instant && (Effect.Period != 0 || Stacking)) ||
+                      (Object->HasField(TEXT("execute_on_application")) && Effect.Period == 0) ||
+                       (Effect.Stacking !=
+                        TEXT("None") && Effect.Stacking != TEXT("AggregateBySource") &&
+                                                                Effect.Stacking != TEXT("AggregateByTarget")) ||
+                                            (Stacking ? Effect.StackLimit < 1 : Object->HasField(TEXT("stack_limit"))))
+                return Fail(TEXT("Invalid GAS duration/period/stacking combination"));
+            if ((Effect.StackDuration !=
+                 TEXT("RefreshOnSuccessfulApplication") &&
+                      Effect.StackDuration != TEXT("NeverRefresh") && Effect.StackDuration != TEXT("ExtendDuration")) ||
+                          (Effect.StackPeriod !=
+                           TEXT("ResetOnSuccessfulApplication") && Effect.StackPeriod != TEXT("NeverReset")) ||
+                           (Effect.StackExpiration !=
+                            TEXT("ClearEntireStack") &&
+                                 Effect.StackExpiration != TEXT("RemoveSingleStackAndRefreshDuration") &&
+                                                                Effect.StackExpiration != TEXT("RefreshDuration")) ||
+                                     (!Stacking &&
+                                      (Object->HasField(
+                                          TEXT("stack_duration")) ||
+                                          Object->HasField(TEXT("stack_period")) ||
+                                                           Object->HasField(TEXT("stack_expiration")) ||
+                                                                            Object->HasField(TEXT("deny_overflow")))) ||
+                                          (Object->HasField(TEXT("stack_duration")) && !Timed) ||
+                                           (Object->HasField(TEXT("stack_expiration")) && !Timed) ||
+                                            (Object->HasField(TEXT("stack_period")) && Effect.Period == 0))
+                return Fail(TEXT("Invalid or inapplicable GAS stacking policy"));
+        }
         if (Kind != TEXT("attributes") && Kind != TEXT("effect"))
             return Fail(TEXT("Unknown GAS declaration kind"));
         for (const auto& Field : *Fields)

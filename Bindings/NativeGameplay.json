@@ -2552,7 +2552,7 @@
 		},
 		{
 			"path": "/Script/DasRuntime.DasAuthoredEffectResult",
-			"signature": "Valid:BoolProperty:0;Applied:BoolProperty:0;HasActiveHandle:BoolProperty:0;",
+			"signature": "Valid:BoolProperty:0;Applied:BoolProperty:0;HasActiveHandle:BoolProperty:0;Target:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;ActiveId:IntProperty:0;",
 			"fields": [
 				{
 					"kind": "bool",
@@ -2568,6 +2568,16 @@
 					"kind": "bool",
 					"type_path": "",
 					"name": "HasActiveHandle"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"name": "Target"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "ActiveId"
 				}
 			]
 		},
@@ -2604,6 +2614,42 @@
 						"type_path": ""
 					},
 					"name": "Magnitudes"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasAuthoredEffectState",
+			"signature": "Active:BoolProperty:0;Infinite:BoolProperty:0;Stacks:IntProperty:0;Duration:FloatProperty:0;Remaining:FloatProperty:0;Period:FloatProperty:0;",
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "Active"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "Infinite"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "Stacks"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Duration"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Remaining"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Period"
 				}
 			]
 		},
@@ -3712,7 +3758,7 @@
 				{
 					"name": "ApplyAuthoredSpec",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
-					"signature": "v1;ApplyAuthoredSpec;Spec:StructProperty:134218114:/Script/DasRuntime.DasAuthoredEffectSpec{Source:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;Definition:ObjectProperty:0:/Script/DasRuntime.DasAuthoredGameplayEffect;Level:FloatProperty:0;Magnitudes:MapProperty:0[Magnitudes_Key:NameProperty:0;Magnitudes:FloatProperty:0;];};ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredEffectResult{Valid:BoolProperty:0;Applied:BoolProperty:0;HasActiveHandle:BoolProperty:0;};",
+					"signature": "v1;ApplyAuthoredSpec;Spec:StructProperty:134218114:/Script/DasRuntime.DasAuthoredEffectSpec{Source:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;Definition:ObjectProperty:0:/Script/DasRuntime.DasAuthoredGameplayEffect;Level:FloatProperty:0;Magnitudes:MapProperty:0[Magnitudes_Key:NameProperty:0;Magnitudes:FloatProperty:0;];};ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredEffectResult{Valid:BoolProperty:0;Applied:BoolProperty:0;HasActiveHandle:BoolProperty:0;Target:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;ActiveId:IntProperty:0;};",
 					"const": false,
 					"construction_unsafe": false,
 					"parameters": [
@@ -3773,6 +3819,27 @@
 						{
 							"kind": "struct",
 							"type_path": "/Script/DasRuntime.DasAuthoredAttributeChange",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "AuthoredEffectState",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;AuthoredEffectState;ActiveId:IntProperty:128;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredEffectState{Active:BoolProperty:0;Infinite:BoolProperty:0;Stacks:IntProperty:0;Duration:FloatProperty:0;Remaining:FloatProperty:0;Period:FloatProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ActiveId",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasAuthoredEffectState",
 							"name": "ReturnValue",
 							"direction": "return"
 						}
@@ -4494,6 +4561,34 @@
 							"name": "StacksToRemove",
 							"direction": "in",
 							"default_text": "-1"
+						}
+					]
+				},
+				{
+					"name": "RemoveAuthoredEffect",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;RemoveAuthoredEffect;ActiveId:IntProperty:128;Stacks:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ActiveId",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Stacks",
+							"direction": "in",
+							"default_text": "-1"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
 						}
 					]
 				},

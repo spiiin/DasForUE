@@ -37,3 +37,29 @@ class SetMana {
     @operation="Override"
     Mana:float=7.0f
 }
+
+// Temporary MaxHealth bonus; removal restores the aggregate, not the base value.
+[ue_gameplay_effect(attributes="CombatAttributes",duration=0.5f)]
+class Fortitude {
+    MaxHealth:float=20.0f
+}
+
+[ue_gameplay_effect(attributes="CombatAttributes",duration="Infinite",
+    stacking="AggregateByTarget",stack_limit=3)]
+class ManaAura {
+    Mana:float=3.0f
+}
+
+// Periodic effects execute into the base attribute; their gains survive removal.
+[ue_gameplay_effect(attributes="CombatAttributes",duration=0.5f,
+    period=0.1f,execute_on_application=false)]
+class ManaRegen {
+    Mana:float=2.0f
+}
+
+[ue_gameplay_effect(attributes="CombatAttributes",duration=0.3f,
+    stacking="AggregateBySource",stack_limit=3,stack_duration="NeverRefresh",
+    stack_expiration="RemoveSingleStackAndRefreshDuration")]
+class LayeredFortitude {
+    MaxHealth:float=5.0f
+}

@@ -7,6 +7,7 @@ require ue_native_gameplay public
 typedef GASAttributeChange = DasAuthoredAttributeChange
 typedef GASEffectSpec = DasAuthoredEffectSpec
 typedef GASEffectResult = DasAuthoredEffectResult
+typedef GASEffectState = DasAuthoredEffectState
 
 def ue_gas_add_attributes(asc:AuthoredAbilitySystemComponentRef; attributes:AttributeSetClass):void {
     verify(asc.AddAuthoredAttributes(ue_class_handle(attributes)),"Cannot register authored AttributeSet on this ASC")
@@ -32,4 +33,16 @@ def ue_gas_apply(target:AuthoredAbilitySystemComponentRef; spec:GASEffectSpec):G
     let result=target.ApplyAuthoredSpec(spec)
     verify(result.Valid,"Invalid authored GAS spec, magnitudes, attributes or source world")
     return result
+}
+
+// HasActiveHandle describes the apply result; this queries current native liveness.
+def ue_gas_effect_state(effect:GASEffectResult):GASEffectState {
+    if(!ue_is_valid(effect.Target) || effect.ActiveId<=0) { return GASEffectState() }
+    return effect.Target.AuthoredEffectState(effect.ActiveId)
+}
+
+def ue_gas_remove_effect(effect:GASEffectResult; stacks:int= -1):bool {
+    verify(stacks== -1 || stacks>0,"Remove one or more stacks, or -1 for all")
+    if(!ue_is_valid(effect.Target) || effect.ActiveId<=0) { return false }
+    return effect.Target.RemoveAuthoredEffect(effect.ActiveId,stacks)
 }

@@ -29,6 +29,10 @@ FString SetDigest(const FDasGASSetDeclaration& D)
 FString EffectDigest(const FDasGASEffectDeclaration& D, const FString& SetHash)
 {
     FString Value = D.Id + TEXT("|")+ SetHash;
+    if (D.Duration != TEXT("Instant"))
+        Value += FString::Printf(TEXT("|v2|%s|%.9g|%.9g|%d|%s|%d|%s|%s|%s|%d"), *D.Duration, double(D.Seconds),
+                                      double(D.Period), D.ExecuteOnApplication, *D.Stacking, D.StackLimit,
+                                      *D.StackDuration, *D.StackPeriod, *D.StackExpiration, D.DenyOverflow);
     for (const auto& M : D.Modifiers)
         Value += FString::Printf(TEXT("|%s|%s|%.9g|%s"), *M.Attribute.ToString(), *M.Operation, double(M.Magnitude),
                                       *M.SetByCaller.ToString());
@@ -154,7 +158,8 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             CDO->InitializeDeclaredValues();
             // CDO data was assigned after compilation. Refresh the Blueprint fast
             // construction list so new instances copy native declaration fields.
-            CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())->UpdateCustomPropertyListForPostConstruction();
+            CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
+                ->UpdateCustomPropertyListForPostConstruction();
             FAssetRegistryModule::AssetCreated(W.BP);
             W.BP->MarkPackageDirty();
         }
@@ -176,7 +181,50 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             auto* CDO = CastChecked<UDasAuthoredGameplayEffect>(W.BP->GeneratedClass->GetDefaultObject());
             CDO->DefinitionId = Effect.Id;
             CDO->DefinitionHash = W.Hash;
-            CDO->DurationPolicy = EGameplayEffectDurationType::Instant;
+            CDO->DurationPolicy =
+                Effect.Duration == TEXT("HasDuration")
+                                        ? EGameplayEffectDurationType::HasDuration
+                                        : Effect.Duration == TEXT("Infinite") ? EGameplayEffectDurationType::Infinite
+                                                                              : EGameplayEffectDurationType::Instant;
+            CDO->DurationMagnitude = FGameplayEffectModifierMagnitude(FScalableFloat(Effect.Seconds));
+            CDO->Period = FScalableFloat(Effect.Period);
+            CDO->bExecutePeriodicEffectOnApplication = Effect.ExecuteOnApplication;
+            const auto Stacking =
+                Effect.Stacking == TEXT("AggregateByTarget")
+                                        ? EGameplayEffectStackingType::AggregateByTarget
+                                        : Effect.Stacking == TEXT("AggregateBySource")
+                                                                  ? EGameplayEffectStackingType::AggregateBySource
+                                                                  : EGameplayEffectStackingType::None;
+            // UE 5.8 declares SetStackingType without exporting it from the DLL.
+            // Populate its reflected editor property instead of calling an unexported symbol.
+            auto* StackingProperty = FindFProperty<FEnumProperty>(UGameplayEffect::StaticClass(), TEXT("StackingType"));
+            if (!StackingProperty)
+                return Fail(TEXT("UE GameplayEffect stacking property is missing"));
+            StackingProperty->GetUnderlyingProperty()->SetIntPropertyValue(
+                StackingProperty->ContainerPtrToValuePtr<void>(CDO), int64(Stacking));
+            CDO->StackLimitCount = Effect.StackLimit;
+            CDO->StackDurationRefreshPolicy =
+                Effect.StackDuration ==
+                TEXT("NeverRefresh") ? EGameplayEffectStackingDurationPolicy::NeverRefresh
+                                     : Effect.StackDuration ==
+                                           TEXT("ExtendDuration")
+                                                ? EGameplayEffectStackingDurationPolicy::ExtendDuration
+                                                : EGameplayEffectStackingDurationPolicy::RefreshOnSuccessfulApplication;
+            CDO->StackPeriodResetPolicy =
+                Effect.StackPeriod == TEXT("NeverReset")
+                                           ? EGameplayEffectStackingPeriodPolicy::NeverReset
+                                           : EGameplayEffectStackingPeriodPolicy::ResetOnSuccessfulApplication;
+            CDO->StackExpirationPolicy =
+                Effect.StackExpiration ==
+                TEXT("RemoveSingleStackAndRefreshDuration")
+                     ? EGameplayEffectStackingExpirationPolicy::RemoveSingleStackAndRefreshDuration
+                     : Effect.StackExpiration == TEXT("RefreshDuration")
+                                                      ? EGameplayEffectStackingExpirationPolicy::RefreshDuration
+                                                      : EGameplayEffectStackingExpirationPolicy::ClearEntireStack;
+            // UE checks overflow even on the first active application. Non-stacking
+            // effects have limit zero, so they must not opt into overflow denial.
+            CDO->bDenyOverflowApplication = Effect.Stacking != TEXT("None") && Effect.DenyOverflow;
+            CDO->bClearStackOnOverflow = false;
             CDO->Modifiers.Empty();
             CDO->RequiredMagnitudes.Empty();
             auto* SetCDO =
@@ -204,7 +252,8 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             }
             // CDO data was assigned after compilation. Refresh the Blueprint fast
             // construction list so new instances copy native declaration fields.
-            CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())->UpdateCustomPropertyListForPostConstruction();
+            CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
+                ->UpdateCustomPropertyListForPostConstruction();
             FAssetRegistryModule::AssetCreated(W.BP);
             W.BP->MarkPackageDirty();
         }
@@ -226,7 +275,7 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
 }
 static FAutoConsoleCommand DasGASImportCommand(
     TEXT("Das.GASImport"),
-         TEXT("Das.GASImport Script.das /Game/Folder : import authored AttributeSets and instant GameplayEffects"),
+         TEXT("Das.GASImport Script.das /Game/Folder : import authored AttributeSets and GameplayEffects"),
               FConsoleCommandWithArgsDelegate::CreateLambda(
                   [](const TArray<FString>& Args)
                   {

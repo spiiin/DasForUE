@@ -156,8 +156,7 @@ UDasAuthoredAbilitySystemComponent::MakeAuthoredSpec(TSubclassOf<UDasAuthoredGam
         !FMath::IsFinite(Level) || Level <= 0)
         return Value;
     auto* Def = Class->GetDefaultObject<UDasAuthoredGameplayEffect>();
-    if (Def->DefinitionId.IsEmpty() || Def->Modifiers.IsEmpty() ||
-        Def->DurationPolicy != EGameplayEffectDurationType::Instant)
+    if (Def->DefinitionId.IsEmpty() || Def->Modifiers.IsEmpty())
         return Value;
     if (!Definitions.Contains(Def))
     {
@@ -177,8 +176,7 @@ FDasAuthoredEffectResult UDasAuthoredAbilitySystemComponent::ApplyAuthoredSpec(c
     auto* Def = Spec.Definition.Get();
     if (!Live() || !Source || !Source->Live() || Source->GetWorld() != GetWorld() || !IsValid(Def) ||
         !Source->Definitions.Contains(Def) || Def != Def->GetClass()->GetDefaultObject() ||
-        Def->DurationPolicy != EGameplayEffectDurationType::Instant || !FMath::IsFinite(Spec.Level) ||
-        Spec.Level <= 0 || Spec.Magnitudes.Num() > 32)
+        !FMath::IsFinite(Spec.Level) || Spec.Level <= 0 || Spec.Magnitudes.Num() > 32)
         return Result;
     for (const auto& Mod : Def->Modifiers)
         if (!Mod.Attribute.IsValid() || !GetAttributeSubobject(Mod.Attribute.GetAttributeSetClass()))
@@ -190,6 +188,10 @@ FDasAuthoredEffectResult UDasAuthoredAbilitySystemComponent::ApplyAuthoredSpec(c
         if (!Def->RequiredMagnitudes.Contains(Pair.Key) || !FMath::IsFinite(Pair.Value) ||
             !FGameplayTag::RequestGameplayTag(Pair.Key, false).IsValid())
             return Result;
+    PruneActiveEffects();
+    if (Def->DurationPolicy != EGameplayEffectDurationType::Instant &&
+        (ActiveEffects.Num() >= 1024 || NextActiveId == MAX_int32))
+        return Result;
     auto Context = Source->MakeEffectContext();
     Context.AddSourceObject(Source->GetOwner());
     auto Native = Source->MakeOutgoingSpec(Def->GetClass(), Spec.Level, Context);
@@ -200,8 +202,51 @@ FDasAuthoredEffectResult UDasAuthoredAbilitySystemComponent::ApplyAuthoredSpec(c
     Result.Valid = true;
     const auto Handle = ApplyGameplayEffectSpecToSelf(*Native.Data.Get());
     Result.Applied = Handle.WasSuccessfullyApplied();
-    Result.HasActiveHandle = Handle.IsValid();
+    Result.HasActiveHandle = Handle.IsValid() && GetActiveGameplayEffect(Handle) != nullptr;
+    if (Result.HasActiveHandle)
+    {
+        const int32* Existing = ActiveEffects.FindKey(Handle);
+        const int32 Id = Existing ? *Existing : NextActiveId++;
+        ActiveEffects.Add(Id, Handle);
+        Result.Target = this;
+        Result.ActiveId = Id;
+    }
     return Result;
+}
+void UDasAuthoredAbilitySystemComponent::PruneActiveEffects()
+{
+    for (auto It = ActiveEffects.CreateIterator(); It; ++It)
+        if (!GetActiveGameplayEffect(It.Value()))
+            It.RemoveCurrent();
+}
+FDasAuthoredEffectState UDasAuthoredAbilitySystemComponent::AuthoredEffectState(int32 ActiveId) const
+{
+    FDasAuthoredEffectState Result;
+    if (!Live())
+        return Result;
+    const auto* Handle = ActiveEffects.Find(ActiveId);
+    const auto* Effect = Handle ? GetActiveGameplayEffect(*Handle) : nullptr;
+    if (!Effect)
+        return Result;
+    Result.Active = true;
+    Result.Infinite = Effect->GetDuration() == UGameplayEffect::INFINITE_DURATION;
+    Result.Stacks = Effect->Spec.GetStackCount();
+    Result.Duration = Effect->GetDuration();
+    Result.Remaining = Result.Infinite ? -1.f : FMath::Max(0.f, Effect->GetTimeRemaining(GetWorld()->GetTimeSeconds()));
+    Result.Period = Effect->GetPeriod();
+    return Result;
+}
+bool UDasAuthoredAbilitySystemComponent::RemoveAuthoredEffect(int32 ActiveId, int32 Stacks)
+{
+    if (!Live() || (Stacks != -1 && Stacks <= 0))
+        return false;
+    const auto* Found = ActiveEffects.Find(ActiveId);
+    if (!Found)
+        return false;
+    const auto Handle = *Found;
+    const bool Removed = RemoveActiveGameplayEffect(Handle, Stacks);
+    PruneActiveEffects();
+    return Removed;
 }
 void UDasAuthoredAbilitySystemComponent::Changed(const FOnAttributeChangeData& Data, FName Set)
 {
@@ -225,6 +270,7 @@ void UDasAuthoredAbilitySystemComponent::EndPlay(const EEndPlayReason::Type Reas
     Ended = true;
     Detach();
     Definitions.Empty();
+    ActiveEffects.Empty();
     Super::EndPlay(Reason);
 }
 void UDasAuthoredAbilitySystemComponent::BeginDestroy()

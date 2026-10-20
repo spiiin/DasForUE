@@ -1050,6 +1050,8 @@ struct DasAuthoredEffectResult {
     Valid:bool
     Applied:bool
     HasActiveHandle:bool
+    Target:AuthoredAbilitySystemComponentRef
+    ActiveId:int
 }
 
 [ue_native_struct(path="/Script/DasRuntime.DasAuthoredEffectSpec")]
@@ -1058,6 +1060,16 @@ struct DasAuthoredEffectSpec {
     Definition:AuthoredGameplayEffectRef
     Level:float
     Magnitudes:table<UENameValue;float>
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasAuthoredEffectState")]
+struct DasAuthoredEffectState {
+    Active:bool
+    Infinite:bool
+    Stacks:int
+    Duration:float
+    Remaining:float
+    Period:float
 }
 
 [ue_native_struct(path="/Script/DasRuntime.DasCallMetrics")]

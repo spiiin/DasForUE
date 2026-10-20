@@ -45,9 +45,10 @@ let result=ue_gas_apply(self.Abilities,spec)
 
 A spec is an owned snapshot recipe, reusable/copyable without borrowing native
 memory. An actual GAS spec is made when applying it. It supports the two starter
-effects, a positive finite level and one required SetByCaller magnitude; generic
-effect classes, captured attributes, durations and active-effect handles are
-future work. Level is stored on the GAS spec; these starter effects do not scale
+effects, a positive finite level and one required SetByCaller magnitude. Authored
+effect classes, durations, periods, stacks and active-effect management use the
+separate [authored GAS adapter](GASAuthoring.md); attribute capture calculations
+remain future work. Level is stored on the GAS spec; these starter effects do not scale
 magnitude by level. Amount is finite and nonnegative; damage applies its negative
 internally. Invalid input, wrong tags, missing magnitudes, uninitialized or foreign
 world sources are rejected. A valid request blocked by GAS returns Applied=false.

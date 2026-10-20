@@ -6,6 +6,10 @@ surface and deviations are recorded here; see [GAS guide](../../Guide/Gameplay/G
 
 The next increment adds [authored data-only AttributeSets and instant GameplayEffects](../../Guide/Gameplay/GASAuthoring.md). Editor build passed; the focused scenario passed 9 checks on creation and 9 after reopening saved assets in another process. The original health scenario still passes all 10 checks.
 
+A further authored-DSL increment adds native duration, period and stacking policies,
+plus checked active-effect queries/removal; see the authoring guide for its current
+surface. The initial starter scope below is retained as historical context.
+
 ## Initial implementation decisions
 
 - `ue_gas.das` exposes HealthAbilitySystemComponentRef, HealthAttribute,
