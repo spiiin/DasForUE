@@ -38,6 +38,8 @@ struct FManagedSubscription
     FString PayloadPath;
     TStrongObjectPtr<UDasIntDelegateProxy> Proxy;
     FName ProxyFunction;
+    FName DirectFunction;
+    TWeakObjectPtr<UObject> DirectTarget;
     int32 SaveGameKind = 0;
     FString SaveGameName;
     TStrongObjectPtr<UDasSaveGameProxy> SaveGameProxy;
@@ -65,6 +67,17 @@ struct FManagedSubscription
     TStrongObjectPtr<UDasMontageProxy> MontageProxy;
     ~FManagedSubscription()
     {
+        if (!DirectFunction.IsNone())
+        {
+            if (auto* O = Source.Get())
+                if (auto* P = FindFProperty<FMulticastDelegateProperty>(O->GetClass(), Event))
+                {
+                    FScriptDelegate D;
+                    D.BindUFunction(DirectTarget.Get(), DirectFunction);
+                    P->RemoveDelegate(D, O, P->ContainerPtrToValuePtr<void>(O));
+                }
+            return;
+        }
         if (AIMoveProxy.IsValid())
         {
             AIMoveProxy->Deactivate();

@@ -6,6 +6,7 @@ public:
     FUnrealFoundationModule() : das::Module("ue_foundation")
     {
         AddCollisionProfileEnum(*this);
+
         globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEInputNameLint()));
         addCommentReader(new FUECommentReader());
         addAnnotation(new FUENativeBaseAnnotation());
@@ -777,6 +778,8 @@ public:
                                                     das::SideEffects::modifyExternal, "DelegateSetField");
         AddUEExtern<DAS_BIND_FUN(DelegateCreate)>(*this, Library, "__ue_delegate_create",
                                                   das::SideEffects::modifyExternal, "DelegateCreate");
+        AddUEExtern<DAS_BIND_FUN(DynamicEventListen)>(*this, Library, "__ue_dynamic_event",
+                                                      das::SideEffects::modifyExternal, "DynamicEventListen");
         AddUEExtern<DAS_BIND_FUN(DelegateBind)>(*this, Library, "__ue_delegate_bind", das::SideEffects::modifyExternal,
                                                 "DelegateBind");
         AddUEExtern<DAS_BIND_FUN(DelegateRemove)>(*this, Library, "__ue_delegate_remove",

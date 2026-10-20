@@ -117,6 +117,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             TGuardValue<FString> NativeDefaultsHint(DSLNativeDefaultsParentHint, NativeHint);
             DSLExpandDeclarationGroups(St, true);
             DSLNormalizeEventDeclarations(St, Group);
+            DSLNormalizeDynamicEvents(St);
             DSLNormalizeOperationKeys(St, Args);
             DSLNormalizeInlineCallbacks(St, Group);
             DSLNormalizeMethodReferences(St, Group);

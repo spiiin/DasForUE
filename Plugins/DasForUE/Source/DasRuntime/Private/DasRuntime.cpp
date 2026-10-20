@@ -550,6 +550,7 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasCollisionNames.inl"
 #include "DasFoundationModule.inl"
 #include "DasRuntimeTimers.inl"
+#include "DasDynamicEvents.inl"
 #include "DasRuntimeInputSessions.inl"
 }
 

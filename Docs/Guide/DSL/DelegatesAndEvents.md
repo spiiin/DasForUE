@@ -190,6 +190,35 @@ event.Clear()
   existing reflected multicast property. Binding requires `BlueprintAssignable`;
   broadcasting also requires `BlueprintCallable`.
 
+## Dynamic subscriptions without strings
+
+Inside ordinary class methods, use `+=` and `-=` to subscribe and unsubscribe at runtime:
+
+```das
+[ue_function(BlueprintCallable)]
+def Listen(enabled:bool):void {
+    if (enabled) {
+        self.Changed += self.OnChanged
+        self.Health.Changed += self.OnHealthChanged
+    }
+}
+
+[ue_function(BlueprintCallable)]
+def StopListening():void {
+    self.Changed -= self.OnChanged
+    self.Health.Changed -= self.OnHealthChanged
+}
+
+def OnChanged(value:int):void { self.Score += value }
+def OnHealthChanged(current:float; maximum:float):void { self.RefreshHUD() }
+```
+
+The source is a native/authored event on self or a declared component. The handler must be a `void` instance method declared on the same class. It becomes a hidden reflected callback automatically; add an explicit `BlueprintCallable` only to expose it in Blueprint. Event names, argument count and exact UE parameter types are checked before Apply, and the actual property/function contract is checked again when binding. Direct calls require exact types; use the declarative queued form below when you need its supported object/class widening. Mutable ref/out event payloads are not supported by this syntax.
+
+These are synchronous Unreal multicast subscriptions, so handlers run during broadcast and may make nested calls. Conditions and repeated calls are allowed. Repeating `+=` for the same source/event/handler has no effect. Repeating `-=` is harmless and leaves other handlers on the event untouched. Ordinary arithmetic such as `self.Score += self.Increment` retains its normal meaning.
+
+The persistent owner session tracks subscriptions using weak source/target references. EndPlay, Destroy, context release and an accepted hot reload revoke them. **After a successful reload, call the subscription method again when appropriate**; dynamic subscriptions are not automatically replayed. A rejected reload keeps the working bindings. Updates require the game thread and a live session; construction, declaration collection and EndPlay cannot install new subscriptions. Removal during EndPlay is a harmless no-op because lifecycle teardown already detached the bindings. `BindEvents` remains the separate declaration form below. Arbitrary object variables, owner expressions, inherited handler references and inline blocks are outside the dynamic operator syntax.
+
 ## Declarative subscriptions without strings
 
 ```das
@@ -203,7 +232,7 @@ def OnHealthChanged(current:float; maximum:float):void { self.RefreshHUD() }
 
 `BindEvents` is a reserved, unannotated declaration method with no parameters or result. Its body accepts only top-level `+=` declarations. These become ordinary `ue_event` contracts and are collected against the candidate VM before it is accepted. They are not imperative subscriptions executed by calling `BindEvents`. Conditions, loops, arbitrary statements, `-=` and handlers already carrying annotations are rejected. Each handler names one source; use separate forwarding handlers for multiple sources. Native self events and declared native/authored components are supported.
 
-This keeps the existing queued delivery, reload replacement, rejection and owner/source cleanup rules. It does not introduce direct native delegate bindings that outlive the script context. An `+=` expression in an ordinary gameplay method is not this declaration syntax.
+This keeps the existing queued delivery, reload replacement, rejection and owner/source cleanup rules. It does not introduce direct native delegate bindings that outlive the script context. An `+=` expression in an ordinary gameplay method uses the synchronous, session-owned dynamic form above.
 
 ## Subscribing to events: `ue_event`
 
@@ -232,8 +261,9 @@ class ScalarEventActor {
   a component name subscribes to one of the object's own components.
 - When the source is native (self of a class with a native parent, or a native
   component), the delegate is checked while the script compiles: a misspelled name or
-  a handler with the wrong number of parameters is a compile error. Owner and authored
-  sources are checked when `bind_events` subscribes.
+  a handler with the wrong parameter count/types is a compile error. Authored source
+  declarations and explicit owner contracts are checked before Apply; the actual
+  owner is checked again when binding.
 - Handlers return `void` and take 0–16 by-value parameters (`var` allows local
   mutation of the copy); no `ref`/`out`/defaults, and not combined with
   `BlueprintCallable`. Several handlers per class are allowed; duplicates are

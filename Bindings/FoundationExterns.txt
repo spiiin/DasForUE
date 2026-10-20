@@ -81,6 +81,7 @@ __ue_drag_payload	@ue_foundation::__ue_drag_payload CIH<ue_foundation::UObjectHa
 __ue_drag_tag	@ue_foundation::__ue_drag_tag CIH<ue_foundation::UObjectHandle> C_c	string const	4
 __ue_drag_valid	@ue_foundation::__ue_drag_valid CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 __ue_drag_visual	@ue_foundation::__ue_drag_visual CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_dynamic_event	@ue_foundation::__ue_dynamic_event CIs CIs CIs Cb C_c	void	4
 __ue_effect_active	@ue_foundation::__ue_effect_active CIs C_c	bool const	4
 __ue_effect_play	@ue_foundation::__ue_effect_play CIs CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UETransform> CIs Cf Cf C_c	bool const	4
 __ue_effect_stop	@ue_foundation::__ue_effect_stop CIs C_c	bool const	4

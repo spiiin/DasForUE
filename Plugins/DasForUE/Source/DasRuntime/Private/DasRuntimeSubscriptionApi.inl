@@ -339,3 +339,5 @@ bool ScriptTimerPause(const char*, das::Context*);
 bool ScriptTimerResume(const char*, das::Context*);
 bool ScriptTimerActive(const char*, das::Context*);
 float ScriptTimerRemaining(const char*, das::Context*);
+
+void DynamicEventListen(const char*, const char*, const char*, bool, das::Context*);

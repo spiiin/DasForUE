@@ -14,6 +14,7 @@
 #include "UObject/StrongObjectPtr.h"
 #include "UObject/Script.h"
 #include "Containers/Ticker.h"
+#include "Components/SceneComponent.h"
 UDasEventChecksCommandlet::UDasEventChecksCommandlet()
 {
     IsClient = false;
@@ -169,6 +170,117 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
     Check(!WrongResult.bSucceeded && !WrongResult.Error.IsEmpty() && R.SubscriptionCount(WrongComponent) == 0,
           TEXT("wrong_actual_owner_rejected_without_subscription"), WrongResult.Error);
     R.ReleaseObject(WrongComponent);
+    FString Dynamic;
+    if (!FFileHelper::LoadFileToString(Dynamic, *(Repo / TEXT("Tests/EventChecks/dynamic.das"))))
+        return 2;
+    Check(Compile(Dynamic), TEXT("dynamic_conditional_native_authored_and_component_events_compile"), Error);
+    Bad(Dynamic.Replace(TEXT("def OnSignal(value:int)"), TEXT("def OnSignal(value:float)")),
+                        TEXT("dynamic_same_arity_wrong_type_rejected"), TEXT("exactly matching"));
+    Bad(Dynamic.Replace(TEXT("self.OnDasSignal +="), TEXT("self.UnknownSignal +=")),
+                        TEXT("dynamic_unknown_event_rejected"), TEXT("UnknownSignal"));
+    Bad(Dynamic.Replace(TEXT("self.OnDasSignal -= self.OnSignal"), TEXT("self.OnDasSignal -= self.Missing")),
+                        TEXT("dynamic_unknown_remove_handler_rejected"), TEXT("Missing"));
+    Bad(Dynamic.Replace(TEXT("right:float):void {self.Total"), TEXT("right:int):void {self.Total")),
+                        TEXT("dynamic_authored_tuple_type_rejected"), TEXT("exactly matching"));
+    Bad(Dynamic.Replace(TEXT("self.Scene.OnComponentActivated +="), TEXT("self.Missing.OnComponentActivated +=")),
+                        TEXT("dynamic_unknown_component_rejected"), TEXT("Unknown event component"));
+    Bad(Dynamic.Replace(TEXT("component:EventComponentRef"), TEXT("component:ObjectRef")),
+                        TEXT("dynamic_direct_widening_rejected_before_apply"), TEXT("exactly matching"));
+    Bad(Dynamic.Replace(TEXT("def OnSignal(value:int):void {self.Total+=value}"),
+                             TEXT("def OnSignal(value:int):int {return value}")),
+                        TEXT("dynamic_non_void_handler_rejected"), TEXT("void"));
+    Check(Compile(AuthoredComponent.Replace(
+        TEXT("[ue_event(source=Health,name=Changed)]"),
+             TEXT("[ue_function(BlueprintCallable)]\ndef Listen():void{self.Health.Changed += self.Changed}\n"))),
+                  TEXT("dynamic_authored_component_checked_from_source"), Error);
+    FDasAuthoringModule DynamicModel;
+    Write(Dynamic);
+    const bool ModelOK = R.ReadAuthoringScript(Path, DynamicModel, Error);
+    Check(ModelOK && DynamicModel.Classes[0].Methods.ContainsByPredicate(
+                         [](const auto& M)
+                         {
+                             return M.Name == TEXT("OnSignal") &&
+                                                   M.Metadata.FindRef(TEXT("BlueprintInternalUseOnly")) == TEXT("true");
+                         }),
+          TEXT("dynamic_handler_is_hidden_without_annotation"), Error);
+    UBlueprint* DynamicBP = nullptr;
+    Check(FDasDSLService::Apply(File, TEXT("/Game/DasEventChecks/") + Id +
+                                           TEXT("/BP_Dynamic"), TEXT("dynamicevents.DynamicActor"), DynamicBP, Error),
+                                           TEXT("Apply_dynamic_event_contracts"), Error);
+    if (!DynamicBP || !DynamicBP->GeneratedClass)
+        return 1;
+    auto* Listener = World->SpawnActor<ADasProbeActor>(DynamicBP->GeneratedClass);
+    TStrongObjectPtr<ADasProbeActor> KeepListener(Listener);
+    auto* Scene = Cast<USceneComponent>(FindFProperty<FObjectPropertyBase>(
+        Listener->GetClass(), TEXT("Scene"))->GetObjectPropertyValue_InContainer(Listener));
+    if (!Scene)
+        return 1;
+    auto Total = [&]()
+    {
+        return FindFProperty<FIntProperty>(Listener->GetClass(), TEXT("Total"))->GetPropertyValue_InContainer(Listener);
+    };
+    auto Invoke = [&](const TCHAR* N)
+    {
+        Listener->ProcessEvent(Listener->FindFunctionChecked(N), nullptr);
+    };
+    const auto DynamicFirst = R.RunLifecycle(Path, EDasCallback::Tick, Listener, .01f);
+    Check(DynamicFirst.bSucceeded && R.SubscriptionCount(Listener) == 0, TEXT("dynamic_no_subscription_before_start"),
+                                                                              DynamicFirst.Error);
+    bool Enabled = false;
+    Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
+    Check(R.SubscriptionCount(Listener) == 0, TEXT("dynamic_condition_controls_registration"));
+    Enabled = true;
+    Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
+    Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
+    Check(R.SubscriptionCount(Listener) == 3 && Listener->OnDasSignal.GetAllObjects().Num() == 1,
+          TEXT("dynamic_add_is_idempotent"), Listener->LastDasError);
+    Listener->OnDasSignal.Broadcast(7);
+    Invoke(TEXT("Fire"));
+    Scene->OnComponentActivated.Broadcast(Scene, true);
+    Check(Total() == 112, TEXT("dynamic_native_authored_tuple_component_delivery"), Listener->LastDasError);
+    Invoke(TEXT("Arithmetic"));
+    Check(Total() == 115, TEXT("ordinary_data_compound_assignment_unchanged"), Listener->LastDasError);
+    Invoke(TEXT("StartOther"));
+    Invoke(TEXT("Stop"));
+    Invoke(TEXT("Stop"));
+    Listener->OnDasSignal.Broadcast(2);
+    Invoke(TEXT("Fire"));
+    Scene->OnComponentActivated.Broadcast(Scene, true);
+    Check(R.SubscriptionCount(Listener) == 1 && Total() == 135,
+          TEXT("dynamic_remove_is_idempotent_and_preserves_other_handler"), Listener->LastDasError);
+    Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
+    Write(Dynamic.Replace(TEXT("def OnSignal(value:int)"), TEXT("def OnSignal(value:float)")));
+    const auto DynamicRejected = R.RunLifecycle(Path, EDasCallback::Tick, Listener, .01f);
+    Listener->OnDasSignal.Broadcast(1);
+    Check(DynamicRejected.bSucceeded && !DynamicRejected.ReloadError.IsEmpty() &&
+              DynamicRejected.Revision == DynamicFirst.Revision && R.SubscriptionCount(Listener) == 4 && Total() == 146,
+          TEXT("dynamic_rejected_reload_preserves_bindings"), DynamicRejected.ReloadError);
+    Write(Dynamic.Replace(TEXT("// DYNAMIC_RELOAD_MARKER"), TEXT("// accepted replacement")));
+    const auto DynamicReload = R.RunLifecycle(Path, EDasCallback::Tick, Listener, .01f);
+    Listener->OnDasSignal.Broadcast(20);
+    Check(DynamicReload.bSucceeded && DynamicReload.ReloadError.IsEmpty() &&
+              DynamicReload.Revision > DynamicFirst.Revision && R.SubscriptionCount(Listener) == 0 && Total() == 146 &&
+              Listener->OnDasSignal.GetAllObjects().IsEmpty(),
+          TEXT("dynamic_successful_reload_revokes_old_bindings"), DynamicReload.Error + DynamicReload.ReloadError);
+    Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
+    Listener->OnDasSignal.Broadcast(1);
+    Check(R.SubscriptionCount(Listener) == 3 && Total() == 147, TEXT("dynamic_can_rebind_after_reload"),
+                                                                     Listener->LastDasError);
+    const auto Ended = R.RunLifecycle(Path, EDasCallback::EndPlay, Listener);
+    Check(Ended.bSucceeded && R.SubscriptionCount(Listener) == 0,
+          TEXT("dynamic_EndPlay_allows_idempotent_removal_after_teardown"), Ended.Error);
+    R.ReleaseObject(Listener);
+    Listener->OnDasSignal.Broadcast(50);
+    Scene->OnComponentActivated.Broadcast(Scene, true);
+    Check(R.SubscriptionCount(Listener) == 0 && Total() == 147 && Listener->OnDasSignal.GetAllObjects().IsEmpty(),
+          TEXT("dynamic_release_detaches_all_sources"));
+    const auto Restart = R.RunLifecycle(Path, EDasCallback::Tick, Listener, .01f);
+    Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
+    Check(Restart.bSucceeded && R.SubscriptionCount(Listener) == 3, TEXT("dynamic_restart_before_destroy"),
+                                                                         Restart.Error);
+    Listener->Destroy();
+    Pump();
+    Check(R.SubscriptionCount(Listener) == 0, TEXT("dynamic_destroy_revokes_session_bindings"));
     UE_LOG(LogTemp, Display,
            TEXT("DAS_EVENT_CHECK_RESULT=%s checks=%d"), Failures ? TEXT("FAIL"): TEXT("PASS"), Checks);
     return Failures ? 1 : 0;

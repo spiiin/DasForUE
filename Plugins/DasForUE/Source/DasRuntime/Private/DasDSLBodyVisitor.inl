@@ -29,6 +29,8 @@ int32 DSLCallbackArgument(const das::string& QualifiedName, size_t Count)
     const auto Separator = QualifiedName.rfind("::");
     const das::string Name = Separator == das::string::npos ? QualifiedName : QualifiedName.substr(Separator + 2);
     int32 Index = -1;
+    if (Name == "__ue_dynamic_event" && Count == 4)
+        return 2;
     if (Name == "ue_widget_bind_click" && Count == 2)
         return 1;
     if (Name == "ue_timer_start" || Name == "ue_input_bind_action" || Name == "ue_enhanced_bind" ||
@@ -147,6 +149,8 @@ void DSLNormalizeMethodReferences(const das::StructurePtr& St, das::ModuleGroup&
         F->body = F->body->visit(References);
     }
 }
+void DSLValidateDynamicEvent(das::ExprCall*, const FDasDeclaredClass&, const das::StructurePtr&, das::ModuleGroup&,
+                             const FString&, const FString&);
 struct FDSLBodyVisitor : das::Visitor
 {
     const FDasDeclaredClass& Decl;
@@ -397,7 +401,7 @@ struct FDSLBodyVisitor : das::Visitor
         }
         if (P->Type.Kind == TEXT("event"))
         {
-            Error = TEXT("Declare source.Event += self.Handler in BindEvents(), or use AddUFunction/RemoveUFunction");
+            Error = TEXT("Event updates require += or -= with self.Method");
             return E;
         }
         if (P->bReadOnly)
@@ -1536,6 +1540,8 @@ struct FDSLBodyVisitor : das::Visitor
     }
     virtual das::ExpressionPtr visit(das::ExprCall* E) override
     {
+        if (!NativeOnly && (E->name == "__ue_dynamic_event" || E->name == "ue_foundation::__ue_dynamic_event"))
+            DSLValidateDynamicEvent(E, Decl, Source, Group, Folder, Registry);
         if (const auto* Local = QualifiedLocals.Find(DSLText(E->name));
             Local && !E->arguments.empty() && E->arguments[0]->rtti_isVar() &&
             static_cast<das::ExprVar*>(E->arguments[0])->name == Self)

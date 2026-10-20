@@ -1,3 +1,50 @@
+// Runtime subscriptions are lowered before hidden callback discovery and type inference.
+void DSLNormalizeDynamicEvents(const das::StructurePtr& St)
+{
+    struct FRewrite : das::Visitor
+    {
+        das::StructurePtr Class;
+        das::string Self;
+        FRewrite(const das::StructurePtr& C, const das::string& S) : Class(C), Self(S) {}
+        bool IsSelf(das::Expression* E) { return E && E->rtti_isVar() && static_cast<das::ExprVar*>(E)->name == Self; }
+        virtual das::ExpressionPtr visit(das::ExprOp2* E) override
+        {
+            if ((E->op != "+=" && E->op != "-=") || !E->left->rtti_isField() || !E->right->rtti_isField())
+                return E;
+            auto* Handler = static_cast<das::ExprField*>(E->right);
+            if (!IsSelf(Handler->value))
+                return E;
+            // Keep ordinary arithmetic on declared data fields in the normal lowering path.
+            const auto* Member = Class->findField(Handler->name);
+            if (Member && !Member->classMethod)
+                return E;
+            auto* Event = static_cast<das::ExprField*>(E->left);
+            das::string Source = "self";
+            if (!IsSelf(Event->value))
+            {
+                if (!Event->value->rtti_isField())
+                    return E;
+                auto* Component = static_cast<das::ExprField*>(Event->value);
+                if (!IsSelf(Component->value))
+                    return E;
+                Source = Component->name;
+            }
+            return DSLCall(E->at, "__ue_dynamic_event",
+                           {new das::ExprConstString(E->at, Source), new das::ExprConstString(E->at, Event->name),
+                            Handler, new das::ExprConstBool(E->at, E->op == "+=")});
+        }
+    };
+    St->module->functions.foreach (
+        [&](const das::FunctionPtr& F)
+        {
+            if (F->classParent == St && F->body && !F->arguments.empty() && DSLMethodName(F) != "BindEvents")
+            {
+                FRewrite Rewrite(St, F->arguments[0]->name);
+                F->body = F->body->visit(Rewrite);
+            }
+        });
+}
+
 // A declarative block shares bind_events' candidate validation and lifecycle cleanup.
 void DSLNormalizeEventDeclarations(const das::StructurePtr& St, das::ModuleGroup& Group)
 {
@@ -97,7 +144,7 @@ das::TypeDeclPtr DSLEventOwnerType(const das::AnnotationArgumentList& Options, c
 void DSLValidateEventSignature(const FDasDeclaredClass& C, const FDasDeclaredCallback& Callback,
                                const das::FunctionPtr& F, const das::StructurePtr& St, das::ModuleGroup& Group,
                                const FString& Folder, const FString& Registry,
-                               const das::AnnotationArgumentList& Options)
+                               const das::AnnotationArgumentList& Options, bool Exact = false)
 {
     TArray<FDasDeclaredType> Arguments;
     for (size_t I = 1; I < F->arguments.size(); ++I)
@@ -194,6 +241,39 @@ void DSLValidateEventSignature(const FDasDeclaredClass& C, const FDasDeclaredCal
         Signature = P->SignatureFunction;
     }
     FString Error;
+    if (Exact)
+    {
+        const auto* Method =
+            C.Methods.FindByPredicate([&](const auto& M) { return M.Name == DSLText(DSLMethodName(F)); });
+        TStrongObjectPtr<UFunction> Handler(
+            Method ? MakeDasDelegateSignature(*Method, true, GetTransientPackage(), NAME_None, Error) : nullptr);
+        if (!Handler.IsValid() || !DelegateFrameMatches(Signature, Handler.Get()))
+            DSLFail(TEXT("Dynamic event requires exactly matching handler argument types: ") + Callback.Source +
+                         TEXT(".") + Callback.EventName);
+    }
     if (!ValidateDasCallbackSignature(Signature, Arguments, Error))
         DSLFail(TEXT("ue_event ")+ Callback.Source + TEXT(".")+ Callback.EventName + TEXT(": ")+ Error);
+}
+
+void DSLValidateDynamicEvent(das::ExprCall* E, const FDasDeclaredClass& C, const das::StructurePtr& St,
+                             das::ModuleGroup& Group, const FString& Folder, const FString& Registry)
+{
+    if (E->arguments.size() != 4 || E->arguments[0]->__rtti != das::string("ExprConstString") ||
+        E->arguments[1]->__rtti != das::string("ExprConstString") ||
+        E->arguments[2]->__rtti != das::string("ExprConstString"))
+        DSLFail(TEXT("Dynamic event requires self.Event +=/-= self.Method"));
+    FDasDeclaredCallback Callback;
+    Callback.Source = DSLText(static_cast<das::ExprConstString*>(E->arguments[0])->text);
+    Callback.EventName = DSLText(static_cast<das::ExprConstString*>(E->arguments[1])->text);
+    const auto Name = static_cast<das::ExprConstString*>(E->arguments[2])->text;
+    das::FunctionPtr Handler = nullptr;
+    St->module->functions.foreach (
+        [&](const das::FunctionPtr& F)
+        {
+            if (F->classParent == St && DSLMethodName(F) == Name)
+                Handler = F;
+        });
+    if (!Handler)
+        DSLFail(TEXT("Unknown dynamic event handler: ") + DSLText(Name));
+    DSLValidateEventSignature(C, Callback, Handler, St, Group, Folder, Registry, {}, true);
 }

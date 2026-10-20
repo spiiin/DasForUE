@@ -13,6 +13,7 @@ function Get-HiddenHashes {
     $Paths+=@(Get-ChildItem "$($Das.Repo)/Plugins/DasForUE/Content/Das/Scripts" -File -Filter '*.das' |
         ForEach-Object FullName)
     $Paths+="$($Das.Repo)/Tests/EventChecks/probe.das"
+    $Paths+="$($Das.Repo)/Tests/EventChecks/dynamic.das"
     $Paths+=@('DasRuntime','DasEditor' | ForEach-Object {
         "$($Das.Repo)/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$_.dll"
     })
@@ -30,7 +31,7 @@ $Log=Invoke-DasCommandlet $Das -Run DasEventChecks -Name 'event-check-runtime' -
     -FailPattern 'DAS_EVENT_CHECK_FAIL|Ensure condition failed|Fatal error:|Log[^:]+: Error:'
 $Text=Get-Content -LiteralPath $Log -Raw
 $Match=[regex]::Match($Text,'DAS_EVENT_CHECK_RESULT=PASS checks=(\d+)')
-if(!$Match.Success -or [int]$Match.Groups[1].Value -ne 27){throw 'Incomplete event check probe'}
+if(!$Match.Success -or [int]$Match.Groups[1].Value -ne 51){throw 'Incomplete event check probe'}
 if((Get-HiddenHashes) -ne $Before){throw 'Source or binary changed during event check validation'}
 [ordered]@{state='PASS';checks=[int]$Match.Groups[1].Value;runtime_log=$Log;sha256=($Before|ConvertFrom-Json);
     mode='headless Game World, native/authored event signatures, Apply and managed reload';PIE='not_run';packaged='not_run';full_suites='not_run'} |
