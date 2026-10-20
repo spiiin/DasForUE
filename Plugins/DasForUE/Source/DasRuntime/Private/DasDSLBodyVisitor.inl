@@ -29,9 +29,10 @@ int32 DSLCallbackArgument(const das::string& QualifiedName, size_t Count)
     const auto Separator = QualifiedName.rfind("::");
     const das::string Name = Separator == das::string::npos ? QualifiedName : QualifiedName.substr(Separator + 2);
     int32 Index = -1;
+    if (Name == "ue_widget_bind_click" && Count == 2)return 1;
     if (Name == "ue_timer_start" || Name == "ue_input_bind_action" || Name == "ue_enhanced_bind" ||
         Name == "ue_latent_delay" || Name == "ue_asset_load_async" || Name == "ue_soft_load_async" ||
-        Name == "ue_widget_bind_click")
+        (Name == "ue_widget_bind_click" && Count == 3))
         Index = 2;
     else if (Name == "ue_timer_next_tick" || Name == "ue_input_bind_axis")
         Index = 1;
@@ -1438,9 +1439,9 @@ struct FDSLBodyVisitor : das::Visitor
     // Button handlers are Blueprint functions found by name at runtime; check them here when known.
     das::ExpressionPtr RewriteWidgetClick(das::ExprCall* E)
     {
-        if (E->arguments.size() != 3)
+        if (E->arguments.size() != 2 && E->arguments.size() != 3)
             return E;
-        auto* Name = CallbackName(E->arguments[2]);
+        auto* Name = CallbackName(E->arguments.back());
         if (!Name)
             return E;
         bool Found = false;

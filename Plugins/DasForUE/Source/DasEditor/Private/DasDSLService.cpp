@@ -9,6 +9,9 @@
 #include "DasComponentComposition.h"
 #include "DasDefaultsMigration.h"
 #include "DasAuthoring.h"
+#include "DasWidgetLayouts.h"
+#include "Blueprint/WidgetBlueprintGeneratedClass.h"
+#include "Blueprint/WidgetTree.h"
 #include "DasBlueprintService.h"
 #include "DasRuntime.h"
 #include "DasAsyncPhysicsVM.h"
@@ -57,6 +60,8 @@ void DasFailWidenAfterCompileForTesting(bool Enabled)
     GDasFailWidenAfterCompile = Enabled;
 }
 #endif
+
+#include "DasWidgetLayoutsPreflight.inl"
 
 bool FDasDSLService::Apply(const FString& Script, const FString& Package, const FString& Id, UBlueprint*& Out,
                            FString& Error, EDasDefaultMigrationPolicy DefaultPolicy)
@@ -110,6 +115,7 @@ bool FDasDSLService::Apply(const FString& Script, const FString& Package, const 
         Error = TEXT("Asset exists and is not a Blueprint");
         return false;
     }
+    if(!PreflightDasWidgetLayouts(PhysicsDeclaration,BP,Error))return false;
     const bool Created = !BP;
     if (!Created && BP->GeneratedClass)
     {

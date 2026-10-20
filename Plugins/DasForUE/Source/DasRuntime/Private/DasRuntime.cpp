@@ -23,6 +23,8 @@
 #include "Animation/Skeleton.h"
 #include "Engine/SkeletalMesh.h"
 #include "DasWidgetLifetime.h"
+#include "DasWidgetLayouts.h"
+#include "Blueprint/WidgetTree.h"
 #include "DasImageSoftBrush.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"

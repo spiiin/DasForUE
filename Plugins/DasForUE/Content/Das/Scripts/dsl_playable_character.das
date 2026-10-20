@@ -6,6 +6,9 @@ require ue_health_refs public
 require ue_interaction public
 require ue_effects public
 
+[ue_widget_layout]
+struct HUDView { Score:TextBlockRef; Health:TextBlockRef; Damage:ButtonRef }
+
 // The same field operators work in ordinary functions and in authored methods.
 def set_movement_speed(movement:CharacterMovementRef; value:float):float {
     movement.MaxWalkSpeed=value
@@ -116,13 +119,15 @@ class PlayableCharacter : Character {
         self.UIOpen=false
         self.HUD=ue_widget_create(self.HUDClass,ue_pawn_controller(ue_character_self()))
         verify(ue_widget_show(self.HUD),"Cannot add HUD to local player screen")
-        ue_widget_bind_click(self.HUD,"Damage",self.HurtFromHUD)
+        let view=ue_widget_view(type<HUDView>,self.HUD)
+        ue_widget_bind_click(view.Damage,self.HurtFromHUD)
         self.RefreshHUD()
     }
     def RefreshHUD():void {
         if(!ue_widget_visible(self.HUD)) { return }
-        ue_widget_set_text(self.HUD,"Score",ue_text_invariant("Score: {self.Score}"))
-        ue_widget_set_text(self.HUD,"Health",ue_text_invariant("Health: {self.Health.Current} / {self.Health.Maximum}"))
+        let view=ue_widget_view(type<HUDView>,self.HUD)
+        ue_widget_set_text(view.Score,ue_text_invariant("Score: {self.Score}"))
+        ue_widget_set_text(view.Health,ue_text_invariant("Health: {self.Health.Current} / {self.Health.Maximum}"))
     }
     [ue_event(source="Health",name="Changed")]
     def OnHealthChanged(current:float; maximum:float):void { self.HealthChanges+=1;self.RefreshHUD() }

@@ -8,6 +8,8 @@ public:
         addCommentReader(new FUECommentReader());
         addAnnotation(new FUENativeBaseAnnotation());
         addAnnotation(new FUEClassAnnotation());
+        addAnnotation(new FUEWidgetLayoutAnnotation());
+        {auto* Macro=new FUEWidgetViewMacro();ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));Macro->module=this;addCallMacro(Macro->name,[Macro](const das::LineInfo& At)->das::ExprLooksLikeCall*{auto* E=new das::ExprCallMacro(At,Macro->name);E->macro=Macro;return E;});}
         addAnnotation(new FUEAsyncPhysicsAnnotation());
         addAnnotation(new FUELibraryAnnotation());
         addAnnotation(new FUEEnumAnnotation());
@@ -402,6 +404,10 @@ public:
                                                         das::SideEffects::modifyExternal, "RemoveGameplayWidget");
         AddUEExtern<DAS_BIND_FUN(GameplayWidgetText)>(*this, Library, "__ue_widget_text",
                                                       das::SideEffects::modifyExternal, "GameplayWidgetText");
+        AddUEExtern<DAS_BIND_FUN(ResolveWidgetLayout)>(*this,Library,"__ue_widget_layout_resolve",das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN(WidgetLayoutField),das::SimNode_ExtFuncCallAndCopyOrMove>(*this,Library,"__ue_widget_layout_field",das::SideEffects::accessExternal);
+        AddUEExtern<DAS_BIND_FUN(GameplayWidgetClickRef)>(*this,Library,"__ue_widget_click_ref",das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN(GameplayWidgetTextRef)>(*this,Library,"__ue_widget_text_ref",das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN(GameplayWidgetClick)>(*this, Library, "__ue_widget_click",
                                                        das::SideEffects::modifyExternal, "GameplayWidgetClick");
         AddUEExtern<DAS_BIND_FUN(GameplayWidgetInput)>(*this, Library, "__ue_widget_input",

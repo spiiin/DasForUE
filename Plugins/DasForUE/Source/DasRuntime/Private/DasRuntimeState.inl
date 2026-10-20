@@ -188,6 +188,7 @@ public:
     virtual FString GetReferencerName() const override { return TEXT("FUnrealDasContext snapshots"); }
     uint64 TraceScope = NextTraceScope++;
     FDasWidgetLifetime WidgetLifetime;
+    TMap<FString,FDasResolvedWidgetLayout> WidgetLayouts;
     FDasImageSoftBrushLifetime ImageBrushes;
     FDasDragLifetime DragLifetime;
     TArray<TStrongObjectPtr<USaveGame>> SaveGames;

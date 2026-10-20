@@ -625,7 +625,7 @@ bool FDasAuthoringModule::FromJson(const FString& Json, FDasAuthoringModule& Out
                                      TEXT("parent_id"),
                                           TEXT("source_script"),
                                                TEXT("library_type_registry"),
-                                                    TEXT("async_physics"),
+                                                    TEXT("widget_layouts"), TEXT("async_physics"),
                                                          TEXT("interfaces"),
                                                               TEXT("components"),
                                                                    TEXT("component_overrides"),
@@ -645,6 +645,7 @@ bool FDasAuthoringModule::FromJson(const FString& Json, FDasAuthoringModule& Out
                                                                                                              C.Metadata,
                                                                                                              Error))
             return false;
+        if(J->HasField(TEXT("widget_layouts"))){const TArray<TSharedPtr<FJsonValue>>* Layouts=nullptr;if(!J->TryGetArrayField(TEXT("widget_layouts"),Layouts) || Layouts->Num()>64)return Fail(Error,TEXT("Expected at most 64 widget layouts"));for(const auto& V:*Layouts){if(V->Type!=EJson::Object)return Fail(Error,TEXT("Expected widget layout object"));FString Spec;FJsonSerializer::Serialize(V->AsObject().ToSharedRef(),TJsonWriterFactory<>::Create(&Spec));FDasWidgetLayoutUse L;if(!ParseDasWidgetLayout(Spec,L,Error))return false;C.WidgetLayouts.Add(MoveTemp(L));}}
         if (J->HasField(TEXT("native_parent")) && !String(J, TEXT("native_parent"), C.NativeParent, Error))
             return false;
         if (J->HasField(TEXT("parent_id")) && !String(J, TEXT("parent_id"), C.ParentId, Error))
@@ -1141,6 +1142,7 @@ bool FDasAuthoringModule::ToJson(FString& Out, FString& Error) const
         J->SetStringField(C->ParentId.IsEmpty()
                           ? TEXT("native_parent")
                           : TEXT("parent_id"), C->ParentId.IsEmpty() ? C->NativeParent : C->ParentId);
+        if(!C->WidgetLayouts.IsEmpty()){TArray<TSharedPtr<FJsonValue>> Layouts;for(const auto& L:C->WidgetLayouts){TSharedPtr<FJsonObject> Item;FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(DasWidgetLayoutSpec(L)),Item);Layouts.Add(MakeShared<FJsonValueObject>(Item));}J->SetArrayField(TEXT("widget_layouts"),Layouts);}
         MetadataJson(C->Metadata, J);
         if (!C->LibraryTypeRegistry.IsEmpty())
             J->SetStringField(TEXT("library_type_registry"), C->LibraryTypeRegistry);
@@ -1278,6 +1280,7 @@ bool FDasAuthoringModule::ResolveClass(const FString& ClassId, FDasDeclaredClass
         const auto& C = *Chain[I];
         if (C.AsyncPhysics)
             Effective.AsyncPhysics = C.AsyncPhysics;
+        for(const auto& L:C.WidgetLayouts)Effective.WidgetLayouts.AddUnique(L);
         if (const auto* Type = C.Metadata.Find(TEXT("PrimaryAssetType")))
             Effective.Metadata.Add(TEXT("PrimaryAssetType"), *Type);
         for (const auto& Interface : C.Interfaces)
@@ -1800,6 +1803,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
 FDasAuthoringDelta FDasAuthoringModule::Compare(const FDasDeclaredClass& Old, const FDasDeclaredClass& Next)
 {
     FDasAuthoringDelta D;
+    D.bImplementation = Old.WidgetLayouts != Next.WidgetLayouts;
     D.bStructural = Old.Id != Next.Id || Old.Name != Next.Name || Old.NativeParent != Next.NativeParent ||
                     Old.ParentId != Next.ParentId || Old.Interfaces != Next.Interfaces ||
                     Old.Components != Next.Components || Old.ComponentOverrides != Next.ComponentOverrides ||

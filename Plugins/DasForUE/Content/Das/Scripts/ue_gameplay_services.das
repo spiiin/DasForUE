@@ -76,6 +76,14 @@ def ue_widget_visible(widget:UserWidgetRef):bool { return __ue_widget_visible(wi
 def ue_widget_remove(widget:UserWidgetRef):void { __ue_widget_remove(widget.handle) }
 def ue_widget_set_text(widget:UserWidgetRef; name:string; text:UETextValue):void { __ue_widget_text(widget.handle,name,text) }
 def ue_widget_bind_click(widget:UserWidgetRef; name:string; handler:string):void { __ue_widget_click(widget.handle,name,handler) }
+[ue_native_object(path="/Script/UMG.TextBlock")]
+struct TextBlockRef { handle:UObjectHandle }
+def TextBlockRef_from(value:UObjectHandle):TextBlockRef {return TextBlockRef(handle=ue_cast_nullable_object(value,"/Script/UMG.TextBlock"))}
+[ue_native_object(path="/Script/UMG.Button")]
+struct ButtonRef { handle:UObjectHandle }
+def ButtonRef_from(value:UObjectHandle):ButtonRef {return ButtonRef(handle=ue_cast_nullable_object(value,"/Script/UMG.Button"))}
+def ue_widget_set_text(widget:TextBlockRef; text:UETextValue):void { __ue_widget_text_ref(widget.handle,text) }
+def ue_widget_bind_click(widget:ButtonRef; handler:string):void { __ue_widget_click_ref(widget.handle,handler) }
 def ue_widget_input(widget:UserWidgetRef; enabled:bool):void { __ue_widget_input(widget.handle,enabled) }
 
 // Collision results are snapshots; object getters return nullable checked weak views.

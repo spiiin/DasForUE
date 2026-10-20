@@ -699,6 +699,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             const FString RefKey = Script + TEXT("::")+ C.Name;
             DSLActiveRefDeclarations.Add(RefKey, C);
             DSLRememberPropertySources(RefKey, St, C, TypeScope);
+            DSLCollectWidgetLayoutUses(St, Group, C);
             das::vector<das::FunctionPtr> Functions, Generated;
             St->module->functions.foreach (
                 [&](const das::FunctionPtr& F)
