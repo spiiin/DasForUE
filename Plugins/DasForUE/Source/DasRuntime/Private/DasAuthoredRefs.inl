@@ -17,9 +17,11 @@ struct FDSLPropertySourceSignature
     FDSLTypeScope Scope;
 };
 TMap<FString, FDSLPropertySourceSignature> DSLPropertySourceSignatures;
+void DSLResetIdentityLint();
 void DSLResetReferenceDeclarations()
 {
     DSLResetDocComments();
+    DSLResetIdentityLint();
     DSLSourceCatalogExpectedIds.Reset();
     DSLActiveRefDeclarations.Reset();
     DSLMethodSourceSignatures.Reset();
@@ -485,9 +487,9 @@ struct FUEReferenceFactory : das::CallMacro
                               : TEXT("ue_ref requires an authored reference type"));
             if (Owner && !DasActorNativeParent(DSLReferenceDeclaration(T).NativeParent))
                 DSLFail(TEXT("ue_owner reference must describe an Actor"));
-            return DSLReferenceValue(
-                E->at, T,
-                Owner ? DSLCall(E->at, "ue_component_owner", {DSLCall(E->at, "ue_self_object", {})}) : E->arguments[1]);
+            return Owner ? DSLReferenceValue(
+                               E->at, T, DSLCall(E->at, "ue_component_owner", {DSLCall(E->at, "ue_self_object", {})}))
+                         : DSLAuthoredUnpack(E->at, T, E->arguments[1]);
         }
         catch (const std::exception& X)
         {

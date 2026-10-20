@@ -41,7 +41,7 @@ class PlayableCharacter : Character {
         self.Label.RelativeLocation=ue_vector(0.0lf,0.0lf,130.0lf)
     }
     def BeginPlay():void {
-        self.Label.K2_SetText(ue_text("DasForUE","PlayerLabel","Player"))
+        self.Label.K2_SetText(ue_loctext(PlayerLabel, "Player"))
         self.CharacterMovement.MaxWalkSpeed=450.0f
     }
     def Tick(delta:float):void {

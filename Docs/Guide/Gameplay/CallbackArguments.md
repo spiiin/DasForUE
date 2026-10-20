@@ -125,7 +125,7 @@ Multiple arguments, including a native five-argument event:
 ```das
 def Schedule():void {
     var weights:array<int> = [3,7]
-    let title=ue_text("Example","Saved","Saved")
+    let title=ue_loctext(Saved, "Saved")
     ue_timer_next_tick("update","UpdateScore",17,title,weights)
     ue_timer_start("repeat",0.1f,"UpdateScore",true,17,title,weights)
     clear(weights)

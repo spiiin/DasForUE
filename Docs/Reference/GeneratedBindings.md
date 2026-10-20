@@ -91,7 +91,7 @@ API packages generated with `canonical_math` map Vector2D/Vector/Rotator/Transfo
 ### Object references
 
 ```das
-let actor = C_Actor_adf65d5b_from(ue_self_object())
+let actor = ue_ref(type<C_Actor_adf65d5b>, ue_self_object())
 let owner = actor_GetOwner(actor)            // also C_Actor_adf65d5b
 if (C_Actor_adf65d5b_valid(owner)) {
     let position = actor_K2_GetActorLocation(owner)
@@ -108,19 +108,19 @@ For every `C_<Name>_<hash>` the generator emits:
 | `_valid(value)` | `false` for null, destroyed or wrong-class objects |
 | `_as_<Ancestor>(value)` | Explicit upcast, e.g. `C_Actor_adf65d5b_as_C_Object_55c3753a(actor)` |
 
-There are no implicit conversions between classes. Downcast through the handle: `C_Actor_adf65d5b_from(C_Object_55c3753a_raw(object))`. A function declared to return `UObject*` returns the Object view even when the object is an Actor.
+There are no implicit conversions between classes. Downcast through the handle: `ue_ref(type<C_Actor_adf65d5b>, C_Object_55c3753a_raw(object))`. A function declared to return `UObject*` returns the Object view even when the object is an Actor.
 
 The reference holds a weak, context-local token: it does not own the UObject or protect it from GC. Null is allowed for object arguments and results but not for the receiver. A non-null expired token raises an error on conversion or call; it never silently becomes null. The `handle` field is public but is not a security boundary: every wrapper re-checks the receiver and object arguments.
 
 ### Arrays
 
 ```das
-let self = C_DasObjectFixture_5f019a81_from(ue_self_object())
+let self = ue_ref(type<C_DasObjectFixture_5f019a81>, ue_self_object())
 let input <- [1, 2, 3]
 let result <- fixture_TransformInts(self, input)
 verify(input[0] == 1)                         // input is never modified in place
 
-let children <- actor_GetAttachedActors(C_Actor_adf65d5b_from(ue_self_object()))
+let children <- actor_GetAttachedActors(ue_ref(type<C_Actor_adf65d5b>, ue_self_object()))
 for (child in children) {
     if (C_Actor_adf65d5b_valid(child)) { let p = actor_K2_GetActorLocation(child) }
 }

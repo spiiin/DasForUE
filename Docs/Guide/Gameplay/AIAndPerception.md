@@ -83,6 +83,7 @@ The static `NavigationSystemV1` queries (projection, random/reachable points, Na
 
 ```das
 require ue_perception
+var @ue_state seen:int = 0
 
 [ue_class]
 class PerceptionProbe : Actor {
@@ -92,7 +93,7 @@ class PerceptionProbe : Actor {
     [ue_event(source="Perception",name="OnTargetPerceptionUpdated")]
     def OnTarget(actor:ActorRef; stimulus:AIStimulus):void {
         if(stimulus.Sense==AISense.Sight && stimulus.SuccessfullySensed) {
-            ue_state_set_int("seen",ue_state_get_int("seen",0)+1)
+            seen += 1
         }
     }
 }

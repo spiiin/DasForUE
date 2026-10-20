@@ -118,6 +118,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             DSLExpandDeclarationGroups(St, true);
             DSLNormalizeInlineCallbacks(St, Group);
             DSLNormalizeMethodReferences(St);
+            DSLNormalizeIdentityDefaults(St, Group);
             DSLPrepareComputedDefaults(St);
             const auto ComponentDefaults = DSLCollectComponentDefaults(St);
             DSLCommentTooltip(St->at, Args);

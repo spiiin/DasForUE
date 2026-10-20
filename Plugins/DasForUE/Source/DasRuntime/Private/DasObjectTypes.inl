@@ -108,6 +108,24 @@ das::TypeDeclPtr DSLObjectNormalize(const das::TypeDeclPtr& T, das::ModuleGroup&
     }
     return T;
 }
+// Canonical reference construction does not depend on a per-type helper function.
+das::ExpressionPtr DSLNativeReferenceUnpack(const das::LineInfo& At, const das::TypeDeclPtr& T,
+                                            das::ExpressionPtr Handle)
+{
+    auto* Value = new das::ExprMakeStruct(At);
+    Value->makeType = DSLObjectCopyType(T);
+    Value->makeType->ref = false;
+    Value->makeType->constant = false;
+    Value->useInitializer = true;
+    Value->alwaysUseInitializer = true;
+    auto* Check = new das::ExprCall(At, DSLTypedInterface(T) ? "ue_cast_interface" : "ue_cast_nullable_object");
+    Check->arguments.push_back(Handle);
+    Check->arguments.push_back(new das::ExprConstString(At, DSLUtf8(DSLTypedReferencePath(T))));
+    auto* Fields = new das::MakeStruct();
+    Fields->push_back(new das::MakeFieldDecl(At, "handle", Check, false, false));
+    Value->structs.push_back(Fields);
+    return Value;
+}
 struct FUEObjectTypeAnnotation : das::StructureAnnotation
 {
     FUEObjectTypeAnnotation() : StructureAnnotation("ue_native_object") {}

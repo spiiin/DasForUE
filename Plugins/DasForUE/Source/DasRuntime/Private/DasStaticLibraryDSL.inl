@@ -23,6 +23,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
             if (!St->isClass || St->parent || St->hasStaticMembers)
                 DSLFail(TEXT("ue_library requires a root class without fields/static state"));
             DSLExpandDeclarationGroups(St, true);
+            DSLNormalizeIdentityDefaults(St, Group);
             for (const auto& Field : St->fields)
                 if (!Field.generated && !Field.classMethod && Field.name != "__rtti")
                     DSLFail(TEXT("Function library cannot declare properties or components"));

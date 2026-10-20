@@ -191,6 +191,22 @@ public:
                          });
         }
         inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEPropertyPass()));
+        inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEStatePass()));
+        globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEPathLintPass()));
+        for (bool Text : {false, true})
+        {
+            auto* Macro = new FUEIdentityMacro(Text);
+            ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));
+            Macro->module = this;
+            addCallMacro(Macro->name,
+                         [Macro](const das::LineInfo& At) -> das::ExprLooksLikeCall*
+                         {
+                             auto* E = new das::ExprCallMacro(At, Macro->name);
+                             E->macro = Macro;
+                             return E;
+                         });
+        }
+
         for (bool Owner : {false, true})
         {
             auto* Macro = new FUEReferenceFactory(Owner);
@@ -1103,6 +1119,18 @@ public:
                                                 "SubscribeInt");
         AddUEExtern<DAS_BIND_FUN(EmitSignal)>(*this, Library, "ue_emit_signal", das::SideEffects::modifyExternal,
                                               "EmitSignal");
+        AddUEExtern<DAS_BIND_FUN(ClassDefaultObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_class_default_object", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<int32,das::Type::tInt>))>(
+            *this, Library, "__ue_state_init_int", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<bool,das::Type::tBool>))>(
+            *this, Library, "__ue_state_init_bool", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<float,das::Type::tFloat>))>(
+            *this, Library, "__ue_state_init_float", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<double,das::Type::tDouble>))>(
+            *this, Library, "__ue_state_init_double", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN(InitializePersistentString)>(*this, Library, "__ue_state_init_string",
+                                                              das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN(GetStateInt)>(*this, Library, "ue_state_get_int", das::SideEffects::modifyExternal,
                                                "GetStateInt");
         AddUEExtern<DAS_BIND_FUN(SetStateInt)>(*this, Library, "ue_state_set_int", das::SideEffects::modifyExternal,

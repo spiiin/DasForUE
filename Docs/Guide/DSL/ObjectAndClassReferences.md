@@ -160,7 +160,7 @@ authored object (`api` below is an authored reference, see
 ```das
 let actor = api.NativeActor                 // ActorRef
 api.NativeActor = anotherActor
-api.NativeEvents = DasEventInterface_from(api.handle)
+api.NativeEvents = ue_ref(type<DasEventInterface>, api.handle)
 api.NativeActor = default<ActorRef>
 ```
 

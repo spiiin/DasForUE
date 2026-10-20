@@ -20,7 +20,7 @@
 #include "Modules/ModuleManager.h"
 #include "Engine/World.h"
 
-FString DasFoundationExternManifest();
+#include "DasFoundationManifest.h"
 
 bool RunDasFoundationTests(FString& Report)
 {

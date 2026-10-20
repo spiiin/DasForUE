@@ -457,6 +457,9 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             else
             {
                 Candidate->Context = MakeUnique<FUnrealDasContext>(Candidate->Program->getContextStackSize());
+                if (Session->Live)
+                    Candidate->Context->PersistentGlobals =
+                        SnapshotPersistentGlobals(Session->Live->Program, *Session->Live->Context);
                 FActiveContextScope Scope(*Candidate->Context);
                 // No self during initialization: rejected code cannot alter the live Actor.
                 if (!Candidate->Program->simulate(*Candidate->Context, Output))

@@ -640,6 +640,7 @@ das::ExpressionPtr DSLDelegateFieldWrite(const das::LineInfo&, const das::TypeDe
 #include "DasComponentFields.inl"
 #include "DasDeclarationGroups.inl"
 #include "DasComputedDefaults.inl"
+#include "DasIdentityDSL.inl"
 #include "DasComponentDefaults.inl"
 #include "DasContainerDefaultsDSL.inl"
 bool DSLVirtualMethod(const FDasDeclaredClass& C, const FDasDeclaredMethod& M)

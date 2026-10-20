@@ -174,10 +174,25 @@ struct FDelegateValue
 uint64 NextCallHandle = 1;
 
 uint64 NextTraceScope = 1;
+struct FDasPersistentGlobalValue
+{
+    das::Type Kind = das::Type::tVoid;
+    int32 Int = 0;
+    double Number = 0;
+    bool Bool = false;
+    FString String;
+};
 class FUnrealDasContext final : public das::Context, public FGCObject
 {
 public:
     explicit FUnrealDasContext(uint32 StackSize) : das::Context(StackSize) {}
+    void* PersistentGlobalStorage(uint64 Hash)
+    {
+        for (int I = 0; I < totalVariables; ++I)
+            if (globalVariables[I].mangledNameHash == Hash)
+                return getVariable(I);
+        return nullptr;
+    }
     virtual void AddReferencedObjects(FReferenceCollector& Collector) override
     {
         for (auto& Value : StructValues)
@@ -188,7 +203,7 @@ public:
     virtual FString GetReferencerName() const override { return TEXT("FUnrealDasContext snapshots"); }
     uint64 TraceScope = NextTraceScope++;
     FDasWidgetLifetime WidgetLifetime;
-    TMap<FString,FDasResolvedWidgetLayout> WidgetLayouts;
+    TMap<FString, FDasResolvedWidgetLayout> WidgetLayouts;
     FDasImageSoftBrushLifetime ImageBrushes;
     FDasDragLifetime DragLifetime;
     TArray<TStrongObjectPtr<USaveGame>> SaveGames;
@@ -217,6 +232,7 @@ public:
     TMap<uint64, FName> DSLNames;
     TMap<FName, uint64> DSLNameTokens;
     TMap<FString, int32> PersistentInts;
+    TMap<FString, FDasPersistentGlobalValue> PersistentGlobals;
     int32 ExecutionDepth = 0;
     bool bEnding = false;
     bool bCollectingSubscriptions = false;

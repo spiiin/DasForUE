@@ -58,6 +58,7 @@ __ue_checked_enum_number	@ue_foundation::__ue_checked_enum_number CH<ue_foundati
 __ue_class_check	@ue_foundation::__ue_class_check CH<ue_foundation::UEClassHandle> CIs C_c	ue_foundation::UEClassHandle	4
 __ue_class_component_operation	@ue_foundation::__ue_class_component_operation CIH<ue_foundation::UObjectHandle> CH<ue_foundation::UEClassHandle> CIs Ci CIs CIs C_c	ue_foundation::UObjectHandle	4
 __ue_class_component_operation	@ue_foundation::__ue_class_component_operation CIH<ue_foundation::UObjectHandle> CIs CIs Ci CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_class_default_object	@ue_foundation::__ue_class_default_object CIs CH<ue_foundation::UEClassHandle> CIs Cb C_c	ue_foundation::UObjectHandle	4
 __ue_class_loaded	@ue_foundation::__ue_class_loaded CIs CIs CIs C_c	ue_foundation::UEClassHandle	4
 __ue_curve_table_eval	@ue_foundation::__ue_curve_table_eval CIH<ue_foundation::UObjectHandle> CIs Cf Cf C_c	float const	4
 __ue_curve_table_has	@ue_foundation::__ue_curve_table_has CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
@@ -246,6 +247,11 @@ __ue_soft_make	@ue_foundation::__ue_soft_make CIs CIs C_c	ue_foundation::UEStruc
 __ue_soft_null	@ue_foundation::__ue_soft_null CIH<ue_foundation::UEStructValue> C_c	bool const	4
 __ue_soft_path	@ue_foundation::__ue_soft_path CIH<ue_foundation::UEStructValue> C_c	string const	4
 __ue_soft_upcast	@ue_foundation::__ue_soft_upcast CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UEStructValue	4
+__ue_state_init_bool	@ue_foundation::__ue_state_init_bool CIs Cb C_c	bool const	4
+__ue_state_init_double	@ue_foundation::__ue_state_init_double CIs Cd C_c	double const	4
+__ue_state_init_float	@ue_foundation::__ue_state_init_float CIs Cf C_c	float const	4
+__ue_state_init_int	@ue_foundation::__ue_state_init_int CIs Ci C_c	int const	4
+__ue_state_init_string	@ue_foundation::__ue_state_init_string CIs CIs C_c	string const	4
 __ue_struct_get_class	@ue_foundation::__ue_struct_get_class CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UEClassHandle	4
 __ue_struct_get_enum_value	@ue_foundation::__ue_struct_get_enum_value CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UEEnumValue	4
 __ue_struct_map_get_byte_enum	@ue_foundation::__ue_struct_map_get_byte_enum CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	ue_foundation::UEEnumValue	4

@@ -177,7 +177,7 @@ compile time.
 require ue_foundation
 require ue_contract_bindings
 
-let api = ue_interface(type<CounterContract>, target)   // or CounterContract_from(target)
+let api = ue_ref(type<CounterContract>, target)
 if (CounterContract_valid(api)) {
     let answer = api.Query(5)
 
@@ -189,7 +189,7 @@ if (CounterContract_valid(api)) {
 
 | Helper | Behavior |
 | --- | --- |
-| `ue_interface(type<T>, obj)`, `T_from(obj)` | Checked construction; null allowed; a non-null expired or non-implementing object is rejected |
+| `ue_ref(type<T>, obj)` | Checked construction; null allowed; a non-null expired or non-implementing object is rejected |
 | `T_null()` | Empty reference |
 | `T_valid(ref)` | False for null, expired or non-implementing objects |
 | `T_raw(ref)` | Underlying handle |
@@ -234,8 +234,8 @@ require ue_text
 require ue_text_byte_interface_bindings
 
 def UpdateExample(target:UObjectHandle):void {
-    let api = TextByteContract_from(target)
-    let title = api.EchoText(ue_text("MyGame", "Title", "Example"))
+    let api = ue_ref(type<TextByteContract>, target)
+    let title = api.EchoText(ue_loctext(Title, "Example"))
     var bytes:array<uint8> = [uint8(0)]
     var messages:array<FText>
     api.ChangeArrays(bytes, messages)
