@@ -83,7 +83,7 @@ $Steps = @{
     }
     script     = { param($S)
         & (Join-Path $PSScriptRoot $S.script) -Engine $Engine -SkipBuild
-        $Probes[$S.name] = (Get-Content -LiteralPath (Join-Path $Das.Logs $S.probe) -Raw).Trim()
+        if ($S.probe) { $Probes[$S.name] = (Get-Content -LiteralPath (Join-Path $Das.Logs $S.probe) -Raw).Trim() }
     }
     packaged   = { param($S)
         $Ids = @{ export = [Guid]::NewGuid().ToString('N') }

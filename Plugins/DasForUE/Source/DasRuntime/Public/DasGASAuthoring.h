@@ -62,17 +62,31 @@ struct FDasGASAbilityDeclaration
     FName CooldownTag;
     bool AutoEnd = true;
 };
+struct FDasGASOutputDeclaration
+{
+    FName Name, Attribute;
+    FString Attributes, Operation = TEXT("Add");
+};
+struct FDasGASCallerDeclaration
+{
+    FName Name, Tag;
+};
 struct FDasGASCaptureDeclaration
 {
     FName Name, Attribute;
     FString Attributes, Source = TEXT("Source");
     bool Snapshot = true;
+    FString ScopedOperation;
+    float ScopedMagnitude = 0;
 };
 struct FDasGASCalculationDeclaration
 {
     FString Name, Id, Kind = TEXT("Magnitude"), Attributes, Output, Operation = TEXT("Add");
     FString ScriptFile, ScriptContract, Entry;
     TArray<FDasGASCaptureDeclaration> Captures;
+    TArray<FDasGASOutputDeclaration> Outputs;
+    TArray<FDasGASCallerDeclaration> Callers;
+    bool StructuredOutput = false;
 };
 struct FDasGASDeclarations
 {
@@ -177,6 +191,7 @@ struct DASRUNTIME_API FDasAuthoredEffectState
     UPROPERTY(BlueprintReadWrite)
     float Period = 0;
 };
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasAuthoredCueReceived, FDasGASCueEvent, Cue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDasAuthoredAttributeChanged, FDasAuthoredAttributeChange, Change);
 UCLASS(ClassGroup = (Das), meta = (BlueprintSpawnableComponent))
 class DASRUNTIME_API UDasAuthoredAbilitySystemComponent : public UAbilitySystemComponent
@@ -189,6 +204,23 @@ public:
     FDasAuthoredAttributeChanged AttributeChanged;
     UPROPERTY(BlueprintAssignable, Category = "GAS")
     FDasAuthoredAbilityChanged AbilityChanged;
+    UPROPERTY(BlueprintAssignable, Category = "GAS|Cues")
+    FDasAuthoredCueReceived GameplayCueReceived;
+    UFUNCTION(BlueprintCallable, Category = "GAS|Cues")
+    bool WatchAuthoredCue(FName Tag);
+    UFUNCTION(BlueprintCallable, Category = "GAS|Cues")
+    bool UnwatchAuthoredCue(FName Tag);
+    UFUNCTION(BlueprintCallable, Category = "GAS|Cues")
+    bool ExecuteAuthoredCue(FName Tag, const FDasGASCueParameters& Parameters);
+    UFUNCTION(BlueprintCallable, Category = "GAS|Cues")
+    bool AddAuthoredCue(FName Tag, const FDasGASCueParameters& Parameters);
+    UFUNCTION(BlueprintCallable, Category = "GAS|Cues")
+    bool RemoveAuthoredCue(FName Tag);
+    UFUNCTION(BlueprintPure, Category = "GAS|Cues")
+    bool AuthoredCueActive(FName Tag) const;
+    UFUNCTION(BlueprintPure, Category = "GAS|Cues")
+    FDasGASCueEvent EmptyAuthoredCueEvent() const { return {}; }
+    void ReceiveAuthoredCue(FName Tag, FName MatchedTag, FName Event, const FGameplayCueParameters& Parameters);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     FDasAuthoredAbilityGrant GiveAuthoredAbility(TSubclassOf<UDasAuthoredGameplayAbility> Class, int32 Level = 1);
     UFUNCTION(BlueprintPure, Category = "GAS")
@@ -281,4 +313,8 @@ private:
     FGameplayAttribute FindAttribute(FName Set, FName Name) const;
     void Changed(const FOnAttributeChangeData& Data, FName Set);
     void Detach();
+    TSet<FName> WatchedCues;
+    TSet<FName> AddedCues;
+    void ClearAuthoredCues();
+    bool MakeAuthoredCueParameters(const FDasGASCueParameters& In, FGameplayCueParameters& Out);
 };

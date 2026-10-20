@@ -236,3 +236,46 @@ def ue_gas_target_class(var query:GASTargetingQuery; kind:auto):void {
     verify(ue_class_valid(kind),"Targeting class must be a loaded Actor class")
     query.ActorClassPath=ue_class_path(kind)
 }
+
+// Execution output aliases map to attributes/operations in the saved calculation schema.
+typedef GASExecutionResult = DasGASExecutionResult
+
+def ue_gas_output(var result:GASExecutionResult; output:string; magnitude:float):void {
+    verify(magnitude>=-3.402823466e38f && magnitude<=3.402823466e38f,"Execution output must be finite")
+    let name=ue_name_value(output)
+    verify(!key_exists(result.Outputs,name),"Execution output was already supplied")
+    result.Outputs[name]=magnitude
+}
+def ue_gas_caller(context:GASCalculationContext; alias:string):float {
+    return ue_gas_captured(context,alias)
+}
+
+// Cue callbacks use [ue_event(source="Abilities",name="GameplayCueReceived")].
+typedef GASCueParameters = DasGASCueParameters
+typedef GASCueEvent = DasGASCueEvent
+
+def ue_gas_cue_params(magnitude:float=0.0f):GASCueParameters {
+    var params:GASCueParameters
+    params.RawMagnitude=magnitude
+    params.AbilityLevel=1
+    params.EffectLevel=1
+    return params
+}
+def ue_gas_cue_watch(asc:AuthoredAbilitySystemComponentRef; tag:ue_gameplay_tags::GameplayTag):bool {
+    return asc.WatchAuthoredCue(ue_name_value(ue_tag_name(tag)))
+}
+def ue_gas_cue_unwatch(asc:AuthoredAbilitySystemComponentRef; tag:ue_gameplay_tags::GameplayTag):bool {
+    return asc.UnwatchAuthoredCue(ue_name_value(ue_tag_name(tag)))
+}
+def ue_gas_cue_execute(asc:AuthoredAbilitySystemComponentRef; tag:ue_gameplay_tags::GameplayTag; params:GASCueParameters):bool {
+    return asc.ExecuteAuthoredCue(ue_name_value(ue_tag_name(tag)),params)
+}
+def ue_gas_cue_add(asc:AuthoredAbilitySystemComponentRef; tag:ue_gameplay_tags::GameplayTag; params:GASCueParameters):bool {
+    return asc.AddAuthoredCue(ue_name_value(ue_tag_name(tag)),params)
+}
+def ue_gas_cue_remove(asc:AuthoredAbilitySystemComponentRef; tag:ue_gameplay_tags::GameplayTag):bool {
+    return asc.RemoveAuthoredCue(ue_name_value(ue_tag_name(tag)))
+}
+def ue_gas_cue_active(asc:AuthoredAbilitySystemComponentRef; tag:ue_gameplay_tags::GameplayTag):bool {
+    return asc.AuthoredCueActive(ue_name_value(ue_tag_name(tag)))
+}

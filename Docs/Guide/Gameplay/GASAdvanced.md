@@ -117,7 +117,7 @@ same source's explicit AttributeSet/calculation registry. Unknown captures,
 wrong calculation kinds, duplicate aliases and conflicting literal/SetByCaller
 magnitudes are rejected before creating assets. Capture defaults must be zero.
 
-Execution calculations add one native output modifier:
+The scalar execution shorthand adds one native output modifier:
 
 ```das
 [ue_gas_calculation(kind="Execution",attributes="BattleStats",output="Health")]
@@ -134,11 +134,11 @@ class ExecutedDamage {}
 
 These create real UGameplayEffectExecutionCalculation subclasses. Output
 operation supports Add, Multiply and Override. Execution effects must be Instant
-or periodic. Multiple output calculations can be composed as separate effects;
-arbitrary dynamic output lists and execution-scoped modifiers are not included.
+or periodic. For several outputs in one execution, see [GAS execution outputs](GASExecution.md).
+Output aliases and operations remain explicitly declared in the calculation schema.
 Ability costs still require strictly negative constant Instant Add modifiers.
 
-GASCalculationContext contains Level, Values (named captures), SetByCaller (tag
+GASCalculationContext contains Level, Values (named captures and required caller aliases), SetByCaller (tag
 names to supplied magnitudes), Source and Target. Target is available for native
 executions; native MMC does not expose a target ASC, so its Target is empty.
 Use captured values for MMC target-dependent work. No execution parameters,
@@ -149,7 +149,7 @@ GASEffectSpec DAS value is a descriptor: its native spec is created on applicati
 Calling ue_gas_make_spec alone therefore does not freeze source attributes.
 Non-snapshot captures retain native aggregator/recalculation behavior.
 
-Calculate must be stateless and return a finite float; it may be evaluated more
+Calculate must be stateless and return a finite float (or a validated GASExecutionResult for structured executions); it may be evaluated more
 than once by GAS. Its cached program is owned by the native calculation CDO, not
 by an ability/actor. Source contract changes require reimport; body reload uses
 the existing runtime validation. Game-thread execution is required. Script errors
@@ -167,3 +167,5 @@ checked; full animation playback, PIE and packaged validation are not part of th
 short scenario. Result and source/DLL hashes: logs/gas-advanced-validation.json.
 
 Latest focused run: PASS, 12 checks, commandlet exit code 0. The authored ASC uses a local effect context that explicitly retains the source ASC for Blueprint/DSL owners without the native C++ AbilitySystemInterface.
+
+Multiple declared execution outputs, named required SetByCaller aliases and native execution-scoped capture modifiers are covered by [GAS execution outputs](GASExecution.md).

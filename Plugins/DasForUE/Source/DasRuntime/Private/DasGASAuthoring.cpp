@@ -236,8 +236,13 @@ UDasAuthoredAbilitySystemComponent::ApplyAuthoredSpecInternal(const FDasAuthored
                 return false;
         }
         if (const auto* E = Cast<UDasGASExecutionCalculation>(Calculation))
-            if (!E->Definition.Output.IsValid() || !GetAttributeSubobject(E->Definition.Output.GetAttributeSetClass()))
+        {
+            if (E->Definition.Outputs.IsEmpty())
                 return false;
+            for (const auto& Output : E->Definition.Outputs)
+                if (!Output.Attribute.IsValid() || !GetAttributeSubobject(Output.Attribute.GetAttributeSetClass()))
+                    return false;
+        }
         return true;
     };
     for (const auto& M : Def->Modifiers)
@@ -342,6 +347,7 @@ void UDasAuthoredAbilitySystemComponent::Detach()
 void UDasAuthoredAbilitySystemComponent::EndPlay(const EEndPlayReason::Type Reason)
 {
     Ended = true;
+    ClearAuthoredCues();
     Detach();
     Definitions.Empty();
     ActiveEffects.Empty();

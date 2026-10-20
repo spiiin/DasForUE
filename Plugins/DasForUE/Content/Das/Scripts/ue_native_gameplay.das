@@ -1141,6 +1141,33 @@ struct DasGASCalculationContext {
     Target:C_Actor_adf65d5b
 }
 
+[ue_native_struct(path="/Script/DasRuntime.DasGASCueParameters")]
+struct DasGASCueParameters {
+    RawMagnitude:float
+    NormalizedMagnitude:float
+    Location:UEVector
+    Normal:UEVector
+    Instigator:C_Actor_adf65d5b
+    EffectCauser:C_Actor_adf65d5b
+    SourceObject:C_Object_55c3753a
+    AbilityLevel:int
+    EffectLevel:int
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasGASCueEvent")]
+struct DasGASCueEvent {
+    Tag:UENameValue
+    MatchedTag:UENameValue
+    Event:UENameValue
+    Target:C_Actor_adf65d5b
+    Parameters:DasGASCueParameters
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasGASExecutionResult")]
+struct DasGASExecutionResult {
+    Outputs:table<UENameValue;float>
+}
+
 [ue_native_struct(path="/Script/DasRuntime.DasGASTargetData")]
 struct DasGASTargetData {
     Actors:array<C_Actor_adf65d5b>

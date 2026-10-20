@@ -2952,6 +2952,109 @@
 			]
 		},
 		{
+			"path": "/Script/DasRuntime.DasGASCueEvent",
+			"signature": "Tag:NameProperty:0;MatchedTag:NameProperty:0;Event:NameProperty:0;Target:ObjectProperty:0:/Script/Engine.Actor;Parameters:StructProperty:0:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;};",
+			"fields": [
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "Tag"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "MatchedTag"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "Event"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "Target"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasGASCueParameters",
+					"name": "Parameters"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasGASCueParameters",
+			"signature": "RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;",
+			"fields": [
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "RawMagnitude"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "NormalizedMagnitude"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "Location"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "Normal"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "Instigator"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "EffectCauser"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/CoreUObject.Object",
+					"name": "SourceObject"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "AbilityLevel"
+				},
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "EffectLevel"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasGASExecutionResult",
+			"signature": "Outputs:MapProperty:0[Outputs_Key:NameProperty:0;Outputs:FloatProperty:0;];",
+			"fields": [
+				{
+					"kind": "map",
+					"type_path": "",
+					"key":
+					{
+						"kind": "name",
+						"type_path": ""
+					},
+					"value":
+					{
+						"kind": "float",
+						"type_path": ""
+					},
+					"name": "Outputs"
+				}
+			]
+		},
+		{
 			"path": "/Script/DasRuntime.DasGASTargetData",
 			"signature": "Actors:ArrayProperty:0[Actors:ObjectProperty:0:/Script/Engine.Actor;];Hits:ArrayProperty:0[Hits:IntProperty:0;];Source:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;",
 			"fields": [
@@ -4136,6 +4239,33 @@
 					]
 				},
 				{
+					"name": "AddAuthoredCue",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;AddAuthoredCue;Tag:NameProperty:128;Parameters:StructProperty:134218114:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;};ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasGASCueParameters",
+							"name": "Parameters",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "AddTickPrerequisiteActor",
 					"declaring_class": "/Script/Engine.ActorComponent",
 					"signature": "v1;AddTickPrerequisiteActor;PrerequisiteActor:ObjectProperty:128:/Script/Engine.Actor;",
@@ -4282,6 +4412,27 @@
 						{
 							"kind": "struct",
 							"type_path": "/Script/DasRuntime.DasAuthoredAttributeChange",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "AuthoredCueActive",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;AuthoredCueActive;Tag:NameProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
 							"name": "ReturnValue",
 							"direction": "return"
 						}
@@ -4459,6 +4610,48 @@
 					"const": false,
 					"construction_unsafe": true,
 					"parameters": []
+				},
+				{
+					"name": "EmptyAuthoredCueEvent",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;EmptyAuthoredCueEvent;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasGASCueEvent{Tag:NameProperty:0;MatchedTag:NameProperty:0;Event:NameProperty:0;Target:ObjectProperty:0:/Script/Engine.Actor;Parameters:StructProperty:0:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;};};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasGASCueEvent",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "ExecuteAuthoredCue",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;ExecuteAuthoredCue;Tag:NameProperty:128;Parameters:StructProperty:134218114:/Script/DasRuntime.DasGASCueParameters{RawMagnitude:FloatProperty:0;NormalizedMagnitude:FloatProperty:0;Location:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Normal:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Instigator:ObjectProperty:0:/Script/Engine.Actor;EffectCauser:ObjectProperty:0:/Script/Engine.Actor;SourceObject:ObjectProperty:0:/Script/CoreUObject.Object;AbilityLevel:IntProperty:0;EffectLevel:IntProperty:0;};ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasGASCueParameters",
+							"name": "Parameters",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
 				},
 				{
 					"name": "FindAllAbilitiesWithInputID",
@@ -5261,6 +5454,27 @@
 					]
 				},
 				{
+					"name": "RemoveAuthoredCue",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;RemoveAuthoredCue;Tag:NameProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "RemoveAuthoredEffect",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
 					"signature": "v1;RemoveAuthoredEffect;ActiveId:IntProperty:128;Stacks:IntProperty:128;ReturnValue:BoolProperty:1408;",
@@ -5608,6 +5822,27 @@
 					]
 				},
 				{
+					"name": "UnwatchAuthoredCue",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;UnwatchAuthoredCue;Tag:NameProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "UpdateAuthoredTargeting",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
 					"signature": "v1;UpdateAuthoredTargeting;Id:IntProperty:128;Query:StructProperty:134218114:/Script/DasRuntime.DasGASTargetingQuery{Mode:NameProperty:0;Start:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};End:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Radius:FloatProperty:0;Channel:IntProperty:0;TraceComplex:BoolProperty:0;IgnoreSelf:BoolProperty:0;RequireAbilitySystem:BoolProperty:0;MaxTargets:IntProperty:0;ActorClassPath:StrProperty:0;IgnoredActors:ArrayProperty:0[IgnoredActors:ObjectProperty:0:/Script/Engine.Actor;];RequiredTags:ArrayProperty:0[RequiredTags:NameProperty:0;];BlockedTags:ArrayProperty:0[BlockedTags:NameProperty:0;];};ReturnValue:BoolProperty:1408;",
@@ -5624,6 +5859,27 @@
 							"kind": "struct",
 							"type_path": "/Script/DasRuntime.DasGASTargetingQuery",
 							"name": "Query",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "WatchAuthoredCue",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;WatchAuthoredCue;Tag:NameProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
 							"direction": "in"
 						},
 						{
@@ -5764,6 +6020,11 @@
 				{
 					"domain": "field",
 					"name": "Definitions",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "GameplayCueReceived",
 					"reason": "hidden_editor_or_deprecated"
 				},
 				{
@@ -7897,6 +8158,21 @@
 						{
 							"kind": "struct",
 							"type_path": "/Script/DasRuntime.DasGASCalculationContext",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "EmptyExecutionResult",
+					"declaring_class": "/Script/DasRuntime.DasGASMagnitudeCalculation",
+					"signature": "v1;EmptyExecutionResult;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasGASExecutionResult{Outputs:MapProperty:0[Outputs_Key:NameProperty:0;Outputs:FloatProperty:0;];};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasGASExecutionResult",
 							"name": "ReturnValue",
 							"direction": "return"
 						}

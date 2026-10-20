@@ -12,6 +12,32 @@ struct DASRUNTIME_API FDasGASCapture
     FName Name;
     UPROPERTY()
     FGameplayEffectAttributeCaptureDefinition Definition;
+    UPROPERTY()
+    bool Scoped = false;
+    UPROPERTY()
+    TEnumAsByte<EGameplayModOp::Type> ScopedOperation = EGameplayModOp::Additive;
+    UPROPERTY()
+    float ScopedMagnitude = 0;
+};
+USTRUCT()
+struct DASRUNTIME_API FDasGASExecutionOutput
+{
+    GENERATED_BODY()
+    UPROPERTY()
+    FName Name;
+    UPROPERTY()
+    FGameplayAttribute Attribute;
+    UPROPERTY()
+    TEnumAsByte<EGameplayModOp::Type> Operation = EGameplayModOp::Additive;
+};
+USTRUCT()
+struct DASRUNTIME_API FDasGASCaller
+{
+    GENERATED_BODY()
+    UPROPERTY()
+    FName Name;
+    UPROPERTY()
+    FName Tag;
 };
 USTRUCT()
 struct DASRUNTIME_API FDasGASCalculationDefinition
@@ -32,6 +58,12 @@ struct DASRUNTIME_API FDasGASCalculationDefinition
     UPROPERTY()
     FGameplayAttribute Output;
     UPROPERTY()
+    TArray<FDasGASExecutionOutput> Outputs;
+    UPROPERTY()
+    TArray<FDasGASCaller> Callers;
+    UPROPERTY()
+    bool StructuredOutput = false;
+    UPROPERTY()
     TEnumAsByte<EGameplayModOp::Type> Operation = EGameplayModOp::Additive;
 };
 UCLASS(BlueprintType, Blueprintable)
@@ -47,6 +79,8 @@ public:
     // Makes the detached calculation context discoverable by the native generator.
     UFUNCTION(BlueprintPure, Category = "GAS")
     FDasGASCalculationContext EmptyCalculationContext() const { return {}; }
+    UFUNCTION(BlueprintPure, Category = "GAS")
+    FDasGASExecutionResult EmptyExecutionResult() const { return {}; }
 };
 UCLASS(BlueprintType, Blueprintable)
 class DASRUNTIME_API UDasGASExecutionCalculation : public UGameplayEffectExecutionCalculation

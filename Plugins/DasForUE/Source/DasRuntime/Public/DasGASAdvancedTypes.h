@@ -85,6 +85,52 @@ struct DASRUNTIME_API FDasGASTargetingResult
     FDasGASTargetData Targets;
 };
 USTRUCT(BlueprintType)
+struct DASRUNTIME_API FDasGASCueParameters
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite)
+    float RawMagnitude = 0;
+    UPROPERTY(BlueprintReadWrite)
+    float NormalizedMagnitude = 0;
+    UPROPERTY(BlueprintReadWrite)
+    FVector Location = FVector::ZeroVector;
+    UPROPERTY(BlueprintReadWrite)
+    FVector Normal = FVector::ZeroVector;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<AActor> Instigator = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<AActor> EffectCauser = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<UObject> SourceObject = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    int32 AbilityLevel = 1;
+    UPROPERTY(BlueprintReadWrite)
+    int32 EffectLevel = 1;
+};
+USTRUCT(BlueprintType)
+struct DASRUNTIME_API FDasGASCueEvent
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite)
+    FName Tag;
+    UPROPERTY(BlueprintReadWrite)
+    FName MatchedTag;
+    UPROPERTY(BlueprintReadWrite)
+    FName Event;
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<AActor> Target = nullptr;
+    UPROPERTY(BlueprintReadWrite)
+    FDasGASCueParameters Parameters;
+};
+// Keys are declared execution output aliases; attributes and operations remain native schema.
+USTRUCT(BlueprintType)
+struct DASRUNTIME_API FDasGASExecutionResult
+{
+    GENERATED_BODY()
+    UPROPERTY(BlueprintReadWrite)
+    TMap<FName, float> Outputs;
+};
+USTRUCT(BlueprintType)
 struct DASRUNTIME_API FDasGASCalculationContext
 {
     GENERATED_BODY()

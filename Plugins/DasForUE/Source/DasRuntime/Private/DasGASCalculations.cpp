@@ -5,20 +5,20 @@
 #include "GameFramework/Actor.h"
 namespace
 {
-bool Evaluate(const UObject* Owner, const FDasGASCalculationDefinition& D, const FDasGASCalculationContext& C,
-              float& Value)
+FDasExecutionResult Evaluate(const UObject* Owner, const FDasGASCalculationDefinition& D,
+                             const FDasGASCalculationContext& C)
 {
     auto* R = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime"));
-    if (!R || !IsInGameThread())
-        return false;
-    const auto Result = R->DispatchGASCalculation(const_cast<UObject*>(Owner), D.Script, D.Entry, D.Contract, C);
-    if (!Result.bSucceeded || !FMath::IsFinite(Result.FloatValue))
+    FDasExecutionResult Result;
+    if (R && IsInGameThread())
+        Result = R->DispatchGASCalculation(const_cast<UObject*>(Owner), D.Script, D.Entry, D.Contract, C,
+                                           D.StructuredOutput);
+    if (!Result.bSucceeded || (!D.StructuredOutput && !FMath::IsFinite(Result.FloatValue)))
     {
+        Result.bSucceeded = false;
         UE_LOG(LogTemp, Warning, TEXT("DAS_GAS_CALCULATION_FAILED %s: %s"), *D.Id, *Result.Error);
-        return false;
     }
-    Value = Result.FloatValue;
-    return true;
+    return Result;
 }
 void Release(UObject* Object)
 {
@@ -26,14 +26,23 @@ void Release(UObject* Object)
         if (auto* R = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))
             R->ReleaseObject(Object);
 }
-FDasGASCalculationContext Context(const FGameplayEffectSpec& Spec)
+bool Context(const FGameplayEffectSpec& Spec, const FDasGASCalculationDefinition& D, FDasGASCalculationContext& C)
 {
-    FDasGASCalculationContext C;
     C.Level = Spec.GetLevel();
     C.Source = Spec.GetContext().GetOriginalInstigator();
     for (const auto& P : Spec.SetByCallerTagMagnitudes)
         C.SetByCaller.Add(P.Key.GetTagName(), P.Value);
-    return C;
+    for (const auto& Caller : D.Callers)
+    {
+        const auto* Value = C.SetByCaller.Find(Caller.Tag);
+        if (!Value || !FMath::IsFinite(*Value))
+        {
+            UE_LOG(LogTemp, Warning, TEXT("DAS_GAS_CALCULATION_MISSING_CALLER %s %s"), *D.Id, *Caller.Name.ToString());
+            return false;
+        }
+        C.Values.Add(Caller.Name, *Value);
+    }
+    return true;
 }
 FAggregatorEvaluateParameters Parameters(const FGameplayEffectSpec& Spec)
 {
@@ -57,7 +66,9 @@ void UDasGASExecutionCalculation::ConfigureCaptures()
 }
 float UDasGASMagnitudeCalculation::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
-    auto C = Context(Spec);
+    FDasGASCalculationContext C;
+    if (!Context(Spec, Definition, C))
+        return 0;
     const auto P = Parameters(Spec);
     for (const auto& Capture : Definition.Captures)
     {
@@ -66,28 +77,55 @@ float UDasGASMagnitudeCalculation::CalculateBaseMagnitude_Implementation(const F
             return 0;
         C.Values.Add(Capture.Name, V);
     }
-    float V = 0;
-    Evaluate(this, Definition, C, V);
-    return V;
+    const auto Result = Evaluate(this, Definition, C);
+    return Result.bSucceeded ? Result.FloatValue : 0;
 }
 void UDasGASExecutionCalculation::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& Params,
                                                          FGameplayEffectCustomExecutionOutput& Out) const
 {
     const auto& Spec = Params.GetOwningSpec();
-    auto C = Context(Spec);
+    FDasGASCalculationContext C;
+    if (!Context(Spec, Definition, C))
+        return;
     const auto P = Parameters(Spec);
     if (auto* ASC = Params.GetTargetAbilitySystemComponent())
         C.Target = ASC->GetOwner();
     for (const auto& Capture : Definition.Captures)
     {
         float V = 0;
+        // Native GAS includes Execution.CalculationModifiers only in this evaluation.
         if (!Params.AttemptCalculateCapturedAttributeMagnitude(Capture.Definition, P, V) || !FMath::IsFinite(V))
             return;
         C.Values.Add(Capture.Name, V);
     }
-    float V = 0;
-    if (Definition.Output.IsValid() && Evaluate(this, Definition, C, V))
-        Out.AddOutputModifier(FGameplayModifierEvaluatedData(Definition.Output, Definition.Operation, V));
+    const auto Result = Evaluate(this, Definition, C);
+    if (!Result.bSucceeded)
+        return;
+    TMap<FName, float> Values;
+    if (Definition.StructuredOutput)
+    {
+        const auto* Typed = Result.StructValue.GetPtr<FDasGASExecutionResult>();
+        if (!Typed)
+            return;
+        Values = Typed->Outputs;
+    }
+    else if (Definition.Output.IsValid())
+        Values.Add(FName(*Definition.Output.GetName()), Result.FloatValue);
+    // Validate the entire output before publishing any native modifier.
+    if (Values.Num() > 16)
+        return;
+    for (const auto& Pair : Values)
+        if (!FMath::IsFinite(Pair.Value) ||
+            !Definition.Outputs.ContainsByPredicate([&](const auto& O)
+                                                    { return O.Name == Pair.Key && O.Attribute.IsValid(); }))
+        {
+            UE_LOG(LogTemp, Warning, TEXT("DAS_GAS_CALCULATION_INVALID_OUTPUT %s"), *Definition.Id);
+            return;
+        }
+    // Declaration order makes multiple operations on an attribute deterministic.
+    for (const auto& O : Definition.Outputs)
+        if (const float* Value = Values.Find(O.Name))
+            Out.AddOutputModifier(FGameplayModifierEvaluatedData(O.Attribute, O.Operation, *Value));
 }
 void UDasGASMagnitudeCalculation::BeginDestroy()
 {

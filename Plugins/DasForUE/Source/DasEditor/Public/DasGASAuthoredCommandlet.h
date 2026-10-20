@@ -58,3 +58,21 @@ public:
     UDasGASAdvancedCommandlet();
     virtual int32 Main(const FString& Params) override;
 };
+
+UCLASS()
+class UDasGASExecutionCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
+public:
+    UDasGASExecutionCommandlet();
+    virtual int32 Main(const FString& Params) override;
+};
+
+UCLASS()
+class UDasGASCuesCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
+public:
+    UDasGASCuesCommandlet();
+    virtual int32 Main(const FString& Params) override;
+};

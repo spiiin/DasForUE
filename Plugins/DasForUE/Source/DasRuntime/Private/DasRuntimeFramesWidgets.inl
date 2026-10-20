@@ -315,7 +315,10 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
         });
         if (Declared) return true;
     }
-    if(GASCalculationContract && F->generated && C.ReturnKind==EDasMethodSignature::Float && C.InputDirections.IsEmpty() &&
+    if(GASCalculationContract && F->generated &&
+       (C.ReturnKind==EDasMethodSignature::Float ||
+        (C.ReturnKind==EDasMethodSignature::Struct && C.ReturnClass==TEXT("/Script/DasRuntime.DasGASExecutionResult"))) &&
+       C.InputDirections.IsEmpty() &&
        C.Inputs.Num()==1 && C.Inputs[0]==EDasMethodSignature::Struct && C.InputClasses.Num()==1 &&
        C.InputClasses[0]==TEXT("/Script/DasRuntime.DasGASCalculationContext")) return true;
     bool Objects = C.ReturnKind == EDasMethodSignature::Delegate || C.ReturnKind == EDasMethodSignature::Object ||

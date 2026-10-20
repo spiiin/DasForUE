@@ -790,7 +790,7 @@ FDasExecutionResult FDasRuntimeModule::DispatchInputEventSnapshots(const FString
     return RunNamedFramePersistent(Path, Entry, Args, EDasMethodSignature::Int, Self);
 }
 
-FDasExecutionResult FDasRuntimeModule::DispatchGASCalculation(UObject* Owner,const FString& Script,const FString& Entry,const FString& Contract,const FDasGASCalculationContext& Context)
+FDasExecutionResult FDasRuntimeModule::DispatchGASCalculation(UObject* Owner,const FString& Script,const FString& Entry,const FString& Contract,const FDasGASCalculationContext& Context, bool StructuredOutput)
 {
     FDasExecutionResult Rejected;
     if(!IsInGameThread()||!IsValid(Owner)||AuthoredDispatchDepth>=32||ConstructingObject||Contract.Len()!=32||
@@ -799,7 +799,9 @@ FDasExecutionResult FDasRuntimeModule::DispatchGASCalculation(UObject* Owner,con
     FDasScalarValue A;A.Kind=12;A.ObjectClass=FDasGASCalculationContext::StaticStruct()->GetPathName();A.StructValue.InitializeAs<FDasGASCalculationContext>(Context);
     TGuardValue<int32> Depth(AuthoredDispatchDepth,AuthoredDispatchDepth+1);
     TGuardValue<const FString*> Scope(GASCalculationContract,&Contract);
-    return RunNamedFramePersistent(ScriptPath(Script),Entry,{A},EDasMethodSignature::Float,Owner);
+    return RunNamedFramePersistent(ScriptPath(Script),Entry,{A},
+        StructuredOutput ? EDasMethodSignature::Struct : EDasMethodSignature::Float,Owner,
+        StructuredOutput ? TEXT("/Script/DasRuntime.DasGASExecutionResult") : FString());
 }
 
 FDasExecutionResult FDasRuntimeModule::DispatchGASAbilityHook(UDasAuthoredGameplayAbility* Ability, const FString& Entry)

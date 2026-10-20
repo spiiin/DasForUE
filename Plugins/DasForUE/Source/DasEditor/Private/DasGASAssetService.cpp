@@ -49,6 +49,11 @@ FString AbilityDigest(const FDasGASAbilityDeclaration& D, const TMap<FString, FS
         Value += TEXT("|script-v1|") + D.ScriptFile + TEXT("|") + D.ScriptContract;
     return FMD5::HashAnsiString(*Value);
 }
+EGameplayModOp::Type GASOperation(const FString& Op)
+{
+    return Op == TEXT("Multiply") ? EGameplayModOp::MultiplyCompound
+                                  : Op == TEXT("Override") ? EGameplayModOp::Override : EGameplayModOp::Additive;
+}
 UBlueprint* NewGASBlueprint(const FString& Path, UClass* Parent)
 {
     return FKismetEditorUtilities::CreateBlueprint(Parent, CreatePackage(*Path),
@@ -96,6 +101,11 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
         FString Value = D.ScriptContract + TEXT("|")+ Hashes.FindChecked(D.Attributes);
         for (const auto& C : D.Captures)
             Value += TEXT("|")+ Hashes.FindChecked(C.Attributes);
+        for (const auto& O : D.Outputs)
+            Value += TEXT("|") + Hashes.FindChecked(O.Attributes);
+        for (const auto& Caller : D.Callers)
+            if (!FGameplayTag::RequestGameplayTag(Caller.Tag, false).IsValid())
+                return Fail(TEXT("Calculation SetByCaller tag is not registered: ")+ Caller.Tag.ToString());
         const auto Hash = FMD5::HashAnsiString(*Value);
         Hashes.Add(D.Id, Hash);
         Work.Add({D.Name, D.Id,
@@ -246,6 +256,19 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             Def.Script = D.ScriptFile;
             Def.Contract = D.ScriptContract;
             Def.Entry = D.Entry;
+            Def.StructuredOutput = D.StructuredOutput;
+            for (const auto& Caller : D.Callers)
+                Def.Callers.Add({Caller.Name, Caller.Tag});
+            for (const auto& O : D.Outputs)
+            {
+                FDasGASExecutionOutput Output;
+                Output.Name = O.Name;
+                Output.Attribute =
+                    CastChecked<UDasAuthoredAttributeSet>(Sets.FindChecked(O.Attributes)->GetDefaultObject())
+                        ->Attribute(O.Attribute);
+                Output.Operation = GASOperation(O.Operation);
+                Def.Outputs.Add(Output);
+            }
             Def.Operation = D.Operation == TEXT("Multiply")? EGameplayModOp::MultiplyCompound
                                                            : D.Operation == TEXT("Override")? EGameplayModOp::Override
                                                                                             : EGameplayModOp::Additive;
@@ -253,6 +276,9 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             {
                 FDasGASCapture Capture;
                 Capture.Name = C.Name;
+                Capture.Scoped = !C.ScopedOperation.IsEmpty();
+                Capture.ScopedOperation = GASOperation(C.ScopedOperation);
+                Capture.ScopedMagnitude = C.ScopedMagnitude;
                 auto* Set = CastChecked<UDasAuthoredAttributeSet>(Sets.FindChecked(C.Attributes)->GetDefaultObject());
                 Capture.Definition = FGameplayEffectAttributeCaptureDefinition(
                     Set->Attribute(C.Attribute), C.Source == TEXT("Source")
@@ -261,7 +287,7 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
                                                                   C.Snapshot);
                 Def.Captures.Add(Capture);
             }
-            if (D.Kind == TEXT("Execution"))
+            if (D.Kind == TEXT("Execution") && !D.StructuredOutput)
                 Def.Output = CastChecked<UDasAuthoredAttributeSet>(Sets.FindChecked(D.Attributes)->GetDefaultObject())
                                  ->Attribute(FName(*D.Output));
             auto* CDO = W.BP->GeneratedClass->GetDefaultObject();
@@ -349,6 +375,19 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             {
                 FGameplayEffectExecutionDefinition Execution;
                 Execution.CalculationClass = Calculations.FindChecked(Effect.Execution);
+                const auto& Definition =
+                    Execution.CalculationClass->GetDefaultObject<UDasGASExecutionCalculation>()->Definition;
+                for (const auto& Capture : Definition.Captures)
+                    if (Capture.Scoped)
+                    {
+                        FGameplayEffectExecutionScopedModifierInfo Scoped(Capture.Definition);
+                        Scoped.ModifierOp = Capture.ScopedOperation;
+                        Scoped.ModifierMagnitude =
+                            FGameplayEffectModifierMagnitude(FScalableFloat(Capture.ScopedMagnitude));
+                        Execution.CalculationModifiers.Add(Scoped);
+                    }
+                for (const auto& Caller : Definition.Callers)
+                    CDO->RequiredMagnitudes.AddUnique(Caller.Tag);
                 CDO->Executions.Add(Execution);
             }
             auto* SetCDO =
@@ -367,6 +406,10 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
                 {
                     FCustomCalculationBasedFloat Magnitude;
                     Magnitude.CalculationClassMagnitude = Calculations.FindChecked(M.Calculation);
+                    for (const auto& Caller :
+                         Magnitude.CalculationClassMagnitude->GetDefaultObject<UDasGASMagnitudeCalculation>()
+                             ->Definition.Callers)
+                        CDO->RequiredMagnitudes.AddUnique(Caller.Tag);
                     Mod.ModifierMagnitude = FGameplayEffectModifierMagnitude(Magnitude);
                 }
                 else if (M.SetByCaller.IsNone())

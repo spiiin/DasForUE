@@ -34,8 +34,29 @@ instead. Each suite prints `DAS_SUITE_<NAME>=PASS seconds=<n>`, the run ends wit
 pin the expected minimum test count.
 
 `TestCombined.ps1` (`full`), `TestCombined.ps1 -SkipEditor` and
-`TestCombinedEditor.ps1 [-SkipBuild]` (`editor`) remain as wrappers. The build agent
-accepts `test-quick <id>` and `test-suite <id> <suite,suite>`.
+`TestCombinedEditor.ps1 [-SkipBuild]` (`editor`) remain as wrappers.
+
+## Build agent and parallel work
+
+All checkouts share one engine, and every editor build rewrites the engine's module
+BuildId: a build from another checkout during a test run makes that run fail with
+"The game module ... could not be found". Run builds and tests of every checkout
+through the single build agent (`Scripts\DasBuildAgent.ps1`, started once from the
+main checkout); it runs one job at a time.
+
+A request is one line in a new file under `logs\agent\queue\` of the main checkout
+(any name ending in `.txt`; oldest first) or in `logs\agent\request.txt`:
+
+```text
+test-quick q1
+test-suite s1 foundation,method-values
+test-suite ui1 automation-quick repo=C:\src\DasForUE2-ui
+```
+
+`test-suite` always builds first. `repo=` must be the main checkout or one of its
+`git worktree`s. Output goes to `logs\agent\<id>.log` and the exit code to
+`logs\agent\<id>.done` in the main checkout; the scripts' own logs stay in the
+worktree's `logs\`.
 
 ## Foundation
 

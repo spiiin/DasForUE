@@ -59,6 +59,7 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             FDasGASCalculationDeclaration D;
             D.Name = Name;
             D.Id = Id;
+            Object->TryGetBoolField(TEXT("structured_output"), D.StructuredOutput);
             if (!Object->TryGetStringField(
                     TEXT("calculation_kind"), D.Kind) ||
                     !Object->TryGetStringField(
@@ -72,9 +73,12 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
                                     !Object->TryGetStringField(
                                         TEXT("entry"), D.Entry) ||
                                         !Object->TryGetStringField(
-                                            TEXT("contract"), D.ScriptContract) || Fields->Num() > 16 ||
+                                            TEXT("contract"), D.ScriptContract) || Fields->Num() > 48 ||
                                             (D.Kind != TEXT("Magnitude")&& D.Kind != TEXT("Execution")) ||
-                                             (D.Kind == TEXT("Magnitude")? !D.Output.IsEmpty() : !GASName(D.Output)) ||
+                                             (D.Kind == TEXT("Magnitude")
+                                                             ? (!D.Output.IsEmpty() || D.StructuredOutput)
+                                                             : (D.StructuredOutput ? !D.Output.IsEmpty()
+                                                                                   : !GASName(D.Output))) ||
                                               (D.Operation !=
                                                TEXT("Add")&& D.Operation != TEXT("Multiply")&&
                                                                                  D.Operation != TEXT("Override")) ||
@@ -88,24 +92,64 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             for (const auto& ItemField : *Fields)
             {
                 auto F = ItemField->AsObject();
+                FString Alias, Role = TEXT("capture");
+                if (!F || !F->TryGetStringField(TEXT("name"), Alias) || !GASName(Alias) || Seen.Contains(FName(*Alias)))
+                    return Fail(TEXT("Invalid/duplicate calculation field"));
+                Seen.Add(FName(*Alias));
+                F->TryGetStringField(TEXT("role"), Role);
+                if (Role == TEXT("caller"))
+                {
+                    FString Tag;
+                    if (!F->TryGetStringField(TEXT("set_by_caller"), Tag) ||
+                                              !FGameplayTag::IsValidGameplayTagString(Tag))
+                        return Fail(TEXT("Invalid required calculation SetByCaller tag"));
+                    D.Callers.Add({FName(*Alias), FName(*Tag)});
+                    continue;
+                }
+                FString Attribute, Attributes;
+                if (!F->TryGetStringField(TEXT("attribute"), Attribute) || !GASName(Attribute) ||
+                                          !F->TryGetStringField(TEXT("attributes"), Attributes))
+                    return Fail(TEXT("Invalid calculation attribute reference"));
+                if (Role == TEXT("output"))
+                {
+                    FDasGASOutputDeclaration O;
+                    O.Name = FName(*Alias);
+                    O.Attribute = FName(*Attribute);
+                    O.Attributes = Attributes;
+                    F->TryGetStringField(TEXT("operation"), O.Operation);
+                    if (D.Kind !=
+                        TEXT("Execution") || !D.StructuredOutput ||
+                             (O.Operation != TEXT("Add") && O.Operation != TEXT("Multiply") &&
+                                                                                O.Operation != TEXT("Override")))
+                        return Fail(TEXT("Invalid execution output declaration"));
+                    D.Outputs.Add(O);
+                    continue;
+                }
                 FDasGASCaptureDeclaration C;
-                FString Alias, Attribute;
-                if (!F || !F->TryGetStringField(
-                              TEXT("name"), Alias) || !GASName(Alias) || Seen.Contains(FName(*Alias)) ||
-                              !F->TryGetStringField(
-                                  TEXT("attribute"), Attribute) || !GASName(Attribute) ||
-                                  !F->TryGetStringField(
-                                      TEXT("attributes"), C.Attributes) ||
-                                      !F->TryGetStringField(
-                                          TEXT("source"), C.Source) ||
-                                          !F->TryGetBoolField(TEXT("snapshot"), C.Snapshot) ||
-                                                              (C.Source != TEXT("Source")&& C.Source != TEXT("Target")))
-                    return Fail(TEXT("Invalid/duplicate attribute capture"));
                 C.Name = FName(*Alias);
                 C.Attribute = FName(*Attribute);
-                Seen.Add(C.Name);
+                C.Attributes = Attributes;
+                if (Role != TEXT("capture") ||
+                                 !F->TryGetStringField(
+                                     TEXT("source"), C.Source) ||
+                                     !F->TryGetBoolField(TEXT("snapshot"), C.Snapshot) ||
+                                                         (C.Source != TEXT("Source") && C.Source != TEXT("Target")))
+                    return Fail(TEXT("Invalid attribute capture"));
+                if (F->HasField(
+                        TEXT("scoped_operation")) &&
+                        (!F->TryGetStringField(
+                            TEXT("scoped_operation"), C.ScopedOperation) ||
+                            (C.ScopedOperation !=
+                             TEXT("Add") &&
+                                  C.ScopedOperation != TEXT("Multiply") && C.ScopedOperation != TEXT("Override")) ||
+                                      D.Kind != TEXT("Execution") ||
+                                                     !GASNumber(F, TEXT("scoped_magnitude"), C.ScopedMagnitude)))
+                    return Fail(TEXT("Invalid execution-scoped modifier"));
                 D.Captures.Add(C);
             }
+            if (D.Captures.Num() > 16 || D.Callers.Num() > 16 || D.Outputs.Num() > 16 ||
+                (D.StructuredOutput && D.Outputs.IsEmpty()))
+                return Fail(TEXT("Calculation allows up to 16 captures/callers/outputs and needs at least one declared output"));
             Candidate.Calculations.Add(MoveTemp(D));
             continue;
         }
@@ -337,9 +381,15 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
         if (!OutputSet)
             return Fail(TEXT("Calculation attribute set is not in the explicit registry"));
         D.Attributes = OutputSet->Id;
-        if (D.Kind == TEXT("Execution")&& !OutputSet->Attributes.ContainsByPredicate(
-                                              [&](const auto& A) { return A.Name == FName(*D.Output); }))
-            return Fail(TEXT("Unknown execution output attribute"));
+        if (D.Kind == TEXT("Execution") && !D.StructuredOutput)
+            D.Outputs.Add({FName(*D.Output), FName(*D.Output), D.Attributes, D.Operation});
+        for (auto& O : D.Outputs)
+        {
+            const auto* Set = ResolveSet(O.Attributes);
+            if (!Set || !Set->Attributes.ContainsByPredicate([&](const auto& A) { return A.Name == O.Attribute; }))
+                return Fail(TEXT("Unknown execution output attribute"));
+            O.Attributes = Set->Id;
+        }
         for (auto& C : D.Captures)
         {
             const auto* Set = ResolveSet(C.Attributes);
@@ -388,9 +438,19 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             return Fail(TEXT("Ability effect/cost is not in this script's explicit effect registry"));
         for (const auto* E : {Effect, Cost})
             if (E)
+            {
+                auto RequiresCaller = [&](const FString& Id)
+                {
+                    const auto* C = Candidate.Calculations.FindByPredicate([&](const auto& C) { return C.Id == Id; });
+                    return C && !C->Callers.IsEmpty();
+                };
+                if (RequiresCaller(E->Execution))
+                    return Fail(
+                        TEXT("Declarative ability effects cannot provide required calculation SetByCaller values"));
                 for (const auto& Mod : E->Modifiers)
-                    if (!Mod.SetByCaller.IsNone())
+                    if (!Mod.SetByCaller.IsNone() || RequiresCaller(Mod.Calculation))
                         return Fail(TEXT("Declarative abilities require constant effect magnitudes"));
+            }
         if (Cost)
         {
             if (Cost->Duration != TEXT("Instant") || !Cost->Execution.IsEmpty())
