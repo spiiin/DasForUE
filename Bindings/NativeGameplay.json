@@ -50,6 +50,11 @@
 				"name": "AuthoredGameplayEffectRef"
 			},
 			{
+				"path": "/Script/DasRuntime.DasGASMagnitudeCalculation",
+				"module": "ue_gas_authored_types",
+				"name": "GASMagnitudeCalculationRef"
+			},
+			{
 				"path": "/Script/DasRuntime.DasHealthAbilitySystemComponent",
 				"module": "ue_gas_types",
 				"name": "HealthAbilitySystemComponentRef"
@@ -2531,7 +2536,7 @@
 		},
 		{
 			"path": "/Script/DasRuntime.DasAuthoredAbilityContext",
-			"signature": "Ability:ObjectProperty:0:/Script/DasRuntime.DasAuthoredGameplayAbility;Owner:ObjectProperty:0:/Script/Engine.Actor;Avatar:ObjectProperty:0:/Script/Engine.Actor;System:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;GrantId:IntProperty:0;ActivationId:IntProperty:0;Level:IntProperty:0;Phase:NameProperty:0;Cancelled:BoolProperty:0;",
+			"signature": "Ability:ObjectProperty:0:/Script/DasRuntime.DasAuthoredGameplayAbility;Owner:ObjectProperty:0:/Script/Engine.Actor;Avatar:ObjectProperty:0:/Script/Engine.Actor;System:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;GrantId:IntProperty:0;ActivationId:IntProperty:0;Level:IntProperty:0;Phase:NameProperty:0;Task:StructProperty:0:/Script/DasRuntime.DasGASAbilityTaskResult{Id:IntProperty:0;Kind:NameProperty:0;Phase:NameProperty:0;EventTag:NameProperty:0;Magnitude:FloatProperty:0;Instigator:ObjectProperty:0:/Script/Engine.Actor;Target:ObjectProperty:0:/Script/Engine.Actor;};Cancelled:BoolProperty:0;",
 			"fields": [
 				{
 					"kind": "object",
@@ -2572,6 +2577,11 @@
 					"kind": "name",
 					"type_path": "",
 					"name": "Phase"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasGASAbilityTaskResult",
+					"name": "Task"
 				},
 				{
 					"kind": "bool",
@@ -2846,6 +2856,129 @@
 					"kind": "float",
 					"type_path": "",
 					"name": "NewValue"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasGASAbilityTaskResult",
+			"signature": "Id:IntProperty:0;Kind:NameProperty:0;Phase:NameProperty:0;EventTag:NameProperty:0;Magnitude:FloatProperty:0;Instigator:ObjectProperty:0:/Script/Engine.Actor;Target:ObjectProperty:0:/Script/Engine.Actor;",
+			"fields": [
+				{
+					"kind": "int",
+					"type_path": "",
+					"name": "Id"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "Kind"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "Phase"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "EventTag"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Magnitude"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "Instigator"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "Target"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasGASCalculationContext",
+			"signature": "Level:FloatProperty:0;Values:MapProperty:0[Values_Key:NameProperty:0;Values:FloatProperty:0;];SetByCaller:MapProperty:0[SetByCaller_Key:NameProperty:0;SetByCaller:FloatProperty:0;];Source:ObjectProperty:0:/Script/Engine.Actor;Target:ObjectProperty:0:/Script/Engine.Actor;",
+			"fields": [
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "Level"
+				},
+				{
+					"kind": "map",
+					"type_path": "",
+					"key":
+					{
+						"kind": "name",
+						"type_path": ""
+					},
+					"value":
+					{
+						"kind": "float",
+						"type_path": ""
+					},
+					"name": "Values"
+				},
+				{
+					"kind": "map",
+					"type_path": "",
+					"key":
+					{
+						"kind": "name",
+						"type_path": ""
+					},
+					"value":
+					{
+						"kind": "float",
+						"type_path": ""
+					},
+					"name": "SetByCaller"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "Source"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/Engine.Actor",
+					"name": "Target"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasGASTargetData",
+			"signature": "Actors:ArrayProperty:0[Actors:ObjectProperty:0:/Script/Engine.Actor;];Hits:ArrayProperty:0[Hits:IntProperty:0;];Source:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;",
+			"fields": [
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "object",
+						"type_path": "/Script/Engine.Actor"
+					},
+					"name": "Actors"
+				},
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "int",
+						"type_path": ""
+					},
+					"name": "Hits"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"name": "Source"
 				}
 			]
 		},
@@ -3931,6 +4064,38 @@
 					]
 				},
 				{
+					"name": "ApplyAuthoredTargets",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;ApplyAuthoredTargets;Spec:StructProperty:134218114:/Script/DasRuntime.DasAuthoredEffectSpec{Source:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;Definition:ObjectProperty:0:/Script/DasRuntime.DasAuthoredGameplayEffect;Level:FloatProperty:0;Magnitudes:MapProperty:0[Magnitudes_Key:NameProperty:0;Magnitudes:FloatProperty:0;];};Targets:StructProperty:134218114:/Script/DasRuntime.DasGASTargetData{Actors:ArrayProperty:0[Actors:ObjectProperty:0:/Script/Engine.Actor;];Hits:ArrayProperty:0[Hits:IntProperty:0;];Source:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;};ReturnValue:ArrayProperty:1408[ReturnValue:StructProperty:0:/Script/DasRuntime.DasAuthoredEffectResult{Valid:BoolProperty:0;Applied:BoolProperty:0;HasActiveHandle:BoolProperty:0;Target:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;ActiveId:IntProperty:0;};];",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasAuthoredEffectSpec",
+							"name": "Spec",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasGASTargetData",
+							"name": "Targets",
+							"direction": "in"
+						},
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "struct",
+								"type_path": "/Script/DasRuntime.DasAuthoredEffectResult"
+							},
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "AreAbilityTagsBlocked",
 					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
 					"signature": "v1;AreAbilityTagsBlocked;Tags:StructProperty:134218114:/Script/GameplayTags.GameplayTagContainer{GameplayTags:ArrayProperty:0[GameplayTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];ParentTags:ArrayProperty:0[ParentTags:StructProperty:0:/Script/GameplayTags.GameplayTag{TagName:NameProperty:0;};];};ReturnValue:BoolProperty:1408;",
@@ -4641,6 +4806,43 @@
 					]
 				},
 				{
+					"name": "MakeAuthoredTargets",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;MakeAuthoredTargets;Actors:ArrayProperty:134218114[Actors:ObjectProperty:0:/Script/Engine.Actor;];Hits:ArrayProperty:134218114[Hits:IntProperty:0;];ReturnValue:StructProperty:1408:/Script/DasRuntime.DasGASTargetData{Actors:ArrayProperty:0[Actors:ObjectProperty:0:/Script/Engine.Actor;];Hits:ArrayProperty:0[Hits:IntProperty:0;];Source:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "object",
+								"type_path": "/Script/Engine.Actor"
+							},
+							"name": "Actors",
+							"direction": "in"
+						},
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "int",
+								"type_path": ""
+							},
+							"name": "Hits",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasGASTargetData",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "PressInputID",
 					"declaring_class": "/Script/GameplayAbilities.AbilitySystemComponent",
 					"signature": "v1;PressInputID;InputID:IntProperty:128;",
@@ -4676,6 +4878,27 @@
 						},
 						{
 							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "ReleaseAuthoredTargetHit",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;ReleaseAuthoredTargetHit;Id:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Id",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
 							"type_path": "",
 							"name": "ReturnValue",
 							"direction": "return"
@@ -4885,6 +5108,45 @@
 							"type_path": "/Script/Engine.ActorComponent",
 							"name": "PrerequisiteComponent",
 							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SendAuthoredGameplayEvent",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredAbilitySystemComponent",
+					"signature": "v1;SendAuthoredGameplayEvent;Tag:NameProperty:128;Magnitude:FloatProperty:128;Instigator:ObjectProperty:128:/Script/Engine.Actor;Target:ObjectProperty:128:/Script/Engine.Actor;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
+							"direction": "in"
+						},
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "Magnitude",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "Instigator",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "Target",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
 						}
 					]
 				},
@@ -5833,6 +6095,33 @@
 					]
 				},
 				{
+					"name": "CancelScriptTask",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;CancelScriptTask;ActivationId:IntProperty:128;TaskId:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ActivationId",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "TaskId",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "CommitScriptAbility",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
 					"signature": "v1;CommitScriptAbility;ActivationId:IntProperty:128;ReturnValue:BoolProperty:1408;",
@@ -6003,12 +6292,48 @@
 					"parameters": []
 				},
 				{
+					"name": "IsAuthoredCommitted",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;IsAuthoredCommitted;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "IsLocallyControlled",
 					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
 					"signature": "v1;IsLocallyControlled;ReturnValue:BoolProperty:1408;",
 					"const": true,
 					"construction_unsafe": false,
 					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsScriptActivationCurrent",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;IsScriptActivationCurrent;Id:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Id",
+							"direction": "in"
+						},
 						{
 							"kind": "bool",
 							"type_path": "",
@@ -6137,6 +6462,47 @@
 					]
 				},
 				{
+					"name": "PlayScriptMontage",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;PlayScriptMontage;ActivationId:IntProperty:128;Montage:ObjectProperty:128:/Script/Engine.AnimMontage;Rate:FloatProperty:128;Section:NameProperty:128;ReturnValue:IntProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ActivationId",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.AnimMontage",
+							"name": "Montage",
+							"direction": "in"
+						},
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "Rate",
+							"direction": "in",
+							"default_text": "1.000000"
+						},
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Section",
+							"direction": "in",
+							"default_text": "None"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
 					"name": "RemoveGrantedByEffect",
 					"declaring_class": "/Script/GameplayAbilities.GameplayAbility",
 					"signature": "v1;RemoveGrantedByEffect;",
@@ -6147,13 +6513,28 @@
 				{
 					"name": "ScriptAbilityContext",
 					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
-					"signature": "v1;ScriptAbilityContext;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredAbilityContext{Ability:ObjectProperty:0:/Script/DasRuntime.DasAuthoredGameplayAbility;Owner:ObjectProperty:0:/Script/Engine.Actor;Avatar:ObjectProperty:0:/Script/Engine.Actor;System:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;GrantId:IntProperty:0;ActivationId:IntProperty:0;Level:IntProperty:0;Phase:NameProperty:0;Cancelled:BoolProperty:0;};",
+					"signature": "v1;ScriptAbilityContext;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasAuthoredAbilityContext{Ability:ObjectProperty:0:/Script/DasRuntime.DasAuthoredGameplayAbility;Owner:ObjectProperty:0:/Script/Engine.Actor;Avatar:ObjectProperty:0:/Script/Engine.Actor;System:ObjectProperty:0:/Script/DasRuntime.DasAuthoredAbilitySystemComponent;GrantId:IntProperty:0;ActivationId:IntProperty:0;Level:IntProperty:0;Phase:NameProperty:0;Task:StructProperty:0:/Script/DasRuntime.DasGASAbilityTaskResult{Id:IntProperty:0;Kind:NameProperty:0;Phase:NameProperty:0;EventTag:NameProperty:0;Magnitude:FloatProperty:0;Instigator:ObjectProperty:0:/Script/Engine.Actor;Target:ObjectProperty:0:/Script/Engine.Actor;};Cancelled:BoolProperty:0;};",
 					"const": true,
 					"construction_unsafe": false,
 					"parameters": [
 						{
 							"kind": "struct",
 							"type_path": "/Script/DasRuntime.DasAuthoredAbilityContext",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "ScriptTaskCount",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;ScriptTaskCount;ReturnValue:IntProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
 							"name": "ReturnValue",
 							"direction": "return"
 						}
@@ -6186,6 +6567,74 @@
 							"type_path": "",
 							"name": "bShouldBlockAbilities",
 							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "WaitScriptDelay",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;WaitScriptDelay;ActivationId:IntProperty:128;Seconds:FloatProperty:128;ReturnValue:IntProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ActivationId",
+							"direction": "in"
+						},
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "Seconds",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "WaitScriptEvent",
+					"declaring_class": "/Script/DasRuntime.DasAuthoredGameplayAbility",
+					"signature": "v1;WaitScriptEvent;ActivationId:IntProperty:128;Tag:NameProperty:128;Once:BoolProperty:128;Exact:BoolProperty:128;ReturnValue:IntProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ActivationId",
+							"direction": "in"
+						},
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "Once",
+							"direction": "in",
+							"default_text": "true"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "Exact",
+							"direction": "in",
+							"default_text": "true"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
 						}
 					]
 				}
@@ -6383,6 +6832,11 @@
 				},
 				{
 					"domain": "field",
+					"name": "ScriptTasks",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
 					"name": "SourceBlockedTags",
 					"reason": "hidden_editor_or_deprecated"
 				},
@@ -6399,6 +6853,11 @@
 				{
 					"domain": "field",
 					"name": "TargetRequiredTags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "TaskEntry",
 					"reason": "hidden_editor_or_deprecated"
 				},
 				{
@@ -7040,6 +7499,100 @@
 					"domain": "method",
 					"name": "ExecuteUbergraph",
 					"reason": "requires_adapter_or_nonpublic_policy"
+				}
+			]
+		},
+		{
+			"path": "/Script/DasRuntime.DasGASMagnitudeCalculation",
+			"fixture": false,
+			"fields": [],
+			"methods": [
+				{
+					"name": "EmptyCalculationContext",
+					"declaring_class": "/Script/DasRuntime.DasGASMagnitudeCalculation",
+					"signature": "v1;EmptyCalculationContext;ReturnValue:StructProperty:1408:/Script/DasRuntime.DasGASCalculationContext{Level:FloatProperty:0;Values:MapProperty:0[Values_Key:NameProperty:0;Values:FloatProperty:0;];SetByCaller:MapProperty:0[SetByCaller_Key:NameProperty:0;SetByCaller:FloatProperty:0;];Source:ObjectProperty:0:/Script/Engine.Actor;Target:ObjectProperty:0:/Script/Engine.Actor;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/DasRuntime.DasGASCalculationContext",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				}
+			],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "bAllowNonNetAuthorityDependencyRegistration",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "Definition",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "RelevantAttributesToCapture",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "method",
+					"name": "CalculateBaseMagnitude",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "GetSetByCallerMagnitudeByName",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetSetByCallerMagnitudeByTag",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetSourceActorTags",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetSourceAggregatedTags",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetSourceSpecTags",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetTargetActorTags",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetTargetAggregatedTags",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetTargetSpecTags",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_GetCapturedAttributeMagnitude",
+					"reason": "unsupported_parameter_type"
 				}
 			]
 		},

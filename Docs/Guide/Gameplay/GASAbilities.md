@@ -232,3 +232,5 @@ No full PIE, reopening or packaged run is part of this check. Its current result
 is recorded in `logs/gas-hooks-validation.json`.
 
 The latest focused hooks run passed all 12 checks (exit code 0).
+
+Tasks, targets and calculations are covered in [GASAdvanced.md](GASAdvanced.md).

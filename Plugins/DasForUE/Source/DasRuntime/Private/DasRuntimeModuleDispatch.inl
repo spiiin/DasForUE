@@ -790,11 +790,23 @@ FDasExecutionResult FDasRuntimeModule::DispatchInputEventSnapshots(const FString
     return RunNamedFramePersistent(Path, Entry, Args, EDasMethodSignature::Int, Self);
 }
 
+FDasExecutionResult FDasRuntimeModule::DispatchGASCalculation(UObject* Owner,const FString& Script,const FString& Entry,const FString& Contract,const FDasGASCalculationContext& Context)
+{
+    FDasExecutionResult Rejected;
+    if(!IsInGameThread()||!IsValid(Owner)||AuthoredDispatchDepth>=32||ConstructingObject||Contract.Len()!=32||
+       (!Owner->IsA<UDasGASMagnitudeCalculation>()&&!Owner->IsA<UDasGASExecutionCalculation>())) {
+       Rejected.Error=TEXT("Invalid GAS calculation dispatch");return Rejected;}
+    FDasScalarValue A;A.Kind=12;A.ObjectClass=FDasGASCalculationContext::StaticStruct()->GetPathName();A.StructValue.InitializeAs<FDasGASCalculationContext>(Context);
+    TGuardValue<int32> Depth(AuthoredDispatchDepth,AuthoredDispatchDepth+1);
+    TGuardValue<const FString*> Scope(GASCalculationContract,&Contract);
+    return RunNamedFramePersistent(ScriptPath(Script),Entry,{A},EDasMethodSignature::Float,Owner);
+}
+
 FDasExecutionResult FDasRuntimeModule::DispatchGASAbilityHook(UDasAuthoredGameplayAbility* Ability, const FString& Entry)
 {
     FDasExecutionResult Rejected;
     if (!IsInGameThread() || !IsValid(Ability) || Ability->IsTemplate() || Ability->ScriptFile.IsEmpty() ||
-        Entry.IsEmpty() || (Entry != Ability->ActivateEntry && Entry != Ability->EndEntry && Entry != Ability->CancelEntry) ||
+        Entry.IsEmpty() || (Entry != Ability->ActivateEntry && Entry != Ability->EndEntry && Entry != Ability->CancelEntry && Entry != Ability->TaskEntry) ||
         ConstructingObject || AuthoredDispatchDepth >= 32)
     {
         Rejected.Error = TEXT("Invalid or recursive GAS ability hook dispatch");
@@ -872,6 +884,7 @@ bool FDasRuntimeModule::ReadGASScript(const FString& Path, FDasGASDeclarations& 
                     A = DSLAnnotation(S->annotations, "ue_gameplay_effect");
                 if (!A)
                     A = DSLAnnotation(S->annotations, "ue_gameplay_ability");
+                if(!A) A=DSLAnnotation(S->annotations,"ue_gas_calculation");
                 if (!A || !OK)
                     return;
                 const auto* Wire = A->arguments.find(DSLGASKey, das::Type::tString);

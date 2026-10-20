@@ -130,6 +130,7 @@ void UDasAuthoredGameplayAbility::EndAbility(FGameplayAbilitySpecHandle Handle, 
 {
     const bool WasActive = IsActive();
     auto* ASC = Info ? Cast<UDasAuthoredAbilitySystemComponent>(Info->AbilitySystemComponent.Get()) : nullptr;
+    if (WasActive) { TGuardValue<bool> Ending(ScriptEnding,true); ClearScriptTasks(); }
     Super::EndAbility(Handle, Info, Activation, Replicate, Cancelled);
     if (WasActive && !IsActive() && ASC)
     {
@@ -325,6 +326,7 @@ FDasAuthoredAbilityContext UDasAuthoredGameplayAbility::ScriptAbilityContext() c
     Result.ActivationId = ActivationSerial;
     Result.Level = ScriptLevel;
     Result.Phase = ScriptPhase;
+    Result.Task = CurrentTask;
     Result.Cancelled = ScriptCancelled;
     return Result;
 }
@@ -382,6 +384,7 @@ bool UDasAuthoredGameplayAbility::RunScriptHook(const FString& Entry, FName Phas
         ScriptError = TEXT("DAS runtime is unavailable");
         return false;
     }
+    TGuardValue<bool> ExecutingHook(ScriptActivating,true);
     TGuardValue<FName> PhaseScope(ScriptPhase, Phase);
     TGuardValue<bool> CancelScope(ScriptCancelled, Cancelled);
     const auto Result = Runtime->DispatchGASAbilityHook(this, Entry);
@@ -408,6 +411,7 @@ void UDasAuthoredGameplayAbility::OnRemoveAbility(const FGameplayAbilityActorInf
 }
 void UDasAuthoredGameplayAbility::BeginDestroy()
 {
+    ClearScriptTasks();
     ReleaseScript();
     Super::BeginDestroy();
 }

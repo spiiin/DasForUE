@@ -2,6 +2,7 @@
 #include "UObject/FieldPath.h"
 #include "DasGameplayTags.h"
 #include "DasGASAuthoring.h"
+#include "DasGASCalculations.h"
 #include "Engine/CurveTable.h"
 #include "Engine/DataTable.h"
 #include "DasDataAssets.h"

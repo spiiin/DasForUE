@@ -1037,6 +1037,17 @@ struct Vector4 {
     W:double
 }
 
+[ue_native_struct(path="/Script/DasRuntime.DasGASAbilityTaskResult")]
+struct DasGASAbilityTaskResult {
+    Id:int
+    Kind:UENameValue
+    Phase:UENameValue
+    EventTag:UENameValue
+    Magnitude:float
+    Instigator:C_Actor_adf65d5b
+    Target:C_Actor_adf65d5b
+}
+
 [ue_native_struct(path="/Script/DasRuntime.DasAuthoredAbilityContext")]
 struct DasAuthoredAbilityContext {
     Ability:AuthoredGameplayAbilityRef
@@ -1047,6 +1058,7 @@ struct DasAuthoredAbilityContext {
     ActivationId:int
     Level:int
     Phase:UENameValue
+    Task:DasGASAbilityTaskResult
     Cancelled:bool
 }
 
@@ -1118,6 +1130,22 @@ struct DasCallPayload {
     Label:string
     bEnabled:bool
     Weight:double
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasGASCalculationContext")]
+struct DasGASCalculationContext {
+    Level:float
+    Values:table<UENameValue;float>
+    SetByCaller:table<UENameValue;float>
+    Source:C_Actor_adf65d5b
+    Target:C_Actor_adf65d5b
+}
+
+[ue_native_struct(path="/Script/DasRuntime.DasGASTargetData")]
+struct DasGASTargetData {
+    Actors:array<C_Actor_adf65d5b>
+    Hits:array<int>
+    Source:AuthoredAbilitySystemComponentRef
 }
 
 [ue_native_struct(path="/Script/DasRuntime.DasGameplayAttributeChange")]

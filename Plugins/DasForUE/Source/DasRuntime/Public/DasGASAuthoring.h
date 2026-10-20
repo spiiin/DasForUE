@@ -36,11 +36,13 @@ struct FDasGASModifierDeclaration
     FString Operation = TEXT("Add");
     float Magnitude = 0;
     FName SetByCaller;
+    FString Calculation;
 };
 struct FDasGASEffectDeclaration
 {
     FString Name, Id, Attributes;
     TArray<FDasGASModifierDeclaration> Modifiers;
+    FString Execution;
     FString Duration = TEXT("Instant");
     float Seconds = 0;
     float Period = 0;
@@ -55,13 +57,26 @@ struct FDasGASEffectDeclaration
 struct FDasGASAbilityDeclaration
 {
     FString Name, Id, Effect, Cost;
-    FString ScriptFile, ScriptContract, ActivateEntry, EndEntry, CancelEntry;
+    FString ScriptFile, ScriptContract, ActivateEntry, EndEntry, CancelEntry, TaskEntry;
     float Cooldown = 0;
     FName CooldownTag;
     bool AutoEnd = true;
 };
+struct FDasGASCaptureDeclaration
+{
+    FName Name, Attribute;
+    FString Attributes, Source = TEXT("Source");
+    bool Snapshot = true;
+};
+struct FDasGASCalculationDeclaration
+{
+    FString Name, Id, Kind = TEXT("Magnitude"), Attributes, Output, Operation = TEXT("Add");
+    FString ScriptFile, ScriptContract, Entry;
+    TArray<FDasGASCaptureDeclaration> Captures;
+};
 struct FDasGASDeclarations
 {
+    TArray<FDasGASCalculationDeclaration> Calculations;
     TArray<FDasGASSetDeclaration> Sets;
     TArray<FDasGASEffectDeclaration> Effects;
     TArray<FDasGASAbilityDeclaration> Abilities;
@@ -169,6 +184,7 @@ class DASRUNTIME_API UDasAuthoredAbilitySystemComponent : public UAbilitySystemC
     GENERATED_BODY()
 public:
     UDasAuthoredAbilitySystemComponent();
+    virtual FGameplayEffectContextHandle MakeEffectContext() const override;
     UPROPERTY(BlueprintAssignable, Category = "GAS")
     FDasAuthoredAttributeChanged AttributeChanged;
     UPROPERTY(BlueprintAssignable, Category = "GAS")
@@ -185,6 +201,16 @@ public:
     bool FinishAuthoredAbility(int32 Id);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     bool RemoveAuthoredAbility(int32 Id);
+    int32 RegisterAuthoredTargetHit(const FHitResult& Hit);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool ReleaseAuthoredTargetHit(int32 Id);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool SendAuthoredGameplayEvent(FName Tag, float Magnitude, AActor* Instigator, AActor* Target);
+    UFUNCTION(BlueprintPure, Category = "GAS")
+    FDasGASTargetData MakeAuthoredTargets(const TArray<AActor*>& Actors, const TArray<int32>& Hits) const;
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    TArray<FDasAuthoredEffectResult> ApplyAuthoredTargets(const FDasAuthoredEffectSpec& Spec,
+                                                          const FDasGASTargetData& Targets);
     void NotifyAuthoredAbility(FGameplayAbilitySpecHandle Handle, FName Phase, bool Succeeded = false);
     int32 AuthoredAbilityId(FGameplayAbilitySpecHandle Handle) const;
     UFUNCTION(BlueprintCallable, Category = "GAS")
@@ -227,6 +253,9 @@ private:
     void PruneActiveEffects();
     bool Live() const;
     bool InitializeAuthoredActorInfo();
+    TMap<int32, FHitResult> TargetHits;
+    int32 NextTargetHit = 1;
+    FDasAuthoredEffectResult ApplyAuthoredSpecInternal(const FDasAuthoredEffectSpec& Spec, const FHitResult* Hit);
     FGameplayAttribute FindAttribute(FName Set, FName Name) const;
     void Changed(const FOnAttributeChangeData& Data, FName Set);
     void Detach();

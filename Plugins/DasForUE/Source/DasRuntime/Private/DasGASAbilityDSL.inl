@@ -52,7 +52,7 @@ struct FUEGASAbilityAnnotation : das::StructureAnnotation
                         DSLFail(TEXT("Ability methods are ordinary DAS methods; reflected UE method annotations are not supported here"));
                     const FString Name = DSLText(
                         F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
-                    if (Name != TEXT("Activate") && Name != TEXT("End") && Name != TEXT("Cancel"))
+                    if (Name != TEXT("Activate") && Name != TEXT("End") && Name != TEXT("Cancel") && Name != TEXT("Task"))
                         return;
                     if (F->result && F->result->baseType == das::Type::autoinfer)
                         F->result = new das::TypeDecl(das::Type::tVoid, F->at);

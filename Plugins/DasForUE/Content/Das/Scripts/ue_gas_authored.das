@@ -98,3 +98,56 @@ def ue_gas_cancel(context:GASAbilityContext):bool {
 def ue_gas_apply_ability_effect(context:GASAbilityContext):bool {
     return ue_is_valid(context.Ability) && context.Ability.ApplyScriptAbilityEffect(context.ActivationId)
 }
+
+typedef GASTargetData = DasGASTargetData
+typedef GASCalculationContext = DasGASCalculationContext
+typedef GASAbilityTaskResult = DasGASAbilityTaskResult
+
+def ue_gas_wait_delay(context:GASAbilityContext; seconds:float):int {
+    if(!ue_is_valid(context.Ability)) {return 0}
+    return context.Ability.WaitScriptDelay(context.ActivationId,seconds)
+}
+def ue_gas_wait_event(context:GASAbilityContext; tag:ue_gameplay_tags::GameplayTag; once:bool=true; exact:bool=true):int {
+    if(!ue_is_valid(context.Ability)) {return 0}
+    return context.Ability.WaitScriptEvent(context.ActivationId,ue_name_value(ue_tag_name(tag)),once,exact)
+}
+def ue_gas_play_montage(context:GASAbilityContext; montage:auto; rate:float=1.0f; section:string=""):int {
+    if(!ue_is_valid(context.Ability)) {return 0}
+    return context.Ability.PlayScriptMontage(context.ActivationId,montage,rate,ue_name_value(section))
+}
+def ue_gas_cancel_task(context:GASAbilityContext; task:int):bool {
+    return ue_is_valid(context.Ability) && context.Ability.CancelScriptTask(context.ActivationId,task)
+}
+def ue_gas_target(actor:auto):GASTargetData {
+    var data:GASTargetData
+    push(data.Actors,actor)
+    return <-data
+}
+def ue_gas_hit_target(asc:AuthoredAbilitySystemComponentRef; hit:UEHitResult):GASTargetData {
+    let id=__ue_gas_store_hit(asc.handle,hit)
+    verify(id>0,"Invalid hit or GAS hit snapshot capacity exceeded")
+    var data:GASTargetData
+    data.Source=asc
+    push(data.Hits,id)
+    return <-data
+}
+def ue_gas_release_targets(var targets:GASTargetData):void {
+    if(ue_is_valid(targets.Source)) {
+        for(id in targets.Hits) {targets.Source.ReleaseAuthoredTargetHit(id)}
+    }
+    clear(targets.Hits)
+}
+def ue_gas_apply_targets(asc:AuthoredAbilitySystemComponentRef; spec:GASEffectSpec; targets:GASTargetData):array<GASEffectResult> {
+    return <-asc.ApplyAuthoredTargets(spec,targets)
+}
+def ue_gas_apply_targets(context:GASAbilityContext; spec:GASEffectSpec; targets:GASTargetData):array<GASEffectResult> {
+    verify(ue_is_valid(context.Ability) && context.Ability.IsScriptActivationCurrent(context.ActivationId) && context.Ability.IsAuthoredCommitted(),"Targeted ability action requires current committed activation")
+    verify(ue_same_object(context.System,spec.Source),"Effect source must match the ability ASC")
+    return <-context.System.ApplyAuthoredTargets(spec,targets)
+}
+def ue_gas_captured(context:GASCalculationContext; name:string):float {
+    var result=0.0f
+    let found=get(context.Values,ue_name_value(name)) $(value) {result=value}
+    verify(found,"Unknown captured GAS attribute")
+    return result
+}

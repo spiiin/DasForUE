@@ -54,6 +54,61 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             return Fail(TEXT("Invalid/duplicate GAS declaration or field count"));
         Names.Add(Name.ToLower());
         Ids.Add(Id);
+        if (Kind == TEXT("calculation"))
+        {
+            FDasGASCalculationDeclaration D;
+            D.Name = Name;
+            D.Id = Id;
+            if (!Object->TryGetStringField(
+                    TEXT("calculation_kind"), D.Kind) ||
+                    !Object->TryGetStringField(
+                        TEXT("attributes"), D.Attributes) ||
+                        !Object->TryGetStringField(
+                            TEXT("output"), D.Output) ||
+                            !Object->TryGetStringField(
+                                TEXT("operation"), D.Operation) ||
+                                !Object->TryGetStringField(
+                                    TEXT("script"), D.ScriptFile) ||
+                                    !Object->TryGetStringField(
+                                        TEXT("entry"), D.Entry) ||
+                                        !Object->TryGetStringField(
+                                            TEXT("contract"), D.ScriptContract) || Fields->Num() > 16 ||
+                                            (D.Kind != TEXT("Magnitude")&& D.Kind != TEXT("Execution")) ||
+                                             (D.Kind == TEXT("Magnitude")? !D.Output.IsEmpty() : !GASName(D.Output)) ||
+                                              (D.Operation !=
+                                               TEXT("Add")&& D.Operation != TEXT("Multiply")&&
+                                                                                 D.Operation != TEXT("Override")) ||
+                                                                 FPaths::GetCleanFilename(D.ScriptFile) !=
+                                                                     D.ScriptFile ||
+                                                                 FPaths::GetExtension(D.ScriptFile) !=
+                                                                     TEXT("das")|| D.ScriptContract.Len() != 32 ||
+                                                                          D.Entry != TEXT("__ue_gas_calculate_")+ Name)
+                return Fail(TEXT("Invalid calculation descriptor"));
+            TSet<FName> Seen;
+            for (const auto& ItemField : *Fields)
+            {
+                auto F = ItemField->AsObject();
+                FDasGASCaptureDeclaration C;
+                FString Alias, Attribute;
+                if (!F || !F->TryGetStringField(
+                              TEXT("name"), Alias) || !GASName(Alias) || Seen.Contains(FName(*Alias)) ||
+                              !F->TryGetStringField(
+                                  TEXT("attribute"), Attribute) || !GASName(Attribute) ||
+                                  !F->TryGetStringField(
+                                      TEXT("attributes"), C.Attributes) ||
+                                      !F->TryGetStringField(
+                                          TEXT("source"), C.Source) ||
+                                          !F->TryGetBoolField(TEXT("snapshot"), C.Snapshot) ||
+                                                              (C.Source != TEXT("Source")&& C.Source != TEXT("Target")))
+                    return Fail(TEXT("Invalid/duplicate attribute capture"));
+                C.Name = FName(*Alias);
+                C.Attribute = FName(*Attribute);
+                Seen.Add(C.Name);
+                D.Captures.Add(C);
+            }
+            Candidate.Calculations.Add(MoveTemp(D));
+            continue;
+        }
         if (Kind == TEXT("ability"))
         {
             FDasGASAbilityDeclaration Ability;
@@ -81,7 +136,8 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
                           !ReadHook(TEXT("contract"), Ability.ScriptContract) ||
                                     !ReadHook(TEXT("activate"), Ability.ActivateEntry) ||
                                               !ReadHook(TEXT("end"), Ability.EndEntry) ||
-                                                        !ReadHook(TEXT("cancel"), Ability.CancelEntry))
+                                                        !ReadHook(TEXT("cancel"), Ability.CancelEntry) ||
+                                                                  !ReadHook(TEXT("task"), Ability.TaskEntry))
                 return Fail(TEXT("Invalid ability script metadata"));
             const FString Prefix = TEXT("__ue_ability_") + Name + TEXT("_");
             if (!Ability.ActivateEntry.IsEmpty())
@@ -95,15 +151,17 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
                                                                      (!Ability.CancelEntry.IsEmpty() &&
                                                                       Ability.CancelEntry != Prefix + TEXT("Cancel")))
                     return Fail(TEXT("Invalid generated ability hook identity"));
+                if (!Ability.TaskEntry.IsEmpty() && Ability.TaskEntry != Prefix + TEXT("Task"))
+                    return Fail(TEXT("Invalid ability task entry"));
             }
             else if (Ability.Effect.IsEmpty() || !Ability.ScriptFile.IsEmpty() || !Ability.ScriptContract.IsEmpty() ||
-                     !Ability.EndEntry.IsEmpty() || !Ability.CancelEntry.IsEmpty())
+                     !Ability.EndEntry.IsEmpty() || !Ability.CancelEntry.IsEmpty() || !Ability.TaskEntry.IsEmpty())
                 return Fail(TEXT("Ability requires an effect or an Activate method"));
             Ability.CooldownTag = FName(*Tag);
             Candidate.Abilities.Add(MoveTemp(Ability));
             continue;
         }
-        if (Fields->IsEmpty())
+        if (Fields->IsEmpty() && !(Kind == TEXT("effect")&& Object->HasField(TEXT("execution"))))
             return Fail(TEXT("AttributeSet/GameplayEffect declarations require fields"));
         TSet<FName> FieldNames;
         FDasGASSetDeclaration Set;
@@ -117,6 +175,10 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
             return Fail(TEXT("Effect requires an explicit attribute-set name and 1..32 modifiers"));
         if (Kind == TEXT("effect"))
         {
+            if (Object->HasField(TEXT("execution")) &&
+                                 (!Object->TryGetStringField(TEXT("execution"), Effect.Execution) ||
+                                                             Effect.Execution.IsEmpty()))
+                return Fail(TEXT("Execution requires a calculation name"));
             auto StringOption = [&](const TCHAR* Key, FString& Value)
             {
                 return !Object->HasField(Key) || Object->TryGetStringField(Key, Value);
@@ -224,6 +286,9 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
                 Mod.Attribute = FName(*N);
                 Mod.Magnitude = Initial;
                 F->TryGetStringField(TEXT("operation"), Mod.Operation);
+                if (F->HasField(TEXT("calculation")) && (!F->TryGetStringField(TEXT("calculation"), Mod.Calculation) ||
+                                                                               Mod.Calculation.IsEmpty()))
+                    return Fail(TEXT("Calculation requires a name"));
                 if (Mod.Operation != TEXT("Add") && Mod.Operation != TEXT("Multiply") &&
                                                                           Mod.Operation != TEXT("Override"))
                     return Fail(TEXT("Supported modifier operations: Add, Multiply, Override"));
@@ -234,6 +299,8 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
                         return Fail(TEXT("Invalid SetByCaller tag"));
                     Mod.SetByCaller = FName(*Tag);
                 }
+                if (!Mod.Calculation.IsEmpty() && (!Mod.SetByCaller.IsNone() || Mod.Magnitude != 0))
+                    return Fail(TEXT("Calculation conflicts with literal/SetByCaller magnitude"));
                 Effect.Modifiers.Add(Mod);
             }
         }
@@ -260,6 +327,27 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
                 Current = Maximum;
             }
         }
+    for (auto& D : Candidate.Calculations)
+    {
+        auto ResolveSet = [&](const FString& Hint)
+        {
+            return Candidate.Sets.FindByPredicate([&](const auto& S) { return S.Name == Hint || S.Id == Hint; });
+        };
+        const auto* OutputSet = ResolveSet(D.Attributes);
+        if (!OutputSet)
+            return Fail(TEXT("Calculation attribute set is not in the explicit registry"));
+        D.Attributes = OutputSet->Id;
+        if (D.Kind == TEXT("Execution")&& !OutputSet->Attributes.ContainsByPredicate(
+                                              [&](const auto& A) { return A.Name == FName(*D.Output); }))
+            return Fail(TEXT("Unknown execution output attribute"));
+        for (auto& C : D.Captures)
+        {
+            const auto* Set = ResolveSet(C.Attributes);
+            if (!Set || !Set->Attributes.ContainsByPredicate([&](const auto& A) { return A.Name == C.Attribute; }))
+                return Fail(TEXT("Unknown captured attribute"));
+            C.Attributes = Set->Id;
+        }
+    }
     for (auto& Effect : Candidate.Effects)
     {
         const auto* Set = Candidate.Sets.FindByPredicate(
@@ -267,6 +355,22 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
         if (!Set)
             return Fail(TEXT("Effect attribute-set name is not in this script's explicit registry"));
         Effect.Attributes = Set->Id;
+        auto ResolveCalculation = [&](FString& Hint, const TCHAR* Kind)
+        {
+            const auto* D =
+                Candidate.Calculations.FindByPredicate([&](const auto& C) { return C.Id == Hint || C.Name == Hint; });
+            if (!D || D->Kind != Kind)
+                return false;
+            Hint = D->Id;
+            return true;
+        };
+        if (!Effect.Execution.IsEmpty() &&
+            (!ResolveCalculation(Effect.Execution, TEXT("Execution")) ||
+                                 (Effect.Duration != TEXT("Instant")&& Effect.Period <= 0)))
+            return Fail(TEXT("Execution calculation requires Instant or periodic effect"));
+        for (auto& M : Effect.Modifiers)
+            if (!M.Calculation.IsEmpty() && !ResolveCalculation(M.Calculation, TEXT("Magnitude")))
+                return Fail(TEXT("Unknown magnitude calculation"));
         for (const auto& Mod : Effect.Modifiers)
             if (!Set->Attributes.ContainsByPredicate([&](const auto& A) { return A.Name == Mod.Attribute; }))
                 return Fail(TEXT("Effect modifies an unknown attribute"));
@@ -289,10 +393,10 @@ bool ParseDasGASDeclarations(const FString& Json, FDasGASDeclarations& Out, FStr
                         return Fail(TEXT("Declarative abilities require constant effect magnitudes"));
         if (Cost)
         {
-            if (Cost->Duration != TEXT("Instant"))
+            if (Cost->Duration != TEXT("Instant") || !Cost->Execution.IsEmpty())
                 return Fail(TEXT("Ability cost must be an Instant GameplayEffect"));
             for (const auto& Mod : Cost->Modifiers)
-                if (Mod.Operation != TEXT("Add") || Mod.Magnitude >= 0)
+                if (Mod.Operation != TEXT("Add") || Mod.Magnitude >= 0 || !Mod.Calculation.IsEmpty())
                     return Fail(TEXT("Ability costs require strictly negative Add modifiers"));
         }
         if (Effect)

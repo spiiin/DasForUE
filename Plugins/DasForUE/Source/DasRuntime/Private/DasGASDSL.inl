@@ -23,7 +23,7 @@ struct FUEGASDeclarationAnnotation : das::StructureAnnotation
                 DSLFail(TEXT("GAS declarations require a class without DAS inheritance"));
             for (const auto& A : Args)
                 if (A.name != "id" &&
-                    (!Effect || (A.name != "attributes" && A.name != "duration" && A.name != "period" &&
+                    (!Effect || (A.name != "attributes" && A.name != "execution" && A.name != "duration" && A.name != "period" &&
                                  A.name != "execute_on_application" && A.name != "stacking" &&
                                  A.name != "stack_limit" && A.name != "stack_duration" && A.name != "stack_period" &&
                                  A.name != "stack_expiration" && A.name != "deny_overflow")))
@@ -99,7 +99,7 @@ struct FUEGASDeclarationAnnotation : das::StructureAnnotation
                         else
                             DSLFail(TEXT("Attribute min/max requires a number; max also accepts a field name"));
                     }
-                    else if (Effect && (Key == TEXT("operation") || Key == TEXT("set_by_caller")))
+                    else if (Effect && (Key == TEXT("operation") || Key == TEXT("set_by_caller") || Key == TEXT("calculation")))
                     {
                         if (A.type != das::Type::tString)
                             DSLFail(TEXT("Modifier annotations require strings"));

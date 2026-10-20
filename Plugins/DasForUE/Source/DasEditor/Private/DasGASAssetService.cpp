@@ -1,5 +1,6 @@
 #include "DasGASAssetService.h"
 #include "DasGASAuthoring.h"
+#include "DasGASCalculations.h"
 #include "DasRuntime.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -90,12 +91,38 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
         Work.Add({Set.Name, Set.Id,
                   Folder + TEXT("/AS_")+ Set.Name, Hash, UDasAuthoredAttributeSet::StaticClass(), nullptr});
     }
+    for (const auto& D : Model.Calculations)
+    {
+        FString Value = D.ScriptContract + TEXT("|")+ Hashes.FindChecked(D.Attributes);
+        for (const auto& C : D.Captures)
+            Value += TEXT("|")+ Hashes.FindChecked(C.Attributes);
+        const auto Hash = FMD5::HashAnsiString(*Value);
+        Hashes.Add(D.Id, Hash);
+        Work.Add({D.Name, D.Id,
+                  Folder + TEXT("/GC_")+ D.Name, Hash,
+                                D.Kind == TEXT("Magnitude")? UDasGASMagnitudeCalculation::StaticClass()
+                                                           : UDasGASExecutionCalculation::StaticClass(),
+                                               nullptr});
+    }
     for (const auto& Effect : Model.Effects)
     {
         for (const auto& M : Effect.Modifiers)
             if (!M.SetByCaller.IsNone() && !FGameplayTag::RequestGameplayTag(M.SetByCaller, false).IsValid())
                 return Fail(TEXT("SetByCaller tag is not registered: ")+ M.SetByCaller.ToString());
-        const auto Hash = EffectDigest(Effect, Hashes.FindChecked(Effect.Attributes));
+        FString Value = EffectDigest(Effect, Hashes.FindChecked(Effect.Attributes));
+        bool Calculated = false;
+        if (!Effect.Execution.IsEmpty())
+        {
+            Value += TEXT("|")+ Hashes.FindChecked(Effect.Execution);
+            Calculated = true;
+        }
+        for (const auto& M : Effect.Modifiers)
+            if (!M.Calculation.IsEmpty())
+            {
+                Value += TEXT("|")+ Hashes.FindChecked(M.Calculation);
+                Calculated = true;
+            }
+        const auto Hash = Calculated ? FMD5::HashAnsiString(*Value) : Value;
         Hashes.Add(Effect.Id, Hash);
         Work.Add({Effect.Name, Effect.Id,
                   Folder + TEXT("/GE_") + Effect.Name, Hash, UDasAuthoredGameplayEffect::StaticClass(), nullptr});
@@ -136,6 +163,16 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
         {
             Id = Ability->DefinitionId;
             Hash = Ability->DefinitionHash;
+        }
+        if (const auto* C = Cast<UDasGASMagnitudeCalculation>(CDO))
+        {
+            Id = C->Definition.Id;
+            Hash = C->Definition.Hash;
+        }
+        if (const auto* C = Cast<UDasGASExecutionCalculation>(CDO))
+        {
+            Id = C->Definition.Id;
+            Hash = C->Definition.Hash;
         }
         if (Id != W.Id || Hash != W.Hash)
             return Fail(TEXT("GAS schema changed; live structural migration is deferred. Import into a new folder."));
@@ -189,6 +226,62 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
         }
         Sets.Add(Set.Id, W.BP->GeneratedClass);
         Out.Add(Set.Name, W.BP);
+    }
+    TMap<FString, UClass*> Calculations;
+    for (const auto& D : Model.Calculations)
+    {
+        auto& W = *Work.FindByPredicate([&](const auto& A) { return A.Id == D.Id; });
+        if (!W.BP)
+        {
+            W.BP = NewGASBlueprint(W.Path, W.Parent);
+            if (!W.BP)
+                return Fail(TEXT("Cannot create GAS calculation Blueprint"));
+            Created.Add(W.BP);
+            FKismetEditorUtilities::CompileBlueprint(W.BP);
+            if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
+                return Fail(TEXT("Calculation Blueprint compilation failed"));
+            FDasGASCalculationDefinition Def;
+            Def.Id = D.Id;
+            Def.Hash = W.Hash;
+            Def.Script = D.ScriptFile;
+            Def.Contract = D.ScriptContract;
+            Def.Entry = D.Entry;
+            Def.Operation = D.Operation == TEXT("Multiply")? EGameplayModOp::MultiplyCompound
+                                                           : D.Operation == TEXT("Override")? EGameplayModOp::Override
+                                                                                            : EGameplayModOp::Additive;
+            for (const auto& C : D.Captures)
+            {
+                FDasGASCapture Capture;
+                Capture.Name = C.Name;
+                auto* Set = CastChecked<UDasAuthoredAttributeSet>(Sets.FindChecked(C.Attributes)->GetDefaultObject());
+                Capture.Definition = FGameplayEffectAttributeCaptureDefinition(
+                    Set->Attribute(C.Attribute), C.Source == TEXT("Source")
+                                                                  ? EGameplayEffectAttributeCaptureSource::Source
+                                                                  : EGameplayEffectAttributeCaptureSource::Target,
+                                                                  C.Snapshot);
+                Def.Captures.Add(Capture);
+            }
+            if (D.Kind == TEXT("Execution"))
+                Def.Output = CastChecked<UDasAuthoredAttributeSet>(Sets.FindChecked(D.Attributes)->GetDefaultObject())
+                                 ->Attribute(FName(*D.Output));
+            auto* CDO = W.BP->GeneratedClass->GetDefaultObject();
+            if (auto* C = Cast<UDasGASMagnitudeCalculation>(CDO))
+            {
+                C->Definition = Def;
+                C->ConfigureCaptures();
+            }
+            if (auto* C = Cast<UDasGASExecutionCalculation>(CDO))
+            {
+                C->Definition = Def;
+                C->ConfigureCaptures();
+            }
+            CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
+                ->UpdateCustomPropertyListForPostConstruction();
+            FAssetRegistryModule::AssetCreated(W.BP);
+            W.BP->MarkPackageDirty();
+        }
+        Calculations.Add(D.Id, W.BP->GeneratedClass.Get());
+        Out.Add(D.Name, W.BP);
     }
     for (const auto& Effect : Model.Effects)
     {
@@ -251,6 +344,13 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             CDO->bClearStackOnOverflow = false;
             CDO->Modifiers.Empty();
             CDO->RequiredMagnitudes.Empty();
+            CDO->Executions.Empty();
+            if (!Effect.Execution.IsEmpty())
+            {
+                FGameplayEffectExecutionDefinition Execution;
+                Execution.CalculationClass = Calculations.FindChecked(Effect.Execution);
+                CDO->Executions.Add(Execution);
+            }
             auto* SetCDO =
                 CastChecked<UDasAuthoredAttributeSet>(Sets.FindChecked(Effect.Attributes)->GetDefaultObject());
             for (const auto& M : Effect.Modifiers)
@@ -263,7 +363,13 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
                                                      ? EGameplayModOp::MultiplyCompound
                                                      : M.Operation == TEXT("Override")? EGameplayModOp::Override
                                                                                       : EGameplayModOp::Additive;
-                if (M.SetByCaller.IsNone())
+                if (!M.Calculation.IsEmpty())
+                {
+                    FCustomCalculationBasedFloat Magnitude;
+                    Magnitude.CalculationClassMagnitude = Calculations.FindChecked(M.Calculation);
+                    Mod.ModifierMagnitude = FGameplayEffectModifierMagnitude(Magnitude);
+                }
+                else if (M.SetByCaller.IsNone())
                     Mod.ModifierMagnitude = FGameplayEffectModifierMagnitude(FScalableFloat(M.Magnitude));
                 else
                 {
@@ -317,6 +423,7 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             CDO->ActivateEntry = Ability.ActivateEntry;
             CDO->EndEntry = Ability.EndEntry;
             CDO->CancelEntry = Ability.CancelEntry;
+            CDO->TaskEntry = Ability.TaskEntry;
             CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
                 ->UpdateCustomPropertyListForPostConstruction();
             FAssetRegistryModule::AssetCreated(W.BP);

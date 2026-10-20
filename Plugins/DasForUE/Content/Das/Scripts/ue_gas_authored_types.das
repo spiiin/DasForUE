@@ -28,3 +28,6 @@ def AuthoredGameplayAbilityRef_from(value:UObjectHandle):AuthoredGameplayAbility
     return AuthoredGameplayAbilityRef(handle=ue_cast_nullable_object(value,"/Script/DasRuntime.DasAuthoredGameplayAbility"))
 }
 typedef AuthoredGameplayAbilityClass = $UEClass<AuthoredGameplayAbilityRef>
+
+[ue_native_object(path="/Script/DasRuntime.DasGASMagnitudeCalculation")]
+struct GASMagnitudeCalculationRef { handle:UObjectHandle }

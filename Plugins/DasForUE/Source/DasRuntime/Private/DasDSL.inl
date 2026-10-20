@@ -213,7 +213,7 @@ void DSLDeclarationKind(const das::AnnotationList& Args)
             Name == "ue_interface" || Name == "ue_struct" || Name == "ue_native_struct" || Name == "ue_class_ref" ||
             Name == "ue_native_object" || Name == "ue_native_interface" || Name == "ue_interface_ref" ||
             Name == "ue_delegate" || Name == "ue_multicast" || Name == "ue_attribute_set" ||
-            Name == "ue_gameplay_effect" || Name == "ue_gameplay_ability")
+            Name == "ue_gameplay_effect" || Name == "ue_gameplay_ability" || Name=="ue_gas_calculation")
             Kinds.Add(DSLText(Name));
     }
     if (Kinds.Num() > 1)
@@ -853,11 +853,24 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
 #include "DasDSLTypeAnnotations.inl"
 #include "DasGASDSL.inl"
 #include "DasGASAbilityDSL.inl"
+#include "DasGASCalculationDSL.inl"
 #include "DasStaticLibraryDSL.inl"
 
 bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObject* Self, FString& Wire,
                       FString& Error)
 {
+    if(GASCalculationContract) {
+        bool Match=false;
+        Program->getThisModule()->structures.foreach([&](const das::StructurePtr& S){
+            const auto* A=DSLAnnotation(S->annotations,"ue_gas_calculation");
+            const auto* Data=A?A->arguments.find(DSLGASKey,das::Type::tString):nullptr;
+            TSharedPtr<FJsonObject> O;FString Contract,Point;
+            if(Data && FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(DSLText(Data->sValue)),O) &&
+               O->TryGetStringField(TEXT("contract"),Contract)&&O->TryGetStringField(TEXT("entry"),Point)&&
+               Contract==*GASCalculationContract && Point==Entry)Match=true;
+        });
+        Wire.Reset();if(!Match)Error=TEXT("GAS calculation source contract differs from saved asset");return Match;
+    }
     if (const auto* Ability = Cast<UDasAuthoredGameplayAbility>(Self); Ability && !Ability->ActivateEntry.IsEmpty())
     {
         bool Match = false;
@@ -870,7 +883,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
             if (Data && FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(DSLText(Data->sValue)), Object) &&
                 Object->TryGetStringField(TEXT("contract"), Contract) && Object->TryGetStringField(TEXT("id"), Id) &&
                 Id == Ability->DefinitionId && Contract == Ability->ScriptContract &&
-                (Entry == Ability->ActivateEntry || Entry == Ability->EndEntry || Entry == Ability->CancelEntry))
+                (Entry == Ability->ActivateEntry || Entry == Ability->EndEntry || Entry == Ability->CancelEntry || Entry == Ability->TaskEntry))
             {
                 // The native CDO validates this contract; this is not an Actor/Library schema.
                 Wire.Reset();

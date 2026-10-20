@@ -29,3 +29,24 @@ public:
     UDasGASHooksCommandlet();
     virtual int32 Main(const FString& Params) override;
 };
+
+UCLASS()
+class ADasGASAdvancedProbeHost : public ADasGASAuthoredProbeHost
+{
+    GENERATED_BODY()
+public:
+    UPROPERTY(BlueprintReadOnly)
+    TObjectPtr<AActor> Other;
+    UPROPERTY()
+    FHitResult ProbeHit;
+    UFUNCTION(BlueprintPure)
+    FHitResult ReadProbeHit() const { return ProbeHit; }
+};
+UCLASS()
+class UDasGASAdvancedCommandlet : public UCommandlet
+{
+    GENERATED_BODY()
+public:
+    UDasGASAdvancedCommandlet();
+    virtual int32 Main(const FString& Params) override;
+};

@@ -2,10 +2,13 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "GameplayEffect.h"
+#include "DasGASAdvancedTypes.h"
 #include "DasGASAbility.generated.h"
 class UDasAuthoredAbilitySystemComponent;
 class UDasAuthoredGameplayEffect;
 class UDasAuthoredGameplayAbility;
+class UDasGASAbilityTaskRelay;
+class UAnimMontage;
 
 USTRUCT(BlueprintType)
 struct DASRUNTIME_API FDasAuthoredAbilityContext
@@ -27,6 +30,8 @@ struct DASRUNTIME_API FDasAuthoredAbilityContext
     int32 Level = 0;
     UPROPERTY(BlueprintReadWrite)
     FName Phase;
+    UPROPERTY(BlueprintReadWrite)
+    FDasGASAbilityTaskResult Task;
     UPROPERTY(BlueprintReadWrite)
     bool Cancelled = false;
 };
@@ -113,6 +118,8 @@ public:
     FString EndEntry;
     UPROPERTY()
     FString CancelEntry;
+    UPROPERTY()
+    FString TaskEntry;
     UFUNCTION(BlueprintPure, Category = "GAS")
     FDasAuthoredAbilityContext ScriptAbilityContext() const;
     UFUNCTION(BlueprintCallable, Category = "GAS")
@@ -123,6 +130,20 @@ public:
     bool CancelScriptAbility(int32 ActivationId);
     UFUNCTION(BlueprintCallable, Category = "GAS")
     bool ApplyScriptAbilityEffect(int32 ActivationId);
+    UFUNCTION(BlueprintPure, Category = "GAS")
+    bool IsScriptActivationCurrent(int32 Id) const { return ValidScriptActivation(Id); }
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    int32 WaitScriptDelay(int32 ActivationId, float Seconds);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    int32 WaitScriptEvent(int32 ActivationId, FName Tag, bool Once = true, bool Exact = true);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    int32 PlayScriptMontage(int32 ActivationId, UAnimMontage* Montage, float Rate = 1.f, FName Section = NAME_None);
+    UFUNCTION(BlueprintCallable, Category = "GAS")
+    bool CancelScriptTask(int32 ActivationId, int32 TaskId);
+    UFUNCTION(BlueprintPure, Category = "GAS")
+    int32 ScriptTaskCount() const { return ScriptTasks.Num(); }
+    void DeliverScriptTask(UDasGASAbilityTaskRelay* Relay, const FDasGASAbilityTaskResult& Result, bool Terminal);
+    UFUNCTION(BlueprintPure, Category = "GAS")
     bool IsAuthoredCommitted() const { return CommittedForActivation; }
     const FString& GetScriptError() const { return ScriptError; }
     virtual void OnRemoveAbility(const FGameplayAbilityActorInfo* Info, const FGameplayAbilitySpec& Spec) override;
@@ -144,6 +165,12 @@ public:
                             FGameplayAbilityActivationInfo Activation, bool Replicate, bool Cancelled) override;
 
 private:
+    UPROPERTY(Transient)
+    TMap<int32, TObjectPtr<UDasGASAbilityTaskRelay>> ScriptTasks;
+    int32 NextScriptTask = 1;
+    FDasGASAbilityTaskResult CurrentTask;
+    UDasGASAbilityTaskRelay* NewScriptTask(int32 Serial, FName Kind);
+    void ClearScriptTasks();
     int32 ActivationSerial = 0;
     int32 ScriptGrantId = 0;
     int32 ScriptLevel = 0;

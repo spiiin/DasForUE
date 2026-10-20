@@ -1,4 +1,6 @@
 #include "DasGASAuthoring.h"
+#include "DasGASCalculations.h"
+#include "AbilitySystemGlobals.h"
 #include "GameplayEffectExtension.h"
 #include "GameplayTagsManager.h"
 #include "Engine/World.h"
@@ -78,6 +80,34 @@ void UDasAuthoredAttributeSet::PostGameplayEffectExecute(const FGameplayEffectMo
     Clamp(Data.EvaluatedData.Attribute, Value);
     if (Value != ASC->GetNumericAttributeBase(Data.EvaluatedData.Attribute))
         ASC->SetNumericAttributeBase(Data.EvaluatedData.Attribute, Value);
+}
+namespace
+{
+// Local authored actors can own an ASC without implementing the native C++ interface.
+struct FDasAuthoredEffectContext final : FGameplayEffectContext
+{
+    virtual void AddInstigator(AActor* Owner, AActor* Avatar) override
+    {
+        FGameplayEffectContext::AddInstigator(Owner, Avatar);
+        if (!InstigatorAbilitySystemComponent.IsValid())
+            InstigatorAbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Owner, true);
+    }
+    void SetSource(UAbilitySystemComponent* Source) { InstigatorAbilitySystemComponent = Source; }
+    virtual FGameplayEffectContext* Duplicate() const override
+    {
+        auto* Copy = new FDasAuthoredEffectContext(*this);
+        if (const auto* Hit = GetHitResult())
+            Copy->AddHitResult(*Hit, true);
+        return Copy;
+    }
+};
+}
+FGameplayEffectContextHandle UDasAuthoredAbilitySystemComponent::MakeEffectContext() const
+{
+    auto* Data = new FDasAuthoredEffectContext();
+    Data->AddInstigator(GetOwnerActor(), GetAvatarActor());
+    Data->SetSource(const_cast<UDasAuthoredAbilitySystemComponent*>(this));
+    return FGameplayEffectContextHandle(Data);
 }
 UDasAuthoredAbilitySystemComponent::UDasAuthoredAbilitySystemComponent()
 {
@@ -164,7 +194,7 @@ UDasAuthoredAbilitySystemComponent::MakeAuthoredSpec(TSubclassOf<UDasAuthoredGam
         !FMath::IsFinite(Level) || Level <= 0)
         return Value;
     auto* Def = Class->GetDefaultObject<UDasAuthoredGameplayEffect>();
-    if (Def->DefinitionId.IsEmpty() || Def->Modifiers.IsEmpty())
+    if (Def->DefinitionId.IsEmpty() || (Def->Modifiers.IsEmpty() && Def->Executions.IsEmpty()))
         return Value;
     if (!Definitions.Contains(Def))
     {
@@ -179,6 +209,11 @@ UDasAuthoredAbilitySystemComponent::MakeAuthoredSpec(TSubclassOf<UDasAuthoredGam
 }
 FDasAuthoredEffectResult UDasAuthoredAbilitySystemComponent::ApplyAuthoredSpec(const FDasAuthoredEffectSpec& Spec)
 {
+    return ApplyAuthoredSpecInternal(Spec, nullptr);
+}
+FDasAuthoredEffectResult
+UDasAuthoredAbilitySystemComponent::ApplyAuthoredSpecInternal(const FDasAuthoredEffectSpec& Spec, const FHitResult* Hit)
+{
     FDasAuthoredEffectResult Result;
     auto* Source = Spec.Source.Get();
     auto* Def = Spec.Definition.Get();
@@ -188,6 +223,30 @@ FDasAuthoredEffectResult UDasAuthoredAbilitySystemComponent::ApplyAuthoredSpec(c
         return Result;
     for (const auto& Mod : Def->Modifiers)
         if (!Mod.Attribute.IsValid() || !GetAttributeSubobject(Mod.Attribute.GetAttributeSetClass()))
+            return Result;
+    auto CapturesReady = [&](const UGameplayEffectCalculation* Calculation)
+    {
+        if (!Calculation)
+            return false;
+        for (const auto& C : Calculation->GetAttributeCaptureDefinitions())
+        {
+            auto* ASC = C.AttributeSource == EGameplayEffectAttributeCaptureSource::Source ? Source : this;
+            if (!C.AttributeToCapture.IsValid() ||
+                !ASC->GetAttributeSubobject(C.AttributeToCapture.GetAttributeSetClass()))
+                return false;
+        }
+        if (const auto* E = Cast<UDasGASExecutionCalculation>(Calculation))
+            if (!E->Definition.Output.IsValid() || !GetAttributeSubobject(E->Definition.Output.GetAttributeSetClass()))
+                return false;
+        return true;
+    };
+    for (const auto& M : Def->Modifiers)
+        if (auto C = M.ModifierMagnitude.GetCustomMagnitudeCalculationClass();
+            C && !CapturesReady(C->GetDefaultObject<UGameplayModMagnitudeCalculation>()))
+            return Result;
+    for (const auto& E : Def->Executions)
+        if (!E.CalculationClass ||
+            !CapturesReady(E.CalculationClass->GetDefaultObject<UGameplayEffectExecutionCalculation>()))
             return Result;
     for (FName Name : Def->RequiredMagnitudes)
         if (!Spec.Magnitudes.Contains(Name))
@@ -202,12 +261,19 @@ FDasAuthoredEffectResult UDasAuthoredAbilitySystemComponent::ApplyAuthoredSpec(c
         return Result;
     auto Context = Source->MakeEffectContext();
     Context.AddSourceObject(Source->GetOwner());
+    if (Hit)
+    {
+        if (Hit->GetActor() != GetOwner())
+            return Result;
+        Context.AddHitResult(*Hit, true);
+    }
     auto Native = Source->MakeOutgoingSpec(Def->GetClass(), Spec.Level, Context);
     if (!Native.IsValid())
         return Result;
     for (const auto& Pair : Spec.Magnitudes)
         Native.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(Pair.Key, false), Pair.Value);
     Result.Valid = true;
+    Result.Target = this;
     const auto Handle = ApplyGameplayEffectSpecToSelf(*Native.Data.Get());
     Result.Applied = Handle.WasSuccessfullyApplied();
     Result.HasActiveHandle = Handle.IsValid() && GetActiveGameplayEffect(Handle) != nullptr;
@@ -279,6 +345,7 @@ void UDasAuthoredAbilitySystemComponent::EndPlay(const EEndPlayReason::Type Reas
     Detach();
     Definitions.Empty();
     ActiveEffects.Empty();
+    TargetHits.Empty();
     Abilities.Empty();
     Super::EndPlay(Reason);
 }
