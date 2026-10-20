@@ -111,5 +111,10 @@ try {
         & $Steps[$S.kind] $S
         Write-Output ("DAS_SUITE_{0}=PASS seconds={1:0}" -f $S.name.ToUpper().Replace('-', '_'), ((Get-Date) - $Started).TotalSeconds)
     }
+    # Receipts are local run artifacts; refresh their derived index only after the selected suites finish.
+    & $Python (Join-Path $PSScriptRoot 'RenderValidation.py')
+    if ($LASTEXITCODE) { throw 'Validation index generation failed' }
+    & $Python (Join-Path $PSScriptRoot 'RenderValidation.py') --check
+    if ($LASTEXITCODE) { throw 'Validation index freshness check failed' }
     Write-Output 'DAS_SUITES=PASS'
 } finally { $env:UE_SKIP_UBT_SDK_SETUP = $PreviousSdkSetup }

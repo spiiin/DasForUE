@@ -136,3 +136,43 @@ python Scripts\CheckFormat.py --staged  # check staged files; new lines must be 
 ```
 
 The script uses `clang-format` from PATH or from the Visual Studio LLVM tools.
+
+## Shared script helpers and validation index
+
+`Test*.ps1` runners import `DasTest.psm1`. Use `Invoke-DasBuild` for builds;
+`-BuildArguments` preserves a specialized game target or receipt-refresh invocation,
+while `-Modules` and `-NoEngineChanges` cover module-only editor builds. Use
+`Invoke-DasCommandlet`, `Invoke-DasAssetPhases`, `Invoke-DasAutomation` or
+`Invoke-DasPackaged` for standard runs. Keep scenario-specific setup and negative
+exit-code expectations explicit. `Test-DasResult` retains Select-String's literal,
+regex and Quiet behavior; `Get-DasResult` extracts custom result fields;
+`Assert-DasResult` additionally checks an exact count. `Invoke-DasValidation`
+combines a scoped source/binary freeze, a commandlet, count/lint checks and a receipt.
+Its path provider is evaluated before and after the probe, including additions/removals.
+The ten common DSL receipt runners are about 20 lines each.
+
+`RunDasTests.ps1` regenerates [the validation index](Validation/index.md) after its
+selected suites finish and then checks it. Standalone commands:
+
+```powershell
+C:/Python312/python.exe Scripts/RenderValidation.py
+C:/Python312/python.exe Scripts/RenderValidation.py --check
+```
+
+The generator reads top-level `logs/*.json` receipts, supports state/result and
+numeric/list check counts, and ignores unrelated probe JSON. It uses an explicit
+receipt timestamp or the JSON file's UTC modification time. Missing counts and
+log paths remain unknown. A source-content fingerprint catches receipt changes
+that do not alter the visible table. `--check` does not write; missing, changed,
+added or removed receipts make it fail. Invalid validation JSON is an error.
+Logs are local artifacts: a fresh checkout with no receipts generates an empty
+index. Recorded PASS rows describe those receipts, not the current checkout's
+source or an unperformed PIE/packaged run. Existing manual reports are preserved.
+
+Candidates for later removal of duplicated result sections: `WidgetLayouts.md`,
+`ReflectionMacros.md`, `IdentityDSL.md`, `EnumNames.md`, `HiddenCallbacks.md`,
+`InlineCallbacks.md`, `HandlerReferences.md` and `InheritedHandlers.md` under
+`Docs/Dev/Validation`. Whole-file removal is conditional on moving their unique
+contract/migration explanations to the Guide and retaining the corresponding JSON
+receipts. Historical aggregate reports are not automatically superseded by a new
+narrow run and should not be deleted on that basis.
