@@ -226,7 +226,8 @@ void MethodMetadata(UEdGraph* Graph, const FDasMethodSchema& Method)
     Graph->GetNodesOfClass(Entries);
     for (auto* Entry : Entries)
     {
-        for (const auto* Key : {TEXT("Category"), TEXT("DisplayName"), TEXT("ToolTip")})
+        for (const auto* Key :
+             {TEXT("Category"), TEXT("DisplayName"), TEXT("ToolTip"), TEXT("BlueprintInternalUseOnly")})
             Entry->MetaData.RemoveMetaData(Key);
         for (const auto& Pair : Method.Metadata)
             Entry->MetaData.SetMetaData(*Pair.Key, FString(Pair.Value));
@@ -1502,6 +1503,7 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
         {
             if (!M.StableId.IsEmpty())
                 Function->SetMetaData(TEXT("DasMemberId"), *M.StableId);
+            Function->RemoveMetaData(TEXT("BlueprintInternalUseOnly"));
             for (const auto& Pair : M.Metadata)
                 Function->SetMetaData(*Pair.Key, *Pair.Value);
         }

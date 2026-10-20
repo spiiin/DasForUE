@@ -140,15 +140,7 @@ void DSLNormalizeInlineCallbacks(const das::StructurePtr& St, das::ModuleGroup& 
                 Body->isLambdaBlock = false;
                 Fn->body = Body;
                 das::modifyToClassMember(Fn, St, false, false);
-                auto Annotations = Group.findAnnotation("ue_function", St->module);
-                if (Annotations.size() != 1)
-                    DSLFail(TEXT("Missing ue_function annotation"));
-                auto* A = new das::AnnotationDeclaration();
-                A->flags = 0;
-                A->annotation = Annotations[0];
-                A->at = Arg->at;
-                A->arguments.push_back(das::AnnotationArgument("BlueprintCallable", true));
-                Fn->annotations.push_back(A);
+                DSLHiddenCallback(Fn, St, Group);
                 das::Structure::FieldDeclaration Member;
                 Member.name = Name;
                 Member.at = Arg->at;

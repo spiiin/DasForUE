@@ -16,7 +16,6 @@ class TimerCounter {
     def BeginPlay():void {
         ue_timer_start("score",1.0,self.Pulse,true)
     }
-    [ue_function(BlueprintCallable)]
     def Pulse():void {
         self.Score+=1
     }
@@ -39,7 +38,7 @@ Example: `Plugins/DasForUE/Content/Das/Scripts/dsl_managed_timers.das`. For plai
 | `ue_timer_remaining(name)` | Seconds, or `-1` when absent. |
 | `ue_timer_elapsed(name)` | UE elapsed seconds, or `-1` when absent. |
 
-- The handler is an annotated instance method returning `void`, passed as `self.Method` (or its name as a string literal); methods declared later in the class are resolved. A misspelled or mismatched handler is a compile error. No extra callback annotation is needed.
+- The handler is an instance method returning `void`, passed as `self.Method`; methods declared later in the class are resolved and receive hidden entry points automatically. String names require explicitly reflected handlers. A misspelled or mismatched handler is a compile error. No `ue_function` annotation is needed for `self.Method`; add `BlueprintCallable` only to expose the handler to Blueprint.
 - `interval` must be a positive finite float.
 - Queries follow TimerManager semantics, including those of pending next-tick handles. A fired one-shot timer has no record.
 
@@ -48,12 +47,10 @@ Example: `Plugins/DasForUE/Content/Das/Scripts/dsl_managed_timers.das`. For plai
 Trailing arguments after `repeat` (or after `handler` for next-tick) are captured at start and delivered to the handler:
 
 ```das
-ue_timer_start("score",1.0,"AddScore",true,5)
-ue_timer_next_tick("priority","SetPriority",uint8(255))   // uint8 needs an explicit cast
+ue_timer_start("score",1.0,self.AddScore,true,5)
+ue_timer_next_tick("priority",self.SetPriority,uint8(255))   // uint8 needs an explicit cast
 
-[ue_function(BlueprintCallable)]
 def AddScore(amount:int):void { self.Score+=amount }
-[ue_function(BlueprintCallable)]
 def SetPriority(value:uint8):void { self.Priority=value }
 ```
 

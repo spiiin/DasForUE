@@ -176,21 +176,24 @@ bool FDasClassSchema::Validate(FString& Error) const
         for (const auto& Pair : Values)
             if ((Pair.Key !=
                  TEXT("Category") &&
-                      Pair.Key != TEXT("DisplayName") &&
-                                       Pair.Key !=
-                                           TEXT("ToolTip") &&
-                                                !(Field && Pair.Key == TEXT("AssetBundles") &&
-                                                                            Parent == TEXT("PrimaryDataAsset")) &&
-                                                               !(!Field && !Method &&
-                                                                 Pair.Key == TEXT("PrimaryAssetType") &&
-                                                                                  Parent == TEXT("PrimaryDataAsset")) &&
-                                                                     !(Method &&
-                                                                       Pair.Key == TEXT("DasFunctionKind") &&
-                                                                                        (Pair.Value ==
-                                                                                         TEXT("Event") ||
-                                                                                              Pair.Value ==
-                                                                                                  TEXT("Callable")))) ||
-                                                                       Pair.Value.Len() > 4096)
+                      Pair.Key !=
+                          TEXT("DisplayName") &&
+                               Pair.Key !=
+                                   TEXT("ToolTip") &&
+                                        !(Method &&
+                                          Pair.Key == TEXT("BlueprintInternalUseOnly") && Pair.Value == TEXT("true")) &&
+                                              !(Field &&
+                                                Pair.Key == TEXT("AssetBundles") &&
+                                                                 Parent == TEXT("PrimaryDataAsset")) &&
+                                                    !(!Field && !Method &&
+                                                      Pair.Key == TEXT("PrimaryAssetType") &&
+                                                                       Parent == TEXT("PrimaryDataAsset")) &&
+                                                          !(Method &&
+                                                            Pair.Key == TEXT("DasFunctionKind") &&
+                                                                             (Pair.Value ==
+                                                                              TEXT("Event") ||
+                                                                                   Pair.Value == TEXT("Callable")))) ||
+                                                            Pair.Value.Len() > 4096)
             {
                 Error = TEXT("Unsupported adapter metadata");
                 return false;

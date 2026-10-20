@@ -117,7 +117,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             TGuardValue<FString> NativeDefaultsHint(DSLNativeDefaultsParentHint, NativeHint);
             DSLExpandDeclarationGroups(St, true);
             DSLNormalizeInlineCallbacks(St, Group);
-            DSLNormalizeMethodReferences(St);
+            DSLNormalizeMethodReferences(St, Group);
             DSLNormalizeIdentityDefaults(St, Group);
             DSLPrepareComputedDefaults(St);
             const auto ComponentDefaults = DSLCollectComponentDefaults(St);
@@ -728,6 +728,13 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 TMap<FString, FString> Directions;
                 for (const auto& V : A->arguments)
                 {
+                    if (V.name == "_ue_hidden_callback")
+                    {
+                        if (V.at.fileInfo || !DSLBool(V))
+                            DSLFail(TEXT("Reserved callback compiler option"));
+                        M.Metadata.Add(TEXT("BlueprintInternalUseOnly"), TEXT("true"));
+                        continue;
+                    }
                     if (V.name == "id")
                     {
                         M.Id = DSLString(A->arguments, "id");
