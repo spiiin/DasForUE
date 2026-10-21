@@ -15,6 +15,8 @@ template <class T> bool MathValid(const T& Value)
 template <class T> class TDasMathAdapter final : public IDasTypeAdapter
 {
 public:
+    explicit TDasMathAdapter(const TCHAR* InDefaultKind) : DefaultKind(InDefaultKind) {}
+    virtual const TCHAR* GetDefaultKind() const override { return DefaultKind; }
     virtual EDasTypeKind GetKind() const override { return EDasTypeKind::Struct; }
     virtual const UScriptStruct* GetStruct() const override { return TBaseStructure<T>::Get(); }
     virtual bool IsLeafValue() const override { return true; }
@@ -26,6 +28,9 @@ public:
         Error = TEXT("Invalid nested math snapshot value");
         return false;
     }
+
+private:
+    const TCHAR* DefaultKind;
 };
 // InputActionValue: identity and its handle view only; values travel through the input snapshot
 // (FDasInputActionValue) and their own bridge.
@@ -39,19 +44,19 @@ public:
 
 TSharedRef<const IDasTypeAdapter> MakeDasVectorAdapter()
 {
-    return MakeShared<TDasMathAdapter<FVector>>();
+    return MakeShared<TDasMathAdapter<FVector>>(TEXT("vector"));
 }
 TSharedRef<const IDasTypeAdapter> MakeDasVector2DAdapter()
 {
-    return MakeShared<TDasMathAdapter<FVector2D>>();
+    return MakeShared<TDasMathAdapter<FVector2D>>(TEXT("vector2d"));
 }
 TSharedRef<const IDasTypeAdapter> MakeDasRotatorAdapter()
 {
-    return MakeShared<TDasMathAdapter<FRotator>>();
+    return MakeShared<TDasMathAdapter<FRotator>>(TEXT("rotator"));
 }
 TSharedRef<const IDasTypeAdapter> MakeDasTransformAdapter()
 {
-    return MakeShared<TDasMathAdapter<FTransform>>();
+    return MakeShared<TDasMathAdapter<FTransform>>(TEXT("transform"));
 }
 TSharedRef<const IDasTypeAdapter> MakeDasInputActionValueAdapter()
 {

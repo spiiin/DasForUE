@@ -1,4 +1,5 @@
 #include "DasTypeService.h"
+#include "DasTypeAdapters.h"
 #include "DasSoftReferences.h"
 #include "DasTypePins.h"
 #include "DasReflectedTypes.h"
@@ -73,7 +74,7 @@ bool TypeFieldDefaultMatches(UUserDefinedStruct* U, const FDasDeclaredProperty& 
         return V->GetPropertyValue_InContainer(M) == FName(*D.Default.String);
     if (auto* V = CastField<FStructProperty>(P))
     {
-        if (IsDasMathStructPath(D.Type.TypePath))
+        if (DasMathAdapter(D.Type.TypePath))
         {
             FInstancedStruct Expected;
             FString Error;
@@ -92,7 +93,7 @@ FString TypeFieldDefault(const FDasDeclaredProperty& P)
         return TEXT("None");
     if (P.Type.Kind == TEXT("enum"))
         return P.Default.String;
-    if (P.Type.Kind == TEXT("struct") && IsDasMathStructPath(P.Type.TypePath))
+    if (P.Type.Kind == TEXT("struct") && DasMathAdapter(P.Type.TypePath))
     {
         FInstancedStruct Value;
         FString Error;
@@ -367,7 +368,7 @@ bool FDasTypeService::Apply(const FString& Script, const FString& Folder, TArray
             if (!FStructureEditorUtils::RenameVariable(U, Guid, P.Name) ||
                 (P.Type.Kind !=
                  TEXT("object") &&
-                      (P.Type.Kind != TEXT("struct") || IsDasMathStructPath(P.Type.TypePath)) &&
+                      (P.Type.Kind != TEXT("struct") || DasMathAdapter(P.Type.TypePath)) &&
                        P.Type.Kind != TEXT("array") &&
                                            P.Type.Kind !=
                                                TEXT("map") &&

@@ -327,7 +327,7 @@ FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FS
                 FInstancedStruct Child;
                 if (!ParseDasStructDefault(
                         Nested->Struct->GetPathName(),
-                        IsDasMathStructPath(F.Type.TypePath) ? F.Default.String : TEXT(""), Child, Error) ||
+                        DasMathAdapter(F.Type.TypePath) ? F.Default.String : TEXT(""), Child, Error) ||
                             !MatchesDasStructDefault(Nested->Struct, Nested->ContainerPtrToValuePtr<void>(Memory),
                                                      Child.GetMemory()))
                     DSLFail(TEXT("Nested default differs from child default"));

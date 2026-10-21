@@ -6,11 +6,6 @@
 #include "Dom/JsonObject.h"
 #include "Misc/SecureHash.h"
 #include "Serialization/JsonSerializer.h"
-bool IsDasMathStructPath(const FString& Path)
-{
-    const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(Path);
-    return Adapter && Adapter->IsMath();
-}
 namespace
 {
 bool TypeIdentifier(const FString& S)
@@ -255,7 +250,7 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                     }
                 }
                 if (P.Type.Value->Kind == TEXT("struct") && !DasSoftProperty(P.Type.Value->TypePath) &&
-                                               !IsDasMathStructPath(P.Type.Value->TypePath) &&
+                                               !DasMathAdapter(P.Type.Value->TypePath) &&
                                                !DasLeafValueAdapter(P.Type.Value->TypePath))
                 {
                     const auto* Child = Refs.Find(P.Type.Value->TypePath);
@@ -331,7 +326,7 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                         continue;
                     }
                     Ref = P.Type.Element.Get();
-                    if (DasSoftProperty(Ref->TypePath) || IsDasMathStructPath(Ref->TypePath) ||
+                    if (DasSoftProperty(Ref->TypePath) || DasMathAdapter(Ref->TypePath) ||
                         DasLeafValueAdapter(Ref->TypePath))
                     {
                         if (++Leaves > 1024)
@@ -365,7 +360,7 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                         return false;
                     continue;
                 }
-                if (P.Type.Kind == TEXT("struct") && IsDasMathStructPath(Ref->TypePath))
+                if (P.Type.Kind == TEXT("struct") && DasMathAdapter(Ref->TypePath))
                 {
                     if (P.Default.Kind != TEXT("string"))
                     {

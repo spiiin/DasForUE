@@ -20,16 +20,10 @@ static bool ValidateComponentDefaults(const FDasDeclaredComponent& C, FString& E
             if (V.String.Len() > 4096)
                 return Fail(Error, TEXT("Default string too long"));
         }
-        else if (V.Kind == TEXT("vector") || V.Kind == TEXT("rotator") || V.Kind == TEXT("vector2d") ||
-                                                                                         V.Kind == TEXT("transform"))
+        else if (const auto* Math = FDasTypeAdapters::Get().FindDefaultKind(V.Kind))
         {
             FInstancedStruct Value;
-            const FString Path = V.Kind == TEXT("vector")
-                                 ? TEXT("/Script/CoreUObject.Vector")
-                                 : V.Kind == TEXT("rotator")
-                                       ? TEXT("/Script/CoreUObject.Rotator")
-                                       : V.Kind == TEXT("vector2d")? TEXT("/Script/CoreUObject.Vector2D")
-                                                                   : TEXT("/Script/CoreUObject.Transform");
+            const FString Path = Math->GetStruct()->GetPathName();
             if (!ParseDasStructDefault(Path, V.String, Value, Error))
                 return false;
         }

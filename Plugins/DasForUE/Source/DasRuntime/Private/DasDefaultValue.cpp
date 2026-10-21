@@ -1,4 +1,5 @@
 #include "DasNativeDefaults.h"
+#include "DasTypeAdapters.h"
 #include "DasSchema.h"
 #include "DasAuthoring.h"
 #include "DasDefaultRoots.h"
@@ -37,15 +38,8 @@ bool DasParseEditableDefault(FProperty* P, const FDasDeclaredLiteral& V, void* D
     }
     else if (auto* Struct = CastField<FStructProperty>(P))
     {
-        const FString Path = Struct->Struct->GetPathName();
-        const FString Expected =
-            Path == TEXT("/Script/CoreUObject.Vector")
-            ? TEXT("vector")
-            : Path == TEXT("/Script/CoreUObject.Rotator")
-                  ? TEXT("rotator")
-                  : Path == TEXT("/Script/CoreUObject.Vector2D")
-                        ? TEXT("vector2d")
-                        : Path == TEXT("/Script/CoreUObject.Transform")? TEXT("transform"): FString();
+        const auto* Adapter = FDasTypeAdapters::Get().FindStruct(Struct->Struct);
+        const FString Expected = Adapter && Adapter->GetDefaultKind() ? Adapter->GetDefaultKind() : TEXT("");
         if (V.Kind != TEXT("struct") && (Expected.IsEmpty() || V.Kind != Expected))
             return Fail();
         // Adapt existing source constructors at the boundary. The materializer only
@@ -53,7 +47,7 @@ bool DasParseEditableDefault(FProperty* P, const FDasDeclaredLiteral& V, void* D
         const FString& Text = V.String;
         FDasDefaultRoots Roots;
         auto& Value = Roots.Values.AddDefaulted_GetRef();
-        if (!ParseDasStructDefault(Path, Text, Value, Error))
+        if (!ParseDasStructDefault(Struct->Struct->GetPathName(), Text, Value, Error))
             return false;
         Json = ExportDasPropertyDefault(P, Value.GetMemory());
     }

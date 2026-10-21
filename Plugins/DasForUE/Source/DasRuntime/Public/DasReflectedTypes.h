@@ -1,6 +1,5 @@
 #pragma once
 #include "DasAuthoring.h"
-DASRUNTIME_API bool IsDasMathStructPath(const FString& Path);
 struct FDasEnumEntry
 {
     FString Name;

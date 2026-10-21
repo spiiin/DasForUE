@@ -25,6 +25,8 @@ public:
     virtual bool IsLeafValue() const { return false; }
     // Math value structs (Vector, Vector2D, Rotator, Transform): text literal defaults, finite values.
     virtual bool IsMath() const { return false; }
+    // Literal kind of constructor defaults ("vector", "rotator", ...), or nullptr when the type has none.
+    virtual const TCHAR* GetDefaultKind() const { return nullptr; }
     virtual EDasAdapterDefault GetDefaultPolicy() const { return EDasAdapterDefault::Explicit; }
     // nullptr leaves property creation to the generic builder of the kind.
     virtual FProperty* MakeProperty(FFieldVariant Owner, FName Name, const FDasDeclaredType& Type,
@@ -55,6 +57,7 @@ public:
     const IDasTypeAdapter* FindStruct(const UScriptStruct* Type) const;
     const IDasTypeAdapter* FindStructPath(const FString& Path) const;
     const IDasTypeAdapter* FindProperty(const FProperty* Property) const;
+    const IDasTypeAdapter* FindDefaultKind(const FString& Kind) const;
     TConstArrayView<FEntry> Entries() const { return EntryList; }
 
 private:
@@ -66,4 +69,6 @@ private:
 
 // Leaf value struct (GameplayTag, ...) by path, for authored type validation.
 DASRUNTIME_API const IDasTypeAdapter* DasLeafValueAdapter(const FString& StructPath);
+// Math value struct (Vector, Vector2D, Rotator, Transform) by path.
+DASRUNTIME_API const IDasTypeAdapter* DasMathAdapter(const FString& StructPath);
 DASRUNTIME_API bool CheckDasTypeAdapters(FString& Error);

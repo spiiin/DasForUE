@@ -1,4 +1,5 @@
 #include "DasComponentComposition.h"
+#include "DasTypeAdapters.h"
 #include "DasScriptHosts.h"
 #include "DasComponentDefaults.h"
 #include "DasDSLService.h"
@@ -109,15 +110,8 @@ bool DasPrepareComponentComposition(const FDasDeclaredClass& D, const FDasDeclar
             Property->Default = Pair.Value;
             if (Property->Type.Kind == TEXT("struct"))
             {
-                const FString Expected = Property->Type.TypePath == TEXT("/Script/CoreUObject.Vector")
-                                         ? TEXT("vector")
-                                         : Property->Type.TypePath == TEXT("/Script/CoreUObject.Rotator")
-                                               ? TEXT("rotator")
-                                               : Property->Type.TypePath == TEXT("/Script/CoreUObject.Vector2D")
-                                                     ? TEXT("vector2d")
-                                                     : Property->Type.TypePath == TEXT("/Script/CoreUObject.Transform")
-                                                           ? TEXT("transform")
-                                                           : FString();
+                const auto* Math = DasMathAdapter(Property->Type.TypePath);
+                const FString Expected = Math ? Math->GetDefaultKind() : TEXT("");
                 if (Pair.Value.Kind != TEXT("struct") && (Expected.IsEmpty() || Pair.Value.Kind != Expected))
                 {
                     Error = TEXT("Authored component math default type mismatch");

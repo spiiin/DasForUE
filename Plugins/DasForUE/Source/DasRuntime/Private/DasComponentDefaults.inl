@@ -102,39 +102,21 @@ FDasDeclaredLiteral DSLDefaultMath(das::ExpressionPtr E)
 FString DSLMathPropertyDefault(const das::Structure::FieldDeclaration& Field)
 {
     const FString Path = DSLMathPath(Field.type);
+    const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(Path);
+    const TCHAR* Kind = Adapter ? Adapter->GetDefaultKind() : nullptr;
+    if (!Kind)
+        DSLFail(TEXT("Value type has no field defaults: ")+ Path);
     if (Field.init)
     {
         const auto V = DSLDefaultMath(Field.init);
-        const FString Expected =
-            Path == TEXT("/Script/CoreUObject.Vector")
-            ? TEXT("vector")
-            : Path == TEXT("/Script/CoreUObject.Rotator")
-                  ? TEXT("rotator")
-                  : Path == TEXT("/Script/CoreUObject.Vector2D")? TEXT("vector2d"): TEXT("transform");
-        if (V.Kind != Expected)
+        if (V.Kind != Kind)
             DSLFail(TEXT("Math default constructor does not match property type"));
         return V.String;
     }
-    FVector Vector = FVector::ZeroVector;
-    FRotator Rotation = FRotator::ZeroRotator;
-    FVector2D Vector2 = FVector2D::ZeroVector;
-    FTransform Transform = FTransform::Identity;
-    UScriptStruct* Type = Path == TEXT("/Script/CoreUObject.Vector")
-                                       ? TBaseStructure<FVector>::Get()
-                                       : Path == TEXT("/Script/CoreUObject.Rotator")
-                                                      ? TBaseStructure<FRotator>::Get()
-                                                      : Path == TEXT("/Script/CoreUObject.Vector2D")
-                                                                     ? TBaseStructure<FVector2D>::Get()
-                                                                     : TBaseStructure<FTransform>::Get();
-    const void* Memory = Path == TEXT("/Script/CoreUObject.Vector")
-                                      ? static_cast<const void*>(&Vector)
-                                      : Path == TEXT("/Script/CoreUObject.Rotator")
-                                                     ? static_cast<const void*>(&Rotation)
-                                                     : Path == TEXT("/Script/CoreUObject.Vector2D")
-                                                                    ? static_cast<const void*>(&Vector2)
-                                                                    : static_cast<const void*>(&Transform);
+    // A missing initializer is the struct's own default (zero vectors and rotators, identity transform).
+    FStructOnScope Default(Adapter->GetStruct());
     FString Text;
-    Type->ExportText(Text, Memory, nullptr, nullptr, PPF_None, nullptr);
+    Adapter->GetStruct()->ExportText(Text, Default.GetStructMemory(), nullptr, nullptr, PPF_None, nullptr);
     return Text;
 }
 TArray<FDSLComponentDefault> DSLCollectComponentDefaults(const das::StructurePtr& S)

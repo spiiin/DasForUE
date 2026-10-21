@@ -15,6 +15,8 @@ PORTED = {
         [r'/Script/GameplayTags\.', r'\bDSLGameplay', r'\bIsDasGameplayTagPath\b', r'\bDasIsGameplayTagType\b'],
         {'DasGameplayTags.cpp', 'DasGameplayTagsDSL.inl', 'DasGameplayTagsRuntime.inl', 'DasGameplayTags.h'},
     ),
+    # Math structs, partly ported (phase 2.2b): the old path predicate is gone.
+    'Math': ([r'\bIsDasMathStructPath\b'], set()),
 }
 
 

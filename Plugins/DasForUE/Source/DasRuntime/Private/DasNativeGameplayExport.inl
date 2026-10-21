@@ -46,7 +46,7 @@ bool FDasRuntimeModule::ExportNativeGameplay(const FString& OutputPath, const FS
             D->SetObjectField(TEXT("element"), TypeJson(CastFieldChecked<FSetProperty>(P)->ElementProp));
         if (T.Kind == TEXT("array"))
             D->SetObjectField(TEXT("element"), TypeJson(CastFieldChecked<FArrayProperty>(P)->Inner));
-        if (T.Kind == TEXT("struct") && !CastField<FSoftObjectProperty>(P) && !IsDasMathStructPath(T.TypePath))
+        if (T.Kind == TEXT("struct") && !CastField<FSoftObjectProperty>(P) && !DasMathAdapter(T.TypePath))
         {
             UScriptStruct* S = CastFieldChecked<FStructProperty>(P)->Struct;
             if (!Structs.Contains(T.TypePath))

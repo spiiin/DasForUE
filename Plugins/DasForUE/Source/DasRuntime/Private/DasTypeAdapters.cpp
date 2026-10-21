@@ -58,6 +58,18 @@ const IDasTypeAdapter* FDasTypeAdapters::FindProperty(const FProperty* Property)
             return &*Entry.Adapter;
     return nullptr;
 }
+const IDasTypeAdapter* FDasTypeAdapters::FindDefaultKind(const FString& Kind) const
+{
+    for (const auto& Entry : EntryList)
+        if (const TCHAR* Own = Entry.Adapter->GetDefaultKind(); Own && Kind == Own)
+            return &*Entry.Adapter;
+    return nullptr;
+}
+const IDasTypeAdapter* DasMathAdapter(const FString& StructPath)
+{
+    const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(StructPath);
+    return Adapter && Adapter->IsMath() ? Adapter : nullptr;
+}
 const IDasTypeAdapter* DasLeafValueAdapter(const FString& StructPath)
 {
     const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(StructPath);
