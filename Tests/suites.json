@@ -43,6 +43,8 @@
       "requires": ["components-prepare"] },
     { "name": "actor-component", "kind": "automation", "test": "DasForUE.ActorComponent", "log": "actor-component-automation",
       "minimum": 3, "comment": "Composed actors: PIE lifecycle and declaration reimport in the editor and during PIE." },
+    { "name": "actor-component-assets", "kind": "script", "script": "TestActorComponent.ps1",
+      "comment": "DasActorComponent commandlet: composition import checks, saved assets, Create and Reopen phases." },
     { "name": "reload-matrix", "kind": "automation", "test": "DasForUE.ReloadMatrix", "log": "reload-matrix",
       "minimum": 3, "comment": "Every declaration change of every entity kind, editor and PIE, against Tests/ReloadMatrix/expected.json." },
     { "name": "gameplay-pie", "kind": "automation", "test": "DasForUE.Gameplay.RuntimePIE", "log": "gameplay-pie",

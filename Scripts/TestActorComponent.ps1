@@ -1,4 +1,4 @@
-param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$Cooked)
+param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$Cooked,[switch]$SkipBuild)
 Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 
 $ErrorActionPreference='Stop'
@@ -6,10 +6,12 @@ $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests\DasForUESmoke\DasForUESmoke.uproject'
 $Logs=Join-Path $Repo 'logs'
 New-Item -ItemType Directory -Path $Logs -Force | Out-Null
-Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+if(!$SkipBuild){
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
     'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
     '-MaxParallelActions=12')
-if($LASTEXITCODE){throw 'Actor/Component editor build failed'}
+ if($LASTEXITCODE){throw 'Actor/Component editor build failed'}
+}
 $ProbeId=[Guid]::NewGuid().ToString('N')
 $Base='/Game/DasActorComponent/'+$ProbeId
 foreach($Phase in @('Create','Reopen')){
