@@ -202,15 +202,59 @@ bool DasPrepareComponentComposition(const FDasDeclaredClass& D, const FDasDeclar
     return true;
 }
 bool DasApplyComponentComposition(UBlueprint* BP, const FDasDeclaredClass& D, const FDasDeclaredClass& Effective,
-                                  const TMap<FString, UBlueprint*>& Components, bool Create, FString& Error)
+                                  const TMap<FString, UBlueprint*>& Components, bool Create, FString& Error,
+                                  const FDasDeclaredClass* Old)
 {
-    if (D.Components.IsEmpty() && D.ComponentOverrides.IsEmpty())
+    if (D.Components.IsEmpty() && D.ComponentOverrides.IsEmpty() && (!Old || Old->Components.IsEmpty()))
         return true;
     if (!BP->SimpleConstructionScript)
     {
         Error = TEXT("Actor Blueprint has no construction script");
         return false;
     }
+    USimpleConstructionScript* SCS = BP->SimpleConstructionScript;
+    auto FindById = [&](const FString& Id) -> USCS_Node*
+    {
+        for (auto* Node : SCS->GetAllNodes())
+            if (Node->FindMetaDataEntryIndexForKey(TEXT("DasComponentId")) != INDEX_NONE &&
+                                                   Node->GetMetaData(TEXT("DasComponentId")) == Id)
+                return Node;
+        return nullptr;
+    };
+    auto FindByName = [&](const FString& Name) -> USCS_Node*
+    {
+        for (auto* Node : SCS->GetAllNodes())
+            if (Node->GetVariableName() == FName(*Name))
+                return Node;
+        return nullptr;
+    };
+    auto Previous = [&](const FDasDeclaredComponent& C) -> const FDasDeclaredComponent*
+    {
+        return Old ? Old->Components.FindByPredicate([&](const auto& X) { return X.Id == C.Id; }) : nullptr;
+    };
+    auto SetNodeMetadata = [](USCS_Node* Node, const FDasDeclaredComponent& C)
+    {
+        Node->SetMetaData(TEXT("DasComponentId"), C.Id);
+        Node->SetMetaData(TEXT("DasComponentReadOnly"), C.bReadOnly ? TEXT("true") : TEXT("false"));
+        Node->SetMetaData(TEXT("DasComponentEditable"), C.bEditable ? TEXT("true") : TEXT("false"));
+        Node->SetMetaData(TEXT("DasComponentVisible"), C.bVisible ? TEXT("true") : TEXT("false"));
+        for (const auto& Pair : C.Metadata)
+            Node->SetMetaData(FName(*Pair.Key), Pair.Value);
+        if (const auto* Category = C.Metadata.Find(TEXT("Category")))
+            Node->CategoryName = FText::FromString(*Category);
+    };
+    bool Changed = Create;
+    // Components that left the declaration; their children move up to the removed node's parent.
+    if (!Create)
+        for (auto* Node : TArray<USCS_Node*>(SCS->GetAllNodes()))
+            if (Node->FindMetaDataEntryIndexForKey(
+                    TEXT("DasComponentId")) != INDEX_NONE &&
+                    !D.Components.ContainsByPredicate([&](const auto& C)
+                                                      { return C.Id == Node->GetMetaData(TEXT("DasComponentId")); }))
+            {
+                SCS->RemoveNodeAndPromoteChildren(Node);
+                Changed = true;
+            }
     for (const auto& C : D.Components)
     {
         auto* Child = Components.FindRef(C.Id);
@@ -222,87 +266,102 @@ bool DasApplyComponentComposition(UBlueprint* BP, const FDasDeclaredClass& D, co
             Error = TEXT("Component Blueprint is unavailable");
             return false;
         }
-        USCS_Node* Existing = nullptr;
-        for (auto* Node : BP->SimpleConstructionScript->GetAllNodes())
-            if (Node->GetVariableName() == FName(*C.Name))
-                Existing = Node;
-        if (!Create)
+        const auto* Was = Previous(C);
+        if (USCS_Node* Existing = Create ? nullptr : FindById(C.Id))
         {
-            if (!Existing || Existing->ComponentClass != ComponentClass ||
-                (Existing->FindMetaDataEntryIndexForKey(TEXT("DasComponentId")) == INDEX_NONE ||
-                                                        Existing->GetMetaData(TEXT("DasComponentId")) != C.Id))
+            if (Existing->ComponentClass != ComponentClass)
             {
                 Error = TEXT("Component composition differs from imported Blueprint: ")+ C.Name;
                 return false;
             }
+            if (Existing->GetVariableName() != FName(*C.Name))
+            {
+                if (FindByName(C.Name) || BP->GeneratedClass->FindFunctionByName(*C.Name))
+                {
+                    Error = TEXT("Component name conflicts with Blueprint member: ")+ C.Name;
+                    return false;
+                }
+                FBlueprintEditorUtils::RenameComponentMemberVariable(BP, Existing, FName(*C.Name));
+                Changed = true;
+            }
+            // Only declared values that changed are written: template edits made in the editor stay.
+            if (Was && !Was->Defaults.OrderIndependentCompareEqual(C.Defaults))
+            {
+                if (!DasComponentDefaults(ComponentClass, C, Existing->ComponentTemplate, Error))
+                    return false;
+                Changed = true;
+            }
+            if (Was && (Was->bReadOnly != C.bReadOnly || Was->bEditable != C.bEditable || Was->bVisible != C.bVisible ||
+                        !Was->Metadata.OrderIndependentCompareEqual(C.Metadata)))
+            {
+                SetNodeMetadata(Existing, C);
+                Changed = true;
+            }
             continue;
         }
-        if (Existing || BP->GeneratedClass->FindPropertyByName(*C.Name) ||
+        if (!Create && Was)
+        {
+            Error = TEXT("Component composition differs from imported Blueprint: ")+ C.Name;
+            return false;
+        }
+        if (FindByName(C.Name) || BP->GeneratedClass->FindPropertyByName(*C.Name) ||
             BP->GeneratedClass->FindFunctionByName(*C.Name))
         {
             Error = TEXT("Component name conflicts with Blueprint member: ")+ C.Name;
             return false;
         }
-        auto* Node = BP->SimpleConstructionScript->CreateNode(ComponentClass, FName(*C.Name));
+        auto* Node = SCS->CreateNode(ComponentClass, FName(*C.Name));
         if (!DasComponentDefaults(ComponentClass, C, Node->ComponentTemplate, Error))
             return false;
-        Node->SetMetaData(TEXT("DasComponentId"), C.Id);
-        Node->SetMetaData(TEXT("DasComponentReadOnly"), C.bReadOnly ? TEXT("true"): TEXT("false"));
-        Node->SetMetaData(TEXT("DasComponentEditable"), C.bEditable ? TEXT("true"): TEXT("false"));
-        Node->SetMetaData(TEXT("DasComponentVisible"), C.bVisible ? TEXT("true"): TEXT("false"));
-        for (const auto& Pair : C.Metadata)
-            Node->SetMetaData(FName(*Pair.Key), Pair.Value);
-        if (const auto* Category = C.Metadata.Find(TEXT("Category")))
-            Node->CategoryName = FText::FromString(*Category);
-        BP->SimpleConstructionScript->AddNode(Node);
+        SetNodeMetadata(Node, C);
+        SCS->AddNode(Node);
+        Changed = true;
     }
-    if (Create)
+    // Attach new components and the ones whose attachment changed.
+    const auto* Root = Effective.Components.FindByPredicate([](const auto& C) { return C.bRoot; });
+    for (const auto& C : D.Components)
     {
-        const auto* Root = Effective.Components.FindByPredicate([](const auto& C) { return C.bRoot; });
-        for (const auto& C : D.Components)
+        const auto* Was = Previous(C);
+        if (!Create && Was && Was->Attach == C.Attach && Was->AttachSocket == C.AttachSocket)
+            continue;
+        const FString ParentName = !C.Attach.IsEmpty()            ? C.Attach
+                                   : Root && Root->Name != C.Name ? Root->Name
+                                                                  : FString();
+        if (ParentName.IsEmpty())
+            continue;
+        USCS_Node* ChildNode = FindByName(C.Name);
+        USCS_Node* Parent = FindByName(ParentName);
+        if (!ChildNode || !ChildNode->ComponentClass->IsChildOf(USceneComponent::StaticClass()))
+            continue;
+        if (!Parent)
         {
-            const FString ParentName = !C.Attach.IsEmpty()            ? C.Attach
-                                       : Root && Root->Name != C.Name ? Root->Name
-                                                                      : FString();
-            if (ParentName.IsEmpty())
-                continue;
-            USCS_Node* Child = nullptr;
-            USCS_Node* Parent = nullptr;
-            for (auto* Node : BP->SimpleConstructionScript->GetAllNodes())
+            for (auto* Ancestor = BP->ParentClass.Get(); Ancestor && !Parent; Ancestor = Ancestor->GetSuperClass())
+                if (auto* ParentBP = Cast<UBlueprint>(Ancestor->ClassGeneratedBy))
+                    if (ParentBP->SimpleConstructionScript)
+                        for (auto* Node : ParentBP->SimpleConstructionScript->GetAllNodes())
+                            if (Node->GetVariableName() == FName(*ParentName))
+                            {
+                                Parent = Node;
+                                break;
+                            }
+            if (!Parent)
             {
-                if (Node->GetVariableName() == FName(*C.Name))
-                    Child = Node;
-                if (Node->GetVariableName() == FName(*ParentName))
-                    Parent = Node;
+                Error = TEXT("Inherited attachment node is unavailable: ")+ ParentName;
+                return false;
             }
-            if (Child && !Parent && Child->ComponentClass->IsChildOf(USceneComponent::StaticClass()))
-            {
-                for (auto* Ancestor = BP->ParentClass.Get(); Ancestor && !Parent; Ancestor = Ancestor->GetSuperClass())
-                    if (auto* ParentBP = Cast<UBlueprint>(Ancestor->ClassGeneratedBy))
-                        if (ParentBP->SimpleConstructionScript)
-                            for (auto* Node : ParentBP->SimpleConstructionScript->GetAllNodes())
-                                if (Node->GetVariableName() == FName(*ParentName))
-                                {
-                                    Parent = Node;
-                                    break;
-                                }
-                if (!Parent)
-                {
-                    Error = TEXT("Inherited attachment node is unavailable: ")+ ParentName;
-                    return false;
-                }
-                // Cross-Blueprint parent references must retain the node in the child's SCS.
-                Child->SetParent(Parent);
-                Child->AttachToName = FName(*C.AttachSocket);
-                continue;
-            }
-            if (Child && Parent && Child->ComponentClass->IsChildOf(USceneComponent::StaticClass()))
-            {
-                BP->SimpleConstructionScript->RemoveNode(Child, false);
-                Parent->AddChildNode(Child);
-                Child->AttachToName = FName(*C.AttachSocket);
-            }
+            // Cross-Blueprint parent references must retain the node in the child's SCS.
+            ChildNode->SetParent(Parent);
+            ChildNode->AttachToName = FName(*C.AttachSocket);
+            Changed = true;
+            continue;
         }
+        if (USCS_Node* Current = SCS->FindParentNode(ChildNode))
+            Current->RemoveChildNode(ChildNode);
+        else
+            SCS->RemoveNode(ChildNode, false);
+        Parent->AddChildNode(ChildNode);
+        ChildNode->AttachToName = FName(*C.AttachSocket);
+        Changed = true;
     }
     for (const auto& O : D.ComponentOverrides)
     {
@@ -339,7 +398,7 @@ bool DasApplyComponentComposition(UBlueprint* BP, const FDasDeclaredClass& D, co
             return false;
         }
     }
-    if (Create)
+    if (Changed)
         FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BP);
     return true;
 }

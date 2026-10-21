@@ -127,6 +127,12 @@ non-numeric conversions, dependency scopes in the automatic path, Callable <-> B
 
 ### S5. Components and defaults during PIE
 
+**Done 2026-10-21.** Component composition changes apply (add, remove, rename by component id, re-attach,
+template defaults and metadata of changed components only); a changed component class or root is refused.
+Rollback snapshots the SCS tree and serialized templates. Default merges include the running PIE world
+(values still equal to the old default follow the new one). Matrix: 5 component cells migrated; 97
+migrated, 10 refused.
+
 - Component composition: add/remove components (new SCS nodes, removed nodes with their instance data
   archived), template default merge with per-instance overrides, rename by component id, attachment changes.
 - Optional live default changes during PIE: update non-overridden values of play-world instances, using the

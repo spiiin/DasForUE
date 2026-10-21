@@ -336,11 +336,23 @@
       "message": "",
       "outcome": "migrated"
     },
+    "composed/int/add_component": {
+      "message": "",
+      "outcome": "migrated"
+    },
     "composed/int/add_field": {
       "message": "",
       "outcome": "migrated"
     },
     "composed/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/change_attach": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/change_component_default": {
       "message": "",
       "outcome": "migrated"
     },
@@ -356,11 +368,19 @@
       "message": "",
       "outcome": "migrated"
     },
+    "composed/int/remove_component": {
+      "message": "",
+      "outcome": "migrated"
+    },
     "composed/int/remove_field": {
       "message": "",
       "outcome": "migrated"
     },
     "composed/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/rename_component": {
       "message": "",
       "outcome": "migrated"
     },
@@ -746,11 +766,23 @@
       "message": "",
       "outcome": "migrated"
     },
+    "composed/int/add_component": {
+      "message": "",
+      "outcome": "migrated"
+    },
     "composed/int/add_field": {
       "message": "",
       "outcome": "migrated"
     },
     "composed/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/change_attach": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/change_component_default": {
       "message": "",
       "outcome": "migrated"
     },
@@ -766,11 +798,19 @@
       "message": "",
       "outcome": "migrated"
     },
+    "composed/int/remove_component": {
+      "message": "",
+      "outcome": "migrated"
+    },
     "composed/int/remove_field": {
       "message": "",
       "outcome": "migrated"
     },
     "composed/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/rename_component": {
       "message": "",
       "outcome": "migrated"
     },

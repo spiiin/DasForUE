@@ -7,6 +7,10 @@
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/World.h"
+#include "Engine/SCS_Node.h"
+#include "Engine/SimpleConstructionScript.h"
+#include "Serialization/ObjectReader.h"
+#include "Serialization/ObjectWriter.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Kismet2/KismetEditorUtilities.h"
@@ -70,8 +74,18 @@ struct FDasBlueprintRollback::FImpl
         TStrongObjectPtr<UEdGraph> Graph;
         TMap<FName, FString> Metadata;
     };
+    // Components: the SCS tree, names, attachment, metadata and the serialized template of every node.
+    struct FSCSNode
+    {
+        TStrongObjectPtr<USCS_Node> Node;
+        USCS_Node* Parent = nullptr;
+        FName Variable, AttachTo;
+        TArray<FBPVariableMetaDataEntry> Metadata;
+        TArray<uint8> Template;
+    };
     struct FBlueprint
     {
+        TArray<FSCSNode> Nodes;
         TStrongObjectPtr<UBlueprint> BP;
         TStrongObjectPtr<UClass> OriginalClass;
         TArray<FBPVariableDescription> Variables;
@@ -281,6 +295,19 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
         Image.Description = B->BlueprintDescription;
         Image.Category = B->BlueprintCategory;
         Image.Metadata = RollbackMetadata(B);
+        if (USimpleConstructionScript* SCS = B->SimpleConstructionScript)
+            for (auto* N : SCS->GetAllNodes())
+            {
+                FImpl::FSCSNode Node;
+                Node.Node.Reset(N);
+                Node.Parent = SCS->FindParentNode(N);
+                Node.Variable = N->GetVariableName();
+                Node.AttachTo = N->AttachToName;
+                Node.Metadata = N->MetaDataArray;
+                if (N->ComponentTemplate)
+                    FObjectWriter(N->ComponentTemplate, Node.Template);
+                Image.Nodes.Add(MoveTemp(Node));
+            }
         Image.ClassMetadata = RollbackMetadata(B->GeneratedClass);
         for (TFieldIterator<UFunction> It(B->GeneratedClass, EFieldIteratorFlags::ExcludeSuper); It; ++It)
             Image.FunctionMetadata.Add(It->GetFName(), RollbackMetadata(*It));
@@ -426,6 +453,39 @@ bool FDasBlueprintRollback::Restore(FString& Error)
         B->BlueprintDescription = I.Description;
         B->BlueprintCategory = I.Category;
         B->GetOutermost()->GetMetaData().SetObjectValues(B, I.Metadata);
+        if (USimpleConstructionScript* SCS = B->SimpleConstructionScript)
+        {
+            for (auto* N : TArray<USCS_Node*>(SCS->GetAllNodes()))
+                if (!I.Nodes.ContainsByPredicate([&](const auto& X) { return X.Node.Get() == N; }))
+                    SCS->RemoveNode(N, false);
+            // Nodes are recorded parents first, so every parent is back before its children.
+            for (auto& X : I.Nodes)
+            {
+                USCS_Node* N = X.Node.Get();
+                const bool InTree = SCS->GetAllNodes().Contains(N);
+                USCS_Node* ParentNow = InTree ? SCS->FindParentNode(N) : nullptr;
+                if (!InTree || ParentNow != X.Parent)
+                {
+                    if (InTree)
+                    {
+                        if (ParentNow)
+                            ParentNow->RemoveChildNode(N);
+                        else
+                            SCS->RemoveNode(N, false);
+                    }
+                    if (X.Parent)
+                        X.Parent->AddChildNode(N);
+                    else
+                        SCS->AddNode(N);
+                }
+                if (N->GetVariableName() != X.Variable)
+                    N->SetVariableName(X.Variable);
+                N->AttachToName = X.AttachTo;
+                N->MetaDataArray = X.Metadata;
+                if (N->ComponentTemplate && !X.Template.IsEmpty())
+                    FObjectReader(N->ComponentTemplate, X.Template);
+            }
+        }
     }
     for (auto& I : S.Graphs)
         I.Graph->GetOutermost()->GetMetaData().SetObjectValues(I.Graph.Get(), I.Metadata);

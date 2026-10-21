@@ -362,7 +362,8 @@ bool CheckCompositionImport(const FString& Base, UBlueprint* Owner, FString& Err
     const FString Original = Meta.GetValue(Owner, TEXT("DasDSLModel"));
     if (!FDasAuthoringModule::FromJson(Original, Model, Error))
         return false;
-    Model.Classes[0].Components.Reset();
+    // A component whose class changed (here: the stored model claims another class) stays a new Blueprint.
+    Model.Classes[0].Components[0].ClassName += TEXT("Old");
     if (!Model.ToJson(Json, Error))
         return false;
     Meta.SetValue(Owner, TEXT("DasDSLModel"), *Json);
@@ -371,9 +372,9 @@ bool CheckCompositionImport(const FString& Base, UBlueprint* Owner, FString& Err
     const bool Applied = FDasDSLService::Apply(TEXT("dsl_actor_component_owner.das"), Owner->GetOutermost()->GetName(),
                                                     TEXT("dsl_actor_component_owner.ComponentOwner"), Out, Error);
     Meta.SetValue(Owner, TEXT("DasDSLModel"), *Original);
-    if (Applied || !Error.Contains(TEXT("composition migration is deferred")) || Owner->GeneratedClass != Before)
+    if (Applied || !Error.Contains(TEXT("component class")) || Owner->GeneratedClass != Before)
         return false;
-    UE_LOG(LogTemp, Display, TEXT("PASS DSL_component_composition_change_refused_without_recompile"));
+    UE_LOG(LogTemp, Display, TEXT("PASS DSL_component_class_change_refused_without_recompile"));
     Error.Reset();
     return true;
 }

@@ -36,11 +36,12 @@ no longer runs: in Play the editor shows "daScript did not run on …" on screen
 Run `CreatePlayableCharacter.ps1` again and open the new map. Edits of method bodies need no recreation:
 they take effect on the next call, also during Play (code that already ran, such as `BeginPlay`, runs
 again only after restarting Play). A new pickup field is applied on save as well, also during Play. A changed
-default value is applied too (also together with new fields): running actors keep their values, spawned
-ones and the next Play use the new default. A script edited while the editor was closed is applied when
+default value is applied too (also together with new fields), also to running actors whose value the game
+has not changed. A script edited while the editor was closed is applied when
 the map opens. New character fields and methods are applied the same way, and the player keeps control of
 the character. Renamed (same `ue_id`) and removed fields, numeric type changes and method changes are
-applied too; other type changes and changed components still need recreating the example
+applied too, and so are added, removed, renamed or re-attached components; other type changes and a
+changed component class still need recreating the example
 (see the [reload matrix](../../Reference/ReloadMatrix.md)). See [automatic reimport](../Workflow/ApplyAndHotReload.md#automatic-reimport-on-save).
 
 | Input | Action |

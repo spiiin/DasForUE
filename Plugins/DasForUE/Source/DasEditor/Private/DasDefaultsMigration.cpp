@@ -326,10 +326,8 @@ bool PlanRoot(FPlan& Plan, UObject* Root, FProperty* P, const void* Old, const v
             if (auto* C = Cast<UActorComponent>(O);
                 C && (C->IsBeingDestroyed() || (C->GetOwner() && C->GetOwner()->IsActorBeingDestroyed())))
                 return true;
-            // Objects of a running game (PIE) keep their current values: those are game state. New default
-            // values reach them only when they are spawned again.
-            if (auto* W = O->GetWorld(); !O->IsTemplate() && W && W->IsGameWorld())
-                return true;
+            // Objects of a running game (PIE) are merged like editor instances: a value still equal to the old
+            // default follows the new one, a value the game changed is kept.
             return !IsValid(O) || O == Root || O->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) ||
                    O->GetClass()->GetName().StartsWith(TEXT("SKEL_")) || O->GetClass()->GetName().StartsWith(
                                                                              TEXT("REINST_")) ||

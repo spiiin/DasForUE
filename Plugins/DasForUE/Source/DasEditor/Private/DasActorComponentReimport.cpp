@@ -211,10 +211,22 @@ bool FDasComposedReimportTest::RunTest(const FString&)
 
     UClass* Before = BP->GeneratedClass;
     TestTrue(TEXT("write_v3_composition_change"), Script.Write(ComposedV3()));
-    TestTrue(TEXT("composition_change_refused"),
-                  !FDasDSLService::Reimport(BP, Error) && Error.Contains(TEXT("composition migration is deferred")) &&
-                                                                         BP->GeneratedClass == Before &&
-                                                                         CompositionKept(BP));
+    // A failure after the components changed restores the SCS, the templates and the placed instance.
+    DasFailStructuralForTesting(2);
+    const bool FailedComposition = !FDasDSLService::Reimport(BP, Error);
+    DasFailStructuralForTesting(0);
+    Placed = FindActor(World, TEXT("ComposedPlaced"));
+    TestTrue(TEXT("composition_change_rolls_back"),
+                  FailedComposition &&
+                      Error.Contains(TEXT("rolled back")) && CompositionKept(BP) &&
+                                     Component(Placed, TEXT("Child")) &&
+                                               Component(Placed, TEXT("Child"))->GetRelativeLocation().Z == 80.0);
+    TestTrue(TEXT("composition_change_applied"), FDasDSLService::Reimport(BP, Error));
+    Placed = FindActor(World, TEXT("ComposedPlaced"));
+    TestTrue(TEXT("added_component_on_placed_instance"),
+                  Component(Placed, TEXT("Extra")) &&
+                            Component(Placed, TEXT("Child")) &&
+                                      Component(Placed, TEXT("Child"))->GetRelativeLocation().Z == 80.0);
     TestTrue(TEXT("restore_mixed"), Script.Write(ComposedMixed()));
     TestTrue(TEXT("explicit_instance_default_migration_refused"),
                   !FDasDSLService::Reimport(BP, Error, EDasDefaultMigrationPolicy::PreserveInstances) &&

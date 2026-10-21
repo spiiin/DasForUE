@@ -7,4 +7,4 @@ bool DasPrepareComponentComposition(const FDasDeclaredClass& Declaration, const 
                                     FString& Error);
 bool DasApplyComponentComposition(UBlueprint* Blueprint, const FDasDeclaredClass& Declaration,
                                   const FDasDeclaredClass& Effective, const TMap<FString, UBlueprint*>& Components,
-                                  bool Create, FString& Error);
+                                  bool Create, FString& Error, const FDasDeclaredClass* Old = nullptr);

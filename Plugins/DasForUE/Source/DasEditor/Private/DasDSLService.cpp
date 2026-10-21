@@ -248,12 +248,33 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
             if (!FDasAuthoringModule::FromJson(PriorWire, Prior, Error))
                 return false;
             const auto* Old = Prior.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
-            if (!Old || Old->ParentId != Declaration.ParentId || Old->Components != Declaration.Components ||
+            if (!Old || Old->ParentId != Declaration.ParentId ||
                 Old->ComponentOverrides != Declaration.ComponentOverrides)
             {
                 Error = TEXT("Component composition migration is deferred");
                 return false;
             }
+            // Components may be added, removed, renamed (same id), re-attached or get new template defaults; a
+            // changed component class or root stays a new Blueprint.
+            for (const auto& C : Declaration.Components)
+            {
+                const auto* Was = Old->Components.FindByPredicate([&](const auto& X) { return X.Id == C.Id; });
+                if ((Was && (Was->NativeClass != C.NativeClass || Was->ScriptFile != C.ScriptFile ||
+                             Was->ClassName != C.ClassName || Was->bRoot != C.bRoot)) ||
+                    (!Was && C.bRoot))
+                {
+                    Error = TEXT("Changing a component class or the root component is deferred; create a new "
+                                 "Blueprint");
+                    return false;
+                }
+            }
+            for (const auto& C : Old->Components)
+                if (C.bRoot && !Declaration.Components.ContainsByPredicate([&](const auto& X) { return X.Id == C.Id; }))
+                {
+                    Error = TEXT("Changing a component class or the root component is deferred; create a new "
+                                 "Blueprint");
+                    return false;
+                }
             for (const auto& Property : Declaration.Properties)
             {
                 const auto* Before =
@@ -453,8 +474,15 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         Error = TEXT("Cannot create Blueprint");
         return false;
     }
-    if (!DasApplyComponentComposition(BP, Declaration, EffectiveDeclaration, ComponentBlueprints, Created, Error))
+    // A new Blueprint gets its components now; an existing one after the rollback snapshot below.
+    if (Created &&
+        !DasApplyComponentComposition(BP, Declaration, EffectiveDeclaration, ComponentBlueprints, true, Error))
         return false;
+    FDasAuthoringModule PriorModel;
+    const FDasDeclaredClass* PriorClass = nullptr;
+    if (FString PriorError; !Created && FDasAuthoringModule::FromJson(BP->GetOutermost()->GetMetaData().GetValue(
+                                            BP, TEXT("DasDSLModel")), PriorModel, PriorError))
+        PriorClass = PriorModel.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
     auto& Metadata = BP->GetOutermost()->GetMetaData();
     const bool BodyOnly = !Created && Metadata.GetValue(BP, TEXT("DasDSLModel")) == Json;
     // Pawn and Character declarations migrate like other actors: the rollback snapshot covers every host.
@@ -502,6 +530,16 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         UE_LOG(LogTemp, Display, TEXT("DAS_STRUCTURAL_ROLLBACK=%s"), OK ? TEXT("PASS"): TEXT("FAIL"));
         return false;
     };
+    if (!Created && !DasApplyComponentComposition(BP, Declaration, EffectiveDeclaration, ComponentBlueprints, false,
+                                                  Error, PriorClass))
+    {
+        if (Rollback)
+        {
+            const FString Reason = Error;
+            return Restore(Reason);
+        }
+        return false;
+    }
     // Validate the current Blueprint even when unchanged declarations avoid reinstancing.
     if (!FDasBlueprintService::Apply(BP, Schema, Error, BodyOnly, DefaultPolicy))
     {

@@ -82,8 +82,8 @@ values. It is a value comparison, not an edit history: a manual value equal to t
 follows the new default. Existing non-empty containers and delegate bindings are preserved.
 
 The merge does not recompile, reinstance or rerun construction; object/class identity and idle VM
-sessions stay. During PIE it updates the class and the editor world; actors of the running game keep
-their current values (game state) and pick up the new default only when spawned again. It refuses:
+sessions stay. During PIE the running game is merged the same way: a value still equal to the old default
+follows the new one, a value the game changed is kept. It refuses:
 layout, metadata, hierarchy, method signature or callback contract changes; unmanaged classes. For
 component defaults, referencing maps must be
 open in the editor (a map loaded only as an asset is refused — open it and retry). On failure, values,

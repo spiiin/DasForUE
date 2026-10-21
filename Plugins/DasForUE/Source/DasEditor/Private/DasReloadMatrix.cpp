@@ -88,19 +88,57 @@ enum class EChange
     AddMethod,
     RemoveMethod,
     ChangeSignature,
+    AddComponent,
+    RemoveComponent,
+    RenameComponent,
+    ChangeComponentDefault,
+    ChangeAttach,
 };
 const TCHAR* ChangeName(EChange C)
 {
     // clang-format off
     static const TCHAR* Names[] = {TEXT("add_field"), TEXT("remove_field"), TEXT("rename_field"),
                                    TEXT("retype_field"), TEXT("change_default"), TEXT("make_read_only"),
-                                   TEXT("add_method"), TEXT("remove_method"), TEXT("change_signature")};
+                                   TEXT("add_method"), TEXT("remove_method"), TEXT("change_signature"),
+                                   TEXT("add_component"), TEXT("remove_component"), TEXT("rename_component"),
+                                   TEXT("change_component_default"), TEXT("change_attach")};
     // clang-format on
     return Names[int32(C)];
 }
 bool FieldChange(EChange C)
 {
     return C <= EChange::MakeReadOnly;
+}
+bool ComponentChange(EChange C)
+{
+    return C >= EChange::AddComponent;
+}
+bool Composed(const FMatrixKind& K)
+{
+    return FCString::Strcmp(K.Name, TEXT("composed")) == 0;
+}
+// Pivot (root), Child and Other attached to it; Child is the one the component changes touch.
+FString ComposedMembers(TOptional<EChange> Change)
+{
+    auto Is = [&](EChange C)
+    {
+        return Change.IsSet() && *Change == C;
+    };
+    const TCHAR* Child = Is(EChange::RenameComponent) ? TEXT("Arm") : TEXT("Child");
+    FString S = TEXT("    @ue_component\n    @RootComponent\n    Pivot:SceneComponentRef\n");
+    if (!Is(EChange::RemoveComponent))
+        S += FString::Printf(TEXT("    @ue_component\n    @Attach=\"%s\"\n    @ue_id=\"reloadmatrix.host.child\"\n"
+                                  "    %s:SceneComponentRef\n"),
+                                  Is(EChange::ChangeAttach) ? TEXT("Other") : TEXT("Pivot"), Child);
+    S += TEXT("    @ue_component\n    @Attach=\"Pivot\"\n    @ue_id=\"reloadmatrix.host.other\"\n"
+              "    Other:SceneComponentRef\n");
+    if (Is(EChange::AddComponent))
+        S += TEXT("    @ue_component\n    @Attach=\"Pivot\"\n    Extra:SceneComponentRef\n");
+    S += TEXT("    defaults=ue_defaults() {\n");
+    if (!Is(EChange::RemoveComponent))
+        S += FString::Printf(TEXT("        self.%s.RelativeLocation=ue_vector(0.0lf,0.0lf,%s)\n"), Child,
+                                  Is(EChange::ChangeComponentDefault) ? TEXT("60.0lf") : TEXT("50.0lf"));
+    return S + TEXT("        self.Other.RelativeLocation=ue_vector(0.0lf,0.0lf,30.0lf)\n    }\n");
 }
 
 // The declaration of one cell before (Change unset) or after its change.
@@ -117,7 +155,7 @@ FString MatrixScript(const FMatrixKind& K, const FMatrixType& T, TOptional<EChan
             S += FString::Printf(TEXT("require %s\n"), R);
     S += FString::Printf(TEXT("[ue_class(module_id=\"reloadmatrix\",id=\"reloadmatrix.host\",parent=\"%s\","
                               "Blueprintable)]\nclass MatrixHost {\n%s"),
-                              K.Parent, K.Members);
+                              K.Parent, Composed(K) ? *ComposedMembers(Change) : K.Members);
     if (!Is(EChange::RemoveField))
         S += FString::Printf(
             TEXT("    @ue_property=(EditAnywhere,%s)\n    @ue_id=\"reloadmatrix.host.value\"\n    %s : %s = %s\n"),
@@ -160,6 +198,19 @@ bool Import(UObject* O, const TCHAR* Name, const TCHAR* Value)
     FProperty* P = O ? O->GetClass()->FindPropertyByName(Name) : nullptr;
     return P && P->ImportText_Direct(Value, P->ContainerPtrToValuePtr<void>(O), O, PPF_None);
 }
+USceneComponent* SceneComp(AActor* Actor, const TCHAR* Name)
+{
+    if (Actor)
+        for (auto* C : Actor->GetComponents())
+            if (C && C->GetFName() == Name)
+                return Cast<USceneComponent>(C);
+    return nullptr;
+}
+double CompZ(AActor* Actor, const TCHAR* Name)
+{
+    auto* C = SceneComp(Actor, Name);
+    return C ? C->GetRelativeLocation().Z : -1.0;
+}
 AActor* FindActor(UWorld* World, FName Name)
 {
     if (World)
@@ -186,12 +237,15 @@ TArray<FMatrixCell> MatrixCells()
     const FString Run = FGuid::NewGuid().ToString(EGuidFormats::Digits);
     for (const auto& K : MatrixKinds)
         for (const auto& T : MatrixTypes)
-            for (int32 C = 0; C <= int32(EChange::ChangeSignature); ++C)
+            for (int32 C = 0; C <= int32(EChange::ChangeAttach); ++C)
             {
                 const EChange Change = EChange(C);
                 // Field changes for every type on plain actors; one representative type elsewhere.
                 if ((FCString::Strcmp(K.Name, TEXT("actor")) != 0 || !FieldChange(Change)) &&
                      FCString::Strcmp(T.Name, TEXT("int")) != 0)
+                    continue;
+                // Component changes only on the composed actor.
+                if (ComponentChange(Change) && !Composed(K))
                     continue;
                 FMatrixCell Cell{&K, &T, Change};
                 Cell.Key = FString::Printf(TEXT("%s/%s/%s"), K.Name, T.Name, ChangeName(Change));
@@ -233,6 +287,12 @@ bool PrepareCell(FMatrixCell& Cell, UWorld* World, FString& Error)
         Error = TEXT("Cannot override matrix instance values");
         return false;
     }
+    if (Composed(*Cell.Kind))
+        if (auto* Child = SceneComp(Placed, TEXT("Child")))
+        {
+            Child->Modify();
+            Child->SetRelativeLocation(FVector(0, 0, 80));
+        }
     return true;
 }
 // Applies the cell's change and classifies the result on the instance Placed (Anchor = AnchorValue).
@@ -280,6 +340,9 @@ void RunCell(FMatrixCell& Cell, UWorld* World, const TCHAR* AnchorValue)
         AActor* Plain = FindActor(GEditor->GetEditorWorldContext().World(), Cell.Plain);
         Shape &= Text(CDO, TEXT("Value")) != TEXT("<missing>");
         Kept &= Text(Placed, TEXT("Value")) == ValueBefore && Text(Plain, TEXT("Value")) == Text(CDO, TEXT("Value"));
+        // During PIE the running copy without an override follows the new default as well.
+        if (World->IsGameWorld())
+            Kept &= Text(FindActor(World, Cell.Plain), TEXT("Value")) == Text(CDO, TEXT("Value"));
         break;
     }
     case EChange::MakeReadOnly:
@@ -301,11 +364,37 @@ void RunCell(FMatrixCell& Cell, UWorld* World, const TCHAR* AnchorValue)
         Shape &= F && F->NumParms == 2;
         break;
     }
+    // Component changes: the placed instance moved Child to Z=80, the template has Z=50.
+    case EChange::AddComponent:
+        Shape &= SceneComp(Placed, TEXT("Extra")) != nullptr;
+        Kept &= CompZ(Placed, TEXT("Child")) == 80.0;
+        break;
+    case EChange::RemoveComponent:
+        Shape &= !SceneComp(Placed, TEXT("Child")) && SceneComp(Placed, TEXT("Other"));
+        break;
+    case EChange::RenameComponent:
+        Shape &= SceneComp(Placed, TEXT("Arm")) && !SceneComp(Placed, TEXT("Child"));
+        Kept &= CompZ(Placed, TEXT("Arm")) == 80.0;
+        break;
+    case EChange::ChangeComponentDefault:
+        Shape &= CompZ(FindActor(GEditor->GetEditorWorldContext().World(), Cell.Plain), TEXT("Child")) == 60.0;
+        Kept &= CompZ(Placed, TEXT("Child")) == 80.0;
+        break;
+    case EChange::ChangeAttach:
+    {
+        auto* Moved = SceneComp(Placed, TEXT("Child"));
+        Shape &= Moved && Moved->GetAttachParent() == SceneComp(Placed, TEXT("Other"));
+        Kept &= CompZ(Placed, TEXT("Child")) == 80.0;
+        break;
+    }
     }
     Cell.Outcome = !Shape ? TEXT("broken") : Kept ? TEXT("migrated") : TEXT("lossy");
     if (Cell.Outcome != TEXT("migrated"))
-        Cell.Message = FString::Printf(TEXT("Value %s -> %s, Anchor %s"), *ValueBefore,
-                                            *Text(Placed, TEXT("Value")), *Text(Placed, TEXT("Anchor")));
+        Cell.Message = FString::Printf(
+            TEXT("Value %s -> %s, Anchor %s, Child Z %.0f"), *ValueBefore,
+                 *Text(Placed, TEXT("Value")),
+                       *Text(Placed, TEXT("Anchor")),
+                             CompZ(Placed, Cell.Change == EChange::RenameComponent ? TEXT("Arm") : TEXT("Child")));
 }
 
 FString RepoDir()

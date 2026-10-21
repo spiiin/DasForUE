@@ -70,11 +70,11 @@ already live through hot reload, also during PIE. Unloaded Blueprints are not to
 them. A script changed without a save in this editor session (while the editor was closed, by another tool)
 is picked up when a map opens and before Play starts.
 
-Actors that declare components migrate like other actors as long as the components themselves are unchanged:
-a new field or method reinstances placed and running actors, also during PIE, and keeps component
-templates and per-instance component edits. Changing the components (adding, removing, their template
-defaults) still needs a new Blueprint. A new default value is applied during PIE as well: the class and the
-editor world get it, actors of the running game keep their current values. One save may add members and
+Actors that declare components migrate like other actors: new fields and methods reinstance placed and
+running actors and keep component templates and per-instance component edits, and components can be added,
+removed, renamed (same `@ue_id`), re-attached or get new template defaults. A changed component class or
+root component needs a new Blueprint. A new default value is applied during PIE as well: the class, the
+editor world and the running game get it, except values the game or the level already changed. One save may add members and
 change default values at once: the new declaration is applied first, then the default values. A change
 refused while PIE runs is tried again when Play stops.
 Turn it off with `Das.DSL.AutoReimport 0`; commandlets and unattended runs never reimport automatically.

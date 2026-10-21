@@ -42,6 +42,11 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 | add_method | ✅ | ✅ | ✅ | ✅ |
 | remove_method | ✅ | ✅ | ✅ | ✅ |
 | change_signature | ✅ | ✅ | ✅ | ✅ |
+| add_component | · | ✅ | · | · |
+| remove_component | · | ✅ | · | · |
+| rename_component | · | ✅ | · | · |
+| change_component_default | · | ✅ | · | · |
+| change_attach | · | ✅ | · | · |
 
 <details><summary>Reasons</summary>
 
@@ -84,6 +89,11 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 | add_method | ✅ | ✅ | ✅ | ✅ |
 | remove_method | ✅ | ✅ | ✅ | ✅ |
 | change_signature | ✅ | ✅ | ✅ | ✅ |
+| add_component | · | ✅ | · | · |
+| remove_component | · | ✅ | · | · |
+| rename_component | · | ✅ | · | · |
+| change_component_default | · | ✅ | · | · |
+| change_attach | · | ✅ | · | · |
 
 <details><summary>Reasons</summary>
 

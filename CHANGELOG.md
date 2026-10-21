@@ -45,6 +45,9 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - Saving a script that renames fields (same `ue_id`), removes fields or changes a numeric field type applies
   the matching migration automatically (rename, archive, exact conversion); read-only/editable flags and
   method removals, renames and signature changes are applied as well. Archive works on Pawn and Character.
+- Components of an imported Actor can be added, removed, renamed (same `@ue_id`), re-attached and get new
+  template defaults on save; default changes also reach running PIE actors whose value the game has not
+  changed.
 - Classes with array, map or set fields accept declaration changes (new fields and methods, defaults) instead
   of body-only reimport; container contents of instances are kept.
 - `Tests/suites.json` gains `defaults-merge` and `actor-component`; the defaults merge probe was not part of
