@@ -39,6 +39,7 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - A Blueprint that the editor marked as needing a compile without a real change (after saving its package,
   or after a template default update) no longer blocks reimport: default updates accept it, structural
   migrations compile it first. A freshly created DSL Blueprint is up to date right away.
+- Changing the default of a byte or text field is merged like other defaults instead of being refused.
 - `Tests/suites.json` gains `defaults-merge` and `actor-component`; the defaults merge probe was not part of
   any suite and had been failing since before this change.
 

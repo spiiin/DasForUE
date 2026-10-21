@@ -26,7 +26,7 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 | remove_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
 | rename_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
 | retype_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| change_default | ✅ | ✅ | ✅ | ✅ | ✅ | ⛔ | ⛔ | ✅ | ✅ | ✅ | ✅ |
+| change_default | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | make_read_only | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
 
 ### By class kind (int field)
@@ -54,7 +54,6 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 - `actor/bool/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/byte/change_default`: Unsupported default property
 - `actor/byte/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `actor/byte/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/byte/rename_field`: Removal, type, default or editability changes require a migration policy
@@ -86,7 +85,6 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 - `actor/string/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/string/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/string/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/text/change_default`: Unsupported default property
 - `actor/text/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `actor/text/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/text/rename_field`: Removal, type, default or editability changes require a migration policy
@@ -130,7 +128,7 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 | remove_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
 | rename_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
 | retype_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| change_default | ✅ | ✅ | ✅ | ✅ | ✅ | ⛔ | ⛔ | ✅ | ✅ | ✅ | ✅ |
+| change_default | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | make_read_only | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
 
 ### By class kind (int field)
@@ -158,7 +156,6 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 - `actor/bool/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/byte/change_default`: Unsupported default property
 - `actor/byte/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `actor/byte/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/byte/rename_field`: Removal, type, default or editability changes require a migration policy
@@ -190,7 +187,6 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 - `actor/string/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/string/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/string/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/text/change_default`: Unsupported default property
 - `actor/text/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `actor/text/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/text/rename_field`: Removal, type, default or editability changes require a migration policy

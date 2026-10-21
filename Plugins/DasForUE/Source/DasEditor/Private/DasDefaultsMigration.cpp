@@ -184,6 +184,12 @@ bool OwnValue(FProperty* P, const FDasFieldSchema& F, void* Data, FString& Error
     case EDasScalarKind::Name:
         CastFieldChecked<FNameProperty>(P)->SetPropertyValue(Data, F.NameDefault);
         break;
+    case EDasScalarKind::Byte:
+        CastFieldChecked<FByteProperty>(P)->SetPropertyValue(Data, uint8(F.IntDefault));
+        break;
+    case EDasScalarKind::Text:
+        CastFieldChecked<FTextProperty>(P)->SetPropertyValue(Data, F.TextDefault);
+        break;
     case EDasScalarKind::Enum:
     {
         auto* E = ResolveDasEnum(F.EnumPath, Error);

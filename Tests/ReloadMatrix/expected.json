@@ -53,8 +53,8 @@
       "outcome": "migrated"
     },
     "actor/byte/change_default": {
-      "message": "Unsupported default property",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/byte/make_read_only": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -233,8 +233,8 @@
       "outcome": "migrated"
     },
     "actor/text/change_default": {
-      "message": "Unsupported default property",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/text/make_read_only": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -439,8 +439,8 @@
       "outcome": "migrated"
     },
     "actor/byte/change_default": {
-      "message": "Unsupported default property",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/byte/make_read_only": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -619,8 +619,8 @@
       "outcome": "migrated"
     },
     "actor/text/change_default": {
-      "message": "Unsupported default property",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/text/make_read_only": {
       "message": "Removal, type, default or editability changes require a migration policy",
