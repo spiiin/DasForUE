@@ -13,8 +13,8 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 ### Added
 
 - Saving a `.das` file reimports the loaded Blueprints bound to it with the safe automatic policy; body-only
-  edits stay live through hot reload, also during PIE. Actors with components still accept only body-only
-  reimport. `Das.DSL.AutoReimport 0` turns it off
+  edits stay live through hot reload, also during PIE. Actors with components accept declaration
+  changes as long as their components stay the same. `Das.DSL.AutoReimport 0` turns it off
   ([Apply and hot reload](Docs/Guide/Workflow/ApplyAndHotReload.md#automatic-reimport-on-save)).
 
 ### Changed

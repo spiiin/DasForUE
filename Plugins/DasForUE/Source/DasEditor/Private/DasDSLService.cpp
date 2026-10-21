@@ -238,11 +238,12 @@ bool FDasDSLService::Apply(const FString& Script, const FString& Package, const 
             return false;
         }
     }
-    if (!Created && !Declaration.Components.IsEmpty() &&
-        (DefaultPolicy != EDasDefaultMigrationPolicy::Refuse ||
-         BP->GetOutermost()->GetMetaData().GetValue(BP, TEXT("DasDSLModel")) != Json))
+    // Composed actors migrate like other actors while their composition is unchanged (checked above), so the
+    // SCS and its templates stay as they are. Default migration of placed instances does not cover them yet.
+    if (!Created && !Declaration.Components.IsEmpty() && DefaultPolicy == EDasDefaultMigrationPolicy::PreserveInstances)
     {
-        Error = TEXT("Actor declarations with components support body-only reimport while migration is deferred");
+        Error =
+            TEXT("Default migration of actors with components is deferred; other declaration changes are supported");
         return false;
     }
     if (!Created)

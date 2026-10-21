@@ -69,9 +69,11 @@ Blueprint unchanged. Saving with an unchanged declaration does nothing: the edit
 already live through hot reload, also during PIE. Unloaded Blueprints are not touched until you reimport
 them.
 
-Declaration changes are not applied everywhere yet: actors that declare components accept only body-only
-reimport (recreate the Blueprint, or the example, to change their fields), and a change that updates the
-defaults of actors placed in a running PIE world is refused until PIE stops.
+Actors that declare components migrate like other actors as long as the components themselves are unchanged:
+a new field or method reinstances placed and running actors, also during PIE, and keeps component
+templates and per-instance component edits. Changing the components (adding, removing, their template
+defaults) still needs a new Blueprint, and a change that updates the defaults of actors placed in a running
+PIE world is refused until PIE stops.
 Turn it off with `Das.DSL.AutoReimport 0`; commandlets and unattended runs never reimport automatically.
 
 ### Das.DSL.Reimport

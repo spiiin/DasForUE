@@ -229,9 +229,10 @@ Examples: `dsl_native_components.das`, `dsl_scene_components.das`,
 - At most 32 components per effective class. Names must not collide with fields,
   methods, inherited members or other components.
 - Changing component declarations, metadata or template defaults on an already
-  imported Actor is refused rather than silently modified; body-only reimport
-  works. Use a new Blueprint for structural changes. Save the Actor and its
-  component Blueprints after import.
+  imported Actor is refused rather than silently modified; use a new Blueprint for
+  that. Other declaration changes of the Actor (fields, methods) are reimported as
+  for any Actor and keep the components. Save the Actor and its component
+  Blueprints after import.
 - Replacing an inherited component with a subclass is not possible (engine
   constraint, see [Inheritance](Inheritance.md#components-in-a-hierarchy)).
 - Replication and save/cook of runtime-created components are not covered by the
