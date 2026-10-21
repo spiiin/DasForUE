@@ -42,6 +42,8 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - Changing the default of a byte or text field is merged like other defaults instead of being refused.
 - Pawn and Character declarations accept added fields and methods like other actors, also during PIE; a
   possessed Pawn stays possessed after the reinstance. Structural rollback snapshots every instance kind.
+- Classes with array, map or set fields accept declaration changes (new fields and methods, defaults) instead
+  of body-only reimport; container contents of instances are kept.
 - `Tests/suites.json` gains `defaults-merge` and `actor-component`; the defaults merge probe was not part of
   any suite and had been failing since before this change.
 

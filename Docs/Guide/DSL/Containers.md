@@ -168,7 +168,11 @@ These limits keep the data transport bounded. They are not a memory sandbox for 
 
 ## Reload and migration
 
-Body-only reimport of a class with container properties works. Changing the declaration of an existing container property, or a struct that contains containers, is refused before any change. Container structural migration is not provided. See [Migrations](../Workflow/Migrations.md).
+A class with container properties is reimported like any class: new fields and methods (container fields
+included) are added, container defaults are merged with instance values, and instance contents are kept.
+Removing, renaming or retyping an existing container property, or changing a struct that contains
+containers, is refused before any change. See [Migrations](../Workflow/Migrations.md) and the
+[reload matrix](../../Reference/ReloadMatrix.md).
 
 Examples, all in `Plugins/DasForUE/Content/Das/Scripts/`: `dsl_container_calls.das`, `dsl_array_authoring.das`, `dsl_primitive_arrays.das`, `dsl_map_authoring.das`, `dsl_string_maps.das`, `dsl_scalar_maps.das`, `dsl_set_authoring.das`, `ue_struct_map_types.das` + `dsl_struct_maps.das` + `dsl_reflected_maps.das`, `dsl_text_byte_containers.das`, `ue_object_keys.das`, `dsl_method_value_driver.das`. Fixtures that contain `REGISTRY` need your own registry object path in its place.
 

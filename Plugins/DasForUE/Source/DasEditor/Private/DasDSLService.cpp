@@ -282,10 +282,13 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
                 [](const auto& P)
                 { return P.Type.Kind == TEXT("array") || P.Type.Kind == TEXT("map") || P.Type.Kind == TEXT("set"); });
         };
+        // Classes with container fields migrate like other classes (rollback keeps container values as property
+        // text); the explicit per-instance default migration does not cover containers yet.
         if ((HasContainers(Declaration) || (Old && HasContainers(*Old))) &&
-            (DefaultPolicy != EDasDefaultMigrationPolicy::Refuse || PriorWire != Json))
+            DefaultPolicy == EDasDefaultMigrationPolicy::PreserveInstances)
         {
-            Error = TEXT("Direct container class declaration migration is deferred; body-only reimport is supported");
+            Error = TEXT("Default migration of classes with container fields is deferred; other declaration changes "
+                         "are supported");
             return false;
         }
     }

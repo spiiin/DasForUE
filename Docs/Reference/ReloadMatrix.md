@@ -20,14 +20,14 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 
 ### Fields of an Actor, by type
 
-| Change | int | float | bool | string | name | text | byte | vector | soft | array | map |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| add_field | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⛔ | ⛔ |
-| remove_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| rename_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| retype_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| change_default | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| make_read_only | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| Change | int | float | bool | string | name | text | byte | vector | soft | array | map | set |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| add_field | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| remove_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| rename_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| retype_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| change_default | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| make_read_only | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
 
 ### By class kind (int field)
 
@@ -45,11 +45,10 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 
 <details><summary>Reasons</summary>
 
-- `actor/array/add_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/array/make_read_only`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/array/remove_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/array/rename_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/array/retype_field`: Direct container class declaration migration is deferred; body-only reimport is supported
+- `actor/array/make_read_only`: Removal, type, default or editability changes require a migration policy
+- `actor/array/remove_field`: Removal, type, default or editability changes require a migration policy
+- `actor/array/rename_field`: Removal, type, default or editability changes require a migration policy
+- `actor/array/retype_field`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/rename_field`: Removal, type, default or editability changes require a migration policy
@@ -68,15 +67,18 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 - `actor/int/remove_method`: Legacy authored method identity changed
 - `actor/int/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/int/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/map/add_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/map/make_read_only`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/map/remove_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/map/rename_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/map/retype_field`: Direct container class declaration migration is deferred; body-only reimport is supported
+- `actor/map/make_read_only`: Removal, type, default or editability changes require a migration policy
+- `actor/map/remove_field`: Removal, type, default or editability changes require a migration policy
+- `actor/map/rename_field`: Removal, type, default or editability changes require a migration policy
+- `actor/map/retype_field`: Removal, type, default or editability changes require a migration policy
 - `actor/name/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `actor/name/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/name/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/name/retype_field`: Removal, type, default or editability changes require a migration policy
+- `actor/set/make_read_only`: Removal, type, default or editability changes require a migration policy
+- `actor/set/remove_field`: Removal, type, default or editability changes require a migration policy
+- `actor/set/rename_field`: Removal, type, default or editability changes require a migration policy
+- `actor/set/retype_field`: Removal, type, default or editability changes require a migration policy
 - `actor/soft/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `actor/soft/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/soft/rename_field`: Removal, type, default or editability changes require a migration policy
@@ -118,14 +120,14 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 
 ### Fields of an Actor, by type
 
-| Change | int | float | bool | string | name | text | byte | vector | soft | array | map |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| add_field | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⛔ | ⛔ |
-| remove_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| rename_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| retype_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| change_default | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| make_read_only | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| Change | int | float | bool | string | name | text | byte | vector | soft | array | map | set |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| add_field | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| remove_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| rename_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| retype_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| change_default | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| make_read_only | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
 
 ### By class kind (int field)
 
@@ -143,11 +145,10 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 
 <details><summary>Reasons</summary>
 
-- `actor/array/add_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/array/make_read_only`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/array/remove_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/array/rename_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/array/retype_field`: Direct container class declaration migration is deferred; body-only reimport is supported
+- `actor/array/make_read_only`: Removal, type, default or editability changes require a migration policy
+- `actor/array/remove_field`: Removal, type, default or editability changes require a migration policy
+- `actor/array/rename_field`: Removal, type, default or editability changes require a migration policy
+- `actor/array/retype_field`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/rename_field`: Removal, type, default or editability changes require a migration policy
@@ -166,15 +167,18 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 - `actor/int/remove_method`: Legacy authored method identity changed
 - `actor/int/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/int/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/map/add_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/map/make_read_only`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/map/remove_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/map/rename_field`: Direct container class declaration migration is deferred; body-only reimport is supported
-- `actor/map/retype_field`: Direct container class declaration migration is deferred; body-only reimport is supported
+- `actor/map/make_read_only`: Removal, type, default or editability changes require a migration policy
+- `actor/map/remove_field`: Removal, type, default or editability changes require a migration policy
+- `actor/map/rename_field`: Removal, type, default or editability changes require a migration policy
+- `actor/map/retype_field`: Removal, type, default or editability changes require a migration policy
 - `actor/name/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `actor/name/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/name/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/name/retype_field`: Removal, type, default or editability changes require a migration policy
+- `actor/set/make_read_only`: Removal, type, default or editability changes require a migration policy
+- `actor/set/remove_field`: Removal, type, default or editability changes require a migration policy
+- `actor/set/rename_field`: Removal, type, default or editability changes require a migration policy
+- `actor/set/retype_field`: Removal, type, default or editability changes require a migration policy
 - `actor/soft/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `actor/soft/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/soft/rename_field`: Removal, type, default or editability changes require a migration policy

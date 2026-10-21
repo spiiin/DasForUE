@@ -1,27 +1,27 @@
 {
   "editor": {
     "actor/array/add_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/array/change_default": {
       "message": "",
       "outcome": "migrated"
     },
     "actor/array/make_read_only": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/array/remove_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/array/rename_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/array/retype_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/bool/add_field": {
@@ -133,27 +133,27 @@
       "outcome": "refused"
     },
     "actor/map/add_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/map/change_default": {
       "message": "",
       "outcome": "migrated"
     },
     "actor/map/make_read_only": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/map/remove_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/map/rename_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/map/retype_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/name/add_field": {
@@ -177,6 +177,30 @@
       "outcome": "refused"
     },
     "actor/name/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/set/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/set/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/set/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/set/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/set/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/set/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
@@ -387,27 +411,27 @@
   },
   "pie": {
     "actor/array/add_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/array/change_default": {
       "message": "",
       "outcome": "migrated"
     },
     "actor/array/make_read_only": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/array/remove_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/array/rename_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/array/retype_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/bool/add_field": {
@@ -519,27 +543,27 @@
       "outcome": "refused"
     },
     "actor/map/add_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/map/change_default": {
       "message": "",
       "outcome": "migrated"
     },
     "actor/map/make_read_only": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/map/remove_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/map/rename_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/map/retype_field": {
-      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "actor/name/add_field": {
@@ -563,6 +587,30 @@
       "outcome": "refused"
     },
     "actor/name/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/set/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/set/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/set/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/set/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/set/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/set/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },

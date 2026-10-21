@@ -25,7 +25,7 @@ KIND_TITLES = {
     "pawn": "Pawn",
     "character": "Character",
 }
-TYPES = ["int", "float", "bool", "string", "name", "text", "byte", "vector", "soft", "array", "map"]
+TYPES = ["int", "float", "bool", "string", "name", "text", "byte", "vector", "soft", "array", "map", "set"]
 FIELD_CHANGES = ["add_field", "remove_field", "rename_field", "retype_field", "change_default", "make_read_only"]
 METHOD_CHANGES = ["add_method", "remove_method", "change_signature"]
 MODES = ["editor", "pie"]

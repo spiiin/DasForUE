@@ -86,6 +86,11 @@ Pawn, Character, components, the CDO), not only `ADasProbeActor`; values the own
 
 ### S2. Containers
 
+**Gate removed 2026-10-21.** Classes with array/map/set fields migrate like other classes (rollback keeps
+container values as property text); only explicit `PreserveInstances` default migration is refused for them.
+Matrix: array/map/set `add_field` and `change_default` migrated. Still open (with S4): removing, renaming and
+retyping container fields, element-wise conversion.
+
 - Remove the container gates (`DasDSLService.cpp:228`, `DasBlueprintRollback.cpp:232`).
 - Add/remove container fields; element type conversion element-wise through the adapter; map key conversion
   only when keys stay unique; struct-element arrays reuse struct field migration.

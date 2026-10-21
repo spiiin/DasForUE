@@ -55,6 +55,8 @@ const FMatrixType MatrixTypes[] = {
      TEXT("string"), TEXT("\"a\"")},
     {TEXT("array"), nullptr, TEXT("array<int>"), TEXT("[1,2]"), TEXT("[3]"), TEXT("(7,8)"), TEXT("array<float>"),
      TEXT("[1.0f]")},
+    {TEXT("set"), nullptr, TEXT("table<string>"), TEXT("{\"a\"}"), TEXT("{\"b\"}"), TEXT("(\"o\")"), TEXT("table<int>"),
+     TEXT("{1}")},
     {TEXT("map"), nullptr, TEXT("table<string;int>"), TEXT("{\"a\"=>1}"), TEXT("{\"b\"=>2}"), TEXT("((\"o\", 7))"),
      TEXT("table<string;float>"), TEXT("{\"a\"=>1.0f}")},
 };

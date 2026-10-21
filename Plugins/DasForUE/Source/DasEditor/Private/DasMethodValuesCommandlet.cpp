@@ -476,18 +476,15 @@ int32 UDasMethodValuesCommandlet::Main(const FString& Params)
             return 1;
         }
         UE_LOG(LogTemp, Display, TEXT("PASS direct_container_body_only_reimport"));
-        BadSource =
-            TargetSource.Replace(TEXT("DirectSamples:array<double>"),
-                                      TEXT("@DisplayName=\"Changed samples\"\n    DirectSamples:array<double>"));
+        BadSource = TargetSource.Replace(TEXT("LockedDirect:array<double>"), TEXT("LockedDirect:array<int>"));
         if (BadSource == TargetSource ||
             !FFileHelper::SaveStringToFile(BadSource, *Runtime.ScriptPath(Bad),
                                            FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM) ||
             FDasDSLService::Apply(
                 Bad, Base + TEXT("/BP_Target"), TEXT("methodvalues.ValueTarget"), Reimported, Error) ||
-                                 !Error.Contains(TEXT("Direct container class declaration migration is deferred")) ||
-                                                 Target->GeneratedClass.Get() != BeforeReimport)
+                                 !Error.Contains(TEXT("type")) || Target->GeneratedClass.Get() != BeforeReimport)
             return 1;
-        UE_LOG(LogTemp, Display, TEXT("PASS direct_container_declaration_change_refused"));
+        UE_LOG(LogTemp, Display, TEXT("PASS direct_container_retype_refused"));
         for (const auto& Change : TArray<TPair<FString, FString>>{
                  {TEXT("self.Groups[0].Scores[1l] += 3.0lf"), TEXT("self.LockedGroups[0].Scores[1l] += 3.0lf")},
                   {TEXT("self.Groups[0].Scores[1l] += 3.0lf"), TEXT("self.Groups[\"bad\"].Scores[1l] += 3.0lf")},
