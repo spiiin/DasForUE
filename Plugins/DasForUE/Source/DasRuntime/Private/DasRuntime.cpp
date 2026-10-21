@@ -2,6 +2,11 @@
 #include "UObject/FieldPath.h"
 #include "DasGameplayTags.h"
 #include "DasTypeAdapters.h"
+#include "DasUEAot.h"
+#include "DasUEAotProbe.h"
+#include "Async/Async.h"
+#include "DasObjectFixture.h"
+#include "DasExecutionRolePrivate.h"
 #include "DasGASAuthoring.h"
 #include "DasGASCalculations.h"
 #include "Engine/CurveTable.h"
@@ -562,6 +567,17 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeInputSessions.inl"
 }
 
+void* dasue::aot::Resolve(uint64_t Key, das::Context* Context)
+{
+    if (!Context) throw std::runtime_error("UE AOT call requires a context");
+    if (!IsInGameThread() || !ActiveContext || Context != ActiveContext)
+        Context->throw_error("UE AOT requires the active game-thread context");
+    GuardUEExtern();
+    const auto* Entry = UEAotEntries.Find(Key);
+    if (!Entry) Context->throw_error("UE AOT extern ABI is absent or stale; regenerate and rebuild");
+    return Entry->Function;
+}
+
 // Declared by DasTypeAdapters.cpp; the adapters themselves live in the anonymous namespace.
 void DasRegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
 {
@@ -575,6 +591,7 @@ void FDasRuntimeModule::StartupModule()
     const FTCHARToUTF8 Utf8Root(*Root);
     das::setDasRoot(das::string(Utf8Root.Get(), Utf8Root.Length()));
     NEED_ALL_DEFAULT_MODULES;
+    UEAotEntries.Reset();
     das::Module::Initialize();
     new FUnrealFoundationModule();
     InputRestoreTickHandle = FWorldDelegates::OnWorldTickStart.AddLambda([](UWorld* World, ELevelTick, float)
@@ -1124,6 +1141,7 @@ FDasExecutionResult FDasRuntimeModule::RunLibraryFrame(const FString& Contract, 
 #include "DasPerformanceProbe.inl"
 
 #include "DasExecutionGuardProbe.inl"
+#include "DasUEAotProbe.inl"
 
 #include "DasAsyncPhysicsVM.inl"
 

@@ -3,6 +3,11 @@
 class FUnrealFoundationModule final : public das::Module
 {
 public:
+    virtual das::ModuleAotType aotRequire(das::TextWriter& Writer) const override
+    {
+        Writer << "#include \"DasUEAot.h\"\n";
+        return das::ModuleAotType::cpp;
+    }
     FUnrealFoundationModule() : das::Module("ue_foundation")
     {
         AddCollisionProfileEnum(*this);

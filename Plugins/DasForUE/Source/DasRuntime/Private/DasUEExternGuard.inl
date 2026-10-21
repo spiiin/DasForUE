@@ -1,6 +1,31 @@
 // Every UE FFI binding uses this factory. The guarded pointer is also the JIT
 // builtin address; scalar and CMRES nodes keep their original ABI.
 void GuardUEExtern();
+template <class F> struct TCheckedUEExtern;
+struct FUEAotEntry
+{
+    void* Function;
+    FString Identity;
+};
+TMap<uint64, FUEAotEntry> UEAotEntries;
+
+template <class F, F Fn> bool ConfigureUEAot(das::BuiltInFunction* Bound, const char* Name)
+{
+    if constexpr (dasue::aot::Signature<F>::Supported)
+    {
+        const FString Types = dasue::aot::Signature<F>::CppTypes();
+        const uint64 Key = dasue::aot::Key(Name, TCHAR_TO_UTF8(*Types));
+        const FString Identity = FString(UTF8_TO_TCHAR(Name)) + TEXT(":") + Types;
+        void* Pointer = reinterpret_cast<void*>(&TCheckedUEExtern<F>::template Invoke<Fn>);
+        if (const auto* Existing = UEAotEntries.Find(Key);
+            Existing && (Existing->Identity != Identity || Existing->Function != Pointer))
+            throw std::runtime_error("UE AOT extern identity collision");
+        UEAotEntries.Add(Key, {Pointer, Identity});
+        Bound->cppName = TCHAR_TO_UTF8(*FString::Printf(TEXT("dasue::aot::Call<%lluULL,%s>"), Key, *Types));
+        return true;
+    }
+    return false;
+}
 int32 UEExternRegistrationCount = 0;
 template <class F> struct TCheckedUEExtern;
 template <class R, class... A> struct TCheckedUEExtern<R (*)(A...)>
@@ -17,9 +42,9 @@ auto AddUEExtern(das::Module& Module, const das::ModuleLibrary& Library, const c
 {
     auto* Bound = das::addExtern<F, &TCheckedUEExtern<F>::template Invoke<Fn>, Node>(
         Module, Library, Name, Effects | das::SideEffects::accessExternal, CppName, std::forward<QQ>(Temp));
-    // The foundation module already has no AOT implementation. Make the guard
-    // requirement explicit so emitted raw cppName calls cannot bypass it.
-    Bound->noAot = true;
+    // Only the checked, ABI-described registry bridge is AOT eligible. All other
+    // signatures stay closed; raw cppName calls can never bypass the guard.
+    Bound->noAot = !ConfigureUEAot<F, Fn>(Bound, Name);
     ++UEExternRegistrationCount;
     return Bound;
 }

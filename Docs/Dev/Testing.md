@@ -270,3 +270,10 @@ Candidates for later removal of duplicated result sections: `WidgetLayouts.md`,
 contract/migration explanations to the Guide and retaining the corresponding JSON
 receipts. Historical aggregate reports are not automatically superseded by a new
 narrow run and should not be deleted on that basis.
+
+## Guarded UE API AOT
+
+Queue `test-suite ueaot1 ue-aot repo=C:\src\DasForUE2-main` through the shared
+build agent. It generates and links the focused UE AOT fixture and runs one
+short strict native-execution/guard check. See [bridge scope and safety
+contract](Plans/UEApiAot.md). This is not full gameplay/GAS AOT acceptance.
