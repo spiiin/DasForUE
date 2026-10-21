@@ -1086,16 +1086,20 @@ public:
                                                                           TEXT("editor_world_override_isolated"));
         Check(Actor && Holder && Holder->Peer == Actor && Actor->Peer == Holder, TEXT("references_preserved"));
         Check(Actor && Call().Value == 187, TEXT("new_declaration_runtime_accepted"));
-        BeforeClass = Actor ? Actor->GetClass() : nullptr;
+        // A new default during PIE updates the class and the editor world; the running actor keeps its value.
         Check(Write(S->Source2.Replace(TEXT("Score : int = 10"), TEXT("Score : int = 999"))),
-                    TEXT("write_unsupported_default_change"));
-        Check(!FDasDSLService::Reimport(S->Blueprint.Get(), Error) && Actor && Actor->GetClass() == BeforeClass,
-              TEXT("unsupported_migration_rejected"));
+                    TEXT("write_default_change"));
+        Check(FDasDSLService::Reimport(S->Blueprint.Get(), Error) &&
+              Int(S->Blueprint->GeneratedClass->GetDefaultObject(), TEXT("Score")) == 999,
+                  TEXT("default_change_applied_during_PIE"));
+        Actor = Find(World, TEXT("DSLActor"));
         Fallback = Call();
-        Check(Fallback.bSucceeded && Fallback.Value == 187 &&
-              Fallback.ReloadError.Contains(TEXT("apply/reimport")),
-                                            TEXT("rejected_default_change_keeps_last_good_body"));
-        Check(Write(S->Source2) && Call().ReloadError.IsEmpty(), TEXT("restore_last_good_source"));
+        Check(Actor && Int(Actor, TEXT("Score")) == 77 && Fallback.bSucceeded && Fallback.Value == 187 &&
+                           Fallback.ReloadError.IsEmpty() &&
+                           Int(Find(GEditor->GetEditorWorldContext().World(), TEXT("DSLActor")), TEXT("Score")) == 33,
+                               TEXT("default_change_keeps_game_state_and_overrides"));
+        Check(Write(S->Source2) && FDasDSLService::Reimport(S->Blueprint.Get(), Error) && Call().ReloadError.IsEmpty(),
+              TEXT("restore_last_good_source"));
         CollectGarbage(RF_NoFlags);
         Actor = Find(World, TEXT("DSLActor"));
         Check(Actor && Int(Actor, TEXT("Score")) == 77 && Evaluate(Actor) == 222, TEXT("reimport_survives_GC"));
@@ -2536,8 +2540,8 @@ public:
                 Check(FFileHelper::SaveStringToFile(MigratedSource, *Path,
                                                     FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),
                       TEXT("PIE_write_new_default"));
-                Check(!FDasDSLService::Reimport(BP.Get(), Error) && BP->GeneratedClass == Before,
-                      TEXT("PIE_default_change_without_policy_refused"));
+                // The automatic merge is allowed during PIE as well (DasForUE.ActorComponent.DeclarationReimportPIE);
+                // here the explicit policy rewrites the CDO without reinstancing.
                 Check(FDasDSLService::Reimport(BP.Get(), Error, EDasDefaultMigrationPolicy::PreserveInstances) &&
                           BP->GeneratedClass == Before,
                       TEXT("PIE_explicit_default_migration_without_reinstance"));

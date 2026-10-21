@@ -35,8 +35,10 @@ After the example scripts gain or change declarations (properties, method signat
 no longer runs: in Play the editor shows "daScript did not run on …" on screen and in the PIE Message Log.
 Run `CreatePlayableCharacter.ps1` again and open the new map. Edits of method bodies need no recreation:
 they take effect on the next call, also during Play (code that already ran, such as `BeginPlay`, runs
-again only after restarting Play). A new pickup field is applied on save as well, also during Play. A default
-value changed during Play is applied when Play stops. New character fields (Pawn/Character migration is
+again only after restarting Play). A new pickup field is applied on save as well, also during Play. A changed
+default value is applied too (also together with new fields): running actors keep their values, spawned
+ones and the next Play use the new default. A script edited while the editor was closed is applied when
+the map opens. New character fields (Pawn/Character migration is
 deferred) and changed components still need recreating the example. See [automatic reimport](../Workflow/ApplyAndHotReload.md#automatic-reimport-on-save).
 
 | Input | Action |

@@ -59,6 +59,10 @@ void FDasAutoReimport::Start()
             Watches.Emplace(Full, Handle);
     }
     EndPIEHandle = FEditorDelegates::EndPIE.AddRaw(this, &FDasAutoReimport::OnEndPIE);
+    PreBeginPIEHandle = FEditorDelegates::PreBeginPIE.AddRaw(this, &FDasAutoReimport::OnPreBeginPIE);
+    MapOpenedHandle = FEditorDelegates::OnMapOpened.AddRaw(this, &FDasAutoReimport::OnMapOpened);
+    // The startup map may already be open.
+    OnMapOpened(FString(), false);
 }
 void FDasAutoReimport::Stop()
 {
@@ -68,7 +72,9 @@ void FDasAutoReimport::Stop()
                 Watcher->UnregisterDirectoryChangedCallback_Handle(Watch.Key, Watch.Value);
     Watches.Reset();
     FEditorDelegates::EndPIE.Remove(EndPIEHandle);
-    for (auto* Handle : {&Ticker, &RetryTicker})
+    FEditorDelegates::PreBeginPIE.Remove(PreBeginPIEHandle);
+    FEditorDelegates::OnMapOpened.Remove(MapOpenedHandle);
+    for (auto* Handle : {&Ticker, &RetryTicker, &StaleTicker})
     {
         if (Handle->IsValid())
             FTSTicker::GetCoreTicker().RemoveTicker(*Handle);
@@ -76,6 +82,7 @@ void FDasAutoReimport::Stop()
     }
     Pending.Reset();
     Deferred.Reset();
+    Checked.Reset();
 }
 void FDasAutoReimport::OnScriptsChanged(const TArray<FFileChangeData>& Changes)
 {
@@ -96,12 +103,12 @@ bool FDasAutoReimport::ProcessPending(float)
         ReimportFiles(Saved);
     return false;
 }
-void FDasAutoReimport::ReimportFiles(const TSet<FString>& Files)
+TArray<UBlueprint*> FDasAutoReimport::Bound(const TSet<FString>* Files) const
 {
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     // Only loaded Blueprints: those of the open level and editors. Others still run their last applied
     // declaration and report the mismatch when they play.
-    TArray<UBlueprint*> Bound;
+    TArray<UBlueprint*> Result;
     for (TObjectIterator<UBlueprint> It; It; ++It)
     {
         UBlueprint* Blueprint = *It;
@@ -109,11 +116,50 @@ void FDasAutoReimport::ReimportFiles(const TSet<FString>& Files)
             continue;
         const FString Source = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLSource"));
         if (!Source.IsEmpty() &&
-            Files.Contains(FullPath(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source)))
-            Bound.Add(Blueprint);
+            (!Files || Files->Contains(FullPath(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source))))
+            Result.Add(Blueprint);
     }
-    for (UBlueprint* Blueprint : Bound)
+    return Result;
+}
+void FDasAutoReimport::ReimportFiles(const TSet<FString>& Files)
+{
+    for (UBlueprint* Blueprint : Bound(&Files))
         Reimport(Blueprint, false);
+}
+void FDasAutoReimport::ReimportStale()
+{
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    for (UBlueprint* Blueprint : Bound(nullptr))
+    {
+        auto& Metadata = Blueprint->GetOutermost()->GetMetaData();
+        const FString Source = Metadata.GetValue(Blueprint, TEXT("DasDSLSource"));
+        const FDateTime Stamp =
+            IFileManager::Get().GetTimeStamp(*(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source));
+        // Compiling a script to compare declarations is not free; skip what did not change since the last check.
+        const FString Key = Blueprint->GetPathName();
+        if (const auto* Seen = Checked.Find(Key);
+            Seen && Seen->Key == Stamp && Seen->Value == Metadata.GetValue(Blueprint, TEXT("DasDSLModel")))
+            continue;
+        Reimport(Blueprint, false);
+        Checked.Add(Key, {Stamp, Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel"))});
+    }
+}
+void FDasAutoReimport::OnPreBeginPIE(bool)
+{
+    if (CVarAutoReimport.GetValueOnGameThread() != 0 && !GIsAutomationTesting)
+        ReimportStale();
+}
+void FDasAutoReimport::OnMapOpened(const FString&, bool)
+{
+    if (!StaleTicker.IsValid())
+        StaleTicker = FTSTicker::GetCoreTicker().AddTicker(
+            FTickerDelegate::CreateRaw(this, &FDasAutoReimport::CheckStale), SettleSeconds);
+}
+bool FDasAutoReimport::CheckStale(float)
+{
+    StaleTicker.Reset();
+    OnPreBeginPIE(false);
+    return false;
 }
 void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
 {
@@ -150,6 +196,7 @@ void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
         Notify(Text, false);
         return;
     }
+    Deferred.Remove(Blueprint);
     if (bRetry || Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel")) != Before)
     {
         UE_LOG(LogTemp, Display, TEXT("DAS_DSL_AUTO_REIMPORT applied %s"), *Name);

@@ -1463,12 +1463,6 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
             Error = TEXT("Unable to create method graph");
             return false;
         }
-    // Before compiling: setting variable metadata marks the Blueprint dirty, and a dirty Blueprint refuses the
-    // next structural reimport until it is compiled again.
-    for (const auto& Field : Schema.Fields)
-        if (!Field.StableId.IsEmpty())
-            FBlueprintEditorUtils::SetBlueprintVariableMetaData(BP, Field.Name, nullptr,
-                                                                TEXT("DasMemberId"), Field.StableId);
     FKismetEditorUtilities::CompileBlueprint(BP);
     FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();
     if (BP->Status == BS_Error || !BP->GeneratedClass)
@@ -1488,6 +1482,14 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
         if (LegacyMethodName.IsEmpty() && !Methods.IsEmpty())
             Metadata.SetValue(BP, TEXT("DasInputId"), *Methods[0].InputStableId);
     }
+    // Variable metadata does not affect the compiled class, but setting it marks the Blueprint as needing a
+    // compile, and such a Blueprint refuses the next structural reimport; keep the status of this compile.
+    const EBlueprintStatus Compiled = BP->Status;
+    for (const auto& Field : Schema.Fields)
+        if (!Field.StableId.IsEmpty())
+            FBlueprintEditorUtils::SetBlueprintVariableMetaData(BP, Field.Name, nullptr,
+                                                                TEXT("DasMemberId"), Field.StableId);
+    BP->Status = Compiled;
     auto& Metadata = BP->GetOutermost()->GetMetaData();
     for (const auto* Key : {TEXT("Category"), TEXT("DisplayName"), TEXT("ToolTip")})
     {

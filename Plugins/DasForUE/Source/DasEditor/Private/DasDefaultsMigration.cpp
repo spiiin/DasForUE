@@ -320,6 +320,10 @@ bool PlanRoot(FPlan& Plan, UObject* Root, FProperty* P, const void* Old, const v
             if (auto* C = Cast<UActorComponent>(O);
                 C && (C->IsBeingDestroyed() || (C->GetOwner() && C->GetOwner()->IsActorBeingDestroyed())))
                 return true;
+            // Objects of a running game (PIE) keep their current values: those are game state. New default
+            // values reach them only when they are spawned again.
+            if (auto* W = O->GetWorld(); !O->IsTemplate() && W && W->IsGameWorld())
+                return true;
             return !IsValid(O) || O == Root || O->GetClass()->HasAnyClassFlags(CLASS_NewerVersionExists) ||
                    O->GetClass()->GetName().StartsWith(TEXT("SKEL_")) || O->GetClass()->GetName().StartsWith(
                                                                              TEXT("REINST_")) ||
@@ -334,11 +338,6 @@ bool PlanRoot(FPlan& Plan, UObject* Root, FProperty* P, const void* Old, const v
     }
     for (auto* O : Objects)
     {
-        if (auto* W = O->GetWorld(); !O->IsTemplate() && W && W->IsGameWorld())
-        {
-            Error = TEXT("Stop PIE/game worlds before updating defaults");
-            return false;
-        }
         if (auto* W = O->GetWorld(); W && (W->IsPartitionedWorld() || !W->GetStreamingLevels().IsEmpty()))
         {
             Error = TEXT("Partitioned/streaming world defaults require a separate migration scope");
@@ -805,11 +804,12 @@ bool DasMergeDefaults(UBlueprint* BP, const FDasAuthoringModule& Next, const FSt
     {
         UBlueprint* BP;
         TArray<FBPVariableDescription> Variables;
+        EBlueprintStatus Status;
     };
     TArray<FBPImage> Blueprints;
     for (auto* B : Scope)
     {
-        Blueprints.Add({B, B->NewVariables});
+        Blueprints.Add({B, B->NewVariables, B->Status});
         Plan.Dirty.FindOrAdd(B->GetOutermost(), B->GetOutermost()->IsDirty());
     }
     const auto* Meta = FMetaData::GetMapForObject(BP);
@@ -845,6 +845,7 @@ bool DasMergeDefaults(UBlueprint* BP, const FDasAuthoringModule& Next, const FSt
         for (auto& B : Blueprints)
         {
             B.BP->NewVariables = B.Variables;
+            B.BP->Status = B.Status;
             CastChecked<UBlueprintGeneratedClass>(B.BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();
         }
         BP->GetOutermost()->GetMetaData().SetObjectValues(BP, Metadata);
@@ -924,6 +925,12 @@ bool DasMergeDefaults(UBlueprint* BP, const FDasAuthoringModule& Next, const FSt
     CDO->MarkPackageDirty();
     for (const auto& Change : Plan.Changes)
         Change.Image->Object->MarkPackageDirty();
+    // Template edits notify the editor, which marks the Blueprint as needing a compile. The merge changes
+    // values only (variable defaults included), so a compiled Blueprint stays compiled; otherwise the next
+    // structural reimport would be refused until someone compiles it.
+    for (auto& B : Blueprints)
+        if (B.Status == BS_UpToDate || B.Status == BS_UpToDateWithWarnings)
+            B.BP->Status = B.Status;
     Applied = true;
     UE_LOG(LogTemp, Display,
            TEXT("DAS_DEFAULTS_MERGE=PASS changed=%d objects=%d"), Plan.Changes.Num(), Plan.Images.Num());

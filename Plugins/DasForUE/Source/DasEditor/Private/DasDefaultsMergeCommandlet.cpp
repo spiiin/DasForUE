@@ -195,15 +195,6 @@ int32 UDasDefaultsMergeCommandlet::Main(const FString& Params)
                    !Check(Call(A) == 87 && A->LastDasError.IsEmpty(), TEXT("persistent_VM_seed")))
             return 1;
         {
-            auto* Game = UWorld::CreateWorld(EWorldType::Game, false);
-            auto* Playing = Game->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
-            const bool Rejected = Playing && !FDasDSLService::Reimport(BP, Error) && Error.Contains(TEXT("PIE/game"));
-            Game->DestroyActor(Playing);
-            Game->DestroyWorld(false);
-            if (!Check(Rejected, TEXT("game_world_rejected_before_mutation")))
-                return 1;
-        }
-        {
             const FString Bad = Old.Replace(TEXT("var Auto:int=10"), TEXT("var Auto:int=10\n        var Extra:int=1"));
             FFileHelper::SaveStringToFile(Bad, *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
             const bool Rejected = !FDasDSLService::Reimport(BP, Error, EDasDefaultMigrationPolicy::PreserveOverrides);
@@ -240,6 +231,19 @@ int32 UDasDefaultsMergeCommandlet::Main(const FString& Params)
                 return 1;
         }
 #endif
+        {
+            auto* Game = UWorld::CreateWorld(EWorldType::Game, false);
+            auto* Playing = Game->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+            if (Playing)
+                SetInt(Playing, TEXT("Auto"), 5);
+            // Game-world instances keep their values; the merge covers the class and editor instances.
+            const bool Merged = Playing && FDasDSLService::Reimport(BP, Error) &&
+                                Int(Playing, TEXT("Auto")) == 5 && Int(CDO, TEXT("Auto")) == 20;
+            Game->DestroyActor(Playing);
+            Game->DestroyWorld(false);
+            if (!Check(Merged, TEXT("game_world_instances_keep_their_values")))
+                return 1;
+        }
         if (!Check(IConsoleManager::Get().ProcessUserConsoleInput(
                 *(TEXT("Das.DSL.Reimport ")+ Root + TEXT("/BP_Merge")), *GLog, W) &&
                 Int(CDO, TEXT("Auto")) == 20, TEXT("console_automatic_merge_new_defaults")) ||

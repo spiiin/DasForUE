@@ -49,6 +49,8 @@
       "comment": "Informational benchmark (DasPerformance commandlet); writes logs/performance-editor.json." },
     { "name": "native-defaults", "kind": "script", "script": "TestNativeDefaults.ps1",
       "probe": "native-defaults-probe-id.txt" },
+    { "name": "defaults-merge", "kind": "script", "script": "TestDefaultsMerge.ps1",
+      "comment": "PreserveOverrides merge: Create, Reopen, Recompile, Unopened phases (packaged run only with -Package)." },
     { "name": "computed-defaults", "kind": "script", "script": "TestComputedDefaults.ps1",
       "probe": "computed-defaults-probe-id.txt" },
     { "name": "gameplay-tags", "kind": "script", "script": "TestGameplayTags.ps1",

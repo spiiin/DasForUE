@@ -51,6 +51,11 @@ FString ComposedV2()
                                               "    [ue_function"))
                           .Replace(TEXT("self.Score + input"), TEXT("self.Score + input + self.Bonus"));
 }
+// v2 plus a changed default of an existing field: applied as the new declaration first, then the default.
+FString ComposedMixed()
+{
+    return ComposedV2().Replace(TEXT("Score : int = 10"), TEXT("Score : int = 20"));
+}
 FString ComposedV3()
 {
     return ComposedV2().Replace(TEXT("    defaults="), TEXT("    @ue_component\n    @Attach=\"Pivot\"\n    Extra:SceneComponentRef\n    defaults="));
@@ -157,6 +162,8 @@ bool FDasComposedReimportTest::RunTest(const FString&)
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("ComposedPlaced");
     AActor* Placed = World->SpawnActor<AActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    Spawn.Name = TEXT("ComposedDefault");
+    World->SpawnActor<AActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     if (!TestNotNull(TEXT("placed_actor"), Placed))
         return false;
     SetInt(Placed, TEXT("Score"), 77);
@@ -171,7 +178,7 @@ bool FDasComposedReimportTest::RunTest(const FString&)
     // A Blueprint created in this editor session migrates without an extra compile.
     TestTrue(TEXT("created_Blueprint_is_up_to_date"),
                   BP->Status == BS_UpToDate || BP->Status == BS_UpToDateWithWarnings);
-    TestTrue(TEXT("write_v2_new_field"), Script.Write(ComposedV2()));
+    TestTrue(TEXT("write_new_field_and_default"), Script.Write(ComposedMixed()));
     // A failure after the class was rebuilt restores the old declaration and the instance values, the
     // soft reference included.
     DasFailStructuralForTesting(2);
@@ -191,6 +198,10 @@ bool FDasComposedReimportTest::RunTest(const FString&)
     TestTrue(TEXT("placed_actor_reinstanced_with_new_field"),
                   Placed && Placed->GetClass() == BP->GeneratedClass && Int(Placed, TEXT("Bonus")) == 5);
     TestEqual(TEXT("placed_override_preserved"), Int(Placed, TEXT("Score")), 77);
+    TestTrue(TEXT("mixed_change_updates_default"),
+                  Int(BP->GeneratedClass->GetDefaultObject(), TEXT("Score")) == 20 &&
+                      Int(FindActor(World, TEXT("ComposedDefault")), TEXT("Score")) == 20 &&
+                                    Int(FindActor(World, TEXT("ComposedDefault")), TEXT("Bonus")) == 5);
     TestEqual(TEXT("placed_soft_reference_preserved"), Mesh(Placed), FString(Cube));
     // Methods run only in game worlds; the PIE test checks the new body.
     TestTrue(TEXT("method_kept"), Placed && Placed->FindFunction(TEXT("Evaluate")) != nullptr);
@@ -204,12 +215,23 @@ bool FDasComposedReimportTest::RunTest(const FString&)
                   !FDasDSLService::Reimport(BP, Error) && Error.Contains(TEXT("composition migration is deferred")) &&
                                                                          BP->GeneratedClass == Before &&
                                                                          CompositionKept(BP));
-    TestTrue(TEXT("restore_v2"), Script.Write(ComposedV2()));
+    TestTrue(TEXT("restore_mixed"), Script.Write(ComposedMixed()));
     TestTrue(TEXT("explicit_instance_default_migration_refused"),
                   !FDasDSLService::Reimport(BP, Error, EDasDefaultMigrationPolicy::PreserveInstances) &&
                       Error.Contains(TEXT("actors with components")));
     TestTrue(TEXT("unchanged_reimport_after_refusals"),
                   FDasDSLService::Reimport(BP, Error) && BP->GeneratedClass == Before);
+
+    // A script changed without a save event (editor closed, external tool) is picked up by the stale check
+    // that runs when a map opens and before PIE.
+    TestTrue(TEXT("write_without_reimport"),
+                  Script.Write(ComposedMixed().Replace(TEXT("    [ue_function"),
+                                                            TEXT("    @ue_property=(EditAnywhere,BlueprintReadWrite)\n"
+                                                       "    @ue_id=\"composedreimport.host.spare\"\n"
+                                                       "    Spare : int = 3\n    [ue_function"))));
+    FDasAutoReimport Auto;
+    Auto.ReimportStale();
+    TestEqual(TEXT("stale_check_reimports"), Int(BP->GeneratedClass->GetDefaultObject(), TEXT("Spare")), 3);
     return true;
 }
 
@@ -250,14 +272,11 @@ public:
             if (GEditor->PlayWorld && FPlatformTime::Seconds() - Start < 30)
                 return false;
             Check(!GEditor->PlayWorld, TEXT("EndPIE"));
-            // What EndPIE triggers in the editor: the default change refused during PIE is applied now.
+            // What EndPIE triggers in the editor: nothing is left, the later save applied the change.
             S->Auto.RetryDeferred();
-            UObject* CDO = S->Blueprint->GeneratedClass->GetDefaultObject();
             Check(S->Auto.DeferredCount() == 0 &&
-                  Int(CDO, TEXT("Score")) == 20 &&
-                      Int(FindActor(GEditor->GetEditorWorldContext().World(), TEXT("ComposedPlaced")), TEXT("Score")) ==
-                                    20,
-                          TEXT("deferred_default_change_applied_after_PIE"));
+                  Int(S->Blueprint->GeneratedClass->GetDefaultObject(), TEXT("Score")) == 20,
+                      TEXT("retry_after_PIE_keeps_applied_change"));
             S->Script->Delete();
             UE_LOG(LogTemp, Display, TEXT("DAS_COMPOSED_PIE_RESULT=%s"), S->Passed ? TEXT("PASS"): TEXT("FAIL"));
             return true;
@@ -280,8 +299,17 @@ public:
         auto Handle = FCoreUObjectDelegates::OnObjectsReplaced.AddLambda(
             [&](const FCoreUObjectDelegates::FReplacementObjectMap& Map) { Replaced |= Map.Contains(BeforeActor); });
         FString Error;
-        Check(S->Script->Write(ComposedV2()), TEXT("write_v2_during_PIE"));
-        Check(FDasDSLService::Reimport(S->Blueprint.Get(), Error), TEXT("composed_reimport_during_PIE"));
+        // A reimport that fails during PIE is queued for the end of PIE and leaves the game running the old
+        // declaration.
+        Check(S->Script->Write(ComposedMixed()), TEXT("write_mixed_change_during_PIE"));
+        DasFailStructuralForTesting(2);
+        S->Auto.ReimportFiles({FPaths::ConvertRelativePathToFull(S->Script->Path)});
+        DasFailStructuralForTesting(0);
+        Check(S->Auto.DeferredCount() == 1 && Evaluate(FindActor(World, TEXT("ComposedPlaced")), 1) == 78,
+                                                       TEXT("failed_reimport_deferred_during_PIE"));
+        // A new field and a changed default in one save, applied to the running game: the field is added, the
+        // running actor keeps its value, the class and the editor world get the new default.
+        S->Auto.ReimportFiles({FPaths::ConvertRelativePathToFull(S->Script->Path)});
         FCoreUObjectDelegates::OnObjectsReplaced.Remove(Handle);
         if (!Error.IsEmpty())
             Test->AddInfo(Error);
@@ -295,15 +323,10 @@ public:
                                  Child->GetAttachParent() == Component(Actor, TEXT("Pivot")) &&
                                                                        Child->GetRelativeLocation().Z == 50.0,
                                                                        TEXT("PIE_components_kept_after_reinstance"));
-        Check(Int(FindActor(GEditor->GetEditorWorldContext().World(), TEXT("ComposedPlaced")), TEXT("Score")) == 10,
-                  TEXT("editor_world_actor_isolated"));
-        // A new default value is not applied to a running game; auto-reimport defers it to the end of PIE.
-        Check(S->Script->Write(ComposedV2().Replace(TEXT("Score : int = 10"), TEXT("Score : int = 20"))),
-                               TEXT("write_default_change_during_PIE"));
-        S->Auto.ReimportFiles({FPaths::ConvertRelativePathToFull(S->Script->Path)});
-        Check(S->Auto.DeferredCount() == 1 &&
-              Int(S->Blueprint->GeneratedClass->GetDefaultObject(), TEXT("Score")) == 10,
-                  TEXT("default_change_deferred_during_PIE"));
+        Check(S->Auto.DeferredCount() == 0 &&
+              Int(S->Blueprint->GeneratedClass->GetDefaultObject(), TEXT("Score")) == 20 &&
+                  Int(FindActor(GEditor->GetEditorWorldContext().World(), TEXT("ComposedPlaced")), TEXT("Score")) == 20,
+                      TEXT("default_change_applied_to_class_and_editor_world"));
         return Finish();
     }
 };

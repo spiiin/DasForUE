@@ -447,9 +447,14 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                          {
                              if (!Session->bDefaultsUpdateApproved)
                                  return false;
+                             // A default update may follow an approved declaration change (one save that
+                             // adds members and changes defaults); compare with what Unreal approved.
                              FDasAuthoringModule Old, Next;
                              FString Issue;
-                             return FDasAuthoringModule::FromJson(Session->Live->DSLDeclaration, Old, Issue) &&
+                             const FString& Base = Session->ApprovedDSLDeclaration.IsEmpty()
+                                                       ? Session->Live->DSLDeclaration
+                                                       : Session->ApprovedDSLDeclaration;
+                             return FDasAuthoringModule::FromJson(Base, Old, Issue) &&
                                     FDasAuthoringModule::FromJson(Candidate->DSLDeclaration, Next, Issue) &&
                                     FDasAuthoringModule::DefaultsOnly(Old, Next, Issue);
                          })())

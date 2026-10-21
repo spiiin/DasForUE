@@ -187,13 +187,34 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
                     BPs.AddUnique(B);
             }
     }
+    auto Compiled = [](const UBlueprint* B)
+    {
+        return B->GeneratedClass && (B->Status == BS_UpToDate || B->Status == BS_UpToDateWithWarnings);
+    };
     for (auto* B : BPs)
     {
-        if (!B->GeneratedClass || (B->Status != BS_UpToDate && B->Status != BS_UpToDateWithWarnings) ||
-            (!DefaultsOnly && B != Root &&
-             !B->GetOutermost()->GetMetaData().GetValue(B, TEXT("DasDSLSource")).IsEmpty()))
+        // The editor marks a Blueprint as needing a compile for edits that do not change it (saving its
+        // package, template notifications). A default update writes values into the CDO, templates and
+        // variable defaults, which a later compile keeps, so it accepts such a Blueprint as is; a structural
+        // migration recompiles and reinstances anyway, so it compiles first. Only a failed compile refuses.
+        if (DefaultsOnly && B->GeneratedClass && B->Status == BS_Dirty)
+            continue;
+        if (!Compiled(B) && B->GeneratedClass && B->Status != BS_Error)
         {
-            Error = TEXT("Compile dependent Blueprints; independent DSL sources need their own migration");
+            const bool WasDirty = B->GetOutermost()->IsDirty();
+            FKismetEditorUtilities::CompileBlueprint(B);
+            FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();
+            B->GetOutermost()->SetDirtyFlag(WasDirty);
+        }
+        if (!Compiled(B))
+        {
+            Error = FString::Printf(TEXT("Compile dependent Blueprints first: %s does not compile (status %d)"),
+                                         *B->GetName(), int32(B->Status));
+            return false;
+        }
+        if (!DefaultsOnly && B != Root && !B->GetOutermost()->GetMetaData().GetValue(B, TEXT("DasDSLSource")).IsEmpty())
+        {
+            Error = FString::Printf(TEXT("Independent DSL sources need their own migration: %s"), *B->GetName());
             return false;
         }
     }

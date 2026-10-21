@@ -67,13 +67,16 @@ automatic policy below. A notification reports each updated Blueprint; a refused
 type change, compile error) is reported in the notification and the Blueprint Log and leaves the
 Blueprint unchanged. Saving with an unchanged declaration does nothing: the edited method bodies are
 already live through hot reload, also during PIE. Unloaded Blueprints are not touched until you reimport
-them.
+them. A script changed without a save in this editor session (while the editor was closed, by another tool)
+is picked up when a map opens and before Play starts.
 
 Actors that declare components migrate like other actors as long as the components themselves are unchanged:
 a new field or method reinstances placed and running actors, also during PIE, and keeps component
 templates and per-instance component edits. Changing the components (adding, removing, their template
-defaults) still needs a new Blueprint. A change that updates default values is not applied to a running PIE
-world: the notification says so, and the change is applied automatically when Play stops.
+defaults) still needs a new Blueprint. A new default value is applied during PIE as well: the class and the
+editor world get it, actors of the running game keep their current values. One save may add members and
+change default values at once: the new declaration is applied first, then the default values. A change
+refused while PIE runs is tried again when Play stops.
 Turn it off with `Das.DSL.AutoReimport 0`; commandlets and unattended runs never reimport automatically.
 
 ### Das.DSL.Reimport

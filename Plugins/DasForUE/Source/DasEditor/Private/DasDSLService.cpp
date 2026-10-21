@@ -63,8 +63,12 @@ void DasFailWidenAfterCompileForTesting(bool Enabled)
 
 #include "DasWidgetLayoutsPreflight.inl"
 
-bool FDasDSLService::Apply(const FString& Script, const FString& Package, const FString& Id, UBlueprint*& Out,
-                           FString& Error, EDasDefaultMigrationPolicy DefaultPolicy)
+namespace
+{
+// Apply with the declaration read from Script, or with Override (the declaration of Script with some
+// values replaced; see SplitDefaultChanges).
+bool ApplyDeclaration(const FString& Script, const FString& Package, const FString& Id, UBlueprint*& Out,
+                      FString& Error, EDasDefaultMigrationPolicy DefaultPolicy, const FDasAuthoringModule* Override)
 {
     Out = nullptr;
     Error.Reset();
@@ -79,7 +83,9 @@ bool FDasDSLService::Apply(const FString& Script, const FString& Package, const 
     FDasAuthoringModule Model;
     FDasClassSchema Schema;
     FString Json;
-    if (!Runtime.ReadAuthoringScript(Runtime.ScriptPath(Script), Model, Error) ||
+    if (Override)
+        Model = *Override;
+    if ((!Override && !Runtime.ReadAuthoringScript(Runtime.ScriptPath(Script), Model, Error)) ||
         !Model.ToActorSchema(Id, Schema, Error) || !Model.ToJson(Json, Error))
         return false;
     FDasDeclaredClass PhysicsDeclaration;
@@ -359,8 +365,8 @@ bool FDasDSLService::Apply(const FString& Script, const FString& Package, const 
             }
         }
         UBlueprint* ParentBP = nullptr;
-        if (!Apply(Parent->SourceScript, ParentPackage, Parent->Id, ParentBP, Error,
-                   EDasDefaultMigrationPolicy::Automatic))
+        if (!FDasDSLService::Apply(Parent->SourceScript, ParentPackage, Parent->Id, ParentBP, Error,
+                                   EDasDefaultMigrationPolicy::Automatic))
             return false;
         DeclaredParent = ParentBP->GeneratedClass;
         if (SaveParent)
@@ -550,6 +556,48 @@ bool FDasDSLService::Apply(const FString& Script, const FString& Package, const 
                 BodyOnly ? TEXT("body-only; no Blueprint recompile"): TEXT("declaration applied"));
     return true;
 }
+// A change that adds members and also edits default values is applied in two steps: first the new
+// declaration with the defaults the Blueprint already has (Out), then only the default values. Returns
+// false when the change needs no split.
+bool SplitDefaultChanges(UBlueprint* BP, const FString& Source, FDasAuthoringModule& Out)
+{
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    FDasAuthoringModule Prior, Next;
+    FString Error, PriorJson, NextJson, SplitJson;
+    if (!FDasAuthoringModule::FromJson(BP->GetOutermost()->GetMetaData().GetValue(BP, TEXT("DasDSLModel")), Prior,
+                                                                                  Error) ||
+                                       !Runtime.ReadAuthoringScript(Runtime.ScriptPath(Source), Next, Error) ||
+                                       FDasAuthoringModule::DefaultsOnly(Prior, Next, Error))
+        return false;
+    Out = Next;
+    for (auto& C : Out.Classes)
+    {
+        const auto* Old = Prior.Classes.FindByPredicate([&](const auto& X) { return X.Id == C.Id; });
+        if (!Old)
+            continue;
+        C.NativeDefaults = Old->NativeDefaults;
+        C.PropertyOverrides = Old->PropertyOverrides;
+        for (auto& P : C.Properties)
+            if (const auto* Was = Old->Properties.FindByPredicate([&](const auto& X) { return X.Id == P.Id; }))
+                P.Default = Was->Default;
+        for (auto& Component : C.Components)
+            if (const auto* Was = Old->Components.FindByPredicate([&](const auto& X) { return X.Id == Component.Id; }))
+                Component.Defaults = Was->Defaults;
+        for (auto& O : C.ComponentOverrides)
+            if (const auto* Was = Old->ComponentOverrides.FindByPredicate([&](const auto& X) { return X.Id == O.Id; }))
+                O.Defaults = Was->Defaults;
+    }
+    // Split only when the second step is a pure default update and the first step differs from the source.
+    return Out.ToJson(SplitJson, Error) && Next.ToJson(NextJson, Error) && SplitJson != NextJson &&
+           FDasAuthoringModule::DefaultsOnly(Out, Next, Error);
+}
+}
+
+bool FDasDSLService::Apply(const FString& Script, const FString& Package, const FString& Id, UBlueprint*& Out,
+                           FString& Error, EDasDefaultMigrationPolicy DefaultPolicy)
+{
+    return ApplyDeclaration(Script, Package, Id, Out, Error, DefaultPolicy, nullptr);
+}
 bool FDasDSLService::Reimport(UBlueprint* BP, FString& Error, EDasDefaultMigrationPolicy DefaultPolicy)
 {
     if (!IsInGameThread() || !IsValid(BP))
@@ -566,7 +614,20 @@ bool FDasDSLService::Reimport(UBlueprint* BP, FString& Error, EDasDefaultMigrati
         return false;
     }
     UBlueprint* Result = nullptr;
-    return Apply(Source, BP->GetOutermost()->GetName(), Id, Result, Error, DefaultPolicy);
+    const FString Package = BP->GetOutermost()->GetName();
+    FDasAuthoringModule Declaration;
+    if (DefaultPolicy == EDasDefaultMigrationPolicy::Automatic && SplitDefaultChanges(BP, Source, Declaration))
+    {
+        if (!ApplyDeclaration(Source, Package, Id, Result, Error, DefaultPolicy, &Declaration))
+            return false;
+        if (!ApplyDeclaration(Source, Package, Id, Result, Error, DefaultPolicy, nullptr))
+        {
+            Error = TEXT("New members applied; default values not yet: ")+ Error;
+            return false;
+        }
+        return true;
+    }
+    return Apply(Source, Package, Id, Result, Error, DefaultPolicy);
 }
 
 namespace

@@ -14,9 +14,11 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 - Saving a `.das` file reimports the loaded Blueprints bound to it with the safe automatic policy; body-only
   edits stay live through hot reload, also during PIE. Actors with components accept declaration
-  changes as long as their components stay the same. Default-value changes saved during PIE are applied
-  when PIE ends. Classes with soft reference fields (such as the playable pickup) accept declaration changes
-  again; only direct container fields still block structural rollback. `Das.DSL.AutoReimport 0` turns it off
+  changes as long as their components stay the same. Default-value changes apply during PIE to the class and
+  the editor world (running actors keep their values); other refusals during PIE are retried when PIE ends. Classes with soft reference fields (such as the playable pickup) accept declaration changes
+  again; only direct container fields still block structural rollback. A save that adds members and changes
+  defaults applies them in two steps, and scripts changed without a save are picked up when a map opens and
+  before Play. `Das.DSL.AutoReimport 0` turns it off
   ([Apply and hot reload](Docs/Guide/Workflow/ApplyAndHotReload.md#automatic-reimport-on-save)).
 
 ### Changed
@@ -27,6 +29,14 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - The playable example map uses a movable sun with a sky atmosphere: no "Lighting needs to be rebuilt"
   message and no black sky.
 - Generated example folders (`DasExamples/Playable`, `DasExamples/AI`) are no longer kept in git.
+
+### Fixed
+
+- A Blueprint that the editor marked as needing a compile without a real change (after saving its package,
+  or after a template default update) no longer blocks reimport: default updates accept it, structural
+  migrations compile it first. A freshly created DSL Blueprint is up to date right away.
+- `Tests/suites.json` gains `defaults-merge` and `actor-component`; the defaults merge probe was not part of
+  any suite and had been failing since before this change.
 
 ## 2026-10-20
 
