@@ -96,6 +96,7 @@ __ue_enhanced_unbind	@ue_foundation::__ue_enhanced_unbind CIH<ue_foundation::UOb
 __ue_find_by_type	@ue_foundation::__ue_find_by_type CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	ue_foundation::UObjectHandle	4
 __ue_focus_cause	@ue_foundation::__ue_focus_cause CIH<ue_foundation::UEFocusEvent> C_c	string const	4
 __ue_focus_user	@ue_foundation::__ue_focus_user CIH<ue_foundation::UEFocusEvent> C_c	uint const	4
+__ue_gas_store_hit	@ue_foundation::__ue_gas_store_hit CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UEHitResult> C_c	int const	4
 __ue_image_soft_error	@ue_foundation::__ue_image_soft_error CIH<ue_foundation::UObjectHandle> C_c	string const	4
 __ue_image_soft_status	@ue_foundation::__ue_image_soft_status CIH<ue_foundation::UObjectHandle> C_c	string const	4
 __ue_input_kind	@ue_foundation::__ue_input_kind CIH<ue_foundation::InputActionValue> C_c	int const	4

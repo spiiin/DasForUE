@@ -68,7 +68,7 @@ $Steps = @{
         finally { $ErrorActionPreference = $Previous; Pop-Location }
         if ($Code) { throw "Generator tests failed; see $($S.log).log" }
     }
-    commandlet = { param($S) Invoke-DasCommandlet $Das -Run $S.run -Name $S.log -Marker $S.marker | Out-Null }
+    commandlet = { param($S) Invoke-DasCommandlet $Das -Run $S.run -Name $S.log -Marker $S.marker -Rendering:([bool]$S.rendering) | Out-Null }
     phases     = { param($S)
         $Id = Invoke-DasAssetPhases $Das -Run $S.run -Name $S.log -Marker $S.marker -Phases @($S.phases)
         Set-Content -LiteralPath (Join-Path $Das.Logs $S.probe) -Value $Id
@@ -79,7 +79,7 @@ $Steps = @{
         if ($S.probeArgs) {
             foreach ($A in $S.probeArgs.PSObject.Properties) { $Extra += "-$($A.Name)=$(Get-DasProbe $A.Value)" }
         }
-        Invoke-DasAutomation $Das -Test $S.test -Name $S.log -Count $S.minimum -AtLeast -Extra $Extra
+        Invoke-DasAutomation $Das -Test $S.test -Name $S.log -Count $S.minimum -AtLeast -Extra $Extra -Rendering:([bool]$S.rendering)
     }
     script     = { param($S)
         & (Join-Path $PSScriptRoot $S.script) -Engine $Engine -SkipBuild

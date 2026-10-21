@@ -13,6 +13,8 @@ class PlayablePickup : Actor {
         var PickupVFX:NiagaraSystemRef
         var Collector:PlayableCharacterRef
         var Points:int=10
+        // GAS healing, applied in addition to score. Full-health pickups are consumed.
+        var Healing:float=25.0f
         var RespawnSeconds:float=3.0f
     }
     state=ue_properties(BlueprintReadWrite) {
@@ -87,6 +89,7 @@ class PlayablePickup : Actor {
         self.Available=false
         self.Trigger.SetCollisionEnabled(ECollisionEnabled.NoCollision)
         self.Visual.SetVisibility(false,true)
+        self.Collector.Heal(self.Healing)
         self.Collector.AddScore(self.Points)
         self.Pickups+=1
         if(ue_effect_at("pickup",self.PickupSound,self.PickupVFX,self.Trigger.K2_GetComponentLocation(),"OnPickupEffectFinished",0.35f,1.4f,0.4f)) { self.EffectsStarted+=1 }

@@ -63,9 +63,18 @@ FString DSLValidateNativeStruct(const das::TypeDeclPtr& T)
         AppendCallShape(*I, Shape);
         ++Count;
         const auto* F = T->structType->findField(DSLUtf8(I->GetName()));
+        // Cooked FNames need not retain Editor spelling (for example Id becomes ID).
+        // Match the native identity while keeping the canonical DAS declaration's spelling.
+        for (const auto& Candidate : T->structType->fields)
+            if (FName(*DSLText(Candidate.name)) == I->GetFName())
+            {
+                if (F && F != &Candidate)
+                    DSLFail(TEXT("Native struct fields collide under FName identity"));
+                F = &Candidate;
+            }
         FDasDeclaredType Native;
         if (!F || F->generated || F->classMethod || !DasNativeGameplayType(*I, Native))
-            DSLFail(TEXT("Native struct layout mismatch"));
+            DSLFail(TEXT("Native struct layout mismatch: ") + Path + TEXT(".") + I->GetName());
         const auto& Type = F->type;
         if (!Type || Type->ref || Type->isFixedArray())
             DSLFail(TEXT("Native struct members require by-value fields"));
@@ -87,7 +96,7 @@ FString DSLValidateNativeStruct(const das::TypeDeclPtr& T)
                 DSLFail(TEXT("Native struct member identity mismatch"));
         }
     }
-    if (Shape != Row->Signature || Count != int32(T->structType->fields.size()))
+    if (!Shape.Equals(Row->Signature, ESearchCase::IgnoreCase) || Count != int32(T->structType->fields.size()))
         DSLFail(TEXT("Native struct schema stale or fields added"));
     return Path;
 }

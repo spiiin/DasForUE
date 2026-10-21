@@ -33,6 +33,10 @@ class TypeAdapterGateTest(unittest.TestCase):
             for name, path in sources():
                 if name in allowed:
                     continue
+                # Reflection registry data must retain native identifiers, including
+                # nested struct paths. It contains no hand-written type dispatch.
+                if os.path.relpath(path, ROOT).replace(os.sep, '/') == 'DasRuntime/Private/Generated/DasNativeGameplay.generated.h':
+                    continue
                 with open(path, encoding='utf-8', errors='replace') as f:
                     for number, line in enumerate(f, 1):
                         if regex.search(line):

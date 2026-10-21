@@ -2,6 +2,8 @@
 #include "UObject/FieldPath.h"
 #include "DasGameplayTags.h"
 #include "DasTypeAdapters.h"
+#include "DasGASAuthoring.h"
+#include "DasGASCalculations.h"
 #include "Engine/CurveTable.h"
 #include "Engine/DataTable.h"
 #include "DasDataAssets.h"
@@ -556,6 +558,7 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeTimers.inl"
 #include "DasDynamicEvents.inl"
 #include "DasScriptDelegateBindings.inl"
+#include "DasRuntimeGASCueSessions.inl"
 #include "DasRuntimeInputSessions.inl"
 }
 
@@ -710,6 +713,7 @@ void FDasRuntimeModule::ShutdownModule()
         PendingScriptTimers.Empty();
         Sessions.Empty();
         PendingEvents.Empty();
+        DropPendingGASCueHooks();
         CreatedScriptScenes.Empty();
         UDasIntDelegateProxy::ResetDynamicReceivers();
         UDasScriptDelegateProxy::ResetReceivers();

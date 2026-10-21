@@ -48,9 +48,11 @@ function Assert-DasLog {
 function Invoke-DasCommandlet {
     param([Parameter(Mandatory)]$Das, [Parameter(Mandatory)][string]$Run, [Parameter(Mandatory)][string]$Name,
           [Parameter(Mandatory)][string]$Marker, [string[]]$Arguments = @(), [string]$FailPattern,
-          [switch]$NoZen, [switch]$FullStdOut)
+          [switch]$NoZen, [switch]$FullStdOut, [switch]$Rendering)
     $Log = Join-Path $Das.Logs "$Name.log"
-    $All = @($Das.Project, "-run=$Run") + $Arguments + @('-unattended', '-NullRHI', '-nosplash', '-stdout')
+    $All = @($Das.Project, "-run=$Run") + $Arguments + @('-unattended', '-nosplash', '-stdout')
+    if ($Rendering) { $All += @('-AllowCommandletRendering', '-AllowCommandletAudio', '-RenderOffscreen') }
+    else { $All += '-NullRHI' }
     if ($FullStdOut) { $All += '-FullStdOutLogOutput' }
     $All += "-abslog=$Log"
     if ($NoZen) { $All += @('-ddc=NoZenLocalFallback', '-NoZenAutoLaunch') }
@@ -95,12 +97,13 @@ function Invoke-DasAssetPhases {
 # successes without warnings.
 function Invoke-DasAutomation {
     param([Parameter(Mandatory)]$Das, [Parameter(Mandatory)][string]$Test, [Parameter(Mandatory)][string]$Name,
-          [string]$Marker, [int]$Count = 1, [string[]]$Extra = @(), [switch]$AtLeast)
+          [string]$Marker, [int]$Count = 1, [string[]]$Extra = @(), [switch]$AtLeast, [switch]$Rendering)
     $Log = Join-Path $Das.Logs "$Name.log"
     $Report = Join-Path $Das.Logs "$Name-report"
-    $Arguments = @(('"' + $Das.Project + '"'), '-unattended', '-NullRHI', '-nosplash', '-nosound', '-RenderOffscreen',
+    $Arguments = @(('"' + $Das.Project + '"'), '-unattended', '-nosplash', '-RenderOffscreen',
         ('-ExecCmds="Automation RunTests ' + $Test + '"'), '-TestExit="Automation Test Queue Empty"',
         ('-ReportExportPath="' + $Report + '"'), ('-abslog="' + $Log + '"')) + $Extra
+    if (!$Rendering) { $Arguments += @('-NullRHI', '-nosound') }
     $Process = Start-Process -FilePath $Das.Editor -ArgumentList $Arguments @DasWindowStyle -PassThru -Wait
     if ($Process.ExitCode) { throw "$Name editor exited with $($Process.ExitCode)" }
     if ($Marker) { Assert-DasLog -Log $Log -Marker $Marker -Name $Name }

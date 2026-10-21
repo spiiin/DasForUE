@@ -97,7 +97,8 @@ FProperty* NativeGameplayPropertyChecked(UObject* O, const char* ClassPath, cons
     auto* P = ResolveProperty<FProperty>(O, Name, Write, C);
     FString Shape;
     AppendCallShape(P, Shape);
-    if (Shape != Entry->Signature || P->GetOwnerClass()->GetPathName() != Entry->Declaring ||
+    if (!Shape.Equals(Entry->Signature, ESearchCase::IgnoreCase) ||
+        P->GetOwnerClass()->GetPathName() != Entry->Declaring ||
         P->HasAnyPropertyFlags(CPF_Deprecated | CPF_EditorOnly) ||
         P->HasAnyPropertyFlags(CPF_BlueprintReadOnly) != Entry->ReadOnly)
         C->throw_error("native field shape/policy changed; regenerate bindings");
@@ -118,7 +119,7 @@ FDasCallHandle BeginNativeGameplayCall(const FDasObjectHandle& H, const char* Cl
     auto* F = Entry ? O->FindFunction(*Method) : nullptr;
     if (!F || !F->HasAnyFunctionFlags(FUNC_BlueprintCallable) ||
         F->HasAnyFunctionFlags(FUNC_Net | FUNC_Static | FUNC_Delegate | FUNC_MulticastDelegate | FUNC_EditorOnly) ||
-        CallSignatureKey(F) != Entry->Signature)
+        !CallSignatureKey(F).Equals(Entry->Signature, ESearchCase::IgnoreCase))
         C->throw_error("native method missing or shape/policy changed; regenerate bindings");
     if (F->HasAnyFunctionFlags(FUNC_BlueprintAuthorityOnly))
     {

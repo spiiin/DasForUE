@@ -100,7 +100,7 @@ def generate(ir,script_dirs=None):
   if known.get(item['path'])!=(item['module'],item['name']):raise ValueError('Stale native declaration '+item['path'])
  if seen!={item['path'] for item in discovery['classes']}:raise ValueError('Native receiver/discovery mismatch')
  header += ['struct FDasNativeGameplayView { const TCHAR *Class,*Source; };','inline const FDasNativeGameplayView DasNativeGameplayViews[] = {']
- source=['options gen2','module ue_native_gameplay public',*['require '+m+' public' for m in sorted(set(modules)|{'ue_soft_references'})],'','// Generated dependency views; methods/fields are synthesized from the compiled manifest.']
+ source=['options gen2','module ue_native_gameplay public',*['require '+m+' public' for m in sorted(set(modules)|{'ue_soft_references','ue_gameplay_tags'})],'','// Generated dependency views; methods/fields are synthesized from the compiled manifest.']
  view_names={}
  for path in sorted(refs):
   if path in known:
@@ -141,7 +141,7 @@ def generate(ir,script_dirs=None):
  for value in used:
   if value['kind']=='enum' and value['type_path'] not in enums:raise ValueError('Missing native enum definition')
  header.append('};')
- math={'/Script/CoreUObject.Vector':'UEVector','/Script/CoreUObject.Vector2D':'UEVector2D','/Script/CoreUObject.Rotator':'UERotator','/Script/CoreUObject.Transform':'UETransform'}
+ math={'/Script/CoreUObject.Vector':'UEVector','/Script/CoreUObject.Vector2D':'UEVector2D','/Script/CoreUObject.Rotator':'UERotator','/Script/CoreUObject.Transform':'UETransform','/Script/GameplayTags.GameplayTag':'ue_gameplay_tags::GameplayTag','/Script/GameplayTags.GameplayTagContainer':'ue_gameplay_tags::GameplayTagContainer'}
  structs={};names=set(enum_names)|set(view_names.values())
  for item in ir['structs']:
   path=item['path'];name=path.rsplit('.',1)[-1]

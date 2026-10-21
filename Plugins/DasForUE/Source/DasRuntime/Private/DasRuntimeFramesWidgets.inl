@@ -66,6 +66,7 @@ void PublishFrameTransform(int32 I, const FTransform& X, das::Context* C)
 }
 FDelegateHandle RuntimePreExitHandle;
 thread_local bool InputSnapshotDispatch = false;
+thread_local const FString* GASCalculationContract = nullptr;
 thread_local bool GeometrySnapshotDispatch = false;
 uint64 NextPaintEpoch = 1;
 struct FPaintCommand
@@ -304,6 +305,68 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
                    C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
                    C.InputClasses[0] == UTF8_TO_TCHAR(P->sValue.c_str()) && FindDasCallbackFrame(C.InputClasses[0]);
         }
+    // Like authored UFunction entries, the compiler-owned ability descriptor is
+    // an explicit registry for this otherwise non-public struct-frame ABI.
+    if (F->generated && C.ReturnKind == EDasMethodSignature::Void && C.InputDirections.IsEmpty() &&
+        C.Inputs.Num() == 1 && C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
+        C.InputClasses[0] == TEXT("/Script/DasRuntime.DasAuthoredAbilityContext"))
+    {
+        bool Declared = false;
+        Program->getThisModule()->structures.foreach (
+            [&](const das::StructurePtr& S)
+            {
+                for (auto* A : S->annotations)
+                    if (A->annotation->name == "ue_gameplay_ability")
+                    {
+                        auto* Wire = A->arguments.find("_ue_gas_declaration", das::Type::tString);
+                        TSharedPtr<FJsonObject> Object;
+                        if (!Wire || !FJsonSerializer::Deserialize(
+                                         TJsonReaderFactory<>::Create(UTF8_TO_TCHAR(Wire->sValue.c_str())), Object))
+                            continue;
+                        for (const auto* Key : {TEXT("activate"), TEXT("end"), TEXT("cancel"), TEXT("task")})
+                        {
+                            FString Value;
+                            Declared |= Object->TryGetStringField(Key, Value) && Value == Entry;
+                        }
+                    }
+            });
+        if (Declared)
+            return true;
+    }
+    if (F->generated && C.ReturnKind == EDasMethodSignature::Void && C.InputDirections.IsEmpty() &&
+        C.Inputs.Num() == 1 && C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
+        C.InputClasses[0] == TEXT("/Script/DasRuntime.DasGASCueEvent"))
+    {
+        bool Declared = false;
+        Program->getThisModule()->structures.foreach (
+            [&](const das::StructurePtr& S)
+            {
+                for (auto* A : S->annotations)
+                    if (A->annotation->name == "ue_gameplay_cue")
+                    {
+                        const auto* Wire = A->arguments.find("_ue_gas_declaration", das::Type::tString);
+                        TSharedPtr<FJsonObject> O;
+                        if (!Wire || !FJsonSerializer::Deserialize(
+                                         TJsonReaderFactory<>::Create(UTF8_TO_TCHAR(Wire->sValue.c_str())), O))
+                            continue;
+                        for (const auto* Key :
+                             {TEXT("execute"), TEXT("onactive"), TEXT("whileactive"), TEXT("removed")})
+                        {
+                            FString Value;
+                            Declared |= O->TryGetStringField(Key, Value) && Value == Entry;
+                        }
+                    }
+            });
+        if (Declared)
+            return true;
+    }
+    if (GASCalculationContract && F->generated &&
+        (C.ReturnKind == EDasMethodSignature::Float ||
+         (C.ReturnKind == EDasMethodSignature::Struct &&
+          C.ReturnClass == TEXT("/Script/DasRuntime.DasGASExecutionResult"))) &&
+         C.InputDirections.IsEmpty() && C.Inputs.Num() == 1 && C.Inputs[0] == EDasMethodSignature::Struct &&
+         C.InputClasses.Num() == 1 && C.InputClasses[0] == TEXT("/Script/DasRuntime.DasGASCalculationContext"))
+        return true;
     bool Objects = C.ReturnKind == EDasMethodSignature::Delegate || C.ReturnKind == EDasMethodSignature::Object ||
                    C.ReturnKind == EDasMethodSignature::Struct || C.ReturnKind == EDasMethodSignature::Enum;
     for (auto K : C.Inputs)

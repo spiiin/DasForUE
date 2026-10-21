@@ -745,10 +745,14 @@ void DrainEvents()
 #endif
     TGuardValue<bool> Draining(bDrainingEvents, true);
     FlushReleasedSessions();
-    int32 Index = 0;
-    while (Index < PendingEvents.Num() && Index < 1024)
+    int32 Index = 0, DispatchBudget = 0;
+    while ((Index < PendingEvents.Num() || !PendingGASCueSessions.IsEmpty()) && ++DispatchBudget <= 1024)
     {
         FlushReleasedSessions();
+        if (!PendingGASCueSessions.IsEmpty())
+            DrainOneGASCueHook();
+        if (Index >= PendingEvents.Num())
+            continue;
         const auto Event = PendingEvents[Index++];
         const auto& Payload = Event.Capture->GetValue();
         FString CaptureIssue;
@@ -877,9 +881,10 @@ void DrainEvents()
                 *HostError = Error;
         }
     }
-    if (Index < PendingEvents.Num())
+    if (Index < PendingEvents.Num() || !PendingGASCueSessions.IsEmpty())
         UE_LOG(LogDasRuntime, Display, TEXT("Event dispatch budget exceeded; remaining recursive events dropped."));
     PendingEvents.Reset();
+    DropPendingGASCueHooks();
     FlushReleasedSessions();
 }
 

@@ -542,7 +542,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                         Candidate->Context->PersistentInts = Session->Live->Context->PersistentInts;
                     Candidate->Context->Self = Self;
                     auto* BindEvents = Candidate->Context->findFunction("bind_events");
-                    if (BindEvents && !ConstructingObject)
+                    if (BindEvents && !ConstructingObject && !Cast<UDasGASCueSession>(Self.Get()))
                     {
                         if (!das::verifyCall<void>(BindEvents->debugInfo, Candidate->Modules))
                             CandidateError = TEXT("Expected exported bind_events(): void.");

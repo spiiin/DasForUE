@@ -212,7 +212,9 @@ void DSLDeclarationKind(const das::AnnotationList& Args)
         if (Name == "ue_library" || Name == "ue_native_base" || Name == "ue_object_ref" || Name == "ue_class" ||
             Name == "ue_interface" || Name == "ue_struct" || Name == "ue_native_struct" || Name == "ue_class_ref" ||
             Name == "ue_native_object" || Name == "ue_native_interface" || Name == "ue_interface_ref" ||
-            Name == "ue_delegate" || Name == "ue_multicast")
+            Name == "ue_delegate" || Name == "ue_multicast" || Name == "ue_attribute_set" ||
+            Name == "ue_gameplay_cue" || Name == "ue_gameplay_effect" || Name == "ue_gameplay_ability" ||
+            Name == "ue_gas_calculation")
             Kinds.Add(DSLText(Name));
     }
     if (Kinds.Num() > 1)
@@ -861,6 +863,10 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
 #include "DasDSLClassAnnotation.inl"
 #include "DasDSLInterfaceAnnotation.inl"
 #include "DasDSLTypeAnnotations.inl"
+#include "DasGASDSL.inl"
+#include "DasGASAbilityDSL.inl"
+#include "DasGASCueDSL.inl"
+#include "DasGASCalculationDSL.inl"
 #include "DasStaticLibraryDSL.inl"
 
 bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObject* Self, FString& Wire,
@@ -873,6 +879,78 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                     if (const auto* Owner = A->arguments.find("owner_entry", das::Type::tString))
                         if (Owner->sValue.find("ue_") == 0)
                             return DSLValidateOwner(Program, DSLText(Owner->sValue), Self, Wire, Error);
+    if (GASCalculationContract)
+    {
+        bool Match = false;
+        Program->getThisModule()->structures.foreach (
+            [&](const das::StructurePtr& S)
+            {
+                const auto* A = DSLAnnotation(S->annotations, "ue_gas_calculation");
+                const auto* Data = A ? A->arguments.find(DSLGASKey, das::Type::tString) : nullptr;
+                TSharedPtr<FJsonObject> O;
+                FString Contract, Point;
+                if (Data && FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(DSLText(Data->sValue)), O) &&
+                    O->TryGetStringField(TEXT("contract"), Contract) &&
+                                         O->TryGetStringField(TEXT("entry"), Point) &&
+                                                              Contract == *GASCalculationContract && Point == Entry)
+                    Match = true;
+            });
+        Wire.Reset();
+        if (!Match)
+            Error = TEXT("GAS calculation source contract differs from saved asset");
+        return Match;
+    }
+    if (const auto* Session = Cast<UDasGASCueSession>(Self))
+    {
+        bool Match = false;
+        const auto* Cue = Session->Definition.Get();
+        Program->getThisModule()->structures.foreach (
+            [&](const das::StructurePtr& S)
+            {
+                const auto* A = DSLAnnotation(S->annotations, "ue_gameplay_cue");
+                const auto* Data = A ? A->arguments.find(DSLGASKey, das::Type::tString) : nullptr;
+                TSharedPtr<FJsonObject> O;
+                FString Contract, Id;
+                if (Cue && Data &&
+                    FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(DSLText(Data->sValue)), O) &&
+                    O->TryGetStringField(TEXT("contract"), Contract) &&
+                                         O->TryGetStringField(TEXT("id"), Id) && Id == Cue->DefinitionId &&
+                                                              Contract == Cue->ScriptContract)
+                    for (const auto& H : Cue->Hooks)
+                        Match |= H.Value == Entry;
+            });
+        Wire.Reset();
+        if (!Match)
+            Error = TEXT("Cue source contract differs from saved notify asset");
+        return Match;
+    }
+    if (const auto* Ability = Cast<UDasAuthoredGameplayAbility>(Self); Ability && !Ability->ActivateEntry.IsEmpty())
+    {
+        bool Match = false;
+        Program->getThisModule()->structures.foreach (
+            [&](const das::StructurePtr& S)
+            {
+                const auto* A = DSLAnnotation(S->annotations, "ue_gameplay_ability");
+                const auto* Data = A ? A->arguments.find(DSLGASKey, das::Type::tString) : nullptr;
+                TSharedPtr<FJsonObject> Object;
+                FString Contract, Id;
+                if (Data && FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(DSLText(Data->sValue)), Object) &&
+                    Object->TryGetStringField(
+                        TEXT("contract"), Contract) &&
+                        Object->TryGetStringField(TEXT("id"), Id) && Id == Ability->DefinitionId &&
+                                                  Contract == Ability->ScriptContract &&
+                                                  (Entry == Ability->ActivateEntry || Entry == Ability->EndEntry ||
+                                                   Entry == Ability->CancelEntry || Entry == Ability->TaskEntry))
+                {
+                    // The native CDO validates this contract; this is not an Actor/Library schema.
+                    Wire.Reset();
+                    Match = true;
+                }
+            });
+        if (!Match)
+            Error = TEXT("Ability script contract differs from saved asset; reimport into a new folder");
+        return Match;
+    }
     if (LibraryInvocationContract && Self)
     {
         bool Match = false;

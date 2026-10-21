@@ -57,6 +57,11 @@ public:
         addAnnotation(new FUENativeEnumAnnotation());
         addAnnotation(new FUENativeStructAnnotation());
         addAnnotation(new FUEStructAnnotation());
+        addAnnotation(new FUEGASDeclarationAnnotation(false));
+        addAnnotation(new FUEGASDeclarationAnnotation(true));
+        addAnnotation(new FUEGASCueAnnotation());
+        addAnnotation(new FUEGASAbilityAnnotation());
+        addAnnotation(new FUEGASCalculationAnnotation());
         addAnnotation(new FUENativeInterfaceAnnotation());
         addAnnotation(new FUENativeInterfaceAnnotation("ue_interface_ref"));
         addAnnotation(new FUESourceValueBinding());
@@ -427,6 +432,8 @@ public:
                         ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(ViewHitResult), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "ue_hit_result_view", das::SideEffects::modifyExternal, "ViewHitResult");
+        AddUEExtern<DAS_BIND_FUN(StoreGASTargetHit)>(*this, Library, "__ue_gas_store_hit",
+                                                     das::SideEffects::modifyExternal, "StoreGASTargetHit");
         addAnnotation(new FOverlapResultAnnotation(Library));
         AddUEExtern<DAS_BIND_FUN(TraceMaterial), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_trace_material", das::SideEffects::accessExternal, "TraceMaterial");

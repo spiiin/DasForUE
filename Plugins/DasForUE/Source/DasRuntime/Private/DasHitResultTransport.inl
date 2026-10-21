@@ -61,3 +61,9 @@ FDasTraceHit ViewHitResult(const FDasHitResultValue& H, das::Context* C)
     RequireObjectContext(C);
     return ProjectHitResult(ResolveHitResult(H, C), C);
 }
+
+int32 StoreGASTargetHit(const FDasObjectHandle& Source,const FDasHitResultValue& Hit,das::Context* C) {
+    auto* ASC=Cast<UDasAuthoredAbilitySystemComponent>(ResolveObject(Source,C));
+    if(!ASC)C->throw_error("GAS hit source requires an authored ASC");
+    return ASC->RegisterAuthoredTargetHit(ResolveHitResult(Hit,C));
+}

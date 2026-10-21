@@ -127,8 +127,9 @@ FDasDeclaredProperty DSLNativeReferenceProperty(const das::TypeDeclPtr& Receiver
     FString Shape;
     if (P)
         AppendCallShape(P, Shape);
-    if (!P || P->GetName() != Field || Shape != Row->Signature || P->GetOwnerClass()->GetPathName() != Row->Declaring ||
-        !P->HasAnyPropertyFlags(CPF_BlueprintVisible) || P->HasAnyPropertyFlags(CPF_Deprecated | CPF_EditorOnly) ||
+    if (!P || P->GetFName() != FName(*Field) || !Shape.Equals(Row->Signature, ESearchCase::IgnoreCase) ||
+        P->GetOwnerClass()->GetPathName() != Row->Declaring || !P->HasAnyPropertyFlags(CPF_BlueprintVisible) ||
+        P->HasAnyPropertyFlags(CPF_Deprecated | CPF_EditorOnly) ||
         P->HasAnyPropertyFlags(CPF_BlueprintReadOnly) != Row->ReadOnly)
         DSLFail(TEXT("Native field not generated or stale: ")+ Path + TEXT(".")+ Field);
     FString AccessError;
@@ -205,7 +206,7 @@ void DSLNativeMethodDescriptor(das::Program* Program, das::Module* Module, const
     const auto* Row = DasNativeGameplayMethod(Declaration.Id, DSLText(Name));
     auto* Class = FindObject<UClass>(nullptr, *Declaration.Id);
     auto* Function = Row && Class ? Class->FindFunctionByName(*DSLText(Name)) : nullptr;
-    if (!Function || CallSignatureKey(Function) != Row->Signature)
+    if (!Function || !CallSignatureKey(Function).Equals(Row->Signature, ESearchCase::IgnoreCase))
         DSLFail(TEXT("Native method not generated or stale: ")+ Declaration.Id + TEXT(".")+ DSLText(Name));
     Method.Name = DSLText(Name);
     Method.Id = Declaration.Id + TEXT(".")+ Method.Name;

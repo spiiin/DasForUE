@@ -119,7 +119,7 @@ For widget input handlers, painting, drag and drop and the generated UMG API, se
 
 `ue_apply_damage(target:ActorRef, amount:float, source=default<ActorRef>, instigator=default<PlayerControllerRef>):float` calls native `UGameplayStatics::ApplyDamage`. The amount must be finite and non-negative, objects must be live and in the same world, and the caller needs authority. No replication is added. (The `ue_ai` module has an overload taking an `AIControllerRef` instigator.)
 
-`dsl_health_component.das` is a fully authored ActorComponent: it subscribes to `owner.OnTakeAnyDamage`, clamps health at zero, provides `Heal` clamped to `Maximum`, and broadcasts `Changed(current,maximum)`. `ue_event(source="Health",...)` lets the owning Character subscribe to its own component and update the HUD.
+The playable Character/pickup now uses the [GAS health adapter](GAS.md): native Health/MaxHealth attributes, instant damage/healing effects, and owned attribute-change callbacks for the HUD. `dsl_health_component.das` remains a separate non-GAS ActorComponent example; do not attach both health implementations to one actor.
 
 ## Try it
 

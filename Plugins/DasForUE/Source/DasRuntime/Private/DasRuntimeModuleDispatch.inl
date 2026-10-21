@@ -790,6 +790,98 @@ FDasExecutionResult FDasRuntimeModule::DispatchInputEventSnapshots(const FString
     return RunNamedFramePersistent(Path, Entry, Args, EDasMethodSignature::Int, Self);
 }
 
+FDasExecutionResult FDasRuntimeModule::DispatchGASCalculation(UObject* Owner, const FString& Script,
+                                                              const FString& Entry, const FString& Contract,
+                                                              const FDasGASCalculationContext& Context,
+                                                              bool StructuredOutput)
+{
+    FDasExecutionResult Rejected;
+    if (!IsInGameThread() || !IsValid(Owner) || AuthoredDispatchDepth >= 32 || ConstructingObject ||
+        Contract.Len() != 32 ||
+        (!Owner->IsA<UDasGASMagnitudeCalculation>() && !Owner->IsA<UDasGASExecutionCalculation>()))
+    {
+        Rejected.Error = TEXT("Invalid GAS calculation dispatch");
+        return Rejected;
+    }
+    FDasScalarValue A;
+    A.Kind = 12;
+    A.ObjectClass = FDasGASCalculationContext::StaticStruct()->GetPathName();
+    A.StructValue.InitializeAs<FDasGASCalculationContext>(Context);
+    TGuardValue<int32> Depth(AuthoredDispatchDepth, AuthoredDispatchDepth + 1);
+    TGuardValue<const FString*> Scope(GASCalculationContract, &Contract);
+    return RunNamedFramePersistent(ScriptPath(Script), Entry, {A},
+                                   StructuredOutput ? EDasMethodSignature::Struct : EDasMethodSignature::Float, Owner,
+                                   StructuredOutput ? TEXT("/Script/DasRuntime.DasGASExecutionResult") : FString());
+}
+
+void FDasRuntimeModule::QueueGASCueHook(UDasGASCueSession* Session, const FDasGASCueEvent& Event)
+{
+    if (!IsInGameThread() || !IsValid(Session) || !Session->Live() || !Session->Definition->Hooks.Contains(Event.Event))
+        return;
+    if (Session->Pending.Num() >= 64 ||
+        (PendingGASCueSessions.Num() >= 1024 && !PendingGASCueSessions.Contains(Session)))
+    {
+        UE_LOG(LogDasRuntime, Warning, TEXT("DAS_GAS_CUE_QUEUE_LIMIT"));
+        return;
+    }
+    Session->Pending.Add(Event);
+    PendingGASCueSessions.AddUnique(Session);
+    DrainEvents();
+}
+FDasExecutionResult FDasRuntimeModule::DispatchGASCueHook(UDasGASCueSession* Session, const FDasGASCueEvent& Event)
+{
+    FDasExecutionResult Rejected;
+    if (!IsInGameThread() || !IsValid(Session) || !Session->Live() || ActiveContext || ConstructingObject ||
+        AuthoredDispatchDepth >= 32)
+    {
+        Rejected.Error = TEXT("Invalid or recursive cue hook dispatch");
+        return Rejected;
+    }
+    const auto* Cue = Session->Definition.Get();
+    const auto* Entry = Cue->Hooks.Find(Event.Event);
+    if (!Entry || Cue->ScriptFile.IsEmpty() || Cue->ScriptContract.Len() != 32 || Event.Target != Session->Target.Get())
+    {
+        Rejected.Error = TEXT("Invalid cue hook contract or target");
+        return Rejected;
+    }
+    FDasScalarValue Arg;
+    Arg.Kind = 12;
+    Arg.ObjectClass = FDasGASCueEvent::StaticStruct()->GetPathName();
+    Arg.StructValue.InitializeAs<FDasGASCueEvent>(Event);
+    TGuardValue<int32> Depth(AuthoredDispatchDepth, AuthoredDispatchDepth + 1);
+    return RunNamedFramePersistent(ScriptPath(Cue->ScriptFile), *Entry, {Arg}, EDasMethodSignature::Void, Session);
+}
+
+FDasExecutionResult FDasRuntimeModule::DispatchGASAbilityHook(UDasAuthoredGameplayAbility* Ability,
+                                                              const FString& Entry)
+{
+    FDasExecutionResult Rejected;
+    if (!IsInGameThread() || !IsValid(Ability) || Ability->IsTemplate() || Ability->ScriptFile.IsEmpty() ||
+        Entry.IsEmpty() ||
+        (Entry != Ability->ActivateEntry && Entry != Ability->EndEntry && Entry != Ability->CancelEntry &&
+         Entry != Ability->TaskEntry) ||
+        ConstructingObject || AuthoredDispatchDepth >= 32)
+    {
+        Rejected.Error = TEXT("Invalid or recursive GAS ability hook dispatch");
+        return Rejected;
+    }
+    const auto Context = Ability->ScriptAbilityContext();
+    if (Context.ActivationId <= 0 || Context.GrantId <= 0 || !IsValid(Context.Owner) || !IsValid(Context.System) ||
+        !Context.Owner->GetWorld() || Context.Owner->IsActorBeingDestroyed() ||
+        Context.Owner->GetWorld()->bIsTearingDown)
+    {
+        Rejected.Error = TEXT("GAS ability context has expired");
+        return Rejected;
+    }
+    FDasScalarValue Argument;
+    Argument.Kind = 12;
+    Argument.ObjectClass = FDasAuthoredAbilityContext::StaticStruct()->GetPathName();
+    Argument.StructValue.InitializeAs<FDasAuthoredAbilityContext>(Context);
+    TGuardValue<int32> Depth(AuthoredDispatchDepth, AuthoredDispatchDepth + 1);
+    return RunNamedFramePersistent(ScriptPath(Ability->ScriptFile), Entry, {Argument}, EDasMethodSignature::Void,
+                                   Ability);
+}
+
 FDasExecutionResult FDasRuntimeModule::RunNamedFramePersistent(const FString& Path, const FString& Entry,
                                                                const TArray<FDasScalarValue>& Args,
                                                                EDasMethodSignature ResultKind,
@@ -811,4 +903,70 @@ FDasExecutionResult FDasRuntimeModule::RunNamedVoidPersistent(const FString& Pat
                                                               TWeakObjectPtr<UObject> Self)
 {
     return RunCallback(Path, EDasCallback::Main, 0, 0.f, Self, Entry, EDasMethodSignature::Void);
+}
+
+// Compile authoring descriptors without running script initializers or gameplay.
+bool FDasRuntimeModule::ReadGASScript(const FString& Path, FDasGASDeclarations& Out, FString& Error)
+{
+    Error.Reset();
+    Out = {};
+    if (!IsInGameThread() || !bInitialized)
+    {
+        Error = TEXT("GAS authoring requires initialized runtime on game thread");
+        return false;
+    }
+    try
+    {
+        das::TextWriter Output;
+        das::ModuleGroup Group;
+        auto Access = das::make_smart<FUnrealFileAccess>();
+        Access->addFileSystem(new FUnrealFileSystem(), true, false);
+        const FTCHARToUTF8 File(*Path);
+        auto Program = DSLCompile(File.Get(), Access, Output, Group);
+        if (!Program || Program->failed())
+        {
+            Error = Errors(Program, Output);
+            return false;
+        }
+        TArray<TSharedPtr<FJsonValue>> Declarations;
+        bool OK = true;
+        Program->getThisModule()->structures.foreach (
+            [&](const das::StructurePtr& S)
+            {
+                const auto* A = DSLAnnotation(S->annotations, "ue_attribute_set");
+                if (!A)
+                    A = DSLAnnotation(S->annotations, "ue_gameplay_effect");
+                if (!A)
+                    A = DSLAnnotation(S->annotations, "ue_gameplay_ability");
+                if (!A)
+                    A = DSLAnnotation(S->annotations, "ue_gas_calculation");
+                if (!A)
+                    A = DSLAnnotation(S->annotations, "ue_gameplay_cue");
+                if (!A || !OK)
+                    return;
+                const auto* Wire = A->arguments.find(DSLGASKey, das::Type::tString);
+                TSharedPtr<FJsonObject> D;
+                if (!Wire || !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(DSLText(Wire->sValue)), D))
+                {
+                    OK = false;
+                    return;
+                }
+                Declarations.Add(MakeShared<FJsonValueObject>(D));
+            });
+        if (!OK)
+        {
+            Error = TEXT("Missing compiled GAS declaration");
+            return false;
+        }
+        auto DeclarationsRoot = MakeShared<FJsonObject>();
+        DeclarationsRoot->SetArrayField(TEXT("declarations"), Declarations);
+        FString Json;
+        FJsonSerializer::Serialize(DeclarationsRoot, TJsonWriterFactory<>::Create(&Json));
+        return ParseDasGASDeclarations(Json, Out, Error);
+    }
+    catch (const std::exception& X)
+    {
+        Error = UTF8_TO_TCHAR(X.what());
+        return false;
+    }
 }
