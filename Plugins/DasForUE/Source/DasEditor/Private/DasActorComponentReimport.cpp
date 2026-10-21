@@ -1,3 +1,4 @@
+#include "DasAutoReimport.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "Components/SceneComponent.h"
@@ -192,6 +193,7 @@ struct FComposedPIEState
 {
     TStrongObjectPtr<UBlueprint> Blueprint;
     TUniquePtr<FComposedScript> Script;
+    FDasAutoReimport Auto;
     bool Passed = true;
 };
 class FComposedPIECommand final : public IAutomationLatentCommand
@@ -222,6 +224,14 @@ public:
             if (GEditor->PlayWorld && FPlatformTime::Seconds() - Start < 30)
                 return false;
             Check(!GEditor->PlayWorld, TEXT("EndPIE"));
+            // What EndPIE triggers in the editor: the default change refused during PIE is applied now.
+            S->Auto.RetryDeferred();
+            UObject* CDO = S->Blueprint->GeneratedClass->GetDefaultObject();
+            Check(S->Auto.DeferredCount() == 0 &&
+                  Int(CDO, TEXT("Score")) == 20 &&
+                      Int(FindActor(GEditor->GetEditorWorldContext().World(), TEXT("ComposedPlaced")), TEXT("Score")) ==
+                                    20,
+                          TEXT("deferred_default_change_applied_after_PIE"));
             S->Script->Delete();
             UE_LOG(LogTemp, Display, TEXT("DAS_COMPOSED_PIE_RESULT=%s"), S->Passed ? TEXT("PASS"): TEXT("FAIL"));
             return true;
@@ -261,6 +271,13 @@ public:
                                                                        TEXT("PIE_components_kept_after_reinstance"));
         Check(Int(FindActor(GEditor->GetEditorWorldContext().World(), TEXT("ComposedPlaced")), TEXT("Score")) == 10,
                   TEXT("editor_world_actor_isolated"));
+        // A new default value is not applied to a running game; auto-reimport defers it to the end of PIE.
+        Check(S->Script->Write(ComposedV2().Replace(TEXT("Score : int = 10"), TEXT("Score : int = 20"))),
+                               TEXT("write_default_change_during_PIE"));
+        S->Auto.ReimportFiles({FPaths::ConvertRelativePathToFull(S->Script->Path)});
+        Check(S->Auto.DeferredCount() == 1 &&
+              Int(S->Blueprint->GeneratedClass->GetDefaultObject(), TEXT("Score")) == 10,
+                  TEXT("default_change_deferred_during_PIE"));
         return Finish();
     }
 };

@@ -72,8 +72,8 @@ them.
 Actors that declare components migrate like other actors as long as the components themselves are unchanged:
 a new field or method reinstances placed and running actors, also during PIE, and keeps component
 templates and per-instance component edits. Changing the components (adding, removing, their template
-defaults) still needs a new Blueprint, and a change that updates the defaults of actors placed in a running
-PIE world is refused until PIE stops.
+defaults) still needs a new Blueprint. A change that updates default values is not applied to a running PIE
+world: the notification says so, and the change is applied automatically when Play stops.
 Turn it off with `Das.DSL.AutoReimport 0`; commandlets and unattended runs never reimport automatically.
 
 ### Das.DSL.Reimport

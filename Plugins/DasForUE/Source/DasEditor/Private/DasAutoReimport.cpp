@@ -3,6 +3,7 @@
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "DirectoryWatcherModule.h"
+#include "Editor.h"
 #include "IDirectoryWatcher.h"
 #include "Engine/Blueprint.h"
 #include "Framework/Notifications/NotificationManager.h"
@@ -57,6 +58,7 @@ void FDasAutoReimport::Start()
                 Handle))
             Watches.Emplace(Full, Handle);
     }
+    EndPIEHandle = FEditorDelegates::EndPIE.AddRaw(this, &FDasAutoReimport::OnEndPIE);
 }
 void FDasAutoReimport::Stop()
 {
@@ -65,10 +67,15 @@ void FDasAutoReimport::Stop()
             for (const auto& Watch : Watches)
                 Watcher->UnregisterDirectoryChangedCallback_Handle(Watch.Key, Watch.Value);
     Watches.Reset();
-    if (Ticker.IsValid())
-        FTSTicker::GetCoreTicker().RemoveTicker(Ticker);
-    Ticker.Reset();
+    FEditorDelegates::EndPIE.Remove(EndPIEHandle);
+    for (auto* Handle : {&Ticker, &RetryTicker})
+    {
+        if (Handle->IsValid())
+            FTSTicker::GetCoreTicker().RemoveTicker(*Handle);
+        Handle->Reset();
+    }
     Pending.Reset();
+    Deferred.Reset();
 }
 void FDasAutoReimport::OnScriptsChanged(const TArray<FFileChangeData>& Changes)
 {
@@ -85,8 +92,12 @@ bool FDasAutoReimport::ProcessPending(float)
     const TSet<FString> Saved = MoveTemp(Pending);
     Pending.Reset();
     // Automation tests rewrite sources and apply them themselves.
-    if (CVarAutoReimport.GetValueOnGameThread() == 0 || GIsAutomationTesting)
-        return false;
+    if (CVarAutoReimport.GetValueOnGameThread() != 0 && !GIsAutomationTesting)
+        ReimportFiles(Saved);
+    return false;
+}
+void FDasAutoReimport::ReimportFiles(const TSet<FString>& Files)
+{
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     // Only loaded Blueprints: those of the open level and editors. Others still run their last applied
     // declaration and report the mismatch when they play.
@@ -98,35 +109,73 @@ bool FDasAutoReimport::ProcessPending(float)
             continue;
         const FString Source = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLSource"));
         if (!Source.IsEmpty() &&
-            Saved.Contains(FullPath(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source)))
+            Files.Contains(FullPath(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source)))
             Bound.Add(Blueprint);
     }
     for (UBlueprint* Blueprint : Bound)
+        Reimport(Blueprint, false);
+}
+void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
+{
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    const FString Name = Blueprint->GetName();
+    const FString Before = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel"));
+    FString Error;
+    // Body-only edits are already live through hot reload. Reimport would still run the defaults
+    // preflight, which is refused during PIE.
+    const FString Source = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLSource"));
+    FDasAuthoringModule Model;
+    FString Json;
+    if (Runtime.ReadAuthoringScript(Runtime.ScriptPath(Source), Model, Error) && Model.ToJson(Json, Error) &&
+        Json == Before)
+        return;
+    if (!FDasDSLService::Reimport(Blueprint, Error))
     {
-        const FString Name = Blueprint->GetName();
-        const FString Before = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel"));
-        FString Error;
-        // Body-only edits are already live through hot reload. Reimport would still run the defaults
-        // preflight, which is refused during PIE and for actors with components.
-        const FString Source = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLSource"));
-        FDasAuthoringModule Model;
-        FString Json;
-        if (Runtime.ReadAuthoringScript(Runtime.ScriptPath(Source), Model, Error) && Model.ToJson(Json, Error) &&
-            Json == Before)
-            continue;
-        if (!FDasDSLService::Reimport(Blueprint, Error))
+        // Some migrations (default values) never touch a running game world; apply them after PIE.
+        const bool bPlaying = GEditor && GEditor->PlayWorld;
+        const FString Text = bPlaying
+            ? FString::Printf(TEXT("daScript: %s is not updated during Play (%s); it will be updated when Play stops"),
+                                   *Name, *Error)
+            : FString::Printf(TEXT("daScript: %s was not updated: %s"), *Name, *Error);
+        if (bPlaying)
         {
-            const FString Text = FString::Printf(TEXT("daScript: %s was not updated: %s"), *Name, *Error);
+            UE_LOG(LogTemp, Display, TEXT("DAS_DSL_AUTO_REIMPORT deferred %s: %s"), *Name, *Error);
+            Deferred.AddUnique(Blueprint);
+        }
+        else
+        {
             UE_LOG(LogTemp, Warning, TEXT("DAS_DSL_AUTO_REIMPORT rejected %s: %s"), *Name, *Error);
             FMessageLog(TEXT("BlueprintLog")).Error(FText::FromString(Text));
-            Notify(Text, false);
-            continue;
         }
-        if (Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel")) != Before)
-        {
-            UE_LOG(LogTemp, Display, TEXT("DAS_DSL_AUTO_REIMPORT applied %s"), *Name);
-            Notify(FString::Printf(TEXT("daScript: %s updated from its script"), *Name), true);
-        }
+        Notify(Text, false);
+        return;
     }
+    if (bRetry || Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel")) != Before)
+    {
+        UE_LOG(LogTemp, Display, TEXT("DAS_DSL_AUTO_REIMPORT applied %s"), *Name);
+        Notify(FString::Printf(TEXT("daScript: %s updated from its script"), *Name), true);
+    }
+}
+void FDasAutoReimport::OnEndPIE(bool)
+{
+    if (!Deferred.IsEmpty() && !RetryTicker.IsValid())
+        RetryTicker = FTSTicker::GetCoreTicker().AddTicker(
+            FTickerDelegate::CreateRaw(this, &FDasAutoReimport::RetryAfterPIE), SettleSeconds);
+}
+bool FDasAutoReimport::RetryAfterPIE(float)
+{
+    // EndPIE is broadcast before the play world is torn down.
+    if (GEditor && GEditor->PlayWorld)
+        return true;
+    RetryTicker.Reset();
+    RetryDeferred();
     return false;
+}
+void FDasAutoReimport::RetryDeferred()
+{
+    const auto Blueprints = MoveTemp(Deferred);
+    Deferred.Reset();
+    for (const auto& Blueprint : Blueprints)
+        if (Blueprint.IsValid())
+            Reimport(Blueprint.Get(), true);
 }
