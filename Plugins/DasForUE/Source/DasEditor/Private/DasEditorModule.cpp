@@ -13,6 +13,8 @@
 #include "DasTypeService.h"
 #include "Engine/Blueprint.h"
 #include "Misc/PackageName.h"
+#include "DasAutoReimport.h"
+#include "Misc/App.h"
 class FDasEditorModule final : public IModuleInterface
 {
     IConsoleObject* TableCreateCommand = nullptr;
@@ -26,10 +28,14 @@ class FDasEditorModule final : public IModuleInterface
     IConsoleObject* TypesCommand = nullptr;
     IConsoleObject* ApplyCommand = nullptr;
     IConsoleObject* ReimportCommand = nullptr;
+    FDasAutoReimport AutoReimport;
 
 public:
     virtual void StartupModule() override
     {
+        // Interactive editor only: commandlets and unattended test runs apply sources explicitly.
+        if (GIsEditor && !IsRunningCommandlet() && !FApp::IsUnattended())
+            AutoReimport.Start();
         TableCreateCommand = IConsoleManager::Get().RegisterConsoleCommand(TEXT("Das.DSL.Table.Create"),
             TEXT("Das.DSL.Table.Create /Game/Types/ItemRow.ItemRow /Game/Items/DT_Items C:/Data/Items.json (new dirty asset, no overwrite/save)"),
                 FConsoleCommandWithArgsDelegate::CreateLambda(
@@ -374,6 +380,7 @@ public:
             IConsoleManager::Get().UnregisterConsoleObject(ApplyCommand);
         if (ReimportCommand)
             IConsoleManager::Get().UnregisterConsoleObject(ReimportCommand);
+        AutoReimport.Stop();
     }
 };
 IMPLEMENT_MODULE(FDasEditorModule, DasEditor)

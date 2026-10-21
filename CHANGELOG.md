@@ -10,6 +10,12 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ## 2026-10-21
 
+### Added
+
+- Saving a `.das` file reimports the loaded Blueprints bound to it, also during PIE, with the safe automatic
+  policy; new fields take effect in the running game. `Das.DSL.AutoReimport 0` turns it off
+  ([Apply and hot reload](Docs/Guide/Workflow/ApplyAndHotReload.md#automatic-reimport-on-save)).
+
 ### Changed
 
 - A script that cannot run on its actor (for example a Blueprint made from an older version of the script,

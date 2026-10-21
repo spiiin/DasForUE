@@ -60,6 +60,16 @@ The Blueprint stores its source binding (`DasDSLSource`, `DasDSLClassId`) and th
 declaration model in package metadata, so it can be reimported later, also after reopening the
 editor. Example: `Plugins/DasForUE/Content/Das/Scripts/dsl_counter_v1.das` and `dsl_counter_v2.das`.
 
+### Automatic reimport on save
+
+In the interactive editor, saving a `.das` file reimports every loaded Blueprint bound to it with the safe
+automatic policy below, also while PIE is running: a new field or method reinstances the running actors
+and the next frame runs the new script. A notification reports each updated Blueprint; a refused change
+(rename, removal, type change, compile error) is reported in the notification and the Blueprint Log and
+leaves the Blueprint unchanged. Saving with an unchanged declaration only validates it; the edited method
+bodies are already live through hot reload. Unloaded Blueprints are not touched until you reimport them.
+Turn it off with `Das.DSL.AutoReimport 0`; commandlets and unattended runs never reimport automatically.
+
 ### Das.DSL.Reimport
 
 ```text
