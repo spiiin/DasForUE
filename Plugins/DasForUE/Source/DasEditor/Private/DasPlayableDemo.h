@@ -26,6 +26,8 @@
 #include "Engine/StaticMesh.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/SkyLight.h"
+#include "Components/SkyAtmosphereComponent.h"
+#include "Components/DirectionalLightComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/LightComponent.h"
@@ -66,9 +68,14 @@ inline bool SaveDasPlayableDemo(const FString& Root, UClass* CharacterClass, FSt
     Block(FVector(600, 0, 100), FVector(2, 2, 2));
     Block(FVector(600, 500, 50), FVector(2, 2, 1));
     Block(FVector(1000, 500, 150), FVector(2, 2, 3));
+    // Movable lights and an atmosphere: the generated map has no built lighting, so a stationary sun would
+    // show "Lighting needs to be rebuilt" and a black sky.
     auto* Light = World->SpawnActor<ADirectionalLight>();
     Light->SetActorRotation(FRotator(-45, -30, 0));
+    Light->GetLightComponent()->SetMobility(EComponentMobility::Movable);
     Light->GetLightComponent()->SetIntensity(3.f);
+    CastChecked<UDirectionalLightComponent>(Light->GetLightComponent())->SetAtmosphereSunLight(true);
+    World->SpawnActor<ASkyAtmosphere>();
     auto* Sky = World->SpawnActor<ASkyLight>();
     Sky->GetLightComponent()->SetMobility(EComponentMobility::Movable);
     Sky->GetLightComponent()->Intensity = 1.f;
