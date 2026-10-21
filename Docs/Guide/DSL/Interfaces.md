@@ -37,7 +37,9 @@ class InterfaceActor {
 - The generated class passes `ImplementsInterface`; `ProcessEvent`, Blueprint
   interface messages and C++ `Execute_*` calls all reach the DSL body.
 - Membership survives save, reopen and cook. Body-only reimport keeps the contract
-  and hot-reloads the logic without changing the Blueprint class.
+  and hot-reloads the logic without changing the Blueprint class. Adding an
+  `ue_implements` to an imported class applies on save (its events and method
+  graphs are created); removing one is refused, use a new Blueprint.
 
 ## Defining interfaces
 

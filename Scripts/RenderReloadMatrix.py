@@ -18,18 +18,20 @@ EXPECTED = ROOT / "Tests" / "ReloadMatrix" / "expected.json"
 ACTUAL = ROOT / "logs" / "reload-matrix.json"
 PAGE = ROOT / "Docs" / "Reference" / "ReloadMatrix.md"
 
-KINDS = ["actor", "composed", "pawn", "character"]
+KINDS = ["actor", "composed", "pawn", "character", "evented"]
 KIND_TITLES = {
     "actor": "Actor",
     "composed": "Actor with components",
     "pawn": "Pawn",
     "character": "Character",
+    "evented": "Actor with event and delegate",
 }
 TYPES = ["int", "float", "bool", "string", "name", "text", "byte", "vector", "soft", "array", "map", "set"]
 FIELD_CHANGES = ["add_field", "remove_field", "rename_field", "retype_field", "change_default", "make_read_only"]
 METHOD_CHANGES = ["add_method", "remove_method", "change_signature"]
 COMPONENT_CHANGES = ["add_component", "remove_component", "rename_component", "change_component_default",
                      "change_attach"]
+EVENT_CHANGES = ["add_event", "remove_event", "add_interface"]
 MODES = ["editor", "pie"]
 MARK = {"migrated": "✅", "lossy": "⚠️", "refused": "⛔", "broken": "❌"}
 
@@ -71,7 +73,7 @@ def render(data):
         out += ["", "### By class kind (int field)", ""]
         out.append("| Change | " + " | ".join(KIND_TITLES[k] for k in KINDS) + " |")
         out.append("| --- |" + " --- |" * len(KINDS))
-        for change in FIELD_CHANGES + METHOD_CHANGES + COMPONENT_CHANGES:
+        for change in FIELD_CHANGES + METHOD_CHANGES + COMPONENT_CHANGES + EVENT_CHANGES:
             out.append(f"| {change} | " + " | ".join(mark(cells, f"{k}/int/{change}") for k in KINDS) + " |")
         reasons = sorted(
             (key, row["message"]) for key, row in cells.items() if row["outcome"] != "migrated" and row["message"]

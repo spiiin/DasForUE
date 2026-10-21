@@ -4,6 +4,7 @@
 // written to logs/reload-matrix.json; Scripts/RenderReloadMatrix.py turns the expected file into
 // Docs/Reference/ReloadMatrix.md.
 #include "DasDSLService.h"
+#include "DasProbeInterface.h"
 #include "DasRuntime.h"
 #include "Dom/JsonObject.h"
 #include "Editor.h"
@@ -74,7 +75,10 @@ const FMatrixKind MatrixKinds[] = {
     {TEXT("composed"), TEXT("/Script/Engine.Actor"), TEXT("ue_scene_components"),
      TEXT("    @ue_component\n    @RootComponent\n    Pivot:SceneComponentRef\n")},
     {TEXT("pawn"), TEXT("/Script/Engine.Pawn"), nullptr, TEXT("")},
-    {TEXT("character"), TEXT("/Script/Engine.Character"), nullptr, TEXT("")},
+        {TEXT("character"), TEXT("/Script/Engine.Character"), nullptr, TEXT("")},
+    {TEXT("evented"), TEXT("/Script/Engine.Actor"), TEXT("ue_delegate_examples"),
+     TEXT("    @ue_property=(BlueprintAssignable)\n    @ue_id=\"reloadmatrix.host.changed\"\n    Changed:FScoreEvent\n"
+          "    @ue_property=(BlueprintReadWrite)\n    @ue_id=\"reloadmatrix.host.query\"\n    Query:FScoreQuery\n")},
 };
 // clang-format on
 enum class EChange
@@ -93,6 +97,9 @@ enum class EChange
     RenameComponent,
     ChangeComponentDefault,
     ChangeAttach,
+    AddEvent,
+    RemoveEvent,
+    AddInterface,
 };
 const TCHAR* ChangeName(EChange C)
 {
@@ -101,7 +108,8 @@ const TCHAR* ChangeName(EChange C)
                                    TEXT("retype_field"), TEXT("change_default"), TEXT("make_read_only"),
                                    TEXT("add_method"), TEXT("remove_method"), TEXT("change_signature"),
                                    TEXT("add_component"), TEXT("remove_component"), TEXT("rename_component"),
-                                   TEXT("change_component_default"), TEXT("change_attach")};
+                                   TEXT("change_component_default"), TEXT("change_attach"),
+                                   TEXT("add_event"), TEXT("remove_event"), TEXT("add_interface")};
     // clang-format on
     return Names[int32(C)];
 }
@@ -111,11 +119,33 @@ bool FieldChange(EChange C)
 }
 bool ComponentChange(EChange C)
 {
-    return C >= EChange::AddComponent;
+    return C >= EChange::AddComponent && C <= EChange::ChangeAttach;
+}
+bool EventChange(EChange C)
+{
+    return C == EChange::AddEvent || C == EChange::RemoveEvent;
+}
+bool Evented(const FMatrixKind& K)
+{
+    return FCString::Strcmp(K.Name, TEXT("evented")) == 0;
 }
 bool Composed(const FMatrixKind& K)
 {
     return FCString::Strcmp(K.Name, TEXT("composed")) == 0;
+}
+// The evented kind's event and delegate, with the event changes applied.
+FString EventedMembers(const FMatrixKind& K, TOptional<EChange> Change)
+{
+    FString S = K.Members;
+    if (!Evented(K) || !Change.IsSet())
+        return S;
+    if (*Change == EChange::RemoveEvent)
+        S = S.Replace(TEXT("    @ue_property=(BlueprintAssignable)\n    @ue_id=\"reloadmatrix.host.changed\"\n    Changed:FScoreEvent\n"),
+            TEXT(""));
+    if (*Change == EChange::AddEvent)
+        S += TEXT("    @ue_property=(BlueprintAssignable)\n    @ue_id=\"reloadmatrix.host.extra_event\"\n"
+                  "    ExtraEvent:FScoreEvent\n");
+    return S;
 }
 // Pivot (root), Child and Other attached to it; Child is the one the component changes touch.
 FString ComposedMembers(TOptional<EChange> Change)
@@ -154,8 +184,11 @@ FString MatrixScript(const FMatrixKind& K, const FMatrixType& T, TOptional<EChan
         if (R)
             S += FString::Printf(TEXT("require %s\n"), R);
     S += FString::Printf(TEXT("[ue_class(module_id=\"reloadmatrix\",id=\"reloadmatrix.host\",parent=\"%s\","
-                              "Blueprintable)]\nclass MatrixHost {\n%s"),
-                              K.Parent, Composed(K) ? *ComposedMembers(Change) : K.Members);
+                              "Blueprintable)%s]\nclass MatrixHost {\n%s"),
+                              K.Parent,
+                              Is(EChange::AddInterface)
+                              ? TEXT(",ue_implements(interface=\"/Script/DasRuntime.DasEventInterface\")")
+                              : TEXT(""), Composed(K) ? *ComposedMembers(Change) : *EventedMembers(K, Change));
     if (!Is(EChange::RemoveField))
         S += FString::Printf(
             TEXT("    @ue_property=(EditAnywhere,%s)\n    @ue_id=\"reloadmatrix.host.value\"\n    %s : %s = %s\n"),
@@ -179,6 +212,9 @@ FString MatrixScript(const FMatrixKind& K, const FMatrixType& T, TOptional<EChan
     // Actor adapters need at least one method; Keep stays in every version.
     S += TEXT("    [ue_function(id=\"reloadmatrix.host.keep\",BlueprintCallable)]\n"
               "    def Keep():int { return 3 }\n");
+    if (Is(EChange::AddInterface))
+        S += TEXT("    [ue_function(BlueprintCallable)]\n    def Notify(Amount:int):void { self.Anchor += Amount }\n"
+                  "    [ue_function(BlueprintCallable)]\n    def ResetCounter():void { self.Anchor = 1 }\n");
     if (Is(EChange::AddMethod))
         S += TEXT("    [ue_function(id=\"reloadmatrix.host.extra_method\",BlueprintCallable)]\n"
                   "    def ExtraMethod():int { return 2 }\n");
@@ -237,7 +273,7 @@ TArray<FMatrixCell> MatrixCells()
     const FString Run = FGuid::NewGuid().ToString(EGuidFormats::Digits);
     for (const auto& K : MatrixKinds)
         for (const auto& T : MatrixTypes)
-            for (int32 C = 0; C <= int32(EChange::ChangeAttach); ++C)
+            for (int32 C = 0; C <= int32(EChange::AddInterface); ++C)
             {
                 const EChange Change = EChange(C);
                 // Field changes for every type on plain actors; one representative type elsewhere.
@@ -245,7 +281,8 @@ TArray<FMatrixCell> MatrixCells()
                      FCString::Strcmp(T.Name, TEXT("int")) != 0)
                     continue;
                 // Component changes only on the composed actor.
-                if (ComponentChange(Change) && !Composed(K))
+                if ((ComponentChange(Change) && !Composed(K)) || (EventChange(Change) && !Evented(K)) ||
+                    (Change == EChange::AddInterface && FCString::Strcmp(K.Name, TEXT("actor")) != 0))
                     continue;
                 FMatrixCell Cell{&K, &T, Change};
                 Cell.Key = FString::Printf(TEXT("%s/%s/%s"), K.Name, T.Name, ChangeName(Change));
@@ -379,6 +416,17 @@ void RunCell(FMatrixCell& Cell, UWorld* World, const TCHAR* AnchorValue)
     case EChange::ChangeComponentDefault:
         Shape &= CompZ(FindActor(GEditor->GetEditorWorldContext().World(), Cell.Plain), TEXT("Child")) == 60.0;
         Kept &= CompZ(Placed, TEXT("Child")) == 80.0;
+        break;
+    case EChange::AddEvent:
+        Shape &= CastField<FMulticastDelegateProperty>(BP->GeneratedClass->FindPropertyByName(TEXT("ExtraEvent"))) &&
+                                                       BP->GeneratedClass->FindPropertyByName(TEXT("Changed"));
+        break;
+    case EChange::RemoveEvent:
+        Shape &= !BP->GeneratedClass->FindPropertyByName(TEXT("Changed")) &&
+                                                         BP->GeneratedClass->FindPropertyByName(TEXT("Query"));
+        break;
+    case EChange::AddInterface:
+        Shape &= BP->GeneratedClass->ImplementsInterface(UDasEventInterface::StaticClass());
         break;
     case EChange::ChangeAttach:
     {
@@ -645,6 +693,63 @@ bool FDasReloadMatrixPossessedTest::RunTest(const FString&)
     S->Cell.Blueprint.Reset(BP);
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<DasReloadMatrix::FPossessedCommand>(S, this));
+    return true;
+}
+
+void DasFailStructuralForTesting(int32 Stage);
+// A failure after an interface was added, an event or a method removed or a signature changed restores the
+// Blueprint exactly.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasReloadMatrixRollbackTest, "DasForUE.ReloadMatrix.Rollback",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasReloadMatrixRollbackTest::RunTest(const FString&)
+{
+    UWorld* World = FAutomationEditorCommonUtils::CreateNewMap();
+    for (auto& Cell : DasReloadMatrix::MatrixCells())
+    {
+        if (Cell.Key != TEXT("actor/int/add_interface") &&
+                             Cell.Key != TEXT("evented/int/remove_event") &&
+                                              Cell.Key != TEXT("actor/int/remove_method") &&
+                                                               Cell.Key != TEXT("actor/int/change_signature"))
+            continue;
+        FString Error;
+        if (!TestTrue(*(Cell.Key + TEXT(" v1")), DasReloadMatrix::PrepareCell(Cell, World, Error)))
+        {
+            AddError(Error);
+            continue;
+        }
+        UBlueprint* BP = Cell.Blueprint.Get();
+        int32 Nodes = 0;
+        TArray<UEdGraph*> Graphs;
+        BP->GetAllGraphs(Graphs);
+        for (UEdGraph* G : Graphs)
+            Nodes += G->Nodes.Num();
+        const int32 Interfaces = BP->ImplementedInterfaces.Num(), Dispatchers = BP->DelegateSignatureGraphs.Num();
+        DasReloadMatrix::Write(Cell.ScriptPath, DasReloadMatrix::MatrixScript(*Cell.Kind, *Cell.Type, Cell.Change));
+        DasFailStructuralForTesting(2);
+        const bool Failed = !FDasDSLService::Reimport(BP, Error);
+        DasFailStructuralForTesting(0);
+        int32 NodesAfter = 0;
+        Graphs.Reset();
+        BP->GetAllGraphs(Graphs);
+        for (UEdGraph* G : Graphs)
+            NodesAfter += G->Nodes.Num();
+        AddInfo(FString::Printf(TEXT("%s: failed=%d nodes %d->%d interfaces %d->%d dispatchers %d->%d changed=%d (%s)"),
+                                     *Cell.Key, Failed, Nodes, NodesAfter, Interfaces, BP->ImplementedInterfaces.Num(),
+                                     Dispatchers, BP->DelegateSignatureGraphs.Num(),
+                                     BP->GeneratedClass->FindPropertyByName(TEXT("Changed")) != nullptr, *Error));
+        TestTrue(*(Cell.Key + TEXT(" rolled back")),
+                   Failed &&
+                       Error.Contains(TEXT("rolled back")) && BP->ImplementedInterfaces.Num() == Interfaces &&
+                                      BP->DelegateSignatureGraphs.Num() == Dispatchers && NodesAfter == Nodes &&
+                                      !BP->GeneratedClass->ImplementsInterface(UDasEventInterface::StaticClass()) &&
+                                      (Cell.Change != DasReloadMatrix::EChange::RemoveEvent ||
+                                       BP->GeneratedClass->FindPropertyByName(TEXT("Changed"))) &&
+                                       (BP->GeneratedClass->FindFunctionByName(
+                                           TEXT("Get")) &&
+                                           BP->GeneratedClass->FindFunctionByName(TEXT("Get"))->NumParms == 1));
+        TestTrue(*(Cell.Key + TEXT(" applies after the failure")), FDasDSLService::Reimport(BP, Error));
+        IFileManager::Get().Delete(*Cell.ScriptPath);
+    }
     return true;
 }
 #endif

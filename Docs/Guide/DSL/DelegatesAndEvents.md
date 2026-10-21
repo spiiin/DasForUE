@@ -319,8 +319,10 @@ the old bindings. Handler errors are reported but do not unsubscribe.
   ref/out parameters; delegates in containers or captured by timers/events;
   delegate parameters in interface methods; native non-UFUNCTION delegates; script
   lambda bindings; worker-thread delivery.
-- Structural or default migrations of classes containing delegate or event fields
-  are refused; body and metadata-only reimports work.
+- Classes containing delegate or event fields migrate like other classes (fields,
+  methods, defaults); delegate and event fields can be added and removed (bindings in
+  Blueprints that still use a removed one fail the compile and roll the change back).
+  Changing the signature of an existing delegate or event is refused: add a new field.
 
 ## Examples
 

@@ -45,6 +45,9 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - Saving a script that renames fields (same `ue_id`), removes fields or changes a numeric field type applies
   the matching migration automatically (rename, archive, exact conversion); read-only/editable flags and
   method removals, renames and signature changes are applied as well. Archive works on Pawn and Character.
+- Classes with delegate or event fields accept declaration changes; delegate and event fields can be added
+  and removed, and an `ue_implements` interface can be added on save. Changing a delegate/event signature or
+  removing an interface is still refused.
 - Components of an imported Actor can be added, removed, renamed (same `@ue_id`), re-attached and get new
   template defaults on save; default changes also reach running PIE actors whose value the game has not
   changed.

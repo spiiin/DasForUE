@@ -31,22 +31,25 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 
 ### By class kind (int field)
 
-| Change | Actor | Actor with components | Pawn | Character |
-| --- | --- | --- | --- | --- |
-| add_field | ✅ | ✅ | ✅ | ✅ |
-| remove_field | ✅ | ✅ | ✅ | ✅ |
-| rename_field | ✅ | ✅ | ✅ | ✅ |
-| retype_field | ✅ | ✅ | ✅ | ✅ |
-| change_default | ✅ | ✅ | ✅ | ✅ |
-| make_read_only | ✅ | ✅ | ✅ | ✅ |
-| add_method | ✅ | ✅ | ✅ | ✅ |
-| remove_method | ✅ | ✅ | ✅ | ✅ |
-| change_signature | ✅ | ✅ | ✅ | ✅ |
-| add_component | · | ✅ | · | · |
-| remove_component | · | ✅ | · | · |
-| rename_component | · | ✅ | · | · |
-| change_component_default | · | ✅ | · | · |
-| change_attach | · | ✅ | · | · |
+| Change | Actor | Actor with components | Pawn | Character | Actor with event and delegate |
+| --- | --- | --- | --- | --- | --- |
+| add_field | ✅ | ✅ | ✅ | ✅ | ✅ |
+| remove_field | ✅ | ✅ | ✅ | ✅ | ✅ |
+| rename_field | ✅ | ✅ | ✅ | ✅ | ✅ |
+| retype_field | ✅ | ✅ | ✅ | ✅ | ✅ |
+| change_default | ✅ | ✅ | ✅ | ✅ | ✅ |
+| make_read_only | ✅ | ✅ | ✅ | ✅ | ✅ |
+| add_method | ✅ | ✅ | ✅ | ✅ | ✅ |
+| remove_method | ✅ | ✅ | ✅ | ✅ | ✅ |
+| change_signature | ✅ | ✅ | ✅ | ✅ | ✅ |
+| add_component | · | ✅ | · | · | · |
+| remove_component | · | ✅ | · | · | · |
+| rename_component | · | ✅ | · | · | · |
+| change_component_default | · | ✅ | · | · | · |
+| change_attach | · | ✅ | · | · | · |
+| add_event | · | · | · | · | ✅ |
+| remove_event | · | · | · | · | ✅ |
+| add_interface | ✅ | · | · | · | · |
 
 <details><summary>Reasons</summary>
 
@@ -78,22 +81,25 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 
 ### By class kind (int field)
 
-| Change | Actor | Actor with components | Pawn | Character |
-| --- | --- | --- | --- | --- |
-| add_field | ✅ | ✅ | ✅ | ✅ |
-| remove_field | ✅ | ✅ | ✅ | ✅ |
-| rename_field | ✅ | ✅ | ✅ | ✅ |
-| retype_field | ✅ | ✅ | ✅ | ✅ |
-| change_default | ✅ | ✅ | ✅ | ✅ |
-| make_read_only | ✅ | ✅ | ✅ | ✅ |
-| add_method | ✅ | ✅ | ✅ | ✅ |
-| remove_method | ✅ | ✅ | ✅ | ✅ |
-| change_signature | ✅ | ✅ | ✅ | ✅ |
-| add_component | · | ✅ | · | · |
-| remove_component | · | ✅ | · | · |
-| rename_component | · | ✅ | · | · |
-| change_component_default | · | ✅ | · | · |
-| change_attach | · | ✅ | · | · |
+| Change | Actor | Actor with components | Pawn | Character | Actor with event and delegate |
+| --- | --- | --- | --- | --- | --- |
+| add_field | ✅ | ✅ | ✅ | ✅ | ✅ |
+| remove_field | ✅ | ✅ | ✅ | ✅ | ✅ |
+| rename_field | ✅ | ✅ | ✅ | ✅ | ✅ |
+| retype_field | ✅ | ✅ | ✅ | ✅ | ✅ |
+| change_default | ✅ | ✅ | ✅ | ✅ | ✅ |
+| make_read_only | ✅ | ✅ | ✅ | ✅ | ✅ |
+| add_method | ✅ | ✅ | ✅ | ✅ | ✅ |
+| remove_method | ✅ | ✅ | ✅ | ✅ | ✅ |
+| change_signature | ✅ | ✅ | ✅ | ✅ | ✅ |
+| add_component | · | ✅ | · | · | · |
+| remove_component | · | ✅ | · | · | · |
+| rename_component | · | ✅ | · | · | · |
+| change_component_default | · | ✅ | · | · | · |
+| change_attach | · | ✅ | · | · | · |
+| add_event | · | · | · | · | ✅ |
+| remove_event | · | · | · | · | ✅ |
+| add_interface | ✅ | · | · | · | · |
 
 <details><summary>Reasons</summary>
 

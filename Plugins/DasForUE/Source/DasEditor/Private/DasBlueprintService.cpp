@@ -934,6 +934,20 @@ bool FDasBlueprintService::ApplyAuthoring(UBlueprint* BP, const FDasAuthoringMod
     return Apply(BP, Candidate, Error);
 }
 
+// Takes a graph out of the Blueprint reversibly: FBlueprintEditorUtils::RemoveGraph moves it out of the
+// Blueprint, and a rollback could not put it back. The graph stays inside under a free name, excluded from
+// saving; FDasBlueprintRollback restores its name and flags.
+static void DasDetachGraph(UBlueprint* BP, UEdGraph* Graph)
+{
+    BP->FunctionGraphs.Remove(Graph);
+    BP->DelegateSignatureGraphs.Remove(Graph);
+    BP->UbergraphPages.Remove(Graph);
+    for (auto& I : BP->ImplementedInterfaces)
+        I.Graphs.Remove(Graph);
+    const FName Free = MakeUniqueObjectName(BP, Graph->GetClass(), *(TEXT("DasDetached_")+ Graph->GetName()));
+    Graph->Rename(*Free.ToString(), BP, REN_DoNotDirty | REN_DontCreateRedirectors);
+    Graph->SetFlags(RF_Transient);
+}
 bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, FString& Error, bool bValidateOnly,
                                  EDasDefaultMigrationPolicy DefaultPolicy)
 {
@@ -987,14 +1001,14 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
         WantedInterfaces.Add(I);
     if (!ExistingId.IsEmpty())
     {
-        bool Same = ExistingInterfaces.Num() == WantedInterfaces.Num();
+        // New interfaces are added below (description, events and graphs of their methods); removing one
+        // would delete nodes that Blueprints may link to, so it stays a new Blueprint.
         for (const auto& I : ExistingInterfaces)
-            Same &= WantedInterfaces.Contains(I);
-        if (!Same)
-        {
-            Error = TEXT("Changing interface implementation requires a later structural policy");
-            return false;
-        }
+            if (!WantedInterfaces.Contains(I))
+            {
+                Error = TEXT("Removing an implemented interface is deferred; create a new Blueprint: ")+ I;
+                return false;
+            }
     }
     else
         for (const auto& I : ExistingInterfaces)
@@ -1114,10 +1128,18 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
             return false;
         Defaults.Add(Field.Name, MoveTemp(Default));
     }
+    // Removed events and delegates: their variable and dispatcher graph are deleted (bindings, no values).
+    TArray<FName> StaleEvents;
     for (const auto& Old : BP->NewVariables)
     {
         const auto* Field =
             Schema.Fields.FindByPredicate([&](const FDasFieldSchema& F) { return F.Name == Old.VarName; });
+        if (!Field && (Old.VarType.PinCategory == UEdGraphSchema_K2::PC_MCDelegate ||
+                       Old.VarType.PinCategory == UEdGraphSchema_K2::PC_Delegate))
+        {
+            StaleEvents.Add(Old.VarName);
+            continue;
+        }
         if (!Field ||
             (Field->Kind == EDasScalarKind::Event      ? Old.VarType.PinCategory != UEdGraphSchema_K2::PC_MCDelegate
              : Field->Kind == EDasScalarKind::Delegate ? Old.VarType.PinCategory != UEdGraphSchema_K2::PC_Delegate
@@ -1339,10 +1361,18 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
             }
     if (bValidateOnly)
         return true;
+    for (FName Name : StaleEvents)
+    {
+        // Only the description: nodes that still use the event fail the compile and roll back intact.
+        BP->NewVariables.RemoveAll([&](const FBPVariableDescription& V) { return V.VarName == Name; });
+        for (UEdGraph* Graph : TArray<UEdGraph*>(BP->DelegateSignatureGraphs))
+            if (Graph && Graph->GetFName() == Name)
+                DasDetachGraph(BP, Graph);
+    }
     for (UEdGraph* Graph : DasOwnedMethodGraphs(BP))
         if (StaleGraphs.Contains(Graph) ||
             (RebuildGraphs.Contains(Graph->GetFName()) && BP->FunctionGraphs.Contains(Graph)))
-            FBlueprintEditorUtils::RemoveGraph(BP, Graph, EGraphRemoveFlags::None);
+            DasDetachGraph(BP, Graph);
     if (!DasEnsureSingleSignatures(BP, Schema, Error))
         return false;
     for (const auto& Field : Schema.Fields)

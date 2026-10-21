@@ -100,6 +100,10 @@
       "message": "",
       "outcome": "migrated"
     },
+    "actor/int/add_interface": {
+      "message": "",
+      "outcome": "migrated"
+    },
     "actor/int/add_method": {
       "message": "",
       "outcome": "migrated"
@@ -389,6 +393,50 @@
       "outcome": "migrated"
     },
     "composed/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/add_event": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/remove_event": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/retype_field": {
       "message": "",
       "outcome": "migrated"
     },
@@ -530,6 +578,10 @@
       "message": "",
       "outcome": "migrated"
     },
+    "actor/int/add_interface": {
+      "message": "",
+      "outcome": "migrated"
+    },
     "actor/int/add_method": {
       "message": "",
       "outcome": "migrated"
@@ -819,6 +871,50 @@
       "outcome": "migrated"
     },
     "composed/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/add_event": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/remove_event": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "evented/int/retype_field": {
       "message": "",
       "outcome": "migrated"
     },

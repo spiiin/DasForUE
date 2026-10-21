@@ -357,13 +357,29 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
                 return C.Properties.ContainsByPredicate(
                     [](const auto& P) { return P.Type.Kind == TEXT("event") || P.Type.Kind == TEXT("delegate"); });
             };
+            // Classes with events and delegates migrate like others; an event or delegate keeps its signature
+            // (bindings in Blueprints and live sessions depend on it), and their defaults are not migrated per
+            // instance.
             if ((HasEvents(Declaration) || (Old && HasEvents(*Old))) &&
-                (!Old || DefaultPolicy != EDasDefaultMigrationPolicy::Refuse ||
-                 FDasAuthoringModule::Compare(*Old, Declaration).bStructural))
+                DefaultPolicy == EDasDefaultMigrationPolicy::PreserveInstances)
             {
-                Error = TEXT("Structural migration of classes with authored delegates/events is deferred; body/metadata-only reimport is supported");
+                Error = TEXT("Default migration of classes with delegates/events is deferred");
                 return false;
             }
+            if (Old)
+                for (const auto& P : Declaration.Properties)
+                    if (const auto* Was = Old->Properties.FindByPredicate([&](const auto& X) { return X.Id == P.Id; });
+                        Was && (P.Type.Kind ==
+                                TEXT("event") || P.Type.Kind == TEXT("delegate") ||
+                                                                     Was->Type.Kind ==
+                                                                         TEXT("event") ||
+                                                                              Was->Type.Kind == TEXT("delegate")) &&
+                                                                              Was->Type.Identity() != P.Type.Identity())
+                    {
+                        Error =
+                            TEXT("Changing an event or delegate signature is deferred; create a new field: ")+ P.Name;
+                        return false;
+                    }
         }
     }
     FDasDeclaredClass EffectiveDeclaration;
@@ -713,7 +729,12 @@ EFieldMigration ClassifyFieldMigration(UBlueprint* BP, const FString& Source, co
     }
     for (const auto& P : Old->Properties)
         if (!New->Properties.ContainsByPredicate([&](const auto& X) { return X.Id == P.Id; }))
+        {
+            // Events and delegates hold bindings, not values: they are removed by the plain path.
+            if (P.Type.Kind == TEXT("event") || P.Type.Kind == TEXT("delegate"))
+                return EFieldMigration::None;
             ++Removed;
+        }
     // Each explicit migration also checks that its change is the only difference (methods, defaults, ...).
     if (Other || Added)
         return EFieldMigration::None;
@@ -837,14 +858,6 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP, FString& Error, bool 
                                        !Prior.ToActorSchema(Id, Previous, Error) ||
                                        !Next.ToActorSchema(Id, Candidate, Error) || !Next.ToJson(Json, Error))
         return false;
-    if (Previous.Fields.ContainsByPredicate(
-            [](const auto& F) { return F.Kind == EDasScalarKind::Delegate || F.Kind == EDasScalarKind::Event; }) ||
-        Candidate.Fields.ContainsByPredicate(
-            [](const auto& F) { return F.Kind == EDasScalarKind::Delegate || F.Kind == EDasScalarKind::Event; }))
-    {
-        Error = TEXT("Structural migration of classes with delegate fields is deferred");
-        return false;
-    }
     if (!Previous.ParentStableId.IsEmpty() || !Candidate.ParentStableId.IsEmpty())
     {
         Error = TEXT("Structural migration of authored class hierarchies is deferred");
@@ -1263,14 +1276,6 @@ bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP, const FDasNu
                                        !Prior.ToActorSchema(Id, Previous, Error) ||
                                        !Next.ToActorSchema(Id, Candidate, Error) || !Next.ToJson(Json, Error))
         return false;
-    if (Previous.Fields.ContainsByPredicate(
-            [](const auto& F) { return F.Kind == EDasScalarKind::Delegate || F.Kind == EDasScalarKind::Event; }) ||
-        Candidate.Fields.ContainsByPredicate(
-            [](const auto& F) { return F.Kind == EDasScalarKind::Delegate || F.Kind == EDasScalarKind::Event; }))
-    {
-        Error = TEXT("Structural migration of classes with delegate fields is deferred");
-        return false;
-    }
     if (!Previous.ParentStableId.IsEmpty() || !Candidate.ParentStableId.IsEmpty())
     {
         Error = TEXT("Structural migration of authored class hierarchies is deferred");
@@ -1785,14 +1790,6 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
         !Prior.ToActorSchema(Id, Previous, Error) || !Next.ToActorSchema(Id, Candidate, Error) ||
         !Next.ToJson(Json, Error) || !FDasBlueprintService::Apply(BP, Previous, Error, true))
         return false;
-    if (Previous.Fields.ContainsByPredicate(
-            [](const auto& F) { return F.Kind == EDasScalarKind::Delegate || F.Kind == EDasScalarKind::Event; }) ||
-        Candidate.Fields.ContainsByPredicate(
-            [](const auto& F) { return F.Kind == EDasScalarKind::Delegate || F.Kind == EDasScalarKind::Event; }))
-    {
-        Error = TEXT("Structural migration of classes with delegate fields is deferred");
-        return false;
-    }
     if (!Previous.ParentStableId.IsEmpty() || !Candidate.ParentStableId.IsEmpty())
     {
         Error = TEXT("Structural migration of authored class hierarchies is deferred");

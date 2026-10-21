@@ -46,7 +46,7 @@
     { "name": "actor-component-assets", "kind": "script", "script": "TestActorComponent.ps1",
       "comment": "DasActorComponent commandlet: composition import checks, saved assets, Create and Reopen phases." },
     { "name": "reload-matrix", "kind": "automation", "test": "DasForUE.ReloadMatrix", "log": "reload-matrix",
-      "minimum": 3, "comment": "Every declaration change of every entity kind, editor and PIE, against Tests/ReloadMatrix/expected.json." },
+      "minimum": 4, "comment": "Every declaration change of every entity kind, editor and PIE, against Tests/ReloadMatrix/expected.json." },
     { "name": "gameplay-pie", "kind": "automation", "test": "DasForUE.Gameplay.RuntimePIE", "log": "gameplay-pie",
       "minimum": 1, "comment": "Playable character, native references and their informational benchmark." },
     { "name": "performance", "kind": "script", "script": "TestPerformance.ps1",

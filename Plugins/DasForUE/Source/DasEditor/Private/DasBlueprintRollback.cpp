@@ -52,6 +52,10 @@ bool RollbackCapture(UObject* Object, const FDasFieldSchema& Field, FDasScalarVa
 bool RollbackText(UObject* Object, FName Name, const FString& Text)
 {
     auto* P = IsValid(Object) ? Object->GetClass()->FindPropertyByName(Name) : nullptr;
+    // Delegate and event fields hold bindings, which reinstancing copies with the object; there is no value
+    // to write back (and their text form does not import).
+    if (CastField<FMulticastDelegateProperty>(P) || CastField<FDelegateProperty>(P))
+        return true;
     return P && P->ImportText_Direct(*Text, P->ContainerPtrToValuePtr<void>(Object), Object, PPF_None);
 }
 bool RollbackValue(UObject* Object, FName Name, const FDasScalarValue& Value)
@@ -73,6 +77,12 @@ struct FDasBlueprintRollback::FImpl
     {
         TStrongObjectPtr<UEdGraph> Graph;
         TMap<FName, FString> Metadata;
+        // Nodes added to an existing graph (interface events in the EventGraph) are removed on restore.
+        TArray<UEdGraphNode*> Nodes;
+        // A detached graph (removed method or event) gets its name, outer and flags back.
+        FName Name;
+        UObject* Outer = nullptr;
+        bool bTransient = false;
     };
     // Components: the SCS tree, names, attachment, metadata and the serialized template of every node.
     struct FSCSNode
@@ -86,6 +96,7 @@ struct FDasBlueprintRollback::FImpl
     struct FBlueprint
     {
         TArray<FSCSNode> Nodes;
+        TArray<FBPInterfaceDescription> Interfaces;
         TStrongObjectPtr<UBlueprint> BP;
         TStrongObjectPtr<UClass> OriginalClass;
         TArray<FBPVariableDescription> Variables;
@@ -295,6 +306,7 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
         Image.Description = B->BlueprintDescription;
         Image.Category = B->BlueprintCategory;
         Image.Metadata = RollbackMetadata(B);
+        Image.Interfaces = B->ImplementedInterfaces;
         if (USimpleConstructionScript* SCS = B->SimpleConstructionScript)
             for (auto* N : SCS->GetAllNodes())
             {
@@ -320,6 +332,11 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
             FImpl::FGraph Graph;
             Graph.Graph.Reset(G);
             Graph.Metadata = RollbackMetadata(G);
+            Graph.Name = G->GetFName();
+            Graph.Outer = G->GetOuter();
+            Graph.bTransient = G->HasAnyFlags(RF_Transient);
+            for (auto& N : G->Nodes)
+                Graph.Nodes.Add(N.Get());
             S.Graphs.Add(MoveTemp(Graph));
             for (auto& E : G->Nodes)
                 if (auto* Node = Cast<UK2Node>(E.Get()))
@@ -448,6 +465,7 @@ bool FDasBlueprintRollback::Restore(FString& Error)
         B->FunctionGraphs = I.Functions;
         B->UbergraphPages = I.Uber;
         B->DelegateSignatureGraphs = I.Delegates;
+        B->ImplementedInterfaces = I.Interfaces;
         B->MacroGraphs = I.Macros;
         B->BlueprintDisplayName = I.Display;
         B->BlueprintDescription = I.Description;
@@ -488,7 +506,16 @@ bool FDasBlueprintRollback::Restore(FString& Error)
         }
     }
     for (auto& I : S.Graphs)
+    {
+        if (I.Graph->GetOuter() != I.Outer || I.Graph->GetFName() != I.Name)
+            I.Graph->Rename(*I.Name.ToString(), I.Outer, REN_DoNotDirty | REN_DontCreateRedirectors);
+        if (!I.bTransient)
+            I.Graph->ClearFlags(RF_Transient);
         I.Graph->GetOutermost()->GetMetaData().SetObjectValues(I.Graph.Get(), I.Metadata);
+        for (UEdGraphNode* N : TArray<UEdGraphNode*>(ObjectPtrDecay(I.Graph->Nodes)))
+            if (N && !I.Nodes.Contains(N))
+                I.Graph->RemoveNode(N);
+    }
     for (auto& I : S.Nodes)
     {
         if (auto* V = Cast<UK2Node_Variable>(I.Node.Get()))

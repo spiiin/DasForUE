@@ -140,6 +140,13 @@ migrated, 10 refused.
 
 ### S6. Delegates, events and interfaces
 
+**Done 2026-10-21 (except interface removal and signature changes).** Classes with delegate/event fields
+migrate like others (also through the explicit migrations); delegate/event fields can be added and removed
+(variable and dispatcher graph); a changed delegate/event signature is refused. Implemented interfaces can
+be added; removal is refused (it would cut links of nodes other Blueprints may use). Rollback restores
+`ImplementedInterfaces` and removes nodes added to existing graphs (`DasForUE.ReloadMatrix.Rollback`).
+Matrix: 109 migrated, 10 refused.
+
 - Delegate/event fields: add/remove; signature change rebinds compatible handlers and drops incompatible ones
   with a report; bindings of live instances are restored after reinstancing.
 - Interfaces: add/remove an implemented interface (Blueprint interface list, generated events); interface
