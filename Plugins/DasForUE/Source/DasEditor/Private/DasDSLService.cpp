@@ -1,4 +1,6 @@
 #include "DasDSLService.h"
+#include "DasCharacter.h"
+#include "DasPawn.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerState.h"
@@ -632,6 +634,61 @@ bool SplitDefaultChanges(UBlueprint* BP, const FString& Source, FDasAuthoringMod
 }
 }
 
+namespace
+{
+// A change of existing fields that one of the explicit migrations handles on its own.
+enum class EFieldMigration
+{
+    None,
+    Rename,
+    Remove,
+    Numeric,
+};
+EFieldMigration ClassifyFieldMigration(UBlueprint* BP, const FString& Source, const FString& Id)
+{
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    FDasAuthoringModule Prior, Next;
+    FString Error;
+    if (!FDasAuthoringModule::FromJson(BP->GetOutermost()->GetMetaData().GetValue(BP, TEXT("DasDSLModel")), Prior,
+                                                                                  Error) ||
+                                       !Runtime.ReadAuthoringScript(Runtime.ScriptPath(Source), Next, Error))
+        return EFieldMigration::None;
+    const auto* Old = Prior.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
+    const auto* New = Next.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
+    if (!Old || !New)
+        return EFieldMigration::None;
+    auto Numeric = [](const FDasDeclaredType& T)
+    {
+        const auto K = T.GetKind();
+        return K == EDasTypeKind::Int || K == EDasTypeKind::Float || K == EDasTypeKind::Double;
+    };
+    int32 Added = 0, Removed = 0, Renamed = 0, Retyped = 0, Other = 0;
+    for (const auto& P : New->Properties)
+    {
+        const auto* Was = Old->Properties.FindByPredicate([&](const auto& X) { return X.Id == P.Id; });
+        if (!Was)
+            ++Added;
+        else if (P.Type.Identity() != Was->Type.Identity())
+            (Numeric(P.Type) && Numeric(Was->Type) && P.Name == Was->Name ? Retyped : Other) += 1;
+        else if (P.Name != Was->Name)
+            ++Renamed;
+    }
+    for (const auto& P : Old->Properties)
+        if (!New->Properties.ContainsByPredicate([&](const auto& X) { return X.Id == P.Id; }))
+            ++Removed;
+    // Each explicit migration also checks that its change is the only difference (methods, defaults, ...).
+    if (Other || Added)
+        return EFieldMigration::None;
+    if (Renamed && !Removed && !Retyped)
+        return EFieldMigration::Rename;
+    if (Removed && !Renamed && !Retyped)
+        return EFieldMigration::Remove;
+    if (Retyped && !Renamed && !Removed)
+        return EFieldMigration::Numeric;
+    return EFieldMigration::None;
+}
+}
+
 bool FDasDSLService::Apply(const FString& Script, const FString& Package, const FString& Id, UBlueprint*& Out,
                            FString& Error, EDasDefaultMigrationPolicy DefaultPolicy)
 {
@@ -665,6 +722,27 @@ bool FDasDSLService::Reimport(UBlueprint* BP, FString& Error, EDasDefaultMigrati
             return false;
         }
         return true;
+    }
+    // Renaming, removing or numerically retyping existing fields: the matching explicit migration keeps the
+    // values (renamed, archived for a later restore, exactly converted) instead of a refusal.
+    if (DefaultPolicy == EDasDefaultMigrationPolicy::Automatic)
+    {
+        FKeepPossession Possession(BP->GeneratedClass);
+        switch (ClassifyFieldMigration(BP, Source, Id))
+        {
+        case EFieldMigration::Rename:
+            return ReimportRenamedFields(BP, Error);
+        case EFieldMigration::Remove:
+            return ReimportArchivedFields(BP, false, false, Error);
+        case EFieldMigration::Numeric:
+        {
+            // Exact rules: a value that the new type cannot hold exactly refuses the change.
+            FDasNumericMigrationOptions Options;
+            return ReimportConvertedNumericFields(BP, Options, Error);
+        }
+        case EFieldMigration::None:
+            break;
+        }
     }
     return Apply(Source, Package, Id, Result, Error, DefaultPolicy);
 }
@@ -732,12 +810,6 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP, FString& Error, bool 
     if (!Previous.ParentStableId.IsEmpty() || !Candidate.ParentStableId.IsEmpty())
     {
         Error = TEXT("Structural migration of authored class hierarchies is deferred");
-        return false;
-    }
-    if (const auto* Class = Prior.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
-        Class && !Class->Components.IsEmpty())
-    {
-        Error = TEXT("Actor declarations with components require a later migration policy");
         return false;
     }
     for (const auto& M : Candidate.EffectiveMethods())
@@ -1164,12 +1236,6 @@ bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP, const FDasNu
     if (!Previous.ParentStableId.IsEmpty() || !Candidate.ParentStableId.IsEmpty())
     {
         Error = TEXT("Structural migration of authored class hierarchies is deferred");
-        return false;
-    }
-    if (const auto* Class = Prior.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
-        Class && !Class->Components.IsEmpty())
-    {
-        Error = TEXT("Actor declarations with components require a later migration policy");
         return false;
     }
     for (const auto& M : Candidate.EffectiveMethods())
@@ -1634,6 +1700,17 @@ void DasFailArchiveAfterCompileForTesting(bool Enabled)
 #endif
 namespace
 {
+// Retired values of any actor host (Actor, Pawn, Character); null for other objects.
+TMap<FString, FDasScalarValue>* RetiredValues(UObject* O)
+{
+    if (auto* A = Cast<ADasProbeActor>(O))
+        return &A->RetiredDasValues;
+    if (auto* P = Cast<ADasPawn>(O))
+        return &P->RetiredDasValues;
+    if (auto* C = Cast<ADasCharacter>(O))
+        return &C->RetiredDasValues;
+    return nullptr;
+}
 FString ArchiveKey(const FString& ClassId, const FString& FieldId)
 {
     return ClassId + TEXT("::")+ FieldId;
@@ -1681,12 +1758,6 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
     if (!Previous.ParentStableId.IsEmpty() || !Candidate.ParentStableId.IsEmpty())
     {
         Error = TEXT("Structural migration of authored class hierarchies is deferred");
-        return false;
-    }
-    if (const auto* Class = Prior.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
-        Class && !Class->Components.IsEmpty())
-    {
-        Error = TEXT("Actor declarations with components require a later migration policy");
         return false;
     }
     if (Previous.Fields.ContainsByPredicate([](const FDasFieldSchema& F) { return F.Kind == EDasScalarKind::Class; }) ||
@@ -1998,7 +2069,7 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
         return false;
     struct FSnapshot
     {
-        TStrongObjectPtr<ADasProbeActor> Object;
+        TStrongObjectPtr<UObject> Object;
         TArray<FDasScalarValue> Values;
         TMap<FString, FDasScalarValue> Archive;
     };
@@ -2010,21 +2081,21 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
             !O->GetClass()->GetName().StartsWith(TEXT("SKEL_")) &&
                                                  !O->GetClass()->GetName().StartsWith(TEXT("REINST_")))
         {
-            auto* Actor = Cast<ADasProbeActor>(O);
-            if (!Actor)
+            auto* Retired = RetiredValues(O);
+            if (!Retired)
             {
-                Error = TEXT("Archive requires Actor adapter instances");
+                Error = TEXT("Archive requires Actor, Pawn or Character adapter instances");
                 return false;
             }
-            if (auto* W = Actor->GetWorld())
+            if (auto* W = O->GetWorld())
                 if (W->IsPartitionedWorld() || !W->GetStreamingLevels().IsEmpty())
                 {
                     Error = TEXT("Unsupported loaded partitioned/streaming archive scope");
                     return false;
                 }
             FSnapshot S;
-            S.Object.Reset(Actor);
-            S.Archive = Actor->RetiredDasValues;
+            S.Object.Reset(O);
+            S.Archive = *Retired;
             for (const auto& A : Actions)
             {
                 const FString Key = ArchiveKey(Id, A.Field.StableId);
@@ -2036,7 +2107,7 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
                         return false;
                     }
                     FDasScalarValue Value;
-                    if (!CaptureRenamedField(Actor, A.Field.Name, A.Field.Kind, Value, Error))
+                    if (!CaptureRenamedField(O, A.Field.Name, A.Field.Kind, Value, Error))
                         return false;
                     S.Values.Add(MoveTemp(Value));
                 }
@@ -2057,7 +2128,7 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
                           V->StructValue.GetScriptStruct()->GetPathName() != A.Field.StructPath ||
                           !ValidateDasStructSnapshot(V->StructValue, Error))))
                     {
-                        Error = TEXT("Missing or incompatible retained value: ")+ Actor->GetPathName() +
+                        Error = TEXT("Missing or incompatible retained value: ")+ O->GetPathName() +
                                      TEXT(".")+ A.Field.StableId;
                         return false;
                     }
@@ -2079,7 +2150,7 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
             for (auto& S : Snapshots)
             {
                 if (auto* NewObject = Map.Find(S.Object.Get()))
-                    S.Object.Reset(Cast<ADasProbeActor>(*NewObject));
+                    S.Object.Reset(*NewObject);
                 for (auto& V : S.Values)
                     FDasPropertyValueRoots::Remap(V, Map);
                 FDasPropertyValueRoots::Remap(S.Archive, Map);
@@ -2148,7 +2219,7 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
                 OK = false;
                 continue;
             }
-            S.Object->RetiredDasValues = S.Archive;
+            *RetiredValues(S.Object.Get()) = S.Archive;
             if (!Restore)
                 for (int32 I = 0; I < Actions.Num(); ++I)
                     OK &= RestoreRenamedField(S.Object.Get(), Actions[I].Field.Name, S.Values[I]);
@@ -2209,12 +2280,12 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
             const auto& A = Actions[I];
             const FString Key = ArchiveKey(Id, A.Field.StableId);
             if (!Restore)
-                S.Object->RetiredDasValues.Add(Key, S.Values[I]);
+                RetiredValues(S.Object.Get())->Add(Key, S.Values[I]);
             else
             {
                 if (!RestoreRenamedField(S.Object.Get(), A.Field.Name, S.Values[I]))
                     return Rollback(TEXT("Cannot restore retained value"));
-                S.Object->RetiredDasValues.Remove(Key);
+                RetiredValues(S.Object.Get())->Remove(Key);
             }
         }
     }

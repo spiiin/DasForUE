@@ -1505,9 +1505,10 @@ public:
                 M->Parameters.Swap(0, 1);
                 M->Parameters[0].Id = TEXT("changed-parameter-id");
             }
-            Check(M && !FDasBlueprintService::ApplyAuthoring(BP.Get(), Model, TEXT("mixed.MixedCounter"), Error) &&
-                                                             BP->GeneratedClass == Before,
-                                                             TEXT("frame_parameter_id_change_no_mutation"));
+            // A changed parameter identity rebuilds the method's adapter graph.
+            Check(M && FDasBlueprintService::ApplyAuthoring(BP.Get(), Model, TEXT("mixed.MixedCounter"), Error) &&
+                                                            BP->GeneratedClass && BP->Status != BS_Error,
+                                                            TEXT("frame_parameter_id_change_rebuilds_graph"));
         }
         else
             Check(false, TEXT("frame_model_read"));
@@ -2712,8 +2713,8 @@ public:
                 UClass* Before = BP->GeneratedClass;
                 Check(FFileHelper::SaveStringToFile(Changed, *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),
                       TEXT("PIE_write_rename"));
-                Check(!FDasDSLService::Reimport(BP.Get(), Error) && BP->GeneratedClass == Before,
-                      TEXT("PIE_no_policy_rename_refused"));
+                // The automatic reimport recognizes a pure rename by stable ID; the explicit policy is then a no-op.
+                Check(FDasDSLService::Reimport(BP.Get(), Error), TEXT("PIE_automatic_rename_by_ID"));
                 Check(FDasDSLService::ReimportRenamedFields(BP.Get(), Error), TEXT("PIE_rename_by_ID"));
                 if (!Error.IsEmpty())
                     Test->AddInfo(Error);

@@ -9,16 +9,16 @@
       "outcome": "migrated"
     },
     "actor/array/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/array/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/array/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/array/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -33,16 +33,16 @@
       "outcome": "migrated"
     },
     "actor/bool/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/bool/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/bool/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/bool/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -57,16 +57,16 @@
       "outcome": "migrated"
     },
     "actor/byte/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/byte/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/byte/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/byte/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -81,20 +81,20 @@
       "outcome": "migrated"
     },
     "actor/float/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/float/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/float/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/float/retype_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/add_field": {
       "message": "",
@@ -109,28 +109,28 @@
       "outcome": "migrated"
     },
     "actor/int/change_signature": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/remove_method": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/retype_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/map/add_field": {
       "message": "",
@@ -141,16 +141,16 @@
       "outcome": "migrated"
     },
     "actor/map/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/map/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/map/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/map/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -165,16 +165,16 @@
       "outcome": "migrated"
     },
     "actor/name/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/name/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/name/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/name/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -189,16 +189,16 @@
       "outcome": "migrated"
     },
     "actor/set/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/set/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/set/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/set/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -213,16 +213,16 @@
       "outcome": "migrated"
     },
     "actor/soft/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/soft/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/soft/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/soft/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -237,16 +237,16 @@
       "outcome": "migrated"
     },
     "actor/string/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/string/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/string/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/string/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -261,16 +261,16 @@
       "outcome": "migrated"
     },
     "actor/text/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/text/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/text/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/text/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -285,16 +285,16 @@
       "outcome": "migrated"
     },
     "actor/vector/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/vector/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/vector/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/vector/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -313,28 +313,28 @@
       "outcome": "migrated"
     },
     "character/int/change_signature": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/remove_method": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/retype_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/add_field": {
       "message": "",
@@ -349,28 +349,28 @@
       "outcome": "migrated"
     },
     "composed/int/change_signature": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/remove_method": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/retype_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/add_field": {
       "message": "",
@@ -385,28 +385,28 @@
       "outcome": "migrated"
     },
     "pawn/int/change_signature": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/remove_method": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/retype_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     }
   },
   "pie": {
@@ -419,16 +419,16 @@
       "outcome": "migrated"
     },
     "actor/array/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/array/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/array/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/array/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -443,16 +443,16 @@
       "outcome": "migrated"
     },
     "actor/bool/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/bool/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/bool/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/bool/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -467,16 +467,16 @@
       "outcome": "migrated"
     },
     "actor/byte/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/byte/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/byte/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/byte/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -491,20 +491,20 @@
       "outcome": "migrated"
     },
     "actor/float/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/float/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/float/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/float/retype_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/add_field": {
       "message": "",
@@ -519,28 +519,28 @@
       "outcome": "migrated"
     },
     "actor/int/change_signature": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/remove_method": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/int/retype_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/map/add_field": {
       "message": "",
@@ -551,16 +551,16 @@
       "outcome": "migrated"
     },
     "actor/map/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/map/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/map/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/map/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -575,16 +575,16 @@
       "outcome": "migrated"
     },
     "actor/name/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/name/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/name/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/name/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -599,16 +599,16 @@
       "outcome": "migrated"
     },
     "actor/set/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/set/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/set/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/set/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -623,16 +623,16 @@
       "outcome": "migrated"
     },
     "actor/soft/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/soft/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/soft/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/soft/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -647,16 +647,16 @@
       "outcome": "migrated"
     },
     "actor/string/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/string/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/string/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/string/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -671,16 +671,16 @@
       "outcome": "migrated"
     },
     "actor/text/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/text/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/text/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/text/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -695,16 +695,16 @@
       "outcome": "migrated"
     },
     "actor/vector/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/vector/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/vector/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "actor/vector/retype_field": {
       "message": "Removal, type, default or editability changes require a migration policy",
@@ -723,28 +723,28 @@
       "outcome": "migrated"
     },
     "character/int/change_signature": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/remove_method": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/retype_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/add_field": {
       "message": "",
@@ -759,28 +759,28 @@
       "outcome": "migrated"
     },
     "composed/int/change_signature": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/remove_method": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "composed/int/retype_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/add_field": {
       "message": "",
@@ -795,28 +795,28 @@
       "outcome": "migrated"
     },
     "pawn/int/change_signature": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/make_read_only": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/remove_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/remove_method": {
-      "message": "Legacy authored method identity changed",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/rename_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/retype_field": {
-      "message": "Removal, type, default or editability changes require a migration policy",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     }
   }
 }

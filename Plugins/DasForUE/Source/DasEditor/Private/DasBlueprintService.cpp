@@ -1017,18 +1017,6 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
         return false;
     }
     const FString LegacyMethodName = BP->GetOutermost()->GetMetaData().GetValue(BP, TEXT("DasMethodName"));
-    if (!LegacyMethodName.IsEmpty())
-    {
-        const auto* M = Methods.FindByPredicate([&](const auto& X) { return X.Name == FName(*LegacyMethodName); });
-        if (!M ||
-            M->StableId != BP->GetOutermost()->GetMetaData().GetValue(
-                               BP, TEXT("DasMethodId")) ||
-                               M->InputStableId != BP->GetOutermost()->GetMetaData().GetValue(BP, TEXT("DasInputId")))
-        {
-            Error = TEXT("Legacy authored method identity changed");
-            return false;
-        }
-    }
     for (const auto& Field : Schema.Fields)
     {
         FString Prior;
@@ -1039,14 +1027,22 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
             return false;
         }
     }
+    // Adapter graphs of removed or renamed methods are deleted, those whose signature changed are rebuilt;
+    // Blueprints that still call them fail the scope compile, which rolls the change back.
+    TArray<UEdGraph*> StaleGraphs;
+    TSet<FName> RebuildGraphs;
     for (UEdGraph* Graph : DasOwnedMethodGraphs(BP))
     {
         const FString Prior = BP->GetOutermost()->GetMetaData().GetValue(Graph, TEXT("DasMemberId"));
         if (!Prior.IsEmpty() && !Methods.ContainsByPredicate(
                                     [&](const auto& M) { return M.StableId == Prior && M.Name == Graph->GetFName(); }))
         {
-            Error = TEXT("Method removal/rename requires migration");
-            return false;
+            if (!BP->FunctionGraphs.Contains(Graph))
+            {
+                Error = TEXT("Interface event removal/rename requires migration");
+                return false;
+            }
+            StaleGraphs.Add(Graph);
         }
     }
     for (const auto& M : Methods)
@@ -1073,10 +1069,7 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
                 BP->GetOutermost()->GetMetaData().GetValue(BP, *(TEXT("DasInputId.")+ M.Name.ToString()));
             if ((!PriorId.IsEmpty() && PriorId != M.StableId) ||
                 (!PriorInput.IsEmpty() && PriorInput != M.InputStableId))
-            {
-                Error = TEXT("Authored method/parameter stable ID changed");
-                return false;
-            }
+                RebuildGraphs.Add(M.Name);
         }
     }
     for (const auto& M : Methods)
@@ -1085,10 +1078,7 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
             const FString Key = TEXT("DasParameterId.")+ M.Name.ToString() + TEXT(".")+ P.Name.ToString();
             const FString Prior = BP->GetOutermost()->GetMetaData().GetValue(BP, *Key);
             if (!Prior.IsEmpty() && Prior != P.StableId)
-            {
-                Error = TEXT("Authored parameter stable ID changed");
-                return false;
-            }
+                RebuildGraphs.Add(M.Name);
         }
     FDasDefaultRoots DefaultRoots;
     TMap<FName, FEdGraphPinType> Pins;
@@ -1131,10 +1121,10 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
         if (!Field ||
             (Field->Kind == EDasScalarKind::Event      ? Old.VarType.PinCategory != UEdGraphSchema_K2::PC_MCDelegate
              : Field->Kind == EDasScalarKind::Delegate ? Old.VarType.PinCategory != UEdGraphSchema_K2::PC_Delegate
-                                                       : Pins[Old.VarName] != Old.VarType) ||
-            Field->bInstanceEditable == !!(Old.PropertyFlags & CPF_DisableEditOnInstance) ||
-            Field->bReadOnly != !!(Old.PropertyFlags & CPF_BlueprintReadOnly))
+                                                       : Pins[Old.VarName] != Old.VarType))
         {
+            // Editability flags (InstanceEditable, BlueprintReadOnly) are applied below; Blueprint nodes that
+            // no longer compile against them fail the scope compile and roll the change back.
             Error = TEXT("Removal, type, default or editability changes require a migration policy");
             return false;
         }
@@ -1307,11 +1297,13 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
                 if (auto* Call = Cast<UK2Node_CallFunction>(Item))
                     bAdapter |= AdapterCall(Call) && Call->FindPin(TEXT("ScriptFile"));
             const auto* Decl = Methods.FindByPredicate([&](const auto& M) { return M.Name == Graph->GetFName(); });
-            if (!bAdapter || !Decl || !MethodShape(Function, *Decl))
+            if (!bAdapter || !Decl)
             {
                 Error = TEXT("Existing method is not a supported daScript adapter graph");
                 return false;
             }
+            if (!MethodShape(Function, *Decl) || StaleGraphs.Contains(Graph))
+                RebuildGraphs.Add(Graph->GetFName());
         }
     for (UEdGraph* G : BP->UbergraphPages)
         for (UEdGraphNode* Node : G->Nodes)
@@ -1347,6 +1339,10 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
             }
     if (bValidateOnly)
         return true;
+    for (UEdGraph* Graph : DasOwnedMethodGraphs(BP))
+        if (StaleGraphs.Contains(Graph) ||
+            (RebuildGraphs.Contains(Graph->GetFName()) && BP->FunctionGraphs.Contains(Graph)))
+            FBlueprintEditorUtils::RemoveGraph(BP, Graph, EGraphRemoveFlags::None);
     if (!DasEnsureSingleSignatures(BP, Schema, Error))
         return false;
     for (const auto& Field : Schema.Fields)
@@ -1430,10 +1426,10 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
                 Error = TEXT("Unable to create Blueprint field");
                 return false;
             }
-            FBlueprintEditorUtils::SetBlueprintOnlyEditableFlag(BP, Field.Name, !Field.bInstanceEditable);
         }
     for (const auto& Field : Schema.Fields)
     {
+        FBlueprintEditorUtils::SetBlueprintOnlyEditableFlag(BP, Field.Name, !Field.bInstanceEditable);
         FBlueprintEditorUtils::SetBlueprintPropertyReadOnlyFlag(BP, Field.Name, Field.bReadOnly);
         if (Schema.Parent == TEXT("SaveGame"))
             FBlueprintEditorUtils::SetVariableSaveGameFlag(BP, Field.Name, true);

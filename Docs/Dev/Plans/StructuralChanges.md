@@ -110,6 +110,14 @@ ActorComponent classes remain.
 
 ### S4. Removal, rename and signatures
 
+**Done 2026-10-21 (isolated Blueprints).** The automatic reimport dispatches a pure rename / removal /
+numeric retype to the explicit migrations (exact numeric rules; archive and rename keep the controller of a
+possessed Pawn). Archive works on Actor, Pawn and Character hosts; the explicit migrations no longer refuse
+composed actors. Editability flags are applied. Removed or renamed methods drop their adapter graph,
+changed signatures rebuild it; Blueprints that still call them fail the scope compile and roll back. Matrix:
+92 migrated, 10 refused (non-numeric retypes). Still open: call-site fix-up in dependent Blueprints,
+non-numeric conversions, dependency scopes in the automatic path, Callable <-> BlueprintEvent role changes.
+
 - Member removal archives values automatically; the Blueprint graphs that reference the member are refused
   with a list of the nodes (or fixed up when the member was renamed).
 - Field and method rename by stable id without an explicit policy when the id is unchanged.

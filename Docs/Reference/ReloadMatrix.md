@@ -23,96 +23,38 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 | Change | int | float | bool | string | name | text | byte | vector | soft | array | map | set |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | add_field | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| remove_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| rename_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| retype_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| remove_field | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| rename_field | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| retype_field | ✅ | ✅ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
 | change_default | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| make_read_only | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| make_read_only | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ### By class kind (int field)
 
 | Change | Actor | Actor with components | Pawn | Character |
 | --- | --- | --- | --- | --- |
 | add_field | ✅ | ✅ | ✅ | ✅ |
-| remove_field | ⛔ | ⛔ | ⛔ | ⛔ |
-| rename_field | ⛔ | ⛔ | ⛔ | ⛔ |
-| retype_field | ⛔ | ⛔ | ⛔ | ⛔ |
+| remove_field | ✅ | ✅ | ✅ | ✅ |
+| rename_field | ✅ | ✅ | ✅ | ✅ |
+| retype_field | ✅ | ✅ | ✅ | ✅ |
 | change_default | ✅ | ✅ | ✅ | ✅ |
-| make_read_only | ⛔ | ⛔ | ⛔ | ⛔ |
+| make_read_only | ✅ | ✅ | ✅ | ✅ |
 | add_method | ✅ | ✅ | ✅ | ✅ |
-| remove_method | ⛔ | ⛔ | ⛔ | ⛔ |
-| change_signature | ⛔ | ⛔ | ⛔ | ⛔ |
+| remove_method | ✅ | ✅ | ✅ | ✅ |
+| change_signature | ✅ | ✅ | ✅ | ✅ |
 
 <details><summary>Reasons</summary>
 
-- `actor/array/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/array/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/array/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/array/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/bool/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/bool/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/bool/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/byte/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/byte/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/byte/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/byte/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/float/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/float/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/float/rename_field`: Removal, type, default or editability changes require a migration policy
-- `actor/float/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/int/change_signature`: Legacy authored method identity changed
-- `actor/int/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/int/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/int/remove_method`: Legacy authored method identity changed
-- `actor/int/rename_field`: Removal, type, default or editability changes require a migration policy
-- `actor/int/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/map/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/map/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/map/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/map/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/name/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/name/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/name/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/name/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/set/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/set/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/set/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/set/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/soft/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/soft/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/soft/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/soft/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/string/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/string/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/string/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/string/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/text/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/text/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/text/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/text/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/vector/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/vector/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/vector/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/vector/retype_field`: Removal, type, default or editability changes require a migration policy
-- `character/int/change_signature`: Legacy authored method identity changed
-- `character/int/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `character/int/remove_field`: Removal, type, default or editability changes require a migration policy
-- `character/int/remove_method`: Legacy authored method identity changed
-- `character/int/rename_field`: Removal, type, default or editability changes require a migration policy
-- `character/int/retype_field`: Removal, type, default or editability changes require a migration policy
-- `composed/int/change_signature`: Legacy authored method identity changed
-- `composed/int/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `composed/int/remove_field`: Removal, type, default or editability changes require a migration policy
-- `composed/int/remove_method`: Legacy authored method identity changed
-- `composed/int/rename_field`: Removal, type, default or editability changes require a migration policy
-- `composed/int/retype_field`: Removal, type, default or editability changes require a migration policy
-- `pawn/int/change_signature`: Legacy authored method identity changed
-- `pawn/int/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `pawn/int/remove_field`: Removal, type, default or editability changes require a migration policy
-- `pawn/int/remove_method`: Legacy authored method identity changed
-- `pawn/int/rename_field`: Removal, type, default or editability changes require a migration policy
-- `pawn/int/retype_field`: Removal, type, default or editability changes require a migration policy
 
 </details>
 
@@ -123,95 +65,37 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 | Change | int | float | bool | string | name | text | byte | vector | soft | array | map | set |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | add_field | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| remove_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| rename_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
-| retype_field | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| remove_field | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| rename_field | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| retype_field | ✅ | ✅ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
 | change_default | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| make_read_only | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ | ⛔ |
+| make_read_only | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ### By class kind (int field)
 
 | Change | Actor | Actor with components | Pawn | Character |
 | --- | --- | --- | --- | --- |
 | add_field | ✅ | ✅ | ✅ | ✅ |
-| remove_field | ⛔ | ⛔ | ⛔ | ⛔ |
-| rename_field | ⛔ | ⛔ | ⛔ | ⛔ |
-| retype_field | ⛔ | ⛔ | ⛔ | ⛔ |
+| remove_field | ✅ | ✅ | ✅ | ✅ |
+| rename_field | ✅ | ✅ | ✅ | ✅ |
+| retype_field | ✅ | ✅ | ✅ | ✅ |
 | change_default | ✅ | ✅ | ✅ | ✅ |
-| make_read_only | ⛔ | ⛔ | ⛔ | ⛔ |
+| make_read_only | ✅ | ✅ | ✅ | ✅ |
 | add_method | ✅ | ✅ | ✅ | ✅ |
-| remove_method | ⛔ | ⛔ | ⛔ | ⛔ |
-| change_signature | ⛔ | ⛔ | ⛔ | ⛔ |
+| remove_method | ✅ | ✅ | ✅ | ✅ |
+| change_signature | ✅ | ✅ | ✅ | ✅ |
 
 <details><summary>Reasons</summary>
 
-- `actor/array/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/array/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/array/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/array/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/bool/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/bool/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/bool/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/bool/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/byte/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/byte/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/byte/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/byte/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/float/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/float/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/float/rename_field`: Removal, type, default or editability changes require a migration policy
-- `actor/float/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/int/change_signature`: Legacy authored method identity changed
-- `actor/int/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/int/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/int/remove_method`: Legacy authored method identity changed
-- `actor/int/rename_field`: Removal, type, default or editability changes require a migration policy
-- `actor/int/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/map/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/map/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/map/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/map/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/name/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/name/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/name/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/name/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/set/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/set/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/set/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/set/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/soft/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/soft/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/soft/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/soft/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/string/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/string/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/string/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/string/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/text/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/text/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/text/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/text/retype_field`: Removal, type, default or editability changes require a migration policy
-- `actor/vector/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `actor/vector/remove_field`: Removal, type, default or editability changes require a migration policy
-- `actor/vector/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/vector/retype_field`: Removal, type, default or editability changes require a migration policy
-- `character/int/change_signature`: Legacy authored method identity changed
-- `character/int/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `character/int/remove_field`: Removal, type, default or editability changes require a migration policy
-- `character/int/remove_method`: Legacy authored method identity changed
-- `character/int/rename_field`: Removal, type, default or editability changes require a migration policy
-- `character/int/retype_field`: Removal, type, default or editability changes require a migration policy
-- `composed/int/change_signature`: Legacy authored method identity changed
-- `composed/int/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `composed/int/remove_field`: Removal, type, default or editability changes require a migration policy
-- `composed/int/remove_method`: Legacy authored method identity changed
-- `composed/int/rename_field`: Removal, type, default or editability changes require a migration policy
-- `composed/int/retype_field`: Removal, type, default or editability changes require a migration policy
-- `pawn/int/change_signature`: Legacy authored method identity changed
-- `pawn/int/make_read_only`: Removal, type, default or editability changes require a migration policy
-- `pawn/int/remove_field`: Removal, type, default or editability changes require a migration policy
-- `pawn/int/remove_method`: Legacy authored method identity changed
-- `pawn/int/rename_field`: Removal, type, default or editability changes require a migration policy
-- `pawn/int/retype_field`: Removal, type, default or editability changes require a migration policy
 
 </details>

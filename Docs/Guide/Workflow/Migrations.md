@@ -1,9 +1,16 @@
 # Migrations
 
 When a DSL declaration changes in a way that affects existing assets and saved data (new defaults,
-renamed or removed fields, changed numeric types, changed enums or structs), plain reimport refuses
-the change. You choose an explicit migration policy instead. Each policy preflights the change,
-updates Blueprints, dependent assets and instance values, and rolls back on failure.
+renamed or removed fields, changed numeric types, changed enums or structs), each migration policy
+below preflights the change, updates Blueprints, dependent assets and instance values, and rolls back on
+failure.
+
+The automatic reimport (saving the `.das` file, or `Das.DSL.Reimport <bp>` without an option) picks the
+policy itself when one save makes only one kind of field change: defaults (`preserve_overrides`), renames
+by stable ID (`rename_by_id`), removals (`archive_remove`) or numeric type changes (`convert_numeric`
+with exact rules, so a value that the new type cannot hold refuses the change). Dependency scopes and
+lossy conversions stay explicit. What each change does is listed in the
+[reload matrix](../../Reference/ReloadMatrix.md).
 
 ## Policy overview
 
