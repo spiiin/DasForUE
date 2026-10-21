@@ -4,6 +4,10 @@
 // written to logs/reload-matrix.json; Scripts/RenderReloadMatrix.py turns the expected file into
 // Docs/Reference/ReloadMatrix.md.
 #include "DasDSLService.h"
+#include "DasDataAssetService.h"
+#include "Engine/DataAsset.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "UObject/SavePackage.h"
 #include "DasProbeInterface.h"
 #include "DasRuntime.h"
 #include "Dom/JsonObject.h"
@@ -77,6 +81,10 @@ const FMatrixKind MatrixKinds[] = {
     {TEXT("pawn"), TEXT("/Script/Engine.Pawn"), nullptr, TEXT("")},
         {TEXT("character"), TEXT("/Script/Engine.Character"), nullptr, TEXT("")},
         {TEXT("child"), nullptr, nullptr, TEXT("")},
+    // Instances are objects, not actors: saved DataAsset packages and an unsaved SaveGame object.
+    {TEXT("data_asset"), TEXT("DataAsset"), nullptr, TEXT("")},
+    {TEXT("primary_data_asset"), TEXT("PrimaryDataAsset"), nullptr, TEXT("")},
+    {TEXT("save_game"), TEXT("SaveGame"), TEXT("ue_savegame"), TEXT("")},
     {TEXT("evented"), TEXT("/Script/Engine.Actor"), TEXT("ue_delegate_examples"),
      TEXT("    @ue_property=(BlueprintAssignable)\n    @ue_id=\"reloadmatrix.host.changed\"\n    Changed:FScoreEvent\n"
           "    @ue_property=(BlueprintReadWrite)\n    @ue_id=\"reloadmatrix.host.query\"\n    Query:FScoreQuery\n")},
@@ -160,6 +168,14 @@ FString ParentScript(const TCHAR* Class, const TCHAR* Module, const FString& Suf
                                     "    def ReadBase():int { return self.BaseValue }\n}\n"),
                                     Class);
 }
+bool AssetKind(const FMatrixKind& K)
+{
+    return K.Parent && !FString(K.Parent).StartsWith(TEXT("/Script/"));
+}
+bool DataAssetKind(const FMatrixKind& K)
+{
+    return AssetKind(K) && FString(K.Parent).EndsWith(TEXT("DataAsset"));
+}
 bool Composed(const FMatrixKind& K)
 {
     return FCString::Strcmp(K.Name, TEXT("composed")) == 0;
@@ -222,6 +238,10 @@ FString MatrixScript(const FMatrixKind& K, const FMatrixType& T, TOptional<EChan
             : FString::Printf(TEXT("require reload_matrix_base_%s\n[ue_class(module_id=\"reloadmatrix\","
                                         "id=\"reloadmatrix.host\",Blueprintable)]\nclass MatrixHost : MatrixBase {\n"),
                                    *Suffix);
+    else if (AssetKind(K))
+        S += FString::Printf(TEXT("[ue_class(module_id=\"reloadmatrix\",id=\"reloadmatrix.host\",Blueprintable)]\n"
+                                  "class MatrixHost : %s {\n"),
+                             K.Parent);
     else
         S += FString::Printf(TEXT("[ue_class(module_id=\"reloadmatrix\",id=\"reloadmatrix.host\",parent=\"%s\","
                               "Blueprintable)%s]\nclass MatrixHost {\n%s"),
@@ -274,15 +294,16 @@ bool Import(UObject* O, const TCHAR* Name, const TCHAR* Value)
     FProperty* P = O ? O->GetClass()->FindPropertyByName(Name) : nullptr;
     return P && P->ImportText_Direct(Value, P->ContainerPtrToValuePtr<void>(O), O, PPF_None);
 }
-USceneComponent* SceneComp(AActor* Actor, const TCHAR* Name)
+USceneComponent* SceneComp(UObject* Object, const TCHAR* Name)
 {
+    auto* Actor = Cast<AActor>(Object);
     if (Actor)
         for (auto* C : Actor->GetComponents())
             if (C && C->GetFName() == Name)
                 return Cast<USceneComponent>(C);
     return nullptr;
 }
-double CompZ(AActor* Actor, const TCHAR* Name)
+double CompZ(UObject* Actor, const TCHAR* Name)
 {
     auto* C = SceneComp(Actor, Name);
     return C ? C->GetRelativeLocation().Z : -1.0;
@@ -304,8 +325,18 @@ struct FMatrixCell
     FString Key, ScriptName, ScriptPath, Package, Suffix;
     TStrongObjectPtr<UBlueprint> Blueprint;
     FName Placed, Plain;
+    // Object paths of the instances of asset kinds (empty for actors).
+    FString PlacedPath, PlainPath;
     FString Outcome, Message;
 };
+// The overridden (bPlaced) or plain instance: an actor in World, or the object of an asset kind.
+UObject* Instance(const FMatrixCell& Cell, UWorld* World, bool bPlaced)
+{
+    const FString& Path = bPlaced ? Cell.PlacedPath : Cell.PlainPath;
+    if (!Path.IsEmpty())
+        return FindObject<UObject>(nullptr, *Path);
+    return FindActor(World, bPlaced ? Cell.Placed : Cell.Plain);
+}
 TArray<FMatrixCell> MatrixCells()
 {
     TArray<FMatrixCell> Cells;
@@ -355,6 +386,48 @@ void DeleteCellScripts(const FMatrixCell& Cell)
         for (const TCHAR* Module : {TEXT("reload_matrix_base"), TEXT("reload_matrix_other")})
             IFileManager::Get().Delete(*ParentPath(Module, Cell));
 }
+// Asset kinds: a DataAsset instance is a saved package (found by the migration scope through the asset
+// registry); a SaveGame object lives only in memory.
+bool PlaceObjects(FMatrixCell& Cell, UBlueprint* BP, FString& Error)
+{
+    const FString Folder = FPackageName::GetLongPackagePath(Cell.Package);
+    for (const bool bPlaced : {true, false})
+    {
+        const FString Package = Folder / (bPlaced ? TEXT("Placed") : TEXT("Plain"));
+        UObject* Object = nullptr;
+        if (DataAssetKind(*Cell.Kind))
+        {
+            UDataAsset* Asset = nullptr;
+            if (!FDasDataAssetService::Create(BP, Package, Asset, Error))
+                return false;
+            Object = Asset;
+        }
+        else
+            Object = NewObject<UObject>(CreatePackage(*Package), BP->GeneratedClass,
+                                        *FPackageName::GetLongPackageAssetName(Package), RF_Public | RF_Standalone);
+        if (bPlaced &&
+            (!Import(Object, TEXT("Value"), Cell.Type->Override) || !Import(Object, TEXT("Anchor"), TEXT("42"))))
+        {
+            Error = TEXT("Cannot override matrix instance values");
+            return false;
+        }
+        (bPlaced ? Cell.PlacedPath : Cell.PlainPath) = Object->GetPathName();
+        if (DataAssetKind(*Cell.Kind))
+        {
+            const FString File =
+                FPackageName::LongPackageNameToFilename(Package, FPackageName::GetAssetPackageExtension());
+            FSavePackageArgs Save;
+            Save.TopLevelFlags = RF_Public | RF_Standalone;
+            if (!UPackage::SavePackage(Object->GetOutermost(), Object, *File, Save))
+            {
+                Error = TEXT("Cannot save matrix DataAsset");
+                return false;
+            }
+            FAssetRegistryModule::GetRegistry().ScanFilesSynchronous({File}, true);
+        }
+    }
+    return true;
+}
 bool PrepareCell(FMatrixCell& Cell, UWorld* World, FString& Error)
 {
     UBlueprint* BP = nullptr;
@@ -372,6 +445,8 @@ bool PrepareCell(FMatrixCell& Cell, UWorld* World, FString& Error)
         !FDasDSLService::Apply(Cell.ScriptName, Cell.Package, TEXT("reloadmatrix.host"), BP, Error))
         return false;
     Cell.Blueprint.Reset(BP);
+    if (AssetKind(*Cell.Kind))
+        return PlaceObjects(Cell, BP, Error);
     for (FName Name : {Cell.Placed, Cell.Plain})
     {
         FActorSpawnParameters Spawn;
@@ -382,7 +457,7 @@ bool PrepareCell(FMatrixCell& Cell, UWorld* World, FString& Error)
             return false;
         }
     }
-    AActor* Placed = FindActor(World, Cell.Placed);
+    UObject* Placed = Instance(Cell, World, true);
     if (!Import(Placed, TEXT("Value"), Cell.Type->Override) || !Import(Placed, TEXT("Anchor"), TEXT("42")))
     {
         Error = TEXT("Cannot override matrix instance values");
@@ -400,7 +475,7 @@ bool PrepareCell(FMatrixCell& Cell, UWorld* World, FString& Error)
 void RunCell(FMatrixCell& Cell, UWorld* World, const TCHAR* AnchorValue)
 {
     UBlueprint* BP = Cell.Blueprint.Get();
-    AActor* Placed = FindActor(World, Cell.Placed);
+    UObject* Placed = Instance(Cell, World, true);
     const FString ValueBefore = Text(Placed, TEXT("Value"));
     UClass* ClassBefore = BP->GeneratedClass;
     FString Error;
@@ -411,7 +486,7 @@ void RunCell(FMatrixCell& Cell, UWorld* World, const TCHAR* AnchorValue)
                             : Write(Cell.ScriptPath, MatrixScript(*Cell.Kind, *Cell.Type, Cell.Change, Cell.Suffix))) &&
                  FDasDSLService::Reimport(BP, Error);
     Cell.Message = Error;
-    Placed = FindActor(World, Cell.Placed);
+    Placed = Instance(Cell, World, true);
     if (!Applied)
     {
         // A refusal changes nothing; a later cell must still see the old declaration.
@@ -442,12 +517,12 @@ void RunCell(FMatrixCell& Cell, UWorld* World, const TCHAR* AnchorValue)
     case EChange::ChangeDefault:
     {
         // The editor instance without an override follows the new default.
-        AActor* Plain = FindActor(GEditor->GetEditorWorldContext().World(), Cell.Plain);
+        UObject* Plain = Instance(Cell, GEditor->GetEditorWorldContext().World(), false);
         Shape &= Text(CDO, TEXT("Value")) != TEXT("<missing>");
         Kept &= Text(Placed, TEXT("Value")) == ValueBefore && Text(Plain, TEXT("Value")) == Text(CDO, TEXT("Value"));
         // During PIE the running copy without an override follows the new default as well.
         if (World->IsGameWorld())
-            Kept &= Text(FindActor(World, Cell.Plain), TEXT("Value")) == Text(CDO, TEXT("Value"));
+            Kept &= Text(Instance(Cell, World, false), TEXT("Value")) == Text(CDO, TEXT("Value"));
         break;
     }
     case EChange::MakeReadOnly:
@@ -482,7 +557,7 @@ void RunCell(FMatrixCell& Cell, UWorld* World, const TCHAR* AnchorValue)
         Kept &= CompZ(Placed, TEXT("Arm")) == 80.0;
         break;
     case EChange::ChangeComponentDefault:
-        Shape &= CompZ(FindActor(GEditor->GetEditorWorldContext().World(), Cell.Plain), TEXT("Child")) == 60.0;
+        Shape &= CompZ(Instance(Cell, GEditor->GetEditorWorldContext().World(), false), TEXT("Child")) == 60.0;
         Kept &= CompZ(Placed, TEXT("Child")) == 80.0;
         break;
     case EChange::AddEvent:
@@ -643,7 +718,7 @@ public:
             if (!Cell.Outcome.IsEmpty())
                 continue;
             // A value set in the running game must survive the change (game state).
-            Import(FindActor(World, Cell.Placed), TEXT("Anchor"), TEXT("55"));
+            Import(Instance(Cell, World, true), TEXT("Anchor"), TEXT("55"));
             RunCell(Cell, World, TEXT("55"));
             UE_LOG(LogTemp, Display, TEXT("DAS_RELOAD_MATRIX pie %s %s %s"), *Cell.Key, *Cell.Outcome, *Cell.Message);
         }

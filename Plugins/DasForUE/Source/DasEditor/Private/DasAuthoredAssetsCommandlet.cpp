@@ -110,17 +110,16 @@ int32 UDasAuthoredAssetsCommandlet::Main(const FString& Params)
     ChangedAuthor.ReplaceInline(TEXT("Score:int=10"), TEXT("Score:int=11"));
     if (!FFileHelper::SaveStringToFile(ChangedAuthor, *AuthorPath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
         return 2;
-    UBlueprint* Reimported = nullptr;
-    const bool Rejected =
-        !FDasDSLService::Apply(AuthorFile, Base + TEXT("/Classes/BP_Item"), ItemDecl->Id, Reimported, Error,
-                                                       EDasDefaultMigrationPolicy::PreserveOverrides);
-    Check(Rejected &&
-          Error.Contains(TEXT("migration is deferred")) &&
-                         FindFProperty<FIntProperty>(
-                             ItemBP->GeneratedClass,
-                             TEXT("Score"))->GetPropertyValue_InContainer(ItemBP->GeneratedClass->GetDefaultObject()) ==
-                             10,
-                             TEXT("declaration_update_rejected_before_default_migration"));
+    // Declaration changes migrate DataAsset classes (and their saved instances) like other classes.
+    auto Score = [&]()
+    {
+        return FindFProperty<FIntProperty>(ItemBP->GeneratedClass, TEXT("Score"))
+            ->GetPropertyValue_InContainer(ItemBP->GeneratedClass->GetDefaultObject());
+    };
+    Check(FDasDSLService::Reimport(ItemBP, Error) && Score() == 11, TEXT("declaration_update_applies_to_data_asset"));
+    if (!FFileHelper::SaveStringToFile(Author, *AuthorPath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
+        return 2;
+    Check(FDasDSLService::Reimport(ItemBP, Error) && Score() == 10, TEXT("declaration_update_reverted"));
     if (!FFileHelper::SaveStringToFile(Author, *AuthorPath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
         return 2;
 

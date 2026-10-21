@@ -15,6 +15,9 @@ public:
     FString AuthoredTypeId;
     UPROPERTY()
     TMap<FString, FString> DasDefaultSourceContracts;
+    // Values of removed fields, kept for a restore (see the archive field migration).
+    UPROPERTY(SaveGame)
+    TMap<FString, FDasScalarValue> RetiredDasValues;
     UPROPERTY(Transient, VisibleInstanceOnly, BlueprintReadOnly, Category = "daScript")
     FString LastDasError;
     void RecordLifecycleResult(const FDasExecutionResult& Result);
@@ -51,6 +54,9 @@ public:
     FString AuthoredTypeId;
     UPROPERTY()
     TMap<FString, FString> DasDefaultSourceContracts;
+    // Values of removed fields, kept for a restore (see the archive field migration).
+    UPROPERTY(SaveGame)
+    TMap<FString, FDasScalarValue> RetiredDasValues;
     UPROPERTY(Transient, VisibleInstanceOnly, BlueprintReadOnly, Category = "daScript")
     FString LastDasError;
     void RecordLifecycleResult(const FDasExecutionResult& Result);

@@ -62,7 +62,9 @@ The class path refers to the imported Blueprint asset; `ue_savegame_create` also
 
 ### What gets saved
 
-UE's standard slot serializer stores **all non-transient properties**, not only those marked SaveGame. Object references are not deep copies of world actors or components: keep persistent state as values or durable asset/soft references and rebuild world objects after loading. There is no custom schema migration or save format versioning.
+UE's standard slot serializer stores **all non-transient properties**, not only those marked SaveGame. Object references are not deep copies of world actors or components: keep persistent state as values or durable asset/soft references and rebuild world objects after loading. Changing the class declaration reimports it like other authored classes (live objects keep their values,
+removed fields are archived on the object); files written by an older version load by property name. There is
+no save format versioning.
 
 ## Async save and load
 
@@ -100,7 +102,7 @@ ue_savegame_save_async("save_profile",game,"Player1","on_saved")
 
 ## Limitations
 
-- No schema migration or versioning of save data.
+- No versioning of save files: a renamed or retyped field is not converted when an older file loads.
 - Cross-process/cooked loading and platform-specific save services follow Unreal's own behavior; the plugin adds no guarantees beyond the standard serializer.
 
 Try it: `.\Scripts\TestSaveGame.ps1` runs a scenario that imports the class, writes/reads/deletes unique slots and exercises async save/load and cancellation.

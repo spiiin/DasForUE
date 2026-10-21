@@ -170,6 +170,13 @@ validation, so every structural reimport of a child was refused). Matrix: 120 mi
 
 ### S8. Asset kinds
 
+**S8a done 2026-10-21 (DataAsset, PrimaryDataAsset, SaveGame classes).** The DataAsset gate is gone; saved
+DataAsset instances of the class family are part of the migration scope (`FDasBlueprintRollback::InstanceAsset`,
+also in the explicit migrations), migrated and marked dirty. The automatic path passes "with dependencies" when
+the only saved referencers are such instances. DataAsset, PrimaryDataAsset and SaveGame hosts got
+`RetiredDasValues`, so removed fields are archived on them. Matrix kinds `data_asset`, `primary_data_asset`,
+`save_game`: every field and method change migrates. SaveGame file versioning stays out (decision 2026-10-21).
+
 - DataAsset / PrimaryDataAsset: instances are assets; migrate and re-save them in scope.
 - SaveGame: no live instances to migrate; covered by the save-game schema item (v1) — versioned field ids
   and conversions applied on load.

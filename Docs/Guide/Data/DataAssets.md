@@ -115,7 +115,15 @@ def on_loaded(asset:UObjectHandle):void {
 
 ## Changing the class
 
-Body-only reimport (method implementations) works as usual. Changes to declarations, defaults or the Primary Asset type of these roots are refused before any defaults migration: create a new class, or keep the declaration unchanged while editing method bodies. Existing instances are not migrated and no ID redirectors are generated.
+Saving the script reimports the class like any other authored class: fields and methods can be added, removed,
+renamed or numerically retyped, and defaults can change. Saved instances (`Das.DSL.Asset.Create` assets) are
+migrated with the class: overridden values are kept, values left at the old default follow the new one, removed
+fields are archived on the instance for a later restore, and the changed instance packages are marked dirty —
+save them. A failure rolls the class and every instance back.
+
+Not supported: a class with other saved referencers (maps, Blueprints using it) needs the explicit migrations
+with dependencies ([Migrations](../Workflow/Migrations.md)); changing the Primary Asset type generates no ID
+redirectors.
 
 ## Preflight before cooking
 

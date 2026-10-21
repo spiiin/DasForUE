@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerState.h"
 #include "UObject/UObjectIterator.h"
 #include "DasDataAssets.h"
+#include "DasSaveGame.h"
 #include "DasTypePins.h"
 #include "DasBlueprintDefaults.h"
 #include "DasDefaultRoots.h"
@@ -200,13 +201,6 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         }
     }
     const auto& Declaration = *Model.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
-    if (!Created && (Schema.Parent == TEXT("DataAsset") || Schema.Parent == TEXT("PrimaryDataAsset")) &&
-                                           BP->GetOutermost()->GetMetaData().GetValue(BP, TEXT("DasDSLModel")) != Json)
-    {
-        Error =
-            TEXT("DataAsset declaration migration is deferred; create a new Blueprint or reimport method bodies only");
-        return false;
-    }
     if (DefaultPolicy == EDasDefaultMigrationPolicy::Automatic)
     {
         DefaultPolicy = EDasDefaultMigrationPolicy::Refuse;
@@ -740,6 +734,29 @@ enum class EFieldMigration
     Remove,
     Numeric,
 };
+// True when every saved package referencing BP is a DataAsset instance of its class (no children, no
+// dependent Blueprints, no maps).
+bool OnlyInstanceReferencers(UBlueprint* BP)
+{
+    TArray<UClass*> Children;
+    GetDerivedClasses(BP->GeneratedClass, Children, true);
+    TArray<UBlueprint*> Dependents;
+    FBlueprintEditorUtils::FindDependentBlueprints(BP, Dependents);
+    auto& Registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
+    if (!Children.IsEmpty() || !Dependents.IsEmpty() || Registry.IsLoadingAssets())
+        return false;
+    TArray<FName> Referencers;
+    Registry.GetReferencers(BP->GetOutermost()->GetFName(), Referencers);
+    Referencers.Remove(BP->GetOutermost()->GetFName());
+    for (FName P : Referencers)
+    {
+        TArray<FAssetData> Data;
+        Registry.GetAssetsByPackageName(P, Data);
+        if (Data.Num() != 1 || !FDasBlueprintRollback::InstanceAsset(Data[0], BP->GeneratedClass))
+            return false;
+    }
+    return !Referencers.IsEmpty();
+}
 EFieldMigration ClassifyFieldMigration(UBlueprint* BP, const FString& Source, const FString& Id)
 {
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
@@ -829,16 +846,20 @@ bool FDasDSLService::Reimport(UBlueprint* BP, FString& Error, EDasDefaultMigrati
     if (DefaultPolicy == EDasDefaultMigrationPolicy::Automatic)
     {
         FKeepPossession Possession(BP->GeneratedClass);
+        // Saved DataAsset instances of the class are migrated with it; other saved referencers still need an
+        // explicit migration with dependencies.
+        const bool Instances = OnlyInstanceReferencers(BP);
         switch (ClassifyFieldMigration(BP, Source, Id))
         {
         case EFieldMigration::Rename:
-            return ReimportRenamedFields(BP, Error);
+            return ReimportRenamedFields(BP, Error, Instances);
         case EFieldMigration::Remove:
-            return ReimportArchivedFields(BP, false, false, Error);
+            return ReimportArchivedFields(BP, false, Instances, Error);
         case EFieldMigration::Numeric:
         {
             // Exact rules: a value that the new type cannot hold exactly refuses the change.
             FDasNumericMigrationOptions Options;
+            Options.IncludeDependencies = Instances;
             return ReimportConvertedNumericFields(BP, Options, Error);
         }
         case EFieldMigration::None:
@@ -1037,11 +1058,11 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP, FString& Error, bool 
                     Registry.GetAssetsByPackageName(Package, Assets);
                     if (Assets.Num() != 1 ||
                         (Assets[0].AssetClassPath != UBlueprint::StaticClass()->GetClassPathName() &&
-                         Assets[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName()))
+                         Assets[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName() &&
+                         !FDasBlueprintRollback::InstanceAsset(Assets[0], BP->GeneratedClass)))
                     {
-                        Error =
-                            TEXT("Unsupported dependent package; only Blueprint and ordinary map assets supported: ")+
-                                 Package.ToString();
+                        Error = TEXT("Unsupported dependent package; only Blueprint, map and DataAsset instance assets supported: ")+
+                            Package.ToString();
                         return false;
                     }
                     UObject* Asset = Assets[0].GetAsset();
@@ -1481,11 +1502,11 @@ bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP, const FDasNu
                     Registry.GetAssetsByPackageName(Package, Assets);
                     if (Assets.Num() != 1 ||
                         (Assets[0].AssetClassPath != UBlueprint::StaticClass()->GetClassPathName() &&
-                         Assets[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName()))
+                         Assets[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName() &&
+                         !FDasBlueprintRollback::InstanceAsset(Assets[0], BP->GeneratedClass)))
                     {
-                        Error =
-                            TEXT("Unsupported dependent package; only Blueprint and ordinary map assets supported: ")+
-                                 Package.ToString();
+                        Error = TEXT("Unsupported dependent package; only Blueprint, map and DataAsset instance assets supported: ")+
+                            Package.ToString();
                         return false;
                     }
                     UObject* Asset = Assets[0].GetAsset();
@@ -1790,6 +1811,12 @@ TMap<FString, FDasScalarValue>* RetiredValues(UObject* O)
         return &P->RetiredDasValues;
     if (auto* C = Cast<ADasCharacter>(O))
         return &C->RetiredDasValues;
+    if (auto* D = Cast<UDasDataAsset>(O))
+        return &D->RetiredDasValues;
+    if (auto* D = Cast<UDasPrimaryDataAsset>(O))
+        return &D->RetiredDasValues;
+    if (auto* G = Cast<UDasSaveGame>(O))
+        return &G->RetiredDasValues;
     return nullptr;
 }
 FString ArchiveKey(const FString& ClassId, const FString& FieldId)
@@ -2018,11 +2045,11 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
                     Registry.GetAssetsByPackageName(Package, Assets);
                     if (Assets.Num() != 1 ||
                         (Assets[0].AssetClassPath != UBlueprint::StaticClass()->GetClassPathName() &&
-                         Assets[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName()))
+                         Assets[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName() &&
+                         !FDasBlueprintRollback::InstanceAsset(Assets[0], BP->GeneratedClass)))
                     {
-                        Error =
-                            TEXT("Unsupported dependent package; only Blueprint and ordinary map assets supported: ")+
-                                 Package.ToString();
+                        Error = TEXT("Unsupported dependent package; only Blueprint, map and DataAsset instance assets supported: ")+
+                            Package.ToString();
                         return false;
                     }
                     UObject* Asset = Assets[0].GetAsset();
@@ -2157,7 +2184,7 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
             auto* Retired = RetiredValues(O);
             if (!Retired)
             {
-                Error = TEXT("Archive requires Actor, Pawn or Character adapter instances");
+                Error = TEXT("Archive requires Actor, Pawn, Character, DataAsset or SaveGame instances");
                 return false;
             }
             if (auto* W = O->GetWorld())

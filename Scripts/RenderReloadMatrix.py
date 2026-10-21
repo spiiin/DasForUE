@@ -18,7 +18,7 @@ EXPECTED = ROOT / "Tests" / "ReloadMatrix" / "expected.json"
 ACTUAL = ROOT / "logs" / "reload-matrix.json"
 PAGE = ROOT / "Docs" / "Reference" / "ReloadMatrix.md"
 
-KINDS = ["actor", "composed", "pawn", "character", "child", "evented"]
+KINDS = ["actor", "composed", "pawn", "character", "child", "evented", "data_asset", "primary_data_asset", "save_game"]
 KIND_TITLES = {
     "actor": "Actor",
     "composed": "Actor with components",
@@ -26,6 +26,9 @@ KIND_TITLES = {
     "character": "Character",
     "child": "Child of a DSL parent",
     "evented": "Actor with event and delegate",
+    "data_asset": "DataAsset",
+    "primary_data_asset": "PrimaryDataAsset",
+    "save_game": "SaveGame",
 }
 TYPES = ["int", "float", "bool", "string", "name", "text", "byte", "vector", "soft", "array", "map", "set"]
 FIELD_CHANGES = ["add_field", "remove_field", "rename_field", "retype_field", "change_default", "make_read_only"]

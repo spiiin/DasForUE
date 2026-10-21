@@ -5,6 +5,7 @@
 #include "DasPropertyValues.h"
 #include "DasSoftReferences.h"
 #include "Engine/Blueprint.h"
+#include "Engine/DataAsset.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/World.h"
 #include "Engine/SCS_Node.h"
@@ -96,7 +97,7 @@ struct FDasBlueprintRollback::FImpl
     struct FBlueprint
     {
         TArray<FSCSNode> Nodes;
-                TArray<FBPInterfaceDescription> Interfaces;
+        TArray<FBPInterfaceDescription> Interfaces;
         TObjectPtr<UClass> Parent;
         TStrongObjectPtr<UBlueprint> BP;
         TStrongObjectPtr<UClass> OriginalClass;
@@ -132,6 +133,11 @@ struct FDasBlueprintRollback::FImpl
 };
 FDasBlueprintRollback::FDasBlueprintRollback() : Impl(MakeUnique<FImpl>()) {}
 FDasBlueprintRollback::~FDasBlueprintRollback() = default;
+bool FDasBlueprintRollback::InstanceAsset(const FAssetData& Data, const UClass* Root)
+{
+    const UClass* Class = FindObject<UClass>(Data.AssetClassPath);
+    return Root && Class && Class->IsChildOf(Root) && Class->IsChildOf(UDataAsset::StaticClass());
+}
 bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& BPs,
                                         TArray<TStrongObjectPtr<UObject>>& Assets, FString& Error, bool DefaultsOnly)
 {
@@ -203,9 +209,10 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
                 TArray<FAssetData> Data;
                 Registry.GetAssetsByPackageName(P, Data);
                 if (Data.Num() != 1 || (Data[0].AssetClassPath != UBlueprint::StaticClass()->GetClassPathName() &&
-                                        Data[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName()))
+                                        Data[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName() &&
+                                        !InstanceAsset(Data[0], Root->GeneratedClass)))
                 {
-                    Error = TEXT("Structural migration supports ordinary Blueprint/map packages only");
+                    Error = TEXT("Structural migration supports Blueprint, map and DataAsset instance packages only");
                     return false;
                 }
                 auto* A = Data[0].GetAsset();
@@ -245,7 +252,7 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
                                          *B->GetName(), int32(B->Status));
             return false;
         }
-                // Authored children are recompiled with their parent; other Blueprints with their own DSL source are
+        // Authored children are recompiled with their parent; other Blueprints with their own DSL source are
         // migrated through their own source.
         if (!DefaultsOnly && B != Root && !B->GeneratedClass->IsChildOf(Root->GeneratedClass) &&
             !B->GetOutermost()->GetMetaData().GetValue(B, TEXT("DasDSLSource")).IsEmpty())
@@ -310,7 +317,7 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
         Image.Description = B->BlueprintDescription;
         Image.Category = B->BlueprintCategory;
         Image.Metadata = RollbackMetadata(B);
-                Image.Interfaces = B->ImplementedInterfaces;
+        Image.Interfaces = B->ImplementedInterfaces;
         Image.Parent = B->ParentClass;
         if (USimpleConstructionScript* SCS = B->SimpleConstructionScript)
             for (auto* N : SCS->GetAllNodes())
@@ -470,7 +477,7 @@ bool FDasBlueprintRollback::Restore(FString& Error)
         B->FunctionGraphs = I.Functions;
         B->UbergraphPages = I.Uber;
         B->DelegateSignatureGraphs = I.Delegates;
-                B->ImplementedInterfaces = I.Interfaces;
+        B->ImplementedInterfaces = I.Interfaces;
         if (B->ParentClass != I.Parent)
         {
             B->ParentClass = I.Parent;

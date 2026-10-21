@@ -440,6 +440,42 @@
       "message": "",
       "outcome": "migrated"
     },
+    "data_asset/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
     "evented/int/add_event": {
       "message": "",
       "outcome": "migrated"
@@ -517,6 +553,78 @@
       "outcome": "migrated"
     },
     "pawn/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/retype_field": {
       "message": "",
       "outcome": "migrated"
     }
@@ -962,6 +1070,42 @@
       "message": "",
       "outcome": "migrated"
     },
+    "data_asset/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "data_asset/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
     "evented/int/add_event": {
       "message": "",
       "outcome": "migrated"
@@ -1039,6 +1183,78 @@
       "outcome": "migrated"
     },
     "pawn/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "primary_data_asset/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "save_game/int/retype_field": {
       "message": "",
       "outcome": "migrated"
     }

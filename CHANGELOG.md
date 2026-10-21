@@ -28,6 +28,9 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - Authored hierarchies: a child can switch to another parent with the same native root (reparented in place,
   rolled back on failure), saving a parent script reimports its children, and explicit field migrations
   accept classes with authored children ([Inheritance](Docs/Guide/DSL/Inheritance.md)).
+- DataAsset, PrimaryDataAsset and SaveGame classes accept declaration changes: saved DataAsset instances are
+  migrated with the class and marked dirty, removed fields are archived on the instance
+  ([Data assets](Docs/Guide/Data/DataAssets.md#changing-the-class)).
 
 ### Changed
 
