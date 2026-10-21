@@ -10,6 +10,8 @@
 #include "UObject/Script.h"
 #include "UObject/UnrealType.h"
 class ADasProbeActor;
+// Shows a script error of a running game world in the PIE Message Log and on screen (DasScriptErrors.cpp).
+void DasReportScriptError(const UObject& Owner, const FString& Error);
 // Shared implementation; native hosts retain their real Unreal inheritance.
 struct FDasActorHostRuntime
 {
@@ -101,7 +103,10 @@ struct FDasActorHostRuntime
     {
         const FString Error = Result.bSucceeded ? Result.ReloadError : Result.Error;
         if (Error != A.LastDasError && !Error.IsEmpty())
+        {
             UE_LOG(LogTemp, Display, TEXT("daScript lifecycle %s: %s"), *A.GetName(), *Error);
+            DasReportScriptError(A, Error);
+        }
         A.LastDasError = Error;
     }
     template <class T>
