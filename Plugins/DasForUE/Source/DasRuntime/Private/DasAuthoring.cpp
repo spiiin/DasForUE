@@ -1,4 +1,5 @@
 #include "DasDataAssets.h"
+#include "DasTypeAdapters.h"
 #include "DasCallbackTypes.h"
 #include "DasScriptHosts.h"
 #include "DasAuthoring.h"
@@ -1576,13 +1577,9 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
                 return DasContainerCarrier(T) ? EDasMethodSignature::Struct : EDasMethodSignature::Frame;
             if (K == EDasTypeKind::Struct)
             {
-                if (T.TypePath == TEXT("/Script/CoreUObject.Vector"))
-                    return EDasMethodSignature::Vector;
-                if (T.TypePath == TEXT("/Script/CoreUObject.Rotator"))
-                    return EDasMethodSignature::Rotator;
-                if (T.TypePath == TEXT("/Script/CoreUObject.Transform"))
-                    return EDasMethodSignature::Transform;
-                return EDasMethodSignature::Struct;
+                const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(T.TypePath);
+                const auto Signature = Adapter ? Adapter->GetSignature() : TOptional<EDasMethodSignature>();
+                return Signature.Get(EDasMethodSignature::Struct);
             }
             return Kind(T.Kind);
         };

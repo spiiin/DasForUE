@@ -41,10 +41,8 @@ das::FunctionPtr DSLHandlerABI(const das::FunctionPtr& SourceFunction, const das
             Value = DSLDirectUnpack(SourceFunction->at, Original, Value, FString());
         }
         if (DSLTypedClass(Original) || DSLContainer(Original) || DSLDirectEnum(Original) ||
-            (DSLDirectStruct(Original) ||
-             (DSLMathPath(Original) == TEXT("/Script/CoreUObject.Vector2D") ||
-                                            DSLMathPath(Original) == TEXT("/Script/EnhancedInput.InputActionValue"))) ||
-             DSLTypedReference(Original))
+            (DSLDirectStruct(Original) || DSLAdaptedSnapshot(Original, EDasCallBridge::FrameSlot)) ||
+            DSLTypedReference(Original))
         {
             Arg->type = DSLHandleType(Group, Module,
                                       DSLTypedClass(Original)       ? "UEClassHandle"
@@ -82,30 +80,26 @@ das::FunctionPtr DSLHandlerABI(const das::FunctionPtr& SourceFunction, const das
                 auto Original = SourceFunction->arguments[size_t(I) + Offset]->type;
                 das::ExpressionPtr Updated = new das::ExprVar(SourceFunction->at, "__ue_ref_" + das::to_string(I));
                 const FString Kind = M.Parameters[I].Type.Kind;
-                const das::string Math = DSLUtf8(DSLMathPath(Original));
                 const das::string Suffix =
                     Kind ==
                     TEXT("class")
                          ? "class"
-                         : Kind == TEXT("object")
-                                        ? "object"
-                                        : Kind == TEXT("enum")
-                                                       ? "enum"
-                                                       : Kind == TEXT("struct")
-                                                                      ? (Math == "/Script/CoreUObject.Vector" ? "vector"
-                                                                         : Math == "/Script/CoreUObject.Rotator"
-                                                                             ? "rotator"
-                                                                         : Math == "/Script/CoreUObject.Transform"
-                                                                             ? "transform"
-                                                                             : "struct")
-                                                                  : DSLContainer(Original) ? "struct"
-                                                                                           : DSLScalarSuffix(Kind);
+                         : Kind ==
+                               TEXT("object")
+                                    ? "object"
+                                    : Kind ==
+                                          TEXT("enum")
+                                               ? "enum"
+                                               : Kind ==
+                                                     TEXT("struct")
+                                                          ? (DSLAdaptedBridge(Original, EDasCallBridge::FrameSlot)
+                                                                 ? DSLAdaptedBridge(Original, EDasCallBridge::FrameSlot)
+                                                                 : "struct")
+                                                      : DSLContainer(Original) ? "struct"
+                                                                               : DSLScalarSuffix(Kind);
                 if (DSLTypedClass(Original) || DSLContainer(Original) ||
-                    (DSLDirectStruct(Original) ||
-                     (DSLMathPath(Original) == TEXT("/Script/CoreUObject.Vector2D") ||
-                                                    DSLMathPath(Original) ==
-                                                        TEXT("/Script/EnhancedInput.InputActionValue"))) ||
-                     DSLDirectEnum(Original) || DSLTypedReference(Original))
+                    (DSLDirectStruct(Original) || DSLAdaptedSnapshot(Original, EDasCallBridge::FrameSlot)) ||
+                    DSLDirectEnum(Original) || DSLTypedReference(Original))
                     Updated = DSLDirectPack(SourceFunction->at, Original, Updated,
                                             DSLContainer(Original) ? DSLDirectPath(Original, TypeFolder, TypeRegistry)
                                                                    : M.Parameters[I].Type.TypePath);
@@ -121,10 +115,8 @@ das::FunctionPtr DSLHandlerABI(const das::FunctionPtr& SourceFunction, const das
     if (DSLTypedClass(SourceFunction->result) || DSLContainer(SourceFunction->result) ||
         DSLDirectEnum(SourceFunction->result) ||
         (DSLDirectStruct(SourceFunction->result) ||
-         (DSLMathPath(SourceFunction->result) == TEXT("/Script/CoreUObject.Vector2D") ||
-                                                      DSLMathPath(SourceFunction->result) ==
-                                                          TEXT("/Script/EnhancedInput.InputActionValue"))) ||
-         DSLTypedReference(SourceFunction->result))
+         DSLAdaptedSnapshot(SourceFunction->result, EDasCallBridge::FrameSlot)) ||
+        DSLTypedReference(SourceFunction->result))
     {
         Wrapper->result = DSLHandleType(Group, Module,
                                         DSLTypedClass(SourceFunction->result)       ? "UEClassHandle"

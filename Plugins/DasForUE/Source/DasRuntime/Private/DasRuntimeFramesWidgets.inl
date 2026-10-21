@@ -258,12 +258,10 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
             return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEEnumValue";
         if (K == EDasMethodSignature::Struct)
             return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEStructValue";
-        if (K == EDasMethodSignature::Vector || K == EDasMethodSignature::Rotator ||
-            K == EDasMethodSignature::Transform)
-            return T->baseType == das::Type::tHandle && T->annotation &&
-                   T->annotation->name == (K == EDasMethodSignature::Vector    ? "UEVector"
-                                           : K == EDasMethodSignature::Rotator ? "UERotator"
-                                                                               : "UETransform");
+        if (const auto* Adapter = FDasTypeAdapters::Get().FindSignature(K))
+            for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+                if (&*Entry.Adapter == Adapter && Entry.Script)
+                    return Entry.Script->MatchesScriptType(T);
         if (K == EDasMethodSignature::Object)
             return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UObjectHandle";
         if (K == EDasMethodSignature::Name)

@@ -887,17 +887,13 @@ das::string DSLMethodNativeKind(const FString& Kind)
 {
     return Kind == TEXT("array") || Kind == TEXT("map") || Kind == TEXT("set")? "struct" : DSLUtf8(Kind);
 }
+// Bridge kind of a method argument or result: a handle view's own method bridge (vector, rotator,
+// transform, input_value), otherwise the declared kind; Vector2D falls back to a struct snapshot.
 das::string DSLMethodAdapterKind(const FString& Kind, const das::TypeDeclPtr& Type)
 {
-    const FString Path = DSLMathPath(Type);
-    if (Path == TEXT("/Script/EnhancedInput.InputActionValue"))
-        return "input_value";
-    return Path == TEXT("/Script/CoreUObject.Vector")
-                        ? "vector"
-                        : Path == TEXT("/Script/CoreUObject.Rotator")
-                                       ? "rotator"
-                                       : Path == TEXT("/Script/CoreUObject.Transform")? "transform"
-                                                                                      : DSLMethodNativeKind(Kind);
+    if (const char* Bridge = DSLAdaptedBridge(Type, EDasCallBridge::MethodBridge))
+        return Bridge;
+    return DSLMethodNativeKind(Kind);
 }
 // Call frame bridge for an argument or result of an adapter kind. InputActionValue has its own native
 // transport; text, name, enum, struct and the math structs use the __ue_method_* family.
@@ -911,9 +907,15 @@ das::string DSLMethodBridge(const das::string& Kind, bool bResult)
                               : (bResult ? "ue_result_" : "ue_arg_")) +
            Kind;
 }
+// Math handles with their own method bridge pass as they are; every other described value converts.
 bool DSLMethodSourceConversion(const das::string& Descriptor)
 {
-    return !Descriptor.empty() && (Descriptor.find("@math:") != 0 || Descriptor == "@math:UEVector2D");
+    if (Descriptor.empty())
+        return false;
+    if (Descriptor.find("@math:") != 0)
+        return true;
+    const auto* Script = DSLAdaptedHandleNamed(Descriptor.substr(6));
+    return !Script || !Script->GetCallBridge(EDasCallBridge::MethodBridge);
 }
 // Method-call syntax uses daScript's ordinary receiver-first overload resolution.
 bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const das::TypeDeclPtr& ReceiverType,

@@ -22,6 +22,14 @@ enum class EDasMemberUse : uint8
 };
 ENUM_CLASS_FLAGS(EDasMemberUse)
 
+// Call transports a view may own: a call-frame slot (ue_frame_out_<suffix>) and a method bridge
+// (__ue_method_arg_<suffix>, __ue_arg_input_value). Without one the value crosses as a struct snapshot.
+enum class EDasCallBridge : uint8
+{
+    FrameSlot,
+    MethodBridge
+};
+
 // daScript view of an adapted value type: recognising the view, crossing the boundary and making the view
 // type for properties of the type (Docs/Dev/Design/TypeAdapters.md).
 class IDasScriptTypeFacet
@@ -38,4 +46,8 @@ public:
     virtual const TCHAR* GetViewModule() const = 0;
     // Scalar (double) member of the view usable in place for this use.
     virtual bool HasMember(const das::string& Name, EDasMemberUse Use) const { return false; }
+    // Suffix of the view's own transport of this kind, or nullptr.
+    virtual const char* GetCallBridge(EDasCallBridge Bridge) const { return nullptr; }
+    // daScript handle annotation of a handle view, or nullptr.
+    virtual const char* GetHandleName() const { return nullptr; }
 };

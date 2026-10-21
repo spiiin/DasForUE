@@ -414,9 +414,7 @@ FString DSLTypeName(const das::TypeDeclPtr& T)
             return TEXT("name");
         if (T->annotation && T->annotation->name == "UObjectHandle")
             return TEXT("object");
-        if (T->annotation && (T->annotation->name == "InputActionValue" || T->annotation->name == "UEVector2D" ||
-                              T->annotation->name == "UEVector" || T->annotation->name == "UERotator" ||
-                              T->annotation->name == "UETransform" || T->annotation->name == "UEStructValue"))
+        if (T->annotation && (DSLAdaptedHandle(T) || T->annotation->name == "UEStructValue"))
             return TEXT("struct");
     default:
         break;
@@ -827,17 +825,8 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
     }
     if (DSLContainer(T))
         return TEXT("struct");
-    if (!Math.IsEmpty())
-    {
-        if (Math == TEXT("/Script/CoreUObject.Vector"))
-            return TEXT("vector");
-        if (Math == TEXT("/Script/CoreUObject.Rotator"))
-            return TEXT("rotator");
-        if (Math == TEXT("/Script/CoreUObject.Transform"))
-            return TEXT("transform");
-        if (Math == TEXT("/Script/CoreUObject.Vector2D"))
-            return TEXT("vector2d");
-    }
+    if (const auto* Adapter = DasMathAdapter(Math))
+        return Adapter->GetDefaultKind();
     return K;
 }
 #include "DasHandlerLookupDSL.inl"

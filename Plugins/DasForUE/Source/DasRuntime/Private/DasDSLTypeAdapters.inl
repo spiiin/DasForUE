@@ -44,6 +44,32 @@ bool DSLAdaptedMember(const das::TypeDeclPtr& T, const das::string& Name, EDasMe
     const auto* Entry = DSLAdaptedHandle(T);
     return Entry && Entry->Script->HasMember(Name, Use);
 }
+// Suffix of the handle view's own call transport, or nullptr (also for non-adapted types).
+const char* DSLAdaptedBridge(const das::TypeDeclPtr& T, EDasCallBridge Bridge)
+{
+    const auto* Entry = DSLAdaptedHandle(T);
+    return Entry ? Entry->Script->GetCallBridge(Bridge) : nullptr;
+}
+// Handle view that crosses this kind of call as a struct snapshot (Vector2D; InputActionValue in frames).
+bool DSLAdaptedSnapshot(const das::TypeDeclPtr& T, EDasCallBridge Bridge)
+{
+    return DSLAdaptedHandle(T) && !DSLAdaptedBridge(T, Bridge);
+}
+// Script facet of a handle view by its annotation name, or of an adapter.
+const IDasScriptTypeFacet* DSLAdaptedHandleNamed(const das::string& Name)
+{
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+        if (Entry.Script && Entry.Script->GetHandleName() && Name == Entry.Script->GetHandleName())
+            return Entry.Script;
+    return nullptr;
+}
+const IDasScriptTypeFacet* DSLAdaptedFacet(const IDasTypeAdapter* Adapter)
+{
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+        if (&*Entry.Adapter == Adapter)
+            return Entry.Script;
+    return nullptr;
+}
 das::ExpressionPtr DSLAdaptedHandlePack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V)
 {
     return DSLAdaptedHandle(T)->Script->Pack(At, V);

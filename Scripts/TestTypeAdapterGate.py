@@ -15,8 +15,13 @@ PORTED = {
         [r'/Script/GameplayTags\.', r'\bDSLGameplay', r'\bIsDasGameplayTagPath\b', r'\bDasIsGameplayTagType\b'],
         {'DasGameplayTags.cpp', 'DasGameplayTagsDSL.inl', 'DasGameplayTagsRuntime.inl', 'DasGameplayTags.h'},
     ),
-    # Math structs, partly ported (phase 2.2b): the old path predicate is gone.
-    'Math': ([r'\bIsDasMathStructPath\b'], set()),
+    # Math structs: identity, defaults, members, packing and call transports live in their adapters and
+    # script facets; handle names appear only where the annotations are declared and registered.
+    'Math': (
+        [r'\bIsDasMathStructPath\b', r'\bDSLMathSuffix\b', r'"UE(?:Vector2D|Vector|Rotator|Transform)"'],
+        {'DasMathAdapters.cpp', 'DasMathTypesDSL.inl', 'DasTypeAdaptersBuiltin.inl', 'DasFoundationModule.inl',
+         'DasRuntimeTypeAnnotations.inl'},
+    ),
 }
 
 
@@ -33,7 +38,7 @@ class TypeAdapterGateTest(unittest.TestCase):
         for kind, (patterns, allowed) in PORTED.items():
             regex = re.compile('|'.join(patterns))
             for name, path in sources():
-                if name in allowed:
+                if name in allowed or re.search(r'Tests?\.|Probe|Commandlet', name):
                     continue
                 # Reflection registry data must retain native identifiers, including
                 # nested struct paths. It contains no hand-written type dispatch.

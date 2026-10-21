@@ -25,7 +25,11 @@ public:
     virtual bool IsLeafValue() const { return false; }
     // Math value structs (Vector, Vector2D, Rotator, Transform): text literal defaults, finite values.
     virtual bool IsMath() const { return false; }
-    // Literal kind of constructor defaults ("vector", "rotator", ...), or nullptr when the type has none.
+    // Own call signature with a dedicated FDasScalarValue slot (Vector/Rotator/Transform keep their
+    // persisted numbers); other structs travel as EDasMethodSignature::Struct snapshots.
+    virtual TOptional<EDasMethodSignature> GetSignature() const { return {}; }
+    // Value kind name ("vector", "rotator", ...) shared by constructor defaults and callback payload types,
+    // or nullptr when the type has none.
     virtual const TCHAR* GetDefaultKind() const { return nullptr; }
     virtual EDasAdapterDefault GetDefaultPolicy() const { return EDasAdapterDefault::Explicit; }
     // nullptr leaves property creation to the generic builder of the kind.
@@ -58,6 +62,7 @@ public:
     const IDasTypeAdapter* FindStructPath(const FString& Path) const;
     const IDasTypeAdapter* FindProperty(const FProperty* Property) const;
     const IDasTypeAdapter* FindDefaultKind(const FString& Kind) const;
+    const IDasTypeAdapter* FindSignature(EDasMethodSignature Signature) const;
     TConstArrayView<FEntry> Entries() const { return EntryList; }
 
 private:

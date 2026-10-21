@@ -1,4 +1,5 @@
 #include "DasTypePins.h"
+#include "DasTypeAdapters.h"
 #include "DasValueKinds.h"
 #include "DasPropertyTypes.h"
 #include "DasContainerTypes.h"
@@ -153,12 +154,8 @@ bool DasSchemaType(EDasMethodSignature Kind, const FString& Path, FDasDeclaredTy
             return DescribeDasProperty(Property, Out, Error);
     FDasDeclaredType Type;
     Type.Kind = DasTypeKindName(TypeKind);
-    if (Kind == EDasMethodSignature::Vector)
-        Type.TypePath = TBaseStructure<FVector>::Get()->GetPathName();
-    else if (Kind == EDasMethodSignature::Rotator)
-        Type.TypePath = TBaseStructure<FRotator>::Get()->GetPathName();
-    else if (Kind == EDasMethodSignature::Transform)
-        Type.TypePath = TBaseStructure<FTransform>::Get()->GetPathName();
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindSignature(Kind))
+        Type.TypePath = Adapter->GetStruct()->GetPathName();
     else if (Kind == EDasMethodSignature::Delegate)
         Type.DelegateWire = Path;
     else if (TypeKind == EDasTypeKind::Object || TypeKind == EDasTypeKind::Class || TypeKind == EDasTypeKind::Enum ||

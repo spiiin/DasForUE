@@ -1,4 +1,5 @@
 #include "DasCallbackTypes.h"
+#include "DasTypeAdapters.h"
 #include "InputActionValue.h"
 #include "DasSoftReferences.h"
 #include "DasCallFrame.h"
@@ -286,12 +287,9 @@ const FDasCallbackType* DasCallbackTypeForProperty(const FProperty* Property)
     case EDasTypeKind::Struct:
     {
         auto* Type = CastFieldChecked<FStructProperty>(Property)->Struct.Get();
-        if (Type == TBaseStructure<FVector>::Get())
-            return FindDasCallbackType(TEXT("vector"));
-        if (Type == TBaseStructure<FRotator>::Get())
-            return FindDasCallbackType(TEXT("rotator"));
-        if (Type == TBaseStructure<FTransform>::Get())
-            return FindDasCallbackType(TEXT("transform"));
+        // Structs with their own signature (Vector, Rotator, Transform) have a callback type of their kind name.
+        if (const auto* Adapter = FDasTypeAdapters::Get().FindStruct(Type); Adapter && Adapter->GetSignature())
+            return FindDasCallbackType(Adapter->GetDefaultKind());
         FString Error;
         if (!ValidateDasCallbackTypePath(TEXT("struct"), Type->GetPathName(), Error))
             return nullptr;

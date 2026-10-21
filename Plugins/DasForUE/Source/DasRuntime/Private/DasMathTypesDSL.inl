@@ -3,10 +3,11 @@
 class FDasMathScriptFacet final : public IDasScriptTypeFacet
 {
 public:
-    FDasMathScriptFacet(const char* InHandle, const char* InSuffix, EDasScriptViewUse InUses,
-                        std::initializer_list<const char*> InMembers = {},
+    FDasMathScriptFacet(const char* InHandle, const char* InSuffix, EDasScriptViewUse InUses, bool bInFrameSlot,
+                        bool bInMethodBridge, std::initializer_list<const char*> InMembers = {},
                         EDasMemberUse InMemberUses = EDasMemberUse::None)
-        : Handle(InHandle), Suffix(InSuffix), Uses(InUses), Members(InMembers), MemberUses(InMemberUses)
+        : Handle(InHandle), Suffix(InSuffix), Uses(InUses), bFrameSlot(bInFrameSlot), bMethodBridge(bInMethodBridge),
+          Members(InMembers), MemberUses(InMemberUses)
     {
     }
     virtual bool MatchesScriptType(const das::TypeDeclPtr& T) const override
@@ -38,9 +39,16 @@ public:
         return false;
     }
 
+    virtual const char* GetCallBridge(EDasCallBridge Bridge) const override
+    {
+        return (Bridge == EDasCallBridge::FrameSlot ? bFrameSlot : bMethodBridge) ? Suffix.c_str() : nullptr;
+    }
+    virtual const char* GetHandleName() const override { return Handle.c_str(); }
+
 private:
     das::string Handle, Suffix;
     EDasScriptViewUse Uses;
+    bool bFrameSlot, bMethodBridge;
     TArray<const char*> Members;
     EDasMemberUse MemberUses;
 };

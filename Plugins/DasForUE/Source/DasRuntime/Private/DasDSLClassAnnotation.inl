@@ -811,10 +811,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 }
                 if (ResultType == TEXT("struct"))
                 {
-                    if ((DSLDirectStruct(F->result) ||
-                         (DSLMathPath(F->result) == TEXT("/Script/CoreUObject.Vector2D") ||
-                                                         DSLMathPath(F->result) ==
-                                                             TEXT("/Script/EnhancedInput.InputActionValue"))))
+                    if ((DSLDirectStruct(F->result) || DSLAdaptedSnapshot(F->result, EDasCallBridge::FrameSlot)))
                     {
                         M.ReturnType.TypePath = DSLConstraint(
                             ObjectClasses, TEXT("return_struct"), EDSLTypeKind::Struct,
@@ -898,7 +895,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     }
                     if (K == TEXT("struct"))
                     {
-                        if ((DSLDirectStruct(V->type) || DSLMathPath(V->type) == TEXT("/Script/CoreUObject.Vector2D")))
+                        if ((DSLDirectStruct(V->type) || DSLAdaptedSnapshot(V->type, EDasCallBridge::MethodBridge)))
                         {
                             const FString Key = TEXT("arg_")+ DSLText(V->name) + TEXT("_struct");
                             P.Type.TypePath =

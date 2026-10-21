@@ -41,12 +41,15 @@ void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
     using EUse = EDasScriptViewUse;
     const EUse AllUses = EUse::NativeProperty | EUse::SelfProperty | EUse::AuthoredReference;
     const EDasMemberUse AllMembers = EDasMemberUse::SelfLeaf | EDasMemberUse::AuthoredMutation;
-    static const FDasMathScriptFacet VectorScript("UEVector", "vector", AllUses, {"x", "y", "z"}, AllMembers),
-        Vector2DScript("UEVector2D", "vector2d", EUse::NativeProperty | EUse::SelfProperty, {"x", "y"},
+    // Vector, Rotator and Transform own call-frame slots and method bridges; InputActionValue only a method
+    // bridge; Vector2D crosses calls as a struct snapshot.
+    static const FDasMathScriptFacet VectorScript("UEVector", "vector", AllUses, true, true, {"x", "y", "z"},
+                                                  AllMembers),
+        Vector2DScript("UEVector2D", "vector2d", EUse::NativeProperty | EUse::SelfProperty, false, false, {"x", "y"},
                        EDasMemberUse::AuthoredMutation),
-        RotatorScript("UERotator", "rotator", AllUses, {"pitch", "yaw", "roll"}, AllMembers),
-        TransformScript("UETransform", "transform", AllUses),
-        InputValueScript("InputActionValue", "input_value", EUse::None);
+        RotatorScript("UERotator", "rotator", AllUses, true, true, {"pitch", "yaw", "roll"}, AllMembers),
+        TransformScript("UETransform", "transform", AllUses, true, true),
+        InputValueScript("InputActionValue", "input_value", EUse::None, false, true);
     Registry.Register(MakeDasVectorAdapter(), &VectorScript);
     Registry.Register(MakeDasVector2DAdapter(), &Vector2DScript);
     Registry.Register(MakeDasRotatorAdapter(), &RotatorScript);

@@ -431,10 +431,10 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                         DSLCall(S->at, Bridge,
                                 {Handle(), Str(D.Name),
                                  T->baseType == das::Type::tUInt8 || DSLTypedClass(T) || DSLTypedReference(T) ||
-                                     DSLDirectEnum(T) || DSLDirectStruct(T) || DSLContainer(T) ||
-                                     DSLMathPath(T) == TEXT("/Script/CoreUObject.Vector2D")
-                                                            ? DSLDirectPack(S->at, T, V, DSLMethodValuePath(D.Type))
-                                                            : static_cast<das::ExpressionPtr>(V)}));
+                                         DSLDirectEnum(T) || DSLDirectStruct(T) || DSLContainer(T) ||
+                                         DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge)
+                                     ? DSLDirectPack(S->at, T, V, DSLMethodValuePath(D.Type))
+                                     : static_cast<das::ExpressionPtr>(V)}));
                 }
                 B->list.push_back(DSLCall(S->at, "ue_invoke_call", {Handle()}));
                 B->finalList.push_back(DSLCall(S->at, "__ue_release_authored_call", {Handle()}));
@@ -446,7 +446,7 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                     das::ExpressionPtr Value = DSLCall(S->at, Bridge, {Handle(), Str(TEXT("ReturnValue"))});
                     if (T->baseType == das::Type::tUInt8 || DSLTypedClass(T) || DSLTypedReference(T) ||
                         DSLDirectEnum(T) || DSLDirectStruct(T) || DSLContainer(T) ||
-                        DSLMathPath(T) == TEXT("/Script/CoreUObject.Vector2D"))
+                        DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge))
                         Value = DSLDirectUnpack(S->at, T, Value, DSLMethodValuePath(Method.ReturnType));
                     Local("result", T, Value);
                 }
@@ -461,7 +461,7 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                     das::ExpressionPtr Value = DSLCall(S->at, Bridge, {Handle(), Str(D.Name)});
                     if (T->baseType == das::Type::tUInt8 || DSLTypedClass(T) || DSLTypedReference(T) ||
                         DSLDirectEnum(T) || DSLDirectStruct(T) || DSLContainer(T) ||
-                        DSLMathPath(T) == TEXT("/Script/CoreUObject.Vector2D"))
+                        DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge))
                         Value = DSLDirectUnpack(S->at, T, Value, DSLMethodValuePath(D.Type));
                     Local("out_" + das::to_string(I), T, Value);
                 }

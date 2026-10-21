@@ -15,8 +15,12 @@ template <class T> bool MathValid(const T& Value)
 template <class T> class TDasMathAdapter final : public IDasTypeAdapter
 {
 public:
-    explicit TDasMathAdapter(const TCHAR* InDefaultKind) : DefaultKind(InDefaultKind) {}
+    TDasMathAdapter(const TCHAR* InDefaultKind, TOptional<EDasMethodSignature> InSignature = {})
+        : DefaultKind(InDefaultKind), Signature(InSignature)
+    {
+    }
     virtual const TCHAR* GetDefaultKind() const override { return DefaultKind; }
+    virtual TOptional<EDasMethodSignature> GetSignature() const override { return Signature; }
     virtual EDasTypeKind GetKind() const override { return EDasTypeKind::Struct; }
     virtual const UScriptStruct* GetStruct() const override { return TBaseStructure<T>::Get(); }
     virtual bool IsLeafValue() const override { return true; }
@@ -31,6 +35,7 @@ public:
 
 private:
     const TCHAR* DefaultKind;
+    TOptional<EDasMethodSignature> Signature;
 };
 // InputActionValue: identity and its handle view only; values travel through the input snapshot
 // (FDasInputActionValue) and their own bridge.
@@ -44,7 +49,7 @@ public:
 
 TSharedRef<const IDasTypeAdapter> MakeDasVectorAdapter()
 {
-    return MakeShared<TDasMathAdapter<FVector>>(TEXT("vector"));
+    return MakeShared<TDasMathAdapter<FVector>>(TEXT("vector"), EDasMethodSignature::Vector);
 }
 TSharedRef<const IDasTypeAdapter> MakeDasVector2DAdapter()
 {
@@ -52,11 +57,11 @@ TSharedRef<const IDasTypeAdapter> MakeDasVector2DAdapter()
 }
 TSharedRef<const IDasTypeAdapter> MakeDasRotatorAdapter()
 {
-    return MakeShared<TDasMathAdapter<FRotator>>(TEXT("rotator"));
+    return MakeShared<TDasMathAdapter<FRotator>>(TEXT("rotator"), EDasMethodSignature::Rotator);
 }
 TSharedRef<const IDasTypeAdapter> MakeDasTransformAdapter()
 {
-    return MakeShared<TDasMathAdapter<FTransform>>(TEXT("transform"));
+    return MakeShared<TDasMathAdapter<FTransform>>(TEXT("transform"), EDasMethodSignature::Transform);
 }
 TSharedRef<const IDasTypeAdapter> MakeDasInputActionValueAdapter()
 {

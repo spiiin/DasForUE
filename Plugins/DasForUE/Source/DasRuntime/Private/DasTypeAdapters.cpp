@@ -65,6 +65,13 @@ const IDasTypeAdapter* FDasTypeAdapters::FindDefaultKind(const FString& Kind) co
             return &*Entry.Adapter;
     return nullptr;
 }
+const IDasTypeAdapter* FDasTypeAdapters::FindSignature(EDasMethodSignature Signature) const
+{
+    for (const auto& Entry : EntryList)
+        if (Entry.Adapter->GetSignature() == Signature)
+            return &*Entry.Adapter;
+    return nullptr;
+}
 const IDasTypeAdapter* DasMathAdapter(const FString& StructPath)
 {
     const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(StructPath);

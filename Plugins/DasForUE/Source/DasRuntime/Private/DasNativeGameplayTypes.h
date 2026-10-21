@@ -1,4 +1,5 @@
 #pragma once
+#include "DasTypeAdapters.h"
 #include "CoreMinimal.h"
 #include "DasSchema.h"
 #include "DasNativeHashProbeComponent.h"
@@ -74,10 +75,7 @@ inline FString DasNativeGameplayKind(FProperty* P, FString& Path)
     if (auto* S = CastField<FStructProperty>(P))
     {
         Path = S->Struct->GetPathName();
-        if (Path == TEXT("/Script/CoreUObject.Vector") ||
-                         Path == TEXT("/Script/CoreUObject.Vector2D") ||
-                                      Path == TEXT("/Script/CoreUObject.Rotator") ||
-                                                   Path == TEXT("/Script/CoreUObject.Transform"))
+        if (DasMathAdapter(Path))
             return TEXT("struct");
     }
     Path.Reset();

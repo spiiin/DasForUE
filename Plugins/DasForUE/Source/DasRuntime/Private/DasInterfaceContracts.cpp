@@ -1,4 +1,5 @@
 #include "UObject/TextProperty.h"
+#include "DasTypeAdapters.h"
 #include "DasInterfaceContracts.h"
 #include "DasSchema.h"
 #include "DasContainerTypes.h"
@@ -33,12 +34,10 @@ bool InterfacePropertyMatches(FProperty* P, EDasMethodSignature K, const FString
         auto* E = DasEnumPropertyType(P);
         return E && E->GetPathName() == Path;
     }
-    if (K == EDasMethodSignature::Vector || K == EDasMethodSignature::Rotator || K == EDasMethodSignature::Transform)
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindSignature(K))
     {
         auto* S = CastField<FStructProperty>(P);
-        return S && S->Struct == (K == EDasMethodSignature::Vector    ? TBaseStructure<FVector>::Get()
-                                  : K == EDasMethodSignature::Rotator ? TBaseStructure<FRotator>::Get()
-                                                                      : TBaseStructure<FTransform>::Get());
+        return S && S->Struct == Adapter->GetStruct();
     }
     return K == EDasMethodSignature::Byte     ? (P->IsA<FByteProperty>() && !DasEnumPropertyType(P))
            : K == EDasMethodSignature::Text   ? P->IsA<FTextProperty>()

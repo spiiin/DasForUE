@@ -83,7 +83,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                 else if (DSLDirectEnum(T) || DSLDirectStruct(T) || !DSLMathPath(T).IsEmpty())
                 {
                     D.TypePath = DSLDirectPath(T, TypeFolder, TypeRegistry);
-                    if (DSLDirectStruct(T) || DSLMathPath(T) == TEXT("/Script/CoreUObject.Vector2D"))
+                    if (DSLDirectStruct(T) || DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge))
                         DSLEnsureStructHelpers(T, D.TypePath, Group, St->module, HelpersGenerated, Helpers);
                 }
                 else if (D.GetKind() == EDasTypeKind::Object || D.GetKind() == EDasTypeKind::Class)
@@ -95,7 +95,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
             auto Packed = [](const das::TypeDeclPtr& T)
             {
                 return DSLTypedClass(T) || DSLContainer(T) || DSLDirectEnum(T) || DSLDirectStruct(T) ||
-                       DSLMathPath(T) == TEXT("/Script/CoreUObject.Vector2D") || DSLTypedReference(T);
+                       DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge) || DSLTypedReference(T);
             };
             auto ABI = [&](const das::TypeDeclPtr& T)
             {
@@ -329,31 +329,21 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                         {
                             auto T = F->arguments[size_t(I)]->type;
                             const auto K = M.Parameters[I].Type.Kind;
-                            const auto Math = DSLMathPath(T);
                             const das::string Suffix =
-                                K ==
-                                TEXT("class")
-                                    ? "class"
-                                    : K ==
-                                          TEXT("object")
-                                              ? "object"
-                                              : K ==
-                                                    TEXT("enum")
-                                                        ? "enum"
-                                                        : K ==
-                                                              TEXT("struct")
-                                                              ? (Math ==
-                                                                 TEXT("/Script/CoreUObject.Vector")
-                                                                     ? "vector"
-                                                                     : Math ==
-                                                                           TEXT("/Script/CoreUObject.Rotator")
-                                                                               ? "rotator"
-                                                                               : Math ==
-                                                                                     TEXT("/Script/CoreUObject.Transform")
-                                                                                         ? "transform"
-                                                                                         : "struct")
-                                                                 : DSLContainer(T) ? "struct"
-                                                                                   : DSLScalarSuffix(K);
+                                K == TEXT("class")
+                                          ? "class"
+                                          : K == TEXT("object")
+                                                      ? "object"
+                                                      : K == TEXT("enum")
+                                                                  ? "enum"
+                                                                  : K == TEXT("struct")
+                                                                              ? (DSLAdaptedBridge(
+                                                                                     T, EDasCallBridge::FrameSlot)
+                                                                                     ? DSLAdaptedBridge(
+                                                                                           T, EDasCallBridge::FrameSlot)
+                                                                                     : "struct")
+                                                                          : DSLContainer(T) ? "struct"
+                                                                                            : DSLScalarSuffix(K);
                             das::ExpressionPtr Value = new das::ExprVar(F->at, "__ue_out_" + das::to_string(I));
                             if (Packed(T))
                                 Value = DSLDirectPack(F->at, T, Value,
