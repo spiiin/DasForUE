@@ -3,8 +3,10 @@
 class FDasMathScriptFacet final : public IDasScriptTypeFacet
 {
 public:
-    FDasMathScriptFacet(const char* InHandle, const char* InSuffix, EDasScriptViewUse InUses)
-        : Handle(InHandle), Suffix(InSuffix), Uses(InUses)
+    FDasMathScriptFacet(const char* InHandle, const char* InSuffix, EDasScriptViewUse InUses,
+                        std::initializer_list<const char*> InMembers = {},
+                        EDasMemberUse InMemberUses = EDasMemberUse::None)
+        : Handle(InHandle), Suffix(InSuffix), Uses(InUses), Members(InMembers), MemberUses(InMemberUses)
     {
     }
     virtual bool MatchesScriptType(const das::TypeDeclPtr& T) const override
@@ -26,8 +28,19 @@ public:
         return DSLHandleType(Group, Module, Handle.c_str());
     }
     virtual const TCHAR* GetViewModule() const override { return TEXT("ue_foundation"); }
+    virtual bool HasMember(const das::string& Name, EDasMemberUse Use) const override
+    {
+        if (!EnumHasAnyFlags(MemberUses, Use))
+            return false;
+        for (const char* Member : Members)
+            if (Name == Member)
+                return true;
+        return false;
+    }
 
 private:
     das::string Handle, Suffix;
     EDasScriptViewUse Uses;
+    TArray<const char*> Members;
+    EDasMemberUse MemberUses;
 };

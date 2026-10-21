@@ -1277,11 +1277,7 @@ struct FUEReferenceMutationVisitor : das::Visitor
                     const auto N = static_cast<das::ExprField*>(E)->name;
                     if (!DSLMathPath(Type).IsEmpty())
                     {
-                        const auto M = DSLMathPath(Type);
-                        if (!((M == TEXT("/Script/CoreUObject.Vector2D") && (N == "x" || N == "y")) ||
-                               (M == TEXT("/Script/CoreUObject.Vector") && (N == "x" || N == "y" || N == "z")) ||
-                                (M == TEXT("/Script/CoreUObject.Rotator") &&
-                                           (N == "pitch" || N == "yaw" || N == "roll"))))
+                        if (!DSLAdaptedMember(Type, N, EDasMemberUse::AuthoredMutation))
                             DSLFail(TEXT("Unsupported math mutation member"));
                         Type = new das::TypeDecl(das::Type::tDouble, Original->at);
                     }

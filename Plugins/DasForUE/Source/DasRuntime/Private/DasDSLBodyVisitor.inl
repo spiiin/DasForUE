@@ -657,10 +657,7 @@ struct FDSLBodyVisitor : das::Visitor
                 return false;
             if (!DSLMathPath(Type).IsEmpty())
             {
-                const bool Vector = DSLMathPath(Type) == TEXT("/Script/CoreUObject.Vector");
-                const bool Rotator = DSLMathPath(Type) == TEXT("/Script/CoreUObject.Rotator");
-                if (It + 1 != Names.rend() || !(Vector ? (*It == "x" || *It == "y" || *It == "z")
-                                                       : Rotator && (*It == "pitch" || *It == "yaw" || *It == "roll")))
+                if (It + 1 != Names.rend() || !DSLAdaptedMember(Type, *It, EDasMemberUse::SelfLeaf))
                     return false;
                 Path += (Path.empty() ? "" : ".") + *It;
                 Out = {Root->name, Path, "double"};
@@ -915,10 +912,7 @@ struct FDSLBodyVisitor : das::Visitor
                     const auto N = static_cast<das::ExprField*>(Step)->name;
                     if (!DSLMathPath(Type).IsEmpty())
                     {
-                        const auto Math = DSLMathPath(Type);
-                        if (!((Math == TEXT("/Script/CoreUObject.Vector") && (N == "x" || N == "y" || N == "z")) ||
-                               (Math == TEXT("/Script/CoreUObject.Rotator") &&
-                                             (N == "pitch" || N == "yaw" || N == "roll"))))
+                        if (!DSLAdaptedMember(Type, N, EDasMemberUse::SelfLeaf))
                             DSLFail(TEXT("Unsupported indexed math member"));
                         Type = new das::TypeDecl(das::Type::tDouble, Original->at);
                     }
@@ -1062,11 +1056,7 @@ struct FDSLBodyVisitor : das::Visitor
         {
             if (!DSLMathPath(Type).IsEmpty())
             {
-                const bool Vector = DSLMathPath(Type) == TEXT("/Script/CoreUObject.Vector");
-                const bool Rotator = DSLMathPath(Type) == TEXT("/Script/CoreUObject.Rotator");
-                if (It + 1 != Names.rend() || (Vector    ? (*It != "x" && *It != "y" && *It != "z")
-                                               : Rotator ? (*It != "pitch" && *It != "yaw" && *It != "roll")
-                                                         : true))
+                if (It + 1 != Names.rend() || !DSLAdaptedMember(Type, *It, EDasMemberUse::SelfLeaf))
                 {
                     Error = TEXT("Math scalar writes support Vector x/y/z and Rotator pitch/yaw/roll");
                     return E;

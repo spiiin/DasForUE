@@ -38,6 +38,20 @@ const FDasTypeAdapters::FEntry* DSLAdaptedHandle(const das::TypeDeclPtr& T)
             return &Entry;
     return nullptr;
 }
+// Scalar member of an adapted handle view (Vector x/y/z, Rotator pitch/yaw/roll) usable in place.
+bool DSLAdaptedMember(const das::TypeDeclPtr& T, const das::string& Name, EDasMemberUse Use)
+{
+    const auto* Entry = DSLAdaptedHandle(T);
+    return Entry && Entry->Script->HasMember(Name, Use);
+}
+das::ExpressionPtr DSLAdaptedHandlePack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V)
+{
+    return DSLAdaptedHandle(T)->Script->Pack(At, V);
+}
+das::ExpressionPtr DSLAdaptedHandleUnpack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V)
+{
+    return DSLAdaptedHandle(T)->Script->Unpack(At, T, V);
+}
 // View type of an adapted struct property for one use, or nullptr when the struct has no view there.
 das::TypeDeclPtr DSLAdaptedView(const FString& Path, EDasScriptViewUse Use, das::ModuleGroup& Group,
                                 das::Module* Module, const das::LineInfo& At)

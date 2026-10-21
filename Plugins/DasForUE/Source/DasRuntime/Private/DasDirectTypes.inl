@@ -393,18 +393,6 @@ das::ExprCall* DSLCall(const das::LineInfo& At, const das::string& Name, std::in
         C->arguments.push_back(A);
     return C;
 }
-das::string DSLMathSuffix(const das::TypeDeclPtr& Type)
-{
-    const auto Path = DSLMathPath(Type);
-    return Path == TEXT("/Script/EnhancedInput.InputActionValue")
-                        ? "input_value"
-                        : Path == TEXT("/Script/CoreUObject.Vector2D")
-                                       ? "vector2d"
-                                       : Path == TEXT("/Script/CoreUObject.Vector")
-                                                      ? "vector"
-                                                      : Path == TEXT("/Script/CoreUObject.Rotator")? "rotator"
-                                                                                                   : "transform";
-}
 FString DSLSourceValueKey(const das::TypeDeclPtr& Type, const FString& Path)
 {
     if (DSLContainer(Type))
@@ -432,7 +420,7 @@ das::ExpressionPtr DSLDirectUnpack(const das::LineInfo& At, const das::TypeDeclP
     if (DSLDelegate(Type))
         return DSLDelegateSnapshot(At, Type, V);
     if (!DSLMathPath(Type).IsEmpty())
-        return DSLCall(At, "__ue_math_unpack_" + DSLMathSuffix(Type), {V});
+        return DSLAdaptedHandleUnpack(At, Type, V);
     if (DSLAuthoredView(Type))
         return DSLAuthoredUnpack(At, Type, V);
     if (DSLTypedReference(Type))
@@ -469,7 +457,7 @@ das::ExpressionPtr DSLDirectPack(const das::LineInfo& At, const das::TypeDeclPtr
     if (DSLDelegate(Type))
         return new das::ExprField(At, V, "__delegate_token");
     if (!DSLMathPath(Type).IsEmpty())
-        return DSLCall(At, "__ue_math_pack_" + DSLMathSuffix(Type), {V});
+        return DSLAdaptedHandlePack(At, Type, V);
     if (DSLAuthoredView(Type))
         return DSLAuthoredPack(At, Type, V);
     if (DSLTypedObject(Type))

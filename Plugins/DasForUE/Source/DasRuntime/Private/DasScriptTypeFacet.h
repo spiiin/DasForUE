@@ -12,6 +12,15 @@ enum class EDasScriptViewUse : uint8
     AuthoredReference = 4
 };
 ENUM_CLASS_FLAGS(EDasScriptViewUse)
+// Where scalar members of a view (x/y/z, pitch/yaw/roll) are accessed in place. Vector2D members are
+// mutable through authored references but not as self leaves.
+enum class EDasMemberUse : uint8
+{
+    None = 0,
+    SelfLeaf = 1,
+    AuthoredMutation = 2
+};
+ENUM_CLASS_FLAGS(EDasMemberUse)
 
 // daScript view of an adapted value type: recognising the view, crossing the boundary and making the view
 // type for properties of the type (Docs/Dev/Design/TypeAdapters.md).
@@ -27,4 +36,6 @@ public:
     // View type in the module group, or nullptr when its module is not imported (see GetViewModule).
     virtual das::TypeDeclPtr MakeView(das::ModuleGroup& Group, das::Module* Module, const das::LineInfo& At) const = 0;
     virtual const TCHAR* GetViewModule() const = 0;
+    // Scalar (double) member of the view usable in place for this use.
+    virtual bool HasMember(const das::string& Name, EDasMemberUse Use) const { return false; }
 };

@@ -40,9 +40,12 @@ void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
     // Math structs and InputActionValue; the view uses keep the existing per-type asymmetries as data.
     using EUse = EDasScriptViewUse;
     const EUse AllUses = EUse::NativeProperty | EUse::SelfProperty | EUse::AuthoredReference;
-    static const FDasMathScriptFacet VectorScript("UEVector", "vector", AllUses),
-        Vector2DScript("UEVector2D", "vector2d", EUse::NativeProperty | EUse::SelfProperty),
-        RotatorScript("UERotator", "rotator", AllUses), TransformScript("UETransform", "transform", AllUses),
+    const EDasMemberUse AllMembers = EDasMemberUse::SelfLeaf | EDasMemberUse::AuthoredMutation;
+    static const FDasMathScriptFacet VectorScript("UEVector", "vector", AllUses, {"x", "y", "z"}, AllMembers),
+        Vector2DScript("UEVector2D", "vector2d", EUse::NativeProperty | EUse::SelfProperty, {"x", "y"},
+                       EDasMemberUse::AuthoredMutation),
+        RotatorScript("UERotator", "rotator", AllUses, {"pitch", "yaw", "roll"}, AllMembers),
+        TransformScript("UETransform", "transform", AllUses),
         InputValueScript("InputActionValue", "input_value", EUse::None);
     Registry.Register(MakeDasVectorAdapter(), &VectorScript);
     Registry.Register(MakeDasVector2DAdapter(), &Vector2DScript);
