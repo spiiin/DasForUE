@@ -9,6 +9,9 @@ Shared helpers for DasForUE2 test scripts.
 Every helper throws on failure, so scripts stay a list of steps.
 #>
 
+# Windows PowerShell exposes Get-FileHash as a module function, not a snap-in cmdlet.
+Import-Module Microsoft.PowerShell.Utility -ErrorAction Stop
+
 function Get-DasContext {
     param([string]$Engine = 'C:\src\unreal\UnrealEngine')
     $Repo = Split-Path -Parent $PSScriptRoot
@@ -26,10 +29,14 @@ function Get-DasContext {
 
 # Builds the editor target of the smoke project.
 function Invoke-DasBuild {
-    param([Parameter(Mandatory)]$Das, [string]$Name = 'editor', [string]$Log, [int]$Parallel = 12)
+    param([Parameter(Mandatory)]$Das, [string]$Name = 'editor', [string]$Log, [int]$Parallel = 12,
+          [string[]]$BuildArguments, [string[]]$Modules = @(), [switch]$NoEngineChanges)
     $Arguments = @('DasForUESmokeEditor', 'Win64', 'Development', "-Project=$($Das.Project)", '-WaitMutex', '-NoXGE',
                    "-MaxParallelActions=$Parallel")
+    if ($Modules) { $Arguments += @($Modules | ForEach-Object { "-Module=$_" }) }
+    if ($NoEngineChanges) { $Arguments += '-NoEngineChanges' }
     if ($Log) { $Arguments += "-Log=$Log" }
+    if ($PSBoundParameters.ContainsKey("BuildArguments")) { $Arguments = $BuildArguments }
     & (Join-Path $Das.Engine 'Engine\Build\BatchFiles\Build.bat') @Arguments | ForEach-Object { Write-Host $_ }
     if ($LASTEXITCODE) { throw "$Name build failed" }
 }
@@ -116,5 +123,90 @@ function Invoke-DasAutomation {
     }
 }
 
+
+# Keep native argument lists intact when a runner needs a game target, module-only build or receipt refresh.
+# BuildArguments overrides the default editor arguments rather than appending a second target/project.
+
+# Select-String compatibility for existing boolean gates (including -Quiet and regex matching).
+function Test-DasResult {
+    param([Parameter(Position=1)][string]$Path, [string]$LiteralPath,
+          [Parameter(Position=0)][string]$Pattern, [switch]$SimpleMatch, [switch]$Quiet)
+    Select-String @PSBoundParameters
+}
+
+# Extract a named PASS record once; callers can retain feature-specific fields from Groups.
+function Get-DasResult {
+    param([Parameter(Mandatory)][AllowEmptyString()][string]$Text,
+          [Parameter(Mandatory)][string]$Pattern, [switch]$All)
+    if ($All) { return [regex]::Matches($Text, $Pattern) }
+    return [regex]::Match($Text, $Pattern)
+}
+
+# A checked result record, optionally with an exact check count. Return the record for extra fields.
+function Assert-DasResult {
+    param([Parameter(Mandatory)][string]$Log, [Parameter(Mandatory)][string]$Pattern,
+          [int]$Checks = -1, [string]$Name = $Log)
+    $Result = Get-DasResult -Text (Get-Content -LiteralPath $Log -Raw) -Pattern $Pattern
+    if (!$Result.Success -or ($Checks -ge 0 -and [int]$Result.Groups[1].Value -ne $Checks)) {
+        throw "$Name missing or incomplete result: $Log"
+    }
+    return $Result
+}
+
+# Deterministic source/binary freeze; file discovery stays with the runner so its scope is unchanged.
+function Lock-SourceHashes {
+    param([Parameter(Mandatory)][string[]]$Paths)
+    $Result = [ordered]@{}
+    foreach ($Path in ($Paths | Sort-Object)) {
+        $Result[$Path] = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
+    }
+    return ($Result | ConvertTo-Json -Depth 8 -Compress)
+}
+
+function Write-DasValidation {
+    param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)]$Data, [int]$Depth = 20)
+    $Data | ConvertTo-Json -Depth $Depth | Set-Content -LiteralPath $Path -Encoding utf8
+}
+
+
+# Common freeze scope used by narrow DSL commandlet runners; Extra retains each runner's fixtures.
+function Get-DasValidationPaths {
+    param([Parameter(Mandatory)]$Das, [string[]]$Extra = @())
+    Get-ChildItem "$($Das.Repo)/Plugins/DasForUE/Source" -Recurse -File |
+        Where-Object Extension -in '.h','.cpp','.inl','.cs' | ForEach-Object FullName
+    Get-ChildItem "$($Das.Repo)/Plugins/DasForUE/Content/Das/Scripts" -File -Filter '*.das' |
+        ForEach-Object FullName
+    'DasRuntime','DasEditor' | ForEach-Object {
+        "$($Das.Repo)/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$_.dll"
+    }
+    "$($Das.Engine)/Engine/Binaries/Win64/UnrealEditor.modules"
+    Join-Path $PSScriptRoot 'DasTest.psm1'
+    $Extra | ForEach-Object { "$($Das.Repo)/$_" }
+}
+
+# One scoped commandlet receipt. Re-enumerate paths after the probe to catch additions/removals too.
+function Invoke-DasValidation {
+    param([Parameter(Mandatory)]$Das, [Parameter(Mandatory)][string]$Run,
+          [Parameter(Mandatory)][string]$Name, [Parameter(Mandatory)][string]$Marker,
+          [Parameter(Mandatory)][int]$Checks, [Parameter(Mandatory)][scriptblock]$SourcePaths,
+          [Parameter(Mandatory)][string]$Output, [Parameter(Mandatory)][string]$Mode,
+          [Parameter(Mandatory)][string]$SuccessMarker, [string]$FailPattern,
+          [string[]]$Arguments = @('-Multiprocess'), [string]$RequiredPattern)
+    $Before = Lock-SourceHashes -Paths @(& $SourcePaths)
+    $Log = Invoke-DasCommandlet $Das -Run $Run -Name $Name -Marker $Marker -NoZen `
+        -Arguments $Arguments -FailPattern $FailPattern
+    $Record = Assert-DasResult -Log $Log -Pattern ([regex]::Escape($Marker) + ' checks=(\d+)') -Checks $Checks
+    if ($RequiredPattern -and (Get-Content -LiteralPath $Log -Raw) -notmatch $RequiredPattern) {
+        throw "Missing required diagnostic $RequiredPattern in $Log"
+    }
+    if ((Lock-SourceHashes -Paths @(& $SourcePaths)) -cne $Before) { throw "Source or binary changed during $Name" }
+    Write-DasValidation -Path (Join-Path $Das.Logs $Output) -Depth 8 -Data ([ordered]@{
+        state='PASS'; checks=[int]$Record.Groups[1].Value; runtime_log=$Log; sha256=($Before|ConvertFrom-Json)
+        mode=$Mode; PIE='not_run'; packaged='not_run'; full_suites='not_run'
+    })
+    Write-Output "$SuccessMarker checks=$Checks"
+}
+
 Export-ModuleMember -Function Get-DasContext, Invoke-DasBuild, Assert-DasLog, Invoke-DasCommandlet, Invoke-DasAutomation,
-    Invoke-DasPackaged, Invoke-DasAssetPhases -Variable DasEngineErrorPattern
+    Invoke-DasPackaged, Invoke-DasAssetPhases, Test-DasResult, Get-DasResult, Assert-DasResult,
+    Lock-SourceHashes, Write-DasValidation, Get-DasValidationPaths, Invoke-DasValidation -Variable DasEngineErrorPattern

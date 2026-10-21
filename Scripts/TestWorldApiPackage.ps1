@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild,[switch]$Publish)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 foreach($Test in @('TestBindingsGenerator.py','TestApiPackage.py','TestCanonicalMathGenerator.py')){
@@ -22,7 +24,7 @@ foreach($Check in $Checks){
  "options gen2`nrequire $($Report.staged_module)`n[export]`ndef main(input:int):int {`n$($Check.body)`nreturn 42`n}"|Set-Content -LiteralPath $Probe -Encoding utf8
  $Extra=@();if($Check.world){$Extra+='-GameWorld'}
  & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasExport -Modules=Engine @Extra "-Probe=$Probe" -Multiprocess -unattended -NullRHI -nosplash -stdout "-abslog=$Log" -ddc=NoZenLocalFallback -NoZenAutoLaunch *> "$Log.stdout"
- if(!$LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch $Check.error -Quiet)){throw "Expected rejection $($Check.name) missing: $Log"}
+ if(!$LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch $Check.error -Quiet)){throw "Expected rejection $($Check.name) missing: $Log"}
  Write-Output "DAS_WORLD_API_REJECTION=PASS $($Check.name)"
 }
 $Blocked=@($Report.members|Where-Object {$_.status -eq 'export_blocked'})

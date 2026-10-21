@@ -1,13 +1,17 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild,[switch]$Publish)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot;$Python='C:/Python312/python.exe';$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 & $Python "$PSScriptRoot/TestNavigationGenerator.py";if($LASTEXITCODE){throw 'Navigation generator tests failed'}
-if(!$SkipBuild){& "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/navigation-build.log" *> "$Repo/logs/navigation-build-stdout.log";if($LASTEXITCODE){throw 'Navigation build failed'}}
+if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/navigation-build.log") *> "$Repo/logs/navigation-build-stdout.log";if($LASTEXITCODE){throw 'Navigation build failed'}}
 $Sources=@{};foreach($File in @('Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputNavigation.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyCalls.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasMarshalling.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasBindingExport.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp','Plugins/DasForUE/Source/DasRuntime/Public/DasInputEvents.h','Plugins/DasForUE/Source/DasEditor/Private/DasInputNavigationCommandlet.cpp','Plugins/DasForUE/Source/DasEditor/Public/DasInputNavigationCommandlet.h','Scripts/GenerateBindings.py','Bindings/InputNavigation.contract.json','Tests/InputNavigation/probe.das')){$Sources[$File]=(Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash}
 $Dlls=@{};foreach($Name in @('DasRuntime','DasEditor')){$Path="$Repo/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$Name.dll";$Dlls[$Path]=(Get-FileHash $Path -Algorithm SHA256).Hash}
 $Manifest="$Engine/Engine/Binaries/Win64/UnrealEditor.modules";$BuildId=(Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/UMGInput.profile.json" -SkipBuild -Publish:$Publish|Tee-Object -Variable Output
 if(!$?){throw 'Navigation API package generation failed'}
-$Match=[regex]::Match(($Output -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Navigation package report'}
+$Match=(Get-DasResult -Text ($Output -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Navigation package report'}
 $ReportPath=$Match.Groups[1].Value.Trim();$Stage=Split-Path -Parent $ReportPath;$Report=Get-Content $ReportPath -Raw|ConvertFrom-Json
 $Contract=Get-Content "$Repo/Bindings/InputNavigation.contract.json" -Raw|ConvertFrom-Json
 $Opened=@($Report.members|Where-Object {$_.status -eq 'generation_ready'}|ForEach-Object {$_.class+'.'+$_.function})
@@ -23,9 +27,9 @@ $Editor="$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe";$Common=@($Project,
 try {
  $Source|Set-Content $Probe -Encoding utf8
  & $Editor @Common -run=DasInputNavigation "-Script=$Name" "-abslog=$Log" *> "$Stage/navigation-stdout.log"
- $Result=[regex]::Match((Get-Content $Log -Raw),'DAS_NAVIGATION_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Navigation runtime probe failed: $Log"}
+ $Result=(Get-DasResult -Text (Get-Content $Log -Raw) -Pattern 'DAS_NAVIGATION_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Navigation runtime probe failed: $Log"}
 }finally{Remove-Item -LiteralPath $Probe -ErrorAction SilentlyContinue;if($TemporaryModule){Remove-Item -LiteralPath $TemporaryModule}}
-foreach($File in @('export.log','preflight.log','navigation.log')){if(Select-String "$Stage/$File" -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $File"}}
+foreach($File in @('export.log','preflight.log','navigation.log')){if(Test-DasResult "$Stage/$File" -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $File"}}
 foreach($File in $Sources.Keys){if((Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash -ne $Sources[$File]){throw "Source changed during Navigation verification: $File"}}
 foreach($Path in $Dlls.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Dlls[$Path]){throw 'DLL changed during Navigation verification'}}
 if((Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during Navigation verification'}

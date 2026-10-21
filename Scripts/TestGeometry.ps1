@@ -1,13 +1,17 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild,[switch]$Publish)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot
 $Python='C:/Python312/python.exe';$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 & $Python "$PSScriptRoot/TestGeometryGenerator.py";if($LASTEXITCODE){throw 'Geometry generator tests failed'}
-if(!$SkipBuild){& "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/geometry-build.log" *> "$Repo/logs/geometry-build-stdout.log";if($LASTEXITCODE){throw 'Geometry build failed'}}
+if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/geometry-build.log") *> "$Repo/logs/geometry-build-stdout.log";if($LASTEXITCODE){throw 'Geometry build failed'}}
 $Hashes=@{};foreach($Name in @('DasRuntime','DasEditor')){$Path="$Repo/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$Name.dll";$Hashes[$Path]=(Get-FileHash $Path -Algorithm SHA256).Hash}
 $Manifest="$Engine/Engine/Binaries/Win64/UnrealEditor.modules";$BuildId=(Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/UMGInput.profile.json" -SkipBuild -Publish:$Publish|Tee-Object -Variable PackageOutput
 if(!$?){throw 'Geometry package generation failed'}
-$Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Geometry package report'}
+$Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Geometry package report'}
 $ReportPath=$Match.Groups[1].Value.Trim();$Stage=Split-Path -Parent $ReportPath;$Report=Get-Content $ReportPath -Raw|ConvertFrom-Json
 $Contract=Get-Content "$Repo/Bindings/Geometry.contract.json" -Raw|ConvertFrom-Json
 $Open=@($Report.members|Where-Object {$_.status -eq 'generation_ready'}|ForEach-Object {$_.class+'.'+$_.function})
@@ -18,7 +22,7 @@ $Probe="$Stage/geometry.das";(Get-Content "$Repo/Tests/Geometry/probe.template.d
 $Editor="$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe";$Common=@($Project,'-Multiprocess','-unattended','-NullRHI','-nosplash','-stdout','-ddc=NoZenLocalFallback','-NoZenAutoLaunch')
 $Log="$Stage/geometry.log"
 & $Editor @Common -run=DasGeometry "-Script=$Probe" "-abslog=$Log" *> "$Stage/geometry-stdout.log"
-$Result=[regex]::Match((Get-Content $Log -Raw),'DAS_GEOMETRY_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Geometry native/runtime probe failed: $Log"}
+$Result=(Get-DasResult -Text (Get-Content $Log -Raw) -Pattern 'DAS_GEOMETRY_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Geometry native/runtime probe failed: $Log"}
 $CompileRejections=0
 foreach($Case in @(
  @{name='geometry_integer_constructor';body='let value=UEGeometry(uint64(1));return 0'},
@@ -29,7 +33,7 @@ foreach($Case in @(
  & $Editor @Common -run=DasExport -Modules=Engine "-Probe=$Bad" "-abslog=$BadLog" *> "$BadLog.stdout"
  $BadText=Get-Content $BadLog -Raw;if(!$LASTEXITCODE -or !$BadText.Contains('error[') -or !$BadText.Contains('UEGeometry')){throw "Expected compile-time Geometry token rejection: $BadLog"};$CompileRejections++
 }
-foreach($Name in @('export.log','preflight.log','geometry.log')){if(Select-String (Join-Path $Stage $Name) -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Name"}}
+foreach($Name in @('export.log','preflight.log','geometry.log')){if(Test-DasResult (Join-Path $Stage $Name) -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Name"}}
 foreach($Path in $Hashes.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Hashes[$Path]){throw 'DLL changed during Geometry tests'}}
 if((Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during Geometry tests'}
 $Receipt=Get-Content "$Repo/Tests/DasForUESmoke/Binaries/Win64/DasForUESmokeEditor.target" -Raw|ConvertFrom-Json

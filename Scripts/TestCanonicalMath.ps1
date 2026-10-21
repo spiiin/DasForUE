@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild,[switch]$Publish)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Python='C:\Python312\python.exe'
@@ -30,7 +32,7 @@ foreach($Check in $Checks){
  $Log=Join-Path $Stage ($Check.name+'.log')
  "options gen2`nrequire ue_foundation`n[export]`ndef main(input:int):int {`n$($Check.body)`nreturn 42`n}"|Set-Content -LiteralPath $Probe -Encoding utf8
  & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasExport -Modules=Engine "-Probe=$Probe" -Multiprocess -unattended -NullRHI -nosplash -stdout "-abslog=$Log" -ddc=NoZenLocalFallback -NoZenAutoLaunch *> "$Log.stdout"
- if(!$LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch $Check.error -Quiet)){
+ if(!$LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch $Check.error -Quiet)){
   throw "Expected rejection $($Check.name) missing; inspect $Log"
  }
  Write-Output "DAS_CANONICAL_MATH_REJECTION=PASS $($Check.name)"

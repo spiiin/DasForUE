@@ -62,6 +62,9 @@
     { "name": "dsl-handler-references", "kind": "script", "script": "TestHandlerReferences.ps1" },
     { "name": "dsl-event-checks", "kind": "script", "script": "TestEventChecks.ps1" },
     { "name": "dsl-inline-callbacks", "kind": "script", "script": "TestInlineCallbacks.ps1" },
+    {"name": "dsl-widget-layouts", "kind": "script", "script": "TestWidgetLayouts.ps1"},
+    {"name": "dsl-reflection-macros", "kind": "script", "script": "TestReflectionMacros.ps1"},
+    {"name": "dsl-identity", "kind": "script", "script": "TestIdentityDSL.ps1"},
     { "name": "packaged", "kind": "packaged", "log": "combined-export",
       "requires": ["method-values", "native-defaults", "computed-defaults"],
       "maps": [

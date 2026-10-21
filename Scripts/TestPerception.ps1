@@ -1,15 +1,19 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[string]$Report,[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/perception-build.log" *> "$Repo/logs/perception-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/perception-build.log") *> "$Repo/logs/perception-build-stdout.log"
  if($LASTEXITCODE){throw 'Perception fixture build failed'}
 }
 if(!$Report){
  & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/PawnCharacterAINavigation.profile.json" -SkipBuild | Tee-Object -Variable PackageOutput
  if(!$?){throw 'Pawn AI package failed'}
- $Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+ $Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
  if(!$Match.Success){throw 'Missing package report'}
  $Report=$Match.Groups[1].Value.Trim()
 }
@@ -37,6 +41,6 @@ $Checks=@('real_perception_system','invalid_native_stimulus_is_not_sight','other
 foreach($Check in $Checks){if(!$Text.Contains("DAS_PERCEPTION_PASS $Check")){throw "Missing $Check"}}
 if(!$Text.Contains('DAS_PERCEPTION_RUNTIME=PASS') -or $Text.Contains('Ensure condition failed') -or $Text -match 'Log[^\r\n]*: Error:'){throw "Perception errors or missing success: $Run/runtime.log"}
 if((GetPerceptionHashes) -ne $Before){throw 'Perception DLL, fixture or generated module changed during validation'}
-[ordered]@{state='PASS';native_counters=([regex]::Match($Text,'DAS_PERCEPTION_RUNTIME=PASS ([^\r\n]+)').Groups[1].Value);report=$Report;runtime_log="$Run/runtime.log";checks=$Checks;hashes=($Before|ConvertFrom-Json);scope='real sight/hearing senses and native OnTargetPerceptionUpdated to typed AIStimulus via ue_event; transient Game world';callback='generated ue_event binder and owned AIStimulus projection';stimuli='engine sense processing; no manual RegisterStimulus or delegate Broadcast';scene_saved=$false;PIE='not_run';packaged='not_run';network='not_run';commit='not_created'}|ConvertTo-Json -Depth 6|Set-Content -LiteralPath "$Run/result.json" -Encoding utf8
+[ordered]@{state='PASS';native_counters=((Get-DasResult -Text $Text -Pattern 'DAS_PERCEPTION_RUNTIME=PASS ([^\r\n]+)').Groups[1].Value);report=$Report;runtime_log="$Run/runtime.log";checks=$Checks;hashes=($Before|ConvertFrom-Json);scope='real sight/hearing senses and native OnTargetPerceptionUpdated to typed AIStimulus via ue_event; transient Game world';callback='generated ue_event binder and owned AIStimulus projection';stimuli='engine sense processing; no manual RegisterStimulus or delegate Broadcast';scene_saved=$false;PIE='not_run';packaged='not_run';network='not_run';commit='not_created'}|ConvertTo-Json -Depth 6|Set-Content -LiteralPath "$Run/result.json" -Encoding utf8
 Copy-Item -LiteralPath "$Run/result.json" -Destination "$Repo/logs/perception-validation.json" -Force
 Write-Output "DAS_PERCEPTION_FOCUSED=PASS report=$Run/result.json"

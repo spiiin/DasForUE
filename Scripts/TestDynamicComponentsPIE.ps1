@@ -1,11 +1,14 @@
 param([string]$Engine = 'C:\src\unreal\UnrealEngine')
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference = 'Stop'
 $Repo = Split-Path -Parent $PSScriptRoot
 $Project = Join-Path $Repo 'Tests\DasForUESmoke\DasForUESmoke.uproject'
 $Logs = Join-Path $Repo 'logs'
 New-Item -ItemType Directory -Path $Logs -Force | Out-Null
-& (Join-Path $Engine 'Engine\Build\BatchFiles\Build.bat') DasForUESmokeEditor Win64 Development `
-    "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12 "-Log=$Logs\dynamic-components-pie-build.log"
+Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=12', "-Log=$Logs\dynamic-components-pie-build.log")
 if ($LASTEXITCODE) { throw 'Native components test build failed' }
 $Log = Join-Path $Logs 'dynamic-components-pie.log'
 $Report = Join-Path $Logs 'dynamic-components-pie-report'

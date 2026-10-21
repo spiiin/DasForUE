@@ -1,4 +1,5 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
@@ -12,7 +13,7 @@ function Get-GASSourceFingerprint {
 $Sources=Get-GASSourceFingerprint
 [ordered]@{state='pending';scope='GAS focused runtime'}|ConvertTo-Json|Set-Content "$Repo/logs/gas-validation.json" -Encoding utf8
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/gas-build.log" *> "$Repo/logs/gas-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @('DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE', '-MaxParallelActions=8', "-Log=$Repo/logs/gas-build.log") *> "$Repo/logs/gas-build-stdout.log"
  if($LASTEXITCODE){throw 'GAS build failed'}
 }
 if((Get-GASSourceFingerprint) -cne $Sources){throw 'Source changed during GAS build'}
@@ -30,7 +31,7 @@ try { $ErrorActionPreference='Continue'
 } finally { $ErrorActionPreference=$PreviousErrorAction }
 $Exit=$LASTEXITCODE
 $Text=Get-Content -LiteralPath $Log -Raw
-if($Exit -or $Text -notmatch 'DAS_GAS_RESULT=PASS checks=(\d+)' -or $Text -match 'Ensure condition failed|Log[^:]+: Error:'){throw "GAS focused runtime failed: $Log"}
+if($Exit -or !(Get-DasResult -Text $Text -Pattern 'DAS_GAS_RESULT=PASS checks=(\d+)').Success -or $Text -match 'Ensure condition failed|Log[^:]+: Error:'){throw "GAS focused runtime failed: $Log"}
 if((Get-GASSourceFingerprint) -cne $Sources){throw 'Source changed during GAS runtime check'}
 foreach($Path in $Dlls.Keys){if((Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash -ne $Dlls[$Path]){throw 'DLL changed during GAS runtime check'}}
 [ordered]@{state='PASS';dll_sha256=$Dlls;runtime_log=$Log;scope='native GAS health, instant effects, queued owned snapshots, release';PIE='not_run';packaged='not_run';commit='not_created'}|ConvertTo-Json|Set-Content "$Repo/logs/gas-validation.json" -Encoding utf8

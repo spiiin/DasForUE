@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[string]$Report)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 if(!$Report){throw 'Pass the exact freshly generated Collision run report.json'}
@@ -31,8 +33,8 @@ $Before=GetDllHashes
 $Editor="$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe"
 & $Editor "$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject" -run=DasExport -Modules=Engine -GameWorld -CollisionWorld "-Probe=$Validation/probe.das" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Validation/runtime.log" *> "$Validation/stdout.log"
 if($LASTEXITCODE){throw "Advanced projectile runtime failed: $Validation/runtime.log"}
-if(!(Select-String -LiteralPath "$Validation/runtime.log" -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw 'Missing runtime success marker'}
-if(!(Select-String -LiteralPath "$Validation/stdout.log" -SimpleMatch 'DAS_PROJECTILE_ADVANCED_PASS' -Quiet)){throw 'Missing advanced prediction marker'}
+if(!(Test-DasResult -LiteralPath "$Validation/runtime.log" -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw 'Missing runtime success marker'}
+if(!(Test-DasResult -LiteralPath "$Validation/stdout.log" -SimpleMatch 'DAS_PROJECTILE_ADVANCED_PASS' -Quiet)){throw 'Missing advanced prediction marker'}
 if((GetDllHashes) -ne $Before){throw 'DLL changed during verification'}
 [ordered]@{state='PASS';report=$Report;runtime_log="$Validation/runtime.log";coverage='33/33';scenarios=@('hit','nested_hitresult_and_pathdata','ignored_actor','clear_array','null_element','duplicates','spatial_miss');dll_sha256=($Before|ConvertFrom-Json);PIE='not_run';packaged='not_run';full_foundation='not_run';native_build='not_needed';commit='not_created'}|ConvertTo-Json -Depth 10|Set-Content -LiteralPath "$Validation/result.json" -Encoding utf8
 Copy-Item -LiteralPath "$Validation/result.json" -Destination "$Repo/logs/projectile-advanced-validation.json" -Force

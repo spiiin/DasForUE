@@ -1,4 +1,6 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests/DasForUESmoke/DasForUESmoke.uproject'
@@ -7,14 +9,16 @@ foreach($Test in @('TestBindingsGenerator.py','TestHitResultGenerator.py','TestC
  if($LASTEXITCODE){throw "$Test failed"}
 }
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/constraint-transport-build.log" *> "$Repo/logs/constraint-transport-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/constraint-transport-build.log") *> "$Repo/logs/constraint-transport-build-stdout.log"
  if($LASTEXITCODE){throw 'Constraint transport build failed'}
 }
 $Dlls=@('DasRuntime','DasEditor')|ForEach-Object {Join-Path $Repo "Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$_.dll"}
 $Hashes=@{};foreach($Dll in $Dlls){$Hashes[$Dll]=(Get-FileHash $Dll -Algorithm SHA256).Hash}
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/CollisionPhysics.profile.json" -SkipBuild | Tee-Object -Variable PackageOutput
 if(!$?){throw 'Collision package failed'}
-$Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+$Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
 if(!$Match.Success){throw 'Missing successful package report path'}
 $ReportPath=$Match.Groups[1].Value.Trim();$Stage=Split-Path -Parent $ReportPath
 $Report=Get-Content -LiteralPath $ReportPath -Raw|ConvertFrom-Json
@@ -36,7 +40,7 @@ foreach($Case in @('transport','scope')){
  $Source|Set-Content -LiteralPath $Probe -Encoding utf8
  $Extra=@();if($Case -eq 'scope'){$Extra+='-ProbeContextRoundtrip'}
  & $Editor @Common -GameWorld @Extra "-Probe=$Probe" "-abslog=$Log" *> "$Stage/constraint-$Case-stdout.log"
- if($LASTEXITCODE -or !(Select-String -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw "Constraint $Case probe failed: $Log"}
+ if($LASTEXITCODE -or !(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw "Constraint $Case probe failed: $Log"}
 }
 # Refresh the blocker report from this exact export and a fresh native inventory.
 '{"schema_version":1,"modules":["Engine"],"subsystems":[{"id":"collision_physics","modules":["Engine"],"roots":[]}]}'|Set-Content -LiteralPath "$Stage/inventory-profile.json" -Encoding utf8

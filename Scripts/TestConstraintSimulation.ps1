@@ -1,15 +1,19 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[string]$Report,[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/constraint-simulation-build.log" *> "$Repo/logs/constraint-simulation-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/constraint-simulation-build.log") *> "$Repo/logs/constraint-simulation-build-stdout.log"
  if($LASTEXITCODE){throw 'Constraint simulation commandlet build failed'}
 }
 if(!$Report){
  & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/CollisionPhysics.profile.json" -SkipBuild | Tee-Object -Variable PackageOutput
  if(!$?){throw 'Collision API preflight failed'}
- $Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+ $Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
  if(!$Match.Success){throw 'Missing package report'}
  $Report=$Match.Groups[1].Value.Trim()
 }
@@ -39,7 +43,7 @@ $Editor="$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe"
 if($LASTEXITCODE){throw "Constraint simulation failed: $Validation/runtime.log"}
 $Text=Get-Content -LiteralPath "$Validation/runtime.log" -Raw
 if(!$Text.Contains('DAS_CONSTRAINT_SIMULATION=PASS')){throw 'Missing simulation success marker'}
-$Passed=@([regex]::Matches($Text,'DAS_CONSTRAINT_SIM_PASS ([A-Za-z0-9_]+)')|ForEach-Object {$_.Groups[1].Value}|Sort-Object -Unique)
+$Passed=@((Get-DasResult -Text $Text -Pattern 'DAS_CONSTRAINT_SIM_PASS ([A-Za-z0-9_]+)' -All)|ForEach-Object {$_.Groups[1].Value}|Sort-Object -Unique)
 if($Passed.Count -ne 12){throw "Expected twelve independent native measurements, got $($Passed.Count)"}
 if($Text.Contains('Ensure condition failed') -or $Text -match 'Log[^\r\n]*: Error:'){throw "Engine error/ensure during simulation: $Validation/runtime.log"}
 if((GetConstraintSimulationHashes) -ne $Before){throw 'Test source, generated module or DLL changed during simulation'}

@@ -1,11 +1,12 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 New-Item -ItemType Directory -Path "$Repo/logs" -Force|Out-Null
 [ordered]@{state='pending';scope='scripted GAS lifecycle, one short runtime process'}|ConvertTo-Json|Set-Content "$Repo/logs/gas-hooks-validation.json" -Encoding utf8
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -Module=DasRuntime+DasEditor -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/gas-hooks-build.log" *> "$Repo/logs/gas-hooks-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @('DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-Module=DasRuntime+DasEditor', '-WaitMutex', '-NoXGE', '-MaxParallelActions=8', "-Log=$Repo/logs/gas-hooks-build.log") *> "$Repo/logs/gas-hooks-build-stdout.log"
  if($LASTEXITCODE){throw 'Scripted GAS build failed'}
 }
 $Log="$Repo/logs/gas-hooks-runtime.log"
@@ -17,7 +18,7 @@ try { $ErrorActionPreference='Continue'
 } finally { $ErrorActionPreference=$PreviousErrorAction }
 $Code=$LASTEXITCODE
 $Text=Get-Content -LiteralPath $Log -Raw
-$Match=[regex]::Match($Text,'DAS_GAS_HOOKS_RESULT=PASS checks=(\d+)')
+$Match=Get-DasResult -Text $Text -Pattern 'DAS_GAS_HOOKS_RESULT=PASS checks=(\d+)'
 if($Code -or !$Match.Success -or $Text -match 'Ensure condition failed|Log[^:]+: Error:|DAS_GAS_ABILITY_HOOK_FAILED'){throw "Scripted GAS check failed: $Log"}
 $Files=@(& git -C $Repo diff --name-only HEAD)
 $Files+=@(& git -C $Repo ls-files --others --exclude-standard)

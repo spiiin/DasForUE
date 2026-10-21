@@ -1,13 +1,17 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild,[switch]$Publish)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot;$Python='C:/Python312/python.exe';$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 & $Python "$PSScriptRoot/TestDragDropGenerator.py";if($LASTEXITCODE){throw 'Drag generator tests failed'}
-if(!$SkipBuild){& "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/drag-build.log" *> "$Repo/logs/drag-build-stdout.log";if($LASTEXITCODE){throw 'Drag build failed'}}
+if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/drag-build.log") *> "$Repo/logs/drag-build-stdout.log";if($LASTEXITCODE){throw 'Drag build failed'}}
 $Sources=@{};foreach($File in @('Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp','Plugins/DasForUE/Source/DasRuntime/Public/DasRuntime.h','Plugins/DasForUE/Source/DasRuntime/Private/DasDragRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasDragDropOperation.cpp','Plugins/DasForUE/Source/DasRuntime/Public/DasDragDropOperation.h','Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp','Plugins/DasForUE/Source/DasRuntime/Public/DasScriptUserWidget.h','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyTransport.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyCalls.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasBindingExport.inl','Plugins/DasForUE/Source/DasEditor/Private/DasDragCommandlet.cpp','Plugins/DasForUE/Source/DasEditor/Public/DasDragCommandlet.h','Plugins/DasForUE/Content/Das/Scripts/ue_drag_drop.das','Scripts/GenerateBindings.py','Tests/DragDrop/probe.das','Bindings/DragDrop.contract.json','Bindings/EventReply.contract.json')){$Sources[$File]=(Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash}
 $Dlls=@{};foreach($Name in @('DasRuntime','DasEditor')){$Path="$Repo/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$Name.dll";$Dlls[$Path]=(Get-FileHash $Path -Algorithm SHA256).Hash}
 $Manifest="$Engine/Engine/Binaries/Win64/UnrealEditor.modules";$BuildId=(Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/UMGInput.profile.json" -SkipBuild -Publish:$Publish|Tee-Object -Variable Output
 if(!$?){throw 'Drag API package generation failed'}
-$Match=[regex]::Match(($Output -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Drag package report'}
+$Match=(Get-DasResult -Text ($Output -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Drag package report'}
 $ReportPath=$Match.Groups[1].Value.Trim();$Stage=Split-Path -Parent $ReportPath;$Report=Get-Content $ReportPath -Raw|ConvertFrom-Json
 $Member=@($Report.members|Where-Object {$_.class -eq '/Script/UMG.WidgetBlueprintLibrary' -and $_.function -eq 'DetectDragIfPressed'})
 if($Member.Count -ne 1 -or $Member[0].status -ne 'generation_ready' -or $Report.counts.generation_ready -lt 404 -or $Report.counts.generation_blocked -ne 0){throw 'Unexpected Drag coverage'}
@@ -21,9 +25,9 @@ $Editor="$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe";$Common=@($Project,
 try {
  $Source|Set-Content $Probe -Encoding utf8
  & $Editor @Common -run=DasDrag "-Script=$Name" "-abslog=$Log" *> "$Stage/drag-stdout.log"
- $Result=[regex]::Match((Get-Content $Log -Raw),'DAS_DRAG_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Drag runtime probe failed: $Log"}
+ $Result=(Get-DasResult -Text (Get-Content $Log -Raw) -Pattern 'DAS_DRAG_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Drag runtime probe failed: $Log"}
 }finally{Remove-Item -LiteralPath $Probe -ErrorAction SilentlyContinue;if($TemporaryModule){Remove-Item -LiteralPath $TemporaryModule}}
-foreach($File in @('export.log','preflight.log','drag.log')){if(Select-String "$Stage/$File" -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $File"}}
+foreach($File in @('export.log','preflight.log','drag.log')){if(Test-DasResult "$Stage/$File" -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $File"}}
 foreach($File in $Sources.Keys){if((Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash -ne $Sources[$File]){throw "Source changed during Drag verification: $File"}}
 foreach($Path in $Dlls.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Dlls[$Path]){throw 'DLL changed during Drag verification'}}
 if((Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during Drag verification'}

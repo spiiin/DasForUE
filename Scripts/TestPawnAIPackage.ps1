@@ -1,16 +1,20 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[string]$Report,[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 $Python='C:\Python312\python.exe'
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/pawn-ai-build.log" *> "$Repo/logs/pawn-ai-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/pawn-ai-build.log") *> "$Repo/logs/pawn-ai-build-stdout.log"
  if($LASTEXITCODE){throw 'Pawn AI fixture build failed'}
 }
 if(!$Report){
  & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/PawnCharacterAINavigation.profile.json" -SkipBuild | Tee-Object -Variable PackageOutput
  if(!$?){throw 'Pawn AI package failed'}
- $Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+ $Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
  if(!$Match.Success){throw 'Missing successful package report'}
  $Report=$Match.Groups[1].Value.Trim()
 }
@@ -41,14 +45,14 @@ $Common=@($Project,'-Multiprocess','-unattended','-NullRHI','-nosplash','-stdout
 if($LASTEXITCODE){throw "Pawn AI runtime failed: $Validation/runtime.log"}
 $Text=Get-Content -LiteralPath "$Validation/runtime.log" -Raw
 if(!$Text.Contains('DAS_PAWN_AI_RUNTIME=PASS')){throw 'Missing Pawn AI runtime success marker'}
-$Passed=@([regex]::Matches($Text,'DAS_PAWN_AI_PASS ([A-Za-z0-9_]+)')|ForEach-Object {$_.Groups[1].Value}|Sort-Object -Unique)
+$Passed=@((Get-DasResult -Text $Text -Pattern 'DAS_PAWN_AI_PASS ([A-Za-z0-9_]+)' -All)|ForEach-Object {$_.Groups[1].Value}|Sort-Object -Unique)
 if($Passed.Count -ne 7){throw "Expected seven native runtime groups, got $($Passed.Count)"}
 if($Text.Contains('Ensure condition failed') -or $Text -match 'Log[^\r\n]*: Error:'){throw 'Engine error/ensure in Pawn AI runtime'}
 # Compile this package together with installed Math/World using explicit namespaces.
 $Combined="options gen2`nrequire $($Definition.staged_module)`nrequire ue_api_world`nrequire ue_api_math`n[export]`ndef main(input:int):int {`nlet pawn=$($Definition.staged_module)::C_Pawn_ba3732bb_null()`nif($($Definition.staged_module)::C_Pawn_ba3732bb_valid(pawn)) { return -1 }`nlet actor=ue_api_world::C_Actor_adf65d5b_null()`nif(ue_api_world::C_Actor_adf65d5b_valid(actor)) { return -2 }`nreturn 42`n}"
 $Combined|Set-Content -LiteralPath "$Validation/combined.das" -Encoding utf8
 & $Editor @Common -run=DasExport "-Modules=Engine,AIModule,NavigationSystem" "-Probe=$Validation/combined.das" "-abslog=$Validation/combined.log" *> "$Validation/combined-stdout.log"
-if($LASTEXITCODE -or !(Select-String -LiteralPath "$Validation/combined.log" -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw 'Combined Pawn AI / World / Math imports failed'}
+if($LASTEXITCODE -or !(Test-DasResult -LiteralPath "$Validation/combined.log" -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)){throw 'Combined Pawn AI / World / Math imports failed'}
 # Independent native policy evidence explains every rejected declaration.
 '{"schema_version":1,"modules":["Engine","AIModule","NavigationSystem"],"subsystems":[{"id":"pawn_ai_navigation","modules":["Engine","AIModule","NavigationSystem"],"roots":[]}]}'|Set-Content -LiteralPath "$Validation/inventory-profile.json" -Encoding utf8
 & $Editor @Common -run=DasNativeGameplay -Coverage "-Profile=$Validation/inventory-profile.json" "-Output=$Validation/inventory.json" "-abslog=$Validation/inventory.log" *> "$Validation/inventory-stdout.log"

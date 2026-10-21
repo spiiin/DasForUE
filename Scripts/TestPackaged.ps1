@@ -1,4 +1,5 @@
 param([string]$Engine = 'C:\src\unreal\UnrealEngine',[string[]]$AdditionalMaps=@(),[switch]$SkipZenStore,[string]$DDC='',[string[]]$AdditionalCookDirectories=@(),[switch]$SkipSmoke,[ValidateSet('Development','Shipping')][string]$Configuration='Development',[string]$ArchiveDirectory='')
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 $ErrorActionPreference = 'Stop'
 $DDCArgs=@();if($DDC){$DDCArgs=@("-DDC=$DDC")}
 $Repo = Split-Path -Parent $PSScriptRoot
@@ -14,8 +15,9 @@ if (Test-Path -LiteralPath $TargetMakefile -PathType Leaf) {
 }
 $BuildLog=if($Configuration -eq 'Development'){Join-Path $Logs 'build-packaged.log'}else{Join-Path $Logs "build-packaged-$Configuration.log"}
 # BuildConfiguration switches must be top-level UBT arguments, not nested UAT -Target arguments.
-& (Join-Path $Engine 'Engine\Build\BatchFiles\Build.bat') DasForUESmoke Win64 $Configuration `
-    "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=12 -NoUBTMakefiles -ForceRulesCompile "-Log=$BuildLog"
+Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmoke', 'Win64', $Configuration, "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=12', '-NoUBTMakefiles', '-ForceRulesCompile', "-Log=$BuildLog")
 if ($LASTEXITCODE) { throw 'Packaged target build failed' }
 $Binary = if($Configuration -eq 'Shipping'){'DasForUESmoke-Win64-Shipping'}else{'DasForUESmoke'}
 $Receipt = Get-Content -LiteralPath (Join-Path $Repo "Tests\DasForUESmoke\Binaries\Win64\$Binary.target") -Raw | ConvertFrom-Json
@@ -39,6 +41,6 @@ $Log = Join-Path $Logs 'smoke-packaged.log'
 $Process = Start-Process -FilePath $Executable -ArgumentList '-DasSmoke','-nullrhi','-unattended','-nosplash',"-abslog=$Log" `
     -WindowStyle Hidden -PassThru -Wait
 if ($Process.ExitCode) { throw "Packaged smoke failed: $($Process.ExitCode)" }
-if (!(Select-String -LiteralPath $Log -SimpleMatch 'DAS_FOUNDATION_RESULT=PASS')) {
+if (!(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_FOUNDATION_RESULT=PASS')) {
     throw 'Packaged game exited without a PASS marker'
 }

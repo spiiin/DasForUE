@@ -1,10 +1,14 @@
 param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Profile="$Repo/Bindings/Packages/UMGInput.profile.json"
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/umg-input-build.log" *> "$Repo/logs/umg-input-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/umg-input-build.log") *> "$Repo/logs/umg-input-build-stdout.log"
  if($LASTEXITCODE){throw 'UMG / Input Editor build failed'}
 }
 function GetPackageHashes {
@@ -18,7 +22,7 @@ $Before=GetPackageHashes
 # One runtime probe, embedded in the profile; no extra commandlets or full suites.
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile $Profile -SkipBuild | Tee-Object -Variable PackageOutput
 if(!$?){throw 'UMG / Input package failed'}
-$Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
+$Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)')
 if(!$Match.Success){throw 'Missing successful package report'}
 $Report=(Resolve-Path -LiteralPath $Match.Groups[1].Value.Trim()).Path
 $Definition=Get-Content -LiteralPath $Report -Raw|ConvertFrom-Json

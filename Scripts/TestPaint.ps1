@@ -1,14 +1,18 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild,[switch]$Publish)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot
 $Python='C:/Python312/python.exe';$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 & $Python "$PSScriptRoot/TestPaintGenerator.py";if($LASTEXITCODE){throw 'Paint generator tests failed'}
-if(!$SkipBuild){& "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/paint-build.log" *> "$Repo/logs/paint-build-stdout.log";if($LASTEXITCODE){throw 'Paint build failed'}}
+if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
+    'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
+    '-MaxParallelActions=8', "-Log=$Repo/logs/paint-build.log") *> "$Repo/logs/paint-build-stdout.log";if($LASTEXITCODE){throw 'Paint build failed'}}
 $Sources=@{};foreach($File in @('Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasPaintRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasPaintTransport.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasPaintTransport.h','Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp','Plugins/DasForUE/Source/DasRuntime/Public/DasScriptUserWidget.h','Plugins/DasForUE/Source/DasRuntime/Public/DasRuntime.h','Plugins/DasForUE/Source/DasRuntime/Private/DasMarshalling.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasBindingExport.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasStructValidation.cpp','Plugins/DasForUE/Source/DasEditor/Private/DasPaintCommandlet.cpp','Scripts/GenerateBindings.py','Bindings/PaintContext.contract.json','Tests/Paint/probe.template.das','Plugins/DasForUE/Content/Das/Scripts/ue_paint.das','Plugins/DasForUE/Source/DasEditor/Public/DasPaintCommandlet.h')){$Sources[$File]=(Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash}
 $Hashes=@{};foreach($Name in @('DasRuntime','DasEditor')){$Path="$Repo/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$Name.dll";$Hashes[$Path]=(Get-FileHash $Path -Algorithm SHA256).Hash}
 $Manifest="$Engine/Engine/Binaries/Win64/UnrealEditor.modules";$BuildId=(Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/UMGInput.profile.json" -SkipBuild -Publish:$Publish|Tee-Object -Variable PackageOutput
 if(!$?){throw 'Paint package generation failed'}
-$Match=[regex]::Match(($PackageOutput -join "`n"),'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Paint package report'}
+$Match=(Get-DasResult -Text ($PackageOutput -join "`n") -Pattern 'DAS_API_PACKAGE=PASS[^\r\n]*report=(.+/report\.json)');if(!$Match.Success){throw 'Missing Paint package report'}
 $ReportPath=$Match.Groups[1].Value.Trim();$Stage=Split-Path -Parent $ReportPath;$Report=Get-Content $ReportPath -Raw|ConvertFrom-Json
 $Contract=Get-Content "$Repo/Bindings/PaintContext.contract.json" -Raw|ConvertFrom-Json
 $Open=@($Report.members|Where-Object {$_.status -eq 'generation_ready'}|ForEach-Object {$_.class+'.'+$_.function})
@@ -28,7 +32,7 @@ if(!$Publish){
 try {
  $Source|Set-Content $Probe -Encoding utf8
  & $Editor @Common -run=DasPaint "-Script=$Name" "-abslog=$Log" *> "$Stage/paint-stdout.log"
- $Result=[regex]::Match((Get-Content $Log -Raw),'DAS_PAINT_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Paint native/runtime probe failed: $Log"}
+ $Result=(Get-DasResult -Text (Get-Content $Log -Raw) -Pattern 'DAS_PAINT_RESULT=PASS checks=(\d+)');if($LASTEXITCODE -or !$Result.Success){throw "Paint native/runtime probe failed: $Log"}
 }finally{Remove-Item -LiteralPath $Probe -ErrorAction SilentlyContinue;if($TemporaryModule){Remove-Item -LiteralPath $TemporaryModule}}
 $CompileRejections=0
 foreach($Case in @(
@@ -40,7 +44,7 @@ foreach($Case in @(
  & $Editor @Common -run=DasExport -Modules=Engine "-Probe=$Bad" "-abslog=$BadLog" *> "$BadLog.stdout"
  $BadText=Get-Content $BadLog -Raw;if(!$LASTEXITCODE -or !$BadText.Contains('error[') -or !$BadText.Contains('UEPaintContext')){throw "Expected compile-time Paint token rejection: $BadLog"};$CompileRejections++
 }
-foreach($Name in @('export.log','preflight.log','paint.log')){if(Select-String (Join-Path $Stage $Name) -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Name"}}
+foreach($Name in @('export.log','preflight.log','paint.log')){if(Test-DasResult (Join-Path $Stage $Name) -Pattern 'Ensure condition failed|Log[^:]+: Error:' -Quiet){throw "Engine error/ensure: $Name"}}
 foreach($File in $Sources.Keys){if((Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash -ne $Sources[$File]){throw "Source changed during Paint tests: $File"}}
 foreach($Path in $Hashes.Keys){if((Get-FileHash $Path -Algorithm SHA256).Hash -ne $Hashes[$Path]){throw 'DLL changed during Paint tests'}}
 if((Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId -ne $BuildId){throw 'Engine BuildId changed during Paint tests'}

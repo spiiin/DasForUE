@@ -1,10 +1,11 @@
 param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild)
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
 [ordered]@{state='pending';scope='GAS local targeting; one focused process'}|ConvertTo-Json|Set-Content "$Repo/logs/gas-targeting-validation.json" -Encoding utf8
 if(!$SkipBuild){
- & "$Engine/Engine/Build/BatchFiles/Build.bat" DasForUESmokeEditor Win64 Development "-Project=$Project" -Module=DasRuntime+DasEditor -NoEngineChanges -WaitMutex -NoXGE -MaxParallelActions=8 "-Log=$Repo/logs/gas-targeting-final-build.log" *> "$Repo/logs/gas-targeting-final-build-stdout.log"
+ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @('DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-Module=DasRuntime+DasEditor', '-NoEngineChanges', '-WaitMutex', '-NoXGE', '-MaxParallelActions=8', "-Log=$Repo/logs/gas-targeting-final-build.log") *> "$Repo/logs/gas-targeting-final-build-stdout.log"
  if($LASTEXITCODE){throw 'GAS targeting build failed'}
 }
 $Log="$Repo/logs/gas-targeting-runtime.log"
@@ -14,7 +15,7 @@ $PreviousErrorAction=$ErrorActionPreference
 try { $ErrorActionPreference='Continue'
 & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasGASTargeting -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch "-abslog=$Log" *> "$Repo/logs/gas-targeting-runtime-stdout.log"
 } finally { $ErrorActionPreference=$PreviousErrorAction }
-$Code=$LASTEXITCODE;$Text=Get-Content -LiteralPath $Log -Raw;$Match=[regex]::Match($Text,'DAS_GAS_TARGETING_RESULT=PASS checks=(\d+)')
+$Code=$LASTEXITCODE;$Text=Get-Content -LiteralPath $Log -Raw;$Match=Get-DasResult -Text $Text -Pattern 'DAS_GAS_TARGETING_RESULT=PASS checks=(\d+)'
 if($Code -or !$Match.Success -or $Text -match 'Ensure condition failed|Log[^:]+: Error:|DAS_GAS_ABILITY_HOOK_FAILED'){throw "GAS targeting check failed: $Log"}
 $Hashes=[ordered]@{};$Files=@(& git -C $Repo diff --name-only HEAD)+@(& git -C $Repo ls-files --others --exclude-standard)
 foreach($Name in ($Files|Sort-Object -Unique)){$Path=Join-Path $Repo $Name;if(Test-Path -LiteralPath $Path -PathType Leaf){$Hashes[$Name]=(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}}
