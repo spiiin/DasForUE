@@ -46,11 +46,16 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Fixed
 
+- Authored struct fields of type `UEVector2D` keep their DSL default; the editor formatted it as a
+  Transform and failed its type check.
 - Authored structs accept GameplayTag map values (`table<string;GameplayTag>`); they were refused
   by `ue_struct` and the authored type validation ([GameplayTags](Docs/Guide/Data/GameplayTags.md)).
 
 ### Internal
 
+- Math structs (Vector, Vector2D, Rotator, Transform, InputActionValue) are ported to type adapters:
+  identity, validation, defaults, members, packing and call transports
+  ([Type adapters](Docs/Dev/Design/TypeAdapters.md)).
 - Type adapters (`DasTypeAdapters.h`): one object per value type owns its identity and decisions;
   scalar kinds and GameplayTag are ported, subsystems ask the registry
   ([Type adapters](Docs/Dev/Design/TypeAdapters.md)).

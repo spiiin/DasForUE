@@ -163,3 +163,28 @@ text). Забирает ровно два решения, у которых се
    списка в плане.
 3. Чинить map-значения тегов (`DasReflectedTypes.cpp:263`) в том же шаге?
 4. Оставить литерал пути в `ue_gameplay_tags.das`?
+
+## Перенос math-структур (2026-10-21)
+
+Vector, Vector2D, Rotator, Transform и InputActionValue перенесены в четыре этапа (2.2a–2.2d). Их view в daScript —
+handle-типы `ue_foundation`, поэтому фасет узнаёт и handle (`DSLAdaptedHandle`), а `DSLAdapted` по-прежнему ищет
+только struct-view: иначе поменялось бы поведение math там, где `DSLAdapted` уже стоит.
+
+Хуки, добавленные для math:
+
+| Хук | Где | Данные |
+| --- | --- | --- |
+| `IsMath()` | адаптер | V, V2, R, T: лист, текстовые дефолты, конечные значения (`ValidateValue`; у T нормализованный поворот) |
+| `GetDefaultKind()` | адаптер | `vector`/`vector2d`/`rotator`/`transform`: дефолты конструкторов и типы payload колбэков |
+| `GetSignature()` | адаптер | V/R/T → `EDasMethodSignature` 9/10/11 (номера записаны в данных) |
+| `GetViewUses()`, `MakeView()` | фасет | где используется view: нативное свойство, self, авторская ссылка; у V2 нет авторской ссылки, у IAV ни одного |
+| `HasMember()` | фасет | x/y/z, pitch/yaw/roll; V2 — только через авторские ссылки, не как self-лист |
+| `GetCallBridge()` | фасет | свой слот кадра (V, R, T) и мост метода (V, R, T, IAV); иначе снимок struct |
+
+Найденная ошибка: дефолт авторского поля Vector2D форматировался как Transform (`DasTypeService.cpp`), тест
+`DasForUE.Types.MathFieldDefaults`. Поведение изменено в одном месте: поле InputActionValue без инициализатора
+теперь явная ошибка, а не молчаливый дефолт Transform.
+
+Остались как предметная логика (не решения по типу): разбор конструктора `ue_transform`, свойство `ActorTransform`,
+контракты Enhanced Input, ObjectClass payload Vector2D, текстовые грамматики дефолтов в редакторе. Python-генераторы
+(`CANONICAL_MATH`) — фаза 6.
