@@ -116,7 +116,9 @@ time are in the [changelog](../CHANGELOG.md).
 - Design: [Native DSL syntax](Dev/Design/DSLNativeSyntax.md),
   [DSL syntax check](Dev/Design/DSLSyntaxCheck.md),
   [Async physics handle contract](Dev/Design/AsyncPhysicsHandleContract.md),
-  [Input event transport contract](Dev/Design/InputEventTransportContract.md)
+  [Input event transport contract](Dev/Design/InputEventTransportContract.md),
+  [Type adapters](Dev/Design/TypeAdapters.md),
+  [Native C++ bindings (draft)](Dev/Design/NativeCppBindings.md)
 - API blockers: [Collision / Physics](Dev/Api/Blockers/CollisionPhysicsBlockers.md),
   [Pawn / AI / Navigation](Dev/Api/Blockers/PawnAINavigationBlockers.md),
   [UMG export](Dev/Api/Blockers/UMGExportBlockers.md),
