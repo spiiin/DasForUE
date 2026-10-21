@@ -25,6 +25,10 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
   method change to Actor, composed Actor, Pawn and Character classes and record the outcome;
   [Reload matrix](Docs/Reference/ReloadMatrix.md) is generated from the expected outcomes.
 
+- Authored hierarchies: a child can switch to another parent with the same native root (reparented in place,
+  rolled back on failure), saving a parent script reimports its children, and explicit field migrations
+  accept classes with authored children ([Inheritance](Docs/Guide/DSL/Inheritance.md)).
+
 ### Changed
 
 - A script that cannot run on its actor (for example a Blueprint made from an older version of the script,

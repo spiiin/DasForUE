@@ -115,8 +115,21 @@ TArray<UBlueprint*> FDasAutoReimport::Bound(const TSet<FString>* Files) const
         if (!Blueprint->GeneratedClass || Blueprint->HasAnyFlags(RF_ClassDefaultObject | RF_Transient))
             continue;
         const FString Source = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLSource"));
-        if (!Source.IsEmpty() &&
-            (!Files || Files->Contains(FullPath(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source))))
+                if (Source.IsEmpty())
+            continue;
+        bool Match = !Files || Files->Contains(FullPath(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source));
+        // An authored child also depends on its parents' scripts (recorded in its declaration).
+        if (!Match)
+        {
+            FDasAuthoringModule Model;
+            FString Error;
+            if (FDasAuthoringModule::FromJson(
+                    Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel")), Model, Error))
+                for (const auto& C : Model.Classes)
+                    Match |= !C.SourceScript.IsEmpty() &&
+                             Files->Contains(FullPath(Runtime.ScriptPath(C.SourceScript)));
+        }
+        if (Match)
             Result.Add(Blueprint);
     }
     return Result;

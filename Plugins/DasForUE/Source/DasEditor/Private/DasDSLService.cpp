@@ -71,6 +71,24 @@ void DasFailWidenAfterCompileForTesting(bool Enabled)
 
 namespace
 {
+// The declaration the runtime may reload into: the class and its authored ancestors, as the script's model
+// lists them (a child's model is invalid without its parent).
+FDasAuthoringModule DasApprovalModel(const FDasAuthoringModule& Model, const FString& Id)
+{
+    TSet<FString> Keep;
+    for (FString Cur = Id; !Cur.IsEmpty() && !Keep.Contains(Cur);)
+    {
+        Keep.Add(Cur);
+        const auto* C = Model.Classes.FindByPredicate([&](const auto& X) { return X.Id == Cur; });
+        Cur = C ? C->ParentId : FString();
+    }
+    FDasAuthoringModule Out;
+    Out.Id = Model.Id;
+    for (const auto& C : Model.Classes)
+        if (Keep.Contains(C.Id))
+            Out.Classes.Add(C);
+    return Out;
+}
 // Reinstancing replaces a possessed Pawn without moving its controller to the replacement; keep the player
 // (or AI) in control of the new instance, also when a failed migration rolls the class back.
 struct FKeepPossession
@@ -248,8 +266,8 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
             if (!FDasAuthoringModule::FromJson(PriorWire, Prior, Error))
                 return false;
             const auto* Old = Prior.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
-            if (!Old || Old->ParentId != Declaration.ParentId ||
-                Old->ComponentOverrides != Declaration.ComponentOverrides)
+            if (!Old ||
+                (Old->ParentId == Declaration.ParentId && Old->ComponentOverrides != Declaration.ComponentOverrides))
             {
                 Error = TEXT("Component composition migration is deferred");
                 return false;
@@ -473,10 +491,23 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
     if (Created && (!DasInitializeInheritedDefaults(DeclaredParent, Model, Id, Error, true) ||
                     !DasInitializeNativeDefaults(DeclaredParent, Model, Id, Error, true)))
         return false;
+    // A new authored parent with the same native host is applied after the rollback snapshot below.
+    UClass* Reparent = nullptr;
     if (!Created && BP->ParentClass != DeclaredParent)
     {
-        Error = TEXT("Changing an authored Blueprint parent requires a later migration policy");
-        return false;
+        auto NativeRoot = [](UClass* C)
+        {
+            while (C && !C->HasAnyClassFlags(CLASS_Native))
+                C = C->GetSuperClass();
+            return C;
+        };
+        if (!DeclaredParent || NativeRoot(BP->ParentClass) != NativeRoot(DeclaredParent) ||
+            DefaultPolicy != EDasDefaultMigrationPolicy::Refuse)
+        {
+            Error = TEXT("Changing the native parent of a Blueprint is deferred; create a new Blueprint");
+            return false;
+        }
+        Reparent = DeclaredParent;
     }
     if (Created)
     {
@@ -511,7 +542,8 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
     TUniquePtr<FDasBlueprintRollback> Rollback;
     if (Preserve)
     {
-        if (!FDasBlueprintService::Apply(BP, Schema, Error, true))
+        // A reparent is checked by the real apply below (the current parent does not match the schema yet).
+        if (!Reparent && !FDasBlueprintService::Apply(BP, Schema, Error, true))
             return false;
         TArray<UBlueprint*> Scope;
         TArray<TStrongObjectPtr<UObject>> Assets;
@@ -520,9 +552,7 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         Rollback = MakeUnique<FDasBlueprintRollback>();
         if (!Rollback->Prepare(BP, Schema, Scope, Assets, Error))
             return false;
-        FDasAuthoringModule Approval;
-        Approval.Id = Model.Id;
-        Approval.Classes.Add(*Model.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; }));
+        const FDasAuthoringModule Approval = DasApprovalModel(Model, Id);
         if (!Approval.ToJson(ApprovalWire, Error))
             return false;
         if (!Runtime.BeginPreserveContextsForReinstance(BP->GeneratedClass))
@@ -546,6 +576,18 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         UE_LOG(LogTemp, Display, TEXT("DAS_STRUCTURAL_ROLLBACK=%s"), OK ? TEXT("PASS"): TEXT("FAIL"));
         return false;
     };
+    if (Reparent)
+    {
+        if (!Rollback)
+        {
+            Error = TEXT("Changing the parent requires a structural reimport");
+            return false;
+        }
+        BP->Modify();
+        BP->ParentClass = Reparent;
+        FBlueprintEditorUtils::RefreshAllNodes(BP);
+        FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BP);
+    }
     if (!Created && !DasApplyComponentComposition(BP, Declaration, EffectiveDeclaration, ComponentBlueprints, false,
                                                   Error, PriorClass))
     {
@@ -858,9 +900,9 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP, FString& Error, bool 
                                        !Prior.ToActorSchema(Id, Previous, Error) ||
                                        !Next.ToActorSchema(Id, Candidate, Error) || !Next.ToJson(Json, Error))
         return false;
-    if (!Previous.ParentStableId.IsEmpty() || !Candidate.ParentStableId.IsEmpty())
+    if (Previous.ParentStableId != Candidate.ParentStableId)
     {
-        Error = TEXT("Structural migration of authored class hierarchies is deferred");
+        Error = TEXT("Changing the parent together with a field migration is deferred; save them separately");
         return false;
     }
     for (const auto& M : Candidate.EffectiveMethods())
@@ -1165,9 +1207,7 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP, FString& Error, bool 
         UE_LOG(LogTemp, Display, TEXT("DAS_RENAME_ROLLBACK=%s"), OK ? TEXT("PASS"): TEXT("FAIL"));
         return false;
     };
-    FDasAuthoringModule Approval;
-    Approval.Id = Next.Id;
-    Approval.Classes.Add(*New);
+    const FDasAuthoringModule Approval = DasApprovalModel(Next, New->Id);
     FString ApprovalWire;
     if (!Approval.ToJson(ApprovalWire, Error))
         return false;
@@ -1276,9 +1316,9 @@ bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP, const FDasNu
                                        !Prior.ToActorSchema(Id, Previous, Error) ||
                                        !Next.ToActorSchema(Id, Candidate, Error) || !Next.ToJson(Json, Error))
         return false;
-    if (!Previous.ParentStableId.IsEmpty() || !Candidate.ParentStableId.IsEmpty())
+    if (Previous.ParentStableId != Candidate.ParentStableId)
     {
-        Error = TEXT("Structural migration of authored class hierarchies is deferred");
+        Error = TEXT("Changing the parent together with a field migration is deferred; save them separately");
         return false;
     }
     for (const auto& M : Candidate.EffectiveMethods())
@@ -1625,9 +1665,7 @@ bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP, const FDasNu
         Error = TEXT("Numeric widening requires idle runtime reinstance scope");
         return false;
     }
-    FDasAuthoringModule Approval;
-    Approval.Id = Next.Id;
-    Approval.Classes.Add(*New);
+    const FDasAuthoringModule Approval = DasApprovalModel(Next, New->Id);
     FString ApprovedWire;
     if (!Approval.ToJson(ApprovedWire, Error))
     {
@@ -1790,9 +1828,9 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
         !Prior.ToActorSchema(Id, Previous, Error) || !Next.ToActorSchema(Id, Candidate, Error) ||
         !Next.ToJson(Json, Error) || !FDasBlueprintService::Apply(BP, Previous, Error, true))
         return false;
-    if (!Previous.ParentStableId.IsEmpty() || !Candidate.ParentStableId.IsEmpty())
+    if (Previous.ParentStableId != Candidate.ParentStableId)
     {
-        Error = TEXT("Structural migration of authored class hierarchies is deferred");
+        Error = TEXT("Changing the parent together with a field migration is deferred; save them separately");
         return false;
     }
     if (Previous.Fields.ContainsByPredicate([](const FDasFieldSchema& F) { return F.Kind == EDasScalarKind::Class; }) ||
@@ -2201,9 +2239,7 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
         Error = TEXT("Archive operation requires idle runtime");
         return false;
     }
-    FDasAuthoringModule Approval;
-    Approval.Id = Next.Id;
-    Approval.Classes.Add(*New);
+    const FDasAuthoringModule Approval = DasApprovalModel(Next, New->Id);
     FString ApprovalWire;
     if (!Approval.ToJson(ApprovalWire, Error))
     {

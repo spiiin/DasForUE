@@ -96,7 +96,8 @@ struct FDasBlueprintRollback::FImpl
     struct FBlueprint
     {
         TArray<FSCSNode> Nodes;
-        TArray<FBPInterfaceDescription> Interfaces;
+                TArray<FBPInterfaceDescription> Interfaces;
+        TObjectPtr<UClass> Parent;
         TStrongObjectPtr<UBlueprint> BP;
         TStrongObjectPtr<UClass> OriginalClass;
         TArray<FBPVariableDescription> Variables;
@@ -244,7 +245,10 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
                                          *B->GetName(), int32(B->Status));
             return false;
         }
-        if (!DefaultsOnly && B != Root && !B->GetOutermost()->GetMetaData().GetValue(B, TEXT("DasDSLSource")).IsEmpty())
+                // Authored children are recompiled with their parent; other Blueprints with their own DSL source are
+        // migrated through their own source.
+        if (!DefaultsOnly && B != Root && !B->GeneratedClass->IsChildOf(Root->GeneratedClass) &&
+            !B->GetOutermost()->GetMetaData().GetValue(B, TEXT("DasDSLSource")).IsEmpty())
         {
             Error = FString::Printf(TEXT("Independent DSL sources need their own migration: %s"), *B->GetName());
             return false;
@@ -306,7 +310,8 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
         Image.Description = B->BlueprintDescription;
         Image.Category = B->BlueprintCategory;
         Image.Metadata = RollbackMetadata(B);
-        Image.Interfaces = B->ImplementedInterfaces;
+                Image.Interfaces = B->ImplementedInterfaces;
+        Image.Parent = B->ParentClass;
         if (USimpleConstructionScript* SCS = B->SimpleConstructionScript)
             for (auto* N : SCS->GetAllNodes())
             {
@@ -465,7 +470,12 @@ bool FDasBlueprintRollback::Restore(FString& Error)
         B->FunctionGraphs = I.Functions;
         B->UbergraphPages = I.Uber;
         B->DelegateSignatureGraphs = I.Delegates;
-        B->ImplementedInterfaces = I.Interfaces;
+                B->ImplementedInterfaces = I.Interfaces;
+        if (B->ParentClass != I.Parent)
+        {
+            B->ParentClass = I.Parent;
+            FBlueprintEditorUtils::RefreshAllNodes(B);
+        }
         B->MacroGraphs = I.Macros;
         B->BlueprintDisplayName = I.Display;
         B->BlueprintDescription = I.Description;

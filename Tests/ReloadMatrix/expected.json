@@ -340,6 +340,50 @@
       "message": "",
       "outcome": "migrated"
     },
+    "child/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/parent_add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/reparent": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
     "composed/int/add_component": {
       "message": "",
       "outcome": "migrated"
@@ -815,6 +859,50 @@
       "outcome": "migrated"
     },
     "character/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/parent_add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/reparent": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "child/int/retype_field": {
       "message": "",
       "outcome": "migrated"
     },

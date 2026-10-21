@@ -76,6 +76,7 @@ const FMatrixKind MatrixKinds[] = {
      TEXT("    @ue_component\n    @RootComponent\n    Pivot:SceneComponentRef\n")},
     {TEXT("pawn"), TEXT("/Script/Engine.Pawn"), nullptr, TEXT("")},
         {TEXT("character"), TEXT("/Script/Engine.Character"), nullptr, TEXT("")},
+        {TEXT("child"), nullptr, nullptr, TEXT("")},
     {TEXT("evented"), TEXT("/Script/Engine.Actor"), TEXT("ue_delegate_examples"),
      TEXT("    @ue_property=(BlueprintAssignable)\n    @ue_id=\"reloadmatrix.host.changed\"\n    Changed:FScoreEvent\n"
           "    @ue_property=(BlueprintReadWrite)\n    @ue_id=\"reloadmatrix.host.query\"\n    Query:FScoreQuery\n")},
@@ -100,6 +101,8 @@ enum class EChange
     AddEvent,
     RemoveEvent,
     AddInterface,
+    ParentAddField,
+    Reparent,
 };
 const TCHAR* ChangeName(EChange C)
 {
@@ -109,7 +112,8 @@ const TCHAR* ChangeName(EChange C)
                                    TEXT("add_method"), TEXT("remove_method"), TEXT("change_signature"),
                                    TEXT("add_component"), TEXT("remove_component"), TEXT("rename_component"),
                                    TEXT("change_component_default"), TEXT("change_attach"),
-                                   TEXT("add_event"), TEXT("remove_event"), TEXT("add_interface")};
+                                   TEXT("add_event"), TEXT("remove_event"), TEXT("add_interface"),
+                                   TEXT("parent_add_field"), TEXT("reparent")};
     // clang-format on
     return Names[int32(C)];
 }
@@ -128,6 +132,33 @@ bool EventChange(EChange C)
 bool Evented(const FMatrixKind& K)
 {
     return FCString::Strcmp(K.Name, TEXT("evented")) == 0;
+}
+bool HierarchyChange(EChange C)
+{
+    return C == EChange::ParentAddField || C == EChange::Reparent;
+}
+bool Child(const FMatrixKind& K)
+{
+    return FCString::Strcmp(K.Name, TEXT("child")) == 0;
+}
+// The authored parents of the child kind: MatrixBase (with Added for parent_add_field) and MatrixOther (the
+// reparent target), one module per cell.
+FString ParentScript(const TCHAR* Class, const TCHAR* Module, const FString& Suffix, bool bAdded)
+{
+    FString S = FString::Printf(TEXT("options gen2\nmodule %s_%s public\nrequire ue_dsl public\n"
+                                     "[ue_class(module_id=\"reloadmatrixbase\",id=\"reloadmatrix.%s\",Blueprintable)]\n"
+                                     "class %s : Actor {\n"
+                                     "    @ue_property=(EditAnywhere,BlueprintReadWrite)\n"
+                                     "    @ue_id=\"reloadmatrix.%s.basevalue\"\n    BaseValue:int=7\n"),
+                                     Module, *Suffix, Class, Class, Class);
+    if (bAdded)
+        S += FString::Printf(
+            TEXT("    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    @ue_id=\"reloadmatrix.%s.added\"\n"
+                                  "    Added:int=9\n"),
+                 Class);
+    return S + FString::Printf(TEXT("    [ue_function(id=\"reloadmatrix.%s.readbase\",BlueprintCallable)]\n"
+                                    "    def ReadBase():int { return self.BaseValue }\n}\n"),
+                                    Class);
 }
 bool Composed(const FMatrixKind& K)
 {
@@ -172,7 +203,7 @@ FString ComposedMembers(TOptional<EChange> Change)
 }
 
 // The declaration of one cell before (Change unset) or after its change.
-FString MatrixScript(const FMatrixKind& K, const FMatrixType& T, TOptional<EChange> Change)
+FString MatrixScript(const FMatrixKind& K, const FMatrixType& T, TOptional<EChange> Change, const FString& Suffix)
 {
     const bool V2 = Change.IsSet();
     auto Is = [&](EChange C)
@@ -183,12 +214,21 @@ FString MatrixScript(const FMatrixKind& K, const FMatrixType& T, TOptional<EChan
     for (const TCHAR* R : {K.Require, T.Require})
         if (R)
             S += FString::Printf(TEXT("require %s\n"), R);
-    S += FString::Printf(TEXT("[ue_class(module_id=\"reloadmatrix\",id=\"reloadmatrix.host\",parent=\"%s\","
+    if (Child(K))
+        S += Is(EChange::Reparent)
+            ? FString::Printf(TEXT("require reload_matrix_other_%s\n[ue_class(module_id=\"reloadmatrix\","
+                                        "id=\"reloadmatrix.host\",Blueprintable)]\nclass MatrixHost : MatrixOther {\n"),
+                                   *Suffix)
+            : FString::Printf(TEXT("require reload_matrix_base_%s\n[ue_class(module_id=\"reloadmatrix\","
+                                        "id=\"reloadmatrix.host\",Blueprintable)]\nclass MatrixHost : MatrixBase {\n"),
+                                   *Suffix);
+    else
+        S += FString::Printf(TEXT("[ue_class(module_id=\"reloadmatrix\",id=\"reloadmatrix.host\",parent=\"%s\","
                               "Blueprintable)%s]\nclass MatrixHost {\n%s"),
-                              K.Parent,
-                              Is(EChange::AddInterface)
-                              ? TEXT(",ue_implements(interface=\"/Script/DasRuntime.DasEventInterface\")")
-                              : TEXT(""), Composed(K) ? *ComposedMembers(Change) : *EventedMembers(K, Change));
+                                  K.Parent,
+                                  Is(EChange::AddInterface)
+                                  ? TEXT(",ue_implements(interface=\"/Script/DasRuntime.DasEventInterface\")")
+                                  : TEXT(""), Composed(K) ? *ComposedMembers(Change) : *EventedMembers(K, Change));
     if (!Is(EChange::RemoveField))
         S += FString::Printf(
             TEXT("    @ue_property=(EditAnywhere,%s)\n    @ue_id=\"reloadmatrix.host.value\"\n    %s : %s = %s\n"),
@@ -261,7 +301,7 @@ struct FMatrixCell
     const FMatrixKind* Kind;
     const FMatrixType* Type;
     EChange Change;
-    FString Key, ScriptName, ScriptPath, Package;
+    FString Key, ScriptName, ScriptPath, Package, Suffix;
     TStrongObjectPtr<UBlueprint> Blueprint;
     FName Placed, Plain;
     FString Outcome, Message;
@@ -273,7 +313,7 @@ TArray<FMatrixCell> MatrixCells()
     const FString Run = FGuid::NewGuid().ToString(EGuidFormats::Digits);
     for (const auto& K : MatrixKinds)
         for (const auto& T : MatrixTypes)
-            for (int32 C = 0; C <= int32(EChange::AddInterface); ++C)
+            for (int32 C = 0; C <= int32(EChange::Reparent); ++C)
             {
                 const EChange Change = EChange(C);
                 // Field changes for every type on plain actors; one representative type elsewhere.
@@ -282,6 +322,7 @@ TArray<FMatrixCell> MatrixCells()
                     continue;
                 // Component changes only on the composed actor.
                 if ((ComponentChange(Change) && !Composed(K)) || (EventChange(Change) && !Evented(K)) ||
+                    (HierarchyChange(Change) && !Child(K)) ||
                     (Change == EChange::AddInterface && FCString::Strcmp(K.Name, TEXT("actor")) != 0))
                     continue;
                 FMatrixCell Cell{&K, &T, Change};
@@ -289,6 +330,7 @@ TArray<FMatrixCell> MatrixCells()
                 const FString Id = FString::Printf(TEXT("%s_%s_%s"), K.Name, T.Name, ChangeName(Change));
                 Cell.ScriptName = FString::Printf(TEXT("reload_matrix_%s_%s.das"), *Id, *Run.Left(8));
                 Cell.ScriptPath = Runtime.ScriptPath(Cell.ScriptName);
+                Cell.Suffix = FString::Printf(TEXT("%s_%s"), *Id, *Run.Left(8));
                 Cell.Package = FString::Printf(TEXT("/Game/DasReloadMatrix/%s/%s/BP_Host"), *Run, *Id);
                 Cell.Placed = FName(*(TEXT("Placed_")+ Id));
                 Cell.Plain = FName(*(TEXT("Plain_")+ Id));
@@ -301,10 +343,32 @@ bool Write(const FString& Path, const FString& Text)
     return FFileHelper::SaveStringToFile(Text, *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
 }
 // Applies v1 and places an overridden and a plain instance in World.
+FString ParentPath(const TCHAR* Module, const FMatrixCell& Cell)
+{
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    return Runtime.ScriptPath(FString::Printf(TEXT("%s_%s.das"), Module, *Cell.Suffix));
+}
+void DeleteCellScripts(const FMatrixCell& Cell)
+{
+    IFileManager::Get().Delete(*Cell.ScriptPath);
+    if (Child(*Cell.Kind))
+        for (const TCHAR* Module : {TEXT("reload_matrix_base"), TEXT("reload_matrix_other")})
+            IFileManager::Get().Delete(*ParentPath(Module, Cell));
+}
 bool PrepareCell(FMatrixCell& Cell, UWorld* World, FString& Error)
 {
     UBlueprint* BP = nullptr;
-    if (!Write(Cell.ScriptPath, MatrixScript(*Cell.Kind, *Cell.Type, {})) ||
+    if (Child(*Cell.Kind) &&
+        (!Write(ParentPath(TEXT("reload_matrix_base"), Cell),
+                           ParentScript(TEXT("MatrixBase"), TEXT("reload_matrix_base"), Cell.Suffix, false)) ||
+                           !Write(ParentPath(TEXT("reload_matrix_other"), Cell),
+                                             ParentScript(TEXT("MatrixOther"), TEXT("reload_matrix_other"), Cell.Suffix,
+                                                                                    false))))
+    {
+        Error = TEXT("Cannot write parent scripts");
+        return false;
+    }
+    if (!Write(Cell.ScriptPath, MatrixScript(*Cell.Kind, *Cell.Type, {}, Cell.Suffix)) ||
         !FDasDSLService::Apply(Cell.ScriptName, Cell.Package, TEXT("reloadmatrix.host"), BP, Error))
         return false;
     Cell.Blueprint.Reset(BP);
@@ -340,8 +404,12 @@ void RunCell(FMatrixCell& Cell, UWorld* World, const TCHAR* AnchorValue)
     const FString ValueBefore = Text(Placed, TEXT("Value"));
     UClass* ClassBefore = BP->GeneratedClass;
     FString Error;
-    const bool Applied = Write(Cell.ScriptPath, MatrixScript(*Cell.Kind, *Cell.Type, Cell.Change)) &&
-                         FDasDSLService::Reimport(BP, Error);
+    const bool Applied =
+        (Cell.Change == EChange::ParentAddField
+         ? Write(ParentPath(TEXT("reload_matrix_base"), Cell),
+                            ParentScript(TEXT("MatrixBase"), TEXT("reload_matrix_base"), Cell.Suffix, true))
+                            : Write(Cell.ScriptPath, MatrixScript(*Cell.Kind, *Cell.Type, Cell.Change, Cell.Suffix))) &&
+                 FDasDSLService::Reimport(BP, Error);
     Cell.Message = Error;
     Placed = FindActor(World, Cell.Placed);
     if (!Applied)
@@ -427,6 +495,16 @@ void RunCell(FMatrixCell& Cell, UWorld* World, const TCHAR* AnchorValue)
         break;
     case EChange::AddInterface:
         Shape &= BP->GeneratedClass->ImplementsInterface(UDasEventInterface::StaticClass());
+        break;
+    // Hierarchies: the placed child keeps its own values and gets the parent's new field / new parent.
+    case EChange::ParentAddField:
+        Shape &= Text(Placed, TEXT("Added")) == TEXT("9");
+        Kept &= Text(Placed, TEXT("Value")) == ValueBefore;
+        break;
+    case EChange::Reparent:
+        Shape &= BP->ParentClass && BP->ParentClass->GetName().StartsWith(
+                                        TEXT("BP_MatrixOther")) && Text(Placed, TEXT("BaseValue")) != TEXT("<missing>");
+        Kept &= Text(Placed, TEXT("Value")) == ValueBefore;
         break;
     case EChange::ChangeAttach:
     {
@@ -518,7 +596,7 @@ bool FDasReloadMatrixEditorTest::RunTest(const FString&)
         UE_LOG(LogTemp, Display, TEXT("DAS_RELOAD_MATRIX editor %s %s %s"), *Cell.Key, *Cell.Outcome, *Cell.Message);
     }
     for (const auto& Cell : Cells)
-        IFileManager::Get().Delete(*Cell.ScriptPath);
+        DeleteCellScripts(Cell);
     for (const FString& M : DasReloadMatrix::RecordMatrix(TEXT("editor"), Cells))
         AddError(M);
     return true;
@@ -547,7 +625,7 @@ public:
             if (GEditor->PlayWorld && FPlatformTime::Seconds() - Start < 30)
                 return false;
             for (const auto& Cell : S->Cells)
-                IFileManager::Get().Delete(*Cell.ScriptPath);
+                DeleteCellScripts(Cell);
             for (const FString& M : RecordMatrix(TEXT("pie"), S->Cells))
                 Test->AddError(M);
             return true;
@@ -625,7 +703,7 @@ public:
         {
             if (GEditor->PlayWorld && FPlatformTime::Seconds() - Start < 30)
                 return false;
-            IFileManager::Get().Delete(*S->Cell.ScriptPath);
+            DeleteCellScripts(S->Cell);
             return true;
         }
         UWorld* World = GEditor->PlayWorld;
@@ -655,9 +733,10 @@ public:
         Import(Pawn, TEXT("Anchor"), TEXT("55"));
         Check(PC->GetPawn() == Pawn, TEXT("possessed_before_change"));
         FString Error;
-        Check(Write(S->Cell.ScriptPath, MatrixScript(*S->Cell.Kind, *S->Cell.Type, EChange::AddField)) &&
-                  FDasDSLService::Reimport(BP, Error),
-              TEXT("character_field_added_during_PIE"));
+        Check(
+            Write(S->Cell.ScriptPath, MatrixScript(*S->Cell.Kind, *S->Cell.Type, EChange::AddField, S->Cell.Suffix)) &&
+                FDasDSLService::Reimport(BP, Error),
+            TEXT("character_field_added_during_PIE"));
         if (!Error.IsEmpty())
             Test->AddInfo(Error);
         APawn* Now = PC->GetPawn();
@@ -681,11 +760,10 @@ bool FDasReloadMatrixPossessedTest::RunTest(const FString&)
             S->Cell = MoveTemp(Cell);
     UBlueprint* BP = nullptr;
     FString Error;
-    if (!TestTrue(
-            TEXT("apply_character"),
-                 DasReloadMatrix::Write(S->Cell.ScriptPath,
-                                        DasReloadMatrix::MatrixScript(*S->Cell.Kind, *S->Cell.Type, {})) &&
-                     FDasDSLService::Apply(S->Cell.ScriptName, S->Cell.Package, TEXT("reloadmatrix.host"), BP, Error)))
+    if (!TestTrue(TEXT("apply_character"),
+            DasReloadMatrix::Write(S->Cell.ScriptPath,
+                                   DasReloadMatrix::MatrixScript(*S->Cell.Kind, *S->Cell.Type, {}, S->Cell.Suffix)) &&
+                FDasDSLService::Apply(S->Cell.ScriptName, S->Cell.Package, TEXT("reloadmatrix.host"), BP, Error)))
     {
         AddError(Error);
         return false;
@@ -724,7 +802,8 @@ bool FDasReloadMatrixRollbackTest::RunTest(const FString&)
         for (UEdGraph* G : Graphs)
             Nodes += G->Nodes.Num();
         const int32 Interfaces = BP->ImplementedInterfaces.Num(), Dispatchers = BP->DelegateSignatureGraphs.Num();
-        DasReloadMatrix::Write(Cell.ScriptPath, DasReloadMatrix::MatrixScript(*Cell.Kind, *Cell.Type, Cell.Change));
+        DasReloadMatrix::Write(Cell.ScriptPath,
+                               DasReloadMatrix::MatrixScript(*Cell.Kind, *Cell.Type, Cell.Change, Cell.Suffix));
         DasFailStructuralForTesting(2);
         const bool Failed = !FDasDSLService::Reimport(BP, Error);
         DasFailStructuralForTesting(0);
@@ -748,7 +827,7 @@ bool FDasReloadMatrixRollbackTest::RunTest(const FString&)
                                            TEXT("Get")) &&
                                            BP->GeneratedClass->FindFunctionByName(TEXT("Get"))->NumParms == 1));
         TestTrue(*(Cell.Key + TEXT(" applies after the failure")), FDasDSLService::Reimport(BP, Error));
-        IFileManager::Get().Delete(*Cell.ScriptPath);
+        DeleteCellScripts(Cell);
     }
     return true;
 }

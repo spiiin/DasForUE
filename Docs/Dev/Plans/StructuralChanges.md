@@ -154,6 +154,14 @@ Matrix: 109 migrated, 10 refused.
 
 ### S7. Hierarchy
 
+**Done 2026-10-21 (except a native-root change).** A parent change keeping the native root reparents the
+Blueprint inside the rollback snapshot (which now records `ParentClass`); same-named fields keep values.
+Explicit migrations accept hierarchies (children are part of the rollback scope); only a parent change in
+the same save is refused. Saving a parent script reimports its children too. Matrix kind `child`
+(`parent_add_field`, `reparent`, field and method changes on a child of a DSL parent).
+The runtime approval now carries the class with its authored ancestors (a child-only model failed
+validation, so every structural reimport of a child was refused). Matrix: 120 migrated, 10 refused.
+
 - Parent change between authored classes and to a native parent: reparent, migrate shared fields by id,
   archive fields that disappear.
 - Authored hierarchies in every explicit migration (today refused at `:634`, `:1066`, `:1583`): scope covers

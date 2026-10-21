@@ -43,9 +43,18 @@ Examples: `ue_inheritance_base.das`, `dsl_inheritance_child.das`,
   in the child's folder, verifies its stable identity and saves newly created
   parents so they can be loaded and cooked. Name/path conflicts fail through the
   normal asset-ownership checks.
-- Maximum depth is 32; cycles are rejected. Changing the parent of an existing
-  authored Blueprint, or applying explicit structural field migration to a
-  hierarchy, is rejected.
+- Maximum depth is 32; cycles are rejected.
+- Saving a parent script reimports the parent Blueprint and every child
+  Blueprint whose declaration uses it; placed children keep their values and get
+  the parent's new fields.
+- The parent of an existing authored Blueprint can change to another class with
+  the same native root (`class Child : OtherBase`, or from an authored parent to
+  its native host): the Blueprint is reparented, fields with the same name keep
+  their values, and a failure rolls the whole hierarchy back. Changing the native
+  root (`Actor` -> `Pawn`) is refused: create a new Blueprint.
+- Explicit field migrations (rename, archive, numeric conversion) cover the
+  class and its authored children. Combining them with a parent change in one
+  save is refused; save them separately.
 
 ## Overriding methods
 
