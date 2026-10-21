@@ -45,6 +45,11 @@ bool RollbackCapture(UObject* Object, const FDasFieldSchema& Field, FDasScalarVa
     Out = MoveTemp(Value);
     return true;
 }
+bool RollbackText(UObject* Object, FName Name, const FString& Text)
+{
+    auto* P = IsValid(Object) ? Object->GetClass()->FindPropertyByName(Name) : nullptr;
+    return P && P->ImportText_Direct(*Text, P->ContainerPtrToValuePtr<void>(Object), Object, PPF_None);
+}
 bool RollbackValue(UObject* Object, FName Name, const FDasScalarValue& Value)
 {
     auto* P = IsValid(Object) ? Object->GetClass()->FindPropertyByName(Name) : nullptr;
@@ -77,8 +82,10 @@ struct FDasBlueprintRollback::FImpl
     };
     struct FObject
     {
-        TStrongObjectPtr<ADasProbeActor> Object;
+        TStrongObjectPtr<UObject> Object;
+        // Per field: an owned value, or (for kinds the value codec does not cover) the property text.
         TArray<FDasScalarValue> Values;
+        TArray<TOptional<FString>> Texts;
         TMap<FString, FDasScalarValue> Archive;
     };
     TArray<FBlueprint> Blueprints;
@@ -249,13 +256,6 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
 bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Schema, const TArray<UBlueprint*>& BPs,
                                     const TArray<TStrongObjectPtr<UObject>>& Assets, FString& Error)
 {
-    // Soft references are captured like other owned values; only real containers are deferred.
-    for (TFieldIterator<FProperty> It(Root->GeneratedClass, EFieldIteratorFlags::ExcludeSuper); It; ++It)
-        if (DasContainerCarrierForProperty(*It) && !DasSoftCarrierForProperty(*It))
-        {
-            Error = TEXT("Direct container class rollback/migration is deferred");
-            return false;
-        }
     auto& S = *Impl;
     auto Remember = [&](UObject* O)
     {
@@ -326,28 +326,36 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
             !O->GetClass()->GetName().StartsWith(TEXT("SKEL_")) &&
                                                  !O->GetClass()->GetName().StartsWith(TEXT("REINST_")))
         {
-            auto* A = Cast<ADasProbeActor>(O);
-            if (!A)
-            {
-                Error = TEXT("Rollback supports Actor adapter instances");
-                return false;
-            }
-            if (auto* W = A->GetWorld())
+            // Any instance of the class: actors of every host (Pawn, Character, ...), components, the CDO.
+            if (auto* W = O->GetWorld())
                 if (W->IsPartitionedWorld() || !W->GetStreamingLevels().IsEmpty())
                 {
                     Error = TEXT("Unsupported loaded structural map scope");
                     return false;
                 }
             FImpl::FObject Image;
-            Image.Object.Reset(A);
+            Image.Object.Reset(O);
             for (const auto& F : S.Fields)
             {
                 FDasScalarValue Value;
+                TOptional<FString> Text;
                 if (!RollbackCapture(O, F, Value, Error))
-                    return false;
+                {
+                    // Containers, delegates and other kinds without an owned value codec keep their text.
+                    auto* P = O->GetClass()->FindPropertyByName(F.Name);
+                    if (!P)
+                        return false;
+                    FString Exported;
+                    P->ExportTextItem_Direct(Exported, P->ContainerPtrToValuePtr<void>(O), nullptr, O, PPF_None);
+                    Text = MoveTemp(Exported);
+                    Value = FDasScalarValue();
+                    Error.Reset();
+                }
                 Image.Values.Add(MoveTemp(Value));
+                Image.Texts.Add(MoveTemp(Text));
             }
-            Image.Archive = A->RetiredDasValues;
+            if (auto* A = Cast<ADasProbeActor>(O))
+                Image.Archive = A->RetiredDasValues;
             S.Objects.Add(MoveTemp(Image));
             Remember(O);
         }
@@ -366,7 +374,7 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
             for (auto& O : S.Objects)
             {
                 if (auto* New = Map.Find(O.Object.Get()))
-                    O.Object.Reset(Cast<ADasProbeActor>(*New));
+                    O.Object.Reset(*New);
                 for (auto& V : O.Values)
                     FDasPropertyValueRoots::Remap(V, Map);
                 FDasPropertyValueRoots::Remap(O.Archive, Map);
@@ -456,8 +464,10 @@ bool FDasBlueprintRollback::Restore(FString& Error)
             continue;
         }
         for (int32 N = 0; N < S.Fields.Num(); ++N)
-            OK &= RollbackValue(I.Object.Get(), S.Fields[N].Name, I.Values[N]);
-        I.Object->RetiredDasValues = I.Archive;
+            OK &= I.Texts[N].IsSet() ? RollbackText(I.Object.Get(), S.Fields[N].Name, *I.Texts[N])
+                                     : RollbackValue(I.Object.Get(), S.Fields[N].Name, I.Values[N]);
+        if (auto* A = Cast<ADasProbeActor>(I.Object.Get()))
+            A->RetiredDasValues = I.Archive;
     }
     for (auto& I : S.Blueprints)
     {

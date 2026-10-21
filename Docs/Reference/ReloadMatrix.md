@@ -33,13 +33,13 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 
 | Change | Actor | Actor with components | Pawn | Character |
 | --- | --- | --- | --- | --- |
-| add_field | ✅ | ✅ | ⛔ | ⛔ |
+| add_field | ✅ | ✅ | ✅ | ✅ |
 | remove_field | ⛔ | ⛔ | ⛔ | ⛔ |
 | rename_field | ⛔ | ⛔ | ⛔ | ⛔ |
 | retype_field | ⛔ | ⛔ | ⛔ | ⛔ |
 | change_default | ✅ | ✅ | ✅ | ✅ |
 | make_read_only | ⛔ | ⛔ | ⛔ | ⛔ |
-| add_method | ✅ | ✅ | ⛔ | ⛔ |
+| add_method | ✅ | ✅ | ✅ | ✅ |
 | remove_method | ⛔ | ⛔ | ⛔ | ⛔ |
 | change_signature | ⛔ | ⛔ | ⛔ | ⛔ |
 
@@ -93,28 +93,24 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 - `actor/vector/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/vector/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/vector/retype_field`: Removal, type, default or editability changes require a migration policy
-- `character/int/add_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/add_method`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/change_signature`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/make_read_only`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/remove_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/remove_method`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/rename_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/retype_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
+- `character/int/change_signature`: Legacy authored method identity changed
+- `character/int/make_read_only`: Removal, type, default or editability changes require a migration policy
+- `character/int/remove_field`: Removal, type, default or editability changes require a migration policy
+- `character/int/remove_method`: Legacy authored method identity changed
+- `character/int/rename_field`: Removal, type, default or editability changes require a migration policy
+- `character/int/retype_field`: Removal, type, default or editability changes require a migration policy
 - `composed/int/change_signature`: Legacy authored method identity changed
 - `composed/int/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `composed/int/remove_field`: Removal, type, default or editability changes require a migration policy
 - `composed/int/remove_method`: Legacy authored method identity changed
 - `composed/int/rename_field`: Removal, type, default or editability changes require a migration policy
 - `composed/int/retype_field`: Removal, type, default or editability changes require a migration policy
-- `pawn/int/add_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/add_method`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/change_signature`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/make_read_only`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/remove_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/remove_method`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/rename_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/retype_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
+- `pawn/int/change_signature`: Legacy authored method identity changed
+- `pawn/int/make_read_only`: Removal, type, default or editability changes require a migration policy
+- `pawn/int/remove_field`: Removal, type, default or editability changes require a migration policy
+- `pawn/int/remove_method`: Legacy authored method identity changed
+- `pawn/int/rename_field`: Removal, type, default or editability changes require a migration policy
+- `pawn/int/retype_field`: Removal, type, default or editability changes require a migration policy
 
 </details>
 
@@ -135,13 +131,13 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 
 | Change | Actor | Actor with components | Pawn | Character |
 | --- | --- | --- | --- | --- |
-| add_field | ✅ | ✅ | ⛔ | ⛔ |
+| add_field | ✅ | ✅ | ✅ | ✅ |
 | remove_field | ⛔ | ⛔ | ⛔ | ⛔ |
 | rename_field | ⛔ | ⛔ | ⛔ | ⛔ |
 | retype_field | ⛔ | ⛔ | ⛔ | ⛔ |
 | change_default | ✅ | ✅ | ✅ | ✅ |
 | make_read_only | ⛔ | ⛔ | ⛔ | ⛔ |
-| add_method | ✅ | ✅ | ⛔ | ⛔ |
+| add_method | ✅ | ✅ | ✅ | ✅ |
 | remove_method | ⛔ | ⛔ | ⛔ | ⛔ |
 | change_signature | ⛔ | ⛔ | ⛔ | ⛔ |
 
@@ -195,27 +191,23 @@ The plan for turning refusals into migrations: [Structural changes](../Dev/Plans
 - `actor/vector/remove_field`: Removal, type, default or editability changes require a migration policy
 - `actor/vector/rename_field`: Removal, type, default or editability changes require a migration policy
 - `actor/vector/retype_field`: Removal, type, default or editability changes require a migration policy
-- `character/int/add_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/add_method`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/change_signature`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/make_read_only`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/remove_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/remove_method`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/rename_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `character/int/retype_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
+- `character/int/change_signature`: Legacy authored method identity changed
+- `character/int/make_read_only`: Removal, type, default or editability changes require a migration policy
+- `character/int/remove_field`: Removal, type, default or editability changes require a migration policy
+- `character/int/remove_method`: Legacy authored method identity changed
+- `character/int/rename_field`: Removal, type, default or editability changes require a migration policy
+- `character/int/retype_field`: Removal, type, default or editability changes require a migration policy
 - `composed/int/change_signature`: Legacy authored method identity changed
 - `composed/int/make_read_only`: Removal, type, default or editability changes require a migration policy
 - `composed/int/remove_field`: Removal, type, default or editability changes require a migration policy
 - `composed/int/remove_method`: Legacy authored method identity changed
 - `composed/int/rename_field`: Removal, type, default or editability changes require a migration policy
 - `composed/int/retype_field`: Removal, type, default or editability changes require a migration policy
-- `pawn/int/add_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/add_method`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/change_signature`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/make_read_only`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/remove_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/remove_method`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/rename_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
-- `pawn/int/retype_field`: Structural migration of Pawn/Character declarations is deferred; create a new Blueprint
+- `pawn/int/change_signature`: Legacy authored method identity changed
+- `pawn/int/make_read_only`: Removal, type, default or editability changes require a migration policy
+- `pawn/int/remove_field`: Removal, type, default or editability changes require a migration policy
+- `pawn/int/remove_method`: Legacy authored method identity changed
+- `pawn/int/rename_field`: Removal, type, default or editability changes require a migration policy
+- `pawn/int/retype_field`: Removal, type, default or editability changes require a migration policy
 
 </details>

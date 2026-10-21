@@ -9,6 +9,8 @@
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #include "EngineUtils.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerController.h"
 #include "HAL/FileManager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
@@ -453,6 +455,105 @@ bool FDasReloadMatrixPIETest::RunTest(const FString&)
     }
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<DasReloadMatrix::FMatrixPIECommand>(S, this));
+    return true;
+}
+
+namespace DasReloadMatrix
+{
+// A Character possessed by the player keeps its controller when a declaration change reinstances it.
+struct FPossessedState
+{
+    FMatrixCell Cell;
+    bool Passed = true;
+};
+class FPossessedCommand final : public IAutomationLatentCommand
+{
+    TSharedRef<FPossessedState> S;
+    FAutomationTestBase* Test;
+    double Start = FPlatformTime::Seconds();
+    bool Ending = false;
+
+public:
+    FPossessedCommand(TSharedRef<FPossessedState> State, FAutomationTestBase* T) : S(State), Test(T) {}
+    bool Update() override
+    {
+        auto Check = [&](bool Value, const TCHAR* Name)
+        {
+            S->Passed &= Test->TestTrue(Name, Value);
+            UE_LOG(LogTemp, Display, TEXT("DAS_POSSESSED_PIE %s %s"), Value ? TEXT("PASS") : TEXT("FAIL"), Name);
+        };
+        if (Ending)
+        {
+            if (GEditor->PlayWorld && FPlatformTime::Seconds() - Start < 30)
+                return false;
+            IFileManager::Get().Delete(*S->Cell.ScriptPath);
+            return true;
+        }
+        UWorld* World = GEditor->PlayWorld;
+        APlayerController* PC = World ? World->GetFirstPlayerController() : nullptr;
+        if (!World || !World->HasBegunPlay() || !PC)
+        {
+            if (FPlatformTime::Seconds() - Start < 60)
+                return false;
+            Check(false, TEXT("PIE_started"));
+            return true;
+        }
+        auto Finish = [&]()
+        {
+            GEditor->RequestEndPlayMap();
+            Ending = true;
+            Start = FPlatformTime::Seconds();
+            return false;
+        };
+        UBlueprint* BP = S->Cell.Blueprint.Get();
+        auto* Pawn = Cast<APawn>(World->SpawnActor<AActor>(BP->GeneratedClass, FTransform(FVector(0, 0, 200))));
+        if (!Pawn)
+        {
+            Check(false, TEXT("spawn_character"));
+            return Finish();
+        }
+        PC->Possess(Pawn);
+        Import(Pawn, TEXT("Anchor"), TEXT("55"));
+        Check(PC->GetPawn() == Pawn, TEXT("possessed_before_change"));
+        FString Error;
+        Check(Write(S->Cell.ScriptPath, MatrixScript(*S->Cell.Kind, *S->Cell.Type, EChange::AddField)) &&
+                  FDasDSLService::Reimport(BP, Error),
+              TEXT("character_field_added_during_PIE"));
+        if (!Error.IsEmpty())
+            Test->AddInfo(Error);
+        APawn* Now = PC->GetPawn();
+        Check(Now && Now->GetClass() == BP->GeneratedClass && Now->GetController() == PC,
+              TEXT("possession_kept_after_reinstance"));
+        Check(Now && Text(Now, TEXT("Anchor")) ==
+                          TEXT("55") && Text(Now, TEXT("Extra")) == TEXT("5"),
+                                                                         TEXT("game_state_kept_and_new_field_present"));
+        return Finish();
+    }
+};
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasReloadMatrixPossessedTest, "DasForUE.ReloadMatrix.PossessedCharacterPIE",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasReloadMatrixPossessedTest::RunTest(const FString&)
+{
+    FAutomationEditorCommonUtils::CreateNewMap();
+    auto S = MakeShared<DasReloadMatrix::FPossessedState>();
+    for (auto& Cell : DasReloadMatrix::MatrixCells())
+        if (Cell.Key == TEXT("character/int/add_field"))
+            S->Cell = MoveTemp(Cell);
+    UBlueprint* BP = nullptr;
+    FString Error;
+    if (!TestTrue(
+            TEXT("apply_character"),
+                 DasReloadMatrix::Write(S->Cell.ScriptPath,
+                                        DasReloadMatrix::MatrixScript(*S->Cell.Kind, *S->Cell.Type, {})) &&
+                     FDasDSLService::Apply(S->Cell.ScriptName, S->Cell.Package, TEXT("reloadmatrix.host"), BP, Error)))
+    {
+        AddError(Error);
+        return false;
+    }
+    S->Cell.Blueprint.Reset(BP);
+    ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
+    FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<DasReloadMatrix::FPossessedCommand>(S, this));
     return true;
 }
 #endif

@@ -44,7 +44,7 @@
     { "name": "actor-component", "kind": "automation", "test": "DasForUE.ActorComponent", "log": "actor-component-automation",
       "minimum": 3, "comment": "Composed actors: PIE lifecycle and declaration reimport in the editor and during PIE." },
     { "name": "reload-matrix", "kind": "automation", "test": "DasForUE.ReloadMatrix", "log": "reload-matrix",
-      "minimum": 2, "comment": "Every declaration change of every entity kind, editor and PIE, against Tests/ReloadMatrix/expected.json." },
+      "minimum": 3, "comment": "Every declaration change of every entity kind, editor and PIE, against Tests/ReloadMatrix/expected.json." },
     { "name": "gameplay-pie", "kind": "automation", "test": "DasForUE.Gameplay.RuntimePIE", "log": "gameplay-pie",
       "minimum": 1, "comment": "Playable character, native references and their informational benchmark." },
     { "name": "performance", "kind": "script", "script": "TestPerformance.ps1",

@@ -1,4 +1,8 @@
 #include "DasDSLService.h"
+#include "GameFramework/Controller.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerState.h"
+#include "UObject/UObjectIterator.h"
 #include "DasDataAssets.h"
 #include "DasTypePins.h"
 #include "DasBlueprintDefaults.h"
@@ -65,6 +69,47 @@ void DasFailWidenAfterCompileForTesting(bool Enabled)
 
 namespace
 {
+// Reinstancing replaces a possessed Pawn without moving its controller to the replacement; keep the player
+// (or AI) in control of the new instance, also when a failed migration rolls the class back.
+struct FKeepPossession
+{
+    struct FEntry
+    {
+        TWeakObjectPtr<AController> Controller;
+        UObject* Pawn;
+    };
+    TArray<FEntry> Entries;
+    FDelegateHandle Handle;
+    explicit FKeepPossession(UClass* Class)
+    {
+        for (TObjectIterator<APawn> It; It; ++It)
+            if (It->IsA(Class) && !It->IsTemplate() && It->GetController())
+                Entries.Add({It->GetController(), *It});
+        Handle = FCoreUObjectDelegates::OnObjectsReplaced.AddLambda(
+            [this](const FCoreUObjectDelegates::FReplacementObjectMap& Map)
+            {
+                for (auto& E : Entries)
+                    if (auto* New = Map.Find(E.Pawn))
+                        E.Pawn = *New;
+            });
+    }
+    ~FKeepPossession()
+    {
+        FCoreUObjectDelegates::OnObjectsReplaced.Remove(Handle);
+        for (const auto& E : Entries)
+            if (auto* Pawn = Cast<APawn>(E.Pawn);
+                Pawn && IsValid(Pawn) && E.Controller.IsValid() && E.Controller->GetPawn() != Pawn)
+            {
+                // The replacement inherits the old pawn's bindings, including the player state's destroy
+                // callback that possession adds again.
+                if (APlayerState* State = E.Controller->PlayerState)
+                    Pawn->OnDestroyed.RemoveAll(State);
+                Pawn->Controller = nullptr;
+                E.Controller->Possess(Pawn);
+            }
+    }
+};
+
 // Apply with the declaration read from Script, or with Override (the declaration of Script with some
 // values replaced; see SplitDefaultChanges).
 bool ApplyDeclaration(const FString& Script, const FString& Package, const FString& Id, UBlueprint*& Out,
@@ -407,20 +452,11 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         return false;
     auto& Metadata = BP->GetOutermost()->GetMetaData();
     const bool BodyOnly = !Created && Metadata.GetValue(BP, TEXT("DasDSLModel")) == Json;
-    if (!Created && !BodyOnly && (Schema.Parent == TEXT("Pawn") || Schema.Parent == TEXT("Character")))
-    {
-        FDasAuthoringModule Before;
-        FDasDeclaredClass Old;
-        if (!FDasAuthoringModule::FromJson(Metadata.GetValue(BP, TEXT("DasDSLModel")), Before, Error) ||
-                                           !Before.ResolveClass(Id, Old, Error))
-            return false;
-        if (FDasAuthoringModule::Compare(Old, EffectiveDeclaration).bStructural)
-        {
-            Error = TEXT("Structural migration of Pawn/Character declarations is deferred; create a new Blueprint");
-            return false;
-        }
-    }
+    // Pawn and Character declarations migrate like other actors: the rollback snapshot covers every host.
     const bool Preserve = !Created && !BodyOnly && DefaultPolicy == EDasDefaultMigrationPolicy::Refuse;
+    TOptional<FKeepPossession> Possession;
+    if (Preserve)
+        Possession.Emplace(BP->GeneratedClass);
     FString ApprovalWire;
     bool Applied = false;
     TUniquePtr<FDasBlueprintRollback> Rollback;

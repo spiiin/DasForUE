@@ -38,8 +38,9 @@ they take effect on the next call, also during Play (code that already ran, such
 again only after restarting Play). A new pickup field is applied on save as well, also during Play. A changed
 default value is applied too (also together with new fields): running actors keep their values, spawned
 ones and the next Play use the new default. A script edited while the editor was closed is applied when
-the map opens. New character fields (Pawn/Character migration is
-deferred) and changed components still need recreating the example. See [automatic reimport](../Workflow/ApplyAndHotReload.md#automatic-reimport-on-save).
+the map opens. New character fields and methods are applied the same way, and the player keeps control of
+the character. Removed, renamed or retyped fields and changed components still need recreating the example
+(see the [reload matrix](../../Reference/ReloadMatrix.md)). See [automatic reimport](../Workflow/ApplyAndHotReload.md#automatic-reimport-on-save).
 
 | Input | Action |
 | --- | --- |

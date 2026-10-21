@@ -71,6 +71,11 @@ lossy or broken, editor and PIE alike. Next phases flip cells and update the exp
 
 ### S1. Generic snapshot and rollback
 
+**Done 2026-10-21 (rollback layer).** `FDasBlueprintRollback` snapshots every instance of the class (any host:
+Pawn, Character, components, the CDO), not only `ADasProbeActor`; values the owned-value codec does not cover
+(containers, delegates) are kept as property text. The container rollback guard is gone; the container gate in
+`Apply` stays until S2. Tagged serialization of whole objects was not needed for the current cells.
+
 - Replace scalar capture with tagged property serialization of every instance of the class scope (CDO,
   placed and PIE instances, component templates and component instances, assets), the same mechanism UE
   reinstancing uses, plus object reference roots for GC.
@@ -87,6 +92,11 @@ lossy or broken, editor and PIE alike. Next phases flip cells and update the exp
 - Container defaults merge: replace when the instance value equals the old default, keep overrides.
 
 ### S3. Class kinds: Pawn/Character and ActorComponent
+
+**Pawn/Character done 2026-10-21.** The Pawn/Character gate in `Apply` is removed; added fields and methods
+migrate in the editor and during PIE (matrix cells flipped). A possessed Pawn keeps its controller across the
+reinstance and a rollback (`FKeepPossession`, test `DasForUE.ReloadMatrix.PossessedCharacterPIE`).
+ActorComponent classes remain.
 
 - Pawn/Character: reinstancing during PIE keeps possession, controller, movement state and input bindings
   (check the playable example: WASD and HUD must keep working after a live field add).

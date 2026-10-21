@@ -40,6 +40,8 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
   or after a template default update) no longer blocks reimport: default updates accept it, structural
   migrations compile it first. A freshly created DSL Blueprint is up to date right away.
 - Changing the default of a byte or text field is merged like other defaults instead of being refused.
+- Pawn and Character declarations accept added fields and methods like other actors, also during PIE; a
+  possessed Pawn stays possessed after the reinstance. Structural rollback snapshots every instance kind.
 - `Tests/suites.json` gains `defaults-merge` and `actor-component`; the defaults merge probe was not part of
   any suite and had been failing since before this change.
 

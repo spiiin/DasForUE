@@ -277,39 +277,39 @@
       "outcome": "refused"
     },
     "character/int/add_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/add_method": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/change_default": {
       "message": "",
       "outcome": "migrated"
     },
     "character/int/change_signature": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Legacy authored method identity changed",
       "outcome": "refused"
     },
     "character/int/make_read_only": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "character/int/remove_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "character/int/remove_method": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Legacy authored method identity changed",
       "outcome": "refused"
     },
     "character/int/rename_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "character/int/retype_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "composed/int/add_field": {
@@ -349,39 +349,39 @@
       "outcome": "refused"
     },
     "pawn/int/add_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/add_method": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/change_default": {
       "message": "",
       "outcome": "migrated"
     },
     "pawn/int/change_signature": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Legacy authored method identity changed",
       "outcome": "refused"
     },
     "pawn/int/make_read_only": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "pawn/int/remove_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "pawn/int/remove_method": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Legacy authored method identity changed",
       "outcome": "refused"
     },
     "pawn/int/rename_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "pawn/int/retype_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     }
   },
@@ -663,39 +663,39 @@
       "outcome": "refused"
     },
     "character/int/add_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/add_method": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "character/int/change_default": {
       "message": "",
       "outcome": "migrated"
     },
     "character/int/change_signature": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Legacy authored method identity changed",
       "outcome": "refused"
     },
     "character/int/make_read_only": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "character/int/remove_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "character/int/remove_method": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Legacy authored method identity changed",
       "outcome": "refused"
     },
     "character/int/rename_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "character/int/retype_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "composed/int/add_field": {
@@ -735,39 +735,39 @@
       "outcome": "refused"
     },
     "pawn/int/add_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/add_method": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
-      "outcome": "refused"
+      "message": "",
+      "outcome": "migrated"
     },
     "pawn/int/change_default": {
       "message": "",
       "outcome": "migrated"
     },
     "pawn/int/change_signature": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Legacy authored method identity changed",
       "outcome": "refused"
     },
     "pawn/int/make_read_only": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "pawn/int/remove_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "pawn/int/remove_method": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Legacy authored method identity changed",
       "outcome": "refused"
     },
     "pawn/int/rename_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     },
     "pawn/int/retype_field": {
-      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "message": "Removal, type, default or editability changes require a migration policy",
       "outcome": "refused"
     }
   }

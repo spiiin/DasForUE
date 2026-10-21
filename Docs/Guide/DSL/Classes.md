@@ -285,9 +285,9 @@ See [Functions](Functions.md), [Lifecycle](Lifecycle.md) and
   Assets stay dirty until saved.
 - Editing only method bodies is a body-only reload; no Blueprint recompile is needed.
 - Declaration changes (fields, signatures, flags, components) go through
-  Apply/Reimport and the migration policies; some changes on existing
-  component-bearing or Pawn/Character Blueprints are refused rather than applied
-  silently. Create a new Blueprint in that case.
+  Apply/Reimport and the migration policies; changes that cannot be migrated are
+  refused rather than applied silently ([reload matrix](../../Reference/ReloadMatrix.md)).
+  Create a new Blueprint in that case.
 
 See [Apply and hot reload](../Workflow/ApplyAndHotReload.md) and
 [Migrations](../Workflow/Migrations.md).
