@@ -22,6 +22,39 @@ test infrastructure) is in the [improvement plan](ImprovementPlan.md).
 4. **Deferred until there is a measurable gameplay problem:** further snapshot
    storage optimizations and source-check optimizations.
 
+## Versions
+
+Decided 2026-10-21. The gates below say what closes each item.
+
+### v1 — first release (Win64)
+
+- **Shipping with the interpreter.** Gameplay methods and hooks run in the daScript VM in
+  Win64 Shipping, as the GAS ability map already does; pure-DAS AOT stays optional. Gate:
+  the playable Character and GAS maps pass packaged Shipping, plus a recorded per-frame
+  script budget on both maps.
+- **Clean machine.** The plugin installs and runs without the source tree; dependency
+  licenses are listed.
+- **Reload matrix.** Every structural change listed under "Full DSL and structural reload"
+  has a documented outcome: live migration, controlled refusal or required restart.
+- **Save-game schema compatibility.**
+- **User scripts without low-level code.** Examples and guides use no manual call frames
+  or internal `__ue_*` helpers (priority 2).
+- **Source mapping** of generated DSL/glue errors back to the user's `.das` lines.
+
+### v2
+
+- **AOT of the gameplay path**: object/snapshot ABI and authored callbacks for the
+  [UE API AOT bridge](UEApiAot.md) (scalar/string calls exist), then full release
+  validation.
+- **C++ interop without the daScript VM**, as in AngelScript for Unreal: AOT script
+  methods are native functions that C++ calls directly (UFunction thunks and plain C++
+  entry points, no `Context` evaluation), and scripts call C++ directly instead of going
+  through interpreted extern nodes. The editor keeps the VM for hot reload. Gate: call
+  overhead in both directions measured against an equivalent native call; extern guard,
+  execution-role and lifetime checks behave as in the VM. Builds on the AOT item above.
+- Networking (replication, RPC), other platforms, extended migrations and the
+  integrations below stay unscheduled.
+
 ## Open acceptance gates
 
 These gates come from the original plan (after the NimForUE audit) and are still open.
