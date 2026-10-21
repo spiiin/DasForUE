@@ -35,7 +35,8 @@ Decided 2026-10-21. The gates below say what closes each item.
 - **Clean machine.** The plugin installs and runs without the source tree; dependency
   licenses are listed.
 - **Reload matrix.** Every structural change listed under "Full DSL and structural reload"
-  has a documented outcome: live migration, controlled refusal or required restart.
+  has a documented outcome: live migration, controlled refusal or required restart. Plan:
+  [Structural changes for every entity kind](StructuralChanges.md).
 - **Save-game schema compatibility.**
 - **User scripts without low-level code.** Examples and guides use no manual call frames
   or internal `__ue_*` helpers (priority 2).

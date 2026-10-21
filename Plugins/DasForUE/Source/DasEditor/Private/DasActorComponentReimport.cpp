@@ -15,9 +15,11 @@
 #include "Tests/AutomationEditorCommon.h"
 namespace
 {
-// An actor with native components; v2 adds a field and changes a body, v3 changes the composition.
+// An actor with native components and a soft reference field; v2 adds a field and changes a body, v3
+// changes the composition.
 const TCHAR* ComposedV1 = TEXT(R"(options gen2
 require ue_scene_components
+require ue_pickup_components
 [ue_class(module_id="composedreimport",id="composedreimport.host",parent="/Script/Engine.Actor",Blueprintable)]
 class ComposedHost {
     @ue_component
@@ -28,6 +30,9 @@ class ComposedHost {
     Child:SceneComponentRef
     defaults=ue_defaults() {
         self.Child.RelativeLocation=ue_vector(0.0lf,0.0lf,50.0lf)
+    }
+    refs=ue_properties(EditAnywhere,BlueprintReadWrite) {
+        var Mesh:SoftStaticMesh=ue_soft(type<SoftStaticMesh>,"/Engine/BasicShapes/Sphere.Sphere")
     }
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     @ue_id="composedreimport.host.score"
@@ -80,6 +85,12 @@ int32 Evaluate(AActor* Actor, int32 Input)
         Actor->ProcessEvent(Fn, &Args);
     return Args.Result;
 }
+FString Mesh(UObject* Object)
+{
+    auto* P = Object ? FindFProperty<FSoftObjectProperty>(Object->GetClass(), TEXT("Mesh")) : nullptr;
+    return P ? P->GetPropertyValue_InContainer(Object).ToString() : FString();
+}
+const TCHAR* Cube = TEXT("/Engine/BasicShapes/Cube.Cube");
 USceneComponent* Component(AActor* Actor, FName Name)
 {
     if (Actor)
@@ -119,6 +130,7 @@ struct FComposedScript
     void Delete() const { IFileManager::Get().Delete(*Path); }
 };
 }
+void DasFailStructuralForTesting(int32 Stage);
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasComposedReimportTest, "DasForUE.ActorComponent.DeclarationReimport",
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
@@ -148,6 +160,8 @@ bool FDasComposedReimportTest::RunTest(const FString&)
     if (!TestNotNull(TEXT("placed_actor"), Placed))
         return false;
     SetInt(Placed, TEXT("Score"), 77);
+    if (auto* P = FindFProperty<FSoftObjectProperty>(Placed->GetClass(), TEXT("Mesh")))
+        P->SetPropertyValue_InContainer(Placed, FSoftObjectPtr(FSoftObjectPath(Cube)));
     auto* Child = Component(Placed, TEXT("Child"));
     if (!TestNotNull(TEXT("placed_child_component"), Child))
         return false;
@@ -158,6 +172,17 @@ bool FDasComposedReimportTest::RunTest(const FString&)
     TestTrue(TEXT("created_Blueprint_is_up_to_date"),
                   BP->Status == BS_UpToDate || BP->Status == BS_UpToDateWithWarnings);
     TestTrue(TEXT("write_v2_new_field"), Script.Write(ComposedV2()));
+    // A failure after the class was rebuilt restores the old declaration and the instance values, the
+    // soft reference included.
+    DasFailStructuralForTesting(2);
+    const bool Failed = !FDasDSLService::Reimport(BP, Error);
+    DasFailStructuralForTesting(0);
+    Placed = FindActor(World, TEXT("ComposedPlaced"));
+    TestTrue(TEXT("injected_failure_rolls_back_soft_field_class"),
+                  Failed && Error.Contains(TEXT("rolled back")) && Placed &&
+                                           !FindFProperty<FIntProperty>(Placed->GetClass(), TEXT("Bonus")) &&
+                                                                        Int(Placed, TEXT("Score")) == 77 &&
+                                                                            Mesh(Placed) == Cube);
     TestTrue(TEXT("composed_actor_declaration_reimport"), FDasDSLService::Reimport(BP, Error));
     if (!Error.IsEmpty())
         AddInfo(Error);
@@ -166,6 +191,7 @@ bool FDasComposedReimportTest::RunTest(const FString&)
     TestTrue(TEXT("placed_actor_reinstanced_with_new_field"),
                   Placed && Placed->GetClass() == BP->GeneratedClass && Int(Placed, TEXT("Bonus")) == 5);
     TestEqual(TEXT("placed_override_preserved"), Int(Placed, TEXT("Score")), 77);
+    TestEqual(TEXT("placed_soft_reference_preserved"), Mesh(Placed), FString(Cube));
     // Methods run only in game worlds; the PIE test checks the new body.
     TestTrue(TEXT("method_kept"), Placed && Placed->FindFunction(TEXT("Evaluate")) != nullptr);
     TestTrue(TEXT("composition_and_template_defaults_kept"), CompositionKept(BP));

@@ -3,6 +3,7 @@
 #include "DasNumericGraphMigration.h"
 #include "DasProbeActor.h"
 #include "DasPropertyValues.h"
+#include "DasSoftReferences.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/World.h"
@@ -227,8 +228,9 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
 bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Schema, const TArray<UBlueprint*>& BPs,
                                     const TArray<TStrongObjectPtr<UObject>>& Assets, FString& Error)
 {
+    // Soft references are captured like other owned values; only real containers are deferred.
     for (TFieldIterator<FProperty> It(Root->GeneratedClass, EFieldIteratorFlags::ExcludeSuper); It; ++It)
-        if (DasContainerCarrierForProperty(*It))
+        if (DasContainerCarrierForProperty(*It) && !DasSoftCarrierForProperty(*It))
         {
             Error = TEXT("Direct container class rollback/migration is deferred");
             return false;
