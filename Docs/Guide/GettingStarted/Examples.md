@@ -30,6 +30,13 @@ two NiagaraSystems and `PlayableMap`. The interaction interface is stored once i
 Play. Each run creates a new folder; changing the structure of an existing Blueprint requires
 reimporting it.
 
+Example folders are snapshots of the scripts at the time they were created and are not kept in git.
+After the example scripts gain or change declarations (properties, method signatures), an older folder
+no longer runs: in Play the editor shows "daScript did not run on …" on screen and in the PIE Message Log.
+Run `CreatePlayableCharacter.ps1` again and open the new map. Changes to method bodies need no
+recreation: save the `.das` file during Play and the next frame runs the new code (code that already ran,
+such as `BeginPlay`, runs again only after restarting Play).
+
 | Input | Action |
 | --- | --- |
 | WASD | Move relative to view yaw |

@@ -8,6 +8,17 @@ Target environment for every entry: Unreal Engine 5.8.3 (source build),
 daScript 0.6.4 (pinned), Win64 Development. Start at the
 [documentation index](Docs/index.md).
 
+## 2026-10-21
+
+### Changed
+
+- A script that cannot run on its actor (for example a Blueprint made from an older version of the script,
+  or a failed hot reload) is reported on screen and in the PIE Message Log, not only in the log
+  ([Examples](Docs/Guide/GettingStarted/Examples.md)).
+- The playable example map uses a movable sun with a sky atmosphere: no "Lighting needs to be rebuilt"
+  message and no black sky.
+- Generated example folders (`DasExamples/Playable`, `DasExamples/AI`) are no longer kept in git.
+
 ## 2026-10-20
 
 ### Added
