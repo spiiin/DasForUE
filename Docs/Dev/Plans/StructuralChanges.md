@@ -54,6 +54,13 @@ matrix document updated.
 
 ### S0. Matrix harness and generated matrix document
 
+**Done 2026-10-21.** `DasForUE.ReloadMatrix.Editor` / `.PIE` (`DasReloadMatrix.cpp`, suite `reload-matrix`):
+96 cells (11 field types x 6 field changes on an Actor; 9 field and method changes on Actor, composed
+Actor, Pawn and Character) in the editor and during PIE, compared with `Tests/ReloadMatrix/expected.json`;
+[Reload matrix](../../Reference/ReloadMatrix.md) is generated from it by `Scripts/RenderReloadMatrix.py`
+(`--from-actual` takes the last run, `--check` for staleness). Baseline: 24 migrated, 72 refused, none
+lossy or broken, editor and PIE alike. Next phases flip cells and update the expected file.
+
 - Fixture generator: a base declaration per entity kind and a mutation per change kind (add, remove, rename,
   retype, default, metadata, editability) applied to a placed instance with an overridden value, in the
   editor and in PIE.

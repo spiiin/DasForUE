@@ -21,6 +21,10 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
   before Play. `Das.DSL.AutoReimport 0` turns it off
   ([Apply and hot reload](Docs/Guide/Workflow/ApplyAndHotReload.md#automatic-reimport-on-save)).
 
+- Reload matrix: `DasForUE.ReloadMatrix.Editor` and `.PIE` (suite `reload-matrix`) apply every field and
+  method change to Actor, composed Actor, Pawn and Character classes and record the outcome;
+  [Reload matrix](Docs/Reference/ReloadMatrix.md) is generated from the expected outcomes.
+
 ### Changed
 
 - A script that cannot run on its actor (for example a Blueprint made from an older version of the script,

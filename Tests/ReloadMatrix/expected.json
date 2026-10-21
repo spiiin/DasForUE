@@ -1,0 +1,774 @@
+{
+  "editor": {
+    "actor/array/add_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/array/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/array/make_read_only": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/array/remove_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/array/rename_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/array/retype_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/bool/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/bool/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/bool/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/bool/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/bool/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/bool/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/byte/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/byte/change_default": {
+      "message": "Unsupported default property",
+      "outcome": "refused"
+    },
+    "actor/byte/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/byte/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/byte/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/byte/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/float/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/float/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/float/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/float/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/float/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/float/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/int/change_signature": {
+      "message": "Legacy authored method identity changed",
+      "outcome": "refused"
+    },
+    "actor/int/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/int/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/int/remove_method": {
+      "message": "Legacy authored method identity changed",
+      "outcome": "refused"
+    },
+    "actor/int/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/int/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/map/add_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/map/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/map/make_read_only": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/map/remove_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/map/rename_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/map/retype_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/name/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/name/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/name/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/name/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/name/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/name/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/soft/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/soft/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/soft/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/soft/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/soft/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/soft/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/string/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/string/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/string/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/string/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/string/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/string/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/text/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/text/change_default": {
+      "message": "Unsupported default property",
+      "outcome": "refused"
+    },
+    "actor/text/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/text/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/text/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/text/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/vector/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/vector/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/vector/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/vector/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/vector/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/vector/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "character/int/add_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/add_method": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "character/int/change_signature": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/make_read_only": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/remove_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/remove_method": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/rename_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/retype_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "composed/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/change_signature": {
+      "message": "Legacy authored method identity changed",
+      "outcome": "refused"
+    },
+    "composed/int/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "composed/int/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "composed/int/remove_method": {
+      "message": "Legacy authored method identity changed",
+      "outcome": "refused"
+    },
+    "composed/int/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "composed/int/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "pawn/int/add_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/add_method": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "pawn/int/change_signature": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/make_read_only": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/remove_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/remove_method": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/rename_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/retype_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    }
+  },
+  "pie": {
+    "actor/array/add_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/array/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/array/make_read_only": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/array/remove_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/array/rename_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/array/retype_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/bool/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/bool/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/bool/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/bool/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/bool/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/bool/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/byte/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/byte/change_default": {
+      "message": "Unsupported default property",
+      "outcome": "refused"
+    },
+    "actor/byte/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/byte/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/byte/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/byte/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/float/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/float/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/float/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/float/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/float/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/float/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/int/change_signature": {
+      "message": "Legacy authored method identity changed",
+      "outcome": "refused"
+    },
+    "actor/int/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/int/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/int/remove_method": {
+      "message": "Legacy authored method identity changed",
+      "outcome": "refused"
+    },
+    "actor/int/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/int/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/map/add_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/map/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/map/make_read_only": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/map/remove_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/map/rename_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/map/retype_field": {
+      "message": "Direct container class declaration migration is deferred; body-only reimport is supported",
+      "outcome": "refused"
+    },
+    "actor/name/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/name/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/name/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/name/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/name/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/name/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/soft/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/soft/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/soft/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/soft/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/soft/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/soft/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/string/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/string/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/string/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/string/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/string/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/string/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/text/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/text/change_default": {
+      "message": "Unsupported default property",
+      "outcome": "refused"
+    },
+    "actor/text/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/text/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/text/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/text/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/vector/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/vector/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "actor/vector/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/vector/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/vector/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "actor/vector/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "character/int/add_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/add_method": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "character/int/change_signature": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/make_read_only": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/remove_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/remove_method": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/rename_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "character/int/retype_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "composed/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "composed/int/change_signature": {
+      "message": "Legacy authored method identity changed",
+      "outcome": "refused"
+    },
+    "composed/int/make_read_only": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "composed/int/remove_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "composed/int/remove_method": {
+      "message": "Legacy authored method identity changed",
+      "outcome": "refused"
+    },
+    "composed/int/rename_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "composed/int/retype_field": {
+      "message": "Removal, type, default or editability changes require a migration policy",
+      "outcome": "refused"
+    },
+    "pawn/int/add_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/add_method": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "pawn/int/change_signature": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/make_read_only": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/remove_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/remove_method": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/rename_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    },
+    "pawn/int/retype_field": {
+      "message": "Structural migration of Pawn/Character declarations is deferred; create a new Blueprint",
+      "outcome": "refused"
+    }
+  }
+}
