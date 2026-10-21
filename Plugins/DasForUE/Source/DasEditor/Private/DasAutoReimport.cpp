@@ -1,4 +1,5 @@
 #include "DasAutoReimport.h"
+#include "DasAuthoring.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "DirectoryWatcherModule.h"
@@ -105,6 +106,14 @@ bool FDasAutoReimport::ProcessPending(float)
         const FString Name = Blueprint->GetName();
         const FString Before = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel"));
         FString Error;
+        // Body-only edits are already live through hot reload. Reimport would still run the defaults
+        // preflight, which is refused during PIE and for actors with components.
+        const FString Source = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLSource"));
+        FDasAuthoringModule Model;
+        FString Json;
+        if (Runtime.ReadAuthoringScript(Runtime.ScriptPath(Source), Model, Error) && Model.ToJson(Json, Error) &&
+            Json == Before)
+            continue;
         if (!FDasDSLService::Reimport(Blueprint, Error))
         {
             const FString Text = FString::Printf(TEXT("daScript: %s was not updated: %s"), *Name, *Error);
@@ -113,7 +122,6 @@ bool FDasAutoReimport::ProcessPending(float)
             Notify(Text, false);
             continue;
         }
-        // An unchanged declaration is only validated; body-only edits are already live through hot reload.
         if (Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel")) != Before)
         {
             UE_LOG(LogTemp, Display, TEXT("DAS_DSL_AUTO_REIMPORT applied %s"), *Name);

@@ -63,11 +63,15 @@ editor. Example: `Plugins/DasForUE/Content/Das/Scripts/dsl_counter_v1.das` and `
 ### Automatic reimport on save
 
 In the interactive editor, saving a `.das` file reimports every loaded Blueprint bound to it with the safe
-automatic policy below, also while PIE is running: a new field or method reinstances the running actors
-and the next frame runs the new script. A notification reports each updated Blueprint; a refused change
-(rename, removal, type change, compile error) is reported in the notification and the Blueprint Log and
-leaves the Blueprint unchanged. Saving with an unchanged declaration only validates it; the edited method
-bodies are already live through hot reload. Unloaded Blueprints are not touched until you reimport them.
+automatic policy below. A notification reports each updated Blueprint; a refused change (rename, removal,
+type change, compile error) is reported in the notification and the Blueprint Log and leaves the
+Blueprint unchanged. Saving with an unchanged declaration does nothing: the edited method bodies are
+already live through hot reload, also during PIE. Unloaded Blueprints are not touched until you reimport
+them.
+
+Declaration changes are not applied everywhere yet: actors that declare components accept only body-only
+reimport (recreate the Blueprint, or the example, to change their fields), and a change that updates the
+defaults of actors placed in a running PIE world is refused until PIE stops.
 Turn it off with `Das.DSL.AutoReimport 0`; commandlets and unattended runs never reimport automatically.
 
 ### Das.DSL.Reimport
