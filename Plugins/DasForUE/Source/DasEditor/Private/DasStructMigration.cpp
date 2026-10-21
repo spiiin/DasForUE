@@ -9,6 +9,8 @@
 #include "DasNumericLibrary.h"
 #include <cwchar>
 #include "StructUtils/UserDefinedStruct.h"
+#include "Engine/DataTable.h"
+#include "Engine/CompositeDataTable.h"
 #include "UserDefinedStructure/UserDefinedStructEditorData.h"
 #include "Kismet2/StructureEditorUtils.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -446,6 +448,32 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
                 Queue.Add(Package);
             }
         }
+    // DataTables whose rows are the struct: rows are captured by field ID and restored after the change.
+    TArray<UDataTable*> Tables;
+    auto AddTable = [&](UDataTable* T)
+    {
+        if (T->RowStruct != Type || T->IsA<UCompositeDataTable>())
+        {
+            Error = TEXT("DataTable migration supports tables whose row struct is the migrated struct");
+            return false;
+        }
+        Tables.AddUnique(T);
+        return true;
+    };
+    for (TObjectIterator<UDataTable> It; It; ++It)
+        if (IsValid(*It) && It->RowStruct == Type && !It->HasAnyFlags(RF_Transient | RF_ClassDefaultObject) &&
+            It->GetOutermost()->GetName().StartsWith(TEXT("/Game/")))
+        {
+            if (!AddTable(*It))
+                return false;
+            const FName Package = It->GetOutermost()->GetFName();
+            if (!Seen.Contains(Package))
+            {
+                Scope.Emplace(*It);
+                Seen.Add(Package);
+                Queue.Add(Package);
+            }
+        }
     for (int32 I = 0; I < Queue.Num(); ++I)
     {
         TArray<FName> Refs;
@@ -464,13 +492,16 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
                     (Assets[0].AssetClassPath != UBlueprint::StaticClass()->GetClassPathName() &&
                      Assets[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName() &&
                      Assets[0].AssetClassPath != UDasTypeRegistry::StaticClass()->GetClassPathName() &&
-                     Assets[0].AssetClassPath != UUserDefinedStruct::StaticClass()->GetClassPathName()))
+                     Assets[0].AssetClassPath != UUserDefinedStruct::StaticClass()->GetClassPathName() &&
+                     Assets[0].AssetClassPath != UDataTable::StaticClass()->GetClassPathName()))
                 {
-                    Error = TEXT("Struct migration supports ordinary Blueprint/map/catalog dependencies only");
+                    Error = TEXT("Struct migration supports Blueprint, map, catalog and DataTable dependencies only");
                     return false;
                 }
                 auto* A = Assets[0].GetAsset();
                 if (!A)
+                    return false;
+                if (auto* T = Cast<UDataTable>(A); T && !AddTable(T))
                     return false;
                 Scope.Emplace(A);
                 Seen.Add(P);
@@ -549,7 +580,12 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
                     }
                 }
             }
-    if (!Root || !Root->GeneratedClass || !Root->GeneratedClass->IsChildOf(ADasProbeActor::StaticClass()))
+    // A struct used only as DataTable rows has no class to recompile: only the struct and the rows change.
+    const bool TableOnly =
+        !Root && !Tables.IsEmpty() && Nodes.IsEmpty() &&
+        !Scope.ContainsByPredicate([](const TStrongObjectPtr<UObject>& A) { return A->IsA<UBlueprint>(); });
+    if (!TableOnly &&
+        (!Root || !Root->GeneratedClass || !Root->GeneratedClass->IsChildOf(ADasProbeActor::StaticClass())))
     {
         Error = TEXT("Expected imported DSL Actor root using struct");
         return false;
@@ -558,11 +594,12 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
     TArray<TStrongObjectPtr<UObject>> Assets;
     FDasAuthoringModule ClassModel;
     FDasClassSchema Schema;
-    if (!FDasAuthoringModule::FromJson(
-            Root->GetOutermost()->GetMetaData().GetValue(Root, TEXT("DasDSLModel")), ClassModel, Error) ||
-            !ClassModel.ToActorSchema(Root->GetOutermost()->GetMetaData().GetValue(Root, TEXT("DasDSLClassId")), Schema,
-                                                                                   Error) ||
-                                      !FDasBlueprintRollback::GatherScope(Root, BPs, Assets, Error))
+    if (!TableOnly &&
+        (!FDasAuthoringModule::FromJson(Root->GetOutermost()->GetMetaData().GetValue(Root, TEXT("DasDSLModel")),
+                                        ClassModel, Error) ||
+         !ClassModel.ToActorSchema(Root->GetOutermost()->GetMetaData().GetValue(Root, TEXT("DasDSLClassId")), Schema,
+                                   Error) ||
+         !FDasBlueprintRollback::GatherScope(Root, BPs, Assets, Error)))
         return false;
     for (auto* BP : BPs)
         for (const auto& V : BP->NewVariables)
@@ -785,7 +822,7 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
             if (HasStruct(*P, Type))
             {
                 auto* S = CastField<FStructProperty>(*P);
-                if (!S || S->ArrayDim != 1 || !O->IsA(Root->GeneratedClass) ||
+                if (!S || S->ArrayDim != 1 || !Root || !O->IsA(Root->GeneratedClass) ||
                     !ValidateDasValueStruct(S->Struct->GetPathName(), Error))
                 {
                     Error = TEXT("Struct state migration supports scalar-leaf Actor/CDO struct trees; container/unrelated state requires separate scope");
@@ -809,8 +846,29 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
                 Error = TEXT("Retired struct snapshots require separate migration");
                 return false;
             }
+    struct FTableImage
+    {
+        TStrongObjectPtr<UDataTable> Table;
+        TArray<FName> Rows;
+        FDataImage Image;
+    };
+    TArray<FTableImage> TableData;
+    for (auto* T : Tables)
+    {
+        FTableImage I;
+        I.Table.Reset(T);
+        I.Image.Object.Reset(T);
+        for (const auto& Row : T->GetRowMap())
+        {
+            I.Rows.Add(Row.Key);
+            if (!Capture(Type, Row.Value, Row.Key.ToString() + TEXT("/"), I.Image))
+                return false;
+        }
+        TableData.Add(MoveTemp(I));
+    }
     FDasNumericGraphMigration NumericGraphs;
-    if (!ConvertId.IsEmpty())
+    const bool Graphs = !ConvertId.IsEmpty() && !TableOnly;
+    if (Graphs)
     {
         TMap<UEdGraphPin*, FEdGraphPinType> Pins;
         const auto* New = After.Properties.FindByPredicate([&](const auto& P) { return P.Id == ConvertId; });
@@ -830,8 +888,8 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
             return S && ContainsTarget(S);
         });
     FDasBlueprintRollback Rollback;
-    if (!Rollback.Prepare(Root, RollbackSchema, BPs, Assets, Error) ||
-        !R.BeginPreserveContextsForReinstance(Root->GeneratedClass))
+    if (!TableOnly && (!Rollback.Prepare(Root, RollbackSchema, BPs, Assets, Error) ||
+                       !R.BeginPreserveContextsForReinstance(Root->GeneratedClass)))
         return false;
     FDelegateHandle Handle = FCoreUObjectDelegates::OnObjectsReplaced.AddLambda(
         [&](const FCoreUObjectDelegates::FReplacementObjectMap& Map)
@@ -843,7 +901,8 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
     ON_SCOPE_EXIT
     {
         FCoreUObjectDelegates::OnObjectsReplaced.Remove(Handle);
-        R.EndPreserveContextsForReinstance();
+        if (!TableOnly)
+            R.EndPreserveContextsForReinstance();
     };
     TMap<UPackage*, bool> Dirty;
     for (auto& A : Scope)
@@ -959,6 +1018,23 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
         }
         return true;
     };
+    auto RestoreTables = [&](const FDasDeclaredClass& Definition, bool Forward)
+    {
+        for (auto& T : TableData)
+        {
+            T.Image.RestoredArrayBytes = 0;
+            if (T.Table->RowStruct != Type)
+                return false;
+            for (FName Name : T.Rows)
+            {
+                uint8* Row = T.Table->FindRowUnchecked(Name);
+                if (!Row || !RestoreTree(Type, Row, Name.ToString() + TEXT("/"), T.Image, Definition, Forward))
+                    return false;
+            }
+            T.Table->MarkPackageDirty();
+        }
+        return true;
+    };
     auto Rebuild = [&](bool Forward)
     {
         for (auto* Node : Nodes)
@@ -1000,15 +1076,15 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
         Rebuild(false);
         FString Detail;
         const bool OK = Type->Status == UDSS_UpToDate && RestoreWrapperDefaults(Before, false) &&
-                        (ConvertId.IsEmpty() || NumericGraphs.Restore(Detail)) && Rollback.Restore(Detail) &&
-                        RestoreData(Before);
+                        (!Graphs || NumericGraphs.Restore(Detail)) && (TableOnly || Rollback.Restore(Detail)) &&
+                        RestoreData(Before) && RestoreTables(Before, false);
         for (const auto& Pair : Dirty)
             Pair.Key->SetDirtyFlag(Pair.Value);
         Error = OK ? FString(TEXT("Struct migration rolled back: ")) + Reason
                    : TEXT("Struct migration rollback failed: ")+ Detail;
         return false;
     };
-    if (!ConvertId.IsEmpty() && !NumericGraphs.Apply(Error))
+    if (Graphs && !NumericGraphs.Apply(Error))
         return Fail(TEXT("Numeric graph preparation failed"));
     auto& Vars = FStructureEditorUtils::GetVarDesc(Type);
     Vars.RemoveAll([&](const auto& V) { return Drops.Contains(V.MetaData.FindRef(TEXT("DasMemberId"))); });
@@ -1051,16 +1127,22 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
     Rebuild(true);
     if (StructFailStage == 2)
         return Fail(TEXT("Injected after Make/Break reconstruction"));
-    FKismetEditorUtilities::CompileBlueprint(Root);
-    FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();
-    if (!Root->GeneratedClass || Root->Status == BS_Error || !Rollback.Finish(Error) || !RestoreData(After, true))
-        return Fail(TEXT("Blueprint compilation/data restore failed"));
+    if (!TableOnly)
+    {
+        FKismetEditorUtilities::CompileBlueprint(Root);
+        FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();
+        if (!Root->GeneratedClass || Root->Status == BS_Error || !Rollback.Finish(Error))
+            return Fail(TEXT("Blueprint compilation failed"));
+    }
+    if (!RestoreData(After, true) || !RestoreTables(After, true))
+        return Fail(TEXT("Data restore failed"));
     if (StructFailStage == 3)
         return Fail(TEXT("Injected after Actor/CDO data restore"));
     FDasAuthoringModule Candidate;
     FString ClassWire, Expected;
-    if (!R.ReadAuthoringScript(R.ScriptPath(Script), Candidate, Error) || !Candidate.ToJson(ClassWire, Error) ||
-        !ClassModel.ToJson(Expected, Error) || ClassWire != Expected)
+    if (!TableOnly &&
+        (!R.ReadAuthoringScript(R.ScriptPath(Script), Candidate, Error) || !Candidate.ToJson(ClassWire, Error) ||
+         !ClassModel.ToJson(Expected, Error) || ClassWire != Expected))
         return Fail(TEXT("Class declarations must remain unchanged"));
     for (const auto& B : Registry->Bindings)
     {

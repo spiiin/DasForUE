@@ -177,6 +177,11 @@ the only saved referencers are such instances. DataAsset, PrimaryDataAsset and S
 `RetiredDasValues`, so removed fields are archived on them. Matrix kinds `data_asset`, `primary_data_asset`,
 `save_game`: every field and method change migrates. SaveGame file versioning stays out (decision 2026-10-21).
 
+**S8b done 2026-10-21 (DataTables).** `MigrateStructFields` takes DataTables whose row struct is the migrated
+struct into scope (registry referencers and loaded tables), captures every row by field ID and restores it
+after the struct compiles (and on rollback). A struct used only as rows needs no DSL Actor root.
+Test `DasForUE.Types.StructDataTable` (rename + add, injected failure, drop with rule).
+
 - DataAsset / PrimaryDataAsset: instances are assets; migrate and re-save them in scope.
 - SaveGame: no live instances to migrate; covered by the save-game schema item (v1) — versioned field ids
   and conversions applied on load.

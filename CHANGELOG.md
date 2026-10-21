@@ -31,6 +31,8 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - DataAsset, PrimaryDataAsset and SaveGame classes accept declaration changes: saved DataAsset instances are
   migrated with the class and marked dirty, removed fields are archived on the instance
   ([Data assets](Docs/Guide/Data/DataAssets.md#changing-the-class)).
+- Struct field migration updates the rows of DataTables that use the struct in place (rename, add, drop, convert;
+  rolled back on failure); a struct used only by tables no longer needs a DSL Actor root.
 
 ### Changed
 

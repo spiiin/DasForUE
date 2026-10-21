@@ -313,7 +313,10 @@ duplicates, stale or missing rules are refused. Remove used rules for later runs
 
 Values are migrated in direct struct properties on the DSL Actor/CDO family, inside existing user
 struct wrappers (nested occurrences each keep their own overrides), and inside arrays of structs in
-wrappers (length, order and per-element values preserved; array defaults must be empty). Refused:
+wrappers (length, order and per-element values preserved; array defaults must be empty), and in the rows
+of DataTables whose row struct is the migrated struct (saved or loaded tables; every row keeps its values by
+field ID and the table is marked dirty). A struct used only by DataTables needs no DSL Actor root. Refused:
+composite tables and tables whose rows only nest the struct;
 map/set or direct Actor container storage, retired snapshots of the changing type, split pins,
 Set Members/custom struct nodes, active PIE, multiple independent roots.
 

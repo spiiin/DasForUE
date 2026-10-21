@@ -105,7 +105,12 @@ Validation rules:
 
 Import first goes into a transient candidate table; any native import diagnostic or snapshot validation failure rejects it before the destination package is created. Invalid JSON never creates an asset.
 
-Not provided: updating existing tables, CSV import, custom row key names, automatic reimport from the JSON file, and schema migration.
+Changing the row struct goes through the struct migration (`Das.DSL.Types.MigrateStructFields`, see
+[Migrations](../Workflow/Migrations.md)): added, renamed (same `@ue_id`), dropped (with a rule) and converted
+fields are applied to every row of the tables in place, and the tables are marked dirty.
+
+Not provided: updating rows from the JSON file, CSV import, custom row key names and automatic reimport from the
+JSON file.
 
 ## CurveTables
 
