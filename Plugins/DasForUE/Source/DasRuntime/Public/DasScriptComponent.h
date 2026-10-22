@@ -37,6 +37,9 @@ public:
     float Elapsed = 0;
     UPROPERTY()
     bool bDasConstructionScript = false;
+    // Values of removed fields, kept for a restore (see the archive field migration).
+    UPROPERTY(SaveGame)
+    TMap<FString, FDasScalarValue> RetiredDasValues;
     // Native bridge; never a UFunction or an ordinary registration callback.
     FDasExecutionResult RunDasConstruction();
     virtual void OnRegister() override;

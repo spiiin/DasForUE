@@ -40,6 +40,8 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
   Blueprints: a notification lists the changes and the affected assets (Apply / Details / Cancel) instead of the
   "requires ... with dependencies" refusal. New default values saved together with such a change are applied
   first ([Apply and hot reload](Docs/Guide/Workflow/ApplyAndHotReload.md#automatic-reimport-on-save)).
+- Authored ActorComponent classes accept declaration changes: their templates in Actor Blueprints, placed and
+  running components migrate like Actors ([Components](Docs/Guide/DSL/Components.md#changing-an-authored-component-class)).
 
 ### Changed
 

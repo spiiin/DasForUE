@@ -400,13 +400,6 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
     TMap<FString, UBlueprint*> ComponentBlueprints;
     if (!DasPrepareComponentComposition(Declaration, EffectiveDeclaration, Package, ComponentBlueprints, Error))
         return false;
-    if (!Created && Schema.Parent == TEXT("ActorComponent") &&
-                                          (DefaultPolicy != EDasDefaultMigrationPolicy::Refuse ||
-                                           BP->GetOutermost()->GetMetaData().GetValue(BP, TEXT("DasDSLModel")) != Json))
-    {
-        Error = TEXT("Component declaration migration is deferred; body-only reimport is supported");
-        return false;
-    }
     if (DefaultPolicy != EDasDefaultMigrationPolicy::Refuse)
     {
         if (DefaultPolicy != EDasDefaultMigrationPolicy::PreserveInstances || Created)
@@ -651,13 +644,19 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
             CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();
         }
     }
-    if (Created && Schema.Parent == TEXT("ActorComponent"))
+    if (Schema.Parent == TEXT("ActorComponent"))
     {
+        // A reimport may add or remove the construction callback.
         auto* Component = CastChecked<UDasScriptComponent>(BP->GeneratedClass->GetDefaultObject());
-        Component->LifecycleScript = Script;
-        Component->bDasConstructionScript = EffectiveDeclaration.Callbacks.ContainsByPredicate(
+        const bool Construction = EffectiveDeclaration.Callbacks.ContainsByPredicate(
             [](const auto& C) { return C.Kind == TEXT("ConstructionScript"); });
-        CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();
+        if (Created || Component->LifecycleScript != Script || Component->bDasConstructionScript != Construction)
+        {
+            Component->Modify();
+            Component->LifecycleScript = Script;
+            Component->bDasConstructionScript = Construction;
+            CastChecked<UBlueprintGeneratedClass>(BP->GeneratedClass)->UpdateCustomPropertyListForPostConstruction();
+        }
     }
     {
         auto* CDO = BP->GeneratedClass->GetDefaultObject();
@@ -2050,6 +2049,8 @@ TMap<FString, FDasScalarValue>* RetiredValues(UObject* O)
         return &D->RetiredDasValues;
     if (auto* G = Cast<UDasSaveGame>(O))
         return &G->RetiredDasValues;
+    if (auto* Component = Cast<UDasScriptComponent>(O))
+        return &Component->RetiredDasValues;
     return nullptr;
 }
 FString ArchiveKey(const FString& ClassId, const FString& FieldId)
@@ -2417,7 +2418,8 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
             auto* Retired = RetiredValues(O);
             if (!Retired)
             {
-                Error = TEXT("Archive requires Actor, Pawn, Character, DataAsset or SaveGame instances");
+                Error =
+                    TEXT("Archive requires Actor, Pawn, Character, ActorComponent, DataAsset or SaveGame instances");
                 return false;
             }
             if (auto* W = O->GetWorld())

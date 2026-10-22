@@ -120,6 +120,16 @@ actor.Score += 1
 let raw = ue_ref(type<ActorRef>, ue_component_owner(ue_self_object()))
 ```
 
+### Changing an authored component class
+
+Saving the component's script reimports it like an Actor class: fields and methods can be added, removed (values
+archived), renamed by `@ue_id` and numerically retyped, and default values change. The change reaches every
+place the component lives: its templates in Actor Blueprints (values set in a particular Actor are kept), the
+components of placed actors (per-instance edits kept) and, for additive changes, running actors during PIE. A
+field migration modifies the Actor Blueprints and maps that contain the component, so the editor asks first
+(Apply / Details / Cancel, see [Apply and hot reload](../Workflow/ApplyAndHotReload.md#automatic-reimport-on-save)).
+Reimporting an Actor also brings its authored component classes up to date with their scripts.
+
 ## Scene hierarchy
 
 - `@RootComponent` selects the root. Without one, the first native

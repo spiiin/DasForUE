@@ -13,6 +13,10 @@
 #include "Dom/JsonObject.h"
 #include "Editor.h"
 #include "Engine/Blueprint.h"
+#include "Engine/BlueprintGeneratedClass.h"
+#include "Engine/SCS_Node.h"
+#include "Engine/SimpleConstructionScript.h"
+#include "Kismet2/KismetEditorUtilities.h"
 #include "EngineUtils.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
@@ -85,6 +89,8 @@ const FMatrixKind MatrixKinds[] = {
     {TEXT("data_asset"), TEXT("DataAsset"), nullptr, TEXT("")},
     {TEXT("primary_data_asset"), TEXT("PrimaryDataAsset"), nullptr, TEXT("")},
     {TEXT("save_game"), TEXT("SaveGame"), TEXT("ue_savegame"), TEXT("")},
+    // An authored component inside an actor Blueprint (BP_Owner): instances are the components of placed owners.
+    {TEXT("component"), TEXT("ActorComponent"), nullptr, TEXT("")},
     {TEXT("evented"), TEXT("/Script/Engine.Actor"), TEXT("ue_delegate_examples"),
      TEXT("    @ue_property=(BlueprintAssignable)\n    @ue_id=\"reloadmatrix.host.changed\"\n    Changed:FScoreEvent\n"
           "    @ue_property=(BlueprintReadWrite)\n    @ue_id=\"reloadmatrix.host.query\"\n    Query:FScoreQuery\n")},
@@ -172,6 +178,10 @@ bool AssetKind(const FMatrixKind& K)
 {
     return K.Parent && !FString(K.Parent).StartsWith(TEXT("/Script/"));
 }
+bool ComponentKind(const FMatrixKind& K)
+{
+    return FCString::Strcmp(K.Name, TEXT("component")) == 0;
+}
 bool DataAssetKind(const FMatrixKind& K)
 {
     return AssetKind(K) && FString(K.Parent).EndsWith(TEXT("DataAsset"));
@@ -241,7 +251,7 @@ FString MatrixScript(const FMatrixKind& K, const FMatrixType& T, TOptional<EChan
     else if (AssetKind(K))
         S += FString::Printf(TEXT("[ue_class(module_id=\"reloadmatrix\",id=\"reloadmatrix.host\",Blueprintable)]\n"
                                   "class MatrixHost : %s {\n"),
-                             K.Parent);
+                                  K.Parent);
     else
         S += FString::Printf(TEXT("[ue_class(module_id=\"reloadmatrix\",id=\"reloadmatrix.host\",parent=\"%s\","
                               "Blueprintable)%s]\nclass MatrixHost {\n%s"),
@@ -323,7 +333,7 @@ struct FMatrixCell
     const FMatrixType* Type;
     EChange Change;
     FString Key, ScriptName, ScriptPath, Package, Suffix;
-    TStrongObjectPtr<UBlueprint> Blueprint;
+    TStrongObjectPtr<UBlueprint> Blueprint, Owner;
     FName Placed, Plain;
     // Object paths of the instances of asset kinds (empty for actors).
     FString PlacedPath, PlainPath;
@@ -335,7 +345,15 @@ UObject* Instance(const FMatrixCell& Cell, UWorld* World, bool bPlaced)
     const FString& Path = bPlaced ? Cell.PlacedPath : Cell.PlainPath;
     if (!Path.IsEmpty())
         return FindObject<UObject>(nullptr, *Path);
-    return FindActor(World, bPlaced ? Cell.Placed : Cell.Plain);
+    AActor* Actor = FindActor(World, bPlaced ? Cell.Placed : Cell.Plain);
+    if (Actor && ComponentKind(*Cell.Kind))
+    {
+        for (auto* C : Actor->GetComponents())
+            if (C && C->GetFName() == TEXT("Comp"))
+                return C;
+        return nullptr;
+    }
+    return Actor;
 }
 TArray<FMatrixCell> MatrixCells()
 {
@@ -428,6 +446,40 @@ bool PlaceObjects(FMatrixCell& Cell, UBlueprint* BP, FString& Error)
     }
     return true;
 }
+// The component kind: an actor Blueprint with the authored component, placed twice.
+bool PlaceOwners(FMatrixCell& Cell, UBlueprint* Component, UWorld* World, FString& Error)
+{
+    const FString Package = FPackageName::GetLongPackagePath(Cell.Package) / TEXT("BP_Owner");
+    UBlueprint* Owner = FKismetEditorUtilities::CreateBlueprint(
+        AActor::StaticClass(), CreatePackage(*Package),
+        TEXT("BP_Owner"), BPTYPE_Normal, UBlueprint::StaticClass(), UBlueprintGeneratedClass::StaticClass());
+    if (!Owner || !Owner->SimpleConstructionScript)
+    {
+        Error = TEXT("Cannot create the owner Blueprint");
+        return false;
+    }
+    USimpleConstructionScript* SCS = Owner->SimpleConstructionScript;
+    SCS->AddNode(SCS->CreateNode(Component->GeneratedClass, TEXT("Comp")));
+    FKismetEditorUtilities::CompileBlueprint(Owner);
+    Cell.Owner.Reset(Owner);
+    for (FName Name : {Cell.Placed, Cell.Plain})
+    {
+        FActorSpawnParameters Spawn;
+        Spawn.Name = Name;
+        if (!World->SpawnActor<AActor>(Owner->GeneratedClass, FTransform::Identity, Spawn))
+        {
+            Error = TEXT("Cannot place matrix owner");
+            return false;
+        }
+    }
+    UObject* Placed = Instance(Cell, World, true);
+    if (!Import(Placed, TEXT("Value"), Cell.Type->Override) || !Import(Placed, TEXT("Anchor"), TEXT("42")))
+    {
+        Error = TEXT("Cannot override matrix component values");
+        return false;
+    }
+    return true;
+}
 bool PrepareCell(FMatrixCell& Cell, UWorld* World, FString& Error)
 {
     UBlueprint* BP = nullptr;
@@ -445,6 +497,8 @@ bool PrepareCell(FMatrixCell& Cell, UWorld* World, FString& Error)
         !FDasDSLService::Apply(Cell.ScriptName, Cell.Package, TEXT("reloadmatrix.host"), BP, Error))
         return false;
     Cell.Blueprint.Reset(BP);
+    if (ComponentKind(*Cell.Kind))
+        return PlaceOwners(Cell, BP, World, Error);
     if (AssetKind(*Cell.Kind))
         return PlaceObjects(Cell, BP, Error);
     for (FName Name : {Cell.Placed, Cell.Plain})
@@ -484,7 +538,7 @@ void RunCell(FMatrixCell& Cell, UWorld* World, const TCHAR* AnchorValue)
          ? Write(ParentPath(TEXT("reload_matrix_base"), Cell),
                             ParentScript(TEXT("MatrixBase"), TEXT("reload_matrix_base"), Cell.Suffix, true))
                             : Write(Cell.ScriptPath, MatrixScript(*Cell.Kind, *Cell.Type, Cell.Change, Cell.Suffix))) &&
-                 FDasDSLService::Reimport(BP, Error);
+                 FDasDSLService::Reimport(BP, Error, EDasDefaultMigrationPolicy::Automatic, ComponentKind(*Cell.Kind));
     Cell.Message = Error;
     Placed = Instance(Cell, World, true);
     if (!Applied)

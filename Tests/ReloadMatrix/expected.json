@@ -384,6 +384,42 @@
       "message": "",
       "outcome": "migrated"
     },
+    "component/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
     "composed/int/add_component": {
       "message": "",
       "outcome": "migrated"
@@ -1011,6 +1047,42 @@
       "outcome": "migrated"
     },
     "child/int/retype_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/add_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/add_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/change_default": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/change_signature": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/make_read_only": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/remove_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/remove_method": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/rename_field": {
+      "message": "",
+      "outcome": "migrated"
+    },
+    "component/int/retype_field": {
       "message": "",
       "outcome": "migrated"
     },

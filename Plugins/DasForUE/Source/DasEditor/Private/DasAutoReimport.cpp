@@ -6,6 +6,7 @@
 #include "DirectoryWatcherModule.h"
 #include "Editor.h"
 #include "IDirectoryWatcher.h"
+#include "Components/ActorComponent.h"
 #include "Engine/Blueprint.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "HAL/FileManager.h"
@@ -146,7 +147,15 @@ TArray<UBlueprint*> FDasAutoReimport::Bound(const TSet<FString>* Files) const
 }
 void FDasAutoReimport::ReimportFiles(const TSet<FString>& Files)
 {
-    for (UBlueprint* Blueprint : Bound(&Files))
+    // Component classes first: the actors that contain them reimport against their new declaration.
+    TArray<UBlueprint*> Blueprints = Bound(&Files);
+    Blueprints.StableSort(
+        [](const UBlueprint& A, const UBlueprint& B)
+        {
+            return A.GeneratedClass->IsChildOf(UActorComponent::StaticClass()) &&
+                   !B.GeneratedClass->IsChildOf(UActorComponent::StaticClass());
+        });
+    for (UBlueprint* Blueprint : Blueprints)
         Reimport(Blueprint, false);
     for (const auto& Import : BoundGAS(&Files))
         ReimportGAS(Import, false);
@@ -393,13 +402,12 @@ void FDasAutoReimport::Decline(FString Path)
     CloseConfirmation(Path);
     const FString Name = FPackageName::ObjectPathToObjectName(Path);
     UE_LOG(LogTemp, Display, TEXT("DAS_DSL_AUTO_REIMPORT declined %s"), *Name);
-    FMessageLog(
-        TEXT("BlueprintLog"))
-            .Info(FText::FromString(FString::Printf(
-                TEXT("daScript: %s was not updated; its script changes fields used by other assets."), *Name)))
-                         ->AddToken(FActionToken::Create(FText::FromString(
-                             TEXT("Apply")),
-                             FText::FromString(
-                                 TEXT("Apply the change to the class and the assets using it")),
-                                 FOnActionTokenExecuted::CreateRaw(this, &FDasAutoReimport::Confirm, Path), true));
+    FMessageLog(TEXT("BlueprintLog"))
+                    .Info(FText::FromString(FString::Printf(
+                        TEXT("daScript: %s was not updated; its script changes fields used by other assets."), *Name)))
+                              ->AddToken(FActionToken::Create(FText::FromString(
+                                  TEXT("Apply")),
+                                  FText::FromString(
+                                      TEXT("Apply the change to the class and the assets using it")),
+                                      FOnActionTokenExecuted::CreateRaw(this, &FDasAutoReimport::Confirm, Path), true));
 }

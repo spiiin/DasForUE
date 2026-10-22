@@ -10,7 +10,7 @@ Updated 2026-10-22, after S0–S8. Every change below goes through `FDasDSLServi
 (on save, on map open and before Play), in the editor and during PIE, with a full rollback on failure.
 
 - **Class kinds:** Actor (also with components and soft or container fields), Pawn and Character (possession
-  kept), authored hierarchies, classes with delegates/events and interfaces, DataAsset and PrimaryDataAsset
+  kept), authored ActorComponent classes (templates and placed components migrated), authored hierarchies, classes with delegates/events and interfaces, DataAsset and PrimaryDataAsset
   (saved instances migrated with the class), SaveGame, GAS assets (updated in place), struct rows in
   DataTables.
 - **Fields:** add; remove (values archived, `archive_restore` brings them back); rename by stable id; numeric
@@ -21,7 +21,7 @@ Updated 2026-10-22, after S0–S8. Every change below goes through `FDasDSLServi
   interface. **Parent:** change within the same native root.
 - **Dependencies:** a field migration that also modifies saved maps or other Blueprints asks first (Apply /
   Details / Cancel notification); saved DataAsset instances of the class are always included.
-- **Matrix:** `Docs/Reference/ReloadMatrix.md` — 120 migrated, 10 refused (non-numeric retypes) per mode.
+- **Matrix:** `Docs/Reference/ReloadMatrix.md` — 156 migrated, 10 refused (non-numeric retypes) per mode.
 
 What is still refused or not covered is listed in [Open items](#open-items).
 
@@ -102,6 +102,13 @@ ActorComponent classes remain.
   (check the playable example: WASD and HUD must keep working after a live field add).
 - ActorComponent classes: reinstance component instances inside their actors and the SCS templates that use
   the class; the owning actors' composition stays as is.
+
+**ActorComponent classes done 2026-10-22.** The component gate is gone; `UDasScriptComponent` keeps
+`RetiredDasValues`; the lifecycle script and construction flag follow reimports. Owner Blueprints are
+dependents, so field migrations go through the confirmation (or `IncludeDependencies`). An Actor's composition
+reimports existing component classes with the automatic policy; auto-reimport handles component Blueprints
+before Actors. Matrix kind `component` (owner Blueprint with an SCS node, two placed owners): every field and
+method change migrates in the editor and during PIE.
 
 ### S4. Removal, rename and signatures
 
@@ -205,7 +212,6 @@ Collected 2026-10-22. Each refusal is controlled: nothing changes and the messag
 
 | Change | What happens today | Where |
 |---|---|---|
-| ActorComponent class declaration changes | "Component declaration migration is deferred"; body-only reimport works | S3, `DasDSLService.cpp` `Apply` |
 | Non-numeric retype (bool, string, name, text, byte, vector, soft, containers) | refused; matrix: 10 cells per mode | S4, [Reload matrix](../../Reference/ReloadMatrix.md) |
 | Renamed or removed method still called from other Blueprints | the scope compile fails and rolls back; call sites are not fixed up | S4 |
 | Callable <-> BlueprintEvent role change of a method | not migrated | S4 |

@@ -195,7 +195,17 @@ bool DasPrepareComponentComposition(const FDasDeclaredClass& D, const FDasDeclar
     {
         const auto& S = Sources[I];
         UBlueprint* BP = nullptr;
-        if (!FDasDSLService::Apply(S.File, S.Package, S.Id, BP, Error))
+        // An existing component class follows its script like any other class (the automatic policy); field
+        // migrations that change other assets are applied when the component script itself is saved.
+        if (auto* Existing = LoadObject<UBlueprint>(
+                nullptr, *(S.Package + TEXT(".") + FPackageName::GetLongPackageAssetName(S.Package)), nullptr,
+                           LOAD_NoWarn))
+        {
+            if (!FDasDSLService::Reimport(Existing, Error))
+                return false;
+            BP = Existing;
+        }
+        else if (!FDasDSLService::Apply(S.File, S.Package, S.Id, BP, Error))
             return false;
         Components.Add(S.ComponentId, BP);
     }
