@@ -6,29 +6,24 @@ restart. Drafted 2026-10-21 from an inventory of the current refusals.
 
 ## Where we are
 
-Supported today (editor and PIE, through `FDasDSLService::Reimport` and auto-reimport):
+Updated 2026-10-22, after S0–S8. Every change below goes through `FDasDSLService::Reimport` and auto-reimport
+(on save, on map open and before Play), in the editor and during PIE, with a full rollback on failure.
 
-- body-only changes (hot reload, no reimport);
-- additive changes of Actor classes: new fields, methods, metadata; also composed actors with unchanged
-  components and classes with soft reference fields;
-- default values: merge with per-instance overrides (`PreserveOverrides`), deferred to the end of PIE;
-- explicit migrations: `rename_by_id`, `rename_with_dependencies`, `widen_numeric`, `convert_numeric`,
-  `archive_remove` / `archive_restore`, enum append and value remap, struct field drop/convert.
+- **Class kinds:** Actor (also with components and soft or container fields), Pawn and Character (possession
+  kept), authored hierarchies, classes with delegates/events and interfaces, DataAsset and PrimaryDataAsset
+  (saved instances migrated with the class), SaveGame, GAS assets (updated in place), struct rows in
+  DataTables.
+- **Fields:** add; remove (values archived, `archive_restore` brings them back); rename by stable id; numeric
+  retype with exact rules; editability; default values (merged with per-instance overrides, also live during
+  PIE). New defaults saved together with a field migration are applied first.
+- **Methods:** add, remove, signature change (the adapter graph is rebuilt). **Components:** add, remove,
+  rename, re-attach, template defaults. **Events/interfaces:** add/remove event and delegate fields, add an
+  interface. **Parent:** change within the same native root.
+- **Dependencies:** a field migration that also modifies saved maps or other Blueprints asks first (Apply /
+  Details / Cancel notification); saved DataAsset instances of the class are always included.
+- **Matrix:** `Docs/Reference/ReloadMatrix.md` — 120 migrated, 10 refused (non-numeric retypes) per mode.
 
-Everything else is refused. The refusals fall into three groups.
-
-1. **Snapshot limits** (`FDasBlueprintRollback`). Rollback captures instance values through
-   `ReadDasPropertyValue` and only on `ADasProbeActor` instances. That alone refuses containers, Pawn and
-   Character, ActorComponent, SaveGame and DataAsset classes, and makes component templates and SCS
-   untouchable.
-2. **Missing transforms.** No code maps old values or graph references to the new shape: member removal and
-   rename without an explicit policy, type changes beyond numeric, method signature changes, delegate and
-   event fields, interfaces, parent class, component composition.
-3. **Class-kind gates** in `FDasDSLService::Apply`: DataAsset (`:132`), ActorComponent (`:298`),
-   Pawn/Character (`:404`), GAS schemas (`DasGASAssetService.cpp:227`), and the explicit migrations that
-   refuse authored hierarchies, components and delegates (`:629-640`, `:1061-1072`, `:1578-1589`).
-
-Group 1 blocks most of the others, so it comes first.
+What is still refused or not covered is listed in [Open items](#open-items).
 
 ## Principles
 
@@ -201,6 +196,40 @@ them, and applies with `IncludeDependencies`. New defaults in the same save go f
 - DataTables: row struct migration through struct field rules; rows re-imported in place.
 - GAS (AttributeSet, Effect, Ability, MMC, Execution): replace "import into a new folder" with in-place update
   for additive changes; contract changes stay refusals.
+
+## Open items
+
+Collected 2026-10-22. Each refusal is controlled: nothing changes and the message names the next step.
+
+**Refused changes**
+
+| Change | What happens today | Where |
+|---|---|---|
+| ActorComponent class declaration changes | "Component declaration migration is deferred"; body-only reimport works | S3, `DasDSLService.cpp` `Apply` |
+| Non-numeric retype (bool, string, name, text, byte, vector, soft, containers) | refused; matrix: 10 cells per mode | S4, [Reload matrix](../../Reference/ReloadMatrix.md) |
+| Renamed or removed method still called from other Blueprints | the scope compile fails and rolls back; call sites are not fixed up | S4 |
+| Callable <-> BlueprintEvent role change of a method | not migrated | S4 |
+| Changed class of a component or of the root component | "create a new Blueprint" | S5, [Components](../../Guide/DSL/Components.md) |
+| Inherited component overrides (`ComponentOverrides`) of an imported child | "Component composition migration is deferred" | S5/S7, [Inheritance](../../Guide/DSL/Inheritance.md) |
+| Removing an implemented interface | "create a new Blueprint" | S6, [Interfaces](../../Guide/DSL/Interfaces.md) |
+| Changed event or delegate signature | "create a new field" | S6, [Delegates and events](../../Guide/DSL/DelegatesAndEvents.md) |
+| Changed native root of the parent (`Actor` -> `Pawn`) | "create a new Blueprint" | S7 |
+| Parent change and a field migration in one save | "save them separately" | S7 |
+| Changed authored type of a reference field | "Authored reference field identity migration is deferred" | `DasDSLService.cpp` |
+| Explicit `PreserveInstances` default migration of classes with containers, delegates/events or class references | refused; the automatic policy covers them | S2, S6 |
+| GAS: removing/renaming an attribute, changing a cue tag, a calculation kind or a stable id | "import into a new folder" | S8c, [GAS authoring](../../Guide/Gameplay/GASAuthoring.md#changing-definitions) |
+| Struct migration: map/set/primitive array fields, composite DataTables, tables whose row nests the struct | refused | S8b, [Migrations](../../Guide/Workflow/Migrations.md) |
+| Replacing an inherited component with a subclass | engine constraint (`InheritableComponentHandler`) | S7 |
+
+**Not covered**
+
+- SaveGame files written by an older class load by property name; renamed or retyped fields are not converted
+  on load (no save-format versioning; decision 2026-10-21).
+- Changing a Primary Asset type generates no asset ID redirectors.
+- Auto-reimport only sees loaded Blueprints and GAS assets; others are updated when they are loaded (map open,
+  before Play) or with an explicit reimport. GAS assets imported before S8c remember their folder only after one
+  `Das.GASImport`.
+- Networking (replicated fields, schema mismatch between clients) is outside this plan.
 
 ## Order and size
 
