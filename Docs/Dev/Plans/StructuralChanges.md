@@ -188,6 +188,13 @@ removed/renamed attributes, cue tag and identity changes are refused. Snapshots 
 restore every updated asset on failure. Assets remember `DasGASSource`/`DasGASFolder`; auto-reimport
 updates them on save, on map open and before Play, deferring during Play. Test `DasForUE.Reload.GASInPlace`.
 
+**Dependency scopes in the automatic path (2026-10-22).** `FDasDSLService::PlanReimport` computes the change
+without applying it (added/removed/renamed/retyped fields, new defaults, saved maps and Blueprints outside the
+class). Auto-reimport asks with an Apply / Details / Cancel notification when a field migration would modify
+them, and applies with `IncludeDependencies`. New defaults in the same save go first
+(`DefaultsBeforeMigration`), so a removal plus a default change no longer fails. Test
+`DasForUE.Reload.ConfirmDependencies`.
+
 - DataAsset / PrimaryDataAsset: instances are assets; migrate and re-save them in scope.
 - SaveGame: no live instances to migrate; covered by the save-game schema item (v1) — versioned field ids
   and conversions applied on load.

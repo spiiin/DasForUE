@@ -77,6 +77,14 @@ root component needs a new Blueprint. A new default value is applied during PIE 
 editor world and the running game get it, except values the game or the level already changed. One save may add members and
 change default values at once: the new declaration is applied first, then the default values. A change
 refused while PIE runs is tried again when Play stops.
+Renaming, removing or numerically retyping fields runs the matching field migration (values renamed, archived
+for a later restore, or exactly converted); new default values saved together with it are applied first. When
+such a migration would also modify saved maps or other Blueprints that use the class, the editor asks first: a
+notification lists the changed fields and the affected assets (a summary and the first fields for large changes)
+with **Apply**, **Details** (every field and asset) and **Cancel**. Apply migrates the class together with those
+assets, which stay unsaved until you save them; Cancel leaves everything as it is and keeps an Apply link in the
+Blueprint Log. During Play the question waits until Play stops. The full plan is written to the Output Log
+(`DAS_DSL_REIMPORT_PLAN`).
 GAS assets imported with `Das.GASImport` follow their script the same way: the folder they were imported into is
 updated in place ([Changing definitions](../Gameplay/GASAuthoring.md#changing-definitions)).
 Turn it off with `Das.DSL.AutoReimport 0`; commandlets and unattended runs never reimport automatically.

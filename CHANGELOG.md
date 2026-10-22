@@ -36,6 +36,10 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 - GAS assets update in place: reimporting into the same folder (or saving the script, through auto-reimport)
   rewrites changed effects, abilities, calculations and cues and adds new attributes, keeping the classes that
   other assets reference ([Changing definitions](Docs/Guide/Gameplay/GASAuthoring.md#changing-definitions)).
+- Auto-reimport asks before a field rename, removal or numeric retype that also modifies saved maps or other
+  Blueprints: a notification lists the changes and the affected assets (Apply / Details / Cancel) instead of the
+  "requires ... with dependencies" refusal. New default values saved together with such a change are applied
+  first ([Apply and hot reload](Docs/Guide/Workflow/ApplyAndHotReload.md#automatic-reimport-on-save)).
 
 ### Changed
 

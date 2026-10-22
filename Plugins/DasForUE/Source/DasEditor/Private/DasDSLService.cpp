@@ -812,7 +812,231 @@ bool FDasDSLService::Apply(const FString& Script, const FString& Package, const 
 {
     return ApplyDeclaration(Script, Package, Id, Out, Error, DefaultPolicy, nullptr);
 }
-bool FDasDSLService::Reimport(UBlueprint* BP, FString& Error, EDasDefaultMigrationPolicy DefaultPolicy)
+namespace
+{
+// The previous declaration with the new default values of the fields that keep their type. A field migration
+// accepts no other difference, so these defaults are applied first.
+bool DefaultsBeforeMigration(UBlueprint* BP, const FString& Source, FDasAuthoringModule& Out)
+{
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    FDasAuthoringModule Prior, Next;
+    FString Error, Before, After;
+    if (!FDasAuthoringModule::FromJson(BP->GetOutermost()->GetMetaData().GetValue(BP, TEXT("DasDSLModel")), Prior,
+                                                                                  Error) ||
+                                       !Runtime.ReadAuthoringScript(Runtime.ScriptPath(Source), Next, Error))
+        return false;
+    Out = Prior;
+    for (auto& C : Out.Classes)
+    {
+        const auto* N = Next.Classes.FindByPredicate([&](const auto& X) { return X.Id == C.Id; });
+        if (!N)
+            continue;
+        for (auto& P : C.Properties)
+            if (const auto* X = N->Properties.FindByPredicate([&](const auto& Y) { return Y.Id == P.Id; });
+                X && X->Type.Identity() == P.Type.Identity())
+                P.Default = X->Default;
+        C.PropertyOverrides = N->PropertyOverrides;
+        C.NativeDefaults = N->NativeDefaults;
+        for (auto& Component : C.Components)
+            if (const auto* X = N->Components.FindByPredicate([&](const auto& Y) { return Y.Id == Component.Id; }))
+                Component.Defaults = X->Defaults;
+        for (auto& O : C.ComponentOverrides)
+            if (const auto* X = N->ComponentOverrides.FindByPredicate([&](const auto& Y) { return Y.Id == O.Id; }))
+                O.Defaults = X->Defaults;
+    }
+    return Out.ToJson(After, Error) && Prior.ToJson(Before, Error) && After != Before &&
+           FDasAuthoringModule::DefaultsOnly(Prior, Out, Error);
+}
+FString PlanLiteral(const FDasDeclaredLiteral& L)
+{
+    if (L.Kind == TEXT("number"))
+        return FString::SanitizeFloat(L.Number, 0);
+    if (L.Kind == TEXT("bool"))
+        return L.Boolean ? TEXT("true") : TEXT("false");
+    if (L.Kind == TEXT("string"))
+        return TEXT("\"") + L.String + TEXT("\"");
+    return L.Kind.IsEmpty() ? TEXT("(none)") : L.Kind;
+}
+FString PlanCount(int32 N, const TCHAR* One, const TCHAR* Many)
+{
+    return FString::Printf(TEXT("%d %s"), N, N == 1 ? One : Many);
+}
+}
+
+FString FDasReimportPlan::Summary() const
+{
+    TArray<FString> Parts;
+    auto Add = [&](int32 N, const TCHAR* Text)
+    {
+        if (N)
+            Parts.Add(FString::Printf(TEXT("%s %d"), Text, N));
+    };
+    Add(Removed.Num(), TEXT("removed"));
+    Add(Renamed.Num(), TEXT("renamed"));
+    Add(Retyped.Num(), TEXT("retyped"));
+    Add(Added.Num(), TEXT("added"));
+    Add(Defaults.Num(), TEXT("new defaults"));
+    if (OtherDefaults)
+        Parts.Add(TEXT("other default values"));
+    FString Text = FString::Join(Parts, TEXT(", "));
+    if (!Text.IsEmpty())
+        Text[0] = FChar::ToUpper(Text[0]);
+    return Text;
+}
+FString FDasReimportPlan::Short(int32 MaxFields, int32 MaxAssets) const
+{
+    TArray<FString> Lines{Summary()};
+    int32 Shown = 0, Total = 0;
+    auto Group = [&](const TArray<FString>& Items, const TCHAR* Mark, const TCHAR* Suffix)
+    {
+        for (const FString& Item : Items)
+        {
+            ++Total;
+            if (Shown < MaxFields)
+            {
+                Lines.Add(FString::Printf(TEXT("%s %s%s"), Mark, *Item, Suffix));
+                ++Shown;
+            }
+        }
+    };
+    // Most significant first: removals lose values (archived, restorable), defaults change nothing placed.
+    Group(Removed, TEXT("-"), TEXT(": removed (values archived)"));
+    Group(Renamed, TEXT("~"), TEXT(""));
+    Group(Retyped, TEXT("~"), TEXT(""));
+    Group(Added, TEXT("+"), TEXT(""));
+    Group(Defaults, TEXT("="), TEXT(""));
+    if (Total > Shown)
+        Lines.Add(FString::Printf(TEXT("...and %d more"), Total - Shown));
+    TArray<FString> Assets = Maps;
+    Assets.Append(Blueprints);
+    if (!Assets.IsEmpty())
+    {
+        if (Assets.Num() <= MaxAssets)
+        {
+            TArray<FString> Names;
+            for (const FString& A : Assets)
+                Names.Add(FPackageName::GetShortName(A));
+            Lines.Add(TEXT("Will modify: ") + FString::Join(Names, TEXT(", ")));
+        }
+        else
+            Lines.Add(
+                FString::Printf(TEXT("Will modify %d assets: %s, %s"), Assets.Num(),
+                                     *PlanCount(Maps.Num(), TEXT("map"), TEXT("maps")),
+                                                *PlanCount(Blueprints.Num(), TEXT("Blueprint"), TEXT("Blueprints"))));
+    }
+    return FString::Join(Lines, TEXT("\n"));
+}
+FString FDasReimportPlan::Details(int32 MaxPerGroup) const
+{
+    FString Text = Summary() + TEXT("\n");
+    auto Group = [&](const TCHAR* Title, const TArray<FString>& Items)
+    {
+        if (Items.IsEmpty())
+            return;
+        Text += FString::Printf(TEXT("\n%s (%d):\n"), Title, Items.Num());
+        for (int32 I = 0; I < Items.Num() && I < MaxPerGroup; ++I)
+            Text += TEXT("    ") + Items[I] + TEXT("\n");
+        if (Items.Num() > MaxPerGroup)
+            Text += FString::Printf(TEXT("    ...and %d more (the full list is in the Output Log)\n"),
+                                         Items.Num() - MaxPerGroup);
+    };
+    Group(TEXT("Removed fields; their values are archived on each instance and can be restored"), Removed);
+    Group(TEXT("Renamed fields"), Renamed);
+    Group(TEXT("Retyped fields"), Retyped);
+    Group(TEXT("Added fields"), Added);
+    Group(TEXT("New default values"), Defaults);
+    if (OtherDefaults)
+        Text += TEXT("\nOther default values (components, inherited or native properties) change.\n");
+    Group(TEXT("Maps that will be modified"), Maps);
+    Group(TEXT("Blueprints that will be modified"), Blueprints);
+    if (!Maps.IsEmpty() || !Blueprints.IsEmpty())
+        Text += TEXT("\nModified assets stay unsaved until you save them. A failure rolls everything back.\n");
+    return Text;
+}
+
+bool FDasDSLService::PlanReimport(UBlueprint* BP, FDasReimportPlan& Out, FString& Error)
+{
+    Out = FDasReimportPlan();
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    auto& Metadata = BP->GetOutermost()->GetMetaData();
+    const FString Source = Metadata.GetValue(BP, TEXT("DasDSLSource")),
+                                             Id = Metadata.GetValue(BP, TEXT("DasDSLClassId"));
+    FDasAuthoringModule Prior, Next;
+    if (Source.IsEmpty() ||
+        !FDasAuthoringModule::FromJson(Metadata.GetValue(BP, TEXT("DasDSLModel")), Prior, Error) ||
+                                       !Runtime.ReadAuthoringScript(Runtime.ScriptPath(Source), Next, Error))
+        return false;
+    const auto* Old = Prior.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
+    const auto* New = Next.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
+    if (!Old || !New)
+    {
+        Error = TEXT("Class is missing from the script");
+        return false;
+    }
+    for (const auto& P : New->Properties)
+    {
+        const auto* Was = Old->Properties.FindByPredicate([&](const auto& X) { return X.Id == P.Id; });
+        if (!Was)
+            Out.Added.Add(P.Name);
+        else if (P.Type.Identity() != Was->Type.Identity())
+            Out.Retyped.Add(FString::Printf(TEXT("%s: %s -> %s"), *P.Name, *Was->Type.Identity(), *P.Type.Identity()));
+        else
+        {
+            if (P.Name != Was->Name)
+                Out.Renamed.Add(Was->Name + TEXT(" -> ") + P.Name);
+            if (!(P.Default == Was->Default))
+                Out.Defaults.Add(FString::Printf(TEXT("%s: %s -> %s"), *P.Name, *PlanLiteral(Was->Default),
+                                                      *PlanLiteral(P.Default)));
+        }
+    }
+    for (const auto& P : Old->Properties)
+        if (!New->Properties.ContainsByPredicate([&](const auto& X) { return X.Id == P.Id; }))
+            Out.Removed.Add(P.Name);
+    FDasAuthoringModule Defaults;
+    if (DefaultsBeforeMigration(BP, Source, Defaults))
+    {
+        // Defaults beyond the literal field values: components, inherited and native properties.
+        FDasAuthoringModule Literal = Prior;
+        for (auto& C : Literal.Classes)
+            if (const auto* N = Defaults.Classes.FindByPredicate([&](const auto& X) { return X.Id == C.Id; }))
+                C.Properties = N->Properties;
+        FString A, B;
+        Out.OtherDefaults = Literal.ToJson(A, Error) && Defaults.ToJson(B, Error) && A != B;
+        Error.Reset();
+    }
+    // Saved assets outside the class and its own instances.
+    TArray<UClass*> Children;
+    GetDerivedClasses(BP->GeneratedClass, Children, true);
+    for (auto* C : Children)
+        if (auto* B = Cast<UBlueprint>(C->ClassGeneratedBy))
+            Out.Blueprints.AddUnique(B->GetOutermost()->GetName());
+    TArray<UBlueprint*> Dependents;
+    FBlueprintEditorUtils::FindDependentBlueprints(BP, Dependents);
+    for (auto* B : Dependents)
+        Out.Blueprints.AddUnique(B->GetOutermost()->GetName());
+    auto& Registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
+    TArray<FName> Referencers;
+    Registry.GetReferencers(BP->GetOutermost()->GetFName(), Referencers);
+    for (FName P : Referencers)
+    {
+        if (P == BP->GetOutermost()->GetFName())
+            continue;
+        TArray<FAssetData> Data;
+        Registry.GetAssetsByPackageName(P, Data);
+        if (Data.Num() == 1 && FDasBlueprintRollback::InstanceAsset(Data[0], BP->GeneratedClass))
+            continue;
+        if (Data.Num() == 1 && Data[0].AssetClassPath == UWorld::StaticClass()->GetClassPathName())
+            Out.Maps.AddUnique(P.ToString());
+        else
+            Out.Blueprints.AddUnique(P.ToString());
+    }
+    Out.NeedsConfirmation = ClassifyFieldMigration(BP, Source, Id) != EFieldMigration::None &&
+                            (!Out.Maps.IsEmpty() || !Out.Blueprints.IsEmpty());
+    return true;
+}
+
+bool FDasDSLService::Reimport(UBlueprint* BP, FString& Error, EDasDefaultMigrationPolicy DefaultPolicy,
+                              bool IncludeDependencies)
 {
     if (!IsInGameThread() || !IsValid(BP))
     {
@@ -829,6 +1053,40 @@ bool FDasDSLService::Reimport(UBlueprint* BP, FString& Error, EDasDefaultMigrati
     }
     UBlueprint* Result = nullptr;
     const FString Package = BP->GetOutermost()->GetName();
+    // Renaming, removing or numerically retyping existing fields: the matching explicit migration keeps the
+    // values (renamed, archived for a later restore, exactly converted) instead of a refusal. New default values
+    // in the same save are applied first: the migration accepts no other difference.
+    if (DefaultPolicy == EDasDefaultMigrationPolicy::Automatic)
+    {
+        const EFieldMigration Migration = ClassifyFieldMigration(BP, Source, Id);
+        if (Migration != EFieldMigration::None)
+        {
+            FKeepPossession Possession(BP->GeneratedClass);
+            FDasAuthoringModule Defaults;
+            if (DefaultsBeforeMigration(BP, Source, Defaults) &&
+                !ApplyDeclaration(Source, Package, Id, Result, Error, DefaultPolicy, &Defaults))
+                return false;
+            // Saved DataAsset instances of the class are migrated with it; other saved referencers only when the
+            // caller allows it (auto-reimport asks first).
+            const bool Dependencies = IncludeDependencies || OnlyInstanceReferencers(BP);
+            switch (Migration)
+            {
+            case EFieldMigration::Rename:
+                return ReimportRenamedFields(BP, Error, Dependencies);
+            case EFieldMigration::Remove:
+                return ReimportArchivedFields(BP, false, Dependencies, Error);
+            case EFieldMigration::Numeric:
+            {
+                // Exact rules: a value that the new type cannot hold exactly refuses the change.
+                FDasNumericMigrationOptions Options;
+                Options.IncludeDependencies = Dependencies;
+                return ReimportConvertedNumericFields(BP, Options, Error);
+            }
+            case EFieldMigration::None:
+                break;
+            }
+        }
+    }
     FDasAuthoringModule Declaration;
     if (DefaultPolicy == EDasDefaultMigrationPolicy::Automatic && SplitDefaultChanges(BP, Source, Declaration))
     {
@@ -840,31 +1098,6 @@ bool FDasDSLService::Reimport(UBlueprint* BP, FString& Error, EDasDefaultMigrati
             return false;
         }
         return true;
-    }
-    // Renaming, removing or numerically retyping existing fields: the matching explicit migration keeps the
-    // values (renamed, archived for a later restore, exactly converted) instead of a refusal.
-    if (DefaultPolicy == EDasDefaultMigrationPolicy::Automatic)
-    {
-        FKeepPossession Possession(BP->GeneratedClass);
-        // Saved DataAsset instances of the class are migrated with it; other saved referencers still need an
-        // explicit migration with dependencies.
-        const bool Instances = OnlyInstanceReferencers(BP);
-        switch (ClassifyFieldMigration(BP, Source, Id))
-        {
-        case EFieldMigration::Rename:
-            return ReimportRenamedFields(BP, Error, Instances);
-        case EFieldMigration::Remove:
-            return ReimportArchivedFields(BP, false, Instances, Error);
-        case EFieldMigration::Numeric:
-        {
-            // Exact rules: a value that the new type cannot hold exactly refuses the change.
-            FDasNumericMigrationOptions Options;
-            Options.IncludeDependencies = Instances;
-            return ReimportConvertedNumericFields(BP, Options, Error);
-        }
-        case EFieldMigration::None:
-            break;
-        }
     }
     return Apply(Source, Package, Id, Result, Error, DefaultPolicy);
 }

@@ -12,6 +12,9 @@
 #include "HAL/IConsoleManager.h"
 #include "Interfaces/IPluginManager.h"
 #include "Logging/MessageLog.h"
+#include "Logging/TokenizedMessage.h"
+#include "Misc/MessageDialog.h"
+#include "Misc/PackageName.h"
 #include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
 #include "UObject/MetaData.h"
@@ -81,6 +84,11 @@ void FDasAutoReimport::Stop()
             FTSTicker::GetCoreTicker().RemoveTicker(*Handle);
         Handle->Reset();
     }
+    TArray<FString> Open;
+    Confirmations.GetKeys(Open);
+    for (const FString& Path : Open)
+        CloseConfirmation(Path);
+    Confirmed.Reset();
     Pending.Reset();
     Deferred.Reset();
     DeferredGAS.Reset();
@@ -248,7 +256,25 @@ void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
     if (Runtime.ReadAuthoringScript(Runtime.ScriptPath(Source), Model, Error) && Model.ToJson(Json, Error) &&
         Json == Before)
         return;
-    if (!FDasDSLService::Reimport(Blueprint, Error))
+    // A field migration that also changes saved maps or other Blueprints is applied only after Apply.
+    const FString Path = Blueprint->GetPathName();
+    const bool bConfirmed = Confirmed.Contains(Path);
+    FDasReimportPlan Plan;
+    FString PlanError;
+    if (!bConfirmed && FDasDSLService::PlanReimport(Blueprint, Plan, PlanError) && Plan.NeedsConfirmation)
+    {
+        if (GEditor && GEditor->PlayWorld)
+        {
+            UE_LOG(LogTemp, Display, TEXT("DAS_DSL_AUTO_REIMPORT deferred %s: needs confirmation"), *Name);
+            Deferred.AddUnique(Blueprint);
+            Notify(FString::Printf(TEXT("daScript: %s changes other assets; you will be asked when Play stops"), *Name),
+                                   false);
+            return;
+        }
+        AskConfirmation(Blueprint, Plan);
+        return;
+    }
+    if (!FDasDSLService::Reimport(Blueprint, Error, EDasDefaultMigrationPolicy::Automatic, bConfirmed))
     {
         // Some migrations (default values) never touch a running game world; apply them after PIE.
         const bool bPlaying = GEditor && GEditor->PlayWorld;
@@ -263,6 +289,7 @@ void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
         }
         else
         {
+            Confirmed.Remove(Path);
             UE_LOG(LogTemp, Warning, TEXT("DAS_DSL_AUTO_REIMPORT rejected %s: %s"), *Name, *Error);
             FMessageLog(TEXT("BlueprintLog")).Error(FText::FromString(Text));
         }
@@ -270,7 +297,9 @@ void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
         return;
     }
     Deferred.Remove(Blueprint);
-    if (bRetry || Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel")) != Before)
+    Confirmed.Remove(Path);
+    if (bConfirmed || bRetry ||
+        Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel")) != Before)
     {
         UE_LOG(LogTemp, Display, TEXT("DAS_DSL_AUTO_REIMPORT applied %s"), *Name);
         Notify(FString::Printf(TEXT("daScript: %s updated from its script"), *Name), true);
@@ -302,4 +331,75 @@ void FDasAutoReimport::RetryDeferred()
     DeferredGAS.Reset();
     for (const auto& Import : Imports)
         ReimportGAS(Import, true);
+}
+void FDasAutoReimport::AskConfirmation(UBlueprint* Blueprint, const FDasReimportPlan& Plan)
+{
+    const FString Path = Blueprint->GetPathName(), Name = Blueprint->GetName();
+    CloseConfirmation(Path);
+    // The complete list goes to the log; the notification and the dialog stay short for large changes.
+    UE_LOG(LogTemp, Display, TEXT("DAS_DSL_REIMPORT_PLAN %s\n%s"), *Name, *Plan.Details(MAX_int32));
+    PlanDetails.Add(Path, Plan.Details());
+    FNotificationInfo Info(
+        FText::FromString(FString::Printf(TEXT("daScript: %s - this change also modifies other assets"), *Name)));
+    Info.SubText = FText::FromString(Plan.Short());
+    Info.bFireAndForget = false;
+    Info.bUseSuccessFailIcons = false;
+    Info.ButtonDetails.Add(FNotificationButtonInfo(FText::FromString(
+        TEXT("Apply")), FText::FromString(TEXT("Apply the change to the class and the listed assets")),
+                                          FSimpleDelegate::CreateRaw(this, &FDasAutoReimport::Confirm, Path),
+                                          SNotificationItem::CS_Pending));
+    Info.ButtonDetails.Add(FNotificationButtonInfo(FText::FromString(
+        TEXT("Details")), FText::FromString(TEXT("Show every changed field and affected asset")),
+                                            FSimpleDelegate::CreateRaw(this, &FDasAutoReimport::ShowDetails, Path),
+                                            SNotificationItem::CS_Pending));
+    Info.ButtonDetails.Add(FNotificationButtonInfo(FText::FromString(
+        TEXT("Cancel")), FText::FromString(TEXT("Keep the Blueprint as it is")),
+                                           FSimpleDelegate::CreateRaw(this, &FDasAutoReimport::Decline, Path),
+                                           SNotificationItem::CS_Pending));
+    TSharedPtr<SNotificationItem> Item = FSlateNotificationManager::Get().AddNotification(Info);
+    if (Item)
+        Item->SetCompletionState(SNotificationItem::CS_Pending);
+    Confirmations.Add(Path, Item);
+}
+void FDasAutoReimport::ShowDetails(FString Path)
+{
+    if (const FString* Text = PlanDetails.Find(Path))
+        FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(*Text),
+                             FText::FromString(FString::Printf(TEXT("daScript: changes of %s"),
+                                                                    *FPackageName::ObjectPathToObjectName(Path))));
+}
+void FDasAutoReimport::CloseConfirmation(const FString& Path)
+{
+    TWeakPtr<SNotificationItem> Item;
+    if (Confirmations.RemoveAndCopyValue(Path, Item))
+        if (TSharedPtr<SNotificationItem> Pinned = Item.Pin())
+        {
+            Pinned->SetCompletionState(SNotificationItem::CS_None);
+            Pinned->ExpireAndFadeout();
+        }
+    PlanDetails.Remove(Path);
+}
+void FDasAutoReimport::Confirm(FString Path)
+{
+    CloseConfirmation(Path);
+    if (UBlueprint* Blueprint = FindObject<UBlueprint>(nullptr, *Path))
+    {
+        Confirmed.Add(Path);
+        Reimport(Blueprint, false);
+    }
+}
+void FDasAutoReimport::Decline(FString Path)
+{
+    CloseConfirmation(Path);
+    const FString Name = FPackageName::ObjectPathToObjectName(Path);
+    UE_LOG(LogTemp, Display, TEXT("DAS_DSL_AUTO_REIMPORT declined %s"), *Name);
+    FMessageLog(
+        TEXT("BlueprintLog"))
+            .Info(FText::FromString(FString::Printf(
+                TEXT("daScript: %s was not updated; its script changes fields used by other assets."), *Name)))
+                         ->AddToken(FActionToken::Create(FText::FromString(
+                             TEXT("Apply")),
+                             FText::FromString(
+                                 TEXT("Apply the change to the class and the assets using it")),
+                                 FOnActionTokenExecuted::CreateRaw(this, &FDasAutoReimport::Confirm, Path), true));
 }
