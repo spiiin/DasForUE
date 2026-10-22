@@ -1,6 +1,7 @@
 #include "DasAutoReimport.h"
 #include "DasAuthoring.h"
 #include "DasDSLService.h"
+#include "DasGASAssetService.h"
 #include "DasRuntime.h"
 #include "DirectoryWatcherModule.h"
 #include "Editor.h"
@@ -82,6 +83,7 @@ void FDasAutoReimport::Stop()
     }
     Pending.Reset();
     Deferred.Reset();
+    DeferredGAS.Reset();
     Checked.Reset();
 }
 void FDasAutoReimport::OnScriptsChanged(const TArray<FFileChangeData>& Changes)
@@ -115,9 +117,10 @@ TArray<UBlueprint*> FDasAutoReimport::Bound(const TSet<FString>* Files) const
         if (!Blueprint->GeneratedClass || Blueprint->HasAnyFlags(RF_ClassDefaultObject | RF_Transient))
             continue;
         const FString Source = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLSource"));
-                if (Source.IsEmpty())
+        if (Source.IsEmpty())
             continue;
-        bool Match = !Files || Files->Contains(FullPath(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source));
+        bool Match =
+            !Files || Files->Contains(FullPath(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source));
         // An authored child also depends on its parents' scripts (recorded in its declaration).
         if (!Match)
         {
@@ -126,8 +129,7 @@ TArray<UBlueprint*> FDasAutoReimport::Bound(const TSet<FString>* Files) const
             if (FDasAuthoringModule::FromJson(
                     Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel")), Model, Error))
                 for (const auto& C : Model.Classes)
-                    Match |= !C.SourceScript.IsEmpty() &&
-                             Files->Contains(FullPath(Runtime.ScriptPath(C.SourceScript)));
+                    Match |= !C.SourceScript.IsEmpty() && Files->Contains(FullPath(Runtime.ScriptPath(C.SourceScript)));
         }
         if (Match)
             Result.Add(Blueprint);
@@ -138,6 +140,55 @@ void FDasAutoReimport::ReimportFiles(const TSet<FString>& Files)
 {
     for (UBlueprint* Blueprint : Bound(&Files))
         Reimport(Blueprint, false);
+    for (const auto& Import : BoundGAS(&Files))
+        ReimportGAS(Import, false);
+}
+TSet<TPair<FString, FString>> FDasAutoReimport::BoundGAS(const TSet<FString>* Files) const
+{
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    TSet<TPair<FString, FString>> Result;
+    for (TObjectIterator<UBlueprint> It; It; ++It)
+    {
+        if (!It->GeneratedClass || It->HasAnyFlags(RF_ClassDefaultObject | RF_Transient))
+            continue;
+        auto& Meta = It->GetOutermost()->GetMetaData();
+        const FString Source = Meta.GetValue(*It, TEXT("DasGASSource")),
+                                             Folder = Meta.GetValue(*It, TEXT("DasGASFolder"));
+        if (!Source.IsEmpty() && !Folder.IsEmpty() && (!Files || Files->Contains(FullPath(Runtime.ScriptPath(Source)))))
+            Result.Add({Source, Folder});
+    }
+    return Result;
+}
+void FDasAutoReimport::ReimportGAS(const TPair<FString, FString>& Import, bool bRetry)
+{
+    TMap<FString, UBlueprint*> Assets;
+    FString Error;
+    int32 Updated = 0;
+    // The assets stay dirty until the user saves them, like other reimports.
+    if (!FDasGASAssetService::Apply(Import.Key, Import.Value, Assets, Error, false, &Updated))
+    {
+        const bool bPlaying = GEditor && GEditor->PlayWorld;
+        const FString Text = bPlaying
+            ? FString::Printf(TEXT("daScript: GAS assets of %s are not updated during Play; they will be updated "
+                                   "when Play stops"),
+                                   *Import.Key)
+            : FString::Printf(TEXT("daScript: GAS assets of %s were not updated: %s"), *Import.Key, *Error);
+        if (bPlaying)
+            DeferredGAS.Add(Import);
+        else
+            FMessageLog(TEXT("BlueprintLog")).Error(FText::FromString(Text));
+        UE_LOG(LogTemp, Display,
+               TEXT("DAS_GAS_AUTO_REIMPORT %s %s: %s"),
+                    bPlaying ? TEXT("deferred") : TEXT("rejected"), *Import.Key, *Error);
+        Notify(Text, false);
+        return;
+    }
+    DeferredGAS.Remove(Import);
+    if (Updated > 0 || bRetry)
+    {
+        UE_LOG(LogTemp, Display, TEXT("DAS_GAS_AUTO_REIMPORT applied %s (%d assets)"), *Import.Key, Updated);
+        Notify(FString::Printf(TEXT("daScript: %d GAS assets updated from %s"), Updated, *Import.Key), true);
+    }
 }
 void FDasAutoReimport::ReimportStale()
 {
@@ -155,6 +206,15 @@ void FDasAutoReimport::ReimportStale()
             continue;
         Reimport(Blueprint, false);
         Checked.Add(Key, {Stamp, Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLModel"))});
+    }
+    for (const auto& Import : BoundGAS(nullptr))
+    {
+        const FDateTime Stamp = IFileManager::Get().GetTimeStamp(*Runtime.ScriptPath(Import.Key));
+        const FString Key = TEXT("gas:") + Import.Key + TEXT("|") + Import.Value;
+        if (const auto* Seen = Checked.Find(Key); Seen && Seen->Key == Stamp)
+            continue;
+        ReimportGAS(Import, false);
+        Checked.Add(Key, {Stamp, FString()});
     }
 }
 void FDasAutoReimport::OnPreBeginPIE(bool)
@@ -218,7 +278,7 @@ void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
 }
 void FDasAutoReimport::OnEndPIE(bool)
 {
-    if (!Deferred.IsEmpty() && !RetryTicker.IsValid())
+    if ((!Deferred.IsEmpty() || !DeferredGAS.IsEmpty()) && !RetryTicker.IsValid())
         RetryTicker = FTSTicker::GetCoreTicker().AddTicker(
             FTickerDelegate::CreateRaw(this, &FDasAutoReimport::RetryAfterPIE), SettleSeconds);
 }
@@ -238,4 +298,8 @@ void FDasAutoReimport::RetryDeferred()
     for (const auto& Blueprint : Blueprints)
         if (Blueprint.IsValid())
             Reimport(Blueprint.Get(), true);
+    const auto Imports = MoveTemp(DeferredGAS);
+    DeferredGAS.Reset();
+    for (const auto& Import : Imports)
+        ReimportGAS(Import, true);
 }

@@ -33,6 +33,9 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
   ([Data assets](Docs/Guide/Data/DataAssets.md#changing-the-class)).
 - Struct field migration updates the rows of DataTables that use the struct in place (rename, add, drop, convert;
   rolled back on failure); a struct used only by tables no longer needs a DSL Actor root.
+- GAS assets update in place: reimporting into the same folder (or saving the script, through auto-reimport)
+  rewrites changed effects, abilities, calculations and cues and adds new attributes, keeping the classes that
+  other assets reference ([Changing definitions](Docs/Guide/Gameplay/GASAuthoring.md#changing-definitions)).
 
 ### Changed
 

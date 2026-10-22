@@ -77,6 +77,8 @@ root component needs a new Blueprint. A new default value is applied during PIE 
 editor world and the running game get it, except values the game or the level already changed. One save may add members and
 change default values at once: the new declaration is applied first, then the default values. A change
 refused while PIE runs is tried again when Play stops.
+GAS assets imported with `Das.GASImport` follow their script the same way: the folder they were imported into is
+updated in place ([Changing definitions](../Gameplay/GASAuthoring.md#changing-definitions)).
 Turn it off with `Das.DSL.AutoReimport 0`; commandlets and unattended runs never reimport automatically.
 
 ### Das.DSL.Reimport

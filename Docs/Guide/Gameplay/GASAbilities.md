@@ -58,8 +58,8 @@ parallel cooldown registry is used.
 
 `Das.GASImport gas_combat_definitions.das /Game/GAS/Combat` now also creates
 GA_RestoreHealth and GA_HeldHeal. Their CDOs store typed effect classes, the
-cooldown tag/duration and auto-end setting. Identical reimport preserves classes;
-changed definitions require a new folder while structural migration is deferred.
+cooldown tag/duration and auto-end setting. Reimport into the same folder preserves
+classes and updates changed definitions in place ([Changing definitions](GASAuthoring.md#changing-definitions)).
 These assets are saved with their effect/AttributeSet dependencies.
 
 `require ue_gas` exports AuthoredGameplayAbilityClass and typed helpers. On an

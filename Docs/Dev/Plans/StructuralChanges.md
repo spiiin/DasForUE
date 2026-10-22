@@ -182,6 +182,12 @@ struct into scope (registry referencers and loaded tables), captures every row b
 after the struct compiles (and on rollback). A struct used only as rows needs no DSL Actor root.
 Test `DasForUE.Types.StructDataTable` (rename + add, injected failure, drop with rule).
 
+**S8c done 2026-10-22 (GAS).** `FDasGASAssetService::Apply` into the same folder rewrites the CDO of every
+asset whose definition hash changed (same code as creation) and adds new attributes to AttributeSets;
+removed/renamed attributes, cue tag and identity changes are refused. Snapshots (variables + CDO bytes)
+restore every updated asset on failure. Assets remember `DasGASSource`/`DasGASFolder`; auto-reimport
+updates them on save, on map open and before Play, deferring during Play. Test `DasForUE.Reload.GASInPlace`.
+
 - DataAsset / PrimaryDataAsset: instances are assets; migrate and re-save them in scope.
 - SaveGame: no live instances to migrate; covered by the save-game schema item (v1) — versioned field ids
   and conversions applied on load.

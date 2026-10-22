@@ -72,7 +72,7 @@ The source/target attributes and their base/current values are unchanged. The te
 
 ## Validation and remaining limits
 
-All output attributes resolve through the existing explicit registry and are checked for presence on the target before authored application. Native contract hashes include outputs/callers/scoped metadata and output AttributeSet hashes. Structural changes still require a fresh import folder; body-only edits keep the calculation schema.
+All output attributes resolve through the existing explicit registry and are checked for presence on the target before authored application. Native contract hashes include outputs/callers/scoped metadata and output AttributeSet hashes. Changed captures, outputs and callers update the calculation in place; changing its kind (MMC/Execution) needs a fresh import folder ([Changing definitions](GASAuthoring.md#changing-definitions)).
 
 Script errors or an invalid execution result omit this execution's output; they do not roll back direct modifiers or other executions in the same GameplayEffect. Native attribute clamps and callbacks retain normal GAS semantics. Successful montage playback, target-actor UI, gameplay cues, replication and prediction remain separate work.
 

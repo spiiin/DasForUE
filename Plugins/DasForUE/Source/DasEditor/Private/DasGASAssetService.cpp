@@ -20,7 +20,16 @@
 #include "Misc/ScopeExit.h"
 #include "HAL/FileManager.h"
 #include "HAL/IConsoleManager.h"
+#include "Editor.h"
+#include "Serialization/ObjectReader.h"
+#include "Serialization/ObjectWriter.h"
+#include "UObject/MetaData.h"
 
+static bool GDasFailGASUpdate = false;
+void DasFailGASUpdateForTesting(bool bFail)
+{
+    GDasFailGASUpdate = bFail;
+}
 namespace
 {
 FString SetDigest(const FDasGASSetDeclaration& D)
@@ -66,9 +75,11 @@ UBlueprint* NewGASBlueprint(const FString& Path, UClass* Parent)
 }
 }
 bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TMap<FString, UBlueprint*>& Out,
-                                FString& Error, bool SaveAssets)
+                                FString& Error, bool SaveAssets, int32* Updated)
 {
     Out.Empty();
+    if (Updated)
+        *Updated = 0;
     Error.Reset();
     auto Fail = [&](const FString& Message)
     {
@@ -90,6 +101,8 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
         FString Name, Id, Path, Hash;
         UClass* Parent = nullptr;
         UBlueprint* BP = nullptr;
+        // An existing asset whose definition changed: its CDO is rewritten in place.
+        bool Update = false;
     };
     TArray<FWork> Work;
     TMap<FString, FString> Hashes;
@@ -180,6 +193,13 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
                 return Fail(TEXT("Cue tag already belongs to another notify asset: ")+ Cue.Tag.ToString());
         }
     }
+    // The script and folder an asset was imported from; saving the script updates the folder.
+    auto Remember = [&](UBlueprint* BP)
+    {
+        auto& Meta = BP->GetOutermost()->GetMetaData();
+        Meta.SetValue(BP, TEXT("DasGASSource"), *Script);
+        Meta.SetValue(BP, TEXT("DasGASFolder"), *Folder);
+    };
     // Check the entire batch before creating any UObject or changing an existing package.
     for (auto& W : Work)
     {
@@ -224,33 +244,93 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             Id = C->Definition.Id;
             Hash = C->Definition.Hash;
         }
-        if (Id != W.Id || Hash != W.Hash)
-            return Fail(TEXT("GAS schema changed; live structural migration is deferred. Import into a new folder."));
+        if (Id != W.Id)
+            return Fail(TEXT("GAS definition identity changed; import into a new folder"));
+        if (Hash == W.Hash)
+        {
+            if (W.BP->GetOutermost()->GetMetaData().GetValue(W.BP, TEXT("DasGASFolder")) != Folder)
+                Remember(W.BP);
+            continue;
+        }
+        // Data changes rewrite the asset; what other assets or Blueprints bind to stays as it is.
+        W.Update = true;
+        if (const auto* Set = Model.Sets.FindByPredicate([&](const auto& D) { return D.Id == W.Id; }))
+            for (const auto& V : W.BP->NewVariables)
+                if (V.VarType.PinSubCategoryObject.Get() == FGameplayAttributeData::StaticStruct() &&
+                    !Set->Attributes.ContainsByPredicate([&](const auto& A) { return A.Name == V.VarName; }))
+                    return Fail(TEXT("Removing or renaming an attribute is a contract change; import into a new "
+                                     "folder: ") +
+                                     V.VarName.ToString());
+        if (const auto* Cue = Model.Cues.FindByPredicate([&](const auto& D) { return D.Id == W.Id; }))
+            if (CastChecked<UDasGameplayCueNotify>(CDO)->GameplayCueName != Cue->Tag)
+                return Fail(TEXT("Changing a cue tag is a contract change; import into a new folder: ") +
+                                 Cue->Tag.ToString());
     }
+    if (GEditor && GEditor->PlayWorld && Work.ContainsByPredicate([](const auto& W) { return W.Update; }))
+        return Fail(TEXT("GAS assets are not updated during Play"));
+    // Rollback image of each asset updated in place: its attribute variables and its CDO.
+    struct FSnapshot
+    {
+        UBlueprint* BP;
+        TArray<FBPVariableDescription> Variables;
+        TArray<uint8> CDO;
+        bool WasDirty;
+    };
+    TArray<FSnapshot> Snapshots;
+    for (const auto& W : Work)
+        if (W.Update)
+        {
+            FSnapshot S{W.BP, W.BP->NewVariables, {}, W.BP->GetOutermost()->IsDirty()};
+            FObjectWriter(W.BP->GeneratedClass->GetDefaultObject(), S.CDO);
+            Snapshots.Add(MoveTemp(S));
+        }
     TArray<UBlueprint*> Created;
     bool Success = false;
     ON_SCOPE_EXIT
     {
-        if (!Success)
-            for (auto* BP : Created)
+        if (Success)
+            return;
+        for (auto* BP : Created)
+        {
+            FAssetRegistryModule::AssetDeleted(BP);
+            BP->ClearFlags(RF_Public | RF_Standalone);
+            BP->GetOutermost()->SetDirtyFlag(false);
+        }
+        for (auto& S : Snapshots)
+        {
+            if (S.BP->NewVariables.Num() != S.Variables.Num())
             {
-                FAssetRegistryModule::AssetDeleted(BP);
-                BP->ClearFlags(RF_Public | RF_Standalone);
-                BP->GetOutermost()->SetDirtyFlag(false);
+                S.BP->NewVariables = S.Variables;
+                FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(S.BP);
+                FKismetEditorUtilities::CompileBlueprint(S.BP);
             }
+            FObjectReader(S.BP->GeneratedClass->GetDefaultObject(), S.CDO);
+            CastChecked<UBlueprintGeneratedClass>(S.BP->GeneratedClass.Get())
+                ->UpdateCustomPropertyListForPostConstruction();
+            S.BP->GetOutermost()->SetDirtyFlag(S.WasDirty);
+        }
+        if (!Snapshots.IsEmpty())
+            Error = TEXT("GAS update rolled back: ") + Error;
     };
     TMap<FString, UClass*> Sets;
     for (const auto& Set : Model.Sets)
     {
         auto& W = *Work.FindByPredicate([&](const auto& A) { return A.Id == Set.Id; });
-        if (!W.BP)
+        const bool New = !W.BP;
+        if (New || W.Update)
         {
-            W.BP = NewGASBlueprint(W.Path, W.Parent);
-            if (!W.BP)
-                return Fail(TEXT("Cannot create AttributeSet Blueprint"));
-            Created.Add(W.BP);
+            if (New)
+            {
+                W.BP = NewGASBlueprint(W.Path, W.Parent);
+                if (!W.BP)
+                    return Fail(TEXT("Cannot create AttributeSet Blueprint"));
+                Created.Add(W.BP);
+            }
+            // Attributes are Blueprint variables: a new one is added, existing ones stay bound.
             for (const auto& A : Set.Attributes)
             {
+                if (W.BP->NewVariables.ContainsByPredicate([&](const auto& V) { return V.VarName == A.Name; }))
+                    continue;
                 FEdGraphPinType Type;
                 Type.PinCategory = UEdGraphSchema_K2::PC_Struct;
                 Type.PinSubCategoryObject = FGameplayAttributeData::StaticStruct();
@@ -271,7 +351,11 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             // construction list so new instances copy native declaration fields.
             CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
                 ->UpdateCustomPropertyListForPostConstruction();
-            FAssetRegistryModule::AssetCreated(W.BP);
+            if (New)
+                FAssetRegistryModule::AssetCreated(W.BP);
+            else if (Updated)
+                ++*Updated;
+            Remember(W.BP);
             W.BP->MarkPackageDirty();
         }
         Sets.Add(Set.Id, W.BP->GeneratedClass);
@@ -281,15 +365,19 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
     for (const auto& D : Model.Calculations)
     {
         auto& W = *Work.FindByPredicate([&](const auto& A) { return A.Id == D.Id; });
-        if (!W.BP)
+        const bool New = !W.BP;
+        if (New || W.Update)
         {
-            W.BP = NewGASBlueprint(W.Path, W.Parent);
-            if (!W.BP)
-                return Fail(TEXT("Cannot create GAS calculation Blueprint"));
-            Created.Add(W.BP);
-            FKismetEditorUtilities::CompileBlueprint(W.BP);
-            if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
-                return Fail(TEXT("Calculation Blueprint compilation failed"));
+            if (New)
+            {
+                W.BP = NewGASBlueprint(W.Path, W.Parent);
+                if (!W.BP)
+                    return Fail(TEXT("Cannot create GAS calculation Blueprint"));
+                Created.Add(W.BP);
+                FKismetEditorUtilities::CompileBlueprint(W.BP);
+                if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
+                    return Fail(TEXT("Calculation Blueprint compilation failed"));
+            }
             FDasGASCalculationDefinition Def;
             Def.Id = D.Id;
             Def.Hash = W.Hash;
@@ -343,7 +431,11 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             }
             CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
                 ->UpdateCustomPropertyListForPostConstruction();
-            FAssetRegistryModule::AssetCreated(W.BP);
+            if (New)
+                FAssetRegistryModule::AssetCreated(W.BP);
+            else if (Updated)
+                ++*Updated;
+            Remember(W.BP);
             W.BP->MarkPackageDirty();
         }
         Calculations.Add(D.Id, W.BP->GeneratedClass.Get());
@@ -352,15 +444,19 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
     for (const auto& Cue : Model.Cues)
     {
         auto& W = *Work.FindByPredicate([&](const auto& A) { return A.Id == Cue.Id; });
-        if (!W.BP)
+        const bool New = !W.BP;
+        if (New || W.Update)
         {
-            W.BP = NewGASBlueprint(W.Path, W.Parent);
-            if (!W.BP)
-                return Fail(TEXT("Cannot create cue Blueprint"));
-            Created.Add(W.BP);
-            FKismetEditorUtilities::CompileBlueprint(W.BP);
-            if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
-                return Fail(TEXT("Cue Blueprint compilation failed"));
+            if (New)
+            {
+                W.BP = NewGASBlueprint(W.Path, W.Parent);
+                if (!W.BP)
+                    return Fail(TEXT("Cannot create cue Blueprint"));
+                Created.Add(W.BP);
+                FKismetEditorUtilities::CompileBlueprint(W.BP);
+                if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
+                    return Fail(TEXT("Cue Blueprint compilation failed"));
+            }
             auto* CDO = CastChecked<UDasGameplayCueNotify>(W.BP->GeneratedClass->GetDefaultObject());
             CDO->DefinitionId = Cue.Id;
             CDO->ScriptFile = Cue.ScriptFile;
@@ -371,7 +467,11 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             CDO->GameplayCueName = Cue.Tag;
             CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
                 ->UpdateCustomPropertyListForPostConstruction();
-            FAssetRegistryModule::AssetCreated(W.BP);
+            if (New)
+                FAssetRegistryModule::AssetCreated(W.BP);
+            else if (Updated)
+                ++*Updated;
+            Remember(W.BP);
             W.BP->MarkPackageDirty();
         }
         Out.Add(Cue.Name, W.BP);
@@ -379,15 +479,19 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
     for (const auto& Effect : Model.Effects)
     {
         auto& W = *Work.FindByPredicate([&](const auto& A) { return A.Id == Effect.Id; });
-        if (!W.BP)
+        const bool New = !W.BP;
+        if (New || W.Update)
         {
-            W.BP = NewGASBlueprint(W.Path, W.Parent);
-            if (!W.BP)
-                return Fail(TEXT("Cannot create GameplayEffect Blueprint"));
-            Created.Add(W.BP);
-            FKismetEditorUtilities::CompileBlueprint(W.BP);
-            if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
-                return Fail(TEXT("GameplayEffect Blueprint compilation failed"));
+            if (New)
+            {
+                W.BP = NewGASBlueprint(W.Path, W.Parent);
+                if (!W.BP)
+                    return Fail(TEXT("Cannot create GameplayEffect Blueprint"));
+                Created.Add(W.BP);
+                FKismetEditorUtilities::CompileBlueprint(W.BP);
+                if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
+                    return Fail(TEXT("GameplayEffect Blueprint compilation failed"));
+            }
             auto* CDO = CastChecked<UDasAuthoredGameplayEffect>(W.BP->GeneratedClass->GetDefaultObject());
             CDO->DefinitionId = Effect.Id;
             CDO->GameplayCues.Empty();
@@ -512,7 +616,11 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             // construction list so new instances copy native declaration fields.
             CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
                 ->UpdateCustomPropertyListForPostConstruction();
-            FAssetRegistryModule::AssetCreated(W.BP);
+            if (New)
+                FAssetRegistryModule::AssetCreated(W.BP);
+            else if (Updated)
+                ++*Updated;
+            Remember(W.BP);
             W.BP->MarkPackageDirty();
         }
         Out.Add(Effect.Name, W.BP);
@@ -520,15 +628,19 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
     for (const auto& Ability : Model.Abilities)
     {
         auto& W = *Work.FindByPredicate([&](const auto& A) { return A.Id == Ability.Id; });
-        if (!W.BP)
+        const bool New = !W.BP;
+        if (New || W.Update)
         {
-            W.BP = NewGASBlueprint(W.Path, W.Parent);
-            if (!W.BP)
-                return Fail(TEXT("Cannot create GameplayAbility Blueprint"));
-            Created.Add(W.BP);
-            FKismetEditorUtilities::CompileBlueprint(W.BP);
-            if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
-                return Fail(TEXT("GameplayAbility Blueprint compilation failed"));
+            if (New)
+            {
+                W.BP = NewGASBlueprint(W.Path, W.Parent);
+                if (!W.BP)
+                    return Fail(TEXT("Cannot create GameplayAbility Blueprint"));
+                Created.Add(W.BP);
+                FKismetEditorUtilities::CompileBlueprint(W.BP);
+                if (W.BP->Status == BS_Error || !W.BP->GeneratedClass)
+                    return Fail(TEXT("GameplayAbility Blueprint compilation failed"));
+            }
             auto* CDO = CastChecked<UDasAuthoredGameplayAbility>(W.BP->GeneratedClass->GetDefaultObject());
             auto FindEffect = [&](const FString& Id) -> UClass*
             {
@@ -554,13 +666,22 @@ bool FDasGASAssetService::Apply(const FString& Script, const FString& Folder, TM
             CDO->TaskEntry = Ability.TaskEntry;
             CastChecked<UBlueprintGeneratedClass>(W.BP->GeneratedClass.Get())
                 ->UpdateCustomPropertyListForPostConstruction();
-            FAssetRegistryModule::AssetCreated(W.BP);
+            if (New)
+                FAssetRegistryModule::AssetCreated(W.BP);
+            else if (Updated)
+                ++*Updated;
+            Remember(W.BP);
             W.BP->MarkPackageDirty();
         }
         Out.Add(Ability.Name, W.BP);
     }
+    if (GDasFailGASUpdate && !Snapshots.IsEmpty())
+        return Fail(TEXT("Injected failure after the update"));
+    TArray<UBlueprint*> Changed = Created;
+    for (const auto& S : Snapshots)
+        Changed.Add(S.BP);
     if (SaveAssets)
-        for (auto* BP : Created)
+        for (auto* BP : Changed)
         {
             const auto File = FPackageName::LongPackageNameToFilename(BP->GetOutermost()->GetName(),
                                                                       FPackageName::GetAssetPackageExtension());

@@ -108,11 +108,32 @@ as typed native data in their CDOs; JSON is only the compiler/import transport.
 SetByCaller tags must already exist in the project's GameplayTags dictionary.
 
 The importer preflights the batch before creating assets. Identical reimport
-reuses existing classes. Changed schemas, incompatible existing assets and
-unloadable packages are refused; import a changed definition into a new folder.
-Live structural migrations and arbitrary manual edits to imported assets are not
-part of this first implementation. Saving a multi-asset batch is not a filesystem
-transaction; a disk failure can require retrying the import.
+reuses existing classes.
+
+### Changing definitions
+
+Reimporting into the same folder updates the assets in place: the Blueprints and
+their classes stay the same, so references from other Blueprints, maps and
+abilities keep working.
+
+- Effects, abilities, calculations (MMC, Execution) and cues: any data change
+  (magnitudes, operations, durations, stacking, effect/cost/cue links, cooldowns,
+  script entries) rewrites the asset's CDO.
+- AttributeSets: new attributes are added as variables; initial values and limits
+  change in place.
+- Refused (import into a new folder): removing or renaming an attribute, changing
+  a cue tag, changing a calculation kind (MMC/Execution), changing a stable id.
+- A failure restores every asset updated by the import.
+
+Saving the `.das` file updates the folder it was imported into (auto-reimport,
+`Das.DSL.AutoReimport`): every loaded GAS asset remembers its script and folder.
+During Play the update waits until Play stops. Updated assets stay dirty until
+saved; `Das.GASImport` saves them. Assets imported before this version remember
+their folder after one `Das.GASImport` into the same folder.
+
+Incompatible existing assets and unloadable packages are still refused. Saving a
+multi-asset batch is not a filesystem transaction; a disk failure can require
+retrying the import.
 
 ## Use from gameplay
 

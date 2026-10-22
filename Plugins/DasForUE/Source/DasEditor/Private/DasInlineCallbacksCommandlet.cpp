@@ -1,4 +1,5 @@
 #include "DasInlineCallbacksCommandlet.h"
+#include "DasAuthoring.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "DasProbeActor.h"
