@@ -135,6 +135,8 @@ daScript 0.6.4 is pinned in `dependencies.json` and built into `ThirdParty/daScr
 ## Quick start
 
 ```powershell
+git clone https://github.com/spiiin/DasForUE.git
+cd DasForUE
 .\Scripts\BuildDependencies.ps1          # build the pinned daScript
 .\Scripts\CreatePlayableCharacter.ps1     # build the editor and create the playable example map
 ```

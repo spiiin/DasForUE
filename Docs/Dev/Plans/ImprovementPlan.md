@@ -39,7 +39,7 @@ Effort is in focused working days.
 | 4.4 components and native fields | Done | Self components and object fields use the cached (class, name) lookup: object field reads 12.4 us -> 1.4 us (no value codec for reference properties, shared class path cache, handle index). Generated native field write+read 19.8 us -> 1.1 us (class lookup and field validation cached per site); authored references cache their identity check. |
 | 5.1 test helpers | Done | 136 runners pass syntax/audit gates: no direct `Build.bat` calls or result parsing. Ten receipt runners are 11–17 lines; targets, arguments and negative checks are preserved. All 15 manifest script suites passed via the agent. See [Testing](../Testing.md#shared-script-helpers-and-validation-index). |
 | 5.3 suite manifest | Done | `Tests/suites.json` + `Scripts/RunDasTests.ps1` (`-Preset quick|editor|full`, `-Suite a,b`, dependencies via `requires`); `TestCombined*.ps1` are wrappers; build agent jobs `test-quick`, `test-suite`. |
-| 5.4 validation index | Done | `RenderValidation.py` generates [the index](../Validation/index.md) and has a non-writing `--check` gate. Suite runs regenerate/check it. Eleven renderer tests are in the passing 347-test Python suite. Manual reports remain; [removal candidates](../Testing.md#shared-script-helpers-and-validation-index) need review. |
+| 5.4 validation index | Done | `RenderValidation.py` generates the local index (`Docs/Dev/Validation/index.md`, not committed) and has a non-writing `--check` gate. Suite runs regenerate/check it. Eleven renderer tests are in the passing 347-test Python suite. Manual reports remain; [removal candidates](../Testing.md#shared-script-helpers-and-validation-index) need review. |
 
 ## Phase 0 — make the code reviewable (3–4 days)
 

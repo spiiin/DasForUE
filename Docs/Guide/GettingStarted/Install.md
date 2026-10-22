@@ -18,9 +18,18 @@ enabling the plugin, and creating the playable example.
 The default engine location is `C:\src\unreal\UnrealEngine`; scripts that need the engine accept
 `-Engine <path>`.
 
-## 1. Build the daScript dependency
+## 1. Get the source and build the daScript dependency
 
-From the checkout root:
+Clone the repository and run the scripts from its root:
+
+```powershell
+git clone https://github.com/spiiin/DasForUE.git C:\src\DasForUE
+cd C:\src\DasForUE
+```
+
+The scripts are PowerShell files; if Windows refuses to run them ("running scripts is disabled on this
+system"), allow local scripts for your user once with
+`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. Then build the dependency:
 
 ```powershell
 .\Scripts\BuildDependencies.ps1
@@ -30,7 +39,9 @@ From the checkout root:
 
 The script clones daScript into `ThirdParty/daScript` at the exact commit pinned in
 `dependencies.json` and builds it. It refuses to continue if an existing checkout there is at a
-different revision. Your own daScript checkouts elsewhere are never used or modified.
+different revision. Your own daScript checkouts elsewhere are never used or modified. It also copies
+`daslib` into `Plugins/DasForUE/Content/Das/daslib` (a build output, not committed) and regenerates
+`SmokeAot.cpp`. The first run takes a while: a full clone of daScript plus a CMake build.
 
 ## 2. Verify with the smoke project
 
@@ -56,7 +67,7 @@ at the checkout's `Plugins` folder and enabling it:
 ```json
 {
   "FileVersion": 3,
-  "AdditionalPluginDirectories": [ "C:/src/DasForUE2/Plugins" ],
+  "AdditionalPluginDirectories": [ "C:/src/DasForUE/Plugins" ],
   "Plugins": [
     { "Name": "DasForUE", "Enabled": true },
     { "Name": "EnhancedInput", "Enabled": true }

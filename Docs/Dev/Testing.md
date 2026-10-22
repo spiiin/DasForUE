@@ -245,8 +245,9 @@ combines a scoped source/binary freeze, a commandlet, count/lint checks and a re
 Its path provider is evaluated before and after the probe, including additions/removals.
 The ten common DSL receipt runners are about 20 lines each.
 
-`RunDasTests.ps1` regenerates [the validation index](Validation/index.md) after its
-selected suites finish and then checks it. Standalone commands:
+`RunDasTests.ps1` regenerates the validation index, `Docs/Dev/Validation/index.md`, after its
+selected suites finish and then checks it. The index lists local `logs/*.json` receipts, so it
+is not committed. Standalone commands:
 
 ```powershell
 C:/Python312/python.exe Scripts/RenderValidation.py
