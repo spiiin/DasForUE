@@ -151,7 +151,7 @@ def Add(amount:int):int {
 
 ## Changing a struct later
 
-After the assets exist, changing a definition (adding, removing or retyping members, changing defaults) needs an explicit migration policy. Changing a stored scalar leaf is supported, but changing nested-member or container definitions is refused. See [Migrations](../Workflow/Migrations.md).
+Saving the script migrates the imported structs (auto-reimport, `Das.DSL.AutoReimport`): fields can be added, renamed (same `@ue_id`), removed and numerically retyped, one struct per save. Values stored in Blueprints, actors and DataTable rows follow by field ID. A removal drops the field's values and a numeric retype converts them with exact rules, so these, and any change that reaches Blueprints, maps or DataTables, wait for **Apply** in a notification that lists the changed fields and assets (Details shows all of them). The same migration runs explicitly with `Das.DSL.Types.MigrateStructFields`; changing nested-member or container definitions is refused. See [Migrations](../Workflow/Migrations.md).
 
 Examples: `Plugins/DasForUE/Content/Das/Scripts/dsl_type_declarations.das`, `dsl_direct_types.das`, `dsl_nested_authoring.das`, `ue_method_values.das` (with `dsl_method_value_target.das` / `dsl_method_value_driver.das`), `dsl_struct_fields.das`, `dsl_authored_values.das`. Fixtures that contain `REGISTRY` need your own registry object path in its place.
 

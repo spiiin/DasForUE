@@ -31,8 +31,8 @@ Class policies are options of `Das.DSL.Reimport <asset path>`. Type policies are
 | Append enum members | `Das.DSL.Types.ExtendEnums <script> <registry> [graphs=repair]` | Enum identity, byte values, graph defaults | Single DSL Actor root + dependencies |
 | Rename enum members | `Das.DSL.Types.RenameEnumMembers <script> <registry>` | Member IDs and numbers; graph pins/links | Single DSL Actor root + dependencies |
 | Renumber or remove enum members | `Das.DSL.Types.MigrateEnumValues <script> <registry> <rules.json>` | Values remapped by explicit rules | Scalar enum fields on the DSL Actor |
-| Add/rename struct fields | `Das.DSL.Types.MigrateStructFields <script> <registry>` | Struct identity, field GUIDs, values by ID | Single DSL Actor root + dependencies |
-| Drop or convert struct fields | `Das.DSL.Types.MigrateStructFields <script> <registry> <rules.json>` | Remaining values; converted values by rules | Same |
+| Add/rename struct fields | saving the script (auto-reimport), or `Das.DSL.Types.MigrateStructFields <script> <registry>` | Struct identity, field GUIDs, values by ID | Single DSL Actor root + dependencies |
+| Drop or convert struct fields | saving the script and **Apply** (the rules are written for you), or `Das.DSL.Types.MigrateStructFields <script> <registry> <rules.json>` | Remaining values; converted values by rules | Same |
 
 Shared rules for all policies:
 

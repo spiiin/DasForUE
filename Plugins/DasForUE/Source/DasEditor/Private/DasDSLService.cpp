@@ -908,6 +908,7 @@ FString FDasReimportPlan::Short(int32 MaxFields, int32 MaxAssets) const
         Lines.Add(FString::Printf(TEXT("...and %d more"), Total - Shown));
     TArray<FString> Assets = Maps;
     Assets.Append(Blueprints);
+    Assets.Append(Tables);
     if (!Assets.IsEmpty())
     {
         if (Assets.Num() <= MaxAssets)
@@ -918,10 +919,13 @@ FString FDasReimportPlan::Short(int32 MaxFields, int32 MaxAssets) const
             Lines.Add(TEXT("Will modify: ") + FString::Join(Names, TEXT(", ")));
         }
         else
-            Lines.Add(
-                FString::Printf(TEXT("Will modify %d assets: %s, %s"), Assets.Num(),
-                                     *PlanCount(Maps.Num(), TEXT("map"), TEXT("maps")),
-                                                *PlanCount(Blueprints.Num(), TEXT("Blueprint"), TEXT("Blueprints"))));
+            Lines.Add(FString::Printf(TEXT("Will modify %d assets: %s, %s%s"), Assets.Num(),
+                *PlanCount(Maps.Num(), TEXT("map"), TEXT("maps")),
+                           *PlanCount(Blueprints.Num(), TEXT("Blueprint"), TEXT("Blueprints")),
+                                      *(Tables.IsEmpty()
+                                            ? FString()
+                                            : TEXT(", ") +
+                                                   PlanCount(Tables.Num(), TEXT("DataTable"), TEXT("DataTables")))));
     }
     return FString::Join(Lines, TEXT("\n"));
 }
@@ -948,7 +952,8 @@ FString FDasReimportPlan::Details(int32 MaxPerGroup) const
         Text += TEXT("\nOther default values (components, inherited or native properties) change.\n");
     Group(TEXT("Maps that will be modified"), Maps);
     Group(TEXT("Blueprints that will be modified"), Blueprints);
-    if (!Maps.IsEmpty() || !Blueprints.IsEmpty())
+    Group(TEXT("DataTables whose rows will be modified"), Tables);
+    if (!Maps.IsEmpty() || !Blueprints.IsEmpty() || !Tables.IsEmpty())
         Text += TEXT("\nModified assets stay unsaved until you save them. A failure rolls everything back.\n");
     return Text;
 }

@@ -42,6 +42,9 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
   first ([Apply and hot reload](Docs/Guide/Workflow/ApplyAndHotReload.md#automatic-reimport-on-save)).
 - Authored ActorComponent classes accept declaration changes: their templates in Actor Blueprints, placed and
   running components migrate like Actors ([Components](Docs/Guide/DSL/Components.md#changing-an-authored-component-class)).
+- Saving a `ue_struct` script migrates its structs (values in Blueprints, actors and DataTable rows follow by field
+  ID); removals, numeric retypes and changes that reach other assets wait for Apply
+  ([Structs](Docs/Guide/DSL/Structs.md#changing-a-struct-later)).
 
 ### Changed
 

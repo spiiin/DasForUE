@@ -19,7 +19,7 @@ struct DASEDITOR_API FDasReimportPlan
     TArray<FString> Added, Removed, Renamed, Retyped, Defaults;
     bool OtherDefaults = false;
     // Saved packages outside the class (and its own DataAsset instances) that the change modifies.
-    TArray<FString> Maps, Blueprints;
+    TArray<FString> Maps, Blueprints, Tables;
     bool NeedsConfirmation = false;
     // "Removed 12, renamed 3, retyped 1, new defaults 40".
     FString Summary() const;

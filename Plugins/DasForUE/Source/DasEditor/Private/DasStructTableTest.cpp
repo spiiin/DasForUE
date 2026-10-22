@@ -1,5 +1,7 @@
 // Struct migration with DataTables in scope: rows are captured by field ID and restored after rename, add, drop
 // and a failed (rolled back) change. The row struct is used only by the table, so no class is recompiled.
+#include "DasAutoReimport.h"
+#include "DasDSLService.h"
 #include "DasDataTableService.h"
 #include "DasRuntime.h"
 #include "DasSchema.h"
@@ -10,6 +12,7 @@
 #include "HAL/FileManager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/PackageName.h"
+#include "Misc/Paths.h"
 #include "Misc/ScopeExit.h"
 #include "UObject/SavePackage.h"
 #if WITH_DEV_AUTOMATION_TESTS
@@ -136,6 +139,80 @@ bool FDasStructDataTableTest::RunTest(const FString&)
     TestEqual(TEXT("dropped field gone"), Cell(Table, TEXT("Potion"), TEXT("Label")), FString(TEXT("<missing>")));
     TestEqual(TEXT("values kept after drop"), Cell(Table, TEXT("Potion"), TEXT("Cost")), FString(TEXT("3")));
     TestEqual(TEXT("row count"), Table->GetRowMap().Num(), 2);
+    return true;
+}
+// Saving a struct script migrates the struct through auto-reimport: a table uses it, so it asks first.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FDasStructAutoReimportTest, "DasForUE.Types.StructAutoReimport",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FDasStructAutoReimportTest::RunTest(const FString&)
+{
+    using namespace DasStructTable;
+    auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    const FString Tag = FGuid::NewGuid().ToString(EGuidFormats::Digits).Left(12).ToLower();
+    const FString Module = TEXT("tableauto") + Tag, Script = TEXT("struct_auto_") + Tag +
+                                                                  TEXT(".das"),
+                                                                       Folder = TEXT("/Game/DasStructTable/") + Tag;
+    ON_SCOPE_EXIT
+    {
+        IFileManager::Get().Delete(*R.ScriptPath(Script));
+    };
+    FString Error;
+    TArray<UObject*> Types;
+    UDasTypeRegistry* Registry = nullptr;
+    UDataTable* Table = nullptr;
+    if (!TestTrue(
+            TEXT("write v1"),
+                 FFileHelper::SaveStringToFile(RowScript(Module, false, false, true), *R.ScriptPath(Script))) ||
+            !TestTrue(
+                TEXT("import row struct"), FDasTypeService::Apply(Script, Folder, Types, Error) && Types.Num() == 1) ||
+                !TestTrue(TEXT("registry"), FDasTypeService::BuildRegistry(Types, Folder + TEXT("/Registry"), Registry, Error)) ||
+                    !TestTrue(TEXT("create table"), FDasDataTableService::CreateFromJson(
+                                                        Cast<UScriptStruct>(Types[0]),
+                                                        TEXT("[{\"Name\":\"Potion\",\"Label\":\"Heal\",\"Price\":3}]"),
+                                                             Folder + TEXT("/DT_Items"), Table, Error)) ||
+                                                        !TestTrue(TEXT("save assets"),
+                                                                       Save(Types[0]) && Save(Registry) && Save(Table)))
+    {
+        AddInfo(Error);
+        return false;
+    }
+    TStrongObjectPtr<UDataTable> Keep(Table);
+    FString Full = FPaths::ConvertRelativePathToFull(R.ScriptPath(Script));
+    FPaths::NormalizeFilename(Full);
+    FDasAutoReimport Auto;
+
+    // An added field reaches the table: the change waits for Apply.
+    TestTrue(TEXT("write v2"),
+                  FFileHelper::SaveStringToFile(RowScript(Module, false, true, true), *R.ScriptPath(Script)));
+    Auto.ReimportFiles({Full});
+    TestEqual(TEXT("add waits for confirmation"), Auto.PendingConfirmations(), 1);
+    TestEqual(TEXT("nothing changed while waiting"), Cell(Table, TEXT("Potion"), TEXT("Stock")),
+                                                          FString(TEXT("<missing>")));
+    for (const FString& Key : Auto.PendingKeys())
+        Auto.Confirm(Key);
+    TestEqual(TEXT("apply closes the question"), Auto.PendingConfirmations(), 0);
+    TestEqual(TEXT("added field in the rows"), Cell(Table, TEXT("Potion"), TEXT("Stock")), FString(TEXT("4")));
+    TestEqual(TEXT("values kept"), Cell(Table, TEXT("Potion"), TEXT("Price")), FString(TEXT("3")));
+
+    // A removed field is dropped after Apply (the rules are written for it).
+    TestTrue(TEXT("write v3"),
+                  FFileHelper::SaveStringToFile(RowScript(Module, false, true, false), *R.ScriptPath(Script)));
+    Auto.ReimportFiles({Full});
+    if (Auto.PendingConfirmations() != 1)
+    {
+        FDasReimportPlan Plan;
+        FString Rules;
+        const bool Planned = FDasTypeService::PlanStructMigration(Script, Registry->GetPathName(), Plan, Rules, Error);
+        AddInfo(FString::Printf(TEXT("diagnostic: planned=%d summary='%s' error='%s' binding=%s"), Planned,
+                                     *Plan.Summary(), *Error, *GetPathNameSafe(Registry->Bindings[0].Type.Get())));
+    }
+    TestEqual(TEXT("removal waits for confirmation"), Auto.PendingConfirmations(), 1);
+    for (const FString& Key : Auto.PendingKeys())
+        Auto.Confirm(Key);
+    TestEqual(TEXT("removed field dropped"), Cell(Table, TEXT("Potion"), TEXT("Label")), FString(TEXT("<missing>")));
+    TestEqual(TEXT("values kept after drop"), Cell(Table, TEXT("Potion"), TEXT("Price")), FString(TEXT("3")));
+    TestFalse(TEXT("rules file removed"), IFileManager::Get().FileExists(
+                                              *R.ScriptPath(TEXT("struct_auto_") + Tag + TEXT("_auto_rules.json"))));
     return true;
 }
 #endif

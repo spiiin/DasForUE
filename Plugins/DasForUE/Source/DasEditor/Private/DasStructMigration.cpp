@@ -1,5 +1,7 @@
 #include "DasTypePins.h"
 #include "DasTypeService.h"
+#include "DasDSLService.h"
+#include "Engine/World.h"
 #include "DasTypeRegistry.h"
 #include "DasReflectedTypes.h"
 #include "DasRuntime.h"
@@ -142,6 +144,120 @@ struct FDataImage
     int32 ArrayElements = 0;
     int64 ArrayBytes = 0, RestoredArrayBytes = 0;
 };
+}
+bool FDasTypeService::PlanStructMigration(const FString& Script, const FString& RegistryPath, FDasReimportPlan& Out,
+                                          FString& RulesJson, FString& Error)
+{
+    Out = FDasReimportPlan();
+    RulesJson.Reset();
+    auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    auto* Registry = LoadObject<UDasTypeRegistry>(nullptr, *RegistryPath, nullptr, LOAD_NoWarn);
+    if (!Registry || Registry->Bindings.IsEmpty() || !Registry->Bindings[0].Type)
+    {
+        Error = TEXT("Type registry not found: ") + RegistryPath;
+        return false;
+    }
+    FDasReflectedTypes Old, Next;
+    if (!FDasReflectedTypes::FromJson(Registry->Bindings[0].Type->GetOutermost()->GetMetaData().GetValue(
+                                          Registry->Bindings[0].Type, TEXT("DasTypesModel")), Old, Error) ||
+                                      !R.ReadReflectedTypes(R.ScriptPath(Script), Next, Error))
+        return false;
+    auto Literal = [](const FDasDeclaredLiteral& L)
+    {
+        return L.Kind == TEXT("number") ? FString::SanitizeFloat(L.Number, 0)
+                                        : L.Kind == TEXT("bool")
+                                              ? FString(L.Boolean ? TEXT("true") : TEXT("false"))
+                                              : L.Kind == TEXT("string")
+                                                    ? TEXT("\"") + L.String +
+                                                           TEXT("\"")
+                                                           : (L.Kind.IsEmpty() ? FString(TEXT("(none)")) : L.Kind);
+    };
+    TArray<TSharedPtr<FJsonValue>> Rules;
+    TArray<UObject*> Changed;
+    for (const auto& Before : Old.Structs)
+    {
+        const auto* After = Next.Structs.FindByPredicate([&](const auto& X) { return X.Id == Before.Id; });
+        if (!After)
+            continue;
+        const int32 Count =
+            Out.Added.Num() + Out.Removed.Num() + Out.Renamed.Num() + Out.Retyped.Num() + Out.Defaults.Num();
+        for (const auto& P : After->Properties)
+        {
+            const auto* Was = Before.Properties.FindByPredicate([&](const auto& X) { return X.Id == P.Id; });
+            const FString Name = Before.Name + TEXT(".") + P.Name;
+            if (!Was)
+                Out.Added.Add(Name);
+            else if (P.Type.Identity() != Was->Type.Identity())
+            {
+                Out.Retyped.Add(
+                    FString::Printf(TEXT("%s: %s -> %s"), *Name, *Was->Type.Identity(), *P.Type.Identity()));
+                if (StructNumberKind(P.Type.Kind) >= 0 && StructNumberKind(Was->Type.Kind) >= 0)
+                {
+                    auto Rule = MakeShared<FJsonObject>();
+                    Rule->SetStringField(TEXT("field_id"), P.Id);
+                    Rule->SetStringField(TEXT("operation"), TEXT("convert"));
+                    Rule->SetStringField(TEXT("integer_rule"), TEXT("Exact"));
+                    Rule->SetStringField(TEXT("float_rule"), TEXT("Exact"));
+                    Rules.Add(MakeShared<FJsonValueObject>(Rule));
+                }
+            }
+            else
+            {
+                if (P.Name != Was->Name)
+                    Out.Renamed.Add(Before.Name + TEXT(".") + Was->Name + TEXT(" -> ") + P.Name);
+                if (!(P.Default == Was->Default))
+                    Out.Defaults.Add(
+                        FString::Printf(TEXT("%s: %s -> %s"), *Name, *Literal(Was->Default), *Literal(P.Default)));
+            }
+        }
+        for (const auto& P : Before.Properties)
+            if (!After->Properties.ContainsByPredicate([&](const auto& X) { return X.Id == P.Id; }))
+            {
+                Out.Removed.Add(Before.Name + TEXT(".") + P.Name);
+                auto Rule = MakeShared<FJsonObject>();
+                Rule->SetStringField(TEXT("field_id"), P.Id);
+                Rule->SetStringField(TEXT("operation"), TEXT("drop"));
+                Rules.Add(MakeShared<FJsonValueObject>(Rule));
+            }
+        FString Ignored;
+        if (Out.Added.Num() + Out.Removed.Num() + Out.Renamed.Num() + Out.Retyped.Num() + Out.Defaults.Num() != Count)
+            if (UObject* Type = Registry->Resolve(Before.Id, false, Ignored))
+                Changed.Add(Type);
+    }
+    if (!Rules.IsEmpty())
+    {
+        auto Json = MakeShared<FJsonObject>();
+        Json->SetNumberField(TEXT("schema_version"), 1);
+        Json->SetArrayField(TEXT("rules"), Rules);
+        FJsonSerializer::Serialize(Json, TJsonWriterFactory<>::Create(&RulesJson));
+    }
+    // Saved assets that hold values of a changed struct (the registry and the type assets are part of the change).
+    auto& AR = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
+    for (UObject* Type : Changed)
+    {
+        TArray<FName> Referencers;
+        AR.GetReferencers(Type->GetOutermost()->GetFName(), Referencers);
+        for (FName P : Referencers)
+        {
+            TArray<FAssetData> Data;
+            AR.GetAssetsByPackageName(P, Data);
+            if (Data.Num() != 1 || Data[0].AssetClassPath == UDasTypeRegistry::StaticClass()->GetClassPathName() ||
+                Data[0].AssetClassPath == UUserDefinedStruct::StaticClass()->GetClassPathName())
+                continue;
+            if (Data[0].AssetClassPath == UWorld::StaticClass()->GetClassPathName())
+                Out.Maps.AddUnique(P.ToString());
+            else if (Data[0].AssetClassPath == UDataTable::StaticClass()->GetClassPathName())
+                Out.Tables.AddUnique(P.ToString());
+            else
+                Out.Blueprints.AddUnique(P.ToString());
+        }
+    }
+    // Removals lose data and retypes convert it; other changes ask only when they reach other assets.
+    Out.NeedsConfirmation = !Out.Removed.IsEmpty() || !Out.Retyped.IsEmpty() || !Out.Maps.IsEmpty() ||
+                            !Out.Blueprints.IsEmpty() || !Out.Tables.IsEmpty();
+    if (!Out.Removed.IsEmpty())
+        Out.Removed.Sort();
+    return true;
 }
 void DasFailStructMigrationForTesting(int32 Stage)
 {
@@ -594,12 +710,11 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
     TArray<TStrongObjectPtr<UObject>> Assets;
     FDasAuthoringModule ClassModel;
     FDasClassSchema Schema;
-    if (!TableOnly &&
-        (!FDasAuthoringModule::FromJson(Root->GetOutermost()->GetMetaData().GetValue(Root, TEXT("DasDSLModel")),
-                                        ClassModel, Error) ||
-         !ClassModel.ToActorSchema(Root->GetOutermost()->GetMetaData().GetValue(Root, TEXT("DasDSLClassId")), Schema,
-                                   Error) ||
-         !FDasBlueprintRollback::GatherScope(Root, BPs, Assets, Error)))
+    if (!TableOnly && (!FDasAuthoringModule::FromJson(
+                          Root->GetOutermost()->GetMetaData().GetValue(Root, TEXT("DasDSLModel")), ClassModel, Error) ||
+                          !ClassModel.ToActorSchema(Root->GetOutermost()->GetMetaData().GetValue(
+                                                        Root, TEXT("DasDSLClassId")), Schema, Error) ||
+                                                    !FDasBlueprintRollback::GatherScope(Root, BPs, Assets, Error)))
         return false;
     for (auto* BP : BPs)
         for (const auto& V : BP->NewVariables)
@@ -1149,6 +1264,10 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
         B.Type->GetOutermost()->GetMetaData().SetValue(B.Type, TEXT("DasTypesModel"), *NewWire);
         B.Type->MarkPackageDirty();
     }
+    // Compiling the struct rebuilds its metadata; keep the identity and the source it was imported from.
+    for (const TCHAR* Key : {TEXT("DasTypeId"), TEXT("DasTypesSource")})
+        if (const FString* Value = OldMeta.Find(FName(Key)))
+            Type->GetOutermost()->GetMetaData().SetValue(Type, Key, **Value);
     if (StructFailStage == 4)
         return Fail(TEXT("Injected after model publication"));
     Type->OnChanged();

@@ -2,6 +2,9 @@
 #include "DasAuthoring.h"
 #include "DasDSLService.h"
 #include "DasGASAssetService.h"
+#include "DasTypeRegistry.h"
+#include "DasTypeService.h"
+#include "StructUtils/UserDefinedStruct.h"
 #include "DasRuntime.h"
 #include "DirectoryWatcherModule.h"
 #include "Editor.h"
@@ -10,6 +13,7 @@
 #include "Engine/Blueprint.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "HAL/FileManager.h"
+#include "Misc/FileHelper.h"
 #include "HAL/IConsoleManager.h"
 #include "Interfaces/IPluginManager.h"
 #include "Logging/MessageLog.h"
@@ -93,6 +97,7 @@ void FDasAutoReimport::Stop()
     Pending.Reset();
     Deferred.Reset();
     DeferredGAS.Reset();
+    DeferredTypes.Reset();
     Checked.Reset();
 }
 void FDasAutoReimport::OnScriptsChanged(const TArray<FFileChangeData>& Changes)
@@ -159,6 +164,82 @@ void FDasAutoReimport::ReimportFiles(const TSet<FString>& Files)
         Reimport(Blueprint, false);
     for (const auto& Import : BoundGAS(&Files))
         ReimportGAS(Import, false);
+    const auto Types = BoundTypes(Files);
+    UE_LOG(LogTemp, Verbose, TEXT("DAS_TYPES_AUTO_REIMPORT %d struct scripts"), Types.Num());
+    for (const auto& Import : Types)
+        ReimportTypes(Import, false);
+}
+TSet<TPair<FString, FString>> FDasAutoReimport::BoundTypes(const TSet<FString>& Files) const
+{
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    TSet<TPair<FString, FString>> Result;
+    for (TObjectIterator<UUserDefinedStruct> It; It; ++It)
+    {
+        if (It->HasAnyFlags(RF_Transient | RF_ClassDefaultObject))
+            continue;
+        const FString Source = It->GetOutermost()->GetMetaData().GetValue(*It, TEXT("DasTypesSource"));
+        if (Source.IsEmpty() || !Files.Contains(FullPath(Runtime.ScriptPath(Source))))
+            continue;
+        for (TObjectIterator<UDasTypeRegistry> Registry; Registry; ++Registry)
+            if (Registry->Bindings.ContainsByPredicate([&](const auto& B) { return B.Type == *It; }))
+            {
+                Result.Add({Source, Registry->GetPathName()});
+                break;
+            }
+    }
+    return Result;
+}
+void FDasAutoReimport::ReimportTypes(const TPair<FString, FString>& Import, bool bRetry)
+{
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    const FString Key = TEXT("types:") + Import.Key + TEXT("|") + Import.Value;
+    FDasReimportPlan Plan;
+    FString Rules, Error;
+    if (!FDasTypeService::PlanStructMigration(Import.Key, Import.Value, Plan, Rules, Error))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("DAS_TYPES_AUTO_REIMPORT unreadable %s: %s"), *Import.Key, *Error);
+        Notify(FString::Printf(TEXT("daScript: structs of %s were not updated: %s"), *Import.Key, *Error), false);
+        return;
+    }
+    // Only struct changes; enums keep their explicit migrations.
+    if (Plan.Summary().IsEmpty())
+    {
+        UE_LOG(LogTemp, Display, TEXT("DAS_TYPES_AUTO_REIMPORT unchanged %s"), *Import.Key);
+        return;
+    }
+    if (GEditor && GEditor->PlayWorld)
+    {
+        DeferredTypes.Add(Import);
+        Notify(FString::Printf(TEXT("daScript: structs of %s are updated when Play stops"), *Import.Key), false);
+        return;
+    }
+    if (Plan.NeedsConfirmation && !Confirmed.Contains(Key))
+    {
+        AskConfirmation(Key, FString::Printf(TEXT("structs of %s"), *Import.Key), Plan);
+        return;
+    }
+    // Removed fields are dropped and numeric retypes converted with exact rules (the user confirmed).
+    FString RulesFile;
+    if (!Rules.IsEmpty())
+    {
+        RulesFile = FPaths::GetBaseFilename(Import.Key) + TEXT("_auto_rules.json");
+        FFileHelper::SaveStringToFile(Rules, *Runtime.ScriptPath(RulesFile));
+    }
+    const bool bApplied = FDasTypeService::MigrateStructFields(Import.Key, Import.Value, Error, RulesFile);
+    if (!RulesFile.IsEmpty())
+        IFileManager::Get().Delete(*Runtime.ScriptPath(RulesFile));
+    Confirmed.Remove(Key);
+    DeferredTypes.Remove(Import);
+    if (!bApplied)
+    {
+        const FString Text = FString::Printf(TEXT("daScript: structs of %s were not updated: %s"), *Import.Key, *Error);
+        UE_LOG(LogTemp, Warning, TEXT("DAS_TYPES_AUTO_REIMPORT rejected %s: %s"), *Import.Key, *Error);
+        FMessageLog(TEXT("BlueprintLog")).Error(FText::FromString(Text));
+        Notify(Text, false);
+        return;
+    }
+    UE_LOG(LogTemp, Display, TEXT("DAS_TYPES_AUTO_REIMPORT applied %s (%s)"), *Import.Key, *Plan.Summary());
+    Notify(FString::Printf(TEXT("daScript: structs of %s updated (%s)"), *Import.Key, *Plan.Summary()), true);
 }
 TSet<TPair<FString, FString>> FDasAutoReimport::BoundGAS(const TSet<FString>* Files) const
 {
@@ -280,7 +361,7 @@ void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
                                    false);
             return;
         }
-        AskConfirmation(Blueprint, Plan);
+        AskConfirmation(Path, Name, Plan);
         return;
     }
     if (!FDasDSLService::Reimport(Blueprint, Error, EDasDefaultMigrationPolicy::Automatic, bConfirmed))
@@ -316,7 +397,7 @@ void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
 }
 void FDasAutoReimport::OnEndPIE(bool)
 {
-    if ((!Deferred.IsEmpty() || !DeferredGAS.IsEmpty()) && !RetryTicker.IsValid())
+    if ((!Deferred.IsEmpty() || !DeferredGAS.IsEmpty() || !DeferredTypes.IsEmpty()) && !RetryTicker.IsValid())
         RetryTicker = FTSTicker::GetCoreTicker().AddTicker(
             FTickerDelegate::CreateRaw(this, &FDasAutoReimport::RetryAfterPIE), SettleSeconds);
 }
@@ -340,74 +421,87 @@ void FDasAutoReimport::RetryDeferred()
     DeferredGAS.Reset();
     for (const auto& Import : Imports)
         ReimportGAS(Import, true);
+    const auto Types = MoveTemp(DeferredTypes);
+    DeferredTypes.Reset();
+    for (const auto& Import : Types)
+        ReimportTypes(Import, true);
 }
-void FDasAutoReimport::AskConfirmation(UBlueprint* Blueprint, const FDasReimportPlan& Plan)
+void FDasAutoReimport::AskConfirmation(const FString& Key, const FString& Name, const FDasReimportPlan& Plan)
 {
-    const FString Path = Blueprint->GetPathName(), Name = Blueprint->GetName();
-    CloseConfirmation(Path);
+    CloseConfirmation(Key);
     // The complete list goes to the log; the notification and the dialog stay short for large changes.
     UE_LOG(LogTemp, Display, TEXT("DAS_DSL_REIMPORT_PLAN %s\n%s"), *Name, *Plan.Details(MAX_int32));
-    PlanDetails.Add(Path, Plan.Details());
-    FNotificationInfo Info(
-        FText::FromString(FString::Printf(TEXT("daScript: %s - this change also modifies other assets"), *Name)));
+    PlanDetails.Add(Key, Plan.Details());
+    PlanNames.Add(Key, Name);
+    const bool bAssets = !Plan.Maps.IsEmpty() || !Plan.Blueprints.IsEmpty() || !Plan.Tables.IsEmpty();
+    FNotificationInfo Info(FText::FromString(FString::Printf(
+        TEXT("daScript: %s - %s"), *Name,
+             bAssets ? TEXT("this change also modifies other assets") : TEXT("this change drops or converts values"))));
     Info.SubText = FText::FromString(Plan.Short());
     Info.bFireAndForget = false;
     Info.bUseSuccessFailIcons = false;
     Info.ButtonDetails.Add(FNotificationButtonInfo(FText::FromString(
-        TEXT("Apply")), FText::FromString(TEXT("Apply the change to the class and the listed assets")),
-                                          FSimpleDelegate::CreateRaw(this, &FDasAutoReimport::Confirm, Path),
+        TEXT("Apply")), FText::FromString(TEXT("Apply the change and update the listed assets")),
+                                          FSimpleDelegate::CreateRaw(this, &FDasAutoReimport::Confirm, Key),
                                           SNotificationItem::CS_Pending));
     Info.ButtonDetails.Add(FNotificationButtonInfo(FText::FromString(
         TEXT("Details")), FText::FromString(TEXT("Show every changed field and affected asset")),
-                                            FSimpleDelegate::CreateRaw(this, &FDasAutoReimport::ShowDetails, Path),
+                                            FSimpleDelegate::CreateRaw(this, &FDasAutoReimport::ShowDetails, Key),
                                             SNotificationItem::CS_Pending));
     Info.ButtonDetails.Add(FNotificationButtonInfo(FText::FromString(
-        TEXT("Cancel")), FText::FromString(TEXT("Keep the Blueprint as it is")),
-                                           FSimpleDelegate::CreateRaw(this, &FDasAutoReimport::Decline, Path),
+        TEXT("Cancel")), FText::FromString(TEXT("Keep everything as it is")),
+                                           FSimpleDelegate::CreateRaw(this, &FDasAutoReimport::Decline, Key),
                                            SNotificationItem::CS_Pending));
     TSharedPtr<SNotificationItem> Item = FSlateNotificationManager::Get().AddNotification(Info);
     if (Item)
         Item->SetCompletionState(SNotificationItem::CS_Pending);
-    Confirmations.Add(Path, Item);
+    Confirmations.Add(Key, Item);
 }
-void FDasAutoReimport::ShowDetails(FString Path)
+void FDasAutoReimport::ShowDetails(FString Key)
 {
-    if (const FString* Text = PlanDetails.Find(Path))
+    if (const FString* Text = PlanDetails.Find(Key))
         FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(*Text),
-                             FText::FromString(FString::Printf(TEXT("daScript: changes of %s"),
-                                                                    *FPackageName::ObjectPathToObjectName(Path))));
+                             FText::FromString(TEXT("daScript: changes of ") + PlanNames.FindRef(Key)));
 }
-void FDasAutoReimport::CloseConfirmation(const FString& Path)
+void FDasAutoReimport::CloseConfirmation(const FString& Key)
 {
     TWeakPtr<SNotificationItem> Item;
-    if (Confirmations.RemoveAndCopyValue(Path, Item))
+    if (Confirmations.RemoveAndCopyValue(Key, Item))
         if (TSharedPtr<SNotificationItem> Pinned = Item.Pin())
         {
             Pinned->SetCompletionState(SNotificationItem::CS_None);
             Pinned->ExpireAndFadeout();
         }
-    PlanDetails.Remove(Path);
+    PlanDetails.Remove(Key);
 }
-void FDasAutoReimport::Confirm(FString Path)
+void FDasAutoReimport::Confirm(FString Key)
 {
-    CloseConfirmation(Path);
-    if (UBlueprint* Blueprint = FindObject<UBlueprint>(nullptr, *Path))
-    {
-        Confirmed.Add(Path);
+    CloseConfirmation(Key);
+    PlanNames.Remove(Key);
+    Confirmed.Add(Key);
+    FString Script, Registry;
+    if (Key.StartsWith(TEXT("types:")) && Key.Mid(6).Split(TEXT("|"), &Script, &Registry))
+        ReimportTypes({Script, Registry}, false);
+    else if (UBlueprint* Blueprint = FindObject<UBlueprint>(nullptr, *Key))
         Reimport(Blueprint, false);
-    }
+    else
+        Confirmed.Remove(Key);
 }
-void FDasAutoReimport::Decline(FString Path)
+void FDasAutoReimport::Decline(FString Key)
 {
-    CloseConfirmation(Path);
-    const FString Name = FPackageName::ObjectPathToObjectName(Path);
+    CloseConfirmation(Key);
+    FString Name;
+    if (!PlanNames.RemoveAndCopyValue(Key, Name))
+        Name = FPackageName::ObjectPathToObjectName(Key);
     UE_LOG(LogTemp, Display, TEXT("DAS_DSL_AUTO_REIMPORT declined %s"), *Name);
-    FMessageLog(TEXT("BlueprintLog"))
-                    .Info(FText::FromString(FString::Printf(
-                        TEXT("daScript: %s was not updated; its script changes fields used by other assets."), *Name)))
-                              ->AddToken(FActionToken::Create(FText::FromString(
-                                  TEXT("Apply")),
-                                  FText::FromString(
-                                      TEXT("Apply the change to the class and the assets using it")),
-                                      FOnActionTokenExecuted::CreateRaw(this, &FDasAutoReimport::Confirm, Path), true));
+    FMessageLog(
+        TEXT("BlueprintLog"))
+            .Info(FText::FromString(FString::Printf(
+                TEXT("daScript: %s was not updated; its script changes fields used by other assets or drops values."),
+                     *Name)))
+                      ->AddToken(FActionToken::Create(FText::FromString(
+                          TEXT("Apply")),
+                          FText::FromString(TEXT("Apply the change and update the assets using it")),
+                                            FOnActionTokenExecuted::CreateRaw(this, &FDasAutoReimport::Confirm, Key),
+                                            true));
 }

@@ -110,6 +110,11 @@ reimports existing component classes with the automatic policy; auto-reimport ha
 before Actors. Matrix kind `component` (owner Blueprint with an SCS node, two placed owners): every field and
 method change migrates in the editor and during PIE.
 
+**Struct auto-reimport (2026-10-22).** Saving a `ue_struct` script plans the struct migration
+(`FDasTypeService::PlanStructMigration`: fields, affected Blueprints/maps/DataTables, rules) and runs
+`MigrateStructFields`; removals, numeric retypes and changes that reach other assets wait for Apply, which writes
+the drop/convert rules. Test `DasForUE.Types.StructAutoReimport`.
+
 ### S4. Removal, rename and signatures
 
 **Done 2026-10-21 (isolated Blueprints).** The automatic reimport dispatches a pure rename / removal /
@@ -232,7 +237,7 @@ Collected 2026-10-22. Each refusal is controlled: nothing changes and the messag
 - SaveGame files written by an older class load by property name; renamed or retyped fields are not converted
   on load (no save-format versioning; decision 2026-10-21).
 - Changing a Primary Asset type generates no asset ID redirectors.
-- Auto-reimport only sees loaded Blueprints and GAS assets; others are updated when they are loaded (map open,
+- Auto-reimport only sees loaded Blueprints, structs and GAS assets; enum changes keep their explicit migrations; others are updated when they are loaded (map open,
   before Play) or with an explicit reimport. GAS assets imported before S8c remember their folder only after one
   `Das.GASImport`.
 - Networking (replicated fields, schema mismatch between clients) is outside this plan.
