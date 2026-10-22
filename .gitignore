@@ -53,6 +53,7 @@ __pycache__/
 /Tests/DasForUESmoke/Content/DasConfirm/
 /Tests/DasForUESmoke/Content/DasStructTable/
 /Tests/DasForUESmoke/Content/DasGASUpdate/
+/Tests/DasForUESmoke/Content/DasInheritedHandlers/
 # Scripts written by tests and probes (a GUID or run tag in the name).
 /Plugins/DasForUE/Content/Das/Scripts/*_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*.das
 /Plugins/DasForUE/Content/Das/Scripts/*_auto_rules.json
