@@ -550,6 +550,7 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 
 #include "DasRuntimeState.inl"
 #include "DasRuntimeSelfValues.inl"
+#include "DasBuiltinValueOps.inl"
 #include "DasRuntimeStructValues.inl"
 #include "DasRuntimeFramesWidgets.inl"
 #include "DasRuntimeObjectAccess.inl"

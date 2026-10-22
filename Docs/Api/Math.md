@@ -9,7 +9,7 @@ require ue_api_math
 [export]
 def main(input:int):int {
     let position : UEVector = ue_vector(1.0lf,2.0lf,3.0lf)
-    let doubled : UEVector = ue_math_Add_VectorVector(position,position)
+    let doubled : UEVector = position + position
     return int(doubled.x)
 }
 ```
@@ -58,6 +58,10 @@ let average : UEVector = ue_math_GetVectorArrayAverage(vectors)
 ```
 
 Note the parameter types follow Unreal reflection: some functions take `double` (`FInterpTo`), others `float` (`VInterpTo`'s `DeltaTime`).
+
+The built-in types also expose ordinary operators and a small checked helper API;
+see [operators and math helpers](../Guide/DSL/BuiltinTypes.md#operators-and-math-helpers).
+The generated Kismet functions remain available for the wider API.
 
 ## Default arguments
 

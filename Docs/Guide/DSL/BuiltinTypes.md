@@ -99,7 +99,7 @@ Examples: `Plugins/DasForUE/Content/Das/Scripts/dsl_scalar_methods.das`, `dsl_mi
 `UENameValue` stands for an Unreal `FName`. Because it is a separate type, you cannot pass a `string` where a name is expected by accident.
 
 - `ue_name_value(text)` creates a name. `ue_name_text(value)` returns its text. `ue_names_equal(a, b)` compares with Unreal name rules: equality ignores case, number suffixes such as `Item_7` work as in Unreal, and `None` and the empty name are the same.
-- The `==` and `!=` operators are not defined for `UENameValue`. Use `ue_names_equal`.
+- `==` and `!=` use the same checked FName comparison as `ue_names_equal`; they do not compare token integers or display strings. No implicit conversion from/to `string`, and no ordering operators are provided.
 - A name is a token owned by the current script context, and works only while that context is active. One context can hold up to 65,536 distinct names. The token is not a pointer, and another context does not accept it. Do not store raw token integers as persistent IDs.
 - The generated `ue_generated::UEName` wrapper is a separate type. Convert with `ue_name_text` / `ue_name_value`.
 
@@ -151,7 +151,7 @@ class Mover {
 
     [ue_function(BlueprintCallable)]
     def Step():void {
-        self.Position.x += 4.0lf
+        self.Position += ue_vector(4.0lf, 0.0lf, 0.0lf)
         self.Orientation.yaw += 5.0lf
         self.Pose = ue_transform(ue_vector(8.0lf, 9.0lf, 10.0lf),
                                  ue_rotator(0.0lf, 0.0lf, 0.0lf),
@@ -164,7 +164,7 @@ Constructors and helpers:
 
 - `ue_vector(x, y, z)`, `ue_vector2d(x, y)`, `ue_rotator(pitch, yaw, roll)`. All arguments are `double`.
 - `ue_transform(translation, rotation, scale)` uses the native Unreal constructor. `ue_transform_identity()`, `ue_transform_translation()`, `ue_transform_rotation()`, `ue_transform_scale()` and `ue_transform_position(transform, point)` call the Unreal math API.
-- No arithmetic operators (`+`, `*`, ...) are defined for these types. Work on components, or `require ue_api_math` for the generated KismetMathLibrary wrappers, such as `ue_math_Add_VectorVector(a, b)`. See [API packages](../../Api/README.md).
+- Arithmetic operators and checked helpers are available directly; see [Operators and math helpers](#operators-and-math-helpers) below. For the wider generated KismetMathLibrary API, `require ue_api_math`; see [API packages](../../Api/README.md).
 
 Semantics:
 
@@ -176,6 +176,52 @@ Semantics:
 - Enhanced Input `Axis2D` actions deliver `UEVector2D`. Bind them to a `void` callback that takes `(value:UEVector2D)`. See [Input](../Gameplay/Input.md).
 
 Examples: `Plugins/DasForUE/Content/Das/Scripts/dsl_math_methods.das`, `dsl_vector2d.das`, `dsl_method_value_target.das`.
+
+## Operators and math helpers
+
+The operators are registered in `ue_foundation`, so `ue_dsl` and generated
+packages that publicly import it see the same operations on the same types.
+There is no conversion between UEVector2D, UEVector, Rotator, Transform,
+daScript `float2`/`float3`, or strings and names. Scaling takes `double`:
+use `2.0lf` and `double(deltaSeconds)` when the time step is a `float`.
+
+```das
+let velocity = ue_vector(100.0lf, 0.0lf, 0.0lf)
+var position = ue_vector(0.0lf, 0.0lf, 0.0lf)
+position += velocity * 0.016lf
+let heading = ue_normalized(velocity, 0.00000001lf)
+let distance = ue_length(position)
+
+let turn = ue_rotator(0.0lf, 90.0lf, 0.0lf)
+let facing = ue_rotate_vector(turn, heading)
+let nextTurn = ue_compose_rotation(turn, ue_rotator(20.0lf, 0.0lf, 0.0lf))
+let localToWorld = ue_transform(position, turn, ue_vector(1.0lf, 1.0lf, 1.0lf))
+let point = ue_transform_position(localToWorld, ue_vector(1.0lf, 0.0lf, 0.0lf))
+let sameName = ue_name_value("Pickup_7") == ue_name_value("pickup_7")
+```
+
+| Types | Operations and exact meaning |
+| --- | --- |
+| UEVector / UEVector2D | `a+b`, `a-b`, `-a`, `a*s`, `s*a`, `a/s`; `+=`, `-=`, `*=`, `/=`. Same dimensions, scalar `s:double`. Division by zero is refused. |
+| Vector equality | `==` / `!=` compare components exactly, as UE does. `ue_nearly_equal(a,b,tolerance)` uses native component-wise `Equals`, not a distance sphere. |
+| Vector helpers | `ue_length(v)`, `ue_length_squared(v)`, `ue_distance(a,b)`, `ue_dot(a,b)`, `ue_cross(a,b)`. Cross returns UEVector in 3D, a signed double determinant in 2D. `a*b` between two vectors is deliberately undefined. |
+| Vector normalization | `ue_normalized(v,toleranceSquared)` uses native GetSafeNormal. The tolerance is finite, strictly positive and applies to **squared length**. A zero/tiny vector returns zero according to native UE rules. |
+| UERotator | Degrees. `+`, `-`, unary `-`, scaling in either order, `+=`, `-=`, `*=` operate on Euler components without automatic angle wrapping. `==` is exact component equality. |
+| Rotation helpers | `ue_normalized(r)` uses GetNormalized. `ue_nearly_equal(a,b,toleranceDegrees)` uses Rotator.Equals with wrapped per-axis differences; it is not quaternion angular distance. `ue_compose_rotation(first,then)` matches Kismet ComposeRotators (`ThenQuat * FirstQuat`). `ue_rotate_vector(r,v)` / `ue_unrotate_vector(r,v)` match native Rotator methods. No Rotator*Rotator operator. |
+| UETransform | `a*b` / `a*=b`: native FTransform composition, **first a, then b**. No transform/scalar or transform/vector operator. No exact `==`; `ue_nearly_equal(a,b,tolerance)` is native FTransform.Equals, including quaternion sign equivalence. Its rotation tolerance is quaternion-component tolerance, not degrees. |
+| Transform points | Existing `ue_transform_position(t,p)` includes translation, rotation and scale. `ue_inverse_transform_position(t,p)` reverses that operation. |
+| Transform vectors | `ue_transform_vector(t,v)` includes rotation and scale, no translation. `ue_inverse_transform_vector(t,v)` reverses it. `ue_transform_direction(t,v)` is TransformVectorNoScale: rotation only, without automatic normalization. |
+| Inverse / relative | `ue_transform_inverse(t)` uses FTransform.Inverse. `ue_transform_relative(t,parent)` uses GetRelativeTransform. Inversion requires every inverted scale axis to have magnitude greater than UE_SMALL_NUMBER; zero/near-zero scales are refused instead of silently losing information. Forward operations permit zero scale. |
+
+All comparison tolerances are explicit, finite and non-negative. Inputs and
+results must remain finite; compound assignments compute/validate their result
+before writing it, so a refused operation leaves the variable unchanged.
+
+Transforms retain Unreal's TRS semantics. Non-uniform scale combined with
+rotation can require shear, which FTransform cannot represent. Composition,
+inverse and relative transforms match UE; they are not a general matrix algebra,
+and `Inverse().TransformPosition(p)` is not promised to equal
+`InverseTransformPosition(p)` for arbitrary non-uniform scales.
 
 ## Gameplay tags
 

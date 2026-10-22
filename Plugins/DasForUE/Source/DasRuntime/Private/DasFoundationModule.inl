@@ -1633,6 +1633,7 @@ public:
                                                      "DSLNameFromString");
         AddUEExtern<DAS_BIND_FUN(DSLNameToString)>(*this, Library, "ue_name_text", das::SideEffects::modifyExternal,
                                                    "DSLNameToString");
+#include "DasBuiltinValueBindings.inl"
         AddUEExtern<DAS_BIND_FUN(DSLNamesEqual)>(*this, Library, "ue_names_equal", das::SideEffects::accessExternal,
                                                  "DSLNamesEqual");
         AddUEExtern<DAS_BIND_FUN(EmitType)>(*this, Library, "ue_emit_type", das::SideEffects::modifyExternal,

@@ -278,3 +278,18 @@ Queue `test-suite ueaot1 ue-aot repo=<repo>-main` through the shared
 build agent. It generates and links the focused UE AOT fixture and runs one
 short strict native-execution/guard check. See [bridge scope and safety
 contract](Plans/UEApiAot.md). This is not full gameplay/GAS AOT acceptance.
+
+## Built-in math and Name operators
+
+Queue `test-suite builtin1 builtin-values repo=<main-worktree>` through the build
+agent. One headless commandlet compares operator/helper results against native
+FVector, FVector2D, FRotator, FTransform and FName, checks authored-field lowering,
+and rejects ambiguous type combinations and invalid numeric inputs. It records
+the current extern manifest in `logs/builtin-values-externs.txt` and verifies
+that existing entries have not changed. No full PIE/packaged suite is implied.
+
+Verified 2026-10-23 by `builtin-values-20261023a` (exit 0): Editor Development
+build and 33 focused checks passed; commandlet execution was under one second,
+the scoped suite including process startup and source/DLL freeze took 15 seconds.
+The extern baseline gained exactly 64 registrations, preserving every existing line.
+Receipt: `logs/builtin-values-validation.json`; output: `logs/builtin-values-runtime.log`.

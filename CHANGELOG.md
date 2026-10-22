@@ -8,6 +8,18 @@ Target environment for every entry: Unreal Engine 5.8.3 (source build),
 daScript 0.6.4 (pinned), Win64 Development. Start at the
 [documentation index](Docs/index.md).
 
+## 2026-10-23
+
+### Added
+
+- Canonical Vector/Vector2D arithmetic and compound operators; exact equality and explicit
+  near-equality, length, distance, dot/cross and safe normalization helpers.
+- Rotator component arithmetic, degree-based wrapped comparison, vector rotation and explicit
+  composition; Transform composition, inverse/relative transforms and distinct point/vector/direction helpers.
+- Checked `==` / `!=` for UENameValue using native FName identity. Mixed types and implicit typed
+  float/int scaling are rejected; math results stay finite, singular inverse transforms are refused,
+  and failed compound writes leave the original value unchanged. See [Built-in types](Docs/Guide/DSL/BuiltinTypes.md#operators-and-math-helpers).
+
 ## 2026-10-21
 
 ### Added
