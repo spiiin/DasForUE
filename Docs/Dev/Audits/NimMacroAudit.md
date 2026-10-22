@@ -1,6 +1,6 @@
 # Аудит макросов NimForUE для DSL DasForUE2
 
-Дата: 2026-10-06. Прочитана локальная C:/src/NimForUE, origin jmgomez/NimForUE,
+Дата: 2026-10-06. Прочитана локальная <NimForUE>, origin jmgomez/NimForUE,
 commit `58140f4842a91a0187c17ce950e07181ba455862`. Это анализ исходников конкретной ревизии, не запуск NimForUE
 и не подтверждение совместимости с нашим UE 5.8.3. Репозиторий NimForUE не изменялся.
 

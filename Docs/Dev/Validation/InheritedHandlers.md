@@ -1,6 +1,6 @@
 # Inherited handler references
 
-Worktree `C:/src/DasForUE2-handlers`, branch `inherited-handlers`, based on main merge `52fe60b`.
+Worktree `<repo>-handlers`, branch `inherited-handlers`, based on main merge `52fe60b`.
 
 One nearest-declaration traversal is shared by managed callback validators, typed delegate references, multi-capture timers and dynamic event checks. The traversal crosses authored parents and their script modules and preserves ambiguity/static/signature errors without falling back to a less-derived method. Hidden callback overrides inherit the internal event contract automatically. Script-only inherited helpers receive a child-owned forwarding adapter through existing Super lowering; parent modules and their emitted models are not mutated.
 

@@ -1,6 +1,6 @@
 # Управляемые подписки на события Unreal
 
-Репозиторий: `C:\src\DasForUE2`.
+Репозиторий: `<repo>`.
 
 Первый вариант поддерживает `BlueprintAssignable` dynamic multicast delegates
 с одним аргументом `int32`, без возвращаемого значения, `out` или ссылочных аргументов.
@@ -31,7 +31,7 @@ def main(input:int):int {
 ```
 
 Готовый файл:
-`C:\src\DasForUE2\Plugins\DasForUE\Content\Das\Scripts\delegate_actor.das`.
+`Plugins\DasForUE\Content\Das\Scripts\delegate_actor.das`.
 
 Для пробы разместите два `ADasProbeActor`: источник и слушателя. У слушателя
 укажите `Peer` на источник и `LifecycleScript = delegate_actor.das` до начала PIE.
@@ -103,7 +103,7 @@ Editor foundation: **85 PASS**. Проверены native Broadcast → daScript
 Packaged Win64 Development: build/cook/package и запуск завершились с кодом 0,
 все **85 foundation-проверок** прошли. Повторно прошли `TestLifecyclePIE.ps1`,
 `TestReloadPIE.ps1` и `TestReload.ps1` (включая открытие assets в новом процессе).
-Журналы находятся в `C:\src\DasForUE2\logs`.
+Журналы находятся в `logs`.
 
 ## Ограничения и следующий шаг
 

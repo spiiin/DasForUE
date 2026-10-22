@@ -23,7 +23,7 @@ Blueprint-бэкенде; см. «Вне рамок».
 
 ## Как это сделано в Hazelight UnrealEngine-Angelscript
 
-Исследован `C:\src\UnrealEngine-Angelscript` (частичный клон: плагины `Engine/Plugins/Angelscript*` на диске, движок —
+Исследован `<UnrealEngine-Angelscript>` (частичный клон: плагины `Engine/Plugins/Angelscript*` на диске, движок —
 через `git show`; список правок движка неполный).
 
 | Что | Как | Нужны правки движка |

@@ -1,6 +1,6 @@
 # Проверка native DSL frontend — 2026-10-06
 
-Репозиторий: C:/src/DasForUE2. Unreal Engine 5.8.3, daScript 0.6.4.
+Репозиторий: <repo>. Unreal Engine 5.8.3, daScript 0.6.4.
 
 | Проверка | Результат |
 |---|---|
@@ -25,4 +25,4 @@ containers, delegates, GC, contexts и reload fallback. PIE probes провер�
 DSL structural hot reload во время PIE пока не реализованы; это следующий этап.
 
 Подробности и границы: DasForUE-dsl-frontend.md. Примеры: dsl_counter_v1.das,
-dsl_counter_v2.das. Полные журналы — C:/src/DasForUE2/logs.
+dsl_counter_v2.das. Полные журналы — logs.

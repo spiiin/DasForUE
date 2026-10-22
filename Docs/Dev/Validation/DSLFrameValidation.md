@@ -19,6 +19,6 @@ GC и EndPIE. Графы и parameter IDs сохранены в asset; новы�
 mixed ProcessEvent и idempotent reimport после LoadObject.
 
 Пример без explicit IDs: dsl_mixed_methods.das. Границы: DasForUE-dsl-mixed-methods.md.
-Source: C:/src/DasForUE2. Журналы: logs/smoke-editor.log, smoke-packaged.log,
+Source: <repo>. Журналы: logs/smoke-editor.log, smoke-packaged.log,
 dsl-frame-pie.log, frame-asset-Create.log, frame-asset-Reopen.log.
 Следующий этап — string/name/double и затем object/struct signatures.

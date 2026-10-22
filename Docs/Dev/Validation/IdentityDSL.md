@@ -1,6 +1,6 @@
 # Typed identities and state — Phase 3.9
 
-Worktree: `C:/src/DasForUE2-ui`, branch `widget-layout`.
+Worktree: `<repo>-ui`, branch `widget-layout`.
 
 Implemented without reader macros or parser changes:
 

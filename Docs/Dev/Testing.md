@@ -50,7 +50,7 @@ A request is one line in a new file under `logs\agent\queue\` of the main checko
 ```text
 test-quick q1
 test-suite s1 foundation,method-values
-test-suite ui1 automation-quick repo=C:\src\DasForUE2-ui
+test-suite ui1 automation-quick repo=<repo>-ui
 ```
 
 `test-suite` always builds first. `repo=` must be the main checkout or one of its
@@ -139,7 +139,7 @@ The script uses `clang-format` from PATH or from the Visual Studio LLVM tools.
 
 ## Focused GAS cue assets
 
-Submit `test-suite <unique-id> gas-cue-assets repo=C:\src\DasForUE2-main` through the main checkout build-agent queue described above. The suite builds Editor Development and runs one DasGASCueAssets commandlet. It imports the sample into `/Game/Tests/GASAuthored/CueAssets`, checks repeat import and native route-conflict preflight, applies/removes real GameplayEffects and checks owned DAS cue snapshots after GC. The fixed generated test folder avoids creating duplicate cue assets for the same registered tags on every run. It is not a PIE or packaged suite.
+Submit `test-suite <unique-id> gas-cue-assets repo=<repo>-main` through the main checkout build-agent queue described above. The suite builds Editor Development and runs one DasGASCueAssets commandlet. It imports the sample into `/Game/Tests/GASAuthored/CueAssets`, checks repeat import and native route-conflict preflight, applies/removes real GameplayEffects and checks owned DAS cue snapshots after GC. The fixed generated test folder avoids creating duplicate cue assets for the same registered tags on every run. It is not a PIE or packaged suite.
 
 `gas-cue-hooks` is the corresponding focused suite for scripted cue assets and extended owned payloads. Queue it through the same build agent; the single DasGASCueHooks commandlet uses `/Game/Tests/GASAuthored/CueHooks` and verifies callback-return/GC ownership, per-target state and cleanup. Regenerate native gameplay artifacts through the agent's `gas-native-generate` suite after changes to these reflected payloads.
 
@@ -152,7 +152,7 @@ The gas-ability-playground suite uses the same opt-in offscreen mode and demo as
 
 ## GAS playable map PIE
 
-Queue `test-suite <unique-id> gas-ability-pie repo=C:\src\DasForUE2-main`
+Queue `test-suite <unique-id> gas-ability-pie repo=<repo>-main`
 through the shared build agent. This builds Editor Development and runs only
 `DasForUE.GAS.AbilityPlaygroundPIE`, with real rendering/audio and a real PIE
 world. It generates the saved `/Game/DasExamples/GASCues/GASAbilityMap`, feeds
@@ -167,7 +167,7 @@ Automation suites can opt into `rendering: true` (or Invoke-DasAutomation
 
 ## GAS map in packaged Development
 
-Queue `test-suite <unique-id> gas-ability-packaged repo=C:\src\DasForUE2-main`
+Queue `test-suite <unique-id> gas-ability-packaged repo=<repo>-main`
 through the shared agent. The suite builds Editor, exports the map with
 `DasGASPlaygroundMap`, builds Win64 Development, cooks/stages/archives it and
 runs the archived game with real rendering/audio. It does not run broad editor
@@ -196,7 +196,7 @@ and omitted from ordinary Shipping; the opt-in Shipping acceptance build is desc
 
 ## GAS map in Shipping and AOT scope
 
-Queue `test-suite <unique-id> gas-ability-shipping repo=C:\src\DasForUE2-main`
+Queue `test-suite <unique-id> gas-ability-shipping repo=<repo>-main`
 through the shared build agent. The runner exports the same map, builds Win64
 Shipping, cooks/stages/archives to `Build/PackagedShipping`, then launches the
 archived Shipping executable with real rendering/audio and mapped input.
@@ -273,7 +273,7 @@ narrow run and should not be deleted on that basis.
 
 ## Guarded UE API AOT
 
-Queue `test-suite ueaot1 ue-aot repo=C:\src\DasForUE2-main` through the shared
+Queue `test-suite ueaot1 ue-aot repo=<repo>-main` through the shared
 build agent. It generates and links the focused UE AOT fixture and runs one
 short strict native-execution/guard check. See [bridge scope and safety
 contract](Plans/UEApiAot.md). This is not full gameplay/GAS AOT acceptance.

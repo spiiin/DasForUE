@@ -21,5 +21,5 @@ values, без reclamation по VM roots. Production long-running value churn п
 требует следующего lifetime этапа. Struct fields/defaults не входят в этот slice.
 
 Пример: dsl_reflected_methods.das. Документация: DasForUE-dsl-reflected-structs.md.
-Source: C:/src/DasForUE2. Журналы: logs/smoke-editor.log, smoke-packaged.log,
+Source: <repo>. Журналы: logs/smoke-editor.log, smoke-packaged.log,
 dsl-reflected-pie.log, reflected-asset-Create.log, reflected-asset-Reopen.log.

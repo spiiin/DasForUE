@@ -1,6 +1,6 @@
 # Hidden callbacks — Phase 3.2
 
-Worktree: `C:/src/DasForUE2-ui`, branch `widget-layout`.
+Worktree: `<repo>-ui`, branch `widget-layout`.
 
 ```das
 [ue_function(BlueprintCallable)]

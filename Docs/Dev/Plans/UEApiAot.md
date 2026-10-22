@@ -23,7 +23,7 @@ module remains isolated and has no AOT implementation in this increment.
 Queue through the shared build agent:
 
 ```text
-test-suite ueaot1 ue-aot repo=C:\src\DasForUE2-main
+test-suite ueaot1 ue-aot repo=<repo>-main
 ```
 
 The suite builds the emitter, generates `Private/Generated/UEGuardAot.cpp`

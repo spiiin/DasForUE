@@ -205,7 +205,7 @@ until the proposed APIs exist.
 ## Local Unreal source basis
 
 Verified against the installed engine sources under
-`C:/src/unreal/UnrealEngine/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/`:
+`<UnrealEngine>/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/`:
 
 - AbilitySystemComponent.h: InitAbilityActorInfo, AddAttributeSetSubobject,
   GetGameplayAttributeValueChangeDelegate.

@@ -4,7 +4,7 @@
 
 ## Где смотреть код
 
-Все пути ниже относительно C:\src\DasForUE2.
+Все пути ниже относительно <repo>.
 
 - `Plugins/DasForUE/Source/DasRuntime/Public/DasSchema.h`: минимальная типизированная
   модель класса, scalar-полей, defaults и метода.

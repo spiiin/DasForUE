@@ -20,7 +20,7 @@ baseline records are unchanged. Test cue isolation does not delete saved assets.
 ## Build-agent validation
 
 All builds and editor/game processes were run through the serialized build
-agent against `C:\src\DasForUE2-main`.
+agent against `<repo>-main`.
 
 - `gasmerge-20261021b`: base/authored/scripted GAS, tasks/calculations,
   targeting, execution, cue hooks/assets and the end-to-end ability scenario

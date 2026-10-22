@@ -1,6 +1,6 @@
 # BeginPlay, Tick и EndPlay в daScript
 
-Реализация находится в `C:\src\DasForUE2`. Это фиксированный контракт native Actor
+Реализация находится в `<repo>`. Это фиксированный контракт native Actor
 адаптера, а не окончательный пользовательский DSL.
 
 ## Подключение
@@ -38,7 +38,7 @@ def end_play(reason:int) {
 `void`; неверная сигнатура любого присутствующего обработчика отклоняет новую версию.
 
 Полный проверенный пример:
-`C:\src\DasForUE2\Plugins\DasForUE\Content\Das\Scripts\lifecycle_actor.das`.
+`Plugins\DasForUE\Content\Das\Scripts\lifecycle_actor.das`.
 Он рассчитан на класс с Blueprint-visible полями `health:int` и `speed:float`:
 BeginPlay увеличивает health, Tick прибавляет DeltaSeconds к speed, EndPlay записывает
 результат завершения. Такие поля создаёт существующий пример `schema_v2.das`.
@@ -90,7 +90,7 @@ float delta, все три неверные сигнатуры, reload без п
 Actor движком проверяет PIE-тест; packaged suite проверяет runtime-контракт callbacks.
 
 Команды регрессий: `Scripts\TestReloadPIE.ps1`, `Scripts\TestReload.ps1`,
-`Scripts\TestPackaged.ps1`. Журналы: `C:\src\DasForUE2\logs`.
+`Scripts\TestPackaged.ps1`. Журналы: `logs`.
 
 При проверке упаковки обнаружен и исправлен устаревший staging receipt: UBT
 использовал закешированный список RuntimeDependencies и пропускал новые `.das`.

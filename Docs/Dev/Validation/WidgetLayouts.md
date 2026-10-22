@@ -1,7 +1,7 @@
 # Typed widget layouts — Phase 3.7
 
 Validated on 2026-10-20, Unreal Engine 5.8.3, Win64 Development Editor.
-Worktree: `C:/src/DasForUE2-ui`, branch `widget-layout`.
+Worktree: `<repo>-ui`, branch `widget-layout`.
 
 ```powershell
 ./Scripts/TestWidgetLayouts.ps1

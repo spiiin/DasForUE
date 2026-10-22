@@ -1,6 +1,6 @@
 # Operation identities and event contracts — Phases 3.4 / 3.5
 
-Worktree: `C:/src/DasForUE2-ui`, branch `widget-layout`.
+Worktree: `<repo>-ui`, branch `widget-layout`.
 
 ## Operation identities
 
@@ -40,10 +40,10 @@ This reserved method is a declaration block containing only top-level `+=` entri
 The final run used the single build agent, with this request in the main checkout's queue:
 
 ```text
-test-suite dsl3435-ui-abe548864e76 dsl-operation-keys,dsl-event-checks,dsl-inline-callbacks repo=C:\src\DasForUE2-ui
+test-suite dsl3435-ui-abe548864e76 dsl-operation-keys,dsl-event-checks,dsl-inline-callbacks repo=<repo>-ui
 ```
 
-`C:/src/DasForUE2/logs/agent/dsl3435-ui-abe548864e76.done`: **0**. All suites passed:
+`logs/agent/dsl3435-ui-abe548864e76.done`: **0**. All suites passed:
 
 - **26 operation checks:** keyless starts for all four families, typed pause/resume/query/cancellation, timer/latent isolation, dynamic self key/interval compatibility, expected unknown-key warning, shared hidden-callback Apply/palette/runtime/reload checks.
 - **27 event checks:** native and authored self events, native/authored component signatures, typed owner declarations, wrong names/types/handlers, syntax-invalid declarations, four existing event/component scripts; Apply, native scalar and authored tuple delivery, accepted/rejected reload, cleanup; actual compatible owner binding and incompatible owner rejection without subscriptions.

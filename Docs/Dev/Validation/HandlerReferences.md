@@ -1,6 +1,6 @@
 # Unified handler references
 
-Worktree: `C:/src/DasForUE2-ui`, branch `widget-layout`.
+Worktree: `<repo>-ui`, branch `widget-layout`.
 
 The class pass recognizes `self.Method` in `ue_bind` and BindUFunction/AddUFunction/RemoveUFunction method forms, promotes a hidden reflected entry point and lowers through a common checked macro. Delegate handlers can return values; queued/managed callback targets retain their void constraint. The checked macro validates the complete native delegate signature against the authored method model before Apply, and guards the explicit target to current self. No string lookup alone stands in for a typed reference.
 

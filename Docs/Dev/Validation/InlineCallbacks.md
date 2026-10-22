@@ -1,7 +1,7 @@
 # Inline callbacks — Phase 3.6
 
 Validated on 2026-10-20 with Unreal Engine 5.8.3, Win64 Development Editor.
-Worktree: `C:/src/DasForUE2-ui`, branch `widget-layout`.
+Worktree: `<repo>-ui`, branch `widget-layout`.
 
 ```powershell
 ./Scripts/TestInlineCallbacks.ps1

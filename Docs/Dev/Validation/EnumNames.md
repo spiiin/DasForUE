@@ -1,6 +1,6 @@
 # Typed input and collision names — Phase 3.3
 
-Worktree: `C:/src/DasForUE2-ui`, branch `widget-layout`.
+Worktree: `<repo>-ui`, branch `widget-layout`.
 
 `require ue_collision_profiles` exposes a project-configured `CollisionProfile` enum. Its checked conversion returns the existing context-owned FName transport, usable by native self methods; generated wrappers use `UEName(value=ue_name_text(name))`. IDs hash case-normalized UTF-8 names, independent of configuration order. Label normalization handles punctuation, leading digits, keywords and collisions without confusing the original names. The enum is configuration metadata, not a reflected UEnum or property storage type. Restart the editor/game process after configuration edits to refresh symbols; conversion also rejects removed profiles and forged IDs.
 
@@ -13,7 +13,7 @@ The pickup example uses a typed collision profile. Test-only collision profiles 
 Request through the single shared build agent:
 
 ```text
-test-suite dsl33-ui-8fb2a095413f dsl-enum-names,dsl-inline-callbacks repo=C:\src\DasForUE2-ui
+test-suite dsl33-ui-8fb2a095413f dsl-enum-names,dsl-inline-callbacks repo=<repo>-ui
 ```
 
 Build agent exit code: **0**. Both focused suites passed:

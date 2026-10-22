@@ -17,6 +17,6 @@ Import source/class ID переживают asset save/reopen в новом пр
 Runtime property/declaration guards и fallback дополнительно проверены в packaged.
 
 Команды, ограничения и rollback caveat: DasForUE-dsl-reimport.md.
-Source: C:/src/DasForUE2; журналы: logs/dsl-pie.log, dsl-Create.log,
+Source: <repo>; журналы: logs/dsl-pie.log, dsl-Create.log,
 dsl-Reopen.log, smoke-editor.log, smoke-packaged.log и authoring-*.log.
 Automatic watcher/UI и general signatures/types остаются дальнейшими этапами.

@@ -17,6 +17,6 @@ ProcessEvent, world isolation, сохранённые globals, reimport и UE GC
 процесс подтвердил saved text graphs, double/name defaults и parameter identity.
 
 Пример: dsl_text_methods.das. API и ограничения: DasForUE-dsl-text-types.md.
-Source: C:/src/DasForUE2. Полные журналы: logs/smoke-editor.log,
+Source: <repo>. Полные журналы: logs/smoke-editor.log,
 smoke-packaged.log, dsl-text-pie.log, text-asset-Create.log, text-asset-Reopen.log.
 Следующий этап — object references и reflected value structs.

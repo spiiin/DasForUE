@@ -1,6 +1,6 @@
 # Reflection call macros — Phase 3.8
 
-Worktree: `C:/src/DasForUE2-ui`, branch `widget-layout`.
+Worktree: `<repo>-ui`, branch `widget-layout`.
 
 Implemented forms (no reader macro or parser changes):
 

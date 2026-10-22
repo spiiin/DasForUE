@@ -1,7 +1,7 @@
 # Combined binding validation — 2026-10-17
 
 Baseline: `b7da031597723e0dacfbe9cd2ce7caeb76d9e05b`, plus the fixes below.
-The exact tracked commit was exported into `C:\Users\sanya\Documents\Codex\cccheck`. Stale validation-copy
+The exact tracked commit was exported into `<user folder>`. Stale validation-copy
 source files were backed up and removed there. The main repository's temporary
 files, generated assets and parallel changes made after the commit were preserved.
 The copy uses existing main-repository daScript third-party libraries through a

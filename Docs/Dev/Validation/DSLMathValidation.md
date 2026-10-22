@@ -19,6 +19,6 @@ Staging испытал кратковременный отказ Zen Server по
 readiness/retry восстановил доступ. Итоговая упаковка и packaged smoke успешны.
 
 Пример: dsl_math_methods.das. Контракт: DasForUE-dsl-math-values.md.
-Source: C:/src/DasForUE2. Журналы: logs/smoke-editor.log, smoke-packaged.log,
+Source: <repo>. Журналы: logs/smoke-editor.log, smoke-packaged.log,
 dsl-math-pie.log, math-asset-Create.log, math-asset-Reopen.log.
 Следующий этап — общий reflected struct adapter; struct fields отдельно.

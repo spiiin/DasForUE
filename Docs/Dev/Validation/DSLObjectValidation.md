@@ -18,7 +18,7 @@ identity и Actor ProcessEvent. Editor replacement delegate ограждён WIT
 в packaged runtime проходят общие object lifetime/class/ABI проверки.
 
 Пример: dsl_object_methods.das. Контракт: DasForUE-dsl-object-methods.md.
-Source: C:/src/DasForUE2. Журналы: logs/smoke-editor.log, smoke-packaged.log,
+Source: <repo>. Журналы: logs/smoke-editor.log, smoke-packaged.log,
 dsl-object-frame-pie.log, object-asset-Create.log, object-asset-Reopen.log.
 Следующий этап — FVector/FRotator/FTransform value signatures; object fields
 остаются отдельной задачей с сериализацией и GC policy.

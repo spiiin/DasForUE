@@ -1,6 +1,6 @@
 # Dynamic event operators
 
-Worktree: `C:/src/DasForUE2-ui`, branch `widget-layout`.
+Worktree: `<repo>-ui`, branch `widget-layout`.
 
 The normalizer recognizes `self.Event +=/-= self.Method` and declared component sources inside ordinary method bodies. It preserves compound assignments involving data fields. Hidden callback discovery promotes named methods through the existing path, and lowering reuses native/authored event signature validation plus an exact UE frame/layout check for direct UFunction dispatch. Invalid names, payloads and return types fail before Apply. The runtime checks the actual multicast property and handler again.
 
@@ -13,10 +13,10 @@ The syntax supports events on self and declared native/authored components and h
 The single shared build agent completed this request:
 
 ```text
-test-suite dsl-dynamic-ui-4829cdf231 dsl-event-checks,dsl-enum-names repo=C:\src\DasForUE2-ui
+test-suite dsl-dynamic-ui-4829cdf231 dsl-event-checks,dsl-enum-names repo=<repo>-ui
 ```
 
-`C:/src/DasForUE2/logs/agent/dsl-dynamic-ui-4829cdf231.done`: **0**. Editor build passed, followed by **66 targeted checks**:
+`logs/agent/dsl-dynamic-ui-4829cdf231.done`: **0**. Editor build passed, followed by **66 targeted checks**:
 
 - **51 event checks** (27 existing and 24 dynamic): compile-time unknown source/handler, wrong types, non-void and direct object-widening rejection; authored component validation from source; hidden handler metadata; Apply; conditional registration and idempotence; native scalar, authored tuple and component delivery; ordinary data compound assignment; selective removal; rejected-reload preservation; accepted-reload cleanup and explicit rebinding; harmless EndPlay removal, context release and Destroy cleanup.
 - **15 enum-name regression checks**, including equality of the complete foundation extern baseline after adding one guarded function.
