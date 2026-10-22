@@ -23,6 +23,10 @@
     {
       "Name": "Niagara",
       "Enabled": true
+    },
+    {
+      "Name": "PropertyAccessEditor",
+      "Enabled": true
     }
   ],
   "DisableEnginePluginsByDefault": true
