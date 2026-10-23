@@ -144,3 +144,16 @@ AddUEExtern<DAS_BIND_FUN(BuiltinNearly<FTransform>)>(*this, Library, "ue_nearly_
                                                      "BuiltinNearly<FTransform>");
 AddUEExtern<DAS_BIND_FUN(DSLNamesEqual)>(*this, Library, "==", das::SideEffects::none, "DSLNamesEqual");
 AddUEExtern<DAS_BIND_FUN(BuiltinNamesNotEqual)>(*this, Library, "!=", das::SideEffects::none, "BuiltinNamesNotEqual");
+
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatFromRotator), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_quat",
+                                                                                         das::SideEffects::none,
+                                                                                         "BuiltinQuatFromRotator");
+AddUEExtern<DAS_BIND_FUN(BuiltinRotatorFromQuat), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_rotator",
+                                                                                         das::SideEffects::none,
+                                                                                         "BuiltinRotatorFromQuat");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuat), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_quat",
+                                                                              das::SideEffects::none, "BuiltinQuat");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatIdentity), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                      "ue_quat_identity",
+                                                                                      das::SideEffects::none,
+                                                                                      "BuiltinQuatIdentity");

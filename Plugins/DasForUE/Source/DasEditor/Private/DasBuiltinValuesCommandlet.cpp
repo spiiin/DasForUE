@@ -4,6 +4,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "Misc/Parse.h"
 #include "Misc/ScopeExit.h"
 #include "HAL/FileManager.h"
 
@@ -90,6 +91,36 @@ int32 UDasBuiltinValuesCommandlet::Main(const FString& Params)
                     : R.bSucceeded && R.Value == 42,
                                         Name, R.Error);
     };
+    if (FParse::Param(*Params, TEXT("QuatOnly")))
+    {
+        FString Body = TEXT("let identity:UEQuat=ue_quat_identity()\nverify(identity.x==0.0lf && identity.y==0.0lf && identity.z==0.0lf && identity.w==1.0lf)\n");
+        for (const FRotator& Rotation :
+             TArray<FRotator>{FRotator::ZeroRotator, FRotator(25, 80, -15), FRotator(90, 40, 10),
+                              FRotator(-90, -130, 35), FRotator(89.99999, 179.999, -179.5), FRotator(390, -450, 720)})
+        {
+            const FQuat Q = Rotation.Quaternion();
+            Body += TEXT("{ let q:UEQuat=ue_quat(") + Rot(Rotation) + TEXT(")\n");
+            Body += Scalar(TEXT("q.x"), Q.X) + Scalar(TEXT("q.y"), Q.Y) + Scalar(TEXT("q.z"), Q.Z) +
+                                                                                 Scalar(TEXT("q.w"), Q.W);
+            Body += NearR(TEXT("ue_rotator(q)"), Q.Rotator());
+            Body += NearR(FString::Printf(TEXT("ue_rotator(ue_quat(%s,%s,%s,%s))"), *Number(-Q.X), *Number(-Q.Y),
+                                               *Number(-Q.Z), *Number(-Q.W)),
+                                          Q.Rotator());
+            // At Euler singularities compare the recovered rotation, not the original Euler triple.
+            Body += TEXT("let restored=ue_quat(ue_rotator(q))\n");
+            Body += TEXT("let dot=q.x*restored.x+q.y*restored.y+q.z*restored.z+q.w*restored.w\nverify(dot*dot>0.999999999lf)\n}\n");
+        }
+        Body += TEXT("var rejected=false\ntry { let q=ue_quat(0.0lf,0.0lf,0.0lf,0.0lf); return int(q.w) } recover { rejected=true }\nverify(rejected)\n");
+        Body += TEXT("var invalid=ue_quat_identity()\ninvalid.w=2.0lf\nrejected=false\ntry { let r=ue_rotator(invalid); return int(r.yaw) } recover { rejected=true }\nverify(rejected)\n");
+        Body += TEXT("invalid=ue_quat_identity()\ninvalid.x=1.0lf/double(input)\nrejected=false\ntry { let r=ue_rotator(invalid); return int(r.yaw) } recover { rejected=true }\nverify(rejected)\n");
+        Run(TEXT("quat_explicit_conversions_match_unreal"), Body);
+        const FString Repo = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("../.."));
+        FFileHelper::SaveStringToFile(DasFoundationExternManifest(),
+                                      *(Repo / TEXT("logs/quat-externs.txt")),
+                                        FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        UE_LOG(LogTemp, Display, TEXT("DAS_QUAT_RESULT=%s checks=%d"), Failures ? TEXT("FAIL") : TEXT("PASS"), Checks);
+        return Failures ? 1 : 0;
+    }
     const FVector A(1.25, -2.5, 3.75), B(-4, 5, 6);
     const FVector2D A2(1.25, -2.5), B2(-4, 5);
     const FRotator RA(25, 80, -15), RB(-10, 20, 45);

@@ -33,7 +33,7 @@ The profile uses `value_types=canonical_math`:
 
 These are the same types used by native class bindings, authored properties, defaults and `self`, in arguments, results, multiple outputs, ref/inout, arrays and fields of other structs. No duplicate `S_Vector_*`/`S_Transform_*` types are generated. Values must be finite; a Transform must have a normalized rotation, and its quaternion is copied as a whole (no Euler round-trip).
 
-Other native structs keep generated transport types with `f_` fields, for example `S_LinearColor_f4abb14b` (`f_r`, `f_g`, `f_b`, `f_a`) returned by `ue_math_MakeColor`. Quat, Box and similar types are also generated structs.
+Other native structs keep generated transport types with `f_` fields, for example `S_LinearColor_f4abb14b` (`f_r`, `f_g`, `f_b`, `f_a`) returned by `ue_math_MakeColor`. Quat, Box and similar types are also generated structs. The foundation now additionally exposes `UEQuat` for explicit `ue_quat(rotator)` / `ue_rotator(quaternion)` conversions; it is currently distinct from the generated Quat transport type. See [quaternion conversions](../Guide/DSL/BuiltinTypes.md#quaternion-conversions-uequat).
 
 ## Examples
 

@@ -670,6 +670,9 @@ ue_physics_add_force	@ue_foundation::ue_physics_add_force CH<ue_foundation::UEPh
 ue_physics_body	@ue_foundation::ue_physics_body Ci C_c	ue_foundation::UEPhysicsBodyToken	4
 ue_physics_input	@ue_foundation::ue_physics_input Ci C_c	double const	4
 ue_physics_output	@ue_foundation::ue_physics_output Ci Cd C_c	void	4
+ue_quat	@ue_foundation::ue_quat Cd Cd Cd Cd C_c	ue_foundation::UEQuat	4
+ue_quat	@ue_foundation::ue_quat CIH<ue_foundation::UERotator> C_c	ue_foundation::UEQuat	4
+ue_quat_identity	@ue_foundation::ue_quat_identity	ue_foundation::UEQuat	4
 ue_release_call	@ue_foundation::ue_release_call CIH<ue_foundation::UCallHandle> C_c	void	4
 ue_require_call_context	@ue_foundation::ue_require_call_context CIH<ue_foundation::UCallHandle> Cb C_c	void	4
 ue_result_array_size	@ue_foundation::ue_result_array_size CIH<ue_foundation::UCallHandle> CIs C_c	int const	4
@@ -686,6 +689,7 @@ ue_result_object	@ue_foundation::ue_result_object CIH<ue_foundation::UCallHandle
 ue_result_string	@ue_foundation::ue_result_string CIH<ue_foundation::UCallHandle> CIs C_c	string const	4
 ue_rotate_vector	@ue_foundation::ue_rotate_vector CIH<ue_foundation::UERotator> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
 ue_rotator	@ue_foundation::ue_rotator Cd Cd Cd C_c	ue_foundation::UERotator	4
+ue_rotator	@ue_foundation::ue_rotator CIH<ue_foundation::UEQuat> C_c	ue_foundation::UERotator	4
 ue_self_object	@ue_foundation::ue_self_object C_c	ue_foundation::UObjectHandle	4
 ue_set_self_bool	@ue_foundation::ue_set_self_bool CIs Cb C_c	void	4
 ue_set_self_byte	@ue_foundation::ue_set_self_byte CIs Cu8 C_c	void	4

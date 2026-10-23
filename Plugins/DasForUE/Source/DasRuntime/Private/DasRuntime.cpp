@@ -487,6 +487,7 @@ MAKE_TYPE_FACTORY(InputActionValue, FDasInputActionValue);
 MAKE_TYPE_FACTORY(UEVector2D, FVector2D);
 MAKE_TYPE_FACTORY(UEVector, FVector);
 MAKE_TYPE_FACTORY(UERotator, FRotator);
+MAKE_TYPE_FACTORY(UEQuat, FQuat);
 MAKE_TYPE_FACTORY(UETransform, FTransform);
 // A source-side checked view of a native FHitResult. References are weak handles.
 struct FDasTraceHit

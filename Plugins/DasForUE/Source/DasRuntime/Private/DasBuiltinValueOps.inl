@@ -171,3 +171,29 @@ bool BuiltinNamesNotEqual(FDasNameValue A, FDasNameValue B, das::Context* C)
 {
     return !DSLNamesEqual(A, B, C);
 }
+
+// Quaternion conversions preserve Unreal's double-precision rotation convention.
+// Never silently normalize a caller's quaternion or reinterpret Euler components.
+const FQuat& BuiltinRotationQuat(const FQuat& Q, das::Context* C)
+{
+    BuiltinValid(Q, C);
+    if (!Q.IsNormalized())
+        C->throw_error("quaternion rotation must be normalized");
+    return Q;
+}
+FQuat BuiltinQuatFromRotator(const FRotator& R, das::Context* C)
+{
+    return BuiltinRotationQuat(BuiltinValid(R, C).Quaternion(), C);
+}
+FRotator BuiltinRotatorFromQuat(const FQuat& Q, das::Context* C)
+{
+    return BuiltinValid(BuiltinRotationQuat(Q, C).Rotator(), C);
+}
+FQuat BuiltinQuat(double X, double Y, double Z, double W, das::Context* C)
+{
+    return BuiltinRotationQuat(FQuat(X, Y, Z, W), C);
+}
+FQuat BuiltinQuatIdentity()
+{
+    return FQuat::Identity;
+}

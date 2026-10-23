@@ -12,6 +12,9 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Added
 
+- Native `UEQuat` local values, identity/component constructors and explicit guarded
+  Rotator ↔ Quaternion conversions, with finite/normalized input checks.
+
 - Canonical Vector/Vector2D arithmetic and compound operators; exact equality and explicit
   near-equality, length, distance, dot/cross and safe normalization helpers.
 - Rotator component arithmetic, degree-based wrapped comparison, vector rotation and explicit

@@ -177,6 +177,34 @@ Semantics:
 
 Examples: `Plugins/DasForUE/Content/Das/Scripts/dsl_math_methods.das`, `dsl_vector2d.das`, `dsl_method_value_target.das`.
 
+## Quaternion conversions (`UEQuat`)
+
+`require ue_foundation` exposes the native double-precision `FQuat` as `UEQuat`.
+Conversions are explicit:
+
+```das
+let rotation : UERotator = ue_rotator(25.0lf, 80.0lf, -15.0lf)
+let quaternion : UEQuat = ue_quat(rotation)
+let recovered : UERotator = ue_rotator(quaternion)
+let identity : UEQuat = ue_quat_identity()
+let sameIdentity : UEQuat = ue_quat(0.0lf, 0.0lf, 0.0lf, 1.0lf)
+```
+
+- `ue_quat(rotator)` calls `FRotator::Quaternion()`; `ue_rotator(quaternion)` calls
+  `FQuat::Rotator()`. Euler angles are in degrees, in Unreal's pitch/yaw/roll convention.
+- `ue_quat(x,y,z,w)` takes four `double` components and requires a normalized rotation.
+  The fields `x`, `y`, `z`, `w` are doubles; values are owned copies. Initialize locals
+  explicitly: an uninitialized `UEQuat` is not guaranteed to be identity.
+- Non-finite inputs/results and non-normalized quaternion inputs are rejected through
+  the existing guarded UE extern boundary. Conversions never silently normalize an input.
+  If components are edited directly, validation runs at the next helper call.
+- Euler round trips preserve the rotation, not necessarily the original angle triple,
+  especially at pitch singularities. `q` and `-q` represent the same rotation.
+- This increment exposes local native values and explicit conversions. It does not yet
+  add quaternion operators, authored `ue_property`/reflected function parameters,
+  containers, or generated native API transport. Generated `S_Quat_*` wrappers remain
+  distinct from `UEQuat`; no implicit conversions are provided.
+
 ## Operators and math helpers
 
 The operators are registered in `ue_foundation`, so `ue_dsl` and generated

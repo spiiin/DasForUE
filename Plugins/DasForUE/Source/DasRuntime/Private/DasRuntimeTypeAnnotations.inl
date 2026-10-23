@@ -136,6 +136,16 @@ struct FDSLRotatorAnnotation : FMathValueAnnotation<FRotator>
         addField<DAS_BIND_MANAGED_FIELD(Roll)>("roll");
     }
 };
+struct FDSLQuatAnnotation : FMathValueAnnotation<FQuat>
+{
+    FDSLQuatAnnotation(das::ModuleLibrary& L) : FMathValueAnnotation("UEQuat", L, "FQuat")
+    {
+        addField<DAS_BIND_MANAGED_FIELD(X)>("x");
+        addField<DAS_BIND_MANAGED_FIELD(Y)>("y");
+        addField<DAS_BIND_MANAGED_FIELD(Z)>("z");
+        addField<DAS_BIND_MANAGED_FIELD(W)>("w");
+    }
+};
 struct FTraceHitAnnotation : FMathValueAnnotation<FDasTraceHit>
 {
     FTraceHitAnnotation(das::ModuleLibrary& L) : FMathValueAnnotation("UETraceHit", L, "FDasTraceHit")

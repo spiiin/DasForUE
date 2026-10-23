@@ -293,3 +293,18 @@ build and 33 focused checks passed; commandlet execution was under one second,
 the scoped suite including process startup and source/DLL freeze took 15 seconds.
 The extern baseline gained exactly 64 registrations, preserving every existing line.
 Receipt: `logs/builtin-values-validation.json`; output: `logs/builtin-values-runtime.log`.
+
+## Quaternion conversion check
+
+Queue `test-suite quat1 quat repo=<main-worktree>` through the shared build agent.
+The suite builds Editor Development and runs one short `DasBuiltinValues -QuatOnly`
+probe against native `FRotator::Quaternion()` / `FQuat::Rotator()`: ordinary and
+wrapped angles, pitch singularities, quaternion sign equivalence, identity and
+component constructors, and refusal of zero/non-unit/non-finite rotations.
+It writes `logs/quat-validation.json`, `logs/quat-runtime.log` and the current
+extern manifest in `logs/quat-externs.txt`. It does not run PIE or packaged tests.
+
+Verified 2026-10-23 by `quat-20261023a` (exit 0): Editor Development build
+and the single focused conversion probe passed. Native commandlet execution took
+0.06 seconds; the suite including process startup and source/DLL freeze took 13 seconds.
+Four extern registrations were added without changing any existing manifest entry.
