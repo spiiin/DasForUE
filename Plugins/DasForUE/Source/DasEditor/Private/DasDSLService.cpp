@@ -634,10 +634,14 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         const FString Reason = Error;
         return Restore(Reason);
     }
-    if (DasActorNativeParent(EffectiveDeclaration.NativeParent))
+    if (DasActorNativeParent(EffectiveDeclaration.NativeParent) ||
+        Schema.Parent == TEXT("WorldSubsystem") || Schema.Parent == TEXT("GameInstanceSubsystem"))
     {
         auto* Lifecycle = DasHostString(BP->GeneratedClass->GetDefaultObject(), TEXT("LifecycleScript"));
-        const bool Needed = !EffectiveDeclaration.Callbacks.IsEmpty() || EffectiveDeclaration.AsyncPhysics.IsSet();
+        const bool Needed = Schema.Parent == TEXT("WorldSubsystem") ||
+                                                  Schema.Parent == TEXT("GameInstanceSubsystem") ||
+                                                                        !EffectiveDeclaration.Callbacks.IsEmpty() ||
+                                                                        EffectiveDeclaration.AsyncPhysics.IsSet();
         if (Lifecycle && (Needed || *Lifecycle == Script))
         {
             *Lifecycle = Needed ? Script : FString();

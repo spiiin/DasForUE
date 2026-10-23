@@ -1317,7 +1317,12 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     DSLFail(TEXT("Conflicting UE callback/function annotations"));
                 FDasDeclaredCallback Callback;
                 Callback.Name = DSLText(DSLMethodName(F));
-                Callback.Kind = Event ? TEXT("event"): Callback.Name;
+                const bool Deinitialize = !Event && Callback.Name == TEXT("Deinitialize");
+                if (Deinitialize &&
+                    C.NativeParent != TEXT("/Script/Engine.WorldSubsystem") &&
+                                           C.NativeParent != TEXT("/Script/Engine.GameInstanceSubsystem"))
+                    DSLFail(TEXT("Deinitialize requires a subsystem root"));
+                Callback.Kind = Event ? TEXT("event"): Deinitialize ? TEXT("EndPlay") : Callback.Name;
                 if (F->result && F->result->baseType == das::Type::autoinfer)
                     F->result = new das::TypeDecl(das::Type::tVoid, F->at);
                 if (F->isStaticClassMethod || !F->result || F->result->ref ||
@@ -1328,8 +1333,9 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     Event ? (F->arguments.size() == 1   ? FString()
                              : F->arguments.size() == 2 ? DSLTypeName(F->arguments[1]->type)
                                                         : TEXT("invalid"))
-                          : Callback.Kind == TEXT("Tick")? TEXT("float")
-                                                         : Callback.Kind == TEXT("EndPlay")? TEXT("int"): FString();
+                          : Callback.Kind == TEXT("Tick")
+                                ? TEXT("float")
+                                : Callback.Kind == TEXT("EndPlay") && !Deinitialize ? TEXT("int"): FString();
                 if (MultiEvent)
                 {
                     Parameter = TEXT("struct");
@@ -1443,6 +1449,14 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     F->body = F->body->visit(SuperSource);
                 }
                 Clone->arguments.erase(Clone->arguments.begin());
+                if (Deinitialize)
+                {
+                    auto* Reason = new das::Variable();
+                    Reason->name = "__ue_end_reason";
+                    Reason->at = F->at;
+                    Reason->type = new das::TypeDecl(das::Type::tInt, F->at);
+                    Clone->arguments.push_back(Reason);
+                }
                 if (MultiEvent)
                     DSLCallbackUnpackArguments(Clone, TypeFolder, TypeRegistry, Group, St->module);
                 if (!MultiEvent && Event && (Parameter == TEXT("object") || Parameter == TEXT("class")))

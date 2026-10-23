@@ -81,6 +81,8 @@ time are in the [changelog](../CHANGELOG.md).
 - [Apply and hot reload](Guide/Workflow/ApplyAndHotReload.md)
 - [Migrations](Guide/Workflow/Migrations.md)
 
+- [Authored WorldSubsystem and GameInstanceSubsystem](Guide/Gameplay/Subsystems.md)
+
 ## Engine API packages
 
 - [Overview](Api/README.md)

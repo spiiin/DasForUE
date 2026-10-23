@@ -483,6 +483,7 @@ __ue_struct_set_element_object_key	@ue_foundation::__ue_struct_set_element_objec
 __ue_struct_set_with_enum	@ue_foundation::__ue_struct_set_with_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cb C_c C_l	ue_foundation::UEStructValue	4
 __ue_struct_set_with_object_key	@ue_foundation::__ue_struct_set_with_object_key CIH<ue_foundation::UEStructValue> CIs Cu64 Cb C_c C_l	ue_foundation::UEStructValue	4
 __ue_struct_with_enum_value	@ue_foundation::__ue_struct_with_enum_value CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_subsystem	@ue_foundation::__ue_subsystem CIs CH<ue_foundation::UEClassHandle> CIs Cb C_c	ue_foundation::UObjectHandle	4
 __ue_tag_check	@ue_foundation::__ue_tag_check CIH<ue_foundation::UEStructValue> Cb C_c	ue_foundation::UEStructValue	4
 __ue_tag_matches	@ue_foundation::__ue_tag_matches CIH<ue_foundation::UEStructValue> CIH<ue_foundation::UEStructValue> Cb C_c	bool const	4
 __ue_tag_name	@ue_foundation::__ue_tag_name CIH<ue_foundation::UEStructValue> C_c	string const	4

@@ -56,8 +56,10 @@ bool DSLStandardLifecycle(const das::FunctionPtr& F)
 {
     const FString Name = DSLText(DSLMethodName(F));
     return Name == TEXT("ConstructionScript") ||
-                        Name == TEXT("Initialize") || Name == TEXT("BeginPlay") || Name == TEXT("Tick") ||
-                                                                                                Name == TEXT("EndPlay");
+                        Name == TEXT("Deinitialize") || Name == TEXT("Initialize") ||
+                                                                     Name == TEXT("BeginPlay") ||
+                                                                                  Name == TEXT("Tick") ||
+                                                                                               Name == TEXT("EndPlay");
 }
 struct FUECallbackAnnotation : das::FunctionAnnotation
 {
@@ -72,7 +74,7 @@ struct FUECallbackAnnotation : das::FunctionAnnotation
                 DSLFail(TEXT("UE callbacks require an instance method of ue_class"));
             DSLAnnotationArguments(Args);
             if (!Event && !Args.empty())
-                DSLFail(TEXT("ue_lifecycle takes no arguments; name the method ConstructionScript, Initialize, BeginPlay, Tick or EndPlay"));
+                DSLFail(TEXT("ue_lifecycle takes no arguments; name the method ConstructionScript, Initialize, Deinitialize, BeginPlay, Tick or EndPlay"));
             if (Event)
             {
                 for (const auto& A : Args)
@@ -293,10 +295,15 @@ struct FUENativeBaseAnnotation : das::StructureAnnotation
                 DSLFail(TEXT("Expected ue_native_base(path=NativeClassPath)"));
             const FString Path = DSLString(Args, "path");
             if (!DasActorNativeParent(Path) &&
-                Path != TEXT("/Script/Engine.ActorComponent") &&
-                             Path != TEXT("/Script/Engine.SaveGame") &&
-                                          Path != TEXT("/Script/Engine.DataAsset") &&
-                                                       Path != TEXT("/Script/Engine.PrimaryDataAsset"))
+                Path != TEXT("/Script/Engine.WorldSubsystem") &&
+                             Path != TEXT("/Script/Engine.GameInstanceSubsystem") &&
+                                          Path != TEXT("/Script/Engine.ActorComponent") &&
+                                                       Path !=
+                                                           TEXT("/Script/Engine.SaveGame") &&
+                                                                Path !=
+                                                                    TEXT("/Script/Engine.DataAsset") &&
+                                                                         Path !=
+                                                                             TEXT("/Script/Engine.PrimaryDataAsset"))
                 DSLFail(TEXT("Unsupported native DSL base; expected Actor, Pawn, Character, ActorComponent, SaveGame, DataAsset or PrimaryDataAsset"));
             auto* Native = FindObject<UClass>(nullptr, *Path);
             if (!Native || !Native->HasAnyClassFlags(CLASS_Native) || Native->HasAnyClassFlags(CLASS_Interface))

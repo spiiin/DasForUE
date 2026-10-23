@@ -308,3 +308,10 @@ Verified 2026-10-23 by `quat-20261023a` (exit 0): Editor Development build
 and the single focused conversion probe passed. Native commandlet execution took
 0.06 seconds; the suite including process startup and source/DLL freeze took 13 seconds.
 Four extern registrations were added without changing any existing manifest entry.
+
+## Authored subsystems
+
+Queue `test-suite <id> authored-subsystems,authored-subsystems-pie repo=C:\src\DasForUE2-subsystems`
+through the shared build agent. These are focused native-collection/reload and
+real multi-world PIE tests, not a packaged or full regression run. See
+[the subsystem guide](../Guide/Gameplay/Subsystems.md) for contracts and limits.

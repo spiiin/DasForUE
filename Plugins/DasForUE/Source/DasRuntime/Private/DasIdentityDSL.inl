@@ -40,7 +40,14 @@ das::ExpressionPtr DSLLoctext(das::ExprCallMacro* E, das::Module* M)
 struct FUEIdentityMacro : das::CallMacro
 {
     bool Text;
-    FUEIdentityMacro(bool InText) : CallMacro(InText ? "ue_loctext" : "ue_class_default"), Text(InText) {}
+    bool Subsystem;
+    FUEIdentityMacro(bool InText, bool InSubsystem = false)
+        : CallMacro(InText        ? "ue_loctext"
+                    : InSubsystem ? "ue_subsystem"
+                                  : "ue_class_default"),
+          Text(InText), Subsystem(InSubsystem)
+    {
+    }
     virtual bool canVisitArguments(das::ExprCallMacro*, int I) override { return !Text && I == 1; }
     virtual das::ExpressionPtr visit(das::Program* P, das::Module* M, das::ExprCallMacro* E) override
     {
@@ -56,7 +63,7 @@ struct FUEIdentityMacro : das::CallMacro
             if (Authored && !Concrete)
                 DSLFail(TEXT("An authored reference is a contract; its CDO requires a concrete class handle"));
             auto* CDO =
-                DSLCall(E->at, "__ue_class_default_object",
+                DSLCall(E->at, Subsystem ? "__ue_subsystem" : "__ue_class_default_object",
                         {new das::ExprConstString(E->at, DSLUtf8(DSLIdentityPath(T))),
                          Concrete ? DSLClassArgument(E->at, E->arguments[1]) : DSLCall(E->at, "ue_class_null", {}),
                          new das::ExprConstString(E->at, DSLUtf8(Authored ? DSLReferenceDeclaration(T).Id : FString())),
