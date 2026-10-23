@@ -1,0 +1,106 @@
+options gen2
+options ue_native_routes = true
+require ue_native_gameplay
+require smoke_routes
+require math
+
+// Gameplay calls of UFUNCTIONs that ue_engine binds reflect (DasNativeBinds.h, Reflects), run by
+// DasNativeRoutesProbe.cpp with the probe actor as self. native_routes_probe.das calls the binds,
+// native_routes_reflected.das is the same file with `ue_native_routes = false` (reflection); keep them equal line
+// for line, the probe compares their errors. Each entry makes one gameplay method call and returns 0 when its
+// result is right, or a value the probe compares with C++; the probe counts the calls the binds answered.
+def near(a, b : UEVector) : bool {
+    return ue_nearly_equal(a, b, 0.001lf)
+}
+def self_actor() : ActorRef {
+    return ue_ref(type<ActorRef>, ue_self_object())
+}
+
+[export]
+def actor_location(input:int):int {
+    let a = self_actor()
+    return a.K2_GetActorLocation() == ue_vector(100.0lf, 200.0lf, 300.0lf) ? 0 : 1
+}
+[export]
+def actor_rotation(input:int):int {
+    let a = self_actor()
+    return abs(a.K2_GetActorRotation().yaw - 90.0lf) < 0.001lf ? 0 : 1
+}
+[export]
+def actor_forward(input:int):int {
+    let a = self_actor()
+    return near(a.GetActorForwardVector(), ue_vector(0.0lf, 1.0lf, 0.0lf)) ? 0 : 1
+}
+[export]
+def actor_transform(input:int):int {
+    let a = self_actor()
+    return near(ue_transform_translation(a.GetTransform()), ue_vector(100.0lf, 200.0lf, 300.0lf)) ? 0 : 1
+}
+[export]
+def set_actor_scale(input:int):int {
+    let a = self_actor()
+    a.SetActorScale3D(ue_vector(2.0lf, 2.0lf, 2.0lf))
+    return 0
+}
+[export]
+def actor_has_tag(input:int):int {
+    let a = self_actor()
+    return a.ActorHasTag(ue_name_value("probe_tag")) ? 0 : 1
+}
+[export]
+def actor_life_span(input:int):int {
+    let a = self_actor()
+    return a.GetLifeSpan() == 0.0 ? 0 : 1
+}
+[export]
+def set_actor_hidden(input:int):int {
+    let a = self_actor()
+    a.SetActorHiddenInGame(true)
+    return 0
+}
+[export]
+def component_location(input:int):int {
+    let a = self_actor()
+    let c = a.RootComponent
+    return c.K2_GetComponentLocation() == ue_vector(100.0lf, 200.0lf, 300.0lf) ? 0 : 1
+}
+// Pawn: the Actor bind answers a UFUNCTION of an ancestor class.
+[export]
+def pawn_location(input:int):int {
+    let p = ue_ref(type<NativePawnRef>, smoke_routes_pawn())
+    return p.K2_GetActorLocation() == ue_vector(0.0lf, 0.0lf, 500.0lf) ? 0 : 1
+}
+[export]
+def pawn_locally_controlled(input:int):int {
+    let p = ue_ref(type<NativePawnRef>, smoke_routes_pawn())
+    return p.IsLocallyControlled() ? 1 : 0
+}
+// Kept on reflection by policy: unsafe in construction scripts, requires authority.
+[export]
+def component_is_active(input:int):int {
+    let a = self_actor()
+    let c = a.RootComponent
+    return c.IsActive() ? 1 : 0
+}
+[export]
+def set_replicates(input:int):int {
+    let a = self_actor()
+    a.SetReplicates(false)
+    return 0
+}
+// The receiver checks of the reflected call: a destroyed actor is refused with the same error.
+[export]
+def destroyed_receiver(input:int):int {
+    let v = ue_ref(type<ActorRef>, smoke_routes_victim())
+    smoke_routes_destroy_victim()
+    return v.K2_GetActorLocation() == ue_vector(0.0lf, 0.0lf, 0.0lf) ? 0 : 1
+}
+[export]
+def bench(count:int):int {
+    let a = self_actor()
+    var n = 0
+    for (i in range(0, count)) {
+        if (a.K2_GetActorLocation().x > -1.0e30lf) { n += 1 }
+    }
+    return n
+}

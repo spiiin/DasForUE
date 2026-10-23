@@ -85,6 +85,7 @@ class Native:
     def __init__(self, manifest):
         self.by_name = collections.defaultdict(list)
         self.modules = []
+        self.routed = set()  # UFUNCTION names that gameplay scripts call through a bind (Reflects)
         for module in json.load(open(manifest, encoding='utf-8'))['modules']:
             if module['name'] not in PLUGIN_MODULES:
                 continue
@@ -92,6 +93,8 @@ class Native:
             for f in module['functions']:
                 if f['origin'] != 'helper':
                     self.by_name[norm(f['name'])].append(f)
+                if f.get('routed'):
+                    self.routed.add(f['reflects'].rsplit(':', 1)[-1])
 
     def find(self, owner, name):
         script_type = OWNER_TYPES.get(owner, '')
@@ -150,13 +153,14 @@ def main():
             script_type = REFLECTED_CLASSES.get(path)
             if not script_type:
                 continue
-            row = reflected.setdefault(script_type, [0, 0, []])
+            row = reflected.setdefault(script_type, [0, 0, [], 0])
             if function in row[2]:
                 continue
             row[2].append(function)
             row[0] += 1
             name = norm(re.sub(r'^K2_', '', function))
             row[1] += any(script_type == f['receiver'] for f in native.by_name.get(name, []))
+            row[3] += function in native.routed
 
     functions = sum(len(m['functions']) for m in native.modules)
     out = ['# Native binds coverage', '',
@@ -176,12 +180,15 @@ def main():
         out.append('| %s | %d | %d | %d | %d | %d |' % (owner, row['total'], row['before_direct'], row['before_missing'],
                                                        row['native'], row['now_missing']))
     out += ['', '## Reflected functions of the bound classes', '',
-            'The functions our generated bindings call through reflection (about 2 µs a call) for the classes',
-            '`ue_engine` declares, and how many of them are now direct methods. AngelScript binds these through',
-            'reflection too, so they are not in the table above.', '',
-            '| Script type | Reflected functions | Direct now |', '| --- | ---: | ---: |']
-    for script_type, (total, direct, _) in reflected.items():
-        out.append('| %s | %d | %d |' % (script_type, total, direct))
+            'The functions our generated bindings call through reflection (tens of µs a call, see Performance.md)',
+            'for the classes `ue_engine` declares, and how many of them are now direct methods. AngelScript binds',
+            'these through reflection too, so they are not in the table above. "Routed" counts the UFUNCTIONs',
+            'that gameplay scripts (`ref.K2_GetActorLocation()`) now call through the bind that reflects them',
+            '(`Reflects`), matched by name.',
+            '',
+            '| Script type | Reflected functions | Direct now | Routed |', '| --- | ---: | ---: | ---: |']
+    for script_type, (total, direct, _, routed) in reflected.items():
+        out.append('| %s | %d | %d | %d |' % (script_type, total, direct, routed))
     out += ['', '## Still missing in these areas', '']
     for owner, names in missing.items():
         out.append('- **%s**: %s' % (owner, ', '.join('`%s`' % n for n in sorted(set(names)))))

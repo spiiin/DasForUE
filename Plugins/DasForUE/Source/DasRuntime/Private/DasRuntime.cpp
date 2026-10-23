@@ -642,6 +642,18 @@ TArray<FDasNativeModuleInfo> DescribeDasNativeModules()
             Info.Origin = Origin;
             Info.bPure = EnumHasAnyFlags(F.Flags, EDasBind::Pure);
             Info.bNonNullArgs = EnumHasAnyFlags(F.Flags, EDasBind::NonNullArgs);
+            if (F.ReflectedPath.IsEmpty() || FCString::Strcmp(Origin, TEXT("declared")) != 0)
+                return;
+            Info.Reflects = F.ReflectedPath;
+            const UFunction* U = FindObject<UFunction>(nullptr, *F.ReflectedPath);
+            bool bObjects = F.Result.Type == EDasNativeType::Object;
+            for (int32 I = 1; I < F.Arguments.Num(); ++I)
+                bObjects |= F.Arguments[I].Type == EDasNativeType::Object;
+            // Gameplay scripts pass object references as script structs, which are not bind types.
+            Info.RouteNote = !U         ? FString(TEXT("UFUNCTION not found"))
+                             : bObjects ? FString(TEXT("object parameters or result"))
+                                        : DasNativeRoutePolicy(U, F.Receiver());
+            Info.bRouted = Info.RouteNote.IsEmpty();
         };
         for (const FDasNativeFunctionDesc& F : Desc->Functions)
             Describe(F, TEXT("declared"));

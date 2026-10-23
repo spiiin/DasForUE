@@ -373,6 +373,7 @@ private:
     void Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasNativeParam Result, TArray<FDasNativeParam> Args,
              EDasBind Flags, FDasNativeClassFn Receiver, void* AotEntry = nullptr);
     void AddClass(const TCHAR* ScriptName, FDasNativeClassFn Class);
+    void SetReflects(const TCHAR* FunctionName);
     friend struct FDasNativeModuleBuilder;
     void* Module = nullptr; // the module being described (DasRuntime internal)
 };
@@ -395,6 +396,18 @@ public:
         Module.Add(ScriptName, &S::template Thunk<Fn>, S::Result(), MoveTemp(Args), Flags, &T::StaticClass);
         return *this;
     }
+    // The method added last does what the UFUNCTION FunctionName of T does. Gameplay scripts that call that
+    // UFUNCTION on a native reference (`self.Camera.K2_GetComponentLocation()`) then call this bind instead of
+    // going through reflection: the same syntax, the same receiver checks, without the call frame. Checked when
+    // the module is built: the UFUNCTION must exist, be BlueprintCallable and native, not an event, static,
+    // network or editor-only function, and take and return the same types, every parameter an input; the bind
+    // must not use EDasBind::NonNullArgs (reflection passes nullptr). One bind per UFUNCTION. UFUNCTIONs that
+    // need authority or are unsafe in construction scripts keep the reflected call.
+    TDasNativeClass& Reflects(const TCHAR* FunctionName)
+    {
+        Module.SetReflects(FunctionName);
+        return *this;
+    }
 
 private:
     FDasNativeModule& Module;
@@ -408,6 +421,8 @@ DASRUNTIME_API FString DasNativeModuleStatus(const TCHAR* ModuleName);
 // Called from a bound function: when it returns, the script call fails with "<function>: <Message>" (the result
 // is ignored). Game thread, only during a native bind call; the first message of a call wins.
 DASRUNTIME_API void DasNativeError(const FString& Message);
+// How many gameplay method calls binds answered instead of reflection (Reflects) since the start; for tests.
+DASRUNTIME_API uint64 DasNativeRoutedCalls();
 
 // Read-only description of the registered native modules (manifests, coverage reports, documentation). Builds the
 // modules registered since the last compilation; game thread.
@@ -420,6 +435,11 @@ struct FDasNativeFunctionInfo
     FString Origin; // "declared", "inherited" (an ancestor's method on a descendant type) or "helper"
     bool bPure = false;
     bool bNonNullArgs = false;
+    FString Reflects; // path of the UFUNCTION it reflects (Reflects), empty when none
+    // Gameplay scripts call it instead of the UFUNCTION; false with Reflects when the UFUNCTION's policy keeps
+    // the reflected call (RouteNote says which).
+    bool bRouted = false;
+    FString RouteNote;
 };
 struct FDasNativeModuleInfo
 {

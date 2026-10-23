@@ -939,6 +939,92 @@ bool DSLMethodSourceConversion(const das::string& Descriptor)
     const auto* Script = DSLAdaptedHandleNamed(Descriptor.substr(6));
     return !Script || !Script->GetCallBridge(EDasCallBridge::MethodBridge);
 }
+das::ExpressionPtr DSLMethodArgumentDefault(bool Native, const FDasDeclaredParameter& Param,
+                                            const das::TypeDeclPtr& Type, const das::LineInfo& At)
+{
+    if (Native && Param.Type.Kind == TEXT("byte") && Param.Default.Kind == TEXT("number"))
+        return new das::ExprConstInt(At, int32(Param.Default.Number));
+    if (Native && Param.Default.Kind == TEXT("enum"))
+        return new das::ExprConstEnumeration(At, DSLUtf8(Param.Default.String), Type);
+    return DSLParameterDefaultExpression(Param, At);
+}
+// DasNativeBinds.inl
+FString DasNativeRoutePolicy(const UFunction* Function, const UClass* Receiver);
+FString DasNativeRouteTypes(const FDasNativeRoute& Route, const das::ModuleLibrary& Lib,
+                            const das::vector<das::TypeDeclPtr>& Types);
+// A native gameplay method that a native bind reflects (DasNativeBinds.h, Reflects) calls that bind: the wrapper has
+// the method's name, parameters and defaults and calls the bind's route (SimNode_DasNativeRoute) with the
+// receiver's handle and class path. Not when the script sets `options ue_native_routes = false`, the UFUNCTION's
+// policy keeps the reflected call (DasNativeRoutePolicy), or the script types differ from the bind's. Returns false
+// to emit the reflected wrapper.
+bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::TypeDeclPtr& ReceiverType,
+                         const das::string& Name, const das::LineInfo& At, const FString& ClassPath,
+                         const FDasDeclaredMethod& Method, const FDSLMethodSourceSignature& Descriptor)
+{
+    if (!Program->options.getBoolOption("ue_native_routes", true))
+        return false;
+    UClass* Class = FindObject<UClass>(nullptr, *ClassPath);
+    UFunction* Function = Class ? Class->FindFunctionByName(*DSLText(Name)) : nullptr;
+    const FDasNativeRoute Route = FindDasNativeRoute(Function, Class);
+    if (!Route.Function)
+        return false;
+    FString Why = DasNativeRoutePolicy(Function, Class);
+    das::vector<das::TypeDeclPtr> Types; // the result, then the parameters
+    Types.push_back(DSLMethodValueType(Program, Module, Method.ReturnType, Descriptor.Result, Descriptor.Scope, At));
+    for (int32 Index = 0; Why.IsEmpty() && Index < Method.Parameters.Num(); ++Index)
+    {
+        if (Method.Parameters[Index].Direction != TEXT("in"))
+            Why = TEXT("an output parameter");
+        Types.push_back(DSLMethodValueType(Program, Module, Method.Parameters[Index].Type,
+                                           Descriptor.Parameters[size_t(Index)], Descriptor.Scope, At));
+    }
+    if (Why.IsEmpty())
+        Why = DasNativeRouteTypes(Route, *Program->thisModuleGroup, Types);
+    if (!Why.IsEmpty())
+    {
+        UE_LOG(LogDasRuntime, Verbose, TEXT("%s.%s keeps the reflected call: %s"), *ClassPath, *DSLText(Name), *Why);
+        return false;
+    }
+    auto* Fn = new das::Function();
+    Fn->at = At;
+    Fn->name = Name;
+    Fn->generated = true;
+    Fn->privateFunction = false;
+    Fn->result = DSLObjectCopyType(Types[0]);
+    auto AddArgument = [&](const das::string& ArgName, const das::TypeDeclPtr& Type)
+    {
+        auto* Arg = new das::Variable();
+        Arg->at = At;
+        Arg->name = ArgName;
+        Arg->type = DSLObjectCopyType(Type);
+        Arg->type->ref = false;
+        Arg->type->constant = true;
+        Fn->arguments.push_back(Arg);
+        return Arg;
+    };
+    AddArgument("receiver", ReceiverType);
+    das::vector<das::ExpressionPtr> Arguments{new das::ExprField(At, new das::ExprVar(At, "receiver"), "handle"),
+                                              new das::ExprConstString(At, DSLUtf8(ClassPath))};
+    for (int32 Index = 0; Index < Method.Parameters.Num(); ++Index)
+    {
+        const auto ArgName = "arg_" + das::to_string(Index);
+        auto* Arg = AddArgument(ArgName, Types[size_t(Index) + 1]);
+        Arg->init = DSLMethodArgumentDefault(true, Method.Parameters[Index], Arg->type, At);
+        Arguments.push_back(new das::ExprVar(At, ArgName));
+    }
+    auto* Call = DSLCall(At, DSLUtf8(Route.Function->RouteName), {});
+    Call->arguments = std::move(Arguments);
+    auto* Block = new das::ExprBlock();
+    Block->at = At;
+    if (Fn->result->baseType == das::Type::tVoid)
+        Block->list.push_back(Call);
+    else
+        Block->list.push_back(new das::ExprReturn(At, Call));
+    Fn->body = Block;
+    if (!Module->addFunction(Fn, true))
+        DSLFail(TEXT("Authored method overload collision"));
+    return true;
+}
 // Method-call syntax uses daScript's ordinary receiver-first overload resolution.
 bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const das::TypeDeclPtr& ReceiverType,
                             const das::string& Name, const das::LineInfo& At)
@@ -996,6 +1082,8 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
     const auto* Descriptor = Native ? &NativeDescriptor : DSLMethodSourceSignatures.Find(SourceKey);
     if (!Descriptor || Descriptor->Parameters.size() != size_t(Method->Parameters.Num()))
         DSLFail(TEXT("Missing authored method source signature"));
+    if (Native && DSLEmitRoutedMethod(Program, Module, ReceiverType, Name, At, Declaration.Id, *Method, *Descriptor))
+        return true;
     auto* Fn = new das::Function();
     Fn->at = At;
     Fn->name = Name;
@@ -1084,18 +1172,7 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
             DSLFail(TEXT("Unsupported authored method parameter: ")+ Param.Type.Kind);
         const auto ArgName = "arg_" + das::to_string(Index);
         AddArgument(ArgName, Type, Param.Direction != TEXT("in"));
-        Fn->arguments.back()->init =
-            Native &&
-            Param.Type.Kind ==
-                TEXT("byte") &&
-                     Param.Default.Kind ==
-                         TEXT("number")
-                              ? static_cast<das::ExpressionPtr>(new das::ExprConstInt(At, int32(Param.Default.Number)))
-                              : Native && Param.Default.Kind ==
-                                              TEXT("enum")
-                                                   ? static_cast<das::ExpressionPtr>(new das::ExprConstEnumeration(
-                                                         At, DSLUtf8(Param.Default.String), Type))
-                                                   : DSLParameterDefaultExpression(Param, At);
+        Fn->arguments.back()->init = DSLMethodArgumentDefault(Native, Param, Type, At);
         if (Param.Direction != TEXT("out"))
         {
             const das::string Kind = DSLMethodAdapterKind(Param.Type.Kind, Type);

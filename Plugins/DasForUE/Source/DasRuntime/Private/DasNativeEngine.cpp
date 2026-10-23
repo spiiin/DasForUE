@@ -2,7 +2,8 @@
 // their most used methods, bound directly (no reflection). Game modules declare their own classes on top of these
 // (Class<AMyPickup>(TEXT("Pickup")) inherits the Actor methods) or add methods to them (Class<AActor>()).
 // Built on the public native binds API (DasNativeBinds.h). Engine functions are called from small lambdas: the
-// address of a function imported from the engine DLL is not a template argument.
+// address of a function imported from the engine DLL is not a template argument. Methods that do what a UFUNCTION
+// does reflect it (Reflects): gameplay scripts calling that UFUNCTION on a native reference call the bind.
 #include "DasNativeBinds.h"
 #include "Components/SceneComponent.h"
 #include "Engine/Engine.h"
@@ -56,6 +57,7 @@ DAS_ENGINE_FN(SetActorTickEnabled, (AActor & A, bool bEnabled), A.SetActorTickEn
 DAS_ENGINE_FN(IsActorTickEnabled, (const AActor& A), A.IsActorTickEnabled())
 DAS_ENGINE_FN(GetActorNameOrLabel, (const AActor& A), A.GetActorNameOrLabel())
 DAS_ENGINE_FN(ActorHasTag, (const AActor& A, FName Tag), A.ActorHasTag(Tag))
+DAS_ENGINE_FN(SetReplicates, (AActor & A, bool bReplicates), A.SetReplicates(bReplicates))
 // Actor: relations.
 DAS_ENGINE_FN(GetActorOwner, (const AActor& A), A.GetOwner())
 DAS_ENGINE_FN(SetActorOwner, (AActor & A, AActor* Owner), A.SetOwner(Owner))
@@ -161,40 +163,43 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
 {
     using namespace DasNativeEngine;
     auto Actor = Binds.Class<AActor>(TEXT("Actor"));
-    Actor.Method<GetActorLocation>(TEXT("get_actor_location"));
+    Actor.Method<GetActorLocation>(TEXT("get_actor_location")).Reflects(TEXT("K2_GetActorLocation"));
     Actor.Method<SetActorLocation>(TEXT("set_actor_location"));
-    Actor.Method<GetActorRotation>(TEXT("get_actor_rotation"));
+    Actor.Method<GetActorRotation>(TEXT("get_actor_rotation")).Reflects(TEXT("K2_GetActorRotation"));
     Actor.Method<SetActorRotation>(TEXT("set_actor_rotation"));
-    Actor.Method<GetActorTransform>(TEXT("get_actor_transform"));
+    Actor.Method<GetActorTransform>(TEXT("get_actor_transform")).Reflects(TEXT("GetTransform"));
     Actor.Method<SetActorTransform>(TEXT("set_actor_transform"));
-    Actor.Method<GetActorScale3D>(TEXT("get_actor_scale3d"));
-    Actor.Method<SetActorScale3D>(TEXT("set_actor_scale3d"));
+    Actor.Method<GetActorScale3D>(TEXT("get_actor_scale3d")).Reflects(TEXT("GetActorScale3D"));
+    Actor.Method<SetActorScale3D>(TEXT("set_actor_scale3d")).Reflects(TEXT("SetActorScale3D"));
     Actor.Method<AddActorWorldOffset>(TEXT("add_actor_world_offset"));
     Actor.Method<AddActorLocalOffset>(TEXT("add_actor_local_offset"));
     Actor.Method<AddActorWorldRotation>(TEXT("add_actor_world_rotation"));
     Actor.Method<AddActorLocalRotation>(TEXT("add_actor_local_rotation"));
-    Actor.Method<GetActorForwardVector>(TEXT("get_actor_forward_vector"));
-    Actor.Method<GetActorRightVector>(TEXT("get_actor_right_vector"));
-    Actor.Method<GetActorUpVector>(TEXT("get_actor_up_vector"));
+    Actor.Method<GetActorForwardVector>(TEXT("get_actor_forward_vector")).Reflects(TEXT("GetActorForwardVector"));
+    Actor.Method<GetActorRightVector>(TEXT("get_actor_right_vector")).Reflects(TEXT("GetActorRightVector"));
+    Actor.Method<GetActorUpVector>(TEXT("get_actor_up_vector")).Reflects(TEXT("GetActorUpVector"));
     Actor.Method<GetDistanceTo>(TEXT("get_distance_to"), EDasBind::NonNullArgs);
     Actor.Method<GetSquaredDistanceTo>(TEXT("get_squared_distance_to"), EDasBind::NonNullArgs);
     Actor.Method<GetHorizontalDistanceTo>(TEXT("get_horizontal_distance_to"), EDasBind::NonNullArgs);
-    Actor.Method<GetVelocity>(TEXT("get_velocity"));
+    Actor.Method<GetVelocity>(TEXT("get_velocity")).Reflects(TEXT("GetVelocity"));
     Actor.Method<IsHidden>(TEXT("is_hidden"));
-    Actor.Method<SetActorHiddenInGame>(TEXT("set_actor_hidden_in_game"));
-    Actor.Method<SetActorEnableCollision>(TEXT("set_actor_enable_collision"));
-    Actor.Method<GetActorEnableCollision>(TEXT("get_actor_enable_collision"));
+    Actor.Method<SetActorHiddenInGame>(TEXT("set_actor_hidden_in_game")).Reflects(TEXT("SetActorHiddenInGame"));
+    Actor.Method<SetActorEnableCollision>(TEXT("set_actor_enable_collision")).Reflects(TEXT("SetActorEnableCollision"));
+    Actor.Method<GetActorEnableCollision>(TEXT("get_actor_enable_collision")).Reflects(TEXT("GetActorEnableCollision"));
     Actor.Method<HasActorBegunPlay>(TEXT("has_actor_begun_play"));
     Actor.Method<IsActorInitialized>(TEXT("is_actor_initialized"));
     Actor.Method<IsActorBeingDestroyed>(TEXT("is_actor_being_destroyed"));
     Actor.Method<Destroy>(TEXT("destroy"));
-    Actor.Method<GetLifeSpan>(TEXT("get_life_span"));
-    Actor.Method<SetLifeSpan>(TEXT("set_life_span"));
-    Actor.Method<GetGameTimeSinceCreation>(TEXT("get_game_time_since_creation"));
-    Actor.Method<SetActorTickEnabled>(TEXT("set_actor_tick_enabled"));
-    Actor.Method<IsActorTickEnabled>(TEXT("is_actor_tick_enabled"));
+    Actor.Method<GetLifeSpan>(TEXT("get_life_span")).Reflects(TEXT("GetLifeSpan"));
+    Actor.Method<SetLifeSpan>(TEXT("set_life_span")).Reflects(TEXT("SetLifeSpan"));
+    Actor.Method<GetGameTimeSinceCreation>(TEXT("get_game_time_since_creation"))
+        .Reflects(TEXT("GetGameTimeSinceCreation"));
+    Actor.Method<SetActorTickEnabled>(TEXT("set_actor_tick_enabled")).Reflects(TEXT("SetActorTickEnabled"));
+    Actor.Method<IsActorTickEnabled>(TEXT("is_actor_tick_enabled")).Reflects(TEXT("IsActorTickEnabled"));
     Actor.Method<GetActorNameOrLabel>(TEXT("get_actor_name_or_label"));
-    Actor.Method<ActorHasTag>(TEXT("actor_has_tag"));
+    Actor.Method<ActorHasTag>(TEXT("actor_has_tag")).Reflects(TEXT("ActorHasTag"));
+    // BlueprintAuthorityOnly: gameplay scripts keep the reflected call, which checks authority.
+    Actor.Method<SetReplicates>(TEXT("set_replicates")).Reflects(TEXT("SetReplicates"));
     Actor.Method<GetActorOwner>(TEXT("get_owner"));
     Actor.Method<SetActorOwner>(TEXT("set_owner"));
     Actor.Method<GetInstigator>(TEXT("get_instigator"));
@@ -203,28 +208,30 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
 
     auto Pawn = Binds.Class<APawn>(TEXT("Pawn"));
     Pawn.Method<GetController>(TEXT("get_controller"));
-    Pawn.Method<IsLocallyControlled>(TEXT("is_locally_controlled"));
-    Pawn.Method<IsPlayerControlled>(TEXT("is_player_controlled"));
+    Pawn.Method<IsLocallyControlled>(TEXT("is_locally_controlled")).Reflects(TEXT("IsLocallyControlled"));
+    Pawn.Method<IsPlayerControlled>(TEXT("is_player_controlled")).Reflects(TEXT("IsPlayerControlled"));
     Pawn.Method<AddMovementInput>(TEXT("add_movement_input"));
 
     auto Component = Binds.Class<UActorComponent>(TEXT("ActorComponent"));
     Component.Method<GetComponentOwner>(TEXT("get_owner"));
-    Component.Method<IsActive>(TEXT("is_active"));
+    Component.Method<IsActive>(TEXT("is_active")).Reflects(TEXT("IsActive"));
     Component.Method<Activate>(TEXT("activate"));
     Component.Method<Deactivate>(TEXT("deactivate"));
     Component.Method<SetActive>(TEXT("set_active"));
     Component.Method<HasBegunPlay>(TEXT("has_begun_play"));
     Component.Method<IsRegistered>(TEXT("is_registered"));
-    Component.Method<SetComponentTickEnabled>(TEXT("set_component_tick_enabled"));
-    Component.Method<IsComponentTickEnabled>(TEXT("is_component_tick_enabled"));
+    Component.Method<SetComponentTickEnabled>(TEXT("set_component_tick_enabled"))
+        .Reflects(TEXT("SetComponentTickEnabled"));
+    Component.Method<IsComponentTickEnabled>(TEXT("is_component_tick_enabled"))
+        .Reflects(TEXT("IsComponentTickEnabled"));
     Component.Method<DestroyComponent>(TEXT("destroy_component"));
-    Component.Method<ComponentHasTag>(TEXT("component_has_tag"));
+    Component.Method<ComponentHasTag>(TEXT("component_has_tag")).Reflects(TEXT("ComponentHasTag"));
     Component.Method<GetComponentWorld>(TEXT("get_world"));
 
     auto Scene = Binds.Class<USceneComponent>(TEXT("SceneComponent"));
-    Scene.Method<GetComponentLocation>(TEXT("get_component_location"));
-    Scene.Method<GetComponentRotation>(TEXT("get_component_rotation"));
-    Scene.Method<GetComponentTransform>(TEXT("get_component_transform"));
+    Scene.Method<GetComponentLocation>(TEXT("get_component_location")).Reflects(TEXT("K2_GetComponentLocation"));
+    Scene.Method<GetComponentRotation>(TEXT("get_component_rotation")).Reflects(TEXT("K2_GetComponentRotation"));
+    Scene.Method<GetComponentTransform>(TEXT("get_component_transform")).Reflects(TEXT("K2_GetComponentToWorld"));
     Scene.Method<SetWorldLocation>(TEXT("set_world_location"));
     Scene.Method<SetWorldRotation>(TEXT("set_world_rotation"));
     Scene.Method<GetRelativeLocation>(TEXT("get_relative_location"));
@@ -237,20 +244,20 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Scene.Method<AddLocalOffset>(TEXT("add_local_offset"));
     Scene.Method<AddWorldRotation>(TEXT("add_world_rotation"));
     Scene.Method<AddLocalRotation>(TEXT("add_local_rotation"));
-    Scene.Method<GetForwardVector>(TEXT("get_forward_vector"));
-    Scene.Method<GetRightVector>(TEXT("get_right_vector"));
-    Scene.Method<GetUpVector>(TEXT("get_up_vector"));
-    Scene.Method<GetSocketLocation>(TEXT("get_socket_location"));
-    Scene.Method<GetSocketRotation>(TEXT("get_socket_rotation"));
-    Scene.Method<DoesSocketExist>(TEXT("does_socket_exist"));
-    Scene.Method<GetComponentVelocity>(TEXT("get_component_velocity"));
+    Scene.Method<GetForwardVector>(TEXT("get_forward_vector")).Reflects(TEXT("GetForwardVector"));
+    Scene.Method<GetRightVector>(TEXT("get_right_vector")).Reflects(TEXT("GetRightVector"));
+    Scene.Method<GetUpVector>(TEXT("get_up_vector")).Reflects(TEXT("GetUpVector"));
+    Scene.Method<GetSocketLocation>(TEXT("get_socket_location")).Reflects(TEXT("GetSocketLocation"));
+    Scene.Method<GetSocketRotation>(TEXT("get_socket_rotation")).Reflects(TEXT("GetSocketRotation"));
+    Scene.Method<DoesSocketExist>(TEXT("does_socket_exist")).Reflects(TEXT("DoesSocketExist"));
+    Scene.Method<GetComponentVelocity>(TEXT("get_component_velocity")).Reflects(TEXT("GetComponentVelocity"));
     Scene.Method<SetComponentVelocity>(TEXT("set_component_velocity"));
     Scene.Method<GetAttachParent>(TEXT("get_attach_parent"));
-    Scene.Method<GetAttachSocketName>(TEXT("get_attach_socket_name"));
+    Scene.Method<GetAttachSocketName>(TEXT("get_attach_socket_name")).Reflects(TEXT("GetAttachSocketName"));
     Scene.Method<&AttachTo>(TEXT("attach_to"), EDasBind::NonNullArgs);
     Scene.Method<&Detach>(TEXT("detach"));
     Scene.Method<SetVisibility>(TEXT("set_visibility"));
-    Scene.Method<IsVisible>(TEXT("is_visible"));
+    Scene.Method<IsVisible>(TEXT("is_visible")).Reflects(TEXT("IsVisible"));
     Scene.Method<SetHiddenInGame>(TEXT("set_hidden_in_game"));
 
     auto World = Binds.Class<UWorld>(TEXT("World"));

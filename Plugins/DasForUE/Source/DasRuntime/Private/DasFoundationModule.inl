@@ -15,6 +15,9 @@ public:
 
         globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEInputNameLint()));
         globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(MakeDasClosedCallsLint()));
+        // `options ue_native_routes = false`: native gameplay methods always go through reflection, even when a
+        // native bind reflects them (DasNativeBinds.h, Reflects). Tests compare both paths with it.
+        options["ue_native_routes"] = das::Type::tBool;
         addCommentReader(new FUECommentReader());
         addAnnotation(new FUENativeBaseAnnotation());
         addAnnotation(new FUEClassAnnotation());

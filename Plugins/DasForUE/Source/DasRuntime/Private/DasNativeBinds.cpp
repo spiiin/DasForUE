@@ -1,4 +1,8 @@
 #include "DasNativeBindsRegistry.h"
+#include "UObject/Class.h"
+#include "UObject/StrProperty.h"
+#include "UObject/TextProperty.h"
+#include "UObject/UnrealType.h"
 
 namespace
 {
@@ -56,6 +60,16 @@ void DasNativeError(const FString& Message)
     }
     if (Slot->IsEmpty())
         *Slot = Message.IsEmpty() ? FString(TEXT("failed")) : Message;
+}
+
+uint64& DasNativeRoutedCallCount()
+{
+    static uint64 Count = 0;
+    return Count;
+}
+uint64 DasNativeRoutedCalls()
+{
+    return DasNativeRoutedCallCount();
 }
 
 TArray<FDasNativeModuleDesc*>& DasNativeModuleDescs()
@@ -169,6 +183,132 @@ void FDasNativeModule::AddClass(const TCHAR* ScriptName, FDasNativeClassFn Class
         Desc.Classes.Add({Name, Class});
 }
 
+void FDasNativeModule::SetReflects(const TCHAR* FunctionName)
+{
+    auto& Desc = *static_cast<FDasNativeModuleDesc*>(Module);
+    if (!Desc.Error.IsEmpty())
+        return;
+    const FString Name = FunctionName ? FunctionName : TEXT("");
+    if (Desc.Functions.IsEmpty() || !Desc.Functions.Last().IsMethod() || !Desc.Functions.Last().ReflectedName.IsEmpty())
+        Desc.Error = FString::Printf(TEXT("Native module '%s': Reflects(%s) must follow a Method that reflects "
+                                          "nothing yet"),
+                                     *Desc.Name, *Name);
+    else if (!IsScriptIdentifier(Name))
+        Desc.Error = FString::Printf(TEXT("Native module '%s': function '%s' reflects '%s', which is not a "
+                                          "UFUNCTION name"),
+                                     *Desc.Name, *Desc.Functions.Last().Name, *Name);
+    else
+        Desc.Functions.Last().ReflectedName = Name;
+}
+
+namespace
+{
+// The native bind type of a UFUNCTION parameter or result, false when there is none.
+bool DasNativeParamOfProperty(const FProperty* P, FDasNativeParam& Out, UClass*& ObjectClass)
+{
+    ObjectClass = nullptr;
+    if (P->ArrayDim != 1)
+        return false;
+    auto Is = [&](EDasNativeType Type)
+    {
+        Out.Type = Type;
+        return true;
+    };
+    if (P->IsA<FBoolProperty>())
+        return Is(EDasNativeType::Bool);
+    if (P->IsA<FIntProperty>())
+        return Is(EDasNativeType::Int32);
+    if (P->IsA<FInt64Property>())
+        return Is(EDasNativeType::Int64);
+    if (P->IsA<FFloatProperty>())
+        return Is(EDasNativeType::Float);
+    if (P->IsA<FDoubleProperty>())
+        return Is(EDasNativeType::Double);
+    if (const auto* Byte = CastField<FByteProperty>(P))
+        return !Byte->Enum && Is(EDasNativeType::Byte);
+    if (P->IsA<FStrProperty>())
+        return Is(EDasNativeType::String);
+    if (P->IsA<FNameProperty>())
+        return Is(EDasNativeType::Name);
+    if (P->IsA<FTextProperty>())
+        return Is(EDasNativeType::Text);
+    if (const auto* Object = CastField<FObjectProperty>(P); Object && !P->IsA<FClassProperty>())
+    {
+        ObjectClass = Object->PropertyClass;
+        return Is(EDasNativeType::Object);
+    }
+    if (const auto* Struct = CastField<FStructProperty>(P))
+    {
+        const UScriptStruct* S = Struct->Struct;
+#define DAS_NATIVE_STRUCT(CppType, Kind)                                                                               \
+    if (S == TBaseStructure<CppType>::Get())                                                                           \
+        return Is(EDasNativeType::Kind);
+        DAS_NATIVE_STRUCT(FVector, Vector)
+        DAS_NATIVE_STRUCT(FVector2D, Vector2D)
+        DAS_NATIVE_STRUCT(FRotator, Rotator)
+        DAS_NATIVE_STRUCT(FQuat, Quat)
+        DAS_NATIVE_STRUCT(FTransform, Transform)
+        DAS_NATIVE_STRUCT(FLinearColor, LinearColor)
+        DAS_NATIVE_STRUCT(FColor, Color)
+        DAS_NATIVE_STRUCT(FDateTime, DateTime)
+#undef DAS_NATIVE_STRUCT
+        // FTimespan has no TBaseStructure.
+        if (S->GetStructPathName() == FTopLevelAssetPath(TEXT("/Script/CoreUObject"), TEXT("Timespan")))
+            return Is(EDasNativeType::Timespan);
+    }
+    return false;
+}
+bool SameAsProperty(const FDasNativeParam& Bind, const FProperty* P)
+{
+    FDasNativeParam Param;
+    UClass* ObjectClass = nullptr;
+    if (!DasNativeParamOfProperty(P, Param, ObjectClass) || Param.Type != Bind.Type)
+        return false;
+    return Bind.Type != EDasNativeType::Object || (Bind.Class && Bind.Class() == ObjectClass);
+}
+// Why the bind cannot reflect its UFUNCTION, or empty; fills ReflectedPath.
+FString CheckReflects(FDasNativeFunctionDesc& F)
+{
+    UClass* Class = F.Receiver();
+    UFunction* U = Class ? Class->FindFunctionByName(FName(*F.ReflectedName)) : nullptr;
+    if (!U)
+        return FString::Printf(TEXT("is not a UFUNCTION of class %s"), Class ? *Class->GetName() : TEXT("?"));
+    // A Blueprint or script override of an event would be skipped by the C++ call.
+    if (U->HasAnyFunctionFlags(FUNC_Event | FUNC_BlueprintEvent))
+        return TEXT("is an event (BlueprintNativeEvent / BlueprintImplementableEvent)");
+    if (!U->HasAllFunctionFlags(FUNC_BlueprintCallable | FUNC_Native))
+        return TEXT("is not a BlueprintCallable native function");
+    if (U->HasAnyFunctionFlags(FUNC_Static | FUNC_Net | FUNC_Delegate | FUNC_MulticastDelegate | FUNC_EditorOnly))
+        return TEXT("is a static, network, delegate or editor-only function");
+    if (EnumHasAnyFlags(F.Flags, EDasBind::NonNullArgs))
+        return TEXT("is NonNullArgs, the UFUNCTION takes nullptr");
+    const FProperty* Return = U->GetReturnProperty();
+    if (Return ? !SameAsProperty(F.Result, Return) : F.Result.Type != EDasNativeType::Void)
+        return TEXT("has another result type");
+    int32 Index = 1; // Arguments[0] is the receiver
+    for (TFieldIterator<FProperty> It(U); It && It->HasAnyPropertyFlags(CPF_Parm); ++It)
+    {
+        if (It->HasAnyPropertyFlags(CPF_ReturnParm))
+            continue;
+        if (It->HasAnyPropertyFlags(CPF_OutParm) && !It->HasAnyPropertyFlags(CPF_ConstParm))
+            return FString::Printf(TEXT("has an output parameter %s"), *It->GetName());
+        if (Index >= F.Arguments.Num() || !SameAsProperty(F.Arguments[Index], *It))
+            return FString::Printf(TEXT("has another type of parameter %s"), *It->GetName());
+        ++Index;
+    }
+    if (Index != F.Arguments.Num())
+        return TEXT("has another number of parameters");
+    F.ReflectedPath = U->GetPathName();
+    for (const FDasNativeModuleDesc* Other : DasNativeModuleDescs())
+        if (Other->bLoaded && Other->Error.IsEmpty())
+            for (const FDasNativeFunctionDesc& G : Other->Functions)
+                if (&G != &F && G.ReflectedPath == F.ReflectedPath)
+                    return FString::Printf(TEXT("is already reflected by '%s' (module '%s')"), *G.Name,
+                                           *Other->Name);
+    return FString();
+}
+}
+
 void FDasNativeModuleBuilder::Describe(FDasNativeModuleDesc& Desc)
 {
     Desc.bAttempted = true;
@@ -179,4 +319,23 @@ void FDasNativeModuleBuilder::Describe(FDasNativeModuleDesc& Desc)
     Desc.Build(Module);
     if (Desc.Error.IsEmpty() && Desc.Functions.IsEmpty() && Desc.Classes.IsEmpty())
         Desc.Error = FString::Printf(TEXT("Native module '%s' binds nothing"), *Desc.Name);
+    for (FDasNativeFunctionDesc& F : Desc.Functions)
+        if (Desc.Error.IsEmpty() && !F.ReflectedName.IsEmpty())
+            if (const FString Why = CheckReflects(F); !Why.IsEmpty())
+                Desc.Error = FString::Printf(TEXT("Native module '%s': function '%s' reflects UFUNCTION %s, which "
+                                                  "%s"),
+                                             *Desc.Name, *F.Name, *F.ReflectedName, *Why);
+}
+
+FDasNativeRoute FindDasNativeRoute(const UFunction* Function, const UClass* Receiver)
+{
+    if (!Function || !Receiver)
+        return {};
+    const FString Path = Function->GetPathName();
+    for (const FDasNativeModuleDesc* Desc : DasNativeModuleDescs())
+        if (Desc->bLoaded && Desc->bBuilt && Desc->Error.IsEmpty())
+            for (const FDasNativeFunctionDesc& F : Desc->Functions)
+                if (F.ReflectedPath == Path && Receiver->IsChildOf(F.Receiver()))
+                    return {Desc, &F};
+    return {};
 }

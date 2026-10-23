@@ -290,6 +290,11 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
             Context.throw_error_at(debugInfo, "%s", TCHAR_TO_UTF8(*Module->Error));
         vec4f Raw[FDasNativeModule::MaxArguments + 1]; // + the context argument of an AOT-eligible function
         evalArgs(Context, Raw);
+        return Run(Context, Raw);
+    }
+    // The call with evaluated arguments.
+    vec4f Run(das::Context& Context, vec4f* Raw)
+    {
         FDasNativeValues Values;
         void* Args[FDasNativeModule::MaxArguments];
         UObject* Objects[FDasNativeModule::MaxArguments] = {};
@@ -442,6 +447,97 @@ public:
     }
 };
 
+// A native gameplay method (`ref.K2_GetComponentLocation()`, DasAuthoredRefs.inl) answered by the native bind that
+// reflects it (Reflects). The script module gets a wrapper with the method's name and parameters (DSLEmitRoutedMethod)
+// that calls the bind's route: a builtin of ue_foundation, made when the bind's module is built, that takes the
+// receiver's handle and class path before the bind's own arguments. It runs the receiver checks of the reflected
+// call (BeginNativeGameplayCall: a live receiver in the owner's world, no calls in bind_events / EndPlay, its
+// class), then the bind, without a call frame. The route is not in the script module: an executable program drops
+// the builtins of its own module (removeUnusedSymbols marks only script functions used), and its calls would keep
+// dangling pointers.
+struct SimNode_DasNativeRoute : SimNode_DasNative
+{
+    using SimNode_DasNative::SimNode_DasNative;
+    DAS_EVAL_ABI virtual vec4f eval(das::Context& Context) override
+    {
+        GuardUEExtern();
+        if (!Module->bLoaded)
+            Context.throw_error_at(debugInfo, "%s", TCHAR_TO_UTF8(*Module->Error));
+        vec4f Raw[FDasNativeModule::MaxArguments + 2]; // the receiver, its class path, the other arguments
+        evalArgs(Context, Raw);
+        const auto* Handle = static_cast<const FDasObjectHandle*>(das::cast<void*>::to(Raw[0]));
+        NativeGameplayObject(*Handle, das::cast<const char*>::to(Raw[1]), true, &Context);
+        for (int32 I = 1; I < Function->Arguments.Num(); ++I)
+            Raw[I] = Raw[I + 1];
+        ++DasNativeRoutedCallCount();
+        return Run(Context, Raw);
+    }
+};
+class FDasNativeRouteFunction final : public das::ExternalFnBase
+{
+public:
+    const FDasNativeModuleDesc* Module;
+    const FDasNativeFunctionDesc* Function;
+    das::string Label;
+    FDasNativeRouteFunction(const FDasNativeModuleDesc& Origin, const FDasNativeFunctionDesc& F,
+                            const das::ModuleLibrary& Lib)
+        : ExternalFnBase(TCHAR_TO_UTF8(*F.RouteName), nullptr), Module(&Origin), Function(&F),
+          Label(TCHAR_TO_UTF8(*F.ReflectedName))
+    {
+        das::vector<das::TypeDeclPtr> Types{DasNativeTypeDecl(F.Result, F.Resolved.Last(), Lib, false),
+                                            das::makeType<const FDasObjectHandle&>(Lib),
+                                            das::makeType<const char*>(Lib)};
+        for (int32 I = 1; I < F.Arguments.Num(); ++I)
+            Types.push_back(DasNativeTypeDecl(F.Arguments[I], F.Resolved[I], Lib, true));
+        constructExternal(Types);
+        // Object receivers have no AOT ABI: callers stay in the interpreter (FDasClosedCallsLint).
+        noAot = true;
+    }
+    virtual das::SimNode* makeSimNode(das::Context& Context, const das::vector<das::ExpressionPtr>&) override
+    {
+        const char* FnName = Context.code->allocateName(this->name);
+        return Context.code->makeNode<TDasDiagnosticNode<SimNode_DasNativeRoute>>(at, FnName, Module, Function,
+                                                                                 Label.c_str());
+    }
+};
+
+// Why a gameplay call of UFUNCTION Function on a receiver of class Receiver keeps the reflected call although
+// a bind reflects it, or empty. Policies that the reflected call checks per call stay there.
+FString DasNativeRoutePolicy(const UFunction* Function, const UClass* Receiver)
+{
+    const auto* Row = DasNativeGameplayMethod(Receiver->GetPathName(), Function->GetName());
+    if (!Row)
+        return TEXT("not a generated native gameplay method");
+    if (Row->ConstructionUnsafe)
+        return TEXT("unsafe in construction scripts");
+    if (Function->HasAnyFunctionFlags(FUNC_BlueprintAuthorityOnly))
+        return TEXT("requires authority");
+    return FString();
+}
+// Why the script types of a gameplay method (Types: the result, then the parameters) are not the types of the
+// bind that reflects it, or empty. Object references, for one, are script structs and not bind types.
+FString DasNativeRouteTypes(const FDasNativeRoute& Route, const das::ModuleLibrary& Lib,
+                            const das::vector<das::TypeDeclPtr>& Types)
+{
+    const FDasNativeFunctionDesc& F = *Route.Function;
+    if (F.RouteName.IsEmpty())
+        return TEXT("the bind has no route");
+    if (Types.size() != size_t(F.Arguments.Num()))
+        return TEXT("the number of parameters differs");
+    auto Same = [&](const das::TypeDeclPtr& Script, const FDasNativeParam& P, const FDasNativeResolvedParam& R,
+                    bool bArgument)
+    {
+        const auto Bind = DasNativeTypeDecl(P, R, Lib, bArgument);
+        return Script->isSameType(*Bind, das::RefMatters::no, das::ConstMatters::no, das::TemporaryMatters::no);
+    };
+    if (!Same(Types[0], F.Result, F.Resolved.Last(), false))
+        return TEXT("the result type differs");
+    for (int32 I = 1; I < F.Arguments.Num(); ++I)
+        if (!Same(Types[size_t(I)], F.Arguments[I], F.Resolved[I], true))
+            return FString::Printf(TEXT("the type of parameter %d differs"), I);
+    return FString();
+}
+
 // Object parameters of a module's own function: the class each object must have and its script type.
 void ResolveDasNativeFunction(FDasNativeFunctionDesc& F)
 {
@@ -535,6 +631,8 @@ public:
         {
             ResolveDasNativeFunction(F);
             Add(Desc, F);
+            if (!F.ReflectedPath.IsEmpty())
+                AddRoute(*Foundation, F);
         }
         for (FDasNativeClassType* Type : Owned)
             AddHelpers(*Type);
@@ -591,6 +689,15 @@ private:
                                              ? das::SideEffects::none
                                              : das::SideEffects::modifyExternal | das::SideEffects::accessExternal;
         das::addExternFunc(*this, Fn, DasNativeIsCmres(F.Result.Type), Effects);
+    }
+    // The route of a bind that reflects a UFUNCTION (SimNode_DasNativeRoute): a builtin of ue_foundation, which every
+    // gameplay script sees, with a name of its own (a rebuilt module adds a new one).
+    void AddRoute(das::Module& Foundation, FDasNativeFunctionDesc& F)
+    {
+        static int32 Routes = 0;
+        F.RouteName = FString::Printf(TEXT("__ue_native_route_%d"), ++Routes);
+        das::addExternFunc(Foundation, new FDasNativeRouteFunction(Desc, F, Library), DasNativeIsCmres(F.Result.Type),
+                           das::SideEffects::modifyExternal | das::SideEffects::accessExternal);
     }
     // The AOT entry goes into the bridge registry under a key of module, name and C++ types; the function's
     // cppName is the bridge call. Resolve refuses an entry of an unloaded module.

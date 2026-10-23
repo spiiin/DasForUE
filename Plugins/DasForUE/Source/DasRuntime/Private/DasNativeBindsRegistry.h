@@ -47,6 +47,9 @@ struct FDasNativeFunctionDesc
     FDasNativeClassFn Receiver = nullptr; // methods: the bound class
     EDasNativeHelper Helper = EDasNativeHelper::Call;
     TArray<FDasNativeResolvedParam> Resolved; // per argument, then the result; filled when built
+    FString ReflectedName; // Reflects: the UFUNCTION of the receiver class
+    FString ReflectedPath; // its path, checked when the module is described
+    FString RouteName;     // its route in ue_foundation (gameplay scripts call it), set when the module is built
     bool IsMethod() const { return Receiver != nullptr; }
 };
 struct FDasNativeClassDecl
@@ -70,6 +73,14 @@ struct FDasNativeModuleDesc
 // Game thread only.
 TArray<FDasNativeModuleDesc*>& DasNativeModuleDescs();
 FDasNativeModuleDesc* FindDasNativeModuleDesc(const FString& Name);
+// The bind that reflects UFUNCTION Function for a receiver of class Receiver (built modules only), or nullptr.
+struct FDasNativeRoute
+{
+    const FDasNativeModuleDesc* Module = nullptr;
+    const FDasNativeFunctionDesc* Function = nullptr;
+};
+FDasNativeRoute FindDasNativeRoute(const UFunction* Function, const UClass* Receiver);
+uint64& DasNativeRoutedCallCount(); // DasNativeRoutedCalls
 // The error a running native bind call collects (DasNativeError); nullptr outside such a call.
 FString*& DasNativeErrorSlot();
 // The error of a call from AOT code, reported by dasue::aot::Finish after the call.

@@ -317,3 +317,22 @@ rows of one run only.
   | `scalar_extern` (a guarded `ue_foundation` extern, for comparison) | 155.4 | 171.8 |
 
 Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.
+
+### Gameplay methods answered by binds (`Reflects`) — 2026-10-24
+
+A native bind that declares `.Reflects(UFunctionName)` answers the gameplay call of that UFUNCTION on a native
+reference (`ref.K2_GetActorLocation()`): the same syntax and receiver checks, without the reflected call frame.
+`DasForUE.NativeRoutes` runs the same loop with the bind and with `options ue_native_routes = false`
+(reflection), in a temporary game world; the line `native_routes_bench` (one call of `K2_GetActorLocation`,
+informational):
+
+| Run | Bind ns/call | Reflection ns/call | Ratio |
+| --- | ---: | ---: | ---: |
+| Editor automation | 326 | 38925 | ~120x |
+| Packaged game (`-DasNativeBinds`) | 187 | 10087 | ~54x |
+
+- The routed call costs a little more than `actor.get_actor_location()` through `ue_engine` (136 ns in the table
+  above): it also runs the receiver checks of the reflected call (`NativeGameplayObject`: a live receiver in
+  the owner's world, no calls in `bind_events` / `EndPlay`, its class) and passes through a script wrapper that
+  keeps the method's name and default arguments.
+- Routed calls stay in the interpreter (object receivers have no AOT ABI); scripts with reflected calls did too.
