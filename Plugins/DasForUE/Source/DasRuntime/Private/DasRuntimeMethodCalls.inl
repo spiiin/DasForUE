@@ -54,21 +54,53 @@ void ReleaseAuthoredCall(const FDasCallHandle& H, das::Context* C)
     if (C == ActiveContext && ActiveContext)
         ActiveContext->Calls.Remove(H.Token);
 }
+// Parsed authored class contracts by wire string address, and the UFunctions already checked against them.
+struct FAuthoredWire
+{
+    std::string Text;
+    FDasAuthoringModule Model;
+    TMap<FString, TWeakObjectPtr<UFunction>> Checked;
+};
+TMap<const char*, FAuthoredWire> AuthoredWires;
 FDasCallHandle BeginAuthoredCallSelected(const FDasObjectHandle& Target, const char* Id, const char* Name,
                                          const char* Wire, das::Context* Context, UFunction* Selected = nullptr)
 {
-    auto* Object = ResolveAuthoredObject(Target, Id, Context);
-    FDasAuthoringModule Model;
-    FString Error;
-    if (!Wire || !FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire), Model, Error) || Model.Classes.Num() != 1 ||
-        Model.Classes[0].Id != UTF8_TO_TCHAR(Id))
+    ResolveAuthoredObject(Target, Id, Context);
+    // The wire (class contract JSON) is a string constant of the compiled script: parse it once per program.
+    // An entry is keyed by the string's address and keeps a copy to detect a reused address after reload.
+    if (!Wire || !Id || !Name)
         Context->throw_error("invalid authored method contract");
-    const auto* Method = Model.Classes[0].Methods.FindByPredicate([&](const auto& Item)
-                                                                  { return Name && Item.Name == UTF8_TO_TCHAR(Name); });
+    FAuthoredWire* Parsed = AuthoredWires.Find(Wire);
+    if (!Parsed || Parsed->Text != Wire)
+    {
+        FAuthoredWire Fresh;
+        Fresh.Text = Wire;
+        FString ParseError;
+        if (!FDasAuthoringModule::FromJson(UTF8_TO_TCHAR(Wire), Fresh.Model, ParseError) ||
+            Fresh.Model.Classes.Num() != 1)
+            Context->throw_error("invalid authored method contract");
+        if (AuthoredWires.Num() >= 4096)
+            AuthoredWires.Reset();
+        Parsed = &AuthoredWires.Add(Wire, MoveTemp(Fresh));
+    }
+    if (Parsed->Model.Classes[0].Id != UTF8_TO_TCHAR(Id))
+        Context->throw_error("invalid authored method contract");
+    const FString MethodName = UTF8_TO_TCHAR(Name);
+    const auto* Method =
+        Parsed->Model.Classes[0].Methods.FindByPredicate([&](const auto& Item) { return Item.Name == MethodName; });
     if (!Method || !Method->bCallable || Method->bStatic)
         Context->throw_error("unknown callable authored method");
     auto Handle = BeginCallSelected(Target, Name, Context, Selected);
     auto& Call = ResolveCall(Handle, Context);
+    // A UFunction checked against this method contract once stays valid until it is replaced (Blueprint
+    // recompile creates a new UFunction; a collected one fails the weak pointer).
+    TWeakObjectPtr<UFunction>& Checked = Parsed->Checked.FindOrAdd(MethodName);
+    if (Checked.Get() == Call.Function.Get())
+    {
+        Call.bAuthored = true;
+        return Handle;
+    }
+    FString Error;
 
     auto Matches = [&](FProperty* Property, const FDasDeclaredType& Type)
     {
@@ -127,6 +159,7 @@ FDasCallHandle BeginAuthoredCallSelected(const FDasObjectHandle& Target, const c
     }
     if (Index != Method->Parameters.Num())
         Context->throw_error("authored method parameter count changed");
+    Checked = Call.Function.Get();
     Call.bAuthored = true;
     return Handle;
 }

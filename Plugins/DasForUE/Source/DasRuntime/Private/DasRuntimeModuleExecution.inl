@@ -1,5 +1,69 @@
 // Part of DasRuntime.cpp: FDasRuntimeModule: script execution, callbacks, construction and library frames.
 // Included in place; declaration order matters.
+const FString& NormalizeScriptPath(const FString& Path)
+{
+    if (const FString* Cached = NormalizedScriptPaths.Find(Path))
+        return *Cached;
+    FString Full = FPaths::ConvertRelativePathToFull(Path);
+    FPaths::NormalizeFilename(Full);
+    FPaths::CollapseRelativeDirectories(Full);
+    return NormalizedScriptPaths.Add(Path, MoveTemp(Full));
+}
+// Whether a call must compare its session sources with disk (das.ScriptChangeCheck).
+bool SourcesNeedCheck(const FPersistentSession& Session)
+{
+    int32 Mode = CVarScriptChangeCheck.GetValueOnGameThread();
+    if (Mode < 0)
+        Mode = bScriptWatcherActive && !GIsAutomationTesting ? 1 : 0;
+    if (Mode == 2)
+        return false;
+    return Mode != 1 || Session.CheckedEpoch != ScriptSourceEpoch ||
+           FPlatformTime::Seconds() - Session.CheckedAt >= CVarScriptChangePollSeconds.GetValueOnGameThread();
+}
+void MarkSourcesChecked(FPersistentSession& Session)
+{
+    Session.CheckedEpoch = ScriptSourceEpoch;
+    Session.CheckedAt = FPlatformTime::Seconds();
+}
+uint8 WidgetContractFlags()
+{
+    return uint8(WidgetPaintContract) | uint8(WidgetDragContract) << 1 | uint8(FocusNotificationContract) << 2 |
+           uint8(WidgetReplyContract) << 3;
+}
+void FDasRuntimeModule::NotifyScriptsChanged(const TArray<FString>& Files, bool bFilesAddedOrRemoved)
+{
+    check(IsInGameThread());
+    if (Files.IsEmpty() || bFilesAddedOrRemoved)
+        ScriptPathCache.Reset();
+    if (Files.IsEmpty())
+    {
+        ++ScriptSourceEpoch;
+        return;
+    }
+    TSet<FString> Changed;
+    for (const FString& File : Files)
+        Changed.Add(NormalizeScriptPath(File));
+    auto Mark = [&](const TArray<TUniquePtr<FPersistentSession>>& List)
+    {
+        for (const auto& Session : List)
+            for (const auto& Source : Session->AttemptedSources)
+                if (Changed.Contains(NormalizeScriptPath(Source.Key)))
+                {
+                    Session->CheckedEpoch = 0;
+                    break;
+                }
+    };
+    Mark(Sessions);
+#if WITH_EDITOR
+    Mark(PreservedSessions);
+#endif
+}
+void FDasRuntimeModule::SetScriptWatcherActive(bool bActive)
+{
+    bScriptWatcherActive = bActive;
+    ScriptPathCache.Reset();
+    ++ScriptSourceEpoch; // Changes made while no watcher listened were not reported.
+}
 FDasExecutionResult FDasRuntimeModule::RunNamedPersistent(const FString& Path, const FString& EntryPoint, int32 Input,
                                                           TWeakObjectPtr<UObject> Self)
 {
@@ -347,9 +411,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         return Result;
     }
     PruneSessions();
-    FString FullPath = FPaths::ConvertRelativePathToFull(Path);
-    FPaths::NormalizeFilename(FullPath);
-    FPaths::CollapseRelativeDirectories(FullPath);
+    const FString FullPath = NormalizeScriptPath(Path);
     if (Event == EDasCallback::Initialize &&
         (!Owner->GetWorld() || !Owner->GetWorld()->IsGameWorld() || Owner->IsTemplate()))
     {
@@ -396,12 +458,17 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     bool bChanged =
         Session->AttemptedSources.IsEmpty() ||
         (!Session->Live && (Session->AttemptedEntry != EntryPoint || Session->AttemptedContract != Expected));
-    for (const auto& Source : Session->AttemptedSources)
-        if (!Source.Value.Matches(Source.Key))
-        {
-            bChanged = true;
-            break;
-        }
+    if (!bChanged && SourcesNeedCheck(*Session))
+    {
+        for (const auto& Source : Session->AttemptedSources)
+            if (!Source.Value.Matches(Source.Key))
+            {
+                bChanged = true;
+                break;
+            }
+        if (!bChanged)
+            MarkSourcesChecked(*Session);
+    }
     if (Session->bReleaseRequested)
     {
         Result.Error = TEXT("Script session was released");
@@ -420,6 +487,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Session->AttemptedContract = Expected;
         Session->AttemptedSources.Reset();
         Session->AttemptedSources.Add(FullPath, FSourceSnapshot::Read(FullPath));
+        MarkSourcesChecked(*Session); // The compile below snapshots every source it reads.
         FString CandidateError;
         auto Candidate = MakeUnique<FCompiledContext>();
         try
@@ -780,12 +848,20 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                                                                                     : das::cast<int32>::from(Input)};
         if (Event == EDasCallback::Main)
         {
-            const FTCHARToUTF8 EntryUtf8(*EntryPoint);
-            Function = Context.findFunction(EntryUtf8.Get());
-            if (!Function || !VerifyContract(Session->Live->Program, EntryPoint, Expected))
+            const uint8 Flags = WidgetContractFlags();
+            const auto* Verified = Session->Live->VerifiedEntries.Find(EntryPoint);
+            if (Verified && Verified->Flags == Flags && Verified->Contract == Expected)
+                Function = Verified->Function;
+            else
             {
-                Result.Error = TEXT("Expected exported ")+ EntryPoint + TEXT(" with requested scalar signature.");
-                return Result;
+                const FTCHARToUTF8 EntryUtf8(*EntryPoint);
+                Function = Context.findFunction(EntryUtf8.Get());
+                if (!Function || !VerifyContract(Session->Live->Program, EntryPoint, Expected))
+                {
+                    Result.Error = TEXT("Expected exported ") + EntryPoint + TEXT(" with requested scalar signature.");
+                    return Result;
+                }
+                Session->Live->VerifiedEntries.Add(EntryPoint, {Function, Expected, Flags});
             }
             Session->RequiredEntries.Add(EntryPoint, Expected);
             if (WidgetDragContract && ActiveWidgetDrag)

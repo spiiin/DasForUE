@@ -159,6 +159,7 @@
 #include "Interfaces/IPluginManager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/ScopeExit.h"
+#include "HAL/IConsoleManager.h"
 #include "Misc/SecureHash.h"
 #include "Misc/Paths.h"
 #include "Misc/PackageName.h"
@@ -761,14 +762,21 @@ uint64 FDasRuntimeModule::StructSnapshotsReclaimed(const UObject* Owner) const
 
 FString FDasRuntimeModule::ScriptPath(const FString& Name) const
 {
-    if (Name == FPaths::GetCleanFilename(Name))
-    {
-        const FString Project =
-            FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Das/Scripts")/ Name);
-        if (IFileManager::Get().FileExists(*Project))
-            return Project;
-    }
-    return Root / TEXT("Scripts") / Name;
+    int32 Slash;
+    if (Name.FindChar(TEXT('/'), Slash) || Name.FindChar(TEXT('\\'), Slash))
+        return Root / TEXT("Scripts") / Name;
+    // A project script shadows the plugin script of the same name. The file check costs tens of microseconds,
+    // so the answer is cached until a reported folder change or the poll interval (NotifyScriptsChanged).
+    const bool bCache = IsInGameThread();
+    const double Now = FPlatformTime::Seconds();
+    if (const auto* Cached = bCache ? ScriptPathCache.Find(Name) : nullptr;
+        Cached && Now - Cached->CheckedAt < CVarScriptChangePollSeconds.GetValueOnGameThread())
+        return Cached->Path;
+    const FString Project = FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Das/Scripts") / Name);
+    FString Path = IFileManager::Get().FileExists(*Project) ? Project : Root / TEXT("Scripts") / Name;
+    if (bCache)
+        ScriptPathCache.Add(Name, {Path, Now});
+    return Path;
 }
 
 bool FDasRuntimeModule::ReadAuthoredInterfaces(const FString& Path, FDasAuthoringModule& Out, FString& Error)

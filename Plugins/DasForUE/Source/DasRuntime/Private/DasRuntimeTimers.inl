@@ -25,6 +25,15 @@ struct FCompiledContext
     das::SimFunction* BeginPlay = nullptr;
     das::SimFunction* Tick = nullptr;
     das::SimFunction* EndPlay = nullptr;
+    // Main entry points already found and checked against a contract; dropped with this program on reload.
+    // The key includes the widget contract flags VerifyContract reads.
+    struct FVerifiedEntry
+    {
+        das::SimFunction* Function = nullptr;
+        FDasCallContract Contract;
+        uint8 Flags = 0;
+    };
+    TMap<FString, FVerifiedEntry> VerifiedEntries;
 };
 #include "DasAsyncPhysicsDSLRuntime.inl"
 
@@ -184,6 +193,9 @@ struct FPersistentSession
     TWeakObjectPtr<UWorld> World;
     FString Path;
     FSourceSet AttemptedSources;
+    // Hot reload: sources were last compared with disk at this epoch and time (see SourcesNeedCheck).
+    uint64 CheckedEpoch = 0;
+    double CheckedAt = 0;
     TMap<FString, FDasCallContract> RequiredEntries;
     TSet<FString> NativeInputEntries, GeometrySnapshotEntries, InputSnapshotEntries, WidgetReplyEntries,
         WidgetPaintEntries, WidgetDragEntries, FocusNotificationEntries;
@@ -223,6 +235,26 @@ struct FInitializerDelivery
 };
 TMap<TWeakObjectPtr<UObject>, TMap<FString, FInitializerDelivery>> InitializerDeliveries;
 TArray<TUniquePtr<FPersistentSession>> Sessions;
+// Hot reload source checks (FDasRuntimeModule::NotifyScriptsChanged).
+uint64 ScriptSourceEpoch = 1;
+bool bScriptWatcherActive = false;
+TMap<FString, FString> NormalizedScriptPaths;
+// ScriptPath: script name -> project or plugin path, with the time it was checked (game thread only).
+struct FCachedScriptPath
+{
+    FString Path;
+    double CheckedAt = 0;
+};
+TMap<FString, FCachedScriptPath> ScriptPathCache;
+TAutoConsoleVariable<int32> CVarScriptChangeCheck(
+    TEXT("das.ScriptChangeCheck"), -1,
+    TEXT("When persistent script calls compare their sources with disk: -1 auto (watch while a file watcher is ")
+        TEXT("active and no automation test runs, otherwise always), 0 every call, 1 watch (after a reported ")
+        TEXT("change or the poll interval), 2 never (no hot reload)."));
+TAutoConsoleVariable<float> CVarScriptChangePollSeconds(
+    TEXT("das.ScriptChangePollSeconds"), 1.f,
+    TEXT("Watch mode: also compare sources with disk if the last check is older than this, in case the file ")
+        TEXT("watcher missed a change."));
 #if WITH_EDITOR
 TArray<TUniquePtr<FPersistentSession>> PreservedSessions;
 bool bPreservingSessions = false;

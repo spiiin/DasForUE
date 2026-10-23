@@ -67,6 +67,9 @@ void FDasAutoReimport::Start()
                 Handle))
             Watches.Emplace(Full, Handle);
     }
+    // Persistent calls stop re-reading their sources on every call; saves are reported from OnScriptsChanged.
+    if (!Watches.IsEmpty())
+        FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).SetScriptWatcherActive(true);
     EndPIEHandle = FEditorDelegates::EndPIE.AddRaw(this, &FDasAutoReimport::OnEndPIE);
     PreBeginPIEHandle = FEditorDelegates::PreBeginPIE.AddRaw(this, &FDasAutoReimport::OnPreBeginPIE);
     MapOpenedHandle = FEditorDelegates::OnMapOpened.AddRaw(this, &FDasAutoReimport::OnMapOpened);
@@ -79,6 +82,9 @@ void FDasAutoReimport::Stop()
         if (auto* Watcher = Module->Get())
             for (const auto& Watch : Watches)
                 Watcher->UnregisterDirectoryChangedCallback_Handle(Watch.Key, Watch.Value);
+    if (!Watches.IsEmpty())
+        if (auto* Runtime = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))
+            Runtime->SetScriptWatcherActive(false);
     Watches.Reset();
     FEditorDelegates::EndPIE.Remove(EndPIEHandle);
     FEditorDelegates::PreBeginPIE.Remove(PreBeginPIEHandle);
@@ -102,6 +108,18 @@ void FDasAutoReimport::Stop()
 }
 void FDasAutoReimport::OnScriptsChanged(const TArray<FFileChangeData>& Changes)
 {
+    // Hot reload of method bodies: the next call of an affected script compares its sources at once,
+    // without waiting for the settle delay of the declaration reimport below.
+    TArray<FString> Changed;
+    bool bAddedOrRemoved = false;
+    for (const auto& Change : Changes)
+    {
+        Changed.Add(FullPath(Change.Filename));
+        bAddedOrRemoved |= Change.Action != FFileChangeData::FCA_Modified;
+    }
+    if (!Changed.IsEmpty())
+        FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"))
+            .NotifyScriptsChanged(Changed, bAddedOrRemoved);
     for (const auto& Change : Changes)
         if (Change.Action != FFileChangeData::FCA_Removed && FPaths::GetExtension(Change.Filename) == TEXT("das"))
             Pending.Add(FullPath(Change.Filename));
