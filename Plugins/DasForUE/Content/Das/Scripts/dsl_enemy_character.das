@@ -13,6 +13,7 @@ class EnemyCharacter : Character {
     }
     state=ue_properties(BlueprintReadWrite) {
         var Attacks:int=0
+        var DamageDealt:float=0.0f
         var MoveCompletions:int=0
         var LastMoveCode:int=-1
         var Cooldown:float=0.0f
@@ -40,7 +41,7 @@ class EnemyCharacter : Character {
         if(self.GetDistanceTo(self.Target)<=self.AttackRange) {
             ue_ai_move_cancel("chase")
             if(self.Cooldown<=0.0f) {
-                ue_apply_damage(self.Target,self.AttackDamage,ue_self_actor(),controller)
+                self.DamageDealt+=ue_apply_damage(self.Target,self.AttackDamage,ue_self_actor(),controller)
                 self.Attacks+=1
                 self.Cooldown=self.AttackInterval>0.25f ? self.AttackInterval : 0.25f
             }

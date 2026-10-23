@@ -48,8 +48,10 @@ void StartDasAIValidation(){
   if(S->Stage==1){
    if(!Error(A).IsEmpty())return Fail(Error(A));S->MaxY=FMath::Max(S->MaxY,FMath::Abs(float(A->GetActorLocation().Y)));
    if(Int(A,TEXT("Attacks"))<1)return true;
-   auto* HealthProperty=FindFProperty<FObjectPropertyBase>(S->Player->GetClass(),TEXT("Health"));auto* Health=HealthProperty?HealthProperty->GetObjectPropertyValue_InContainer(S->Player.Get()):nullptr;auto* Value=Health?FindFProperty<FFloatProperty>(Health->GetClass(),TEXT("Current")):nullptr;
-   if(S->MaxY<160 || A->GetDistanceTo(S->Player.Get())>155 || !Value || Value->GetPropertyValue_InContainer(Health)>=100.f)return Fail(FString::Printf(TEXT("path/damage maxY=%f distance=%f health=%s"),S->MaxY,A->GetDistanceTo(S->Player.Get()),*GetNameSafe(Health)));
+   // The player keeps health in GAS, which ApplyDamage does not change: the enemy example records the damage
+   // the engine accepted (ApplyDamage returns 0 for a target that cannot be damaged).
+   auto* DealtProperty=FindFProperty<FFloatProperty>(A->GetClass(),TEXT("DamageDealt"));const float Dealt=DealtProperty?DealtProperty->GetPropertyValue_InContainer(A):-1.f;
+   if(S->MaxY<160 || A->GetDistanceTo(S->Player.Get())>155 || Dealt<=0.f)return Fail(FString::Printf(TEXT("path/damage maxY=%f distance=%f damage_dealt=%f"),S->MaxY,A->GetDistanceTo(S->Player.Get()),Dealt));
    if(!Call(A,TEXT("StopBrain")) || R.SubscriptionCount(A)!=0)return Fail(TEXT("brain cancel retained callbacks"));
    UE_LOG(LogTemp,Display,TEXT("PASS ai_navmesh_pursuit_obstacle_and_damage"));
    if(!FFileHelper::LoadFileToString(S->Template,*R.ScriptPath(TEXT("ai_reload_probe.das"))))return Fail(TEXT("missing reload template"));S->ReloadPath=R.ScriptPath(TEXT("ai_reload_")+FGuid::NewGuid().ToString(EGuidFormats::Digits)+TEXT(".das"));if(!FFileHelper::SaveStringToFile(S->Template,*S->ReloadPath))return Fail(TEXT("write probe"));
