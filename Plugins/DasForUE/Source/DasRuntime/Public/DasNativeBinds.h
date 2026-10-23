@@ -273,6 +273,27 @@ DASRUNTIME_API FString DasNativeModuleStatus(const TCHAR* ModuleName);
 // is ignored). Game thread, only during a native bind call; the first message of a call wins.
 DASRUNTIME_API void DasNativeError(const FString& Message);
 
+// Read-only description of the registered native modules (manifests, coverage reports, documentation). Builds the
+// modules registered since the last compilation; game thread.
+struct FDasNativeFunctionInfo
+{
+    FString Name;
+    FString Receiver;          // script type of a method's receiver; empty for a function
+    TArray<FString> Arguments; // script types, a method's receiver first
+    FString Result;
+    FString Origin; // "declared", "inherited" (an ancestor's method on a descendant type) or "helper"
+    bool bPure = false;
+    bool bNonNullArgs = false;
+};
+struct FDasNativeModuleInfo
+{
+    FString Name;
+    FString Error;           // empty when the module is available
+    TArray<FString> Classes; // script types the module declares
+    TArray<FDasNativeFunctionInfo> Functions;
+};
+DASRUNTIME_API TArray<FDasNativeModuleInfo> DescribeDasNativeModules();
+
 struct FDasNativeBindsRegistrar
 {
     FString Name;

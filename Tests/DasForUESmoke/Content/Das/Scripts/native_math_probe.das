@@ -212,3 +212,30 @@ def main(input:int):int {
     if (!ue_vector2d(1.0lf, 0.0lf).get_rotated(90.0lf).equals(ue_vector2d(0.0lf, 1.0lf), 0.0001lf)) { return 102 }
     return 0
 }
+
+// The call cost benchmark (interop-performance): f_interp_to through ue_math against the same formula in
+// daScript (FMath::FInterpTo).
+def interp_in_script(current, target, dt, speed : double) : double {
+    if (speed <= 0.0lf) { return target }
+    let dist = target - current
+    if (dist * dist < 1.0e-8lf) { return target }
+    return current + dist * clamp(dt * speed, 0.0lf, 1.0lf)
+}
+
+[export]
+def bench_interp_native(count:int):int {
+    var n = 0
+    for (i in range(0, count)) {
+        if (f_interp_to(double(i), 100.0lf, 0.016lf, 1.0lf) >= 0.0lf) { n += 1 }
+    }
+    return n
+}
+
+[export]
+def bench_interp_script(count:int):int {
+    var n = 0
+    for (i in range(0, count)) {
+        if (interp_in_script(double(i), 100.0lf, 0.016lf, 1.0lf) >= 0.0lf) { n += 1 }
+    }
+    return n
+}

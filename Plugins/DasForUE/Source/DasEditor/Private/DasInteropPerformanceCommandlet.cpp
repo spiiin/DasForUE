@@ -237,16 +237,19 @@ void RunEditorCases(FDasInteropBench& B)
     Loop(TEXT("script_native_self_field_read"), TEXT("ue_InteropProbe_NativeFieldReads"), TEXT("D properties"),
                                                                                                7ll * Light);
 
-    // E. Script -> C++ through a native bind (DasNativeBinds.h): the module "smoke_native" exists only in the smoke
-    // project, elsewhere the case is skipped (a registered module is built by the first compilation).
-    if (!DasNativeModuleStatus(TEXT("smoke_native")).EndsWith(TEXT("is not registered")))
+    // E. Script -> C++ through native binds (DasNativeBinds.h), each a loop inside the script. The probe scripts
+    // and the module "smoke_native" exist only in the smoke project; elsewhere the cases are skipped (a registered
+    // module is built by the first compilation). Compare cases of one run only: the machine's speed varies more
+    // between runs than these costs differ.
+    auto NativeLoop = [&](const TCHAR* Case, const TCHAR* Script, const TCHAR* Entry, int64 Expected)
     {
+        if (DasNativeModuleStatus(TEXT("smoke_native")).EndsWith(TEXT("is not registered")))
+            return;
         FDasScriptChangeCheckScope Watch(1);
-        const FString Path = Runtime.ScriptPath(TEXT("native_binds_probe.das"));
-        const TCHAR* Case = TEXT("script_native_bind_call");
+        const FString Path = Runtime.ScriptPath(Script);
         auto Run = [&](int32 N)
         {
-            const auto R = Runtime.RunNamedPersistent(Path, TEXT("bench"), N, Actor);
+            const auto R = Runtime.RunNamedPersistent(Path, Entry, N, Actor);
             if (!R.bSucceeded)
             {
                 B.Fail(FString(Case) + TEXT(": ") + R.Error);
@@ -254,43 +257,17 @@ void RunEditorCases(FDasInteropBench& B)
             }
             return int64(R.Value);
         };
-        B.Measure(Case, TEXT("E script -> C++"), Light, Run, Triangle(Light));
-    }
-    if (!DasNativeModuleStatus(TEXT("smoke_native")).EndsWith(TEXT("is not registered")))
-    {
-        FDasScriptChangeCheckScope Watch(1);
-        const FString Path = Runtime.ScriptPath(TEXT("native_binds_objects.das"));
-        const TCHAR* Case = TEXT("script_native_method_call");
-        auto Run = [&](int32 N)
-        {
-            const auto R = Runtime.RunNamedPersistent(Path, TEXT("bench_method"), N, Actor);
-            if (!R.bSucceeded)
-            {
-                B.Fail(FString(Case) + TEXT(": ") + R.Error);
-                return int64(-1);
-            }
-            return int64(R.Value);
-        };
-        B.Measure(Case, TEXT("E script -> C++"), Light, Run, int64(Light));
-    }
-    // E3. An engine method through ue_engine: actor.get_actor_location() on self, inside the script.
-    if (!DasNativeModuleStatus(TEXT("smoke_engine")).EndsWith(TEXT("is not registered")))
-    {
-        FDasScriptChangeCheckScope Watch(1);
-        const FString Path = Runtime.ScriptPath(TEXT("native_engine_probe.das"));
-        const TCHAR* Case = TEXT("script_native_actor_location");
-        auto Run = [&](int32 N)
-        {
-            const auto R = Runtime.RunNamedPersistent(Path, TEXT("bench_actor_location"), N, Actor);
-            if (!R.bSucceeded)
-            {
-                B.Fail(FString(Case) + TEXT(": ") + R.Error);
-                return int64(-1);
-            }
-            return int64(R.Value);
-        };
-        B.Measure(Case, TEXT("E script -> C++"), Light, Run, int64(Light));
-    }
+        B.Measure(Case, TEXT("E script -> C++"), Light, Run, Expected);
+    };
+    NativeLoop(TEXT("script_native_bind_call"), TEXT("native_binds_probe.das"), TEXT("bench"), Triangle(Light));
+    NativeLoop(TEXT("script_native_method_call"), TEXT("native_binds_objects.das"), TEXT("bench_method"), Light);
+    // The same engine function, direct and through the reflected generated binding.
+    const TCHAR* ActorLocation = TEXT("bench_actor_location");
+    NativeLoop(TEXT("script_native_actor_location"), TEXT("native_engine_probe.das"), ActorLocation, Light);
+    NativeLoop(TEXT("script_reflected_actor_location"), TEXT("native_reflected_bench.das"), ActorLocation, Light);
+    // A cheap engine function against the same formula in daScript: the cost of crossing into C++.
+    NativeLoop(TEXT("script_native_interp"), TEXT("native_math_probe.das"), TEXT("bench_interp_native"), Light);
+    NativeLoop(TEXT("script_daslang_interp"), TEXT("native_math_probe.das"), TEXT("bench_interp_script"), Light);
 
     // D3. C++ reading the authored property.
     auto* Value = FindFProperty<FIntProperty>(Actor->GetClass(), TEXT("Value"));

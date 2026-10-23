@@ -98,6 +98,11 @@ bool RunDasNativeEngineProbe(UWorld* GameWorld, FString& Report)
     const bool bApplied = Self->IsHidden() && Self->GetOwner() == Other.Get() && !ChildComponent->IsActive();
     Check(bApplied, TEXT("native_engine_changes_visible_in_cpp"));
 
+    // ue_engine and the generated bindings both name a type Actor: qualified names and conversions work.
+    const auto Mix = R.RunNamedPersistent(R.ScriptPath(TEXT("native_engine_generated_mix.das")), TEXT("main"), 0, Self);
+    const bool bMixed = Mix.bSucceeded && Mix.Value == 0;
+    Check(bMixed, TEXT("native_engine_with_generated_bindings"), Mix.bSucceeded ? FString() : Mix.Error.Left(300));
+
     // A null receiver and a destroyed actor are script errors.
     auto Refused = [&](const TCHAR* Name, const TCHAR* Entry, const TCHAR* Expected)
     {

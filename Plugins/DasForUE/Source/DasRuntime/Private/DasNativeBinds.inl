@@ -92,6 +92,54 @@ das::TypeDeclPtr DasNativeTypeDecl(const FDasNativeParam& Param, const FDasNativ
     }
     return das::makeType<void>(Lib);
 }
+// The script name of a parameter or result type (manifests).
+FString DasNativeScriptTypeName(const FDasNativeParam& Param, const FDasNativeResolvedParam& Resolved)
+{
+    switch (Param.Type)
+    {
+    case EDasNativeType::Void:
+        return TEXT("void");
+    case EDasNativeType::Bool:
+        return TEXT("bool");
+    case EDasNativeType::Int32:
+        return TEXT("int");
+    case EDasNativeType::Int64:
+        return TEXT("int64");
+    case EDasNativeType::Float:
+        return TEXT("float");
+    case EDasNativeType::Double:
+        return TEXT("double");
+    case EDasNativeType::Byte:
+        return TEXT("uint8");
+    case EDasNativeType::String:
+        return TEXT("string");
+    case EDasNativeType::Name:
+        return TEXT("UENameValue");
+    case EDasNativeType::Text:
+        return TEXT("UETextValue");
+    case EDasNativeType::DateTime:
+        return TEXT("UEDateTime");
+    case EDasNativeType::Timespan:
+        return TEXT("UETimespan");
+    case EDasNativeType::Object:
+        return Resolved.Script ? Resolved.Script->Name : FString(TEXT("UObjectHandle"));
+    case EDasNativeType::Vector:
+        return TEXT("UEVector");
+    case EDasNativeType::Vector2D:
+        return TEXT("UEVector2D");
+    case EDasNativeType::Rotator:
+        return TEXT("UERotator");
+    case EDasNativeType::Quat:
+        return TEXT("UEQuat");
+    case EDasNativeType::Transform:
+        return TEXT("UETransform");
+    case EDasNativeType::LinearColor:
+        return TEXT("UELinearColor");
+    case EDasNativeType::Color:
+        return TEXT("UEColor");
+    }
+    return FString();
+}
 bool DasNativeIsMath(EDasNativeType Type)
 {
     return Type >= EDasNativeType::Vector;

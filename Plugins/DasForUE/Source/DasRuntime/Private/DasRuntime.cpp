@@ -624,6 +624,41 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeInputSessions.inl"
 }
 
+TArray<FDasNativeModuleInfo> DescribeDasNativeModules()
+{
+    EnsureDasNativeModules();
+    TArray<FDasNativeModuleInfo> Result;
+    for (const FDasNativeModuleDesc* Desc : DasNativeModuleDescs())
+    {
+        if (!Desc->bLoaded)
+            continue;
+        FDasNativeModuleInfo& Module = Result.AddDefaulted_GetRef();
+        Module.Name = Desc->Name;
+        Module.Error = Desc->Error;
+        for (const FDasNativeClassDecl& Decl : Desc->Classes)
+            Module.Classes.Add(Decl.ScriptName);
+        if (!Desc->bBuilt)
+            continue;
+        auto Describe = [&](const FDasNativeFunctionDesc& F, const TCHAR* Origin)
+        {
+            FDasNativeFunctionInfo& Info = Module.Functions.AddDefaulted_GetRef();
+            Info.Name = F.Name;
+            for (int32 I = 0; I < F.Arguments.Num(); ++I)
+                Info.Arguments.Add(DasNativeScriptTypeName(F.Arguments[I], F.Resolved[I]));
+            Info.Receiver = F.IsMethod() ? Info.Arguments[0] : FString();
+            Info.Result = DasNativeScriptTypeName(F.Result, F.Resolved.Last());
+            Info.Origin = Origin;
+            Info.bPure = EnumHasAnyFlags(F.Flags, EDasBind::Pure);
+            Info.bNonNullArgs = EnumHasAnyFlags(F.Flags, EDasBind::NonNullArgs);
+        };
+        for (const FDasNativeFunctionDesc& F : Desc->Functions)
+            Describe(F, TEXT("declared"));
+        for (const TUniquePtr<FDasNativeFunctionDesc>& F : Desc->Generated)
+            Describe(*F, F->Helper == EDasNativeHelper::Call ? TEXT("inherited") : TEXT("helper"));
+    }
+    return Result;
+}
+
 void* dasue::aot::Resolve(uint64_t Key, das::Context* Context)
 {
     if (!Context)

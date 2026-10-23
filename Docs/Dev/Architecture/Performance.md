@@ -279,3 +279,34 @@ event drain — the VM itself about 0.1 us. A generated binding spends its 2.2 u
 of the frame state and `FStructOnScope`), argument and result paths and the release. AOT makes pure script
 code 7-9x faster (loop 2.6 -> 0.4 ns) and does not change calls across the boundary (guarded externs,
 40-170 ns either way).
+
+## Native binds — 2026-10-23
+
+Script -> C++ through native binds (`DasNativeBinds.h`: `ue_engine`, `ue_math`, `ue_time`, game modules), each
+case a loop inside the script, `interop-performance` group E. All rows come from one run: this machine's speed
+varied about 2x between runs (the native function call measured 36 ns and 71 ns on different days), so compare
+rows of one run only.
+
+| Case | ns/call |
+| --- | ---: |
+| `script_self_method_call` (script -> script, for scale) | 17 |
+| `script_native_bind_call` (free function, two ints) | 71 |
+| `script_native_method_call` (method through a typed reference) | 153 |
+| `script_native_actor_location` (`actor.get_actor_location()`, `ue_engine`) | 136 |
+| `script_reflected_actor_location` (the generated binding of `K2_GetActorLocation`) | 22115 |
+| `script_native_interp` (`f_interp_to`, `ue_math`) | 160 |
+| `script_daslang_interp` (the same formula written in daScript) | 57 |
+
+- The same engine function costs about 160x less through `ue_engine` than through the reflected generated
+  binding.
+- A method costs about twice a free function: the receiver goes through the context's handle table (lookup,
+  `IsA`).
+- Crossing into C++ costs more than a few arithmetic operations: `f_interp_to` through `ue_math` is about three
+  times slower than the same formula in daScript. Native math pays off for work that is not a one-liner.
+- AOT: a script that requires a native module is not compiled for AOT at all. The AOT emitter
+  (`daslib/aot_cpp.das`, `getRequiredModulesFor`) asks every required module for AOT support and the native
+  modules do not declare it ("AOT disabled due to module requirements"); the whole file runs in the
+  interpreter. The `DasNativeBindsManifest` commandlet checks this on `native_binds_aot_check.das`. AOT support
+  for native binds is a separate step.
+
+Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.

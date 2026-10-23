@@ -52,6 +52,8 @@
       "requires": ["components-prepare"] },
     { "name": "native-binds", "kind": "automation", "test": "DasForUE.NativeBinds+DasForUE.NativeTime+DasForUE.NativeEngine+DasForUE.NativeMath",
       "log": "native-binds-automation", "minimum": 4, "comment": "Native binds and the plugin native modules (DasNativeBinds.h): the automation tests alone." },
+    { "name": "native-binds-manifest", "kind": "commandlet", "run": "DasNativeBindsManifest", "log": "native-binds-manifest",
+      "marker": "DAS_NATIVE_BINDS_MANIFEST=PASS", "comment": "logs/native-binds-manifest.json for Scripts/NativeBindsCoverage.py; also tries AOT generation of a script with native calls." },
     { "name": "actor-component", "kind": "automation", "test": "DasForUE.ActorComponent", "log": "actor-component-automation",
       "minimum": 3, "comment": "Composed actors: PIE lifecycle and declaration reimport in the editor and during PIE." },
     { "name": "actor-component-assets", "kind": "script", "script": "TestActorComponent.ps1",
