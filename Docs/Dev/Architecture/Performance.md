@@ -231,3 +231,51 @@ The foundation test prints `self_container_benchmark` for push+pop on a 1024-ele
 220–270 ns per in-place operation, against 190–230 us for one snapshot read and write of the same array.
 The snapshot figure is a lower bound for the former path, which also converted the container to and from
 a VM value. After `erase` a map keeps the native element order; before, it was rebuilt from the VM table.
+
+## Call cost between C++, Blueprint and daScript — 2026-10-23
+
+`Scripts/TestInteropPerformance.ps1` (suite `interop-performance`) measures what one call costs in each
+direction: C++ -> script (`RunNamedPersistent`), the Blueprint bridge (`ExecuteDasFrame`, `ProcessEvent` of a
+generated function), script -> C++ (direct externs, reflected calls, generated engine bindings), method
+calls through typed references, property access and AOT against the interpreter. It is informational:
+medians and p95 over 9 samples plus a checksum per case, no thresholds. The editor commandlet is
+`-run=DasInteropPerformance`, the game flag `-DasInteropPerformance` (runtime cases only); the report is
+`logs/interop-performance-editor.json`. Cases with an opt-in phase profiler (`DasCallPhases.h`, one branch per
+mark when off) also list the nanoseconds of each step of the call (`phases_ns_per_call`).
+
+Medians in ns per call, Development editor, RTX laptop; figures drift up to 3x between runs with the machine
+state, so compare cases of one run (the call shape cache was measured A/B in one run).
+"Before" is the first measurement of the benchmark; for generated bindings and the typed reference it is
+the same run with the call shape cache switched off.
+
+| Call | Before | After |
+| --- | ---: | ---: |
+| C++ -> script, `RunNamedPersistent` (int -> int) | 1 202 525 | 1 430 |
+| Blueprint bridge `ExecuteDasFrame` (int) | 6 086 854 | 3 127 |
+| `ProcessEvent` of a generated Blueprint function (int) | 6 217 783 | 3 246 |
+| Script -> authored method through a typed reference | 3 559 914 | 6 150 |
+| Generated engine binding, object (`fixture_AddHealth`) | 9 900 | 2 183 |
+| Generated engine binding, static (`Add_IntInt`) | 16 300 | 2 312 |
+| Reflected `ue_call_int` (no call frame, unchanged) | 1 000 | 890 |
+| Script -> direct extern (`ue_add`), unchanged | 12 | 14 |
+| Script -> script function call, unchanged | 3 | 3 |
+
+What made the difference:
+
+- Hot reload checked every call by reading all script sources (with the engine API modules about 1 MB).
+  Calls now check sources only after a reported change: writes in this process are reported by
+  `DasScriptWriteTracker` (a pass-through `IPlatformFile` layer), saves in the editor by `DasAutoReimport`,
+  edits by other programs by a shared poll of file size and time (`das.ScriptChangePollSeconds`).
+  `das.ScriptChangeCheck 0` restores the per-call check (630 us per call in the same run).
+- Normalized script paths, verified entry functions, `ScriptPath` (it probed the project folder with
+  `FileExists`, 25 us) and parsed authored method contracts (a JSON parse per call, about 230 us) are cached.
+- Reflected call frames reuse an `FCallShape` per `UFunction`: parameter descriptions, the signature key,
+  parameters by name and which adapters and validators apply (some of these built class path names on every
+  call). A/B in one run: 9.9 -> 2.2 us (object), 16.3 -> 2.3 us (static), 12.1 -> 6.1 us (typed reference).
+
+What a call still costs (phase profile): `RunCallback` spends its 1.4 us on a dozen small steps — entry and
+lifecycle checks, frame and contract building, session lookup, VM restart and scopes, entry bookkeeping,
+event drain — the VM itself about 0.1 us. A generated binding spends its 2.2 us on the frame (`MakeShared`
+of the frame state and `FStructOnScope`), argument and result paths and the release. AOT makes pure script
+code 7-9x faster (loop 2.6 -> 0.4 ns) and does not change calls across the boundary (guarded externs,
+40-170 ns either way).
