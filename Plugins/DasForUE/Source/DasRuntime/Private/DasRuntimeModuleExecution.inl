@@ -410,12 +410,20 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Result.Error = TEXT("self is missing or expired");
         return Result;
     }
+    if (Event != EDasCallback::EndPlay &&
+        ((Cast<UDasWorldSubsystem>(Owner) && !CastChecked<UDasWorldSubsystem>(Owner)->IsDasActive()) ||
+         (Cast<UDasGameInstanceSubsystem>(Owner) && !CastChecked<UDasGameInstanceSubsystem>(Owner)->IsDasActive())))
+    {
+        Result.Error = TEXT("Subsystem is deinitialized; its VM cannot be recreated");
+        return Result;
+    }
     DasCallPhaseMark(EDasCallPhase::Frame);
     PruneSessions();
     DasCallPhaseMark(EDasCallPhase::PruneSessions);
     const FString FullPath = NormalizeScriptPath(Path);
     if (Event == EDasCallback::Initialize &&
-        (!Owner->GetWorld() || !Owner->GetWorld()->IsGameWorld() || Owner->IsTemplate()))
+        ((!Owner->IsA<UDasGameInstanceSubsystem>() && (!Owner->GetWorld() || !Owner->GetWorld()->IsGameWorld())) ||
+         Owner->IsTemplate()))
     {
         Result.Error = TEXT("Initialize requires a live game-world instance");
         return Result;
@@ -454,6 +462,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Result.bSucceeded = Event == EDasCallback::EndPlay;
         if (!Result.bSucceeded)
             Result.Error = TEXT("Script lifecycle has already ended.");
+        if (Owner->IsA<UDasGameInstanceSubsystem>())
+            Session->World = Owner->GetWorld();
         Result.Revision = Session->Revision;
         return Result;
     }
@@ -547,7 +557,9 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 // No self during initialization: rejected code cannot alter the live Actor.
                 if (!Candidate->Program->simulate(*Candidate->Context, Output))
                 {
-                    CandidateError = Errors(Candidate->Program, Output);
+                    CandidateError = Candidate->Context->getException()
+                        ? DSLDiagnosticRuntime(*Candidate->Context, Candidate->Program, TEXT("initialization"))
+                                               : Errors(Candidate->Program, Output);
                     if (CandidateError.IsEmpty())
                         CandidateError = TEXT("Candidate initialization failed.");
                 }
@@ -647,7 +659,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     }
                 }
                 if (const char* Exception = Candidate->Context->getException())
-                    CandidateError = UTF8_TO_TCHAR(Exception);
+                    CandidateError = DSLDiagnosticRuntime(*Candidate->Context, Candidate->Program, EntryPoint);
             }
         }
         catch (const std::exception& Exception)
@@ -698,9 +710,17 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         }
     }
     DasCallPhaseMark(EDasCallPhase::Reload);
+    if (Owner->IsA<UDasGameInstanceSubsystem>())
+        Session->World = Owner->GetWorld();
     Result.Revision = Session->Revision;
     Result.ReloadError = Session->ReloadError;
-    if (Event == EDasCallback::EndPlay && (!Session->Live || !Session->bBeginDelivered || Session->bEndDelivered))
+    const auto* SubsystemInitializers = InitializerDeliveries.Find(Self);
+    const auto* SubsystemInitializer = SubsystemInitializers ? SubsystemInitializers->Find(FullPath) : nullptr;
+    const bool InitializedSubsystem = (Owner->IsA<UDasWorldSubsystem>() || Owner->IsA<UDasGameInstanceSubsystem>()) &&
+                                      SubsystemInitializer &&
+                                      SubsystemInitializer->State == EInitializerDelivery::Complete;
+    if (Event == EDasCallback::EndPlay &&
+        (!Session->Live || (!Session->bBeginDelivered && !InitializedSubsystem) || Session->bEndDelivered))
     {
         if (Session->Live)
         {
@@ -750,7 +770,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 Context.evalWithCatch(Session->Live->Construction, nullptr);
             if (const char* Exception = Context.getException())
             {
-                Result.Error = FString(TEXT("ConstructionScript failed: ")) + UTF8_TO_TCHAR(Exception);
+                Result.Error = DSLDiagnosticRuntime(Context, Session->Live->Program, EntryPoint);
                 return Result;
             }
             Result.bSucceeded = true;
@@ -762,7 +782,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             return Result;
         }
         // Parent BeginPlay does not implicitly opt back into an overridden initializer.
-        const bool CanInitialize = Owner->GetWorld() && Owner->GetWorld()->IsGameWorld() && !Owner->IsTemplate();
+        const bool CanInitialize = !Owner->IsTemplate() && (Owner->IsA<UDasGameInstanceSubsystem>() ||
+                                                            (Owner->GetWorld() && Owner->GetWorld()->IsGameWorld()));
         if (!CanInitialize && Session->Live->Initializer &&
             (Event == EDasCallback::BeginPlay || Event == EDasCallback::Tick))
         {
@@ -774,7 +795,9 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             (CanInitialize && !ParentLifecycle && (Event == EDasCallback::BeginPlay || Event == EDasCallback::Tick));
         if (NeedInitialize)
         {
-            if (!Owner->GetWorld() || !Owner->GetWorld()->IsGameWorld() || Owner->IsTemplate())
+            if ((!Owner->IsA<UDasGameInstanceSubsystem>() &&
+                 (!Owner->GetWorld() || !Owner->GetWorld()->IsGameWorld())) ||
+                Owner->IsTemplate())
             {
                 Result.Error = TEXT("Initialize requires a live game-world instance");
                 return Result;
@@ -815,7 +838,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     Context.evalWithCatch(Session->Live->Initializer, nullptr);
                 if (const char* Exception = Context.getException())
                 {
-                    Result.Error = FString(TEXT("Initialize failed: ")) + UTF8_TO_TCHAR(Exception);
+                    Result.Error = DSLDiagnosticRuntime(Context, Session->Live->Program, EntryPoint);
                     return Result;
                 }
                 if (!IsValid(Owner) || (Cast<AActor>(Owner) && CastChecked<AActor>(Owner)->IsActorBeingDestroyed()) ||
@@ -841,7 +864,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 Context.evalWithCatch(Session->Live->BeginPlay, nullptr);
             if (const char* Exception = Context.getException())
             {
-                Result.Error = UTF8_TO_TCHAR(Exception);
+                Result.Error = DSLDiagnosticRuntime(Context, Session->Live->Program, EntryPoint);
                 if (Session->Live->Physics)
                 {
                     Session->Live->Physics->Activated = true;
@@ -1214,7 +1237,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             return Result;
         }
         if (const char* Exception = Context.getException())
-            Result.Error = UTF8_TO_TCHAR(Exception);
+            Result.Error = DSLDiagnosticRuntime(Context, Session->Live->Program, EntryPoint);
         else
         {
             if (!ParentLifecycle && (Event == EDasCallback::BeginPlay || Event == EDasCallback::Tick) &&

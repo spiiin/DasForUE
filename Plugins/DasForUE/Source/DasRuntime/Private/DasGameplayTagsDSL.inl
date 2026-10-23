@@ -57,6 +57,7 @@ struct FUEGameplayValueAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& S, das::ModuleGroup&, das::AnnotationArgumentList& A,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(S->at, UTF8_TO_TCHAR(S->name.c_str()));
         try
         {
             if (!S->module || S->module->name != "ue_gameplay_tags" ||

@@ -278,3 +278,123 @@ Queue `test-suite ueaot1 ue-aot repo=<repo>-main` through the shared
 build agent. It generates and links the focused UE AOT fixture and runs one
 short strict native-execution/guard check. See [bridge scope and safety
 contract](Plans/UEApiAot.md). This is not full gameplay/GAS AOT acceptance.
+
+## Built-in math and Name operators
+
+Queue `test-suite builtin1 builtin-values repo=<main-worktree>` through the build
+agent. One headless commandlet compares operator/helper results against native
+FVector, FVector2D, FRotator, FTransform and FName, checks authored-field lowering,
+and rejects ambiguous type combinations and invalid numeric inputs. It records
+the current extern manifest in `logs/builtin-values-externs.txt` and verifies
+that existing entries have not changed. No full PIE/packaged suite is implied.
+
+Verified 2026-10-23 by `builtin-values-20261023a` (exit 0): Editor Development
+build and 33 focused checks passed; commandlet execution was under one second,
+the scoped suite including process startup and source/DLL freeze took 15 seconds.
+The extern baseline gained exactly 64 registrations, preserving every existing line.
+Receipt: `logs/builtin-values-validation.json`; output: `logs/builtin-values-runtime.log`.
+
+## Quaternion conversion check
+
+Queue `test-suite quat1 quat repo=<main-worktree>` through the shared build agent.
+The suite builds Editor Development and runs one short `DasBuiltinValues -QuatOnly`
+probe against native `FRotator::Quaternion()` / `FQuat::Rotator()`: ordinary and
+wrapped angles, pitch singularities, quaternion sign equivalence, identity and
+component constructors, and refusal of zero/non-unit/non-finite rotations.
+It writes `logs/quat-validation.json`, `logs/quat-runtime.log` and the current
+extern manifest in `logs/quat-externs.txt`. It does not run PIE or packaged tests.
+
+Verified 2026-10-23 by `quat-20261023a` (exit 0): Editor Development build
+and the single focused conversion probe passed. Native commandlet execution took
+0.06 seconds; the suite including process startup and source/DLL freeze took 13 seconds.
+Four extern registrations were added without changing any existing manifest entry.
+
+## Complete built-in type block
+
+Queue `test-suite builtins1 complete-builtins repo=<main-worktree>` through the
+shared build agent. It builds Editor Development and runs one short
+`DasBuiltinValues -Complete` commandlet. Five checks cover native math/color parity,
+compilation of all installed canonical API packages and selected generated calls,
+refusal/atomic-write behavior, explicit conversion rules, real authored struct defaults,
+and real reflected calls with native fields, array/map values, ref/out and a typed delegate. The source fixture
+is `builtin_types_example.das`; assets are transient test imports and are not saved.
+Receipt: `logs/complete-builtins-validation.json`; extern manifest:
+`logs/complete-builtins-externs.txt`. PIE, packaged and full regressions are not run.
+
+Verified 2026-10-23 by `builtins-complete-20261023d` (exit 0): Editor Development
+build and all five grouped checks passed; commandlet execution took 10.56 seconds,
+and the scoped suite including startup and source/DLL freeze took 24 seconds.
+Native assertions include actual array/map contents, typed delegate results and
+ref/out values. The extern baseline gained 54 registrations without changing
+any existing line. Seven focused canonical-generator unit tests and native-generator
+freshness passed separately. After the run, only generated package/profile newlines
+were normalized to the repository LF policy; exact reconstruction of the validated
+bytes is recorded in the receipt. No extra runtime run is needed for that text-only
+normalization. Full profile-specific runtime probes, PIE, packaged and full regressions
+were not run. The probe also exposed and fixed the Editor struct-default fallback
+that incorrectly cast new adapted values to FTransform.
+
+
+## Focused DSL diagnostics
+
+Queue `test-suite diagnostics1 dsl-diagnostics repo=<main-worktree>` through the
+shared build agent. One `DasDSLDiagnostics` commandlet checks compile/annotation/
+lowering/runtime coordinates, generated method names, imported sources, rejected
+reload maps and Message Log action navigation using an injected opener. Nine
+focused checks; no PIE/packaged and no external editor is opened. See the
+[diagnostics guide](../Guide/DSL/Diagnostics.md).
+
+Verified 2026-10-23 by `dsl-diagnostics-20261023g` (exit 0): Editor Development
+build and all nine grouped checks passed. Commandlet execution took 0.26 seconds;
+the scoped suite including startup and source/DLL freeze took 13 seconds.
+Receipt: `logs/dsl-diagnostics-validation.json`; output:
+`logs/dsl-diagnostics-runtime.log`. Full PIE/packaged suites were not run.
+## Authored subsystems
+
+Queue `test-suite <id> authored-subsystems,authored-subsystems-pie repo=C:\src\DasForUE2-subsystems`
+through the shared build agent. These are focused native-collection/reload and
+real multi-world PIE tests, not a packaged or full regression run. See
+[the subsystem guide](../Guide/Gameplay/Subsystems.md) for contracts and limits.
+
+### Authored subsystem packaged gate
+
+Queue `test-suite <id> authored-subsystems-packaged repo=<worktree>` through the
+shared build agent. This builds/cooks only the dedicated subsystem map/assets and
+runs Win64 Development with NullRHI, without the general packaged smoke test.
+The twelve checks and config restoration contract are documented in
+[Subsystems](../Guide/Gameplay/Subsystems.md#focused-packaged-startup-and-shutdown).
+
+## Authored SaveGame compatibility
+
+Queue `test-suite savecompat1 savegame-compatibility repo=<main-worktree>` through
+the shared agent. The focused scenario first imports and evolves an authored
+SaveGame, then cooks two distinct Win64 Development archives with the same
+Blueprint class path: Original writes a stock GVAS save, Renamed loads those
+unchanged bytes after a stable-ID field rename. This is a characterization of
+Unreal's stock serializer, not an added migration format.
+
+`savegame-compatibility-runtime` runs only the initial schema-evolution commandlet
+for quicker diagnosis. It checks add/remove, defaults versus stored overrides,
+int-to-double widening and fractional double-to-int loading. It does not cook.
+
+The full runner verifies the Blueprint variable GUID across the editor rename,
+old/new cooked field layouts, loaded control values and actual DAS method reads
+in both archives. It explicitly expects stock cooked loading to leave the renamed
+field at its new default; a PASS is evidence of this limitation, not a promise of
+rename compatibility. Generated assets are isolated under
+`/Game/Tests/DasSaveGameCompatibility/<probe>/`; scripts and save files use unique
+probe IDs. Only the runner's temporary authoring script is removed afterwards.
+
+Receipts: `logs/savegame-compatibility-validation.json`,
+`logs/savegame-compatibility-runtime.json`,
+`logs/savegame-compatibility-upgrade.json`, and the two
+`logs/savegame-compatibility-packaged-{Write,Read}.json` observations.
+Archives and original save bytes are retained under
+`Build/SaveGameCompatibility/<probe>/`. No broad PIE/full regression is selected.
+
+Verified 2026-10-23 by `savegame-compat-20261023b` (exit 0): 27 Prepare,
+6 editor Upgrade, 5 packaged Write and 8 packaged Read checks passed. Prepare
+ran in 0.59 seconds; the full focused script with two cooks took 257 seconds.
+The default cooked rename loses `73` and leaves the new default `20`, while
+control `123` survives; Editor rename preserves `73`. This PASS characterizes
+that limitation and must not be described as successful packaged rename migration.

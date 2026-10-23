@@ -1,3 +1,5 @@
+#include "DasDiagnosticMaps.inl"
+
 const char* DSLModelKey = "_ue_model_json";
 FString DSLText(const das::string& S)
 {
@@ -9,7 +11,7 @@ das::string DSLUtf8(const FString& S)
 }
 void DSLFail(const FString& S)
 {
-    throw std::runtime_error(TCHAR_TO_UTF8(*S));
+    throw std::runtime_error(TCHAR_TO_UTF8(*DSLDiagnosticFailure(S)));
 }
 FString DSLString(const das::AnnotationArgumentList& Args, const char* Key, const FString& Default = FString())
 {
@@ -826,7 +828,10 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
     if (DSLContainer(T))
         return TEXT("struct");
     if (const auto* Adapter = DasMathAdapter(Math))
-        return Adapter->GetDefaultKind();
+    {
+        const FString Kind = Adapter->GetDefaultKind();
+        return FindDasCallbackType(Kind) ? Kind : TEXT("struct");
+    }
     return K;
 }
 #include "DasHandlerLookupDSL.inl"
@@ -1005,7 +1010,8 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                     }
                     const bool ActorAdapter = Self->IsA<ADasProbeActor>() || Self->IsA<UDasScriptComponent>() ||
                                               Self->IsA<UDasSaveGame>() || Self->IsA<UDasDataAsset>() ||
-                                              Self->IsA<UDasPrimaryDataAsset>();
+                                              Self->IsA<UDasPrimaryDataAsset>() || Self->IsA<UDasWorldSubsystem>() ||
+                                              Self->IsA<UDasGameInstanceSubsystem>();
                     FDasDeclaredClass EffectiveDefaults;
                     if (!Model.ResolveClass(C.Id, EffectiveDefaults, Error))
                     {

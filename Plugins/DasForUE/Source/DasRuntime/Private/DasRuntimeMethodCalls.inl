@@ -495,3 +495,63 @@ FProperty* ScalarEventParameter(FMulticastDelegateProperty* P)
             return *It;
     return nullptr;
 }
+
+FDasStructValue MathPackquat(const FQuat& V, das::Context* C, das::LineInfoArg* At)
+{
+    return MathPack(V, C, At);
+}
+FQuat MathUnpackquat(const FDasStructValue& V, das::Context* C)
+{
+    return MathUnpack<FQuat>(V, C);
+}
+void MethodArgquat(const FDasCallHandle& H, const char* P, const FQuat& V, das::Context* C)
+{
+    FString Error;
+    if (!FDasTypeAdapters::Get().FindStruct(TBaseStructure<FQuat>::Get())->ValidateValue(&V, Error))
+        C->throw_error(TCHAR_TO_UTF8(*Error));
+    MethodArgstruct(H, P, MathPack(V, C, nullptr), C);
+}
+FQuat MethodResultquat(const FDasCallHandle& H, const char* P, das::Context* C, das::LineInfoArg* At)
+{
+    return MathUnpack<FQuat>(MethodResultstruct(H, P, C, At), C);
+}
+
+FDasStructValue MathPacklinear_color(const FLinearColor& V, das::Context* C, das::LineInfoArg* At)
+{
+    return MathPack(V, C, At);
+}
+FLinearColor MathUnpacklinear_color(const FDasStructValue& V, das::Context* C)
+{
+    return MathUnpack<FLinearColor>(V, C);
+}
+void MethodArglinear_color(const FDasCallHandle& H, const char* P, const FLinearColor& V, das::Context* C)
+{
+    FString Error;
+    if (!FDasTypeAdapters::Get().FindStruct(TBaseStructure<FLinearColor>::Get())->ValidateValue(&V, Error))
+        C->throw_error(TCHAR_TO_UTF8(*Error));
+    MethodArgstruct(H, P, MathPack(V, C, nullptr), C);
+}
+FLinearColor MethodResultlinear_color(const FDasCallHandle& H, const char* P, das::Context* C, das::LineInfoArg* At)
+{
+    return MathUnpack<FLinearColor>(MethodResultstruct(H, P, C, At), C);
+}
+
+FDasStructValue MathPackcolor(const FColor& V, das::Context* C, das::LineInfoArg* At)
+{
+    return MathPack(V, C, At);
+}
+FColor MathUnpackcolor(const FDasStructValue& V, das::Context* C)
+{
+    return MathUnpack<FColor>(V, C);
+}
+void MethodArgcolor(const FDasCallHandle& H, const char* P, const FColor& V, das::Context* C)
+{
+    FString Error;
+    if (!FDasTypeAdapters::Get().FindStruct(TBaseStructure<FColor>::Get())->ValidateValue(&V, Error))
+        C->throw_error(TCHAR_TO_UTF8(*Error));
+    MethodArgstruct(H, P, MathPack(V, C, nullptr), C);
+}
+FColor MethodResultcolor(const FDasCallHandle& H, const char* P, das::Context* C, das::LineInfoArg* At)
+{
+    return MathUnpack<FColor>(MethodResultstruct(H, P, C, At), C);
+}

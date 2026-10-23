@@ -6,6 +6,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
     virtual bool look(const das::StructurePtr& St, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                       das::string& Error) override
     {
+        FDSLDiagnosticEntityScope Diagnostics(St, Group);
         try
         {
             DSLDeclarationKind(St->annotations);
@@ -96,6 +97,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& St, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticEntityScope Diagnostics(St, Group);
         try
         {
             FString NativeHint = DSLString(Args, "parent", TEXT("/Script/Engine.Actor"));
@@ -298,6 +300,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 });
             for (auto& F : St->fields)
             {
+                FDSLDiagnosticLocationScope Source(F.at, DSLText(St->name) + TEXT(".")+ DSLText(F.name));
                 // Pinned makeClassRtti adds __rtti without setting generated.
                 const bool InheritedDefault =
                     F.inherited &&
@@ -717,6 +720,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 });
             for (const auto& F : Functions)
             {
+                FDSLDiagnosticLocationScope Source(F->at, DSLText(St->name) + TEXT(".")+ DSLText(DSLMethodName(F)));
                 if (DSLAnnotation(F->annotations, "ue_lifecycle") || DSLAnnotation(F->annotations, "ue_event") ||
                     DSLStandardLifecycle(F))
                     DSLFail(TEXT("Conflicting UE callback/function annotations"));
@@ -1179,6 +1183,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             }
             for (const auto& F : Functions)
             {
+                FDSLDiagnosticLocationScope Source(F->at, DSLText(St->name) + TEXT(".")+ DSLText(DSLMethodName(F)));
                 const FString MethodName = DSLText(DSLMethodName(F));
                 const auto M = *C.Methods.FindByPredicate([&](const auto& Item) { return Item.Name == MethodName; });
                 const FString ResultType = DSLTypeName(F->result);
@@ -1317,7 +1322,12 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     DSLFail(TEXT("Conflicting UE callback/function annotations"));
                 FDasDeclaredCallback Callback;
                 Callback.Name = DSLText(DSLMethodName(F));
-                Callback.Kind = Event ? TEXT("event"): Callback.Name;
+                const bool Deinitialize = !Event && Callback.Name == TEXT("Deinitialize");
+                if (Deinitialize &&
+                    C.NativeParent != TEXT("/Script/Engine.WorldSubsystem") &&
+                                           C.NativeParent != TEXT("/Script/Engine.GameInstanceSubsystem"))
+                    DSLFail(TEXT("Deinitialize requires a subsystem root"));
+                Callback.Kind = Event ? TEXT("event"): Deinitialize ? TEXT("EndPlay") : Callback.Name;
                 if (F->result && F->result->baseType == das::Type::autoinfer)
                     F->result = new das::TypeDecl(das::Type::tVoid, F->at);
                 if (F->isStaticClassMethod || !F->result || F->result->ref ||
@@ -1328,8 +1338,9 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     Event ? (F->arguments.size() == 1   ? FString()
                              : F->arguments.size() == 2 ? DSLTypeName(F->arguments[1]->type)
                                                         : TEXT("invalid"))
-                          : Callback.Kind == TEXT("Tick")? TEXT("float")
-                                                         : Callback.Kind == TEXT("EndPlay")? TEXT("int"): FString();
+                          : Callback.Kind == TEXT("Tick")
+                                ? TEXT("float")
+                                : Callback.Kind == TEXT("EndPlay") && !Deinitialize ? TEXT("int"): FString();
                 if (MultiEvent)
                 {
                     Parameter = TEXT("struct");
@@ -1443,6 +1454,14 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     F->body = F->body->visit(SuperSource);
                 }
                 Clone->arguments.erase(Clone->arguments.begin());
+                if (Deinitialize)
+                {
+                    auto* Reason = new das::Variable();
+                    Reason->name = "__ue_end_reason";
+                    Reason->at = F->at;
+                    Reason->type = new das::TypeDecl(das::Type::tInt, F->at);
+                    Clone->arguments.push_back(Reason);
+                }
                 if (MultiEvent)
                     DSLCallbackUnpackArguments(Clone, TypeFolder, TypeRegistry, Group, St->module);
                 if (!MultiEvent && Event && (Parameter == TEXT("object") || Parameter == TEXT("class")))

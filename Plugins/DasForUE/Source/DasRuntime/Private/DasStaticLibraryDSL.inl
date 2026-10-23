@@ -9,6 +9,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& St, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(St->at, UTF8_TO_TCHAR(St->name.c_str()));
         try
         {
             if (const auto* Done = Args.find(DSLModelKey, das::Type::tString))

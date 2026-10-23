@@ -358,6 +358,7 @@ struct FDSLDefaultAudit : das::Visitor
     }
     virtual void preVisitExpression(das::Expression* E) override
     {
+        FDSLDiagnosticLocationScope Source(E->at, DSLDiagnosticCurrent.Entity);
         if (++Nodes > 8192)
             DSLFail(TEXT("Computed defaults exceed expression budget"));
         if (E->rtti_isCallFunc())
@@ -381,6 +382,7 @@ void DSLEvaluateComputedDefaults(const das::ProgramPtr& Program, das::TextWriter
     FDSLDefaultAudit Audit;
     for (const auto& P : DSLComputedDefaults->Pending)
     {
+        FDSLDiagnosticLocationScope Source(P.Function->at, P.Key);
         try
         {
             Audit.Check(P.Function);
@@ -400,12 +402,17 @@ void DSLEvaluateComputedDefaults(const das::ProgramPtr& Program, das::TextWriter
     Context.stringHeap->setLimit(4 * 1024 * 1024);
     for (const auto& P : DSLComputedDefaults->Pending)
     {
+        FDSLDiagnosticLocationScope Source(P.Function->at, P.Key);
         auto* Fn = Context.findFunction(P.Function->name.c_str());
         if (!Fn)
             DSLFail(TEXT("Missing computed default evaluator"));
         const auto Value = Context.evalWithCatch(Fn, nullptr);
         if (const char* Error = Context.getException())
+        {
+            FDSLDiagnosticLocationScope Fault(Context.exceptionAt.fileInfo ? Context.exceptionAt : P.Function->at,
+                                              P.Key);
             DSLFail(P.Key + TEXT(": computed default failed: ")+ UTF8_TO_TCHAR(Error));
+        }
         das::gc_active_scope Keep(&DSLComputedDefaults->SavedExpressions);
         const auto At = P.Function->at;
         das::ExpressionPtr Literal = nullptr;

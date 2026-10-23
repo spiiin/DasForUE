@@ -98,3 +98,11 @@ das::TypeDeclPtr DSLAdaptedNativeView(const FString& Path, das::ModuleGroup& Gro
 {
     return DSLAdaptedView(Path, EDasScriptViewUse::NativeProperty, Group, Module, At);
 }
+
+das::TypeDeclPtr DSLAdaptedMemberType(const das::TypeDeclPtr& T, const das::string& Name)
+{
+    auto Field = T->annotation->makeFieldType(Name, false);
+    if (!Field)
+        DSLFail(TEXT("Unknown adapted scalar member"));
+    return new das::TypeDecl(Field->baseType, Field->at);
+}

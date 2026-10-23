@@ -60,3 +60,7 @@ __pycache__/
 # Scripts written by tests and probes (a GUID or run tag in the name).
 /Plugins/DasForUE/Content/Das/Scripts/*_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*.das
 /Plugins/DasForUE/Content/Das/Scripts/*_auto_rules.json
+
+/Tests/DasForUESmoke/Content/DasSubsystems/
+
+/Tests/DasForUESmoke/Content/Tests/DasSaveGameCompatibility/

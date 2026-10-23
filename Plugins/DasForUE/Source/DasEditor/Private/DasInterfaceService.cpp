@@ -1,4 +1,5 @@
 #include "DasInterfaceService.h"
+#include "DasDiagnostics.h"
 #include "DasTypePins.h"
 #include "DasRuntime.h"
 #include "DasAuthoring.h"
@@ -84,6 +85,8 @@ void FDasInterfaceService::RegisterCompiler()
 }
 bool FDasInterfaceService::Apply(const FString& Script, const FString& Folder, TArray<UBlueprint*>& Out, FString& Error)
 {
+    FDasDiagnosticCapture Diagnostics(
+        Error, FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).ScriptPath(Script));
     Out.Reset();
     Error.Reset();
     if (!IsInGameThread() || Script != FPaths::GetCleanFilename(Script) ||

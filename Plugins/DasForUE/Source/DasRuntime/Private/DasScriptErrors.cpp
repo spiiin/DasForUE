@@ -1,4 +1,5 @@
 #include "DasActorHostRuntime.h"
+#include "DasDiagnostics.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Logging/MessageLog.h"
@@ -23,7 +24,12 @@ void DasReportScriptError(const UObject& Owner, const FString& Error)
                       "recreate the example.")
                     : TEXT(""));
 #if WITH_EDITOR
-    FMessageLog(TEXT("PIE")).Error(FText::FromString(Text));
+    const auto Diagnostics = FDasDiagnostic::Parse(Error);
+    if (!Diagnostics.IsEmpty() && DasDiagnosticEvents().IsBound())
+        for (const auto& D : Diagnostics)
+            DasDiagnosticEvents().Broadcast(D);
+    else
+        FMessageLog(TEXT("PIE")).Error(FText::FromString(Text));
 #endif
     if (GEngine)
         GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, Text);

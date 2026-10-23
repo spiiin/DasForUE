@@ -8,6 +8,38 @@ Target environment for every entry: Unreal Engine 5.8.3 (source build),
 daScript 0.6.4 (pinned), Win64 Development. Start at the
 [documentation index](Docs/index.md).
 
+## 2026-10-23
+
+### Added
+
+- Authored SaveGame compatibility probes: add/remove fields, delta defaults,
+  numeric load conversions and a real two-archive packaged Development rename
+  check. Editor rename keeps the value; stock cooked loading with the tested
+  default settings leaves the renamed field at its new default. See
+  [SaveGame compatibility](Docs/Guide/Data/SaveGame.md#runtime-schema-compatibility-probe).
+
+- Unified DSL compile/lowering/runtime/import diagnostics with original `.das`
+  coordinates, public declaration names and retained raw details. Compiler-owned
+  maps stay with the correct VM generation after rejected reloads. Editor Message
+  Log entries provide validated source-navigation actions; see
+  [DSL diagnostics](Docs/Guide/DSL/Diagnostics.md).
+
+- Complete built-in convenience block: quaternion composition/inverse/normalization/slerp,
+  vector interpolation/projection/reflection/length limits, Rotator slerp and native Transform blend.
+- Canonical `UELinearColor` / `UEColor` with explicit sRGB vs raw linear-byte conversions;
+  Quat and colors now use shared adapters for authored fields, snapshots and generated native calls.
+  Native component access preserves double/float/byte types. See `builtin_types_example.das`.
+- Native `UEQuat` local values, identity/component constructors and explicit guarded
+  Rotator ↔ Quaternion conversions, with finite/normalized input checks.
+
+- Canonical Vector/Vector2D arithmetic and compound operators; exact equality and explicit
+  near-equality, length, distance, dot/cross and safe normalization helpers.
+- Rotator component arithmetic, degree-based wrapped comparison, vector rotation and explicit
+  composition; Transform composition, inverse/relative transforms and distinct point/vector/direction helpers.
+- Checked `==` / `!=` for UENameValue using native FName identity. Mixed types and implicit typed
+  float/int scaling are rejected; math results stay finite, singular inverse transforms are refused,
+  and failed compound writes leave the original value unchanged. See [Built-in types](Docs/Guide/DSL/BuiltinTypes.md#operators-and-math-helpers).
+
 ## 2026-10-21
 
 ### Added

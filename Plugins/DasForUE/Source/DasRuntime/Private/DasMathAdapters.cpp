@@ -8,6 +8,13 @@ template <class T> bool MathValid(const T& Value)
 {
     if constexpr (std::is_same_v<T, FTransform>)
         return !Value.ContainsNaN() && Value.IsRotationNormalized();
+    else if constexpr (std::is_same_v<T, FQuat>)
+        return !Value.ContainsNaN();
+    else if constexpr (std::is_same_v<T, FLinearColor>)
+        return FMath::IsFinite(Value.R) && FMath::IsFinite(Value.G) && FMath::IsFinite(Value.B) &&
+               FMath::IsFinite(Value.A);
+    else if constexpr (std::is_same_v<T, FColor>)
+        return true;
     else
         return !Value.ContainsNaN();
 }
@@ -72,4 +79,19 @@ bool DasMathValueValid(const UScriptStruct* Type, const void* Data)
     FString Error;
     const auto* Adapter = FDasTypeAdapters::Get().FindStruct(Type);
     return !Adapter || !Adapter->IsMath() || Adapter->ValidateValue(Data, Error);
+}
+
+TSharedRef<const IDasTypeAdapter> MakeDasQuatAdapter()
+{
+    return MakeShared<TDasMathAdapter<FQuat>>(TEXT("quat"));
+}
+
+TSharedRef<const IDasTypeAdapter> MakeDasLinearColorAdapter()
+{
+    return MakeShared<TDasMathAdapter<FLinearColor>>(TEXT("linear_color"));
+}
+
+TSharedRef<const IDasTypeAdapter> MakeDasColorAdapter()
+{
+    return MakeShared<TDasMathAdapter<FColor>>(TEXT("color"));
 }

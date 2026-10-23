@@ -10,3 +10,6 @@ TSharedRef<const IDasTypeAdapter> MakeDasTransformAdapter();
 TSharedRef<const IDasTypeAdapter> MakeDasInputActionValueAdapter();
 // Finite math values; a Transform also needs a normalized rotation.
 bool DasMathValueValid(const UScriptStruct* Type, const void* Data);
+TSharedRef<const IDasTypeAdapter> MakeDasQuatAdapter();
+TSharedRef<const IDasTypeAdapter> MakeDasLinearColorAdapter();
+TSharedRef<const IDasTypeAdapter> MakeDasColorAdapter();

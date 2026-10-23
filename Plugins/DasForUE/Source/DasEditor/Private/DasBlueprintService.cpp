@@ -5,6 +5,7 @@
 #include "DasDefaultRoots.h"
 #include "DasScriptHosts.h"
 #include "DasSaveGame.h"
+#include "DasSubsystems.h"
 #include "DasDataAssets.h"
 #include "DasBlueprintLibrary.h"
 #include "DasAuthoring.h"
@@ -134,6 +135,8 @@ bool AdapterCall(const UK2Node_CallFunction* Call)
                      TEXT("Pawn"))->FindFunctionByName(Name) ||
                      T == DasNativeScriptHost(TEXT("Character"))->FindFunctionByName(Name) ||
                                               T == UDasSaveGame::StaticClass()->FindFunctionByName(Name) ||
+                                              T == UDasWorldSubsystem::StaticClass()->FindFunctionByName(Name) ||
+                                              T == UDasGameInstanceSubsystem::StaticClass()->FindFunctionByName(Name) ||
                                               T == UDasDataAsset::StaticClass()->FindFunctionByName(Name) ||
                                               T == UDasPrimaryDataAsset::StaticClass()->FindFunctionByName(Name))
             return true;
@@ -955,6 +958,8 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     if (!IsInGameThread() || !IsValid(BP) || !BP->GeneratedClass || !BP->ParentClass ||
         (!DasActorHostClass(BP->ParentClass) && !BP->ParentClass->IsChildOf(UDasScriptComponent::StaticClass()) &&
          !BP->ParentClass->IsChildOf(UDasSaveGame::StaticClass()) &&
+         !BP->ParentClass->IsChildOf(UDasWorldSubsystem::StaticClass()) &&
+         !BP->ParentClass->IsChildOf(UDasGameInstanceSubsystem::StaticClass()) &&
          !BP->ParentClass->IsChildOf(UDasDataAsset::StaticClass()) &&
          !BP->ParentClass->IsChildOf(UDasPrimaryDataAsset::StaticClass())))
     {

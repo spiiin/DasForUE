@@ -1,4 +1,6 @@
 #include "DasScriptHosts.h"
+#include "Subsystems/WorldSubsystem.h"
+#include "Subsystems/GameInstanceSubsystem.h"
 #include "DasNativeDefaults.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
@@ -10,6 +12,10 @@
 #include "Misc/SecureHash.h"
 UClass* DasNativeDefaultBase(const FString& Parent)
 {
+    if (Parent == TEXT("/Script/Engine.WorldSubsystem"))
+        return UWorldSubsystem::StaticClass();
+    if (Parent == TEXT("/Script/Engine.GameInstanceSubsystem"))
+        return UGameInstanceSubsystem::StaticClass();
     return Parent == TEXT("/Script/Engine.Actor")
                           ? AActor::StaticClass()
                           : Parent == TEXT("/Script/Engine.Pawn")

@@ -42,6 +42,7 @@ struct FUEWidgetLayoutAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& St, das::ModuleGroup& G, das::AnnotationArgumentList& A,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(St->at, UTF8_TO_TCHAR(St->name.c_str()));
         try
         {
             if (!A.empty())

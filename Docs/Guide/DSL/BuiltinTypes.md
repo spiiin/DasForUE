@@ -17,15 +17,18 @@ This page lists the daScript value types that map directly to Unreal property an
 | `UEVector` | `ue_dsl` | `FVector` (`/Script/CoreUObject.Vector`) | Vector | Double-precision `x`, `y`, `z`. |
 | `UEVector2D` | `ue_dsl` | `FVector2D` (`/Script/CoreUObject.Vector2D`) | Vector 2D | Double-precision `x`, `y`. |
 | `UERotator` | `ue_dsl` | `FRotator` (`/Script/CoreUObject.Rotator`) | Rotator | `pitch`, `yaw`, `roll` in degrees. |
+| `UEQuat` | `ue_dsl` | `FQuat` (`/Script/CoreUObject.Quat`) | Quaternion struct | Double-precision `x`, `y`, `z`, `w`; explicit conversions. |
+| `UELinearColor` | `ue_dsl` | `FLinearColor` | Linear Color | Float `r`, `g`, `b`, `a`; linear/HDR values. |
+| `UEColor` | `ue_dsl` | `FColor` | Color struct | Byte `r`, `g`, `b`, `a`; color space is explicit at conversion. |
 | `UETransform` | `ue_dsl` | `FTransform` (`/Script/CoreUObject.Transform`) | Transform | Opaque. Rotation is stored as a quaternion. Use the helpers below. |
 | `GameplayTag` | `ue_gameplay_tags` | `FGameplayTag` | Gameplay Tag | Edited with the standard tag picker. See [GameplayTags](../Data/GameplayTags.md). |
 | `GameplayTagContainer` | `ue_gameplay_tags` | `FGameplayTagContainer` | Gameplay Tag Container | |
 | `SoftObject`, `SoftActorClass`, `$UESoftObject<T>`, `$UESoftClass<T>` | `ue_soft_references` | `TSoftObjectPtr` / `TSoftClassPtr` | Soft Object / Soft Class Reference | See [Soft references](SoftReferences.md). |
-| Other loaded native value structs (for example `LinearColor`) | `ue_dsl` | the native `UScriptStruct` | that struct | Use `UEStructValue` snapshots, or the generated wrappers from `ue_api_math`. See [Structs](Structs.md#native-unreal-structs-uestructvalue). |
+| Other loaded native value structs (for example `Box`) | `ue_dsl` | the native `UScriptStruct` | that struct | Use `UEStructValue` snapshots, or the generated wrappers from `ue_api_math`. See [Structs](Structs.md#native-unreal-structs-uestructvalue). |
 
 Object and class references are covered in [Object and class references](ObjectAndClassReferences.md), and enums and authored structs on their own pages.
 
-**Not available as authored types:** `int64`, `uint32` and other integer widths besides `int`/`uint8`, `FQuat`, `FColor` as a built-in, fixed-size C++ arrays, and arbitrary pointers. Unreal `int64` properties are not exposed in the generated native API either.
+**Not available as authored types:** `int64`, `uint32` and other integer widths besides `int`/`uint8`, fixed-size C++ arrays, and arbitrary pointers. Unreal `int64` properties are not exposed in the generated native API either.
 
 ## Where the types can be used
 
@@ -99,7 +102,7 @@ Examples: `Plugins/DasForUE/Content/Das/Scripts/dsl_scalar_methods.das`, `dsl_mi
 `UENameValue` stands for an Unreal `FName`. Because it is a separate type, you cannot pass a `string` where a name is expected by accident.
 
 - `ue_name_value(text)` creates a name. `ue_name_text(value)` returns its text. `ue_names_equal(a, b)` compares with Unreal name rules: equality ignores case, number suffixes such as `Item_7` work as in Unreal, and `None` and the empty name are the same.
-- The `==` and `!=` operators are not defined for `UENameValue`. Use `ue_names_equal`.
+- `==` and `!=` use the same checked FName comparison as `ue_names_equal`; they do not compare token integers or display strings. No implicit conversion from/to `string`, and no ordering operators are provided.
 - A name is a token owned by the current script context, and works only while that context is active. One context can hold up to 65,536 distinct names. The token is not a pointer, and another context does not accept it. Do not store raw token integers as persistent IDs.
 - The generated `ue_generated::UEName` wrapper is a separate type. Convert with `ue_name_text` / `ue_name_value`.
 
@@ -151,7 +154,7 @@ class Mover {
 
     [ue_function(BlueprintCallable)]
     def Step():void {
-        self.Position.x += 4.0lf
+        self.Position += ue_vector(4.0lf, 0.0lf, 0.0lf)
         self.Orientation.yaw += 5.0lf
         self.Pose = ue_transform(ue_vector(8.0lf, 9.0lf, 10.0lf),
                                  ue_rotator(0.0lf, 0.0lf, 0.0lf),
@@ -164,7 +167,7 @@ Constructors and helpers:
 
 - `ue_vector(x, y, z)`, `ue_vector2d(x, y)`, `ue_rotator(pitch, yaw, roll)`. All arguments are `double`.
 - `ue_transform(translation, rotation, scale)` uses the native Unreal constructor. `ue_transform_identity()`, `ue_transform_translation()`, `ue_transform_rotation()`, `ue_transform_scale()` and `ue_transform_position(transform, point)` call the Unreal math API.
-- No arithmetic operators (`+`, `*`, ...) are defined for these types. Work on components, or `require ue_api_math` for the generated KismetMathLibrary wrappers, such as `ue_math_Add_VectorVector(a, b)`. See [API packages](../../Api/README.md).
+- Arithmetic operators and checked helpers are available directly; see [Operators and math helpers](#operators-and-math-helpers) below. For the wider generated KismetMathLibrary API, `require ue_api_math`; see [API packages](../../Api/README.md).
 
 Semantics:
 
@@ -176,6 +179,135 @@ Semantics:
 - Enhanced Input `Axis2D` actions deliver `UEVector2D`. Bind them to a `void` callback that takes `(value:UEVector2D)`. See [Input](../Gameplay/Input.md).
 
 Examples: `Plugins/DasForUE/Content/Das/Scripts/dsl_math_methods.das`, `dsl_vector2d.das`, `dsl_method_value_target.das`.
+
+## Quaternion conversions (`UEQuat`)
+
+`require ue_foundation` exposes the native double-precision `FQuat` as `UEQuat`.
+Conversions are explicit:
+
+```das
+let rotation : UERotator = ue_rotator(25.0lf, 80.0lf, -15.0lf)
+let quaternion : UEQuat = ue_quat(rotation)
+let recovered : UERotator = ue_rotator(quaternion)
+let identity : UEQuat = ue_quat_identity()
+let sameIdentity : UEQuat = ue_quat(0.0lf, 0.0lf, 0.0lf, 1.0lf)
+```
+
+- `ue_quat(rotator)` calls `FRotator::Quaternion()`; `ue_rotator(quaternion)` calls
+  `FQuat::Rotator()`. Euler angles are in degrees, in Unreal's pitch/yaw/roll convention.
+- `ue_quat(x,y,z,w)` takes four finite `double` components. Like native `FQuat`,
+  it can represent a non-unit quaternion: call `ue_normalized(q,toleranceSquared)`
+  explicitly before using it as a rotation. Zero/too-short quaternions cannot be normalized.
+  The fields `x`, `y`, `z`, `w` are doubles; values are owned copies. Initialize locals
+  explicitly: an uninitialized `UEQuat` is not guaranteed to be identity.
+- Non-finite inputs/results are rejected. Rotation operations (Rotator conversion,
+  composition, inverse, vector rotation, slerp and Transform construction) additionally
+  require unit quaternions. They never silently repair the input.
+- `a*b` follows native quaternion multiplication: apply `b` then `a`. In contrast,
+  `ue_compose_rotation(first,then)` explicitly applies `first` then `then`, for either
+  Rotator or Quat arguments. `q*=other` validates before assignment and supports aliasing.
+- `ue_inverse(q)`, `ue_rotate_vector(q,v)`, `ue_unrotate_vector(q,v)`,
+  `ue_slerp(a,b,alpha)` and `ue_nearly_equal(a,b,tolerance)` use native FQuat operations.
+  Near-equality treats `q` and `-q` as equivalent and uses component tolerance. There
+  is no quaternion `==` operator. Slerp alpha is finite and can extrapolate.
+- Euler round trips preserve the rotation, not necessarily the original angle triple,
+  especially at pitch singularities. `q` and `-q` represent the same rotation.
+- Quat and both color types use the common adapters for authored fields/defaults,
+  struct members, calls, containers and callback snapshots. Missing authored defaults
+  are identity Quat, opaque black LinearColor, and opaque black Color. Initialize
+  ordinary local variables explicitly. Readonly rules still apply.
+- Canonical generated packages and native class wrappers use these same types, including
+  nested structs and arrays. Explicit `generated_transport` generator mode remains available;
+  its `S_Quat_*` / `S_Color_*` representations are not implicitly interchangeable.
+
+## Colors and explicit color spaces
+
+```das
+let tint = ue_linear_color(0.25f,0.5f,0.75f,1.0f)
+let packed = ue_color(64,128,192,255)
+let decoded : UELinearColor = ue_srgb_to_linear(packed)
+let encoded : UEColor = ue_linear_to_srgb(tint)
+let rawBytes = ue_quantize_linear(tint)
+let rawFloats = ue_reinterpret_linear(rawBytes)
+```
+
+`ue_linear_color` accepts four floats; HDR components outside [0,1] are allowed.
+`ue_color` takes four ints and rejects channels outside [0,255]. Its fields are
+`uint8`, so explicit casts are required when assigning an int to a field.
+LinearColor supports `+`, `-`, double scalar `*` / `/`, their compound forms,
+exact `==` / `!=`, `ue_nearly_equal` and `ue_lerp`. Color supports exact equality;
+arithmetic on packed bytes is deliberately absent.
+
+The sRGB helpers call `FLinearColor::FromSRGBColor` / `ToFColorSRGB`. The raw helpers
+call `ToFColor(false)` / `FColor::ReinterpretAsLinear`, without a gamma conversion.
+Native quantization/clamping and alpha handling are preserved; an HDR-to-byte round
+trip is lossy. There is no implicit color-space conversion or string coercion.
+
+## Interpolation and geometry
+
+- `ue_lerp(a,b,alpha)` for Vector/Vector2D or LinearColor follows native linear
+  interpolation. Finite alpha can extrapolate; LinearColor computes in float precision.
+- `ue_clamp_length(v,max)` for Vector/Vector2D requires a finite non-negative maximum.
+- `ue_project_onto(v,axis)` supports either vector dimension. The axis squared length
+  must exceed `UE_SMALL_NUMBER`; it need not be normalized.
+- `ue_project_onto_plane(v,normal)` and `ue_reflect(v,normal)` require a unit 3D normal.
+- `ue_slerp(rotatorA,rotatorB,alpha)` interpolates their native quaternions along the
+  shortest rotation path, then returns a Rotator; it does not interpolate Euler components.
+- `ue_transform(translation,quat,scale)` preserves the quaternion directly;
+  `ue_transform_quat(transform)` retrieves it without an Euler round trip.
+- `ue_blend(transformA,transformB,alpha)` calls native `FTransform::Blend`, including
+  its normalized quaternion lerp and endpoint thresholds. Alpha must be in [0,1].
+  This is not quaternion slerp or arbitrary matrix interpolation. Native TRS/shear
+  limitations described below still apply.
+
+Example with authored properties, containers and reflected methods:
+`Plugins/DasForUE/Content/Das/Scripts/builtin_types_example.das`.
+
+## Operators and math helpers
+
+The operators are registered in `ue_foundation`, so `ue_dsl` and generated
+packages that publicly import it see the same operations on the same types.
+There is no conversion between UEVector2D, UEVector, Rotator, Transform,
+daScript `float2`/`float3`, or strings and names. Scaling takes `double`:
+use `2.0lf` and `double(deltaSeconds)` when the time step is a `float`.
+
+```das
+let velocity = ue_vector(100.0lf, 0.0lf, 0.0lf)
+var position = ue_vector(0.0lf, 0.0lf, 0.0lf)
+position += velocity * 0.016lf
+let heading = ue_normalized(velocity, 0.00000001lf)
+let distance = ue_length(position)
+
+let turn = ue_rotator(0.0lf, 90.0lf, 0.0lf)
+let facing = ue_rotate_vector(turn, heading)
+let nextTurn = ue_compose_rotation(turn, ue_rotator(20.0lf, 0.0lf, 0.0lf))
+let localToWorld = ue_transform(position, turn, ue_vector(1.0lf, 1.0lf, 1.0lf))
+let point = ue_transform_position(localToWorld, ue_vector(1.0lf, 0.0lf, 0.0lf))
+let sameName = ue_name_value("Pickup_7") == ue_name_value("pickup_7")
+```
+
+| Types | Operations and exact meaning |
+| --- | --- |
+| UEVector / UEVector2D | `a+b`, `a-b`, `-a`, `a*s`, `s*a`, `a/s`; `+=`, `-=`, `*=`, `/=`. Same dimensions, scalar `s:double`. Division by zero is refused. |
+| Vector equality | `==` / `!=` compare components exactly, as UE does. `ue_nearly_equal(a,b,tolerance)` uses native component-wise `Equals`, not a distance sphere. |
+| Vector helpers | `ue_length(v)`, `ue_length_squared(v)`, `ue_distance(a,b)`, `ue_dot(a,b)`, `ue_cross(a,b)`. Cross returns UEVector in 3D, a signed double determinant in 2D. `a*b` between two vectors is deliberately undefined. |
+| Vector normalization | `ue_normalized(v,toleranceSquared)` uses native GetSafeNormal. The tolerance is finite, strictly positive and applies to **squared length**. A zero/tiny vector returns zero according to native UE rules. |
+| UERotator | Degrees. `+`, `-`, unary `-`, scaling in either order, `+=`, `-=`, `*=` operate on Euler components without automatic angle wrapping. `==` is exact component equality. |
+| Rotation helpers | `ue_normalized(r)` uses GetNormalized. `ue_nearly_equal(a,b,toleranceDegrees)` uses Rotator.Equals with wrapped per-axis differences; it is not quaternion angular distance. `ue_compose_rotation(first,then)` matches Kismet ComposeRotators (`ThenQuat * FirstQuat`). `ue_rotate_vector(r,v)` / `ue_unrotate_vector(r,v)` match native Rotator methods. No Rotator*Rotator operator. |
+| UETransform | `a*b` / `a*=b`: native FTransform composition, **first a, then b**. No transform/scalar or transform/vector operator. No exact `==`; `ue_nearly_equal(a,b,tolerance)` is native FTransform.Equals, including quaternion sign equivalence. Its rotation tolerance is quaternion-component tolerance, not degrees. |
+| Transform points | Existing `ue_transform_position(t,p)` includes translation, rotation and scale. `ue_inverse_transform_position(t,p)` reverses that operation. |
+| Transform vectors | `ue_transform_vector(t,v)` includes rotation and scale, no translation. `ue_inverse_transform_vector(t,v)` reverses it. `ue_transform_direction(t,v)` is TransformVectorNoScale: rotation only, without automatic normalization. |
+| Inverse / relative | `ue_transform_inverse(t)` uses FTransform.Inverse. `ue_transform_relative(t,parent)` uses GetRelativeTransform. Inversion requires every inverted scale axis to have magnitude greater than UE_SMALL_NUMBER; zero/near-zero scales are refused instead of silently losing information. Forward operations permit zero scale. |
+
+All comparison tolerances are explicit, finite and non-negative. Inputs and
+results must remain finite; compound assignments compute/validate their result
+before writing it, so a refused operation leaves the variable unchanged.
+
+Transforms retain Unreal's TRS semantics. Non-uniform scale combined with
+rotation can require shear, which FTransform cannot represent. Composition,
+inverse and relative transforms match UE; they are not a general matrix algebra,
+and `Inverse().TransformPosition(p)` is not promised to equal
+`InverseTransformPosition(p)` for arbitrary non-uniform scales.
 
 ## Gameplay tags
 

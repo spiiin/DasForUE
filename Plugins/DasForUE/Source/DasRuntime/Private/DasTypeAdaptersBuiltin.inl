@@ -45,8 +45,7 @@ void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
     // bridge; Vector2D crosses calls as a struct snapshot.
     static const FDasMathScriptFacet VectorScript("UEVector", "vector", AllUses, true, true, {"x", "y", "z"},
                                                   AllMembers),
-        Vector2DScript("UEVector2D", "vector2d", EUse::NativeProperty | EUse::SelfProperty, false, false, {"x", "y"},
-                       EDasMemberUse::AuthoredMutation),
+        Vector2DScript("UEVector2D", "vector2d", AllUses, false, false, {"x", "y"}, AllMembers),
         RotatorScript("UERotator", "rotator", AllUses, true, true, {"pitch", "yaw", "roll"}, AllMembers),
         TransformScript("UETransform", "transform", AllUses, true, true),
         InputValueScript("InputActionValue", "input_value", EUse::None, false, true);
@@ -54,5 +53,14 @@ void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
     Registry.Register(MakeDasVector2DAdapter(), &Vector2DScript);
     Registry.Register(MakeDasRotatorAdapter(), &RotatorScript);
     Registry.Register(MakeDasTransformAdapter(), &TransformScript);
+    static const FDasMathScriptFacet QuatScript("UEQuat", "quat", AllUses, false, false, {"x", "y", "z", "w"},
+                                                AllMembers);
+    Registry.Register(MakeDasQuatAdapter(), &QuatScript);
+    static const FDasMathScriptFacet LinearColorScript("UELinearColor", "linear_color", AllUses, false, false,
+                                                       {"r", "g", "b", "a"}, AllMembers);
+    Registry.Register(MakeDasLinearColorAdapter(), &LinearColorScript);
+    static const FDasMathScriptFacet ColorScript("UEColor", "color", AllUses, false, false, {"r", "g", "b", "a"},
+                                                 AllMembers);
+    Registry.Register(MakeDasColorAdapter(), &ColorScript);
     Registry.Register(MakeDasInputActionValueAdapter(), &InputValueScript);
 }

@@ -2,15 +2,17 @@
   "schema_version": 1,
   "package": "ue_api_world",
   "engine_version": "5.8.3-0+UE5",
-  "source_sha256": "499aea217b364343f251b8f7f6befb6d061de7bfb993abc31acba5f0cfa12b33",
+  "source_sha256": "f9a1e210a8d42279328cbeabc81052e1b069469690dca023781d210dcce38f4a",
   "state": "published",
   "preflight": {
-    "build_mode": "Editor NullRHI",
-    "game_world": true,
-    "profile_sha256": "283620cbbd8674adfc3090f20fe329cdf6be82e3381e260e9f2acbae3a95291f",
-    "runtime_probe": "passed",
     "compile": "passed",
-    "packaged": "not_run"
+    "runtime_probe": "not_run",
+    "build_mode": "Editor NullRHI",
+    "game_world": false,
+    "packaged": "not_run",
+    "profile_sha256": "283620cbbd8674adfc3090f20fe329cdf6be82e3381e260e9f2acbae3a95291f",
+    "validation_scope": "complete-builtins: all installed modules compiled; selected native math/color calls executed; full profile probes not rerun",
+    "build_agent_job": "builtins-complete-20261023d"
   },
   "value_types": "canonical_math",
   "default_arguments": "explicit",

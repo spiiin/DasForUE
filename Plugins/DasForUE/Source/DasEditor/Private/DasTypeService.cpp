@@ -1,4 +1,5 @@
 #include "DasTypeService.h"
+#include "DasDiagnostics.h"
 #include "DasTypeAdapters.h"
 #include "DasSoftReferences.h"
 #include "DasTypePins.h"
@@ -115,7 +116,11 @@ FString TypeFieldDefault(const FDasDeclaredProperty& P)
             const auto& V = Value.Get<FVector2D>();
             return FString::Printf(TEXT("(X=%.17g,Y=%.17g)"), V.X, V.Y);
         }
-        return Value.Get<FTransform>().ToString();
+        if (Value.GetScriptStruct() == TBaseStructure<FTransform>::Get())
+            return Value.Get<FTransform>().ToString();
+        // Quat/LinearColor/Color and future adapted structs use native ExportText grammar.
+        // Do not assume an adapted value has Transform layout.
+        return P.Default.String;
     }
     if (P.Type.Kind == TEXT("object"))
         return TEXT("None");
@@ -131,6 +136,8 @@ FString TypeFieldDefault(const FDasDeclaredProperty& P)
 }
 bool FDasTypeService::Apply(const FString& Script, const FString& Folder, TArray<UObject*>& Out, FString& Error)
 {
+    FDasDiagnosticCapture Diagnostics(
+        Error, FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).ScriptPath(Script));
     Out.Reset();
     Error.Reset();
     if (!IsInGameThread() || Script != FPaths::GetCleanFilename(Script) ||

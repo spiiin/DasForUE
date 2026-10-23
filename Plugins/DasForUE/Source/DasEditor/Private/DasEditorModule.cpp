@@ -14,6 +14,8 @@
 #include "Engine/Blueprint.h"
 #include "Misc/PackageName.h"
 #include "DasAutoReimport.h"
+#include "DasDiagnosticEditor.h"
+#include "Logging/MessageLog.h"
 #include "Misc/App.h"
 class FDasEditorModule final : public IModuleInterface
 {
@@ -29,10 +31,13 @@ class FDasEditorModule final : public IModuleInterface
     IConsoleObject* ApplyCommand = nullptr;
     IConsoleObject* ReimportCommand = nullptr;
     FDasAutoReimport AutoReimport;
+    FDelegateHandle DiagnosticHandle;
 
 public:
     virtual void StartupModule() override
     {
+        DiagnosticHandle = DasDiagnosticEvents().AddLambda(
+            [](const FDasDiagnostic& D) { FMessageLog(TEXT("PIE")).AddMessage(DasDiagnosticEditor::Message(D)); });
         // Interactive editor only: commandlets and unattended test runs apply sources explicitly.
         if (GIsEditor && !IsRunningCommandlet() && !FApp::IsUnattended())
             AutoReimport.Start();
@@ -380,6 +385,7 @@ public:
             IConsoleManager::Get().UnregisterConsoleObject(ApplyCommand);
         if (ReimportCommand)
             IConsoleManager::Get().UnregisterConsoleObject(ReimportCommand);
+        DasDiagnosticEvents().Remove(DiagnosticHandle);
         AutoReimport.Stop();
     }
 };

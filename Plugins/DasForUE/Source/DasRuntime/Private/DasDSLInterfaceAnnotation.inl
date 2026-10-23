@@ -4,9 +4,10 @@ const char* DSLInterfaceKey = "_ue_interface_json";
 struct FUEInterfaceAnnotation : das::StructureAnnotation
 {
     FUEInterfaceAnnotation() : StructureAnnotation("ue_interface") {}
-    virtual bool look(const das::StructurePtr& St, das::ModuleGroup&, das::AnnotationArgumentList&,
+    virtual bool look(const das::StructurePtr& St, das::ModuleGroup& Group, das::AnnotationArgumentList&,
                       das::string& Error) override
     {
+        FDSLDiagnosticEntityScope Diagnostics(St, Group);
         try
         {
             DSLDeclarationKind(St->annotations);
@@ -22,6 +23,7 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& St, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticEntityScope Diagnostics(St, Group);
         try
         {
             if (const auto* Wire = Args.find(DSLInterfaceKey, das::Type::tString))
@@ -135,6 +137,7 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                 });
             for (const auto& Field : St->fields)
             {
+                FDSLDiagnosticLocationScope Source(Field.at, DSLText(St->name) + TEXT(".")+ DSLText(Field.name));
                 if (Field.generated || Field.name == "__rtti")
                     continue;
                 if (!Field.classMethod)

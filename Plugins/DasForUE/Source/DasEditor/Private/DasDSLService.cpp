@@ -1,4 +1,5 @@
 #include "DasDSLService.h"
+#include "DasDiagnostics.h"
 #include "DasCharacter.h"
 #include "DasPawn.h"
 #include "GameFramework/Controller.h"
@@ -634,10 +635,14 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         const FString Reason = Error;
         return Restore(Reason);
     }
-    if (DasActorNativeParent(EffectiveDeclaration.NativeParent))
+    if (DasActorNativeParent(EffectiveDeclaration.NativeParent) ||
+        Schema.Parent == TEXT("WorldSubsystem") || Schema.Parent == TEXT("GameInstanceSubsystem"))
     {
         auto* Lifecycle = DasHostString(BP->GeneratedClass->GetDefaultObject(), TEXT("LifecycleScript"));
-        const bool Needed = !EffectiveDeclaration.Callbacks.IsEmpty() || EffectiveDeclaration.AsyncPhysics.IsSet();
+        const bool Needed = Schema.Parent == TEXT("WorldSubsystem") ||
+                                                  Schema.Parent == TEXT("GameInstanceSubsystem") ||
+                                                                        !EffectiveDeclaration.Callbacks.IsEmpty() ||
+                                                                        EffectiveDeclaration.AsyncPhysics.IsSet();
         if (Lifecycle && (Needed || *Lifecycle == Script))
         {
             *Lifecycle = Needed ? Script : FString();
@@ -809,6 +814,8 @@ EFieldMigration ClassifyFieldMigration(UBlueprint* BP, const FString& Source, co
 bool FDasDSLService::Apply(const FString& Script, const FString& Package, const FString& Id, UBlueprint*& Out,
                            FString& Error, EDasDefaultMigrationPolicy DefaultPolicy)
 {
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    FDasDiagnosticCapture Diagnostics(Error, Runtime.ScriptPath(Script), Id);
     return ApplyDeclaration(Script, Package, Id, Out, Error, DefaultPolicy, nullptr);
 }
 namespace

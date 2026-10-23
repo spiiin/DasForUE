@@ -352,7 +352,8 @@ FDasExecutionResult FDasRuntimeModule::RunFile(const FString& Path, int32 Input,
         FActiveContextScope ActiveScope(Context);
         if (!Program->simulate(Context, Output))
         {
-            Result.Error = Errors(Program, Output);
+            Result.Error = Context.getException()                        ? DSLDiagnosticRuntime(Context, Program, TEXT("initialization"))
+                                                                         : Errors(Program, Output);
             return Result;
         }
         auto Function = Context.findFunction("main");
@@ -365,7 +366,7 @@ FDasExecutionResult FDasRuntimeModule::RunFile(const FString& Path, int32 Input,
         const vec4f Value = Context.evalWithCatch(Function, Arguments);
         if (const char* Exception = Context.getException())
         {
-            Result.Error = UTF8_TO_TCHAR(Exception);
+            Result.Error = DSLDiagnosticRuntime(Context, Program, TEXT("main"));
             return Result;
         }
         Result.bUsedAot = Function->aot;

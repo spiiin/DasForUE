@@ -1,4 +1,5 @@
 #include "DasScriptHosts.h"
+#include "DasSubsystems.h"
 #include "DasPawn.h"
 #include "DasCharacter.h"
 #include "DasProbeActor.h"
@@ -13,6 +14,10 @@ bool DasActorNativeParent(const FString& P)
 }
 UClass* DasNativeScriptHost(const FString& P)
 {
+    if (P == TEXT("WorldSubsystem") || P == TEXT("/Script/Engine.WorldSubsystem"))
+        return UDasWorldSubsystem::StaticClass();
+    if (P == TEXT("GameInstanceSubsystem") || P == TEXT("/Script/Engine.GameInstanceSubsystem"))
+        return UDasGameInstanceSubsystem::StaticClass();
     return P ==
            TEXT("Actor") ||
                P ==
@@ -62,7 +67,8 @@ bool DasActorHostClass(const UClass* C)
 FString* DasHostString(UObject* O, FName N)
 {
     if (!O || (!DasActorHostClass(O->GetClass()) && !O->IsA<UDasScriptComponent>() && !O->IsA<UDasSaveGame>() &&
-               !O->IsA<UDasDataAsset>() && !O->IsA<UDasPrimaryDataAsset>()))
+               !O->IsA<UDasDataAsset>() && !O->IsA<UDasPrimaryDataAsset>() && !O->IsA<UDasWorldSubsystem>() &&
+               !O->IsA<UDasGameInstanceSubsystem>()))
         return nullptr;
     auto* P = FindFProperty<FStrProperty>(O->GetClass(), N);
     return P ? P->ContainerPtrToValuePtr<FString>(O) : nullptr;
@@ -80,7 +86,8 @@ FString DasHostLifecycle(const UObject* O)
 TMap<FString, FString>* DasHostContracts(UObject* O)
 {
     if (!O || (!DasActorHostClass(O->GetClass()) && !O->IsA<UDasScriptComponent>() && !O->IsA<UDasSaveGame>() &&
-               !O->IsA<UDasDataAsset>() && !O->IsA<UDasPrimaryDataAsset>()))
+               !O->IsA<UDasDataAsset>() && !O->IsA<UDasPrimaryDataAsset>() && !O->IsA<UDasWorldSubsystem>() &&
+               !O->IsA<UDasGameInstanceSubsystem>()))
         return nullptr;
     auto* P = FindFProperty<FMapProperty>(O->GetClass(), TEXT("DasDefaultSourceContracts"));
     return P ? P->ContainerPtrToValuePtr<TMap<FString, FString>>(O) : nullptr;

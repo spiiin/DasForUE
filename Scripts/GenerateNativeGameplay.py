@@ -141,7 +141,7 @@ def generate(ir,script_dirs=None):
  for value in used:
   if value['kind']=='enum' and value['type_path'] not in enums:raise ValueError('Missing native enum definition')
  header.append('};')
- math={'/Script/CoreUObject.Vector':'UEVector','/Script/CoreUObject.Vector2D':'UEVector2D','/Script/CoreUObject.Rotator':'UERotator','/Script/CoreUObject.Transform':'UETransform','/Script/GameplayTags.GameplayTag':'ue_gameplay_tags::GameplayTag','/Script/GameplayTags.GameplayTagContainer':'ue_gameplay_tags::GameplayTagContainer'}
+ math={'/Script/CoreUObject.Quat':'UEQuat','/Script/CoreUObject.LinearColor':'UELinearColor','/Script/CoreUObject.Color':'UEColor','/Script/CoreUObject.Vector':'UEVector','/Script/CoreUObject.Vector2D':'UEVector2D','/Script/CoreUObject.Rotator':'UERotator','/Script/CoreUObject.Transform':'UETransform','/Script/GameplayTags.GameplayTag':'ue_gameplay_tags::GameplayTag','/Script/GameplayTags.GameplayTagContainer':'ue_gameplay_tags::GameplayTagContainer'}
  structs={};names=set(enum_names)|set(view_names.values())
  for item in ir['structs']:
   path=item['path'];name=path.rsplit('.',1)[-1]

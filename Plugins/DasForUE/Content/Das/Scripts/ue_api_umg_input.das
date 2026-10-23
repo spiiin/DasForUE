@@ -1919,13 +1919,6 @@ struct S_Box2f_1ae76a2c {
     f_bisvalid : bool
 }
 
-struct S_LinearColor_f4abb14b {
-    f_r : float
-    f_g : float
-    f_b : float
-    f_a : float
-}
-
 struct S_Vector4_420fe7b1 {
     f_x : double
     f_y : double
@@ -1985,7 +1978,7 @@ struct S_InputChord_72a2a539 {
 }
 
 struct S_SlateColor_1f7d2c16 {
-    f_specifiedcolor : S_LinearColor_f4abb14b
+    f_specifiedcolor : UELinearColor
     f_coloruserule : E_ESlateColorStylingMode_8d024516
 }
 
@@ -2017,7 +2010,7 @@ struct S_SlateBrush_e5037ad8 {
     f_imagetype : E_ESlateBrushImageType_d8ea0e88
     f_imagesize : S_DeprecateSlateVector2D_5732bbd6
     f_margin : S_Margin_deff9f65
-    f_tint : S_LinearColor_f4abb14b
+    f_tint : UELinearColor
     f_resourceobject : C_Object_55c3753a
     f_outlinesettings : S_SlateBrushOutlineSettings_a873b1e2
     f_uvregion : S_Box2f_1ae76a2c
@@ -2054,7 +2047,7 @@ struct S_FontOutlineSettings_3b2abd50 {
     f_bseparatefillalpha : bool
     f_bapplyoutlinetodropshadows : bool
     f_outlinematerial : C_Object_55c3753a
-    f_outlinecolor : S_LinearColor_f4abb14b
+    f_outlinecolor : UELinearColor
 }
 
 struct S_SlateFontInfo_4461086f {
@@ -2111,15 +2104,12 @@ def ue_button_SetAllowDragDrop(target : C_Button_9a851e84; arg_binallowdragdrop 
     ue_release_call(call)
 }
 
-def ue_button_SetBackgroundColor(target : C_Button_9a851e84; arg_inbackgroundcolor : S_LinearColor_f4abb14b) {
+def ue_button_SetBackgroundColor(target : C_Button_9a851e84; arg_inbackgroundcolor : UELinearColor) {
     let receiver = ue_cast_object(C_Button_9a851e84_raw(target), "/Script/UMG.Button")
     let call = ue_begin_call(receiver, "SetBackgroundColor")
     ue_expect_signature(call, "v1;SetBackgroundColor;InBackgroundColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inbackgroundcolor.r", arg_inbackgroundcolor.f_r)
-    ue_arg_float(call, "inbackgroundcolor.g", arg_inbackgroundcolor.f_g)
-    ue_arg_float(call, "inbackgroundcolor.b", arg_inbackgroundcolor.f_b)
-    ue_arg_float(call, "inbackgroundcolor.a", arg_inbackgroundcolor.f_a)
+    __ue_method_arg_linear_color(call, "inbackgroundcolor", arg_inbackgroundcolor)
     ue_invoke_call(call)
     ue_release_call(call)
 }
@@ -2134,15 +2124,12 @@ def ue_button_SetClickMethod(target : C_Button_9a851e84; arg_inclickmethod : E_E
     ue_release_call(call)
 }
 
-def ue_button_SetColorAndOpacity(target : C_Button_9a851e84; arg_incolorandopacity : S_LinearColor_f4abb14b) {
+def ue_button_SetColorAndOpacity(target : C_Button_9a851e84; arg_incolorandopacity : UELinearColor) {
     let receiver = ue_cast_object(C_Button_9a851e84_raw(target), "/Script/UMG.Button")
     let call = ue_begin_call(receiver, "SetColorAndOpacity")
     ue_expect_signature(call, "v1;SetColorAndOpacity;InColorAndOpacity:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolorandopacity.r", arg_incolorandopacity.f_r)
-    ue_arg_float(call, "incolorandopacity.g", arg_incolorandopacity.f_g)
-    ue_arg_float(call, "incolorandopacity.b", arg_incolorandopacity.f_b)
-    ue_arg_float(call, "incolorandopacity.a", arg_incolorandopacity.f_a)
+    __ue_method_arg_linear_color(call, "incolorandopacity", arg_incolorandopacity)
     ue_invoke_call(call)
     ue_release_call(call)
 }
@@ -2162,10 +2149,7 @@ def ue_button_SetStyle(target : C_Button_9a851e84; arg_instyle : S_ButtonStyle_7
     let call = ue_begin_call(receiver, "SetStyle")
     ue_expect_signature(call, "v1;SetStyle;InStyle:StructProperty:134218114:/Script/SlateCore.ButtonStyle\{Normal:StructProperty:0:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};Hovered:StructProperty:0:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};Pressed:StructProperty:0:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};Disabled:StructProperty:0:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};NormalForeground:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};HoveredForeground:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};PressedForeground:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DisabledForeground:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};NormalPadding:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};PressedPadding:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};PressedSlateSound:StructProperty:0:/Script/SlateCore.SlateSound\{ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;\};ClickedSlateSound:StructProperty:0:/Script/SlateCore.SlateSound\{ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;\};HoveredSlateSound:StructProperty:0:/Script/SlateCore.SlateSound\{ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;\};PressedSound:NameProperty:0;HoveredSound:NameProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "instyle.normal.tintcolor.specifiedcolor.r", arg_instyle.f_normal.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.normal.tintcolor.specifiedcolor.g", arg_instyle.f_normal.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.normal.tintcolor.specifiedcolor.b", arg_instyle.f_normal.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.normal.tintcolor.specifiedcolor.a", arg_instyle.f_normal.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.normal.tintcolor.specifiedcolor", arg_instyle.f_normal.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "instyle.normal.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_normal.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "instyle.normal.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_instyle.f_normal.f_drawas))
     ue_arg_enum(call, "instyle.normal.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_instyle.f_normal.f_tiling))
@@ -2177,19 +2161,13 @@ def ue_button_SetStyle(target : C_Button_9a851e84; arg_instyle : S_ButtonStyle_7
     ue_arg_float(call, "instyle.normal.margin.top", arg_instyle.f_normal.f_margin.f_top)
     ue_arg_float(call, "instyle.normal.margin.right", arg_instyle.f_normal.f_margin.f_right)
     ue_arg_float(call, "instyle.normal.margin.bottom", arg_instyle.f_normal.f_margin.f_bottom)
-    ue_arg_float(call, "instyle.normal.tint.r", arg_instyle.f_normal.f_tint.f_r)
-    ue_arg_float(call, "instyle.normal.tint.g", arg_instyle.f_normal.f_tint.f_g)
-    ue_arg_float(call, "instyle.normal.tint.b", arg_instyle.f_normal.f_tint.f_b)
-    ue_arg_float(call, "instyle.normal.tint.a", arg_instyle.f_normal.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "instyle.normal.tint", arg_instyle.f_normal.f_tint)
     ue_arg_object(call, "instyle.normal.resourceobject", C_Object_55c3753a_raw(arg_instyle.f_normal.f_resourceobject))
     ue_arg_double(call, "instyle.normal.outlinesettings.cornerradii.x", arg_instyle.f_normal.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "instyle.normal.outlinesettings.cornerradii.y", arg_instyle.f_normal.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "instyle.normal.outlinesettings.cornerradii.z", arg_instyle.f_normal.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "instyle.normal.outlinesettings.cornerradii.w", arg_instyle.f_normal.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "instyle.normal.outlinesettings.color.specifiedcolor.r", arg_instyle.f_normal.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.normal.outlinesettings.color.specifiedcolor.g", arg_instyle.f_normal.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.normal.outlinesettings.color.specifiedcolor.b", arg_instyle.f_normal.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.normal.outlinesettings.color.specifiedcolor.a", arg_instyle.f_normal.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.normal.outlinesettings.color.specifiedcolor", arg_instyle.f_normal.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "instyle.normal.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_normal.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "instyle.normal.outlinesettings.width", arg_instyle.f_normal.f_outlinesettings.f_width)
     ue_arg_enum(call, "instyle.normal.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_instyle.f_normal.f_outlinesettings.f_roundingtype))
@@ -2202,10 +2180,7 @@ def ue_button_SetStyle(target : C_Button_9a851e84; arg_instyle : S_ButtonStyle_7
     ue_arg_bool(call, "instyle.normal.bisdynamicallyloaded", arg_instyle.f_normal.f_bisdynamicallyloaded)
     ue_arg_bool(call, "instyle.normal.bhasuobject", arg_instyle.f_normal.f_bhasuobject)
     ue_arg_name(call, "instyle.normal.resourcename", arg_instyle.f_normal.f_resourcename.value)
-    ue_arg_float(call, "instyle.hovered.tintcolor.specifiedcolor.r", arg_instyle.f_hovered.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.hovered.tintcolor.specifiedcolor.g", arg_instyle.f_hovered.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.hovered.tintcolor.specifiedcolor.b", arg_instyle.f_hovered.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.hovered.tintcolor.specifiedcolor.a", arg_instyle.f_hovered.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.hovered.tintcolor.specifiedcolor", arg_instyle.f_hovered.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "instyle.hovered.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_hovered.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "instyle.hovered.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_instyle.f_hovered.f_drawas))
     ue_arg_enum(call, "instyle.hovered.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_instyle.f_hovered.f_tiling))
@@ -2217,19 +2192,13 @@ def ue_button_SetStyle(target : C_Button_9a851e84; arg_instyle : S_ButtonStyle_7
     ue_arg_float(call, "instyle.hovered.margin.top", arg_instyle.f_hovered.f_margin.f_top)
     ue_arg_float(call, "instyle.hovered.margin.right", arg_instyle.f_hovered.f_margin.f_right)
     ue_arg_float(call, "instyle.hovered.margin.bottom", arg_instyle.f_hovered.f_margin.f_bottom)
-    ue_arg_float(call, "instyle.hovered.tint.r", arg_instyle.f_hovered.f_tint.f_r)
-    ue_arg_float(call, "instyle.hovered.tint.g", arg_instyle.f_hovered.f_tint.f_g)
-    ue_arg_float(call, "instyle.hovered.tint.b", arg_instyle.f_hovered.f_tint.f_b)
-    ue_arg_float(call, "instyle.hovered.tint.a", arg_instyle.f_hovered.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "instyle.hovered.tint", arg_instyle.f_hovered.f_tint)
     ue_arg_object(call, "instyle.hovered.resourceobject", C_Object_55c3753a_raw(arg_instyle.f_hovered.f_resourceobject))
     ue_arg_double(call, "instyle.hovered.outlinesettings.cornerradii.x", arg_instyle.f_hovered.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "instyle.hovered.outlinesettings.cornerradii.y", arg_instyle.f_hovered.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "instyle.hovered.outlinesettings.cornerradii.z", arg_instyle.f_hovered.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "instyle.hovered.outlinesettings.cornerradii.w", arg_instyle.f_hovered.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "instyle.hovered.outlinesettings.color.specifiedcolor.r", arg_instyle.f_hovered.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.hovered.outlinesettings.color.specifiedcolor.g", arg_instyle.f_hovered.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.hovered.outlinesettings.color.specifiedcolor.b", arg_instyle.f_hovered.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.hovered.outlinesettings.color.specifiedcolor.a", arg_instyle.f_hovered.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.hovered.outlinesettings.color.specifiedcolor", arg_instyle.f_hovered.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "instyle.hovered.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_hovered.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "instyle.hovered.outlinesettings.width", arg_instyle.f_hovered.f_outlinesettings.f_width)
     ue_arg_enum(call, "instyle.hovered.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_instyle.f_hovered.f_outlinesettings.f_roundingtype))
@@ -2242,10 +2211,7 @@ def ue_button_SetStyle(target : C_Button_9a851e84; arg_instyle : S_ButtonStyle_7
     ue_arg_bool(call, "instyle.hovered.bisdynamicallyloaded", arg_instyle.f_hovered.f_bisdynamicallyloaded)
     ue_arg_bool(call, "instyle.hovered.bhasuobject", arg_instyle.f_hovered.f_bhasuobject)
     ue_arg_name(call, "instyle.hovered.resourcename", arg_instyle.f_hovered.f_resourcename.value)
-    ue_arg_float(call, "instyle.pressed.tintcolor.specifiedcolor.r", arg_instyle.f_pressed.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.pressed.tintcolor.specifiedcolor.g", arg_instyle.f_pressed.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.pressed.tintcolor.specifiedcolor.b", arg_instyle.f_pressed.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.pressed.tintcolor.specifiedcolor.a", arg_instyle.f_pressed.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.pressed.tintcolor.specifiedcolor", arg_instyle.f_pressed.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "instyle.pressed.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_pressed.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "instyle.pressed.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_instyle.f_pressed.f_drawas))
     ue_arg_enum(call, "instyle.pressed.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_instyle.f_pressed.f_tiling))
@@ -2257,19 +2223,13 @@ def ue_button_SetStyle(target : C_Button_9a851e84; arg_instyle : S_ButtonStyle_7
     ue_arg_float(call, "instyle.pressed.margin.top", arg_instyle.f_pressed.f_margin.f_top)
     ue_arg_float(call, "instyle.pressed.margin.right", arg_instyle.f_pressed.f_margin.f_right)
     ue_arg_float(call, "instyle.pressed.margin.bottom", arg_instyle.f_pressed.f_margin.f_bottom)
-    ue_arg_float(call, "instyle.pressed.tint.r", arg_instyle.f_pressed.f_tint.f_r)
-    ue_arg_float(call, "instyle.pressed.tint.g", arg_instyle.f_pressed.f_tint.f_g)
-    ue_arg_float(call, "instyle.pressed.tint.b", arg_instyle.f_pressed.f_tint.f_b)
-    ue_arg_float(call, "instyle.pressed.tint.a", arg_instyle.f_pressed.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "instyle.pressed.tint", arg_instyle.f_pressed.f_tint)
     ue_arg_object(call, "instyle.pressed.resourceobject", C_Object_55c3753a_raw(arg_instyle.f_pressed.f_resourceobject))
     ue_arg_double(call, "instyle.pressed.outlinesettings.cornerradii.x", arg_instyle.f_pressed.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "instyle.pressed.outlinesettings.cornerradii.y", arg_instyle.f_pressed.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "instyle.pressed.outlinesettings.cornerradii.z", arg_instyle.f_pressed.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "instyle.pressed.outlinesettings.cornerradii.w", arg_instyle.f_pressed.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "instyle.pressed.outlinesettings.color.specifiedcolor.r", arg_instyle.f_pressed.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.pressed.outlinesettings.color.specifiedcolor.g", arg_instyle.f_pressed.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.pressed.outlinesettings.color.specifiedcolor.b", arg_instyle.f_pressed.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.pressed.outlinesettings.color.specifiedcolor.a", arg_instyle.f_pressed.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.pressed.outlinesettings.color.specifiedcolor", arg_instyle.f_pressed.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "instyle.pressed.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_pressed.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "instyle.pressed.outlinesettings.width", arg_instyle.f_pressed.f_outlinesettings.f_width)
     ue_arg_enum(call, "instyle.pressed.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_instyle.f_pressed.f_outlinesettings.f_roundingtype))
@@ -2282,10 +2242,7 @@ def ue_button_SetStyle(target : C_Button_9a851e84; arg_instyle : S_ButtonStyle_7
     ue_arg_bool(call, "instyle.pressed.bisdynamicallyloaded", arg_instyle.f_pressed.f_bisdynamicallyloaded)
     ue_arg_bool(call, "instyle.pressed.bhasuobject", arg_instyle.f_pressed.f_bhasuobject)
     ue_arg_name(call, "instyle.pressed.resourcename", arg_instyle.f_pressed.f_resourcename.value)
-    ue_arg_float(call, "instyle.disabled.tintcolor.specifiedcolor.r", arg_instyle.f_disabled.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.disabled.tintcolor.specifiedcolor.g", arg_instyle.f_disabled.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.disabled.tintcolor.specifiedcolor.b", arg_instyle.f_disabled.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.disabled.tintcolor.specifiedcolor.a", arg_instyle.f_disabled.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.disabled.tintcolor.specifiedcolor", arg_instyle.f_disabled.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "instyle.disabled.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_disabled.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "instyle.disabled.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_instyle.f_disabled.f_drawas))
     ue_arg_enum(call, "instyle.disabled.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_instyle.f_disabled.f_tiling))
@@ -2297,19 +2254,13 @@ def ue_button_SetStyle(target : C_Button_9a851e84; arg_instyle : S_ButtonStyle_7
     ue_arg_float(call, "instyle.disabled.margin.top", arg_instyle.f_disabled.f_margin.f_top)
     ue_arg_float(call, "instyle.disabled.margin.right", arg_instyle.f_disabled.f_margin.f_right)
     ue_arg_float(call, "instyle.disabled.margin.bottom", arg_instyle.f_disabled.f_margin.f_bottom)
-    ue_arg_float(call, "instyle.disabled.tint.r", arg_instyle.f_disabled.f_tint.f_r)
-    ue_arg_float(call, "instyle.disabled.tint.g", arg_instyle.f_disabled.f_tint.f_g)
-    ue_arg_float(call, "instyle.disabled.tint.b", arg_instyle.f_disabled.f_tint.f_b)
-    ue_arg_float(call, "instyle.disabled.tint.a", arg_instyle.f_disabled.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "instyle.disabled.tint", arg_instyle.f_disabled.f_tint)
     ue_arg_object(call, "instyle.disabled.resourceobject", C_Object_55c3753a_raw(arg_instyle.f_disabled.f_resourceobject))
     ue_arg_double(call, "instyle.disabled.outlinesettings.cornerradii.x", arg_instyle.f_disabled.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "instyle.disabled.outlinesettings.cornerradii.y", arg_instyle.f_disabled.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "instyle.disabled.outlinesettings.cornerradii.z", arg_instyle.f_disabled.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "instyle.disabled.outlinesettings.cornerradii.w", arg_instyle.f_disabled.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "instyle.disabled.outlinesettings.color.specifiedcolor.r", arg_instyle.f_disabled.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.disabled.outlinesettings.color.specifiedcolor.g", arg_instyle.f_disabled.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.disabled.outlinesettings.color.specifiedcolor.b", arg_instyle.f_disabled.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.disabled.outlinesettings.color.specifiedcolor.a", arg_instyle.f_disabled.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.disabled.outlinesettings.color.specifiedcolor", arg_instyle.f_disabled.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "instyle.disabled.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_disabled.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "instyle.disabled.outlinesettings.width", arg_instyle.f_disabled.f_outlinesettings.f_width)
     ue_arg_enum(call, "instyle.disabled.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_instyle.f_disabled.f_outlinesettings.f_roundingtype))
@@ -2322,25 +2273,13 @@ def ue_button_SetStyle(target : C_Button_9a851e84; arg_instyle : S_ButtonStyle_7
     ue_arg_bool(call, "instyle.disabled.bisdynamicallyloaded", arg_instyle.f_disabled.f_bisdynamicallyloaded)
     ue_arg_bool(call, "instyle.disabled.bhasuobject", arg_instyle.f_disabled.f_bhasuobject)
     ue_arg_name(call, "instyle.disabled.resourcename", arg_instyle.f_disabled.f_resourcename.value)
-    ue_arg_float(call, "instyle.normalforeground.specifiedcolor.r", arg_instyle.f_normalforeground.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.normalforeground.specifiedcolor.g", arg_instyle.f_normalforeground.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.normalforeground.specifiedcolor.b", arg_instyle.f_normalforeground.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.normalforeground.specifiedcolor.a", arg_instyle.f_normalforeground.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.normalforeground.specifiedcolor", arg_instyle.f_normalforeground.f_specifiedcolor)
     ue_arg_enum(call, "instyle.normalforeground.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_normalforeground.f_coloruserule))
-    ue_arg_float(call, "instyle.hoveredforeground.specifiedcolor.r", arg_instyle.f_hoveredforeground.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.hoveredforeground.specifiedcolor.g", arg_instyle.f_hoveredforeground.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.hoveredforeground.specifiedcolor.b", arg_instyle.f_hoveredforeground.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.hoveredforeground.specifiedcolor.a", arg_instyle.f_hoveredforeground.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.hoveredforeground.specifiedcolor", arg_instyle.f_hoveredforeground.f_specifiedcolor)
     ue_arg_enum(call, "instyle.hoveredforeground.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_hoveredforeground.f_coloruserule))
-    ue_arg_float(call, "instyle.pressedforeground.specifiedcolor.r", arg_instyle.f_pressedforeground.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.pressedforeground.specifiedcolor.g", arg_instyle.f_pressedforeground.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.pressedforeground.specifiedcolor.b", arg_instyle.f_pressedforeground.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.pressedforeground.specifiedcolor.a", arg_instyle.f_pressedforeground.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.pressedforeground.specifiedcolor", arg_instyle.f_pressedforeground.f_specifiedcolor)
     ue_arg_enum(call, "instyle.pressedforeground.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_pressedforeground.f_coloruserule))
-    ue_arg_float(call, "instyle.disabledforeground.specifiedcolor.r", arg_instyle.f_disabledforeground.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instyle.disabledforeground.specifiedcolor.g", arg_instyle.f_disabledforeground.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instyle.disabledforeground.specifiedcolor.b", arg_instyle.f_disabledforeground.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instyle.disabledforeground.specifiedcolor.a", arg_instyle.f_disabledforeground.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instyle.disabledforeground.specifiedcolor", arg_instyle.f_disabledforeground.f_specifiedcolor)
     ue_arg_enum(call, "instyle.disabledforeground.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instyle.f_disabledforeground.f_coloruserule))
     ue_arg_float(call, "instyle.normalpadding.left", arg_instyle.f_normalpadding.f_left)
     ue_arg_float(call, "instyle.normalpadding.top", arg_instyle.f_normalpadding.f_top)
@@ -2634,15 +2573,12 @@ def ue_editable_text_SetError(target : C_EditableTextBox_73a5803b; arg_inerror :
     ue_release_call(call)
 }
 
-def ue_editable_text_SetForegroundColor(target : C_EditableTextBox_73a5803b; arg_color : S_LinearColor_f4abb14b) {
+def ue_editable_text_SetForegroundColor(target : C_EditableTextBox_73a5803b; arg_color : UELinearColor) {
     let receiver = ue_cast_object(C_EditableTextBox_73a5803b_raw(target), "/Script/UMG.EditableTextBox")
     let call = ue_begin_call(receiver, "SetForegroundColor")
     ue_expect_signature(call, "v1;SetForegroundColor;color:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "color.r", arg_color.f_r)
-    ue_arg_float(call, "color.g", arg_color.f_g)
-    ue_arg_float(call, "color.b", arg_color.f_b)
-    ue_arg_float(call, "color.a", arg_color.f_a)
+    __ue_method_arg_linear_color(call, "color", arg_color)
     ue_invoke_call(call)
     ue_release_call(call)
 }
@@ -2877,10 +2813,7 @@ def ue_image_SetBrush(target : C_Image_61e460fb; arg_inbrush : S_SlateBrush_e503
     let call = ue_begin_call(receiver, "SetBrush")
     ue_expect_signature(call, "v1;SetBrush;InBrush:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inbrush.tintcolor.specifiedcolor.r", arg_inbrush.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "inbrush.tintcolor.specifiedcolor.g", arg_inbrush.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "inbrush.tintcolor.specifiedcolor.b", arg_inbrush.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "inbrush.tintcolor.specifiedcolor.a", arg_inbrush.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "inbrush.tintcolor.specifiedcolor", arg_inbrush.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "inbrush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_inbrush.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "inbrush.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_inbrush.f_drawas))
     ue_arg_enum(call, "inbrush.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_inbrush.f_tiling))
@@ -2892,19 +2825,13 @@ def ue_image_SetBrush(target : C_Image_61e460fb; arg_inbrush : S_SlateBrush_e503
     ue_arg_float(call, "inbrush.margin.top", arg_inbrush.f_margin.f_top)
     ue_arg_float(call, "inbrush.margin.right", arg_inbrush.f_margin.f_right)
     ue_arg_float(call, "inbrush.margin.bottom", arg_inbrush.f_margin.f_bottom)
-    ue_arg_float(call, "inbrush.tint.r", arg_inbrush.f_tint.f_r)
-    ue_arg_float(call, "inbrush.tint.g", arg_inbrush.f_tint.f_g)
-    ue_arg_float(call, "inbrush.tint.b", arg_inbrush.f_tint.f_b)
-    ue_arg_float(call, "inbrush.tint.a", arg_inbrush.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "inbrush.tint", arg_inbrush.f_tint)
     ue_arg_object(call, "inbrush.resourceobject", C_Object_55c3753a_raw(arg_inbrush.f_resourceobject))
     ue_arg_double(call, "inbrush.outlinesettings.cornerradii.x", arg_inbrush.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "inbrush.outlinesettings.cornerradii.y", arg_inbrush.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "inbrush.outlinesettings.cornerradii.z", arg_inbrush.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "inbrush.outlinesettings.cornerradii.w", arg_inbrush.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "inbrush.outlinesettings.color.specifiedcolor.r", arg_inbrush.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "inbrush.outlinesettings.color.specifiedcolor.g", arg_inbrush.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "inbrush.outlinesettings.color.specifiedcolor.b", arg_inbrush.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "inbrush.outlinesettings.color.specifiedcolor.a", arg_inbrush.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "inbrush.outlinesettings.color.specifiedcolor", arg_inbrush.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "inbrush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_inbrush.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "inbrush.outlinesettings.width", arg_inbrush.f_outlinesettings.f_width)
     ue_arg_enum(call, "inbrush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_inbrush.f_outlinesettings.f_roundingtype))
@@ -3010,24 +2937,18 @@ def ue_image_SetBrushTintColor(target : C_Image_61e460fb; arg_tintcolor : S_Slat
     let call = ue_begin_call(receiver, "SetBrushTintColor")
     ue_expect_signature(call, "v1;SetBrushTintColor;TintColor:StructProperty:128:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "tintcolor.specifiedcolor.r", arg_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "tintcolor.specifiedcolor.g", arg_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "tintcolor.specifiedcolor.b", arg_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "tintcolor.specifiedcolor.a", arg_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "tintcolor.specifiedcolor", arg_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_tintcolor.f_coloruserule))
     ue_invoke_call(call)
     ue_release_call(call)
 }
 
-def ue_image_SetColorAndOpacity(target : C_Image_61e460fb; arg_incolorandopacity : S_LinearColor_f4abb14b) {
+def ue_image_SetColorAndOpacity(target : C_Image_61e460fb; arg_incolorandopacity : UELinearColor) {
     let receiver = ue_cast_object(C_Image_61e460fb_raw(target), "/Script/UMG.Image")
     let call = ue_begin_call(receiver, "SetColorAndOpacity")
     ue_expect_signature(call, "v1;SetColorAndOpacity;InColorAndOpacity:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolorandopacity.r", arg_incolorandopacity.f_r)
-    ue_arg_float(call, "incolorandopacity.g", arg_incolorandopacity.f_g)
-    ue_arg_float(call, "incolorandopacity.b", arg_incolorandopacity.f_b)
-    ue_arg_float(call, "incolorandopacity.a", arg_incolorandopacity.f_a)
+    __ue_method_arg_linear_color(call, "incolorandopacity", arg_incolorandopacity)
     ue_invoke_call(call)
     ue_release_call(call)
 }
@@ -4122,15 +4043,12 @@ def ue_panel_RemoveChildAt(target : C_PanelWidget_7bd308a3; arg_index : int) : b
     return result
 }
 
-def ue_progress_SetFillColorAndOpacity(target : C_ProgressBar_a13d2d73; arg_incolor : S_LinearColor_f4abb14b) {
+def ue_progress_SetFillColorAndOpacity(target : C_ProgressBar_a13d2d73; arg_incolor : UELinearColor) {
     let receiver = ue_cast_object(C_ProgressBar_a13d2d73_raw(target), "/Script/UMG.ProgressBar")
     let call = ue_begin_call(receiver, "SetFillColorAndOpacity")
     ue_expect_signature(call, "v1;SetFillColorAndOpacity;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
     ue_release_call(call)
 }
@@ -4530,28 +4448,22 @@ def ue_slider_SetMinValue(target : C_Slider_258a71e6; arg_invalue : float) {
     ue_release_call(call)
 }
 
-def ue_slider_SetSliderBarColor(target : C_Slider_258a71e6; arg_invalue : S_LinearColor_f4abb14b) {
+def ue_slider_SetSliderBarColor(target : C_Slider_258a71e6; arg_invalue : UELinearColor) {
     let receiver = ue_cast_object(C_Slider_258a71e6_raw(target), "/Script/UMG.Slider")
     let call = ue_begin_call(receiver, "SetSliderBarColor")
     ue_expect_signature(call, "v1;SetSliderBarColor;InValue:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "invalue.r", arg_invalue.f_r)
-    ue_arg_float(call, "invalue.g", arg_invalue.f_g)
-    ue_arg_float(call, "invalue.b", arg_invalue.f_b)
-    ue_arg_float(call, "invalue.a", arg_invalue.f_a)
+    __ue_method_arg_linear_color(call, "invalue", arg_invalue)
     ue_invoke_call(call)
     ue_release_call(call)
 }
 
-def ue_slider_SetSliderHandleColor(target : C_Slider_258a71e6; arg_invalue : S_LinearColor_f4abb14b) {
+def ue_slider_SetSliderHandleColor(target : C_Slider_258a71e6; arg_invalue : UELinearColor) {
     let receiver = ue_cast_object(C_Slider_258a71e6_raw(target), "/Script/UMG.Slider")
     let call = ue_begin_call(receiver, "SetSliderHandleColor")
     ue_expect_signature(call, "v1;SetSliderHandleColor;InValue:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "invalue.r", arg_invalue.f_r)
-    ue_arg_float(call, "invalue.g", arg_invalue.f_g)
-    ue_arg_float(call, "invalue.b", arg_invalue.f_b)
-    ue_arg_float(call, "invalue.a", arg_invalue.f_a)
+    __ue_method_arg_linear_color(call, "invalue", arg_invalue)
     ue_invoke_call(call)
     ue_release_call(call)
 }
@@ -4635,10 +4547,7 @@ def ue_text_block_SetColorAndOpacity(target : C_TextBlock_d2a443cc; arg_incolora
     let call = ue_begin_call(receiver, "SetColorAndOpacity")
     ue_expect_signature(call, "v1;SetColorAndOpacity;InColorAndOpacity:StructProperty:128:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolorandopacity.specifiedcolor.r", arg_incolorandopacity.f_specifiedcolor.f_r)
-    ue_arg_float(call, "incolorandopacity.specifiedcolor.g", arg_incolorandopacity.f_specifiedcolor.f_g)
-    ue_arg_float(call, "incolorandopacity.specifiedcolor.b", arg_incolorandopacity.f_specifiedcolor.f_b)
-    ue_arg_float(call, "incolorandopacity.specifiedcolor.a", arg_incolorandopacity.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "incolorandopacity.specifiedcolor", arg_incolorandopacity.f_specifiedcolor)
     ue_arg_enum(call, "incolorandopacity.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_incolorandopacity.f_coloruserule))
     ue_invoke_call(call)
     ue_release_call(call)
@@ -4656,10 +4565,7 @@ def ue_text_block_SetFont(target : C_TextBlock_d2a443cc; arg_infontinfo : S_Slat
     ue_arg_bool(call, "infontinfo.outlinesettings.bseparatefillalpha", arg_infontinfo.f_outlinesettings.f_bseparatefillalpha)
     ue_arg_bool(call, "infontinfo.outlinesettings.bapplyoutlinetodropshadows", arg_infontinfo.f_outlinesettings.f_bapplyoutlinetodropshadows)
     ue_arg_object(call, "infontinfo.outlinesettings.outlinematerial", C_Object_55c3753a_raw(arg_infontinfo.f_outlinesettings.f_outlinematerial))
-    ue_arg_float(call, "infontinfo.outlinesettings.outlinecolor.r", arg_infontinfo.f_outlinesettings.f_outlinecolor.f_r)
-    ue_arg_float(call, "infontinfo.outlinesettings.outlinecolor.g", arg_infontinfo.f_outlinesettings.f_outlinecolor.f_g)
-    ue_arg_float(call, "infontinfo.outlinesettings.outlinecolor.b", arg_infontinfo.f_outlinesettings.f_outlinecolor.f_b)
-    ue_arg_float(call, "infontinfo.outlinesettings.outlinecolor.a", arg_infontinfo.f_outlinesettings.f_outlinecolor.f_a)
+    __ue_method_arg_linear_color(call, "infontinfo.outlinesettings.outlinecolor", arg_infontinfo.f_outlinesettings.f_outlinecolor)
     ue_arg_name(call, "infontinfo.typefacefontname", arg_infontinfo.f_typefacefontname.value)
     ue_arg_float(call, "infontinfo.size", arg_infontinfo.f_size)
     ue_arg_int(call, "infontinfo.letterspacing", arg_infontinfo.f_letterspacing)
@@ -4723,15 +4629,12 @@ def ue_text_block_SetOpacity(target : C_TextBlock_d2a443cc; arg_inopacity : floa
     ue_release_call(call)
 }
 
-def ue_text_block_SetShadowColorAndOpacity(target : C_TextBlock_d2a443cc; arg_inshadowcolorandopacity : S_LinearColor_f4abb14b) {
+def ue_text_block_SetShadowColorAndOpacity(target : C_TextBlock_d2a443cc; arg_inshadowcolorandopacity : UELinearColor) {
     let receiver = ue_cast_object(C_TextBlock_d2a443cc_raw(target), "/Script/UMG.TextBlock")
     let call = ue_begin_call(receiver, "SetShadowColorAndOpacity")
     ue_expect_signature(call, "v1;SetShadowColorAndOpacity;InShadowColorAndOpacity:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inshadowcolorandopacity.r", arg_inshadowcolorandopacity.f_r)
-    ue_arg_float(call, "inshadowcolorandopacity.g", arg_inshadowcolorandopacity.f_g)
-    ue_arg_float(call, "inshadowcolorandopacity.b", arg_inshadowcolorandopacity.f_b)
-    ue_arg_float(call, "inshadowcolorandopacity.a", arg_inshadowcolorandopacity.f_a)
+    __ue_method_arg_linear_color(call, "inshadowcolorandopacity", arg_inshadowcolorandopacity)
     ue_invoke_call(call)
     ue_release_call(call)
 }
@@ -4751,10 +4654,7 @@ def ue_text_block_SetStrikeBrush(target : C_TextBlock_d2a443cc; arg_instrikebrus
     let call = ue_begin_call(receiver, "SetStrikeBrush")
     ue_expect_signature(call, "v1;SetStrikeBrush;InStrikeBrush:StructProperty:128:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "instrikebrush.tintcolor.specifiedcolor.r", arg_instrikebrush.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instrikebrush.tintcolor.specifiedcolor.g", arg_instrikebrush.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instrikebrush.tintcolor.specifiedcolor.b", arg_instrikebrush.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instrikebrush.tintcolor.specifiedcolor.a", arg_instrikebrush.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instrikebrush.tintcolor.specifiedcolor", arg_instrikebrush.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "instrikebrush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instrikebrush.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "instrikebrush.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_instrikebrush.f_drawas))
     ue_arg_enum(call, "instrikebrush.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_instrikebrush.f_tiling))
@@ -4766,19 +4666,13 @@ def ue_text_block_SetStrikeBrush(target : C_TextBlock_d2a443cc; arg_instrikebrus
     ue_arg_float(call, "instrikebrush.margin.top", arg_instrikebrush.f_margin.f_top)
     ue_arg_float(call, "instrikebrush.margin.right", arg_instrikebrush.f_margin.f_right)
     ue_arg_float(call, "instrikebrush.margin.bottom", arg_instrikebrush.f_margin.f_bottom)
-    ue_arg_float(call, "instrikebrush.tint.r", arg_instrikebrush.f_tint.f_r)
-    ue_arg_float(call, "instrikebrush.tint.g", arg_instrikebrush.f_tint.f_g)
-    ue_arg_float(call, "instrikebrush.tint.b", arg_instrikebrush.f_tint.f_b)
-    ue_arg_float(call, "instrikebrush.tint.a", arg_instrikebrush.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "instrikebrush.tint", arg_instrikebrush.f_tint)
     ue_arg_object(call, "instrikebrush.resourceobject", C_Object_55c3753a_raw(arg_instrikebrush.f_resourceobject))
     ue_arg_double(call, "instrikebrush.outlinesettings.cornerradii.x", arg_instrikebrush.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "instrikebrush.outlinesettings.cornerradii.y", arg_instrikebrush.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "instrikebrush.outlinesettings.cornerradii.z", arg_instrikebrush.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "instrikebrush.outlinesettings.cornerradii.w", arg_instrikebrush.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "instrikebrush.outlinesettings.color.specifiedcolor.r", arg_instrikebrush.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "instrikebrush.outlinesettings.color.specifiedcolor.g", arg_instrikebrush.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "instrikebrush.outlinesettings.color.specifiedcolor.b", arg_instrikebrush.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "instrikebrush.outlinesettings.color.specifiedcolor.a", arg_instrikebrush.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "instrikebrush.outlinesettings.color.specifiedcolor", arg_instrikebrush.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "instrikebrush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_instrikebrush.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "instrikebrush.outlinesettings.width", arg_instrikebrush.f_outlinesettings.f_width)
     ue_arg_enum(call, "instrikebrush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_instrikebrush.f_outlinesettings.f_roundingtype))
@@ -4913,7 +4807,7 @@ def ue_ui_DismissAllMenus() {
 }
 
 [ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DrawBox", signature="v1;DrawBox;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Position:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Size:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Brush:ObjectProperty:128:/Script/Engine.SlateBrushAsset;Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_ui_DrawBox(arg_context : UEPaintContext; arg_position : UEVector2D; arg_size : UEVector2D; arg_brush : C_SlateBrushAsset_c9451dbb; arg_tint : S_LinearColor_f4abb14b) : UEPaintContext {
+def ue_ui_DrawBox(arg_context : UEPaintContext; arg_position : UEVector2D; arg_size : UEVector2D; arg_brush : C_SlateBrushAsset_c9451dbb; arg_tint : UELinearColor) : UEPaintContext {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawBox", "")
     ue_expect_signature(call, "v1;DrawBox;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Position:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Size:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Brush:ObjectProperty:128:/Script/Engine.SlateBrushAsset;Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
@@ -4921,10 +4815,7 @@ def ue_ui_DrawBox(arg_context : UEPaintContext; arg_position : UEVector2D; arg_s
     __ue_method_arg_vector2d(call, "position", arg_position)
     __ue_method_arg_vector2d(call, "size", arg_size)
     ue_arg_object(call, "brush", C_SlateBrushAsset_c9451dbb_raw(arg_brush))
-    ue_arg_float(call, "tint.r", arg_tint.f_r)
-    ue_arg_float(call, "tint.g", arg_tint.f_g)
-    ue_arg_float(call, "tint.b", arg_tint.f_b)
-    ue_arg_float(call, "tint.a", arg_tint.f_a)
+    __ue_method_arg_linear_color(call, "tint", arg_tint)
     ue_invoke_call(call)
     let result = __ue_result_paint_context(call, "context")
     ue_release_call(call)
@@ -4932,17 +4823,14 @@ def ue_ui_DrawBox(arg_context : UEPaintContext; arg_position : UEVector2D; arg_s
 }
 
 [ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DrawLine", signature="v1;DrawLine;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};PositionA:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};PositionB:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bAntiAlias:BoolProperty:128;Thickness:FloatProperty:128;")]
-def ue_ui_DrawLine(arg_context : UEPaintContext; arg_positiona : UEVector2D; arg_positionb : UEVector2D; arg_tint : S_LinearColor_f4abb14b; arg_bantialias : bool; arg_thickness : float) : UEPaintContext {
+def ue_ui_DrawLine(arg_context : UEPaintContext; arg_positiona : UEVector2D; arg_positionb : UEVector2D; arg_tint : UELinearColor; arg_bantialias : bool; arg_thickness : float) : UEPaintContext {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawLine", "")
     ue_expect_signature(call, "v1;DrawLine;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};PositionA:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};PositionB:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bAntiAlias:BoolProperty:128;Thickness:FloatProperty:128;")
     ue_require_call_context(call, false)
     __ue_arg_paint_context(call, "context", arg_context)
     __ue_method_arg_vector2d(call, "positiona", arg_positiona)
     __ue_method_arg_vector2d(call, "positionb", arg_positionb)
-    ue_arg_float(call, "tint.r", arg_tint.f_r)
-    ue_arg_float(call, "tint.g", arg_tint.f_g)
-    ue_arg_float(call, "tint.b", arg_tint.f_b)
-    ue_arg_float(call, "tint.a", arg_tint.f_a)
+    __ue_method_arg_linear_color(call, "tint", arg_tint)
     ue_arg_bool(call, "bantialias", arg_bantialias)
     ue_arg_float(call, "thickness", arg_thickness)
     ue_invoke_call(call)
@@ -4952,7 +4840,7 @@ def ue_ui_DrawLine(arg_context : UEPaintContext; arg_positiona : UEVector2D; arg
 }
 
 [ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DrawLines", signature="v1;DrawLines;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Points:ArrayProperty:134218114[Points:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};];Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bAntiAlias:BoolProperty:128;Thickness:FloatProperty:128;")]
-def ue_ui_DrawLines(arg_context : UEPaintContext; arg_points : array<UEVector2D>; arg_tint : S_LinearColor_f4abb14b; arg_bantialias : bool; arg_thickness : float) : UEPaintContext {
+def ue_ui_DrawLines(arg_context : UEPaintContext; arg_points : array<UEVector2D>; arg_tint : UELinearColor; arg_bantialias : bool; arg_thickness : float) : UEPaintContext {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawLines", "")
     ue_expect_signature(call, "v1;DrawLines;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Points:ArrayProperty:134218114[Points:StructProperty:0:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};];Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bAntiAlias:BoolProperty:128;Thickness:FloatProperty:128;")
     ue_require_call_context(call, false)
@@ -4961,10 +4849,7 @@ def ue_ui_DrawLines(arg_context : UEPaintContext; arg_points : array<UEVector2D>
     for (index in range(length(arg_points))) {
         __ue_method_arg_vector2d(call, "points.{index}", arg_points[index])
     }
-    ue_arg_float(call, "tint.r", arg_tint.f_r)
-    ue_arg_float(call, "tint.g", arg_tint.f_g)
-    ue_arg_float(call, "tint.b", arg_tint.f_b)
-    ue_arg_float(call, "tint.a", arg_tint.f_a)
+    __ue_method_arg_linear_color(call, "tint", arg_tint)
     ue_arg_bool(call, "bantialias", arg_bantialias)
     ue_arg_float(call, "thickness", arg_thickness)
     ue_invoke_call(call)
@@ -4974,7 +4859,7 @@ def ue_ui_DrawLines(arg_context : UEPaintContext; arg_points : array<UEVector2D>
 }
 
 [ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DrawSpline", signature="v1;DrawSpline;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Start:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};StartDir:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};End:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};EndDir:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Thickness:FloatProperty:128;")]
-def ue_ui_DrawSpline(arg_context : UEPaintContext; arg_start : UEVector2D; arg_startdir : UEVector2D; arg_end : UEVector2D; arg_enddir : UEVector2D; arg_tint : S_LinearColor_f4abb14b; arg_thickness : float) : UEPaintContext {
+def ue_ui_DrawSpline(arg_context : UEPaintContext; arg_start : UEVector2D; arg_startdir : UEVector2D; arg_end : UEVector2D; arg_enddir : UEVector2D; arg_tint : UELinearColor; arg_thickness : float) : UEPaintContext {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawSpline", "")
     ue_expect_signature(call, "v1;DrawSpline;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Start:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};StartDir:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};End:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};EndDir:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Thickness:FloatProperty:128;")
     ue_require_call_context(call, false)
@@ -4983,10 +4868,7 @@ def ue_ui_DrawSpline(arg_context : UEPaintContext; arg_start : UEVector2D; arg_s
     __ue_method_arg_vector2d(call, "startdir", arg_startdir)
     __ue_method_arg_vector2d(call, "end", arg_end)
     __ue_method_arg_vector2d(call, "enddir", arg_enddir)
-    ue_arg_float(call, "tint.r", arg_tint.f_r)
-    ue_arg_float(call, "tint.g", arg_tint.f_g)
-    ue_arg_float(call, "tint.b", arg_tint.f_b)
-    ue_arg_float(call, "tint.a", arg_tint.f_a)
+    __ue_method_arg_linear_color(call, "tint", arg_tint)
     ue_arg_float(call, "thickness", arg_thickness)
     ue_invoke_call(call)
     let result = __ue_result_paint_context(call, "context")
@@ -4995,7 +4877,7 @@ def ue_ui_DrawSpline(arg_context : UEPaintContext; arg_start : UEVector2D; arg_s
 }
 
 [ue_reflected_call(owner="/Script/UMG.WidgetBlueprintLibrary", method="DrawTextFormatted", signature="v1;DrawTextFormatted;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Text:TextProperty:134218114;Position:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Font:ObjectProperty:128:/Script/Engine.Font;FontSize:FloatProperty:128;FontTypeFace:NameProperty:128;Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_ui_DrawTextFormatted(arg_context : UEPaintContext; arg_text : UETextValue; arg_position : UEVector2D; arg_font : C_Font_684a8ec8; arg_fontsize : float; arg_fonttypeface : UEName; arg_tint : S_LinearColor_f4abb14b) : UEPaintContext {
+def ue_ui_DrawTextFormatted(arg_context : UEPaintContext; arg_text : UETextValue; arg_position : UEVector2D; arg_font : C_Font_684a8ec8; arg_fontsize : float; arg_fonttypeface : UEName; arg_tint : UELinearColor) : UEPaintContext {
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "DrawTextFormatted", "")
     ue_expect_signature(call, "v1;DrawTextFormatted;Context:StructProperty:134218112:/Script/UMG.PaintContext\{\};Text:TextProperty:134218114;Position:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};Font:ObjectProperty:128:/Script/Engine.Font;FontSize:FloatProperty:128;FontTypeFace:NameProperty:128;Tint:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
@@ -5005,10 +4887,7 @@ def ue_ui_DrawTextFormatted(arg_context : UEPaintContext; arg_text : UETextValue
     ue_arg_object(call, "font", C_Font_684a8ec8_raw(arg_font))
     ue_arg_float(call, "fontsize", arg_fontsize)
     ue_arg_name(call, "fonttypeface", arg_fonttypeface.value)
-    ue_arg_float(call, "tint.r", arg_tint.f_r)
-    ue_arg_float(call, "tint.g", arg_tint.f_g)
-    ue_arg_float(call, "tint.b", arg_tint.f_b)
-    ue_arg_float(call, "tint.a", arg_tint.f_a)
+    __ue_method_arg_linear_color(call, "tint", arg_tint)
     ue_invoke_call(call)
     let result = __ue_result_paint_context(call, "context")
     ue_release_call(call)
@@ -5071,10 +4950,7 @@ def ue_ui_GetBrushResource(arg_brush : S_SlateBrush_e5037ad8) : C_Object_55c3753
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetBrushResource", "")
     ue_expect_signature(call, "v1;GetBrushResource;Brush:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/CoreUObject.Object;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.r", arg_brush.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.g", arg_brush.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.b", arg_brush.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.a", arg_brush.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.tintcolor.specifiedcolor", arg_brush.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_brush.f_drawas))
     ue_arg_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_brush.f_tiling))
@@ -5086,19 +4962,13 @@ def ue_ui_GetBrushResource(arg_brush : S_SlateBrush_e5037ad8) : C_Object_55c3753
     ue_arg_float(call, "brush.margin.top", arg_brush.f_margin.f_top)
     ue_arg_float(call, "brush.margin.right", arg_brush.f_margin.f_right)
     ue_arg_float(call, "brush.margin.bottom", arg_brush.f_margin.f_bottom)
-    ue_arg_float(call, "brush.tint.r", arg_brush.f_tint.f_r)
-    ue_arg_float(call, "brush.tint.g", arg_brush.f_tint.f_g)
-    ue_arg_float(call, "brush.tint.b", arg_brush.f_tint.f_b)
-    ue_arg_float(call, "brush.tint.a", arg_brush.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "brush.tint", arg_brush.f_tint)
     ue_arg_object(call, "brush.resourceobject", C_Object_55c3753a_raw(arg_brush.f_resourceobject))
     ue_arg_double(call, "brush.outlinesettings.cornerradii.x", arg_brush.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.y", arg_brush.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.z", arg_brush.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.w", arg_brush.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.r", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.g", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.b", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.a", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.outlinesettings.color.specifiedcolor", arg_brush.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "brush.outlinesettings.width", arg_brush.f_outlinesettings.f_width)
     ue_arg_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_brush.f_outlinesettings.f_roundingtype))
@@ -5122,10 +4992,7 @@ def ue_ui_GetBrushResourceAsMaterial(arg_brush : S_SlateBrush_e5037ad8) : C_Mate
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetBrushResourceAsMaterial", "")
     ue_expect_signature(call, "v1;GetBrushResourceAsMaterial;Brush:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.MaterialInterface;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.r", arg_brush.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.g", arg_brush.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.b", arg_brush.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.a", arg_brush.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.tintcolor.specifiedcolor", arg_brush.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_brush.f_drawas))
     ue_arg_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_brush.f_tiling))
@@ -5137,19 +5004,13 @@ def ue_ui_GetBrushResourceAsMaterial(arg_brush : S_SlateBrush_e5037ad8) : C_Mate
     ue_arg_float(call, "brush.margin.top", arg_brush.f_margin.f_top)
     ue_arg_float(call, "brush.margin.right", arg_brush.f_margin.f_right)
     ue_arg_float(call, "brush.margin.bottom", arg_brush.f_margin.f_bottom)
-    ue_arg_float(call, "brush.tint.r", arg_brush.f_tint.f_r)
-    ue_arg_float(call, "brush.tint.g", arg_brush.f_tint.f_g)
-    ue_arg_float(call, "brush.tint.b", arg_brush.f_tint.f_b)
-    ue_arg_float(call, "brush.tint.a", arg_brush.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "brush.tint", arg_brush.f_tint)
     ue_arg_object(call, "brush.resourceobject", C_Object_55c3753a_raw(arg_brush.f_resourceobject))
     ue_arg_double(call, "brush.outlinesettings.cornerradii.x", arg_brush.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.y", arg_brush.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.z", arg_brush.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.w", arg_brush.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.r", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.g", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.b", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.a", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.outlinesettings.color.specifiedcolor", arg_brush.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "brush.outlinesettings.width", arg_brush.f_outlinesettings.f_width)
     ue_arg_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_brush.f_outlinesettings.f_roundingtype))
@@ -5173,10 +5034,7 @@ def ue_ui_GetBrushResourceAsTexture2D(arg_brush : S_SlateBrush_e5037ad8) : C_Tex
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetBrushResourceAsTexture2D", "")
     ue_expect_signature(call, "v1;GetBrushResourceAsTexture2D;Brush:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.Texture2D;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.r", arg_brush.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.g", arg_brush.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.b", arg_brush.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.a", arg_brush.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.tintcolor.specifiedcolor", arg_brush.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_brush.f_drawas))
     ue_arg_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_brush.f_tiling))
@@ -5188,19 +5046,13 @@ def ue_ui_GetBrushResourceAsTexture2D(arg_brush : S_SlateBrush_e5037ad8) : C_Tex
     ue_arg_float(call, "brush.margin.top", arg_brush.f_margin.f_top)
     ue_arg_float(call, "brush.margin.right", arg_brush.f_margin.f_right)
     ue_arg_float(call, "brush.margin.bottom", arg_brush.f_margin.f_bottom)
-    ue_arg_float(call, "brush.tint.r", arg_brush.f_tint.f_r)
-    ue_arg_float(call, "brush.tint.g", arg_brush.f_tint.f_g)
-    ue_arg_float(call, "brush.tint.b", arg_brush.f_tint.f_b)
-    ue_arg_float(call, "brush.tint.a", arg_brush.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "brush.tint", arg_brush.f_tint)
     ue_arg_object(call, "brush.resourceobject", C_Object_55c3753a_raw(arg_brush.f_resourceobject))
     ue_arg_double(call, "brush.outlinesettings.cornerradii.x", arg_brush.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.y", arg_brush.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.z", arg_brush.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.w", arg_brush.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.r", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.g", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.b", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.a", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.outlinesettings.color.specifiedcolor", arg_brush.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "brush.outlinesettings.width", arg_brush.f_outlinesettings.f_width)
     ue_arg_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_brush.f_outlinesettings.f_roundingtype))
@@ -5240,10 +5092,7 @@ def ue_ui_GetDynamicMaterial(arg_brush : S_SlateBrush_e5037ad8) : ue_ui_GetDynam
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "GetDynamicMaterial", "")
     ue_expect_signature(call, "v1;GetDynamicMaterial;Brush:StructProperty:134218112:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:ObjectProperty:1408:/Script/Engine.MaterialInstanceDynamic;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.r", arg_brush.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.g", arg_brush.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.b", arg_brush.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.a", arg_brush.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.tintcolor.specifiedcolor", arg_brush.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_brush.f_drawas))
     ue_arg_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_brush.f_tiling))
@@ -5255,19 +5104,13 @@ def ue_ui_GetDynamicMaterial(arg_brush : S_SlateBrush_e5037ad8) : ue_ui_GetDynam
     ue_arg_float(call, "brush.margin.top", arg_brush.f_margin.f_top)
     ue_arg_float(call, "brush.margin.right", arg_brush.f_margin.f_right)
     ue_arg_float(call, "brush.margin.bottom", arg_brush.f_margin.f_bottom)
-    ue_arg_float(call, "brush.tint.r", arg_brush.f_tint.f_r)
-    ue_arg_float(call, "brush.tint.g", arg_brush.f_tint.f_g)
-    ue_arg_float(call, "brush.tint.b", arg_brush.f_tint.f_b)
-    ue_arg_float(call, "brush.tint.a", arg_brush.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "brush.tint", arg_brush.f_tint)
     ue_arg_object(call, "brush.resourceobject", C_Object_55c3753a_raw(arg_brush.f_resourceobject))
     ue_arg_double(call, "brush.outlinesettings.cornerradii.x", arg_brush.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.y", arg_brush.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.z", arg_brush.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.w", arg_brush.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.r", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.g", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.b", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.a", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.outlinesettings.color.specifiedcolor", arg_brush.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "brush.outlinesettings.width", arg_brush.f_outlinesettings.f_width)
     ue_arg_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_brush.f_outlinesettings.f_roundingtype))
@@ -5281,7 +5124,7 @@ def ue_ui_GetDynamicMaterial(arg_brush : S_SlateBrush_e5037ad8) : ue_ui_GetDynam
     ue_arg_bool(call, "brush.bhasuobject", arg_brush.f_bhasuobject)
     ue_arg_name(call, "brush.resourcename", arg_brush.f_resourcename.value)
     ue_invoke_call(call)
-    let result = ue_ui_GetDynamicMaterial_Result(out_brush = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.tintcolor.specifiedcolor.r"), f_g = ue_result_float(call, "brush.tintcolor.specifiedcolor.g"), f_b = ue_result_float(call, "brush.tintcolor.specifiedcolor.b"), f_a = ue_result_float(call, "brush.tintcolor.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "brush.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "brush.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "brush.imagesize.x"), f_y = ue_result_float(call, "brush.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "brush.margin.left"), f_top = ue_result_float(call, "brush.margin.top"), f_right = ue_result_float(call, "brush.margin.right"), f_bottom = ue_result_float(call, "brush.margin.bottom")), f_tint = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.tint.r"), f_g = ue_result_float(call, "brush.tint.g"), f_b = ue_result_float(call, "brush.tint.b"), f_a = ue_result_float(call, "brush.tint.a")), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "brush.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "brush.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "brush.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "brush.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "brush.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.r"), f_g = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.g"), f_b = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.b"), f_a = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "brush.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "brush.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.min.x"), f_y = ue_result_float(call, "brush.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.max.x"), f_y = ue_result_float(call, "brush.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "brush.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "brush.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "brush.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "brush.resourcename"))), out_returnvalue = C_MaterialInstanceDynamic_65b20eca_from(ue_result_object(call, "returnvalue")))
+    let result = ue_ui_GetDynamicMaterial_Result(out_brush = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "brush.tintcolor.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "brush.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "brush.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "brush.imagesize.x"), f_y = ue_result_float(call, "brush.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "brush.margin.left"), f_top = ue_result_float(call, "brush.margin.top"), f_right = ue_result_float(call, "brush.margin.right"), f_bottom = ue_result_float(call, "brush.margin.bottom")), f_tint = __ue_method_result_linear_color(call, "brush.tint"), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "brush.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "brush.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "brush.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "brush.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "brush.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "brush.outlinesettings.color.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "brush.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "brush.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.min.x"), f_y = ue_result_float(call, "brush.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.max.x"), f_y = ue_result_float(call, "brush.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "brush.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "brush.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "brush.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "brush.resourcename"))), out_returnvalue = C_MaterialInstanceDynamic_65b20eca_from(ue_result_object(call, "returnvalue")))
     ue_release_call(call)
     return result
 }
@@ -5410,7 +5253,7 @@ def ue_ui_MakeBrushFromAsset(arg_brushasset : C_SlateBrushAsset_c9451dbb) : S_Sl
     ue_require_call_context(call, false)
     ue_arg_object(call, "brushasset", C_SlateBrushAsset_c9451dbb_raw(arg_brushasset))
     ue_invoke_call(call)
-    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.r"), f_g = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.g"), f_b = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.b"), f_a = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "returnvalue.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "returnvalue.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "returnvalue.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "returnvalue.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "returnvalue.imagesize.x"), f_y = ue_result_float(call, "returnvalue.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "returnvalue.margin.left"), f_top = ue_result_float(call, "returnvalue.margin.top"), f_right = ue_result_float(call, "returnvalue.margin.right"), f_bottom = ue_result_float(call, "returnvalue.margin.bottom")), f_tint = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.tint.r"), f_g = ue_result_float(call, "returnvalue.tint.g"), f_b = ue_result_float(call, "returnvalue.tint.b"), f_a = ue_result_float(call, "returnvalue.tint.a")), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "returnvalue.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.r"), f_g = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.g"), f_b = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.b"), f_a = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "returnvalue.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "returnvalue.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.min.x"), f_y = ue_result_float(call, "returnvalue.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.max.x"), f_y = ue_result_float(call, "returnvalue.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "returnvalue.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "returnvalue.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "returnvalue.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "returnvalue.resourcename")))
+    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "returnvalue.tintcolor.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "returnvalue.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "returnvalue.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "returnvalue.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "returnvalue.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "returnvalue.imagesize.x"), f_y = ue_result_float(call, "returnvalue.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "returnvalue.margin.left"), f_top = ue_result_float(call, "returnvalue.margin.top"), f_right = ue_result_float(call, "returnvalue.margin.right"), f_bottom = ue_result_float(call, "returnvalue.margin.bottom")), f_tint = __ue_method_result_linear_color(call, "returnvalue.tint"), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "returnvalue.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "returnvalue.outlinesettings.color.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "returnvalue.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "returnvalue.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.min.x"), f_y = ue_result_float(call, "returnvalue.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.max.x"), f_y = ue_result_float(call, "returnvalue.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "returnvalue.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "returnvalue.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "returnvalue.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "returnvalue.resourcename")))
     ue_release_call(call)
     return result
 }
@@ -5424,7 +5267,7 @@ def ue_ui_MakeBrushFromMaterial(arg_material : C_MaterialInterface_d64f3063; arg
     ue_arg_int(call, "width", arg_width)
     ue_arg_int(call, "height", arg_height)
     ue_invoke_call(call)
-    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.r"), f_g = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.g"), f_b = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.b"), f_a = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "returnvalue.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "returnvalue.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "returnvalue.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "returnvalue.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "returnvalue.imagesize.x"), f_y = ue_result_float(call, "returnvalue.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "returnvalue.margin.left"), f_top = ue_result_float(call, "returnvalue.margin.top"), f_right = ue_result_float(call, "returnvalue.margin.right"), f_bottom = ue_result_float(call, "returnvalue.margin.bottom")), f_tint = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.tint.r"), f_g = ue_result_float(call, "returnvalue.tint.g"), f_b = ue_result_float(call, "returnvalue.tint.b"), f_a = ue_result_float(call, "returnvalue.tint.a")), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "returnvalue.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.r"), f_g = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.g"), f_b = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.b"), f_a = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "returnvalue.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "returnvalue.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.min.x"), f_y = ue_result_float(call, "returnvalue.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.max.x"), f_y = ue_result_float(call, "returnvalue.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "returnvalue.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "returnvalue.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "returnvalue.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "returnvalue.resourcename")))
+    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "returnvalue.tintcolor.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "returnvalue.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "returnvalue.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "returnvalue.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "returnvalue.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "returnvalue.imagesize.x"), f_y = ue_result_float(call, "returnvalue.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "returnvalue.margin.left"), f_top = ue_result_float(call, "returnvalue.margin.top"), f_right = ue_result_float(call, "returnvalue.margin.right"), f_bottom = ue_result_float(call, "returnvalue.margin.bottom")), f_tint = __ue_method_result_linear_color(call, "returnvalue.tint"), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "returnvalue.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "returnvalue.outlinesettings.color.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "returnvalue.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "returnvalue.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.min.x"), f_y = ue_result_float(call, "returnvalue.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.max.x"), f_y = ue_result_float(call, "returnvalue.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "returnvalue.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "returnvalue.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "returnvalue.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "returnvalue.resourcename")))
     ue_release_call(call)
     return result
 }
@@ -5438,7 +5281,7 @@ def ue_ui_MakeBrushFromTexture(arg_texture : C_Texture2D_2db8ea5c; arg_width : i
     ue_arg_int(call, "width", arg_width)
     ue_arg_int(call, "height", arg_height)
     ue_invoke_call(call)
-    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.r"), f_g = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.g"), f_b = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.b"), f_a = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "returnvalue.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "returnvalue.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "returnvalue.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "returnvalue.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "returnvalue.imagesize.x"), f_y = ue_result_float(call, "returnvalue.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "returnvalue.margin.left"), f_top = ue_result_float(call, "returnvalue.margin.top"), f_right = ue_result_float(call, "returnvalue.margin.right"), f_bottom = ue_result_float(call, "returnvalue.margin.bottom")), f_tint = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.tint.r"), f_g = ue_result_float(call, "returnvalue.tint.g"), f_b = ue_result_float(call, "returnvalue.tint.b"), f_a = ue_result_float(call, "returnvalue.tint.a")), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "returnvalue.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.r"), f_g = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.g"), f_b = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.b"), f_a = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "returnvalue.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "returnvalue.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.min.x"), f_y = ue_result_float(call, "returnvalue.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.max.x"), f_y = ue_result_float(call, "returnvalue.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "returnvalue.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "returnvalue.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "returnvalue.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "returnvalue.resourcename")))
+    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "returnvalue.tintcolor.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "returnvalue.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "returnvalue.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "returnvalue.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "returnvalue.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "returnvalue.imagesize.x"), f_y = ue_result_float(call, "returnvalue.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "returnvalue.margin.left"), f_top = ue_result_float(call, "returnvalue.margin.top"), f_right = ue_result_float(call, "returnvalue.margin.right"), f_bottom = ue_result_float(call, "returnvalue.margin.bottom")), f_tint = __ue_method_result_linear_color(call, "returnvalue.tint"), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "returnvalue.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "returnvalue.outlinesettings.color.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "returnvalue.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "returnvalue.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.min.x"), f_y = ue_result_float(call, "returnvalue.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.max.x"), f_y = ue_result_float(call, "returnvalue.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "returnvalue.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "returnvalue.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "returnvalue.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "returnvalue.resourcename")))
     ue_release_call(call)
     return result
 }
@@ -5449,7 +5292,7 @@ def ue_ui_NoResourceBrush() : S_SlateBrush_e5037ad8 {
     ue_expect_signature(call, "v1;NoResourceBrush;ReturnValue:StructProperty:1408:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
-    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.r"), f_g = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.g"), f_b = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.b"), f_a = ue_result_float(call, "returnvalue.tintcolor.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "returnvalue.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "returnvalue.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "returnvalue.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "returnvalue.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "returnvalue.imagesize.x"), f_y = ue_result_float(call, "returnvalue.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "returnvalue.margin.left"), f_top = ue_result_float(call, "returnvalue.margin.top"), f_right = ue_result_float(call, "returnvalue.margin.right"), f_bottom = ue_result_float(call, "returnvalue.margin.bottom")), f_tint = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.tint.r"), f_g = ue_result_float(call, "returnvalue.tint.g"), f_b = ue_result_float(call, "returnvalue.tint.b"), f_a = ue_result_float(call, "returnvalue.tint.a")), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "returnvalue.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.r"), f_g = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.g"), f_b = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.b"), f_a = ue_result_float(call, "returnvalue.outlinesettings.color.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "returnvalue.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "returnvalue.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.min.x"), f_y = ue_result_float(call, "returnvalue.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.max.x"), f_y = ue_result_float(call, "returnvalue.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "returnvalue.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "returnvalue.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "returnvalue.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "returnvalue.resourcename")))
+    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "returnvalue.tintcolor.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "returnvalue.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "returnvalue.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "returnvalue.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "returnvalue.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "returnvalue.imagesize.x"), f_y = ue_result_float(call, "returnvalue.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "returnvalue.margin.left"), f_top = ue_result_float(call, "returnvalue.margin.top"), f_right = ue_result_float(call, "returnvalue.margin.right"), f_bottom = ue_result_float(call, "returnvalue.margin.bottom")), f_tint = __ue_method_result_linear_color(call, "returnvalue.tint"), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "returnvalue.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "returnvalue.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "returnvalue.outlinesettings.color.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "returnvalue.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "returnvalue.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "returnvalue.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.min.x"), f_y = ue_result_float(call, "returnvalue.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "returnvalue.uvregion.max.x"), f_y = ue_result_float(call, "returnvalue.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "returnvalue.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "returnvalue.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "returnvalue.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "returnvalue.resourcename")))
     ue_release_call(call)
     return result
 }
@@ -5485,10 +5328,7 @@ def ue_ui_SetBrushResourceToMaterial(arg_brush : S_SlateBrush_e5037ad8; arg_mate
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetBrushResourceToMaterial", "")
     ue_expect_signature(call, "v1;SetBrushResourceToMaterial;Brush:StructProperty:134218112:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};Material:ObjectProperty:128:/Script/Engine.MaterialInterface;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.r", arg_brush.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.g", arg_brush.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.b", arg_brush.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.a", arg_brush.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.tintcolor.specifiedcolor", arg_brush.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_brush.f_drawas))
     ue_arg_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_brush.f_tiling))
@@ -5500,19 +5340,13 @@ def ue_ui_SetBrushResourceToMaterial(arg_brush : S_SlateBrush_e5037ad8; arg_mate
     ue_arg_float(call, "brush.margin.top", arg_brush.f_margin.f_top)
     ue_arg_float(call, "brush.margin.right", arg_brush.f_margin.f_right)
     ue_arg_float(call, "brush.margin.bottom", arg_brush.f_margin.f_bottom)
-    ue_arg_float(call, "brush.tint.r", arg_brush.f_tint.f_r)
-    ue_arg_float(call, "brush.tint.g", arg_brush.f_tint.f_g)
-    ue_arg_float(call, "brush.tint.b", arg_brush.f_tint.f_b)
-    ue_arg_float(call, "brush.tint.a", arg_brush.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "brush.tint", arg_brush.f_tint)
     ue_arg_object(call, "brush.resourceobject", C_Object_55c3753a_raw(arg_brush.f_resourceobject))
     ue_arg_double(call, "brush.outlinesettings.cornerradii.x", arg_brush.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.y", arg_brush.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.z", arg_brush.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.w", arg_brush.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.r", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.g", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.b", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.a", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.outlinesettings.color.specifiedcolor", arg_brush.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "brush.outlinesettings.width", arg_brush.f_outlinesettings.f_width)
     ue_arg_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_brush.f_outlinesettings.f_roundingtype))
@@ -5527,7 +5361,7 @@ def ue_ui_SetBrushResourceToMaterial(arg_brush : S_SlateBrush_e5037ad8; arg_mate
     ue_arg_name(call, "brush.resourcename", arg_brush.f_resourcename.value)
     ue_arg_object(call, "material", C_MaterialInterface_d64f3063_raw(arg_material))
     ue_invoke_call(call)
-    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.tintcolor.specifiedcolor.r"), f_g = ue_result_float(call, "brush.tintcolor.specifiedcolor.g"), f_b = ue_result_float(call, "brush.tintcolor.specifiedcolor.b"), f_a = ue_result_float(call, "brush.tintcolor.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "brush.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "brush.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "brush.imagesize.x"), f_y = ue_result_float(call, "brush.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "brush.margin.left"), f_top = ue_result_float(call, "brush.margin.top"), f_right = ue_result_float(call, "brush.margin.right"), f_bottom = ue_result_float(call, "brush.margin.bottom")), f_tint = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.tint.r"), f_g = ue_result_float(call, "brush.tint.g"), f_b = ue_result_float(call, "brush.tint.b"), f_a = ue_result_float(call, "brush.tint.a")), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "brush.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "brush.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "brush.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "brush.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "brush.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.r"), f_g = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.g"), f_b = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.b"), f_a = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "brush.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "brush.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.min.x"), f_y = ue_result_float(call, "brush.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.max.x"), f_y = ue_result_float(call, "brush.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "brush.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "brush.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "brush.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "brush.resourcename")))
+    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "brush.tintcolor.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "brush.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "brush.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "brush.imagesize.x"), f_y = ue_result_float(call, "brush.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "brush.margin.left"), f_top = ue_result_float(call, "brush.margin.top"), f_right = ue_result_float(call, "brush.margin.right"), f_bottom = ue_result_float(call, "brush.margin.bottom")), f_tint = __ue_method_result_linear_color(call, "brush.tint"), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "brush.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "brush.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "brush.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "brush.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "brush.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "brush.outlinesettings.color.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "brush.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "brush.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.min.x"), f_y = ue_result_float(call, "brush.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.max.x"), f_y = ue_result_float(call, "brush.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "brush.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "brush.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "brush.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "brush.resourcename")))
     ue_release_call(call)
     return result
 }
@@ -5537,10 +5371,7 @@ def ue_ui_SetBrushResourceToTexture(arg_brush : S_SlateBrush_e5037ad8; arg_textu
     let call = ue_begin_static_call("/Script/UMG.WidgetBlueprintLibrary", "SetBrushResourceToTexture", "")
     ue_expect_signature(call, "v1;SetBrushResourceToTexture;Brush:StructProperty:134218112:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};Texture:ObjectProperty:128:/Script/Engine.Texture2D;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.r", arg_brush.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.g", arg_brush.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.b", arg_brush.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.tintcolor.specifiedcolor.a", arg_brush.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.tintcolor.specifiedcolor", arg_brush.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_brush.f_drawas))
     ue_arg_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_brush.f_tiling))
@@ -5552,19 +5383,13 @@ def ue_ui_SetBrushResourceToTexture(arg_brush : S_SlateBrush_e5037ad8; arg_textu
     ue_arg_float(call, "brush.margin.top", arg_brush.f_margin.f_top)
     ue_arg_float(call, "brush.margin.right", arg_brush.f_margin.f_right)
     ue_arg_float(call, "brush.margin.bottom", arg_brush.f_margin.f_bottom)
-    ue_arg_float(call, "brush.tint.r", arg_brush.f_tint.f_r)
-    ue_arg_float(call, "brush.tint.g", arg_brush.f_tint.f_g)
-    ue_arg_float(call, "brush.tint.b", arg_brush.f_tint.f_b)
-    ue_arg_float(call, "brush.tint.a", arg_brush.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "brush.tint", arg_brush.f_tint)
     ue_arg_object(call, "brush.resourceobject", C_Object_55c3753a_raw(arg_brush.f_resourceobject))
     ue_arg_double(call, "brush.outlinesettings.cornerradii.x", arg_brush.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.y", arg_brush.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.z", arg_brush.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "brush.outlinesettings.cornerradii.w", arg_brush.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.r", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.g", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.b", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "brush.outlinesettings.color.specifiedcolor.a", arg_brush.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "brush.outlinesettings.color.specifiedcolor", arg_brush.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_brush.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "brush.outlinesettings.width", arg_brush.f_outlinesettings.f_width)
     ue_arg_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_brush.f_outlinesettings.f_roundingtype))
@@ -5579,7 +5404,7 @@ def ue_ui_SetBrushResourceToTexture(arg_brush : S_SlateBrush_e5037ad8; arg_textu
     ue_arg_name(call, "brush.resourcename", arg_brush.f_resourcename.value)
     ue_arg_object(call, "texture", C_Texture2D_2db8ea5c_raw(arg_texture))
     ue_invoke_call(call)
-    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.tintcolor.specifiedcolor.r"), f_g = ue_result_float(call, "brush.tintcolor.specifiedcolor.g"), f_b = ue_result_float(call, "brush.tintcolor.specifiedcolor.b"), f_a = ue_result_float(call, "brush.tintcolor.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "brush.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "brush.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "brush.imagesize.x"), f_y = ue_result_float(call, "brush.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "brush.margin.left"), f_top = ue_result_float(call, "brush.margin.top"), f_right = ue_result_float(call, "brush.margin.right"), f_bottom = ue_result_float(call, "brush.margin.bottom")), f_tint = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.tint.r"), f_g = ue_result_float(call, "brush.tint.g"), f_b = ue_result_float(call, "brush.tint.b"), f_a = ue_result_float(call, "brush.tint.a")), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "brush.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "brush.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "brush.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "brush.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "brush.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.r"), f_g = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.g"), f_b = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.b"), f_a = ue_result_float(call, "brush.outlinesettings.color.specifiedcolor.a")), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "brush.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "brush.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.min.x"), f_y = ue_result_float(call, "brush.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.max.x"), f_y = ue_result_float(call, "brush.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "brush.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "brush.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "brush.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "brush.resourcename")))
+    let result = S_SlateBrush_e5037ad8(f_tintcolor = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "brush.tintcolor.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_drawas = E_ESlateBrushDrawType_b4190a42_from_symbol(ue_result_enum(call, "brush.drawas", "/Script/SlateCore.ESlateBrushDrawType")), f_tiling = E_ESlateBrushTileType_90ba8662_from_symbol(ue_result_enum(call, "brush.tiling", "/Script/SlateCore.ESlateBrushTileType")), f_mirroring = E_ESlateBrushMirrorType_2066815f_from_symbol(ue_result_enum(call, "brush.mirroring", "/Script/SlateCore.ESlateBrushMirrorType")), f_imagetype = E_ESlateBrushImageType_d8ea0e88_from_symbol(ue_result_enum(call, "brush.imagetype", "/Script/SlateCore.ESlateBrushImageType")), f_imagesize = S_DeprecateSlateVector2D_5732bbd6(f_x = ue_result_float(call, "brush.imagesize.x"), f_y = ue_result_float(call, "brush.imagesize.y")), f_margin = S_Margin_deff9f65(f_left = ue_result_float(call, "brush.margin.left"), f_top = ue_result_float(call, "brush.margin.top"), f_right = ue_result_float(call, "brush.margin.right"), f_bottom = ue_result_float(call, "brush.margin.bottom")), f_tint = __ue_method_result_linear_color(call, "brush.tint"), f_resourceobject = C_Object_55c3753a_from(ue_result_object(call, "brush.resourceobject")), f_outlinesettings = S_SlateBrushOutlineSettings_a873b1e2(f_cornerradii = S_Vector4_420fe7b1(f_x = ue_result_double(call, "brush.outlinesettings.cornerradii.x"), f_y = ue_result_double(call, "brush.outlinesettings.cornerradii.y"), f_z = ue_result_double(call, "brush.outlinesettings.cornerradii.z"), f_w = ue_result_double(call, "brush.outlinesettings.cornerradii.w")), f_color = S_SlateColor_1f7d2c16(f_specifiedcolor = __ue_method_result_linear_color(call, "brush.outlinesettings.color.specifiedcolor"), f_coloruserule = E_ESlateColorStylingMode_8d024516_from_symbol(ue_result_enum(call, "brush.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode"))), f_width = ue_result_float(call, "brush.outlinesettings.width"), f_roundingtype = E_ESlateBrushRoundingType_d27e8bba_from_symbol(ue_result_enum(call, "brush.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType")), f_busebrushtransparency = ue_result_bool(call, "brush.outlinesettings.busebrushtransparency")), f_uvregion = S_Box2f_1ae76a2c(f_min = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.min.x"), f_y = ue_result_float(call, "brush.uvregion.min.y")), f_max = S_Vector2f_19cec4b3(f_x = ue_result_float(call, "brush.uvregion.max.x"), f_y = ue_result_float(call, "brush.uvregion.max.y")), f_bisvalid = ue_result_bool(call, "brush.uvregion.bisvalid")), f_bisdynamicallyloaded = ue_result_bool(call, "brush.bisdynamicallyloaded"), f_bhasuobject = ue_result_bool(call, "brush.bhasuobject"), f_resourcename = UEName(value = ue_result_name(call, "brush.resourcename")))
     ue_release_call(call)
     return result
 }
@@ -5792,10 +5617,7 @@ def ue_ui_geometry_EqualEqual_SlateBrush(arg_a : S_SlateBrush_e5037ad8; arg_b : 
     let call = ue_begin_static_call("/Script/UMG.SlateBlueprintLibrary", "EqualEqual_SlateBrush", "")
     ue_expect_signature(call, "v1;EqualEqual_SlateBrush;A:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};B:StructProperty:134218114:/Script/SlateCore.SlateBrush\{TintColor:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};DrawAs:ByteProperty:0:/Script/SlateCore.ESlateBrushDrawType;Tiling:ByteProperty:0:/Script/SlateCore.ESlateBrushTileType;Mirroring:ByteProperty:0:/Script/SlateCore.ESlateBrushMirrorType;ImageType:ByteProperty:0:/Script/SlateCore.ESlateBrushImageType;ImageSize:StructProperty:0:/Script/SlateCore.DeprecateSlateVector2D\{X:FloatProperty:0;Y:FloatProperty:0;\};Margin:StructProperty:0:/Script/SlateCore.Margin\{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;\};Tint:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ResourceObject:ObjectProperty:0:/Script/CoreUObject.Object;OutlineSettings:StructProperty:0:/Script/SlateCore.SlateBrushOutlineSettings\{CornerRadii:StructProperty:0:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Color:StructProperty:0:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};Width:FloatProperty:0;RoundingType:ByteProperty:0:/Script/SlateCore.ESlateBrushRoundingType;bUseBrushTransparency:BoolProperty:0;\};UVRegion:StructProperty:0:/Script/CoreUObject.Box2f\{Min:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};Max:StructProperty:0:/Script/CoreUObject.Vector2f\{X:FloatProperty:0;Y:FloatProperty:0;\};bIsValid:BoolProperty:0;\};bIsDynamicallyLoaded:BoolProperty:0;bHasUObject:BoolProperty:0;ResourceName:NameProperty:0;\};ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.tintcolor.specifiedcolor.r", arg_a.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "a.tintcolor.specifiedcolor.g", arg_a.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "a.tintcolor.specifiedcolor.b", arg_a.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "a.tintcolor.specifiedcolor.a", arg_a.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "a.tintcolor.specifiedcolor", arg_a.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "a.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_a.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "a.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_a.f_drawas))
     ue_arg_enum(call, "a.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_a.f_tiling))
@@ -5807,19 +5629,13 @@ def ue_ui_geometry_EqualEqual_SlateBrush(arg_a : S_SlateBrush_e5037ad8; arg_b : 
     ue_arg_float(call, "a.margin.top", arg_a.f_margin.f_top)
     ue_arg_float(call, "a.margin.right", arg_a.f_margin.f_right)
     ue_arg_float(call, "a.margin.bottom", arg_a.f_margin.f_bottom)
-    ue_arg_float(call, "a.tint.r", arg_a.f_tint.f_r)
-    ue_arg_float(call, "a.tint.g", arg_a.f_tint.f_g)
-    ue_arg_float(call, "a.tint.b", arg_a.f_tint.f_b)
-    ue_arg_float(call, "a.tint.a", arg_a.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "a.tint", arg_a.f_tint)
     ue_arg_object(call, "a.resourceobject", C_Object_55c3753a_raw(arg_a.f_resourceobject))
     ue_arg_double(call, "a.outlinesettings.cornerradii.x", arg_a.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "a.outlinesettings.cornerradii.y", arg_a.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "a.outlinesettings.cornerradii.z", arg_a.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "a.outlinesettings.cornerradii.w", arg_a.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "a.outlinesettings.color.specifiedcolor.r", arg_a.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "a.outlinesettings.color.specifiedcolor.g", arg_a.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "a.outlinesettings.color.specifiedcolor.b", arg_a.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "a.outlinesettings.color.specifiedcolor.a", arg_a.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "a.outlinesettings.color.specifiedcolor", arg_a.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "a.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_a.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "a.outlinesettings.width", arg_a.f_outlinesettings.f_width)
     ue_arg_enum(call, "a.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_a.f_outlinesettings.f_roundingtype))
@@ -5832,10 +5648,7 @@ def ue_ui_geometry_EqualEqual_SlateBrush(arg_a : S_SlateBrush_e5037ad8; arg_b : 
     ue_arg_bool(call, "a.bisdynamicallyloaded", arg_a.f_bisdynamicallyloaded)
     ue_arg_bool(call, "a.bhasuobject", arg_a.f_bhasuobject)
     ue_arg_name(call, "a.resourcename", arg_a.f_resourcename.value)
-    ue_arg_float(call, "b.tintcolor.specifiedcolor.r", arg_b.f_tintcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "b.tintcolor.specifiedcolor.g", arg_b.f_tintcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "b.tintcolor.specifiedcolor.b", arg_b.f_tintcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "b.tintcolor.specifiedcolor.a", arg_b.f_tintcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "b.tintcolor.specifiedcolor", arg_b.f_tintcolor.f_specifiedcolor)
     ue_arg_enum(call, "b.tintcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_b.f_tintcolor.f_coloruserule))
     ue_arg_enum(call, "b.drawas", "/Script/SlateCore.ESlateBrushDrawType", E_ESlateBrushDrawType_b4190a42_to_symbol(arg_b.f_drawas))
     ue_arg_enum(call, "b.tiling", "/Script/SlateCore.ESlateBrushTileType", E_ESlateBrushTileType_90ba8662_to_symbol(arg_b.f_tiling))
@@ -5847,19 +5660,13 @@ def ue_ui_geometry_EqualEqual_SlateBrush(arg_a : S_SlateBrush_e5037ad8; arg_b : 
     ue_arg_float(call, "b.margin.top", arg_b.f_margin.f_top)
     ue_arg_float(call, "b.margin.right", arg_b.f_margin.f_right)
     ue_arg_float(call, "b.margin.bottom", arg_b.f_margin.f_bottom)
-    ue_arg_float(call, "b.tint.r", arg_b.f_tint.f_r)
-    ue_arg_float(call, "b.tint.g", arg_b.f_tint.f_g)
-    ue_arg_float(call, "b.tint.b", arg_b.f_tint.f_b)
-    ue_arg_float(call, "b.tint.a", arg_b.f_tint.f_a)
+    __ue_method_arg_linear_color(call, "b.tint", arg_b.f_tint)
     ue_arg_object(call, "b.resourceobject", C_Object_55c3753a_raw(arg_b.f_resourceobject))
     ue_arg_double(call, "b.outlinesettings.cornerradii.x", arg_b.f_outlinesettings.f_cornerradii.f_x)
     ue_arg_double(call, "b.outlinesettings.cornerradii.y", arg_b.f_outlinesettings.f_cornerradii.f_y)
     ue_arg_double(call, "b.outlinesettings.cornerradii.z", arg_b.f_outlinesettings.f_cornerradii.f_z)
     ue_arg_double(call, "b.outlinesettings.cornerradii.w", arg_b.f_outlinesettings.f_cornerradii.f_w)
-    ue_arg_float(call, "b.outlinesettings.color.specifiedcolor.r", arg_b.f_outlinesettings.f_color.f_specifiedcolor.f_r)
-    ue_arg_float(call, "b.outlinesettings.color.specifiedcolor.g", arg_b.f_outlinesettings.f_color.f_specifiedcolor.f_g)
-    ue_arg_float(call, "b.outlinesettings.color.specifiedcolor.b", arg_b.f_outlinesettings.f_color.f_specifiedcolor.f_b)
-    ue_arg_float(call, "b.outlinesettings.color.specifiedcolor.a", arg_b.f_outlinesettings.f_color.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "b.outlinesettings.color.specifiedcolor", arg_b.f_outlinesettings.f_color.f_specifiedcolor)
     ue_arg_enum(call, "b.outlinesettings.color.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_b.f_outlinesettings.f_color.f_coloruserule))
     ue_arg_float(call, "b.outlinesettings.width", arg_b.f_outlinesettings.f_width)
     ue_arg_enum(call, "b.outlinesettings.roundingtype", "/Script/SlateCore.ESlateBrushRoundingType", E_ESlateBrushRoundingType_d27e8bba_to_symbol(arg_b.f_outlinesettings.f_roundingtype))
@@ -6794,15 +6601,12 @@ def ue_user_widget_SetAnimationCurrentTime(target : C_UserWidget_a3d12281; arg_i
     ue_release_call(call)
 }
 
-def ue_user_widget_SetColorAndOpacity(target : C_UserWidget_a3d12281; arg_incolorandopacity : S_LinearColor_f4abb14b) {
+def ue_user_widget_SetColorAndOpacity(target : C_UserWidget_a3d12281; arg_incolorandopacity : UELinearColor) {
     let receiver = ue_cast_object(C_UserWidget_a3d12281_raw(target), "/Script/UMG.UserWidget")
     let call = ue_begin_call(receiver, "SetColorAndOpacity")
     ue_expect_signature(call, "v1;SetColorAndOpacity;InColorAndOpacity:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolorandopacity.r", arg_incolorandopacity.f_r)
-    ue_arg_float(call, "incolorandopacity.g", arg_incolorandopacity.f_g)
-    ue_arg_float(call, "incolorandopacity.b", arg_incolorandopacity.f_b)
-    ue_arg_float(call, "incolorandopacity.a", arg_incolorandopacity.f_a)
+    __ue_method_arg_linear_color(call, "incolorandopacity", arg_incolorandopacity)
     ue_invoke_call(call)
     ue_release_call(call)
 }
@@ -6834,10 +6638,7 @@ def ue_user_widget_SetForegroundColor(target : C_UserWidget_a3d12281; arg_infore
     let call = ue_begin_call(receiver, "SetForegroundColor")
     ue_expect_signature(call, "v1;SetForegroundColor;InForegroundColor:StructProperty:128:/Script/SlateCore.SlateColor\{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inforegroundcolor.specifiedcolor.r", arg_inforegroundcolor.f_specifiedcolor.f_r)
-    ue_arg_float(call, "inforegroundcolor.specifiedcolor.g", arg_inforegroundcolor.f_specifiedcolor.f_g)
-    ue_arg_float(call, "inforegroundcolor.specifiedcolor.b", arg_inforegroundcolor.f_specifiedcolor.f_b)
-    ue_arg_float(call, "inforegroundcolor.specifiedcolor.a", arg_inforegroundcolor.f_specifiedcolor.f_a)
+    __ue_method_arg_linear_color(call, "inforegroundcolor.specifiedcolor", arg_inforegroundcolor.f_specifiedcolor)
     ue_arg_enum(call, "inforegroundcolor.coloruserule", "/Script/SlateCore.ESlateColorStylingMode", E_ESlateColorStylingMode_8d024516_to_symbol(arg_inforegroundcolor.f_coloruserule))
     ue_invoke_call(call)
     ue_release_call(call)

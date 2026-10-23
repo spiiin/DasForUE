@@ -4,6 +4,7 @@ struct FUEGASAbilityAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& S, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(S->at, UTF8_TO_TCHAR(S->name.c_str()));
         try
         {
             if (const auto* Done = Args.find(DSLGASKey, das::Type::tString))
@@ -52,7 +53,8 @@ struct FUEGASAbilityAnnotation : das::StructureAnnotation
                         DSLFail(TEXT("Ability methods are ordinary DAS methods; reflected UE method annotations are not supported here"));
                     const FString Name = DSLText(
                         F->name.substr(F->name.find_last_of(das::string(1, char(96)) + das::string(1, char(39))) + 1));
-                    if (Name != TEXT("Activate") && Name != TEXT("End") && Name != TEXT("Cancel") && Name != TEXT("Task"))
+                    if (Name != TEXT("Activate") && Name != TEXT("End") && Name != TEXT("Cancel") &&
+                                                                                        Name != TEXT("Task"))
                         return;
                     if (F->result && F->result->baseType == das::Type::autoinfer)
                         F->result = new das::TypeDecl(das::Type::tVoid, F->at);
@@ -140,6 +142,7 @@ struct FUEGASAbilityAnnotation : das::StructureAnnotation
     virtual bool look(const das::StructurePtr& S, das::ModuleGroup&, das::AnnotationArgumentList&,
                       das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(S->at, UTF8_TO_TCHAR(S->name.c_str()));
         try
         {
             DSLDeclarationKind(S->annotations);

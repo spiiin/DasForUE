@@ -4,6 +4,7 @@ struct FUEGASCueAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& S, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(S->at, UTF8_TO_TCHAR(S->name.c_str()));
         try
         {
             if (const auto* Done = Args.find(DSLGASKey, das::Type::tString))
@@ -131,6 +132,7 @@ struct FUEGASCueAnnotation : das::StructureAnnotation
     virtual bool look(const das::StructurePtr& S, das::ModuleGroup&, das::AnnotationArgumentList&,
                       das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(S->at, UTF8_TO_TCHAR(S->name.c_str()));
         try
         {
             DSLDeclarationKind(S->annotations);

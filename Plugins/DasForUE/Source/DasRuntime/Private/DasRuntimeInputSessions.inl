@@ -868,7 +868,7 @@ void DrainEvents()
                 Args[0] = das::cast<char*>::from(CopyDSLString(Payload.StringValue, &Context));
             Context.evalWithCatch(Function, Payload.Kind == 3 ? nullptr : Args);
             if (const char* Exception = Context.getException())
-                Error = UTF8_TO_TCHAR(Exception);
+                Error = DSLDiagnosticRuntime(Context, Session->Live->Program, Handler);
         }
         catch (const std::exception& Exception)
         {

@@ -220,9 +220,9 @@ public:
         inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEPropertyPass()));
         inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEStatePass()));
         globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEPathLintPass()));
-        for (bool Text : {false, true})
+        for (int Mode : {0, 1, 2})
         {
-            auto* Macro = new FUEIdentityMacro(Text);
+            auto* Macro = new FUEIdentityMacro(Mode == 1, Mode == 2);
             ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));
             Macro->module = this;
             addCallMacro(Macro->name,
@@ -271,6 +271,9 @@ public:
         addAnnotation(new FDSLVector2DAnnotation(Library));
         addAnnotation(new FDSLVectorAnnotation(Library));
         addAnnotation(new FDSLRotatorAnnotation(Library));
+        addAnnotation(new FDSLQuatAnnotation(Library));
+        addAnnotation(new FDSLLinearColorAnnotation(Library));
+        addAnnotation(new FDSLColorAnnotation(Library));
         addAnnotation(new FMathValueAnnotation<FTransform>("UETransform", Library, "FTransform"));
 
         addAnnotation(new FObjectHandleAnnotation(Library));
@@ -1182,6 +1185,8 @@ public:
                                                 "SubscribeInt");
         AddUEExtern<DAS_BIND_FUN(EmitSignal)>(*this, Library, "ue_emit_signal", das::SideEffects::modifyExternal,
                                               "EmitSignal");
+        AddUEExtern<DAS_BIND_FUN(SubsystemObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_subsystem", das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN(ClassDefaultObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_class_default_object", das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<int32,das::Type::tInt>))>(
@@ -1633,6 +1638,7 @@ public:
                                                      "DSLNameFromString");
         AddUEExtern<DAS_BIND_FUN(DSLNameToString)>(*this, Library, "ue_name_text", das::SideEffects::modifyExternal,
                                                    "DSLNameToString");
+#include "DasBuiltinValueBindings.inl"
         AddUEExtern<DAS_BIND_FUN(DSLNamesEqual)>(*this, Library, "ue_names_equal", das::SideEffects::accessExternal,
                                                  "DSLNamesEqual");
         AddUEExtern<DAS_BIND_FUN(EmitType)>(*this, Library, "ue_emit_type", das::SideEffects::modifyExternal,

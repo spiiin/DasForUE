@@ -36,3 +36,8 @@ def ue_delegate_target(target:UObjectHandle):UObjectHandle { return target }
 def ue_delegate_target(target:auto):UObjectHandle { return target.handle }
 def ue_delegate_name(method:string):string { return method }
 def ue_delegate_name(method:UENameValue):string { return ue_name_text(method) }
+
+[ue_native_base(path="/Script/Engine.WorldSubsystem")]
+class WorldSubsystem {}
+[ue_native_base(path="/Script/Engine.GameInstanceSubsystem")]
+class GameInstanceSubsystem {}

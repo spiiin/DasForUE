@@ -17,6 +17,7 @@
 #include "HAL/IConsoleManager.h"
 #include "Interfaces/IPluginManager.h"
 #include "Logging/MessageLog.h"
+#include "DasDiagnosticEditor.h"
 #include "Logging/TokenizedMessage.h"
 #include "Misc/MessageDialog.h"
 #include "Misc/PackageName.h"
@@ -252,7 +253,7 @@ void FDasAutoReimport::ReimportTypes(const TPair<FString, FString>& Import, bool
     {
         const FString Text = FString::Printf(TEXT("daScript: structs of %s were not updated: %s"), *Import.Key, *Error);
         UE_LOG(LogTemp, Warning, TEXT("DAS_TYPES_AUTO_REIMPORT rejected %s: %s"), *Import.Key, *Error);
-        FMessageLog(TEXT("BlueprintLog")).Error(FText::FromString(Text));
+        DasDiagnosticEditor::Report(Text);
         Notify(Text, false);
         return;
     }
@@ -292,7 +293,7 @@ void FDasAutoReimport::ReimportGAS(const TPair<FString, FString>& Import, bool b
         if (bPlaying)
             DeferredGAS.Add(Import);
         else
-            FMessageLog(TEXT("BlueprintLog")).Error(FText::FromString(Text));
+            DasDiagnosticEditor::Report(Text);
         UE_LOG(LogTemp, Display,
                TEXT("DAS_GAS_AUTO_REIMPORT %s %s: %s"),
                     bPlaying ? TEXT("deferred") : TEXT("rejected"), *Import.Key, *Error);
@@ -399,7 +400,7 @@ void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
         {
             Confirmed.Remove(Path);
             UE_LOG(LogTemp, Warning, TEXT("DAS_DSL_AUTO_REIMPORT rejected %s: %s"), *Name, *Error);
-            FMessageLog(TEXT("BlueprintLog")).Error(FText::FromString(Text));
+            DasDiagnosticEditor::Report(Text);
         }
         Notify(Text, false);
         return;

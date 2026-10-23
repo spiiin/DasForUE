@@ -5,6 +5,7 @@ struct FUEHandlerContractAnnotation : das::FunctionAnnotation
     virtual bool apply(const das::FunctionPtr& F, das::ModuleGroup&, das::AnnotationArgumentList&,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(F->at, DSLDiagnosticFunctionEntity(F));
         if (!F->generated)
         {
             Error = "Internal annotation requires a generated handler";

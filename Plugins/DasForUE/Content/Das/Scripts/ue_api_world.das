@@ -2032,13 +2032,6 @@ struct S_IntVector_1c5addc5 {
     f_z : int
 }
 
-struct S_LinearColor_f4abb14b {
-    f_r : float
-    f_g : float
-    f_b : float
-    f_a : float
-}
-
 struct S_Plane_a3bdbfa8 {
     f_w : double
     f_x : double
@@ -2057,13 +2050,6 @@ struct S_PrimaryAssetType_b65c189d {
 struct S_PrimaryAssetId_ea64396c {
     f_primaryassettype : S_PrimaryAssetType_b65c189d
     f_primaryassetname : UEName
-}
-
-struct S_Quat_82f9549e {
-    f_x : double
-    f_y : double
-    f_z : double
-    f_w : double
 }
 
 struct S_TopLevelAssetPath_16fe4d56 {
@@ -5363,7 +5349,7 @@ struct ue_gameplay_SuggestProjectileVelocity_MovingTarget_Result {
 }
 
 [ue_reflected_call(owner="/Script/Engine.GameplayStatics", method="SuggestProjectileVelocity_MovingTarget", signature="v1;SuggestProjectileVelocity_MovingTarget;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;OutLaunchVelocity:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ProjectileStartLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};TargetActor:ObjectProperty:128:/Script/Engine.Actor;TargetLocationOffset:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};GravityZOverride:DoubleProperty:128;TimeToTarget:DoubleProperty:128;DrawDebugType:ByteProperty:128:/Script/Engine.EDrawDebugTrace;DrawDebugTime:FloatProperty:128;DrawDebugColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")]
-def ue_gameplay_SuggestProjectileVelocity_MovingTarget(arg_projectilestartlocation : UEVector; arg_targetactor : C_Actor_adf65d5b; arg_targetlocationoffset : UEVector; arg_gravityzoverride : double; arg_timetotarget : double; arg_drawdebugtype : E_EDrawDebugTrace_59edfe33; arg_drawdebugtime : float; arg_drawdebugcolor : S_LinearColor_f4abb14b) : ue_gameplay_SuggestProjectileVelocity_MovingTarget_Result {
+def ue_gameplay_SuggestProjectileVelocity_MovingTarget(arg_projectilestartlocation : UEVector; arg_targetactor : C_Actor_adf65d5b; arg_targetlocationoffset : UEVector; arg_gravityzoverride : double; arg_timetotarget : double; arg_drawdebugtype : E_EDrawDebugTrace_59edfe33; arg_drawdebugtime : float; arg_drawdebugcolor : UELinearColor) : ue_gameplay_SuggestProjectileVelocity_MovingTarget_Result {
     let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SuggestProjectileVelocity_MovingTarget", "worldcontextobject")
     ue_expect_signature(call, "v1;SuggestProjectileVelocity_MovingTarget;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;OutLaunchVelocity:StructProperty:384:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ProjectileStartLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};TargetActor:ObjectProperty:128:/Script/Engine.Actor;TargetLocationOffset:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};GravityZOverride:DoubleProperty:128;TimeToTarget:DoubleProperty:128;DrawDebugType:ByteProperty:128:/Script/Engine.EDrawDebugTrace;DrawDebugTime:FloatProperty:128;DrawDebugColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
@@ -5374,10 +5360,7 @@ def ue_gameplay_SuggestProjectileVelocity_MovingTarget(arg_projectilestartlocati
     ue_arg_double(call, "timetotarget", arg_timetotarget)
     ue_arg_enum(call, "drawdebugtype", "/Script/Engine.EDrawDebugTrace", E_EDrawDebugTrace_59edfe33_to_symbol(arg_drawdebugtype))
     ue_arg_float(call, "drawdebugtime", arg_drawdebugtime)
-    ue_arg_float(call, "drawdebugcolor.r", arg_drawdebugcolor.f_r)
-    ue_arg_float(call, "drawdebugcolor.g", arg_drawdebugcolor.f_g)
-    ue_arg_float(call, "drawdebugcolor.b", arg_drawdebugcolor.f_b)
-    ue_arg_float(call, "drawdebugcolor.a", arg_drawdebugcolor.f_a)
+    __ue_method_arg_linear_color(call, "drawdebugcolor", arg_drawdebugcolor)
     ue_invoke_call(call)
     let result = ue_gameplay_SuggestProjectileVelocity_MovingTarget_Result(out_outlaunchvelocity = __ue_method_result_vector(call, "outlaunchvelocity"), out_returnvalue = ue_result_bool(call, "returnvalue"))
     ue_release_call(call)
@@ -8299,17 +8282,14 @@ def ue_system_DoesImplementInterface(arg_testobject : C_Object_55c3753a; arg_int
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugArrow", signature="v1;DrawDebugArrow;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;LineStart:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ArrowSize:FloatProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
-def ue_system_DrawDebugArrow(arg_linestart : UEVector; arg_lineend : UEVector; arg_arrowsize : float; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
+def ue_system_DrawDebugArrow(arg_linestart : UEVector; arg_lineend : UEVector; arg_arrowsize : float; arg_linecolor : UELinearColor; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugArrow", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugArrow;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;LineStart:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ArrowSize:FloatProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "linestart", arg_linestart)
     __ue_method_arg_vector(call, "lineend", arg_lineend)
     ue_arg_float(call, "arrowsize", arg_arrowsize)
-    ue_arg_float(call, "linecolor.r", arg_linecolor.f_r)
-    ue_arg_float(call, "linecolor.g", arg_linecolor.f_g)
-    ue_arg_float(call, "linecolor.b", arg_linecolor.f_b)
-    ue_arg_float(call, "linecolor.a", arg_linecolor.f_a)
+    __ue_method_arg_linear_color(call, "linecolor", arg_linecolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_float(call, "thickness", arg_thickness)
     ue_arg_enum(call, "depthpriority", "/Script/Engine.EDrawDebugSceneDepthPriorityGroup", E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd_to_symbol(arg_depthpriority))
@@ -8318,16 +8298,13 @@ def ue_system_DrawDebugArrow(arg_linestart : UEVector; arg_lineend : UEVector; a
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugBox", signature="v1;DrawDebugBox;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Extent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Rotation:StructProperty:130:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
-def ue_system_DrawDebugBox(arg_center : UEVector; arg_extent : UEVector; arg_linecolor : S_LinearColor_f4abb14b; arg_rotation : UERotator; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
+def ue_system_DrawDebugBox(arg_center : UEVector; arg_extent : UEVector; arg_linecolor : UELinearColor; arg_rotation : UERotator; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugBox", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugBox;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Extent:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Rotation:StructProperty:130:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "center", arg_center)
     __ue_method_arg_vector(call, "extent", arg_extent)
-    ue_arg_float(call, "linecolor.r", arg_linecolor.f_r)
-    ue_arg_float(call, "linecolor.g", arg_linecolor.f_g)
-    ue_arg_float(call, "linecolor.b", arg_linecolor.f_b)
-    ue_arg_float(call, "linecolor.a", arg_linecolor.f_a)
+    __ue_method_arg_linear_color(call, "linecolor", arg_linecolor)
     __ue_method_arg_rotator(call, "rotation", arg_rotation)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_float(call, "thickness", arg_thickness)
@@ -8337,22 +8314,19 @@ def ue_system_DrawDebugBox(arg_center : UEVector; arg_extent : UEVector; arg_lin
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugCamera", signature="v1;DrawDebugCamera;CameraActor:ObjectProperty:130:/Script/Engine.CameraActor;CameraColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")]
-def ue_system_DrawDebugCamera(arg_cameraactor : C_CameraActor_cb891975; arg_cameracolor : S_LinearColor_f4abb14b; arg_duration : float) {
+def ue_system_DrawDebugCamera(arg_cameraactor : C_CameraActor_cb891975; arg_cameracolor : UELinearColor; arg_duration : float) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugCamera", "")
     ue_expect_signature(call, "v1;DrawDebugCamera;CameraActor:ObjectProperty:130:/Script/Engine.CameraActor;CameraColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")
     ue_require_call_context(call, false)
     ue_arg_object(call, "cameraactor", C_CameraActor_cb891975_raw(arg_cameraactor))
-    ue_arg_float(call, "cameracolor.r", arg_cameracolor.f_r)
-    ue_arg_float(call, "cameracolor.g", arg_cameracolor.f_g)
-    ue_arg_float(call, "cameracolor.b", arg_cameracolor.f_b)
-    ue_arg_float(call, "cameracolor.a", arg_cameracolor.f_a)
+    __ue_method_arg_linear_color(call, "cameracolor", arg_cameracolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_invoke_call(call)
     ue_release_call(call)
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugCapsule", signature="v1;DrawDebugCapsule;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};HalfHeight:FloatProperty:128;Radius:FloatProperty:128;Rotation:StructProperty:130:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
-def ue_system_DrawDebugCapsule(arg_center : UEVector; arg_halfheight : float; arg_radius : float; arg_rotation : UERotator; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
+def ue_system_DrawDebugCapsule(arg_center : UEVector; arg_halfheight : float; arg_radius : float; arg_rotation : UERotator; arg_linecolor : UELinearColor; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugCapsule", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugCapsule;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};HalfHeight:FloatProperty:128;Radius:FloatProperty:128;Rotation:StructProperty:130:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
     ue_require_call_context(call, false)
@@ -8360,10 +8334,7 @@ def ue_system_DrawDebugCapsule(arg_center : UEVector; arg_halfheight : float; ar
     ue_arg_float(call, "halfheight", arg_halfheight)
     ue_arg_float(call, "radius", arg_radius)
     __ue_method_arg_rotator(call, "rotation", arg_rotation)
-    ue_arg_float(call, "linecolor.r", arg_linecolor.f_r)
-    ue_arg_float(call, "linecolor.g", arg_linecolor.f_g)
-    ue_arg_float(call, "linecolor.b", arg_linecolor.f_b)
-    ue_arg_float(call, "linecolor.a", arg_linecolor.f_a)
+    __ue_method_arg_linear_color(call, "linecolor", arg_linecolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_float(call, "thickness", arg_thickness)
     ue_arg_enum(call, "depthpriority", "/Script/Engine.EDrawDebugSceneDepthPriorityGroup", E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd_to_symbol(arg_depthpriority))
@@ -8372,17 +8343,14 @@ def ue_system_DrawDebugCapsule(arg_center : UEVector; arg_halfheight : float; ar
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugCircle", signature="v1;DrawDebugCircle;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;NumSegments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;YAxis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZAxis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};bDrawAxis:BoolProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
-def ue_system_DrawDebugCircle(arg_center : UEVector; arg_radius : float; arg_numsegments : int; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_yaxis : UEVector; arg_zaxis : UEVector; arg_bdrawaxis : bool; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
+def ue_system_DrawDebugCircle(arg_center : UEVector; arg_radius : float; arg_numsegments : int; arg_linecolor : UELinearColor; arg_duration : float; arg_thickness : float; arg_yaxis : UEVector; arg_zaxis : UEVector; arg_bdrawaxis : bool; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugCircle", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugCircle;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;NumSegments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;YAxis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZAxis:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};bDrawAxis:BoolProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "center", arg_center)
     ue_arg_float(call, "radius", arg_radius)
     ue_arg_int(call, "numsegments", arg_numsegments)
-    ue_arg_float(call, "linecolor.r", arg_linecolor.f_r)
-    ue_arg_float(call, "linecolor.g", arg_linecolor.f_g)
-    ue_arg_float(call, "linecolor.b", arg_linecolor.f_b)
-    ue_arg_float(call, "linecolor.a", arg_linecolor.f_a)
+    __ue_method_arg_linear_color(call, "linecolor", arg_linecolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_float(call, "thickness", arg_thickness)
     __ue_method_arg_vector(call, "yaxis", arg_yaxis)
@@ -8394,7 +8362,7 @@ def ue_system_DrawDebugCircle(arg_center : UEVector; arg_radius : float; arg_num
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugConeInDegrees", signature="v1;DrawDebugConeInDegrees;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Origin:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Direction:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Length:FloatProperty:128;AngleWidth:FloatProperty:128;AngleHeight:FloatProperty:128;NumSides:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
-def ue_system_DrawDebugConeInDegrees(arg_origin : UEVector; arg_direction : UEVector; arg_length : float; arg_anglewidth : float; arg_angleheight : float; arg_numsides : int; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
+def ue_system_DrawDebugConeInDegrees(arg_origin : UEVector; arg_direction : UEVector; arg_length : float; arg_anglewidth : float; arg_angleheight : float; arg_numsides : int; arg_linecolor : UELinearColor; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugConeInDegrees", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugConeInDegrees;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Origin:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Direction:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Length:FloatProperty:128;AngleWidth:FloatProperty:128;AngleHeight:FloatProperty:128;NumSides:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
     ue_require_call_context(call, false)
@@ -8404,10 +8372,7 @@ def ue_system_DrawDebugConeInDegrees(arg_origin : UEVector; arg_direction : UEVe
     ue_arg_float(call, "anglewidth", arg_anglewidth)
     ue_arg_float(call, "angleheight", arg_angleheight)
     ue_arg_int(call, "numsides", arg_numsides)
-    ue_arg_float(call, "linecolor.r", arg_linecolor.f_r)
-    ue_arg_float(call, "linecolor.g", arg_linecolor.f_g)
-    ue_arg_float(call, "linecolor.b", arg_linecolor.f_b)
-    ue_arg_float(call, "linecolor.a", arg_linecolor.f_a)
+    __ue_method_arg_linear_color(call, "linecolor", arg_linecolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_float(call, "thickness", arg_thickness)
     ue_arg_enum(call, "depthpriority", "/Script/Engine.EDrawDebugSceneDepthPriorityGroup", E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd_to_symbol(arg_depthpriority))
@@ -8431,7 +8396,7 @@ def ue_system_DrawDebugCoordinateSystem(arg_axisloc : UEVector; arg_axisrot : UE
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugCylinder", signature="v1;DrawDebugCylinder;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Start:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};End:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;Segments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
-def ue_system_DrawDebugCylinder(arg_start : UEVector; arg_end : UEVector; arg_radius : float; arg_segments : int; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
+def ue_system_DrawDebugCylinder(arg_start : UEVector; arg_end : UEVector; arg_radius : float; arg_segments : int; arg_linecolor : UELinearColor; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugCylinder", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugCylinder;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Start:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};End:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;Segments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
     ue_require_call_context(call, false)
@@ -8439,10 +8404,7 @@ def ue_system_DrawDebugCylinder(arg_start : UEVector; arg_end : UEVector; arg_ra
     __ue_method_arg_vector(call, "end", arg_end)
     ue_arg_float(call, "radius", arg_radius)
     ue_arg_int(call, "segments", arg_segments)
-    ue_arg_float(call, "linecolor.r", arg_linecolor.f_r)
-    ue_arg_float(call, "linecolor.g", arg_linecolor.f_g)
-    ue_arg_float(call, "linecolor.b", arg_linecolor.f_b)
-    ue_arg_float(call, "linecolor.a", arg_linecolor.f_a)
+    __ue_method_arg_linear_color(call, "linecolor", arg_linecolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_float(call, "thickness", arg_thickness)
     ue_arg_enum(call, "depthpriority", "/Script/Engine.EDrawDebugSceneDepthPriorityGroup", E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd_to_symbol(arg_depthpriority))
@@ -8451,7 +8413,7 @@ def ue_system_DrawDebugCylinder(arg_start : UEVector; arg_end : UEVector; arg_ra
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugFloatHistoryLocation", signature="v1;DrawDebugFloatHistoryLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FloatHistory:StructProperty:134218114:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};DrawLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DrawSize:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DrawColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")]
-def ue_system_DrawDebugFloatHistoryLocation(arg_floathistory : S_DebugFloatHistory_f7f88be1; arg_drawlocation : UEVector; arg_drawsize : UEVector2D; arg_drawcolor : S_LinearColor_f4abb14b; arg_duration : float) {
+def ue_system_DrawDebugFloatHistoryLocation(arg_floathistory : S_DebugFloatHistory_f7f88be1; arg_drawlocation : UEVector; arg_drawsize : UEVector2D; arg_drawcolor : UELinearColor; arg_duration : float) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugFloatHistoryLocation", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugFloatHistoryLocation;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FloatHistory:StructProperty:134218114:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};DrawLocation:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};DrawSize:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DrawColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")
     ue_require_call_context(call, false)
@@ -8465,17 +8427,14 @@ def ue_system_DrawDebugFloatHistoryLocation(arg_floathistory : S_DebugFloatHisto
     ue_arg_bool(call, "floathistory.bautoadjustminmax", arg_floathistory.f_bautoadjustminmax)
     __ue_method_arg_vector(call, "drawlocation", arg_drawlocation)
     __ue_method_arg_vector2d(call, "drawsize", arg_drawsize)
-    ue_arg_float(call, "drawcolor.r", arg_drawcolor.f_r)
-    ue_arg_float(call, "drawcolor.g", arg_drawcolor.f_g)
-    ue_arg_float(call, "drawcolor.b", arg_drawcolor.f_b)
-    ue_arg_float(call, "drawcolor.a", arg_drawcolor.f_a)
+    __ue_method_arg_linear_color(call, "drawcolor", arg_drawcolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_invoke_call(call)
     ue_release_call(call)
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugFloatHistoryTransform", signature="v1;DrawDebugFloatHistoryTransform;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FloatHistory:StructProperty:134218114:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};DrawTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};DrawSize:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DrawColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")]
-def ue_system_DrawDebugFloatHistoryTransform(arg_floathistory : S_DebugFloatHistory_f7f88be1; arg_drawtransform : UETransform; arg_drawsize : UEVector2D; arg_drawcolor : S_LinearColor_f4abb14b; arg_duration : float) {
+def ue_system_DrawDebugFloatHistoryTransform(arg_floathistory : S_DebugFloatHistory_f7f88be1; arg_drawtransform : UETransform; arg_drawsize : UEVector2D; arg_drawcolor : UELinearColor; arg_duration : float) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugFloatHistoryTransform", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugFloatHistoryTransform;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FloatHistory:StructProperty:134218114:/Script/Engine.DebugFloatHistory\{Samples:ArrayProperty:0[Samples:FloatProperty:0;];MaxSamples:IntProperty:0;MinValue:FloatProperty:0;MaxValue:FloatProperty:0;bAutoAdjustMinMax:BoolProperty:0;\};DrawTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};DrawSize:StructProperty:128:/Script/CoreUObject.Vector2D\{X:DoubleProperty:0;Y:DoubleProperty:0;\};DrawColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")
     ue_require_call_context(call, false)
@@ -8489,25 +8448,19 @@ def ue_system_DrawDebugFloatHistoryTransform(arg_floathistory : S_DebugFloatHist
     ue_arg_bool(call, "floathistory.bautoadjustminmax", arg_floathistory.f_bautoadjustminmax)
     __ue_method_arg_transform(call, "drawtransform", arg_drawtransform)
     __ue_method_arg_vector2d(call, "drawsize", arg_drawsize)
-    ue_arg_float(call, "drawcolor.r", arg_drawcolor.f_r)
-    ue_arg_float(call, "drawcolor.g", arg_drawcolor.f_g)
-    ue_arg_float(call, "drawcolor.b", arg_drawcolor.f_b)
-    ue_arg_float(call, "drawcolor.a", arg_drawcolor.f_a)
+    __ue_method_arg_linear_color(call, "drawcolor", arg_drawcolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_invoke_call(call)
     ue_release_call(call)
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugFrustum", signature="v1;DrawDebugFrustum;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FrustumTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};FrustumColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;")]
-def ue_system_DrawDebugFrustum(arg_frustumtransform : UETransform; arg_frustumcolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float) {
+def ue_system_DrawDebugFrustum(arg_frustumtransform : UETransform; arg_frustumcolor : UELinearColor; arg_duration : float; arg_thickness : float) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugFrustum", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugFrustum;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;FrustumTransform:StructProperty:134218114:/Script/CoreUObject.Transform\{Rotation:StructProperty:0:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Translation:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Scale3D:StructProperty:0:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};FrustumColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;")
     ue_require_call_context(call, false)
     __ue_method_arg_transform(call, "frustumtransform", arg_frustumtransform)
-    ue_arg_float(call, "frustumcolor.r", arg_frustumcolor.f_r)
-    ue_arg_float(call, "frustumcolor.g", arg_frustumcolor.f_g)
-    ue_arg_float(call, "frustumcolor.b", arg_frustumcolor.f_b)
-    ue_arg_float(call, "frustumcolor.a", arg_frustumcolor.f_a)
+    __ue_method_arg_linear_color(call, "frustumcolor", arg_frustumcolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_float(call, "thickness", arg_thickness)
     ue_invoke_call(call)
@@ -8515,16 +8468,13 @@ def ue_system_DrawDebugFrustum(arg_frustumtransform : UETransform; arg_frustumco
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugLine", signature="v1;DrawDebugLine;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;LineStart:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
-def ue_system_DrawDebugLine(arg_linestart : UEVector; arg_lineend : UEVector; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
+def ue_system_DrawDebugLine(arg_linestart : UEVector; arg_lineend : UEVector; arg_linecolor : UELinearColor; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugLine", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugLine;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;LineStart:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineEnd:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "linestart", arg_linestart)
     __ue_method_arg_vector(call, "lineend", arg_lineend)
-    ue_arg_float(call, "linecolor.r", arg_linecolor.f_r)
-    ue_arg_float(call, "linecolor.g", arg_linecolor.f_g)
-    ue_arg_float(call, "linecolor.b", arg_linecolor.f_b)
-    ue_arg_float(call, "linecolor.a", arg_linecolor.f_a)
+    __ue_method_arg_linear_color(call, "linecolor", arg_linecolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_float(call, "thickness", arg_thickness)
     ue_arg_enum(call, "depthpriority", "/Script/Engine.EDrawDebugSceneDepthPriorityGroup", E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd_to_symbol(arg_depthpriority))
@@ -8533,7 +8483,7 @@ def ue_system_DrawDebugLine(arg_linestart : UEVector; arg_lineend : UEVector; ar
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugPlane", signature="v1;DrawDebugPlane;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlaneCoordinates:StructProperty:134218114:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Location:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Size:FloatProperty:128;PlaneColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
-def ue_system_DrawDebugPlane(arg_planecoordinates : S_Plane_a3bdbfa8; arg_location : UEVector; arg_size : float; arg_planecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
+def ue_system_DrawDebugPlane(arg_planecoordinates : S_Plane_a3bdbfa8; arg_location : UEVector; arg_size : float; arg_planecolor : UELinearColor; arg_duration : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugPlane", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugPlane;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;PlaneCoordinates:StructProperty:134218114:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Location:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Size:FloatProperty:128;PlaneColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
     ue_require_call_context(call, false)
@@ -8543,10 +8493,7 @@ def ue_system_DrawDebugPlane(arg_planecoordinates : S_Plane_a3bdbfa8; arg_locati
     ue_arg_double(call, "planecoordinates.z", arg_planecoordinates.f_z)
     __ue_method_arg_vector(call, "location", arg_location)
     ue_arg_float(call, "size", arg_size)
-    ue_arg_float(call, "planecolor.r", arg_planecolor.f_r)
-    ue_arg_float(call, "planecolor.g", arg_planecolor.f_g)
-    ue_arg_float(call, "planecolor.b", arg_planecolor.f_b)
-    ue_arg_float(call, "planecolor.a", arg_planecolor.f_a)
+    __ue_method_arg_linear_color(call, "planecolor", arg_planecolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_enum(call, "depthpriority", "/Script/Engine.EDrawDebugSceneDepthPriorityGroup", E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd_to_symbol(arg_depthpriority))
     ue_invoke_call(call)
@@ -8554,16 +8501,13 @@ def ue_system_DrawDebugPlane(arg_planecoordinates : S_Plane_a3bdbfa8; arg_locati
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugPoint", signature="v1;DrawDebugPoint;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Position:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Size:FloatProperty:128;PointColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
-def ue_system_DrawDebugPoint(arg_position : UEVector; arg_size : float; arg_pointcolor : S_LinearColor_f4abb14b; arg_duration : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
+def ue_system_DrawDebugPoint(arg_position : UEVector; arg_size : float; arg_pointcolor : UELinearColor; arg_duration : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugPoint", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugPoint;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Position:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Size:FloatProperty:128;PointColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "position", arg_position)
     ue_arg_float(call, "size", arg_size)
-    ue_arg_float(call, "pointcolor.r", arg_pointcolor.f_r)
-    ue_arg_float(call, "pointcolor.g", arg_pointcolor.f_g)
-    ue_arg_float(call, "pointcolor.b", arg_pointcolor.f_b)
-    ue_arg_float(call, "pointcolor.a", arg_pointcolor.f_a)
+    __ue_method_arg_linear_color(call, "pointcolor", arg_pointcolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_enum(call, "depthpriority", "/Script/Engine.EDrawDebugSceneDepthPriorityGroup", E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd_to_symbol(arg_depthpriority))
     ue_invoke_call(call)
@@ -8571,17 +8515,14 @@ def ue_system_DrawDebugPoint(arg_position : UEVector; arg_size : float; arg_poin
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugSphere", signature="v1;DrawDebugSphere;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;Segments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")]
-def ue_system_DrawDebugSphere(arg_center : UEVector; arg_radius : float; arg_segments : int; arg_linecolor : S_LinearColor_f4abb14b; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
+def ue_system_DrawDebugSphere(arg_center : UEVector; arg_radius : float; arg_segments : int; arg_linecolor : UELinearColor; arg_duration : float; arg_thickness : float; arg_depthpriority : E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugSphere", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugSphere;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;Center:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Radius:FloatProperty:128;Segments:IntProperty:128;LineColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Thickness:FloatProperty:128;DepthPriority:EnumProperty:128:/Script/Engine.EDrawDebugSceneDepthPriorityGroup;")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "center", arg_center)
     ue_arg_float(call, "radius", arg_radius)
     ue_arg_int(call, "segments", arg_segments)
-    ue_arg_float(call, "linecolor.r", arg_linecolor.f_r)
-    ue_arg_float(call, "linecolor.g", arg_linecolor.f_g)
-    ue_arg_float(call, "linecolor.b", arg_linecolor.f_b)
-    ue_arg_float(call, "linecolor.a", arg_linecolor.f_a)
+    __ue_method_arg_linear_color(call, "linecolor", arg_linecolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_float(call, "thickness", arg_thickness)
     ue_arg_enum(call, "depthpriority", "/Script/Engine.EDrawDebugSceneDepthPriorityGroup", E_EDrawDebugSceneDepthPriorityGroup_9a69dbbd_to_symbol(arg_depthpriority))
@@ -8590,17 +8531,14 @@ def ue_system_DrawDebugSphere(arg_center : UEVector; arg_radius : float; arg_seg
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="DrawDebugString", signature="v1;DrawDebugString;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;TextLocation:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Text:StrProperty:128;TestBaseActor:ObjectProperty:128:/Script/Engine.Actor;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")]
-def ue_system_DrawDebugString(arg_textlocation : UEVector; arg_text : string; arg_testbaseactor : C_Actor_adf65d5b; arg_textcolor : S_LinearColor_f4abb14b; arg_duration : float) {
+def ue_system_DrawDebugString(arg_textlocation : UEVector; arg_text : string; arg_testbaseactor : C_Actor_adf65d5b; arg_textcolor : UELinearColor; arg_duration : float) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "DrawDebugString", "worldcontextobject")
     ue_expect_signature(call, "v1;DrawDebugString;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;TextLocation:StructProperty:130:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};Text:StrProperty:128;TestBaseActor:ObjectProperty:128:/Script/Engine.Actor;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "textlocation", arg_textlocation)
     ue_arg_string(call, "text", arg_text)
     ue_arg_object(call, "testbaseactor", C_Actor_adf65d5b_raw(arg_testbaseactor))
-    ue_arg_float(call, "textcolor.r", arg_textcolor.f_r)
-    ue_arg_float(call, "textcolor.g", arg_textcolor.f_g)
-    ue_arg_float(call, "textcolor.b", arg_textcolor.f_b)
-    ue_arg_float(call, "textcolor.a", arg_textcolor.f_a)
+    __ue_method_arg_linear_color(call, "textcolor", arg_textcolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_invoke_call(call)
     ue_release_call(call)
@@ -9927,17 +9865,14 @@ def ue_system_ParseParamValue(arg_instring : string; arg_inparam : string) : ue_
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="PrintString", signature="v1;PrintString;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InString:StrProperty:128;bPrintToScreen:BoolProperty:128;bPrintToLog:BoolProperty:128;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Key:NameProperty:130;")]
-def ue_system_PrintString(arg_instring : string; arg_bprinttoscreen : bool; arg_bprinttolog : bool; arg_textcolor : S_LinearColor_f4abb14b; arg_duration : float; arg_key : UEName) {
+def ue_system_PrintString(arg_instring : string; arg_bprinttoscreen : bool; arg_bprinttolog : bool; arg_textcolor : UELinearColor; arg_duration : float; arg_key : UEName) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "PrintString", "worldcontextobject")
     ue_expect_signature(call, "v1;PrintString;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InString:StrProperty:128;bPrintToScreen:BoolProperty:128;bPrintToLog:BoolProperty:128;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Key:NameProperty:130;")
     ue_require_call_context(call, false)
     ue_arg_string(call, "instring", arg_instring)
     ue_arg_bool(call, "bprinttoscreen", arg_bprinttoscreen)
     ue_arg_bool(call, "bprinttolog", arg_bprinttolog)
-    ue_arg_float(call, "textcolor.r", arg_textcolor.f_r)
-    ue_arg_float(call, "textcolor.g", arg_textcolor.f_g)
-    ue_arg_float(call, "textcolor.b", arg_textcolor.f_b)
-    ue_arg_float(call, "textcolor.a", arg_textcolor.f_a)
+    __ue_method_arg_linear_color(call, "textcolor", arg_textcolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_name(call, "key", arg_key.value)
     ue_invoke_call(call)
@@ -9945,17 +9880,14 @@ def ue_system_PrintString(arg_instring : string; arg_bprinttoscreen : bool; arg_
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetSystemLibrary", method="PrintText", signature="v1;PrintText;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InText:TextProperty:130;bPrintToScreen:BoolProperty:128;bPrintToLog:BoolProperty:128;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Key:NameProperty:130;")]
-def ue_system_PrintText(arg_intext : UETextValue; arg_bprinttoscreen : bool; arg_bprinttolog : bool; arg_textcolor : S_LinearColor_f4abb14b; arg_duration : float; arg_key : UEName) {
+def ue_system_PrintText(arg_intext : UETextValue; arg_bprinttoscreen : bool; arg_bprinttolog : bool; arg_textcolor : UELinearColor; arg_duration : float; arg_key : UEName) {
     let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "PrintText", "worldcontextobject")
     ue_expect_signature(call, "v1;PrintText;WorldContextObject:ObjectProperty:130:/Script/CoreUObject.Object;InText:TextProperty:130;bPrintToScreen:BoolProperty:128;bPrintToLog:BoolProperty:128;TextColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Duration:FloatProperty:128;Key:NameProperty:130;")
     ue_require_call_context(call, false)
     __ue_method_arg_text(call, "intext", arg_intext)
     ue_arg_bool(call, "bprinttoscreen", arg_bprinttoscreen)
     ue_arg_bool(call, "bprinttolog", arg_bprinttolog)
-    ue_arg_float(call, "textcolor.r", arg_textcolor.f_r)
-    ue_arg_float(call, "textcolor.g", arg_textcolor.f_g)
-    ue_arg_float(call, "textcolor.b", arg_textcolor.f_b)
-    ue_arg_float(call, "textcolor.a", arg_textcolor.f_a)
+    __ue_method_arg_linear_color(call, "textcolor", arg_textcolor)
     ue_arg_float(call, "duration", arg_duration)
     ue_arg_name(call, "key", arg_key.value)
     ue_invoke_call(call)

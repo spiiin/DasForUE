@@ -207,7 +207,35 @@ struct FDasPersistentGlobalValue
 class FUnrealDasContext final : public das::Context, public FGCObject
 {
 public:
-    explicit FUnrealDasContext(uint32 StackSize) : das::Context(StackSize) { ++GDasSelfSiteEpoch; }
+    explicit FUnrealDasContext(uint32 StackSize) : das::Context(StackSize)
+    {
+        ++GDasSelfSiteEpoch;
+        alwaysStackWalkOnException = true;
+        showArgumentsOnException = false;
+        showLocalVariablesOnException = false;
+    }
+    FDasSourceLocation DiagnosticFault;
+    FString DiagnosticException, DiagnosticStack;
+    virtual void to_err(const das::LineInfo* At, const char* Text) override
+    {
+        if (!getException())
+        {
+            das::Context::to_err(At, Text);
+            return;
+        }
+        DiagnosticException = UTF8_TO_TCHAR(getException());
+        DiagnosticStack = UTF8_TO_TCHAR(Text);
+        const auto* Site = exceptionAt.fileInfo
+                               ? &exceptionAt
+                               : (DasNativeDiagnosticSite.Context == this ? DasNativeDiagnosticSite.At : At);
+        DiagnosticFault = {};
+        if (Site && Site->fileInfo)
+        {
+            DiagnosticFault.File = UTF8_TO_TCHAR(Site->fileInfo->name.c_str());
+            DiagnosticFault.Line = int32(Site->line);
+            DiagnosticFault.Column = int32(Site->column) + 1;
+        }
+    }
     virtual ~FUnrealDasContext() { ++GDasSelfSiteEpoch; }
     void* PersistentGlobalStorage(uint64 Hash)
     {
@@ -366,6 +394,7 @@ thread_local int32 AuthoredDispatchDepth = 0;
 thread_local FString* AuthoredDispatchFailure = nullptr;
 struct FActiveContextScope
 {
+    TGuardValue<FDasNativeDiagnosticSite> DiagnosticBoundary{DasNativeDiagnosticSite, FDasNativeDiagnosticSite{}};
     FUnrealDasContext* Previous;
     TSet<uint64> ExistingCalls;
     uint64 PreviousToken = ActiveScopeToken;

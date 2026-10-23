@@ -10,11 +10,14 @@
 #include "DasGASAuthoring.h"
 #include "DasGASCalculations.h"
 #include "DasMathAdapters.h"
+#include "DasDiagnostics.h"
 #include "Engine/CurveTable.h"
 #include "Engine/DataTable.h"
 #include "DasDataAssets.h"
 #include "DasPrimaryAssets.h"
 #include "DasSaveGame.h"
+#include "DasSubsystems.h"
+#include "Engine/GameInstance.h"
 #include "DasSaveGameProxy.h"
 #include "DasAIMoveProxy.h"
 #include "AIController.h"
@@ -493,6 +496,9 @@ MAKE_TYPE_FACTORY(InputActionValue, FDasInputActionValue);
 MAKE_TYPE_FACTORY(UEVector2D, FVector2D);
 MAKE_TYPE_FACTORY(UEVector, FVector);
 MAKE_TYPE_FACTORY(UERotator, FRotator);
+MAKE_TYPE_FACTORY(UEQuat, FQuat);
+MAKE_TYPE_FACTORY(UELinearColor, FLinearColor);
+MAKE_TYPE_FACTORY(UEColor, FColor);
 MAKE_TYPE_FACTORY(UETransform, FTransform);
 // A source-side checked view of a native FHitResult. References are weak handles.
 struct FDasTraceHit
@@ -573,6 +579,7 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 
 #include "DasRuntimeState.inl"
 #include "DasRuntimeSelfValues.inl"
+#include "DasBuiltinValueOps.inl"
 #include "DasRuntimeStructValues.inl"
 #include "DasRuntimeFramesWidgets.inl"
 #include "DasRuntimeObjectAccess.inl"
@@ -593,12 +600,14 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 
 void* dasue::aot::Resolve(uint64_t Key, das::Context* Context)
 {
-    if (!Context) throw std::runtime_error("UE AOT call requires a context");
+    if (!Context)
+        throw std::runtime_error("UE AOT call requires a context");
     if (!IsInGameThread() || !ActiveContext || Context != ActiveContext)
         Context->throw_error("UE AOT requires the active game-thread context");
     GuardUEExtern();
     const auto* Entry = UEAotEntries.Find(Key);
-    if (!Entry) Context->throw_error("UE AOT extern ABI is absent or stale; regenerate and rebuild");
+    if (!Entry)
+        Context->throw_error("UE AOT extern ABI is absent or stale; regenerate and rebuild");
     return Entry->Function;
 }
 
@@ -619,8 +628,14 @@ void FDasRuntimeModule::StartupModule()
     UEAotEntries.Reset();
     das::Module::Initialize();
     new FUnrealFoundationModule();
-    InputRestoreTickHandle = FWorldDelegates::OnWorldTickStart.AddLambda([](UWorld* World, ELevelTick, float)
-                                                                         { ReconcileScriptInput(World); });
+    InputRestoreTickHandle = FWorldDelegates::OnWorldTickStart.AddLambda(
+        [](UWorld* World, ELevelTick, float)
+        {
+            for (const auto& Session : Sessions)
+                if (Session->Owner.IsValid() && Session->Owner->IsA<UDasGameInstanceSubsystem>())
+                    Session->World = Session->Owner->GetWorld();
+            ReconcileScriptInput(World);
+        });
     WorldCleanupHandle = FWorldDelegates::OnWorldCleanup.AddLambda(
         [](UWorld* World, bool, bool)
         {
@@ -628,15 +643,30 @@ void FDasRuntimeModule::StartupModule()
             for (auto It = InitializerDeliveries.CreateIterator(); It; ++It)
             {
                 auto* O = It.Key().Get();
-                if (!O || O->GetWorld() == World)
+                if (!O ||
+                    (O->GetWorld() == World && !O->IsA<UDasGameInstanceSubsystem>() && !O->IsA<UDasWorldSubsystem>()))
                     It.RemoveCurrent();
             }
             for (const auto& Session : Sessions)
-                if (Session->World.Get() == World)
+                if (Session->World.Get() == World && Session->Owner.IsValid() &&
+                    Session->Owner->IsA<UDasGameInstanceSubsystem>())
+                {
+                    ClearSessionTimers(*Session);
+                    Session->Bindings.Empty();
+                    Session->InputContexts.Empty();
+                    Session->InputRecipes.Empty();
+                    Session->ContextRecipes.Empty();
+                }
+            for (const auto& Session : Sessions)
+                if (Session->World.Get() == World &&
+                    (!Session->Owner.IsValid() ||
+                     (!Session->Owner->IsA<UDasGameInstanceSubsystem>() && !Session->Owner->IsA<UDasWorldSubsystem>())))
                     RevokeSession(*Session);
 #if WITH_EDITOR
             for (const auto& Session : PreservedSessions)
-                if (Session->World.Get() == World)
+                if (Session->World.Get() == World &&
+                    (!Session->Owner.IsValid() ||
+                     (!Session->Owner->IsA<UDasGameInstanceSubsystem>() && !Session->Owner->IsA<UDasWorldSubsystem>())))
                     RevokeSession(*Session);
 #endif
             FlushReleasedSessions();
@@ -736,6 +766,7 @@ void FDasRuntimeModule::ShutdownModule()
     DasRemoveScriptWriteTracker();
     // Release rooted callback signatures while UObject storage is still valid.
     FCoreDelegates::OnPreExit.Remove(RuntimePreExitHandle);
+    ResetDasSubsystemClasses();
     RuntimePreExitHandle.Reset();
     UDasAsyncPhysicsBridge::RevokeAll();
     DSLPhysicsOwners.Empty();

@@ -43,6 +43,7 @@ struct FUENativeStructAnnotation : das::StructureAnnotation
     virtual bool look(const das::StructurePtr& S, das::ModuleGroup&, das::AnnotationArgumentList&,
                       das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(S->at, UTF8_TO_TCHAR(S->name.c_str()));
         try
         {
             DSLDeclarationKind(S->annotations);
@@ -65,6 +66,7 @@ struct FUENativeEnumAnnotation : das::EnumerationAnnotation
     virtual bool touch(const das::EnumerationPtr& E, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(E->at, UTF8_TO_TCHAR(E->name.c_str()));
         try
         {
             DSLAnnotationArguments(Args);
@@ -131,9 +133,10 @@ struct FUENativeEnumAnnotation : das::EnumerationAnnotation
 struct FUEEnumAnnotation : das::EnumerationAnnotation
 {
     FUEEnumAnnotation() : EnumerationAnnotation("ue_enum") {}
-    virtual bool touch(const das::EnumerationPtr& E, das::ModuleGroup&, das::AnnotationArgumentList& Args,
+    virtual bool touch(const das::EnumerationPtr& E, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope Diagnostic(E->at, DSLText(E->name));
         try
         {
             if (const auto* Wire = Args.find(DSLTypesKey, das::Type::tString))
@@ -186,9 +189,10 @@ struct FUEEnumAnnotation : das::EnumerationAnnotation
 struct FUEStructAnnotation : das::StructureAnnotation
 {
     FUEStructAnnotation() : StructureAnnotation("ue_struct") {}
-    virtual bool look(const das::StructurePtr& St, das::ModuleGroup&, das::AnnotationArgumentList&,
+    virtual bool look(const das::StructurePtr& St, das::ModuleGroup& Group, das::AnnotationArgumentList&,
                       das::string& Error) override
     {
+        FDSLDiagnosticEntityScope Diagnostics(St, Group);
         try
         {
             DSLDeclarationKind(St->annotations);
@@ -204,6 +208,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& S, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticEntityScope Diagnostics(S, Group);
         try
         {
             DSLCommentTooltip(S->at, Args);
