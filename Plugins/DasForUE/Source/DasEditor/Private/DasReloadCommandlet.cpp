@@ -694,7 +694,9 @@ public:
         Source->EmitDasSignal(1);
         Check(!Fallback.ReloadError.IsEmpty() && Call(First).Value == 33 && Call(Second).Value == 33,
               TEXT("failed_reload_preserves_both_bindings"));
-        Check(First->Destroy() && Source->OnDasSignal.GetAllObjects().Num() == 1 && Runtime.SubscriptionCount() == 1,
+        // Per owner: with several PIE clients every client has its own pair of actors and subscriptions.
+        Check(First->Destroy() && Source->OnDasSignal.GetAllObjects().Num() == 1 &&
+                  Runtime.SubscriptionCount(First) == 0 && Runtime.SubscriptionCount(Second) == 1,
               TEXT("Destroy_removes_only_destroyed_owner_subscription"));
         Source->EmitDasSignal(1);
         Check(Call(Second).Value == 43, TEXT("remaining_listener_still_receives"));
@@ -720,7 +722,8 @@ public:
         Source->OnDasSignal.AddDynamic(Destroyer.Get(), &UDasDelegateDestroyer::OnSignal);
         const auto LastCall = Call(Source);
         Check(LastCall.bSucceeded && LastCall.Value == 42 && Destroyer->Calls == 1 && Source->IsActorBeingDestroyed() &&
-                  Runtime.SubscriptionCount() == 1 && Runtime.PersistentContextCount(World) == 1,
+                  Runtime.SubscriptionCount(Source) == 0 && Runtime.SubscriptionCount(Second) == 1 &&
+                  Runtime.PersistentContextCount(World) == 1,
               TEXT("destroy_inside_VM_defers_context_free_and_revokes_callbacks"));
 
         GEditor->RequestEndPlayMap();

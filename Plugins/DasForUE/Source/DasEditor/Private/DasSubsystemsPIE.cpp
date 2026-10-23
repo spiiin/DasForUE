@@ -54,6 +54,8 @@ struct FSubsystemPIEState
         Settings->SetPlayNetMode(OldMode);
         Settings->SetPlayNumberOfClients(OldClients);
         Settings->SetRunUnderOneProcess(OldSingle);
+        // Starting PIE saved the two-client settings to the user config; save the restored ones too.
+        Settings->SaveConfig();
         if (!Path.IsEmpty())
             IFileManager::Get().Delete(*Path, false, true);
     }
