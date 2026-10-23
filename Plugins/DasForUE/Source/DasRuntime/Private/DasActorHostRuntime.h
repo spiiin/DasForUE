@@ -2,6 +2,7 @@
 #include <type_traits>
 #include "DasRuntime.h"
 #include "DasScriptComponent.h"
+#include "DasCallPhases.h"
 #include "Components/SceneComponent.h"
 #include "Modules/ModuleManager.h"
 #include "Misc/Paths.h"
@@ -122,9 +123,14 @@ struct FDasActorHostRuntime
             Failed.Kind = -1;
             return Failed;
         }
+        DasCallPhaseMark(EDasCallPhase::BlueprintGraph);
         auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
-        const auto V = R.RunNamedFramePersistent(R.ScriptPath(File), Entry, Args,
-                                                 static_cast<EDasMethodSignature>(Kind), &A, ResultClass);
+        DasCallPhaseMark(EDasCallPhase::BridgeModule);
+        const FString Path = R.ScriptPath(File);
+        DasCallPhaseMark(EDasCallPhase::BridgeScriptPath);
+        const auto V =
+            R.RunNamedFramePersistent(Path, Entry, Args, static_cast<EDasMethodSignature>(Kind), &A, ResultClass);
+        DasCallPhaseMark(EDasCallPhase::Exit);
         A.RecordLifecycleResult(V);
         FDasScalarValue Result;
         Result.Kind = V.bSucceeded ? Kind : -1;
@@ -144,6 +150,7 @@ struct FDasActorHostRuntime
         Result.StructValue = V.StructValue;
         Result.DelegateValue = V.DelegateValue;
         Result.ObjectClass = (Kind == 8 || Kind == 13 || Kind == 15 || Kind == 16) ? ResultClass : FString();
+        DasCallPhaseMark(EDasCallPhase::BridgeResult);
         return Result;
     }
     template <class T>

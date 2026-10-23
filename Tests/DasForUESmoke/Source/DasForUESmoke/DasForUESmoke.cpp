@@ -5,6 +5,7 @@
 #include "Misc/Parse.h"
 #include "Misc/FileHelper.h"
 #include "DasRuntime.h"
+#include "DasInteropProbe.h"
 #include "DasExtendedDefaultsProbe.h"
 #include "DasDefaultsMergeProbe.h"
 #include "DasInheritedDefaultsProbe.h"
@@ -43,6 +44,17 @@ public:
                 bool Passed=RunDasPerformanceProbe(Report,Json,Iterations,Samples);
                 if(!Output.IsEmpty())Passed &= FFileHelper::SaveStringToFile(Json,*Output,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
                 UE_LOG(LogTemp,Display,TEXT("%s"),*Report);UE_LOG(LogTemp,Display,TEXT("DAS_PERFORMANCE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));
+                FPlatformMisc::RequestExitWithStatus(false,Passed?0:1);
+            });return;
+        }
+        if(FParse::Param(FCommandLine::Get(),TEXT("DasInteropPerformance"))){
+            InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{
+                FDasInteropBench Bench;FString Output,Report,Json;
+                FParse::Value(FCommandLine::Get(),TEXT("PerfSamples="),Bench.Samples);FParse::Value(FCommandLine::Get(),TEXT("PerfOutput="),Output);
+                Bench.Samples=FMath::Max(Bench.Samples,1);RunDasInteropProbe(Bench);
+                bool Passed=Bench.Finish(Report,Json,TEXT("packaged"));
+                if(!Output.IsEmpty())Passed &= FFileHelper::SaveStringToFile(Json,*Output,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+                UE_LOG(LogTemp,Display,TEXT("%s"),*Report);UE_LOG(LogTemp,Display,TEXT("DAS_INTEROP_PERFORMANCE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));
                 FPlatformMisc::RequestExitWithStatus(false,Passed?0:1);
             });return;
         }

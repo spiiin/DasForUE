@@ -10,10 +10,11 @@ UDasUEAotCommandlet::UDasUEAotCommandlet()
 }
 int32 UDasUEAotCommandlet::Main(const FString& Params)
 {
-    FString Output, Report;
+    FString Output, Report, Script = TEXT("aot_ue_guard.das");
+    FParse::Value(*Params, TEXT("Script="), Script);
     if (FParse::Value(*Params, TEXT("Output="), Output))
     {
-        if (!GenerateDasUEAotProbe(Output, Report))
+        if (!GenerateDasUEAotProbe(Output, Report, Script))
         {
             UE_LOG(LogTemp, Error, TEXT("%s"), *Report);
             return 1;

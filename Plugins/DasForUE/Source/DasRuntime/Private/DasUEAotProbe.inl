@@ -1,5 +1,5 @@
 // Included in DasRuntime.cpp; does not expose VM internals to user scripts.
-bool GenerateDasUEAotProbe(const FString& Output, FString& Error)
+bool GenerateDasUEAotProbe(const FString& Output, FString& Error, const FString& Script)
 {
     if (!IsInGameThread())
     {
@@ -13,7 +13,7 @@ bool GenerateDasUEAotProbe(const FString& Output, FString& Error)
         auto Access = das::make_smart<FUnrealFileAccess>();
         Access->addFileSystem(new FUnrealFileSystem(), true, false);
         auto& Runtime = FModuleManager::GetModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
-        FTCHARToUTF8 File(*Runtime.ScriptPath(TEXT("aot_ue_guard.das")));
+        FTCHARToUTF8 File(*Runtime.ScriptPath(Script));
         das::CodeOfPolicies Policies;
         Policies.aot = false;
         Policies.aot_module = true;

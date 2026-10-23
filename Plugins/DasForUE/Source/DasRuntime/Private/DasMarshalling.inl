@@ -1039,6 +1039,7 @@ FDasObjectHandle GetCallObject(const FDasCallHandle& Handle, const char* Path, d
 
 void InvokeCall(const FDasCallHandle& Handle, das::Context* Context)
 {
+    DasCallPhaseMark(EDasCallPhase::AuthoredArguments);
     auto& Call = ResolveCall(Handle, Context);
     if (!Call.CallbackFramePath.IsEmpty())
         Context->throw_error("callback builders cannot invoke a UFunction");
@@ -1122,10 +1123,12 @@ void InvokeCall(const FDasCallHandle& Handle, das::Context* Context)
             Context->throw_error("authored method recursion limit exceeded");
         TGuardValue<int32> Depth(AuthoredDispatchDepth, AuthoredDispatchDepth + 1);
         TGuardValue<FString*> Failure(AuthoredDispatchFailure, &DispatchFailure);
+        DasCallPhaseMark(EDasCallPhase::InvokeChecks);
         if (Call.DelegateInvoke)
             Call.DelegateInvoke(Call.Frame->GetStructMemory());
         else
             Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
+        DasCallPhaseMark(EDasCallPhase::BlueprintReturn);
     }
     else if (!DispatchImageSoftBrush(Call, Context) && !DispatchInputNavigationCall(Call, Context) &&
              !StagePaintCall(Call, Context) && !DispatchEventReplyCall(Call, Context) &&
@@ -1179,6 +1182,7 @@ void InvokeCall(const FDasCallHandle& Handle, das::Context* Context)
     for (auto& Pin : OutputPins)
         Call.ObjectPins.Add(Pin.Key, MoveTemp(Pin.Value));
     bComplete = true;
+    DasCallPhaseMark(EDasCallPhase::InvokeOutputs);
 }
 template <class P> auto GetCallScalar(const FDasCallHandle& Handle, const char* Path, das::Context* Context)
 {

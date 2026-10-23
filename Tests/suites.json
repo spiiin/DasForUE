@@ -51,6 +51,8 @@
       "minimum": 1, "comment": "Playable character, native references and their informational benchmark." },
     { "name": "performance", "kind": "script", "script": "TestPerformance.ps1",
       "comment": "Informational benchmark (DasPerformance commandlet); writes logs/performance-editor.json." },
+    { "name": "interop-performance", "kind": "script", "script": "TestInteropPerformance.ps1",
+      "comment": "Informational call-cost benchmark C++ <-> daScript, AOT vs interpreter; writes logs/interop-performance-editor.json." },
     { "name": "native-defaults", "kind": "script", "script": "TestNativeDefaults.ps1",
       "probe": "native-defaults-probe-id.txt" },
     { "name": "defaults-merge", "kind": "script", "script": "TestDefaultsMerge.ps1",

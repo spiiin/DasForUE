@@ -65,6 +65,7 @@ TMap<const char*, FAuthoredWire> AuthoredWires;
 FDasCallHandle BeginAuthoredCallSelected(const FDasObjectHandle& Target, const char* Id, const char* Name,
                                          const char* Wire, das::Context* Context, UFunction* Selected = nullptr)
 {
+    DasCallPhaseMark(EDasCallPhase::ScriptBetween);
     ResolveAuthoredObject(Target, Id, Context);
     // The wire (class contract JSON) is a string constant of the compiled script: parse it once per program.
     // An entry is keyed by the string's address and keeps a copy to detect a reused address after reload.
@@ -90,13 +91,16 @@ FDasCallHandle BeginAuthoredCallSelected(const FDasObjectHandle& Target, const c
         Parsed->Model.Classes[0].Methods.FindByPredicate([&](const auto& Item) { return Item.Name == MethodName; });
     if (!Method || !Method->bCallable || Method->bStatic)
         Context->throw_error("unknown callable authored method");
+    DasCallPhaseMark(EDasCallPhase::AuthoredContract);
     auto Handle = BeginCallSelected(Target, Name, Context, Selected);
     auto& Call = ResolveCall(Handle, Context);
+    DasCallPhaseMark(EDasCallPhase::AuthoredFrame);
     // A UFunction checked against this method contract once stays valid until it is replaced (Blueprint
     // recompile creates a new UFunction; a collected one fails the weak pointer).
     TWeakObjectPtr<UFunction>& Checked = Parsed->Checked.FindOrAdd(MethodName);
     if (Checked.Get() == Call.Function.Get())
     {
+        DasCallPhaseMark(EDasCallPhase::AuthoredValidate);
         Call.bAuthored = true;
         return Handle;
     }
@@ -160,6 +164,7 @@ FDasCallHandle BeginAuthoredCallSelected(const FDasObjectHandle& Target, const c
     if (Index != Method->Parameters.Num())
         Context->throw_error("authored method parameter count changed");
     Checked = Call.Function.Get();
+    DasCallPhaseMark(EDasCallPhase::AuthoredValidate);
     Call.bAuthored = true;
     return Handle;
 }

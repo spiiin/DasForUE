@@ -54,6 +54,8 @@
 #include "Misc/CoreDelegates.h"
 #include "DasPropertyTypes.h"
 #include "DasPropertyValues.h"
+#include "DasInteropProbe.h"
+#include "DasCallPhases.h"
 #include "DasPropertyAccess.h"
 #include "DasSnapshotFields.h"
 #include "DasSnapshotContainers.h"
@@ -160,6 +162,7 @@
 #include "Misc/FileHelper.h"
 #include "Misc/ScopeExit.h"
 #include "HAL/IConsoleManager.h"
+#include "Misc/Guid.h"
 #include "Misc/SecureHash.h"
 #include "Misc/Paths.h"
 #include "Misc/PackageName.h"
@@ -1148,6 +1151,7 @@ FDasExecutionResult FDasRuntimeModule::RunLibraryFrame(const FString& Contract, 
     return RunNamedFramePersistent(ScriptPath(Script), Entry, Arguments, Kind, Owner, ReturnClass);
 }
 #include "DasPerformanceProbe.inl"
+#include "DasInteropProbe.inl"
 
 #include "DasExecutionGuardProbe.inl"
 #include "DasUEAotProbe.inl"

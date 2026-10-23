@@ -213,6 +213,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Result.Error = TEXT("Gameplay callbacks are forbidden during ConstructionScript");
         return Result;
     }
+    DasCallPhaseMark(EDasCallPhase::Entry);
     TArray<FDasScalarValue> NormalizedFrame, PendingOutputs;
     if (Frame)
     {
@@ -410,7 +411,9 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Result.Error = TEXT("self is missing or expired");
         return Result;
     }
+    DasCallPhaseMark(EDasCallPhase::Frame);
     PruneSessions();
+    DasCallPhaseMark(EDasCallPhase::PruneSessions);
     const FString FullPath = NormalizeScriptPath(Path);
     if (Event == EDasCallback::Initialize &&
         (!Owner->GetWorld() || !Owner->GetWorld()->IsGameWorld() || Owner->IsTemplate()))
@@ -455,6 +458,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Result.Revision = Session->Revision;
         return Result;
     }
+    DasCallPhaseMark(EDasCallPhase::Session);
     bool bChanged =
         Session->AttemptedSources.IsEmpty() ||
         (!Session->Live && (Session->AttemptedEntry != EntryPoint || Session->AttemptedContract != Expected));
@@ -469,6 +473,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         if (!bChanged)
             MarkSourcesChecked(*Session);
     }
+    DasCallPhaseMark(EDasCallPhase::SourceCheck);
     if (Session->bReleaseRequested)
     {
         Result.Error = TEXT("Script session was released");
@@ -687,6 +692,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                         *Session->ReloadError);
         }
     }
+    DasCallPhaseMark(EDasCallPhase::Reload);
     Result.Revision = Session->Revision;
     Result.ReloadError = Session->ReloadError;
     if (Event == EDasCallback::EndPlay && (!Session->Live || !Session->bBeginDelivered || Session->bEndDelivered))
@@ -840,6 +846,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 return Result;
             }
         }
+        DasCallPhaseMark(EDasCallPhase::PrepareVM);
         das::SimFunction* Function = nullptr;
         vec4f Arguments[] = {
             Event == EDasCallback::Tick || (Event == EDasCallback::Main && Signature == EDasMethodSignature::Float)
@@ -896,6 +903,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         }
         if (Function)
         {
+            DasCallPhaseMark(EDasCallPhase::Function);
             FDasPaintValue PaintArgument{WidgetPaintEntry ? ActiveWidgetPaint->Epoch : 0};
             das::vector<vec4f> Packed;
             TArray<FDasObjectHandle> ObjectArgs;
@@ -1028,6 +1036,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                         if (It.Value()->WidgetReplyEpoch == ActiveWidgetReply->Epoch)
                             It.RemoveCurrent();
             };
+            DasCallPhaseMark(EDasCallPhase::Arguments);
             const auto Value = Context.evalWithCatch(
                 Function,
                 Frame ? (Packed.empty() ? nullptr : Packed.data())
@@ -1039,6 +1048,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 : Signature == EDasMethodSignature::Rotator   ? static_cast<void*>(&ReturnedRotator)
                 : Signature == EDasMethodSignature::Transform ? static_cast<void*>(&ReturnedTransform)
                                                               : nullptr);
+            DasCallPhaseMark(EDasCallPhase::Eval);
             if (Event == EDasCallback::Main)
             {
                 if (Signature == EDasMethodSignature::Byte && !Context.getException())
@@ -1209,6 +1219,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             Result.Types = Context.Types;
             Result.bSucceeded = true;
             Result.OutputValues = MoveTemp(PendingOutputs);
+            DasCallPhaseMark(EDasCallPhase::Result);
         }
     }
     catch (const std::exception& Exception)
