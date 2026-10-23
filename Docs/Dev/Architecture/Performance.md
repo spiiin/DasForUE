@@ -303,10 +303,17 @@ rows of one run only.
   `IsA`).
 - Crossing into C++ costs more than a few arithmetic operations: `f_interp_to` through `ue_math` is about three
   times slower than the same formula in daScript. Native math pays off for work that is not a one-liner.
-- AOT: a script that requires a native module is not compiled for AOT at all. The AOT emitter
-  (`daslib/aot_cpp.das`, `getRequiredModulesFor`) asks every required module for AOT support and the native
-  modules do not declare it ("AOT disabled due to module requirements"); the whole file runs in the
-  interpreter. The `DasNativeBindsManifest` commandlet checks this on `native_binds_aot_check.das`. AOT support
-  for native binds is a separate step.
+- AOT: native binds whose types all have an ABI in the guarded bridge (scalars, strings, engine math values,
+  dates and time spans) are called from AOT code through `dasue::aot::Call` (`DasUEAot.h`). Objects, `FName`,
+  `FText` and operators stay closed; a script function that calls one stays in the interpreter (lint
+  `ue_closed_builtin_calls`), the rest of the file is compiled. `DasNativeBindsManifest` checks this on
+  `native_binds_aot_check.das`. Measured in `interop_aot.das` (C3, one run, a faster machine state than the
+  table above):
+
+  | Case | Interpreter ns | AOT ns |
+  | --- | ---: | ---: |
+  | `native_bind` (`days_in_year`, one call) | 34.8 | 25.1 |
+  | `native_values` (six calls: `FVector` by value and by const reference, a date) | 226.9 | 174.2 |
+  | `scalar_extern` (a guarded `ue_foundation` extern, for comparison) | 155.4 | 171.8 |
 
 Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.

@@ -7,6 +7,8 @@ struct FUEAotEntry
 {
     void* Function;
     FString Identity;
+    FString Label;               // the script name, for errors
+    const bool* Loaded = nullptr; // native binds: false once the code module is unloaded
 };
 TMap<uint64, FUEAotEntry> UEAotEntries;
 
@@ -21,7 +23,7 @@ template <class F, F Fn> bool ConfigureUEAot(das::BuiltInFunction* Bound, const 
         if (const auto* Existing = UEAotEntries.Find(Key);
             Existing && (Existing->Identity != Identity || Existing->Function != Pointer))
             throw std::runtime_error("UE AOT extern identity collision");
-        UEAotEntries.Add(Key, {Pointer, Identity});
+        UEAotEntries.Add(Key, {Pointer, Identity, FString(UTF8_TO_TCHAR(Name))});
         Bound->cppName = TCHAR_TO_UTF8(*FString::Printf(TEXT("dasue::aot::Call<%lluULL,%s>"), Key, *Types));
         return true;
     }

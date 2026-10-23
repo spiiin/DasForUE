@@ -552,19 +552,25 @@ void RunDasInteropProbe(FDasInteropBench& B)
                   7ll * Light);
 
     // C3. The same script loops compiled for AOT and for the interpreter. RunFile compiles on every call, so a
-    // zero-iteration run is subtracted. Modes: 0 loop, 1 script call, 2 self field read, 3 scalar extern.
+    // zero-iteration run is subtracted. Modes: 0 loop, 1 script call, 2 self field read, 3 scalar extern, 4 native
+    // bind (DasNativeBinds.h, ue_time: days_in_year), 5 native binds with engine values (six calls an iteration).
     struct FAotMode
     {
         const TCHAR* Name;
         int32 Mode;
     };
-    for (const FAotMode& M :
-         {FAotMode{TEXT("loop"), 0}, FAotMode{TEXT("script_call"), 1}, FAotMode{TEXT("self_field_read"), 2},
-                                                                                FAotMode{TEXT("scalar_extern"), 3}})
+    const FAotMode AotLoop{TEXT("loop"), 0}, AotCall{TEXT("script_call"), 1}, AotField{TEXT("self_field_read"), 2};
+    const FAotMode AotExtern{TEXT("scalar_extern"), 3}, AotNative{TEXT("native_bind"), 4};
+    const FAotMode AotValues{TEXT("native_values"), 5};
+    for (const FAotMode& M : {AotLoop, AotCall, AotField, AotExtern, AotNative, AotValues})
     {
         int64 Expected = 0;
         for (int32 I = 0; I < AotCalls; ++I)
-            Expected ^= M.Mode == 0 ? (I & 7) : M.Mode == 1 ? I + 1 : M.Mode == 2 ? 7 + I : I;
+        {
+            // Mode 5: |rotated forward| 1 + day 29 + 24 characters of "2024-02-29T00:00:00.000Z".
+            const int32 Value[] = {I & 7, I + 1, 7 + I, I, 365 + I, 1 + 29 + 24 + I};
+            Expected ^= Value[M.Mode];
+        }
         for (bool bAot : {false, true})
         {
             const FString Name = FString::Printf(TEXT("%s_%s"), bAot ? TEXT("aot") : TEXT("interpreter"), M.Name);

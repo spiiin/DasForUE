@@ -264,16 +264,8 @@ template <> struct cast<FDasNameValue>
     static FDasNameValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-// FDateTime and FTimespan as script values (ticks), for native binds (module ue_time).
-struct FDasDateTimeValue
-{
-    int64 Ticks = 0;
-};
+// FDateTime and FTimespan as script values (ticks, DasScriptValues.h), for native binds (module ue_time).
 MAKE_TYPE_FACTORY(UEDateTime, FDasDateTimeValue);
-struct FDasTimespanValue
-{
-    int64 Ticks = 0;
-};
 MAKE_TYPE_FACTORY(UETimespan, FDasTimespanValue);
 namespace das
 {
@@ -659,6 +651,21 @@ TArray<FDasNativeModuleInfo> DescribeDasNativeModules()
     return Result;
 }
 
+char* DasNativeAotString(const FString& Value, das::Context* Context)
+{
+    return CopyDSLString(Value, Context);
+}
+void dasue::aot::Finish(uint64_t Key, das::Context* Context)
+{
+    FString& Error = DasNativeAotPendingError();
+    if (Error.IsEmpty())
+        return;
+    const auto* Entry = UEAotEntries.Find(Key);
+    const FString Message = (Entry ? Entry->Label : FString(TEXT("native bind"))) + TEXT(": ") + Error;
+    Error.Empty();
+    Context->throw_error(TCHAR_TO_UTF8(*Message));
+}
+
 void* dasue::aot::Resolve(uint64_t Key, das::Context* Context)
 {
     if (!Context)
@@ -669,6 +676,8 @@ void* dasue::aot::Resolve(uint64_t Key, das::Context* Context)
     const auto* Entry = UEAotEntries.Find(Key);
     if (!Entry)
         Context->throw_error("UE AOT extern ABI is absent or stale; regenerate and rebuild");
+    if (Entry->Loaded && !*Entry->Loaded)
+        Context->throw_error(TCHAR_TO_UTF8(*(Entry->Label + TEXT(": its native module was unloaded"))));
     return Entry->Function;
 }
 

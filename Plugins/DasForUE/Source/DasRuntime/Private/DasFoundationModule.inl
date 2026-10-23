@@ -1,5 +1,6 @@
 // Part of DasRuntime.cpp: The ue_foundation daScript module: annotations and extern registrations.
 // Included in place; declaration order matters.
+das::PassMacro* MakeDasClosedCallsLint(); // DasNativeBinds.inl
 class FUnrealFoundationModule final : public das::Module
 {
 public:
@@ -13,6 +14,7 @@ public:
         AddCollisionProfileEnum(*this);
 
         globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEInputNameLint()));
+        globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(MakeDasClosedCallsLint()));
         addCommentReader(new FUECommentReader());
         addAnnotation(new FUENativeBaseAnnotation());
         addAnnotation(new FUEClassAnnotation());

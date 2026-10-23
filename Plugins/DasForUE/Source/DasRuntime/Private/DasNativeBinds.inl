@@ -140,6 +140,65 @@ FString DasNativeScriptTypeName(const FDasNativeParam& Param, const FDasNativeRe
     }
     return FString();
 }
+// AOT ABI of a parameter or result (DasUEAot.h): engine values by const reference, results by value. nullptr when
+// a type has none (objects, FName, FText): such functions stay in the interpreter.
+const char* DasNativeAbiName(EDasNativeType Type, bool bArgument)
+{
+    switch (Type)
+    {
+    case EDasNativeType::Void:
+        return bArgument ? nullptr : "void";
+    case EDasNativeType::Bool:
+        return "bool";
+    case EDasNativeType::Int32:
+        return "int32_t";
+    case EDasNativeType::Int64:
+        return "int64_t";
+    case EDasNativeType::Float:
+        return "float";
+    case EDasNativeType::Double:
+        return "double";
+    case EDasNativeType::Byte:
+        return "uint8_t";
+    case EDasNativeType::String:
+        return bArgument ? "const char *" : "char *";
+    case EDasNativeType::DateTime:
+        return "FDasDateTimeValue";
+    case EDasNativeType::Timespan:
+        return "FDasTimespanValue";
+#define DAS_NATIVE_ABI(Kind, CppType)                                                                                  \
+    case EDasNativeType::Kind:                                                                                         \
+        return bArgument ? "const " CppType " &" : CppType;
+        DAS_NATIVE_ABI(Vector, "FVector")
+        DAS_NATIVE_ABI(Vector2D, "FVector2D")
+        DAS_NATIVE_ABI(Rotator, "FRotator")
+        DAS_NATIVE_ABI(Quat, "FQuat")
+        DAS_NATIVE_ABI(Transform, "FTransform")
+        DAS_NATIVE_ABI(LinearColor, "FLinearColor")
+        DAS_NATIVE_ABI(Color, "FColor")
+#undef DAS_NATIVE_ABI
+    default:
+        return nullptr;
+    }
+}
+// The C++ types of a function's AOT entry ("R,A1,...,das::Context *"), or empty when it has none. Operators stay
+// closed: generated code calls an operator with its operands only, without the context argument of the entry.
+FString DasNativeAbiTypes(const FDasNativeFunctionDesc& F)
+{
+    const char* Result = DasNativeAbiName(F.Result.Type, false);
+    const bool bOperator = !F.Name.IsEmpty() && !FChar::IsAlpha(F.Name[0]) && F.Name[0] != TEXT('_');
+    if (!F.AotEntry || F.Helper != EDasNativeHelper::Call || !Result || bOperator)
+        return FString();
+    FString Types = UTF8_TO_TCHAR(Result);
+    for (const FDasNativeParam& P : F.Arguments)
+    {
+        const char* Argument = DasNativeAbiName(P.Type, true);
+        if (!Argument)
+            return FString();
+        Types += FString(TEXT(",")) + UTF8_TO_TCHAR(Argument);
+    }
+    return Types + TEXT(",das::Context *");
+}
 bool DasNativeIsMath(EDasNativeType Type)
 {
     return Type >= EDasNativeType::Vector;
@@ -229,7 +288,7 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
         GuardUEExtern();
         if (!Module->bLoaded)
             Context.throw_error_at(debugInfo, "%s", TCHAR_TO_UTF8(*Module->Error));
-        vec4f Raw[FDasNativeModule::MaxArguments];
+        vec4f Raw[FDasNativeModule::MaxArguments + 1]; // + the context argument of an AOT-eligible function
         evalArgs(Context, Raw);
         FDasNativeValues Values;
         void* Args[FDasNativeModule::MaxArguments];
@@ -359,8 +418,9 @@ public:
     const FDasNativeModuleDesc* Module;
     const FDasNativeFunctionDesc* Function;
     das::string Label;
+    // bAot: the function has an AOT entry; generated code passes the context as the last argument.
     FDasNativeFunction(const FDasNativeModuleDesc& Origin, const FDasNativeFunctionDesc& F,
-                       const das::ModuleLibrary& Lib, const das::string& Name)
+                       const das::ModuleLibrary& Lib, const das::string& Name, bool bAot)
         : ExternalFnBase(Name.c_str(), nullptr), Module(&Origin), Function(&F), Label(Name)
     {
         if (F.Helper == EDasNativeHelper::Call && F.IsMethod() && F.Resolved[0].Script)
@@ -368,8 +428,10 @@ public:
         das::vector<das::TypeDeclPtr> Types{DasNativeTypeDecl(F.Result, F.Resolved.Last(), Lib, false)};
         for (int32 I = 0; I < F.Arguments.Num(); ++I)
             Types.push_back(DasNativeTypeDecl(F.Arguments[I], F.Resolved[I], Lib, true));
+        if (bAot)
+            Types.push_back(das::makeType<das::Context*>(Lib));
         constructExternal(Types);
-        // Calls go through the generic node; AOT would need a registered entry (dasue::aot) — a later step.
+        // AOT calls go through the guarded bridge once the entry is registered (FDasNativeDasModule::Add).
         noAot = true;
     }
     virtual das::SimNode* makeSimNode(das::Context& Context, const das::vector<das::ExpressionPtr>&) override
@@ -396,12 +458,65 @@ void ResolveDasNativeFunction(FDasNativeFunctionDesc& F)
     Resolve(F.Result, F.Resolved.Last());
 }
 
+// The daScript modules of native binds (the closed-calls lint below needs to recognize them).
+TSet<const das::Module*>& DasNativeDasModules()
+{
+    static TSet<const das::Module*> Modules;
+    return Modules;
+}
+
+// AOT: generated code calls a builtin by its C++ name, and a closed plugin builtin (noAot: no ABI in the bridge)
+// has none. A script function that calls one stays in the interpreter; AOT code reaches it through the
+// interpreter (das_invoke_function), the rest of the file is still compiled. Registered in ue_foundation.
+struct FDasClosedCallsLint : das::PassMacro
+{
+    FDasClosedCallsLint() : PassMacro("ue_closed_builtin_calls") {}
+    virtual bool apply(das::Program*, das::Module* M) override
+    {
+        struct FFind : das::Visitor
+        {
+            bool bClosed = false;
+            void Check(const das::Function* F)
+            {
+                if (F && F->builtIn && F->noAot && F->module &&
+                    (F->module->name == "ue_foundation" || DasNativeDasModules().Contains(F->module)))
+                    bClosed = true;
+            }
+            virtual void preVisit(das::ExprCall* E) override { Check(E->func); }
+            virtual void preVisit(das::ExprOp1* E) override { Check(E->func); }
+            virtual void preVisit(das::ExprOp2* E) override { Check(E->func); }
+        };
+        M->functions.foreach (
+            [&](das::Function* F)
+            {
+                if (!F->body || F->noAot)
+                    return;
+                FFind Find;
+                F->body->visit(Find);
+                if (Find.bClosed)
+                    F->noAot = true;
+            });
+        return false;
+    }
+};
+das::PassMacro* MakeDasClosedCallsLint()
+{
+    return new FDasClosedCallsLint();
+}
+
 class FDasNativeDasModule final : public das::Module
 {
 public:
+    // Generated AOT code calls native binds through the guarded bridge; functions without an ABI stay closed.
+    virtual das::ModuleAotType aotRequire(das::TextWriter& Writer) const override
+    {
+        Writer << "#include \"DasUEAot.h\"\n";
+        return das::ModuleAotType::cpp;
+    }
     explicit FDasNativeDasModule(FDasNativeModuleDesc& InDesc)
         : das::Module(TCHAR_TO_UTF8(*InDesc.Name)), Desc(InDesc), Library(this)
     {
+        DasNativeDasModules().Add(this);
         Library.addBuiltInModule();
         auto* Foundation = das::Module::require("ue_foundation");
         Library.addModule(Foundation);
@@ -468,11 +583,32 @@ private:
     {
         UseTypes(F);
         Signatures.Add(Signature(F));
-        auto* Fn = new FDasNativeFunction(Origin, F, Library, das::string(TCHAR_TO_UTF8(*F.Name)));
+        const FString AbiTypes = DasNativeAbiTypes(F);
+        auto* Fn = new FDasNativeFunction(Origin, F, Library, das::string(TCHAR_TO_UTF8(*F.Name)), !AbiTypes.IsEmpty());
+        if (!AbiTypes.IsEmpty())
+            RegisterAot(Origin, F, *Fn, AbiTypes);
         const das::SideEffects Effects = EnumHasAnyFlags(F.Flags, EDasBind::Pure)
                                              ? das::SideEffects::none
                                              : das::SideEffects::modifyExternal | das::SideEffects::accessExternal;
         das::addExternFunc(*this, Fn, DasNativeIsCmres(F.Result.Type), Effects);
+    }
+    // The AOT entry goes into the bridge registry under a key of module, name and C++ types; the function's
+    // cppName is the bridge call. Resolve refuses an entry of an unloaded module.
+    static void RegisterAot(const FDasNativeModuleDesc& Origin, const FDasNativeFunctionDesc& F, FDasNativeFunction& Fn,
+                            const FString& Types)
+    {
+        const FString Name = FString::Printf(TEXT("native:%s::%s"), *Origin.Name, *F.Name);
+        const uint64 Key = dasue::aot::Key(TCHAR_TO_UTF8(*Name), TCHAR_TO_UTF8(*Types));
+        if (const auto* Existing = UEAotEntries.Find(Key);
+            Existing && Existing->Function != F.AotEntry && (!Existing->Loaded || *Existing->Loaded))
+        {
+            UE_LOG(LogDasRuntime, Warning,
+                   TEXT("Native bind %s: AOT key collision, it stays in the interpreter"), *Name);
+            return;
+        }
+        UEAotEntries.Add(Key, {F.AotEntry, Name + TEXT(":") + Types, UTF8_TO_TCHAR(Fn.Label.c_str()), &Origin.bLoaded});
+        Fn.cppName = TCHAR_TO_UTF8(*FString::Printf(TEXT("dasue::aot::Call<%lluULL,%s>"), Key, *Types));
+        Fn.noAot = false;
     }
     // Helper functions: object parameters and results of a given script type (nullptr: UObjectHandle).
     FDasNativeFunctionDesc& Generate(const FString& Name, EDasNativeHelper Helper)

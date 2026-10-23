@@ -11,6 +11,10 @@
 #include "daScript/misc/performance_time.h"
  // require ue_foundation
 #include "DasUEAot.h"
+ // require ue_time
+#include "DasUEAot.h"
+ // require ue_math
+#include "DasUEAot.h"
  // require builtin
 
 #if defined(_MSC_VER)
@@ -62,82 +66,120 @@ static void resolveTypeInfoAnnotations()
 }
 
 
-inline int32_t main_110c7960ea0f6f0d ( Context * __context__, int32_t __input_rename_at_9_0 );
+inline int32_t main_fe2bff7dbe813f38 ( Context * __context__, int32_t __input_rename_at_13_0 );
 
 void __init_script ( Context * __context__, bool __init_shared )
 {
 }
 
-inline int32_t main_110c7960ea0f6f0d ( Context * __context__, int32_t __input_rename_at_9_0 )
+inline int32_t main_fe2bff7dbe813f38 ( Context * __context__, int32_t __input_rename_at_13_0 )
 {
-    int32_t __mode_rename_at_10_1 = ((int32_t)(SimPolicy<int32_t>::Mod(__input_rename_at_9_0,10,*__context__,nullptr)));
-    int32_t __count_rename_at_11_2 = ((int32_t)(SimPolicy<int32_t>::Div(__input_rename_at_9_0,10,*__context__,nullptr)));
-    int32_t __acc_rename_at_12_3 = 0;
-    if ( __mode_rename_at_10_1 == 0 )
+    int32_t __mode_rename_at_14_1 = ((int32_t)(SimPolicy<int32_t>::Mod(__input_rename_at_13_0,10,*__context__,nullptr)));
+    int32_t __count_rename_at_15_2 = ((int32_t)(SimPolicy<int32_t>::Div(__input_rename_at_13_0,10,*__context__,nullptr)));
+    int32_t __acc_rename_at_16_3 = 0;
+    if ( __mode_rename_at_14_1 == 0 )
     {
         {
-            bool __need_loop_14 = true;
+            bool __need_loop_18 = true;
             // i: int const
-            das_iterator<range> __i_iterator((range(0,__count_rename_at_11_2)));
-            int32_t __i_rename_at_14_4;
-            __need_loop_14 = __i_iterator.first(__context__,(__i_rename_at_14_4)) && __need_loop_14;
-            for ( ; __need_loop_14 ; __need_loop_14 = __i_iterator.next(__context__,(__i_rename_at_14_4)) )
+            das_iterator<range> __i_iterator((range(0,__count_rename_at_15_2)));
+            int32_t __i_rename_at_18_4;
+            __need_loop_18 = __i_iterator.first(__context__,(__i_rename_at_18_4)) && __need_loop_18;
+            for ( ; __need_loop_18 ; __need_loop_18 = __i_iterator.next(__context__,(__i_rename_at_18_4)) )
             {
-                __acc_rename_at_12_3 ^= (__i_rename_at_14_4 & 7);
+                __acc_rename_at_16_3 ^= (__i_rename_at_18_4 & 7);
             }
-            __i_iterator.close(__context__,(__i_rename_at_14_4));
+            __i_iterator.close(__context__,(__i_rename_at_18_4));
         };
     } else {
-        if ( __mode_rename_at_10_1 == 1 )
+        if ( __mode_rename_at_14_1 == 1 )
         {
             {
-                bool __need_loop_16 = true;
+                bool __need_loop_20 = true;
                 // i: int const
-                das_iterator<range> __i_iterator((range(0,__count_rename_at_11_2)));
-                int32_t __i_rename_at_16_5;
-                __need_loop_16 = __i_iterator.first(__context__,(__i_rename_at_16_5)) && __need_loop_16;
-                for ( ; __need_loop_16 ; __need_loop_16 = __i_iterator.next(__context__,(__i_rename_at_16_5)) )
+                das_iterator<range> __i_iterator((range(0,__count_rename_at_15_2)));
+                int32_t __i_rename_at_20_5;
+                __need_loop_20 = __i_iterator.first(__context__,(__i_rename_at_20_5)) && __need_loop_20;
+                for ( ; __need_loop_20 ; __need_loop_20 = __i_iterator.next(__context__,(__i_rename_at_20_5)) )
                 {
-                    __acc_rename_at_12_3 ^= (__i_rename_at_16_5 + 1);
+                    __acc_rename_at_16_3 ^= (__i_rename_at_20_5 + 1);
                 }
-                __i_iterator.close(__context__,(__i_rename_at_16_5));
+                __i_iterator.close(__context__,(__i_rename_at_20_5));
             };
         } else {
-            if ( __mode_rename_at_10_1 == 2 )
+            if ( __mode_rename_at_14_1 == 2 )
             {
                 {
-                    bool __need_loop_18 = true;
+                    bool __need_loop_22 = true;
                     // i: int const
-                    das_iterator<range> __i_iterator((range(0,__count_rename_at_11_2)));
-                    int32_t __i_rename_at_18_6;
-                    __need_loop_18 = __i_iterator.first(__context__,(__i_rename_at_18_6)) && __need_loop_18;
-                    for ( ; __need_loop_18 ; __need_loop_18 = __i_iterator.next(__context__,(__i_rename_at_18_6)) )
+                    das_iterator<range> __i_iterator((range(0,__count_rename_at_15_2)));
+                    int32_t __i_rename_at_22_6;
+                    __need_loop_22 = __i_iterator.first(__context__,(__i_rename_at_22_6)) && __need_loop_22;
+                    for ( ; __need_loop_22 ; __need_loop_22 = __i_iterator.next(__context__,(__i_rename_at_22_6)) )
                     {
-                        __acc_rename_at_12_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__); }, [&]() { return __i_rename_at_18_6; }));
+                        __acc_rename_at_16_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__); }, [&]() { return __i_rename_at_22_6; }));
                     }
-                    __i_iterator.close(__context__,(__i_rename_at_18_6));
+                    __i_iterator.close(__context__,(__i_rename_at_22_6));
                 };
             } else {
+                if ( __mode_rename_at_14_1 == 3 )
                 {
-                    bool __need_loop_20 = true;
-                    // i: int const
-                    das_iterator<range> __i_iterator((range(0,__count_rename_at_11_2)));
-                    int32_t __i_rename_at_20_7;
-                    __need_loop_20 = __i_iterator.first(__context__,(__i_rename_at_20_7)) && __need_loop_20;
-                    for ( ; __need_loop_20 ; __need_loop_20 = __i_iterator.next(__context__,(__i_rename_at_20_7)) )
                     {
-                        __acc_rename_at_12_3 ^= dasue::aot::Call<14567322116369018978ULL,int32_t,const char *,int32_t,das::Context *>((das_string_cast(((char *) "interop_missing"))),__i_rename_at_20_7,__context__);
-                    }
-                    __i_iterator.close(__context__,(__i_rename_at_20_7));
+                        bool __need_loop_24 = true;
+                        // i: int const
+                        das_iterator<range> __i_iterator((range(0,__count_rename_at_15_2)));
+                        int32_t __i_rename_at_24_7;
+                        __need_loop_24 = __i_iterator.first(__context__,(__i_rename_at_24_7)) && __need_loop_24;
+                        for ( ; __need_loop_24 ; __need_loop_24 = __i_iterator.next(__context__,(__i_rename_at_24_7)) )
+                        {
+                            __acc_rename_at_16_3 ^= dasue::aot::Call<14567322116369018978ULL,int32_t,const char *,int32_t,das::Context *>((das_string_cast(((char *) "interop_missing"))),__i_rename_at_24_7,__context__);
+                        }
+                        __i_iterator.close(__context__,(__i_rename_at_24_7));
+                    };
+                } else {
+                    if ( __mode_rename_at_14_1 == 4 )
+                    {
+                        {
+                            bool __need_loop_26 = true;
+                            // i: int const
+                            das_iterator<range> __i_iterator((range(0,__count_rename_at_15_2)));
+                            int32_t __i_rename_at_26_8;
+                            __need_loop_26 = __i_iterator.first(__context__,(__i_rename_at_26_8)) && __need_loop_26;
+                            for ( ; __need_loop_26 ; __need_loop_26 = __i_iterator.next(__context__,(__i_rename_at_26_8)) )
+                            {
+                                __acc_rename_at_16_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<4443721035264859406ULL,int32_t,int32_t,das::Context *>(2023,__context__); }, [&]() { return __i_rename_at_26_8; }));
+                            }
+                            __i_iterator.close(__context__,(__i_rename_at_26_8));
+                        };
+                    } else {
+                        int32_t __iso_rename_at_29_9 = ((int32_t)builtin_string_length((das_string_cast(((char * const )(dasue::aot::Call<13387352495426118873ULL,char *,FDasDateTimeValue,das::Context *>(dasue::aot::Call<8825012288880494545ULL,FDasDateTimeValue,int32_t,int32_t,int32_t,das::Context *>(2024,2,29,__context__),__context__))))),__context__));
+                        {
+                            bool __need_loop_30 = true;
+                            // i: int const
+                            das_iterator<range> __i_iterator((range(0,__count_rename_at_15_2)));
+                            int32_t __i_rename_at_30_10;
+                            __need_loop_30 = __i_iterator.first(__context__,(__i_rename_at_30_10)) && __need_loop_30;
+                            for ( ; __need_loop_30 ; __need_loop_30 = __i_iterator.next(__context__,(__i_rename_at_30_10)) )
+                            {
+                                FVector _temp_make_local_31_23_0; _temp_make_local_31_23_0;
+                                FVector _temp_make_local_31_66_1; _temp_make_local_31_66_1;
+                                FVector __turned_rename_at_31_11_ConstRef = ((FVector)dasue::aot::Call<10699467065866260611ULL,FVector,const FVector &,double,const FVector &,das::Context *>(das_arg<FVector>::pass((_temp_make_local_31_23_0 = (dasue::aot::Call<1330956332943852056ULL,FVector,das::Context *>(__context__)))),1.80000000000000000e+02,das_arg<FVector>::pass((_temp_make_local_31_66_1 = (dasue::aot::Call<3537813788641287030ULL,FVector,das::Context *>(__context__)))),__context__));
+                                FVector const  & __turned_rename_at_31_11 = __turned_rename_at_31_11_ConstRef;
+;
+                                __acc_rename_at_16_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return int32_t(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<2177605327252515959ULL,double,const FVector &,das::Context *>(__turned_rename_at_31_11,__context__); }, [&]() { return 5.00000000000000000e-01; })); }, [&]() { return dasue::aot::Call<12959918929561704913ULL,int32_t,FDasDateTimeValue,das::Context *>(dasue::aot::Call<8825012288880494545ULL,FDasDateTimeValue,int32_t,int32_t,int32_t,das::Context *>(2024,2,29,__context__),__context__); })); }, [&]() { return __iso_rename_at_29_9; })); }, [&]() { return __i_rename_at_30_10; }));
+                            }
+                            __i_iterator.close(__context__,(__i_rename_at_30_10));
+                        };
+                    };
                 };
             };
         };
     };
-    return das_auto_cast<int32_t>::cast(__acc_rename_at_12_3);
+    return das_auto_cast<int32_t>::cast(__acc_rename_at_16_3);
 }
-static vec4f __wrap_main_110c7960ea0f6f0d ( Context * __context__ ) {
+static vec4f __wrap_main_fe2bff7dbe813f38 ( Context * __context__ ) {
     int32_t arg_input = cast_aot_arg<int32_t>::to(*__context__,__context__->abiArguments()[0]);
-    return cast<int32_t>::from(main_110c7960ea0f6f0d(__context__, arg_input));
+    return cast<int32_t>::from(main_fe2bff7dbe813f38(__context__, arg_input));
 }
 
 #ifdef _MSC_VER
@@ -145,8 +187,8 @@ static vec4f __wrap_main_110c7960ea0f6f0d ( Context * __context__ ) {
 #endif
 struct AotFunction { uint64_t hash; bool is_cmres; void * fn; vec4f (*wrappedFn)(Context*); };
 static AotFunction functions[] = {
-    // main Ci hash=0x110c7960ea0f6f0d
-    { 0xa7d3126795747ea5, false, (void*)&main_110c7960ea0f6f0d, &__wrap_main_110c7960ea0f6f0d },
+    // main Ci hash=0xfe2bff7dbe813f38
+    { 0x1f267a9387455554, false, (void*)&main_fe2bff7dbe813f38, &__wrap_main_fe2bff7dbe813f38 },
 };
 #ifdef _MSC_VER
 #pragma optimize("", on)

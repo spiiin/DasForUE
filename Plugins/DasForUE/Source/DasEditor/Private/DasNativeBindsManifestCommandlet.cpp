@@ -66,18 +66,25 @@ int32 UDasNativeBindsManifestCommandlet::Main(const FString& Params)
     const bool bWritten =
         FJsonSerializer::Serialize(Root, Writer) &&
         FFileHelper::SaveStringToFile(Json, *Output, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
-    const bool bPassed = bWritten && Failed == 0 && Modules.Num() > 0;
+    const bool bManifest = bWritten && Failed == 0 && Modules.Num() > 0;
+    const TCHAR* ManifestResult = bManifest ? TEXT("PASS") : TEXT("FAIL");
     UE_LOG(LogTemp, Display,
-           TEXT("DAS_NATIVE_BINDS_MANIFEST=%s modules=%d functions=%d output=%s"),
-                bPassed ? TEXT("PASS") : TEXT("FAIL"), Modules.Num(), Functions, *Output);
+           TEXT("DAS_NATIVE_BINDS_MANIFEST=%s modules=%d functions=%d output=%s"), ManifestResult, Modules.Num(),
+                Functions, *Output);
 
-    // AOT (informational): can a script that calls native binds be generated for AOT? The generated source is kept
-    // next to the manifest for inspection; it is not compiled.
+    // AOT: native_binds_aot_check.das is generated for AOT (not compiled here; the generated source is kept next to
+    // the manifest). open_only must call native binds through the guarded bridge; with_closed, which calls a bind
+    // without an AOT ABI, must stay in the interpreter.
     const FString AotOutput = FPaths::GetPath(Output) / TEXT("native-binds-aot-check.cpp");
-    FString AotError;
-    const bool bAot = GenerateDasUEAotProbe(AotOutput, AotError, TEXT("native_binds_aot_check.das"));
-    UE_LOG(LogTemp, Display,
-           TEXT("DAS_NATIVE_BINDS_AOT=%s output=%s %s"),
-                bAot ? TEXT("GENERATED") : TEXT("FAILED"), *AotOutput, *AotError.Left(1000));
-    return bPassed ? 0 : 1;
+    FString AotError, AotText;
+    bool bAot = GenerateDasUEAotProbe(AotOutput, AotError, TEXT("native_binds_aot_check.das")) &&
+                                      FFileHelper::LoadFileToString(AotText, *AotOutput);
+    if (bAot && !AotText.Contains(TEXT("open_only")))
+        AotError = TEXT("open_only is not compiled for AOT");
+    else if (bAot && AotText.Contains(TEXT("with_closed")))
+        AotError = TEXT("with_closed is compiled for AOT although it calls a bind without an AOT ABI");
+    bAot = bAot && AotError.IsEmpty();
+    const TCHAR* AotResult = bAot ? TEXT("PASS") : TEXT("FAIL");
+    UE_LOG(LogTemp, Display, TEXT("DAS_NATIVE_BINDS_AOT=%s output=%s %s"), AotResult, *AotOutput, *AotError.Left(1000));
+    return bManifest && bAot ? 0 : 1;
 }

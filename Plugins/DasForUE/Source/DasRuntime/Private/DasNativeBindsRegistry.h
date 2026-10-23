@@ -40,6 +40,7 @@ struct FDasNativeFunctionDesc
 {
     FString Name;
     FDasNativeThunk Thunk = nullptr;
+    void* AotEntry = nullptr; // DasNativeBinds.h AotInvoke, when every type has an AOT ABI
     FDasNativeParam Result;
     TArray<FDasNativeParam> Arguments; // a method's receiver is Arguments[0]
     EDasBind Flags = EDasBind::None;
@@ -71,6 +72,8 @@ TArray<FDasNativeModuleDesc*>& DasNativeModuleDescs();
 FDasNativeModuleDesc* FindDasNativeModuleDesc(const FString& Name);
 // The error a running native bind call collects (DasNativeError); nullptr outside such a call.
 FString*& DasNativeErrorSlot();
+// The error of a call from AOT code, reported by dasue::aot::Finish after the call.
+FString& DasNativeAotPendingError();
 struct FDasNativeModuleBuilder
 {
     // Runs the module's Build and validates names; fills Desc.Error on failure.
