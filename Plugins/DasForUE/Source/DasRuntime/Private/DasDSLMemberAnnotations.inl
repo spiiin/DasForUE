@@ -16,6 +16,7 @@ struct FUEFunctionAnnotation : das::FunctionAnnotation
     virtual bool apply(const das::FunctionPtr& F, das::ModuleGroup&, das::AnnotationArgumentList&,
                        das::string& E) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(F->at, DSLDiagnosticFunctionEntity(F));
         if (!F->classParent)
         {
             E = "ue_function must be a member of ue_class or ue_interface";
@@ -26,6 +27,7 @@ struct FUEFunctionAnnotation : das::FunctionAnnotation
     virtual bool finalize(const das::FunctionPtr& F, das::ModuleGroup&, das::AnnotationArgumentList&,
                           const das::AnnotationArgumentList&, das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(F->at, DSLDiagnosticFunctionEntity(F));
         try
         {
             DSLAnnotation(F->annotations, "ue_function");
@@ -66,6 +68,7 @@ struct FUECallbackAnnotation : das::FunctionAnnotation
     virtual bool apply(const das::FunctionPtr& F, das::ModuleGroup&, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(F->at, DSLDiagnosticFunctionEntity(F));
         try
         {
             if (!F->classParent || F->isStaticClassMethod)
@@ -93,6 +96,7 @@ struct FUECallbackAnnotation : das::FunctionAnnotation
     virtual bool finalize(const das::FunctionPtr& F, das::ModuleGroup&, das::AnnotationArgumentList&,
                           const das::AnnotationArgumentList&, das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(F->at, DSLDiagnosticFunctionEntity(F));
         try
         {
             DSLAnnotation(F->annotations, Event ? "ue_event" : "ue_lifecycle");
@@ -123,6 +127,7 @@ struct FUEImplementsAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& St, das::ModuleGroup&, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(St->at, UTF8_TO_TCHAR(St->name.c_str()));
         try
         {
             if (!St->isClass)
@@ -141,6 +146,7 @@ struct FUEImplementsAnnotation : das::StructureAnnotation
     virtual bool look(const das::StructurePtr& St, das::ModuleGroup&, das::AnnotationArgumentList&,
                       das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(St->at, UTF8_TO_TCHAR(St->name.c_str()));
         if (!DSLAnnotation(St->annotations, "ue_class"))
         {
             Error = "ue_implements requires ue_class";
@@ -178,6 +184,7 @@ struct FUEAsyncPhysicsAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& St, das::ModuleGroup&, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(St->at, UTF8_TO_TCHAR(St->name.c_str()));
         try
         {
             if (!St->isClass)
@@ -194,6 +201,7 @@ struct FUEAsyncPhysicsAnnotation : das::StructureAnnotation
     virtual bool look(const das::StructurePtr& St, das::ModuleGroup&, das::AnnotationArgumentList&,
                       das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(St->at, UTF8_TO_TCHAR(St->name.c_str()));
         try
         {
             DSLAnnotation(St->annotations, "ue_async_physics");
@@ -214,6 +222,7 @@ struct FUEComponentAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& St, das::ModuleGroup&, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(St->at, UTF8_TO_TCHAR(St->name.c_str()));
         try
         {
             if (!St->isClass)
@@ -237,6 +246,7 @@ struct FUEComponentAnnotation : das::StructureAnnotation
     virtual bool look(const das::StructurePtr& St, das::ModuleGroup&, das::AnnotationArgumentList&,
                       das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(St->at, UTF8_TO_TCHAR(St->name.c_str()));
         try
         {
             if (!DSLAnnotation(St->annotations, "ue_class"))
@@ -286,6 +296,7 @@ struct FUENativeBaseAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& St, das::ModuleGroup&, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(St->at, UTF8_TO_TCHAR(St->name.c_str()));
         try
         {
             DSLAnnotationArguments(Args);
@@ -317,6 +328,7 @@ struct FUENativeBaseAnnotation : das::StructureAnnotation
     virtual bool look(const das::StructurePtr& St, das::ModuleGroup&, das::AnnotationArgumentList&,
                       das::string& Error) override
     {
+        FDSLDiagnosticLocationScope SourceDiagnostic(St->at, UTF8_TO_TCHAR(St->name.c_str()));
         try
         {
             DSLDeclarationKind(St->annotations);

@@ -469,7 +469,9 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 // No self during initialization: rejected code cannot alter the live Actor.
                 if (!Candidate->Program->simulate(*Candidate->Context, Output))
                 {
-                    CandidateError = Errors(Candidate->Program, Output);
+                    CandidateError = Candidate->Context->getException()
+                        ? DSLDiagnosticRuntime(*Candidate->Context, Candidate->Program, TEXT("initialization"))
+                                               : Errors(Candidate->Program, Output);
                     if (CandidateError.IsEmpty())
                         CandidateError = TEXT("Candidate initialization failed.");
                 }
@@ -569,7 +571,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     }
                 }
                 if (const char* Exception = Candidate->Context->getException())
-                    CandidateError = UTF8_TO_TCHAR(Exception);
+                    CandidateError = DSLDiagnosticRuntime(*Candidate->Context, Candidate->Program, EntryPoint);
             }
         }
         catch (const std::exception& Exception)
@@ -671,7 +673,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 Context.evalWithCatch(Session->Live->Construction, nullptr);
             if (const char* Exception = Context.getException())
             {
-                Result.Error = FString(TEXT("ConstructionScript failed: ")) + UTF8_TO_TCHAR(Exception);
+                Result.Error = DSLDiagnosticRuntime(Context, Session->Live->Program, EntryPoint);
                 return Result;
             }
             Result.bSucceeded = true;
@@ -736,7 +738,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     Context.evalWithCatch(Session->Live->Initializer, nullptr);
                 if (const char* Exception = Context.getException())
                 {
-                    Result.Error = FString(TEXT("Initialize failed: ")) + UTF8_TO_TCHAR(Exception);
+                    Result.Error = DSLDiagnosticRuntime(Context, Session->Live->Program, EntryPoint);
                     return Result;
                 }
                 if (!IsValid(Owner) || (Cast<AActor>(Owner) && CastChecked<AActor>(Owner)->IsActorBeingDestroyed()) ||
@@ -762,7 +764,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 Context.evalWithCatch(Session->Live->BeginPlay, nullptr);
             if (const char* Exception = Context.getException())
             {
-                Result.Error = UTF8_TO_TCHAR(Exception);
+                Result.Error = DSLDiagnosticRuntime(Context, Session->Live->Program, EntryPoint);
                 if (Session->Live->Physics)
                 {
                     Session->Live->Physics->Activated = true;
@@ -1123,7 +1125,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             return Result;
         }
         if (const char* Exception = Context.getException())
-            Result.Error = UTF8_TO_TCHAR(Exception);
+            Result.Error = DSLDiagnosticRuntime(Context, Session->Live->Program, EntryPoint);
         else
         {
             if (!ParentLifecycle && (Event == EDasCallback::BeginPlay || Event == EDasCallback::Tick) &&

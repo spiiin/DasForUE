@@ -333,3 +333,19 @@ bytes is recorded in the receipt. No extra runtime run is needed for that text-o
 normalization. Full profile-specific runtime probes, PIE, packaged and full regressions
 were not run. The probe also exposed and fixed the Editor struct-default fallback
 that incorrectly cast new adapted values to FTransform.
+
+
+## Focused DSL diagnostics
+
+Queue `test-suite diagnostics1 dsl-diagnostics repo=<main-worktree>` through the
+shared build agent. One `DasDSLDiagnostics` commandlet checks compile/annotation/
+lowering/runtime coordinates, generated method names, imported sources, rejected
+reload maps and Message Log action navigation using an injected opener. Nine
+focused checks; no PIE/packaged and no external editor is opened. See the
+[diagnostics guide](../Guide/DSL/Diagnostics.md).
+
+Verified 2026-10-23 by `dsl-diagnostics-20261023g` (exit 0): Editor Development
+build and all nine grouped checks passed. Commandlet execution took 0.26 seconds;
+the scoped suite including startup and source/DLL freeze took 13 seconds.
+Receipt: `logs/dsl-diagnostics-validation.json`; output:
+`logs/dsl-diagnostics-runtime.log`. Full PIE/packaged suites were not run.

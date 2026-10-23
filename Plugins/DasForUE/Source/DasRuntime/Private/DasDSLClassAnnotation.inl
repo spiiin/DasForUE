@@ -6,6 +6,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
     virtual bool look(const das::StructurePtr& St, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                       das::string& Error) override
     {
+        FDSLDiagnosticEntityScope Diagnostics(St, Group);
         try
         {
             DSLDeclarationKind(St->annotations);
@@ -96,6 +97,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
     virtual bool touch(const das::StructurePtr& St, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
                        das::string& Error) override
     {
+        FDSLDiagnosticEntityScope Diagnostics(St, Group);
         try
         {
             FString NativeHint = DSLString(Args, "parent", TEXT("/Script/Engine.Actor"));
@@ -298,6 +300,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 });
             for (auto& F : St->fields)
             {
+                FDSLDiagnosticLocationScope Source(F.at, DSLText(St->name) + TEXT(".")+ DSLText(F.name));
                 // Pinned makeClassRtti adds __rtti without setting generated.
                 const bool InheritedDefault =
                     F.inherited &&
@@ -717,6 +720,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 });
             for (const auto& F : Functions)
             {
+                FDSLDiagnosticLocationScope Source(F->at, DSLText(St->name) + TEXT(".")+ DSLText(DSLMethodName(F)));
                 if (DSLAnnotation(F->annotations, "ue_lifecycle") || DSLAnnotation(F->annotations, "ue_event") ||
                     DSLStandardLifecycle(F))
                     DSLFail(TEXT("Conflicting UE callback/function annotations"));
@@ -1179,6 +1183,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             }
             for (const auto& F : Functions)
             {
+                FDSLDiagnosticLocationScope Source(F->at, DSLText(St->name) + TEXT(".")+ DSLText(DSLMethodName(F)));
                 const FString MethodName = DSLText(DSLMethodName(F));
                 const auto M = *C.Methods.FindByPredicate([&](const auto& Item) { return Item.Name == MethodName; });
                 const FString ResultType = DSLTypeName(F->result);

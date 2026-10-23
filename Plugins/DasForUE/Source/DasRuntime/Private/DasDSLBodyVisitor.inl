@@ -271,6 +271,87 @@ struct FDSLBodyVisitor : das::Visitor
     TMap<FString, FDasDeclaredProperty> NativeProperties;
     bool NativeOnly = false;
     FString Error;
+    virtual das::ExpressionPtr visit(das::ExprInvoke* E) override
+    {
+        auto Result = VisitBody(E);
+        if (!Error.IsEmpty() && FDasDiagnostic::Parse(Error).IsEmpty())
+        {
+            FDSLDiagnosticLocationScope Site(E->at, DSLDiagnosticCurrent.Entity);
+            Error = DSLDiagnosticFailure(Error);
+        }
+        return Result;
+    }
+    virtual das::ExpressionPtr visit(das::ExprCall* E) override
+    {
+        auto Result = VisitBody(E);
+        if (!Error.IsEmpty() && FDasDiagnostic::Parse(Error).IsEmpty())
+        {
+            FDSLDiagnosticLocationScope Site(E->at, DSLDiagnosticCurrent.Entity);
+            Error = DSLDiagnosticFailure(Error);
+        }
+        return Result;
+    }
+    virtual das::ExpressionPtr visit(das::ExprField* E) override
+    {
+        auto Result = VisitBody(E);
+        if (!Error.IsEmpty() && FDasDiagnostic::Parse(Error).IsEmpty())
+        {
+            FDSLDiagnosticLocationScope Site(E->at, DSLDiagnosticCurrent.Entity);
+            Error = DSLDiagnosticFailure(Error);
+        }
+        return Result;
+    }
+    virtual das::ExpressionPtr visit(das::ExprCopy* E) override
+    {
+        auto Result = VisitBody(E);
+        if (!Error.IsEmpty() && FDasDiagnostic::Parse(Error).IsEmpty())
+        {
+            FDSLDiagnosticLocationScope Site(E->at, DSLDiagnosticCurrent.Entity);
+            Error = DSLDiagnosticFailure(Error);
+        }
+        return Result;
+    }
+    virtual das::ExpressionPtr visit(das::ExprMove* E) override
+    {
+        auto Result = VisitBody(E);
+        if (!Error.IsEmpty() && FDasDiagnostic::Parse(Error).IsEmpty())
+        {
+            FDSLDiagnosticLocationScope Site(E->at, DSLDiagnosticCurrent.Entity);
+            Error = DSLDiagnosticFailure(Error);
+        }
+        return Result;
+    }
+    virtual das::ExpressionPtr visit(das::ExprClone* E) override
+    {
+        auto Result = VisitBody(E);
+        if (!Error.IsEmpty() && FDasDiagnostic::Parse(Error).IsEmpty())
+        {
+            FDSLDiagnosticLocationScope Site(E->at, DSLDiagnosticCurrent.Entity);
+            Error = DSLDiagnosticFailure(Error);
+        }
+        return Result;
+    }
+    virtual das::ExpressionPtr visit(das::ExprOp2* E) override
+    {
+        auto Result = VisitBody(E);
+        if (!Error.IsEmpty() && FDasDiagnostic::Parse(Error).IsEmpty())
+        {
+            FDSLDiagnosticLocationScope Site(E->at, DSLDiagnosticCurrent.Entity);
+            Error = DSLDiagnosticFailure(Error);
+        }
+        return Result;
+    }
+    virtual das::ExpressionPtr visit(das::ExprWith* E) override
+    {
+        auto Result = VisitBody(E);
+        if (!Error.IsEmpty() && FDasDiagnostic::Parse(Error).IsEmpty())
+        {
+            FDSLDiagnosticLocationScope Site(E->at, DSLDiagnosticCurrent.Entity);
+            Error = DSLDiagnosticFailure(Error);
+        }
+        return Result;
+    }
+
     FDSLBodyVisitor(const FDasDeclaredClass& C, const das::string& S, const das::StructurePtr& St, const FString& F,
                     const FString& R, das::ModuleGroup& G, das::vector<das::FunctionPtr>& H, TSet<FString>& Paths)
         : Decl(C), Self(S), Source(St), Folder(F), Registry(R), Group(G), GeneratedHelpers(H), HelperPaths(Paths)
@@ -1284,7 +1365,7 @@ struct FDSLBodyVisitor : das::Visitor
             Call->arguments.push_back(E->arguments[I]);
         return Call;
     }
-    virtual das::ExpressionPtr visit(das::ExprInvoke* E) override
+    das::ExpressionPtr VisitBody(das::ExprInvoke* E)
     {
         auto Super = SuperCall(E);
         if (Super != E)
@@ -1685,7 +1766,7 @@ struct FDSLBodyVisitor : das::Visitor
         E->arguments.push_back(new das::ExprConstString(E->at, DSLUtf8(Path)));
         return E;
     }
-    virtual das::ExpressionPtr visit(das::ExprCall* E) override
+    das::ExpressionPtr VisitBody(das::ExprCall* E)
     {
         if (!NativeOnly && (E->name == "__ue_dynamic_event" || E->name == "ue_foundation::__ue_dynamic_event"))
             DSLValidateDynamicEvent(E, Decl, Source, Group, Folder, Registry);
@@ -1949,7 +2030,7 @@ struct FDSLBodyVisitor : das::Visitor
         if (E->op == "+=" || E->op == "-=" || E->op == "*=" || E->op == "/=")
             MarkLeft(E->left);
     }
-    virtual das::ExpressionPtr visit(das::ExprField* E) override
+    das::ExpressionPtr VisitBody(das::ExprField* E)
     {
         if (const auto* Leaf = ScalarLeafReads.Find(E))
             return DSLCall(E->at, "__ue_self_struct_get_" + Leaf->Suffix,
@@ -1959,7 +2040,7 @@ struct FDSLBodyVisitor : das::Visitor
                            {DSLDirectPack(E->at, Native->Receiver, E->value, DSLTypedReferencePath(Native->Receiver))});
         return SelfField(E) && !LeftFields.Contains(E) ? Read(E) : E;
     }
-    virtual das::ExpressionPtr visit(das::ExprCopy* E) override
+    das::ExpressionPtr VisitBody(das::ExprCopy* E)
     {
         if (IndexedSelf(E->left))
             return WriteIndexed(E, false);
@@ -1967,7 +2048,7 @@ struct FDSLBodyVisitor : das::Visitor
             return Write(E, F, false);
         return StructRoot(E->left) ? WriteLeaf(E, false) : E;
     }
-    virtual das::ExpressionPtr visit(das::ExprMove* E) override
+    das::ExpressionPtr VisitBody(das::ExprMove* E)
     {
         if (IndexedSelf(E->left))
             return WriteIndexed(E, false);
@@ -1975,7 +2056,7 @@ struct FDSLBodyVisitor : das::Visitor
             return Write(E, F, false);
         return StructRoot(E->left) ? WriteLeaf(E, false) : E;
     }
-    virtual das::ExpressionPtr visit(das::ExprClone* E) override
+    das::ExpressionPtr VisitBody(das::ExprClone* E)
     {
         if (IndexedSelf(E->left))
             return WriteIndexed(E, false);
@@ -1983,7 +2064,7 @@ struct FDSLBodyVisitor : das::Visitor
             return Write(E, F, false);
         return StructRoot(E->left) ? WriteLeaf(E, false) : E;
     }
-    virtual das::ExpressionPtr visit(das::ExprOp2* E) override
+    das::ExpressionPtr VisitBody(das::ExprOp2* E)
     {
         if ((E->op == "+=" || E->op == "-=" || E->op == "*=" || E->op == "/=") && IndexedSelf(E->left))
             return WriteIndexed(E, true);
@@ -1992,7 +2073,7 @@ struct FDSLBodyVisitor : das::Visitor
         auto* F = SelfField(E->left);
         return F && LeftFields.Contains(F) ? Write(E, F, true) : E;
     }
-    virtual das::ExpressionPtr visit(das::ExprWith* E) override
+    das::ExpressionPtr VisitBody(das::ExprWith* E)
     {
         return E->with && E->with->rtti_isVar() && static_cast<das::ExprVar*>(E->with)->name == Self ? E->body : E;
     }

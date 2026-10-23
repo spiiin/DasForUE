@@ -35,6 +35,7 @@ time are in the [changelog](../CHANGELOG.md).
 - [Handler references](Guide/DSL/HandlerReferences.md)
 - [Containers](Guide/DSL/Containers.md)
 - [Functions](Guide/DSL/Functions.md)
+- [Diagnostics and source navigation](Guide/DSL/Diagnostics.md)
 - [Defaults](Guide/DSL/Defaults.md)
 - [Components](Guide/DSL/Components.md)
 - [Inheritance](Guide/DSL/Inheritance.md)

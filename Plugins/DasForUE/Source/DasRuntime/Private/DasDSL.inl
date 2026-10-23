@@ -1,3 +1,5 @@
+#include "DasDiagnosticMaps.inl"
+
 const char* DSLModelKey = "_ue_model_json";
 FString DSLText(const das::string& S)
 {
@@ -9,7 +11,7 @@ das::string DSLUtf8(const FString& S)
 }
 void DSLFail(const FString& S)
 {
-    throw std::runtime_error(TCHAR_TO_UTF8(*S));
+    throw std::runtime_error(TCHAR_TO_UTF8(*DSLDiagnosticFailure(S)));
 }
 FString DSLString(const das::AnnotationArgumentList& Args, const char* Key, const FString& Default = FString())
 {

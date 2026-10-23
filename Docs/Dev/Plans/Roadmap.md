@@ -41,7 +41,6 @@ Decided 2026-10-21. The gates below say what closes each item.
 - **Save-game schema compatibility.**
 - **User scripts without low-level code.** Examples and guides use no manual call frames
   or internal `__ue_*` helpers (priority 2).
-- **Source mapping** of generated DSL/glue errors back to the user's `.das` lines.
 
 ### v2
 
@@ -94,7 +93,7 @@ These gates come from the original plan (after the NimForUE audit) and are still
 
 ### Tooling beyond NimForUE parity
 
-- Source mapping of generated DSL/glue errors back to the daScript source.
+- Extend the implemented [VM DSL diagnostics](../../Guide/DSL/Diagnostics.md) to full authored gameplay AOT/native glue as that backend lands.
 - Static checks of lifetime/thread/replication contracts where the IR allows.
 - Script time/memory limits and compiler macro limits (research; not a sandbox
   for untrusted code).

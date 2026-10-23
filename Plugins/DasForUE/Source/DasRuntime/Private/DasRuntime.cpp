@@ -10,6 +10,7 @@
 #include "DasGASAuthoring.h"
 #include "DasGASCalculations.h"
 #include "DasMathAdapters.h"
+#include "DasDiagnostics.h"
 #include "Engine/CurveTable.h"
 #include "Engine/DataTable.h"
 #include "DasDataAssets.h"
@@ -574,12 +575,14 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 
 void* dasue::aot::Resolve(uint64_t Key, das::Context* Context)
 {
-    if (!Context) throw std::runtime_error("UE AOT call requires a context");
+    if (!Context)
+        throw std::runtime_error("UE AOT call requires a context");
     if (!IsInGameThread() || !ActiveContext || Context != ActiveContext)
         Context->throw_error("UE AOT requires the active game-thread context");
     GuardUEExtern();
     const auto* Entry = UEAotEntries.Find(Key);
-    if (!Entry) Context->throw_error("UE AOT extern ABI is absent or stale; regenerate and rebuild");
+    if (!Entry)
+        Context->throw_error("UE AOT extern ABI is absent or stale; regenerate and rebuild");
     return Entry->Function;
 }
 

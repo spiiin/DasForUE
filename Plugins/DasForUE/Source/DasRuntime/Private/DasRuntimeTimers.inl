@@ -4,7 +4,7 @@ FString Errors(const das::ProgramPtr& Program, das::TextWriter& Output)
 {
     if (Program)
         for (const auto& Error : Program->errors)
-            Output << das::reportError(Error.at, Error.what, Error.extra, Error.fixme, Error.cerr);
+            Output << TCHAR_TO_UTF8(*DSLDiagnosticCompilerError(Program, Error)) << "\n";
     const auto Text = Output.str();
     return UTF8_TO_TCHAR(Text.c_str());
 }

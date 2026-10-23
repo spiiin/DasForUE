@@ -1,4 +1,5 @@
 #include "DasDSLService.h"
+#include "DasDiagnostics.h"
 #include "DasCharacter.h"
 #include "DasPawn.h"
 #include "GameFramework/Controller.h"
@@ -809,6 +810,8 @@ EFieldMigration ClassifyFieldMigration(UBlueprint* BP, const FString& Source, co
 bool FDasDSLService::Apply(const FString& Script, const FString& Package, const FString& Id, UBlueprint*& Out,
                            FString& Error, EDasDefaultMigrationPolicy DefaultPolicy)
 {
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    FDasDiagnosticCapture Diagnostics(Error, Runtime.ScriptPath(Script), Id);
     return ApplyDeclaration(Script, Package, Id, Out, Error, DefaultPolicy, nullptr);
 }
 namespace

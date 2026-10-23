@@ -1,4 +1,5 @@
 #include "DasTypeService.h"
+#include "DasDiagnostics.h"
 #include "DasTypeAdapters.h"
 #include "DasSoftReferences.h"
 #include "DasTypePins.h"
@@ -135,6 +136,8 @@ FString TypeFieldDefault(const FDasDeclaredProperty& P)
 }
 bool FDasTypeService::Apply(const FString& Script, const FString& Folder, TArray<UObject*>& Out, FString& Error)
 {
+    FDasDiagnosticCapture Diagnostics(
+        Error, FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).ScriptPath(Script));
     Out.Reset();
     Error.Reset();
     if (!IsInGameThread() || Script != FPaths::GetCleanFilename(Script) ||

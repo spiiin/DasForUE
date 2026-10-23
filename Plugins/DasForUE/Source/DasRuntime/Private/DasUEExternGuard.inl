@@ -1,6 +1,7 @@
 // Every UE FFI binding uses this factory. The guarded pointer is also the JIT
 // builtin address; scalar and CMRES nodes keep their original ABI.
 void GuardUEExtern();
+#include "DasDiagnosticNodes.inl"
 template <class F> struct TCheckedUEExtern;
 struct FUEAotEntry
 {
@@ -36,12 +37,17 @@ template <class R, class... A> struct TCheckedUEExtern<R (*)(A...)>
         return Fn(std::forward<A>(Args)...);
     }
 };
+template <template <class> class Node> struct TDasDiagnosticSelect
+{
+    template <class F> using Type = TDasDiagnosticNode<Node<F>>;
+};
 template <class F, F Fn, template <class> class Node = das::SimNode_ExtFuncCall, class QQ = das::defaultTempFn>
 auto AddUEExtern(das::Module& Module, const das::ModuleLibrary& Library, const char* Name, das::SideEffects Effects,
                  const char* CppName = nullptr, QQ&& Temp = QQ())
 {
-    auto* Bound = das::addExtern<F, &TCheckedUEExtern<F>::template Invoke<Fn>, Node>(
-        Module, Library, Name, Effects | das::SideEffects::accessExternal, CppName, std::forward<QQ>(Temp));
+    auto* Bound =
+        das::addExtern<F, &TCheckedUEExtern<F>::template Invoke<Fn>, TDasDiagnosticSelect<Node>::template Type>(
+            Module, Library, Name, Effects | das::SideEffects::accessExternal, CppName, std::forward<QQ>(Temp));
     // Only the checked, ABI-described registry bridge is AOT eligible. All other
     // signatures stay closed; raw cppName calls can never bypass the guard.
     Bound->noAot = !ConfigureUEAot<F, Fn>(Bound, Name);

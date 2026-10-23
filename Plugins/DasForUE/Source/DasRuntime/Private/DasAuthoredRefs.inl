@@ -59,6 +59,17 @@ das::string DSLMethodSourceName(const das::TypeDeclPtr& Type)
 void DSLRememberMethodSource(const FString& Key, FDasDeclaredMethod& Method, const das::FunctionPtr& Function,
                              const FDSLTypeScope& Scope)
 {
+    if (DSLDiagnosticActiveMap)
+    {
+        const FString Entity = DSLDiagnosticCurrent.Entity.Contains(
+            TEXT(".")) ? DSLDiagnosticCurrent.Entity : DSLDiagnosticCurrent.Entity + TEXT(".")+ Method.Name;
+        auto Origin = DSLDiagnosticLocation(Function->at, Entity);
+        if (Function->body)
+            Origin.EndLine = FMath::Max(Origin.EndLine, int32(Function->body->at.last_line));
+        DSLDiagnosticActiveMap->Remember(Origin);
+        DSLDiagnosticActiveMap->Symbols.Add(Method.EntryPoint, Origin);
+        DSLDiagnosticActiveMap->Symbols.Add(TEXT("__impl_")+ Method.EntryPoint, Origin);
+    }
     FDSLMethodSourceSignature Descriptor;
     Descriptor.Scope = {Scope.ModuleId, Scope.Folder, Scope.Registry, nullptr, nullptr};
     Descriptor.Result = DSLMethodSourceName(Function->result);
@@ -106,6 +117,7 @@ auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWri
                 const das::CodeOfPolicies& Policies = das::CodeOfPolicies())
 {
     FDSLDeclarationCompileScope Scope;
+    FDSLDiagnosticCompileScope Diagnostics(Group);
     FDSLComputedDefaults Computed;
     TGuardValue<FDSLComputedDefaults*> Active(DSLComputedDefaults, &Computed);
     const auto ReferenceBefore = DSLActiveRefDeclarations;
@@ -113,6 +125,7 @@ auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWri
     const auto PropertiesBefore = DSLPropertySourceSignatures;
     const auto CatalogBefore = DSLSourceCatalogExpectedIds;
     auto Program = das::compileDaScript(File, Access, Output, Group, Policies);
+    DSLDiagnosticGenerated(Program);
     if (!Program || Program->failed() || Computed.Pending.IsEmpty())
         return Program;
     DSLEvaluateComputedDefaults(Program, Output);
@@ -133,7 +146,10 @@ auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWri
     DSLMethodSourceSignatures = MethodsBefore;
     DSLPropertySourceSignatures = PropertiesBefore;
     DSLSourceCatalogExpectedIds = CatalogBefore;
-    return das::compileDaScript(File, Access, Output, Group, Policies);
+    Diagnostics.RebuiltGroup();
+    auto Resolved = das::compileDaScript(File, Access, Output, Group, Policies);
+    DSLDiagnosticGenerated(Resolved);
+    return Resolved;
 }
 
 struct FUEAuthoredRefAnnotation : das::StructureAnnotation

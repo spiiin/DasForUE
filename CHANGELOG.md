@@ -12,6 +12,12 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Added
 
+- Unified DSL compile/lowering/runtime/import diagnostics with original `.das`
+  coordinates, public declaration names and retained raw details. Compiler-owned
+  maps stay with the correct VM generation after rejected reloads. Editor Message
+  Log entries provide validated source-navigation actions; see
+  [DSL diagnostics](Docs/Guide/DSL/Diagnostics.md).
+
 - Complete built-in convenience block: quaternion composition/inverse/normalization/slerp,
   vector interpolation/projection/reflection/length limits, Rotator slerp and native Transform blend.
 - Canonical `UELinearColor` / `UEColor` with explicit sRGB vs raw linear-byte conversions;
