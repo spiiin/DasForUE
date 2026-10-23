@@ -19,6 +19,7 @@
 
 bool RunDasRegisteredCooked(FString& Report);
 bool RunDasNativeBindsProbe(FString& Report);
+bool RunDasNativeTimeProbe(FString& Report);
 void StartDasClassCallbacksValidation();
 void StartDasSubsystemsValidation();
 void StartDasSaveGameCompatibilityValidation();
@@ -67,7 +68,7 @@ public:
         }
         if(FParse::Param(FCommandLine::Get(),TEXT("DasNativeBinds"))){
             InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{
-                FString Report;const bool Passed=RunDasNativeBindsProbe(Report);
+                FString Report;bool Passed=RunDasNativeBindsProbe(Report);Passed&=RunDasNativeTimeProbe(Report);
                 UE_LOG(LogTemp,Display,TEXT("%s"),*Report);UE_LOG(LogTemp,Display,TEXT("DAS_NATIVE_BINDS_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));
                 FPlatformMisc::RequestExitWithStatus(false,Passed?0:1);
             });return;

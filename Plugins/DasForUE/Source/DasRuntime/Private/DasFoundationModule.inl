@@ -267,6 +267,8 @@ public:
         addAnnotation(new FDSLTextAnnotation(Library));
         addAnnotation(new FDSLNameAnnotation(Library));
         addAnnotation(new FDSLEnumAnnotation(Library));
+        addAnnotation(new TDasTicksAnnotation<FDasDateTimeValue>("UEDateTime", Library, "FDasDateTimeValue"));
+        addAnnotation(new TDasTicksAnnotation<FDasTimespanValue>("UETimespan", Library, "FDasTimespanValue"));
         addAnnotation(new FReflectedValueAnnotation(Library));
         addAnnotation(new FDSLVector2DAnnotation(Library));
         addAnnotation(new FDSLVectorAnnotation(Library));

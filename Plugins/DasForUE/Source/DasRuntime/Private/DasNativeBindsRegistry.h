@@ -69,6 +69,8 @@ struct FDasNativeModuleDesc
 // Game thread only.
 TArray<FDasNativeModuleDesc*>& DasNativeModuleDescs();
 FDasNativeModuleDesc* FindDasNativeModuleDesc(const FString& Name);
+// The error a running native bind call collects (DasNativeError); nullptr outside such a call.
+FString*& DasNativeErrorSlot();
 struct FDasNativeModuleBuilder
 {
     // Runs the module's Build and validates names; fills Desc.Error on failure.

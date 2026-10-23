@@ -78,6 +78,31 @@ struct FDSLNameAnnotation : das::ManagedStructureAnnotation<FDasNameValue, false
     virtual bool hasNonTrivialCtor() const override { return false; }
     virtual bool isPod() const override { return true; }
 };
+// Ticks of FDateTime / FTimespan, held by value like int64.
+template <class T> struct TDasTicksAnnotation : das::ManagedStructureAnnotation<T, false>
+{
+    TDasTicksAnnotation(const char* Name, das::ModuleLibrary& L, const char* CppName)
+        : das::ManagedStructureAnnotation<T, false>(Name, L, CppName)
+    {
+    }
+    virtual das::TypeDeclPtr makeValueType() const override
+    {
+        static_assert(sizeof(T) == sizeof(int64));
+        return new das::TypeDecl(das::Type::tInt64, das::LineInfo());
+    }
+    virtual das::SimNode* simulateClone(das::Context& C, const das::LineInfo& At, das::SimNode* Left,
+                                        das::SimNode* Right) const override
+    {
+        return C.code->makeNode<das::SimNode_Set<T>>(At, Left, Right);
+    }
+    virtual bool isRefType() const override { return false; }
+    virtual bool isLocal() const override { return true; }
+    virtual bool canCopy() const override { return true; }
+    virtual bool canMove() const override { return true; }
+    virtual bool hasNonTrivialCtor() const override { return false; }
+    virtual bool isPod() const override { return true; }
+    virtual bool canBePlacedInContainer() const override { return true; }
+};
 struct FDSLTextAnnotation : das::ManagedStructureAnnotation<FDasTextValue, false>
 {
     FDSLTextAnnotation(das::ModuleLibrary& L) : ManagedStructureAnnotation("UETextValue", L, "FDasTextValue") {}

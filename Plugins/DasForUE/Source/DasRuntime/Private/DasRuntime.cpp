@@ -264,6 +264,30 @@ template <> struct cast<FDasNameValue>
     static FDasNameValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
+// FDateTime and FTimespan as script values (ticks), for native binds (module ue_time).
+struct FDasDateTimeValue
+{
+    int64 Ticks = 0;
+};
+MAKE_TYPE_FACTORY(UEDateTime, FDasDateTimeValue);
+struct FDasTimespanValue
+{
+    int64 Ticks = 0;
+};
+MAKE_TYPE_FACTORY(UETimespan, FDasTimespanValue);
+namespace das
+{
+template <> struct cast<FDasDateTimeValue>
+{
+    static vec4f from(FDasDateTimeValue V) { return cast<int64_t>::from(V.Ticks); }
+    static FDasDateTimeValue to(vec4f V) { return {cast<int64_t>::to(V)}; }
+};
+template <> struct cast<FDasTimespanValue>
+{
+    static vec4f from(FDasTimespanValue V) { return cast<int64_t>::from(V.Ticks); }
+    static FDasTimespanValue to(vec4f V) { return {cast<int64_t>::to(V)}; }
+};
+}
 // Keep native returns and the annotation's uint64 value representation in the same ABI slot.
 namespace das
 {

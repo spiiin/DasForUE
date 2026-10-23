@@ -50,6 +50,8 @@ das::TypeDeclPtr DasNativeTypeDecl(const FDasNativeParam& Param, const FDasNativ
         return das::makeType<bool>(Lib);
     case EDasNativeType::Int32:
         return das::makeType<int32_t>(Lib);
+    case EDasNativeType::Int64:
+        return das::makeType<int64_t>(Lib);
     case EDasNativeType::Float:
         return das::makeType<float>(Lib);
     case EDasNativeType::Double:
@@ -62,6 +64,10 @@ das::TypeDeclPtr DasNativeTypeDecl(const FDasNativeParam& Param, const FDasNativ
         return das::makeType<FDasNameValue>(Lib);
     case EDasNativeType::Text:
         return das::makeType<FDasTextValue>(Lib);
+    case EDasNativeType::DateTime:
+        return das::makeType<FDasDateTimeValue>(Lib);
+    case EDasNativeType::Timespan:
+        return das::makeType<FDasTimespanValue>(Lib);
     case EDasNativeType::Object:
     {
         if (!Resolved.Script)
@@ -197,6 +203,15 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
             case EDasNativeType::Int32:
                 *static_cast<int32*>(Slot) = das::cast<int32_t>::to(Raw[I]);
                 break;
+            case EDasNativeType::Int64:
+                *static_cast<int64*>(Slot) = das::cast<int64_t>::to(Raw[I]);
+                break;
+            case EDasNativeType::DateTime:
+                *static_cast<FDateTime*>(Slot) = FDateTime(das::cast<FDasDateTimeValue>::to(Raw[I]).Ticks);
+                break;
+            case EDasNativeType::Timespan:
+                *static_cast<FTimespan*>(Slot) = FTimespan(das::cast<FDasTimespanValue>::to(Raw[I]).Ticks);
+                break;
             case EDasNativeType::Float:
                 *static_cast<float*>(Slot) = das::cast<float>::to(Raw[I]);
                 break;
@@ -248,7 +263,14 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
             Out = cmresEval->evalPtr(Context);
         else if (Result != EDasNativeType::Void)
             Out = Values.Construct(Result);
+        // DasNativeError during the call fails it after the function returns.
+        FString Error;
+        FString* const Outer = DasNativeErrorSlot();
+        DasNativeErrorSlot() = &Error;
         Function->Thunk(Args, Out);
+        DasNativeErrorSlot() = Outer;
+        if (!Error.IsEmpty())
+            Context.throw_error_at(debugInfo, "%s: %s", Label, TCHAR_TO_UTF8(*Error));
         switch (Result)
         {
         case EDasNativeType::Void:
@@ -257,6 +279,12 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
             return das::cast<bool>::from(*static_cast<bool*>(Out));
         case EDasNativeType::Int32:
             return das::cast<int32_t>::from(*static_cast<int32*>(Out));
+        case EDasNativeType::Int64:
+            return das::cast<int64_t>::from(*static_cast<int64*>(Out));
+        case EDasNativeType::DateTime:
+            return das::cast<FDasDateTimeValue>::from({static_cast<FDateTime*>(Out)->GetTicks()});
+        case EDasNativeType::Timespan:
+            return das::cast<FDasTimespanValue>::from({static_cast<FTimespan*>(Out)->GetTicks()});
         case EDasNativeType::Float:
             return das::cast<float>::from(*static_cast<float*>(Out));
         case EDasNativeType::Double:

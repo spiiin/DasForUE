@@ -11,6 +11,36 @@ bool IsScriptIdentifier(const FString& Name)
             return false;
     return true;
 }
+// Function names: identifiers or operators.
+bool IsScriptFunctionName(const FString& Name)
+{
+    static const TArray<FString> Operators = []
+    {
+        TArray<FString> List;
+        FString(TEXT("+ - * / % == != < <= > >=")).ParseIntoArray(List, TEXT(" "));
+        return List;
+    }();
+    if (Operators.Contains(Name))
+        return true;
+    return IsScriptIdentifier(Name);
+}
+}
+
+FString*& DasNativeErrorSlot()
+{
+    static FString* Slot = nullptr;
+    return Slot;
+}
+void DasNativeError(const FString& Message)
+{
+    FString* Slot = DasNativeErrorSlot();
+    if (!Slot)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("DasNativeError outside a native bind call: %s"), *Message);
+        return;
+    }
+    if (Slot->IsEmpty())
+        *Slot = Message.IsEmpty() ? FString(TEXT("failed")) : Message;
 }
 
 TArray<FDasNativeModuleDesc*>& DasNativeModuleDescs()
@@ -86,7 +116,7 @@ void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasN
     {
         Desc.Error = FString::Printf(TEXT("Native module '%s': function '%s' %s"), *Desc.Name, *F.Name, *Why);
     };
-    if (!IsScriptIdentifier(F.Name))
+    if (!IsScriptFunctionName(F.Name))
         Fail(TEXT("has a name that is not a script identifier"));
     else if (Desc.Functions.ContainsByPredicate(
                  [&](const FDasNativeFunctionDesc& G)

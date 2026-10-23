@@ -29,6 +29,7 @@ def main(input:int):int {
     smoke_count_call()
     if (smoke_void_calls() != before + 2) { return 17 }
     if (smoke_square(12) != 144) { return 18 }
+    if (smoke_echo_int64(-9000000000l) != -9000000000l) { return 19 }
     return 0
 }
 

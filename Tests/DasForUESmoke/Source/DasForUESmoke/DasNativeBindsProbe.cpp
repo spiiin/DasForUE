@@ -28,6 +28,10 @@ int32 EchoInt(int32 V)
 {
     return V;
 }
+int64 EchoInt64(int64 V)
+{
+    return V;
+}
 float EchoFloat(float V)
 {
     return V;
@@ -180,6 +184,7 @@ DAS_NATIVE_BINDS(SmokeNative, "smoke_native")
     using namespace DasNativeBindsProbe;
     Binds.Function<&EchoBool>(TEXT("smoke_echo_bool"));
     Binds.Function<&EchoInt>(TEXT("smoke_echo_int"));
+    Binds.Function<&EchoInt64>(TEXT("smoke_echo_int64"));
     Binds.Function<&EchoFloat>(TEXT("smoke_echo_float"));
     Binds.Function<&EchoDouble>(TEXT("smoke_echo_double"));
     Binds.Function<&EchoByte>(TEXT("smoke_echo_byte"));

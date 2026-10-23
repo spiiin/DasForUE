@@ -1,5 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "Misc/DateTime.h"
+#include "Misc/Timespan.h"
 #include "UObject/Object.h"
 #include <type_traits>
 #include <utility>
@@ -29,6 +31,9 @@
 // References are weak: a script does not keep objects alive, a destroyed or collected object reads as null.
 // A null or expired receiver is a script error; a null or expired argument reaches C++ as nullptr (see
 // EDasBind::NonNullArgs).
+//
+// Function names may also be operators (+ - * / % == != < <= > >=; "-" with one parameter is the unary minus).
+// A bound function reports a script error with DasNativeError (bad arguments, failed parsing, ...).
 
 // Types of parameters and results. A const reference counts as its value type.
 enum class EDasNativeType : uint8
@@ -36,12 +41,15 @@ enum class EDasNativeType : uint8
     Void,
     Bool,
     Int32,
+    Int64,
     Float,
     Double,
     Byte,
     String,
     Name,
     Text,
+    DateTime, // script type UEDateTime (ticks)
+    Timespan, // script type UETimespan (ticks)
     Object,
     Vector,
     Vector2D,
@@ -66,9 +74,9 @@ ENUM_CLASS_FLAGS(EDasBind)
 template <class T> struct TDasNativeType
 {
     static_assert(sizeof(T) == 0,
-                  "Unsupported native bind type: use bool, int32, float, double, uint8, FString, FName, "
-                  "FText, FVector, FVector2D, FRotator, FQuat, FTransform, FLinearColor, FColor or a "
-                  "pointer to a UObject class");
+                  "Unsupported native bind type: use bool, int32, int64, float, double, uint8, FString, FName, "
+                  "FText, FDateTime, FTimespan, FVector, FVector2D, FRotator, FQuat, FTransform, FLinearColor, "
+                  "FColor or a pointer to a UObject class");
 };
 #define DAS_NATIVE_TYPE(CppType, Kind)                                                                                 \
     template <> struct TDasNativeType<CppType>                                                                         \
@@ -78,12 +86,15 @@ template <class T> struct TDasNativeType
 DAS_NATIVE_TYPE(void, Void)
 DAS_NATIVE_TYPE(bool, Bool)
 DAS_NATIVE_TYPE(int32, Int32)
+DAS_NATIVE_TYPE(int64, Int64)
 DAS_NATIVE_TYPE(float, Float)
 DAS_NATIVE_TYPE(double, Double)
 DAS_NATIVE_TYPE(uint8, Byte)
 DAS_NATIVE_TYPE(FString, String)
 DAS_NATIVE_TYPE(FName, Name)
 DAS_NATIVE_TYPE(FText, Text)
+DAS_NATIVE_TYPE(FDateTime, DateTime)
+DAS_NATIVE_TYPE(FTimespan, Timespan)
 DAS_NATIVE_TYPE(FVector, Vector)
 DAS_NATIVE_TYPE(FVector2D, Vector2D)
 DAS_NATIVE_TYPE(FRotator, Rotator)
@@ -258,6 +269,9 @@ private:
 DASRUNTIME_API void RegisterDasNativeModule(const TCHAR* ModuleName, void (*Build)(FDasNativeModule&));
 DASRUNTIME_API void UnregisterDasNativeModule(const TCHAR* ModuleName);
 DASRUNTIME_API FString DasNativeModuleStatus(const TCHAR* ModuleName);
+// Called from a bound function: when it returns, the script call fails with "<function>: <Message>" (the result
+// is ignored). Game thread, only during a native bind call; the first message of a call wins.
+DASRUNTIME_API void DasNativeError(const FString& Message);
 
 struct FDasNativeBindsRegistrar
 {
