@@ -355,3 +355,11 @@ Queue `test-suite <id> authored-subsystems,authored-subsystems-pie repo=C:\src\D
 through the shared build agent. These are focused native-collection/reload and
 real multi-world PIE tests, not a packaged or full regression run. See
 [the subsystem guide](../Guide/Gameplay/Subsystems.md) for contracts and limits.
+
+### Authored subsystem packaged gate
+
+Queue `test-suite <id> authored-subsystems-packaged repo=<worktree>` through the
+shared build agent. This builds/cooks only the dedicated subsystem map/assets and
+runs Win64 Development with NullRHI, without the general packaged smoke test.
+The twelve checks and config restoration contract are documented in
+[Subsystems](../Guide/Gameplay/Subsystems.md#focused-packaged-startup-and-shutdown).

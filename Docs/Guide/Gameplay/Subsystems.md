@@ -91,7 +91,7 @@ ends PIE and checks Deinitialize before GC without retaining world objects, and 
 resource release. Play settings are restored after the test. Generated assets
 stay under `/Game/DasSubsystems`; no user map or service is modified.
 
-These checks do not certify packaged startup, level travel/network replication,
+The native/PIE checks alone do not certify packaged startup, level travel/network replication,
 subsystem dependencies, LocalPlayerSubsystem, EditorSubsystem, or automatic
 registration of newly authored classes during a running session.
 
@@ -107,3 +107,37 @@ with zero automation warnings or failed tests. Local evidence is in
 `logs/authored-subsystems-block-validation.json`. The native receipt freezes
 source and binary hashes during its run; the block receipt verifies local files
 again after PIE. Initial failed runs are retained in the agent logs.
+
+## Focused packaged startup and shutdown
+
+Queue `test-suite <id> authored-subsystems-packaged repo=<worktree>` through the
+shared build agent. The runner exports two dedicated service Blueprints and an
+empty map under `/Game/DasSubsystems/Packaged`. The map contains no service Actors
+or hard references to the service classes. The runner temporarily supplies the
+`DasSubsystems.Classes` allowlist in the smoke project's `DefaultGame.ini` and
+cooks the dedicated asset directory explicitly. Original config bytes are restored
+in `finally`, including on packaging failure. The archived game consumes the cooked
+configuration, not the restored source config.
+
+The Win64 Development probe never loads the classes itself. Twelve checks cover
+the cooked process/config, classes already loaded by the native bootstrap,
+collection-owned instances, Initialize once, staged scripts, reflected method
+execution and live timers/VMs. It requests normal game exit and observes native
+GameInstance/World Deinitialize before runtime module shutdown, requiring both
+callbacks once and all VM/timer/subscription resources released. It never manually
+calls Deinitialize or ReleaseObject. The runner enforces a three-minute runtime
+deadline and checks a final marker emitted after native teardown, source/config
+hash stability and the executable hash.
+
+Receipt: `logs/authored-subsystems-packaged-validation.json`; runtime log:
+`logs/subsystems-packaged.log`. This focused suite does not run Foundation, PIE,
+networking, level travel or Shipping acceptance tests.
+
+Verified 2026-10-23 by `subsystems-package3-20261023` through the build agent:
+all twelve checks passed, the game exited with code 0 after normal native teardown,
+and the agent exited 0. Scripts were resolved under the archived
+`Windows/RemappedPlugins/DasForUE/Content/Das` directory. Source/config and executable
+hashes matched before/after the run. Repeated export reopens/fully loads the dedicated
+map package before saving; the native exit observer removes its callbacks while
+global delegates are still alive. No runtime subsystem implementation changes were
+needed for this gate.

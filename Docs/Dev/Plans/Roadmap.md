@@ -101,7 +101,7 @@ These gates come from the original plan (after the NimForUE audit) and are still
 
 ## Subsystem follow-ups
 
-- **Authored services:** WorldSubsystem / GameInstanceSubsystem are implemented. Focused checks pass: 20 native collection/reload/travel checks and two real offline PIE worlds with separate GameInstances, inline timers and GC cleanup. See [Subsystems](../../Guide/Gameplay/Subsystems.md).
+- **Authored services:** WorldSubsystem / GameInstanceSubsystem are implemented. Focused checks pass: 20 native collection/reload/travel checks and two real offline PIE worlds with separate GameInstances, inline timers and GC cleanup. The focused Win64 packaged Development gate also passes 12 checks: config-only class loading, explicit cook, native collection creation, staged script/method execution, timers and normal engine shutdown with exit 0. See [Subsystems](../../Guide/Gameplay/Subsystems.md).
 
 
 - **AI / Perception:** sight occlusion, team filters, additional perception

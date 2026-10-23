@@ -4,6 +4,7 @@
     { "name": "build", "kind": "build", "log": "combined-editor-build" },
     { "name": "dsl-diagnostics", "kind": "script", "script": "TestDSLDiagnostics.ps1", "requires": ["build"] },
     { "name": "complete-builtins", "kind": "script", "script": "TestCompleteBuiltinTypes.ps1", "requires": ["build"] },
+    { "name": "authored-subsystems-packaged", "kind": "script", "script": "TestSubsystemsPackaged.ps1", "requires": ["build"] },
     { "name": "authored-subsystems", "kind": "script", "script": "TestSubsystems.ps1" },
     { "name": "authored-subsystems-pie", "kind": "automation", "test": "DasForUE.Subsystems.PIE", "log": "authored-subsystems-pie", "minimum": 1 },
     { "name": "quat", "kind": "script", "script": "TestQuat.ps1", "requires": ["build"] },
