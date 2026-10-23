@@ -36,7 +36,8 @@ const TCHAR* DasCallPhaseName(EDasCallPhase Phase)
         TEXT("prune_sessions"), TEXT("session"), TEXT("source_check"), TEXT("reload"), TEXT("prepare_vm"),
         TEXT("function"), TEXT("arguments"), TEXT("eval"), TEXT("result"), TEXT("exit"), TEXT("bridge_result"),
         TEXT("blueprint_return"), TEXT("script_between"), TEXT("authored_contract"), TEXT("authored_frame"),
-        TEXT("authored_validate"), TEXT("authored_arguments"), TEXT("invoke_checks"), TEXT("invoke_outputs")};
+        TEXT("authored_validate"), TEXT("call_arguments"), TEXT("invoke_checks"), TEXT("invoke_outputs"),
+        TEXT("call_begin"), TEXT("call_signature"), TEXT("call_result"), TEXT("call_release")};
     // clang-format on
     static_assert(UE_ARRAY_COUNT(Names) == static_cast<int32>(EDasCallPhase::Count));
     return Names[static_cast<int32>(Phase)];
@@ -472,22 +473,24 @@ void RunDasInteropProbe(FDasInteropBench& B)
     }
 
     // B, C, D. One script entry per case; the loop runs inside the script, so one dispatch per sample.
-    auto Loop = [&](const FString& File, const TCHAR* Entry, const TCHAR* Group, int64 Expected)
+    auto Loop = [&](const FString& File, const TCHAR* Entry, const TCHAR* Group, int64 Expected, bool bProfile = false)
     {
         FDasScriptChangeCheckScope Watch(1);
-        B.Measure(
-            Entry, Group, Light,
-            [&](int32 N)
+        auto Run = [&](int32 N)
+        {
+            DasCallPhaseBegin();
+            const auto R = Runtime.RunNamedPersistent(File, Entry, N, F);
+            if (!R.bSucceeded)
             {
-                const auto R = Runtime.RunNamedPersistent(File, Entry, N, F);
-                if (!R.bSucceeded)
-                {
-                    B.Fail(FString(Entry) + TEXT(": ") + R.Error);
-                    return int64(-1);
-                }
-                return int64(R.Value);
-            },
-            Expected);
+                B.Fail(FString(Entry) + TEXT(": ") + R.Error);
+                return int64(-1);
+            }
+            return int64(R.Value);
+        };
+        B.Measure(Entry, Group, Light, Run, Expected);
+        // The loop runs inside the script: each of the N calls is profiled, the one outer dispatch adds 1/N.
+        if (bProfile)
+            B.Profile(Entry, Light, Run);
     };
     int64 Masked = 0;
     for (int32 I = 0; I < Light; ++I)
@@ -496,8 +499,8 @@ void RunDasInteropProbe(FDasInteropBench& B)
     Loop(Script, TEXT("script_to_script_call"), TEXT("C script -> script"), Triangle(Light));
     Loop(Script, TEXT("script_to_extern"), TEXT("B script -> C++"), Triangle(Light));
     Loop(Script, TEXT("script_call_int_reflected"), TEXT("B script -> C++"), 7ll * Light);
-    Loop(Script, TEXT("script_generated_object_call"), TEXT("B script -> C++"), 7ll * Light);
-    Loop(Script, TEXT("script_generated_static_int"), TEXT("B script -> C++"), Triangle(Light));
+    Loop(Script, TEXT("script_generated_object_call"), TEXT("B script -> C++"), 7ll * Light, true);
+    Loop(Script, TEXT("script_generated_static_int"), TEXT("B script -> C++"), Triangle(Light), true);
     Loop(Script, TEXT("script_generated_static_vector"), TEXT("B script -> C++"), 5ll * Light);
     Loop(Script, TEXT("script_self_field_read_write"), TEXT("D properties"), 7ll * Light);
     Loop(Script, TEXT("script_object_field_read"), TEXT("D properties"), 7ll * Light);

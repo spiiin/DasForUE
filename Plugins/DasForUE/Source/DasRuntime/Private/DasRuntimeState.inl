@@ -129,6 +129,23 @@ struct FPendingHash
     TArray<TUniquePtr<FHashValue>> Keys;
     TArray<TUniquePtr<FHashValue>> Values;
 };
+struct FCallShape;
+// Parameter descriptions of a call frame; frames of one UFunction share them through its cached FCallShape.
+struct FCallSignature
+{
+    TSharedPtr<const TArray<FMarshalledParameter>> Items;
+    FCallSignature& operator=(TArray<FMarshalledParameter>&& Value)
+    {
+        Items = MakeShared<TArray<FMarshalledParameter>>(MoveTemp(Value));
+        return *this;
+    }
+    const FMarshalledParameter* begin() const { return Items ? Items->GetData() : nullptr; }
+    const FMarshalledParameter* end() const { return Items ? Items->GetData() + Items->Num() : nullptr; }
+    template <class F> const FMarshalledParameter* FindByPredicate(F&& Predicate) const
+    {
+        return Items ? Items->FindByPredicate(Forward<F>(Predicate)) : nullptr;
+    }
+};
 struct FMarshalledCall
 {
     TWeakObjectPtr<UObject> Target;
@@ -144,8 +161,9 @@ struct FMarshalledCall
     TSet<FString> Assigned;
     TSet<FString> WholeInputs;
     TMap<FString, TStrongObjectPtr<UObject>> ObjectPins;
-    TArray<FMarshalledParameter> Signature;
-    FString SignatureKey;
+    FCallSignature Signature;
+    // Set for frames begun on a UFunction (BeginCall, BeginStaticCall): what does not change per call.
+    TSharedPtr<const FCallShape> Shape;
     TWeakObjectPtr<UClass> RequiredInterface;
     TWeakObjectPtr<UClass> FunctionScopeClass;
     FString InterfaceSignatureKey;

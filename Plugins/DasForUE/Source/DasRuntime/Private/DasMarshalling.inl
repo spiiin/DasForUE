@@ -381,11 +381,139 @@ FObjectProperty* StaticWorldParameter(UFunction* Function, const FString& Name, 
 }
 #include "DasCollisionProfileAdapter.inl"
 
+// What a call frame needs to know about its UFunction that does not change while that UFunction lives: the
+// parameter descriptions and signature key, the top-level parameters by name, and which special adapters and
+// validators can apply. Built once per UFunction; a recompiled Blueprint function is a new object (new key).
+struct FCallShape
+{
+    TSharedPtr<const TArray<FMarshalledParameter>> Signature; // set once DescribeCall succeeded
+    FString SignatureKey;
+    // Top-level parameters with lower-case ASCII names, for the fast path of ResolveCallField. Directions repeat
+    // that function's lookup: the first signature entry with the exact path, or (whole-struct access) also one
+    // under it.
+    struct FParameter
+    {
+        std::string Name;
+        FString Path;
+        FProperty* Property = nullptr;
+        bool bExact = false, bExactIn = false, bExactOut = false;
+        bool bWhole = false, bWholeIn = false, bWholeOut = false;
+    };
+    TArray<FParameter> Parameters;
+    TArray<int32> PlainInputs; // signature entries without wildcards that every call must assign
+    bool bWildcardInputs = false;
+    bool bInputEventParameters = false, bGeometry = false, bWidgetAnimation = false, bPaint = false;
+    bool bEventReply = false, bInputNavigation = false, bImageBrush = false, bConstraintOutput = false;
+    bool bUnsafeDuringConstruction = false, bLatentOrThunk = false;
+    FString WorldContextMeta;
+    mutable const char* CheckedExpected = nullptr; // last generated signature literal found equal
+    mutable std::string CheckedExpectedText;
+};
+TMap<FObjectKey, TSharedPtr<FCallShape>> CallShapes;
+// Adapter and validator applicability; DescribeCall is separate (it may reject the function).
+TSharedPtr<FCallShape> CallShapeOf(UFunction* F)
+{
+    if (auto* Found = CallShapes.Find(FObjectKey(F)))
+        return *Found;
+    auto Shape = MakeShared<FCallShape>();
+    for (TFieldIterator<FStructProperty> It(F); It; ++It)
+        Shape->bInputEventParameters |= It->HasAnyPropertyFlags(CPF_Parm) && DasIsInputEventType(It->Struct);
+    Shape->bGeometry = DasGeometryFunctionAllowed(F);
+    Shape->bWidgetAnimation = DasWidgetAnimationFunctionAllowed(F);
+    Shape->bPaint = DasPaintFunctionAllowed(F);
+    Shape->bEventReply = DasEventReplyFunctionAllowed(F);
+    Shape->bInputNavigation = DasInputNavigationFunctionAllowed(F);
+    Shape->bImageBrush = DasImageSoftBrushFunctionAllowed(F) || F->GetName().StartsWith(TEXT("SetBrush")) ||
+                         F->GetFName() == TEXT("GetDynamicMaterial");
+    Shape->bConstraintOutput = F->GetOuterUClass()->GetFName() == TEXT("PhysicsConstraintComponent");
+#if WITH_EDITOR
+    Shape->bUnsafeDuringConstruction = F->HasMetaData(TEXT("UnsafeDuringActorConstruction"));
+    Shape->bLatentOrThunk = F->HasMetaData(TEXT("Latent")) || F->HasMetaData(TEXT("CustomThunk"));
+    Shape->WorldContextMeta = F->GetMetaData(TEXT("WorldContext"));
+#endif
+    if (CallShapes.Num() >= 16384)
+        CallShapes.Reset();
+    CallShapes.Add(FObjectKey(F), Shape);
+    return Shape;
+}
+// The shape with parameter descriptions; throws like DescribeCall for an unsupported function.
+TSharedPtr<FCallShape> CallShapeWithSignature(UFunction* F, das::Context* Context)
+{
+    auto Shape = CallShapeOf(F);
+    if (Shape->Signature)
+        return Shape;
+    auto Signature = MakeShared<TArray<FMarshalledParameter>>(DescribeCall(F, Context));
+    for (TFieldIterator<FProperty> It(F); It; ++It)
+    {
+        if (!It->HasAnyPropertyFlags(CPF_Parm))
+            continue;
+        FCallShape::FParameter P;
+        P.Path = It->GetName().ToLower();
+        P.Property = *It;
+        bool bAscii = !P.Path.IsEmpty();
+        for (TCHAR Ch : P.Path)
+            bAscii &= Ch > 0 && Ch < 128 && Ch != TEXT('.');
+        if (!bAscii)
+            continue;
+        P.Name = TCHAR_TO_UTF8(*P.Path);
+        const bool bStruct = CastField<FStructProperty>(*It) != nullptr;
+        for (const auto& Item : *Signature)
+        {
+            const bool bExact = Item.Path == P.Path;
+            if (bExact && !P.bExact)
+            {
+                P.bExact = true;
+                P.bExactIn = Item.bInput;
+                P.bExactOut = Item.bOutput;
+            }
+            if ((bExact || (bStruct && Item.Path.StartsWith(P.Path + TEXT(".")))) && !P.bWhole)
+            {
+                P.bWhole = true;
+                P.bWholeIn = Item.bInput;
+                P.bWholeOut = Item.bOutput;
+            }
+        }
+        Shape->Parameters.Add(MoveTemp(P));
+    }
+    for (int32 I = 0; I < Signature->Num(); ++I)
+        if ((*Signature)[I].bInput)
+        {
+            if ((*Signature)[I].Path.Contains(TEXT(".*")))
+                Shape->bWildcardInputs = true;
+            else
+                Shape->PlainInputs.Add(I);
+        }
+    Shape->SignatureKey = CallSignatureKey(F);
+    Shape->Signature = Signature;
+    return Shape;
+}
+// Function names and static owner classes arrive as string constants of the compiled script: resolve each
+// once per string address (a copy of the text detects an address reused for another string).
+struct FCallLiteral
+{
+    std::string Text;
+    FName Name;
+    TWeakObjectPtr<UClass> Class;
+};
+TMap<const char*, FCallLiteral> CallLiterals;
+FCallLiteral& CallLiteral(const char* Text)
+{
+    if (auto* Found = CallLiterals.Find(Text); Found && Found->Text == Text)
+        return *Found;
+    if (CallLiterals.Num() >= 16384)
+        CallLiterals.Reset();
+    FCallLiteral& Entry = CallLiterals.Add(Text);
+    Entry.Text = Text;
+    Entry.Name = FName(UTF8_TO_TCHAR(Text));
+    return Entry;
+}
+
 void SetCallConstructionPolicy(FMarshalledCall& Call, das::Context* Context, bool Dispatch = false)
 {
 #if WITH_EDITOR
     Call.bConstructionPolicyKnown = true;
-    Call.bConstructionUnsafe |= Call.Function->HasMetaData(TEXT("UnsafeDuringActorConstruction"));
+    Call.bConstructionUnsafe |= Call.Shape ? Call.Shape->bUnsafeDuringConstruction
+                                           : Call.Function->HasMetaData(TEXT("UnsafeDuringActorConstruction"));
 #endif
     if (Dispatch && ConstructingObject && !Call.bConstructionPolicyKnown && !Call.bAuthored)
         Context->throw_error("ConstructionScript requires a generated call context policy");
@@ -394,16 +522,25 @@ void SetCallConstructionPolicy(FMarshalledCall& Call, das::Context* Context, boo
 }
 FDasCallHandle BeginStaticCall(const char* Path, const char* Name, const char* WorldParameter, das::Context* Context)
 {
+    DasCallPhaseMark(EDasCallPhase::ScriptBetween);
     RequireObjectContext(Context);
     if (ActiveContext->bCollectingSubscriptions)
         Context->throw_error("UFunction calls are forbidden in bind_events");
-    const FString ClassPath = Path ? UTF8_TO_TCHAR(Path) : TEXT("");
-    auto* Class = FindObject<UClass>(nullptr, *ClassPath);
-    if (!ClassPath.StartsWith(TEXT("/Script/")) || !Class || !Class->HasAnyClassFlags(CLASS_Native))
+    if (!Path)
         Context->throw_error("expected loaded native static owner class");
+    auto& Owner = CallLiteral(Path);
+    UClass* Class = Owner.Class.Get();
+    if (!Class)
+    {
+        const FString ClassPath = UTF8_TO_TCHAR(Path);
+        Class = FindObject<UClass>(nullptr, *ClassPath);
+        if (!ClassPath.StartsWith(TEXT("/Script/")) || !Class || !Class->HasAnyClassFlags(CLASS_Native))
+            Context->throw_error("expected loaded native static owner class");
+        Owner.Class = Class;
+    }
     if (!Name || !*Name || FCStringAnsi::Strlen(Name) >= NAME_SIZE)
         Context->throw_error("invalid static function name");
-    auto* Function = Class->FindFunctionByName(FName(UTF8_TO_TCHAR(Name)));
+    auto* Function = Class->FindFunctionByName(CallLiteral(Name).Name);
     if (!Function || !Function->HasAllFunctionFlags(FUNC_Static | FUNC_Native | FUNC_BlueprintCallable) ||
         Function->HasAnyFunctionFlags(FUNC_Net | FUNC_Delegate | FUNC_MulticastDelegate))
         Context->throw_error("expected native static BlueprintCallable function");
@@ -412,9 +549,10 @@ FDasCallHandle BeginStaticCall(const char* Path, const char* Name, const char* W
         ValidateCollisionProfileAdapterSignature(Function, Context);
     const FString WorldName = WorldParameter ? UTF8_TO_TCHAR(WorldParameter) : TEXT("");
 #if WITH_EDITOR
-    if (Function->HasMetaData(TEXT("Latent")) || (Function->HasMetaData(TEXT("CustomThunk")) && !ProfileAdapter))
+    const auto Meta = CallShapeOf(Function);
+    if (Meta->bLatentOrThunk && (Function->HasMetaData(TEXT("Latent")) || !ProfileAdapter))
         Context->throw_error("static function needs a special call adapter");
-    if (Function->GetMetaData(TEXT("WorldContext")).ToLower() != WorldName.ToLower())
+    if (!Meta->WorldContextMeta.Equals(WorldName, ESearchCase::IgnoreCase))
         Context->throw_error("WorldContext contract changed; regenerate bindings");
 #endif
     auto* WorldProperty = StaticWorldParameter(Function, WorldName, Context);
@@ -427,12 +565,12 @@ FDasCallHandle BeginStaticCall(const char* Path, const char* Name, const char* W
         if (!World || !World->IsGameWorld() || !WorldObject->IsA(WorldProperty->PropertyClass))
             Context->throw_error("WorldContext requires script owner's live game world and compatible object");
     }
-    auto Signature = DescribeCall(Function, Context);
+    const auto Shape = CallShapeWithSignature(Function, Context);
     if (ActiveContext->Calls.Num() >= 256)
         Context->throw_error("call frame limit reached");
     auto Call = MakeShared<FMarshalledCall>();
-    Call->Signature = MoveTemp(Signature);
-    Call->SignatureKey = CallSignatureKey(Function);
+    Call->Shape = Shape;
+    Call->Signature.Items = Shape->Signature;
     Call->Target = Class->GetDefaultObject();
     Call->Function.Reset(Function);
     Call->Frame = MakeUnique<FStructOnScope>(Function);
@@ -451,37 +589,42 @@ FDasCallHandle BeginStaticCall(const char* Path, const char* Name, const char* W
         Call->ObjectPins.Add(Call->AutomaticWorldContext, TStrongObjectPtr<UObject>(WorldObject));
     }
     SetCallConstructionPolicy(*Call, Context);
-    BindEventReplyCall(*Call, Context);
-    BindPaintCall(*Call, Context);
+    if (Shape->bEventReply || Shape->bInputNavigation)
+        BindEventReplyCall(*Call, Context);
+    if (Shape->bPaint)
+        BindPaintCall(*Call, Context);
     const uint64 Token = NextCallHandle++;
     ActiveContext->Calls.Add(Token, MoveTemp(Call));
+    DasCallPhaseMark(EDasCallPhase::CallBegin);
     return {Token};
 }
 
 FDasCallHandle BeginCallSelected(const FDasObjectHandle& Target, const char* Name, das::Context* Context,
                                  UFunction* Selected = nullptr)
 {
+    DasCallPhaseMark(EDasCallPhase::ScriptBetween);
     UObject* Object = ResolveObject(Target, Context);
     if (ActiveContext->bCollectingSubscriptions)
         Context->throw_error("UFunction calls are forbidden in bind_events");
     if (!Name || !*Name || FCStringAnsi::Strlen(Name) >= NAME_SIZE)
         Context->throw_error("invalid function name");
-    UFunction* Function = Selected ? Selected : Object->FindFunction(FName(UTF8_TO_TCHAR(Name)));
+    UFunction* Function = Selected ? Selected : Object->FindFunction(CallLiteral(Name).Name);
     if (!Function || !Function->HasAnyFunctionFlags(FUNC_BlueprintCallable) ||
         Function->HasAnyFunctionFlags(FUNC_Static | FUNC_Net | FUNC_Delegate | FUNC_MulticastDelegate))
         Context->throw_error("expected a local BlueprintCallable instance UFunction");
-    auto Signature = DescribeCall(Function, Context);
+    const auto Shape = CallShapeWithSignature(Function, Context);
     if (ActiveContext->Calls.Num() >= 256)
         Context->throw_error("call frame limit reached; release unused calls");
     auto Call = MakeShared<FMarshalledCall>();
-    Call->Signature = MoveTemp(Signature);
-    Call->SignatureKey = CallSignatureKey(Function);
+    Call->Shape = Shape;
+    Call->Signature.Items = Shape->Signature;
     Call->Target = Object;
     Call->Function.Reset(Function);
     Call->Frame = MakeUnique<FStructOnScope>(Function);
     SetCallConstructionPolicy(*Call, Context);
     const uint64 Token = NextCallHandle++;
     ActiveContext->Calls.Add(Token, MoveTemp(Call));
+    DasCallPhaseMark(EDasCallPhase::CallBegin);
     return {Token};
 }
 
@@ -530,8 +673,20 @@ void RequireCallContext(const FDasCallHandle& Handle, bool ConstructionUnsafe, d
 void ExpectCallSignature(const FDasCallHandle& Handle, const char* Expected, das::Context* Context)
 {
     auto& Call = ResolveCall(Handle, Context);
-    if (Call.bExecuted || !Expected || !Call.SignatureKey.Equals(UTF8_TO_TCHAR(Expected), ESearchCase::IgnoreCase))
+    if (Call.bExecuted || !Expected)
         Context->throw_error("generated binding signature changed; regenerate bindings");
+    const FCallShape* Shape = Call.Shape.Get();
+    if (!Shape || Shape->CheckedExpected != Expected || Shape->CheckedExpectedText != Expected)
+    {
+        if (!(Shape ? Shape->SignatureKey : FString()).Equals(UTF8_TO_TCHAR(Expected), ESearchCase::IgnoreCase))
+            Context->throw_error("generated binding signature changed; regenerate bindings");
+        if (Shape)
+        {
+            Shape->CheckedExpected = Expected;
+            Shape->CheckedExpectedText = Expected;
+        }
+    }
+    DasCallPhaseMark(EDasCallPhase::CallSignature);
 }
 
 FCallField ResolveCallField(FMarshalledCall& Call, const char* Path, bool bOutput, das::Context* Context,
@@ -546,6 +701,19 @@ FCallField ResolveCallField(FMarshalledCall& Call, const char* Path, bool bOutpu
     if (!bOutput && !Call.AutomaticWorldContext.IsEmpty() &&
         Call.AutomaticWorldContext.Equals(UTF8_TO_TCHAR(Path), ESearchCase::IgnoreCase))
         Context->throw_error("automatic WorldContext cannot be overridden");
+    // A top-level parameter by name: no path parsing, FName lookup or allocation besides the result path.
+    // Names the table does not know take the general path below, which reports the error.
+    if (const FCallShape* Shape = Call.Shape.Get())
+        for (const auto& P : Shape->Parameters)
+            if (FCStringAnsi::Stricmp(Path, P.Name.c_str()) == 0)
+            {
+                const bool bFound = bAllowStruct ? P.bWhole : P.bExact;
+                const bool bDirection = bAllowStruct ? (bOutput ? P.bWholeOut : P.bWholeIn)
+                                                     : (bOutput ? P.bExactOut : P.bExactIn);
+                if (!bFound || !bDirection)
+                    Context->throw_error("unknown parameter or wrong parameter direction");
+                return {P.Property, P.Property->ContainerPtrToValuePtr<void>(Call.Frame->GetStructMemory()), P.Path};
+            }
     TArray<FString> Parts;
     FString(UTF8_TO_TCHAR(Path)).ParseIntoArray(Parts, TEXT("."), false);
     UStruct* Type = Call.Function.Get();
@@ -1039,7 +1207,7 @@ FDasObjectHandle GetCallObject(const FDasCallHandle& Handle, const char* Path, d
 
 void InvokeCall(const FDasCallHandle& Handle, das::Context* Context)
 {
-    DasCallPhaseMark(EDasCallPhase::AuthoredArguments);
+    DasCallPhaseMark(EDasCallPhase::CallArguments);
     auto& Call = ResolveCall(Handle, Context);
     if (!Call.CallbackFramePath.IsEmpty())
         Context->throw_error("callback builders cannot invoke a UFunction");
@@ -1081,13 +1249,27 @@ void InvokeCall(const FDasCallHandle& Handle, das::Context* Context)
                 return true;
         return false;
     };
-    for (const auto& Parameter : Call.Signature)
-        if (Parameter.bInput && !WholeInput(Parameter.Path) &&
-            !Parameter.Path.Contains(TEXT(".*")) && !Call.Assigned.Contains(Parameter.Path))
-            Context->throw_error("missing input argument or struct field");
+    // Special adapters and validators run only where the shape of the function says they can apply.
+    const FCallShape* Shape = Call.Shape.Get();
+    auto Applies = [&](bool bFlag) { return !Shape || bFlag; };
+    if (Shape)
+    {
+        for (int32 Index : Shape->PlainInputs)
+        {
+            const auto& Parameter = (*Shape->Signature)[Index];
+            if (!WholeInput(Parameter.Path) && !Call.Assigned.Contains(Parameter.Path))
+                Context->throw_error("missing input argument or struct field");
+        }
+    }
+    else
+        for (const auto& Parameter : Call.Signature)
+            if (Parameter.bInput && !WholeInput(Parameter.Path) &&
+                !Parameter.Path.Contains(TEXT(".*")) && !Call.Assigned.Contains(Parameter.Path))
+                Context->throw_error("missing input argument or struct field");
     int32 InputTraversalBudget = 1048576;
     for (const auto& Parameter : Call.Signature)
-        if (Parameter.bInput && !WholeInput(Parameter.Path) && Parameter.Path.Contains(TEXT(".*")))
+        if (Applies(Shape && Shape->bWildcardInputs) && Parameter.bInput && !WholeInput(Parameter.Path) &&
+            Parameter.Path.Contains(TEXT(".*")))
             VisitCallContainerPaths(
                 Call, Parameter.Path, false, Context,
                 [&](const FString& Concrete)
@@ -1099,9 +1281,12 @@ void InvokeCall(const FDasCallHandle& Handle, das::Context* Context)
                 InputTraversalBudget);
     SetCallConstructionPolicy(Call, Context, true);
     ValidateConstraintCallInputs(Call, Context);
-    ValidateInputEventCallInputs(Call, Context);
-    ValidateGeometryCall(Call, Context, false);
-    ValidateWidgetAnimationCall(Call, Context);
+    if (Applies(Shape && Shape->bInputEventParameters))
+        ValidateInputEventCallInputs(Call, Context);
+    if (Applies(Shape && Shape->bGeometry))
+        ValidateGeometryCall(Call, Context, false);
+    if (Applies(Shape && Shape->bWidgetAnimation))
+        ValidateWidgetAnimationCall(Call, Context);
     CommitPendingHashes(Call, Context);
     for (const auto& Pin : Call.ObjectPins)
         if (UObject* Argument = Pin.Value.Get();
@@ -1130,15 +1315,20 @@ void InvokeCall(const FDasCallHandle& Handle, das::Context* Context)
             Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
         DasCallPhaseMark(EDasCallPhase::BlueprintReturn);
     }
-    else if (!DispatchImageSoftBrush(Call, Context) && !DispatchInputNavigationCall(Call, Context) &&
-             !StagePaintCall(Call, Context) && !DispatchEventReplyCall(Call, Context) &&
+    else if (!(Applies(Shape && Shape->bImageBrush) && DispatchImageSoftBrush(Call, Context)) &&
+             !(Applies(Shape && Shape->bInputNavigation) && DispatchInputNavigationCall(Call, Context)) &&
+             !(Applies(Shape && Shape->bPaint) && StagePaintCall(Call, Context)) &&
+             !(Applies(Shape && Shape->bEventReply) && DispatchEventReplyCall(Call, Context)) &&
              !DispatchCollisionProfileProperty(Call, Context))
         Object->ProcessEvent(Call.Function.Get(), Call.Frame->GetStructMemory());
     if (!DispatchFailure.IsEmpty())
         Context->throw_error(TCHAR_TO_UTF8(*DispatchFailure));
-    CaptureConstraintCallOutput(Call, Context);
-    CaptureWidgetAnimationOutput(Call, Context);
-    ValidateGeometryCall(Call, Context, true);
+    if (Applies(Shape && Shape->bConstraintOutput))
+        CaptureConstraintCallOutput(Call, Context);
+    if (Applies(Shape && Shape->bWidgetAnimation))
+        CaptureWidgetAnimationOutput(Call, Context);
+    if (Applies(Shape && Shape->bGeometry))
+        ValidateGeometryCall(Call, Context, true);
     int32 OutputTraversalBudget = 1048576;
     for (const auto& Parameter : Call.Signature)
         if (Parameter.bOutput && Parameter.Kind == EMarshallingKind::Array)
@@ -1194,6 +1384,7 @@ template <class P> auto GetCallScalar(const FDasCallHandle& Handle, const char* 
     auto Value = ReadCallValue(Field, Context);
     if (Value.Kind != int32(TPropertyScalarSlot<P>::Kind))
         Context->throw_error("result scalar type mismatch");
+    DasCallPhaseMark(EDasCallPhase::CallResult);
     return Value.*TPropertyScalarSlot<P>::Member;
 }
 char* GetCallString(const FDasCallHandle& H, const char* P, das::Context* C)
@@ -1212,6 +1403,7 @@ void ReleaseCall(const FDasCallHandle& Handle, das::Context* Context)
 {
     ResolveCall(Handle, Context);
     ActiveContext->Calls.Remove(Handle.Token);
+    DasCallPhaseMark(EDasCallPhase::CallRelease);
 }
 struct FCallHandleAnnotation : das::ManagedStructureAnnotation<FDasCallHandle, false>
 {

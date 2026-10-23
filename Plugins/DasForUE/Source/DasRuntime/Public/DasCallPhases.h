@@ -26,13 +26,18 @@ enum class EDasCallPhase : uint8
     BridgeResult,     // bridge: lifecycle error record and result copy
     BlueprintReturn,  // rest of ProcessEvent after the bridge returns
     // Script -> authored method through a typed reference (peer.Method(...)): a reflected call frame.
-    ScriptBetween,     // script code since the previous mark: result reads of the last call, the loop
-    AuthoredContract,  // object identity check, method contract (JSON wire) lookup
-    AuthoredFrame,     // UFunction lookup, call signature, parameter frame allocation
-    AuthoredValidate,  // UFunction parameters against the contract
-    AuthoredArguments, // argument writes by name
-    InvokeChecks,      // ue_invoke_call checks before ProcessEvent
-    InvokeOutputs,     // output pins and container outputs after ProcessEvent
+    ScriptBetween,    // script code since the previous mark: result reads of the last call, the loop
+    AuthoredContract, // object identity check, method contract (JSON wire) lookup
+    AuthoredFrame,    // UFunction lookup, call signature, parameter frame allocation
+    AuthoredValidate, // UFunction parameters against the contract
+    CallArguments,    // argument writes by name (any reflected call frame)
+    InvokeChecks,     // ue_invoke_call checks before ProcessEvent
+    InvokeOutputs,    // output pins and container outputs after ProcessEvent
+    // Reflected call frames (generated engine bindings, ue_begin_call); ScriptBetween marks the frame start.
+    CallBegin,     // UFunction lookup, call shape, parameter frame allocation
+    CallSignature, // generated binding signature check
+    CallResult,    // scalar result read by name
+    CallRelease,   // frame release
     Count
 };
 struct FDasCallPhaseState
