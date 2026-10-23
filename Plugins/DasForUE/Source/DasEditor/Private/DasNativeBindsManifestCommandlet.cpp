@@ -1,5 +1,8 @@
 #include "DasNativeBindsManifestCommandlet.h"
 #include "DasNativeBinds.h"
+#include "DasRuntime.h"
+#include "HAL/FileManager.h"
+#include "Modules/ModuleManager.h"
 #include "DasUEAotProbe.h"
 #include "Dom/JsonObject.h"
 #include "Misc/FileHelper.h"
@@ -33,12 +36,14 @@ int32 UDasNativeBindsManifestCommandlet::Main(const FString& Params)
     int32 Failed = 0;
     int32 Routed = 0, Kept = 0; // binds that reflect a UFUNCTION (Reflects)
     TMap<FString, FString> Routes; // "Receiver.name" -> "routed" or the note of a kept reflected call
+    TSet<FString> NativeTypes;     // script types of the native modules
     for (const FDasNativeModuleInfo& Module : DescribeDasNativeModules())
     {
         auto Object = MakeShared<FJsonObject>();
         Object->SetStringField(TEXT("name"), Module.Name);
         Object->SetStringField(TEXT("error"), Module.Error);
         Object->SetArrayField(TEXT("classes"), Strings(Module.Classes));
+        NativeTypes.Append(Module.Classes);
         TArray<TSharedPtr<FJsonValue>> List;
         for (const FDasNativeFunctionInfo& F : Module.Functions)
         {
@@ -90,6 +95,27 @@ int32 UDasNativeBindsManifestCommandlet::Main(const FString& Params)
                    Expected.Value, Got ? **Got : TEXT("no Reflects"));
             ++Failed;
         }
+    // Generated modules (Scripts/GenerateBindings.py) declare no short alias with the name of a native type: in a
+    // script that requires both, the name would be ambiguous. A hit means a stale generated module.
+    const FString Scripts = FPaths::GetPath(
+        FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).ScriptPath(TEXT("ue_generated.das")));
+    TArray<FString> ScriptFiles;
+    IFileManager::Get().FindFiles(ScriptFiles, *(Scripts / TEXT("*.das")), true, false);
+    for (const FString& File : ScriptFiles)
+    {
+        FString Text;
+        if (!FFileHelper::LoadFileToString(Text, *(Scripts / File)))
+            continue;
+        for (const FString& Name : NativeTypes)
+            if (Text.StartsWith(TEXT("typedef ") + Name + TEXT(" = ")) ||
+                Text.Contains(TEXT("\ntypedef ") + Name + TEXT(" = ")))
+            {
+                UE_LOG(LogTemp, Error, TEXT("DAS_NATIVE_BINDS_MANIFEST %s: short alias %s is the name of a native type; "
+                                            "regenerate it with Scripts/GenerateBindings.py"),
+                       *File, *Name);
+                ++Failed;
+            }
+    }
     const bool bManifest = bWritten && Failed == 0 && Modules.Num() > 0;
     const TCHAR* ManifestResult = bManifest ? TEXT("PASS") : TEXT("FAIL");
     UE_LOG(LogTemp, Display,

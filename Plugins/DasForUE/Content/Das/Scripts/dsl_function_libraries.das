@@ -19,7 +19,7 @@ class LibraryProbe {
         push(values,klass)
         push(values,ue_class_null())
         let returned=ue_lib_EchoClassArray(values)
-        let receiver=ue_ref(type<ue_library_generated::Actor>,ue_self_object())
+        let receiver=ue_ref(type<ue_library_generated::C_Actor_adf65d5b>,ue_self_object())
         let base=ue_class_loaded(type<ObjectRef>,"/Script/Engine.ActorComponent")
         let components=ue_lib_GetComponentsByClass(receiver,base)
         let found=ue_lib_GetActorOfClass(klass)

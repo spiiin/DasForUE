@@ -204,9 +204,9 @@ struct C_WorldSettings_5d995f30 { handle : UObjectHandle }
 [ue_native_object(path="/Script/PhysicsCore.PhysicalMaterial")]
 struct C_PhysicalMaterial_b3257fa1 { handle : UObjectHandle }
 
-typedef Actor = C_Actor_adf65d5b
+// Actor: no short alias, the name belongs to the native bind type Actor (DasNativeBinds.h); use C_Actor_adf65d5b
 
-typedef ActorComponent = C_ActorComponent_97441d45
+// ActorComponent: no short alias, the name belongs to the native bind type ActorComponent (DasNativeBinds.h); use C_ActorComponent_97441d45
 
 typedef AudioComponent = C_AudioComponent_86ff3f82
 
@@ -244,7 +244,7 @@ typedef ForceFeedbackComponent = C_ForceFeedbackComponent_ca7b1c8d
 
 typedef ForceFeedbackEffect = C_ForceFeedbackEffect_551fc643
 
-typedef GameInstance = C_GameInstance_c6fa677d
+// GameInstance: no short alias, the name belongs to the native bind type GameInstance (DasNativeBinds.h); use C_GameInstance_c6fa677d
 
 typedef GameModeBase = C_GameModeBase_b500be5e
 
@@ -280,7 +280,7 @@ typedef ParticleSystem = C_ParticleSystem_fc843ad6
 
 typedef ParticleSystemComponent = C_ParticleSystemComponent_c9254c05
 
-typedef Pawn = C_Pawn_ba3732bb
+// Pawn: no short alias, the name belongs to the native bind type Pawn (DasNativeBinds.h); use C_Pawn_ba3732bb
 
 typedef PhysicalMaterial = C_PhysicalMaterial_b3257fa1
 
@@ -306,7 +306,7 @@ typedef SceneCaptureComponent = C_SceneCaptureComponent_1a4855ff
 
 typedef SceneCaptureComponent2D = C_SceneCaptureComponent2D_fa96627e
 
-typedef SceneComponent = C_SceneComponent_6f0751c1
+// SceneComponent: no short alias, the name belongs to the native bind type SceneComponent (DasNativeBinds.h); use C_SceneComponent_6f0751c1
 
 typedef ScriptStruct = C_ScriptStruct_efcc540e
 
@@ -332,7 +332,7 @@ typedef Texture2D = C_Texture2D_2db8ea5c
 
 typedef Volume = C_Volume_3948bec0
 
-typedef World = C_World_585eb25e
+// World: no short alias, the name belongs to the native bind type World (DasNativeBinds.h); use C_World_585eb25e
 
 typedef WorldSettings = C_WorldSettings_5d995f30
 

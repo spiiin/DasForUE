@@ -15,7 +15,7 @@ struct C_DasWeakCollisionFixture_0d943e41 { handle : UObjectHandle }
 [ue_native_object(path="/Script/Engine.ActorComponent")]
 struct C_ActorComponent_97441d45 { handle : UObjectHandle }
 
-typedef ActorComponent = C_ActorComponent_97441d45
+// ActorComponent: no short alias, the name belongs to the native bind type ActorComponent (DasNativeBinds.h); use C_ActorComponent_97441d45
 
 typedef DasWeakCollisionFixture = C_DasWeakCollisionFixture_0d943e41
 

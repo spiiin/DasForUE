@@ -11,6 +11,38 @@ from pathlib import Path
 from DasKinds import property_classes
 
 
+ROOT = Path(__file__).resolve().parents[1]
+# Native modules of the plugin (DasNativeBinds.h); projects add their own with --native-binds-source.
+NATIVE_BINDS_SOURCE = ROOT / 'Plugins/DasForUE/Source'
+_native_type_names_cache = {}
+
+
+def native_type_names(dirs):
+    """Script type names that native modules declare: Class<T>(TEXT("Name")) in files with DAS_NATIVE_BINDS.
+
+    A generated short alias with such a name would make the name ambiguous in a script that requires both
+    modules, so generate() emits none (the full C_<Leaf>_<hash> name stays). Comments are ignored.
+    """
+    key = tuple(sorted(str(Path(d).resolve()) for d in dirs))
+    if key not in _native_type_names_cache:
+        names = set()
+        for root in key:
+            for path in sorted(Path(root).rglob('*')):
+                if path.suffix not in ('.cpp', '.h', '.inl') or not path.is_file():
+                    continue
+                text = re.sub(r'//[^\n]*', '', path.read_text(encoding='utf-8', errors='replace'))
+                if 'DAS_NATIVE_BINDS(' not in text:
+                    continue
+                names.update(re.findall(r'\bClass<[^;()]*?>\(\s*TEXT\("([A-Za-z_][A-Za-z0-9_]*)"\)', text))
+        _native_type_names_cache[key] = frozenset(names)
+    return _native_type_names_cache[key]
+
+
+def skipped_aliases(text):
+    """Short aliases generate() left out for native type names, from its comments."""
+    return re.findall(r'^// ([A-Za-z_][A-Za-z0-9_]*): no short alias,', text, re.M)
+
+
 def ident(value):
     result = re.sub(r'[^A-Za-z0-9_]', '_', value)
     return result if result and not result[0].isdigit() else '_' + result
@@ -133,7 +165,7 @@ CANONICAL_MATH = {
 }
 
 
-def generate(ir, module="ue_generated", source_types=None, canonical_math=False):
+def generate(ir, module="ue_generated", source_types=None, canonical_math=False, native_names=None):
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", module): raise ValueError("Invalid module name")
     if ir.get('schema_version') != 5:
         raise ValueError('Unsupported IR schema version')
@@ -485,7 +517,10 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
         args = 'path=' + quote(path)
         if path in interface_ids: annotation = 'ue_interface_ref'; args += ', id=' + quote(interface_ids[path])
         lines += [f'[{annotation}({args})]', f'struct {class_name(path)} {{ handle : UObjectHandle }}', '']
-    # Short names are aliases of existing wrappers, never a second object representation.
+    # Short names are aliases of existing wrappers, never a second object representation. None for names of native
+    # bind types (native_type_names): `Actor` would be ambiguous next to ue_engine::Actor.
+    if native_names is None:
+        native_names = native_type_names([NATIVE_BINDS_SOURCE])
     names = {}
     short_aliases = set()
     for path in sorted(classes):
@@ -494,6 +529,10 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False)
         names.setdefault(name, []).append(path)
     for name, paths in sorted(names.items()):
         if len(paths) == 1 and name not in symbols:
+            if name in native_names:
+                lines += [f'// {name}: no short alias, the name belongs to the native bind type {name} '
+                          f'(DasNativeBinds.h); use {class_name(paths[0])}', '']
+                continue
             register(name)
             short_aliases.add(name)
             lines += [f'typedef {name} = {class_name(paths[0])}', '']
@@ -884,9 +923,14 @@ def main():
     parser.add_argument('--source-types', type=Path)
     parser.add_argument('--canonical-math', action='store_true', help='Reuse foundation UEVector2D/UEVector/UERotator/UETransform')
     parser.add_argument('--check', action='store_true', help='Fail if the checked-in module differs')
+    parser.add_argument('--native-binds-source', type=Path, action='append', default=[],
+                        help='Also scan this source folder for native bind types (besides the plugin)')
     args = parser.parse_args()
     source_types = json.loads(args.source_types.read_text(encoding='utf-8-sig')) if args.source_types else None
-    text = generate(json.loads(args.ir.read_text(encoding='utf-8-sig')), args.module, source_types, canonical_math=args.canonical_math)
+    native_names = native_type_names([NATIVE_BINDS_SOURCE] + args.native_binds_source)
+    text = generate(json.loads(args.ir.read_text(encoding='utf-8-sig')), args.module, source_types,
+                    canonical_math=args.canonical_math, native_names=native_names)
+    print('GENERATE_BINDINGS_SKIPPED_ALIASES=' + ','.join(skipped_aliases(text)))
     if args.check:
         if not args.output.exists() or args.output.read_text(encoding='utf-8') != text:
             parser.exit(1, 'Generated bindings are stale\n')

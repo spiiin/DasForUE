@@ -123,22 +123,17 @@ FString DasNativeScriptTypeName(const FDasNativeParam& Param, const FDasNativeRe
         return TEXT("UETimespan");
     case EDasNativeType::Object:
         return Resolved.Script ? Resolved.Script->Name : FString(TEXT("UObjectHandle"));
-    case EDasNativeType::Vector:
-        return TEXT("UEVector");
-    case EDasNativeType::Vector2D:
-        return TEXT("UEVector2D");
-    case EDasNativeType::Rotator:
-        return TEXT("UERotator");
-    case EDasNativeType::Quat:
-        return TEXT("UEQuat");
-    case EDasNativeType::Transform:
-        return TEXT("UETransform");
-    case EDasNativeType::LinearColor:
-        return TEXT("UELinearColor");
-    case EDasNativeType::Color:
-        return TEXT("UEColor");
+    default:
+    {
+        // Engine values: the name of the type annotation ue_foundation registered (math handle names live in
+        // their adapters, Scripts/TestTypeAdapterGate.py).
+        das::ModuleLibrary Lib;
+        Lib.addBuiltInModule();
+        Lib.addModule(das::Module::require("ue_foundation"));
+        const das::TypeDeclPtr Type = DasNativeTypeDecl(Param, Resolved, Lib, false);
+        return Type->annotation ? FString(UTF8_TO_TCHAR(Type->annotation->name.c_str())) : FString();
     }
-    return FString();
+    }
 }
 // AOT ABI of a parameter or result (DasUEAot.h): engine values by const reference, results by value. nullptr when
 // a type has none (objects, FName, FText): such functions stay in the interpreter.

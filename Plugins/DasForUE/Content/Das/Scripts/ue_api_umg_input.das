@@ -235,7 +235,7 @@ struct C_WidgetSwitcherSlot_744830c2 { handle : UObjectHandle }
 [ue_native_object(path="/Script/UMG.WrapBoxSlot")]
 struct C_WrapBoxSlot_68305a89 { handle : UObjectHandle }
 
-typedef Actor = C_Actor_adf65d5b
+// Actor: no short alias, the name belongs to the native bind type Actor (DasNativeBinds.h); use C_Actor_adf65d5b
 
 typedef BlueprintFunctionLibrary = C_BlueprintFunctionLibrary_a62507e5
 
@@ -263,7 +263,7 @@ typedef EnhancedInputWorldSubsystem = C_EnhancedInputWorldSubsystem_a8c99c7a
 
 typedef Font = C_Font_684a8ec8
 
-typedef GameInstance = C_GameInstance_c6fa677d
+// GameInstance: no short alias, the name belongs to the native bind type GameInstance (DasNativeBinds.h); use C_GameInstance_c6fa677d
 
 typedef GridSlot = C_GridSlot_50f32788
 
@@ -307,7 +307,7 @@ typedef PanelSlot = C_PanelSlot_ee99b2a9
 
 typedef PanelWidget = C_PanelWidget_7bd308a3
 
-typedef Pawn = C_Pawn_ba3732bb
+// Pawn: no short alias, the name belongs to the native bind type Pawn (DasNativeBinds.h); use C_Pawn_ba3732bb
 
 typedef Player = C_Player_14308001
 

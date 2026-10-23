@@ -69,6 +69,8 @@ Descriptive metadata (Category, DisplayName, ToolTip, Units, Clamp/UI ranges, de
 
 `<hash>` is a short SHA-256 suffix of the full UE type path, so identity is defined by the type, not by its field list. A user-defined `FakeVector` with the same fields is a different type.
 
+A class whose short name is unique also gets a short alias: `typedef Light = C_Light_<hash>`. There is none when the name belongs to a native bind type (`Class<T>(TEXT("Name"))` in a `DAS_NATIVE_BINDS` module, `DasNativeBinds.h`): `ue_engine` declares `Actor`, `Pawn`, `ActorComponent`, `SceneComponent`, `World` and `GameInstance`, and in a script that requires both modules the name would be ambiguous. The generated module then has a comment in place of the alias (`// Actor: no short alias, ...; use C_Actor_<hash>`), the generator prints `GENERATE_BINDINGS_SKIPPED_ALIASES=...`, and the full name works as before. `GenerateBindings.py` scans the plugin sources for these names; a project with its own native modules adds its source folders with `--native-binds-source <folder>`. The `DasNativeBindsManifest` commandlet fails if a module in the plugin's scripts still declares such an alias.
+
 ### Enums and names
 
 Enum wrappers are real daScript enums. Conversion to Unreal uses registered symbols, so `int(value)` is not a promise of the Unreal numeric value. `int` instead of an enum, or a different enum type, does not compile. Symbols ending in `_MAX` are reserved and rejected in both directions; other `Hidden` members are not filtered.

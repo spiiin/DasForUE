@@ -48,9 +48,9 @@ struct C_SceneComponent_6f0751c1 { handle : UObjectHandle }
 [ue_native_object(path="/Script/PhysicsCore.PhysicalMaterial")]
 struct C_PhysicalMaterial_b3257fa1 { handle : UObjectHandle }
 
-typedef Actor = C_Actor_adf65d5b
+// Actor: no short alias, the name belongs to the native bind type Actor (DasNativeBinds.h); use C_Actor_adf65d5b
 
-typedef ActorComponent = C_ActorComponent_97441d45
+// ActorComponent: no short alias, the name belongs to the native bind type ActorComponent (DasNativeBinds.h); use C_ActorComponent_97441d45
 
 typedef BlueprintFunctionLibrary = C_BlueprintFunctionLibrary_a62507e5
 
@@ -64,7 +64,7 @@ typedef MaterialInterface = C_MaterialInterface_d64f3063
 
 typedef Object = C_Object_55c3753a
 
-typedef Pawn = C_Pawn_ba3732bb
+// Pawn: no short alias, the name belongs to the native bind type Pawn (DasNativeBinds.h); use C_Pawn_ba3732bb
 
 typedef PhysicalMaterial = C_PhysicalMaterial_b3257fa1
 
@@ -74,7 +74,7 @@ typedef PhysicsHandleComponent = C_PhysicsHandleComponent_c490d7a8
 
 typedef PrimitiveComponent = C_PrimitiveComponent_5efdd477
 
-typedef SceneComponent = C_SceneComponent_6f0751c1
+// SceneComponent: no short alias, the name belongs to the native bind type SceneComponent (DasNativeBinds.h); use C_SceneComponent_6f0751c1
 
 def C_Object_55c3753a_from(value : UObjectHandle) : C_Object_55c3753a { return C_Object_55c3753a(handle = ue_cast_nullable_object(value, "/Script/CoreUObject.Object")) }
 def C_Object_55c3753a_raw(value : C_Object_55c3753a) : UObjectHandle { return ue_cast_nullable_object(value.handle, "/Script/CoreUObject.Object") }

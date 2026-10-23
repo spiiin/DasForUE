@@ -6,7 +6,8 @@ import sys
 import tempfile
 from unittest import mock
 from pathlib import Path
-from GenerateBindings import generate, default_expr, enum_name, class_name
+from GenerateBindings import generate, default_expr, enum_name, class_name, native_type_names, skipped_aliases, \
+    NATIVE_BINDS_SOURCE
 
 ROOT = Path(__file__).resolve().parents[1]
 class GeneratorTests(unittest.TestCase):
@@ -87,12 +88,38 @@ class GeneratorTests(unittest.TestCase):
         self.ir['functions'][0]['static'] = 'yes'
         with self.assertRaisesRegex(ValueError, 'static marker'): generate(self.ir)
     def test_native_object_metadata_and_short_alias(self):
-        text = generate(self.ir)
+        text = generate(self.ir, native_names=frozenset())
         self.assertIn('[ue_native_object(path="/Script/Engine.Actor")]', text)
         self.assertIn('typedef Actor = ' + class_name('/Script/Engine.Actor'), text)
+    def test_native_bind_type_name_has_no_short_alias(self):
+        # Actor is the native bind type ue_engine::Actor: a generated alias would make the name ambiguous.
+        actor = class_name('/Script/Engine.Actor')
+        self.ir['classes'].append(dict(type_path='/Script/Engine.Light', parent='/Script/Engine.Actor'))
+        text = generate(self.ir, native_names=frozenset({'Actor'}))
+        self.assertNotIn('typedef Actor = ', text)
+        self.assertIn('// Actor: no short alias, the name belongs to the native bind type Actor (DasNativeBinds.h); '
+                      'use ' + actor, text)
+        self.assertIn('struct ' + actor + ' { handle : UObjectHandle }', text)
+        self.assertIn('def ' + actor + '_from(value : UObjectHandle)', text)
+        self.assertIn('typedef Light = ' + class_name('/Script/Engine.Light'), text)
+        self.assertEqual(skipped_aliases(text), ['Actor'])
+    def test_plugin_native_bind_types_have_no_short_alias(self):
+        self.assertEqual(sorted(native_type_names([NATIVE_BINDS_SOURCE])),
+                         ['Actor', 'ActorComponent', 'GameInstance', 'Pawn', 'SceneComponent', 'World'])
+        self.assertEqual(skipped_aliases(generate(self.ir)), ['Actor'])
+    def test_native_type_names_scan(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'Binds.cpp').write_text('// Class<AOld>(TEXT("Commented"))\nDAS_NATIVE_BINDS(Game, "game")\n{\n'
+                                            '    Binds.Class<AFoo>(TEXT("Foo")).Method<&Get>(TEXT("get"));\n'
+                                            '    Binds.Class<TMyTemplate<int>>( TEXT("Templated"));\n'
+                                            '    Binds.Class<AActor>().Method<&Extra>(TEXT("extra"));\n}\n')
+            (root / 'Other.cpp').write_text('auto X = Registry.Class<ABar>(TEXT("Bar"));\n')
+            (root / 'Notes.txt').write_text('DAS_NATIVE_BINDS(X, "x") Class<ABaz>(TEXT("Baz"))\n')
+            self.assertEqual(sorted(native_type_names([root])), ['Foo', 'Templated'])
     def test_ambiguous_native_short_name_is_not_exported(self):
         self.ir['classes'].append(dict(type_path='/Script/Other.Actor', parent='/Script/CoreUObject.Object'))
-        text = generate(self.ir)
+        text = generate(self.ir, native_names=frozenset())
         self.assertNotIn('typedef Actor = ', text)
         self.assertIn('struct ' + class_name('/Script/Other.Actor'), text)
         self.assertIn('struct ' + class_name('/Script/Engine.Actor'), text)
@@ -222,7 +249,7 @@ class GeneratorTests(unittest.TestCase):
         self.assertIn('result.Target.handle = ue_generated::'+class_name('/Script/Engine.Actor')+'_raw(value.f_actor_native)',text)
     def test_source_bindings_qualify_internal_symbols(self):
         manifest=self.nested_source_fixture()
-        text=generate(self.ir,'ue_custom',manifest)
+        text=generate(self.ir,'ue_custom',manifest,native_names=frozenset())
         actor=class_name('/Script/Engine.Actor')
         self.assertIn('typedef Actor = ue_custom::'+actor,text)
         self.assertIn('def '+actor+'_from(value : UObjectHandle) : ue_custom::'+actor,text)

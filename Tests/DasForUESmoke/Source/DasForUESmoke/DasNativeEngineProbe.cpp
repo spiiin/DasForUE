@@ -98,7 +98,8 @@ bool RunDasNativeEngineProbe(UWorld* GameWorld, FString& Report)
     const bool bApplied = Self->IsHidden() && Self->GetOwner() == Other.Get() && !ChildComponent->IsActive();
     Check(bApplied, TEXT("native_engine_changes_visible_in_cpp"));
 
-    // ue_engine and the generated bindings both name a type Actor: qualified names and conversions work.
+    // ue_engine and the generated bindings together: Actor is the native type (the generator has no short alias
+    // for it), the generated wrapper keeps its full name, conversions work.
     const auto Mix = R.RunNamedPersistent(R.ScriptPath(TEXT("native_engine_generated_mix.das")), TEXT("main"), 0, Self);
     const bool bMixed = Mix.bSucceeded && Mix.Value == 0;
     Check(bMixed, TEXT("native_engine_with_generated_bindings"), Mix.bSucceeded ? FString() : Mix.Error.Left(300));
