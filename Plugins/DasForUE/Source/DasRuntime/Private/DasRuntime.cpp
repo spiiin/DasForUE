@@ -56,6 +56,8 @@
 #include "DasPropertyValues.h"
 #include "DasInteropProbe.h"
 #include "DasCallPhases.h"
+#include "DasScriptWriteTracker.h"
+#include "HAL/PlatformFileManager.h"
 #include "DasPropertyAccess.h"
 #include "DasSnapshotFields.h"
 #include "DasSnapshotContainers.h"
@@ -530,11 +532,28 @@ struct FSourceSnapshot
 {
     bool bExists = false;
     TArray<uint8> Bytes;
+    // Size and modification time the bytes were read with: the watch-mode poll compares these first.
+    int64 Size = -1;
+    FDateTime Stamp, ReadAt;
     static FSourceSnapshot Read(const FString& Path)
     {
         FSourceSnapshot Result;
         Result.bExists = IFileManager::Get().FileExists(*Path) && FFileHelper::LoadFileToArray(Result.Bytes, *Path);
+        if (Result.bExists)
+        {
+            const FFileStatData Stat = IFileManager::Get().GetStatData(*Path);
+            Result.Size = Stat.FileSize;
+            Result.Stamp = Stat.ModificationTime;
+            Result.ReadAt = FDateTime::UtcNow();
+        }
         return Result;
+    }
+    // File times advance in coarse steps (about 15 ms on Windows): a same-size write soon after the snapshot can
+    // keep size and time. Like git's racy entries, such a snapshot is compared by bytes until it settles.
+    bool IsRacy() const { return bExists && ReadAt - Stamp < FTimespan::FromSeconds(2); }
+    bool StatMatches(const FFileStatData& Stat) const
+    {
+        return bExists ? Stat.bIsValid && Stat.FileSize == Size && Stat.ModificationTime == Stamp : !Stat.bIsValid;
     }
     bool Matches(const FString& Path) const
     {
@@ -590,6 +609,7 @@ void DasRegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
 }
 void FDasRuntimeModule::StartupModule()
 {
+    DasInstallScriptWriteTracker();
     FModuleManager::LoadModuleChecked<IModuleInterface>(TEXT("EnhancedInput"));
     Root = FPaths::ConvertRelativePathToFull(IPluginManager::Get().FindPlugin(TEXT("DasForUE"))->GetContentDir() /
                                                                               TEXT("Das"));
@@ -713,6 +733,7 @@ void FDasRuntimeModule::StartupModule()
 
 void FDasRuntimeModule::ShutdownModule()
 {
+    DasRemoveScriptWriteTracker();
     // Release rooted callback signatures while UObject storage is still valid.
     FCoreDelegates::OnPreExit.Remove(RuntimePreExitHandle);
     RuntimePreExitHandle.Reset();
@@ -771,6 +792,8 @@ FString FDasRuntimeModule::ScriptPath(const FString& Name) const
     // A project script shadows the plugin script of the same name. The file check costs tens of microseconds,
     // so the answer is cached until a reported folder change or the poll interval (NotifyScriptsChanged).
     const bool bCache = IsInGameThread();
+    if (bCache)
+        DrainScriptWrites(); // a script just written in this process may shadow the plugin one
     const double Now = FPlatformTime::Seconds();
     if (const auto* Cached = bCache ? ScriptPathCache.Find(Name) : nullptr;
         Cached && Now - Cached->CheckedAt < CVarScriptChangePollSeconds.GetValueOnGameThread())

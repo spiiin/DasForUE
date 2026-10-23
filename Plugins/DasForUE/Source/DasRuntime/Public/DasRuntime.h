@@ -151,10 +151,10 @@ public:
     int32 ScriptTimerCount(const UObject* Owner = nullptr) const;
     int32 SubscriptionCount(const UObject* Owner = nullptr) const;
     void ReleaseObject(UObject* Object);
-    // Hot reload: every persistent call re-reads its script sources unless a file watcher is active (the
-    // editor's DasAutoReimport) and reports saved files here. Then a call rechecks its sources only after a
-    // report that names one of them, after an empty report (everything), or every das.ScriptChangePollSeconds.
-    // das.ScriptChangeCheck overrides the mode. Code that rewrites scripts itself may report them too.
+    // Hot reload: a persistent call rechecks its script sources only after a report that names one of them (an
+    // empty report: everything). Writes made in this process are reported automatically (a platform-file layer),
+    // the editor file watcher reports saves; edits by other programs are noticed within
+    // das.ScriptChangePollSeconds. das.ScriptChangeCheck 0 rechecks on every call (slow: re-reads all sources).
     // bFilesAddedOrRemoved: a script appeared or disappeared, so ScriptPath must look at the folders again
     // (it caches name -> path; without a report an entry is rechecked after das.ScriptChangePollSeconds).
     void NotifyScriptsChanged(const TArray<FString>& Files = {}, bool bFilesAddedOrRemoved = false);

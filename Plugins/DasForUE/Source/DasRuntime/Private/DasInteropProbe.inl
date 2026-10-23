@@ -170,6 +170,7 @@ namespace DasInterop
 // reported, and stops shadowing after its removal is reported.
 void CheckScriptPathCache(FDasInteropBench& B, FDasRuntimeModule& Runtime)
 {
+    FDasScriptChangeCheckScope Poll(1, 1e6f);
     const FString Name = TEXT("interop_shadow_") + FGuid::NewGuid().ToString(EGuidFormats::Digits) + TEXT(".das");
     const FString Plugin = Runtime.ScriptPath(Name);
     const FString ProjectFolder = FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Das/Scripts"));
@@ -180,20 +181,15 @@ void CheckScriptPathCache(FDasInteropBench& B, FDasRuntimeModule& Runtime)
         IFileManager::Get().Delete(*Project);
         if (bNewFolder)
             IFileManager::Get().DeleteDirectory(*ProjectFolder, false, true);
-        Runtime.NotifyScriptsChanged({Project}, true);
     };
-    FDasScriptChangeCheckScope Poll(1, 1e6f);
+    // Written and deleted through the engine: the write tracker reports both, no NotifyScriptsChanged needed.
     if (!FFileHelper::SaveStringToFile(TEXT("options gen2\n"), *Project))
         return B.Fail(TEXT("script_path_cache: cannot write ") + Project);
-    const FString Unreported = Runtime.ScriptPath(Name);
-    Runtime.NotifyScriptsChanged({Project}, true);
     const FString Added = Runtime.ScriptPath(Name);
     IFileManager::Get().Delete(*Project);
-    Runtime.NotifyScriptsChanged({Project}, true);
     const FString Removed = Runtime.ScriptPath(Name);
-    if (Unreported != Plugin || !FPaths::IsSamePath(Added, Project) || Removed != Plugin)
-        B.Fail(FString::Printf(TEXT("script_path_cache: plugin %s, unreported %s, added %s, removed %s"), *Plugin,
-                                    *Unreported, *Added, *Removed));
+    if (!FPaths::IsSamePath(Added, Project) || Removed != Plugin)
+        B.Fail(FString::Printf(TEXT("script_path_cache: plugin %s, added %s, removed %s"), *Plugin, *Added, *Removed));
 }
 #endif
 // Watch mode keeps hot reload: an edit is invisible until it is reported (or the poll interval passes), runs
@@ -206,32 +202,46 @@ void CheckWatchReload(FDasInteropBench& B, FDasRuntimeModule& Runtime, UObject* 
     {
         IFileManager::Get().Delete(*Path);
     };
-    auto Write = [&](int32 Value)
+    auto Text = [](int32 Value)
     {
-        return FFileHelper::SaveStringToFile(
-            FString::Printf(TEXT("options gen2\n[export]\ndef probe(value:int):int { return %d }\n"), Value), *Path);
+        return FString::Printf(TEXT("options gen2\n[export]\ndef probe(value:int):int { return %d }\n"), Value);
     };
     FDasScriptChangeCheckScope Watch(1, 1e6f);
     auto Call = [&]()
     {
         return Runtime.RunNamedPersistent(Path, TEXT("probe"), 0, Self);
     };
-    if (!Write(1))
+    if (!FFileHelper::SaveStringToFile(Text(1), *Path))
         return B.Fail(TEXT("watch_reload: cannot write the probe script"));
     const auto First = Call();
-    if (!Write(2))
-        return B.Fail(TEXT("watch_reload: cannot rewrite the probe script"));
-    const auto Unreported = Call();
-    Runtime.NotifyScriptsChanged({Path});
-    const auto Reported = Call();
-    Runtime.NotifyScriptsChanged({Path});
-    const auto Unchanged = Call();
-    if (!First.bSucceeded || First.Value != 1 || !Unreported.bSucceeded || Unreported.Value != 1 ||
-        !Reported.bSucceeded || Reported.Value != 2 || Reported.Revision != First.Revision + 1 ||
-        !Unchanged.bSucceeded || Unchanged.Revision != Reported.Revision)
-        B.Fail(FString::Printf(TEXT("watch_reload: values %d/%d/%d, revisions %u/%u/%u/%u: %s %s"), First.Value,
-                                    Unreported.Value, Reported.Value, First.Revision, Unreported.Revision,
-                                    Reported.Revision, Unchanged.Revision, *First.Error, *Reported.Error));
+    // A write in this process: reported by the write tracker, the next call runs the new code.
+    FFileHelper::SaveStringToFile(Text(2), *Path);
+    const auto Written = Call();
+    // The same bytes again: compared, not recompiled.
+    FFileHelper::SaveStringToFile(Text(2), *Path);
+    const auto Same = Call();
+    // Another program's edit: written below the tracking layer, noticed by the poll only.
+    {
+        TUniquePtr<IFileHandle> Handle(FPlatformFileManager::Get().GetPlatformPhysical().OpenWrite(*Path));
+        const FTCHARToUTF8 Utf8(*Text(3));
+        if (!Handle || !Handle->Write(reinterpret_cast<const uint8*>(Utf8.Get()), Utf8.Length()))
+            return B.Fail(TEXT("watch_reload: cannot write below the tracking layer"));
+    }
+    const auto Unpolled = Call();
+    FDasScriptChangeCheckScope Poll(1, 0.f);
+    const auto Polled = Call();
+    // A deleted source: the reload is attempted and rejected, the live code stays.
+    IFileManager::Get().Delete(*Path);
+    const auto Deleted = Call();
+    if (!First.bSucceeded || First.Value != 1 || !Written.bSucceeded || Written.Value != 2 ||
+        Written.Revision != First.Revision + 1 || !Same.bSucceeded || Same.Revision != Written.Revision ||
+        !Unpolled.bSucceeded || Unpolled.Value != 2 || !Polled.bSucceeded || Polled.Value != 3 ||
+        Polled.Revision != Written.Revision + 1 || !Deleted.bSucceeded || Deleted.Value != 3 ||
+        Deleted.ReloadError.IsEmpty())
+        B.Fail(FString::Printf(TEXT("watch_reload: values %d/%d/%d/%d/%d/%d, revisions %u/%u/%u/%u/%u: %s %s"),
+                                    First.Value, Written.Value, Same.Value, Unpolled.Value, Polled.Value, Deleted.Value,
+                                    First.Revision, Written.Revision, Same.Revision, Polled.Revision, Deleted.Revision,
+                                    *First.Error, *Written.Error));
 }
 }
 
@@ -331,6 +341,14 @@ void RunDasInteropProbe(FDasInteropBench& B)
             TEXT("cpp_to_script_scalar_check_always"),
                  TEXT("A2 C++ -> script"), Heavy, [&](int32 N)
                       { return ScalarCalls(TEXT("cpp_to_script_scalar_check_always"), N); }, Triangle(Heavy));
+    }
+    {
+        // The default: watch mode everywhere (writes in this process are reported by the write tracker).
+        FDasScriptChangeCheckScope Default(-1);
+        B.Measure(
+            TEXT("cpp_to_script_scalar_check_default"),
+                 TEXT("A2 C++ -> script"), Light, [&](int32 N)
+                      { return ScalarCalls(TEXT("cpp_to_script_scalar_check_default"), N); }, Triangle(Light));
     }
     {
         FDasScriptChangeCheckScope Watch(1);

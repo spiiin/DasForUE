@@ -1,24 +1,48 @@
 // Part of DasRuntime.cpp: FDasRuntimeModule: script execution, callbacks, construction and library frames.
 // Included in place; declaration order matters.
-const FString& NormalizeScriptPath(const FString& Path)
+// How a call checks its session sources against disk (das.ScriptChangeCheck): Full compares bytes (always mode,
+// or a change was reported), Poll compares file stats (watch mode, once per poll interval), None trusts them.
+enum class ESourceCheck : uint8
 {
-    if (const FString* Cached = NormalizedScriptPaths.Find(Path))
-        return *Cached;
-    FString Full = FPaths::ConvertRelativePathToFull(Path);
-    FPaths::NormalizeFilename(Full);
-    FPaths::CollapseRelativeDirectories(Full);
-    return NormalizedScriptPaths.Add(Path, MoveTemp(Full));
-}
-// Whether a call must compare its session sources with disk (das.ScriptChangeCheck).
-bool SourcesNeedCheck(const FPersistentSession& Session)
+    None,
+    Poll,
+    Full
+};
+ESourceCheck SourceCheckFor(const FPersistentSession& Session)
 {
-    int32 Mode = CVarScriptChangeCheck.GetValueOnGameThread();
-    if (Mode < 0)
-        Mode = bScriptWatcherActive && !GIsAutomationTesting ? 1 : 0;
+    DrainScriptWrites();
+    const int32 Mode = CVarScriptChangeCheck.GetValueOnGameThread();
     if (Mode == 2)
-        return false;
-    return Mode != 1 || Session.CheckedEpoch != ScriptSourceEpoch ||
-           FPlatformTime::Seconds() - Session.CheckedAt >= CVarScriptChangePollSeconds.GetValueOnGameThread();
+        return ESourceCheck::None;
+    if (Mode == 0 || Session.CheckedEpoch != ScriptSourceEpoch)
+        return ESourceCheck::Full;
+    return FPlatformTime::Seconds() - Session.CheckedAt >= CVarScriptChangePollSeconds.GetValueOnGameThread()
+               ? ESourceCheck::Poll
+               : ESourceCheck::None;
+}
+// Edits by other programs: each file's stat is refreshed at most once per interval for all sessions; bytes are
+// compared only where the stat differs from the snapshot (a touched file with the same bytes keeps the session).
+bool SourcesChangedOnDisk(FPersistentSession& Session)
+{
+    const double Now = FPlatformTime::Seconds();
+    const float Interval = CVarScriptChangePollSeconds.GetValueOnGameThread();
+    for (auto& Source : Session.AttemptedSources)
+    {
+        FPolledStat& Polled = PolledStats.FindOrAdd(Source.Key);
+        if (Now - Polled.CheckedAt >= Interval)
+        {
+            Polled.Stat = IFileManager::Get().GetStatData(*Source.Key);
+            Polled.CheckedAt = Now;
+        }
+        if (Source.Value.StatMatches(Polled.Stat) && !Source.Value.IsRacy())
+            continue;
+        if (!Source.Value.Matches(Source.Key))
+            return true;
+        Source.Value.Size = Polled.Stat.FileSize;
+        Source.Value.Stamp = Polled.Stat.ModificationTime;
+        Source.Value.ReadAt = FDateTime::UtcNow();
+    }
+    return false;
 }
 void MarkSourcesChecked(FPersistentSession& Session)
 {
@@ -32,37 +56,12 @@ uint8 WidgetContractFlags()
 }
 void FDasRuntimeModule::NotifyScriptsChanged(const TArray<FString>& Files, bool bFilesAddedOrRemoved)
 {
-    check(IsInGameThread());
-    if (Files.IsEmpty() || bFilesAddedOrRemoved)
-        ScriptPathCache.Reset();
-    if (Files.IsEmpty())
-    {
-        ++ScriptSourceEpoch;
-        return;
-    }
-    TSet<FString> Changed;
-    for (const FString& File : Files)
-        Changed.Add(NormalizeScriptPath(File));
-    auto Mark = [&](const TArray<TUniquePtr<FPersistentSession>>& List)
-    {
-        for (const auto& Session : List)
-            for (const auto& Source : Session->AttemptedSources)
-                if (Changed.Contains(NormalizeScriptPath(Source.Key)))
-                {
-                    Session->CheckedEpoch = 0;
-                    break;
-                }
-    };
-    Mark(Sessions);
-#if WITH_EDITOR
-    Mark(PreservedSessions);
-#endif
+    MarkScriptsChanged(Files, {}, bFilesAddedOrRemoved);
 }
 void FDasRuntimeModule::SetScriptWatcherActive(bool bActive)
 {
-    bScriptWatcherActive = bActive;
-    ScriptPathCache.Reset();
-    ++ScriptSourceEpoch; // Changes made while no watcher listened were not reported.
+    // Edits by other programs before the watcher started were not reported: check everything once.
+    MarkScriptsChanged({}, {}, true);
 }
 FDasExecutionResult FDasRuntimeModule::RunNamedPersistent(const FString& Path, const FString& EntryPoint, int32 Input,
                                                           TWeakObjectPtr<UObject> Self)
@@ -462,15 +461,21 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     bool bChanged =
         Session->AttemptedSources.IsEmpty() ||
         (!Session->Live && (Session->AttemptedEntry != EntryPoint || Session->AttemptedContract != Expected));
-    if (!bChanged && SourcesNeedCheck(*Session))
+    if (!bChanged)
     {
-        for (const auto& Source : Session->AttemptedSources)
-            if (!Source.Value.Matches(Source.Key))
-            {
-                bChanged = true;
-                break;
-            }
-        if (!bChanged)
+        const ESourceCheck Check = SourceCheckFor(*Session);
+        if (Check == ESourceCheck::Full)
+        {
+            for (const auto& Source : Session->AttemptedSources)
+                if (!Source.Value.Matches(Source.Key))
+                {
+                    bChanged = true;
+                    break;
+                }
+        }
+        else if (Check == ESourceCheck::Poll)
+            bChanged = SourcesChangedOnDisk(*Session);
+        if (!bChanged && Check != ESourceCheck::None)
             MarkSourcesChecked(*Session);
     }
     DasCallPhaseMark(EDasCallPhase::SourceCheck);

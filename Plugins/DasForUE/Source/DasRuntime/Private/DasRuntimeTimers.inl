@@ -193,7 +193,7 @@ struct FPersistentSession
     TWeakObjectPtr<UWorld> World;
     FString Path;
     FSourceSet AttemptedSources;
-    // Hot reload: sources were last compared with disk at this epoch and time (see SourcesNeedCheck).
+    // Hot reload: sources were last compared with disk at this epoch and time (see SourceCheckFor).
     uint64 CheckedEpoch = 0;
     double CheckedAt = 0;
     TMap<FString, FDasCallContract> RequiredEntries;
@@ -237,7 +237,6 @@ TMap<TWeakObjectPtr<UObject>, TMap<FString, FInitializerDelivery>> InitializerDe
 TArray<TUniquePtr<FPersistentSession>> Sessions;
 // Hot reload source checks (FDasRuntimeModule::NotifyScriptsChanged).
 uint64 ScriptSourceEpoch = 1;
-bool bScriptWatcherActive = false;
 TMap<FString, FString> NormalizedScriptPaths;
 // ScriptPath: script name -> project or plugin path, with the time it was checked (game thread only).
 struct FCachedScriptPath
@@ -248,17 +247,79 @@ struct FCachedScriptPath
 TMap<FString, FCachedScriptPath> ScriptPathCache;
 TAutoConsoleVariable<int32> CVarScriptChangeCheck(
     TEXT("das.ScriptChangeCheck"), -1,
-    TEXT("When persistent script calls compare their sources with disk: -1 auto (watch while a file watcher is ")
-        TEXT("active and no automation test runs, otherwise always), 0 every call, 1 watch (after a reported ")
-        TEXT("change or the poll interval), 2 never (no hot reload)."));
+    TEXT("When persistent script calls compare their sources with disk: -1 or 1 watch (after a reported change: ")
+        TEXT("writes in this process, the editor file watcher, NotifyScriptsChanged; edits by other programs ")
+        TEXT("within the poll interval), 0 every call (re-reads all sources), 2 never (no hot reload)."));
 TAutoConsoleVariable<float> CVarScriptChangePollSeconds(
     TEXT("das.ScriptChangePollSeconds"), 1.f,
-    TEXT("Watch mode: also compare sources with disk if the last check is older than this, in case the file ")
-        TEXT("watcher missed a change."));
+    TEXT("Watch mode: how often file size and time are compared with what scripts were compiled from, for edits ")
+        TEXT("by other programs. Each file is checked once per interval for all sessions; bytes only on a change."));
 #if WITH_EDITOR
 TArray<TUniquePtr<FPersistentSession>> PreservedSessions;
 bool bPreservingSessions = false;
 #endif
+// Current file stats for the watch-mode poll, shared by all sessions.
+struct FPolledStat
+{
+    FFileStatData Stat;
+    double CheckedAt = -1e9;
+};
+TMap<FString, FPolledStat> PolledStats;
+const FString& NormalizeScriptPath(const FString& Path)
+{
+    if (const FString* Cached = NormalizedScriptPaths.Find(Path))
+        return *Cached;
+    FString Full = FPaths::ConvertRelativePathToFull(Path);
+    FPaths::NormalizeFilename(Full);
+    FPaths::CollapseRelativeDirectories(Full);
+    return NormalizedScriptPaths.Add(Path, MoveTemp(Full));
+}
+// Sessions that read one of Files, or anything under Directories, compare their sources on the next call.
+// Nothing named: every session does.
+void MarkScriptsChanged(const TArray<FString>& Files, const TArray<FString>& Directories, bool bAddedOrRemoved)
+{
+    check(IsInGameThread());
+    PolledStats.Reset();
+    if (bAddedOrRemoved || !Directories.IsEmpty() || Files.IsEmpty())
+        ScriptPathCache.Reset();
+    if (Files.IsEmpty() && Directories.IsEmpty())
+    {
+        ++ScriptSourceEpoch;
+        return;
+    }
+    TSet<FString> Changed;
+    for (const FString& File : Files)
+        Changed.Add(NormalizeScriptPath(File));
+    TArray<FString> Under;
+    for (const FString& Directory : Directories)
+        Under.Add(NormalizeScriptPath(Directory) + TEXT("/"));
+    auto Mark = [&](const TArray<TUniquePtr<FPersistentSession>>& List)
+    {
+        for (const auto& Session : List)
+            for (const auto& Source : Session->AttemptedSources)
+            {
+                const FString& Path = NormalizeScriptPath(Source.Key);
+                if (Changed.Contains(Path) ||
+                    Under.ContainsByPredicate([&](const FString& Prefix) { return Path.StartsWith(Prefix); }))
+                {
+                    Session->CheckedEpoch = 0;
+                    break;
+                }
+            }
+    };
+    Mark(Sessions);
+#if WITH_EDITOR
+    Mark(PreservedSessions);
+#endif
+}
+// Reports script writes queued by the platform-file layer (DasScriptWriteTracker), on the game thread.
+void DrainScriptWrites()
+{
+    TArray<FString> Files, Directories;
+    bool bAddedOrRemoved = false;
+    if (DasTakeScriptWrites(Files, Directories, bAddedOrRemoved))
+        MarkScriptsChanged(Files, Directories, bAddedOrRemoved);
+}
 
 struct FManagedScriptTimer
 {
