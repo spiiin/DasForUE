@@ -308,3 +308,28 @@ Verified 2026-10-23 by `quat-20261023a` (exit 0): Editor Development build
 and the single focused conversion probe passed. Native commandlet execution took
 0.06 seconds; the suite including process startup and source/DLL freeze took 13 seconds.
 Four extern registrations were added without changing any existing manifest entry.
+
+## Complete built-in type block
+
+Queue `test-suite builtins1 complete-builtins repo=<main-worktree>` through the
+shared build agent. It builds Editor Development and runs one short
+`DasBuiltinValues -Complete` commandlet. Five checks cover native math/color parity,
+compilation of all installed canonical API packages and selected generated calls,
+refusal/atomic-write behavior, explicit conversion rules, real authored struct defaults,
+and real reflected calls with native fields, array/map values, ref/out and a typed delegate. The source fixture
+is `builtin_types_example.das`; assets are transient test imports and are not saved.
+Receipt: `logs/complete-builtins-validation.json`; extern manifest:
+`logs/complete-builtins-externs.txt`. PIE, packaged and full regressions are not run.
+
+Verified 2026-10-23 by `builtins-complete-20261023d` (exit 0): Editor Development
+build and all five grouped checks passed; commandlet execution took 10.56 seconds,
+and the scoped suite including startup and source/DLL freeze took 24 seconds.
+Native assertions include actual array/map contents, typed delegate results and
+ref/out values. The extern baseline gained 54 registrations without changing
+any existing line. Seven focused canonical-generator unit tests and native-generator
+freshness passed separately. After the run, only generated package/profile newlines
+were normalized to the repository LF policy; exact reconstruction of the validated
+bytes is recorded in the receipt. No extra runtime run is needed for that text-only
+normalization. Full profile-specific runtime probes, PIE, packaged and full regressions
+were not run. The probe also exposed and fixed the Editor struct-default fallback
+that incorrectly cast new adapted values to FTransform.

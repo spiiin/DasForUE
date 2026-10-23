@@ -826,7 +826,10 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
     if (DSLContainer(T))
         return TEXT("struct");
     if (const auto* Adapter = DasMathAdapter(Math))
-        return Adapter->GetDefaultKind();
+    {
+        const FString Kind = Adapter->GetDefaultKind();
+        return FindDasCallbackType(Kind) ? Kind : TEXT("struct");
+    }
     return K;
 }
 #include "DasHandlerLookupDSL.inl"

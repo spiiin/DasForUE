@@ -157,3 +157,157 @@ AddUEExtern<DAS_BIND_FUN(BuiltinQuatIdentity), das::SimNode_ExtFuncCallAndCopyOr
                                                                                       "ue_quat_identity",
                                                                                       das::SideEffects::none,
                                                                                       "BuiltinQuatIdentity");
+AddUEExtern<DAS_BIND_FUN(MathPackquat), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "__ue_math_pack_quat",
+                                                                               das::SideEffects::modifyExternal,
+                                                                               "MathPackquat")
+                ->needCallerStackFrame = true;
+AddUEExtern<DAS_BIND_FUN(MathUnpackquat), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                 "__ue_math_unpack_quat",
+                                                                                 das::SideEffects::modifyExternal,
+                                                                                 "MathUnpackquat");
+AddUEExtern<DAS_BIND_FUN(MethodArgquat)>(*this, Library, "__ue_method_arg_quat", das::SideEffects::modifyExternal,
+                                         "MethodArgquat");
+AddUEExtern<DAS_BIND_FUN(MethodResultquat), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                   "__ue_method_result_quat",
+                                                                                   das::SideEffects::modifyExternal,
+                                                                                   "MethodResultquat")
+                ->needCallerStackFrame = true;
+AddUEExtern<DAS_BIND_FUN(MathPacklinear_color), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                       "__ue_math_pack_linear_color",
+                                                                                       das::SideEffects::modifyExternal,
+                                                                                       "MathPacklinear_color")
+                ->needCallerStackFrame = true;
+AddUEExtern<DAS_BIND_FUN(MathUnpacklinear_color), das::SimNode_ExtFuncCallAndCopyOrMove>(
+    *this, Library, "__ue_math_unpack_linear_color", das::SideEffects::modifyExternal, "MathUnpacklinear_color");
+AddUEExtern<DAS_BIND_FUN(MethodArglinear_color)>(*this, Library, "__ue_method_arg_linear_color",
+                                                 das::SideEffects::modifyExternal, "MethodArglinear_color");
+AddUEExtern<DAS_BIND_FUN(MethodResultlinear_color), das::SimNode_ExtFuncCallAndCopyOrMove>(
+                *this, Library, "__ue_method_result_linear_color", das::SideEffects::modifyExternal,
+                "MethodResultlinear_color")
+                ->needCallerStackFrame = true;
+AddUEExtern<DAS_BIND_FUN(MathPackcolor), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "__ue_math_pack_color",
+                                                                                das::SideEffects::modifyExternal,
+                                                                                "MathPackcolor")
+                ->needCallerStackFrame = true;
+AddUEExtern<DAS_BIND_FUN(MathUnpackcolor), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                  "__ue_math_unpack_color",
+                                                                                  das::SideEffects::modifyExternal,
+                                                                                  "MathUnpackcolor");
+AddUEExtern<DAS_BIND_FUN(MethodArgcolor)>(*this, Library, "__ue_method_arg_color", das::SideEffects::modifyExternal,
+                                          "MethodArgcolor");
+AddUEExtern<DAS_BIND_FUN(MethodResultcolor), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                    "__ue_method_result_color",
+                                                                                    das::SideEffects::modifyExternal,
+                                                                                    "MethodResultcolor")
+                ->needCallerStackFrame = true;
+AddUEExtern<DAS_BIND_FUN(BuiltinLerp<FVector>), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_lerp",
+                                                                                       das::SideEffects::none,
+                                                                                       "BuiltinLerp<FVector>");
+AddUEExtern<DAS_BIND_FUN(BuiltinClampLength<FVector>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+    *this, Library, "ue_clamp_length", das::SideEffects::none, "BuiltinClampLength<FVector>");
+AddUEExtern<DAS_BIND_FUN(BuiltinProject<FVector>), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                          "ue_project_onto",
+                                                                                          das::SideEffects::none,
+                                                                                          "BuiltinProject<FVector>");
+AddUEExtern<DAS_BIND_FUN(BuiltinLerp<FVector2D>), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_lerp",
+                                                                                         das::SideEffects::none,
+                                                                                         "BuiltinLerp<FVector2D>");
+AddUEExtern<DAS_BIND_FUN(BuiltinClampLength<FVector2D>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+    *this, Library, "ue_clamp_length", das::SideEffects::none, "BuiltinClampLength<FVector2D>");
+AddUEExtern<DAS_BIND_FUN(BuiltinProject<FVector2D>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+    *this, Library, "ue_project_onto", das::SideEffects::none, "BuiltinProject<FVector2D>");
+AddUEExtern<DAS_BIND_FUN(BuiltinProjectPlane), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                      "ue_project_onto_plane",
+                                                                                      das::SideEffects::none,
+                                                                                      "BuiltinProjectPlane");
+AddUEExtern<DAS_BIND_FUN(BuiltinReflect), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_reflect",
+                                                                                 das::SideEffects::none,
+                                                                                 "BuiltinReflect");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatNormalize), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_normalized",
+                                                                                       das::SideEffects::none,
+                                                                                       "BuiltinQuatNormalize");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatInverse), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_inverse",
+                                                                                     das::SideEffects::none,
+                                                                                     "BuiltinQuatInverse");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatMultiply), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "*",
+                                                                                      das::SideEffects::none,
+                                                                                      "BuiltinQuatMultiply");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatCompose), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                     "ue_compose_rotation",
+                                                                                     das::SideEffects::none,
+                                                                                     "BuiltinQuatCompose");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatSlerp), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_slerp",
+                                                                                   das::SideEffects::none,
+                                                                                   "BuiltinQuatSlerp");
+AddUEExtern<DAS_BIND_FUN(BuiltinRotatorSlerp), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_slerp",
+                                                                                      das::SideEffects::none,
+                                                                                      "BuiltinRotatorSlerp");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatRotate), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_rotate_vector",
+                                                                                    das::SideEffects::none,
+                                                                                    "BuiltinQuatRotate");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatUnrotate), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                      "ue_unrotate_vector",
+                                                                                      das::SideEffects::none,
+                                                                                      "BuiltinQuatUnrotate");
+AddUEExtern<DAS_BIND_FUN(BuiltinTransformQuat), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_transform",
+                                                                                       das::SideEffects::none,
+                                                                                       "BuiltinTransformQuat");
+AddUEExtern<DAS_BIND_FUN(BuiltinTransformRotationQuat), das::SimNode_ExtFuncCallAndCopyOrMove>(
+    *this, Library, "ue_transform_quat", das::SideEffects::none, "BuiltinTransformRotationQuat");
+AddUEExtern<DAS_BIND_FUN(BuiltinTransformBlend), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_blend",
+                                                                                        das::SideEffects::none,
+                                                                                        "BuiltinTransformBlend");
+AddUEExtern<DAS_BIND_FUN(BuiltinLinearColor), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_linear_color",
+                                                                                     das::SideEffects::none,
+                                                                                     "BuiltinLinearColor");
+AddUEExtern<DAS_BIND_FUN(BuiltinColor), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_color",
+                                                                               das::SideEffects::none, "BuiltinColor");
+AddUEExtern<DAS_BIND_FUN(BuiltinLinearToSRGB), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                      "ue_linear_to_srgb",
+                                                                                      das::SideEffects::none,
+                                                                                      "BuiltinLinearToSRGB");
+AddUEExtern<DAS_BIND_FUN(BuiltinSRGBToLinear), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                      "ue_srgb_to_linear",
+                                                                                      das::SideEffects::none,
+                                                                                      "BuiltinSRGBToLinear");
+AddUEExtern<DAS_BIND_FUN(BuiltinLinearQuantize), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library,
+                                                                                        "ue_quantize_linear",
+                                                                                        das::SideEffects::none,
+                                                                                        "BuiltinLinearQuantize");
+AddUEExtern<DAS_BIND_FUN(BuiltinColorReinterpretLinear), das::SimNode_ExtFuncCallAndCopyOrMove>(
+    *this, Library, "ue_reinterpret_linear", das::SideEffects::none, "BuiltinColorReinterpretLinear");
+AddUEExtern<DAS_BIND_FUN(BuiltinColorLerp), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "ue_lerp",
+                                                                                   das::SideEffects::none,
+                                                                                   "BuiltinColorLerp");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatMultiplyAssign)>(*this, Library, "*=", das::SideEffects::modifyArgument,
+                                                     "BuiltinQuatMultiplyAssign");
+AddUEExtern<DAS_BIND_FUN(BuiltinQuatNearly)>(*this, Library, "ue_nearly_equal", das::SideEffects::none,
+                                             "BuiltinQuatNearly");
+AddUEExtern<DAS_BIND_FUN(BuiltinColorNearly)>(*this, Library, "ue_nearly_equal", das::SideEffects::none,
+                                              "BuiltinColorNearly");
+AddUEExtern<DAS_BIND_FUN(BuiltinEqual<FLinearColor>)>(*this, Library, "==", das::SideEffects::none,
+                                                      "BuiltinEqual<FLinearColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinNotEqual<FLinearColor>)>(*this, Library, "!=", das::SideEffects::none,
+                                                         "BuiltinNotEqual<FLinearColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinEqual<FColor>)>(*this, Library, "==", das::SideEffects::none, "BuiltinEqual<FColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinNotEqual<FColor>)>(*this, Library, "!=", das::SideEffects::none,
+                                                   "BuiltinNotEqual<FColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinAdd<FLinearColor>), das::SimNode_ExtFuncCallAndCopyOrMove>(*this, Library, "+",
+                                                                                           das::SideEffects::none,
+                                                                                           "BuiltinAdd<FLinearColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinSubtract<FLinearColor>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+    *this, Library, "-", das::SideEffects::none, "BuiltinSubtract<FLinearColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinMultiply<FLinearColor>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+    *this, Library, "*", das::SideEffects::none, "BuiltinMultiply<FLinearColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinMultiplyLeft<FLinearColor>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+    *this, Library, "*", das::SideEffects::none, "BuiltinMultiplyLeft<FLinearColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinDivide<FLinearColor>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+    *this, Library, "/", das::SideEffects::none, "BuiltinDivide<FLinearColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinAddAssign<FLinearColor>)>(*this, Library, "+=", das::SideEffects::modifyArgument,
+                                                          "BuiltinAddAssign<FLinearColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinSubtractAssign<FLinearColor>)>(*this, Library, "-=", das::SideEffects::modifyArgument,
+                                                               "BuiltinSubtractAssign<FLinearColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinMultiplyAssign<FLinearColor>)>(*this, Library, "*=", das::SideEffects::modifyArgument,
+                                                               "BuiltinMultiplyAssign<FLinearColor>");
+AddUEExtern<DAS_BIND_FUN(BuiltinDivideAssign<FLinearColor>)>(*this, Library, "/=", das::SideEffects::modifyArgument,
+                                                             "BuiltinDivideAssign<FLinearColor>");

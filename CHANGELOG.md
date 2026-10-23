@@ -12,6 +12,11 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Added
 
+- Complete built-in convenience block: quaternion composition/inverse/normalization/slerp,
+  vector interpolation/projection/reflection/length limits, Rotator slerp and native Transform blend.
+- Canonical `UELinearColor` / `UEColor` with explicit sRGB vs raw linear-byte conversions;
+  Quat and colors now use shared adapters for authored fields, snapshots and generated native calls.
+  Native component access preserves double/float/byte types. See `builtin_types_example.das`.
 - Native `UEQuat` local values, identity/component constructors and explicit guarded
   Rotator ↔ Quaternion conversions, with finite/normalized input checks.
 

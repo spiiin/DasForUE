@@ -272,6 +272,8 @@ public:
         addAnnotation(new FDSLVectorAnnotation(Library));
         addAnnotation(new FDSLRotatorAnnotation(Library));
         addAnnotation(new FDSLQuatAnnotation(Library));
+        addAnnotation(new FDSLLinearColorAnnotation(Library));
+        addAnnotation(new FDSLColorAnnotation(Library));
         addAnnotation(new FMathValueAnnotation<FTransform>("UETransform", Library, "FTransform"));
 
         addAnnotation(new FObjectHandleAnnotation(Library));

@@ -1013,25 +1013,9 @@ struct IntPoint {
     Y:int
 }
 
-[ue_native_struct(path="/Script/CoreUObject.LinearColor")]
-struct LinearColor {
-    R:float
-    G:float
-    B:float
-    A:float
-}
-
 [ue_native_struct(path="/Script/CoreUObject.PlatformUserId")]
 struct PlatformUserId {
     InternalId:int
-}
-
-[ue_native_struct(path="/Script/CoreUObject.Quat")]
-struct Quat {
-    X:double
-    Y:double
-    Z:double
-    W:double
 }
 
 [ue_native_struct(path="/Script/CoreUObject.Vector4")]
@@ -1482,7 +1466,7 @@ struct Margin {
 
 [ue_native_struct(path="/Script/SlateCore.SlateColor")]
 struct SlateColor {
-    SpecifiedColor:LinearColor
+    SpecifiedColor:UELinearColor
     ColorUseRule:ESlateColorStylingMode
 }
 

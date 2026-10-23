@@ -115,7 +115,11 @@ FString TypeFieldDefault(const FDasDeclaredProperty& P)
             const auto& V = Value.Get<FVector2D>();
             return FString::Printf(TEXT("(X=%.17g,Y=%.17g)"), V.X, V.Y);
         }
-        return Value.Get<FTransform>().ToString();
+        if (Value.GetScriptStruct() == TBaseStructure<FTransform>::Get())
+            return Value.Get<FTransform>().ToString();
+        // Quat/LinearColor/Color and future adapted structs use native ExportText grammar.
+        // Do not assume an adapted value has Transform layout.
+        return P.Default.String;
     }
     if (P.Type.Kind == TEXT("object"))
         return TEXT("None");

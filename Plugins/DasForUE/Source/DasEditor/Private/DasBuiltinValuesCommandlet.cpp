@@ -7,6 +7,15 @@
 #include "Misc/Parse.h"
 #include "Misc/ScopeExit.h"
 #include "HAL/FileManager.h"
+#include "DasTypeService.h"
+#include "DasDSLService.h"
+#include "DasAuthoring.h"
+#include "Engine/Blueprint.h"
+#include "StructUtils/UserDefinedStruct.h"
+#include "UObject/StructOnScope.h"
+#include "UObject/StrongObjectPtr.h"
+#include "UObject/UnrealType.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 
 namespace
 {
@@ -53,6 +62,8 @@ FString Scalar(const FString& Expr, double V)
              *Number(V));
 }
 }
+#include "DasCompleteBuiltinValues.inl"
+
 UDasBuiltinValuesCommandlet::UDasBuiltinValuesCommandlet()
 {
     IsClient = false;
@@ -77,6 +88,8 @@ int32 UDasBuiltinValuesCommandlet::Main(const FString& Params)
     {
         IFileManager::Get().Delete(*Path, false, true);
     };
+    if (FParse::Param(*Params, TEXT("Complete")))
+        return RunCompleteBuiltinTypes(Runtime, Path);
     auto Run = [&](const TCHAR* Name, const FString& Body, const TCHAR* Error = nullptr, bool CompileError = false)
     {
         const FString Code = TEXT("options gen2\nrequire ue_foundation\n[export]\ndef main(input:int):int {\n")+ Body +
@@ -110,7 +123,7 @@ int32 UDasBuiltinValuesCommandlet::Main(const FString& Params)
             Body += TEXT("let restored=ue_quat(ue_rotator(q))\n");
             Body += TEXT("let dot=q.x*restored.x+q.y*restored.y+q.z*restored.z+q.w*restored.w\nverify(dot*dot>0.999999999lf)\n}\n");
         }
-        Body += TEXT("var rejected=false\ntry { let q=ue_quat(0.0lf,0.0lf,0.0lf,0.0lf); return int(q.w) } recover { rejected=true }\nverify(rejected)\n");
+        Body += TEXT("var rejected=false\ntry { let r=ue_rotator(ue_quat(0.0lf,0.0lf,0.0lf,0.0lf)); return int(r.yaw) } recover { rejected=true }\nverify(rejected)\n");
         Body += TEXT("var invalid=ue_quat_identity()\ninvalid.w=2.0lf\nrejected=false\ntry { let r=ue_rotator(invalid); return int(r.yaw) } recover { rejected=true }\nverify(rejected)\n");
         Body += TEXT("invalid=ue_quat_identity()\ninvalid.x=1.0lf/double(input)\nrejected=false\ntry { let r=ue_rotator(invalid); return int(r.yaw) } recover { rejected=true }\nverify(rejected)\n");
         Run(TEXT("quat_explicit_conversions_match_unreal"), Body);

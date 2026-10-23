@@ -29,7 +29,7 @@
       "policy_excluded": 0
     }
   },
-  "source_sha256": "c10efb846d301d2934501b65992d274c2238efd30741ba110e9113114dbfb6f3",
+  "source_sha256": "07f159c6110dfe55c0b96e1f5d2c1e3863dc7b935940102b420ca50a4a5547fd",
   "dependencies": {
     "das_modules": [
       "ue_foundation",
@@ -5469,11 +5469,13 @@
     }
   ],
   "preflight": {
-    "runtime_probe": "passed",
-    "packaged": "not_run",
-    "profile_sha256": "1d4c88d06eb46092b2c8a99ddf06f625a10e731f1d0c19cd187e4880778323aa",
     "compile": "passed",
-    "game_world": true,
-    "build_mode": "Editor NullRHI"
+    "runtime_probe": "not_run",
+    "build_mode": "Editor NullRHI",
+    "game_world": false,
+    "packaged": "not_run",
+    "profile_sha256": "57cce72b39309200cc24648f553ad1d3a9255ca7decbd38efb76db933ab615f8",
+    "validation_scope": "complete-builtins: all installed modules compiled; selected native math/color calls executed; full profile probes not rerun",
+    "build_agent_job": "builtins-complete-20261023d"
   }
 }

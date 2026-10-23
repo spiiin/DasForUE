@@ -9,7 +9,6 @@ def fixture(path='/Script/CoreUObject.Vector', array=False):
     for identity,(_,_,layout) in CANONICAL_MATH.items():
         fields=[dict(path=name,kind='struct' if kind.startswith('/') else kind,type_path=kind if kind.startswith('/') else '') for name,kind in layout.items()]
         structures.append(dict(type_path=identity,fields=fields))
-    structures.append(dict(type_path='/Script/CoreUObject.Quat',fields=[dict(path=name,kind='double',type_path='') for name in ('x','y','z','w')]))
     def parameter(name,output):
         value=dict(path=name,kind='struct',type_path=path,input=not output,output=output)
         if array:value.update(kind='array',type_path='StructProperty',element=dict(kind='struct',type_path=path))
@@ -33,7 +32,7 @@ def fixture(path='/Script/CoreUObject.Vector', array=False):
 
 
 class CanonicalMath(unittest.TestCase):
-    def test_all_four_math_identities_reuse_foundation_types(self):
+    def test_all_math_identities_reuse_foundation_types(self):
         for path,(name,bridge,_) in CANONICAL_MATH.items():
             with self.subTest(path=path):
                 text=generate(fixture(path),canonical_math=True)

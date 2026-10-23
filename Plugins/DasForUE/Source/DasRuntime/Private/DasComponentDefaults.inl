@@ -33,6 +33,9 @@ FDasDeclaredLiteral DSLDefaultMath(das::ExpressionPtr E)
     FVector2D Vector2;
     FRotator Rotation;
     FTransform Transform = FTransform::Identity;
+    FQuat Quat = FQuat::Identity;
+    FLinearColor LinearColor = FLinearColor::Black;
+    FColor Color = FColor::Black;
     const void* Memory = nullptr;
     if (Call->name == "ue_vector" || Call->name == "ue_rotator")
     {
@@ -63,6 +66,64 @@ FDasDeclaredLiteral DSLDefaultMath(das::ExpressionPtr E)
         Type = TBaseStructure<FVector2D>::Get();
         Memory = &Vector2;
     }
+    else if (Call->name == "ue_quat" || Call->name == "ue_quat_identity" || Call->name == "ue_linear_color" ||
+             Call->name == "ue_color")
+    {
+        if (Call->name == "ue_quat_identity")
+        {
+            if (!Call->arguments.empty())
+                DSLFail(TEXT("Quaternion identity takes no arguments"));
+        }
+        else if (Call->name == "ue_quat" && Call->arguments.size() == 1)
+        {
+            const auto R = DSLDefaultMath(Call->arguments[0]);
+            FInstancedStruct Rot;
+            FString Error;
+            if (R.Kind != TEXT("rotator") ||
+                               !ParseDasStructDefault(TEXT("/Script/CoreUObject.Rotator"), R.String, Rot, Error))
+                DSLFail(TEXT("Quaternion default requires a literal rotator"));
+            Quat = Rot.Get<FRotator>().Quaternion();
+        }
+        else
+        {
+            if (Call->arguments.size() != 4)
+                DSLFail(TEXT("Expected four numeric components"));
+            double C[4];
+            for (int I = 0; I < 4; ++I)
+                C[I] = DSLDefaultNumber(Call->arguments[I]);
+            if (Call->name == "ue_quat")
+                Quat = FQuat(C[0], C[1], C[2], C[3]);
+            else if (Call->name == "ue_linear_color")
+                LinearColor = FLinearColor(C[0], C[1], C[2], C[3]);
+            else
+            {
+                for (double Channel : C)
+                    if (Channel < 0 || Channel > 255 || FMath::FloorToDouble(Channel) != Channel)
+                        DSLFail(TEXT("Color channels must be integer literals from 0 to 255"));
+                Color = FColor(uint8(C[0]), uint8(C[1]), uint8(C[2]), uint8(C[3]));
+            }
+        }
+        if (Call->name == "ue_color")
+        {
+            V.Kind = TEXT("color");
+            Type = TBaseStructure<FColor>::Get();
+            Memory = &Color;
+        }
+        else if (Call->name == "ue_linear_color")
+        {
+            V.Kind = TEXT("linear_color");
+            Type = TBaseStructure<FLinearColor>::Get();
+            Memory = &LinearColor;
+        }
+        else
+        {
+            V.Kind = TEXT("quat");
+            Type = TBaseStructure<FQuat>::Get();
+            Memory = &Quat;
+        }
+        if (!DasMathValueValid(Type, Memory))
+            DSLFail(TEXT("Invalid quaternion or color default"));
+    }
     else if (Call->name == "ue_transform" || Call->name == "ue_transform_identity")
     {
         V.Kind = TEXT("transform");
@@ -79,17 +140,21 @@ FDasDeclaredLiteral DSLDefaultMath(das::ExpressionPtr E)
                 DSLFail(TEXT("Transform requires literal translation, rotation and scale"));
             auto T = DSLDefaultMath(Call->arguments[0]), R = DSLDefaultMath(Call->arguments[1]),
                  S = DSLDefaultMath(Call->arguments[2]);
-            if (T.Kind != TEXT("vector") || R.Kind != TEXT("rotator") || S.Kind != TEXT("vector"))
+            if (T.Kind != TEXT("vector") || (R.Kind != TEXT("rotator") && R.Kind != TEXT("quat")) ||
+                                             S.Kind != TEXT("vector"))
                 DSLFail(TEXT("Transform requires vector, rotator, vector"));
             FInstancedStruct Translation, Scale, Rotator;
             FString Issue;
             if (!ParseDasStructDefault(
                     TEXT("/Script/CoreUObject.Vector"), T.String, Translation, Issue) ||
                     !ParseDasStructDefault(TEXT("/Script/CoreUObject.Vector"), S.String, Scale, Issue) ||
-                                           !ParseDasStructDefault(TEXT("/Script/CoreUObject.Rotator"), R.String,
-                                                                       Rotator, Issue))
+                                           !ParseDasStructDefault(R.Kind == TEXT("quat")
+                                                                  ? TEXT("/Script/CoreUObject.Quat")
+                                                                  : TEXT("/Script/CoreUObject.Rotator"), R.String,
+                                                                         Rotator, Issue))
                 DSLFail(Issue);
-            Transform = FTransform(Rotator.Get<FRotator>(), Translation.Get<FVector>(), Scale.Get<FVector>());
+            Transform = FTransform(R.Kind == TEXT("quat") ? Rotator.Get<FQuat>() : Rotator.Get<FRotator>().Quaternion(),
+                                                  Translation.Get<FVector>(), Scale.Get<FVector>());
             if (Transform.ContainsNaN() || !Transform.IsRotationNormalized())
                 DSLFail(TEXT("Invalid transform default"));
         }
@@ -115,6 +180,12 @@ FString DSLMathPropertyDefault(const das::Structure::FieldDeclaration& Field)
     }
     // A missing initializer is the struct's own default (zero vectors and rotators, identity transform).
     FStructOnScope Default(Adapter->GetStruct());
+    if (Adapter->GetStruct() == TBaseStructure<FQuat>::Get())
+        *reinterpret_cast<FQuat*>(Default.GetStructMemory()) = FQuat::Identity;
+    else if (Adapter->GetStruct() == TBaseStructure<FLinearColor>::Get())
+        *reinterpret_cast<FLinearColor*>(Default.GetStructMemory()) = FLinearColor::Black;
+    else if (Adapter->GetStruct() == TBaseStructure<FColor>::Get())
+        *reinterpret_cast<FColor*>(Default.GetStructMemory()) = FColor::Black;
     FString Text;
     Adapter->GetStruct()->ExportText(Text, Default.GetStructMemory(), nullptr, nullptr, PPF_None, nullptr);
     return Text;

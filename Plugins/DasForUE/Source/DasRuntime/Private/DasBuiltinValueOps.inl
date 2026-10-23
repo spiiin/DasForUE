@@ -1,8 +1,16 @@
 // Included in DasRuntime.cpp. Operators reuse native UE value semantics and the common extern guard.
 template <class T> const T& BuiltinValid(const T& V, das::Context* C)
 {
-    if (V.ContainsNaN())
-        C->throw_error("built-in math requires finite values");
+    if constexpr (std::is_same_v<T, FLinearColor>)
+    {
+        if (!FMath::IsFinite(V.R) || !FMath::IsFinite(V.G) || !FMath::IsFinite(V.B) || !FMath::IsFinite(V.A))
+            C->throw_error("built-in math requires finite values");
+    }
+    else if constexpr (!std::is_same_v<T, FColor>)
+    {
+        if (V.ContainsNaN())
+            C->throw_error("built-in math requires finite values");
+    }
     if constexpr (std::is_same_v<T, FTransform>)
         if (!V.IsRotationNormalized())
             C->throw_error("transform rotation must be normalized");
@@ -191,9 +199,148 @@ FRotator BuiltinRotatorFromQuat(const FQuat& Q, das::Context* C)
 }
 FQuat BuiltinQuat(double X, double Y, double Z, double W, das::Context* C)
 {
-    return BuiltinRotationQuat(FQuat(X, Y, Z, W), C);
+    return BuiltinValid(FQuat(X, Y, Z, W), C);
 }
 FQuat BuiltinQuatIdentity()
 {
     return FQuat::Identity;
+}
+
+// The complete convenience API operates on native values and keeps the shared UE call guard.
+template <class T> T BuiltinLerp(const T& A, const T& B, double Alpha, das::Context* C)
+{
+    return BuiltinValid(FMath::Lerp(BuiltinValid(A, C), BuiltinValid(B, C), BuiltinFinite(Alpha, C)), C);
+}
+template <class T> T BuiltinClampLength(const T& V, double Maximum, das::Context* C)
+{
+    return BuiltinValid(BuiltinValid(V, C).GetClampedToMaxSize(BuiltinTolerance(Maximum, C)), C);
+}
+template <class T> T BuiltinProject(const T& V, const T& Onto, das::Context* C)
+{
+    BuiltinValid(V, C);
+    BuiltinValid(Onto, C);
+    const double Length = BuiltinFinite(Onto.SizeSquared(), C);
+    if (Length <= UE_SMALL_NUMBER)
+        C->throw_error("projection requires a non-zero axis");
+    return BuiltinValid(Onto * (BuiltinFinite(T::DotProduct(V, Onto), C) / Length), C);
+}
+FVector BuiltinProjectPlane(const FVector& V, const FVector& Normal, das::Context* C)
+{
+    BuiltinValid(V, C);
+    BuiltinValid(Normal, C);
+    if (!Normal.IsNormalized())
+        C->throw_error("plane normal must be normalized");
+    return BuiltinValid(FVector::VectorPlaneProject(V, Normal), C);
+}
+FVector BuiltinReflect(const FVector& V, const FVector& Normal, das::Context* C)
+{
+    BuiltinValid(V, C);
+    BuiltinValid(Normal, C);
+    if (!Normal.IsNormalized())
+        C->throw_error("reflection normal must be normalized");
+    return BuiltinValid(V.MirrorByVector(Normal), C);
+}
+FQuat BuiltinQuatNormalize(const FQuat& Q, double ToleranceSquared, das::Context* C)
+{
+    BuiltinValid(Q, C);
+    if (BuiltinFinite(ToleranceSquared, C) <= 0 || BuiltinFinite(Q.SizeSquared(), C) <= ToleranceSquared)
+        C->throw_error("quaternion normalization requires positive tolerance and non-zero length");
+    return BuiltinRotationQuat(Q.GetNormalized(ToleranceSquared), C);
+}
+FQuat BuiltinQuatInverse(const FQuat& Q, das::Context* C)
+{
+    return BuiltinRotationQuat(BuiltinRotationQuat(Q, C).Inverse(), C);
+}
+FQuat BuiltinQuatMultiply(const FQuat& A, const FQuat& B, das::Context* C)
+{
+    return BuiltinRotationQuat(BuiltinRotationQuat(A, C) * BuiltinRotationQuat(B, C), C);
+}
+void BuiltinQuatMultiplyAssign(FQuat& A, const FQuat& B, das::Context* C)
+{
+    A = BuiltinQuatMultiply(A, B, C);
+}
+FQuat BuiltinQuatCompose(const FQuat& First, const FQuat& Then, das::Context* C)
+{
+    return BuiltinQuatMultiply(Then, First, C);
+}
+bool BuiltinQuatNearly(const FQuat& A, const FQuat& B, double Tolerance, das::Context* C)
+{
+    return BuiltinRotationQuat(A, C).Equals(BuiltinRotationQuat(B, C), BuiltinTolerance(Tolerance, C));
+}
+FQuat BuiltinQuatSlerp(const FQuat& A, const FQuat& B, double Alpha, das::Context* C)
+{
+    return BuiltinRotationQuat(
+        FQuat::Slerp(BuiltinRotationQuat(A, C), BuiltinRotationQuat(B, C), BuiltinFinite(Alpha, C)), C);
+}
+FRotator BuiltinRotatorSlerp(const FRotator& A, const FRotator& B, double Alpha, das::Context* C)
+{
+    return BuiltinRotatorFromQuat(
+        BuiltinQuatSlerp(BuiltinQuatFromRotator(A, C), BuiltinQuatFromRotator(B, C), Alpha, C), C);
+}
+FVector BuiltinQuatRotate(const FQuat& Q, const FVector& V, das::Context* C)
+{
+    return BuiltinValid(BuiltinRotationQuat(Q, C).RotateVector(BuiltinValid(V, C)), C);
+}
+FVector BuiltinQuatUnrotate(const FQuat& Q, const FVector& V, das::Context* C)
+{
+    return BuiltinValid(BuiltinRotationQuat(Q, C).UnrotateVector(BuiltinValid(V, C)), C);
+}
+FTransform BuiltinTransformQuat(const FVector& Position, const FQuat& Q, const FVector& Scale, das::Context* C)
+{
+    return BuiltinValid(FTransform(BuiltinRotationQuat(Q, C), BuiltinValid(Position, C), BuiltinValid(Scale, C)), C);
+}
+FQuat BuiltinTransformRotationQuat(const FTransform& T, das::Context* C)
+{
+    return BuiltinRotationQuat(BuiltinValid(T, C).GetRotation(), C);
+}
+FTransform BuiltinTransformBlend(const FTransform& A, const FTransform& B, double Alpha, das::Context* C)
+{
+    BuiltinValid(A, C);
+    BuiltinValid(B, C);
+    BuiltinFinite(Alpha, C);
+    if (Alpha < 0 || Alpha > 1)
+        C->throw_error("transform blend alpha must be within [0,1]");
+    FTransform Result;
+    Result.Blend(A, B, Alpha);
+    return BuiltinValid(Result, C);
+}
+FLinearColor BuiltinLinearColor(float R, float G, float B, float A, das::Context* C)
+{
+    return BuiltinValid(FLinearColor(R, G, B, A), C);
+}
+FColor BuiltinColor(int R, int G, int B, int A, das::Context* C)
+{
+    if (R < 0 || R > 255 || G < 0 || G > 255 || B < 0 || B > 255 || A < 0 || A > 255)
+        C->throw_error("color channels must be within [0,255]");
+    return FColor(uint8(R), uint8(G), uint8(B), uint8(A));
+}
+FColor BuiltinLinearToSRGB(const FLinearColor& Color, das::Context* C)
+{
+    return BuiltinValid(Color, C).ToFColorSRGB();
+}
+FLinearColor BuiltinSRGBToLinear(const FColor& Color)
+{
+    return FLinearColor::FromSRGBColor(Color);
+}
+FColor BuiltinLinearQuantize(const FLinearColor& Color, das::Context* C)
+{
+    return BuiltinValid(Color, C).ToFColor(false);
+}
+FLinearColor BuiltinColorReinterpretLinear(const FColor& Color)
+{
+    return Color.ReinterpretAsLinear();
+}
+FLinearColor BuiltinColorLerp(const FLinearColor& A, const FLinearColor& B, double Alpha, das::Context* C)
+{
+    const double T = BuiltinFinite(Alpha, C);
+    if (FMath::Abs(T) > MAX_flt)
+        C->throw_error("color lerp alpha exceeds float range");
+    return BuiltinValid(FMath::Lerp(BuiltinValid(A, C), BuiltinValid(B, C), float(T)), C);
+}
+bool BuiltinColorNearly(const FLinearColor& A, const FLinearColor& B, double Tolerance, das::Context* C)
+{
+    const double T = BuiltinTolerance(Tolerance, C);
+    if (T > MAX_flt)
+        C->throw_error("color tolerance exceeds float range");
+    return BuiltinValid(A, C).Equals(BuiltinValid(B, C), float(T));
 }

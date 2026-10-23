@@ -123,6 +123,9 @@ def is_opaque_native(value):
     return value.get('kind')=='struct' and value.get('type_path') in OPAQUE_TRANSPORTS
 
 CANONICAL_MATH = {
+    '/Script/CoreUObject.Quat': ('UEQuat', 'quat', {'x':'double','y':'double','z':'double','w':'double'}),
+    '/Script/CoreUObject.LinearColor': ('UELinearColor', 'linear_color', {'r':'float','g':'float','b':'float','a':'float'}),
+    '/Script/CoreUObject.Color': ('UEColor', 'color', {'r':'byte','g':'byte','b':'byte','a':'byte'}),
     '/Script/CoreUObject.Vector2D': ('UEVector2D', 'vector2d', {'x':'double', 'y':'double'}),
     '/Script/CoreUObject.Vector': ('UEVector', 'vector', {'x':'double', 'y':'double', 'z':'double'}),
     '/Script/CoreUObject.Rotator': ('UERotator', 'rotator', {'pitch':'double', 'yaw':'double', 'roll':'double'}),

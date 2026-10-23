@@ -17,15 +17,18 @@ This page lists the daScript value types that map directly to Unreal property an
 | `UEVector` | `ue_dsl` | `FVector` (`/Script/CoreUObject.Vector`) | Vector | Double-precision `x`, `y`, `z`. |
 | `UEVector2D` | `ue_dsl` | `FVector2D` (`/Script/CoreUObject.Vector2D`) | Vector 2D | Double-precision `x`, `y`. |
 | `UERotator` | `ue_dsl` | `FRotator` (`/Script/CoreUObject.Rotator`) | Rotator | `pitch`, `yaw`, `roll` in degrees. |
+| `UEQuat` | `ue_dsl` | `FQuat` (`/Script/CoreUObject.Quat`) | Quaternion struct | Double-precision `x`, `y`, `z`, `w`; explicit conversions. |
+| `UELinearColor` | `ue_dsl` | `FLinearColor` | Linear Color | Float `r`, `g`, `b`, `a`; linear/HDR values. |
+| `UEColor` | `ue_dsl` | `FColor` | Color struct | Byte `r`, `g`, `b`, `a`; color space is explicit at conversion. |
 | `UETransform` | `ue_dsl` | `FTransform` (`/Script/CoreUObject.Transform`) | Transform | Opaque. Rotation is stored as a quaternion. Use the helpers below. |
 | `GameplayTag` | `ue_gameplay_tags` | `FGameplayTag` | Gameplay Tag | Edited with the standard tag picker. See [GameplayTags](../Data/GameplayTags.md). |
 | `GameplayTagContainer` | `ue_gameplay_tags` | `FGameplayTagContainer` | Gameplay Tag Container | |
 | `SoftObject`, `SoftActorClass`, `$UESoftObject<T>`, `$UESoftClass<T>` | `ue_soft_references` | `TSoftObjectPtr` / `TSoftClassPtr` | Soft Object / Soft Class Reference | See [Soft references](SoftReferences.md). |
-| Other loaded native value structs (for example `LinearColor`) | `ue_dsl` | the native `UScriptStruct` | that struct | Use `UEStructValue` snapshots, or the generated wrappers from `ue_api_math`. See [Structs](Structs.md#native-unreal-structs-uestructvalue). |
+| Other loaded native value structs (for example `Box`) | `ue_dsl` | the native `UScriptStruct` | that struct | Use `UEStructValue` snapshots, or the generated wrappers from `ue_api_math`. See [Structs](Structs.md#native-unreal-structs-uestructvalue). |
 
 Object and class references are covered in [Object and class references](ObjectAndClassReferences.md), and enums and authored structs on their own pages.
 
-**Not available as authored types:** `int64`, `uint32` and other integer widths besides `int`/`uint8`, `FQuat`, `FColor` as a built-in, fixed-size C++ arrays, and arbitrary pointers. Unreal `int64` properties are not exposed in the generated native API either.
+**Not available as authored types:** `int64`, `uint32` and other integer widths besides `int`/`uint8`, fixed-size C++ arrays, and arbitrary pointers. Unreal `int64` properties are not exposed in the generated native API either.
 
 ## Where the types can be used
 
@@ -192,18 +195,73 @@ let sameIdentity : UEQuat = ue_quat(0.0lf, 0.0lf, 0.0lf, 1.0lf)
 
 - `ue_quat(rotator)` calls `FRotator::Quaternion()`; `ue_rotator(quaternion)` calls
   `FQuat::Rotator()`. Euler angles are in degrees, in Unreal's pitch/yaw/roll convention.
-- `ue_quat(x,y,z,w)` takes four `double` components and requires a normalized rotation.
+- `ue_quat(x,y,z,w)` takes four finite `double` components. Like native `FQuat`,
+  it can represent a non-unit quaternion: call `ue_normalized(q,toleranceSquared)`
+  explicitly before using it as a rotation. Zero/too-short quaternions cannot be normalized.
   The fields `x`, `y`, `z`, `w` are doubles; values are owned copies. Initialize locals
   explicitly: an uninitialized `UEQuat` is not guaranteed to be identity.
-- Non-finite inputs/results and non-normalized quaternion inputs are rejected through
-  the existing guarded UE extern boundary. Conversions never silently normalize an input.
-  If components are edited directly, validation runs at the next helper call.
+- Non-finite inputs/results are rejected. Rotation operations (Rotator conversion,
+  composition, inverse, vector rotation, slerp and Transform construction) additionally
+  require unit quaternions. They never silently repair the input.
+- `a*b` follows native quaternion multiplication: apply `b` then `a`. In contrast,
+  `ue_compose_rotation(first,then)` explicitly applies `first` then `then`, for either
+  Rotator or Quat arguments. `q*=other` validates before assignment and supports aliasing.
+- `ue_inverse(q)`, `ue_rotate_vector(q,v)`, `ue_unrotate_vector(q,v)`,
+  `ue_slerp(a,b,alpha)` and `ue_nearly_equal(a,b,tolerance)` use native FQuat operations.
+  Near-equality treats `q` and `-q` as equivalent and uses component tolerance. There
+  is no quaternion `==` operator. Slerp alpha is finite and can extrapolate.
 - Euler round trips preserve the rotation, not necessarily the original angle triple,
   especially at pitch singularities. `q` and `-q` represent the same rotation.
-- This increment exposes local native values and explicit conversions. It does not yet
-  add quaternion operators, authored `ue_property`/reflected function parameters,
-  containers, or generated native API transport. Generated `S_Quat_*` wrappers remain
-  distinct from `UEQuat`; no implicit conversions are provided.
+- Quat and both color types use the common adapters for authored fields/defaults,
+  struct members, calls, containers and callback snapshots. Missing authored defaults
+  are identity Quat, opaque black LinearColor, and opaque black Color. Initialize
+  ordinary local variables explicitly. Readonly rules still apply.
+- Canonical generated packages and native class wrappers use these same types, including
+  nested structs and arrays. Explicit `generated_transport` generator mode remains available;
+  its `S_Quat_*` / `S_Color_*` representations are not implicitly interchangeable.
+
+## Colors and explicit color spaces
+
+```das
+let tint = ue_linear_color(0.25f,0.5f,0.75f,1.0f)
+let packed = ue_color(64,128,192,255)
+let decoded : UELinearColor = ue_srgb_to_linear(packed)
+let encoded : UEColor = ue_linear_to_srgb(tint)
+let rawBytes = ue_quantize_linear(tint)
+let rawFloats = ue_reinterpret_linear(rawBytes)
+```
+
+`ue_linear_color` accepts four floats; HDR components outside [0,1] are allowed.
+`ue_color` takes four ints and rejects channels outside [0,255]. Its fields are
+`uint8`, so explicit casts are required when assigning an int to a field.
+LinearColor supports `+`, `-`, double scalar `*` / `/`, their compound forms,
+exact `==` / `!=`, `ue_nearly_equal` and `ue_lerp`. Color supports exact equality;
+arithmetic on packed bytes is deliberately absent.
+
+The sRGB helpers call `FLinearColor::FromSRGBColor` / `ToFColorSRGB`. The raw helpers
+call `ToFColor(false)` / `FColor::ReinterpretAsLinear`, without a gamma conversion.
+Native quantization/clamping and alpha handling are preserved; an HDR-to-byte round
+trip is lossy. There is no implicit color-space conversion or string coercion.
+
+## Interpolation and geometry
+
+- `ue_lerp(a,b,alpha)` for Vector/Vector2D or LinearColor follows native linear
+  interpolation. Finite alpha can extrapolate; LinearColor computes in float precision.
+- `ue_clamp_length(v,max)` for Vector/Vector2D requires a finite non-negative maximum.
+- `ue_project_onto(v,axis)` supports either vector dimension. The axis squared length
+  must exceed `UE_SMALL_NUMBER`; it need not be normalized.
+- `ue_project_onto_plane(v,normal)` and `ue_reflect(v,normal)` require a unit 3D normal.
+- `ue_slerp(rotatorA,rotatorB,alpha)` interpolates their native quaternions along the
+  shortest rotation path, then returns a Rotator; it does not interpolate Euler components.
+- `ue_transform(translation,quat,scale)` preserves the quaternion directly;
+  `ue_transform_quat(transform)` retrieves it without an Euler round trip.
+- `ue_blend(transformA,transformB,alpha)` calls native `FTransform::Blend`, including
+  its normalized quaternion lerp and endpoint thresholds. Alpha must be in [0,1].
+  This is not quaternion slerp or arbitrary matrix interpolation. Native TRS/shear
+  limitations described below still apply.
+
+Example with authored properties, containers and reflected methods:
+`Plugins/DasForUE/Content/Das/Scripts/builtin_types_example.das`.
 
 ## Operators and math helpers
 

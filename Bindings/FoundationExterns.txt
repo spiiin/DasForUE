@@ -1,38 +1,53 @@
 !=	@ue_foundation::!= CH<ue_foundation::UENameValue> CH<ue_foundation::UENameValue> C_c	bool const	4
+!=	@ue_foundation::!= CIH<ue_foundation::UEColor> CIH<ue_foundation::UEColor> C_c	bool const	4
+!=	@ue_foundation::!= CIH<ue_foundation::UELinearColor> CIH<ue_foundation::UELinearColor> C_c	bool const	4
 !=	@ue_foundation::!= CIH<ue_foundation::UERotator> CIH<ue_foundation::UERotator> C_c	bool const	4
 !=	@ue_foundation::!= CIH<ue_foundation::UEVector2D> CIH<ue_foundation::UEVector2D> C_c	bool const	4
 !=	@ue_foundation::!= CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> C_c	bool const	4
+*	@ue_foundation::* Cd CIH<ue_foundation::UELinearColor> C_c	ue_foundation::UELinearColor	4
 *	@ue_foundation::* Cd CIH<ue_foundation::UERotator> C_c	ue_foundation::UERotator	4
 *	@ue_foundation::* Cd CIH<ue_foundation::UEVector2D> C_c	ue_foundation::UEVector2D	4
 *	@ue_foundation::* Cd CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
+*	@ue_foundation::* CIH<ue_foundation::UELinearColor> Cd C_c	ue_foundation::UELinearColor	4
+*	@ue_foundation::* CIH<ue_foundation::UEQuat> CIH<ue_foundation::UEQuat> C_c	ue_foundation::UEQuat	4
 *	@ue_foundation::* CIH<ue_foundation::UERotator> Cd C_c	ue_foundation::UERotator	4
 *	@ue_foundation::* CIH<ue_foundation::UETransform> CIH<ue_foundation::UETransform> C_c	ue_foundation::UETransform	4
 *	@ue_foundation::* CIH<ue_foundation::UEVector2D> Cd C_c	ue_foundation::UEVector2D	4
 *	@ue_foundation::* CIH<ue_foundation::UEVector> Cd C_c	ue_foundation::UEVector	4
+*=	@ue_foundation::*= IH<ue_foundation::UELinearColor> Cd C_c	void	12
+*=	@ue_foundation::*= IH<ue_foundation::UEQuat> CIH<ue_foundation::UEQuat> C_c	void	12
 *=	@ue_foundation::*= IH<ue_foundation::UERotator> Cd C_c	void	12
 *=	@ue_foundation::*= IH<ue_foundation::UETransform> CIH<ue_foundation::UETransform> C_c	void	12
 *=	@ue_foundation::*= IH<ue_foundation::UEVector2D> Cd C_c	void	12
 *=	@ue_foundation::*= IH<ue_foundation::UEVector> Cd C_c	void	12
++	@ue_foundation::+ CIH<ue_foundation::UELinearColor> CIH<ue_foundation::UELinearColor> C_c	ue_foundation::UELinearColor	4
 +	@ue_foundation::+ CIH<ue_foundation::UERotator> CIH<ue_foundation::UERotator> C_c	ue_foundation::UERotator	4
 +	@ue_foundation::+ CIH<ue_foundation::UEVector2D> CIH<ue_foundation::UEVector2D> C_c	ue_foundation::UEVector2D	4
 +	@ue_foundation::+ CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
++=	@ue_foundation::+= IH<ue_foundation::UELinearColor> CIH<ue_foundation::UELinearColor> C_c	void	12
 +=	@ue_foundation::+= IH<ue_foundation::UERotator> CIH<ue_foundation::UERotator> C_c	void	12
 +=	@ue_foundation::+= IH<ue_foundation::UEVector2D> CIH<ue_foundation::UEVector2D> C_c	void	12
 +=	@ue_foundation::+= IH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> C_c	void	12
+-	@ue_foundation::- CIH<ue_foundation::UELinearColor> CIH<ue_foundation::UELinearColor> C_c	ue_foundation::UELinearColor	4
 -	@ue_foundation::- CIH<ue_foundation::UERotator> C_c	ue_foundation::UERotator	4
 -	@ue_foundation::- CIH<ue_foundation::UERotator> CIH<ue_foundation::UERotator> C_c	ue_foundation::UERotator	4
 -	@ue_foundation::- CIH<ue_foundation::UEVector2D> C_c	ue_foundation::UEVector2D	4
 -	@ue_foundation::- CIH<ue_foundation::UEVector2D> CIH<ue_foundation::UEVector2D> C_c	ue_foundation::UEVector2D	4
 -	@ue_foundation::- CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
 -	@ue_foundation::- CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
+-=	@ue_foundation::-= IH<ue_foundation::UELinearColor> CIH<ue_foundation::UELinearColor> C_c	void	12
 -=	@ue_foundation::-= IH<ue_foundation::UERotator> CIH<ue_foundation::UERotator> C_c	void	12
 -=	@ue_foundation::-= IH<ue_foundation::UEVector2D> CIH<ue_foundation::UEVector2D> C_c	void	12
 -=	@ue_foundation::-= IH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> C_c	void	12
+/	@ue_foundation::/ CIH<ue_foundation::UELinearColor> Cd C_c	ue_foundation::UELinearColor	4
 /	@ue_foundation::/ CIH<ue_foundation::UEVector2D> Cd C_c	ue_foundation::UEVector2D	4
 /	@ue_foundation::/ CIH<ue_foundation::UEVector> Cd C_c	ue_foundation::UEVector	4
+/=	@ue_foundation::/= IH<ue_foundation::UELinearColor> Cd C_c	void	12
 /=	@ue_foundation::/= IH<ue_foundation::UEVector2D> Cd C_c	void	12
 /=	@ue_foundation::/= IH<ue_foundation::UEVector> Cd C_c	void	12
 ==	@ue_foundation::== CH<ue_foundation::UENameValue> CH<ue_foundation::UENameValue> C_c	bool const	4
+==	@ue_foundation::== CIH<ue_foundation::UEColor> CIH<ue_foundation::UEColor> C_c	bool const	4
+==	@ue_foundation::== CIH<ue_foundation::UELinearColor> CIH<ue_foundation::UELinearColor> C_c	bool const	4
 ==	@ue_foundation::== CIH<ue_foundation::UERotator> CIH<ue_foundation::UERotator> C_c	bool const	4
 ==	@ue_foundation::== CIH<ue_foundation::UEVector2D> CIH<ue_foundation::UEVector2D> C_c	bool const	4
 ==	@ue_foundation::== CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> C_c	bool const	4
@@ -140,28 +155,40 @@ __ue_image_soft_status	@ue_foundation::__ue_image_soft_status CIH<ue_foundation:
 __ue_input_kind	@ue_foundation::__ue_input_kind CIH<ue_foundation::InputActionValue> C_c	int const	4
 __ue_input_make	@ue_foundation::__ue_input_make Ci Cd Cd Cd C_c	ue_foundation::InputActionValue	4
 __ue_library_scope	@ue_foundation::__ue_library_scope CIH<ue_foundation::UObjectHandle> Cb CI1<v>$ C_c	void	4
+__ue_math_pack_color	@ue_foundation::__ue_math_pack_color CIH<ue_foundation::UEColor> C_c C_l	ue_foundation::UEStructValue	4
 __ue_math_pack_input_value	@ue_foundation::__ue_math_pack_input_value CIH<ue_foundation::InputActionValue> C_c C_l	ue_foundation::UEStructValue	4
+__ue_math_pack_linear_color	@ue_foundation::__ue_math_pack_linear_color CIH<ue_foundation::UELinearColor> C_c C_l	ue_foundation::UEStructValue	4
+__ue_math_pack_quat	@ue_foundation::__ue_math_pack_quat CIH<ue_foundation::UEQuat> C_c C_l	ue_foundation::UEStructValue	4
 __ue_math_pack_rotator	@ue_foundation::__ue_math_pack_rotator CIH<ue_foundation::UERotator> C_c C_l	ue_foundation::UEStructValue	4
 __ue_math_pack_transform	@ue_foundation::__ue_math_pack_transform CIH<ue_foundation::UETransform> C_c C_l	ue_foundation::UEStructValue	4
 __ue_math_pack_vector	@ue_foundation::__ue_math_pack_vector CIH<ue_foundation::UEVector> C_c C_l	ue_foundation::UEStructValue	4
 __ue_math_pack_vector2d	@ue_foundation::__ue_math_pack_vector2d CIH<ue_foundation::UEVector2D> C_c C_l	ue_foundation::UEStructValue	4
+__ue_math_unpack_color	@ue_foundation::__ue_math_unpack_color CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEColor	4
 __ue_math_unpack_input_value	@ue_foundation::__ue_math_unpack_input_value CIH<ue_foundation::UEStructValue> C_c	ue_foundation::InputActionValue	4
+__ue_math_unpack_linear_color	@ue_foundation::__ue_math_unpack_linear_color CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UELinearColor	4
+__ue_math_unpack_quat	@ue_foundation::__ue_math_unpack_quat CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEQuat	4
 __ue_math_unpack_rotator	@ue_foundation::__ue_math_unpack_rotator CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UERotator	4
 __ue_math_unpack_transform	@ue_foundation::__ue_math_unpack_transform CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UETransform	4
 __ue_math_unpack_vector	@ue_foundation::__ue_math_unpack_vector CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEVector	4
 __ue_math_unpack_vector2d	@ue_foundation::__ue_math_unpack_vector2d CIH<ue_foundation::UEStructValue> C_c	ue_foundation::UEVector2D	4
+__ue_method_arg_color	@ue_foundation::__ue_method_arg_color CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEColor> C_c	void	4
 __ue_method_arg_delegate	@ue_foundation::__ue_method_arg_delegate CIH<ue_foundation::UCallHandle> CIs CIs Cu64 C_c	void	4
 __ue_method_arg_enum	@ue_foundation::__ue_method_arg_enum CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UEEnumValue> C_c	void	4
+__ue_method_arg_linear_color	@ue_foundation::__ue_method_arg_linear_color CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UELinearColor> C_c	void	4
 __ue_method_arg_name	@ue_foundation::__ue_method_arg_name CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UENameValue> C_c	void	4
+__ue_method_arg_quat	@ue_foundation::__ue_method_arg_quat CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEQuat> C_c	void	4
 __ue_method_arg_rotator	@ue_foundation::__ue_method_arg_rotator CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UERotator> C_c	void	4
 __ue_method_arg_struct	@ue_foundation::__ue_method_arg_struct CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEStructValue> C_c	void	4
 __ue_method_arg_text	@ue_foundation::__ue_method_arg_text CIH<ue_foundation::UCallHandle> CIs CH<ue_foundation::UETextValue> C_c	void	4
 __ue_method_arg_transform	@ue_foundation::__ue_method_arg_transform CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UETransform> C_c	void	4
 __ue_method_arg_vector	@ue_foundation::__ue_method_arg_vector CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEVector> C_c	void	4
 __ue_method_arg_vector2d	@ue_foundation::__ue_method_arg_vector2d CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEVector2D> C_c	void	4
+__ue_method_result_color	@ue_foundation::__ue_method_result_color CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEColor	4
 __ue_method_result_delegate	@ue_foundation::__ue_method_result_delegate CIH<ue_foundation::UCallHandle> CIs CIs C_c	uint64 const	4
 __ue_method_result_enum	@ue_foundation::__ue_method_result_enum CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UEEnumValue	4
+__ue_method_result_linear_color	@ue_foundation::__ue_method_result_linear_color CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UELinearColor	4
 __ue_method_result_name	@ue_foundation::__ue_method_result_name CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UENameValue	4
+__ue_method_result_quat	@ue_foundation::__ue_method_result_quat CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEQuat	4
 __ue_method_result_rotator	@ue_foundation::__ue_method_result_rotator CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UERotator	4
 __ue_method_result_struct	@ue_foundation::__ue_method_result_struct CIH<ue_foundation::UCallHandle> CIs C_c C_l	ue_foundation::UEStructValue	4
 __ue_method_result_text	@ue_foundation::__ue_method_result_text CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UETextValue	4
@@ -566,6 +593,7 @@ ue_async_physics_set_input	@ue_foundation::ue_async_physics_set_input Ci Cd C_c	
 ue_begin_call	@ue_foundation::ue_begin_call CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UCallHandle	4
 ue_begin_interface_call	@ue_foundation::ue_begin_interface_call CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UCallHandle	4
 ue_begin_static_call	@ue_foundation::ue_begin_static_call CIs CIs CIs C_c	ue_foundation::UCallHandle	4
+ue_blend	@ue_foundation::ue_blend CIH<ue_foundation::UETransform> CIH<ue_foundation::UETransform> Cd C_c	ue_foundation::UETransform	4
 ue_call_float	@ue_foundation::ue_call_float CIH<ue_foundation::UObjectHandle> CIs Cf C_c	float const	4
 ue_call_int	@ue_foundation::ue_call_int CIH<ue_foundation::UObjectHandle> CIs Ci C_c	int const	4
 ue_call_object	@ue_foundation::ue_call_object CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
@@ -574,11 +602,15 @@ ue_call_void_object	@ue_foundation::ue_call_void_object CIH<ue_foundation::UObje
 ue_cast_interface	@ue_foundation::ue_cast_interface CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
 ue_cast_nullable_object	@ue_foundation::ue_cast_nullable_object CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
 ue_cast_object	@ue_foundation::ue_cast_object CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
+ue_clamp_length	@ue_foundation::ue_clamp_length CIH<ue_foundation::UEVector2D> Cd C_c	ue_foundation::UEVector2D	4
+ue_clamp_length	@ue_foundation::ue_clamp_length CIH<ue_foundation::UEVector> Cd C_c	ue_foundation::UEVector	4
 ue_class_null	@ue_foundation::ue_class_null	ue_foundation::UEClassHandle	4
 ue_class_path	@ue_foundation::ue_class_path CH<ue_foundation::UEClassHandle> C_c	string const	4
 ue_class_valid	@ue_foundation::ue_class_valid CH<ue_foundation::UEClassHandle> C_c	bool const	4
+ue_color	@ue_foundation::ue_color Ci Ci Ci Ci C_c	ue_foundation::UEColor	4
 ue_component_destroy_handle	@ue_foundation::ue_component_destroy_handle CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 ue_component_owner	@ue_foundation::ue_component_owner CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+ue_compose_rotation	@ue_foundation::ue_compose_rotation CIH<ue_foundation::UEQuat> CIH<ue_foundation::UEQuat> C_c	ue_foundation::UEQuat	4
 ue_compose_rotation	@ue_foundation::ue_compose_rotation CIH<ue_foundation::UERotator> CIH<ue_foundation::UERotator> C_c	ue_foundation::UERotator	4
 ue_constraint_valid	@ue_foundation::ue_constraint_valid CIH<ue_foundation::UEConstraintHandle> C_c	bool const	4
 ue_cross	@ue_foundation::ue_cross CIH<ue_foundation::UEVector2D> CIH<ue_foundation::UEVector2D> C_c	double const	4
@@ -639,6 +671,7 @@ ue_input_unbind_all	@ue_foundation::ue_input_unbind_all C_c	int const	4
 ue_input_unbind_axis	@ue_foundation::ue_input_unbind_axis CIs C_c	bool const	4
 ue_interface_call_int	@ue_foundation::ue_interface_call_int CIH<ue_foundation::UObjectHandle> CIs CIs Ci C_c	int const	4
 ue_interface_call_string	@ue_foundation::ue_interface_call_string CIH<ue_foundation::UObjectHandle> CIs CIs C_c	string const	4
+ue_inverse	@ue_foundation::ue_inverse CIH<ue_foundation::UEQuat> C_c	ue_foundation::UEQuat	4
 ue_inverse_transform_position	@ue_foundation::ue_inverse_transform_position CIH<ue_foundation::UETransform> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
 ue_inverse_transform_vector	@ue_foundation::ue_inverse_transform_vector CIH<ue_foundation::UETransform> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
 ue_invoke_call	@ue_foundation::ue_invoke_call CIH<ue_foundation::UCallHandle> C_c	void	4
@@ -650,13 +683,21 @@ ue_length	@ue_foundation::ue_length CIH<ue_foundation::UEVector2D> C_c	double co
 ue_length	@ue_foundation::ue_length CIH<ue_foundation::UEVector> C_c	double const	4
 ue_length_squared	@ue_foundation::ue_length_squared CIH<ue_foundation::UEVector2D> C_c	double const	4
 ue_length_squared	@ue_foundation::ue_length_squared CIH<ue_foundation::UEVector> C_c	double const	4
+ue_lerp	@ue_foundation::ue_lerp CIH<ue_foundation::UELinearColor> CIH<ue_foundation::UELinearColor> Cd C_c	ue_foundation::UELinearColor	4
+ue_lerp	@ue_foundation::ue_lerp CIH<ue_foundation::UEVector2D> CIH<ue_foundation::UEVector2D> Cd C_c	ue_foundation::UEVector2D	4
+ue_lerp	@ue_foundation::ue_lerp CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> Cd C_c	ue_foundation::UEVector	4
+ue_linear_color	@ue_foundation::ue_linear_color Cf Cf Cf Cf C_c	ue_foundation::UELinearColor	4
+ue_linear_to_srgb	@ue_foundation::ue_linear_to_srgb CIH<ue_foundation::UELinearColor> C_c	ue_foundation::UEColor	4
 ue_name_text	@ue_foundation::ue_name_text CH<ue_foundation::UENameValue> C_c	string const	4
 ue_name_value	@ue_foundation::ue_name_value CIs C_c	ue_foundation::UENameValue	4
 ue_names_equal	@ue_foundation::ue_names_equal CH<ue_foundation::UENameValue> CH<ue_foundation::UENameValue> C_c	bool const	4
+ue_nearly_equal	@ue_foundation::ue_nearly_equal CIH<ue_foundation::UELinearColor> CIH<ue_foundation::UELinearColor> Cd C_c	bool const	4
+ue_nearly_equal	@ue_foundation::ue_nearly_equal CIH<ue_foundation::UEQuat> CIH<ue_foundation::UEQuat> Cd C_c	bool const	4
 ue_nearly_equal	@ue_foundation::ue_nearly_equal CIH<ue_foundation::UERotator> CIH<ue_foundation::UERotator> Cd C_c	bool const	4
 ue_nearly_equal	@ue_foundation::ue_nearly_equal CIH<ue_foundation::UETransform> CIH<ue_foundation::UETransform> Cd C_c	bool const	4
 ue_nearly_equal	@ue_foundation::ue_nearly_equal CIH<ue_foundation::UEVector2D> CIH<ue_foundation::UEVector2D> Cd C_c	bool const	4
 ue_nearly_equal	@ue_foundation::ue_nearly_equal CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> Cd C_c	bool const	4
+ue_normalized	@ue_foundation::ue_normalized CIH<ue_foundation::UEQuat> Cd C_c	ue_foundation::UEQuat	4
 ue_normalized	@ue_foundation::ue_normalized CIH<ue_foundation::UERotator> C_c	ue_foundation::UERotator	4
 ue_normalized	@ue_foundation::ue_normalized CIH<ue_foundation::UEVector2D> Cd C_c	ue_foundation::UEVector2D	4
 ue_normalized	@ue_foundation::ue_normalized CIH<ue_foundation::UEVector> Cd C_c	ue_foundation::UEVector	4
@@ -670,9 +711,15 @@ ue_physics_add_force	@ue_foundation::ue_physics_add_force CH<ue_foundation::UEPh
 ue_physics_body	@ue_foundation::ue_physics_body Ci C_c	ue_foundation::UEPhysicsBodyToken	4
 ue_physics_input	@ue_foundation::ue_physics_input Ci C_c	double const	4
 ue_physics_output	@ue_foundation::ue_physics_output Ci Cd C_c	void	4
+ue_project_onto	@ue_foundation::ue_project_onto CIH<ue_foundation::UEVector2D> CIH<ue_foundation::UEVector2D> C_c	ue_foundation::UEVector2D	4
+ue_project_onto	@ue_foundation::ue_project_onto CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
+ue_project_onto_plane	@ue_foundation::ue_project_onto_plane CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
+ue_quantize_linear	@ue_foundation::ue_quantize_linear CIH<ue_foundation::UELinearColor> C_c	ue_foundation::UEColor	4
 ue_quat	@ue_foundation::ue_quat Cd Cd Cd Cd C_c	ue_foundation::UEQuat	4
 ue_quat	@ue_foundation::ue_quat CIH<ue_foundation::UERotator> C_c	ue_foundation::UEQuat	4
 ue_quat_identity	@ue_foundation::ue_quat_identity	ue_foundation::UEQuat	4
+ue_reflect	@ue_foundation::ue_reflect CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
+ue_reinterpret_linear	@ue_foundation::ue_reinterpret_linear CIH<ue_foundation::UEColor>	ue_foundation::UELinearColor	4
 ue_release_call	@ue_foundation::ue_release_call CIH<ue_foundation::UCallHandle> C_c	void	4
 ue_require_call_context	@ue_foundation::ue_require_call_context CIH<ue_foundation::UCallHandle> Cb C_c	void	4
 ue_result_array_size	@ue_foundation::ue_result_array_size CIH<ue_foundation::UCallHandle> CIs C_c	int const	4
@@ -687,6 +734,7 @@ ue_result_int	@ue_foundation::ue_result_int CIH<ue_foundation::UCallHandle> CIs 
 ue_result_name	@ue_foundation::ue_result_name CIH<ue_foundation::UCallHandle> CIs C_c	string const	4
 ue_result_object	@ue_foundation::ue_result_object CIH<ue_foundation::UCallHandle> CIs C_c	ue_foundation::UObjectHandle	4
 ue_result_string	@ue_foundation::ue_result_string CIH<ue_foundation::UCallHandle> CIs C_c	string const	4
+ue_rotate_vector	@ue_foundation::ue_rotate_vector CIH<ue_foundation::UEQuat> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
 ue_rotate_vector	@ue_foundation::ue_rotate_vector CIH<ue_foundation::UERotator> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
 ue_rotator	@ue_foundation::ue_rotator Cd Cd Cd C_c	ue_foundation::UERotator	4
 ue_rotator	@ue_foundation::ue_rotator CIH<ue_foundation::UEQuat> C_c	ue_foundation::UERotator	4
@@ -703,6 +751,9 @@ ue_set_self_object	@ue_foundation::ue_set_self_object CIs CIH<ue_foundation::UOb
 ue_set_self_string	@ue_foundation::ue_set_self_string CIs CIs C_c	void	4
 ue_set_self_struct	@ue_foundation::ue_set_self_struct CIs CIH<ue_foundation::UEStructValue> C_c	void	4
 ue_set_self_text	@ue_foundation::ue_set_self_text CIs CH<ue_foundation::UETextValue> C_c	void	4
+ue_slerp	@ue_foundation::ue_slerp CIH<ue_foundation::UEQuat> CIH<ue_foundation::UEQuat> Cd C_c	ue_foundation::UEQuat	4
+ue_slerp	@ue_foundation::ue_slerp CIH<ue_foundation::UERotator> CIH<ue_foundation::UERotator> Cd C_c	ue_foundation::UERotator	4
+ue_srgb_to_linear	@ue_foundation::ue_srgb_to_linear CIH<ue_foundation::UEColor>	ue_foundation::UELinearColor	4
 ue_state_get_int	@ue_foundation::ue_state_get_int CIs Ci C_c	int const	4
 ue_state_set_int	@ue_foundation::ue_state_set_int CIs Ci C_c	void	4
 ue_struct_array_resize	@ue_foundation::ue_struct_array_resize CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	ue_foundation::UEStructValue	4
@@ -883,16 +934,19 @@ ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIH<ue_foundation::U
 ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIH<ue_foundation::UEVector> C_c	void	4
 ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb CIs C_c	void	4
 ue_timer_start	@ue_foundation::ue_timer_start CIs Cf CIs Cb Cu8 C_c	void	4
+ue_transform	@ue_foundation::ue_transform CIH<ue_foundation::UEVector> CIH<ue_foundation::UEQuat> CIH<ue_foundation::UEVector> C_c	ue_foundation::UETransform	4
 ue_transform	@ue_foundation::ue_transform CIH<ue_foundation::UEVector> CIH<ue_foundation::UERotator> CIH<ue_foundation::UEVector> C_c	ue_foundation::UETransform	4
 ue_transform_direction	@ue_foundation::ue_transform_direction CIH<ue_foundation::UETransform> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
 ue_transform_identity	@ue_foundation::ue_transform_identity	ue_foundation::UETransform	4
 ue_transform_inverse	@ue_foundation::ue_transform_inverse CIH<ue_foundation::UETransform> C_c	ue_foundation::UETransform	4
 ue_transform_position	@ue_foundation::ue_transform_position CIH<ue_foundation::UETransform> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
+ue_transform_quat	@ue_foundation::ue_transform_quat CIH<ue_foundation::UETransform> C_c	ue_foundation::UEQuat	4
 ue_transform_relative	@ue_foundation::ue_transform_relative CIH<ue_foundation::UETransform> CIH<ue_foundation::UETransform> C_c	ue_foundation::UETransform	4
 ue_transform_rotation	@ue_foundation::ue_transform_rotation CIH<ue_foundation::UETransform>	ue_foundation::UERotator	4
 ue_transform_scale	@ue_foundation::ue_transform_scale CIH<ue_foundation::UETransform>	ue_foundation::UEVector	4
 ue_transform_translation	@ue_foundation::ue_transform_translation CIH<ue_foundation::UETransform>	ue_foundation::UEVector	4
 ue_transform_vector	@ue_foundation::ue_transform_vector CIH<ue_foundation::UETransform> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
+ue_unrotate_vector	@ue_foundation::ue_unrotate_vector CIH<ue_foundation::UEQuat> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
 ue_unrotate_vector	@ue_foundation::ue_unrotate_vector CIH<ue_foundation::UERotator> CIH<ue_foundation::UEVector> C_c	ue_foundation::UEVector	4
 ue_vector	@ue_foundation::ue_vector Cd Cd Cd C_c	ue_foundation::UEVector	4
 ue_vector2d	@ue_foundation::ue_vector2d Cd Cd	ue_foundation::UEVector2D	4

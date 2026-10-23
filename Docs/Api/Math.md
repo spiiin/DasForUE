@@ -29,11 +29,20 @@ The profile uses `value_types=canonical_math`:
 | `FVector2D` | `UEVector2D` | `x`, `y`; `ue_vector2d(x,y)` |
 | `FVector` | `UEVector` | `x`, `y`, `z`; `ue_vector(x,y,z)` |
 | `FRotator` | `UERotator` | `ue_rotator(pitch,yaw,roll)` |
+| `FQuat` | `UEQuat` | `x`, `y`, `z`, `w`; `ue_quat(rotator)` or `ue_quat(x,y,z,w)` |
+| `FLinearColor` | `UELinearColor` | `r`, `g`, `b`, `a` floats; `ue_linear_color(r,g,b,a)` |
+| `FColor` | `UEColor` | `r`, `g`, `b`, `a` bytes; `ue_color(r,g,b,a)` |
 | `FTransform` | `UETransform` | `ue_transform_translation(t)` and other foundation helpers |
 
 These are the same types used by native class bindings, authored properties, defaults and `self`, in arguments, results, multiple outputs, ref/inout, arrays and fields of other structs. No duplicate `S_Vector_*`/`S_Transform_*` types are generated. Values must be finite; a Transform must have a normalized rotation, and its quaternion is copied as a whole (no Euler round-trip).
 
-Other native structs keep generated transport types with `f_` fields, for example `S_LinearColor_f4abb14b` (`f_r`, `f_g`, `f_b`, `f_a`) returned by `ue_math_MakeColor`. Quat, Box and similar types are also generated structs. The foundation now additionally exposes `UEQuat` for explicit `ue_quat(rotator)` / `ue_rotator(quaternion)` conversions; it is currently distinct from the generated Quat transport type. See [quaternion conversions](../Guide/DSL/BuiltinTypes.md#quaternion-conversions-uequat).
+Other native structs such as Box keep generated transport types with `f_` fields.
+Quat, LinearColor and Color now use their canonical foundation types. For example,
+`ue_math_MakeColor(...)` returns `UELinearColor` with `.r` / `.a`, and
+`ue_math_Conv_RotatorToQuaternion(...)` returns `UEQuat`. Their array elements and
+nested properties use the same copied native snapshots. Existing generated transport
+mode remains an explicit generator choice, without implicit conversions between views.
+See [built-in type operations](../Guide/DSL/BuiltinTypes.md#quaternion-conversions-uequat).
 
 ## Examples
 

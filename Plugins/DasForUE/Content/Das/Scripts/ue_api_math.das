@@ -132,13 +132,6 @@ struct S_BoxSphereBounds_cda0dc69 {
     f_sphereradius : double
 }
 
-struct S_Color_1d162ca1 {
-    f_b : uint8
-    f_g : uint8
-    f_r : uint8
-    f_a : uint8
-}
-
 struct S_FrameNumber_206b76b9 {
     f_value : int
 }
@@ -169,13 +162,6 @@ struct S_IntVector2_5b68e073 {
     f_y : int
 }
 
-struct S_LinearColor_f4abb14b {
-    f_r : float
-    f_g : float
-    f_b : float
-    f_a : float
-}
-
 struct S_Plane_a3bdbfa8 {
     f_w : double
     f_x : double
@@ -203,13 +189,6 @@ struct S_OrientedBox_017d0f89 {
 struct S_QualifiedFrameTime_efb392be {
     f_time : S_FrameTime_bba4313e
     f_rate : S_FrameRate_491c16ee
-}
-
-struct S_Quat_82f9549e {
-    f_x : double
-    f_y : double
-    f_z : double
-    f_w : double
 }
 
 struct S_RandomStream_7b64b757 {
@@ -353,20 +332,14 @@ def ue_math_Add_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPoint
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_LinearColorLinearColor", signature="v1;Add_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_Add_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
+def ue_math_Add_LinearColorLinearColor(arg_a : UELinearColor; arg_b : UELinearColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;Add_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
-    ue_arg_float(call, "b.r", arg_b.f_r)
-    ue_arg_float(call, "b.g", arg_b.f_g)
-    ue_arg_float(call, "b.b", arg_b.f_b)
-    ue_arg_float(call, "b.a", arg_b.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
+    __ue_method_arg_linear_color(call, "b", arg_b)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -415,20 +388,14 @@ def ue_math_Add_MatrixMatrix(arg_a : S_Matrix_c85cbab4; arg_b : S_Matrix_c85cbab
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Add_QuatQuat", signature="v1;Add_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Add_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Quat_82f9549e {
+def ue_math_Add_QuatQuat(arg_a : UEQuat; arg_b : UEQuat) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Add_QuatQuat", "")
     ue_expect_signature(call, "v1;Add_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "a.x", arg_a.f_x)
-    ue_arg_double(call, "a.y", arg_a.f_y)
-    ue_arg_double(call, "a.z", arg_a.f_z)
-    ue_arg_double(call, "a.w", arg_a.f_w)
-    ue_arg_double(call, "b.x", arg_b.f_x)
-    ue_arg_double(call, "b.y", arg_b.f_y)
-    ue_arg_double(call, "b.z", arg_b.f_z)
-    ue_arg_double(call, "b.w", arg_b.f_w)
+    __ue_method_arg_quat(call, "a", arg_a)
+    __ue_method_arg_quat(call, "b", arg_b)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -815,14 +782,11 @@ struct ue_math_BreakColor_Result {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakColor", signature="v1;BreakColor;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};R:FloatProperty:384;G:FloatProperty:384;B:FloatProperty:384;A:FloatProperty:384;")]
-def ue_math_BreakColor(arg_incolor : S_LinearColor_f4abb14b) : ue_math_BreakColor_Result {
+def ue_math_BreakColor(arg_incolor : UELinearColor) : ue_math_BreakColor_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakColor", "")
     ue_expect_signature(call, "v1;BreakColor;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};R:FloatProperty:384;G:FloatProperty:384;B:FloatProperty:384;A:FloatProperty:384;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
     let result = ue_math_BreakColor_Result(out_r = ue_result_float(call, "r"), out_g = ue_result_float(call, "g"), out_b = ue_result_float(call, "b"), out_a = ue_result_float(call, "a"))
     ue_release_call(call)
@@ -876,14 +840,11 @@ struct ue_math_BreakQuat_Result {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="BreakQuat", signature="v1;BreakQuat;InQuat:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:FloatProperty:384;Y:FloatProperty:384;Z:FloatProperty:384;W:FloatProperty:384;")]
-def ue_math_BreakQuat(arg_inquat : S_Quat_82f9549e) : ue_math_BreakQuat_Result {
+def ue_math_BreakQuat(arg_inquat : UEQuat) : ue_math_BreakQuat_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "BreakQuat", "")
     ue_expect_signature(call, "v1;BreakQuat;InQuat:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:FloatProperty:384;Y:FloatProperty:384;Z:FloatProperty:384;W:FloatProperty:384;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "inquat.x", arg_inquat.f_x)
-    ue_arg_double(call, "inquat.y", arg_inquat.f_y)
-    ue_arg_double(call, "inquat.z", arg_inquat.f_z)
-    ue_arg_double(call, "inquat.w", arg_inquat.f_w)
+    __ue_method_arg_quat(call, "inquat", arg_inquat)
     ue_invoke_call(call)
     let result = ue_math_BreakQuat_Result(out_x = ue_result_float(call, "x"), out_y = ue_result_float(call, "y"), out_z = ue_result_float(call, "z"), out_w = ue_result_float(call, "w"))
     ue_release_call(call)
@@ -1095,22 +1056,16 @@ def ue_math_BreakVector_NetQuantizeNormal(arg_invec : S_Vector_NetQuantizeNormal
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="CInterpTo", signature="v1;CInterpTo;Current:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_CInterpTo(arg_current : S_LinearColor_f4abb14b; arg_target : S_LinearColor_f4abb14b; arg_deltatime : float; arg_interpspeed : float) : S_LinearColor_f4abb14b {
+def ue_math_CInterpTo(arg_current : UELinearColor; arg_target : UELinearColor; arg_deltatime : float; arg_interpspeed : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "CInterpTo", "")
     ue_expect_signature(call, "v1;CInterpTo;Current:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Target:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};DeltaTime:FloatProperty:128;InterpSpeed:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "current.r", arg_current.f_r)
-    ue_arg_float(call, "current.g", arg_current.f_g)
-    ue_arg_float(call, "current.b", arg_current.f_b)
-    ue_arg_float(call, "current.a", arg_current.f_a)
-    ue_arg_float(call, "target.r", arg_target.f_r)
-    ue_arg_float(call, "target.g", arg_target.f_g)
-    ue_arg_float(call, "target.b", arg_target.f_b)
-    ue_arg_float(call, "target.a", arg_target.f_a)
+    __ue_method_arg_linear_color(call, "current", arg_current)
+    __ue_method_arg_linear_color(call, "target", arg_target)
     ue_arg_float(call, "deltatime", arg_deltatime)
     ue_arg_float(call, "interpspeed", arg_interpspeed)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -1283,28 +1238,25 @@ def ue_math_Conv_ByteToInt(arg_inbyte : uint8) : int {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_ColorToLinearColor", signature="v1;Conv_ColorToLinearColor;InColor:StructProperty:128:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_Conv_ColorToLinearColor(arg_incolor : S_Color_1d162ca1) : S_LinearColor_f4abb14b {
+def ue_math_Conv_ColorToLinearColor(arg_incolor : UEColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_ColorToLinearColor", "")
     ue_expect_signature(call, "v1;Conv_ColorToLinearColor;InColor:StructProperty:128:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_byte(call, "incolor.b", int(arg_incolor.f_b))
-    ue_arg_byte(call, "incolor.g", int(arg_incolor.f_g))
-    ue_arg_byte(call, "incolor.r", int(arg_incolor.f_r))
-    ue_arg_byte(call, "incolor.a", int(arg_incolor.f_a))
+    __ue_method_arg_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_DoubleToLinearColor", signature="v1;Conv_DoubleToLinearColor;InDouble:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_Conv_DoubleToLinearColor(arg_indouble : double) : S_LinearColor_f4abb14b {
+def ue_math_Conv_DoubleToLinearColor(arg_indouble : double) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_DoubleToLinearColor", "")
     ue_expect_signature(call, "v1;Conv_DoubleToLinearColor;InDouble:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
     ue_arg_double(call, "indouble", arg_indouble)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -1446,30 +1398,24 @@ def ue_math_Conv_IntVectorToVector(arg_inintvector : S_IntVector_1c5addc5) : UEV
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_LinearColorToColor", signature="v1;Conv_LinearColorToColor;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InUseSRGB:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")]
-def ue_math_Conv_LinearColorToColor(arg_inlinearcolor : S_LinearColor_f4abb14b; arg_inusesrgb : bool) : S_Color_1d162ca1 {
+def ue_math_Conv_LinearColorToColor(arg_inlinearcolor : UELinearColor; arg_inusesrgb : bool) : UEColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_LinearColorToColor", "")
     ue_expect_signature(call, "v1;Conv_LinearColorToColor;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InUseSRGB:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inlinearcolor.r", arg_inlinearcolor.f_r)
-    ue_arg_float(call, "inlinearcolor.g", arg_inlinearcolor.f_g)
-    ue_arg_float(call, "inlinearcolor.b", arg_inlinearcolor.f_b)
-    ue_arg_float(call, "inlinearcolor.a", arg_inlinearcolor.f_a)
+    __ue_method_arg_linear_color(call, "inlinearcolor", arg_inlinearcolor)
     ue_arg_bool(call, "inusesrgb", arg_inusesrgb)
     ue_invoke_call(call)
-    let result = S_Color_1d162ca1(f_b = uint8(ue_result_byte(call, "returnvalue.b")), f_g = uint8(ue_result_byte(call, "returnvalue.g")), f_r = uint8(ue_result_byte(call, "returnvalue.r")), f_a = uint8(ue_result_byte(call, "returnvalue.a")))
+    let result = __ue_method_result_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_LinearColorToVector", signature="v1;Conv_LinearColorToVector;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Conv_LinearColorToVector(arg_inlinearcolor : S_LinearColor_f4abb14b) : UEVector {
+def ue_math_Conv_LinearColorToVector(arg_inlinearcolor : UELinearColor) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_LinearColorToVector", "")
     ue_expect_signature(call, "v1;Conv_LinearColorToVector;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inlinearcolor.r", arg_inlinearcolor.f_r)
-    ue_arg_float(call, "inlinearcolor.g", arg_inlinearcolor.f_g)
-    ue_arg_float(call, "inlinearcolor.b", arg_inlinearcolor.f_b)
-    ue_arg_float(call, "inlinearcolor.a", arg_inlinearcolor.f_a)
+    __ue_method_arg_linear_color(call, "inlinearcolor", arg_inlinearcolor)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
     ue_release_call(call)
@@ -1531,13 +1477,13 @@ def ue_math_Conv_MatrixToTransform(arg_inmatrix : S_Matrix_c85cbab4) : UETransfo
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_RotatorToQuaternion", signature="v1;Conv_RotatorToQuaternion;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Conv_RotatorToQuaternion(arg_inrot : UERotator) : S_Quat_82f9549e {
+def ue_math_Conv_RotatorToQuaternion(arg_inrot : UERotator) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_RotatorToQuaternion", "")
     ue_expect_signature(call, "v1;Conv_RotatorToQuaternion;InRot:StructProperty:128:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
     __ue_method_arg_rotator(call, "inrot", arg_inrot)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -1604,7 +1550,7 @@ def ue_math_Conv_Vector2DToVector(arg_invector2d : UEVector2D; arg_z : float) : 
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_Vector4ToQuaternion", signature="v1;Conv_Vector4ToQuaternion;InVec:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Conv_Vector4ToQuaternion(arg_invec : S_Vector4_420fe7b1) : S_Quat_82f9549e {
+def ue_math_Conv_Vector4ToQuaternion(arg_invec : S_Vector4_420fe7b1) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_Vector4ToQuaternion", "")
     ue_expect_signature(call, "v1;Conv_Vector4ToQuaternion;InVec:StructProperty:134218114:/Script/CoreUObject.Vector4\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
@@ -1613,7 +1559,7 @@ def ue_math_Conv_Vector4ToQuaternion(arg_invec : S_Vector4_420fe7b1) : S_Quat_82
     ue_arg_double(call, "invec.z", arg_invec.f_z)
     ue_arg_double(call, "invec.w", arg_invec.f_w)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -1649,25 +1595,25 @@ def ue_math_Conv_Vector4ToVector(arg_invector4 : S_Vector4_420fe7b1) : UEVector 
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_VectorToLinearColor", signature="v1;Conv_VectorToLinearColor;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_Conv_VectorToLinearColor(arg_invec : UEVector) : S_LinearColor_f4abb14b {
+def ue_math_Conv_VectorToLinearColor(arg_invec : UEVector) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_VectorToLinearColor", "")
     ue_expect_signature(call, "v1;Conv_VectorToLinearColor;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "invec", arg_invec)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Conv_VectorToQuaternion", signature="v1;Conv_VectorToQuaternion;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Conv_VectorToQuaternion(arg_invec : UEVector) : S_Quat_82f9549e {
+def ue_math_Conv_VectorToQuaternion(arg_invec : UEVector) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Conv_VectorToQuaternion", "")
     ue_expect_signature(call, "v1;Conv_VectorToQuaternion;InVec:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "invec", arg_invec)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -2034,20 +1980,14 @@ def ue_math_Divide_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_IntPo
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Divide_LinearColorLinearColor", signature="v1;Divide_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_Divide_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
+def ue_math_Divide_LinearColorLinearColor(arg_a : UELinearColor; arg_b : UELinearColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Divide_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;Divide_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
-    ue_arg_float(call, "b.r", arg_b.f_r)
-    ue_arg_float(call, "b.g", arg_b.f_g)
-    ue_arg_float(call, "b.b", arg_b.f_b)
-    ue_arg_float(call, "b.a", arg_b.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
+    __ue_method_arg_linear_color(call, "b", arg_b)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -2276,18 +2216,12 @@ def ue_math_EqualEqual_IntInt(arg_a : int; arg_b : int) : bool {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_LinearColorLinearColor", signature="v1;EqualEqual_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")]
-def ue_math_EqualEqual_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : bool {
+def ue_math_EqualEqual_LinearColorLinearColor(arg_a : UELinearColor; arg_b : UELinearColor) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;EqualEqual_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
-    ue_arg_float(call, "b.r", arg_b.f_r)
-    ue_arg_float(call, "b.g", arg_b.f_g)
-    ue_arg_float(call, "b.b", arg_b.f_b)
-    ue_arg_float(call, "b.a", arg_b.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
+    __ue_method_arg_linear_color(call, "b", arg_b)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
     ue_release_call(call)
@@ -2365,18 +2299,12 @@ def ue_math_EqualEqual_ObjectObject(arg_a : C_Object_55c3753a; arg_b : C_Object_
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="EqualEqual_QuatQuat", signature="v1;EqualEqual_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
-def ue_math_EqualEqual_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e; arg_tolerance : float) : bool {
+def ue_math_EqualEqual_QuatQuat(arg_a : UEQuat; arg_b : UEQuat; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "EqualEqual_QuatQuat", "")
     ue_expect_signature(call, "v1;EqualEqual_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "a.x", arg_a.f_x)
-    ue_arg_double(call, "a.y", arg_a.f_y)
-    ue_arg_double(call, "a.z", arg_a.f_z)
-    ue_arg_double(call, "a.w", arg_a.f_w)
-    ue_arg_double(call, "b.x", arg_b.f_x)
-    ue_arg_double(call, "b.y", arg_b.f_y)
-    ue_arg_double(call, "b.z", arg_b.f_z)
-    ue_arg_double(call, "b.w", arg_b.f_w)
+    __ue_method_arg_quat(call, "a", arg_a)
+    __ue_method_arg_quat(call, "b", arg_b)
     ue_arg_float(call, "tolerance", arg_tolerance)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
@@ -3239,7 +3167,7 @@ def ue_math_GridSnap_Float(arg_location : double; arg_gridsize : double) : doubl
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="HSVToRGB", signature="v1;HSVToRGB;H:FloatProperty:128;S:FloatProperty:128;V:FloatProperty:128;A:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_HSVToRGB(arg_h : float; arg_s : float; arg_v : float; arg_a : float) : S_LinearColor_f4abb14b {
+def ue_math_HSVToRGB(arg_h : float; arg_s : float; arg_v : float; arg_a : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "HSVToRGB", "")
     ue_expect_signature(call, "v1;HSVToRGB;H:FloatProperty:128;S:FloatProperty:128;V:FloatProperty:128;A:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
@@ -3248,37 +3176,31 @@ def ue_math_HSVToRGB(arg_h : float; arg_s : float; arg_v : float; arg_a : float)
     ue_arg_float(call, "v", arg_v)
     ue_arg_float(call, "a", arg_a)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="HSVToRGBLinear", signature="v1;HSVToRGBLinear;HSV:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_HSVToRGBLinear(arg_hsv : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
+def ue_math_HSVToRGBLinear(arg_hsv : UELinearColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "HSVToRGBLinear", "")
     ue_expect_signature(call, "v1;HSVToRGBLinear;HSV:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "hsv.r", arg_hsv.f_r)
-    ue_arg_float(call, "hsv.g", arg_hsv.f_g)
-    ue_arg_float(call, "hsv.b", arg_hsv.f_b)
-    ue_arg_float(call, "hsv.a", arg_hsv.f_a)
+    __ue_method_arg_linear_color(call, "hsv", arg_hsv)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="HSVToRGB_Vector", signature="v1;HSVToRGB_Vector;HSV:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};RGB:StructProperty:384:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_HSVToRGB_Vector(arg_hsv : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
+def ue_math_HSVToRGB_Vector(arg_hsv : UELinearColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "HSVToRGB_Vector", "")
     ue_expect_signature(call, "v1;HSVToRGB_Vector;HSV:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};RGB:StructProperty:384:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "hsv.r", arg_hsv.f_r)
-    ue_arg_float(call, "hsv.g", arg_hsv.f_g)
-    ue_arg_float(call, "hsv.b", arg_hsv.f_b)
-    ue_arg_float(call, "hsv.a", arg_hsv.f_a)
+    __ue_method_arg_linear_color(call, "hsv", arg_hsv)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "rgb.r"), f_g = ue_result_float(call, "rgb.g"), f_b = ue_result_float(call, "rgb.b"), f_a = ue_result_float(call, "rgb.a"))
+    let result = __ue_method_result_linear_color(call, "rgb")
     ue_release_call(call)
     return result
 }
@@ -3691,96 +3613,75 @@ def ue_math_LinePlaneIntersection_OriginNormal(arg_linestart : UEVector; arg_lin
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColorLerp", signature="v1;LinearColorLerp;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Alpha:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColorLerp(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b; arg_alpha : float) : S_LinearColor_f4abb14b {
+def ue_math_LinearColorLerp(arg_a : UELinearColor; arg_b : UELinearColor; arg_alpha : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColorLerp", "")
     ue_expect_signature(call, "v1;LinearColorLerp;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Alpha:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
-    ue_arg_float(call, "b.r", arg_b.f_r)
-    ue_arg_float(call, "b.g", arg_b.f_g)
-    ue_arg_float(call, "b.b", arg_b.f_b)
-    ue_arg_float(call, "b.a", arg_b.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
+    __ue_method_arg_linear_color(call, "b", arg_b)
     ue_arg_float(call, "alpha", arg_alpha)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColorLerpUsingHSV", signature="v1;LinearColorLerpUsingHSV;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Alpha:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColorLerpUsingHSV(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b; arg_alpha : float) : S_LinearColor_f4abb14b {
+def ue_math_LinearColorLerpUsingHSV(arg_a : UELinearColor; arg_b : UELinearColor; arg_alpha : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColorLerpUsingHSV", "")
     ue_expect_signature(call, "v1;LinearColorLerpUsingHSV;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Alpha:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
-    ue_arg_float(call, "b.r", arg_b.f_r)
-    ue_arg_float(call, "b.g", arg_b.f_g)
-    ue_arg_float(call, "b.b", arg_b.f_b)
-    ue_arg_float(call, "b.a", arg_b.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
+    __ue_method_arg_linear_color(call, "b", arg_b)
     ue_arg_float(call, "alpha", arg_alpha)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Black", signature="v1;LinearColor_Black;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_Black() : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_Black() : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Black", "")
     ue_expect_signature(call, "v1;LinearColor_Black;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Blue", signature="v1;LinearColor_Blue;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_Blue() : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_Blue() : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Blue", "")
     ue_expect_signature(call, "v1;LinearColor_Blue;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Desaturated", signature="v1;LinearColor_Desaturated;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InDesaturation:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_Desaturated(arg_incolor : S_LinearColor_f4abb14b; arg_indesaturation : float) : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_Desaturated(arg_incolor : UELinearColor; arg_indesaturation : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Desaturated", "")
     ue_expect_signature(call, "v1;LinearColor_Desaturated;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InDesaturation:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_arg_float(call, "indesaturation", arg_indesaturation)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Distance", signature="v1;LinearColor_Distance;C1:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};C2:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")]
-def ue_math_LinearColor_Distance(arg_c1 : S_LinearColor_f4abb14b; arg_c2 : S_LinearColor_f4abb14b) : float {
+def ue_math_LinearColor_Distance(arg_c1 : UELinearColor; arg_c2 : UELinearColor) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Distance", "")
     ue_expect_signature(call, "v1;LinearColor_Distance;C1:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};C2:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "c1.r", arg_c1.f_r)
-    ue_arg_float(call, "c1.g", arg_c1.f_g)
-    ue_arg_float(call, "c1.b", arg_c1.f_b)
-    ue_arg_float(call, "c1.a", arg_c1.f_a)
-    ue_arg_float(call, "c2.r", arg_c2.f_r)
-    ue_arg_float(call, "c2.g", arg_c2.f_g)
-    ue_arg_float(call, "c2.b", arg_c2.f_b)
-    ue_arg_float(call, "c2.a", arg_c2.f_a)
+    __ue_method_arg_linear_color(call, "c1", arg_c1)
+    __ue_method_arg_linear_color(call, "c2", arg_c2)
     ue_invoke_call(call)
     let result = ue_result_float(call, "returnvalue")
     ue_release_call(call)
@@ -3788,14 +3689,11 @@ def ue_math_LinearColor_Distance(arg_c1 : S_LinearColor_f4abb14b; arg_c2 : S_Lin
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_GetLuminance", signature="v1;LinearColor_GetLuminance;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")]
-def ue_math_LinearColor_GetLuminance(arg_incolor : S_LinearColor_f4abb14b) : float {
+def ue_math_LinearColor_GetLuminance(arg_incolor : UELinearColor) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_GetLuminance", "")
     ue_expect_signature(call, "v1;LinearColor_GetLuminance;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
     let result = ue_result_float(call, "returnvalue")
     ue_release_call(call)
@@ -3803,14 +3701,11 @@ def ue_math_LinearColor_GetLuminance(arg_incolor : S_LinearColor_f4abb14b) : flo
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_GetMax", signature="v1;LinearColor_GetMax;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")]
-def ue_math_LinearColor_GetMax(arg_incolor : S_LinearColor_f4abb14b) : float {
+def ue_math_LinearColor_GetMax(arg_incolor : UELinearColor) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_GetMax", "")
     ue_expect_signature(call, "v1;LinearColor_GetMax;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
     let result = ue_result_float(call, "returnvalue")
     ue_release_call(call)
@@ -3818,14 +3713,11 @@ def ue_math_LinearColor_GetMax(arg_incolor : S_LinearColor_f4abb14b) : float {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_GetMin", signature="v1;LinearColor_GetMin;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")]
-def ue_math_LinearColor_GetMin(arg_incolor : S_LinearColor_f4abb14b) : float {
+def ue_math_LinearColor_GetMin(arg_incolor : UELinearColor) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_GetMin", "")
     ue_expect_signature(call, "v1;LinearColor_GetMin;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:FloatProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
     let result = ue_result_float(call, "returnvalue")
     ue_release_call(call)
@@ -3833,40 +3725,34 @@ def ue_math_LinearColor_GetMin(arg_incolor : S_LinearColor_f4abb14b) : float {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Gray", signature="v1;LinearColor_Gray;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_Gray() : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_Gray() : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Gray", "")
     ue_expect_signature(call, "v1;LinearColor_Gray;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Green", signature="v1;LinearColor_Green;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_Green() : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_Green() : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Green", "")
     ue_expect_signature(call, "v1;LinearColor_Green;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_IsNearEqual", signature="v1;LinearColor_IsNearEqual;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
-def ue_math_LinearColor_IsNearEqual(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b; arg_tolerance : float) : bool {
+def ue_math_LinearColor_IsNearEqual(arg_a : UELinearColor; arg_b : UELinearColor; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_IsNearEqual", "")
     ue_expect_signature(call, "v1;LinearColor_IsNearEqual;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
-    ue_arg_float(call, "b.r", arg_b.f_r)
-    ue_arg_float(call, "b.g", arg_b.f_g)
-    ue_arg_float(call, "b.b", arg_b.f_b)
-    ue_arg_float(call, "b.a", arg_b.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
+    __ue_method_arg_linear_color(call, "b", arg_b)
     ue_arg_float(call, "tolerance", arg_tolerance)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
@@ -3875,217 +3761,178 @@ def ue_math_LinearColor_IsNearEqual(arg_a : S_LinearColor_f4abb14b; arg_b : S_Li
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_QuantizeRound", signature="v1;LinearColor_QuantizeRound;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")]
-def ue_math_LinearColor_QuantizeRound(arg_incolor : S_LinearColor_f4abb14b) : S_Color_1d162ca1 {
+def ue_math_LinearColor_QuantizeRound(arg_incolor : UELinearColor) : UEColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_QuantizeRound", "")
     ue_expect_signature(call, "v1;LinearColor_QuantizeRound;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
-    let result = S_Color_1d162ca1(f_b = uint8(ue_result_byte(call, "returnvalue.b")), f_g = uint8(ue_result_byte(call, "returnvalue.g")), f_r = uint8(ue_result_byte(call, "returnvalue.r")), f_a = uint8(ue_result_byte(call, "returnvalue.a")))
+    let result = __ue_method_result_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Red", signature="v1;LinearColor_Red;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_Red() : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_Red() : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Red", "")
     ue_expect_signature(call, "v1;LinearColor_Red;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Set", signature="v1;LinearColor_Set;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_Set(arg_inoutcolor : S_LinearColor_f4abb14b; arg_incolor : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_Set(arg_inoutcolor : UELinearColor; arg_incolor : UELinearColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Set", "")
     ue_expect_signature(call, "v1;LinearColor_Set;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inoutcolor.r", arg_inoutcolor.f_r)
-    ue_arg_float(call, "inoutcolor.g", arg_inoutcolor.f_g)
-    ue_arg_float(call, "inoutcolor.b", arg_inoutcolor.f_b)
-    ue_arg_float(call, "inoutcolor.a", arg_inoutcolor.f_a)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "inoutcolor", arg_inoutcolor)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "inoutcolor.r"), f_g = ue_result_float(call, "inoutcolor.g"), f_b = ue_result_float(call, "inoutcolor.b"), f_a = ue_result_float(call, "inoutcolor.a"))
+    let result = __ue_method_result_linear_color(call, "inoutcolor")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetFromHSV", signature="v1;LinearColor_SetFromHSV;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};H:FloatProperty:128;S:FloatProperty:128;V:FloatProperty:128;A:FloatProperty:128;")]
-def ue_math_LinearColor_SetFromHSV(arg_inoutcolor : S_LinearColor_f4abb14b; arg_h : float; arg_s : float; arg_v : float; arg_a : float) : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_SetFromHSV(arg_inoutcolor : UELinearColor; arg_h : float; arg_s : float; arg_v : float; arg_a : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetFromHSV", "")
     ue_expect_signature(call, "v1;LinearColor_SetFromHSV;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};H:FloatProperty:128;S:FloatProperty:128;V:FloatProperty:128;A:FloatProperty:128;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inoutcolor.r", arg_inoutcolor.f_r)
-    ue_arg_float(call, "inoutcolor.g", arg_inoutcolor.f_g)
-    ue_arg_float(call, "inoutcolor.b", arg_inoutcolor.f_b)
-    ue_arg_float(call, "inoutcolor.a", arg_inoutcolor.f_a)
+    __ue_method_arg_linear_color(call, "inoutcolor", arg_inoutcolor)
     ue_arg_float(call, "h", arg_h)
     ue_arg_float(call, "s", arg_s)
     ue_arg_float(call, "v", arg_v)
     ue_arg_float(call, "a", arg_a)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "inoutcolor.r"), f_g = ue_result_float(call, "inoutcolor.g"), f_b = ue_result_float(call, "inoutcolor.b"), f_a = ue_result_float(call, "inoutcolor.a"))
+    let result = __ue_method_result_linear_color(call, "inoutcolor")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetFromPow22", signature="v1;LinearColor_SetFromPow22;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InColor:StructProperty:134218114:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")]
-def ue_math_LinearColor_SetFromPow22(arg_inoutcolor : S_LinearColor_f4abb14b; arg_incolor : S_Color_1d162ca1) : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_SetFromPow22(arg_inoutcolor : UELinearColor; arg_incolor : UEColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetFromPow22", "")
     ue_expect_signature(call, "v1;LinearColor_SetFromPow22;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InColor:StructProperty:134218114:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inoutcolor.r", arg_inoutcolor.f_r)
-    ue_arg_float(call, "inoutcolor.g", arg_inoutcolor.f_g)
-    ue_arg_float(call, "inoutcolor.b", arg_inoutcolor.f_b)
-    ue_arg_float(call, "inoutcolor.a", arg_inoutcolor.f_a)
-    ue_arg_byte(call, "incolor.b", int(arg_incolor.f_b))
-    ue_arg_byte(call, "incolor.g", int(arg_incolor.f_g))
-    ue_arg_byte(call, "incolor.r", int(arg_incolor.f_r))
-    ue_arg_byte(call, "incolor.a", int(arg_incolor.f_a))
+    __ue_method_arg_linear_color(call, "inoutcolor", arg_inoutcolor)
+    __ue_method_arg_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "inoutcolor.r"), f_g = ue_result_float(call, "inoutcolor.g"), f_b = ue_result_float(call, "inoutcolor.b"), f_a = ue_result_float(call, "inoutcolor.a"))
+    let result = __ue_method_result_linear_color(call, "inoutcolor")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetFromSRGB", signature="v1;LinearColor_SetFromSRGB;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InSRGB:StructProperty:134218114:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")]
-def ue_math_LinearColor_SetFromSRGB(arg_inoutcolor : S_LinearColor_f4abb14b; arg_insrgb : S_Color_1d162ca1) : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_SetFromSRGB(arg_inoutcolor : UELinearColor; arg_insrgb : UEColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetFromSRGB", "")
     ue_expect_signature(call, "v1;LinearColor_SetFromSRGB;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InSRGB:StructProperty:134218114:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inoutcolor.r", arg_inoutcolor.f_r)
-    ue_arg_float(call, "inoutcolor.g", arg_inoutcolor.f_g)
-    ue_arg_float(call, "inoutcolor.b", arg_inoutcolor.f_b)
-    ue_arg_float(call, "inoutcolor.a", arg_inoutcolor.f_a)
-    ue_arg_byte(call, "insrgb.b", int(arg_insrgb.f_b))
-    ue_arg_byte(call, "insrgb.g", int(arg_insrgb.f_g))
-    ue_arg_byte(call, "insrgb.r", int(arg_insrgb.f_r))
-    ue_arg_byte(call, "insrgb.a", int(arg_insrgb.f_a))
+    __ue_method_arg_linear_color(call, "inoutcolor", arg_inoutcolor)
+    __ue_method_arg_color(call, "insrgb", arg_insrgb)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "inoutcolor.r"), f_g = ue_result_float(call, "inoutcolor.g"), f_b = ue_result_float(call, "inoutcolor.b"), f_a = ue_result_float(call, "inoutcolor.a"))
+    let result = __ue_method_result_linear_color(call, "inoutcolor")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetRGBA", signature="v1;LinearColor_SetRGBA;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};R:FloatProperty:128;G:FloatProperty:128;B:FloatProperty:128;A:FloatProperty:128;")]
-def ue_math_LinearColor_SetRGBA(arg_inoutcolor : S_LinearColor_f4abb14b; arg_r : float; arg_g : float; arg_b : float; arg_a : float) : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_SetRGBA(arg_inoutcolor : UELinearColor; arg_r : float; arg_g : float; arg_b : float; arg_a : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetRGBA", "")
     ue_expect_signature(call, "v1;LinearColor_SetRGBA;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};R:FloatProperty:128;G:FloatProperty:128;B:FloatProperty:128;A:FloatProperty:128;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inoutcolor.r", arg_inoutcolor.f_r)
-    ue_arg_float(call, "inoutcolor.g", arg_inoutcolor.f_g)
-    ue_arg_float(call, "inoutcolor.b", arg_inoutcolor.f_b)
-    ue_arg_float(call, "inoutcolor.a", arg_inoutcolor.f_a)
+    __ue_method_arg_linear_color(call, "inoutcolor", arg_inoutcolor)
     ue_arg_float(call, "r", arg_r)
     ue_arg_float(call, "g", arg_g)
     ue_arg_float(call, "b", arg_b)
     ue_arg_float(call, "a", arg_a)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "inoutcolor.r"), f_g = ue_result_float(call, "inoutcolor.g"), f_b = ue_result_float(call, "inoutcolor.b"), f_a = ue_result_float(call, "inoutcolor.a"))
+    let result = __ue_method_result_linear_color(call, "inoutcolor")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetRandomHue", signature="v1;LinearColor_SetRandomHue;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_SetRandomHue(arg_inoutcolor : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_SetRandomHue(arg_inoutcolor : UELinearColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetRandomHue", "")
     ue_expect_signature(call, "v1;LinearColor_SetRandomHue;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inoutcolor.r", arg_inoutcolor.f_r)
-    ue_arg_float(call, "inoutcolor.g", arg_inoutcolor.f_g)
-    ue_arg_float(call, "inoutcolor.b", arg_inoutcolor.f_b)
-    ue_arg_float(call, "inoutcolor.a", arg_inoutcolor.f_a)
+    __ue_method_arg_linear_color(call, "inoutcolor", arg_inoutcolor)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "inoutcolor.r"), f_g = ue_result_float(call, "inoutcolor.g"), f_b = ue_result_float(call, "inoutcolor.b"), f_a = ue_result_float(call, "inoutcolor.a"))
+    let result = __ue_method_result_linear_color(call, "inoutcolor")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_SetTemperature", signature="v1;LinearColor_SetTemperature;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InTemperature:FloatProperty:128;")]
-def ue_math_LinearColor_SetTemperature(arg_inoutcolor : S_LinearColor_f4abb14b; arg_intemperature : float) : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_SetTemperature(arg_inoutcolor : UELinearColor; arg_intemperature : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_SetTemperature", "")
     ue_expect_signature(call, "v1;LinearColor_SetTemperature;InOutColor:StructProperty:134218112:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InTemperature:FloatProperty:128;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inoutcolor.r", arg_inoutcolor.f_r)
-    ue_arg_float(call, "inoutcolor.g", arg_inoutcolor.f_g)
-    ue_arg_float(call, "inoutcolor.b", arg_inoutcolor.f_b)
-    ue_arg_float(call, "inoutcolor.a", arg_inoutcolor.f_a)
+    __ue_method_arg_linear_color(call, "inoutcolor", arg_inoutcolor)
     ue_arg_float(call, "intemperature", arg_intemperature)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "inoutcolor.r"), f_g = ue_result_float(call, "inoutcolor.g"), f_b = ue_result_float(call, "inoutcolor.b"), f_a = ue_result_float(call, "inoutcolor.a"))
+    let result = __ue_method_result_linear_color(call, "inoutcolor")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_ToNewOpacity", signature="v1;LinearColor_ToNewOpacity;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InOpacity:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_ToNewOpacity(arg_incolor : S_LinearColor_f4abb14b; arg_inopacity : float) : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_ToNewOpacity(arg_incolor : UELinearColor; arg_inopacity : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_ToNewOpacity", "")
     ue_expect_signature(call, "v1;LinearColor_ToNewOpacity;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};InOpacity:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_arg_float(call, "inopacity", arg_inopacity)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_ToRGBE", signature="v1;LinearColor_ToRGBE;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")]
-def ue_math_LinearColor_ToRGBE(arg_inlinearcolor : S_LinearColor_f4abb14b) : S_Color_1d162ca1 {
+def ue_math_LinearColor_ToRGBE(arg_inlinearcolor : UELinearColor) : UEColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_ToRGBE", "")
     ue_expect_signature(call, "v1;LinearColor_ToRGBE;InLinearColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Color\{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "inlinearcolor.r", arg_inlinearcolor.f_r)
-    ue_arg_float(call, "inlinearcolor.g", arg_inlinearcolor.f_g)
-    ue_arg_float(call, "inlinearcolor.b", arg_inlinearcolor.f_b)
-    ue_arg_float(call, "inlinearcolor.a", arg_inlinearcolor.f_a)
+    __ue_method_arg_linear_color(call, "inlinearcolor", arg_inlinearcolor)
     ue_invoke_call(call)
-    let result = S_Color_1d162ca1(f_b = uint8(ue_result_byte(call, "returnvalue.b")), f_g = uint8(ue_result_byte(call, "returnvalue.g")), f_r = uint8(ue_result_byte(call, "returnvalue.r")), f_a = uint8(ue_result_byte(call, "returnvalue.a")))
+    let result = __ue_method_result_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Transparent", signature="v1;LinearColor_Transparent;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_Transparent() : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_Transparent() : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Transparent", "")
     ue_expect_signature(call, "v1;LinearColor_Transparent;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_White", signature="v1;LinearColor_White;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_White() : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_White() : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_White", "")
     ue_expect_signature(call, "v1;LinearColor_White;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="LinearColor_Yellow", signature="v1;LinearColor_Yellow;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_LinearColor_Yellow() : S_LinearColor_f4abb14b {
+def ue_math_LinearColor_Yellow() : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "LinearColor_Yellow", "")
     ue_expect_signature(call, "v1;LinearColor_Yellow;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -4169,7 +4016,7 @@ def ue_math_MakeBoxWithOrigin(arg_origin : UEVector; arg_extent : UEVector) : S_
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeColor", signature="v1;MakeColor;R:FloatProperty:128;G:FloatProperty:128;B:FloatProperty:128;A:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_MakeColor(arg_r : float; arg_g : float; arg_b : float; arg_a : float) : S_LinearColor_f4abb14b {
+def ue_math_MakeColor(arg_r : float; arg_g : float; arg_b : float; arg_a : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeColor", "")
     ue_expect_signature(call, "v1;MakeColor;R:FloatProperty:128;G:FloatProperty:128;B:FloatProperty:128;A:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
@@ -4178,7 +4025,7 @@ def ue_math_MakeColor(arg_r : float; arg_g : float; arg_b : float; arg_a : float
     ue_arg_float(call, "b", arg_b)
     ue_arg_float(call, "a", arg_a)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -4253,7 +4100,7 @@ def ue_math_MakeQualifiedFrameTime(arg_frame : S_FrameNumber_206b76b9; arg_frame
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="MakeQuat", signature="v1;MakeQuat;X:FloatProperty:128;Y:FloatProperty:128;Z:FloatProperty:128;W:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_MakeQuat(arg_x : float; arg_y : float; arg_z : float; arg_w : float) : S_Quat_82f9549e {
+def ue_math_MakeQuat(arg_x : float; arg_y : float; arg_z : float; arg_w : float) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "MakeQuat", "")
     ue_expect_signature(call, "v1;MakeQuat;X:FloatProperty:128;Y:FloatProperty:128;Z:FloatProperty:128;W:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
@@ -4262,7 +4109,7 @@ def ue_math_MakeQuat(arg_x : float; arg_y : float; arg_z : float; arg_w : float)
     ue_arg_float(call, "z", arg_z)
     ue_arg_float(call, "w", arg_w)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -5555,7 +5402,7 @@ def ue_math_Matrix_SetOrigin(arg_m : S_Matrix_c85cbab4; arg_neworigin : UEVector
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Matrix_ToQuat", signature="v1;Matrix_ToQuat;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Matrix_ToQuat(arg_m : S_Matrix_c85cbab4) : S_Quat_82f9549e {
+def ue_math_Matrix_ToQuat(arg_m : S_Matrix_c85cbab4) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Matrix_ToQuat", "")
     ue_expect_signature(call, "v1;Matrix_ToQuat;M:StructProperty:134218114:/Script/CoreUObject.Matrix\{XPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};YPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ZPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};WPlane:StructProperty:0:/Script/CoreUObject.Plane\{W:DoubleProperty:0;X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
@@ -5576,7 +5423,7 @@ def ue_math_Matrix_ToQuat(arg_m : S_Matrix_c85cbab4) : S_Quat_82f9549e {
     ue_arg_double(call, "m.wplane.y", arg_m.f_wplane.f_y)
     ue_arg_double(call, "m.wplane.z", arg_m.f_wplane.f_z)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -5973,36 +5820,27 @@ def ue_math_Multiply_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_Int
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_LinearColorFloat", signature="v1;Multiply_LinearColorFloat;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_Multiply_LinearColorFloat(arg_a : S_LinearColor_f4abb14b; arg_b : float) : S_LinearColor_f4abb14b {
+def ue_math_Multiply_LinearColorFloat(arg_a : UELinearColor; arg_b : float) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_LinearColorFloat", "")
     ue_expect_signature(call, "v1;Multiply_LinearColorFloat;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
     ue_arg_float(call, "b", arg_b)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_LinearColorLinearColor", signature="v1;Multiply_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_Multiply_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
+def ue_math_Multiply_LinearColorLinearColor(arg_a : UELinearColor; arg_b : UELinearColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;Multiply_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
-    ue_arg_float(call, "b.r", arg_b.f_r)
-    ue_arg_float(call, "b.g", arg_b.f_g)
-    ue_arg_float(call, "b.b", arg_b.f_b)
-    ue_arg_float(call, "b.a", arg_b.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
+    __ue_method_arg_linear_color(call, "b", arg_b)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -6079,20 +5917,14 @@ def ue_math_Multiply_MatrixMatrix(arg_a : S_Matrix_c85cbab4; arg_b : S_Matrix_c8
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Multiply_QuatQuat", signature="v1;Multiply_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Multiply_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Quat_82f9549e {
+def ue_math_Multiply_QuatQuat(arg_a : UEQuat; arg_b : UEQuat) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Multiply_QuatQuat", "")
     ue_expect_signature(call, "v1;Multiply_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "a.x", arg_a.f_x)
-    ue_arg_double(call, "a.y", arg_a.f_y)
-    ue_arg_double(call, "a.z", arg_a.f_z)
-    ue_arg_double(call, "a.w", arg_a.f_w)
-    ue_arg_double(call, "b.x", arg_b.f_x)
-    ue_arg_double(call, "b.y", arg_b.f_y)
-    ue_arg_double(call, "b.z", arg_b.f_z)
-    ue_arg_double(call, "b.w", arg_b.f_w)
+    __ue_method_arg_quat(call, "a", arg_a)
+    __ue_method_arg_quat(call, "b", arg_b)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -6489,18 +6321,12 @@ def ue_math_NotEqual_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_Int
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_LinearColorLinearColor", signature="v1;NotEqual_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")]
-def ue_math_NotEqual_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : bool {
+def ue_math_NotEqual_LinearColorLinearColor(arg_a : UELinearColor; arg_b : UELinearColor) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;NotEqual_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
-    ue_arg_float(call, "b.r", arg_b.f_r)
-    ue_arg_float(call, "b.g", arg_b.f_g)
-    ue_arg_float(call, "b.b", arg_b.f_b)
-    ue_arg_float(call, "b.a", arg_b.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
+    __ue_method_arg_linear_color(call, "b", arg_b)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
     ue_release_call(call)
@@ -6578,18 +6404,12 @@ def ue_math_NotEqual_ObjectObject(arg_a : C_Object_55c3753a; arg_b : C_Object_55
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="NotEqual_QuatQuat", signature="v1;NotEqual_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
-def ue_math_NotEqual_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e; arg_errortolerance : float) : bool {
+def ue_math_NotEqual_QuatQuat(arg_a : UEQuat; arg_b : UEQuat; arg_errortolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "NotEqual_QuatQuat", "")
     ue_expect_signature(call, "v1;NotEqual_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ErrorTolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "a.x", arg_a.f_x)
-    ue_arg_double(call, "a.y", arg_a.f_y)
-    ue_arg_double(call, "a.z", arg_a.f_z)
-    ue_arg_double(call, "a.w", arg_a.f_w)
-    ue_arg_double(call, "b.x", arg_b.f_x)
-    ue_arg_double(call, "b.y", arg_b.f_y)
-    ue_arg_double(call, "b.z", arg_b.f_z)
-    ue_arg_double(call, "b.w", arg_b.f_w)
+    __ue_method_arg_quat(call, "a", arg_a)
+    __ue_method_arg_quat(call, "b", arg_b)
     ue_arg_float(call, "errortolerance", arg_errortolerance)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
@@ -6791,18 +6611,12 @@ def ue_math_ProjectVectorOnToVector(arg_v : UEVector; arg_target : UEVector) : U
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_AngularDistance", signature="v1;Quat_AngularDistance;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")]
-def ue_math_Quat_AngularDistance(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : float {
+def ue_math_Quat_AngularDistance(arg_a : UEQuat; arg_b : UEQuat) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_AngularDistance", "")
     ue_expect_signature(call, "v1;Quat_AngularDistance;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "a.x", arg_a.f_x)
-    ue_arg_double(call, "a.y", arg_a.f_y)
-    ue_arg_double(call, "a.z", arg_a.f_z)
-    ue_arg_double(call, "a.w", arg_a.f_w)
-    ue_arg_double(call, "b.x", arg_b.f_x)
-    ue_arg_double(call, "b.y", arg_b.f_y)
-    ue_arg_double(call, "b.z", arg_b.f_z)
-    ue_arg_double(call, "b.w", arg_b.f_w)
+    __ue_method_arg_quat(call, "a", arg_a)
+    __ue_method_arg_quat(call, "b", arg_b)
     ue_invoke_call(call)
     let result = ue_result_float(call, "returnvalue")
     ue_release_call(call)
@@ -6810,33 +6624,24 @@ def ue_math_Quat_AngularDistance(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_EnforceShortestArcWith", signature="v1;Quat_EnforceShortestArcWith;A:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_EnforceShortestArcWith(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Quat_82f9549e {
+def ue_math_Quat_EnforceShortestArcWith(arg_a : UEQuat; arg_b : UEQuat) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_EnforceShortestArcWith", "")
     ue_expect_signature(call, "v1;Quat_EnforceShortestArcWith;A:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "a.x", arg_a.f_x)
-    ue_arg_double(call, "a.y", arg_a.f_y)
-    ue_arg_double(call, "a.z", arg_a.f_z)
-    ue_arg_double(call, "a.w", arg_a.f_w)
-    ue_arg_double(call, "b.x", arg_b.f_x)
-    ue_arg_double(call, "b.y", arg_b.f_y)
-    ue_arg_double(call, "b.z", arg_b.f_z)
-    ue_arg_double(call, "b.w", arg_b.f_w)
+    __ue_method_arg_quat(call, "a", arg_a)
+    __ue_method_arg_quat(call, "b", arg_b)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "a.x"), f_y = ue_result_double(call, "a.y"), f_z = ue_result_double(call, "a.z"), f_w = ue_result_double(call, "a.w"))
+    let result = __ue_method_result_quat(call, "a")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Euler", signature="v1;Quat_Euler;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_Euler(arg_q : S_Quat_82f9549e) : UEVector {
+def ue_math_Quat_Euler(arg_q : UEQuat) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Euler", "")
     ue_expect_signature(call, "v1;Quat_Euler;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
     ue_release_call(call)
@@ -6844,55 +6649,49 @@ def ue_math_Quat_Euler(arg_q : S_Quat_82f9549e) : UEVector {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Exp", signature="v1;Quat_Exp;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_Exp(arg_q : S_Quat_82f9549e) : S_Quat_82f9549e {
+def ue_math_Quat_Exp(arg_q : UEQuat) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Exp", "")
     ue_expect_signature(call, "v1;Quat_Exp;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_FindBetweenNormals", signature="v1;Quat_FindBetweenNormals;StartNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};EndNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_FindBetweenNormals(arg_startnormal : UEVector; arg_endnormal : UEVector) : S_Quat_82f9549e {
+def ue_math_Quat_FindBetweenNormals(arg_startnormal : UEVector; arg_endnormal : UEVector) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_FindBetweenNormals", "")
     ue_expect_signature(call, "v1;Quat_FindBetweenNormals;StartNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};EndNormal:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "startnormal", arg_startnormal)
     __ue_method_arg_vector(call, "endnormal", arg_endnormal)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_FindBetweenVectors", signature="v1;Quat_FindBetweenVectors;Start:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};End:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_FindBetweenVectors(arg_start : UEVector; arg_end : UEVector) : S_Quat_82f9549e {
+def ue_math_Quat_FindBetweenVectors(arg_start : UEVector; arg_end : UEVector) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_FindBetweenVectors", "")
     ue_expect_signature(call, "v1;Quat_FindBetweenVectors;Start:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};End:StructProperty:128:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "start", arg_start)
     __ue_method_arg_vector(call, "end", arg_end)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetAngle", signature="v1;Quat_GetAngle;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")]
-def ue_math_Quat_GetAngle(arg_q : S_Quat_82f9549e) : float {
+def ue_math_Quat_GetAngle(arg_q : UEQuat) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetAngle", "")
     ue_expect_signature(call, "v1;Quat_GetAngle;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = ue_result_float(call, "returnvalue")
     ue_release_call(call)
@@ -6900,14 +6699,11 @@ def ue_math_Quat_GetAngle(arg_q : S_Quat_82f9549e) : float {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetAxisX", signature="v1;Quat_GetAxisX;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_GetAxisX(arg_q : S_Quat_82f9549e) : UEVector {
+def ue_math_Quat_GetAxisX(arg_q : UEQuat) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetAxisX", "")
     ue_expect_signature(call, "v1;Quat_GetAxisX;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
     ue_release_call(call)
@@ -6915,14 +6711,11 @@ def ue_math_Quat_GetAxisX(arg_q : S_Quat_82f9549e) : UEVector {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetAxisY", signature="v1;Quat_GetAxisY;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_GetAxisY(arg_q : S_Quat_82f9549e) : UEVector {
+def ue_math_Quat_GetAxisY(arg_q : UEQuat) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetAxisY", "")
     ue_expect_signature(call, "v1;Quat_GetAxisY;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
     ue_release_call(call)
@@ -6930,14 +6723,11 @@ def ue_math_Quat_GetAxisY(arg_q : S_Quat_82f9549e) : UEVector {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetAxisZ", signature="v1;Quat_GetAxisZ;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_GetAxisZ(arg_q : S_Quat_82f9549e) : UEVector {
+def ue_math_Quat_GetAxisZ(arg_q : UEQuat) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetAxisZ", "")
     ue_expect_signature(call, "v1;Quat_GetAxisZ;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
     ue_release_call(call)
@@ -6945,14 +6735,11 @@ def ue_math_Quat_GetAxisZ(arg_q : S_Quat_82f9549e) : UEVector {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetRotationAxis", signature="v1;Quat_GetRotationAxis;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_GetRotationAxis(arg_q : S_Quat_82f9549e) : UEVector {
+def ue_math_Quat_GetRotationAxis(arg_q : UEQuat) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetRotationAxis", "")
     ue_expect_signature(call, "v1;Quat_GetRotationAxis;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
     ue_release_call(call)
@@ -6960,59 +6747,47 @@ def ue_math_Quat_GetRotationAxis(arg_q : S_Quat_82f9549e) : UEVector {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_GetShortestArcWith", signature="v1;Quat_GetShortestArcWith;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_GetShortestArcWith(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Quat_82f9549e {
+def ue_math_Quat_GetShortestArcWith(arg_a : UEQuat; arg_b : UEQuat) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_GetShortestArcWith", "")
     ue_expect_signature(call, "v1;Quat_GetShortestArcWith;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "a.x", arg_a.f_x)
-    ue_arg_double(call, "a.y", arg_a.f_y)
-    ue_arg_double(call, "a.z", arg_a.f_z)
-    ue_arg_double(call, "a.w", arg_a.f_w)
-    ue_arg_double(call, "b.x", arg_b.f_x)
-    ue_arg_double(call, "b.y", arg_b.f_y)
-    ue_arg_double(call, "b.z", arg_b.f_z)
-    ue_arg_double(call, "b.w", arg_b.f_w)
+    __ue_method_arg_quat(call, "a", arg_a)
+    __ue_method_arg_quat(call, "b", arg_b)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Identity", signature="v1;Quat_Identity;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_Identity() : S_Quat_82f9549e {
+def ue_math_Quat_Identity() : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Identity", "")
     ue_expect_signature(call, "v1;Quat_Identity;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Inversed", signature="v1;Quat_Inversed;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_Inversed(arg_q : S_Quat_82f9549e) : S_Quat_82f9549e {
+def ue_math_Quat_Inversed(arg_q : UEQuat) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Inversed", "")
     ue_expect_signature(call, "v1;Quat_Inversed;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_IsFinite", signature="v1;Quat_IsFinite;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
-def ue_math_Quat_IsFinite(arg_q : S_Quat_82f9549e) : bool {
+def ue_math_Quat_IsFinite(arg_q : UEQuat) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_IsFinite", "")
     ue_expect_signature(call, "v1;Quat_IsFinite;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
     ue_release_call(call)
@@ -7020,14 +6795,11 @@ def ue_math_Quat_IsFinite(arg_q : S_Quat_82f9549e) : bool {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_IsIdentity", signature="v1;Quat_IsIdentity;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")]
-def ue_math_Quat_IsIdentity(arg_q : S_Quat_82f9549e; arg_tolerance : float) : bool {
+def ue_math_Quat_IsIdentity(arg_q : UEQuat; arg_tolerance : float) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_IsIdentity", "")
     ue_expect_signature(call, "v1;Quat_IsIdentity;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_arg_float(call, "tolerance", arg_tolerance)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
@@ -7036,14 +6808,11 @@ def ue_math_Quat_IsIdentity(arg_q : S_Quat_82f9549e; arg_tolerance : float) : bo
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_IsNonFinite", signature="v1;Quat_IsNonFinite;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
-def ue_math_Quat_IsNonFinite(arg_q : S_Quat_82f9549e) : bool {
+def ue_math_Quat_IsNonFinite(arg_q : UEQuat) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_IsNonFinite", "")
     ue_expect_signature(call, "v1;Quat_IsNonFinite;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
     ue_release_call(call)
@@ -7051,14 +6820,11 @@ def ue_math_Quat_IsNonFinite(arg_q : S_Quat_82f9549e) : bool {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_IsNormalized", signature="v1;Quat_IsNormalized;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")]
-def ue_math_Quat_IsNormalized(arg_q : S_Quat_82f9549e) : bool {
+def ue_math_Quat_IsNormalized(arg_q : UEQuat) : bool {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_IsNormalized", "")
     ue_expect_signature(call, "v1;Quat_IsNormalized;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:BoolProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = ue_result_bool(call, "returnvalue")
     ue_release_call(call)
@@ -7066,85 +6832,73 @@ def ue_math_Quat_IsNormalized(arg_q : S_Quat_82f9549e) : bool {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Log", signature="v1;Quat_Log;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_Log(arg_q : S_Quat_82f9549e) : S_Quat_82f9549e {
+def ue_math_Quat_Log(arg_q : UEQuat) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Log", "")
     ue_expect_signature(call, "v1;Quat_Log;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_MakeFromEuler", signature="v1;Quat_MakeFromEuler;Euler:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_MakeFromEuler(arg_euler : UEVector) : S_Quat_82f9549e {
+def ue_math_Quat_MakeFromEuler(arg_euler : UEVector) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_MakeFromEuler", "")
     ue_expect_signature(call, "v1;Quat_MakeFromEuler;Euler:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "euler", arg_euler)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_MakeFromRotationVector", signature="v1;Quat_MakeFromRotationVector;V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_MakeFromRotationVector(arg_v : UEVector) : S_Quat_82f9549e {
+def ue_math_Quat_MakeFromRotationVector(arg_v : UEVector) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_MakeFromRotationVector", "")
     ue_expect_signature(call, "v1;Quat_MakeFromRotationVector;V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
     __ue_method_arg_vector(call, "v", arg_v)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Normalize", signature="v1;Quat_Normalize;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;")]
-def ue_math_Quat_Normalize(arg_q : S_Quat_82f9549e; arg_tolerance : float) : S_Quat_82f9549e {
+def ue_math_Quat_Normalize(arg_q : UEQuat; arg_tolerance : float) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Normalize", "")
     ue_expect_signature(call, "v1;Quat_Normalize;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_arg_float(call, "tolerance", arg_tolerance)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "q.x"), f_y = ue_result_double(call, "q.y"), f_z = ue_result_double(call, "q.z"), f_w = ue_result_double(call, "q.w"))
+    let result = __ue_method_result_quat(call, "q")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Normalized", signature="v1;Quat_Normalized;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_Normalized(arg_q : S_Quat_82f9549e; arg_tolerance : float) : S_Quat_82f9549e {
+def ue_math_Quat_Normalized(arg_q : UEQuat; arg_tolerance : float) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Normalized", "")
     ue_expect_signature(call, "v1;Quat_Normalized;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Tolerance:FloatProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_arg_float(call, "tolerance", arg_tolerance)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_RotateVector", signature="v1;Quat_RotateVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_RotateVector(arg_q : S_Quat_82f9549e; arg_v : UEVector) : UEVector {
+def ue_math_Quat_RotateVector(arg_q : UEQuat; arg_v : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_RotateVector", "")
     ue_expect_signature(call, "v1;Quat_RotateVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     __ue_method_arg_vector(call, "v", arg_v)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
@@ -7153,14 +6907,11 @@ def ue_math_Quat_RotateVector(arg_q : S_Quat_82f9549e; arg_v : UEVector) : UEVec
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Rotator", signature="v1;Quat_Rotator;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")]
-def ue_math_Quat_Rotator(arg_q : S_Quat_82f9549e) : UERotator {
+def ue_math_Quat_Rotator(arg_q : UEQuat) : UERotator {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Rotator", "")
     ue_expect_signature(call, "v1;Quat_Rotator;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator\{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = __ue_method_result_rotator(call, "returnvalue")
     ue_release_call(call)
@@ -7168,49 +6919,40 @@ def ue_math_Quat_Rotator(arg_q : S_Quat_82f9549e) : UERotator {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_SetComponents", signature="v1;Quat_SetComponents;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:FloatProperty:128;Y:FloatProperty:128;Z:FloatProperty:128;W:FloatProperty:128;")]
-def ue_math_Quat_SetComponents(arg_q : S_Quat_82f9549e; arg_x : float; arg_y : float; arg_z : float; arg_w : float) : S_Quat_82f9549e {
+def ue_math_Quat_SetComponents(arg_q : UEQuat; arg_x : float; arg_y : float; arg_z : float; arg_w : float) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_SetComponents", "")
     ue_expect_signature(call, "v1;Quat_SetComponents;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};X:FloatProperty:128;Y:FloatProperty:128;Z:FloatProperty:128;W:FloatProperty:128;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_arg_float(call, "x", arg_x)
     ue_arg_float(call, "y", arg_y)
     ue_arg_float(call, "z", arg_z)
     ue_arg_float(call, "w", arg_w)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "q.x"), f_y = ue_result_double(call, "q.y"), f_z = ue_result_double(call, "q.z"), f_w = ue_result_double(call, "q.w"))
+    let result = __ue_method_result_quat(call, "q")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_SetFromEuler", signature="v1;Quat_SetFromEuler;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Euler:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_SetFromEuler(arg_q : S_Quat_82f9549e; arg_euler : UEVector) : S_Quat_82f9549e {
+def ue_math_Quat_SetFromEuler(arg_q : UEQuat; arg_euler : UEVector) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_SetFromEuler", "")
     ue_expect_signature(call, "v1;Quat_SetFromEuler;Q:StructProperty:134218112:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Euler:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     __ue_method_arg_vector(call, "euler", arg_euler)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "q.x"), f_y = ue_result_double(call, "q.y"), f_z = ue_result_double(call, "q.z"), f_w = ue_result_double(call, "q.w"))
+    let result = __ue_method_result_quat(call, "q")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Size", signature="v1;Quat_Size;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")]
-def ue_math_Quat_Size(arg_q : S_Quat_82f9549e) : float {
+def ue_math_Quat_Size(arg_q : UEQuat) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Size", "")
     ue_expect_signature(call, "v1;Quat_Size;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = ue_result_float(call, "returnvalue")
     ue_release_call(call)
@@ -7218,14 +6960,11 @@ def ue_math_Quat_Size(arg_q : S_Quat_82f9549e) : float {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_SizeSquared", signature="v1;Quat_SizeSquared;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")]
-def ue_math_Quat_SizeSquared(arg_q : S_Quat_82f9549e) : float {
+def ue_math_Quat_SizeSquared(arg_q : UEQuat) : float {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_SizeSquared", "")
     ue_expect_signature(call, "v1;Quat_SizeSquared;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:FloatProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = ue_result_float(call, "returnvalue")
     ue_release_call(call)
@@ -7233,34 +6972,25 @@ def ue_math_Quat_SizeSquared(arg_q : S_Quat_82f9549e) : float {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_Slerp", signature="v1;Quat_Slerp;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Alpha:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Quat_Slerp(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e; arg_alpha : double) : S_Quat_82f9549e {
+def ue_math_Quat_Slerp(arg_a : UEQuat; arg_b : UEQuat; arg_alpha : double) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_Slerp", "")
     ue_expect_signature(call, "v1;Quat_Slerp;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};Alpha:DoubleProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "a.x", arg_a.f_x)
-    ue_arg_double(call, "a.y", arg_a.f_y)
-    ue_arg_double(call, "a.z", arg_a.f_z)
-    ue_arg_double(call, "a.w", arg_a.f_w)
-    ue_arg_double(call, "b.x", arg_b.f_x)
-    ue_arg_double(call, "b.y", arg_b.f_y)
-    ue_arg_double(call, "b.z", arg_b.f_z)
-    ue_arg_double(call, "b.w", arg_b.f_w)
+    __ue_method_arg_quat(call, "a", arg_a)
+    __ue_method_arg_quat(call, "b", arg_b)
     ue_arg_double(call, "alpha", arg_alpha)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_ToRotationVector", signature="v1;Quat_ToRotationVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_ToRotationVector(arg_q : S_Quat_82f9549e) : UEVector {
+def ue_math_Quat_ToRotationVector(arg_q : UEQuat) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_ToRotationVector", "")
     ue_expect_signature(call, "v1;Quat_ToRotationVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
     ue_release_call(call)
@@ -7268,14 +6998,11 @@ def ue_math_Quat_ToRotationVector(arg_q : S_Quat_82f9549e) : UEVector {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_UnrotateVector", signature="v1;Quat_UnrotateVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_UnrotateVector(arg_q : S_Quat_82f9549e; arg_v : UEVector) : UEVector {
+def ue_math_Quat_UnrotateVector(arg_q : UEQuat; arg_v : UEVector) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_UnrotateVector", "")
     ue_expect_signature(call, "v1;Quat_UnrotateVector;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};V:StructProperty:134218114:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     __ue_method_arg_vector(call, "v", arg_v)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
@@ -7284,14 +7011,11 @@ def ue_math_Quat_UnrotateVector(arg_q : S_Quat_82f9549e; arg_v : UEVector) : UEV
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_VectorForward", signature="v1;Quat_VectorForward;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_VectorForward(arg_q : S_Quat_82f9549e) : UEVector {
+def ue_math_Quat_VectorForward(arg_q : UEQuat) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_VectorForward", "")
     ue_expect_signature(call, "v1;Quat_VectorForward;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
     ue_release_call(call)
@@ -7299,14 +7023,11 @@ def ue_math_Quat_VectorForward(arg_q : S_Quat_82f9549e) : UEVector {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_VectorRight", signature="v1;Quat_VectorRight;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_VectorRight(arg_q : S_Quat_82f9549e) : UEVector {
+def ue_math_Quat_VectorRight(arg_q : UEQuat) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_VectorRight", "")
     ue_expect_signature(call, "v1;Quat_VectorRight;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
     ue_release_call(call)
@@ -7314,14 +7035,11 @@ def ue_math_Quat_VectorRight(arg_q : S_Quat_82f9549e) : UEVector {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Quat_VectorUp", signature="v1;Quat_VectorUp;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")]
-def ue_math_Quat_VectorUp(arg_q : S_Quat_82f9549e) : UEVector {
+def ue_math_Quat_VectorUp(arg_q : UEQuat) : UEVector {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Quat_VectorUp", "")
     ue_expect_signature(call, "v1;Quat_VectorUp;Q:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "q.x", arg_q.f_x)
-    ue_arg_double(call, "q.y", arg_q.f_y)
-    ue_arg_double(call, "q.z", arg_q.f_z)
-    ue_arg_double(call, "q.w", arg_q.f_w)
+    __ue_method_arg_quat(call, "q", arg_q)
     ue_invoke_call(call)
     let result = __ue_method_result_vector(call, "returnvalue")
     ue_release_call(call)
@@ -7329,16 +7047,13 @@ def ue_math_Quat_VectorUp(arg_q : S_Quat_82f9549e) : UEVector {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RGBLinearToHSV", signature="v1;RGBLinearToHSV;RGB:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_RGBLinearToHSV(arg_rgb : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
+def ue_math_RGBLinearToHSV(arg_rgb : UELinearColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RGBLinearToHSV", "")
     ue_expect_signature(call, "v1;RGBLinearToHSV;RGB:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "rgb.r", arg_rgb.f_r)
-    ue_arg_float(call, "rgb.g", arg_rgb.f_g)
-    ue_arg_float(call, "rgb.b", arg_rgb.f_b)
-    ue_arg_float(call, "rgb.a", arg_rgb.f_a)
+    __ue_method_arg_linear_color(call, "rgb", arg_rgb)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -7351,14 +7066,11 @@ struct ue_math_RGBToHSV_Result {
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RGBToHSV", signature="v1;RGBToHSV;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};H:FloatProperty:384;S:FloatProperty:384;V:FloatProperty:384;A:FloatProperty:384;")]
-def ue_math_RGBToHSV(arg_incolor : S_LinearColor_f4abb14b) : ue_math_RGBToHSV_Result {
+def ue_math_RGBToHSV(arg_incolor : UELinearColor) : ue_math_RGBToHSV_Result {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RGBToHSV", "")
     ue_expect_signature(call, "v1;RGBToHSV;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};H:FloatProperty:384;S:FloatProperty:384;V:FloatProperty:384;A:FloatProperty:384;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
     let result = ue_math_RGBToHSV_Result(out_h = ue_result_float(call, "h"), out_s = ue_result_float(call, "s"), out_v = ue_result_float(call, "v"), out_a = ue_result_float(call, "a"))
     ue_release_call(call)
@@ -7366,16 +7078,13 @@ def ue_math_RGBToHSV(arg_incolor : S_LinearColor_f4abb14b) : ue_math_RGBToHSV_Re
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="RGBToHSV_Vector", signature="v1;RGBToHSV_Vector;RGB:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};HSV:StructProperty:384:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_RGBToHSV_Vector(arg_rgb : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
+def ue_math_RGBToHSV_Vector(arg_rgb : UELinearColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "RGBToHSV_Vector", "")
     ue_expect_signature(call, "v1;RGBToHSV_Vector;RGB:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};HSV:StructProperty:384:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "rgb.r", arg_rgb.f_r)
-    ue_arg_float(call, "rgb.g", arg_rgb.f_g)
-    ue_arg_float(call, "rgb.b", arg_rgb.f_b)
-    ue_arg_float(call, "rgb.a", arg_rgb.f_a)
+    __ue_method_arg_linear_color(call, "rgb", arg_rgb)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "hsv.r"), f_g = ue_result_float(call, "hsv.g"), f_b = ue_result_float(call, "hsv.b"), f_a = ue_result_float(call, "hsv.a"))
+    let result = __ue_method_result_linear_color(call, "hsv")
     ue_release_call(call)
     return result
 }
@@ -7908,21 +7617,15 @@ def ue_math_SelectClass(arg_a : UEClassHandle; arg_b : UEClassHandle; arg_bselec
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="SelectColor", signature="v1;SelectColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bPickA:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_SelectColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b; arg_bpicka : bool) : S_LinearColor_f4abb14b {
+def ue_math_SelectColor(arg_a : UELinearColor; arg_b : UELinearColor; arg_bpicka : bool) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "SelectColor", "")
     ue_expect_signature(call, "v1;SelectColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};bPickA:BoolProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
-    ue_arg_float(call, "b.r", arg_b.f_r)
-    ue_arg_float(call, "b.g", arg_b.f_g)
-    ue_arg_float(call, "b.b", arg_b.f_b)
-    ue_arg_float(call, "b.a", arg_b.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
+    __ue_method_arg_linear_color(call, "b", arg_b)
     ue_arg_bool(call, "bpicka", arg_bpicka)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -8222,39 +7925,27 @@ def ue_math_Subtract_IntPointIntPoint(arg_a : S_IntPoint_cb05a38b; arg_b : S_Int
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_LinearColorLinearColor", signature="v1;Subtract_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")]
-def ue_math_Subtract_LinearColorLinearColor(arg_a : S_LinearColor_f4abb14b; arg_b : S_LinearColor_f4abb14b) : S_LinearColor_f4abb14b {
+def ue_math_Subtract_LinearColorLinearColor(arg_a : UELinearColor; arg_b : UELinearColor) : UELinearColor {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_LinearColorLinearColor", "")
     ue_expect_signature(call, "v1;Subtract_LinearColorLinearColor;A:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};B:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "a.r", arg_a.f_r)
-    ue_arg_float(call, "a.g", arg_a.f_g)
-    ue_arg_float(call, "a.b", arg_a.f_b)
-    ue_arg_float(call, "a.a", arg_a.f_a)
-    ue_arg_float(call, "b.r", arg_b.f_r)
-    ue_arg_float(call, "b.g", arg_b.f_g)
-    ue_arg_float(call, "b.b", arg_b.f_b)
-    ue_arg_float(call, "b.a", arg_b.f_a)
+    __ue_method_arg_linear_color(call, "a", arg_a)
+    __ue_method_arg_linear_color(call, "b", arg_b)
     ue_invoke_call(call)
-    let result = S_LinearColor_f4abb14b(f_r = ue_result_float(call, "returnvalue.r"), f_g = ue_result_float(call, "returnvalue.g"), f_b = ue_result_float(call, "returnvalue.b"), f_a = ue_result_float(call, "returnvalue.a"))
+    let result = __ue_method_result_linear_color(call, "returnvalue")
     ue_release_call(call)
     return result
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="Subtract_QuatQuat", signature="v1;Subtract_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")]
-def ue_math_Subtract_QuatQuat(arg_a : S_Quat_82f9549e; arg_b : S_Quat_82f9549e) : S_Quat_82f9549e {
+def ue_math_Subtract_QuatQuat(arg_a : UEQuat; arg_b : UEQuat) : UEQuat {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "Subtract_QuatQuat", "")
     ue_expect_signature(call, "v1;Subtract_QuatQuat;A:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};B:StructProperty:134218114:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};ReturnValue:StructProperty:1408:/Script/CoreUObject.Quat\{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;\};")
     ue_require_call_context(call, false)
-    ue_arg_double(call, "a.x", arg_a.f_x)
-    ue_arg_double(call, "a.y", arg_a.f_y)
-    ue_arg_double(call, "a.z", arg_a.f_z)
-    ue_arg_double(call, "a.w", arg_a.f_w)
-    ue_arg_double(call, "b.x", arg_b.f_x)
-    ue_arg_double(call, "b.y", arg_b.f_y)
-    ue_arg_double(call, "b.z", arg_b.f_z)
-    ue_arg_double(call, "b.w", arg_b.f_w)
+    __ue_method_arg_quat(call, "a", arg_a)
+    __ue_method_arg_quat(call, "b", arg_b)
     ue_invoke_call(call)
-    let result = S_Quat_82f9549e(f_x = ue_result_double(call, "returnvalue.x"), f_y = ue_result_double(call, "returnvalue.y"), f_z = ue_result_double(call, "returnvalue.z"), f_w = ue_result_double(call, "returnvalue.w"))
+    let result = __ue_method_result_quat(call, "returnvalue")
     ue_release_call(call)
     return result
 }
@@ -8403,14 +8094,11 @@ def ue_math_ToDirectionAndLength2D(arg_a : UEVector2D) : ue_math_ToDirectionAndL
 }
 
 [ue_reflected_call(owner="/Script/Engine.KismetMathLibrary", method="ToHex_LinearColor", signature="v1;ToHex_LinearColor;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StrProperty:1408;")]
-def ue_math_ToHex_LinearColor(arg_incolor : S_LinearColor_f4abb14b) : string {
+def ue_math_ToHex_LinearColor(arg_incolor : UELinearColor) : string {
     let call = ue_begin_static_call("/Script/Engine.KismetMathLibrary", "ToHex_LinearColor", "")
     ue_expect_signature(call, "v1;ToHex_LinearColor;InColor:StructProperty:128:/Script/CoreUObject.LinearColor\{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;\};ReturnValue:StrProperty:1408;")
     ue_require_call_context(call, false)
-    ue_arg_float(call, "incolor.r", arg_incolor.f_r)
-    ue_arg_float(call, "incolor.g", arg_incolor.f_g)
-    ue_arg_float(call, "incolor.b", arg_incolor.f_b)
-    ue_arg_float(call, "incolor.a", arg_incolor.f_a)
+    __ue_method_arg_linear_color(call, "incolor", arg_incolor)
     ue_invoke_call(call)
     let result = ue_result_string(call, "returnvalue")
     ue_release_call(call)

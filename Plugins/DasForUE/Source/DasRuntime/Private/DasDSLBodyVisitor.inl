@@ -660,7 +660,7 @@ struct FDSLBodyVisitor : das::Visitor
                 if (It + 1 != Names.rend() || !DSLAdaptedMember(Type, *It, EDasMemberUse::SelfLeaf))
                     return false;
                 Path += (Path.empty() ? "" : ".") + *It;
-                Out = {Root->name, Path, "double"};
+                Out = {Root->name, Path, DSLUtf8(DSLTypeName(DSLAdaptedMemberType(Type, *It)))};
                 return true;
             }
             if (!DSLDirectStruct(Type))
@@ -914,7 +914,7 @@ struct FDSLBodyVisitor : das::Visitor
                     {
                         if (!DSLAdaptedMember(Type, N, EDasMemberUse::SelfLeaf))
                             DSLFail(TEXT("Unsupported indexed math member"));
-                        Type = new das::TypeDecl(das::Type::tDouble, Original->at);
+                        Type = DSLAdaptedMemberType(Type, N);
                     }
                     else
                     {
@@ -1064,7 +1064,7 @@ struct FDSLBodyVisitor : das::Visitor
                 if (!Path.empty())
                     Path += ".";
                 Path += *It;
-                Type = new das::TypeDecl(das::Type::tDouble, E->at);
+                Type = DSLAdaptedMemberType(Type, *It);
                 break;
             }
             if (!DSLDirectStruct(Type))

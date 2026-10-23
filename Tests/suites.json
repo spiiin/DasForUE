@@ -2,6 +2,7 @@
   "comment": "Regression suites for Scripts/RunDasTests.ps1. Suites run in this order; 'requires' pulls in prerequisites unless -NoDependencies is given (then their probe files from an earlier run are used).",
   "suites": [
     { "name": "build", "kind": "build", "log": "combined-editor-build" },
+    { "name": "complete-builtins", "kind": "script", "script": "TestCompleteBuiltinTypes.ps1", "requires": ["build"] },
     { "name": "quat", "kind": "script", "script": "TestQuat.ps1", "requires": ["build"] },
     { "name": "builtin-values", "kind": "script", "script": "TestBuiltinValues.ps1", "requires": ["build"] },
     { "name": "ue-aot", "kind": "script", "script": "TestUEAot.ps1", "requires": ["build"] },

@@ -1281,7 +1281,7 @@ struct FUEReferenceMutationVisitor : das::Visitor
                     {
                         if (!DSLAdaptedMember(Type, N, EDasMemberUse::AuthoredMutation))
                             DSLFail(TEXT("Unsupported math mutation member"));
-                        Type = new das::TypeDecl(das::Type::tDouble, Original->at);
+                        Type = DSLAdaptedMemberType(Type, N);
                     }
                     else
                     {
