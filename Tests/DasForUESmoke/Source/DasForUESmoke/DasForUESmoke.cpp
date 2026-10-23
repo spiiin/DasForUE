@@ -18,6 +18,7 @@
 #include "Engine/Level.h"
 
 bool RunDasRegisteredCooked(FString& Report);
+bool RunDasNativeBindsProbe(FString& Report);
 void StartDasClassCallbacksValidation();
 void StartDasSubsystemsValidation();
 void StartDasSaveGameCompatibilityValidation();
@@ -61,6 +62,13 @@ public:
                 bool Passed=Bench.Finish(Report,Json,TEXT("packaged"));
                 if(!Output.IsEmpty())Passed &= FFileHelper::SaveStringToFile(Json,*Output,FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
                 UE_LOG(LogTemp,Display,TEXT("%s"),*Report);UE_LOG(LogTemp,Display,TEXT("DAS_INTEROP_PERFORMANCE_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));
+                FPlatformMisc::RequestExitWithStatus(false,Passed?0:1);
+            });return;
+        }
+        if(FParse::Param(FCommandLine::Get(),TEXT("DasNativeBinds"))){
+            InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{
+                FString Report;const bool Passed=RunDasNativeBindsProbe(Report);
+                UE_LOG(LogTemp,Display,TEXT("%s"),*Report);UE_LOG(LogTemp,Display,TEXT("DAS_NATIVE_BINDS_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));
                 FPlatformMisc::RequestExitWithStatus(false,Passed?0:1);
             });return;
         }

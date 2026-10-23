@@ -103,7 +103,9 @@
         { "name": "computed", "map": "/Game/DasComputedDefaults/{computed-defaults}/Map",
           "switch": "-DasComputedDefaults", "marker": "DAS_COMPUTED_DEFAULTS_PACKAGED=PASS" },
         { "name": "method-values", "map": "/Game/DasMethodValues/{method-values}/Map", "switch": "-DasMethodValues",
-          "marker": "DAS_METHOD_VALUES_RESULT=PASS" }
+          "marker": "DAS_METHOD_VALUES_RESULT=PASS" },
+        { "name": "native-binds", "map": "/Game/DasCookedGameplay/{export}/Map", "switch": "-DasNativeBinds",
+          "marker": "DAS_NATIVE_BINDS_RESULT=PASS" }
       ] }
   ],
   "presets": {

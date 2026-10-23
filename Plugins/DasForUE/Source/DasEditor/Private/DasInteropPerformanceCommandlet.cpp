@@ -2,6 +2,7 @@
 #include "DasDSLService.h"
 #include "DasInteropProbe.h"
 #include "DasCallPhases.h"
+#include "DasNativeBinds.h"
 #include "DasProbeActor.h"
 #include "DasPropertyValues.h"
 #include "DasRuntime.h"
@@ -235,6 +236,26 @@ void RunEditorCases(FDasInteropBench& B)
     Loop(TEXT("script_authored_field_read"), TEXT("ue_InteropProbe_FieldReads"), TEXT("D properties"), 7ll * Light);
     Loop(TEXT("script_native_self_field_read"), TEXT("ue_InteropProbe_NativeFieldReads"), TEXT("D properties"),
                                                                                                7ll * Light);
+
+    // E. Script -> C++ through a native bind (DasNativeBinds.h): the module "smoke_native" exists only in the smoke
+    // project, elsewhere the case is skipped (a registered module is built by the first compilation).
+    if (!DasNativeModuleStatus(TEXT("smoke_native")).EndsWith(TEXT("is not registered")))
+    {
+        FDasScriptChangeCheckScope Watch(1);
+        const FString Path = Runtime.ScriptPath(TEXT("native_binds_probe.das"));
+        const TCHAR* Case = TEXT("script_native_bind_call");
+        auto Run = [&](int32 N)
+        {
+            const auto R = Runtime.RunNamedPersistent(Path, TEXT("bench"), N, Actor);
+            if (!R.bSucceeded)
+            {
+                B.Fail(FString(Case) + TEXT(": ") + R.Error);
+                return int64(-1);
+            }
+            return int64(R.Value);
+        };
+        B.Measure(Case, TEXT("E script -> C++"), Light, Run, Triangle(Light));
+    }
 
     // D3. C++ reading the authored property.
     auto* Value = FindFProperty<FIntProperty>(Actor->GetClass(), TEXT("Value"));

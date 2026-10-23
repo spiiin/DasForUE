@@ -113,9 +113,12 @@ struct FDSLDeclarationCompileScope
             DSLResetReferenceDeclarations();
     }
 };
+void EnsureDasNativeModules(); // DasNativeBinds.inl
 auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWriter& Output, das::ModuleGroup& Group,
                 const das::CodeOfPolicies& Policies = das::CodeOfPolicies())
 {
+    // Native modules registered by code modules since the last compilation become requirable now.
+    EnsureDasNativeModules();
     FDSLDeclarationCompileScope Scope;
     FDSLDiagnosticCompileScope Diagnostics(Group);
     FDSLComputedDefaults Computed;
