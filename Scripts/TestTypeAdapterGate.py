@@ -38,7 +38,8 @@ class TypeAdapterGateTest(unittest.TestCase):
         for kind, (patterns, allowed) in PORTED.items():
             regex = re.compile('|'.join(patterns))
             for name, path in sources():
-                if name in allowed or re.search(r'Tests?\.|Probe|Commandlet', name):
+                # Test drivers spell types as script source text (the reload matrix generates DSL scenarios).
+                if name in allowed or re.search(r'Tests?\.|Probe|Commandlet|ReloadMatrix', name):
                     continue
                 # Reflection registry data must retain native identifiers, including
                 # nested struct paths. It contains no hand-written type dispatch.
