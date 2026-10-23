@@ -12,6 +12,12 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Added
 
+- Authored SaveGame compatibility probes: add/remove fields, delta defaults,
+  numeric load conversions and a real two-archive packaged Development rename
+  check. Editor rename keeps the value; stock cooked loading with the tested
+  default settings leaves the renamed field at its new default. See
+  [SaveGame compatibility](Docs/Guide/Data/SaveGame.md#runtime-schema-compatibility-probe).
+
 - Unified DSL compile/lowering/runtime/import diagnostics with original `.das`
   coordinates, public declaration names and retained raw details. Compiler-owned
   maps stay with the correct VM generation after rejected reloads. Editor Message

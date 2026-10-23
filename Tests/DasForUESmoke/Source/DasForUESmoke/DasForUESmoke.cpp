@@ -19,6 +19,7 @@
 bool RunDasRegisteredCooked(FString& Report);
 void StartDasClassCallbacksValidation();
 void StartDasSubsystemsValidation();
+void StartDasSaveGameCompatibilityValidation();
 void StartDasSoftReferencesValidation();
 void StartDasCookedGameplayValidation();
 void StartDasPlayableMapValidation();
@@ -37,6 +38,9 @@ public:
     virtual void StartupModule() override
     {
         if(FParse::Param(FCommandLine::Get(),TEXT("DasSubsystemsPackaged"))){InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasSubsystemsValidation();});return;}
+        if (FParse::Param(FCommandLine::Get(),TEXT("DasSaveGameCompatibility"))) {
+            InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{StartDasSaveGameCompatibilityValidation();});return;
+        }
         if(FParse::Param(FCommandLine::Get(),TEXT("DasPerformance"))){
             InitHandle=FCoreDelegates::OnFEngineLoopInitComplete.AddLambda([]{
                 int32 Iterations=64,Samples=9;FString Output,Report,Json;

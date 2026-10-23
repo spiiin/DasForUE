@@ -363,3 +363,38 @@ shared build agent. This builds/cooks only the dedicated subsystem map/assets an
 runs Win64 Development with NullRHI, without the general packaged smoke test.
 The twelve checks and config restoration contract are documented in
 [Subsystems](../Guide/Gameplay/Subsystems.md#focused-packaged-startup-and-shutdown).
+
+## Authored SaveGame compatibility
+
+Queue `test-suite savecompat1 savegame-compatibility repo=<main-worktree>` through
+the shared agent. The focused scenario first imports and evolves an authored
+SaveGame, then cooks two distinct Win64 Development archives with the same
+Blueprint class path: Original writes a stock GVAS save, Renamed loads those
+unchanged bytes after a stable-ID field rename. This is a characterization of
+Unreal's stock serializer, not an added migration format.
+
+`savegame-compatibility-runtime` runs only the initial schema-evolution commandlet
+for quicker diagnosis. It checks add/remove, defaults versus stored overrides,
+int-to-double widening and fractional double-to-int loading. It does not cook.
+
+The full runner verifies the Blueprint variable GUID across the editor rename,
+old/new cooked field layouts, loaded control values and actual DAS method reads
+in both archives. It explicitly expects stock cooked loading to leave the renamed
+field at its new default; a PASS is evidence of this limitation, not a promise of
+rename compatibility. Generated assets are isolated under
+`/Game/Tests/DasSaveGameCompatibility/<probe>/`; scripts and save files use unique
+probe IDs. Only the runner's temporary authoring script is removed afterwards.
+
+Receipts: `logs/savegame-compatibility-validation.json`,
+`logs/savegame-compatibility-runtime.json`,
+`logs/savegame-compatibility-upgrade.json`, and the two
+`logs/savegame-compatibility-packaged-{Write,Read}.json` observations.
+Archives and original save bytes are retained under
+`Build/SaveGameCompatibility/<probe>/`. No broad PIE/full regression is selected.
+
+Verified 2026-10-23 by `savegame-compat-20261023b` (exit 0): 27 Prepare,
+6 editor Upgrade, 5 packaged Write and 8 packaged Read checks passed. Prepare
+ran in 0.59 seconds; the full focused script with two cooks took 257 seconds.
+The default cooked rename loses `73` and leaves the new default `20`, while
+control `123` survives; Editor rename preserves `73`. This PASS characterizes
+that limitation and must not be described as successful packaged rename migration.

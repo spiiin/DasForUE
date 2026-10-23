@@ -62,3 +62,5 @@ __pycache__/
 /Plugins/DasForUE/Content/Das/Scripts/*_auto_rules.json
 
 /Tests/DasForUESmoke/Content/DasSubsystems/
+
+/Tests/DasForUESmoke/Content/Tests/DasSaveGameCompatibility/
