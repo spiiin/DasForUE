@@ -3,19 +3,64 @@
 
 // Registered native modules (DasNativeBinds.h). Descriptions are never freed: compiled scripts keep pointers to
 // them, and an unregistered module only turns its functions into script errors.
+
+namespace das
+{
+struct TypeAnnotation;
+}
+struct FDasNativeModuleDesc;
+// A class with its own script type (Class<T>(Name)): owned by the module that declared it. Never freed: compiled
+// scripts and other modules refer to it.
+struct FDasNativeClassType
+{
+    FString Name;
+    UClass* Class = nullptr;
+    FDasNativeModuleDesc* Owner = nullptr;
+    das::TypeAnnotation* Annotation = nullptr; // set when the owner's daScript module is built
+};
+// An object parameter or result resolved when the daScript module is built: the class an object must have and
+// its script type (nullptr: passed as UObjectHandle).
+struct FDasNativeResolvedParam
+{
+    UClass* Class = nullptr;
+    const FDasNativeClassType* Script = nullptr;
+};
+
+// What a function does: calls the bound C++ code or is one of the helpers generated for a class type.
+enum class EDasNativeHelper : uint8
+{
+    Call,
+    Valid,    // x.valid()
+    Handle,   // x.handle()
+    Cast,     // as_<Name>(x)
+    Equal,    // x == y
+    NotEqual, // x != y
+};
 struct FDasNativeFunctionDesc
 {
     FString Name;
     FDasNativeThunk Thunk = nullptr;
-    EDasNativeType Result = EDasNativeType::Void;
-    TArray<EDasNativeType> Arguments;
+    FDasNativeParam Result;
+    TArray<FDasNativeParam> Arguments; // a method's receiver is Arguments[0]
     EDasBind Flags = EDasBind::None;
+    FDasNativeClassFn Receiver = nullptr; // methods: the bound class
+    EDasNativeHelper Helper = EDasNativeHelper::Call;
+    TArray<FDasNativeResolvedParam> Resolved; // per argument, then the result; filled when built
+    bool IsMethod() const { return Receiver != nullptr; }
+};
+struct FDasNativeClassDecl
+{
+    FString ScriptName;
+    FDasNativeClassFn Class = nullptr;
 };
 struct FDasNativeModuleDesc
 {
     FString Name;
     void (*Build)(FDasNativeModule&) = nullptr;
     TArray<FDasNativeFunctionDesc> Functions;
+    TArray<FDasNativeClassDecl> Classes;
+    // Helpers and inherited methods made when the daScript module is built.
+    TArray<TUniquePtr<FDasNativeFunctionDesc>> Generated;
     FString Error;           // why the module is not available
     bool bLoaded = true;     // false once its code module unregistered it
     bool bBuilt = false;     // the daScript module exists

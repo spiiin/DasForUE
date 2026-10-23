@@ -256,6 +256,23 @@ void RunEditorCases(FDasInteropBench& B)
         };
         B.Measure(Case, TEXT("E script -> C++"), Light, Run, Triangle(Light));
     }
+    if (!DasNativeModuleStatus(TEXT("smoke_native")).EndsWith(TEXT("is not registered")))
+    {
+        FDasScriptChangeCheckScope Watch(1);
+        const FString Path = Runtime.ScriptPath(TEXT("native_binds_objects.das"));
+        const TCHAR* Case = TEXT("script_native_method_call");
+        auto Run = [&](int32 N)
+        {
+            const auto R = Runtime.RunNamedPersistent(Path, TEXT("bench_method"), N, Actor);
+            if (!R.bSucceeded)
+            {
+                B.Fail(FString(Case) + TEXT(": ") + R.Error);
+                return int64(-1);
+            }
+            return int64(R.Value);
+        };
+        B.Measure(Case, TEXT("E script -> C++"), Light, Run, int64(Light));
+    }
 
     // D3. C++ reading the authored property.
     auto* Value = FindFProperty<FIntProperty>(Actor->GetClass(), TEXT("Value"));

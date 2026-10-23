@@ -61,8 +61,13 @@ FString DasNativeModuleStatus(const TCHAR* ModuleName)
     return Last;
 }
 
-void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, EDasNativeType Result,
-                           TArray<EDasNativeType> Args, EDasBind Flags)
+static bool SameParam(const FDasNativeParam& A, const FDasNativeParam& B)
+{
+    return A.Type == B.Type && A.Class == B.Class;
+}
+
+void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasNativeParam Result,
+                           TArray<FDasNativeParam> Args, EDasBind Flags, FDasNativeClassFn Receiver)
 {
     auto& Desc = *static_cast<FDasNativeModuleDesc*>(Module);
     if (!Desc.Error.IsEmpty())
@@ -73,18 +78,49 @@ void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, EDasN
     F.Result = Result;
     F.Arguments = MoveTemp(Args);
     F.Flags = Flags;
+    F.Receiver = Receiver;
+    const bool bObjects =
+        Result.Type == EDasNativeType::Object ||
+        F.Arguments.ContainsByPredicate([](const FDasNativeParam& P) { return P.Type == EDasNativeType::Object; });
+    auto Fail = [&](const FString& Why)
+    {
+        Desc.Error = FString::Printf(TEXT("Native module '%s': function '%s' %s"), *Desc.Name, *F.Name, *Why);
+    };
     if (!IsScriptIdentifier(F.Name))
-        Desc.Error = FString::Printf(TEXT("Native module '%s': function name '%s' is not a script identifier"),
-                                          *Desc.Name, *F.Name);
-    else if (Desc.Functions.ContainsByPredicate([&](const FDasNativeFunctionDesc& G) { return G.Name == F.Name; }))
-        // Overloads by parameter types are a later step; one name per module keeps errors readable.
-        Desc.Error = FString::Printf(TEXT("Native module '%s': function '%s' is bound twice"), *Desc.Name, *F.Name);
-    for (EDasNativeType Type : F.Arguments)
-        if (Type == EDasNativeType::Void)
-            Desc.Error =
-                FString::Printf(TEXT("Native module '%s': function '%s' has a void parameter"), *Desc.Name, *F.Name);
+        Fail(TEXT("has a name that is not a script identifier"));
+    else if (Desc.Functions.ContainsByPredicate(
+                 [&](const FDasNativeFunctionDesc& G)
+                 {
+                     if (G.Name != F.Name || G.Arguments.Num() != F.Arguments.Num())
+                         return false;
+                     for (int32 I = 0; I < G.Arguments.Num(); ++I)
+                         if (!SameParam(G.Arguments[I], F.Arguments[I]))
+                             return false;
+                     return true;
+                 }))
+        // Overloads differ by parameter types; the same name and parameters twice would be ambiguous.
+        Fail(TEXT("is bound twice"));
+    else if (F.Arguments.ContainsByPredicate([](const FDasNativeParam& P) { return P.Type == EDasNativeType::Void; }))
+        Fail(TEXT("has a void parameter"));
+    else if (EnumHasAnyFlags(Flags, EDasBind::Pure) && bObjects)
+        Fail(TEXT("is Pure but takes or returns objects"));
     if (Desc.Error.IsEmpty())
         Desc.Functions.Add(MoveTemp(F));
+}
+void FDasNativeModule::AddClass(const TCHAR* ScriptName, FDasNativeClassFn Class)
+{
+    auto& Desc = *static_cast<FDasNativeModuleDesc*>(Module);
+    if (!Desc.Error.IsEmpty())
+        return;
+    const FString Name = ScriptName ? ScriptName : TEXT("");
+    if (!IsScriptIdentifier(Name))
+        Desc.Error =
+            FString::Printf(TEXT("Native module '%s': class name '%s' is not a script identifier"), *Desc.Name, *Name);
+    else if (Desc.Classes.ContainsByPredicate([&](const FDasNativeClassDecl& C)
+                                              { return C.ScriptName == Name || C.Class == Class; }))
+        Desc.Error = FString::Printf(TEXT("Native module '%s': class '%s' is declared twice"), *Desc.Name, *Name);
+    else
+        Desc.Classes.Add({Name, Class});
 }
 
 void FDasNativeModuleBuilder::Describe(FDasNativeModuleDesc& Desc)
@@ -95,6 +131,6 @@ void FDasNativeModuleBuilder::Describe(FDasNativeModuleDesc& Desc)
     FDasNativeModule Module;
     Module.Module = &Desc;
     Desc.Build(Module);
-    if (Desc.Error.IsEmpty() && Desc.Functions.IsEmpty())
-        Desc.Error = FString::Printf(TEXT("Native module '%s' binds no functions"), *Desc.Name);
+    if (Desc.Error.IsEmpty() && Desc.Functions.IsEmpty() && Desc.Classes.IsEmpty())
+        Desc.Error = FString::Printf(TEXT("Native module '%s' binds nothing"), *Desc.Name);
 }
