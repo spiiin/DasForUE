@@ -3,6 +3,7 @@
 #include "DasProbeActor.h"
 #include "DasRuntime.h"
 #include "DasBlueprintService.h"
+#include "DasDiagnostics.h"
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -3786,8 +3787,7 @@ public:
                 DasFailStructuralForTesting(0);
                 Actor = Find(World, TEXT("MigrationActor"));
                 Check(Failed &&
-                      Error.StartsWith(
-                          TEXT("Structural migration rolled back:")) &&
+                      FDasDiagnostic::MessageOf(Error).StartsWith(TEXT("Structural migration rolled back:")) &&
                           !BP->GeneratedClass->FindPropertyByName(
                               TEXT("Added")) &&
                               !BP->GeneratedClass->FindFunctionByName(
@@ -3799,7 +3799,7 @@ public:
                                           BP.Get(), TEXT("DasDSLModel")) && Bindings() && Call(Actor, 0) == 1 &&
                                           Call(Actor, 2) == 0,
                                           TEXT("structural_fault_restores_layout_metadata_lifecycle_and_bindings"));
-                if (!Failed || !Error.StartsWith(TEXT("Structural migration rolled back:")))
+                if (!Failed || !FDasDiagnostic::MessageOf(Error).StartsWith(TEXT("Structural migration rolled back:")))
                     Test->AddInfo(Error);
             }
             Check(FDasDSLService::Reimport(BP.Get(), Error), TEXT("structural_reimport_keeps_lifecycle_contexts"));
@@ -3996,7 +3996,7 @@ public:
         DasFailStructuralForTesting(0);
         A = Find(World, TEXT("ObjectFieldA"));
         B = Find(World, TEXT("ObjectFieldB"));
-        Check(Failed && Error.StartsWith(TEXT("Structural migration rolled back:")) &&
+        Check(Failed && FDasDiagnostic::MessageOf(Error).StartsWith(TEXT("Structural migration rolled back:")) &&
                                          Field(A, TEXT("Target")) == B &&
                                                Field(B, TEXT("Target")) == A &&
                                                      Field(A, TEXT("Component")) == B->GetRootComponent(),
@@ -4198,7 +4198,7 @@ public:
         A = Find(W, TEXT("AuthoredActor"));
         auto* Config = FindFProperty<FStructProperty>(A->GetClass(), TEXT("Config"));
         Check(Failed &&
-              Error.StartsWith(TEXT("Structural migration rolled back:")) &&
+              FDasDiagnostic::MessageOf(Error).StartsWith(TEXT("Structural migration rolled back:")) &&
                                FindFProperty<FByteProperty>(
                                    A->GetClass(), TEXT("Mode"))->GetPropertyValue_InContainer(A) == 42 &&
                                    Count->GetPropertyValue_InContainer(Config->ContainerPtrToValuePtr<void>(A)) == 77,

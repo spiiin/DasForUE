@@ -12,6 +12,13 @@ struct DASRUNTIME_API FDasDiagnostic : FDasSourceLocation
     FString Phase, Message, Details;
     FString Format() const;
     static TArray<FDasDiagnostic> Parse(const FString& Text);
+    // The message of the first diagnostic in Text, or Text itself when it holds none: callers that look for a
+    // known error compare this, since import and runtime errors are prefixed with their source location.
+    static FString MessageOf(const FString& Text)
+    {
+        const TArray<FDasDiagnostic> Found = Parse(Text);
+        return Found.IsEmpty() ? Text : Found[0].Message;
+    }
 };
 DASRUNTIME_API FDasSourceLocation DasDiagnosticSource(const TArray<FDasSourceLocation>& Sources, const FString& File,
                                                       int32 Line, const FString& EntityHint = FString());

@@ -1,4 +1,5 @@
 #include "DasDSLService.h"
+#include "DasDiagnostics.h"
 #include "DasBlueprintService.h"
 #include "DasAuthoring.h"
 #include "DasRuntime.h"
@@ -105,12 +106,12 @@ int32 RunDasStructuralRollbackProbe(const FString& Params)
             DasFailStructuralForTesting(Stage);
             const bool Failed = !FDasDSLService::Reimport(Parent, Error);
             DasFailStructuralForTesting(0);
-            Check(Failed && Error.StartsWith(TEXT("Structural migration rolled back:")) &&
+            Check(Failed && FDasDiagnostic::MessageOf(Error).StartsWith(TEXT("Structural migration rolled back:")) &&
                                              Parent->GetOutermost()->IsDirty() == Dirty &&
                                              Parent->GetOutermost()->GetMetaData().GetValue(
                                                  Parent, TEXT("DasDSLModel")) == OldModel,
                                                  TEXT("structural_fault_preserves_model_and_package_dirty"));
-            if (!Error.StartsWith(TEXT("Structural migration rolled back:")))
+            if (!FDasDiagnostic::MessageOf(Error).StartsWith(TEXT("Structural migration rolled back:")))
                 UE_LOG(LogTemp, Error, TEXT("%s"), *Error);
             Check(FDasBlueprintService::Apply(Parent, Previous, Error, true),
                   TEXT("restored_blueprint_matches_original_schema"));
