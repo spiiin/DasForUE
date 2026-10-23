@@ -1010,7 +1010,8 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                     }
                     const bool ActorAdapter = Self->IsA<ADasProbeActor>() || Self->IsA<UDasScriptComponent>() ||
                                               Self->IsA<UDasSaveGame>() || Self->IsA<UDasDataAsset>() ||
-                                              Self->IsA<UDasPrimaryDataAsset>();
+                                              Self->IsA<UDasPrimaryDataAsset>() || Self->IsA<UDasWorldSubsystem>() ||
+                                              Self->IsA<UDasGameInstanceSubsystem>();
                     FDasDeclaredClass EffectiveDefaults;
                     if (!Model.ResolveClass(C.Id, EffectiveDefaults, Error))
                     {

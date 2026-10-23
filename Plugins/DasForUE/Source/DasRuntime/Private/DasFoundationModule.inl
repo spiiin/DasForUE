@@ -220,9 +220,9 @@ public:
         inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEPropertyPass()));
         inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEStatePass()));
         globalLintMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEPathLintPass()));
-        for (bool Text : {false, true})
+        for (int Mode : {0, 1, 2})
         {
-            auto* Macro = new FUEIdentityMacro(Text);
+            auto* Macro = new FUEIdentityMacro(Mode == 1, Mode == 2);
             ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));
             Macro->module = this;
             addCallMacro(Macro->name,
@@ -1185,6 +1185,8 @@ public:
                                                 "SubscribeInt");
         AddUEExtern<DAS_BIND_FUN(EmitSignal)>(*this, Library, "ue_emit_signal", das::SideEffects::modifyExternal,
                                               "EmitSignal");
+        AddUEExtern<DAS_BIND_FUN(SubsystemObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_subsystem", das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN(ClassDefaultObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_class_default_object", das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<int32,das::Type::tInt>))>(

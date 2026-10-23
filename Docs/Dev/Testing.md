@@ -349,3 +349,9 @@ build and all nine grouped checks passed. Commandlet execution took 0.26 seconds
 the scoped suite including startup and source/DLL freeze took 13 seconds.
 Receipt: `logs/dsl-diagnostics-validation.json`; output:
 `logs/dsl-diagnostics-runtime.log`. Full PIE/packaged suites were not run.
+## Authored subsystems
+
+Queue `test-suite <id> authored-subsystems,authored-subsystems-pie repo=C:\src\DasForUE2-subsystems`
+through the shared build agent. These are focused native-collection/reload and
+real multi-world PIE tests, not a packaged or full regression run. See
+[the subsystem guide](../Guide/Gameplay/Subsystems.md) for contracts and limits.

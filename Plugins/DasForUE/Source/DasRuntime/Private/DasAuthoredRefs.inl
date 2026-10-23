@@ -302,7 +302,10 @@ FString DSLAuthoredReferencePath(const das::TypeDeclPtr& Type)
         return DasNativeScriptHost(Class.NativeParent)->GetPathName();
     if (Class.NativeParent == TEXT("/Script/Engine.ActorComponent"))
         return TEXT("/Script/DasRuntime.DasScriptComponent");
-    DSLFail(TEXT("Authored signature reference requires an Actor/Component host"));
+    if (Class.NativeParent == TEXT("/Script/Engine.WorldSubsystem") ||
+                                   Class.NativeParent == TEXT("/Script/Engine.GameInstanceSubsystem"))
+        return DasNativeScriptHost(Class.NativeParent)->GetPathName();
+    DSLFail(TEXT("Authored signature reference requires an Actor/Component/Subsystem host"));
 }
 das::ExpressionPtr DSLAuthoredPack(const das::LineInfo& At, const das::TypeDeclPtr& Type, das::ExpressionPtr Value)
 {

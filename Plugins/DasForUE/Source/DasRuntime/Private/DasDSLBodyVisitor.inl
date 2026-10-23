@@ -1337,14 +1337,14 @@ struct FDSLBodyVisitor : das::Visitor
             return E;
         }
         if (Field->name == "ConstructionScript" || Field->name == "Initialize" || Field->name == "BeginPlay" ||
-            Field->name == "Tick" || Field->name == "EndPlay")
+            Field->name == "Tick" || Field->name == "EndPlay" || Field->name == "Deinitialize")
         {
-            const int Kind = Field->name == "BeginPlay"    ? 0
-                             : Field->name == "Tick"       ? 1
-                             : Field->name == "EndPlay"    ? 2
-                             : Field->name == "Initialize" ? 3
-                                                           : 4;
-            const size_t Count = (Kind == 0 || Kind == 3 || Kind == 4) ? 2 : 3;
+            const int Kind = Field->name == "BeginPlay"                                    ? 0
+                             : Field->name == "Tick"                                       ? 1
+                             : (Field->name == "EndPlay" || Field->name == "Deinitialize") ? 2
+                             : Field->name == "Initialize"                                 ? 3
+                                                                                           : 4;
+            const size_t Count = (Kind == 0 || Kind == 3 || Kind == 4 || Field->name == "Deinitialize") ? 2 : 3;
             if (E->arguments.size() != Count)
             {
                 Error = TEXT("Super lifecycle argument count mismatch");
@@ -1354,7 +1354,9 @@ struct FDSLBodyVisitor : das::Visitor
                 E->at, "__ue_parent_lifecycle",
                 {new das::ExprConstString(E->at, DSLUtf8(Decl.Id)), new das::ExprConstInt(E->at, Kind),
                  Kind == 1 ? E->arguments[2] : static_cast<das::ExpressionPtr>(new das::ExprConstFloat(E->at, 0.f)),
-                 Kind == 2 ? E->arguments[2] : static_cast<das::ExpressionPtr>(new das::ExprConstInt(E->at, 0))});
+                 Kind == 2 && Field->name != "Deinitialize"
+                     ? E->arguments[2]
+                     : static_cast<das::ExpressionPtr>(new das::ExprConstInt(E->at, 0))});
         }
         auto* Call = new das::ExprInvoke();
         Call->at = E->at;

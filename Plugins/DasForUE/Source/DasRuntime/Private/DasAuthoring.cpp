@@ -1510,6 +1510,8 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
     const auto* Declared = C;
     C = &Effective;
     const bool Library = C->NativeParent == TEXT("/Script/Engine.BlueprintFunctionLibrary");
+    const bool Subsystem = C->NativeParent == TEXT("/Script/Engine.WorldSubsystem") ||
+                                                   C->NativeParent == TEXT("/Script/Engine.GameInstanceSubsystem");
     const bool SaveGame = C->NativeParent == TEXT("/Script/Engine.SaveGame");
     const bool DataAsset = C->NativeParent == TEXT("/Script/Engine.DataAsset") ||
                                                    C->NativeParent == TEXT("/Script/Engine.PrimaryDataAsset");
@@ -1530,26 +1532,40 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         }
     if ((SaveGame || DataAsset) && (!C->Callbacks.IsEmpty() || C->AsyncPhysics || !C->Components.IsEmpty()))
         return Fail(Error, TEXT("SaveGame/DataAsset supports data and methods, without world lifecycle/components"));
-    if (!Library && !SaveGame && !DataAsset &&
+    if (Subsystem && (C->AsyncPhysics || !C->Components.IsEmpty() ||
+                      C->Callbacks.ContainsByPredicate(
+                          [](const auto& Hook)
+                          {
+                              return Hook.Kind !=
+                                     TEXT("Initialize") &&
+                                          (Hook.Kind != TEXT("EndPlay") || Hook.Name != TEXT("Deinitialize"));
+                          })))
+        return Fail(Error,
+                    TEXT("Subsystem supports Initialize and Deinitialize only, without Actor components/physics"));
+    if (!Library && !SaveGame && !DataAsset && !Subsystem &&
         (!DasActorNativeParent(C->NativeParent) && C->NativeParent != TEXT("/Script/Engine.ActorComponent")))
         return Fail(Error, TEXT("Class adapter requires an Actor, Pawn, Character, ActorComponent or SaveGame root"));
-    if ((!SaveGame && !DataAsset && C->Methods.IsEmpty() && C->Callbacks.IsEmpty() && !C->AsyncPhysics) ||
+    if ((!SaveGame && !DataAsset && !Subsystem && C->Methods.IsEmpty() && C->Callbacks.IsEmpty() && !C->AsyncPhysics) ||
         C->Methods.Num() > 64)
         return Fail(Error, TEXT("Actor adapter requires 1..64 methods"));
     FDasClassSchema Result;
     Result.ParentStableId = Declared->ParentId;
     Result.StableId = C->Id;
     Result.Name = *C->Name;
-    Result.Parent = Library ? TEXT("FunctionLibrary")
-                            : DataAsset
-        ? (C->NativeParent == TEXT("/Script/Engine.DataAsset")? TEXT("DataAsset"): TEXT("PrimaryDataAsset"))
-           : SaveGame
-           ? TEXT("SaveGame")
-           : C->NativeParent == TEXT("/Script/Engine.ActorComponent")
-                 ? TEXT("ActorComponent")
-                 : C->NativeParent == TEXT("/Script/Engine.Pawn")
-                       ? TEXT("Pawn")
-                       : C->NativeParent == TEXT("/Script/Engine.Character")? TEXT("Character"): TEXT("Actor");
+    Result.Parent = Subsystem
+        ? (C->NativeParent == TEXT("/Script/Engine.WorldSubsystem") ? TEXT("WorldSubsystem")
+                                                                    : TEXT("GameInstanceSubsystem"))
+           : Library
+           ? TEXT("FunctionLibrary")
+           : DataAsset
+           ? (C->NativeParent == TEXT("/Script/Engine.DataAsset")? TEXT("DataAsset"): TEXT("PrimaryDataAsset"))
+              : SaveGame
+              ? TEXT("SaveGame")
+              : C->NativeParent == TEXT("/Script/Engine.ActorComponent")
+                    ? TEXT("ActorComponent")
+                    : C->NativeParent == TEXT("/Script/Engine.Pawn")
+                          ? TEXT("Pawn")
+                          : C->NativeParent == TEXT("/Script/Engine.Character")? TEXT("Character"): TEXT("Actor");
     Result.Interfaces = C->Interfaces;
     Result.Metadata = C->Metadata;
     TArray<const FDasDeclaredMethod*> Methods;
@@ -1659,7 +1675,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
                                                                : FString::Printf(TEXT("%.17g"), P.Default.Number));
         }
         Method.Signature = (Result.Parent == TEXT("Pawn") || Result.Parent == TEXT("Character")) || Library ||
-                            SaveGame || DataAsset || M.bConst ||
+                            SaveGame || DataAsset || Subsystem || M.bConst ||
                             Result.Parent == TEXT("ActorComponent") || !C->Interfaces.IsEmpty()
                                                   ? EDasMethodSignature::Frame
                                               : Action ? EDasMethodSignature::Void

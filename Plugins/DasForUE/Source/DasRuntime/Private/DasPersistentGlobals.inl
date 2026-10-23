@@ -104,3 +104,38 @@ FDasObjectHandle ClassDefaultObject(const char* Base, FDasClassHandle Concrete, 
     Class = CheckedClass(Class, Base, Id, C);
     return MakeObjectHandle(Class->GetDefaultObject(), Class, C);
 }
+
+FDasObjectHandle SubsystemObject(const char* Base, FDasClassHandle Concrete, const char* Id, bool HasConcrete,
+                                 das::Context* C)
+{
+    RequireObjectContext(C);
+    auto* Owner = ResolveWorldContextObject(C);
+    auto* Class = HasConcrete ? Cast<UClass>(ResolveObject(FDasObjectHandle{Concrete.Token}, C))
+                              : (Base ? FindObject<UClass>(nullptr, UTF8_TO_TCHAR(Base)) : nullptr);
+    Class = CheckedClass(Class, Base, Id, C);
+    UObject* Result = nullptr;
+    if (Class->IsChildOf(UWorldSubsystem::StaticClass()))
+    {
+        auto* World = Owner->GetWorld();
+        if (World && World->IsGameWorld() && !World->bIsTearingDown)
+            Result = World->GetSubsystemBase(Class);
+    }
+    else if (Class->IsChildOf(UGameInstanceSubsystem::StaticClass()))
+    {
+        auto* GI = Cast<UGameInstance>(Owner);
+        if (auto* S = Cast<UGameInstanceSubsystem>(Owner))
+            GI = S->GetGameInstance();
+        if (!GI && Owner->GetWorld())
+            GI = Owner->GetWorld()->GetGameInstance();
+        if (GI)
+            Result = GI->GetSubsystemBase(Class);
+    }
+    else
+        C->throw_error("ue_subsystem requires WorldSubsystem or GameInstanceSubsystem class");
+    if (!IsValid(Result))
+        C->throw_error("subsystem is unavailable: preload its class before the owner collection initializes");
+    if ((Cast<UDasWorldSubsystem>(Result) && !CastChecked<UDasWorldSubsystem>(Result)->IsDasActive()) ||
+        (Cast<UDasGameInstanceSubsystem>(Result) && !CastChecked<UDasGameInstanceSubsystem>(Result)->IsDasActive()))
+        C->throw_error("subsystem is deinitialized");
+    return MakeObjectHandle(Result, Class, C);
+}
