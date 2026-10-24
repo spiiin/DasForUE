@@ -18,9 +18,19 @@ namespace DasNativeRoutesProbe
 {
 TWeakObjectPtr<APawn> Pawn;
 TWeakObjectPtr<AActor> Victim;
+TWeakObjectPtr<AActor> OtherActor;
+TWeakObjectPtr<USceneComponent> Child;
 UObject* GetPawn()
 {
     return Pawn.Get();
+}
+UObject* GetOther()
+{
+    return OtherActor.Get();
+}
+UObject* GetChild()
+{
+    return Child.Get();
 }
 UObject* GetVictim()
 {
@@ -83,6 +93,8 @@ DAS_NATIVE_BINDS(SmokeRoutes, "smoke_routes")
     Binds.Function<&GetPawn>(TEXT("smoke_routes_pawn"));
     Binds.Function<&GetVictim>(TEXT("smoke_routes_victim"));
     Binds.Function<&DestroyVictim>(TEXT("smoke_routes_destroy_victim"));
+    Binds.Function<&GetOther>(TEXT("smoke_routes_other"));
+    Binds.Function<&GetChild>(TEXT("smoke_routes_child"));
 }
 
 // Returns false with the failed checks in Report. World: a game world to spawn into, or nullptr for a temporary one.
@@ -119,6 +131,10 @@ bool RunDasNativeRoutesProbe(UWorld* GameWorld, FString& Report)
     Self->SetActorRotation(FRotator(0, 90, 0));
     Self->Tags.Add(TEXT("probe_tag"));
     Pawn = Cast<APawn>(Spawn(APawn::StaticClass(), FVector(0, 0, 500)));
+    OtherActor = Spawn(AActor::StaticClass(), FVector(0, 0, 900));
+    Child = NewObject<USceneComponent>(Self, TEXT("Child"));
+    Child->SetupAttachment(Self->GetRootComponent());
+    Child->RegisterComponent();
 
     const FString Routed = R.ScriptPath(TEXT("native_routes_probe.das"));
     const FString Reflected = R.ScriptPath(TEXT("native_routes_reflected.das"));
@@ -130,15 +146,15 @@ bool RunDasNativeRoutesProbe(UWorld* GameWorld, FString& Report)
         Calls = DasNativeRoutedCalls() - Before;
         return Result;
     };
-    // Expected: what the entry returns (0: its own check passed); bRouted: a bind answers it.
-    auto Case = [&](const TCHAR* Entry, int32 Expected, bool bRouted, TFunctionRef<bool()> After)
+    // Expected: what the entry returns (0: its own check passed); BindCalls: how many of its calls a bind answers.
+    auto Case = [&](const TCHAR* Entry, int32 Expected, uint64 BindCalls, TFunctionRef<bool()> After)
     {
         uint64 RoutedCalls = 0, ReflectedCalls = 0;
         const auto B = Run(Reflected, Entry, 0, ReflectedCalls);
         const bool bAfterB = After();
         const auto A = Run(Routed, Entry, 0, RoutedCalls);
         const bool bAfterA = After();
-        Check(A.bSucceeded && A.Value == Expected && bAfterA && RoutedCalls == (bRouted ? 1 : 0),
+        Check(A.bSucceeded && A.Value == Expected && bAfterA && RoutedCalls == BindCalls,
               FString(TEXT("native_routes_")) + Entry,
               FString::Printf(TEXT("value %d, bind calls %llu %s"), A.Value, RoutedCalls, *A.Error.Left(300)));
         Check(B.bSucceeded && B.Value == Expected && bAfterB && ReflectedCalls == 0,
@@ -149,48 +165,69 @@ bool RunDasNativeRoutesProbe(UWorld* GameWorld, FString& Report)
     {
         return true;
     };
-    Case(TEXT("actor_location"), 0, true, None);
-    Case(TEXT("actor_rotation"), 0, true, None);
-    Case(TEXT("actor_forward"), 0, true, None);
-    Case(TEXT("actor_transform"), 0, true, None);
-    Case(TEXT("set_actor_scale"), 0, true,
+    Case(TEXT("actor_location"), 0, 1, None);
+    Case(TEXT("actor_rotation"), 0, 1, None);
+    Case(TEXT("actor_forward"), 0, 1, None);
+    Case(TEXT("actor_transform"), 0, 1, None);
+    Case(TEXT("set_actor_scale"), 0, 1,
          [&]
          {
              const bool bScaled = Self->GetActorScale3D().Equals(FVector(2, 2, 2));
              Self->SetActorScale3D(FVector::OneVector);
              return bScaled;
          });
-    Case(TEXT("actor_has_tag"), 0, true, None);
-    Case(TEXT("actor_life_span"), 0, true, None);
-    Case(TEXT("set_actor_hidden"), 0, true,
+    Case(TEXT("actor_has_tag"), 0, 1, None);
+    Case(TEXT("actor_life_span"), 0, 1, None);
+    Case(TEXT("set_actor_hidden"), 0, 1,
          [&]
          {
              const bool bHidden = Self->IsHidden();
              Self->SetActorHiddenInGame(false);
              return bHidden;
          });
-    Case(TEXT("component_location"), 0, true, None);
-    Case(TEXT("pawn_location"), 0, true, None);
-    Case(TEXT("pawn_locally_controlled"), 0, true, None);
+    Case(TEXT("component_location"), 0, 1, None);
+    Case(TEXT("pawn_location"), 0, 1, None);
+    Case(TEXT("pawn_locally_controlled"), 0, 1, None);
     // Policies: construction-unsafe and authority-only UFUNCTIONs keep the reflected call.
-    Case(TEXT("component_is_active"), Self->GetRootComponent()->IsActive() ? 1 : 0, false, None);
-    Case(TEXT("set_replicates"), 0, false, None);
+    Case(TEXT("component_is_active"), Self->GetRootComponent()->IsActive() ? 1 : 0, 0, None);
+    Case(TEXT("set_replicates"), 0, 0, None);
 
-    // A destroyed receiver: both paths refuse it with the same message (the files differ only in the option line).
-    FString Errors[2];
-    for (int32 I = 0; I < 2; ++I)
+    // Object parameters and results (SetOwner + GetOwner: two calls).
+    Case(TEXT("owner_round_trip"), 0, 2,
+         [&]
+         {
+             const bool bOwned = Self->GetOwner() == OtherActor.Get();
+             Self->SetOwner(nullptr);
+             return bOwned;
+         });
+    Case(TEXT("owner_cleared"), 0, 2, [&] { return Self->GetOwner() == nullptr; });
+    Case(TEXT("root_component"), 0, 1, None);
+    Case(TEXT("attach_parent"), 0, 1, None);
+    Case(TEXT("component_owner"), 0, 1, None);
+    Case(TEXT("pawn_controller"), 0, 1, None);
+
+    // A destroyed receiver or object argument: both paths refuse it with the same message (the files differ only
+    // in the option line).
+    auto SameError = [&](const TCHAR* Entry, const TCHAR* Text)
     {
-        Victim = Spawn(AActor::StaticClass(), FVector::ZeroVector);
-        uint64 Calls = 0;
-        const auto Result = Run(I == 0 ? Routed : Reflected, TEXT("destroyed_receiver"), 0, Calls);
-        Errors[I] = Result.bSucceeded ? FString() : Result.Error;
-        Errors[I].ReplaceInline(TEXT("native_routes_reflected.das"), TEXT("native_routes_probe.das"));
-        // The call stack differs: the routed call has the wrapper's frame.
-        Errors[I] = Errors[I].Left(Errors[I].Find(TEXT("CALL STACK")));
-    }
-    const bool bRuntime = !Errors[0].IsEmpty() && !Errors[0].Contains(TEXT("[DAS:compile]"));
-    Check(bRuntime && Errors[0] == Errors[1], TEXT("native_routes_destroyed_receiver_same_error"),
-          Errors[0].Left(300) + TEXT(" | ") + Errors[1].Left(300));
+        FString Errors[2];
+        for (int32 I = 0; I < 2; ++I)
+        {
+            Victim = Spawn(AActor::StaticClass(), FVector::ZeroVector);
+            uint64 Calls = 0;
+            const auto Result = Run(I == 0 ? Routed : Reflected, Entry, 0, Calls);
+            Errors[I] = Result.bSucceeded ? FString() : Result.Error;
+            Errors[I].ReplaceInline(TEXT("native_routes_reflected.das"), TEXT("native_routes_probe.das"));
+            // The call stack differs: the routed call has the wrapper's frame.
+            Errors[I] = Errors[I].Left(Errors[I].Find(TEXT("CALL STACK")));
+        }
+        const bool bRuntime = !Errors[0].IsEmpty() && !Errors[0].Contains(TEXT("[DAS:compile]"));
+        Check(bRuntime && Errors[0].Contains(Text) && Errors[0] == Errors[1],
+              FString(TEXT("native_routes_")) + Entry + TEXT("_same_error"),
+              Errors[0].Left(300) + TEXT(" | ") + Errors[1].Left(300));
+    };
+    SameError(TEXT("destroyed_receiver"), TEXT("expired"));
+    SameError(TEXT("destroyed_argument"), TEXT("expired"));
 
     // Cost of one call on each path (informational; the machine's speed varies between runs).
     auto Time = [&](const FString& Path)
@@ -236,7 +273,7 @@ bool RunDasNativeRoutesProbe(UWorld* GameWorld, FString& Report)
     }
 
     R.ReleaseObject(Self);
-    for (AActor* Actor : {Self, static_cast<AActor*>(Pawn.Get())})
+    for (AActor* Actor : {Self, static_cast<AActor*>(Pawn.Get()), OtherActor.Get()})
         if (Actor)
             Actor->Destroy();
     if (!GameWorld)

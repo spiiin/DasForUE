@@ -447,9 +447,11 @@ public:
 // that calls the bind's route: a builtin of ue_foundation, made when the bind's module is built, that takes the
 // receiver's handle and class path before the bind's own arguments. It runs the receiver checks of the reflected
 // call (BeginNativeGameplayCall: a live receiver in the owner's world, no calls in bind_events / EndPlay, its
-// class), then the bind, without a call frame. The route is not in the script module: an executable program drops
-// the builtins of its own module (removeUnusedSymbols marks only script functions used), and its calls would keep
-// dangling pointers.
+// class), then the bind, without a call frame. Object parameters and results cross the route as UObjectHandle (the
+// wrapper passes `arg.handle` and turns the result into the method's reference type); an object argument that is
+// expired fails with the error of the reflected call (ResolveObject), null passes. The route is not in the script
+// module: an executable program drops the builtins of its own module (removeUnusedSymbols marks only script
+// functions used), and its calls would keep dangling pointers.
 struct SimNode_DasNativeRoute : SimNode_DasNative
 {
     using SimNode_DasNative::SimNode_DasNative;
@@ -463,11 +465,25 @@ struct SimNode_DasNativeRoute : SimNode_DasNative
         const auto* Handle = static_cast<const FDasObjectHandle*>(das::cast<void*>::to(Raw[0]));
         NativeGameplayObject(*Handle, das::cast<const char*>::to(Raw[1]), true, &Context);
         for (int32 I = 1; I < Function->Arguments.Num(); ++I)
+        {
             Raw[I] = Raw[I + 1];
+            if (Function->Arguments[I].Type == EDasNativeType::Object)
+                if (const auto* Argument = static_cast<const FDasObjectHandle*>(das::cast<void*>::to(Raw[I]));
+                    Argument->Token && !TryObject(*Argument, &Context))
+                    Context.throw_error("object handle is null, expired, or belongs to another context");
+        }
         ++DasNativeRoutedCallCount();
         return Run(Context, Raw);
     }
 };
+// A parameter or result type of a route: objects are UObjectHandle (the gameplay method's reference type carries
+// the class), everything else is the bind's type.
+das::TypeDeclPtr DasNativeRouteTypeDecl(const FDasNativeParam& Param, const FDasNativeResolvedParam& Resolved,
+                                        const das::ModuleLibrary& Lib, bool bArgument)
+{
+    return DasNativeTypeDecl(Param, Param.Type == EDasNativeType::Object ? FDasNativeResolvedParam() : Resolved, Lib,
+                             bArgument);
+}
 class FDasNativeRouteFunction final : public das::ExternalFnBase
 {
 public:
@@ -479,11 +495,11 @@ public:
         : ExternalFnBase(TCHAR_TO_UTF8(*F.RouteName), nullptr), Module(&Origin), Function(&F),
           Label(TCHAR_TO_UTF8(*F.ReflectedName))
     {
-        das::vector<das::TypeDeclPtr> Types{DasNativeTypeDecl(F.Result, F.Resolved.Last(), Lib, false),
+        das::vector<das::TypeDeclPtr> Types{DasNativeRouteTypeDecl(F.Result, F.Resolved.Last(), Lib, false),
                                             das::makeType<const FDasObjectHandle&>(Lib),
                                             das::makeType<const char*>(Lib)};
         for (int32 I = 1; I < F.Arguments.Num(); ++I)
-            Types.push_back(DasNativeTypeDecl(F.Arguments[I], F.Resolved[I], Lib, true));
+            Types.push_back(DasNativeRouteTypeDecl(F.Arguments[I], F.Resolved[I], Lib, true));
         constructExternal(Types);
         // Object receivers have no AOT ABI: callers stay in the interpreter (FDasClosedCallsLint).
         noAot = true;
@@ -510,9 +526,11 @@ FString DasNativeRoutePolicy(const UFunction* Function, const UClass* Receiver)
     return FString();
 }
 // Why the script types of a gameplay method (Types: the result, then the parameters) are not the types of the
-// bind that reflects it, or empty. Object references, for one, are script structs and not bind types.
+// bind that reflects it, or empty. An object is a native reference type there: ObjectPath gives its class path (empty
+// for any other type), which must be the bind's class.
 FString DasNativeRouteTypes(const FDasNativeRoute& Route, const das::ModuleLibrary& Lib,
-                            const das::vector<das::TypeDeclPtr>& Types)
+                            const das::vector<das::TypeDeclPtr>& Types,
+                            TFunctionRef<FString(const das::TypeDeclPtr&)> ObjectPath)
 {
     const FDasNativeFunctionDesc& F = *Route.Function;
     if (F.RouteName.IsEmpty())
@@ -522,6 +540,8 @@ FString DasNativeRouteTypes(const FDasNativeRoute& Route, const das::ModuleLibra
     auto Same = [&](const das::TypeDeclPtr& Script, const FDasNativeParam& P, const FDasNativeResolvedParam& R,
                     bool bArgument)
     {
+        if (P.Type == EDasNativeType::Object)
+            return R.Class && ObjectPath(Script) == R.Class->GetPathName();
         const auto Bind = DasNativeTypeDecl(P, R, Lib, bArgument);
         return Script->isSameType(*Bind, das::RefMatters::no, das::ConstMatters::no, das::TemporaryMatters::no);
     };

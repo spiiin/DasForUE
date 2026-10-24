@@ -84,10 +84,17 @@ int32 UDasNativeBindsManifestCommandlet::Main(const FString& Params)
     const bool bWritten =
         FJsonSerializer::Serialize(Root, Writer) &&
         FFileHelper::SaveStringToFile(Json, *Output, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
-    // Reflects in ue_engine: plain getters are routed, an authority-only UFUNCTION keeps the reflected call.
+    // Reflects in ue_engine: plain getters are routed, so are object parameters and results (as native reference
+    // types); an authority-only UFUNCTION keeps the reflected call.
     for (const TPair<const TCHAR*, const TCHAR*>& Expected :
          {TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.get_actor_location"), TEXT("routed")),
           TPair<const TCHAR*, const TCHAR*>(TEXT("USceneComponent.get_component_location"), TEXT("routed")),
+          TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.get_owner"), TEXT("routed")),
+          TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.set_owner"), TEXT("routed")),
+          TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.get_root_component"), TEXT("routed")),
+          TPair<const TCHAR*, const TCHAR*>(TEXT("APawn.get_controller"), TEXT("routed")),
+          TPair<const TCHAR*, const TCHAR*>(TEXT("UActorComponent.get_owner"), TEXT("routed")),
+          TPair<const TCHAR*, const TCHAR*>(TEXT("USceneComponent.get_attach_parent"), TEXT("routed")),
           TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.set_replicates"), TEXT("requires authority"))})
         if (const FString* Got = Routes.Find(Expected.Key); !Got || *Got != Expected.Value)
         {

@@ -180,6 +180,7 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Actor.Method<GetActorForwardVector>(TEXT("get_actor_forward_vector")).Reflects(TEXT("GetActorForwardVector"));
     Actor.Method<GetActorRightVector>(TEXT("get_actor_right_vector")).Reflects(TEXT("GetActorRightVector"));
     Actor.Method<GetActorUpVector>(TEXT("get_actor_up_vector")).Reflects(TEXT("GetActorUpVector"));
+    // NonNullArgs (null is an error here), while the UFUNCTIONs return 0 for null: these do not reflect them.
     Actor.Method<GetDistanceTo>(TEXT("get_distance_to"), EDasBind::NonNullArgs);
     Actor.Method<GetSquaredDistanceTo>(TEXT("get_squared_distance_to"), EDasBind::NonNullArgs);
     Actor.Method<GetHorizontalDistanceTo>(TEXT("get_horizontal_distance_to"), EDasBind::NonNullArgs);
@@ -202,20 +203,20 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Actor.Method<ActorHasTag>(TEXT("actor_has_tag")).Reflects(TEXT("ActorHasTag"));
     // BlueprintAuthorityOnly: gameplay scripts keep the reflected call, which checks authority.
     Actor.Method<SetReplicates>(TEXT("set_replicates")).Reflects(TEXT("SetReplicates"));
-    Actor.Method<GetActorOwner>(TEXT("get_owner"));
-    Actor.Method<SetActorOwner>(TEXT("set_owner"));
+    Actor.Method<GetActorOwner>(TEXT("get_owner")).Reflects(TEXT("GetOwner"));
+    Actor.Method<SetActorOwner>(TEXT("set_owner")).Reflects(TEXT("SetOwner"));
     Actor.Method<GetInstigator>(TEXT("get_instigator"));
-    Actor.Method<GetRootComponent>(TEXT("get_root_component"));
+    Actor.Method<GetRootComponent>(TEXT("get_root_component")).Reflects(TEXT("K2_GetRootComponent"));
     Actor.Method<GetActorWorld>(TEXT("get_world"));
 
     auto Pawn = Binds.Class<APawn>(TEXT("APawn"));
-    Pawn.Method<GetController>(TEXT("get_controller"));
+    Pawn.Method<GetController>(TEXT("get_controller")).Reflects(TEXT("GetController"));
     Pawn.Method<IsLocallyControlled>(TEXT("is_locally_controlled")).Reflects(TEXT("IsLocallyControlled"));
     Pawn.Method<IsPlayerControlled>(TEXT("is_player_controlled")).Reflects(TEXT("IsPlayerControlled"));
     Pawn.Method<AddMovementInput>(TEXT("add_movement_input"));
 
     auto Component = Binds.Class<UActorComponent>(TEXT("UActorComponent"));
-    Component.Method<GetComponentOwner>(TEXT("get_owner"));
+    Component.Method<GetComponentOwner>(TEXT("get_owner")).Reflects(TEXT("GetOwner"));
     Component.Method<IsActive>(TEXT("is_active")).Reflects(TEXT("IsActive"));
     Component.Method<Activate>(TEXT("activate"));
     Component.Method<Deactivate>(TEXT("deactivate"));
@@ -254,7 +255,7 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Scene.Method<DoesSocketExist>(TEXT("does_socket_exist")).Reflects(TEXT("DoesSocketExist"));
     Scene.Method<GetComponentVelocity>(TEXT("get_component_velocity")).Reflects(TEXT("GetComponentVelocity"));
     Scene.Method<SetComponentVelocity>(TEXT("set_component_velocity"));
-    Scene.Method<GetAttachParent>(TEXT("get_attach_parent"));
+    Scene.Method<GetAttachParent>(TEXT("get_attach_parent")).Reflects(TEXT("GetAttachParent"));
     Scene.Method<GetAttachSocketName>(TEXT("get_attach_socket_name")).Reflects(TEXT("GetAttachSocketName"));
     Scene.Method<&AttachTo>(TEXT("attach_to"), EDasBind::NonNullArgs);
     Scene.Method<&Detach>(TEXT("detach"));

@@ -951,10 +951,12 @@ das::ExpressionPtr DSLMethodArgumentDefault(bool Native, const FDasDeclaredParam
 // DasNativeBinds.inl
 FString DasNativeRoutePolicy(const UFunction* Function, const UClass* Receiver);
 FString DasNativeRouteTypes(const FDasNativeRoute& Route, const das::ModuleLibrary& Lib,
-                            const das::vector<das::TypeDeclPtr>& Types);
+                            const das::vector<das::TypeDeclPtr>& Types,
+                            TFunctionRef<FString(const das::TypeDeclPtr&)> ObjectPath);
 // A native gameplay method that a native bind reflects (DasNativeBinds.h, Reflects) calls that bind: the wrapper has
 // the method's name, parameters and defaults and calls the bind's route (SimNode_DasNativeRoute) with the
-// receiver's handle and class path. Not when the script sets `options ue_native_routes = false`, the UFUNCTION's
+// receiver's handle and class path; object arguments pass their handles, an object result becomes the method's
+// reference type. Not when the script sets `options ue_native_routes = false`, the UFUNCTION's
 // policy keeps the reflected call (DasNativeRoutePolicy), or the script types differ from the bind's. Returns false
 // to emit the reflected wrapper.
 bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::TypeDeclPtr& ReceiverType,
@@ -978,8 +980,14 @@ bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::
         Types.push_back(DSLMethodValueType(Program, Module, Method.Parameters[Index].Type,
                                            Descriptor.Parameters[size_t(Index)], Descriptor.Scope, At));
     }
+    // An object is a native object reference (not an interface or an authored view), whose class the bind must
+    // take or return.
+    auto ObjectPath = [](const das::TypeDeclPtr& T)
+    {
+        return DSLTypedObject(T) ? DSLTypedReferencePath(T) : FString();
+    };
     if (Why.IsEmpty())
-        Why = DasNativeRouteTypes(Route, *Program->thisModuleGroup, Types);
+        Why = DasNativeRouteTypes(Route, *Program->thisModuleGroup, Types, ObjectPath);
     if (!Why.IsEmpty())
     {
         UE_LOG(LogDasRuntime, Verbose, TEXT("%s.%s keeps the reflected call: %s"), *ClassPath, *DSLText(Name), *Why);
@@ -1010,7 +1018,10 @@ bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::
         const auto ArgName = "arg_" + das::to_string(Index);
         auto* Arg = AddArgument(ArgName, Types[size_t(Index) + 1]);
         Arg->init = DSLMethodArgumentDefault(true, Method.Parameters[Index], Arg->type, At);
-        Arguments.push_back(new das::ExprVar(At, ArgName));
+        das::ExpressionPtr Value = new das::ExprVar(At, ArgName);
+        if (!ObjectPath(Arg->type).IsEmpty())
+            Value = new das::ExprField(At, Value, "handle");
+        Arguments.push_back(Value);
     }
     auto* Call = DSLCall(At, DSLUtf8(Route.Function->RouteName), {});
     Call->arguments = std::move(Arguments);
@@ -1018,6 +1029,8 @@ bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::
     Block->at = At;
     if (Fn->result->baseType == das::Type::tVoid)
         Block->list.push_back(Call);
+    else if (!ObjectPath(Fn->result).IsEmpty())
+        Block->list.push_back(new das::ExprReturn(At, DSLNativeReferenceUnpack(At, Fn->result, Call)));
     else
         Block->list.push_back(new das::ExprReturn(At, Call));
     Fn->body = Block;

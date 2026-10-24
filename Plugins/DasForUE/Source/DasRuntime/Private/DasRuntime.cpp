@@ -647,13 +647,38 @@ TArray<FDasNativeModuleInfo> DescribeDasNativeModules()
                 return;
             Info.Reflects = F.ReflectedPath;
             const UFunction* U = FindObject<UFunction>(nullptr, *F.ReflectedPath);
-            bool bObjects = F.Result.Type == EDasNativeType::Object;
+            // Gameplay scripts pass objects as native reference types (the route takes their handles): each object
+            // class of the bind needs one.
+            FString MissingView;
+            auto CheckView = [&](const FDasNativeParam& P, const FDasNativeResolvedParam& R)
+            {
+                if (P.Type != EDasNativeType::Object || !MissingView.IsEmpty())
+                    return;
+                const FString Path = R.Class ? R.Class->GetPathName() : FString();
+                bool bFound = false;
+                for (const auto& View : DasNativeGameplayViews)
+                    bFound |= Path == View.Class;
+                if (!bFound)
+                    MissingView = TEXT("no native reference type for ") + Path;
+            };
+            CheckView(F.Result, F.Resolved.Last());
             for (int32 I = 1; I < F.Arguments.Num(); ++I)
-                bObjects |= F.Arguments[I].Type == EDasNativeType::Object;
-            // Gameplay scripts pass object references as script structs, which are not bind types.
-            Info.RouteNote = !U         ? FString(TEXT("UFUNCTION not found"))
-                             : bObjects ? FString(TEXT("object parameters or result"))
-                                        : DasNativeRoutePolicy(U, F.Receiver());
+                CheckView(F.Arguments[I], F.Resolved[I]);
+            // Gameplay references of descendant classes also call the bind: without a row for the receiver class
+            // (UActorComponent.GetOwner), the policy of a descendant's row applies.
+            const UClass* PolicyClass = F.Receiver();
+            if (U && !DasNativeGameplayMethod(PolicyClass->GetPathName(), U->GetName()))
+                for (const auto& Row : DasNativeGameplayMethods)
+                    if (U->GetName() == Row.Name)
+                        if (const UClass* Class = FindObject<UClass>(nullptr, Row.Class);
+                            Class && Class->IsChildOf(PolicyClass))
+                        {
+                            PolicyClass = Class;
+                            break;
+                        }
+            Info.RouteNote = !U                      ? FString(TEXT("UFUNCTION not found"))
+                             : !MissingView.IsEmpty() ? MissingView
+                                                      : DasNativeRoutePolicy(U, PolicyClass);
             Info.bRouted = Info.RouteNote.IsEmpty();
         };
         for (const FDasNativeFunctionDesc& F : Desc->Functions)

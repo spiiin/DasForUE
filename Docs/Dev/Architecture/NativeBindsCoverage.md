@@ -39,9 +39,9 @@ that gameplay scripts (`ref.K2_GetActorLocation()`) now call through the bind th
 
 | Script type | Reflected functions | Direct now | Routed |
 | --- | ---: | ---: | ---: |
-| AActor | 118 | 26 | 18 |
-| APawn | 152 | 30 | 20 |
-| USceneComponent | 77 | 25 | 12 |
+| AActor | 118 | 26 | 21 |
+| APawn | 152 | 30 | 24 |
+| USceneComponent | 77 | 25 | 17 |
 
 ## Still missing in these areas
 

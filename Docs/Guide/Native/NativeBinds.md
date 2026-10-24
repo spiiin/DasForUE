@@ -143,8 +143,12 @@ Actor.Method<GetActorLocation>(TEXT("get_actor_location")).Reflects(TEXT("K2_Get
 ```
 
 Then the same gameplay call runs the bind: same syntax, same receiver checks (a live receiver in the owner's
-world, no calls in `bind_events` / `EndPlay`, its class), no call frame. `ue_engine` reflects about 37
+world, no calls in `bind_events` / `EndPlay`, its class), no call frame. `ue_engine` reflects about 43
 `UFUNCTION`s of `AActor`, `APawn`, `UActorComponent` and `USceneComponent`; the reference lists them.
+
+Object parameters and results work too (`self.GetOwner()`, `self.SetOwner(other)`, `c.GetAttachParent()`): the
+gameplay reference passes its handle to the bind, and an object result becomes the method's reference type. As on
+reflection, a null reference passes as `nullptr` and an expired one is an error.
 
 `Reflects` is checked when the module is built: the `UFUNCTION` exists, is `BlueprintCallable` and native, is not
 an event, static, network or editor-only function, has the same result and only input parameters of the same
@@ -152,8 +156,9 @@ types; the bind is not `NonNullArgs` (reflection passes `nullptr`); one bind per
 module unavailable with the reason.
 
 The gameplay call stays on reflection when the `UFUNCTION` requires authority or is unsafe in construction
-scripts (the reflected call checks these), when its script types differ from the bind's (object parameters and
-results: gameplay references are script structs), or when the script sets `options ue_native_routes = false`.
+scripts (the reflected call checks these), when its script types differ from the bind's (an object must be the
+reference type of the bind's class; interfaces and authored classes are not routed), or when the script sets
+`options ue_native_routes = false`.
 
 ## AOT
 

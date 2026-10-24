@@ -37,8 +37,8 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `get_horizontal_distance_to(AActor) : float` | non-null arguments |
 | `get_instigator() : APawn` |  |
 | `get_life_span() : float` | reflects `GetLifeSpan` |
-| `get_owner() : AActor` |  |
-| `get_root_component() : USceneComponent` |  |
+| `get_owner() : AActor` | reflects `GetOwner` |
+| `get_root_component() : USceneComponent` | reflects `K2_GetRootComponent` |
 | `get_squared_distance_to(AActor) : float` | non-null arguments |
 | `get_velocity() : UEVector` | reflects `GetVelocity` |
 | `get_world() : UWorld` |  |
@@ -55,7 +55,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `set_actor_tick_enabled(bool)` | reflects `SetActorTickEnabled` |
 | `set_actor_transform(UETransform) : bool` |  |
 | `set_life_span(float)` | reflects `SetLifeSpan` |
-| `set_owner(AActor)` |  |
+| `set_owner(AActor)` | reflects `SetOwner` |
 | `set_replicates(bool)` | reflects `SetReplicates` (kept: requires authority) |
 
 ### APawn
@@ -63,7 +63,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | Method | Notes |
 | --- | --- |
 | `add_movement_input(UEVector, float)` |  |
-| `get_controller() : UObjectHandle` |  |
+| `get_controller() : UObjectHandle` | reflects `GetController` |
 | `is_locally_controlled() : bool` | reflects `IsLocallyControlled` |
 | `is_player_controlled() : bool` | reflects `IsPlayerControlled` |
 
@@ -72,17 +72,17 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | Method | Notes |
 | --- | --- |
 | `activate()` |  |
-| `component_has_tag(UENameValue) : bool` | reflects `ComponentHasTag` (kept: not a generated native gameplay method) |
+| `component_has_tag(UENameValue) : bool` | reflects `ComponentHasTag` |
 | `deactivate()` |  |
 | `destroy_component()` |  |
-| `get_owner() : AActor` |  |
+| `get_owner() : AActor` | reflects `GetOwner` |
 | `get_world() : UWorld` |  |
 | `has_begun_play() : bool` |  |
-| `is_active() : bool` | reflects `IsActive` (kept: not a generated native gameplay method) |
-| `is_component_tick_enabled() : bool` | reflects `IsComponentTickEnabled` (kept: not a generated native gameplay method) |
+| `is_active() : bool` | reflects `IsActive` (kept: unsafe in construction scripts) |
+| `is_component_tick_enabled() : bool` | reflects `IsComponentTickEnabled` |
 | `is_registered() : bool` |  |
 | `set_active(bool)` |  |
-| `set_component_tick_enabled(bool)` | reflects `SetComponentTickEnabled` (kept: not a generated native gameplay method) |
+| `set_component_tick_enabled(bool)` | reflects `SetComponentTickEnabled` |
 
 ### USceneComponent
 
@@ -95,7 +95,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `attach_to(USceneComponent, UENameValue, bool) : bool` | non-null arguments |
 | `detach(bool)` |  |
 | `does_socket_exist(UENameValue) : bool` | reflects `DoesSocketExist` |
-| `get_attach_parent() : USceneComponent` |  |
+| `get_attach_parent() : USceneComponent` | reflects `GetAttachParent` |
 | `get_attach_socket_name() : UENameValue` | reflects `GetAttachSocketName` |
 | `get_component_location() : UEVector` | reflects `K2_GetComponentLocation` |
 | `get_component_rotation() : UERotator` | reflects `K2_GetComponentRotation` |
