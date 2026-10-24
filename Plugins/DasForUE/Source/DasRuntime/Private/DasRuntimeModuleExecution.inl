@@ -1,5 +1,14 @@
 // Part of DasRuntime.cpp: FDasRuntimeModule: script execution, callbacks, construction and library frames.
 // Included in place; declaration order matters.
+
+// A typed call from C++ (DasScriptFunctionCalls.inl) through RunCallback: the contract replaces the one a call
+// frame describes, and Invoke replaces packing the frame, the evaluation and reading the result. Invoke returns
+// false with Error for a value the call cannot take or give; a script error stays in the context.
+struct FDasTypedCall
+{
+    FDasCallContract Contract;
+    TFunctionRef<bool(das::Context&, das::SimFunction*, FString&)> Invoke;
+};
 // How a call checks its session sources against disk (das.ScriptChangeCheck): Full compares bytes (always mode,
 // or a change was reported), Poll compares file stats (watch mode, once per poll interval), None trusts them.
 enum class ESourceCheck : uint8
@@ -142,7 +151,8 @@ FDasExecutionResult FDasRuntimeModule::RunLifecycle(const FString& Path, EDasCal
 FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCallback Event, int32 Input,
                                                    float DeltaSeconds, TWeakObjectPtr<UObject> Self,
                                                    const FString& EntryPoint, EDasMethodSignature Signature,
-                                                   const TArray<FDasScalarValue>* Frame, const FString& ReturnClass)
+                                                   const TArray<FDasScalarValue>* Frame, const FString& ReturnClass,
+                                                   const FDasTypedCall* Typed)
 {
     TGuardValue<const FString*> LibraryContractScope(
         LibraryInvocationContract,
@@ -231,6 +241,16 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     }
     FStructFrameRoots FrameRoots(NormalizedFrame);
     FDasCallContract Expected = FDasCallContract::Scalar(Signature);
+    if (Typed)
+    {
+        // Its own contract; no frame, and Signature (Void) leaves every frame and result branch below inert.
+        if (Frame || Event != EDasCallback::Main || Signature != EDasMethodSignature::Void)
+        {
+            Result.Error = TEXT("Invalid typed call");
+            return Result;
+        }
+        Expected = Typed->Contract;
+    }
     if (Frame)
     {
         Expected.Inputs.Reset();
@@ -1065,7 +1085,9 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                             It.RemoveCurrent();
             };
             DasCallPhaseMark(EDasCallPhase::Arguments);
-            const auto Value = Context.evalWithCatch(
+            if (Typed && !Typed->Invoke(Context, Function, Result.Error) && !Context.getException())
+                return Result;
+            const auto Value = Typed ? v_zero() : Context.evalWithCatch(
                 Function,
                 Frame ? (Packed.empty() ? nullptr : Packed.data())
                 : Event == EDasCallback::Main && Signature == EDasMethodSignature::Void ? nullptr

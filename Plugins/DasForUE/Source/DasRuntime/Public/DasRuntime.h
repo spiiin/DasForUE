@@ -24,6 +24,7 @@ struct FDasGASDeclarations;
 struct FDasSourceCatalog;
 struct FDasScriptDelegateLease;
 struct FDasGASCalculationContext;
+struct FDasTypedCall;
 
 struct FDasTypeDeclaration
 {
@@ -184,7 +185,8 @@ private:
     RunCallback(const FString& Path, EDasCallback Event, int32 Input, float DeltaSeconds, TWeakObjectPtr<UObject> Self,
                 const FString& EntryPoint = TEXT("main"), EDasMethodSignature Signature = EDasMethodSignature::Int,
                                                  const TArray<FDasScalarValue>* Frame = nullptr,
-                                                 const FString& ReturnClass = FString());
+                                                 const FString& ReturnClass = FString(),
+                                                 const FDasTypedCall* Typed = nullptr);
     FDelegateHandle InputRestoreTickHandle;
     FDelegateHandle WorldCleanupHandle;
     FDelegateHandle PostGCHandle;

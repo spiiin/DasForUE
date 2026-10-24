@@ -341,8 +341,9 @@ informational):
 
 `TDasFunction<R(A...)>` (`DasScript.h`) calls an exported script function with typed arguments in the owner's
 persistent session. Its first call, and any call after something changed, takes the full persistent call path
-(`RunCallback` with a call frame); it then remembers the session and the function, and later calls with the same
-owner go straight to the VM (`das.ScriptFunctionFastPath`, see `DasScriptFunctionCalls.inl` for when it applies).
+(`RunCallback` with the typed contract, no call frame); it then remembers the session and the function, and later
+calls with the same owner go straight to the VM (`das.ScriptFunctionFastPath`, see `DasScriptFunctionCalls.inl` for
+when it applies).
 
 | Call (int -> int, editor, one run of `interop-performance`) | ns/call, median |
 | --- | ---: |

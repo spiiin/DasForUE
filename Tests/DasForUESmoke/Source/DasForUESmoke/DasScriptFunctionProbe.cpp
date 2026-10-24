@@ -14,6 +14,7 @@
 #include "Misc/AutomationTest.h"
 #include "Misc/FileHelper.h"
 #include "Modules/ModuleManager.h"
+#include <limits>
 
 // Returns false with the failed checks in Report. World: a game world to spawn into, or nullptr for a temporary one.
 bool RunDasScriptFunctionProbe(UWorld* GameWorld, FString& Report)
@@ -92,6 +93,21 @@ bool RunDasScriptFunctionProbe(UWorld* GameWorld, FString& Report)
         const FTransform Transform(FRotator(0, 45, 0), FVector(1, 2, 3), FVector(2, 2, 2));
         Twice(TEXT("transform"), TDasFunction<FTransform(const FTransform&)>(Script, TEXT("same_transform")),
               [&](const FTransform& Value) { return Value.Equals(Transform); }, Transform);
+        // Types without call frame slots (both paths pack them the same way).
+        Twice(TEXT("int64"), TDasFunction<int64(int64)>(Script, TEXT("next_long")), Is((int64(1) << 40) + 1),
+              int64(1) << 40);
+        Twice(TEXT("vector2d"), TDasFunction<FVector2D(const FVector2D&)>(Script, TEXT("swapped")),
+              Is(FVector2D(2, 1)), FVector2D(1, 2));
+        Twice(TEXT("quat"), TDasFunction<FQuat(const FQuat&)>(Script, TEXT("conjugate")),
+              Is(FQuat(-0.1, -0.2, -0.3, 0.9)), FQuat(0.1, 0.2, 0.3, 0.9));
+        Twice(TEXT("linear_color"), TDasFunction<FLinearColor(FLinearColor)>(Script, TEXT("dimmed")),
+              Is(FLinearColor(0.25f, 0.5f, 1.f, 0.75f)), FLinearColor(0.5f, 1.f, 2.f, 0.75f));
+        Twice(TEXT("color"), TDasFunction<FColor(FColor)>(Script, TEXT("rotated")), Is(FColor(20, 30, 10, 40)),
+              FColor(10, 20, 30, 40));
+        Twice(TEXT("date_time"), TDasFunction<FDateTime(FDateTime, FTimespan)>(Script, TEXT("later")),
+              Is(FDateTime(2024, 2, 29, 12)), FDateTime(2024, 2, 28, 12), FTimespan::FromDays(1));
+        Twice(TEXT("timespan"), TDasFunction<FTimespan(const FTimespan&)>(Script, TEXT("twice_span")),
+              Is(FTimespan::FromHours(3)), FTimespan::FromMinutes(90));
         // Objects: the same object back; a result of another class reads as nullptr.
         Twice(TEXT("object"), TDasFunction<AActor*(AActor*)>(Script, TEXT("same_object")), Is(Owner), Owner);
         Twice(TEXT("object_other_class"), TDasFunction<AActor*(UObject*)>(Script, TEXT("same_object")),
@@ -127,6 +143,15 @@ bool RunDasScriptFunctionProbe(UWorld* GameWorld, FString& Report)
                 TEXT("Expected exported missing"), TEXT("(C++ expects missing(int) : int)"));
         Refused(TEXT("not_exported_refused"), TDasFunction<int32(int32)>(Script, TEXT("hidden")).Call(Owner, 1),
                 TEXT("Expected exported hidden"), TEXT("(C++ expects hidden(int) : int)"));
+        Refused(TEXT("int_for_int64_refused"), TDasFunction<int32(int32)>(Script, TEXT("next_long")).Call(Owner, 1),
+                TEXT("Expected exported next_long"), TEXT("(C++ expects next_long(int) : int)"));
+        Refused(TEXT("linear_color_for_color_refused"),
+                TDasFunction<FColor(FLinearColor)>(Script, TEXT("rotated")).Call(Owner, FLinearColor::White),
+                TEXT("Expected exported rotated"), TEXT("(C++ expects rotated(UELinearColor) : UEColor)"));
+        Refused(TEXT("nan_vector2d_refused"),
+                TDasFunction<FVector2D(FVector2D)>(Script, TEXT("swapped"))
+                    .Call(Owner, FVector2D(std::numeric_limits<double>::quiet_NaN(), 0)),
+                TEXT("Invalid/non-finite math struct input"), TEXT("(C++ expects swapped(UEVector2D) : UEVector2D)"));
         Refused(TEXT("null_owner_refused"), TDasFunction<int32(int32)>(Script, TEXT("fails")).Call(nullptr, 1),
                 TEXT("the owner object is null or being destroyed"), TEXT("(C++ expects fails(int) : int)"));
         Refused(TEXT("script_error_reported"), TDasFunction<int32(int32)>(Script, TEXT("fails")).Call(Owner, 3),
@@ -194,6 +219,31 @@ bool RunDasScriptFunctionProbe(UWorld* GameWorld, FString& Report)
               V1.HasError() ? V1.GetError().Left(300) : V2.HasError() ? V2.GetError().Left(300) : FString());
         Check(!V3.HasError() && V3.GetValue() == 12, TEXT("script_function_reload_signature_change_rejected"),
               V3.HasError() ? V3.GetError().Left(300) : FString::FromInt(V3.GetValue()));
+    }
+    // The same for a kind only typed calls have: the session keeps the int64 contract through reloads.
+    {
+        const TCHAR* Reload = TEXT("script_function_reload_int64.das");
+        const FString Path = R.ScriptPath(Reload);
+        auto Write = [&](const TCHAR* Body)
+        {
+            FFileHelper::SaveStringToFile(FString(TEXT("options gen2\n[export]\n")) + Body, *Path,
+                                          FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        };
+        const TDasFunction<int64(int64)> Long(Reload, TEXT("long_version"));
+        Write(TEXT("def long_version(base:int64):int64 { return base + 1l }\n"));
+        const auto L1 = Long.Call(Owner, int64(5));
+        Write(TEXT("def long_version(base:int64):int64 { return base + 2l }\n"));
+        const auto L2 = Long.Call(Owner, int64(5));
+        Write(TEXT("def long_version(base:int):int64 { return int64(base) }\n"));
+        const auto L3 = Long.Call(Owner, int64(5));
+        IFileManager::Get().Delete(*Path);
+        Check(!L1.HasError() && L1.GetValue() == 6 && !L2.HasError() && L2.GetValue() == 7 && !L3.HasError() &&
+                  L3.GetValue() == 7,
+              TEXT("script_function_reload_int64_signature_change_rejected"),
+              L1.HasError()   ? L1.GetError().Left(300)
+              : L2.HasError() ? L2.GetError().Left(300)
+              : L3.HasError() ? L3.GetError().Left(300)
+                              : FString::Printf(TEXT("%lld %lld %lld"), L1.GetValue(), L2.GetValue(), L3.GetValue()));
     }
     Check(TDasFunction<int32(int32, float)>(Script, TEXT("add")).Signature() == TEXT("add(int, float) : int"),
           TEXT("script_function_signature_text"));

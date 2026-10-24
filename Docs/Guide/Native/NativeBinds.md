@@ -219,9 +219,11 @@ subscriptions stay between calls. Another owner has its own session.
 
 | C++ | Script |
 | --- | --- |
-| `bool`, `int32`, `float`, `double`, `uint8` | `bool`, `int`, `float`, `double`, `uint8` |
+| `bool`, `int32`, `int64`, `float`, `double`, `uint8` | `bool`, `int`, `int64`, `float`, `double`, `uint8` |
 | `FString`, `FName`, `FText` | `string`, `UENameValue`, `UETextValue` |
-| `FVector`, `FRotator`, `FTransform` | `UEVector`, `UERotator`, `UETransform` |
+| `FVector`, `FVector2D`, `FRotator`, `FQuat`, `FTransform` | `UEVector`, `UEVector2D`, `UERotator`, `UEQuat`, `UETransform` |
+| `FLinearColor`, `FColor` | `UELinearColor`, `UEColor` |
+| `FDateTime`, `FTimespan` | `UEDateTime`, `UETimespan` (`require ue_time` for their operations) |
 | `T*` (`T` a `UObject` class) | `UObjectHandle` (a result of another class reads as `nullptr`) |
 | `void` result | `void` |
 

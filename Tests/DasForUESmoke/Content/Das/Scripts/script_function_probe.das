@@ -1,5 +1,6 @@
 options gen2
 require ue_foundation
+require ue_time
 
 // Typed calls from C++ (DasScript.h, TDasFunction), run by DasScriptFunctionProbe.cpp with an actor as the owner.
 // Each function transforms its arguments so that the probe can check both directions.
@@ -29,6 +30,23 @@ def turned(value:UERotator):UERotator { return ue_rotator(value.pitch, value.yaw
 def same_transform(value:UETransform):UETransform { return value }
 [export]
 def same_object(value:UObjectHandle):UObjectHandle { return value }
+// Types without call frame slots: int64, the other math structs, date and time.
+[export]
+def next_long(value:int64):int64 { return value + 1l }
+[export]
+def swapped(value:UEVector2D):UEVector2D { return ue_vector2d(value.y, value.x) }
+[export]
+def conjugate(value:UEQuat):UEQuat { return ue_quat(-value.x, -value.y, -value.z, value.w) }
+[export]
+def dimmed(value:UELinearColor):UELinearColor {
+    return ue_linear_color(value.r * 0.5, value.g * 0.5, value.b * 0.5, value.a)
+}
+[export]
+def rotated(value:UEColor):UEColor { return ue_color(int(value.g), int(value.b), int(value.r), int(value.a)) }
+[export]
+def later(value:UEDateTime; step:UETimespan):UEDateTime { return value + step }
+[export]
+def twice_span(value:UETimespan):UETimespan { return value + value }
 // Several parameters of different kinds.
 [export]
 def describe(count:int; ratio:float; title:string; where_:UEVector):string {

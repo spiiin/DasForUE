@@ -1,8 +1,9 @@
 // Part of DasRuntime.cpp: typed calls of script functions from C++ (DasScript.h, TDasFunction).
 // Included after DasRuntimeModuleExecution.inl; declaration order matters.
 //
-// The first call of a TDasFunction, and every call the fast path does not take, goes through RunCallback with a
-// call frame: it creates or reloads the owner's session, checks the function against the signature and runs it.
+// The first call of a TDasFunction, and every call the fast path does not take, goes through RunCallback with the
+// typed contract: it creates or reloads the owner's session, checks the function against the signature and runs it
+// through the same Eval as the fast path (no call frame: the frame has no slots for int64, FQuat, FDateTime...).
 // The call site then remembers that session and function. The next call with the same owner runs the function
 // directly, as long as nothing RunCallback would react to has changed: the session and its program (revision),
 // the set of sessions, the sources (hot reload), the owner's state; and only from the top level (no script on the
@@ -23,11 +24,12 @@ uint64 DasScriptFunctionFastCalls()
 // Math value names belong to their adapters (Scripts/TestTypeAdapterGate.py): the facet knows the handle.
 FString DasScriptTypeName(EDasMethodSignature Kind)
 {
+    const IDasScriptTypeFacet* Facet = DasTypedCallFacet(Kind);
     if (const auto* Adapter = FDasTypeAdapters::Get().FindSignature(Kind))
         for (const auto& Entry : FDasTypeAdapters::Get().Entries())
-            if (&*Entry.Adapter == Adapter && Entry.Script && Entry.Script->GetHandleName())
-                return UTF8_TO_TCHAR(Entry.Script->GetHandleName());
-    return TEXT("?");
+            if (&*Entry.Adapter == Adapter)
+                Facet = Entry.Script;
+    return Facet && Facet->GetHandleName() ? FString(UTF8_TO_TCHAR(Facet->GetHandleName())) : FString(TEXT("?"));
 }
 
 struct FDasScriptCallSite
@@ -42,141 +44,252 @@ struct FDasScriptCallSite
 
 namespace DasScriptCalls
 {
-// A typed argument as a call frame value (the full path).
-FDasScalarValue FrameValue(const FDasScriptArgument& A)
+// Math values travel as the address of a copy (arguments) or of the result slot; the size of the copy, or 0.
+int32 MathSize(EDasMethodSignature Kind)
 {
-    FDasScalarValue V;
-    V.Kind = int32(A.Kind);
-    switch (A.Kind)
+    switch (Kind)
     {
-    case EDasMethodSignature::Bool:
-        V.BoolValue = *static_cast<const bool*>(A.Value);
-        break;
-    case EDasMethodSignature::Int:
-        V.IntValue = *static_cast<const int32*>(A.Value);
-        break;
-    case EDasMethodSignature::Float:
-        V.FloatValue = *static_cast<const float*>(A.Value);
-        break;
-    case EDasMethodSignature::Double:
-        V.DoubleValue = *static_cast<const double*>(A.Value);
-        break;
-    case EDasMethodSignature::Byte:
-        V.ByteValue = *static_cast<const uint8*>(A.Value);
-        break;
-    case EDasMethodSignature::String:
-        V.StringValue = *static_cast<const FString*>(A.Value);
-        break;
-    case EDasMethodSignature::Name:
-        V.NameValue = *static_cast<const FName*>(A.Value);
-        break;
-    case EDasMethodSignature::Text:
-        V.TextValue = *static_cast<const FText*>(A.Value);
-        break;
     case EDasMethodSignature::Vector:
-        V.VectorValue = *static_cast<const FVector*>(A.Value);
-        break;
+        return sizeof(FVector);
     case EDasMethodSignature::Rotator:
-        V.RotatorValue = *static_cast<const FRotator*>(A.Value);
-        break;
+        return sizeof(FRotator);
     case EDasMethodSignature::Transform:
-        V.TransformValue = *static_cast<const FTransform*>(A.Value);
-        break;
-    case EDasMethodSignature::Object:
-        // An exported function takes UObjectHandle: the frame declares the object as UObject (the C++ type
-        // already guarantees the class).
-        V.ObjectValue = *static_cast<UObject* const*>(A.Value);
-        V.ObjectClass = TEXT("/Script/CoreUObject.Object");
-        break;
+        return sizeof(FTransform);
+    case EDasMethodSignature::Vector2D:
+        return sizeof(FVector2D);
+    case EDasMethodSignature::Quat:
+        return sizeof(FQuat);
+    case EDasMethodSignature::LinearColor:
+        return sizeof(FLinearColor);
+    case EDasMethodSignature::Color:
+        return sizeof(FColor);
     default:
-        break;
-    }
-    return V;
-}
-// The result of the full path into the C++ value.
-void StoreResult(const FDasExecutionResult& R, const FDasScriptArgument& Out)
-{
-    switch (Out.Kind)
-    {
-    case EDasMethodSignature::Bool:
-        *static_cast<bool*>(Out.Value) = R.BoolValue;
-        break;
-    case EDasMethodSignature::Int:
-        *static_cast<int32*>(Out.Value) = R.Value;
-        break;
-    case EDasMethodSignature::Float:
-        *static_cast<float*>(Out.Value) = R.FloatValue;
-        break;
-    case EDasMethodSignature::Double:
-        *static_cast<double*>(Out.Value) = R.DoubleValue;
-        break;
-    case EDasMethodSignature::Byte:
-        *static_cast<uint8*>(Out.Value) = R.ByteValue;
-        break;
-    case EDasMethodSignature::String:
-        *static_cast<FString*>(Out.Value) = R.StringValue;
-        break;
-    case EDasMethodSignature::Name:
-        *static_cast<FName*>(Out.Value) = R.NameValue;
-        break;
-    case EDasMethodSignature::Text:
-        *static_cast<FText*>(Out.Value) = R.TextValue;
-        break;
-    case EDasMethodSignature::Vector:
-        *static_cast<FVector*>(Out.Value) = R.VectorValue;
-        break;
-    case EDasMethodSignature::Rotator:
-        *static_cast<FRotator*>(Out.Value) = R.RotatorValue;
-        break;
-    case EDasMethodSignature::Transform:
-        *static_cast<FTransform*>(Out.Value) = R.TransformValue;
-        break;
-    case EDasMethodSignature::Object:
-        *static_cast<UObject**>(Out.Value) = R.ObjectValue.Get();
-        break;
-    default:
-        break;
+        return 0;
     }
 }
-// Arguments the full path would refuse: the fast path leaves them to it, so that it reports them.
-bool ArgumentsValid(TArrayView<const FDasScriptArgument> Arguments)
+constexpr int32 MathSlot = sizeof(FTransform); // the largest
+// Finite values only, in both directions (a transform also needs a normalized rotation).
+bool MathValid(EDasMethodSignature Kind, const void* Value)
 {
+    switch (Kind)
+    {
+    case EDasMethodSignature::Vector:
+        return !static_cast<const FVector*>(Value)->ContainsNaN();
+    case EDasMethodSignature::Rotator:
+        return !static_cast<const FRotator*>(Value)->ContainsNaN();
+    case EDasMethodSignature::Transform:
+    {
+        const auto& T = *static_cast<const FTransform*>(Value);
+        return !T.ContainsNaN() && T.IsRotationNormalized();
+    }
+    case EDasMethodSignature::Vector2D:
+        return !static_cast<const FVector2D*>(Value)->ContainsNaN();
+    case EDasMethodSignature::Quat:
+        return !static_cast<const FQuat*>(Value)->ContainsNaN();
+    case EDasMethodSignature::LinearColor:
+    {
+        const auto& C = *static_cast<const FLinearColor*>(Value);
+        return FMath::IsFinite(C.R) && FMath::IsFinite(C.G) && FMath::IsFinite(C.B) && FMath::IsFinite(C.A);
+    }
+    default:
+        return true;
+    }
+}
+// Arguments a call refuses, with the reason.
+bool ArgumentsValid(TArrayView<const FDasScriptArgument> Arguments, FString& Error)
+{
+    if (Arguments.Num() > 16)
+    {
+        Error = TEXT("at most 16 arguments");
+        return false;
+    }
     for (const FDasScriptArgument& A : Arguments)
-        switch (A.Kind)
+        if (A.Kind == EDasMethodSignature::String)
         {
-        case EDasMethodSignature::String:
-        {
-            // FindChar would find the terminator: look at the characters only, as RunCallback does.
+            // FindChar would find the terminator: look at the characters only.
             const FString& Text = *static_cast<const FString*>(A.Value);
             for (int32 I = 0; I < Text.Len(); ++I)
                 if (Text[I] == 0)
+                {
+                    Error = TEXT("embedded NUL is not supported in strings");
                     return false;
-            break;
+                }
         }
-        case EDasMethodSignature::Vector:
-            if (static_cast<const FVector*>(A.Value)->ContainsNaN())
-                return false;
-            break;
-        case EDasMethodSignature::Rotator:
-            if (static_cast<const FRotator*>(A.Value)->ContainsNaN())
-                return false;
-            break;
-        case EDasMethodSignature::Transform:
+        else if (!MathValid(A.Kind, A.Value))
         {
-            const auto& T = *static_cast<const FTransform*>(A.Value);
-            if (T.ContainsNaN() || !T.IsRotationNormalized())
-                return false;
-            break;
+            Error = TEXT("Invalid/non-finite math struct input");
+            return false;
         }
-        case EDasMethodSignature::Object:
+        else if (A.Kind == EDasMethodSignature::Object)
+        {
             if (UObject* Object = *static_cast<UObject* const*>(A.Value))
                 if (!IsValid(Object) || !DasReferenceMatches(Object, A.Class ? A.Class : UObject::StaticClass()) ||
                     (Object->IsA<AActor>() && CastChecked<AActor>(Object)->IsActorBeingDestroyed()))
+                {
+                    Error = TEXT("Object argument is expired or has wrong class");
                     return false;
+                }
+        }
+    return true;
+}
+// The contract the session records for the function (reloads keep it). Objects are declared as UObject, as a call
+// frame would: the C++ type already guarantees the class, and TDasFunction casts the result.
+FDasCallContract Contract(TArrayView<const FDasScriptArgument> Arguments, const FDasScriptArgument& Result)
+{
+    const FString ObjectClass = TEXT("/Script/CoreUObject.Object");
+    FDasCallContract C;
+    C.ReturnKind = Result.Kind;
+    bool bObjects = false;
+    for (const FDasScriptArgument& A : Arguments)
+    {
+        C.Inputs.Add(A.Kind);
+        bObjects |= A.Kind == EDasMethodSignature::Object;
+    }
+    if (bObjects)
+        for (const FDasScriptArgument& A : Arguments)
+            C.InputClasses.Add(A.Kind == EDasMethodSignature::Object ? ObjectClass : FString());
+    if (Result.Kind == EDasMethodSignature::Object)
+        C.ReturnClass = ObjectClass;
+    return C;
+}
+// Packs the arguments, runs Function and stores its result into Result.Value; both paths call it. False with
+// Error for a value the call cannot take or give; false with the context's exception for a script error.
+bool Eval(das::Context& Context, das::SimFunction* Function, TArrayView<const FDasScriptArgument> Arguments,
+          const FDasScriptArgument& Result, FString& Error)
+{
+    vec4f Packed[16];
+    FDasObjectHandle Handles[16];
+    alignas(16) uint8 Math[16][MathSlot]; // copies: the script may change its parameter, never the caller's value
+    TArray<TStrongObjectPtr<UObject>, TInlineAllocator<4>> Pins;
+    for (int32 I = 0; I < Arguments.Num(); ++I)
+    {
+        const FDasScriptArgument& A = Arguments[I];
+        if (const int32 Size = MathSize(A.Kind))
+        {
+            FMemory::Memcpy(Math[I], A.Value, Size);
+            Packed[I] = das::cast<void*>::from(Math[I]);
+            continue;
+        }
+        switch (A.Kind)
+        {
+        case EDasMethodSignature::Bool:
+            Packed[I] = das::cast<bool>::from(*static_cast<const bool*>(A.Value));
             break;
-        default:
+        case EDasMethodSignature::Int:
+            Packed[I] = das::cast<int32>::from(*static_cast<const int32*>(A.Value));
+            break;
+        case EDasMethodSignature::Int64:
+            Packed[I] = das::cast<int64_t>::from(*static_cast<const int64*>(A.Value));
+            break;
+        case EDasMethodSignature::Float:
+            Packed[I] = das::cast<float>::from(*static_cast<const float*>(A.Value));
+            break;
+        case EDasMethodSignature::Double:
+            Packed[I] = das::cast<double>::from(*static_cast<const double*>(A.Value));
+            break;
+        case EDasMethodSignature::Byte:
+            Packed[I] = das::cast<uint8_t>::from(*static_cast<const uint8*>(A.Value));
+            break;
+        case EDasMethodSignature::String:
+            Packed[I] = das::cast<char*>::from(CopyDSLString(*static_cast<const FString*>(A.Value), &Context));
+            break;
+        case EDasMethodSignature::Name:
+            Packed[I] = das::cast<FDasNameValue>::from(MakeDSLName(*static_cast<const FName*>(A.Value), &Context));
+            break;
+        case EDasMethodSignature::Text:
+            Packed[I] = das::cast<FDasTextValue>::from(MakeDSLText(*static_cast<const FText*>(A.Value), &Context));
+            break;
+        case EDasMethodSignature::DateTime:
+            Packed[I] = das::cast<FDasDateTimeValue>::from({static_cast<const FDateTime*>(A.Value)->GetTicks()});
+            break;
+        case EDasMethodSignature::Timespan:
+            Packed[I] = das::cast<FDasTimespanValue>::from({static_cast<const FTimespan*>(A.Value)->GetTicks()});
+            break;
+        case EDasMethodSignature::Object:
+        {
+            UObject* Object = *static_cast<UObject* const*>(A.Value);
+            Handles[I] = MakeObjectHandle(Object, UObject::StaticClass(), &Context);
+            if (Object)
+                Pins.Emplace(Object);
+            Packed[I] = das::cast<void*>::from(&Handles[I]);
             break;
         }
+        default:
+            Error = TEXT("Invalid scalar argument kind");
+            return false;
+        }
+    }
+    FDasObjectHandle ReturnedObject;
+    alignas(16) uint8 ReturnedMath[MathSlot] = {};
+    const int32 ResultMathSize = MathSize(Result.Kind);
+    void* Cmres = Result.Kind == EDasMethodSignature::Object ? static_cast<void*>(&ReturnedObject)
+                  : ResultMathSize                          ? static_cast<void*>(ReturnedMath)
+                                                            : nullptr;
+    const vec4f Value = Context.evalWithCatch(Function, Arguments.Num() ? Packed : nullptr, Cmres);
+    if (Context.getException())
+        return false;
+    if (ResultMathSize)
+    {
+        if (!MathValid(Result.Kind, ReturnedMath))
+        {
+            Error = TEXT("Invalid/non-finite math struct result");
+            return false;
+        }
+        FMemory::Memcpy(Result.Value, ReturnedMath, ResultMathSize);
+        return true;
+    }
+    switch (Result.Kind)
+    {
+    case EDasMethodSignature::Bool:
+        *static_cast<bool*>(Result.Value) = das::cast<bool>::to(Value);
+        break;
+    case EDasMethodSignature::Int:
+        *static_cast<int32*>(Result.Value) = das::cast<int32>::to(Value);
+        break;
+    case EDasMethodSignature::Int64:
+        *static_cast<int64*>(Result.Value) = das::cast<int64_t>::to(Value);
+        break;
+    case EDasMethodSignature::Float:
+        *static_cast<float*>(Result.Value) = das::cast<float>::to(Value);
+        break;
+    case EDasMethodSignature::Double:
+        *static_cast<double*>(Result.Value) = das::cast<double>::to(Value);
+        break;
+    case EDasMethodSignature::Byte:
+        *static_cast<uint8*>(Result.Value) = das::cast<uint8_t>::to(Value);
+        break;
+    case EDasMethodSignature::String:
+    {
+        const char* Text = das::cast<char*>::to(Value);
+        *static_cast<FString*>(Result.Value) = Text ? UTF8_TO_TCHAR(Text) : TEXT("");
+        break;
+    }
+    case EDasMethodSignature::Name:
+        *static_cast<FName*>(Result.Value) = ResolveDSLName(das::cast<FDasNameValue>::to(Value), &Context);
+        break;
+    case EDasMethodSignature::Text:
+        *static_cast<FText*>(Result.Value) = ResolveDSLText(das::cast<FDasTextValue>::to(Value), &Context);
+        break;
+    case EDasMethodSignature::DateTime:
+        *static_cast<FDateTime*>(Result.Value) = FDateTime(das::cast<FDasDateTimeValue>::to(Value).Ticks);
+        break;
+    case EDasMethodSignature::Timespan:
+        *static_cast<FTimespan*>(Result.Value) = FTimespan(das::cast<FDasTimespanValue>::to(Value).Ticks);
+        break;
+    case EDasMethodSignature::Object:
+    {
+        UObject* Object = ReturnedObject.Token ? TryObject(ReturnedObject, &Context) : nullptr;
+        if (ReturnedObject.Token && !Object)
+        {
+            Error = TEXT("Object result is expired or belongs to another context");
+            return false;
+        }
+        *static_cast<UObject**>(Result.Value) = Object; // TDasFunction casts it to its result class
+        break;
+    }
+    default:
+        break;
+    }
     return true;
 }
 }
@@ -212,7 +325,8 @@ bool FDasRuntimeModule::CallScriptSite(FDasScriptCallSite& Site, UObject* Owner,
         for (const auto& Delivery : *Deliveries)
             if (Delivery.Value.State == EInitializerDelivery::Failed)
                 return false;
-    if (Arguments.Num() > 16 || !DasScriptCalls::ArgumentsValid(Arguments))
+    FString ArgumentError; // the full path reports it
+    if (!DasScriptCalls::ArgumentsValid(Arguments, ArgumentError))
         return false;
     bTaken = true;
     ++GDasScriptFunctionFastCalls;
@@ -229,147 +343,13 @@ bool FDasRuntimeModule::CallScriptSite(FDasScriptCallSite& Site, UObject* Owner,
     TGuardValue<bool> EndingScope(Context.bEnding, false);
     TGuardValue<FOutputFrame*> OutScope(ActiveOutputFrame, nullptr);
 
-    vec4f Packed[16];
-    FDasObjectHandle Handles[16];
-    FVector Vectors[16];   // no constructors run for these two
-    FRotator Rotators[16];
-    TArray<FTransform, TInlineAllocator<2>> Transforms;
-    Transforms.Reserve(Arguments.Num()); // pointers into it stay valid
-    TArray<TStrongObjectPtr<UObject>, TInlineAllocator<4>> Pins;
-    for (int32 I = 0; I < Arguments.Num(); ++I)
-    {
-        const FDasScriptArgument& A = Arguments[I];
-        switch (A.Kind)
-        {
-        case EDasMethodSignature::Bool:
-            Packed[I] = das::cast<bool>::from(*static_cast<const bool*>(A.Value));
-            break;
-        case EDasMethodSignature::Int:
-            Packed[I] = das::cast<int32>::from(*static_cast<const int32*>(A.Value));
-            break;
-        case EDasMethodSignature::Float:
-            Packed[I] = das::cast<float>::from(*static_cast<const float*>(A.Value));
-            break;
-        case EDasMethodSignature::Double:
-            Packed[I] = das::cast<double>::from(*static_cast<const double*>(A.Value));
-            break;
-        case EDasMethodSignature::Byte:
-            Packed[I] = das::cast<uint8_t>::from(*static_cast<const uint8*>(A.Value));
-            break;
-        case EDasMethodSignature::String:
-            Packed[I] = das::cast<char*>::from(CopyDSLString(*static_cast<const FString*>(A.Value), &Context));
-            break;
-        case EDasMethodSignature::Name:
-            Packed[I] = das::cast<FDasNameValue>::from(MakeDSLName(*static_cast<const FName*>(A.Value), &Context));
-            break;
-        case EDasMethodSignature::Text:
-            Packed[I] = das::cast<FDasTextValue>::from(MakeDSLText(*static_cast<const FText*>(A.Value), &Context));
-            break;
-        // Math values are copied: the script may change its parameter, never the caller's value.
-        case EDasMethodSignature::Vector:
-            Vectors[I] = *static_cast<const FVector*>(A.Value);
-            Packed[I] = das::cast<void*>::from(&Vectors[I]);
-            break;
-        case EDasMethodSignature::Rotator:
-            Rotators[I] = *static_cast<const FRotator*>(A.Value);
-            Packed[I] = das::cast<void*>::from(&Rotators[I]);
-            break;
-        case EDasMethodSignature::Transform:
-            Packed[I] = das::cast<void*>::from(&Transforms.Add_GetRef(*static_cast<const FTransform*>(A.Value)));
-            break;
-        case EDasMethodSignature::Object:
-        {
-            UObject* Object = *static_cast<UObject* const*>(A.Value);
-            Handles[I] = MakeObjectHandle(Object, UObject::StaticClass(), &Context);
-            if (Object)
-                Pins.Emplace(Object);
-            Packed[I] = das::cast<void*>::from(&Handles[I]);
-            break;
-        }
-        default:
-            Error = TEXT("Invalid scalar argument kind");
-            return false;
-        }
-    }
-    FDasObjectHandle ReturnedObject;
-    FVector ReturnedVector = FVector::ZeroVector;
-    FRotator ReturnedRotator = FRotator::ZeroRotator;
-    FTransform ReturnedTransform = FTransform::Identity;
-    void* Cmres = Result.Kind == EDasMethodSignature::Object      ? static_cast<void*>(&ReturnedObject)
-                  : Result.Kind == EDasMethodSignature::Vector    ? static_cast<void*>(&ReturnedVector)
-                  : Result.Kind == EDasMethodSignature::Rotator   ? static_cast<void*>(&ReturnedRotator)
-                  : Result.Kind == EDasMethodSignature::Transform ? static_cast<void*>(&ReturnedTransform)
-                                                                  : nullptr;
     try
     {
-        const vec4f Value = Context.evalWithCatch(Site.Function, Arguments.Num() ? Packed : nullptr, Cmres);
+        if (DasScriptCalls::Eval(Context, Site.Function, Arguments, Result, Error))
+            return true;
         if (Context.getException())
-        {
             Error = DSLDiagnosticRuntime(Context, Session->Live->Program, Entry);
-            return false;
-        }
-        switch (Result.Kind)
-        {
-        case EDasMethodSignature::Bool:
-            *static_cast<bool*>(Result.Value) = das::cast<bool>::to(Value);
-            break;
-        case EDasMethodSignature::Int:
-            *static_cast<int32*>(Result.Value) = das::cast<int32>::to(Value);
-            break;
-        case EDasMethodSignature::Float:
-            *static_cast<float*>(Result.Value) = das::cast<float>::to(Value);
-            break;
-        case EDasMethodSignature::Double:
-            *static_cast<double*>(Result.Value) = das::cast<double>::to(Value);
-            break;
-        case EDasMethodSignature::Byte:
-            *static_cast<uint8*>(Result.Value) = das::cast<uint8_t>::to(Value);
-            break;
-        case EDasMethodSignature::String:
-        {
-            const char* Text = das::cast<char*>::to(Value);
-            *static_cast<FString*>(Result.Value) = Text ? UTF8_TO_TCHAR(Text) : TEXT("");
-            break;
-        }
-        case EDasMethodSignature::Name:
-            *static_cast<FName*>(Result.Value) = ResolveDSLName(das::cast<FDasNameValue>::to(Value), &Context);
-            break;
-        case EDasMethodSignature::Text:
-            *static_cast<FText*>(Result.Value) = ResolveDSLText(das::cast<FDasTextValue>::to(Value), &Context);
-            break;
-        case EDasMethodSignature::Vector:
-        case EDasMethodSignature::Rotator:
-        case EDasMethodSignature::Transform:
-            if ((Result.Kind == EDasMethodSignature::Vector && ReturnedVector.ContainsNaN()) ||
-                (Result.Kind == EDasMethodSignature::Rotator && ReturnedRotator.ContainsNaN()) ||
-                (Result.Kind == EDasMethodSignature::Transform &&
-                 (ReturnedTransform.ContainsNaN() || !ReturnedTransform.IsRotationNormalized())))
-            {
-                Error = TEXT("Invalid/non-finite math struct result");
-                return false;
-            }
-            if (Result.Kind == EDasMethodSignature::Vector)
-                *static_cast<FVector*>(Result.Value) = ReturnedVector;
-            else if (Result.Kind == EDasMethodSignature::Rotator)
-                *static_cast<FRotator*>(Result.Value) = ReturnedRotator;
-            else
-                *static_cast<FTransform*>(Result.Value) = ReturnedTransform;
-            break;
-        case EDasMethodSignature::Object:
-        {
-            UObject* Object = ReturnedObject.Token ? TryObject(ReturnedObject, &Context) : nullptr;
-            if (ReturnedObject.Token && !Object)
-            {
-                Error = TEXT("Object result is expired or belongs to another context");
-                return false;
-            }
-            *static_cast<UObject**>(Result.Value) = Object; // TDasFunction casts it to its result class
-            break;
-        }
-        default:
-            break;
-        }
-        return true;
+        return false;
     }
     catch (const std::exception& Exception)
     {
@@ -395,21 +375,22 @@ bool FDasRuntimeModule::CallScriptFunction(TSharedPtr<FDasScriptCallSite>& Site,
         if (bTaken)
             return bSucceeded;
     }
-    // The full path: RunCallback with a call frame. An object result is read as UObject (TDasFunction casts it).
-    TArray<FDasScalarValue> Frame;
-    Frame.Reserve(Arguments.Num());
-    for (const FDasScriptArgument& A : Arguments)
-        Frame.Add(DasScriptCalls::FrameValue(A));
+    // The full path: RunCallback with the typed contract; the same Eval packs, runs and reads the result.
+    if (!DasScriptCalls::ArgumentsValid(Arguments, Error))
+        return false;
+    auto Invoke = [&](das::Context& Context, das::SimFunction* Function, FString& InvokeError)
+    {
+        return DasScriptCalls::Eval(Context, Function, Arguments, Result, InvokeError);
+    };
+    const FDasTypedCall Typed{DasScriptCalls::Contract(Arguments, Result), Invoke};
     const FString Path = ScriptPath(Script);
-    const FDasExecutionResult Out =
-        RunCallback(Path, EDasCallback::Main, 0, 0.f, Owner, Entry, Result.Kind, &Frame,
-                    Result.Kind == EDasMethodSignature::Object ? TEXT("/Script/CoreUObject.Object") : FString());
+    const FDasExecutionResult Out = RunCallback(Path, EDasCallback::Main, 0, 0.f, Owner, Entry,
+                                                EDasMethodSignature::Void, nullptr, FString(), &Typed);
     if (!Out.bSucceeded)
     {
         Error = Out.Error;
         return false;
     }
-    DasScriptCalls::StoreResult(Out, Result);
     // Remember the session and the function for the next call.
     if (!Site)
         Site = MakeShared<FDasScriptCallSite>();

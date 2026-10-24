@@ -140,13 +140,40 @@ const char* WidgetEventHandleName(const FString& Path)
         return "UEPointerEvent";
     return nullptr;
 }
+// The math structs of typed calls from C++ (DasScript.h); their script types belong to the struct adapters.
+const UScriptStruct* DasTypedCallStruct(EDasMethodSignature Kind)
+{
+    switch (Kind)
+    {
+    case EDasMethodSignature::Vector2D:
+        return TBaseStructure<FVector2D>::Get();
+    case EDasMethodSignature::Quat:
+        return TBaseStructure<FQuat>::Get();
+    case EDasMethodSignature::LinearColor:
+        return TBaseStructure<FLinearColor>::Get();
+    case EDasMethodSignature::Color:
+        return TBaseStructure<FColor>::Get();
+    default:
+        return nullptr;
+    }
+}
+// The script facet of a typed call's math struct, or nullptr.
+const IDasScriptTypeFacet* DasTypedCallFacet(EDasMethodSignature Kind)
+{
+    if (const UScriptStruct* Struct = DasTypedCallStruct(Kind))
+        if (const auto* Adapter = FDasTypeAdapters::Get().FindStruct(Struct))
+            for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+                if (&*Entry.Adapter == Adapter)
+                    return Entry.Script;
+    return nullptr;
+}
 bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const FDasCallContract& C,
                     bool AllowNativeInputValue = false)
 {
     if (C.Inputs.Num() > 16 ||
         ((static_cast<uint8>(C.ReturnKind) > 13 && C.ReturnKind != EDasMethodSignature::Class &&
           C.ReturnKind != EDasMethodSignature::Delegate && C.ReturnKind != EDasMethodSignature::Byte &&
-          C.ReturnKind != EDasMethodSignature::Text) ||
+          C.ReturnKind != EDasMethodSignature::Text && !DasIsTypedCallKind(C.ReturnKind)) ||
          C.ReturnKind == EDasMethodSignature::Frame))
         return false;
     const FTCHARToUTF8 N(*Entry);
@@ -243,9 +270,19 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
     {
         if (!T || T->ref ||
             ((static_cast<uint8>(K) > 13 && K != EDasMethodSignature::Class && K != EDasMethodSignature::Delegate &&
-              K != EDasMethodSignature::Byte && K != EDasMethodSignature::Text) ||
+              K != EDasMethodSignature::Byte && K != EDasMethodSignature::Text && !DasIsTypedCallKind(K)) ||
              K == EDasMethodSignature::Frame))
             return false;
+        if (K == EDasMethodSignature::Int64)
+            return T->isSimpleType(das::Type::tInt64);
+        if (K == EDasMethodSignature::DateTime || K == EDasMethodSignature::Timespan)
+            return T->baseType == das::Type::tHandle && T->annotation &&
+                   T->annotation->name == (K == EDasMethodSignature::DateTime ? "UEDateTime" : "UETimespan");
+        if (DasIsTypedCallKind(K))
+        {
+            const auto* Facet = DasTypedCallFacet(K);
+            return Facet && Facet->MatchesScriptType(T);
+        }
         if (K == EDasMethodSignature::Byte)
             return T->isSimpleType(das::Type::tUInt8);
         if (K == EDasMethodSignature::Text)

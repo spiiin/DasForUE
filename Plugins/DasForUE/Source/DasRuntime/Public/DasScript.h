@@ -1,6 +1,8 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "DasSchema.h"
+#include "Misc/DateTime.h"
+#include "Misc/Timespan.h"
 #include "Templates/ValueOrError.h"
 #include "UObject/Object.h"
 #include <type_traits>
@@ -16,9 +18,11 @@
 //     def enemy_count(wave:int; difficulty:float):int { ... }
 //
 // The script function must be [export] and have exactly these types (C++ -> script):
-//     bool -> bool, int32 -> int, float -> float, double -> double, uint8 -> uint8, FString -> string,
-//     FName -> UENameValue, FText -> UETextValue, FVector -> UEVector, FRotator -> UERotator,
-//     FTransform -> UETransform, T* (T a UObject class) -> UObjectHandle, void result -> void.
+//     bool -> bool, int32 -> int, int64 -> int64, float -> float, double -> double, uint8 -> uint8,
+//     FString -> string, FName -> UENameValue, FText -> UETextValue, FVector -> UEVector,
+//     FVector2D -> UEVector2D, FRotator -> UERotator, FQuat -> UEQuat, FTransform -> UETransform,
+//     FLinearColor -> UELinearColor, FColor -> UEColor, FDateTime -> UEDateTime, FTimespan -> UETimespan,
+//     T* (T a UObject class) -> UObjectHandle, void result -> void.
 // The signature is checked when the session first runs the function; a mismatch, a missing function, a script
 // error or a dead owner is an error value, never a crash. A reload that changes the signature of a function the
 // session has been called with is rejected (logged) and the previous version keeps running. A returned object of
@@ -48,8 +52,9 @@ DASRUNTIME_API FString DasScriptTypeName(EDasMethodSignature Kind);
 
 template <class T, class Enable = void> struct TDasScriptType
 {
-    static_assert(sizeof(T) == 0, "Unsupported TDasFunction type: use bool, int32, float, double, uint8, FString, "
-                                  "FName, FText, FVector, FRotator, FTransform, a pointer to a UObject class or void");
+    static_assert(sizeof(T) == 0, "Unsupported TDasFunction type: use bool, int32, int64, float, double, uint8, "
+                                  "FString, FName, FText, FVector, FVector2D, FRotator, FQuat, FTransform, "
+                                  "FLinearColor, FColor, FDateTime, FTimespan, a pointer to a UObject class or void");
 };
 // Kind and script name of a type; Storage holds a result.
 #define DAS_SCRIPT_TYPE(CppType, KindName, ScriptName)                                                                 \
@@ -76,6 +81,7 @@ template <class T, class Enable = void> struct TDasScriptType
     };
 DAS_SCRIPT_TYPE(bool, Bool, TEXT("bool"))
 DAS_SCRIPT_TYPE(int32, Int, TEXT("int"))
+DAS_SCRIPT_TYPE(int64, Int64, TEXT("int64"))
 DAS_SCRIPT_TYPE(float, Float, TEXT("float"))
 DAS_SCRIPT_TYPE(double, Double, TEXT("double"))
 DAS_SCRIPT_TYPE(uint8, Byte, TEXT("uint8"))
@@ -85,6 +91,12 @@ DAS_SCRIPT_TYPE(FText, Text, TEXT("UETextValue"))
 DAS_SCRIPT_TYPE(FVector, Vector, DasScriptTypeName(Kind))
 DAS_SCRIPT_TYPE(FRotator, Rotator, DasScriptTypeName(Kind))
 DAS_SCRIPT_TYPE(FTransform, Transform, DasScriptTypeName(Kind))
+DAS_SCRIPT_TYPE(FVector2D, Vector2D, DasScriptTypeName(Kind))
+DAS_SCRIPT_TYPE(FQuat, Quat, DasScriptTypeName(Kind))
+DAS_SCRIPT_TYPE(FLinearColor, LinearColor, DasScriptTypeName(Kind))
+DAS_SCRIPT_TYPE(FColor, Color, DasScriptTypeName(Kind))
+DAS_SCRIPT_TYPE(FDateTime, DateTime, TEXT("UEDateTime"))
+DAS_SCRIPT_TYPE(FTimespan, Timespan, TEXT("UETimespan"))
 #undef DAS_SCRIPT_TYPE
 template <> struct TDasScriptType<void>
 {

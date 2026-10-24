@@ -85,8 +85,20 @@ enum class EDasMethodSignature : uint8
     Class = 15,
     Delegate = 16,
     Byte = 17,
-    Text = 18
+    Text = 18,
+    // Typed calls from C++ only (DasScript.h, TDasFunction): never in call frames, schemas or components.
+    Int64 = 19,
+    Vector2D = 20,
+    Quat = 21,
+    LinearColor = 22,
+    Color = 23,
+    DateTime = 24,
+    Timespan = 25
 };
+inline bool DasIsTypedCallKind(EDasMethodSignature Kind)
+{
+    return Kind >= EDasMethodSignature::Int64 && Kind <= EDasMethodSignature::Timespan;
+}
 struct FDasCallContract
 {
     EDasMethodSignature ReturnKind = EDasMethodSignature::Int;
