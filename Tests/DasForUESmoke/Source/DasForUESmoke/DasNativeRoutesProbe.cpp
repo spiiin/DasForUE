@@ -230,20 +230,25 @@ bool RunDasNativeRoutesProbe(UWorld* GameWorld, FString& Report)
     SameError(TEXT("destroyed_argument"), TEXT("expired"));
 
     // Cost of one call on each path (informational; the machine's speed varies between runs).
-    auto Time = [&](const FString& Path)
+    auto Time = [&](const FString& Path, const TCHAR* Entry)
     {
         constexpr int32 Count = 1 << 14;
         uint64 Calls = 0;
-        Run(Path, TEXT("bench"), 16, Calls); // warm-up
+        Run(Path, Entry, 16, Calls); // warm-up
         const double Start = FPlatformTime::Seconds();
-        const auto Result = Run(Path, TEXT("bench"), Count, Calls);
+        const auto Result = Run(Path, Entry, Count, Calls);
         const double Ns = (FPlatformTime::Seconds() - Start) * 1e9 / Count;
         return Result.bSucceeded && Result.Value == Count ? Ns : -1.0;
     };
-    const double RoutedNs = Time(Routed), ReflectedNs = Time(Reflected);
+    const double RoutedNs = Time(Routed, TEXT("bench")), ReflectedNs = Time(Reflected, TEXT("bench"));
     Check(RoutedNs > 0 && ReflectedNs > 0, TEXT("native_routes_bench"),
           FString::Printf(TEXT("K2_GetActorLocation: bind %.0f ns, reflection %.0f ns a call"), RoutedNs,
                           ReflectedNs));
+    const double OwnerRoutedNs = Time(Routed, TEXT("bench_owner"));
+    const double OwnerReflectedNs = Time(Reflected, TEXT("bench_owner"));
+    Check(OwnerRoutedNs > 0 && OwnerReflectedNs > 0, TEXT("native_routes_bench_object"),
+          FString::Printf(TEXT("GetOwner: bind %.0f ns, reflection %.0f ns a call"), OwnerRoutedNs,
+                          OwnerReflectedNs));
 
     // Refused Reflects: the module reports why (DasNativeModuleStatus) and is not built.
     const FString Suffix = FGuid::NewGuid().ToString(EGuidFormats::Digits).Left(8).ToLower();

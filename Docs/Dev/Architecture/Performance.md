@@ -337,6 +337,18 @@ informational):
   keeps the method's name and default arguments.
 - Routed calls stay in the interpreter (object receivers have no AOT ABI); scripts with reflected calls did too.
 
+An object result (`native_routes_bench_object`: `GetOwner`, the route returns the handle and the wrapper makes the
+reference type), measured with `K2_GetActorLocation` in the same run:
+
+| Run | `GetOwner` bind / reflection, ns | `K2_GetActorLocation` bind / reflection, ns |
+| --- | ---: | ---: |
+| Editor automation | 502 / 18689 | 357 / 30483 |
+| Packaged game (`-DasNativeBinds`) | 254 / 5177 | 172 / 9245 |
+
+The object result adds ~80-150 ns over a vector result: the reference conversion (`ue_cast_nullable_object`)
+in the wrapper. The reflected `GetOwner` is cheaper than the reflected `K2_GetActorLocation` (no struct result to
+marshal), so the ratio is lower (~20x).
+
 ## Typed calls from C++ (`TDasFunction`) — 2026-10-24
 
 `TDasFunction<R(A...)>` (`DasScript.h`) calls an exported script function with typed arguments in the owner's

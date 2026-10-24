@@ -152,3 +152,13 @@ def bench(count:int):int {
     }
     return n
 }
+// An object result: the owner is null, each call returns an invalid reference.
+[export]
+def bench_owner(count:int):int {
+    let a = self_actor()
+    var n = 0
+    for (i in range(0, count)) {
+        if (!ue_is_valid(a.GetOwner())) { n += 1 }
+    }
+    return n
+}
