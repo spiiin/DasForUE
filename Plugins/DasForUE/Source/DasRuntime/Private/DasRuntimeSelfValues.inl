@@ -68,7 +68,8 @@ FTransform DSLTransform(const FVector& Translation, const FRotator& Rotation, co
         C->throw_error("transform components must be finite");
     return FTransform(Rotation, Translation, Scale);
 }
-FTransform DSLIdentityTransform()
+// The context is unused: an AOT-eligible extern takes exactly one (DasUEAot.h).
+FTransform DSLIdentityTransform(das::Context*)
 {
     return FTransform::Identity;
 }
@@ -81,15 +82,15 @@ FVector DSLTransformPosition(const FTransform& T, const FVector& V, das::Context
         C->throw_error("non-finite transformed position");
     return Result;
 }
-FVector DSLTranslation(const FTransform& T)
+FVector DSLTranslation(const FTransform& T, das::Context*)
 {
     return T.GetTranslation();
 }
-FVector DSLScale(const FTransform& T)
+FVector DSLScale(const FTransform& T, das::Context*)
 {
     return T.GetScale3D();
 }
-FRotator DSLRotation(const FTransform& T)
+FRotator DSLRotation(const FTransform& T, das::Context*)
 {
     return T.Rotator();
 }

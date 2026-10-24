@@ -29,6 +29,24 @@ def main(input:int):int {
         if (ue_object_is_a(s,"/Script/CoreUObject.Object")) { r+=8 }
         return r
     }
+    if (input==7) {
+        // Math externs and operators in compiled code: constructors, + - * += != and transform / rotation helpers.
+        let a=ue_vector(1.0lf,2.0lf,2.0lf)
+        let b=a+a-ue_vector(1.0lf,2.0lf,2.0lf)
+        let c=b*2.0lf
+        let p=ue_transform_position(ue_transform_identity(),c)
+        let r=ue_rotate_vector(ue_rotator(0.0lf,90.0lf,0.0lf),p)
+        var s=r
+        s+=ue_vector(0.0lf,0.0lf,0.0lf)
+        if (s!=r) { return -1 }
+        return int(ue_length(s)+0.5lf)
+    }
+    if (input==8) {
+        // A non-finite value: the extern's own error, the same on both paths.
+        // An overflow to infinity (not 0 / 0: MSVC refuses a constant division by zero in the generated code).
+        let bad=ue_vector(1.0e308lf,0.0lf,0.0lf)*double(input*input)
+        return int(ue_length(bad+ue_vector(1.0lf,0.0lf,0.0lf)))
+    }
     if (input==6) {
         // A null handle where an object is required: the extern's own error, the same on both paths.
         return ue_object_valid(ue_cast_object(ue_null_object(),"/Script/CoreUObject.Object")) ? 1 : 0

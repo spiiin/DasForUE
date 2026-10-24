@@ -194,8 +194,8 @@ and fail with the same messages (without the location in the script). Binds with
 (also `==` and `!=` of the class types) and gameplay calls routed to binds (`Reflects`) stay closed: a script
 function that calls one stays in the interpreter, the rest of the file is still compiled. Of `ue_foundation`'s
 own externs, those with scalars, strings and objects are compiled (`ue_self_object()`, `ue_ref`, `ue_is_valid`,
-object properties, ...); reflected `UFUNCTION` calls through a call frame, structs, traces, class handles and
-math values are not.
+object properties, ...) and math values (`ue_vector`, `ue_transform_identity`, `a + b`, `ue_rotate_vector`,
+...); reflected `UFUNCTION` calls through a call frame, structs, traces and class handles are not.
 
 ## Reload and unloading
 

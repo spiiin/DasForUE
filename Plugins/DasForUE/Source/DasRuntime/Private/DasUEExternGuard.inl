@@ -16,6 +16,10 @@ template <class F, F Fn> bool ConfigureUEAot(das::BuiltInFunction* Bound, const 
 {
     if constexpr (dasue::aot::Signature<F>::Supported)
     {
+        // Generated code calls an operator with its operands only: CallOp adds the context, which must be last.
+        const bool bOperator = Name && Name[0] && !FChar::IsAlpha(TCHAR(Name[0])) && Name[0] != '_';
+        if (bOperator && !dasue::aot::Signature<F>::ContextLast)
+            return false;
         const FString Types = dasue::aot::Signature<F>::CppTypes();
         const uint64 Key = dasue::aot::Key(Name, TCHAR_TO_UTF8(*Types));
         const FString Identity = FString(UTF8_TO_TCHAR(Name)) + TEXT(":") + Types;
@@ -24,7 +28,10 @@ template <class F, F Fn> bool ConfigureUEAot(das::BuiltInFunction* Bound, const 
             Existing && (Existing->Identity != Identity || Existing->Function != Pointer))
             throw std::runtime_error("UE AOT extern identity collision");
         UEAotEntries.Add(Key, {Pointer, Identity, FString(UTF8_TO_TCHAR(Name))});
-        Bound->cppName = TCHAR_TO_UTF8(*FString::Printf(TEXT("dasue::aot::Call<%lluULL,%s>"), Key, *Types));
+        Bound->cppName =
+            TCHAR_TO_UTF8(*(bOperator ? FString::Printf(TEXT("dasue::aot::CallOp<%lluULL,%s>"), Key,
+                                                        *dasue::aot::Signature<F>::OperandTypes())
+                                      : FString::Printf(TEXT("dasue::aot::Call<%lluULL,%s>"), Key, *Types)));
         return true;
     }
     return false;

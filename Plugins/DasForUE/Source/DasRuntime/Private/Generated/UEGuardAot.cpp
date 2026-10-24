@@ -62,13 +62,13 @@ static void resolveTypeInfoAnnotations()
 }
 
 
-inline int32_t main_e6ae49dba1daebf2 ( Context * __context__, int32_t __input_rename_at_5_0 );
+inline int32_t main_78d19a437ecb49e9 ( Context * __context__, int32_t __input_rename_at_5_0 );
 
 void __init_script ( Context * __context__, bool __init_shared )
 {
 }
 
-inline int32_t main_e6ae49dba1daebf2 ( Context * __context__, int32_t __input_rename_at_5_0 )
+inline int32_t main_78d19a437ecb49e9 ( Context * __context__, int32_t __input_rename_at_5_0 )
 {
     if ( __input_rename_at_5_0 == 0 )
     {
@@ -124,9 +124,45 @@ inline int32_t main_e6ae49dba1daebf2 ( Context * __context__, int32_t __input_re
                             };
                             return das_auto_cast<int32_t>::cast(__r_rename_at_25_3);
                         } else {
-                            FDasObjectHandle _temp_make_local_34_31_1; _temp_make_local_34_31_1;
-                            FDasObjectHandle _temp_make_local_34_46_2; _temp_make_local_34_46_2;
-                            return das_auto_cast<int32_t>::cast((__input_rename_at_5_0 == 6) ? das_auto_cast<int32_t>::cast((dasue::aot::Call<4307625512779238427ULL,bool,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_34_31_1 = (dasue::aot::Call<10661269455573276818ULL,FDasObjectHandle,const FDasObjectHandle &,const char *,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_34_46_2 = (dasue::aot::Call<4095682936210074511ULL,FDasObjectHandle,das::Context *>(__context__)))),(das_string_cast(((char *) "/Script/CoreUObject.Object"))),__context__)))),__context__) ? das_auto_cast<int32_t>::cast(1) : das_auto_cast<int32_t>::cast(0))) : das_auto_cast<int32_t>::cast(dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__)));
+                            if ( __input_rename_at_5_0 == 7 )
+                            {
+                                FVector _temp_make_local_35_18_1; _temp_make_local_35_18_1;
+                                FTransform _temp_make_local_37_36_2; _temp_make_local_37_36_2;
+                                FRotator _temp_make_local_38_31_3; _temp_make_local_38_31_3;
+                                FVector _temp_make_local_40_11_4; _temp_make_local_40_11_4;
+                                FVector __a_rename_at_34_4_ConstRef = ((FVector)dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(1.00000000000000000e+00,2.00000000000000000e+00,2.00000000000000000e+00,__context__));
+                                FVector const  & __a_rename_at_34_4 = __a_rename_at_34_4_ConstRef;
+;
+                                FVector __b_rename_at_35_5_ConstRef = ((FVector)(dasue::aot::CallOp<11304109026135635308ULL,FVector,const FVector &,const FVector &>(das_arg<FVector>::pass((dasue::aot::CallOp<11005769877631882766ULL,FVector,const FVector &,const FVector &>(__a_rename_at_34_4,__a_rename_at_34_4))),das_arg<FVector>::pass((_temp_make_local_35_18_1 = (dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(1.00000000000000000e+00,2.00000000000000000e+00,2.00000000000000000e+00,__context__)))))));
+                                FVector const  & __b_rename_at_35_5 = __b_rename_at_35_5_ConstRef;
+;
+                                FVector __c_rename_at_36_6_ConstRef = ((FVector)(dasue::aot::CallOp<17404226676109900178ULL,FVector,const FVector &,double>(__b_rename_at_35_5,2.00000000000000000e+00)));
+                                FVector const  & __c_rename_at_36_6 = __c_rename_at_36_6_ConstRef;
+;
+                                FVector __p_rename_at_37_7_ConstRef = ((FVector)dasue::aot::Call<11060960080875206919ULL,FVector,const FTransform &,const FVector &,das::Context *>(das_arg<FTransform>::pass((_temp_make_local_37_36_2 = (dasue::aot::Call<16889146393893836592ULL,FTransform,das::Context *>(__context__)))),__c_rename_at_36_6,__context__));
+                                FVector const  & __p_rename_at_37_7 = __p_rename_at_37_7_ConstRef;
+;
+                                FVector __r_rename_at_38_8_ConstRef = ((FVector)dasue::aot::Call<7516855317875375973ULL,FVector,const FRotator &,const FVector &,das::Context *>(das_arg<FRotator>::pass((_temp_make_local_38_31_3 = (dasue::aot::Call<15787533893030281030ULL,FRotator,double,double,double,das::Context *>(0.00000000000000000e+00,9.00000000000000000e+01,0.00000000000000000e+00,__context__)))),__p_rename_at_37_7,__context__));
+                                FVector const  & __r_rename_at_38_8 = __r_rename_at_38_8_ConstRef;
+;
+                                FVector __s_rename_at_39_9 = __r_rename_at_38_8;
+                                dasue::aot::CallOp<10815260216286374157ULL,void,FVector &,const FVector &>(das_arg<FVector>::pass(__s_rename_at_39_9),das_arg<FVector>::pass((_temp_make_local_40_11_4 = (dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(0.00000000000000000e+00,0.00000000000000000e+00,0.00000000000000000e+00,__context__)))));
+                                return das_auto_cast<int32_t>::cast((dasue::aot::CallOp<10232838305605187314ULL,bool,const FVector &,const FVector &>(das_arg<FVector>::pass(__s_rename_at_39_9),__r_rename_at_38_8)) ? das_auto_cast<int32_t>::cast(-1) : das_auto_cast<int32_t>::cast(int32_t(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<16429738110919662158ULL,double,const FVector &,das::Context *>(das_arg<FVector>::pass(__s_rename_at_39_9),__context__); }, [&]() { return 5.00000000000000000e-01; }))));
+                            } else {
+                                if ( __input_rename_at_5_0 == 8 )
+                                {
+                                    FVector _temp_make_local_47_16_5; _temp_make_local_47_16_5;
+                                    FVector _temp_make_local_48_33_6; _temp_make_local_48_33_6;
+                                    FVector __bad_rename_at_47_10_ConstRef = ((FVector)(dasue::aot::CallOp<17404226676109900178ULL,FVector,const FVector &,double>(das_arg<FVector>::pass((_temp_make_local_47_16_5 = (dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(1.00000000000000001e+308,0.00000000000000000e+00,0.00000000000000000e+00,__context__)))),double(__input_rename_at_5_0 * __input_rename_at_5_0))));
+                                    FVector const  & __bad_rename_at_47_10 = __bad_rename_at_47_10_ConstRef;
+;
+                                    return das_auto_cast<int32_t>::cast(int32_t(dasue::aot::Call<16429738110919662158ULL,double,const FVector &,das::Context *>(das_arg<FVector>::pass(dasue::aot::CallOp<11005769877631882766ULL,FVector,const FVector &,const FVector &>(__bad_rename_at_47_10,das_arg<FVector>::pass((_temp_make_local_48_33_6 = (dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(1.00000000000000000e+00,0.00000000000000000e+00,0.00000000000000000e+00,__context__)))))),__context__)));
+                                } else {
+                                    FDasObjectHandle _temp_make_local_52_31_7; _temp_make_local_52_31_7;
+                                    FDasObjectHandle _temp_make_local_52_46_8; _temp_make_local_52_46_8;
+                                    return das_auto_cast<int32_t>::cast((__input_rename_at_5_0 == 6) ? das_auto_cast<int32_t>::cast((dasue::aot::Call<4307625512779238427ULL,bool,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_52_31_7 = (dasue::aot::Call<10661269455573276818ULL,FDasObjectHandle,const FDasObjectHandle &,const char *,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_52_46_8 = (dasue::aot::Call<4095682936210074511ULL,FDasObjectHandle,das::Context *>(__context__)))),(das_string_cast(((char *) "/Script/CoreUObject.Object"))),__context__)))),__context__) ? das_auto_cast<int32_t>::cast(1) : das_auto_cast<int32_t>::cast(0))) : das_auto_cast<int32_t>::cast(dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__)));
+                                };
+                            };
                         };
                     };
                 };
@@ -134,9 +170,9 @@ inline int32_t main_e6ae49dba1daebf2 ( Context * __context__, int32_t __input_re
         };
     };
 }
-static vec4f __wrap_main_e6ae49dba1daebf2 ( Context * __context__ ) {
+static vec4f __wrap_main_78d19a437ecb49e9 ( Context * __context__ ) {
     int32_t arg_input = cast_aot_arg<int32_t>::to(*__context__,__context__->abiArguments()[0]);
-    return cast<int32_t>::from(main_e6ae49dba1daebf2(__context__, arg_input));
+    return cast<int32_t>::from(main_78d19a437ecb49e9(__context__, arg_input));
 }
 
 #ifdef _MSC_VER
@@ -144,8 +180,8 @@ static vec4f __wrap_main_e6ae49dba1daebf2 ( Context * __context__ ) {
 #endif
 struct AotFunction { uint64_t hash; bool is_cmres; void * fn; vec4f (*wrappedFn)(Context*); };
 static AotFunction functions[] = {
-    // main Ci hash=0xe6ae49dba1daebf2
-    { 0x88f5eda330ea3784, false, (void*)&main_e6ae49dba1daebf2, &__wrap_main_e6ae49dba1daebf2 },
+    // main Ci hash=0x78d19a437ecb49e9
+    { 0x89913d7c2aec4ad8, false, (void*)&main_78d19a437ecb49e9, &__wrap_main_78d19a437ecb49e9 },
 };
 #ifdef _MSC_VER
 #pragma optimize("", on)

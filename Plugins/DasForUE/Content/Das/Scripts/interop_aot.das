@@ -5,20 +5,20 @@ require ue_math
 require ue_engine
 require interop_objects
 
-// AOT against the interpreter (DasInteropProbe.inl, C3): input = iterations * 10 + mode; the results are folded
+// AOT against the interpreter (DasInteropProbe.inl, C3): input = iterations * 16 + mode; the results are folded
 // with XOR so neither build can drop the loop. Self is a UDasObjectFixture with health == 7. Modes 4 and 5 call
 // native binds through the guarded bridge: 4 a scalar one, 5 engine values (FVector by const reference and by
 // value, a date, a string result) - six calls an iteration. Mode 6 calls binds with objects (interop_objects: two
 // actors made by the probe): a parameter and the receiver, an object result, the valid / handle / as_ helpers.
 // Modes 7 and 8 fail (a null receiver, a null argument of a NonNullArgs bind): the probe compares the errors.
-// Mode 9 passes variables to binds with reference parameters (output parameters; ue_math values only, as
-// ue_foundation's math externs keep a function in the interpreter).
+// Mode 9 passes variables to binds with reference parameters (output parameters). Mode 10 is vector arithmetic
+// with ue_foundation's externs and operators.
 def leaf(value:int):int { return value+1 }
 
 [export]
 def main(input:int):int {
-    let mode=input % 10
-    let count=input / 10
+    let mode=input % 16
+    let count=input / 16
     var acc=0
     if (mode==0) {
         for (i in range(0,count)) { acc^=i & 7 }
@@ -45,6 +45,12 @@ def main(input:int):int {
             let size=double(i & 7)
             forward_vector().get_clamped_to_size(size,size).to_direction_and_length(direction,length)
             acc^=int(length+0.5lf)+i
+        }
+    } elif (mode==10) {
+        let step=ue_vector(1.0lf,0.0lf,0.0lf)
+        for (i in range(0,count)) {
+            let w=ue_vector(double(i & 7),0.0lf,0.0lf)+step*2.0lf
+            acc^=int(ue_length(w)+0.5lf)*(i+1) // not a plain + i: that XOR is 0 over 2^22 iterations
         }
     } elif (mode==7) {
         var none : AActor

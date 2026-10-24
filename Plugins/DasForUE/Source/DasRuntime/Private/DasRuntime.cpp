@@ -734,6 +734,10 @@ void dasue::aot::Finish(uint64_t Key, das::Context* Context)
     Context->throw_error(TCHAR_TO_UTF8(*Message));
 }
 
+das::Context* dasue::aot::CurrentContext()
+{
+    return ActiveContext;
+}
 void* dasue::aot::Resolve(uint64_t Key, das::Context* Context)
 {
     if (!Context)

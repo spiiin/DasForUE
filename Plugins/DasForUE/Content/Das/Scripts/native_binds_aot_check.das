@@ -27,9 +27,11 @@ def with_objects(input:int):int {
     return a.valid() ? int(a.get_actor_location().size_2d()) + input : input
 }
 
-// Reference parameters are compiled too (values made by ue_math: ue_foundation's math externs are not).
+// Reference parameters are compiled too: a transform setter and output parameters.
 [export]
 def with_refs(input:int):int {
+    var t = ue_transform_identity()
+    t.set_location(ue_vector(1.0lf, 2.0lf, 3.0lf))
     var axis = zero_vector()
     var angle = 0.0lf
     make_from_euler(zero_vector()).to_axis_and_angle(axis, angle)
@@ -37,6 +39,13 @@ def with_refs(input:int):int {
     var length = 0.0lf
     forward_vector().to_direction_and_length(direction, length)
     return int(length + angle) + input
+}
+
+// ue_foundation's math externs and operators are compiled.
+[export]
+def with_math(input:int):int {
+    let v = ue_vector(1.0lf, 2.0lf, 2.0lf) + ue_vector(0.0lf, 0.0lf, 0.0lf)
+    return int(ue_length(v * 2.0lf)) + input
 }
 
 // A class argument is compiled (a null handle here: class literals come from ue_foundation externs, which are not).

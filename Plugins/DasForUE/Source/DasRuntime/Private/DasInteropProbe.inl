@@ -569,7 +569,8 @@ void RunDasInteropProbe(FDasInteropBench& B)
     // C3. The same script loops compiled for AOT and for the interpreter. RunFile compiles on every call, so a
     // zero-iteration run is subtracted. Modes: 0 loop, 1 script call, 2 self field read, 3 scalar extern, 4 native
     // bind (DasNativeBinds.h, ue_time: days_in_year), 5 native binds with engine values (six calls an iteration),
-    // 6 native binds with objects (five calls an iteration), 9 output parameters (three calls an iteration).
+    // 6 native binds with objects (five calls an iteration), 9 output parameters (three calls an iteration),
+    // 10 vector arithmetic through ue_foundation's externs (five calls an iteration).
     TStrongObjectPtr<AActor> ActorPin(NewObject<AActor>(GetTransientPackage()));
     TStrongObjectPtr<AActor> OwnerPin(NewObject<AActor>(GetTransientPackage()));
     DasInterop::ObjectsActor = ActorPin.Get();
@@ -582,8 +583,9 @@ void RunDasInteropProbe(FDasInteropBench& B)
     const FAotMode AotLoop{TEXT("loop"), 0}, AotCall{TEXT("script_call"), 1}, AotField{TEXT("self_field_read"), 2};
     const FAotMode AotExtern{TEXT("scalar_extern"), 3}, AotNative{TEXT("native_bind"), 4};
     const FAotMode AotValues{TEXT("native_values"), 5}, AotObjects{TEXT("native_objects"), 6};
-    const FAotMode AotRefs{TEXT("native_refs"), 9};
-    for (const FAotMode& M : {AotLoop, AotCall, AotField, AotExtern, AotNative, AotValues, AotObjects, AotRefs})
+    const FAotMode AotRefs{TEXT("native_refs"), 9}, AotMath{TEXT("vector_math"), 10};
+    for (const FAotMode& M :
+         {AotLoop, AotCall, AotField, AotExtern, AotNative, AotValues, AotObjects, AotRefs, AotMath})
     {
         int64 Expected = 0;
         for (int32 I = 0; I < AotCalls; ++I)
@@ -591,14 +593,15 @@ void RunDasInteropProbe(FDasInteropBench& B)
             // Mode 5: |rotated forward| 1 + day 29 + 24 characters of "2024-02-29T00:00:00.000Z"; mode 6: the
             // owner is valid (1) and casts to AActor (2).
             const int32 Value[] = {I & 7, I + 1, 7 + I, I, 365 + I, 1 + 29 + 24 + I, 3 + I};
-            Expected ^= M.Mode == 9 ? (I & 7) + I : Value[M.Mode]; // mode 9: a vector of length I & 7
+            // Mode 9: a vector of length I & 7; mode 10: of length (I & 7) + 2, times I + 1.
+            Expected ^= M.Mode == 9 ? (I & 7) + I : M.Mode == 10 ? ((I & 7) + 2) * (I + 1) : Value[M.Mode];
         }
         for (bool bAot : {false, true})
         {
             const FString Name = FString::Printf(TEXT("%s_%s"), bAot ? TEXT("aot") : TEXT("interpreter"), M.Name);
             auto Run = [&](int32 N)
             {
-                const auto R = Runtime.RunFile(Aot, N * 10 + M.Mode, bAot, F);
+                const auto R = Runtime.RunFile(Aot, N * 16 + M.Mode, bAot, F);
                 if (!R.bSucceeded || R.bUsedAot != bAot)
                 {
                     B.Fail(Name + (R.bSucceeded ? TEXT(": AOT code for interop_aot.das is not linked; run "

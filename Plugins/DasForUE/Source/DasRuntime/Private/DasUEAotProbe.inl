@@ -119,6 +119,16 @@ bool RunDasUEAotProbe(FString& Report)
     Check(!AotError.bSucceeded && !InterpretedError.bSucceeded && !Message(AotError.Error).IsEmpty() &&
               Message(AotError.Error) == Message(InterpretedError.Error),
           TEXT("object_extern_error"), Message(AotError.Error) + TEXT(" / ") + Message(InterpretedError.Error));
+    // Math externs and operators (CallOp passes the context the generated code does not).
+    R = Run(7);
+    const auto InterpretedMath = Runtime.RunFile(Path, 7, false, Owner.Get());
+    Check(R.bSucceeded && R.bUsedAot && R.Value == 6 && InterpretedMath.bSucceeded && InterpretedMath.Value == 6,
+          TEXT("math_externs"), R.Error + InterpretedMath.Error);
+    const auto MathError = Run(8);
+    const auto InterpretedMathError = Runtime.RunFile(Path, 8, false, Owner.Get());
+    Check(!MathError.bSucceeded && !InterpretedMathError.bSucceeded && !Message(MathError.Error).IsEmpty() &&
+              Message(MathError.Error) == Message(InterpretedMathError.Error),
+          TEXT("math_extern_error"), Message(MathError.Error) + TEXT(" / ") + Message(InterpretedMathError.Error));
     R = Run(1);
     Check(!R.bSucceeded && !R.Error.IsEmpty(), TEXT("missing_property_refused"), R.Error);
     R = Run(2);

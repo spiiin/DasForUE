@@ -201,7 +201,8 @@ FQuat BuiltinQuat(double X, double Y, double Z, double W, das::Context* C)
 {
     return BuiltinValid(FQuat(X, Y, Z, W), C);
 }
-FQuat BuiltinQuatIdentity()
+// The context is unused: an AOT-eligible extern takes exactly one (DasUEAot.h).
+FQuat BuiltinQuatIdentity(das::Context*)
 {
     return FQuat::Identity;
 }
@@ -318,7 +319,7 @@ FColor BuiltinLinearToSRGB(const FLinearColor& Color, das::Context* C)
 {
     return BuiltinValid(Color, C).ToFColorSRGB();
 }
-FLinearColor BuiltinSRGBToLinear(const FColor& Color)
+FLinearColor BuiltinSRGBToLinear(const FColor& Color, das::Context*)
 {
     return FLinearColor::FromSRGBColor(Color);
 }
@@ -326,7 +327,7 @@ FColor BuiltinLinearQuantize(const FLinearColor& Color, das::Context* C)
 {
     return BuiltinValid(Color, C).ToFColor(false);
 }
-FLinearColor BuiltinColorReinterpretLinear(const FColor& Color)
+FLinearColor BuiltinColorReinterpretLinear(const FColor& Color, das::Context*)
 {
     return Color.ReinterpretAsLinear();
 }

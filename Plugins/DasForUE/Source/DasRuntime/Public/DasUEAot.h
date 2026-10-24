@@ -11,6 +11,8 @@ namespace dasue::aot
 DASRUNTIME_API void* Resolve(uint64_t Key, das::Context* Context);
 // After the call: a native bind that reported DasNativeError fails the script call here.
 DASRUNTIME_API void Finish(uint64_t Key, das::Context* Context);
+// The active script context: operators are called from generated code with their operands only (CallOp).
+DASRUNTIME_API das::Context* CurrentContext();
 template <class T> struct Type
 {
     static constexpr const char* Name = nullptr;
@@ -38,9 +40,30 @@ DAS_UE_AOT_TYPE(das::Context*, "das::Context *")
 // Object references as their handles: the extern resolves and checks them itself, the same code on both paths.
 DAS_UE_AOT_TYPE(const FDasObjectHandle&, "const FDasObjectHandle &")
 DAS_UE_AOT_TYPE(FDasObjectHandle, "FDasObjectHandle")
+// Math values: by const reference, by reference (compound assignments) and as results by value.
+DAS_UE_AOT_TYPE(const FVector&, "const FVector &")
+DAS_UE_AOT_TYPE(FVector&, "FVector &")
+DAS_UE_AOT_TYPE(FVector, "FVector")
+DAS_UE_AOT_TYPE(const FVector2D&, "const FVector2D &")
+DAS_UE_AOT_TYPE(FVector2D&, "FVector2D &")
+DAS_UE_AOT_TYPE(FVector2D, "FVector2D")
+DAS_UE_AOT_TYPE(const FRotator&, "const FRotator &")
+DAS_UE_AOT_TYPE(FRotator&, "FRotator &")
+DAS_UE_AOT_TYPE(FRotator, "FRotator")
+DAS_UE_AOT_TYPE(const FQuat&, "const FQuat &")
+DAS_UE_AOT_TYPE(FQuat&, "FQuat &")
+DAS_UE_AOT_TYPE(FQuat, "FQuat")
+DAS_UE_AOT_TYPE(const FTransform&, "const FTransform &")
+DAS_UE_AOT_TYPE(FTransform&, "FTransform &")
+DAS_UE_AOT_TYPE(FTransform, "FTransform")
+DAS_UE_AOT_TYPE(const FLinearColor&, "const FLinearColor &")
+DAS_UE_AOT_TYPE(FLinearColor&, "FLinearColor &")
+DAS_UE_AOT_TYPE(FLinearColor, "FLinearColor")
+DAS_UE_AOT_TYPE(const FColor&, "const FColor &")
+DAS_UE_AOT_TYPE(FColor&, "FColor &")
+DAS_UE_AOT_TYPE(FColor, "FColor")
 #undef DAS_UE_AOT_TYPE
-// Engine values (by const reference, results by value) are only in the ABI of native binds (DasNativeBinds.h);
-// AddUEExtern keeps the scalar and object ABI above.
+// Values only native binds pass (DasNativeBinds.h); AddUEExtern keeps the scalar, object and math ABI above.
 template <class T> struct ValueType
 {
     static constexpr const char* Name = Type<T>::Name;
@@ -50,20 +73,6 @@ template <class T> struct ValueType
     {                                                                                                                  \
         static constexpr const char* Name = N;                                                                         \
     };
-DAS_UE_AOT_VALUE(const FVector&, "const FVector &")
-DAS_UE_AOT_VALUE(FVector, "FVector")
-DAS_UE_AOT_VALUE(const FVector2D&, "const FVector2D &")
-DAS_UE_AOT_VALUE(FVector2D, "FVector2D")
-DAS_UE_AOT_VALUE(const FRotator&, "const FRotator &")
-DAS_UE_AOT_VALUE(FRotator, "FRotator")
-DAS_UE_AOT_VALUE(const FQuat&, "const FQuat &")
-DAS_UE_AOT_VALUE(FQuat, "FQuat")
-DAS_UE_AOT_VALUE(const FTransform&, "const FTransform &")
-DAS_UE_AOT_VALUE(FTransform, "FTransform")
-DAS_UE_AOT_VALUE(const FLinearColor&, "const FLinearColor &")
-DAS_UE_AOT_VALUE(FLinearColor, "FLinearColor")
-DAS_UE_AOT_VALUE(const FColor&, "const FColor &")
-DAS_UE_AOT_VALUE(FColor, "FColor")
 DAS_UE_AOT_VALUE(FDasDateTimeValue, "FDasDateTimeValue")
 DAS_UE_AOT_VALUE(FDasTimespanValue, "FDasTimespanValue")
 DAS_UE_AOT_VALUE(FDasClassHandle, "FDasClassHandle")
@@ -77,15 +86,17 @@ DAS_UE_AOT_VALUE(uint8_t&, "uint8_t &")
 DAS_UE_AOT_VALUE(char*&, "char * &")
 DAS_UE_AOT_VALUE(FDasDateTimeValue&, "FDasDateTimeValue &")
 DAS_UE_AOT_VALUE(FDasTimespanValue&, "FDasTimespanValue &")
-DAS_UE_AOT_VALUE(FVector&, "FVector &")
-DAS_UE_AOT_VALUE(FVector2D&, "FVector2D &")
-DAS_UE_AOT_VALUE(FRotator&, "FRotator &")
-DAS_UE_AOT_VALUE(FQuat&, "FQuat &")
-DAS_UE_AOT_VALUE(FTransform&, "FTransform &")
-DAS_UE_AOT_VALUE(FLinearColor&, "FLinearColor &")
-DAS_UE_AOT_VALUE(FColor&, "FColor &")
 #undef DAS_UE_AOT_VALUE
 
+template <class... A> struct LastIsContext : std::false_type
+{
+};
+template <class A> struct LastIsContext<A> : std::is_same<A, das::Context*>
+{
+};
+template <class A, class B, class... Rest> struct LastIsContext<A, B, Rest...> : LastIsContext<B, Rest...>
+{
+};
 template <class F> struct Signature
 {
     static constexpr bool Supported = false;
@@ -98,6 +109,20 @@ template <class R, class... A> struct Signature<R (*)(A...)>
     {
         FString S = UTF8_TO_TCHAR(Type<R>::Name);
         ((S += FString(TEXT(",")) + UTF8_TO_TCHAR(Type<A>::Name)), ...);
+        return S;
+    }
+    // Operators: the context must be the last parameter; CallOp passes it after the operands.
+    static constexpr bool ContextLast = LastIsContext<A...>::value;
+    static FString OperandTypes()
+    {
+        FString S = UTF8_TO_TCHAR(Type<R>::Name);
+        (
+            [&]
+            {
+                if constexpr (!std::is_same_v<A, das::Context*>)
+                    S += FString(TEXT(",")) + UTF8_TO_TCHAR(Type<A>::Name);
+            }(),
+            ...);
         return S;
     }
 };
@@ -144,6 +169,24 @@ template <uint64_t Id, class R, class... A> R Call(A... Args)
     else
     {
         R Result = Fn(std::forward<A>(Args)...);
+        Finish(Id, Context);
+        return Result;
+    }
+}
+// An operator: generated code passes the operands only; the entry takes the active context last.
+template <uint64_t Id, class R, class... A> R CallOp(A... Args)
+{
+    static_assert(CallSignature<R (*)(A..., das::Context*)>::Supported, "Unsupported UE AOT ABI");
+    das::Context* Context = CurrentContext();
+    auto Fn = reinterpret_cast<R (*)(A..., das::Context*)>(Resolve(Id, Context));
+    if constexpr (std::is_void_v<R>)
+    {
+        Fn(std::forward<A>(Args)..., Context);
+        Finish(Id, Context);
+    }
+    else
+    {
+        R Result = Fn(std::forward<A>(Args)..., Context);
         Finish(Id, Context);
         return Result;
     }

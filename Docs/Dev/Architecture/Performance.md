@@ -328,6 +328,14 @@ rows of one run only.
   output parameters, an iteration): interpreter 359.3 ns, AOT 184.8 ns. A reference is copied in and written back
   on both paths; the compiled caller saves the interpreter's argument nodes.
 
+  Math externs (2026-10-24, `vector_math`: `ue_vector`, `*`, `+`, `ue_length` and one more `ue_vector`, five
+  guarded `ue_foundation` calls an iteration; same run: `scalar_extern` 263.3 / 296.5, `native_refs` 356.6 /
+  184.9): interpreter 309.4 ns, AOT 350.0 ns. Like `scalar_extern`, a guarded extern is not faster compiled: the
+  bridge resolves the entry and checks the guards on every call (`Resolve` / `Finish`), the interpreter's node
+  does the same work. Operators go through `dasue::aot::CallOp`, which adds the active context the generated
+  code does not pass. The gain is again the script around the calls, which math no longer keeps in the
+  interpreter; for speed, `ue_math` binds (unguarded, `native_values`) are the faster path.
+
 Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.
 
 ### Gameplay methods answered by binds (`Reflects`) — 2026-10-24

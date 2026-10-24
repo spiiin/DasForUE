@@ -365,7 +365,7 @@ template <class T> T MathUnpack(const FDasStructValue& Value, das::Context* C)
         C->throw_error("math property snapshot type/value mismatch");
     return Snapshot.Get<T>();
 }
-FVector2D MakeVector2D(double X, double Y)
+FVector2D MakeVector2D(double X, double Y, das::Context*)
 {
     return FVector2D(X, Y);
 }
