@@ -17,6 +17,7 @@ struct FDasNativeClassType
     UClass* Class = nullptr;
     FDasNativeModuleDesc* Owner = nullptr;
     das::TypeAnnotation* Annotation = nullptr; // set when the owner's daScript module is built
+    void* AotCast = nullptr;                   // the AOT entry of as_<Name> (FDasNativeModule::AotCast)
 };
 // An object parameter or result resolved when the daScript module is built: the class an object must have and
 // its script type (nullptr: passed as UObjectHandle).
@@ -56,6 +57,7 @@ struct FDasNativeClassDecl
 {
     FString ScriptName;
     FDasNativeClassFn Class = nullptr;
+    void* AotCast = nullptr;
 };
 struct FDasNativeModuleDesc
 {

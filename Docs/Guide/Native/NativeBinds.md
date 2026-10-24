@@ -162,9 +162,14 @@ reference type of the bind's class; interfaces and authored classes are not rout
 
 ## AOT
 
-Scripts compiled ahead of time call binds whose types all have an AOT ABI — scalars, strings, math values, dates
-and time spans — through a guarded bridge. Binds with objects, `FName`, `FText` and operators stay closed: a
-script function that calls one stays in the interpreter, the rest of the file is still compiled.
+Scripts compiled ahead of time call binds whose types all have an AOT ABI — scalars, strings, math values, dates,
+time spans and objects (receivers, parameters and results, as their handles) — through a guarded bridge, and the
+`valid`, `handle` and `as_<Name>` helpers of the class types. Compiled calls check objects as the interpreter does
+and fail with the same messages (without the location in the script). Binds with `FName` or `FText`, operators
+(also `==` and `!=` of the class types), gameplay calls routed to binds (`Reflects`) and `ue_foundation`'s own
+object externs (`ue_self_object()`, `ue_null_object()`, ...) stay closed: a script function that calls one stays
+in the interpreter, the rest of the file is still compiled. So a function that starts from `ue_self_object()` is
+not compiled yet, even if the rest of it calls only binds.
 
 ## Reload and unloading
 

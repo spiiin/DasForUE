@@ -4,6 +4,7 @@
 #include "Misc/DateTime.h"
 #include "Misc/Timespan.h"
 #include "UObject/Object.h"
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -133,10 +134,23 @@ class Context;
 }
 
 // AOT (DasUEAot.h): a function whose parameters and result all have an AOT ABI gets an entry that generated code
-// calls through the guarded bridge; the others keep the interpreter (objects, FName and FText for now).
+// calls through the guarded bridge; the others keep the interpreter (FName, FText and operators for now).
 DASRUNTIME_API char* DasNativeAotString(const FString& Value, das::Context* Context);
 DASRUNTIME_API FString* DasNativeAotEnter();           // the error slot of an AOT call; returns the outer one
 DASRUNTIME_API void DasNativeAotLeave(FString* Outer); // restores it; dasue::aot::Finish reports the error
+DASRUNTIME_API bool DasNativeAotFailed();              // the current AOT call has reported an error
+// Objects cross the bridge as their handles and are checked as the interpreter checks them: the class, a null or
+// expired receiver, and a null argument of a NonNullArgs function fail the call (Number: the argument's number in
+// the error). The result's handle is made for its class; an object of another class reads as null.
+enum class EDasNativeAotObject : uint8
+{
+    Argument,
+    NonNullArgument,
+    Receiver
+};
+DASRUNTIME_API UObject* DasNativeAotObject(const FDasObjectHandle& Handle, UClass* Class, das::Context* Context,
+                                           int32 Number, EDasNativeAotObject Kind);
+DASRUNTIME_API FDasObjectHandle DasNativeAotHandle(const UObject* Object, UClass* Class, das::Context* Context);
 struct FDasNativeAbiNone
 {
 };
@@ -225,6 +239,16 @@ template <> struct TDasNativeAbi<FTimespan>
     static FTimespan ToCpp(FDasTimespanValue Value) { return FTimespan(Value.Ticks); }
     static FDasTimespanValue FromCpp(const FTimespan& Value, das::Context*) { return {Value.GetTicks()}; }
 };
+template <class T> struct TDasNativeAbi<T*>
+{
+    static constexpr bool Supported = std::is_base_of_v<UObject, std::remove_cv_t<T>>;
+    using Arg = const FDasObjectHandle&;
+    using Result = FDasObjectHandle;
+    static FDasObjectHandle FromCpp(const UObject* Value, das::Context* Context)
+    {
+        return DasNativeAotHandle(Value, std::remove_cv_t<T>::StaticClass(), Context);
+    }
+};
 template <class R> struct TDasNativeAotResult
 {
     using Type = typename TDasNativeAbi<std::decay_t<R>>::Result;
@@ -232,6 +256,62 @@ template <class R> struct TDasNativeAotResult
 template <> struct TDasNativeAotResult<void>
 {
     using Type = void;
+};
+
+// The body of an AOT entry. Converts every argument first (objects are checked); when one fails, the C++
+// function does not run and the bridge reports the error. bMethod: the first argument is the receiver.
+template <class R, class... A> struct TDasNativeAot
+{
+    static constexpr bool Supported = (std::is_void_v<R> || TDasNativeAbi<std::decay_t<R>>::Supported) &&
+                                      (TDasNativeAbi<std::decay_t<A>>::Supported && ...);
+    using Result = typename TDasNativeAotResult<R>::Type;
+    template <class T> using TArg = typename TDasNativeAbi<std::decay_t<T>>::Arg;
+    template <class T>
+    static decltype(auto) Convert(TArg<T> Value, das::Context* Context, int32 Number, EDasNativeAotObject Kind)
+    {
+        using D = std::decay_t<T>;
+        if constexpr (std::is_pointer_v<D>)
+            return static_cast<D>(
+                DasNativeAotObject(Value, std::remove_cv_t<std::remove_pointer_t<D>>::StaticClass(), Context, Number,
+                                   Kind));
+        else
+            return TDasNativeAbi<D>::ToCpp(Value);
+    }
+    static EDasNativeAotObject KindOf(bool bMethod, bool bNonNull, size_t Index)
+    {
+        return bMethod && Index == 0 ? EDasNativeAotObject::Receiver
+               : bNonNull            ? EDasNativeAotObject::NonNullArgument
+                                     : EDasNativeAotObject::Argument;
+    }
+    template <class F> static Result Run(bool bMethod, bool bNonNull, das::Context* Context, F Call, TArg<A>... Args)
+    {
+        return RunAt(bMethod, bNonNull, Context, Call, std::index_sequence_for<A...>(), Args...);
+    }
+    template <class F, size_t... I>
+    static Result RunAt(bool bMethod, bool bNonNull, das::Context* Context, F Call, std::index_sequence<I...>,
+                        TArg<A>... Args)
+    {
+        FString* Outer = DasNativeAotEnter();
+        std::tuple<decltype(Convert<A>(Args, Context, 0, EDasNativeAotObject::Argument))...> Values{
+            Convert<A>(Args, Context, bMethod ? int32(I) : int32(I) + 1, KindOf(bMethod, bNonNull, I))...};
+        if (DasNativeAotFailed())
+        {
+            DasNativeAotLeave(Outer);
+            if constexpr (!std::is_void_v<R>)
+                return Result{};
+        }
+        else if constexpr (std::is_void_v<R>)
+        {
+            Call(std::get<I>(Values)...);
+            DasNativeAotLeave(Outer);
+        }
+        else
+        {
+            auto Value = Call(std::get<I>(Values)...);
+            DasNativeAotLeave(Outer);
+            return TDasNativeAbi<std::decay_t<R>>::FromCpp(Value, Context);
+        }
+    }
 };
 
 // Calls the bound function: Args[i] points to a value of the i-th parameter type (UObject* for objects; for a
@@ -251,7 +331,7 @@ public:
         using S = TSignature<decltype(Fn)>;
         static_assert(S::Count <= MaxArguments, "Native binds take at most 16 parameters");
         Add(ScriptName, &S::template Thunk<Fn>, S::Result(), S::Arguments(), Flags, nullptr,
-            S::template AotEntry<Fn>());
+            S::template AotEntry<Fn>(Flags));
         return *this;
     }
     // Class<T>(Name) declares the script type Name for T (one module owns a class); Class<T>() adds methods to
@@ -260,11 +340,18 @@ public:
     {
         static_assert(std::is_base_of_v<UObject, T>, "Class<T> needs a UObject class");
         if (ScriptName)
-            AddClass(ScriptName, &T::StaticClass);
+            AddClass(ScriptName, &T::StaticClass, reinterpret_cast<void*>(&AotCast<T>));
         return TDasNativeClass<T>(*this);
     }
 
 private:
+    // The AOT entry of as_<Name> (any object to T, null when it is not a T): no checks, as in the interpreter.
+    template <class T> static FDasObjectHandle AotCast(const FDasObjectHandle& Value, das::Context* Context)
+    {
+        const UObject* Object =
+            DasNativeAotObject(Value, UObject::StaticClass(), Context, 0, EDasNativeAotObject::Argument);
+        return DasNativeAotHandle(Object, T::StaticClass(), Context);
+    }
     template <class A> static decltype(auto) Arg(void* P)
     {
         using D = std::decay_t<A>;
@@ -297,29 +384,40 @@ private:
             Store<R>(Out, [&]() -> decltype(auto) { return Fn(Arg<A>(Args[I])...); });
         }
         // The AOT entry: ABI arguments and the context in, the ABI result out (nullptr when a type has no ABI).
-        static constexpr bool AotSupported = (std::is_void_v<R> || TDasNativeAbi<std::decay_t<R>>::Supported) &&
-                                             (TDasNativeAbi<std::decay_t<A>>::Supported && ...);
-        template <auto Fn>
-        static typename TDasNativeAotResult<R>::Type AotInvoke(typename TDasNativeAbi<std::decay_t<A>>::Arg... Args,
-                                                               das::Context* Context)
+        using Aot = TDasNativeAot<R, A...>;
+        template <auto Fn, bool bNonNull>
+        static typename Aot::Result AotInvoke(typename Aot::template TArg<A>... Args, das::Context* Context)
         {
-            FString* Outer = DasNativeAotEnter();
-            if constexpr (std::is_void_v<R>)
-            {
-                Fn(TDasNativeAbi<std::decay_t<A>>::ToCpp(Args)...);
-                DasNativeAotLeave(Outer);
-            }
-            else
-            {
-                auto Value = Fn(TDasNativeAbi<std::decay_t<A>>::ToCpp(Args)...);
-                DasNativeAotLeave(Outer);
-                return TDasNativeAbi<std::decay_t<R>>::FromCpp(Value, Context);
-            }
+            return Aot::Run(false, bNonNull, Context, [](auto&... V) -> decltype(auto) { return Fn(V...); },
+                            Args...);
         }
-        template <auto Fn> static void* AotEntry()
+        template <auto Fn> static void* AotEntry(EDasBind Flags)
         {
-            if constexpr (AotSupported)
-                return reinterpret_cast<void*>(&AotInvoke<Fn>);
+            if constexpr (Aot::Supported)
+                return EnumHasAnyFlags(Flags, EDasBind::NonNullArgs) ? reinterpret_cast<void*>(&AotInvoke<Fn, true>)
+                                                                     : reinterpret_cast<void*>(&AotInvoke<Fn, false>);
+            else
+                return nullptr;
+        }
+    };
+    // The AOT entry of a method of the bound class T: the receiver's handle first.
+    template <class R, class T, class... A> struct TMethodAot
+    {
+        using Aot = TDasNativeAot<R, T*, A...>;
+        // Caller::Call(T* Receiver, Arguments...) runs the method.
+        template <class Caller, bool bNonNull>
+        static typename Aot::Result Invoke(const FDasObjectHandle& Self, typename Aot::template TArg<A>... Args,
+                                           das::Context* Context)
+        {
+            auto Call = [](T* Object, auto&... V) -> decltype(auto) { return Caller::Call(Object, V...); };
+            return Aot::Run(true, bNonNull, Context, Call, Self, Args...);
+        }
+        template <class Caller> static void* Entry(EDasBind Flags)
+        {
+            if constexpr (Aot::Supported)
+                return EnumHasAnyFlags(Flags, EDasBind::NonNullArgs)
+                           ? reinterpret_cast<void*>(&Invoke<Caller, true>)
+                           : reinterpret_cast<void*>(&Invoke<Caller, false>);
             else
                 return nullptr;
         }
@@ -339,6 +437,17 @@ private:
         {
             C* Self = static_cast<C*>(*static_cast<UObject**>(Args[0]));
             Store<R>(Out, [&]() -> decltype(auto) { return (Self->*Fn)(Arg<A>(Args[I + 1])...); });
+        }
+        template <auto Fn, class T> struct TAotCaller
+        {
+            template <class... V> static decltype(auto) Call(T* Object, V&... Values)
+            {
+                return (static_cast<C*>(Object)->*Fn)(Values...);
+            }
+        };
+        template <auto Fn, class T> static void* AotEntry(EDasBind Flags)
+        {
+            return TMethodAot<R, T, A...>::template Entry<TAotCaller<Fn, T>>(Flags);
         }
     };
     template <class F> struct TMethod;
@@ -369,12 +478,27 @@ private:
             else
                 Store<R>(Out, [&]() -> decltype(auto) { return Fn(*Object, Arg<A>(Args[I + 1])...); });
         }
+        template <auto Fn, class T> struct TAotCaller
+        {
+            template <class... V> static decltype(auto) Call(T* Object, V&... Values)
+            {
+                if constexpr (std::is_pointer_v<Self>)
+                    return Fn(static_cast<Receiver*>(Object), Values...);
+                else
+                    return Fn(*static_cast<Receiver*>(Object), Values...);
+            }
+        };
+        template <auto Fn, class T> static void* AotEntry(EDasBind Flags)
+        {
+            return TMethodAot<R, T, A...>::template Entry<TAotCaller<Fn, T>>(Flags);
+        }
     };
     template <class T> friend class TDasNativeClass;
 
     void Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasNativeParam Result, TArray<FDasNativeParam> Args,
              EDasBind Flags, FDasNativeClassFn Receiver, void* AotEntry = nullptr);
-    void AddClass(const TCHAR* ScriptName, FDasNativeClassFn Class);
+    // AotCast: the AOT entry of the class's as_<Name> helper.
+    void AddClass(const TCHAR* ScriptName, FDasNativeClassFn Class, void* AotCast = nullptr);
     void SetReflects(const TCHAR* FunctionName);
     friend struct FDasNativeModuleBuilder;
     void* Module = nullptr; // the module being described (DasRuntime internal)
@@ -395,7 +519,8 @@ public:
         static_assert(S::Count <= FDasNativeModule::MaxArguments, "Native binds take at most 16 parameters");
         TArray<FDasNativeParam> Args{FDasNativeParam{EDasNativeType::Object, &T::StaticClass}};
         Args.Append(S::Arguments());
-        Module.Add(ScriptName, &S::template Thunk<Fn>, S::Result(), MoveTemp(Args), Flags, &T::StaticClass);
+        Module.Add(ScriptName, &S::template Thunk<Fn>, S::Result(), MoveTemp(Args), Flags, &T::StaticClass,
+                   S::template AotEntry<Fn, T>(Flags));
         return *this;
     }
     // The method added last does what the UFUNCTION FunctionName of T does. Gameplay scripts that call that

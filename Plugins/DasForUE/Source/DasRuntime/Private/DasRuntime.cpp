@@ -301,11 +301,7 @@ template <> struct ext_ret_to_carrier<FDasNameValue, uint64_t>
     static uint64_t from(FDasNameValue V) { return V.Token; }
 };
 }
-struct FDasObjectHandle
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UObjectHandle, FDasObjectHandle);
+MAKE_TYPE_FACTORY(UObjectHandle, FDasObjectHandle); // DasScriptValues.h
 struct FDasClassHandle
 {
     uint64 Token = 0;
@@ -692,6 +688,29 @@ TArray<FDasNativeModuleInfo> DescribeDasNativeModules()
 char* DasNativeAotString(const FString& Value, das::Context* Context)
 {
     return CopyDSLString(Value, Context);
+}
+// The checks of SimNode_DasNative::ResolveArgument and ReturnObject for compiled calls; errors go to the AOT call's
+// slot with the interpreter's text (Finish adds the function's label).
+UObject* DasNativeAotObject(const FDasObjectHandle& Handle, UClass* Class, das::Context* Context, int32 Number,
+                            EDasNativeAotObject Kind)
+{
+    UObject* Object = Handle.Token ? TryObject(Handle, Context) : nullptr;
+    if (Object && !Object->IsA(Class))
+    {
+        DasNativeError(FString::Printf(TEXT("argument %d must be %s, got %s"), Number, *Class->GetName(),
+                                       *Object->GetClass()->GetName()));
+        return nullptr;
+    }
+    if (!Object && Kind == EDasNativeAotObject::Receiver)
+        DasNativeError(TEXT("receiver is null or expired"));
+    if (!Object && Kind == EDasNativeAotObject::NonNullArgument)
+        DasNativeError(FString::Printf(TEXT("argument %d is null or expired"), Number));
+    return Object;
+}
+FDasObjectHandle DasNativeAotHandle(const UObject* Object, UClass* Class, das::Context* Context)
+{
+    return Object && Object->IsA(Class) ? MakeObjectHandle(const_cast<UObject*>(Object), Class, Context)
+                                        : FDasObjectHandle();
 }
 void dasue::aot::Finish(uint64_t Key, das::Context* Context)
 {

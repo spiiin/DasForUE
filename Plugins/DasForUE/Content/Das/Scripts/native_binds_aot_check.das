@@ -5,8 +5,9 @@ require ue_math
 require ue_engine
 
 // AOT check of the DasNativeBindsManifest commandlet (DasNativeBinds.h). open_only calls native binds with an AOT
-// ABI (scalars, strings, engine values, time values): it is compiled for AOT and calls them through the guarded
-// bridge. with_closed calls an object method, which has no ABI yet: it stays in the interpreter.
+// ABI (scalars, strings, engine values, time values) and with_objects object methods and helpers: both are
+// compiled for AOT and call them through the guarded bridge. with_closed calls a bind with an FName parameter,
+// which has no ABI yet: it stays in the interpreter.
 [export]
 def open_only(input:int):int {
     let d = make_date_time(2024, 2, 29)
@@ -19,7 +20,15 @@ def open_only(input:int):int {
     return scalars + values + input
 }
 
+// Without ue_self_object: ue_foundation's own object externs have no AOT ABI yet.
+[export]
+def with_objects(input:int):int {
+    var none : AActor
+    let a = as_AActor(none.handle())
+    return a.valid() ? int(a.get_actor_location().size_2d()) + input : input
+}
+
 [export]
 def with_closed(input:int):int {
-    return int(as_AActor(ue_self_object()).get_actor_location().x) + input
+    return as_AActor(ue_self_object()).actor_has_tag(ue_name_value("tag")) ? 1 : input
 }

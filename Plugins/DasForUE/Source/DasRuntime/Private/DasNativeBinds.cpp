@@ -50,6 +50,10 @@ void DasNativeAotLeave(FString* Outer)
 {
     DasNativeErrorSlot() = Outer;
 }
+bool DasNativeAotFailed()
+{
+    return !DasNativeAotPendingError().IsEmpty();
+}
 void DasNativeError(const FString& Message)
 {
     FString* Slot = DasNativeErrorSlot();
@@ -167,7 +171,7 @@ void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasN
     if (Desc.Error.IsEmpty())
         Desc.Functions.Add(MoveTemp(F));
 }
-void FDasNativeModule::AddClass(const TCHAR* ScriptName, FDasNativeClassFn Class)
+void FDasNativeModule::AddClass(const TCHAR* ScriptName, FDasNativeClassFn Class, void* AotCast)
 {
     auto& Desc = *static_cast<FDasNativeModuleDesc*>(Module);
     if (!Desc.Error.IsEmpty())
@@ -180,7 +184,7 @@ void FDasNativeModule::AddClass(const TCHAR* ScriptName, FDasNativeClassFn Class
                                               { return C.ScriptName == Name || C.Class == Class; }))
         Desc.Error = FString::Printf(TEXT("Native module '%s': class '%s' is declared twice"), *Desc.Name, *Name);
     else
-        Desc.Classes.Add({Name, Class});
+        Desc.Classes.Add({Name, Class, AotCast});
 }
 
 void FDasNativeModule::SetReflects(const TCHAR* FunctionName)

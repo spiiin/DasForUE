@@ -135,8 +135,8 @@ FString DasNativeScriptTypeName(const FDasNativeParam& Param, const FDasNativeRe
     }
     }
 }
-// AOT ABI of a parameter or result (DasUEAot.h): engine values by const reference, results by value. nullptr when
-// a type has none (objects, FName, FText): such functions stay in the interpreter.
+// AOT ABI of a parameter or result (DasUEAot.h): engine values by const reference, results by value, objects as
+// their handles. nullptr when a type has none (FName, FText): such functions stay in the interpreter.
 const char* DasNativeAbiName(EDasNativeType Type, bool bArgument)
 {
     switch (Type)
@@ -161,6 +161,8 @@ const char* DasNativeAbiName(EDasNativeType Type, bool bArgument)
         return "FDasDateTimeValue";
     case EDasNativeType::Timespan:
         return "FDasTimespanValue";
+    case EDasNativeType::Object:
+        return bArgument ? "const FDasObjectHandle &" : "FDasObjectHandle";
 #define DAS_NATIVE_ABI(Kind, CppType)                                                                                  \
     case EDasNativeType::Kind:                                                                                         \
         return bArgument ? "const " CppType " &" : CppType;
@@ -177,12 +179,13 @@ const char* DasNativeAbiName(EDasNativeType Type, bool bArgument)
     }
 }
 // The C++ types of a function's AOT entry ("R,A1,...,das::Context *"), or empty when it has none. Operators stay
-// closed: generated code calls an operator with its operands only, without the context argument of the entry.
+// closed (== and != of the class types too): generated code calls an operator with its operands only, without
+// the context argument of the entry.
 FString DasNativeAbiTypes(const FDasNativeFunctionDesc& F)
 {
     const char* Result = DasNativeAbiName(F.Result.Type, false);
     const bool bOperator = !F.Name.IsEmpty() && !FChar::IsAlpha(F.Name[0]) && F.Name[0] != TEXT('_');
-    if (!F.AotEntry || F.Helper != EDasNativeHelper::Call || !Result || bOperator)
+    if (!F.AotEntry || !Result || bOperator)
         return FString();
     FString Types = UTF8_TO_TCHAR(Result);
     for (const FDasNativeParam& P : F.Arguments)
@@ -719,7 +722,8 @@ private:
     static void RegisterAot(const FDasNativeModuleDesc& Origin, const FDasNativeFunctionDesc& F, FDasNativeFunction& Fn,
                             const FString& Types)
     {
-        const FString Name = FString::Printf(TEXT("native:%s::%s"), *Origin.Name, *F.Name);
+        // The label names the receiver's type: a method inherited by a descendant type reports its own name.
+        const FString Name = FString::Printf(TEXT("native:%s::%s"), *Origin.Name, UTF8_TO_TCHAR(Fn.Label.c_str()));
         const uint64 Key = dasue::aot::Key(TCHAR_TO_UTF8(*Name), TCHAR_TO_UTF8(*Types));
         if (const auto* Existing = UEAotEntries.Find(Key);
             Existing && Existing->Function != F.AotEntry && (!Existing->Loaded || *Existing->Loaded))
@@ -752,6 +756,18 @@ private:
                            ? FDasNativeResolvedParam{Type ? Type->Class : UObject::StaticClass(), Type}
                            : FDasNativeResolvedParam());
     }
+    // AOT entries of valid and handle (the casts' are made per class, FDasNativeModule::AotCast); == and != are
+    // operators and have none.
+    static bool AotValid(const FDasObjectHandle& Value, das::Context* Context)
+    {
+        return DasNativeAotObject(Value, UObject::StaticClass(), Context, 0, EDasNativeAotObject::Argument) != nullptr;
+    }
+    static FDasObjectHandle AotHandle(const FDasObjectHandle& Value, das::Context* Context)
+    {
+        const UObject* Object =
+            DasNativeAotObject(Value, UObject::StaticClass(), Context, 0, EDasNativeAotObject::Argument);
+        return DasNativeAotHandle(Object, UObject::StaticClass(), Context);
+    }
     // valid, handle, ==, != and the casts: from UObjectHandle, to and from the ancestors' types.
     void AddHelpers(const FDasNativeClassType& Type)
     {
@@ -761,6 +777,9 @@ private:
             auto& F = Generate(Name, Helper);
             Param(F, From);
             Result(F, Kind, To);
+            F.AotEntry = Helper == EDasNativeHelper::Valid    ? reinterpret_cast<void*>(&AotValid)
+                         : Helper == EDasNativeHelper::Handle ? reinterpret_cast<void*>(&AotHandle)
+                                                              : To->AotCast;
             Add(Desc, F);
         };
         auto Binary = [&](const FString& Name, EDasNativeHelper Helper)
@@ -879,7 +898,8 @@ void EnsureDasNativeModules()
                 Fail(Desc, FString::Printf(TEXT("Native module '%s': script type name '%s' is taken by class %s"),
                                                 *Desc->Name, *Decl.ScriptName, *Named->Class->GetName()));
             else
-                Added.Add(DasNativeClassTypes().Add_GetRef(new FDasNativeClassType{Decl.ScriptName, Class, Desc}));
+                Added.Add(DasNativeClassTypes().Add_GetRef(
+                    new FDasNativeClassType{Decl.ScriptName, Class, Desc, nullptr, Decl.AotCast}));
         }
         if (!Desc->Error.IsEmpty())
             DasNativeClassTypes().RemoveAll([&](FDasNativeClassType* Type) { return Added.Contains(Type); });

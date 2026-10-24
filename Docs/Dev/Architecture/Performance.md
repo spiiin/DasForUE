@@ -304,8 +304,8 @@ rows of one run only.
 - Crossing into C++ costs more than a few arithmetic operations: `f_interp_to` through `ue_math` is about three
   times slower than the same formula in daScript. Native math pays off for work that is not a one-liner.
 - AOT: native binds whose types all have an ABI in the guarded bridge (scalars, strings, engine math values,
-  dates and time spans) are called from AOT code through `dasue::aot::Call` (`DasUEAot.h`). Objects, `FName`,
-  `FText` and operators stay closed; a script function that calls one stays in the interpreter (lint
+  dates and time spans, objects as their handles) are called from AOT code through `dasue::aot::Call`
+  (`DasUEAot.h`). `FName`, `FText`, operators and routed gameplay calls stay closed; a script function that calls one stays in the interpreter (lint
   `ue_closed_builtin_calls`), the rest of the file is compiled. `DasNativeBindsManifest` checks this on
   `native_binds_aot_check.das`. Measured in `interop_aot.das` (C3, one run, a faster machine state than the
   table above):
@@ -315,6 +315,13 @@ rows of one run only.
   | `native_bind` (`days_in_year`, one call) | 34.8 | 25.1 |
   | `native_values` (six calls: `FVector` by value and by const reference, a date) | 226.9 | 174.2 |
   | `scalar_extern` (a guarded `ue_foundation` extern, for comparison) | 155.4 | 171.8 |
+
+  Objects (2026-10-24, another run: `native_values` 240.4 / 212.0 there), `native_objects`, five calls an
+  iteration: `set_owner`, `get_owner`, `valid`, `handle`, `as_AActor` — interpreter 536.3 ns, AOT 545.2 ns. A
+  compiled object call is not faster: its cost is the handle table (lookup, `IsA`, a new handle for each result)
+  and the bridge's guards, the same on both paths. What AOT gains is the script around the calls, which is no
+  longer kept in the interpreter because it touches an object — unless it gets the object from a
+  `ue_foundation` extern such as `ue_self_object()`, which has no object ABI yet.
 
 Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.
 

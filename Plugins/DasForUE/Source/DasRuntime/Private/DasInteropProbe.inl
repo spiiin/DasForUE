@@ -21,6 +21,21 @@ int64 Triangle(int32 N)
 {
     return int64(N) * (N + 1) / 2;
 }
+// Objects for interop_aot.das (mode 6): two actors outside any world, made by the probe.
+TWeakObjectPtr<AActor> ObjectsActor, ObjectsOwner;
+AActor* InteropActor()
+{
+    return ObjectsActor.Get();
+}
+AActor* InteropOwner()
+{
+    return ObjectsOwner.Get();
+}
+}
+DAS_NATIVE_BINDS(InteropObjects, "interop_objects")
+{
+    Binds.Function<&DasInterop::InteropActor>(TEXT("interop_actor"));
+    Binds.Function<&DasInterop::InteropOwner>(TEXT("interop_owner"));
 }
 
 FDasCallPhaseState& DasCallPhaseState()
@@ -553,7 +568,12 @@ void RunDasInteropProbe(FDasInteropBench& B)
 
     // C3. The same script loops compiled for AOT and for the interpreter. RunFile compiles on every call, so a
     // zero-iteration run is subtracted. Modes: 0 loop, 1 script call, 2 self field read, 3 scalar extern, 4 native
-    // bind (DasNativeBinds.h, ue_time: days_in_year), 5 native binds with engine values (six calls an iteration).
+    // bind (DasNativeBinds.h, ue_time: days_in_year), 5 native binds with engine values (six calls an iteration),
+    // 6 native binds with objects (five calls an iteration).
+    TStrongObjectPtr<AActor> ActorPin(NewObject<AActor>(GetTransientPackage()));
+    TStrongObjectPtr<AActor> OwnerPin(NewObject<AActor>(GetTransientPackage()));
+    DasInterop::ObjectsActor = ActorPin.Get();
+    DasInterop::ObjectsOwner = OwnerPin.Get();
     struct FAotMode
     {
         const TCHAR* Name;
@@ -561,14 +581,15 @@ void RunDasInteropProbe(FDasInteropBench& B)
     };
     const FAotMode AotLoop{TEXT("loop"), 0}, AotCall{TEXT("script_call"), 1}, AotField{TEXT("self_field_read"), 2};
     const FAotMode AotExtern{TEXT("scalar_extern"), 3}, AotNative{TEXT("native_bind"), 4};
-    const FAotMode AotValues{TEXT("native_values"), 5};
-    for (const FAotMode& M : {AotLoop, AotCall, AotField, AotExtern, AotNative, AotValues})
+    const FAotMode AotValues{TEXT("native_values"), 5}, AotObjects{TEXT("native_objects"), 6};
+    for (const FAotMode& M : {AotLoop, AotCall, AotField, AotExtern, AotNative, AotValues, AotObjects})
     {
         int64 Expected = 0;
         for (int32 I = 0; I < AotCalls; ++I)
         {
-            // Mode 5: |rotated forward| 1 + day 29 + 24 characters of "2024-02-29T00:00:00.000Z".
-            const int32 Value[] = {I & 7, I + 1, 7 + I, I, 365 + I, 1 + 29 + 24 + I};
+            // Mode 5: |rotated forward| 1 + day 29 + 24 characters of "2024-02-29T00:00:00.000Z"; mode 6: the
+            // owner is valid (1) and casts to AActor (2).
+            const int32 Value[] = {I & 7, I + 1, 7 + I, I, 365 + I, 1 + 29 + 24 + I, 3 + I};
             Expected ^= Value[M.Mode];
         }
         for (bool bAot : {false, true})
@@ -588,5 +609,25 @@ void RunDasInteropProbe(FDasInteropBench& B)
             };
             B.MeasureDifference(Name, TEXT("C3 AOT vs interpreter"), AotCalls, Run, [&]() { return Run(0); }, Expected);
         }
+    }
+    // Object checks of compiled calls fail with the interpreter's message (mode 7: a null receiver, mode 8: a null
+    // argument of a NonNullArgs bind); only the location differs, AOT errors have none. Mode 6 above proved that
+    // main is compiled.
+    for (const int32 Mode : {7, 8})
+    {
+        FString Errors[2];
+        for (const bool bAot : {false, true})
+        {
+            const auto R = Runtime.RunFile(Aot, Mode, bAot, F);
+            FString Text = R.bSucceeded ? FString() : R.Error;
+            if (const int32 Bar = Text.Find(TEXT(" | ")); Bar != INDEX_NONE)
+                Text.MidInline(Bar + 3);
+            if (const int32 End = Text.Find(TEXT("\n")); End != INDEX_NONE)
+                Text.LeftInline(End);
+            Errors[bAot ? 1 : 0] = Text.TrimEnd();
+        }
+        if (Errors[0].IsEmpty() || Errors[0] != Errors[1])
+            B.Fail(FString::Printf(TEXT("aot_object_error_%d: interpreter '%s', AOT '%s'"), Mode, *Errors[0],
+                                   *Errors[1]));
     }
 }

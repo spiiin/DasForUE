@@ -63,6 +63,8 @@ DAS_UE_AOT_VALUE(const FColor&, "const FColor &")
 DAS_UE_AOT_VALUE(FColor, "FColor")
 DAS_UE_AOT_VALUE(FDasDateTimeValue, "FDasDateTimeValue")
 DAS_UE_AOT_VALUE(FDasTimespanValue, "FDasTimespanValue")
+DAS_UE_AOT_VALUE(const FDasObjectHandle&, "const FDasObjectHandle &")
+DAS_UE_AOT_VALUE(FDasObjectHandle, "FDasObjectHandle")
 #undef DAS_UE_AOT_VALUE
 
 template <class F> struct Signature

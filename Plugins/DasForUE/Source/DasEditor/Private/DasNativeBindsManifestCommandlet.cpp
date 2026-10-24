@@ -130,14 +130,16 @@ int32 UDasNativeBindsManifestCommandlet::Main(const FString& Params)
            Modules.Num(), Functions, Routed, Kept, *Output);
 
     // AOT: native_binds_aot_check.das is generated for AOT (not compiled here; the generated source is kept next to
-    // the manifest). open_only must call native binds through the guarded bridge; with_closed, which calls a bind
-    // without an AOT ABI, must stay in the interpreter.
+    // the manifest). open_only and with_objects (object methods and helpers) must call native binds through the
+    // guarded bridge; with_closed, which calls a bind without an AOT ABI, must stay in the interpreter.
     const FString AotOutput = FPaths::GetPath(Output) / TEXT("native-binds-aot-check.cpp");
     FString AotError, AotText;
     bool bAot = GenerateDasUEAotProbe(AotOutput, AotError, TEXT("native_binds_aot_check.das")) &&
                                       FFileHelper::LoadFileToString(AotText, *AotOutput);
     if (bAot && !AotText.Contains(TEXT("open_only")))
         AotError = TEXT("open_only is not compiled for AOT");
+    else if (bAot && !AotText.Contains(TEXT("with_objects")))
+        AotError = TEXT("with_objects is not compiled for AOT");
     else if (bAot && AotText.Contains(TEXT("with_closed")))
         AotError = TEXT("with_closed is compiled for AOT although it calls a bind without an AOT ABI");
     bAot = bAot && AotError.IsEmpty();
