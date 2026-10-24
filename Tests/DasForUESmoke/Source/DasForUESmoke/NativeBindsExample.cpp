@@ -1,7 +1,8 @@
-// The example of Docs/Guide/Native/NativeBinds.md: a game module that binds its own C++ code for scripts. The guide
-// quotes the [doc:...] blocks of this file and of Content/Das/Scripts/native_binds_example.das; Scripts/
-// TestNativeBindsDocs.py keeps them equal. RunDasNativeBindsExample runs the script with a target as self (automation
-// test DasForUE.NativeBindsExample, packaged flag -DasNativeBinds).
+// The example of Docs/Guide/Native/NativeBinds.md: a game module that binds its own C++ code for scripts and calls
+// script functions (TDasFunction). The guide quotes the [doc:...] blocks of this file and of
+// Content/Das/Scripts/native_binds_example.das; Scripts/TestNativeBindsDocs.py keeps them equal.
+// RunDasNativeBindsExample runs the script with a target as self (automation test DasForUE.NativeBindsExample,
+// packaged flag -DasNativeBinds).
 #include "Components/SceneComponent.h"
 #include "DasNativeBinds.h"
 #include "DasRuntime.h"
@@ -41,6 +42,27 @@ DAS_NATIVE_BINDS(ExampleGame, "example_game")
         .Method<&Heal>(TEXT("heal"));
     Binds.Class<AActor>().Method<&DistanceToOrigin>(TEXT("distance_to_origin"));
 }
+// [/doc]
+
+// [doc:call-script]
+// Game code that asks a script: each function names its script file, its exported function and its signature.
+struct FExampleWaves
+{
+    TDasFunction<int32(int32, float)> EnemyCount{TEXT("native_binds_example.das"), TEXT("enemy_count")};
+    TDasFunction<void(AExampleTarget*, int32)> OnTargetHit{TEXT("native_binds_example.das"), TEXT("on_target_hit")};
+
+    // Owner: the object whose session of the script runs the call (self in the script).
+    int32 SpawnCount(UObject* Owner, int32 Wave, float Difficulty) const
+    {
+        const TValueOrError<int32, FString> Count = EnemyCount.Call(Owner, Wave, Difficulty);
+        if (Count.HasError())
+        {
+            UE_LOG(LogTemp, Error, TEXT("%s"), *Count.GetError());
+            return 0;
+        }
+        return Count.GetValue();
+    }
+};
 // [/doc]
 
 // Returns false with the failed checks in Report. World: a game world to spawn into, or nullptr for a temporary one.
@@ -85,6 +107,19 @@ bool RunDasNativeBindsExample(UWorld* GameWorld, FString& Report)
             TEXT("AExampleTarget.heal: heal amount must not be negative"));
     Refused(TEXT("native_binds_example_null_receiver_refused"), TEXT("null_target"),
             TEXT("AExampleTarget.get_health: receiver is null or expired"));
+
+    // C++ calls the script (TDasFunction): (4 + 3 * 2) * 1.5 = 15; the hit goes through the target's bind.
+    const FExampleWaves Waves;
+    const int32 Count = Waves.SpawnCount(Target, 3, 1.5f);
+    Check(Count == 15, TEXT("native_binds_example_cpp_calls_script"), FString::FromInt(Count));
+    const auto Hit = Waves.OnTargetHit.Call(Target, Target, 20);
+    Check(!Hit.HasError() && Target->Health == 70, TEXT("native_binds_example_script_called_from_cpp_uses_binds"),
+          Hit.HasError() ? Hit.GetError().Left(300) : FString::FromInt(Target->Health));
+    const auto Wrong = TDasFunction<int32(int32)>(TEXT("native_binds_example.das"), TEXT("enemy_count")).Call(Target, 3);
+    Check(Wrong.HasError() && Wrong.GetError().Contains(TEXT("Expected exported enemy_count")) &&
+              Wrong.GetError().Contains(TEXT("(C++ expects enemy_count(int) : int)")),
+          TEXT("native_binds_example_wrong_signature_refused"),
+          Wrong.HasError() ? Wrong.GetError().Left(300) : FString(TEXT("no error")));
 
     R.ReleaseObject(Target);
     Target->Destroy();

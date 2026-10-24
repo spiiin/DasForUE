@@ -58,6 +58,7 @@ This page collects the limitations that still apply to DasForUE2, grouped by are
 ## Native API
 
 - Non-reflected C++ is reachable only through hand-written [native binds](../Guide/Native/NativeBinds.md) (`DAS_NATIVE_BINDS`): there is no C++ header parser, no access to private properties, no virtual overrides, no vtable patching.
+- C++ calls scripts through [`TDasFunction`](../Guide/Native/NativeBinds.md#calling-scripts-from-c-tdasfunction) with an owner object only (its session runs the call), on the game thread, without output parameters; types are scalars, strings, names, texts, vectors, rotators, transforms and objects.
 - Latent, CustomThunk, RPC, delegate-signature, internal, protected and deprecated functions are excluded unless a dedicated adapter exists. Async-proxy factories (such as `CreateMoveToProxyObject`) are replaced by managed adapters.
 - API packages: all arguments are explicit (no C++ defaults); soft object/class parameters have no generic wrapper ABI; maps/sets of structs or objects are not supported; object views, `UEName` and enums are not unified between packages, so qualify names when importing several packages. `ue_api_pawn_ai` and `ue_api_animation_audio_vfx` are not installed by default. See [API packages](../Api/README.md).
 - A returned reference type does not expose all members of its class; only classes discovered from `[ue_native_object]` declarations get full member access ([Native class bindings](NativeClassBindings.md)).

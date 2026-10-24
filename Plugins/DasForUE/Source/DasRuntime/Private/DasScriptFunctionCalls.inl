@@ -20,6 +20,16 @@ uint64 DasScriptFunctionFastCalls()
     return GDasScriptFunctionFastCalls;
 }
 
+// Math value names belong to their adapters (Scripts/TestTypeAdapterGate.py): the facet knows the handle.
+FString DasScriptTypeName(EDasMethodSignature Kind)
+{
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindSignature(Kind))
+        for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+            if (&*Entry.Adapter == Adapter && Entry.Script && Entry.Script->GetHandleName())
+                return UTF8_TO_TCHAR(Entry.Script->GetHandleName());
+    return TEXT("?");
+}
+
 struct FDasScriptCallSite
 {
     TWeakObjectPtr<UObject> Owner;

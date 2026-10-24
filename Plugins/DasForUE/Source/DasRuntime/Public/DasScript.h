@@ -43,6 +43,8 @@ DASRUNTIME_API bool DasCallScriptFunction(TSharedPtr<FDasScriptCallSite>& Site, 
                                           const FDasScriptArgument& Result, FString& Error);
 // How many TDasFunction calls took the fast path since the start; for tests.
 DASRUNTIME_API uint64 DasScriptFunctionFastCalls();
+// The script name of a value kind that a type adapter owns (math values), for signatures in error texts.
+DASRUNTIME_API FString DasScriptTypeName(EDasMethodSignature Kind);
 
 template <class T, class Enable = void> struct TDasScriptType
 {
@@ -55,9 +57,9 @@ template <class T, class Enable = void> struct TDasScriptType
     {                                                                                                                  \
         using Storage = CppType;                                                                                       \
         static constexpr EDasMethodSignature Kind = EDasMethodSignature::KindName;                                     \
-        static const TCHAR* Name()                                                                                     \
+        static FString Name()                                                                                          \
         {                                                                                                              \
-            return TEXT(ScriptName);                                                                                   \
+            return ScriptName;                                                                                         \
         }                                                                                                              \
         static UClass* Class()                                                                                         \
         {                                                                                                              \
@@ -72,29 +74,29 @@ template <class T, class Enable = void> struct TDasScriptType
             return Value;                                                                                              \
         }                                                                                                              \
     };
-DAS_SCRIPT_TYPE(bool, Bool, "bool")
-DAS_SCRIPT_TYPE(int32, Int, "int")
-DAS_SCRIPT_TYPE(float, Float, "float")
-DAS_SCRIPT_TYPE(double, Double, "double")
-DAS_SCRIPT_TYPE(uint8, Byte, "uint8")
-DAS_SCRIPT_TYPE(FString, String, "string")
-DAS_SCRIPT_TYPE(FName, Name, "UENameValue")
-DAS_SCRIPT_TYPE(FText, Text, "UETextValue")
-DAS_SCRIPT_TYPE(FVector, Vector, "UEVector")
-DAS_SCRIPT_TYPE(FRotator, Rotator, "UERotator")
-DAS_SCRIPT_TYPE(FTransform, Transform, "UETransform")
+DAS_SCRIPT_TYPE(bool, Bool, TEXT("bool"))
+DAS_SCRIPT_TYPE(int32, Int, TEXT("int"))
+DAS_SCRIPT_TYPE(float, Float, TEXT("float"))
+DAS_SCRIPT_TYPE(double, Double, TEXT("double"))
+DAS_SCRIPT_TYPE(uint8, Byte, TEXT("uint8"))
+DAS_SCRIPT_TYPE(FString, String, TEXT("string"))
+DAS_SCRIPT_TYPE(FName, Name, TEXT("UENameValue"))
+DAS_SCRIPT_TYPE(FText, Text, TEXT("UETextValue"))
+DAS_SCRIPT_TYPE(FVector, Vector, DasScriptTypeName(Kind))
+DAS_SCRIPT_TYPE(FRotator, Rotator, DasScriptTypeName(Kind))
+DAS_SCRIPT_TYPE(FTransform, Transform, DasScriptTypeName(Kind))
 #undef DAS_SCRIPT_TYPE
 template <> struct TDasScriptType<void>
 {
     static constexpr EDasMethodSignature Kind = EDasMethodSignature::Void;
-    static const TCHAR* Name() { return TEXT("void"); }
+    static FString Name() { return TEXT("void"); }
     static UClass* Class() { return nullptr; }
 };
 template <class T> struct TDasScriptType<T*, std::enable_if_t<std::is_base_of_v<UObject, T>>>
 {
     using Storage = UObject*;
     static constexpr EDasMethodSignature Kind = EDasMethodSignature::Object;
-    static const TCHAR* Name() { return TEXT("UObjectHandle"); }
+    static FString Name() { return TEXT("UObjectHandle"); }
     static UClass* Class() { return std::remove_const_t<T>::StaticClass(); }
     // An object argument is passed as the address of its UObject*.
     static void* Address(UObject* const& Value) { return const_cast<UObject**>(&Value); }
@@ -121,7 +123,7 @@ public:
     // The script signature this function expects, e.g. "enemy_count(int, float) : int".
     FString Signature() const
     {
-        const TArray<FString> Names{FString(TType<A>::Name())...};
+        const TArray<FString> Names{TType<A>::Name()...};
         return Entry + TEXT("(") + FString::Join(Names, TEXT(", ")) + TEXT(") : ") + TType<R>::Name();
     }
     const FString& GetScript() const { return Script; }

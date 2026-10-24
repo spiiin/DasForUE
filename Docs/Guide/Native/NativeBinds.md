@@ -1,4 +1,4 @@
-# Native C++ binds
+# Native C++ binds and calls
 
 A native bind is a C++ function or method that scripts call directly: one typed call, no reflection, no
 `ProcessEvent` and no call frame. Binds are written by hand in a game or plugin module with `DAS_NATIVE_BINDS`
@@ -166,6 +166,82 @@ script function that calls one stays in the interpreter, the rest of the file is
 A module that unloads (a game module rebuilt by Live Coding) only marks its binds unavailable: compiled calls
 report `Native module '<name>' was unloaded` instead of running unloaded code. The next compilation picks up the
 module registered by the new code.
+
+## Calling scripts from C++ (`TDasFunction`)
+
+The other direction: C++ calls an exported script function with typed arguments and a typed result
+(`DasScript.h`). A `TDasFunction` names the script file, the function and the signature:
+
+<!-- snippet: Tests/DasForUESmoke/Source/DasForUESmoke/NativeBindsExample.cpp#call-script -->
+```cpp
+// Game code that asks a script: each function names its script file, its exported function and its signature.
+struct FExampleWaves
+{
+    TDasFunction<int32(int32, float)> EnemyCount{TEXT("native_binds_example.das"), TEXT("enemy_count")};
+    TDasFunction<void(AExampleTarget*, int32)> OnTargetHit{TEXT("native_binds_example.das"), TEXT("on_target_hit")};
+
+    // Owner: the object whose session of the script runs the call (self in the script).
+    int32 SpawnCount(UObject* Owner, int32 Wave, float Difficulty) const
+    {
+        const TValueOrError<int32, FString> Count = EnemyCount.Call(Owner, Wave, Difficulty);
+        if (Count.HasError())
+        {
+            UE_LOG(LogTemp, Error, TEXT("%s"), *Count.GetError());
+            return 0;
+        }
+        return Count.GetValue();
+    }
+};
+```
+
+The script side is an ordinary `[export]` function whose types match the C++ signature:
+
+<!-- snippet: Tests/DasForUESmoke/Content/Das/Scripts/native_binds_example.das#called-from-cpp -->
+```das
+// Called from C++ through TDasFunction: exported, with the C++ signature's script types.
+[export]
+def enemy_count(wave:int; difficulty:float):int {
+    return int(float(4 + wave * 2) * difficulty)
+}
+// An object arrives as UObjectHandle; the script calls the target's own bind.
+[export]
+def on_target_hit(target:UObjectHandle; damage:int):void {
+    let hit = as_AExampleTarget(target)
+    if (hit.valid()) {
+        hit.apply_damage(damage)
+    }
+}
+```
+
+`Call(Owner, Args...)` runs the function with `Owner` as `self`, in the owner's persistent session of that
+script: the same session that `RunNamedPersistent` and the owner's lifecycle use, so globals, timers and
+subscriptions stay between calls. Another owner has its own session.
+
+| C++ | Script |
+| --- | --- |
+| `bool`, `int32`, `float`, `double`, `uint8` | `bool`, `int`, `float`, `double`, `uint8` |
+| `FString`, `FName`, `FText` | `string`, `UENameValue`, `UETextValue` |
+| `FVector`, `FRotator`, `FTransform` | `UEVector`, `UERotator`, `UETransform` |
+| `T*` (`T` a `UObject` class) | `UObjectHandle` (a result of another class reads as `nullptr`) |
+| `void` result | `void` |
+
+`Call` returns `TValueOrError<R, FString>` and never crashes. An error names the script, the reason and the
+signature C++ expects, for example
+`native_binds_example.das: Expected exported enemy_count with requested scalar signature. (C++ expects
+enemy_count(int) : int)`. Errors are: no such exported function or other types, a script error during the call,
+an owner that is null or being destroyed, an object argument that is expired or being destroyed, a call from
+another thread.
+
+Hot reload: the call after a script change runs the new code. A change of the signature of a function the
+session has already been called with is rejected (the log says why) and the previous version keeps running.
+
+Speed: a `TDasFunction` remembers the session and the function of its last owner. While neither the script nor
+the owner changes, a call goes straight to the VM: about 0.4 µs against 2.6 µs for `RunNamedFramePersistent`
+([Performance](../../Dev/Architecture/Performance.md#typed-calls-from-c-tdasfunction--2026-10-24)).
+`das.ScriptFunctionFastPath 0` turns this off.
+
+Limits: game thread only; an owner object is required (for script functions without one, use an object with
+the right lifetime, such as the game instance or a subsystem); no output parameters (`T&`).
 
 ## Inspecting modules
 

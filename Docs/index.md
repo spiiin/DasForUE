@@ -79,7 +79,7 @@ time are in the [changelog](../CHANGELOG.md).
 
 ## Native C++
 
-- [Native C++ binds](Guide/Native/NativeBinds.md)
+- [Native C++ binds and calls from C++](Guide/Native/NativeBinds.md)
 
 ## Workflow
 

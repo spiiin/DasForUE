@@ -35,3 +35,19 @@ def null_target(input:int):int {
     var target : AExampleTarget
     return target.get_health()
 }
+
+// [doc:called-from-cpp]
+// Called from C++ through TDasFunction: exported, with the C++ signature's script types.
+[export]
+def enemy_count(wave:int; difficulty:float):int {
+    return int(float(4 + wave * 2) * difficulty)
+}
+// An object arrives as UObjectHandle; the script calls the target's own bind.
+[export]
+def on_target_hit(target:UObjectHandle; damage:int):void {
+    let hit = as_AExampleTarget(target)
+    if (hit.valid()) {
+        hit.apply_damage(damage)
+    }
+}
+// [/doc]
