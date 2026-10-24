@@ -206,6 +206,25 @@ void RunEditorCases(FDasInteropBench& B)
         };
         B.Measure(Case, TEXT("A4 C++ -> script, frame bridge"), Light, Calls, Triangle(Light));
         B.Profile(Case, Light, Calls);
+        // The same function through TDasFunction (DasScript.h): typed, the session remembered between calls.
+        const TDasFunction<int32(int32)> Echo(InteropScript, TEXT("ue_InteropProbe_Echo"));
+        auto Typed = [&](int32 N)
+        {
+            int64 S = 0;
+            for (int32 I = 0; I < N; ++I)
+            {
+                const auto R = Echo.Call(Actor, I);
+                if (R.HasError())
+                {
+                    B.Fail(TEXT("cpp_typed_function_call: ") + R.GetError());
+                    return int64(-1);
+                }
+                S += R.GetValue();
+            }
+            return S;
+        };
+        B.Measure(TEXT("cpp_typed_function_call"), TEXT("A4 C++ -> script, frame bridge"), Light, Typed,
+                  Triangle(Light));
     }
 
     // B, C, D. Loops inside the script, one dispatch per sample; with a file watcher, so that dispatch and the

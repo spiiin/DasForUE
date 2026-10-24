@@ -336,3 +336,20 @@ informational):
   the owner's world, no calls in `bind_events` / `EndPlay`, its class) and passes through a script wrapper that
   keeps the method's name and default arguments.
 - Routed calls stay in the interpreter (object receivers have no AOT ABI); scripts with reflected calls did too.
+
+## Typed calls from C++ (`TDasFunction`) — 2026-10-24
+
+`TDasFunction<R(A...)>` (`DasScript.h`) calls an exported script function with typed arguments in the owner's
+persistent session. Its first call, and any call after something changed, takes the full persistent call path
+(`RunCallback` with a call frame); it then remembers the session and the function, and later calls with the same
+owner go straight to the VM (`das.ScriptFunctionFastPath`, see `DasScriptFunctionCalls.inl` for when it applies).
+
+| Call (int -> int, editor, one run of `interop-performance`) | ns/call, median |
+| --- | ---: |
+| `frame_bridge_int_check_watch` (`ExecuteDasFrame`) | 3165 |
+| `frame_direct_check_watch` (`RunNamedFramePersistent`) | 2604 |
+| `cpp_typed_function_call` (`TDasFunction`) | 426 |
+
+`DasForUE.ScriptFunction` measures `add(int, float)` with the fast path on and off in one run: 453 vs 3698 ns
+in the editor, 445 vs 5048 ns in the packaged game. The VM itself takes about 100 ns; the rest of the fast call
+is the same scopes as the full path (restart, active context, struct collection, event drain).

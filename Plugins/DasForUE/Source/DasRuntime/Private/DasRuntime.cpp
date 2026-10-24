@@ -125,6 +125,7 @@
 #include "DasDefinedEnum.h"
 #include "DasTypeRegistry.h"
 #include "DasRuntime.h"
+#include "DasScript.h"
 #include "DasFoundationManifest.h"
 #include "DasExecutionRole.h"
 #include "DasAsyncPhysicsBridge.h"
@@ -868,6 +869,7 @@ void FDasRuntimeModule::ShutdownModule()
         ScriptTimers.Empty();
         PendingScriptTimers.Empty();
         Sessions.Empty();
+        ++SessionSetEpoch;
         PendingEvents.Empty();
         DropPendingGASCueHooks();
         CreatedScriptScenes.Empty();
@@ -1124,6 +1126,7 @@ double DasExternGuardBenchmarkNs(int32 Iterations)
 
 #include "DasRuntimeModuleDispatch.inl"
 #include "DasRuntimeModuleExecution.inl"
+#include "DasScriptFunctionCalls.inl"
 IMPLEMENT_MODULE(FDasRuntimeModule, DasRuntime)
 
 #include "DasBindingExport.inl"
@@ -1228,6 +1231,7 @@ void FDasRuntimeModule::EndPreserveContextsForReinstance(const FString& Approved
         }
     PreservedSessions.Empty();
     bPreservingSessions = false;
+    ++SessionSetEpoch; // sessions that were not restored are gone
 }
 #endif
 

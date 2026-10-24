@@ -680,8 +680,8 @@ void RevokeSession(FPersistentSession& Session)
 }
 void FlushReleasedSessions()
 {
-    if (!ActiveContext)
-        Sessions.RemoveAll([](const auto& Session) { return Session->bReleaseRequested; });
+    if (!ActiveContext && Sessions.RemoveAll([](const auto& Session) { return Session->bReleaseRequested; }))
+        ++SessionSetEpoch;
 }
 void DrainEvents();
 struct FDrainEventsOnExit

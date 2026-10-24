@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "DasSchema.h"
 #include "DasCallFrame.h"
+#include "DasScript.h"
 #include "Modules/ModuleInterface.h"
 #include "UObject/WeakObjectPtr.h"
 #include "UObject/WeakObjectPtrTemplates.h"
@@ -169,8 +170,16 @@ public:
     bool ExportNativeGameplay(const FString& OutputPath, const FString& RequestsPath, FString& Error);
     bool ExportBindings(const FString& SelectionPath, const FString& OutputPath, FString& Error);
     FString ScriptPath(const FString& Name) const;
+    // TDasFunction (DasScript.h): a typed call of an exported function with Owner as self, in the owner's
+    // persistent session of Script. Site remembers that session for the next call.
+    bool CallScriptFunction(TSharedPtr<FDasScriptCallSite>& Site, UObject* Owner, const FString& Script,
+                            const FString& Entry, TArrayView<const FDasScriptArgument> Arguments,
+                            const FDasScriptArgument& Result, FString& Error);
 
 private:
+    bool CallScriptSite(FDasScriptCallSite& Site, UObject* Owner, const FString& Entry,
+                        TArrayView<const FDasScriptArgument> Arguments, const FDasScriptArgument& Result,
+                        FString& Error, bool& bTaken);
     FDasExecutionResult
     RunCallback(const FString& Path, EDasCallback Event, int32 Input, float DeltaSeconds, TWeakObjectPtr<UObject> Self,
                 const FString& EntryPoint = TEXT("main"), EDasMethodSignature Signature = EDasMethodSignature::Int,

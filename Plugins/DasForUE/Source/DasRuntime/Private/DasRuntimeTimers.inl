@@ -235,6 +235,9 @@ struct FInitializerDelivery
 };
 TMap<TWeakObjectPtr<UObject>, TMap<FString, FInitializerDelivery>> InitializerDeliveries;
 TArray<TUniquePtr<FPersistentSession>> Sessions;
+// Changes whenever a session object may be destroyed: call sites (TDasFunction) that keep a session pointer
+// recheck it then.
+uint64 SessionSetEpoch = 1;
 // Hot reload source checks (FDasRuntimeModule::NotifyScriptsChanged).
 uint64 ScriptSourceEpoch = 1;
 TMap<FString, FString> NormalizedScriptPaths;
