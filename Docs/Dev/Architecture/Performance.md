@@ -334,7 +334,17 @@ rows of one run only.
   bridge resolves the entry and checks the guards on every call (`Resolve` / `Finish`), the interpreter's node
   does the same work. Operators go through `dasue::aot::CallOp`, which adds the active context the generated
   code does not pass. The gain is again the script around the calls, which math no longer keeps in the
-  interpreter; for speed, `ue_math` binds (unguarded, `native_values`) are the faster path.
+  interpreter.
+
+  The bridge, cleaned (2026-10-25): the registry holds the plain function (the guard runs once, in `Resolve`;
+  before, the registered pointer was the guarded wrapper and ran it again) and every call site caches its registry
+  entry (`FCallSite`, valid while the registry generation is unchanged) instead of a `TMap` lookup per call. Same
+  run, ns an iteration, interpreter / AOT: `vector_math` 279.0 / **234.6** (was 309.4 / 350.0, AOT 13% slower;
+  now 16% faster), `float3_math` (the same arithmetic on daScript's `float3`, the floor) 53.8 / 29.5,
+  `scalar_extern` 277.7 / 283.7, `native_refs` 317.4 / 162.3. The parts of one compiled call (C4, in a context
+  scope): `GuardUEExtern` 9.9 ns, the whole bridge (`Resolve` with the cached entry, `Finish`) 31.1 ns. Of the
+  ~47 ns a compiled math call costs, two thirds is the bridge (thread and context checks, the role guard, the
+  pending-error check); the function with its value copies is ~16 ns.
 
 Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.
 

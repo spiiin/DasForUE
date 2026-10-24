@@ -11,6 +11,13 @@ struct FUEAotEntry
     const bool* Loaded = nullptr; // native binds: false once the code module is unloaded
 };
 TMap<uint64, FUEAotEntry> UEAotEntries;
+// Changes with every registration or reset: call sites cache entry pointers, which a rehash moves.
+uint64 UEAotGeneration = 1;
+void AddUEAotEntry(uint64 Key, FUEAotEntry&& Entry)
+{
+    UEAotEntries.Add(Key, MoveTemp(Entry));
+    ++UEAotGeneration;
+}
 
 template <class F, F Fn> bool ConfigureUEAot(das::BuiltInFunction* Bound, const char* Name)
 {
@@ -23,11 +30,12 @@ template <class F, F Fn> bool ConfigureUEAot(das::BuiltInFunction* Bound, const 
         const FString Types = dasue::aot::Signature<F>::CppTypes();
         const uint64 Key = dasue::aot::Key(Name, TCHAR_TO_UTF8(*Types));
         const FString Identity = FString(UTF8_TO_TCHAR(Name)) + TEXT(":") + Types;
-        void* Pointer = reinterpret_cast<void*>(&TCheckedUEExtern<F>::template Invoke<Fn>);
+        // The plain function: Resolve runs the guard before every compiled call, a second one would repeat it.
+        void* Pointer = reinterpret_cast<void*>(Fn);
         if (const auto* Existing = UEAotEntries.Find(Key);
             Existing && (Existing->Identity != Identity || Existing->Function != Pointer))
             throw std::runtime_error("UE AOT extern identity collision");
-        UEAotEntries.Add(Key, {Pointer, Identity, FString(UTF8_TO_TCHAR(Name))});
+        AddUEAotEntry(Key, {Pointer, Identity, FString(UTF8_TO_TCHAR(Name))});
         Bound->cppName =
             TCHAR_TO_UTF8(*(bOperator ? FString::Printf(TEXT("dasue::aot::CallOp<%lluULL,%s>"), Key,
                                                         *dasue::aot::Signature<F>::OperandTypes())

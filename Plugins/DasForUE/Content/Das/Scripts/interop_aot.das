@@ -4,6 +4,7 @@ require ue_time
 require ue_math
 require ue_engine
 require interop_objects
+require math
 
 // AOT against the interpreter (DasInteropProbe.inl, C3): input = iterations * 16 + mode; the results are folded
 // with XOR so neither build can drop the loop. Self is a UDasObjectFixture with health == 7. Modes 4 and 5 call
@@ -12,7 +13,7 @@ require interop_objects
 // actors made by the probe): a parameter and the receiver, an object result, the valid / handle / as_ helpers.
 // Modes 7 and 8 fail (a null receiver, a null argument of a NonNullArgs bind): the probe compares the errors.
 // Mode 9 passes variables to binds with reference parameters (output parameters). Mode 10 is vector arithmetic
-// with ue_foundation's externs and operators.
+// with ue_foundation's externs and operators; mode 11 is the same arithmetic on daScript's float3, the floor.
 def leaf(value:int):int { return value+1 }
 
 [export]
@@ -51,6 +52,12 @@ def main(input:int):int {
         for (i in range(0,count)) {
             let w=ue_vector(double(i & 7),0.0lf,0.0lf)+step*2.0lf
             acc^=int(ue_length(w)+0.5lf)*(i+1) // not a plain + i: that XOR is 0 over 2^22 iterations
+        }
+    } elif (mode==11) {
+        let step=float3(1.0,0.0,0.0)
+        for (i in range(0,count)) {
+            let w=float3(float(i & 7),0.0,0.0)+step*2.0
+            acc^=int(length(w)+0.5)*(i+1)
         }
     } elif (mode==7) {
         var none : AActor

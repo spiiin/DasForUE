@@ -8,7 +8,14 @@
 // Generated code only sees this ABI, never private UE function addresses or UObject layout.
 namespace dasue::aot
 {
-DASRUNTIME_API void* Resolve(uint64_t Key, das::Context* Context);
+// A call site's registry entry, looked up once: valid while the registry is unchanged (its generation).
+struct FCallSite
+{
+    const void* Entry = nullptr;
+    uint64_t Generation = 0;
+};
+// Checks thread, role and context (the only guard of a compiled call) and returns the native function.
+DASRUNTIME_API void* Resolve(uint64_t Key, das::Context* Context, FCallSite& Site);
 // After the call: a native bind that reported DasNativeError fails the script call here.
 DASRUNTIME_API void Finish(uint64_t Key, das::Context* Context);
 // The active script context: operators are called from generated code with their operands only (CallOp).
@@ -160,7 +167,8 @@ template <uint64_t Id, class R, class... A> R Call(A... Args)
         }(),
         ...);
     // Resolve checks thread, role and active context before any native function is entered.
-    auto Fn = reinterpret_cast<R (*)(A...)>(Resolve(Id, Context));
+    static FCallSite Site;
+    auto Fn = reinterpret_cast<R (*)(A...)>(Resolve(Id, Context, Site));
     if constexpr (std::is_void_v<R>)
     {
         Fn(std::forward<A>(Args)...);
@@ -178,7 +186,8 @@ template <uint64_t Id, class R, class... A> R CallOp(A... Args)
 {
     static_assert(CallSignature<R (*)(A..., das::Context*)>::Supported, "Unsupported UE AOT ABI");
     das::Context* Context = CurrentContext();
-    auto Fn = reinterpret_cast<R (*)(A..., das::Context*)>(Resolve(Id, Context));
+    static FCallSite Site;
+    auto Fn = reinterpret_cast<R (*)(A..., das::Context*)>(Resolve(Id, Context, Site));
     if constexpr (std::is_void_v<R>)
     {
         Fn(std::forward<A>(Args)..., Context);

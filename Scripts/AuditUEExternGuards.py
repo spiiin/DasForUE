@@ -16,7 +16,8 @@ def main():
  # Contract checks ignore whitespace so clang-format layout does not matter.
  flat=re.sub(r'\s+','',text);has=lambda needle:re.sub(r'\s+','',needle) in flat
  if not has('&TCheckedUEExtern<F>::template Invoke<Fn>') or not has('GuardUEExtern();return Fn(') or not has('Bound->noAot = !ConfigureUEAot<F, Fn>(Bound, Name)'):raise ValueError('Missing guarded pointer/AOT contract')
- if not has('reinterpret_cast<void*>(&TCheckedUEExtern<F>::template Invoke<Fn>)') or not has('if constexpr (dasue::aot::Signature<F>::Supported)'):raise ValueError('AOT bypasses checked pointer or signature gate')
+ # The registry holds the plain function: AOT code reaches it only through Resolve, which runs the guard (below).
+ if not has('reinterpret_cast<void*>(Fn)') or not has('if constexpr (dasue::aot::Signature<F>::Supported)'):raise ValueError('AOT registry entry or signature gate changed')
  runtime=(root/'Private/DasRuntime.cpp').read_text(encoding='utf-8-sig')
  resolve=runtime.split('void* dasue::aot::Resolve(',1)[1].split('// Declared by DasTypeAdapters.cpp;',1)[0]
  if 'GuardUEExtern();' not in resolve or 'Context != ActiveContext' not in resolve or '!IsInGameThread()' not in resolve:raise ValueError('Missing AOT execution guard')

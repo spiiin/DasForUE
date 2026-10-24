@@ -738,16 +738,22 @@ das::Context* dasue::aot::CurrentContext()
 {
     return ActiveContext;
 }
-void* dasue::aot::Resolve(uint64_t Key, das::Context* Context)
+void* dasue::aot::Resolve(uint64_t Key, das::Context* Context, FCallSite& Site)
 {
     if (!Context)
         throw std::runtime_error("UE AOT call requires a context");
     if (!IsInGameThread() || !ActiveContext || Context != ActiveContext)
         Context->throw_error("UE AOT requires the active game-thread context");
     GuardUEExtern();
-    const auto* Entry = UEAotEntries.Find(Key);
-    if (!Entry)
-        Context->throw_error("UE AOT extern ABI is absent or stale; regenerate and rebuild");
+    // Game thread only (checked above), so the call site's cache needs no synchronization.
+    if (Site.Generation != UEAotGeneration)
+    {
+        const auto* Found = UEAotEntries.Find(Key);
+        if (!Found)
+            Context->throw_error("UE AOT extern ABI is absent or stale; regenerate and rebuild");
+        Site = {Found, UEAotGeneration};
+    }
+    const auto* Entry = static_cast<const FUEAotEntry*>(Site.Entry);
     if (Entry->Loaded && !*Entry->Loaded)
         Context->throw_error(TCHAR_TO_UTF8(*(Entry->Label + TEXT(": its native module was unloaded"))));
     return Entry->Function;
@@ -768,6 +774,7 @@ void FDasRuntimeModule::StartupModule()
     das::setDasRoot(das::string(Utf8Root.Get(), Utf8Root.Length()));
     NEED_ALL_DEFAULT_MODULES;
     UEAotEntries.Reset();
+    ++UEAotGeneration;
     das::Module::Initialize();
     new FUnrealFoundationModule();
     InputRestoreTickHandle = FWorldDelegates::OnWorldTickStart.AddLambda(

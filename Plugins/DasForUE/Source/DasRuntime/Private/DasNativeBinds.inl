@@ -934,7 +934,7 @@ private:
                    TEXT("Native bind %s: AOT key collision, it stays in the interpreter"), *Name);
             return;
         }
-        UEAotEntries.Add(Key, {F.AotEntry, Name + TEXT(":") + Types, UTF8_TO_TCHAR(Fn.Label.c_str()), &Origin.bLoaded});
+        AddUEAotEntry(Key, {F.AotEntry, Name + TEXT(":") + Types, UTF8_TO_TCHAR(Fn.Label.c_str()), &Origin.bLoaded});
         Fn.cppName = TCHAR_TO_UTF8(*FString::Printf(TEXT("dasue::aot::Call<%lluULL,%s>"), Key, *Types));
         Fn.noAot = false;
     }

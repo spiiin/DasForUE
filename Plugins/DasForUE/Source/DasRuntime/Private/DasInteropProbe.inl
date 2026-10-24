@@ -570,7 +570,7 @@ void RunDasInteropProbe(FDasInteropBench& B)
     // zero-iteration run is subtracted. Modes: 0 loop, 1 script call, 2 self field read, 3 scalar extern, 4 native
     // bind (DasNativeBinds.h, ue_time: days_in_year), 5 native binds with engine values (six calls an iteration),
     // 6 native binds with objects (five calls an iteration), 9 output parameters (three calls an iteration),
-    // 10 vector arithmetic through ue_foundation's externs (five calls an iteration).
+    // 10 vector arithmetic through ue_foundation's externs (five calls an iteration), 11 the same on float3.
     TStrongObjectPtr<AActor> ActorPin(NewObject<AActor>(GetTransientPackage()));
     TStrongObjectPtr<AActor> OwnerPin(NewObject<AActor>(GetTransientPackage()));
     DasInterop::ObjectsActor = ActorPin.Get();
@@ -584,8 +584,9 @@ void RunDasInteropProbe(FDasInteropBench& B)
     const FAotMode AotExtern{TEXT("scalar_extern"), 3}, AotNative{TEXT("native_bind"), 4};
     const FAotMode AotValues{TEXT("native_values"), 5}, AotObjects{TEXT("native_objects"), 6};
     const FAotMode AotRefs{TEXT("native_refs"), 9}, AotMath{TEXT("vector_math"), 10};
+    const FAotMode AotFloat3{TEXT("float3_math"), 11};
     for (const FAotMode& M :
-         {AotLoop, AotCall, AotField, AotExtern, AotNative, AotValues, AotObjects, AotRefs, AotMath})
+         {AotLoop, AotCall, AotField, AotExtern, AotNative, AotValues, AotObjects, AotRefs, AotMath, AotFloat3})
     {
         int64 Expected = 0;
         for (int32 I = 0; I < AotCalls; ++I)
@@ -593,8 +594,10 @@ void RunDasInteropProbe(FDasInteropBench& B)
             // Mode 5: |rotated forward| 1 + day 29 + 24 characters of "2024-02-29T00:00:00.000Z"; mode 6: the
             // owner is valid (1) and casts to AActor (2).
             const int32 Value[] = {I & 7, I + 1, 7 + I, I, 365 + I, 1 + 29 + 24 + I, 3 + I};
-            // Mode 9: a vector of length I & 7; mode 10: of length (I & 7) + 2, times I + 1.
-            Expected ^= M.Mode == 9 ? (I & 7) + I : M.Mode == 10 ? ((I & 7) + 2) * (I + 1) : Value[M.Mode];
+            // Mode 9: a vector of length I & 7; modes 10 and 11: of length (I & 7) + 2, times I + 1.
+            Expected ^= M.Mode == 9    ? (I & 7) + I
+                        : M.Mode >= 10 ? ((I & 7) + 2) * (I + 1)
+                                       : Value[M.Mode];
         }
         for (bool bAot : {false, true})
         {
@@ -613,6 +616,43 @@ void RunDasInteropProbe(FDasInteropBench& B)
             };
             B.MeasureDifference(Name, TEXT("C3 AOT vs interpreter"), AotCalls, Run, [&]() { return Run(0); }, Expected);
         }
+    }
+    // C4. The parts of a compiled extern call, in a context scope like a script's: the role guard alone, and the
+    // bridge (Resolve with the call site's cached entry, then Finish) without the native function.
+    {
+        FUnrealDasContext Context(16 * 1024);
+        Context.Self = F;
+        FActiveContextScope Scope(Context);
+        uint64 Key = 0;
+        for (const auto& Entry : UEAotEntries)
+            if (!Entry.Value.Loaded)
+            {
+                Key = Entry.Key;
+                break;
+            }
+        B.Measure(
+            TEXT("guard_ue_extern"), TEXT("C4 compiled call parts"), Direct,
+            [&](int32 N)
+            {
+                for (int32 I = 0; I < N; ++I)
+                    GuardUEExtern();
+                return int64(N);
+            },
+            int64(Direct));
+        dasue::aot::FCallSite Site;
+        B.Measure(
+            TEXT("aot_bridge"), TEXT("C4 compiled call parts"), Direct,
+            [&](int32 N)
+            {
+                int64 S = 0;
+                for (int32 I = 0; I < N; ++I)
+                {
+                    S += dasue::aot::Resolve(Key, &Context, Site) != nullptr;
+                    dasue::aot::Finish(Key, &Context);
+                }
+                return S;
+            },
+            int64(Direct));
     }
     // Object checks of compiled calls fail with the interpreter's message (mode 7: a null receiver, mode 8: a null
     // argument of a NonNullArgs bind); only the location differs, AOT errors have none. Mode 6 above proved that
