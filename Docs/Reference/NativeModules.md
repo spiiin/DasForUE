@@ -25,6 +25,8 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `destroy() : bool` |  |
 | `get_actor_enable_collision() : bool` | reflects `GetActorEnableCollision` |
 | `get_actor_forward_vector() : UEVector` | reflects `GetActorForwardVector` |
+| `get_actor_instigator() : APawn` |  |
+| `get_actor_instigator_controller() : UObjectHandle` |  |
 | `get_actor_location() : UEVector` | reflects `K2_GetActorLocation` |
 | `get_actor_name_or_label() : string` |  |
 | `get_actor_right_vector() : UEVector` | reflects `GetActorRightVector` |
@@ -75,12 +77,14 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `component_has_tag(UENameValue) : bool` | reflects `ComponentHasTag` |
 | `deactivate()` |  |
 | `destroy_component()` |  |
+| `get_component_creation_method() : int` |  |
 | `get_owner() : AActor` | reflects `GetOwner` |
 | `get_world() : UWorld` |  |
 | `has_begun_play() : bool` |  |
 | `is_active() : bool` | reflects `IsActive` (kept: unsafe in construction scripts) |
 | `is_component_tick_enabled() : bool` | reflects `IsComponentTickEnabled` |
 | `is_registered() : bool` |  |
+| `mark_render_state_dirty()` |  |
 | `set_active(bool)` |  |
 | `set_component_tick_enabled(bool)` | reflects `SetComponentTickEnabled` |
 
@@ -126,6 +130,9 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `get_audio_time_seconds() : double` |  |
 | `get_delta_seconds() : float` |  |
 | `get_game_instance() : UGameInstance` |  |
+| `get_level_script_actor() : UObjectHandle` |  |
+| `get_net_mode() : int` |  |
+| `get_persistent_level() : UObjectHandle` |  |
 | `get_real_time_seconds() : double` |  |
 | `get_time_seconds() : double` |  |
 | `get_unpaused_time_seconds() : double` |  |
@@ -138,12 +145,19 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `is_preview_world() : bool` |  |
 | `is_server() : bool` |  |
 | `is_standalone() : bool` |  |
+| `is_starting_up() : bool` |  |
 | `is_tearing_down() : bool` |  |
 
 ### UGameInstance
 
 | Method | Notes |
 | --- | --- |
+| `find_local_player_from_controller_id(int) : UObjectHandle` |  |
+| `get_first_game_player() : UObjectHandle` |  |
+| `get_first_local_player_controller() : UObjectHandle` |  |
+| `get_first_local_player_controller(UWorld) : UObjectHandle` |  |
+| `get_local_player_by_index(int) : UObjectHandle` |  |
+| `get_num_local_players() : int` |  |
 | `get_world() : UWorld` |  |
 
 ### Functions

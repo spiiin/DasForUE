@@ -126,6 +126,26 @@ def main(input:int):int {
     }
     if (!near(p.get_actor_location(), ue_vector(0.0lf, 0.0lf, 500.0lf)) || !as_AActor(p).valid()) { return 40 }
     p.add_movement_input(ue_vector(1.0lf, 0.0lf, 0.0lf), 1.0f)
+    // Coverage part 2: the world's mode and level, local players, the component's creation, the instigator.
+    let mode = w.get_net_mode()
+    if ((mode == 0) != w.is_standalone() || (mode == 3) != w.is_client() || w.is_starting_up()) { return 41 }
+    if (!ue_object_valid(w.get_persistent_level())) { return 42 }
+    let script_actor = w.get_level_script_actor()
+    if (ue_object_valid(script_actor) && !ue_object_is_a(script_actor, "/Script/Engine.LevelScriptActor")) { return 43 }
+    if (gi.valid()) {
+        let players = gi.get_num_local_players()
+        if (players < 0 || ue_object_valid(gi.get_local_player_by_index(-1))) { return 44 }
+        if (ue_object_valid(gi.get_local_player_by_index(players))) { return 45 }
+        if (players > 0 && !ue_object_valid(gi.get_first_game_player())) { return 46 }
+        if (ue_object_valid(gi.find_local_player_from_controller_id(-12345))) { return 47 }
+        let first = gi.get_first_local_player_controller()
+        let first_here = gi.get_first_local_player_controller(w)
+        if (ue_object_valid(first) != ue_object_valid(first_here)) { return 48 }
+        if (ue_object_valid(first) && !__ue_same_object(first, first_here)) { return 48 }
+    }
+    if (child.get_component_creation_method() != 0) { return 49 } // created with NewObject: native
+    child.mark_render_state_dirty()
+    if (a.get_actor_instigator().valid() || ue_object_valid(a.get_actor_instigator_controller())) { return 50 }
     return 0
 }
 

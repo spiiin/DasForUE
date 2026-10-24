@@ -10,10 +10,14 @@
 #include "Components/SceneComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
+#include "Engine/Level.h"
+#include "Engine/LevelScriptActor.h"
+#include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerController.h"
 
 namespace DasNativeEngine
 {
@@ -64,6 +68,7 @@ DAS_ENGINE_FN(SetReplicates, (AActor & A, bool bReplicates), A.SetReplicates(bRe
 DAS_ENGINE_FN(GetActorOwner, (const AActor& A), A.GetOwner())
 DAS_ENGINE_FN(SetActorOwner, (AActor & A, AActor* Owner), A.SetOwner(Owner))
 DAS_ENGINE_FN(GetInstigator, (const AActor& A), A.GetInstigator())
+DAS_ENGINE_FN(GetInstigatorController, (const AActor& A), A.GetInstigatorController())
 DAS_ENGINE_FN(GetRootComponent, (const AActor& A), A.GetRootComponent())
 DAS_ENGINE_FN(GetActorWorld, (const AActor& A), A.GetWorld())
 
@@ -87,6 +92,10 @@ DAS_ENGINE_FN(IsComponentTickEnabled, (const UActorComponent& C), C.IsComponentT
 DAS_ENGINE_FN(DestroyComponent, (UActorComponent & C), C.DestroyComponent())
 DAS_ENGINE_FN(ComponentHasTag, (const UActorComponent& C, FName Tag), C.ComponentHasTag(Tag))
 DAS_ENGINE_FN(GetComponentWorld, (const UActorComponent& C), C.GetWorld())
+// EComponentCreationMethod as its number: 0 native, 1 construction script (simple), 2 user construction script,
+// 3 instance.
+DAS_ENGINE_FN(GetComponentCreationMethod, (const UActorComponent& C), int32(C.CreationMethod))
+DAS_ENGINE_FN(MarkRenderStateDirty, (UActorComponent & C), C.MarkRenderStateDirty())
 
 // SceneComponent: placement.
 DAS_ENGINE_FN(GetComponentLocation, (const USceneComponent& C), C.GetComponentLocation())
@@ -147,7 +156,23 @@ DAS_ENGINE_FN(IsListenServer, (const UWorld& W), W.GetNetMode() == NM_ListenServ
 DAS_ENGINE_FN(IsDedicatedServer, (const UWorld& W), W.GetNetMode() == NM_DedicatedServer)
 DAS_ENGINE_FN(IsServer, (const UWorld& W), W.GetNetMode() == NM_ListenServer || W.GetNetMode() == NM_DedicatedServer)
 DAS_ENGINE_FN(GetGameInstance, (const UWorld& W), W.GetGameInstance())
+// ENetMode as its number: 0 standalone, 1 dedicated server, 2 listen server, 3 client.
+DAS_ENGINE_FN(GetNetMode, (const UWorld& W), int32(W.GetNetMode()))
+DAS_ENGINE_FN(IsStartingUp, (const UWorld& W), W.bStartup != 0)
+DAS_ENGINE_FN(GetPersistentLevel, (const UWorld& W), W.PersistentLevel.Get())
+DAS_ENGINE_FN(GetLevelScriptActor, (const UWorld& W), W.GetLevelScriptActor())
+
+// GameInstance: local players (null for an index or controller id it does not have).
 DAS_ENGINE_FN(GetGameInstanceWorld, (const UGameInstance& G), G.GetWorld())
+DAS_ENGINE_FN(GetNumLocalPlayers, (const UGameInstance& G), G.GetNumLocalPlayers())
+DAS_ENGINE_FN(GetLocalPlayerByIndex, (const UGameInstance& G, int32 Index),
+              Index >= 0 && Index < G.GetNumLocalPlayers() ? G.GetLocalPlayerByIndex(Index) : nullptr)
+DAS_ENGINE_FN(FindLocalPlayerFromControllerId, (const UGameInstance& G, int32 Id),
+              G.FindLocalPlayerFromControllerId(Id))
+DAS_ENGINE_FN(GetFirstGamePlayer, (const UGameInstance& G), G.GetFirstGamePlayer())
+DAS_ENGINE_FN(GetFirstLocalPlayerController, (const UGameInstance& G), G.GetFirstLocalPlayerController())
+DAS_ENGINE_FN(GetFirstLocalPlayerControllerIn, (const UGameInstance& G, const UWorld* World),
+              G.GetFirstLocalPlayerController(World))
 #undef DAS_ENGINE_FN
 
 // The world of any object (UObjectHandle): an actor, a component, a widget...; null when it has none.
@@ -206,6 +231,8 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Actor.Method<GetActorOwner>(TEXT("get_owner")).Reflects(TEXT("GetOwner"));
     Actor.Method<SetActorOwner>(TEXT("set_owner")).Reflects(TEXT("SetOwner"));
     Actor.Method<GetInstigator>(TEXT("get_instigator"));
+    Actor.Method<GetInstigator>(TEXT("get_actor_instigator")); // AngelScript's name
+    Actor.Method<GetInstigatorController>(TEXT("get_actor_instigator_controller"));
     Actor.Method<GetRootComponent>(TEXT("get_root_component")).Reflects(TEXT("K2_GetRootComponent"));
     Actor.Method<GetActorWorld>(TEXT("get_world"));
 
@@ -230,6 +257,8 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Component.Method<DestroyComponent>(TEXT("destroy_component"));
     Component.Method<ComponentHasTag>(TEXT("component_has_tag")).Reflects(TEXT("ComponentHasTag"));
     Component.Method<GetComponentWorld>(TEXT("get_world"));
+    Component.Method<GetComponentCreationMethod>(TEXT("get_component_creation_method"));
+    Component.Method<MarkRenderStateDirty>(TEXT("mark_render_state_dirty"));
 
     auto Scene = Binds.Class<USceneComponent>(TEXT("USceneComponent"));
     Scene.Method<GetComponentLocation>(TEXT("get_component_location")).Reflects(TEXT("K2_GetComponentLocation"));
@@ -280,7 +309,18 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     World.Method<IsListenServer>(TEXT("is_listen_server"));
     World.Method<IsDedicatedServer>(TEXT("is_dedicated_server"));
     World.Method<GetGameInstance>(TEXT("get_game_instance"));
-    Binds.Class<UGameInstance>(TEXT("UGameInstance")).Method<GetGameInstanceWorld>(TEXT("get_world"));
+    World.Method<GetNetMode>(TEXT("get_net_mode"));
+    World.Method<IsStartingUp>(TEXT("is_starting_up"));
+    World.Method<GetPersistentLevel>(TEXT("get_persistent_level"));
+    World.Method<GetLevelScriptActor>(TEXT("get_level_script_actor"));
+    auto GameInstance = Binds.Class<UGameInstance>(TEXT("UGameInstance"));
+    GameInstance.Method<GetGameInstanceWorld>(TEXT("get_world"));
+    GameInstance.Method<GetNumLocalPlayers>(TEXT("get_num_local_players"));
+    GameInstance.Method<GetLocalPlayerByIndex>(TEXT("get_local_player_by_index"));
+    GameInstance.Method<FindLocalPlayerFromControllerId>(TEXT("find_local_player_from_controller_id"));
+    GameInstance.Method<GetFirstGamePlayer>(TEXT("get_first_game_player"));
+    GameInstance.Method<GetFirstLocalPlayerController>(TEXT("get_first_local_player_controller"));
+    GameInstance.Method<GetFirstLocalPlayerControllerIn>(TEXT("get_first_local_player_controller"));
     Binds.Function<&WorldOf>(TEXT("world_of"));
     Binds.Function<&FrameNumber>(TEXT("frame_number"));
 }
