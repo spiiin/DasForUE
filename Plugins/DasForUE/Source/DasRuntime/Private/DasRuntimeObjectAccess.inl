@@ -93,7 +93,8 @@ void LibraryScope(const FDasObjectHandle& H, bool RequiresWorld, const das::TBlo
     if (!Good)
         C->rethrow();
 }
-FDasObjectHandle NullObject()
+// The context is unused: an AOT-eligible extern takes exactly one (DasUEAot.h).
+FDasObjectHandle NullObject(das::Context*)
 {
     return {};
 }

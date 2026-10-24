@@ -100,6 +100,25 @@ bool RunDasUEAotProbe(FString& Report)
     R = Run(4);
     Check(R.bSucceeded && R.bUsedAot && R.Value == 6 &&
           Owner->DSLText == TEXT("native AOT") && Owner->bScalar, TEXT("scalar_string_bool_float_double"), R.Error);
+    // Object externs: compiled, with the interpreter's value; an extern's error has the interpreter's text.
+    R = Run(5);
+    const auto Interpreted = Runtime.RunFile(Path, 5, false, Owner.Get());
+    Check(R.bSucceeded && R.bUsedAot && R.Value == 15 && Interpreted.bSucceeded && Interpreted.Value == 15,
+          TEXT("object_externs"), R.Error + Interpreted.Error);
+    auto Message = [](const FString& Error)
+    {
+        FString Text = Error;
+        if (const int32 Bar = Text.Find(TEXT(" | ")); Bar != INDEX_NONE)
+            Text.MidInline(Bar + 3);
+        if (const int32 End = Text.Find(TEXT("\n")); End != INDEX_NONE)
+            Text.LeftInline(End);
+        return Text.TrimEnd();
+    };
+    const auto AotError = Run(6);
+    const auto InterpretedError = Runtime.RunFile(Path, 6, false, Owner.Get());
+    Check(!AotError.bSucceeded && !InterpretedError.bSucceeded && !Message(AotError.Error).IsEmpty() &&
+              Message(AotError.Error) == Message(InterpretedError.Error),
+          TEXT("object_extern_error"), Message(AotError.Error) + TEXT(" / ") + Message(InterpretedError.Error));
     R = Run(1);
     Check(!R.bSucceeded && !R.Error.IsEmpty(), TEXT("missing_property_refused"), R.Error);
     R = Run(2);
@@ -180,17 +199,19 @@ bool RunDasUEAotProbe(FString& Report)
     }
     const auto Recovered = Eval(true);
     Check(Recovered.IsEmpty() && Owner->health == 104, TEXT("recovered_without_forbidden_writes"), Recovered);
-    bool Closed = false, Open = false;
+    bool Closed = false, Open = false, ObjectOpen = false;
     das::Module::require("ue_foundation")
         ->functions.foreach (
             [&](const das::FunctionPtr& Fn)
             {
-                if (Fn->name == "ue_self_object")
+                if (Fn->name == "ue_begin_call") // a call frame handle has no ABI
                     Closed = Fn->noAot;
                 if (Fn->name == "ue_get_self_int")
                     Open = !Fn->noAot;
+                if (Fn->name == "ue_self_object")
+                    ObjectOpen = !Fn->noAot;
             });
-    Check(Closed && Open, TEXT("unsupported_abi_stays_closed"));
+    Check(Closed && Open && ObjectOpen, TEXT("unsupported_abi_stays_closed"));
     Owner.Reset();
     CollectGarbage(RF_NoFlags);
     const auto Dead = Eval(true);

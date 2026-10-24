@@ -320,8 +320,9 @@ rows of one run only.
   iteration: `set_owner`, `get_owner`, `valid`, `handle`, `as_AActor` — interpreter 536.3 ns, AOT 545.2 ns. A
   compiled object call is not faster: its cost is the handle table (lookup, `IsA`, a new handle for each result)
   and the bridge's guards, the same on both paths. What AOT gains is the script around the calls, which is no
-  longer kept in the interpreter because it touches an object — unless it gets the object from a
-  `ue_foundation` extern such as `ue_self_object()`, which has no object ABI yet.
+  longer kept in the interpreter because it touches an object. `ue_foundation`'s externs with object handles
+  (`ue_self_object()`, casts, validity, object properties: 121 of 186) are compiled too; reflected `UFUNCTION`
+  calls through a call frame are not.
 
 Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.
 

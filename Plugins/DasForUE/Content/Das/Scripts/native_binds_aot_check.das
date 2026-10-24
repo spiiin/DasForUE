@@ -20,11 +20,10 @@ def open_only(input:int):int {
     return scalars + values + input
 }
 
-// Without ue_self_object: ue_foundation's own object externs have no AOT ABI yet.
+// From self to ue_engine methods: ue_self_object and the binds' helpers are all compiled.
 [export]
 def with_objects(input:int):int {
-    var none : AActor
-    let a = as_AActor(none.handle())
+    let a = as_AActor(ue_self_object())
     return a.valid() ? int(a.get_actor_location().size_2d()) + input : input
 }
 

@@ -702,7 +702,7 @@ ue_normalized	@ue_foundation::ue_normalized CIH<ue_foundation::UEQuat> Cd C_c	ue
 ue_normalized	@ue_foundation::ue_normalized CIH<ue_foundation::UERotator> C_c	ue_foundation::UERotator	4
 ue_normalized	@ue_foundation::ue_normalized CIH<ue_foundation::UEVector2D> Cd C_c	ue_foundation::UEVector2D	4
 ue_normalized	@ue_foundation::ue_normalized CIH<ue_foundation::UEVector> Cd C_c	ue_foundation::UEVector	4
-ue_null_object	@ue_foundation::ue_null_object	ue_foundation::UObjectHandle	4
+ue_null_object	@ue_foundation::ue_null_object C_c	ue_foundation::UObjectHandle	4
 ue_object_get_int	@ue_foundation::ue_object_get_int CIH<ue_foundation::UObjectHandle> CIs C_c	int const	4
 ue_object_is_a	@ue_foundation::ue_object_is_a CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
 ue_object_set_int	@ue_foundation::ue_object_set_int CIH<ue_foundation::UObjectHandle> CIs Ci C_c	void	4

@@ -35,9 +35,12 @@ DAS_UE_AOT_TYPE(double, "double")
 DAS_UE_AOT_TYPE(const char*, "const char *")
 DAS_UE_AOT_TYPE(char*, "char *")
 DAS_UE_AOT_TYPE(das::Context*, "das::Context *")
+// Object references as their handles: the extern resolves and checks them itself, the same code on both paths.
+DAS_UE_AOT_TYPE(const FDasObjectHandle&, "const FDasObjectHandle &")
+DAS_UE_AOT_TYPE(FDasObjectHandle, "FDasObjectHandle")
 #undef DAS_UE_AOT_TYPE
 // Engine values (by const reference, results by value) are only in the ABI of native binds (DasNativeBinds.h);
-// AddUEExtern keeps the scalar ABI above.
+// AddUEExtern keeps the scalar and object ABI above.
 template <class T> struct ValueType
 {
     static constexpr const char* Name = Type<T>::Name;
@@ -63,8 +66,6 @@ DAS_UE_AOT_VALUE(const FColor&, "const FColor &")
 DAS_UE_AOT_VALUE(FColor, "FColor")
 DAS_UE_AOT_VALUE(FDasDateTimeValue, "FDasDateTimeValue")
 DAS_UE_AOT_VALUE(FDasTimespanValue, "FDasTimespanValue")
-DAS_UE_AOT_VALUE(const FDasObjectHandle&, "const FDasObjectHandle &")
-DAS_UE_AOT_VALUE(FDasObjectHandle, "FDasObjectHandle")
 #undef DAS_UE_AOT_VALUE
 
 template <class F> struct Signature
