@@ -11,6 +11,8 @@ require interop_objects
 // value, a date, a string result) - six calls an iteration. Mode 6 calls binds with objects (interop_objects: two
 // actors made by the probe): a parameter and the receiver, an object result, the valid / handle / as_ helpers.
 // Modes 7 and 8 fail (a null receiver, a null argument of a NonNullArgs bind): the probe compares the errors.
+// Mode 9 passes variables to binds with reference parameters (output parameters; ue_math values only, as
+// ue_foundation's math externs keep a function in the interpreter).
 def leaf(value:int):int { return value+1 }
 
 [export]
@@ -35,6 +37,14 @@ def main(input:int):int {
             a.set_owner(o)
             let owner=a.get_owner()
             acc^=(owner.valid() ? 1 : 0)+(as_AActor(owner.handle()).valid() ? 2 : 0)+i
+        }
+    } elif (mode==9) {
+        var direction=zero_vector()
+        var length=0.0lf
+        for (i in range(0,count)) {
+            let size=double(i & 7)
+            forward_vector().get_clamped_to_size(size,size).to_direction_and_length(direction,length)
+            acc^=int(length+0.5lf)+i
         }
     } elif (mode==7) {
         var none : AActor

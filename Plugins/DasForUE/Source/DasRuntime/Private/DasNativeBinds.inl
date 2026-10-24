@@ -42,6 +42,16 @@ struct FDasNativeClassAnnotation : das::ManagedStructureAnnotation<FDasObjectHan
 das::TypeDeclPtr DasNativeTypeDecl(const FDasNativeParam& Param, const FDasNativeResolvedParam& Resolved,
                                    const das::ModuleLibrary& Lib, bool bArgument)
 {
+    // A reference parameter: `var x : T&`, the caller's variable.
+    if (bArgument && Param.bRef)
+    {
+        FDasNativeParam Value = Param;
+        Value.bRef = false;
+        das::TypeDeclPtr Type = DasNativeTypeDecl(Value, Resolved, Lib, false);
+        Type->ref = true;
+        Type->constant = false;
+        return Type;
+    }
     switch (Param.Type)
     {
     case EDasNativeType::Void:
@@ -95,6 +105,12 @@ das::TypeDeclPtr DasNativeTypeDecl(const FDasNativeParam& Param, const FDasNativ
 // The script name of a parameter or result type (manifests).
 FString DasNativeScriptTypeName(const FDasNativeParam& Param, const FDasNativeResolvedParam& Resolved)
 {
+    if (Param.bRef)
+    {
+        FDasNativeParam Value = Param;
+        Value.bRef = false;
+        return DasNativeScriptTypeName(Value, Resolved) + TEXT("&");
+    }
     switch (Param.Type)
     {
     case EDasNativeType::Void:
@@ -136,9 +152,48 @@ FString DasNativeScriptTypeName(const FDasNativeParam& Param, const FDasNativeRe
     }
 }
 // AOT ABI of a parameter or result (DasUEAot.h): engine values by const reference, results by value, objects as
-// their handles. nullptr when a type has none (FName, FText): such functions stay in the interpreter.
-const char* DasNativeAbiName(EDasNativeType Type, bool bArgument)
+// their handles, a reference parameter (bRef) as a reference. nullptr when a type has none (FName, FText): such
+// functions stay in the interpreter.
+const char* DasNativeAbiName(EDasNativeType Type, bool bArgument, bool bRef = false)
 {
+    if (bRef)
+        switch (Type)
+        {
+        case EDasNativeType::Bool:
+            return "bool &";
+        case EDasNativeType::Int32:
+            return "int32_t &";
+        case EDasNativeType::Int64:
+            return "int64_t &";
+        case EDasNativeType::Float:
+            return "float &";
+        case EDasNativeType::Double:
+            return "double &";
+        case EDasNativeType::Byte:
+            return "uint8_t &";
+        case EDasNativeType::String:
+            return "char * &";
+        case EDasNativeType::DateTime:
+            return "FDasDateTimeValue &";
+        case EDasNativeType::Timespan:
+            return "FDasTimespanValue &";
+        case EDasNativeType::Vector:
+            return "FVector &";
+        case EDasNativeType::Vector2D:
+            return "FVector2D &";
+        case EDasNativeType::Rotator:
+            return "FRotator &";
+        case EDasNativeType::Quat:
+            return "FQuat &";
+        case EDasNativeType::Transform:
+            return "FTransform &";
+        case EDasNativeType::LinearColor:
+            return "FLinearColor &";
+        case EDasNativeType::Color:
+            return "FColor &";
+        default:
+            return nullptr;
+        }
     switch (Type)
     {
     case EDasNativeType::Void:
@@ -190,7 +245,7 @@ FString DasNativeAbiTypes(const FDasNativeFunctionDesc& F)
     FString Types = UTF8_TO_TCHAR(Result);
     for (const FDasNativeParam& P : F.Arguments)
     {
-        const char* Argument = DasNativeAbiName(P.Type, true);
+        const char* Argument = DasNativeAbiName(P.Type, true, P.bRef);
         if (!Argument)
             return FString();
         Types += FString(TEXT(",")) + UTF8_TO_TCHAR(Argument);
@@ -246,6 +301,80 @@ struct FDasNativeValues
 static_assert(sizeof(FString) <= sizeof(FTransform) && sizeof(FText) <= sizeof(FTransform) &&
               sizeof(FLinearColor) <= sizeof(FTransform) && sizeof(FQuat) <= sizeof(FTransform));
 
+// A reference argument (FDasNativeParam::bRef): the VM passes the address of the script's variable. The call works
+// on a copy in its slot, written back only when the call succeeds.
+int32 DasNativeValueSize(EDasNativeType Type)
+{
+    switch (Type)
+    {
+    case EDasNativeType::Bool:
+        return sizeof(bool);
+    case EDasNativeType::Int32:
+    case EDasNativeType::Float:
+        return 4;
+    case EDasNativeType::Int64:
+    case EDasNativeType::Double:
+        return 8;
+    case EDasNativeType::Byte:
+        return 1;
+    case EDasNativeType::Vector:
+        return sizeof(FVector);
+    case EDasNativeType::Vector2D:
+        return sizeof(FVector2D);
+    case EDasNativeType::Rotator:
+        return sizeof(FRotator);
+    case EDasNativeType::Quat:
+        return sizeof(FQuat);
+    case EDasNativeType::Transform:
+        return sizeof(FTransform);
+    case EDasNativeType::LinearColor:
+        return sizeof(FLinearColor);
+    case EDasNativeType::Color:
+        return sizeof(FColor);
+    default:
+        return 0;
+    }
+}
+void DasNativeReadRef(EDasNativeType Type, const void* Variable, void* Slot)
+{
+    switch (Type)
+    {
+    case EDasNativeType::String:
+    {
+        const char* Text = *static_cast<char* const*>(Variable);
+        *static_cast<FString*>(Slot) = Text ? FString(UTF8_TO_TCHAR(Text)) : FString();
+        break;
+    }
+    case EDasNativeType::DateTime:
+        *static_cast<FDateTime*>(Slot) = FDateTime(static_cast<const FDasDateTimeValue*>(Variable)->Ticks);
+        break;
+    case EDasNativeType::Timespan:
+        *static_cast<FTimespan*>(Slot) = FTimespan(static_cast<const FDasTimespanValue*>(Variable)->Ticks);
+        break;
+    default:
+        FMemory::Memcpy(Slot, Variable, DasNativeValueSize(Type));
+        break;
+    }
+}
+void DasNativeWriteRef(EDasNativeType Type, const void* Slot, void* Variable, das::Context& Context)
+{
+    switch (Type)
+    {
+    case EDasNativeType::String:
+        *static_cast<char**>(Variable) = CopyDSLString(*static_cast<const FString*>(Slot), &Context);
+        break;
+    case EDasNativeType::DateTime:
+        static_cast<FDasDateTimeValue*>(Variable)->Ticks = static_cast<const FDateTime*>(Slot)->GetTicks();
+        break;
+    case EDasNativeType::Timespan:
+        static_cast<FDasTimespanValue*>(Variable)->Ticks = static_cast<const FTimespan*>(Slot)->GetTicks();
+        break;
+    default:
+        FMemory::Memcpy(Variable, Slot, DasNativeValueSize(Type));
+        break;
+    }
+}
+
 struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
 {
     const FDasNativeModuleDesc* Module = nullptr; // whose code runs: an unloaded module reports an error
@@ -299,6 +428,12 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
         for (int32 I = 0; I < Function->Arguments.Num(); ++I)
         {
             const EDasNativeType Type = Function->Arguments[I].Type;
+            if (Function->Arguments[I].bRef)
+            {
+                Args[I] = Values.Construct(Type);
+                DasNativeReadRef(Type, das::cast<void*>::to(Raw[I]), Args[I]);
+                continue;
+            }
             if (DasNativeIsMath(Type))
             {
                 Args[I] = das::cast<void*>::to(Raw[I]); // the VM's own value, passed by const reference
@@ -381,6 +516,9 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
         DasNativeErrorSlot() = Outer;
         if (!Error.IsEmpty())
             Context.throw_error_at(debugInfo, "%s: %s", Label, TCHAR_TO_UTF8(*Error));
+        for (int32 I = 0; I < Function->Arguments.Num(); ++I)
+            if (Function->Arguments[I].bRef)
+                DasNativeWriteRef(Function->Arguments[I].Type, Args[I], das::cast<void*>::to(Raw[I]), Context);
         switch (Result)
         {
         case EDasNativeType::Void:
@@ -703,9 +841,13 @@ private:
         auto* Fn = new FDasNativeFunction(Origin, F, Library, das::string(TCHAR_TO_UTF8(*F.Name)), !AbiTypes.IsEmpty());
         if (!AbiTypes.IsEmpty())
             RegisterAot(Origin, F, *Fn, AbiTypes);
-        const das::SideEffects Effects = EnumHasAnyFlags(F.Flags, EDasBind::Pure)
-                                             ? das::SideEffects::none
-                                             : das::SideEffects::modifyExternal | das::SideEffects::accessExternal;
+        das::SideEffects Effects = EnumHasAnyFlags(F.Flags, EDasBind::Pure)
+                                       ? das::SideEffects::none
+                                       : das::SideEffects::modifyExternal | das::SideEffects::accessExternal;
+        // A reference parameter changes the caller's variable: without this the compiler would keep using the
+        // value it had before the call (constant propagation).
+        if (F.Arguments.ContainsByPredicate([](const FDasNativeParam& P) { return P.bRef; }))
+            Effects = Effects | das::SideEffects::modifyArgument;
         das::addExternFunc(*this, Fn, DasNativeIsCmres(F.Result.Type), Effects);
     }
     // The route of a bind that reflects a UFUNCTION (SimNode_DasNativeRoute): a builtin of ue_foundation, which every

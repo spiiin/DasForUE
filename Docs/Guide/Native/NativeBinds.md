@@ -95,13 +95,36 @@ functions imported from another DLL (engine functions) in a small lambda or func
 A const reference counts as its value type. Up to 16 parameters. Other types do not compile
 (`static_assert` names the supported list).
 
+A `T&` parameter that is not const (a scalar, `FString`, `FDateTime`, `FTimespan` or a math value) is a reference
+in the script, `var x : T&`: the caller passes a variable and sees what the function wrote into it. That is how
+setters of value types and output parameters are bound:
+
+```cpp
+static void SetLocation(FTransform& T, const FVector& V) { T.SetLocation(V); }
+static void ToAxisAndAngle(const FQuat& Q, FVector& Axis, double& Angle) { Q.ToAxisAndAngle(Axis, Angle); }
+```
+
+```das
+var t = ue_transform_identity()
+t.set_location(ue_vector(10.0lf, 0.0lf, 0.0lf))
+var axis = zero_vector()
+var angle = 0.0lf
+q.to_axis_and_angle(axis, angle)
+```
+
+The function works on a copy, written back when the call succeeds: a call that reports `DasNativeError` leaves
+the variable unchanged. Objects, `FName` and `FText` cannot be references; `Pure` functions and `Reflects` methods
+take none.
+
 Flags:
 
 - `EDasBind::Pure` — no side effects and no game state: the compiler may evaluate a call with constant arguments
   while it compiles. Not allowed with object parameters or results.
 - `EDasBind::NonNullArgs` — a null or expired object argument is a script error instead of `nullptr`.
 
-A function name may also be an operator: `+ - * / % == != < <= > >=` (`-` with one parameter is unary minus).
+A function name may also be an operator: `+ - * / % == != < <= > >=` (`-` with one parameter is unary minus)
+and the compound assignments `+= -= *= /= %=`, whose first parameter is a reference (`ue_time`'s
+`span += make_timespan(0, 30, 0)`).
 Overloads with different parameter types may share a name.
 
 `DasNativeError(TEXT("..."))` inside a bound function fails the script call with `<function>: <message>` after

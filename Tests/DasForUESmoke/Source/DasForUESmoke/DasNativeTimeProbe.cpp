@@ -45,12 +45,14 @@ bool RunDasNativeTimeProbe(FString& Report)
     const TCHAR* ZeroDivision = TEXT("return (make_timespan(1, 0, 0) / 0.0lf).get_hours()");
     const TCHAR* LateDate = TEXT("return (max_date_time() + make_timespan(0, 0, 1)).get_day()");
     const TCHAR* LongSpan = TEXT("return (-min_timespan()).get_days()");
+    const TCHAR* ZeroRemainder = TEXT("var s = make_timespan(1, 0, 0)\ns %= zero_timespan()\nreturn s.get_hours()");
     Refused(TEXT("native_time_invalid_date_refused"), BadDate, TEXT("make_date_time: invalid date 2023-2-29"));
     Refused(TEXT("native_time_bad_text_refused"), BadText, TEXT("parse_iso8601: cannot parse 'tomorrow'"));
     Refused(TEXT("native_time_bad_month_refused"), BadMonth, TEXT("days_in_month: month 13 is not 1..12"));
     Refused(TEXT("native_time_division_by_zero_refused"), ZeroDivision, TEXT("division by zero"));
     Refused(TEXT("native_time_date_overflow_refused"), LateDate, TEXT("date is out of range"));
     Refused(TEXT("native_time_span_overflow_refused"), LongSpan, TEXT("time span is out of range"));
+    Refused(TEXT("native_time_remainder_by_zero_refused"), ZeroRemainder, TEXT("%=: division by zero"));
     return bPassed;
 }
 

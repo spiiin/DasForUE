@@ -340,6 +340,77 @@ def main(input:int):int {
     if (!near(t.transform_vector_no_scale(forward_vector()), right_vector())) { return 167 }
     if (!near(t.inverse_transform_vector_no_scale(right_vector()), forward_vector())) { return 168 }
     if (!t.get_relative_transform_reverse(t).equals(u, 0.0001lf)) { return 169 }
+
+    // Coverage part 3: FTransform in place and output parameters (the script passes variables).
+    var tr = ue_transform_identity()
+    tr.set_location(x10)
+    if (!near(tr.get_location(), x10)) { return 170 }
+    tr.set_rotation(q90)
+    tr.set_scale3d(ue_vector(2.0lf, 2.0lf, 2.0lf))
+    if (!same(tr.rotator().yaw, 90.0lf) || !near(tr.get_scale3d(), ue_vector(2.0lf, 2.0lf, 2.0lf))) { return 171 }
+    tr.set_translation(zero_vector())
+    tr.add_to_translation(one_vector())
+    if (!near(tr.get_location(), one_vector())) { return 172 }
+    tr.set_translation_and_scale3d(x10, one_vector())
+    if (!near(tr.get_location(), x10) || !near(tr.get_scale3d(), one_vector())) { return 173 }
+    tr.scale_translation(2.0lf)
+    if (!near(tr.get_location(), ue_vector(20.0lf, 0.0lf, 0.0lf))) { return 174 }
+    tr.scale_translation(ue_vector(0.5lf, 1.0lf, 1.0lf))
+    tr.normalize_rotation()
+    if (!near(tr.get_location(), x10) || !tr.is_rotation_normalized()) { return 175 }
+    var sum = ue_transform_identity()
+    sum.accumulate(t)
+    if (!near(sum.get_location(), x10)) { return 176 }
+    var mixed = ue_transform_identity()
+    mixed.blend_with(t, 1.0lf)
+    if (!mixed.equals(t, 0.0001lf)) { return 177 }
+    var turned_t = ue_transform_identity()
+    turned_t.concatenate_rotation(q90)
+    if (!same(turned_t.rotator().yaw, 90.0lf)) { return 178 }
+    var relative = t
+    relative.set_to_relative_transform(t)
+    if (!relative.equals(u, 0.0001lf) || !t.equals(ue_transform(x10, yaw90, ue_vector(2.0lf, 2.0lf, 2.0lf)))) {
+        return 179 // t, passed by value, is unchanged
+    }
+    var axis = zero_vector()
+    var angle = 0.0lf
+    q90.to_axis_and_angle(axis, angle)
+    if (!near(axis, up_vector()) || !same(angle, 0.5lf * DBL_PI)) { return 180 }
+    var direction = zero_vector()
+    var length3 = 0.0lf
+    ue_vector(3.0lf, 4.0lf, 0.0lf).to_direction_and_length(direction, length3)
+    if (!near(direction, ue_vector(0.6lf, 0.8lf, 0.0lf)) || !same(length3, 5.0lf)) { return 181 }
+    var direction2 = zero_vector2d()
+    var length2 = 0.0lf
+    flat.to_direction_and_length(direction2, length2)
+    if (!direction2.equals(ue_vector2d(0.6lf, -0.8lf), 0.0001lf) || !same(length2, 5.0lf)) { return 182 }
+    var swing = quat_id
+    var twist = quat_id
+    q90.to_swing_twist(up_vector(), swing, twist)
+    if (!twist.equals(q90, 0.0001lf) || !swing.equals(quat_id, 0.0001lf)) { return 183 }
+    var axis1 = zero_vector()
+    var axis2 = zero_vector()
+    up_vector().find_best_axis_vectors(axis1, axis2)
+    if (!orthogonal(axis1, up_vector()) || !orthogonal(axis2, up_vector()) || !orthogonal(axis1, axis2)) { return 184 }
+    var tangent = quat_id
+    calc_tangents(quat_id, q90, quat_id, 0.0lf, tangent)
+    if (tangent.contains_nan()) { return 185 }
+    var winding = zero_rotator()
+    var remainder = zero_rotator()
+    ue_rotator(0.0lf, 400.0lf, 0.0lf).get_winding_and_remainder(winding, remainder)
+    if (!same(winding.yaw, 360.0lf) || !same(remainder.yaw, 40.0lf)) { return 186 }
+    var crossing = one_vector()
+    let across = segment_intersection_2d(ue_vector(-1.0lf, 0.0lf, 0.0lf), x10, ue_vector(0.0lf, -1.0lf, 0.0lf),
+                                         ue_vector(0.0lf, 1.0lf, 0.0lf), crossing)
+    if (!across || !near(crossing, zero_vector())) { return 187 }
+    var hit_location = zero_vector()
+    var hit_normal = zero_vector()
+    var hit_time = 0.0lf
+    let boxed = line_extent_box_intersection(box_min, one_vector(), ue_vector(-5.0lf, 0.0lf, 0.0lf),
+                                             ue_vector(5.0lf, 0.0lf, 0.0lf), zero_vector(), hit_location, hit_normal,
+                                             hit_time)
+    if (!boxed || !near(hit_location, ue_vector(-1.0lf, 0.0lf, 0.0lf)) || !same(hit_time, 0.4lf)) { return 188 }
+    if (!near(hit_normal, backward_vector())) { return 189 }
     return 0
 }
 

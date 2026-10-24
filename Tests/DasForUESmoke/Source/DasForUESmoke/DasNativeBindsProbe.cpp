@@ -265,6 +265,22 @@ void BuildUntypedClass(FDasNativeModule& Binds)
 {
     Binds.Class<UDasScriptComponent>().Method<&One>(TEXT("one"));
 }
+// References: a Pure function cannot change its argument; a compound assignment changes its first one.
+void Double(int32& Value)
+{
+    Value *= 2;
+}
+void AddTo(int32, int32)
+{
+}
+void BuildPureReference(FDasNativeModule& Binds)
+{
+    Binds.Function<&Double>(TEXT("pure_double"), EDasBind::Pure);
+}
+void BuildCompoundByValue(FDasNativeModule& Binds)
+{
+    Binds.Function<&AddTo>(TEXT("+="));
+}
 // A script file that exists for one check.
 struct FTemporaryScript
 {
@@ -352,11 +368,15 @@ bool RunDasNativeBindsProbe(FString& Report)
     const FString PureObject = TEXT("smoke_native_pure_object_") + Run;
     const FString SecondOwner = TEXT("smoke_native_second_owner_") + Run;
     const FString Untyped = TEXT("smoke_native_untyped_") + Run;
+    const FString PureReference = TEXT("smoke_native_pure_reference_") + Run;
+    const FString CompoundByValue = TEXT("smoke_native_compound_by_value_") + Run;
     RegisterDasNativeModule(TEXT("ue_foundation"), &BuildTemporary);
     RegisterDasNativeModule(*Duplicate, &BuildDuplicate);
     RegisterDasNativeModule(*PureObject, &BuildPureObject);
     RegisterDasNativeModule(*SecondOwner, &BuildSecondOwner);
     RegisterDasNativeModule(*Untyped, &BuildUntypedClass);
+    RegisterDasNativeModule(*PureReference, &BuildPureReference);
+    RegisterDasNativeModule(*CompoundByValue, &BuildCompoundByValue);
     {
         FTemporaryScript Trigger(R, TEXT("options gen2\n[export]\ndef main(input:int):int { return 0 }\n"));
         R.RunFile(Trigger.Path, 0); // compiling builds newly registered modules
@@ -373,6 +393,10 @@ bool RunDasNativeBindsProbe(FString& Report)
     Registration(TEXT("native_binds_pure_object_refused"), PureObject, TEXT("is Pure but takes or returns objects"));
     Registration(TEXT("native_binds_second_class_owner_refused"), SecondOwner, SecondOwnerError);
     Registration(TEXT("native_binds_class_without_type_refused"), Untyped, TEXT("which has no script type"));
+    Registration(TEXT("native_binds_pure_reference_refused"), PureReference,
+                 TEXT("is Pure but changes a reference parameter"));
+    Registration(TEXT("native_binds_compound_by_value_refused"), CompoundByValue,
+                 TEXT("is a compound assignment without a reference (T&) first parameter"));
 
     // An unloaded module: compiled calls report an error instead of calling unloaded code.
     const FString Temporary = TEXT("smoke_native_temporary_") + Run;
@@ -402,6 +426,8 @@ bool FDasNativeBindsTest::RunTest(const FString&)
     AddExpectedError(TEXT("is Pure but takes or returns objects"), Contains, 1);
     AddExpectedError(TEXT("already has the script type"), Contains, 1);
     AddExpectedError(TEXT("which has no script type"), Contains, 1);
+    AddExpectedError(TEXT("is Pure but changes a reference parameter"), Contains, 1);
+    AddExpectedError(TEXT("is a compound assignment without a reference"), Contains, 1);
     FString Report;
     const bool bPassed = RunDasNativeBindsProbe(Report);
     TArray<FString> Lines;

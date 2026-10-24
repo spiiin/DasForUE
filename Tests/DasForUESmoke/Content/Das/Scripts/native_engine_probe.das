@@ -142,6 +142,16 @@ def main(input:int):int {
         let first_here = gi.get_first_local_player_controller(w)
         if (ue_object_valid(first) != ue_object_valid(first_here)) { return 48 }
         if (ue_object_valid(first) && !__ue_same_object(first, first_here)) { return 48 }
+        // Coverage part 3: a local player made and removed again (the error is an output parameter).
+        var error = "unchanged"
+        let made = gi.create_local_player(7, error, false)
+        if (!ue_object_valid(made) || gi.get_num_local_players() != players + 1) { return 51 }
+        if (!gi.remove_local_player(made) || gi.get_num_local_players() != players) { return 52 }
+        if (players > 0) {
+            var initial_error = ""
+            let again = gi.create_initial_player(initial_error) // controller 0 has a player already
+            if (ue_object_valid(again) || initial_error == "") { return 53 }
+        }
     }
     if (child.get_component_creation_method() != 0) { return 49 } // created with NewObject: native
     child.mark_render_state_dirty()

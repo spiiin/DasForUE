@@ -401,6 +401,104 @@ FLinearColor MakeFromHexSRGB(int64 Hex)
 {
     return MakeFromHex(Hex, true);
 }
+// FTransform in place: the script passes a variable (`var t : UETransform&`, DasNativeBinds.h references).
+void SetLocation(FTransform& T, const FVector& V)
+{
+    T.SetLocation(V);
+}
+void SetTranslation(FTransform& T, const FVector& V)
+{
+    T.SetTranslation(V);
+}
+void SetRotation(FTransform& T, const FQuat& Q)
+{
+    T.SetRotation(Q);
+}
+void SetScale3D(FTransform& T, const FVector& V)
+{
+    T.SetScale3D(V);
+}
+void SetTranslationAndScale3D(FTransform& T, const FVector& Translation, const FVector& Scale)
+{
+    T.SetTranslationAndScale3D(Translation, Scale);
+}
+void AddToTranslation(FTransform& T, const FVector& V)
+{
+    T.AddToTranslation(V);
+}
+void Accumulate(FTransform& T, const FTransform& Source)
+{
+    T.Accumulate(Source);
+}
+void BlendWith(FTransform& T, const FTransform& Other, double Alpha)
+{
+    T.BlendWith(Other, float(Alpha));
+}
+void ConcatenateRotation(FTransform& T, const FQuat& Q)
+{
+    T.ConcatenateRotation(Q);
+}
+void NormalizeRotation(FTransform& T)
+{
+    T.NormalizeRotation();
+}
+void ScaleTranslation(FTransform& T, const FVector& Scale)
+{
+    T.ScaleTranslation(Scale);
+}
+void ScaleTranslationScalar(FTransform& T, double Scale)
+{
+    T.ScaleTranslation(Scale);
+}
+void SetToRelativeTransform(FTransform& T, const FTransform& Other)
+{
+    T.SetToRelativeTransform(Other);
+}
+
+// Output parameters.
+void ToAxisAndAngle(const FQuat& Q, FVector& Axis, double& Angle)
+{
+    Q.ToAxisAndAngle(Axis, Angle);
+}
+void ToDirectionAndLength(const FVector& V, FVector& Direction, double& Length)
+{
+    V.ToDirectionAndLength(Direction, Length);
+}
+void ToDirectionAndLength2D(const FVector2D& V, FVector2D& Direction, double& Length)
+{
+    V.ToDirectionAndLength(Direction, Length);
+}
+void ToSwingTwist(const FQuat& Q, const FVector& TwistAxis, FQuat& Swing, FQuat& Twist)
+{
+    Q.ToSwingTwist(TwistAxis, Swing, Twist);
+}
+void FindBestAxisVectors(const FVector& V, FVector& Axis1, FVector& Axis2)
+{
+    V.FindBestAxisVectors(Axis1, Axis2);
+}
+void CalcTangents(const FQuat& Previous, const FQuat& P, const FQuat& Next, double Tension, FQuat& Tangent)
+{
+    FQuat::CalcTangents(Previous, P, Next, Tension, Tangent);
+}
+void GetWindingAndRemainder(const FRotator& R, FRotator& Winding, FRotator& Remainder)
+{
+    R.GetWindingAndRemainder(Winding, Remainder);
+}
+bool SegmentIntersection2D(const FVector& StartA, const FVector& EndA, const FVector& StartB, const FVector& EndB,
+                           FVector& Point)
+{
+    return FMath::SegmentIntersection2D(StartA, EndA, StartB, EndB, Point);
+}
+// The box as its corners (FBox is not a script type); the hit time is double in scripts.
+bool LineExtentBoxIntersection(const FVector& BoxMin, const FVector& BoxMax, const FVector& Start, const FVector& End,
+                               const FVector& Extent, FVector& HitLocation, FVector& HitNormal, double& HitTime)
+{
+    float Time = 0;
+    const bool bHit = FMath::LineExtentBoxIntersection(FBox(BoxMin, BoxMax), Start, End, Extent, HitLocation,
+                                                       HitNormal, Time);
+    HitTime = Time;
+    return bHit;
+}
 // C++ integer division truncates toward zero; dividing by zero (or INT_MIN by -1) is a script error.
 template <class T> T IntegerDivisionTrunc(T Value, T DivideBy)
 {
@@ -690,4 +788,28 @@ DAS_NATIVE_BINDS(UEMath, "ue_math")
     Binds.Function<SubtractTranslations>(TEXT("subtract_translations"));
     Binds.Function<TranslationEquals>(TEXT("translation_equals"));
     Binds.Function<TranslationEqualsTolerance>(TEXT("translation_equals"));
+
+    // Coverage part 3: FTransform in place and output parameters (references, DasNativeBinds.h).
+    Binds.Function<&SetLocation>(TEXT("set_location"));
+    Binds.Function<&SetTranslation>(TEXT("set_translation"));
+    Binds.Function<&SetRotation>(TEXT("set_rotation"));
+    Binds.Function<&SetScale3D>(TEXT("set_scale3d"));
+    Binds.Function<&SetTranslationAndScale3D>(TEXT("set_translation_and_scale3d"));
+    Binds.Function<&AddToTranslation>(TEXT("add_to_translation"));
+    Binds.Function<&Accumulate>(TEXT("accumulate"));
+    Binds.Function<&BlendWith>(TEXT("blend_with"));
+    Binds.Function<&ConcatenateRotation>(TEXT("concatenate_rotation"));
+    Binds.Function<&NormalizeRotation>(TEXT("normalize_rotation"));
+    Binds.Function<&ScaleTranslation>(TEXT("scale_translation"));
+    Binds.Function<&ScaleTranslationScalar>(TEXT("scale_translation"));
+    Binds.Function<&SetToRelativeTransform>(TEXT("set_to_relative_transform"));
+    Binds.Function<&ToAxisAndAngle>(TEXT("to_axis_and_angle"));
+    Binds.Function<&ToDirectionAndLength>(TEXT("to_direction_and_length"));
+    Binds.Function<&ToDirectionAndLength2D>(TEXT("to_direction_and_length"));
+    Binds.Function<&ToSwingTwist>(TEXT("to_swing_twist"));
+    Binds.Function<&FindBestAxisVectors>(TEXT("find_best_axis_vectors"));
+    Binds.Function<&CalcTangents>(TEXT("calc_tangents"));
+    Binds.Function<&GetWindingAndRemainder>(TEXT("get_winding_and_remainder"));
+    Binds.Function<&SegmentIntersection2D>(TEXT("segment_intersection_2d"));
+    Binds.Function<&LineExtentBoxIntersection>(TEXT("line_extent_box_intersection"));
 }

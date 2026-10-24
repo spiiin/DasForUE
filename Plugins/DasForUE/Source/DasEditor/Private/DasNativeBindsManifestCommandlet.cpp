@@ -140,6 +140,8 @@ int32 UDasNativeBindsManifestCommandlet::Main(const FString& Params)
         AotError = TEXT("open_only is not compiled for AOT");
     else if (bAot && !AotText.Contains(TEXT("with_objects")))
         AotError = TEXT("with_objects is not compiled for AOT");
+    else if (bAot && !AotText.Contains(TEXT("with_refs")))
+        AotError = TEXT("with_refs is not compiled for AOT");
     else if (bAot && AotText.Contains(TEXT("with_closed")))
         AotError = TEXT("with_closed is compiled for AOT although it calls a bind without an AOT ABI");
     bAot = bAot && AotError.IsEmpty();

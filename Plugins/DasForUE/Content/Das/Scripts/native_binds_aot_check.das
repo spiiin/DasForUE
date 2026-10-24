@@ -27,6 +27,18 @@ def with_objects(input:int):int {
     return a.valid() ? int(a.get_actor_location().size_2d()) + input : input
 }
 
+// Reference parameters are compiled too (values made by ue_math: ue_foundation's math externs are not).
+[export]
+def with_refs(input:int):int {
+    var axis = zero_vector()
+    var angle = 0.0lf
+    make_from_euler(zero_vector()).to_axis_and_angle(axis, angle)
+    var direction = zero_vector()
+    var length = 0.0lf
+    forward_vector().to_direction_and_length(direction, length)
+    return int(length + angle) + input
+}
+
 [export]
 def with_closed(input:int):int {
     return as_AActor(ue_self_object()).actor_has_tag(ue_name_value("tag")) ? 1 : input

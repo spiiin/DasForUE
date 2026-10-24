@@ -56,6 +56,10 @@ FVector Location(const AActor& A)
 {
     return A.GetActorLocation();
 }
+void ScaleOut(const AActor& A, FVector& Scale)
+{
+    Scale = A.GetActorScale3D();
+}
 void BuildOtherSignature(FDasNativeModule& Binds)
 {
     Binds.Class<AActor>().Method<&SetLocation>(TEXT("bad_set_location")).Reflects(TEXT("K2_SetActorLocation"));
@@ -69,6 +73,10 @@ void BuildNonNull(FDasNativeModule& Binds)
     Binds.Class<AActor>()
         .Method<&DistanceTo>(TEXT("bad_distance_to"), EDasBind::NonNullArgs)
         .Reflects(TEXT("GetDistanceTo"));
+}
+void BuildReference(FDasNativeModule& Binds)
+{
+    Binds.Class<AActor>().Method<&ScaleOut>(TEXT("bad_scale_out")).Reflects(TEXT("GetActorScale3D"));
 }
 void BuildMissing(FDasNativeModule& Binds)
 {
@@ -263,6 +271,8 @@ bool RunDasNativeRoutesProbe(UWorld* GameWorld, FString& Report)
          TEXT("reflects UFUNCTION K2_SetActorLocation, which has another type of parameter bSweep")},
         {TEXT("event"), &BuildEvent, TEXT("reflects UFUNCTION ReceiveBeginPlay, which is an event")},
         {TEXT("non_null_args"), &BuildNonNull, TEXT("reflects UFUNCTION GetDistanceTo, which is NonNullArgs")},
+        {TEXT("reference"), &BuildReference,
+         TEXT("reflects UFUNCTION GetActorScale3D, which has a reference parameter")},
         {TEXT("missing"), &BuildMissing, TEXT("which is not a UFUNCTION of class Actor")},
         {TEXT("taken"), &BuildTaken, TEXT("which is already reflected by 'get_actor_location' (module 'ue_engine')")},
         {TEXT("twice"), &BuildTwice, TEXT("must follow a Method that reflects nothing yet")}};
@@ -299,6 +309,7 @@ bool FDasNativeRoutesTest::RunTest(const FString&)
     AddExpectedError(TEXT("which has another type of parameter"), Contains, 1);
     AddExpectedError(TEXT("which is an event"), Contains, 1);
     AddExpectedError(TEXT("which is NonNullArgs"), Contains, 1);
+    AddExpectedError(TEXT("which has a reference parameter"), Contains, 1);
     AddExpectedError(TEXT("which is not a UFUNCTION"), Contains, 1);
     AddExpectedError(TEXT("which is already reflected by"), Contains, 1);
     AddExpectedError(TEXT("must follow a Method that reflects nothing yet"), Contains, 1);

@@ -67,9 +67,11 @@ NOT_APPLICABLE = {
     ('UWorld', 'SetGameInstance'): 'engine internal',
     ('UWorld', 'ServerTravel'): 'networking, out of scope',
     ('UGameInstance', 'FindLocalPlayerFromUniqueNetId'): 'FUniqueNetIdRepl (not a script type)',
+    ('UGameInstance', 'AddLocalPlayer'): 'FPlatformUserId (not a script type)',
 }
 OPERATORS = {'opAdd': '+', 'opSub': '-', 'opMul': '*', 'opDiv': '/', 'opMod': '%', 'opEquals': '==', 'opCmp': '<',
-             'opNeg': '-'}
+             'opNeg': '-', 'opAddAssign': '+=', 'opSubAssign': '-=', 'opMulAssign': '*=', 'opDivAssign': '/=',
+             'opModAssign': '%='}
 # Script classes of the generated reflected bindings -> native script types.
 REFLECTED_CLASSES = {'/Script/Engine.Actor': 'AActor', '/Script/Engine.Pawn': 'APawn',
                      '/Script/Engine.ActorComponent': 'UActorComponent',
@@ -139,7 +141,8 @@ class Native:
             candidates = [alias] if alias else [base, short + base]
         for candidate in candidates:
             for f in self.by_name.get(norm(candidate), []):
-                signature = [f['receiver'], f['result']] + f['arguments']
+                # A reference parameter is written T& in the manifest.
+                signature = [t.rstrip('&') for t in [f['receiver'], f['result']] + f['arguments']]
                 if script_type is None or script_type in signature:
                     return f
         return None

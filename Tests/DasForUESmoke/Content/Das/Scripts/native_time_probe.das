@@ -58,6 +58,24 @@ def main(input:int):int {
     let utc = utc_now()
     if (utc.get_year() < 2026 || (now() - utc).get_duration() > timespan_from_hours(15.0lf)) { return 27 }
     if (today().get_hour() != 0 || today().get_minute() != 0 || today() > now()) { return 28 }
+    // Compound assignments change the variable; a failed one (division by zero) leaves it as it was.
+    var total = make_timespan(1, 0, 0)
+    total += make_timespan(0, 30, 0)
+    total -= make_timespan(0, 10, 0)
+    if (total != make_timespan(1, 20, 0)) { return 29 }
+    total *= 3.0lf
+    total /= 2.0lf
+    if (total != make_timespan(2, 0, 0)) { return 30 }
+    total %= make_timespan(0, 50, 0)
+    if (total != make_timespan(0, 20, 0)) { return 31 }
+    var failed = false
+    try { total /= 0.0lf } recover { failed = true }
+    if (!failed || total != make_timespan(0, 20, 0)) { return 32 }
+    var day = make_date_time(2024, 2, 28)
+    day += timespan_from_days(1.0lf)
+    if (day.get_day() != 29) { return 33 }
+    day -= timespan_from_days(2.0lf)
+    if (day.get_day() != 27) { return 34 }
     return 0
 }
 

@@ -324,6 +324,10 @@ rows of one run only.
   (`ue_self_object()`, casts, validity, object properties: 121 of 186) are compiled too; reflected `UFUNCTION`
   calls through a call frame are not.
 
+  Reference parameters (2026-10-24, `native_refs`: `get_clamped_to_size` and `to_direction_and_length` with two
+  output parameters, an iteration): interpreter 359.3 ns, AOT 184.8 ns. A reference is copied in and written back
+  on both paths; the compiled caller saves the interpreter's argument nodes.
+
 Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.
 
 ### Gameplay methods answered by binds (`Reflects`) — 2026-10-24

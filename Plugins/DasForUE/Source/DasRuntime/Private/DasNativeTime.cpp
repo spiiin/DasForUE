@@ -305,6 +305,36 @@ FTimespan SpanMod(const FTimespan& A, const FTimespan& B)
     // MIN_int64 % -1 traps in hardware; the remainder of a division by -1 is 0.
     return FTimespan(B.GetTicks() == -1 ? 0 : A.GetTicks() % B.GetTicks());
 }
+// Compound assignments (references, DasNativeBinds.h): the checked operators above; a failed one leaves the
+// script's variable unchanged.
+void DateAddAssign(FDateTime& D, const FTimespan& S)
+{
+    D = DateAddSpan(D, S);
+}
+void DateSubAssign(FDateTime& D, const FTimespan& S)
+{
+    D = DateSubSpan(D, S);
+}
+void SpanAddAssign(FTimespan& A, const FTimespan& B)
+{
+    A = SpanAdd(A, B);
+}
+void SpanSubAssign(FTimespan& A, const FTimespan& B)
+{
+    A = SpanSub(A, B);
+}
+void SpanMulAssign(FTimespan& A, double Scalar)
+{
+    A = SpanMul(A, Scalar);
+}
+void SpanDivAssign(FTimespan& A, double Scalar)
+{
+    A = SpanDiv(A, Scalar);
+}
+void SpanModAssign(FTimespan& A, const FTimespan& B)
+{
+    A = SpanMod(A, B);
+}
 double Ratio(const FTimespan& Dividend, const FTimespan& Divisor)
 {
     if (Divisor.IsZero())
@@ -361,6 +391,8 @@ DAS_NATIVE_BINDS(UETime, "ue_time")
     Binds.Function<&DateAddSpan>(TEXT("+"));
     Binds.Function<&DateSubSpan>(TEXT("-"));
     Binds.Function<&DateSubDate>(TEXT("-"));
+    Binds.Function<&DateAddAssign>(TEXT("+="));
+    Binds.Function<&DateSubAssign>(TEXT("-="));
     Binds.Function<DateEqual>(TEXT("=="));
     Binds.Function<DateNotEqual>(TEXT("!="));
     Binds.Function<DateLess>(TEXT("<"));
@@ -409,6 +441,11 @@ DAS_NATIVE_BINDS(UETime, "ue_time")
     Binds.Function<&ScalarMulSpan>(TEXT("*"));
     Binds.Function<&SpanDiv>(TEXT("/"));
     Binds.Function<&SpanMod>(TEXT("%"));
+    Binds.Function<&SpanAddAssign>(TEXT("+="));
+    Binds.Function<&SpanSubAssign>(TEXT("-="));
+    Binds.Function<&SpanMulAssign>(TEXT("*="));
+    Binds.Function<&SpanDivAssign>(TEXT("/="));
+    Binds.Function<&SpanModAssign>(TEXT("%="));
     Binds.Function<SpanEqual>(TEXT("=="));
     Binds.Function<SpanNotEqual>(TEXT("!="));
     Binds.Function<SpanLess>(TEXT("<"));

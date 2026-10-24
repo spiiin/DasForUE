@@ -184,6 +184,19 @@ int64 FrameNumber()
 {
     return int64(GFrameCounter);
 }
+// Local players: Error receives why a player was not created (null result).
+ULocalPlayer* CreateLocalPlayer(UGameInstance& G, int32 ControllerId, FString& Error, bool bSpawnPlayerController)
+{
+    return G.CreateLocalPlayer(ControllerId, Error, bSpawnPlayerController);
+}
+ULocalPlayer* CreateInitialPlayer(UGameInstance& G, FString& Error)
+{
+    return G.CreateInitialPlayer(Error);
+}
+bool RemoveLocalPlayer(UGameInstance& G, ULocalPlayer* Player)
+{
+    return Player && G.RemoveLocalPlayer(Player);
+}
 }
 
 DAS_NATIVE_BINDS(UEEngine, "ue_engine")
@@ -321,6 +334,9 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     GameInstance.Method<GetFirstGamePlayer>(TEXT("get_first_game_player"));
     GameInstance.Method<GetFirstLocalPlayerController>(TEXT("get_first_local_player_controller"));
     GameInstance.Method<GetFirstLocalPlayerControllerIn>(TEXT("get_first_local_player_controller"));
+    GameInstance.Method<&CreateLocalPlayer>(TEXT("create_local_player"));
+    GameInstance.Method<&CreateInitialPlayer>(TEXT("create_initial_player"));
+    GameInstance.Method<&RemoveLocalPlayer>(TEXT("remove_local_player"));
     Binds.Function<&WorldOf>(TEXT("world_of"));
     Binds.Function<&FrameNumber>(TEXT("frame_number"));
 }

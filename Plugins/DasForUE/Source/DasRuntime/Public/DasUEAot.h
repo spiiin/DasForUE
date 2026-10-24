@@ -66,6 +66,23 @@ DAS_UE_AOT_VALUE(const FColor&, "const FColor &")
 DAS_UE_AOT_VALUE(FColor, "FColor")
 DAS_UE_AOT_VALUE(FDasDateTimeValue, "FDasDateTimeValue")
 DAS_UE_AOT_VALUE(FDasTimespanValue, "FDasTimespanValue")
+// Reference parameters of native binds (DasNativeBinds.h: copied in, written back when the call succeeds).
+DAS_UE_AOT_VALUE(bool&, "bool &")
+DAS_UE_AOT_VALUE(int32_t&, "int32_t &")
+DAS_UE_AOT_VALUE(int64_t&, "int64_t &")
+DAS_UE_AOT_VALUE(float&, "float &")
+DAS_UE_AOT_VALUE(double&, "double &")
+DAS_UE_AOT_VALUE(uint8_t&, "uint8_t &")
+DAS_UE_AOT_VALUE(char*&, "char * &")
+DAS_UE_AOT_VALUE(FDasDateTimeValue&, "FDasDateTimeValue &")
+DAS_UE_AOT_VALUE(FDasTimespanValue&, "FDasTimespanValue &")
+DAS_UE_AOT_VALUE(FVector&, "FVector &")
+DAS_UE_AOT_VALUE(FVector2D&, "FVector2D &")
+DAS_UE_AOT_VALUE(FRotator&, "FRotator &")
+DAS_UE_AOT_VALUE(FQuat&, "FQuat &")
+DAS_UE_AOT_VALUE(FTransform&, "FTransform &")
+DAS_UE_AOT_VALUE(FLinearColor&, "FLinearColor &")
+DAS_UE_AOT_VALUE(FColor&, "FColor &")
 #undef DAS_UE_AOT_VALUE
 
 template <class F> struct Signature

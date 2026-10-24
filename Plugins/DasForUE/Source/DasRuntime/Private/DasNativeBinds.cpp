@@ -21,7 +21,7 @@ bool IsScriptFunctionName(const FString& Name)
     static const TArray<FString> Operators = []
     {
         TArray<FString> List;
-        FString(TEXT("+ - * / % == != < <= > >=")).ParseIntoArray(List, TEXT(" "));
+        FString(TEXT("+ - * / % == != < <= > >= += -= *= /= %=")).ParseIntoArray(List, TEXT(" "));
         return List;
     }();
     if (Operators.Contains(Name))
@@ -126,7 +126,7 @@ FString DasNativeModuleStatus(const TCHAR* ModuleName)
 
 static bool SameParam(const FDasNativeParam& A, const FDasNativeParam& B)
 {
-    return A.Type == B.Type && A.Class == B.Class;
+    return A.Type == B.Type && A.Class == B.Class && A.bRef == B.bRef;
 }
 
 void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasNativeParam Result,
@@ -168,6 +168,12 @@ void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasN
         Fail(TEXT("has a void parameter"));
     else if (EnumHasAnyFlags(Flags, EDasBind::Pure) && bObjects)
         Fail(TEXT("is Pure but takes or returns objects"));
+    else if (EnumHasAnyFlags(Flags, EDasBind::Pure) &&
+             F.Arguments.ContainsByPredicate([](const FDasNativeParam& P) { return P.bRef; }))
+        Fail(TEXT("is Pure but changes a reference parameter"));
+    else if (F.Name.Len() == 2 && F.Name[1] == TEXT('=') && FString(TEXT("+-*/%")).Contains(F.Name.Left(1)) &&
+             (F.Arguments.IsEmpty() || !F.Arguments[0].bRef))
+        Fail(TEXT("is a compound assignment without a reference (T&) first parameter"));
     if (Desc.Error.IsEmpty())
         Desc.Functions.Add(MoveTemp(F));
 }
@@ -286,6 +292,8 @@ FString CheckReflects(FDasNativeFunctionDesc& F)
         return TEXT("is a static, network, delegate or editor-only function");
     if (EnumHasAnyFlags(F.Flags, EDasBind::NonNullArgs))
         return TEXT("is NonNullArgs, the UFUNCTION takes nullptr");
+    if (F.Arguments.ContainsByPredicate([](const FDasNativeParam& P) { return P.bRef; }))
+        return TEXT("has a reference parameter, the UFUNCTION's are values");
     const FProperty* Return = U->GetReturnProperty();
     if (Return ? !SameAsProperty(F.Result, Return) : F.Result.Type != EDasNativeType::Void)
         return TEXT("has another result type");

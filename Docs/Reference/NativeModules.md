@@ -152,6 +152,8 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 
 | Method | Notes |
 | --- | --- |
+| `create_initial_player(string&) : UObjectHandle` |  |
+| `create_local_player(int, string&, bool) : UObjectHandle` |  |
 | `find_local_player_from_controller_id(int) : UObjectHandle` |  |
 | `get_first_game_player() : UObjectHandle` |  |
 | `get_first_local_player_controller() : UObjectHandle` |  |
@@ -159,6 +161,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `get_local_player_by_index(int) : UObjectHandle` |  |
 | `get_num_local_players() : int` |  |
 | `get_world() : UWorld` |  |
+| `remove_local_player(UObjectHandle) : bool` |  |
 
 ### Functions
 
@@ -173,14 +176,18 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 
 | Function | Notes |
 | --- | --- |
+| `accumulate(UETransform&, UETransform)` |  |
+| `add_to_translation(UETransform&, UEVector)` |  |
 | `all_components_equal(UEVector) : bool` |  |
 | `all_components_equal(UEVector, double) : bool` |  |
 | `angular_distance(UEQuat, UEQuat) : double` |  |
 | `backward_vector() : UEVector` |  |
 | `blend(UETransform, UETransform, double) : UETransform` |  |
+| `blend_with(UETransform&, UETransform, double)` |  |
 | `bound_to_box(UEVector, UEVector, UEVector) : UEVector` |  |
 | `bound_to_cube(UEVector, double) : UEVector` |  |
 | `c_interp_to(UELinearColor, UELinearColor, double, double) : UELinearColor` |  |
+| `calc_tangents(UEQuat, UEQuat, UEQuat, double, UEQuat&)` |  |
 | `circular_in(double, double, double) : double` |  |
 | `circular_in_out(double, double, double) : double` |  |
 | `circular_out(double, double, double) : double` |  |
@@ -193,6 +200,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `component_clamp(UEVector, UEVector, UEVector) : UEVector` |  |
 | `component_max(UEVector, UEVector) : UEVector` |  |
 | `component_min(UEVector, UEVector) : UEVector` |  |
+| `concatenate_rotation(UETransform&, UEQuat)` |  |
 | `contains_nan(UEQuat) : bool` |  |
 | `contains_nan(UERotator) : bool` |  |
 | `contains_nan(UETransform) : bool` |  |
@@ -237,6 +245,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `fast_asin(double) : double` |  |
 | `fast_bilerp(UEQuat, UEQuat, UEQuat, UEQuat, double, double) : UEQuat` |  |
 | `fast_lerp(UEQuat, UEQuat, double) : UEQuat` |  |
+| `find_best_axis_vectors(UEVector, UEVector&, UEVector&)` |  |
 | `find_between(UEVector, UEVector) : UEQuat` |  |
 | `find_between_normals(UEVector, UEVector) : UEQuat` |  |
 | `find_between_vectors(UEVector, UEVector) : UEQuat` |  |
@@ -287,6 +296,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `get_sign_vector(UEVector2D) : UEVector2D` |  |
 | `get_twist_angle(UEQuat, UEVector) : double` |  |
 | `get_up_vector(UEQuat) : UEVector` |  |
+| `get_winding_and_remainder(UERotator, UERotator&, UERotator&)` |  |
 | `grid_snap(UEVector, double) : UEVector` |  |
 | `grid_snap(double, double) : double` |  |
 | `heading_angle(UEVector) : double` |  |
@@ -320,6 +330,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `left_vector() : UEVector` |  |
 | `lerp_stable(double, double, double) : double` |  |
 | `line_box_intersection(UEVector, UEVector, UEVector, UEVector) : bool` |  |
+| `line_extent_box_intersection(UEVector, UEVector, UEVector, UEVector, UEVector, UEVector&, UEVector&, double&) : bool` |  |
 | `line_plane_intersection(UEVector, UEVector, UEVector, UEVector) : UEVector` |  |
 | `line_sphere_intersection(UEVector, UEVector, double, UEVector, double) : bool` |  |
 | `linear_rgb_to_hsv(UELinearColor) : UELinearColor` |  |
@@ -345,6 +356,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `min3(double, double, double) : double` |  |
 | `mirror_by_vector(UEVector, UEVector) : UEVector` |  |
 | `normalize_axis(double) : double` |  |
+| `normalize_rotation(UETransform&)` |  |
 | `normalize_to_range(double, double, double) : double` |  |
 | `one_vector() : UEVector` |  |
 | `orthogonal(UEVector, UEVector) : bool` |  |
@@ -384,6 +396,15 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `round_from_zero(double) : double` |  |
 | `round_to_double(double) : double` |  |
 | `round_to_float(double) : double` |  |
+| `scale_translation(UETransform&, UEVector)` |  |
+| `scale_translation(UETransform&, double)` |  |
+| `segment_intersection_2d(UEVector, UEVector, UEVector, UEVector, UEVector&) : bool` |  |
+| `set_location(UETransform&, UEVector)` |  |
+| `set_rotation(UETransform&, UEQuat)` |  |
+| `set_scale3d(UETransform&, UEVector)` |  |
+| `set_to_relative_transform(UETransform&, UETransform)` |  |
+| `set_translation(UETransform&, UEVector)` |  |
+| `set_translation_and_scale3d(UETransform&, UEVector, UEVector)` |  |
 | `sinusoidal_in(double, double, double) : double` |  |
 | `sinusoidal_in_out(double, double, double) : double` |  |
 | `sinusoidal_out(double, double, double) : double` |  |
@@ -397,9 +418,13 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `squad(UEQuat, UEQuat, UEQuat, UEQuat, double) : UEQuat` |  |
 | `squad_full_path(UEQuat, UEQuat, UEQuat, UEQuat, double) : UEQuat` |  |
 | `subtract_translations(UETransform, UETransform) : UEVector` |  |
+| `to_axis_and_angle(UEQuat, UEVector&, double&)` |  |
+| `to_direction_and_length(UEVector, UEVector&, double&)` |  |
+| `to_direction_and_length(UEVector2D, UEVector2D&, double&)` |  |
 | `to_fcolor(UELinearColor, bool) : UEColor` |  |
 | `to_orientation_quat(UEVector) : UEQuat` |  |
 | `to_orientation_rotator(UEVector) : UERotator` |  |
+| `to_swing_twist(UEQuat, UEVector, UEQuat&, UEQuat&)` |  |
 | `transform_position_no_scale(UETransform, UEVector) : UEVector` |  |
 | `transform_vector_no_scale(UETransform, UEVector) : UEVector` |  |
 | `translation_equals(UETransform, UETransform) : bool` |  |
@@ -433,15 +458,22 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `!=(UEDateTime, UEDateTime) : bool` |  |
 | `!=(UETimespan, UETimespan) : bool` |  |
 | `%(UETimespan, UETimespan) : UETimespan` |  |
+| `%=(UETimespan&, UETimespan)` |  |
 | `*(UETimespan, double) : UETimespan` |  |
 | `*(double, UETimespan) : UETimespan` |  |
+| `*=(UETimespan&, double)` |  |
 | `+(UEDateTime, UETimespan) : UEDateTime` |  |
 | `+(UETimespan, UETimespan) : UETimespan` |  |
+| `+=(UEDateTime&, UETimespan)` |  |
+| `+=(UETimespan&, UETimespan)` |  |
 | `-(UEDateTime, UEDateTime) : UETimespan` |  |
 | `-(UEDateTime, UETimespan) : UEDateTime` |  |
 | `-(UETimespan) : UETimespan` |  |
 | `-(UETimespan, UETimespan) : UETimespan` |  |
+| `-=(UEDateTime&, UETimespan)` |  |
+| `-=(UETimespan&, UETimespan)` |  |
 | `/(UETimespan, double) : UETimespan` |  |
+| `/=(UETimespan&, double)` |  |
 | `<(UEDateTime, UEDateTime) : bool` |  |
 | `<(UETimespan, UETimespan) : bool` |  |
 | `<=(UEDateTime, UEDateTime) : bool` |  |

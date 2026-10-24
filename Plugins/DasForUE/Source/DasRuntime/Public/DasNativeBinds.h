@@ -36,8 +36,15 @@
 // A null or expired receiver is a script error; a null or expired argument reaches C++ as nullptr (see
 // EDasBind::NonNullArgs).
 //
-// Function names may also be operators (+ - * / % == != < <= > >=; "-" with one parameter is the unary minus).
+// Function names may also be operators (+ - * / % == != < <= > >=; "-" with one parameter is the unary minus;
+// += -= *= /= %= take their first parameter by reference).
 // A bound function reports a script error with DasNativeError (bad arguments, failed parsing, ...).
+//
+// References. A `T&` parameter (not const) of a value type - a scalar, FString, FDateTime, FTimespan or a math
+// value - is a `var x : T&` parameter in the script: the caller passes a variable and sees the function's changes
+// (setters such as SetLocation, output parameters such as ToAxisAndAngle). The value is copied in and written
+// back after the call, only when the call succeeds: a call that reports DasNativeError leaves it unchanged. Objects,
+// FName and FText cannot be references; Pure functions and Reflects methods take no references.
 
 // Types of parameters and results. A const reference counts as its value type.
 enum class EDasNativeType : uint8
@@ -114,7 +121,11 @@ struct FDasNativeParam
 {
     EDasNativeType Type = EDasNativeType::Void;
     FDasNativeClassFn Class = nullptr; // Object only
+    bool bRef = false;                 // a T& parameter: the script passes a variable the function may change
 };
+// A T& parameter that is not const.
+template <class T>
+constexpr bool TDasNativeIsRef = std::is_lvalue_reference_v<T> && !std::is_const_v<std::remove_reference_t<T>>;
 template <class T> FDasNativeParam DasNativeParamOf()
 {
     using D = std::decay_t<T>;
@@ -122,10 +133,15 @@ template <class T> FDasNativeParam DasNativeParamOf()
     {
         using C = std::remove_cv_t<std::remove_pointer_t<D>>;
         static_assert(std::is_base_of_v<UObject, C>, "Native bind pointers must point to UObject classes");
+        static_assert(!TDasNativeIsRef<T>, "Object parameters cannot be references");
         return {EDasNativeType::Object, &C::StaticClass};
     }
     else
-        return {TDasNativeType<D>::Value, nullptr};
+    {
+        static_assert(!TDasNativeIsRef<T> || !(std::is_same_v<D, FName> || std::is_same_v<D, FText>),
+                      "FName and FText parameters cannot be references");
+        return {TDasNativeType<D>::Value, nullptr, TDasNativeIsRef<T>};
+    }
 }
 
 namespace das
@@ -154,16 +170,19 @@ DASRUNTIME_API FDasObjectHandle DasNativeAotHandle(const UObject* Object, UClass
 struct FDasNativeAbiNone
 {
 };
+// Arg: a parameter, RefArg: a T& parameter (copied in and written back with FromCpp), Result: the result.
 template <class T> struct TDasNativeAbi
 {
     static constexpr bool Supported = false;
     using Arg = FDasNativeAbiNone;
+    using RefArg = FDasNativeAbiNone;
     using Result = FDasNativeAbiNone;
 };
 template <class T> struct TDasNativeAbiScalar
 {
     static constexpr bool Supported = true;
     using Arg = T;
+    using RefArg = T&;
     using Result = T;
     static T ToCpp(T Value) { return Value; }
     static T FromCpp(T Value, das::Context*) { return Value; }
@@ -190,6 +209,7 @@ template <class T> struct TDasNativeAbiValue
 {
     static constexpr bool Supported = true;
     using Arg = const T&;
+    using RefArg = T&;
     using Result = T;
     static const T& ToCpp(const T& Value) { return Value; }
     static T FromCpp(const T& Value, das::Context*) { return Value; }
@@ -219,6 +239,7 @@ template <> struct TDasNativeAbi<FString>
 {
     static constexpr bool Supported = true;
     using Arg = const char*;
+    using RefArg = char*&;
     using Result = char*;
     static FString ToCpp(const char* Value) { return Value ? FString(UTF8_TO_TCHAR(Value)) : FString(); }
     static char* FromCpp(const FString& Value, das::Context* Context) { return DasNativeAotString(Value, Context); }
@@ -227,6 +248,7 @@ template <> struct TDasNativeAbi<FDateTime>
 {
     static constexpr bool Supported = true;
     using Arg = FDasDateTimeValue;
+    using RefArg = FDasDateTimeValue&;
     using Result = FDasDateTimeValue;
     static FDateTime ToCpp(FDasDateTimeValue Value) { return FDateTime(Value.Ticks); }
     static FDasDateTimeValue FromCpp(const FDateTime& Value, das::Context*) { return {Value.GetTicks()}; }
@@ -235,6 +257,7 @@ template <> struct TDasNativeAbi<FTimespan>
 {
     static constexpr bool Supported = true;
     using Arg = FDasTimespanValue;
+    using RefArg = FDasTimespanValue&;
     using Result = FDasTimespanValue;
     static FTimespan ToCpp(FDasTimespanValue Value) { return FTimespan(Value.Ticks); }
     static FDasTimespanValue FromCpp(const FTimespan& Value, das::Context*) { return {Value.GetTicks()}; }
@@ -243,6 +266,7 @@ template <class T> struct TDasNativeAbi<T*>
 {
     static constexpr bool Supported = std::is_base_of_v<UObject, std::remove_cv_t<T>>;
     using Arg = const FDasObjectHandle&;
+    using RefArg = FDasNativeAbiNone;
     using Result = FDasObjectHandle;
     static FDasObjectHandle FromCpp(const UObject* Value, das::Context* Context)
     {
@@ -259,18 +283,23 @@ template <> struct TDasNativeAotResult<void>
 };
 
 // The body of an AOT entry. Converts every argument first (objects are checked); when one fails, the C++
-// function does not run and the bridge reports the error. bMethod: the first argument is the receiver.
+// function does not run and the bridge reports the error. bMethod: the first argument is the receiver. A reference
+// is a copy, written back when the call succeeds (as in the interpreter).
 template <class R, class... A> struct TDasNativeAot
 {
     static constexpr bool Supported = (std::is_void_v<R> || TDasNativeAbi<std::decay_t<R>>::Supported) &&
                                       (TDasNativeAbi<std::decay_t<A>>::Supported && ...);
     using Result = typename TDasNativeAotResult<R>::Type;
-    template <class T> using TArg = typename TDasNativeAbi<std::decay_t<T>>::Arg;
+    template <class T>
+    using TArg = std::conditional_t<TDasNativeIsRef<T>, typename TDasNativeAbi<std::decay_t<T>>::RefArg,
+                                    typename TDasNativeAbi<std::decay_t<T>>::Arg>;
     template <class T>
     static decltype(auto) Convert(TArg<T> Value, das::Context* Context, int32 Number, EDasNativeAotObject Kind)
     {
         using D = std::decay_t<T>;
-        if constexpr (std::is_pointer_v<D>)
+        if constexpr (TDasNativeIsRef<T>)
+            return D(TDasNativeAbi<D>::ToCpp(Value));
+        else if constexpr (std::is_pointer_v<D>)
             return static_cast<D>(
                 DasNativeAotObject(Value, std::remove_cv_t<std::remove_pointer_t<D>>::StaticClass(), Context, Number,
                                    Kind));
@@ -303,13 +332,28 @@ template <class R, class... A> struct TDasNativeAot
         else if constexpr (std::is_void_v<R>)
         {
             Call(std::get<I>(Values)...);
+            if (!DasNativeAotFailed())
+                (WriteBack<A>(Args, std::get<I>(Values), Context), ...);
             DasNativeAotLeave(Outer);
         }
         else
         {
             auto Value = Call(std::get<I>(Values)...);
+            if (!DasNativeAotFailed())
+                (WriteBack<A>(Args, std::get<I>(Values), Context), ...);
             DasNativeAotLeave(Outer);
             return TDasNativeAbi<std::decay_t<R>>::FromCpp(Value, Context);
+        }
+    }
+    template <class T, class V> static void WriteBack(TArg<T> Arg, const V& Value, das::Context* Context)
+    {
+        if constexpr (TDasNativeIsRef<T>)
+            Arg = TDasNativeAbi<std::decay_t<T>>::FromCpp(Value, Context);
+        else
+        {
+            (void)Arg;
+            (void)Value;
+            (void)Context;
         }
     }
 };
