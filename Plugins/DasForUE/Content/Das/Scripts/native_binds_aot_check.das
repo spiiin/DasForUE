@@ -39,6 +39,21 @@ def with_refs(input:int):int {
     return int(length + angle) + input
 }
 
+// A class argument is compiled (a null handle here: class literals come from ue_foundation externs, which are not).
+[export]
+def with_classes(input:int):int {
+    var no_class : UEClassHandle
+    var none : USceneComponent
+    return none.valid() && none.get_child_component_by_class(no_class).valid() ? 1 : input
+}
+
+// An array result has no AOT ABI yet: this function stays in the interpreter.
+[export]
+def with_arrays(input:int):int {
+    var none : AActor
+    return none.valid() ? length(none.get_all_components()) : input
+}
+
 [export]
 def with_closed(input:int):int {
     return as_AActor(ue_self_object()).actor_has_tag(ue_name_value("tag")) ? 1 : input

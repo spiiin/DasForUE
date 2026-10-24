@@ -3,6 +3,7 @@
 #include "DasScriptValues.h"
 #include "Misc/DateTime.h"
 #include "Misc/Timespan.h"
+#include "Templates/SubclassOf.h"
 #include "UObject/Object.h"
 #include <tuple>
 #include <type_traits>
@@ -35,6 +36,10 @@
 // References are weak: a script does not keep objects alive, a destroyed or collected object reads as null.
 // A null or expired receiver is a script error; a null or expired argument reaches C++ as nullptr (see
 // EDasBind::NonNullArgs).
+// Classes. A `UClass*` or `TSubclassOf<T>` parameter is a UEClassHandle in the script; a null handle reaches C++ as
+// nullptr, a class that is not a T is a script error. Results cannot be classes.
+// Arrays. A `TArray<T*>` result (T derived from UObject) is `array<T>` in the script (the class's script type, or
+// UObjectHandle); parameters cannot be arrays. Functions with an array result stay in the interpreter under AOT.
 //
 // Function names may also be operators (+ - * / % == != < <= > >=; "-" with one parameter is the unary minus;
 // += -= *= /= %= take their first parameter by reference).
@@ -62,6 +67,8 @@ enum class EDasNativeType : uint8
     DateTime, // script type UEDateTime (ticks)
     Timespan, // script type UETimespan (ticks)
     Object,
+    Class,       // UClass* / TSubclassOf<T> parameter: script type UEClassHandle
+    ObjectArray, // TArray<T*> result: script type array<T>
     Vector,
     Vector2D,
     Rotator,
@@ -87,7 +94,7 @@ template <class T> struct TDasNativeType
     static_assert(sizeof(T) == 0,
                   "Unsupported native bind type: use bool, int32, int64, float, double, uint8, FString, FName, "
                   "FText, FDateTime, FTimespan, FVector, FVector2D, FRotator, FQuat, FTransform, FLinearColor, "
-                  "FColor or a pointer to a UObject class");
+                  "FColor, a pointer to a UObject class, UClass* / TSubclassOf<T> or a TArray<T*> result");
 };
 #define DAS_NATIVE_TYPE(CppType, Kind)                                                                                 \
     template <> struct TDasNativeType<CppType>                                                                         \
@@ -120,16 +127,45 @@ using FDasNativeClassFn = UClass* (*)();
 struct FDasNativeParam
 {
     EDasNativeType Type = EDasNativeType::Void;
-    FDasNativeClassFn Class = nullptr; // Object only
+    FDasNativeClassFn Class = nullptr; // Object: its class; Class: the base; ObjectArray: the element class
     bool bRef = false;                 // a T& parameter: the script passes a variable the function may change
 };
 // A T& parameter that is not const.
 template <class T>
 constexpr bool TDasNativeIsRef = std::is_lvalue_reference_v<T> && !std::is_const_v<std::remove_reference_t<T>>;
+template <class T> struct TDasNativeArrayOf
+{
+    using Element = void;
+};
+template <class T> struct TDasNativeArrayOf<TArray<T*>>
+{
+    using Element = std::remove_cv_t<T>;
+};
+template <class T> struct TDasNativeSubclassOf
+{
+    using Base = void;
+};
+template <class T> struct TDasNativeSubclassOf<TSubclassOf<T>>
+{
+    using Base = T;
+};
 template <class T> FDasNativeParam DasNativeParamOf()
 {
     using D = std::decay_t<T>;
-    if constexpr (std::is_pointer_v<D>)
+    static_assert(!TDasNativeIsRef<T> || (!std::is_same_v<D, UClass*> && !TIsTArray<D>::Value &&
+                                          std::is_void_v<typename TDasNativeSubclassOf<D>::Base>),
+                  "Classes and arrays cannot be references");
+    if constexpr (std::is_same_v<D, UClass*>)
+        return {EDasNativeType::Class, &UObject::StaticClass};
+    else if constexpr (!std::is_void_v<typename TDasNativeSubclassOf<D>::Base>)
+        return {EDasNativeType::Class, &TDasNativeSubclassOf<D>::Base::StaticClass};
+    else if constexpr (TIsTArray<D>::Value)
+    {
+        using E = typename TDasNativeArrayOf<D>::Element;
+        static_assert(std::is_base_of_v<UObject, E>, "Native bind arrays must be TArray<T*> of a UObject class");
+        return {EDasNativeType::ObjectArray, &E::StaticClass};
+    }
+    else if constexpr (std::is_pointer_v<D>)
     {
         using C = std::remove_cv_t<std::remove_pointer_t<D>>;
         static_assert(std::is_base_of_v<UObject, C>, "Native bind pointers must point to UObject classes");
@@ -262,6 +298,21 @@ template <> struct TDasNativeAbi<FTimespan>
     static FTimespan ToCpp(FDasTimespanValue Value) { return FTimespan(Value.Ticks); }
     static FDasTimespanValue FromCpp(const FTimespan& Value, das::Context*) { return {Value.GetTicks()}; }
 };
+// A class argument: the handle; DasNativeAotClass checks it (null passes as nullptr).
+DASRUNTIME_API UClass* DasNativeAotClass(FDasClassHandle Handle, UClass* Base, das::Context* Context, int32 Number);
+struct FDasNativeAbiClass
+{
+    static constexpr bool Supported = true;
+    using Arg = FDasClassHandle;
+    using RefArg = FDasNativeAbiNone;
+    using Result = FDasNativeAbiNone;
+};
+template <> struct TDasNativeAbi<UClass*> : FDasNativeAbiClass
+{
+};
+template <class T> struct TDasNativeAbi<TSubclassOf<T>> : FDasNativeAbiClass
+{
+};
 template <class T> struct TDasNativeAbi<T*>
 {
     static constexpr bool Supported = std::is_base_of_v<UObject, std::remove_cv_t<T>>;
@@ -299,6 +350,10 @@ template <class R, class... A> struct TDasNativeAot
         using D = std::decay_t<T>;
         if constexpr (TDasNativeIsRef<T>)
             return D(TDasNativeAbi<D>::ToCpp(Value));
+        else if constexpr (std::is_same_v<D, UClass*>)
+            return DasNativeAotClass(Value, UObject::StaticClass(), Context, Number);
+        else if constexpr (!std::is_void_v<typename TDasNativeSubclassOf<D>::Base>)
+            return D(DasNativeAotClass(Value, TDasNativeSubclassOf<D>::Base::StaticClass(), Context, Number));
         else if constexpr (std::is_pointer_v<D>)
             return static_cast<D>(
                 DasNativeAotObject(Value, std::remove_cv_t<std::remove_pointer_t<D>>::StaticClass(), Context, Number,
@@ -399,7 +454,9 @@ private:
     template <class A> static decltype(auto) Arg(void* P)
     {
         using D = std::decay_t<A>;
-        if constexpr (std::is_pointer_v<D>)
+        if constexpr (!std::is_void_v<typename TDasNativeSubclassOf<D>::Base>)
+            return D(*static_cast<UClass**>(P));
+        else if constexpr (std::is_pointer_v<D>)
             return static_cast<D>(*static_cast<UObject**>(P));
         else
             return *static_cast<D*>(P);
@@ -410,6 +467,15 @@ private:
             Call();
         else if constexpr (std::is_pointer_v<std::decay_t<R>>)
             *static_cast<UObject**>(Out) = const_cast<UObject*>(static_cast<const UObject*>(Call()));
+        else if constexpr (TIsTArray<std::decay_t<R>>::Value)
+        {
+            // An array result: the slot is a TArray<UObject*>.
+            const auto Values = Call();
+            auto& Objects = *static_cast<TArray<UObject*>*>(Out);
+            Objects.Reset(Values.Num());
+            for (const auto* Value : Values)
+                Objects.Add(const_cast<UObject*>(static_cast<const UObject*>(Value)));
+        }
         else
             *static_cast<std::decay_t<R>*>(Out) = Call();
     }

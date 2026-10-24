@@ -78,6 +78,17 @@ das::TypeDeclPtr DasNativeTypeDecl(const FDasNativeParam& Param, const FDasNativ
         return das::makeType<FDasDateTimeValue>(Lib);
     case EDasNativeType::Timespan:
         return das::makeType<FDasTimespanValue>(Lib);
+    case EDasNativeType::Class:
+        return das::makeType<FDasClassHandle>(Lib);
+    case EDasNativeType::ObjectArray:
+    {
+        // array<T>: the element is the class's script type (or UObjectHandle), held by value.
+        FDasNativeParam Element = Param;
+        Element.Type = EDasNativeType::Object;
+        das::TypeDeclPtr Array = new das::TypeDecl(das::Type::tArray, das::LineInfo());
+        Array->firstType = DasNativeTypeDecl(Element, Resolved, Lib, false);
+        return Array;
+    }
     case EDasNativeType::Object:
     {
         if (!Resolved.Script)
@@ -139,6 +150,11 @@ FString DasNativeScriptTypeName(const FDasNativeParam& Param, const FDasNativeRe
         return TEXT("UETimespan");
     case EDasNativeType::Object:
         return Resolved.Script ? Resolved.Script->Name : FString(TEXT("UObjectHandle"));
+    case EDasNativeType::Class:
+        return TEXT("UEClassHandle");
+    case EDasNativeType::ObjectArray:
+        return TEXT("array<") + (Resolved.Script ? Resolved.Script->Name : FString(TEXT("UObjectHandle"))) +
+               TEXT(">");
     default:
     {
         // Engine values: the name of the type annotation ue_foundation registered (math handle names live in
@@ -218,6 +234,8 @@ const char* DasNativeAbiName(EDasNativeType Type, bool bArgument, bool bRef = fa
         return "FDasTimespanValue";
     case EDasNativeType::Object:
         return bArgument ? "const FDasObjectHandle &" : "FDasObjectHandle";
+    case EDasNativeType::Class:
+        return bArgument ? "FDasClassHandle" : nullptr; // class results are not bound
 #define DAS_NATIVE_ABI(Kind, CppType)                                                                                  \
     case EDasNativeType::Kind:                                                                                         \
         return bArgument ? "const " CppType " &" : CppType;
@@ -259,7 +277,7 @@ bool DasNativeIsMath(EDasNativeType Type)
 // Results returned through the VM's result slot (copy-on-return).
 bool DasNativeIsCmres(EDasNativeType Type)
 {
-    return DasNativeIsMath(Type) || Type == EDasNativeType::Object;
+    return DasNativeIsMath(Type) || Type == EDasNativeType::Object || Type == EDasNativeType::ObjectArray;
 }
 
 // Engine values of one call: constructed in place, destroyed when the call ends (also on a script error).
@@ -282,6 +300,9 @@ struct FDasNativeValues
         case EDasNativeType::Text:
             new (Slot) FText();
             break;
+        case EDasNativeType::ObjectArray:
+            new (Slot) TArray<UObject*>();
+            break;
         default:
             FMemory::Memzero(Slot, sizeof(Storage[0]));
             break;
@@ -296,9 +317,12 @@ struct FDasNativeValues
                 static_cast<FString*>(static_cast<void*>(Storage[I]))->~FString();
             else if (Types[I] == EDasNativeType::Text)
                 static_cast<FText*>(static_cast<void*>(Storage[I]))->~FText();
+            else if (Types[I] == EDasNativeType::ObjectArray)
+                static_cast<TArray<UObject*>*>(static_cast<void*>(Storage[I]))->~TArray<UObject*>();
     }
 };
-static_assert(sizeof(FString) <= sizeof(FTransform) && sizeof(FText) <= sizeof(FTransform) &&
+static_assert(sizeof(TArray<UObject*>) <= sizeof(FTransform) && sizeof(FString) <= sizeof(FTransform) &&
+              sizeof(FText) <= sizeof(FTransform) &&
               sizeof(FLinearColor) <= sizeof(FTransform) && sizeof(FQuat) <= sizeof(FTransform));
 
 // A reference argument (FDasNativeParam::bRef): the VM passes the address of the script's variable. The call works
@@ -403,6 +427,37 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
             Context.throw_error_at(debugInfo, "%s: argument %d is null or expired", Label, Number);
         return Object;
     }
+    // A class argument: null passes as nullptr, an expired handle and a class that is not the base fail the call.
+    UClass* ResolveClassArgument(das::Context& Context, vec4f Raw, int32 I)
+    {
+        const FDasClassHandle Handle = das::cast<FDasClassHandle>::to(Raw);
+        if (!Handle.Token)
+            return nullptr;
+        UClass* Class = Cast<UClass>(TryObject(FDasObjectHandle{Handle.Token}, &Context));
+        if (!Class)
+            Context.throw_error_at(debugInfo, "%s: object handle is null, expired, or belongs to another context",
+                                   Label);
+        UClass* Base = Function->Arguments[I].Class();
+        if (!Class->IsChildOf(Base))
+            Context.throw_error_at(debugInfo, "%s: argument %d must be a subclass of %s, got %s", Label,
+                                   Function->IsMethod() ? I : I + 1, TCHAR_TO_UTF8(*Base->GetName()),
+                                   TCHAR_TO_UTF8(*Class->GetName()));
+        return Class;
+    }
+    // An array result into the caller's array (cmres): handles of the element class, null for other objects.
+    vec4f ReturnObjects(das::Context& Context, const TArray<UObject*>& Values)
+    {
+        UClass* Class = Function->Resolved.Last().Class;
+        auto* Array = reinterpret_cast<das::Array*>(cmresEval->evalPtr(Context));
+        // The result slot is not constructed: the callee makes the array (an empty, unlocked one first).
+        FMemory::Memzero(Array, sizeof(das::Array));
+        das::builtin_array_resize(*Array, Values.Num(), sizeof(FDasObjectHandle), &Context, nullptr);
+        auto* Handles = reinterpret_cast<FDasObjectHandle*>(Array->data);
+        for (int32 I = 0; I < Values.Num(); ++I)
+            Handles[I] = Values[I] && Values[I]->IsA(Class) ? MakeObjectHandle(Values[I], Class, &Context)
+                                                            : FDasObjectHandle();
+        return das::cast<void*>::from(Array);
+    }
     vec4f ReturnObject(das::Context& Context, UObject* Object)
     {
         UClass* Class = Function->Resolved.Last().Class;
@@ -482,6 +537,9 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
                 Objects[I] = ResolveArgument(Context, Raw[I], I);
                 *static_cast<UObject**>(Slot) = Objects[I];
                 break;
+            case EDasNativeType::Class:
+                *static_cast<UClass**>(Slot) = ResolveClassArgument(Context, Raw[I], I);
+                break;
             default:
                 break;
             }
@@ -547,6 +605,8 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
             return das::cast<FDasTextValue>::from(MakeDSLText(*static_cast<FText*>(Out), &Context));
         case EDasNativeType::Object:
             return ReturnObject(Context, *static_cast<UObject**>(Out));
+        case EDasNativeType::ObjectArray:
+            return ReturnObjects(Context, *static_cast<TArray<UObject*>*>(Out));
         default:
             return das::cast<void*>::from(Out);
         }
@@ -700,7 +760,7 @@ void ResolveDasNativeFunction(FDasNativeFunctionDesc& F)
     F.Resolved.SetNum(F.Arguments.Num() + 1);
     auto Resolve = [](const FDasNativeParam& P, FDasNativeResolvedParam& R)
     {
-        if (P.Type != EDasNativeType::Object)
+        if (P.Type != EDasNativeType::Object && P.Type != EDasNativeType::ObjectArray)
             return;
         R.Class = P.Class();
         R.Script = FindDasNativeClassType(R.Class);
@@ -970,7 +1030,7 @@ TSet<FDasNativeModuleDesc*> DasNativeDependencies(const FDasNativeModuleDesc& De
         for (const FDasNativeParam& P : F.Arguments)
             if (P.Type == EDasNativeType::Object)
                 Use(P.Class());
-        if (F.Result.Type == EDasNativeType::Object)
+        if (F.Result.Type == EDasNativeType::Object || F.Result.Type == EDasNativeType::ObjectArray)
             Use(F.Result.Class());
     }
     for (FDasNativeClassType* Type : DasNativeClassTypes())

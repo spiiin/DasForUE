@@ -302,11 +302,7 @@ template <> struct ext_ret_to_carrier<FDasNameValue, uint64_t>
 };
 }
 MAKE_TYPE_FACTORY(UObjectHandle, FDasObjectHandle); // DasScriptValues.h
-struct FDasClassHandle
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEClassHandle, FDasClassHandle);
+MAKE_TYPE_FACTORY(UEClassHandle, FDasClassHandle); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasClassHandle>
@@ -706,6 +702,21 @@ UObject* DasNativeAotObject(const FDasObjectHandle& Handle, UClass* Class, das::
     if (!Object && Kind == EDasNativeAotObject::NonNullArgument)
         DasNativeError(FString::Printf(TEXT("argument %d is null or expired"), Number));
     return Object;
+}
+UClass* DasNativeAotClass(FDasClassHandle Handle, UClass* Base, das::Context* Context, int32 Number)
+{
+    if (!Handle.Token)
+        return nullptr;
+    UClass* Class = Cast<UClass>(TryObject(FDasObjectHandle{Handle.Token}, Context));
+    if (!Class)
+        DasNativeError(TEXT("object handle is null, expired, or belongs to another context"));
+    else if (!Class->IsChildOf(Base))
+    {
+        DasNativeError(FString::Printf(TEXT("argument %d must be a subclass of %s, got %s"), Number, *Base->GetName(),
+                                       *Class->GetName()));
+        return nullptr;
+    }
+    return Class;
 }
 FDasObjectHandle DasNativeAotHandle(const UObject* Object, UClass* Class, das::Context* Context)
 {

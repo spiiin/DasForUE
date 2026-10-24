@@ -156,6 +156,36 @@ def main(input:int):int {
     if (child.get_component_creation_method() != 0) { return 49 } // created with NewObject: native
     child.mark_render_state_dirty()
     if (a.get_actor_instigator().valid() || ue_object_valid(a.get_actor_instigator_controller())) { return 50 }
+    // Coverage part 4: components by class (UEClassHandle) as arrays. The actor has a root_component and its child.
+    let scene_class = __ue_class_loaded("/Script/Engine.SceneComponent", "/Script/CoreUObject.Object", "")
+    let mesh_class = __ue_class_loaded("/Script/Engine.StaticMeshComponent", "/Script/CoreUObject.Object", "")
+    let actor_class = __ue_class_loaded("/Script/Engine.Actor", "/Script/CoreUObject.Object", "")
+    let all = a.get_all_components()
+    var has_child = false
+    for (component in all) {
+        has_child = has_child || __ue_same_object(component.handle(), child.handle())
+    }
+    if (length(all) != 2 || !has_child) { return 54 }
+    if (length(a.get_components_by_class(scene_class)) != 2 || length(a.get_components_by_class(mesh_class)) != 0) {
+        return 55
+    }
+    let tagged = a.get_components_by_class_with_tag(scene_class, ue_name_value("probe_tag"))
+    if (length(tagged) != 1 || !__ue_same_object(tagged[0].handle(), child.handle())) { return 56 }
+    let root_component = a.get_root_component()
+    if (!__ue_same_object(root_component.get_child_component_by_class(scene_class).handle(), child.handle())) { return 57 }
+    var no_class : UEClassHandle
+    if (root_component.get_child_component_by_class(no_class).valid() || length(a.get_components_by_class(no_class)) != 0) {
+        return 58
+    }
+    if (length(root_component.get_children_components_by_class(scene_class, true)) != 1) { return 59 }
+    var refused = false
+    try {
+        let wrong = root_component.get_child_component_by_class(actor_class) // not a SceneComponent
+        refused = !wrong.valid() && false
+    } recover {
+        refused = true
+    }
+    if (!refused) { return 60 }
     return 0
 }
 

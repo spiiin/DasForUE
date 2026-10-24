@@ -281,6 +281,15 @@ void BuildCompoundByValue(FDasNativeModule& Binds)
 {
     Binds.Function<&AddTo>(TEXT("+="));
 }
+// Arrays: a Pure function cannot return objects.
+TArray<UObject*> NoObjects()
+{
+    return {};
+}
+void BuildPureArray(FDasNativeModule& Binds)
+{
+    Binds.Function<&NoObjects>(TEXT("pure_objects"), EDasBind::Pure);
+}
 // A script file that exists for one check.
 struct FTemporaryScript
 {
@@ -370,6 +379,7 @@ bool RunDasNativeBindsProbe(FString& Report)
     const FString Untyped = TEXT("smoke_native_untyped_") + Run;
     const FString PureReference = TEXT("smoke_native_pure_reference_") + Run;
     const FString CompoundByValue = TEXT("smoke_native_compound_by_value_") + Run;
+    const FString PureArray = TEXT("smoke_native_pure_array_") + Run;
     RegisterDasNativeModule(TEXT("ue_foundation"), &BuildTemporary);
     RegisterDasNativeModule(*Duplicate, &BuildDuplicate);
     RegisterDasNativeModule(*PureObject, &BuildPureObject);
@@ -377,6 +387,7 @@ bool RunDasNativeBindsProbe(FString& Report)
     RegisterDasNativeModule(*Untyped, &BuildUntypedClass);
     RegisterDasNativeModule(*PureReference, &BuildPureReference);
     RegisterDasNativeModule(*CompoundByValue, &BuildCompoundByValue);
+    RegisterDasNativeModule(*PureArray, &BuildPureArray);
     {
         FTemporaryScript Trigger(R, TEXT("options gen2\n[export]\ndef main(input:int):int { return 0 }\n"));
         R.RunFile(Trigger.Path, 0); // compiling builds newly registered modules
@@ -397,6 +408,7 @@ bool RunDasNativeBindsProbe(FString& Report)
                  TEXT("is Pure but changes a reference parameter"));
     Registration(TEXT("native_binds_compound_by_value_refused"), CompoundByValue,
                  TEXT("is a compound assignment without a reference (T&) first parameter"));
+    Registration(TEXT("native_binds_pure_array_refused"), PureArray, TEXT("is Pure but takes or returns objects"));
 
     // An unloaded module: compiled calls report an error instead of calling unloaded code.
     const FString Temporary = TEXT("smoke_native_temporary_") + Run;
@@ -423,7 +435,7 @@ bool FDasNativeBindsTest::RunTest(const FString&)
     const auto Contains = EAutomationExpectedErrorFlags::Contains;
     AddExpectedError(TEXT("taken by another daScript module"), Contains, 1);
     AddExpectedError(TEXT("is bound twice"), Contains, 1);
-    AddExpectedError(TEXT("is Pure but takes or returns objects"), Contains, 1);
+    AddExpectedError(TEXT("is Pure but takes or returns objects"), Contains, 2);
     AddExpectedError(TEXT("already has the script type"), Contains, 1);
     AddExpectedError(TEXT("which has no script type"), Contains, 1);
     AddExpectedError(TEXT("is Pure but changes a reference parameter"), Contains, 1);

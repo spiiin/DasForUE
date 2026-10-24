@@ -91,6 +91,8 @@ functions imported from another DLL (engine functions) in a small lambda or func
 | `FVector`, `FVector2D`, `FRotator`, `FQuat`, `FTransform`, `FLinearColor`, `FColor` | `UEVector`, `UEVector2D`, `UERotator`, `UEQuat`, `UETransform`, `UELinearColor`, `UEColor` |
 | `FDateTime`, `FTimespan` | `UEDateTime`, `UETimespan` |
 | `T*` (`T` a `UObject` class) | the script type of `T`, or `UObjectHandle` |
+| `UClass*`, `TSubclassOf<T>` (parameters) | `UEClassHandle` (null passes as `nullptr`; a class that is not a `T` is an error) |
+| `TArray<T*>` (results) | `array<T>` of the script type of `T` (or `UObjectHandle`) |
 
 A const reference counts as its value type. Up to 16 parameters. Other types do not compile
 (`static_assert` names the supported list).

@@ -34,6 +34,9 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `get_actor_scale3d() : UEVector` | reflects `GetActorScale3D` |
 | `get_actor_transform() : UETransform` | reflects `GetTransform` |
 | `get_actor_up_vector() : UEVector` | reflects `GetActorUpVector` |
+| `get_all_components() : array<UActorComponent>` |  |
+| `get_components_by_class(UEClassHandle) : array<UActorComponent>` |  |
+| `get_components_by_class_with_tag(UEClassHandle, UENameValue) : array<UActorComponent>` |  |
 | `get_distance_to(AActor) : float` | non-null arguments |
 | `get_game_time_since_creation() : float` | reflects `GetGameTimeSinceCreation` |
 | `get_horizontal_distance_to(AActor) : float` | non-null arguments |
@@ -101,6 +104,8 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `does_socket_exist(UENameValue) : bool` | reflects `DoesSocketExist` |
 | `get_attach_parent() : USceneComponent` | reflects `GetAttachParent` |
 | `get_attach_socket_name() : UENameValue` | reflects `GetAttachSocketName` |
+| `get_child_component_by_class(UEClassHandle) : USceneComponent` |  |
+| `get_children_components_by_class(UEClassHandle, bool) : array<USceneComponent>` |  |
 | `get_component_location() : UEVector` | reflects `K2_GetComponentLocation` |
 | `get_component_rotation() : UERotator` | reflects `K2_GetComponentRotation` |
 | `get_component_transform() : UETransform` | reflects `K2_GetComponentToWorld` |

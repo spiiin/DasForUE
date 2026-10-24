@@ -143,9 +143,12 @@ void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasN
     F.Arguments = MoveTemp(Args);
     F.Flags = Flags;
     F.Receiver = Receiver;
-    const bool bObjects =
-        Result.Type == EDasNativeType::Object ||
-        F.Arguments.ContainsByPredicate([](const FDasNativeParam& P) { return P.Type == EDasNativeType::Object; });
+    auto IsObjectKind = [](const FDasNativeParam& P)
+    {
+        return P.Type == EDasNativeType::Object || P.Type == EDasNativeType::Class ||
+               P.Type == EDasNativeType::ObjectArray;
+    };
+    const bool bObjects = IsObjectKind(Result) || F.Arguments.ContainsByPredicate(IsObjectKind);
     auto Fail = [&](const FString& Why)
     {
         Desc.Error = FString::Printf(TEXT("Native module '%s': function '%s' %s"), *Desc.Name, *F.Name, *Why);
@@ -166,6 +169,11 @@ void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasN
         Fail(TEXT("is bound twice"));
     else if (F.Arguments.ContainsByPredicate([](const FDasNativeParam& P) { return P.Type == EDasNativeType::Void; }))
         Fail(TEXT("has a void parameter"));
+    else if (F.Arguments.ContainsByPredicate([](const FDasNativeParam& P)
+                                             { return P.Type == EDasNativeType::ObjectArray; }))
+        Fail(TEXT("takes an array (only results may be arrays of objects)"));
+    else if (Result.Type == EDasNativeType::Class)
+        Fail(TEXT("returns a class (only parameters may be classes)"));
     else if (EnumHasAnyFlags(Flags, EDasBind::Pure) && bObjects)
         Fail(TEXT("is Pure but takes or returns objects"));
     else if (EnumHasAnyFlags(Flags, EDasBind::Pure) &&

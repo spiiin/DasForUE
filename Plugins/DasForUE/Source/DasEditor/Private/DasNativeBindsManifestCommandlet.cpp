@@ -142,6 +142,10 @@ int32 UDasNativeBindsManifestCommandlet::Main(const FString& Params)
         AotError = TEXT("with_objects is not compiled for AOT");
     else if (bAot && !AotText.Contains(TEXT("with_refs")))
         AotError = TEXT("with_refs is not compiled for AOT");
+    else if (bAot && !AotText.Contains(TEXT("with_classes")))
+        AotError = TEXT("with_classes is not compiled for AOT");
+    else if (bAot && AotText.Contains(TEXT("with_arrays")))
+        AotError = TEXT("with_arrays is compiled for AOT although an array result has no AOT ABI");
     else if (bAot && AotText.Contains(TEXT("with_closed")))
         AotError = TEXT("with_closed is compiled for AOT although it calls a bind without an AOT ABI");
     bAot = bAot && AotError.IsEmpty();

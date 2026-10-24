@@ -66,6 +66,7 @@ DAS_UE_AOT_VALUE(const FColor&, "const FColor &")
 DAS_UE_AOT_VALUE(FColor, "FColor")
 DAS_UE_AOT_VALUE(FDasDateTimeValue, "FDasDateTimeValue")
 DAS_UE_AOT_VALUE(FDasTimespanValue, "FDasTimespanValue")
+DAS_UE_AOT_VALUE(FDasClassHandle, "FDasClassHandle")
 // Reference parameters of native binds (DasNativeBinds.h: copied in, written back when the call succeeds).
 DAS_UE_AOT_VALUE(bool&, "bool &")
 DAS_UE_AOT_VALUE(int32_t&, "int32_t &")

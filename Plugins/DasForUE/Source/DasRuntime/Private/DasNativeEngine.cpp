@@ -184,6 +184,42 @@ int64 FrameNumber()
 {
     return int64(GFrameCounter);
 }
+// Components by class (a null class finds nothing, as in the engine).
+TArray<UActorComponent*> GetAllComponents(const AActor& A)
+{
+    TArray<UActorComponent*> Components;
+    A.GetComponents(Components);
+    return Components;
+}
+TArray<UActorComponent*> GetComponentsByClass(const AActor& A, TSubclassOf<UActorComponent> Class)
+{
+    return Class ? A.K2_GetComponentsByClass(Class) : TArray<UActorComponent*>();
+}
+TArray<UActorComponent*> GetComponentsByClassWithTag(const AActor& A, TSubclassOf<UActorComponent> Class, FName Tag)
+{
+    return Class ? A.GetComponentsByTag(Class, Tag) : TArray<UActorComponent*>();
+}
+// As AngelScript: the first direct child of the class.
+USceneComponent* GetChildComponentByClass(const USceneComponent& C, TSubclassOf<USceneComponent> Class)
+{
+    if (!Class)
+        return nullptr;
+    for (int32 I = 0; I < C.GetNumChildrenComponents(); ++I)
+        if (USceneComponent* Child = C.GetChildComponent(I); Child && Child->IsA(Class))
+            return Child;
+    return nullptr;
+}
+TArray<USceneComponent*> GetChildrenComponentsByClass(const USceneComponent& C, TSubclassOf<USceneComponent> Class,
+                                                      bool bIncludeAllDescendants)
+{
+    TArray<USceneComponent*> Children;
+    if (Class)
+    {
+        C.GetChildrenComponents(bIncludeAllDescendants, Children);
+        Children.RemoveAll([&](const USceneComponent* Child) { return !Child || !Child->IsA(Class); });
+    }
+    return Children;
+}
 // Local players: Error receives why a player was not created (null result).
 ULocalPlayer* CreateLocalPlayer(UGameInstance& G, int32 ControllerId, FString& Error, bool bSpawnPlayerController)
 {
@@ -248,6 +284,9 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Actor.Method<GetInstigatorController>(TEXT("get_actor_instigator_controller"));
     Actor.Method<GetRootComponent>(TEXT("get_root_component")).Reflects(TEXT("K2_GetRootComponent"));
     Actor.Method<GetActorWorld>(TEXT("get_world"));
+    Actor.Method<&GetAllComponents>(TEXT("get_all_components"));
+    Actor.Method<&GetComponentsByClass>(TEXT("get_components_by_class"));
+    Actor.Method<&GetComponentsByClassWithTag>(TEXT("get_components_by_class_with_tag"));
 
     auto Pawn = Binds.Class<APawn>(TEXT("APawn"));
     Pawn.Method<GetController>(TEXT("get_controller")).Reflects(TEXT("GetController"));
@@ -301,6 +340,8 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Scene.Method<GetAttachSocketName>(TEXT("get_attach_socket_name")).Reflects(TEXT("GetAttachSocketName"));
     Scene.Method<&AttachTo>(TEXT("attach_to"), EDasBind::NonNullArgs);
     Scene.Method<&Detach>(TEXT("detach"));
+    Scene.Method<&GetChildComponentByClass>(TEXT("get_child_component_by_class"));
+    Scene.Method<&GetChildrenComponentsByClass>(TEXT("get_children_components_by_class"));
     Scene.Method<SetVisibility>(TEXT("set_visibility"));
     Scene.Method<IsVisible>(TEXT("is_visible")).Reflects(TEXT("IsVisible"));
     Scene.Method<SetHiddenInGame>(TEXT("set_hidden_in_game"));

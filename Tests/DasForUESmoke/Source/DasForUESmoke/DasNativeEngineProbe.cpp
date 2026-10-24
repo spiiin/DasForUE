@@ -9,7 +9,9 @@
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Pawn.h"
+#include "HAL/FileManager.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/FileHelper.h"
 #include "Modules/ModuleManager.h"
 
 namespace DasNativeEngineProbe
@@ -94,6 +96,23 @@ bool RunDasNativeEngineProbe(UWorld* GameWorld, FString& Report)
     if (Values.bSucceeded && Values.Value != 0)
         Detail = FString::Printf(TEXT("check %d failed"), Values.Value);
     Check(Values.bSucceeded && Values.Value == 0, TEXT("native_engine_values"), Detail);
+    // A class argument that is not the parameter's base: the message names the function and both classes.
+    {
+        const FString File = TEXT("native_engine_class_") + FGuid::NewGuid().ToString(EGuidFormats::Digits);
+        const FString ClassPath = R.ScriptPath(File + TEXT(".das"));
+        FFileHelper::SaveStringToFile(
+            TEXT("options gen2\nrequire ue_engine\n[export]\ndef main(input:int):int {\n"
+                 "    let a = as_AActor(ue_self_object())\n"
+                 "    let actor_class = __ue_class_loaded(\"/Script/Engine.Actor\",\n"
+                 "                                        \"/Script/CoreUObject.Object\", \"\")\n"
+                 "    return a.get_root_component().get_child_component_by_class(actor_class).valid() ? 1 : 0\n}\n"),
+            *ClassPath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        const auto Wrong = R.RunNamedPersistent(ClassPath, TEXT("main"), 0, Self);
+        IFileManager::Get().Delete(*ClassPath);
+        const TCHAR* Expected = TEXT("get_child_component_by_class: argument 1 must be a subclass of SceneComponent");
+        Check(!Wrong.bSucceeded && Wrong.Error.Contains(Expected), TEXT("native_engine_wrong_class_refused"),
+              Wrong.Error.Left(300));
+    }
     // The calls reached the real objects.
     const bool bApplied = Self->IsHidden() && Self->GetOwner() == Other.Get() && !ChildComponent->IsActive();
     Check(bApplied, TEXT("native_engine_changes_visible_in_cpp"));

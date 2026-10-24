@@ -16,3 +16,8 @@ struct FDasObjectHandle
 {
     uint64 Token = 0;
 };
+// A class reference (UEClassHandle): the token of the class object in the context's handle table.
+struct FDasClassHandle
+{
+    uint64 Token = 0;
+};
