@@ -22,6 +22,7 @@ bool RunDasNativeBindsProbe(FString& Report);
 bool RunDasNativeTimeProbe(FString& Report);
 bool RunDasNativeEngineProbe(UWorld* GameWorld, FString& Report);
 bool RunDasNativeRoutesProbe(UWorld* GameWorld, FString& Report);
+bool RunDasNativeBindsExample(UWorld* GameWorld, FString& Report);
 bool RunDasNativeMathProbe(FString& Report);
 void StartDasClassCallbacksValidation();
 void StartDasSubsystemsValidation();
@@ -75,6 +76,7 @@ public:
                 UWorld* GameWorld=nullptr;for(const auto& Context:GEngine->GetWorldContexts())if(Context.World()&&Context.World()->IsGameWorld())GameWorld=Context.World();
                 Passed&=GameWorld&&RunDasNativeEngineProbe(GameWorld,Report);
                 Passed&=GameWorld&&RunDasNativeRoutesProbe(GameWorld,Report);
+                Passed&=GameWorld&&RunDasNativeBindsExample(GameWorld,Report);
                 UE_LOG(LogTemp,Display,TEXT("%s"),*Report);UE_LOG(LogTemp,Display,TEXT("DAS_NATIVE_BINDS_RESULT=%s"),Passed?TEXT("PASS"):TEXT("FAIL"));
                 FPlatformMisc::RequestExitWithStatus(false,Passed?0:1);
             });return;

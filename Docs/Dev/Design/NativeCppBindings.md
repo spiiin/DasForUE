@@ -1,6 +1,8 @@
 # Прямая привязка C++-типов: эскиз
 
-Статус: эскиз на согласование, кода нет (2026-10-21). Связано: [TypeAdapters](TypeAdapters.md),
+Статус: реализовано (2026-10-24) как нативные привязки `DAS_NATIVE_BINDS` (`DasNativeBinds.h`): гайд —
+[Native C++ binds](../../Guide/Native/NativeBinds.md), модули плагина — [справочник](../../Reference/NativeModules.md),
+покрытие — [NativeBindsCoverage](../Architecture/NativeBindsCoverage.md). Ниже — исходный эскиз (2026-10-21). Связано: [TypeAdapters](TypeAdapters.md),
 [аудит функций и событий AngelScript](../Audits/AngelScriptFunctionsEventsAudit.md) (авторская сторона, не привязка C++),
 [Limitations](../../Reference/Limitations.md) («Only reflected API is exposed»), фаза 2 и 6 в
 [ImprovementPlan](../Plans/ImprovementPlan.md).

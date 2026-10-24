@@ -14,6 +14,8 @@ character.StopJumping()
 
 The same syntax works in free functions, authored methods and lifecycle callbacks. In a DSL `Character` class, inherited native members are available through `self` (`self.Jump()`, `self.AddControllerYawInput(value)`); authored methods take precedence over native members of the same name. See `Plugins/DasForUE/Content/Das/Scripts/dsl_playable_character.das` and `native_gameplay_reference_probe.das` (camera fields, controller rotation, typed object results, omitted defaults and out parameters such as `player.GetPlayerViewPoint(location,view)`).
 
+Method calls go through reflection, except `UFUNCTION`s that a native bind reflects (`Reflects`, see [Native C++ binds](../Guide/Native/NativeBinds.md#gameplay-calls-through-binds-reflects)): `self.Trigger.K2_GetComponentLocation()` then calls the bind with the same syntax and receiver checks, without a call frame. `options ue_native_routes = false` keeps a script on reflection.
+
 Native receiver types are reference types, not authored class parents: exposing `PlayerController` members does not make it a supported `[ue_class]` base.
 
 ## Adding a native class

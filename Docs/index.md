@@ -77,6 +77,10 @@ time are in the [changelog](../CHANGELOG.md).
 - [GameplayTags](Guide/Data/GameplayTags.md)
 - [SaveGame](Guide/Data/SaveGame.md)
 
+## Native C++
+
+- [Native C++ binds](Guide/Native/NativeBinds.md)
+
 ## Workflow
 
 - [Apply and hot reload](Guide/Workflow/ApplyAndHotReload.md)
@@ -98,6 +102,7 @@ time are in the [changelog](../CHANGELOG.md).
 - [Type support](Reference/TypeSupport.md)
 - [Generated bindings](Reference/GeneratedBindings.md)
 - [Native class bindings](Reference/NativeClassBindings.md)
+- [Native modules](Reference/NativeModules.md)
 - [Struct snapshots](Reference/StructSnapshots.md)
 - [Low-level calls](Reference/LowLevelCalls.md)
 - [Limitations](Reference/Limitations.md)
