@@ -21,7 +21,7 @@ struct C_ActorComponent_97441d45 { handle : UObjectHandle }
 [ue_native_object(path="/Script/Engine.BlueprintFunctionLibrary")]
 struct C_BlueprintFunctionLibrary_a62507e5 { handle : UObjectHandle }
 
-// ActorComponent: no short alias, the name belongs to the native bind type ActorComponent (DasNativeBinds.h); use C_ActorComponent_97441d45
+// ActorComponent: no short alias, the name belongs to the DSL base class ue_dsl::ActorComponent; use C_ActorComponent_97441d45
 
 typedef BlueprintFunctionLibrary = C_BlueprintFunctionLibrary_a62507e5
 

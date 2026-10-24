@@ -14,7 +14,10 @@ from DasKinds import property_classes
 ROOT = Path(__file__).resolve().parents[1]
 # Native modules of the plugin (DasNativeBinds.h); projects add their own with --native-binds-source.
 NATIVE_BINDS_SOURCE = ROOT / 'Plugins/DasForUE/Source'
+# Script modules of the plugin: ue_dsl declares the DSL base classes ([ue_native_base] class Actor {}).
+PLUGIN_SCRIPTS = ROOT / 'Plugins/DasForUE/Content/Das/Scripts'
 _native_type_names_cache = {}
+_dsl_base_names_cache = {}
 
 
 def native_type_names(dirs):
@@ -38,8 +41,28 @@ def native_type_names(dirs):
     return _native_type_names_cache[key]
 
 
+def dsl_base_names(folder):
+    """DSL base classes of the script modules in folder: name -> module (`[ue_native_base(...)]` + `class Name`).
+
+    A generated short alias with such a name would be ambiguous next to the base class in a script that requires
+    both modules (`var a : Actor`), so generate() emits none. Only modules count, not test scripts.
+    """
+    key = str(Path(folder).resolve())
+    if key not in _dsl_base_names_cache:
+        names = {}
+        for path in sorted(Path(key).glob('*.das')):
+            text = path.read_text(encoding='utf-8', errors='replace')
+            module = re.search(r'^module ([A-Za-z_][A-Za-z0-9_]*)', text, re.M)
+            if not module:
+                continue
+            for name in re.findall(r'^\[ue_native_base\(path="[^"]*"\)\]\s*\nclass ([A-Za-z_][A-Za-z0-9_]*)', text, re.M):
+                names.setdefault(name, module.group(1))
+        _dsl_base_names_cache[key] = names
+    return _dsl_base_names_cache[key]
+
+
 def skipped_aliases(text):
-    """Short aliases generate() left out for native type names, from its comments."""
+    """Short aliases generate() left out for reserved names, from its comments."""
     return re.findall(r'^// ([A-Za-z_][A-Za-z0-9_]*): no short alias,', text, re.M)
 
 
@@ -165,7 +188,8 @@ CANONICAL_MATH = {
 }
 
 
-def generate(ir, module="ue_generated", source_types=None, canonical_math=False, native_names=None):
+def generate(ir, module="ue_generated", source_types=None, canonical_math=False, native_names=None,
+             dsl_bases=None):
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", module): raise ValueError("Invalid module name")
     if ir.get('schema_version') != 5:
         raise ValueError('Unsupported IR schema version')
@@ -518,9 +542,12 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False,
         if path in interface_ids: annotation = 'ue_interface_ref'; args += ', id=' + quote(interface_ids[path])
         lines += [f'[{annotation}({args})]', f'struct {class_name(path)} {{ handle : UObjectHandle }}', '']
     # Short names are aliases of existing wrappers, never a second object representation. None for names of native
-    # bind types (native_type_names): `Actor` would be ambiguous next to ue_engine::Actor.
+    # bind types (native_type_names) and DSL base classes (dsl_base_names: name -> module): such a name would be
+    # ambiguous in a script that requires both.
     if native_names is None:
         native_names = native_type_names([NATIVE_BINDS_SOURCE])
+    if dsl_bases is None:
+        dsl_bases = dsl_base_names(PLUGIN_SCRIPTS)
     names = {}
     short_aliases = set()
     for path in sorted(classes):
@@ -532,6 +559,10 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False,
             if name in native_names:
                 lines += [f'// {name}: no short alias, the name belongs to the native bind type {name} '
                           f'(DasNativeBinds.h); use {class_name(paths[0])}', '']
+                continue
+            if name in dsl_bases:
+                lines += [f'// {name}: no short alias, the name belongs to the DSL base class {dsl_bases[name]}::{name}; '
+                          f'use {class_name(paths[0])}', '']
                 continue
             register(name)
             short_aliases.add(name)

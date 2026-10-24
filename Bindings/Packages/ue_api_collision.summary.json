@@ -29,7 +29,7 @@
       "policy_excluded": 1
     }
   },
-  "source_sha256": "e33e6c0c8112e572943a1b5308f48559dad399fbef8a513769424506f5768738",
+  "source_sha256": "e936c25b87d1ae287cb18e2fe21e75c682a980dfa1624fe7aa38de7004856c84",
   "dependencies": {
     "das_modules": [
       "ue_foundation"

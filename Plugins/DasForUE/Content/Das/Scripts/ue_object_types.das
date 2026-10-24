@@ -3,7 +3,7 @@ module ue_object_types public
 require ue_foundation public
 require ue_generated public
 // This module compiles before the importing class declarations are parsed. Actor has no short generated alias:
-// the name belongs to the native bind type ue_engine::Actor (DasNativeBinds.h), so the full wrapper name is used.
+// the name belongs to the DSL base class ue_dsl::Actor, so the full wrapper name is used.
 typedef ActorRef = $UEObject<C_Actor_adf65d5b>
 typedef ObjectRef = $ue_foundation::UEObject<Object>
 

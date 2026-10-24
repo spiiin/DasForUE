@@ -32,7 +32,7 @@ void DestroyVictim()
         Actor->Destroy();
 }
 
-// Refused Reflects: each module binds one wrong method on the Actor type of ue_engine.
+// Refused Reflects: each module binds one wrong method on the AActor type of ue_engine.
 bool SetLocation(AActor& A, const FVector& V)
 {
     return A.SetActorLocation(V);

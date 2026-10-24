@@ -86,9 +86,9 @@ int32 UDasNativeBindsManifestCommandlet::Main(const FString& Params)
         FFileHelper::SaveStringToFile(Json, *Output, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
     // Reflects in ue_engine: plain getters are routed, an authority-only UFUNCTION keeps the reflected call.
     for (const TPair<const TCHAR*, const TCHAR*>& Expected :
-         {TPair<const TCHAR*, const TCHAR*>(TEXT("Actor.get_actor_location"), TEXT("routed")),
-          TPair<const TCHAR*, const TCHAR*>(TEXT("SceneComponent.get_component_location"), TEXT("routed")),
-          TPair<const TCHAR*, const TCHAR*>(TEXT("Actor.set_replicates"), TEXT("requires authority"))})
+         {TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.get_actor_location"), TEXT("routed")),
+          TPair<const TCHAR*, const TCHAR*>(TEXT("USceneComponent.get_component_location"), TEXT("routed")),
+          TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.set_replicates"), TEXT("requires authority"))})
         if (const FString* Got = Routes.Find(Expected.Key); !Got || *Got != Expected.Value)
         {
             UE_LOG(LogTemp, Error, TEXT("DAS_NATIVE_BINDS_MANIFEST route %s: expected '%s', got '%s'"), Expected.Key,

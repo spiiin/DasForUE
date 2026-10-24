@@ -98,11 +98,15 @@ bool RunDasNativeEngineProbe(UWorld* GameWorld, FString& Report)
     const bool bApplied = Self->IsHidden() && Self->GetOwner() == Other.Get() && !ChildComponent->IsActive();
     Check(bApplied, TEXT("native_engine_changes_visible_in_cpp"));
 
-    // ue_engine and the generated bindings together: Actor is the native type (the generator has no short alias
-    // for it), the generated wrapper keeps its full name, conversions work.
+    // ue_engine and the generated bindings together: AActor is the native type, the generated wrapper keeps its
+    // full name, conversions work.
     const auto Mix = R.RunNamedPersistent(R.ScriptPath(TEXT("native_engine_generated_mix.das")), TEXT("main"), 0, Self);
     const bool bMixed = Mix.bSucceeded && Mix.Value == 0;
     Check(bMixed, TEXT("native_engine_with_generated_bindings"), Mix.bSucceeded ? FString() : Mix.Error.Left(300));
+    // ue_engine next to the DSL: Actor (DSL base), AActor (native type) and ActorRef unqualified in one script.
+    const auto Dsl = R.RunNamedPersistent(R.ScriptPath(TEXT("native_engine_dsl_mix.das")), TEXT("main"), 0, Self);
+    const FString DslDetail = Dsl.bSucceeded ? FString::Printf(TEXT("check %d"), Dsl.Value) : Dsl.Error.Left(300);
+    Check(Dsl.bSucceeded && Dsl.Value == 0, TEXT("native_engine_with_dsl"), DslDetail);
 
     // A null receiver and a destroyed actor are script errors.
     auto Refused = [&](const TCHAR* Name, const TCHAR* Entry, const TCHAR* Expected)
@@ -110,10 +114,10 @@ bool RunDasNativeEngineProbe(UWorld* GameWorld, FString& Report)
         const auto Result = R.RunNamedPersistent(Path, Entry, 0, Self);
         Check(!Result.bSucceeded && Result.Error.Contains(Expected), Name, Result.Error.Left(300));
     };
-    const TCHAR* NullReceiver = TEXT("Actor.get_actor_location: receiver is null or expired");
+    const TCHAR* NullReceiver = TEXT("AActor.get_actor_location: receiver is null or expired");
     Refused(TEXT("native_engine_null_actor_refused"), TEXT("null_actor"), NullReceiver);
     Refused(TEXT("native_engine_destroyed_actor_refused"), TEXT("destroyed_actor"), NullReceiver);
-    const TCHAR* NullParent = TEXT("SceneComponent.attach_to: argument 1 is null or expired");
+    const TCHAR* NullParent = TEXT("USceneComponent.attach_to: argument 1 is null or expired");
     Refused(TEXT("native_engine_null_attach_parent_refused"), TEXT("null_attach_parent"), NullParent);
 
     R.ReleaseObject(Self);

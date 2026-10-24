@@ -12,7 +12,7 @@ def near(a, b : UEVector) : bool {
 
 [export]
 def main(input:int):int {
-    let a = as_Actor(ue_self_object())
+    let a = as_AActor(ue_self_object())
     // Actor: placement.
     if (!a.valid() || a.get_actor_location() != ue_vector(100.0lf, 200.0lf, 300.0lf)) { return 1 }
     let moved = a.set_actor_location(ue_vector(1.0lf, 2.0lf, 3.0lf))
@@ -124,14 +124,14 @@ def main(input:int):int {
     if (!p.valid() || p.is_locally_controlled() || p.is_player_controlled() || ue_object_valid(p.get_controller())) {
         return 39
     }
-    if (!near(p.get_actor_location(), ue_vector(0.0lf, 0.0lf, 500.0lf)) || !as_Actor(p).valid()) { return 40 }
+    if (!near(p.get_actor_location(), ue_vector(0.0lf, 0.0lf, 500.0lf)) || !as_AActor(p).valid()) { return 40 }
     p.add_movement_input(ue_vector(1.0lf, 0.0lf, 0.0lf), 1.0f)
     return 0
 }
 
 [export]
 def null_actor(input:int):int {
-    var a : Actor
+    var a : AActor
     return int(a.get_actor_location().x)
 }
 
@@ -144,14 +144,14 @@ def destroyed_actor(input:int):int {
 
 [export]
 def null_attach_parent(input:int):int {
-    var parent : SceneComponent
+    var parent : USceneComponent
     return smoke_engine_child().attach_to(parent, ue_name_value(""), false) ? 1 : 0
 }
 
 // The call cost benchmark (interop-performance): actor.get_actor_location() inside the script.
 [export]
 def bench_actor_location(count:int):int {
-    let a = as_Actor(ue_self_object())
+    let a = as_AActor(ue_self_object())
     var n = 0
     for (i in range(0, count)) {
         if (a.get_actor_location().x > -1.0e30lf) { n += 1 }

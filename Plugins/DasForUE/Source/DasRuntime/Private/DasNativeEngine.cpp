@@ -1,6 +1,8 @@
-// Native module ue_engine: script types Actor, Pawn, ActorComponent, SceneComponent, World and GameInstance with
-// their most used methods, bound directly (no reflection). Game modules declare their own classes on top of these
-// (Class<AMyPickup>(TEXT("Pickup")) inherits the Actor methods) or add methods to them (Class<AActor>()).
+// Native module ue_engine: script types AActor, APawn, UActorComponent, USceneComponent, UWorld and UGameInstance
+// with their most used methods, bound directly (no reflection). The types are named as in C++: the short names
+// (Actor, Pawn, ...) are DSL base classes in ue_dsl and would be ambiguous in a script that requires both. Game
+// modules declare their own classes on top of these (Class<AMyPickup>(TEXT("AMyPickup")) inherits the AActor
+// methods) or add methods to them (Class<AActor>()).
 // Built on the public native binds API (DasNativeBinds.h). Engine functions are called from small lambdas: the
 // address of a function imported from the engine DLL is not a template argument. Methods that do what a UFUNCTION
 // does reflect it (Reflects): gameplay scripts calling that UFUNCTION on a native reference call the bind.
@@ -162,7 +164,7 @@ int64 FrameNumber()
 DAS_NATIVE_BINDS(UEEngine, "ue_engine")
 {
     using namespace DasNativeEngine;
-    auto Actor = Binds.Class<AActor>(TEXT("Actor"));
+    auto Actor = Binds.Class<AActor>(TEXT("AActor"));
     Actor.Method<GetActorLocation>(TEXT("get_actor_location")).Reflects(TEXT("K2_GetActorLocation"));
     Actor.Method<SetActorLocation>(TEXT("set_actor_location"));
     Actor.Method<GetActorRotation>(TEXT("get_actor_rotation")).Reflects(TEXT("K2_GetActorRotation"));
@@ -206,13 +208,13 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Actor.Method<GetRootComponent>(TEXT("get_root_component"));
     Actor.Method<GetActorWorld>(TEXT("get_world"));
 
-    auto Pawn = Binds.Class<APawn>(TEXT("Pawn"));
+    auto Pawn = Binds.Class<APawn>(TEXT("APawn"));
     Pawn.Method<GetController>(TEXT("get_controller"));
     Pawn.Method<IsLocallyControlled>(TEXT("is_locally_controlled")).Reflects(TEXT("IsLocallyControlled"));
     Pawn.Method<IsPlayerControlled>(TEXT("is_player_controlled")).Reflects(TEXT("IsPlayerControlled"));
     Pawn.Method<AddMovementInput>(TEXT("add_movement_input"));
 
-    auto Component = Binds.Class<UActorComponent>(TEXT("ActorComponent"));
+    auto Component = Binds.Class<UActorComponent>(TEXT("UActorComponent"));
     Component.Method<GetComponentOwner>(TEXT("get_owner"));
     Component.Method<IsActive>(TEXT("is_active")).Reflects(TEXT("IsActive"));
     Component.Method<Activate>(TEXT("activate"));
@@ -228,7 +230,7 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Component.Method<ComponentHasTag>(TEXT("component_has_tag")).Reflects(TEXT("ComponentHasTag"));
     Component.Method<GetComponentWorld>(TEXT("get_world"));
 
-    auto Scene = Binds.Class<USceneComponent>(TEXT("SceneComponent"));
+    auto Scene = Binds.Class<USceneComponent>(TEXT("USceneComponent"));
     Scene.Method<GetComponentLocation>(TEXT("get_component_location")).Reflects(TEXT("K2_GetComponentLocation"));
     Scene.Method<GetComponentRotation>(TEXT("get_component_rotation")).Reflects(TEXT("K2_GetComponentRotation"));
     Scene.Method<GetComponentTransform>(TEXT("get_component_transform")).Reflects(TEXT("K2_GetComponentToWorld"));
@@ -260,7 +262,7 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Scene.Method<IsVisible>(TEXT("is_visible")).Reflects(TEXT("IsVisible"));
     Scene.Method<SetHiddenInGame>(TEXT("set_hidden_in_game"));
 
-    auto World = Binds.Class<UWorld>(TEXT("World"));
+    auto World = Binds.Class<UWorld>(TEXT("UWorld"));
     World.Method<GetTimeSeconds>(TEXT("get_time_seconds"));
     World.Method<GetUnpausedTimeSeconds>(TEXT("get_unpaused_time_seconds"));
     World.Method<GetRealTimeSeconds>(TEXT("get_real_time_seconds"));
@@ -277,7 +279,7 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     World.Method<IsListenServer>(TEXT("is_listen_server"));
     World.Method<IsDedicatedServer>(TEXT("is_dedicated_server"));
     World.Method<GetGameInstance>(TEXT("get_game_instance"));
-    Binds.Class<UGameInstance>(TEXT("GameInstance")).Method<GetGameInstanceWorld>(TEXT("get_world"));
+    Binds.Class<UGameInstance>(TEXT("UGameInstance")).Method<GetGameInstanceWorld>(TEXT("get_world"));
     Binds.Function<&WorldOf>(TEXT("world_of"));
     Binds.Function<&FrameNumber>(TEXT("frame_number"));
 }

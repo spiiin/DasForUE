@@ -204,9 +204,9 @@ struct C_WorldSettings_5d995f30 { handle : UObjectHandle }
 [ue_native_object(path="/Script/PhysicsCore.PhysicalMaterial")]
 struct C_PhysicalMaterial_b3257fa1 { handle : UObjectHandle }
 
-// Actor: no short alias, the name belongs to the native bind type Actor (DasNativeBinds.h); use C_Actor_adf65d5b
+// Actor: no short alias, the name belongs to the DSL base class ue_dsl::Actor; use C_Actor_adf65d5b
 
-// ActorComponent: no short alias, the name belongs to the native bind type ActorComponent (DasNativeBinds.h); use C_ActorComponent_97441d45
+// ActorComponent: no short alias, the name belongs to the DSL base class ue_dsl::ActorComponent; use C_ActorComponent_97441d45
 
 typedef AudioComponent = C_AudioComponent_86ff3f82
 
@@ -218,7 +218,7 @@ typedef CameraActor = C_CameraActor_cb891975
 
 typedef CameraShakeBase = C_CameraShakeBase_102cf2d9
 
-typedef Character = C_Character_ab4a5baa
+// Character: no short alias, the name belongs to the DSL base class ue_dsl::Character; use C_Character_ab4a5baa
 
 typedef ChildActorComponent = C_ChildActorComponent_405d4379
 
@@ -244,7 +244,7 @@ typedef ForceFeedbackComponent = C_ForceFeedbackComponent_ca7b1c8d
 
 typedef ForceFeedbackEffect = C_ForceFeedbackEffect_551fc643
 
-// GameInstance: no short alias, the name belongs to the native bind type GameInstance (DasNativeBinds.h); use C_GameInstance_c6fa677d
+typedef GameInstance = C_GameInstance_c6fa677d
 
 typedef GameModeBase = C_GameModeBase_b500be5e
 
@@ -280,7 +280,7 @@ typedef ParticleSystem = C_ParticleSystem_fc843ad6
 
 typedef ParticleSystemComponent = C_ParticleSystemComponent_c9254c05
 
-// Pawn: no short alias, the name belongs to the native bind type Pawn (DasNativeBinds.h); use C_Pawn_ba3732bb
+// Pawn: no short alias, the name belongs to the DSL base class ue_dsl::Pawn; use C_Pawn_ba3732bb
 
 typedef PhysicalMaterial = C_PhysicalMaterial_b3257fa1
 
@@ -296,7 +296,7 @@ typedef PrimitiveComponent = C_PrimitiveComponent_5efdd477
 
 typedef ReverbEffect = C_ReverbEffect_72af60f2
 
-typedef SaveGame = C_SaveGame_c484e27d
+// SaveGame: no short alias, the name belongs to the DSL base class ue_dsl::SaveGame; use C_SaveGame_c484e27d
 
 typedef SceneCapture = C_SceneCapture_bfa83df5
 
@@ -306,7 +306,7 @@ typedef SceneCaptureComponent = C_SceneCaptureComponent_1a4855ff
 
 typedef SceneCaptureComponent2D = C_SceneCaptureComponent2D_fa96627e
 
-// SceneComponent: no short alias, the name belongs to the native bind type SceneComponent (DasNativeBinds.h); use C_SceneComponent_6f0751c1
+typedef SceneComponent = C_SceneComponent_6f0751c1
 
 typedef ScriptStruct = C_ScriptStruct_efcc540e
 
@@ -332,7 +332,7 @@ typedef Texture2D = C_Texture2D_2db8ea5c
 
 typedef Volume = C_Volume_3948bec0
 
-// World: no short alias, the name belongs to the native bind type World (DasNativeBinds.h); use C_World_585eb25e
+typedef World = C_World_585eb25e
 
 typedef WorldSettings = C_WorldSettings_5d995f30
 

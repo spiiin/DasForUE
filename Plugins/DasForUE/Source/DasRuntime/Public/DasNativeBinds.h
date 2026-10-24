@@ -15,17 +15,19 @@
 //     DAS_NATIVE_BINDS(MyGame, "my_game")
 //     {
 //         Binds.Function<&DamageFor>(TEXT("damage_for"), EDasBind::Pure);
-//         Binds.Class<AMyPickup>(TEXT("Pickup"))
+//         Binds.Class<AMyPickup>(TEXT("AMyPickup"))
 //             .Method<&AMyPickup::GetAmount>(TEXT("get_amount"))
 //             .Method<+[](AMyPickup& Self, int32 Bonus) { Self.Grant(Bonus); }>(TEXT("grant"));
 //     }
 //
-// The script sees `damage_for(base:int; multiplier:float):int`, a type `Pickup` and the methods as functions
+// The script sees `damage_for(base:int; multiplier:float):int`, a type `AMyPickup` and the methods as functions
 // whose first parameter is the receiver: `pickup.get_amount()`. Calls run on the game thread under the same
 // guards as the plugin's own externs. Only engine types appear here: daScript itself stays inside DasRuntime.
 //
 // Objects. `T*` parameters and results (T derived from UObject) are object references. A class bound with
 // Class<T>(Name) has its own script type; other classes are passed as UObjectHandle and checked when called.
+// Name the type as the C++ class (AMyPickup, like ue_engine's AActor): short names such as Pickup can clash with
+// DSL base classes (ue_dsl) and with generated wrapper aliases in a script that requires both.
 // For every class type the module also binds: `as_<Name>(x)` (from UObjectHandle, an ancestor or a descendant
 // type; null when the object is not a <Name>), `x.handle()` (UObjectHandle), `x.valid()`, `==` and `!=`.
 // `var x : <Name>` is a null reference. Methods of ancestor classes are callable on descendant types.

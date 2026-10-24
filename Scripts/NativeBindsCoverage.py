@@ -25,8 +25,8 @@ GENERATED = os.path.join(ROOT, 'Plugins', 'DasForUE', 'Source', 'DasRuntime', 'P
 PLUGIN_MODULES = ('ue_engine', 'ue_math', 'ue_time')
 # Owner in the AngelScript binds -> script type in the native modules (None: free functions).
 OWNER_TYPES = {
-    'AActor': 'Actor', 'APawn': 'Pawn', 'UActorComponent': 'ActorComponent', 'USceneComponent': 'SceneComponent',
-    'UWorld': 'World', 'UGameInstance': 'GameInstance', 'FVector': 'UEVector', 'FVector2D': 'UEVector2D',
+    'AActor': 'AActor', 'APawn': 'APawn', 'UActorComponent': 'UActorComponent', 'USceneComponent': 'USceneComponent',
+    'UWorld': 'UWorld', 'UGameInstance': 'UGameInstance', 'FVector': 'UEVector', 'FVector2D': 'UEVector2D',
     'FRotator': 'UERotator', 'FQuat': 'UEQuat', 'FTransform': 'UETransform', 'FLinearColor': 'UELinearColor',
     'FDateTime': 'UEDateTime', 'FTimespan': 'UETimespan', 'FMath': None,
 }
@@ -41,10 +41,10 @@ ALIASES = {
 OPERATORS = {'opAdd': '+', 'opSub': '-', 'opMul': '*', 'opDiv': '/', 'opMod': '%', 'opEquals': '==', 'opCmp': '<',
              'opNeg': '-'}
 # Script classes of the generated reflected bindings -> native script types.
-REFLECTED_CLASSES = {'/Script/Engine.Actor': 'Actor', '/Script/Engine.Pawn': 'Pawn',
-                     '/Script/Engine.ActorComponent': 'ActorComponent',
-                     '/Script/Engine.SceneComponent': 'SceneComponent', '/Script/Engine.World': 'World',
-                     '/Script/Engine.GameInstance': 'GameInstance'}
+REFLECTED_CLASSES = {'/Script/Engine.Actor': 'AActor', '/Script/Engine.Pawn': 'APawn',
+                     '/Script/Engine.ActorComponent': 'UActorComponent',
+                     '/Script/Engine.SceneComponent': 'USceneComponent', '/Script/Engine.World': 'UWorld',
+                     '/Script/Engine.GameInstance': 'UGameInstance'}
 
 
 def norm(name):

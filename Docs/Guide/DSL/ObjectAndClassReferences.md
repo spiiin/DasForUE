@@ -43,9 +43,10 @@ typedef ObjectClass = $ue_foundation::UEClass<Object>
 `$UEObject<T>` / `$UEClass<T>` are type macros that resolve to an existing
 generated native wrapper type; `T` is a short native name exported by the binding
 generator (ambiguous names are not exported; hash-qualified `C_*` names remain
-available). Names of native bind types (`Actor`, `Pawn`, `ActorComponent`,
-`SceneComponent`, `World`, `GameInstance` from `ue_engine`) are not exported
-either: there `T` is the full `C_*` name, as for `ActorRef` above. The native class must be part of the selected reflection IR. The
+available). Names of DSL base classes (`Actor`, `Pawn`, `Character`,
+`ActorComponent`, `SaveGame`, `DataAsset`, ... from `ue_dsl`) and of native bind
+types (`AActor`, `APawn`, ... from `ue_engine`) are not exported either: there `T`
+is the full `C_*` name, as for `ActorRef` above. The native class must be part of the selected reflection IR. The
 qualified forms `$ue_foundation::UEObject<...>` work too.
 
 **Declare your own aliases in a separate module and `require` it.** The daScript

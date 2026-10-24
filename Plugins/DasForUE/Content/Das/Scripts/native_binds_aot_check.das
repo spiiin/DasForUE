@@ -21,5 +21,5 @@ def open_only(input:int):int {
 
 [export]
 def with_closed(input:int):int {
-    return int(as_Actor(ue_self_object()).get_actor_location().x) + input
+    return int(as_AActor(ue_self_object()).get_actor_location().x) + input
 }

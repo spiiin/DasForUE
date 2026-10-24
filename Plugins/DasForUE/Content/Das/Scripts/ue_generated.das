@@ -27,7 +27,7 @@ struct C_DasProbeInterface_149aa9c6 { handle : UObjectHandle }
 [ue_native_object(path="/Script/Engine.Actor")]
 struct C_Actor_adf65d5b { handle : UObjectHandle }
 
-// Actor: no short alias, the name belongs to the native bind type Actor (DasNativeBinds.h); use C_Actor_adf65d5b
+// Actor: no short alias, the name belongs to the DSL base class ue_dsl::Actor; use C_Actor_adf65d5b
 
 typedef DasCollectionInterface = C_DasCollectionInterface_0db01736
 
