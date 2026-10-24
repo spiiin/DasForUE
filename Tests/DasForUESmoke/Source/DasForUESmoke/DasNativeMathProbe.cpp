@@ -18,7 +18,13 @@ bool RunDasNativeMathProbe(FString& Report)
     if (!Detail.IsEmpty())
         Report += TEXT(": ") + Detail;
     Report += TEXT("\n");
-    return bPassed;
+    // A bind that reports DasNativeError fails the script call with its name and the message.
+    const auto Division = R.RunFile(R.ScriptPath(TEXT("native_math_probe.das")), 1);
+    const bool bDivision =
+        !Division.bSucceeded && Division.Error.Contains(TEXT("integer_division_trunc: division by zero"));
+    Report += FString::Printf(TEXT("%s native_math_division_by_zero%s\n"), bDivision ? TEXT("PASS") : TEXT("FAIL"),
+                              bDivision ? TEXT("") : *(TEXT(": ") + Division.Error.Left(300)));
+    return bPassed && bDivision;
 }
 
 #if WITH_DEV_AUTOMATION_TESTS

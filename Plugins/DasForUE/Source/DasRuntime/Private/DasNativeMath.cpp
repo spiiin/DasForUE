@@ -224,6 +224,133 @@ DAS_MATH_FN(InverseTransformPositionNoScale, (const FTransform& T, const FVector
 DAS_MATH_FN(InverseTransformRotation, (const FTransform& T, const FQuat& Q), T.InverseTransformRotation(Q))
 DAS_MATH_SCALAR(GetDeterminant, (const FTransform& T), T.GetDeterminant())
 DAS_MATH_FN(TransformRotator, (const FTransform& T), T.Rotator())
+DAS_MATH_FN(TransformContainsNaN, (const FTransform& T), T.ContainsNaN())
+DAS_MATH_FN(TransformGetLocation, (const FTransform& T), T.GetLocation())
+DAS_MATH_FN(GetScale3D, (const FTransform& T), T.GetScale3D())
+DAS_MATH_FN(GetRelativeTransformReverse, (const FTransform& T, const FTransform& Other),
+            T.GetRelativeTransformReverse(Other))
+DAS_MATH_FN(TransformVectorNoScale, (const FTransform& T, const FVector& V), T.TransformVectorNoScale(V))
+DAS_MATH_FN(InverseTransformVectorNoScale, (const FTransform& T, const FVector& V),
+            T.InverseTransformVectorNoScale(V))
+DAS_MATH_FN(TransformIsRotationNormalized, (const FTransform& T), T.IsRotationNormalized())
+DAS_MATH_FN(SubtractTranslations, (const FTransform& A, const FTransform& B), FTransform::SubtractTranslations(A, B))
+DAS_MATH_FN(TranslationEquals, (const FTransform& A, const FTransform& B), A.TranslationEquals(B))
+DAS_MATH_FN(TranslationEqualsTolerance, (const FTransform& A, const FTransform& B, double Tolerance),
+            A.TranslationEquals(B, Tolerance))
+
+// FMath: the rest of the AngelScript set. Boxes and planes are passed as their corners and as a point and a normal
+// (FBox and FPlane are not script types).
+DAS_MATH_SCALAR(CubicInterp, (double P0, double T0, double P1, double T1, double Alpha),
+                FMath::CubicInterp(P0, T0, P1, T1, Alpha))
+DAS_MATH_FN(CubicInterpVector,
+            (const FVector& P0, const FVector& T0, const FVector& P1, const FVector& T1, double Alpha),
+            FMath::CubicInterp(P0, T0, P1, T1, Alpha))
+DAS_MATH_FN(CubicInterpDerivative,
+            (const FVector& P0, const FVector& T0, const FVector& P1, const FVector& T1, double Alpha),
+            FMath::CubicInterpDerivative(P0, T0, P1, T1, Alpha))
+DAS_MATH_FN(CubicInterpDerivativeRotator,
+            (const FRotator& P0, const FRotator& T0, const FRotator& P1, const FRotator& T1, double Alpha),
+            FMath::CubicInterpDerivative(P0, T0, P1, T1, Alpha))
+DAS_MATH_SCALAR(FastAsin, (double V), FMath::FastAsin(V))
+DAS_MATH_SCALAR(FindDeltaAngleRadians, (double A, double B), FMath::FindDeltaAngleRadians(A, B))
+DAS_MATH_SCALAR(UnwindRadians, (double A), FMath::UnwindRadians(A))
+DAS_MATH_SCALAR(InvSqrt, (double V), FMath::InvSqrt(V))
+DAS_MATH_SCALAR(InvSqrtEst, (double V), FMath::InvSqrtEst(V))
+DAS_MATH_FN(IsPowerOfTwo, (int32 V), FMath::IsPowerOfTwo(V))
+DAS_MATH_SCALAR(LerpStable, (double A, double B, double Alpha), FMath::LerpStable(A, B, Alpha))
+DAS_MATH_SCALAR(LogX, (double Base, double V), FMath::LogX(Base, V))
+DAS_MATH_SCALAR(Max3, (double A, double B, double C), FMath::Max3(A, B, C))
+DAS_MATH_SCALAR(Min3, (double A, double B, double C), FMath::Min3(A, B, C))
+DAS_MATH_FN(Rand, (), FMath::Rand())
+DAS_MATH_FN(RandHelper, (int32 Max), FMath::RandHelper(Max))
+DAS_MATH_SCALAR(RoundToDouble, (double V), FMath::RoundToDouble(V))
+DAS_MATH_SCALAR(RoundToFloat, (double V), FMath::RoundToFloat(V))
+DAS_MATH_SCALAR(TruncToDouble, (double V), FMath::TruncToDouble(V))
+DAS_MATH_SCALAR(TruncToFloat, (double V), FMath::TruncToFloat(V))
+DAS_MATH_FN(TruncToInt, (double V), FMath::TruncToInt32(V))
+DAS_MATH_FN(LineBoxIntersection,
+            (const FVector& BoxMin, const FVector& BoxMax, const FVector& Start, const FVector& End),
+            FMath::LineBoxIntersection(FBox(BoxMin, BoxMax), Start, End, End - Start))
+DAS_MATH_FN(RayPlaneIntersection,
+            (const FVector& Origin, const FVector& Direction, const FVector& PlanePoint, const FVector& PlaneNormal),
+            FMath::RayPlaneIntersection(Origin, Direction, FPlane(PlanePoint, PlaneNormal)))
+DAS_MATH_FN(SphereAABBIntersection,
+            (const FVector& Center, double RadiusSquared, const FVector& BoxMin, const FVector& BoxMax),
+            FMath::SphereAABBIntersection(Center, RadiusSquared, FBox(BoxMin, BoxMax)))
+
+// FVector: the rest of the AngelScript set.
+DAS_MATH_FN(AllComponentsEqual, (const FVector& V), V.AllComponentsEqual())
+DAS_MATH_FN(AllComponentsEqualTolerance, (const FVector& V, double Tolerance), V.AllComponentsEqual(Tolerance))
+DAS_MATH_FN(BoundToBox, (const FVector& V, const FVector& Min, const FVector& Max), V.BoundToBox(Min, Max))
+DAS_MATH_FN(BoundToCube, (const FVector& V, double Radius), V.BoundToCube(Radius))
+DAS_MATH_FN(Coincident, (const FVector& A, const FVector& B), FVector::Coincident(A, B))
+DAS_MATH_FN(CoincidentThreshold, (const FVector& A, const FVector& B, double Threshold),
+            FVector::Coincident(A, B, Threshold))
+DAS_MATH_SCALAR(DistSquared2D, (const FVector& A, const FVector& B), FVector::DistSquared2D(A, B))
+DAS_MATH_SCALAR(DistSquaredXY, (const FVector& A, const FVector& B), FVector::DistSquaredXY(A, B))
+DAS_MATH_SCALAR(DistXY, (const FVector& A, const FVector& B), FVector::DistXY(A, B))
+DAS_MATH_FN(GetClampedToMaxSize2D, (const FVector& V, double Max), V.GetClampedToMaxSize2D(Max))
+DAS_MATH_FN(GetClampedToSize2D, (const FVector& V, double Min, double Max), V.GetClampedToSize2D(Min, Max))
+DAS_MATH_FN(Orthogonal, (const FVector& A, const FVector& B), FVector::Orthogonal(A, B))
+DAS_MATH_FN(OrthogonalThreshold, (const FVector& A, const FVector& B, double Threshold),
+            FVector::Orthogonal(A, B, Threshold))
+DAS_MATH_FN(Parallel, (const FVector& A, const FVector& B), FVector::Parallel(A, B))
+DAS_MATH_FN(ParallelThreshold, (const FVector& A, const FVector& B, double Threshold),
+            FVector::Parallel(A, B, Threshold))
+DAS_MATH_FN(PointsAreSame, (const FVector& A, const FVector& B), FVector::PointsAreSame(A, B))
+DAS_MATH_FN(VectorProjection, (const FVector& V), V.Projection())
+DAS_MATH_FN(RotateAngleAxisRad, (const FVector& V, double Radians, const FVector& Axis),
+            V.RotateAngleAxisRad(Radians, Axis))
+DAS_MATH_FN(ToOrientationRotator, (const FVector& V), V.ToOrientationRotator())
+DAS_MATH_FN(VectorPlaneProject, (const FVector& V, const FVector& Normal), FVector::VectorPlaneProject(V, Normal))
+
+// FVector2D: the rest of the AngelScript set.
+DAS_MATH_FN(Vector2DContainsNaN, (const FVector2D& V), V.ContainsNaN())
+DAS_MATH_SCALAR(Vector2DDistSquared, (const FVector2D& A, const FVector2D& B), FVector2D::DistSquared(A, B))
+DAS_MATH_FN(Vector2DGetAbs, (const FVector2D& V), V.GetAbs())
+DAS_MATH_SCALAR(Vector2DGetAbsMax, (const FVector2D& V), V.GetAbsMax())
+DAS_MATH_SCALAR(Vector2DGetMax, (const FVector2D& V), V.GetMax())
+DAS_MATH_SCALAR(Vector2DGetMin, (const FVector2D& V), V.GetMin())
+DAS_MATH_FN(Vector2DGetSignVector, (const FVector2D& V), V.GetSignVector())
+DAS_MATH_FN(Vector2DIsZero, (const FVector2D& V), V.IsZero())
+DAS_MATH_FN(Vector2DIsNearlyZero, (const FVector2D& V), V.IsNearlyZero())
+DAS_MATH_FN(Vector2DIsNearlyZeroTolerance, (const FVector2D& V, double Tolerance), V.IsNearlyZero(Tolerance))
+
+// FRotator and FQuat: the rest of the AngelScript set.
+DAS_MATH_FN(RotatorContainsNaN, (const FRotator& R), R.ContainsNaN())
+DAS_MATH_FN(RotatorMakeFromEuler, (const FVector& Euler), FRotator::MakeFromEuler(Euler))
+DAS_MATH_FN(QuatContainsNaN, (const FQuat& Q), Q.ContainsNaN())
+DAS_MATH_SCALAR(QuatSizeSquared, (const FQuat& Q), Q.SizeSquared())
+DAS_MATH_SCALAR(GetTwistAngle, (const FQuat& Q, const FVector& Axis), Q.GetTwistAngle(Axis))
+DAS_MATH_SCALAR(ErrorAutoNormalize, (const FQuat& A, const FQuat& B), FQuat::ErrorAutoNormalize(A, B))
+DAS_MATH_FN(FindBetween, (const FVector& A, const FVector& B), FQuat::FindBetween(A, B))
+DAS_MATH_FN(MakeFromRotator, (const FRotator& R), FQuat::MakeFromRotator(R))
+DAS_MATH_FN(FastBilerp,
+            (const FQuat& P00, const FQuat& P10, const FQuat& P01, const FQuat& P11, double FracX, double FracY),
+            FQuat::FastBilerp(P00, P10, P01, P11, FracX, FracY))
+DAS_MATH_FN(SlerpNotNormalized, (const FQuat& A, const FQuat& B, double Alpha), FQuat::Slerp_NotNormalized(A, B, Alpha))
+DAS_MATH_FN(SlerpFullPathNotNormalized, (const FQuat& A, const FQuat& B, double Alpha),
+            FQuat::SlerpFullPath_NotNormalized(A, B, Alpha))
+DAS_MATH_FN(Squad, (const FQuat& A, const FQuat& TangentA, const FQuat& B, const FQuat& TangentB, double Alpha),
+            FQuat::Squad(A, TangentA, B, TangentB, Alpha))
+DAS_MATH_FN(SquadFullPath,
+            (const FQuat& A, const FQuat& TangentA, const FQuat& B, const FQuat& TangentB, double Alpha),
+            FQuat::SquadFullPath(A, TangentA, B, TangentB, Alpha))
+
+// FLinearColor (float components, as in the engine).
+DAS_MATH_FN(ColorEquals, (const FLinearColor& A, const FLinearColor& B), A.Equals(B))
+DAS_MATH_FN(ColorEqualsTolerance, (const FLinearColor& A, const FLinearColor& B, double Tolerance),
+            A.Equals(B, float(Tolerance)))
+DAS_MATH_FN(ColorGetClamped, (const FLinearColor& C), C.GetClamped())
+DAS_MATH_FN(ColorGetClampedRange, (const FLinearColor& C, double Min, double Max),
+            C.GetClamped(float(Min), float(Max)))
+DAS_MATH_FN(HSVToLinearRGB, (const FLinearColor& C), C.HSVToLinearRGB())
+DAS_MATH_FN(LinearRGBToHSV, (const FLinearColor& C), C.LinearRGBToHSV())
+DAS_MATH_FN(IsAlmostBlack, (const FLinearColor& C), C.IsAlmostBlack())
+DAS_MATH_FN(MakeFromColorTemperature, (double Kelvin), FLinearColor::MakeFromColorTemperature(float(Kelvin)))
+DAS_MATH_FN(MakeFromHSV8, (uint8 H, uint8 S, uint8 V), FLinearColor::MakeFromHSV8(H, S, V))
+DAS_MATH_FN(MakeRandomColor, (), FLinearColor::MakeRandomColor())
+DAS_MATH_FN(ToFColor, (const FLinearColor& C, bool bSRGB), C.ToFColor(bSRGB))
 #undef DAS_MATH_FN
 #undef DAS_MATH_SCALAR
 FTransform RemoveScaling(const FTransform& T)
@@ -255,6 +382,34 @@ FVector2D Vector2DGetSafeNormal(const FVector2D& V)
 FVector2D GetRotated(const FVector2D& V, double Degrees)
 {
     return V.GetRotated(Degrees);
+}
+// As FVector::GetClampedToMaxSize (FVector2D has none).
+FVector2D Vector2DGetClampedToMaxSize(const FVector2D& V, double Max)
+{
+    if (Max < UE_KINDA_SMALL_NUMBER)
+        return FVector2D::ZeroVector;
+    const double SizeSquared = V.SizeSquared();
+    return SizeSquared > Max * Max ? V * (Max * FMath::InvSqrt(SizeSquared)) : V;
+}
+// HexColor: 0xAARRGGBB; sRGB colors are converted to linear, others reinterpreted (as AngelScript's MakeFromHex).
+FLinearColor MakeFromHex(int64 Hex, bool bSRGB)
+{
+    const FColor Color(uint32(Hex & 0xFFFFFFFF));
+    return bSRGB ? FLinearColor(Color) : Color.ReinterpretAsLinear();
+}
+FLinearColor MakeFromHexSRGB(int64 Hex)
+{
+    return MakeFromHex(Hex, true);
+}
+// C++ integer division truncates toward zero; dividing by zero (or INT_MIN by -1) is a script error.
+template <class T> T IntegerDivisionTrunc(T Value, T DivideBy)
+{
+    if (DivideBy == 0 || (Value == TNumericLimits<T>::Min() && DivideBy == -1))
+    {
+        DasNativeError(DivideBy == 0 ? TEXT("division by zero") : TEXT("integer overflow"));
+        return 0;
+    }
+    return Value / DivideBy;
 }
 }
 
@@ -432,4 +587,107 @@ DAS_NATIVE_BINDS(UEMath, "ue_math")
     Binds.Function<&Vector2DEquals>(TEXT("equals"));
     Binds.Function<&Vector2DGetSafeNormal>(TEXT("get_safe_normal"));
     Binds.Function<&GetRotated>(TEXT("get_rotated"));
+
+    // The rest of AngelScript's FMath, FVector, FVector2D, FRotator, FQuat, FLinearColor and FTransform binds
+    // that need no new bind features (Docs/Dev/Architecture/NativeBindsCoverage.md).
+    Binds.Function<CubicInterp>(TEXT("cubic_interp"));
+    Binds.Function<CubicInterpVector>(TEXT("cubic_interp"));
+    Binds.Function<CubicInterpDerivative>(TEXT("cubic_interp_derivative"));
+    Binds.Function<CubicInterpDerivativeRotator>(TEXT("cubic_interp_derivative"));
+    Binds.Function<FastAsin>(TEXT("fast_asin"));
+    Binds.Function<FindDeltaAngleRadians>(TEXT("find_delta_angle_radians"));
+    Binds.Function<UnwindRadians>(TEXT("unwind_radians"));
+    Binds.Function<InvSqrt>(TEXT("inv_sqrt"));
+    Binds.Function<InvSqrtEst>(TEXT("inv_sqrt_est"));
+    Binds.Function<IsPowerOfTwo>(TEXT("is_power_of_two"));
+    Binds.Function<&IntegerDivisionTrunc<int32>>(TEXT("integer_division_trunc"));
+    Binds.Function<&IntegerDivisionTrunc<int64>>(TEXT("integer_division_trunc"));
+    Binds.Function<LerpStable>(TEXT("lerp_stable"));
+    Binds.Function<LogX>(TEXT("log_x"));
+    Binds.Function<Max3>(TEXT("max3"));
+    Binds.Function<Min3>(TEXT("min3"));
+    Binds.Function<Rand>(TEXT("rand"));
+    Binds.Function<RandHelper>(TEXT("rand_helper"));
+    Binds.Function<RoundToDouble>(TEXT("round_to_double"));
+    Binds.Function<RoundToFloat>(TEXT("round_to_float"));
+    Binds.Function<TruncToDouble>(TEXT("trunc_to_double"));
+    Binds.Function<TruncToFloat>(TEXT("trunc_to_float"));
+    Binds.Function<TruncToInt>(TEXT("trunc_to_int"));
+    Binds.Function<LineBoxIntersection>(TEXT("line_box_intersection"));
+    Binds.Function<RayPlaneIntersection>(TEXT("ray_plane_intersection"));
+    Binds.Function<SphereAABBIntersection>(TEXT("sphere_aabb_intersection"));
+
+    Binds.Function<AllComponentsEqual>(TEXT("all_components_equal"));
+    Binds.Function<AllComponentsEqualTolerance>(TEXT("all_components_equal"));
+    Binds.Function<BoundToBox>(TEXT("bound_to_box"));
+    Binds.Function<BoundToBox>(TEXT("component_clamp"));
+    Binds.Function<BoundToCube>(TEXT("bound_to_cube"));
+    Binds.Function<Coincident>(TEXT("coincident"));
+    Binds.Function<CoincidentThreshold>(TEXT("coincident"));
+    Binds.Function<DistSquared2D>(TEXT("dist_squared_2d"));
+    Binds.Function<DistSquaredXY>(TEXT("dist_squared_xy"));
+    Binds.Function<DistXY>(TEXT("dist_xy"));
+    Binds.Function<GetClampedToMaxSize2D>(TEXT("get_clamped_to_max_size_2d"));
+    Binds.Function<GetClampedToSize2D>(TEXT("get_clamped_to_size_2d"));
+    Binds.Function<Orthogonal>(TEXT("orthogonal"));
+    Binds.Function<OrthogonalThreshold>(TEXT("orthogonal"));
+    Binds.Function<Parallel>(TEXT("parallel"));
+    Binds.Function<ParallelThreshold>(TEXT("parallel"));
+    Binds.Function<PointsAreSame>(TEXT("points_are_same"));
+    Binds.Function<VectorProjection>(TEXT("projection"));
+    Binds.Function<RotateAngleAxisRad>(TEXT("rotate_angle_axis_rad"));
+    Binds.Function<ToOrientationRotator>(TEXT("to_orientation_rotator"));
+    Binds.Function<VectorPlaneProject>(TEXT("vector_plane_project"));
+
+    Binds.Function<Vector2DContainsNaN>(TEXT("contains_nan"));
+    Binds.Function<Vector2DDistSquared>(TEXT("dist_squared"));
+    Binds.Function<Vector2DGetAbs>(TEXT("get_abs"));
+    Binds.Function<Vector2DGetAbsMax>(TEXT("get_abs_max"));
+    Binds.Function<&Vector2DGetClampedToMaxSize>(TEXT("get_clamped_to_max_size"));
+    Binds.Function<Vector2DGetMax>(TEXT("get_max"));
+    Binds.Function<Vector2DGetMin>(TEXT("get_min"));
+    Binds.Function<Vector2DGetSignVector>(TEXT("get_sign_vector"));
+    Binds.Function<Vector2DIsZero>(TEXT("is_zero"));
+    Binds.Function<Vector2DIsNearlyZero>(TEXT("is_nearly_zero"));
+    Binds.Function<Vector2DIsNearlyZeroTolerance>(TEXT("is_nearly_zero"));
+
+    Binds.Function<RotatorContainsNaN>(TEXT("contains_nan"));
+    // FQuat has make_from_euler; the result type alone cannot tell overloads apart.
+    Binds.Function<RotatorMakeFromEuler>(TEXT("rotator_make_from_euler"));
+    Binds.Function<QuatContainsNaN>(TEXT("contains_nan"));
+    Binds.Function<QuatSizeSquared>(TEXT("size_squared"));
+    Binds.Function<GetTwistAngle>(TEXT("get_twist_angle"));
+    Binds.Function<ErrorAutoNormalize>(TEXT("error_auto_normalize"));
+    Binds.Function<FindBetween>(TEXT("find_between"));
+    Binds.Function<MakeFromRotator>(TEXT("make_from_rotator"));
+    Binds.Function<FastBilerp>(TEXT("fast_bilerp"));
+    Binds.Function<SlerpNotNormalized>(TEXT("slerp_not_normalized"));
+    Binds.Function<SlerpFullPathNotNormalized>(TEXT("slerp_full_path_not_normalized"));
+    Binds.Function<Squad>(TEXT("squad"));
+    Binds.Function<SquadFullPath>(TEXT("squad_full_path"));
+
+    Binds.Function<ColorEquals>(TEXT("equals"));
+    Binds.Function<ColorEqualsTolerance>(TEXT("equals"));
+    Binds.Function<ColorGetClamped>(TEXT("get_clamped"));
+    Binds.Function<ColorGetClampedRange>(TEXT("get_clamped"));
+    Binds.Function<HSVToLinearRGB>(TEXT("hsv_to_linear_rgb"));
+    Binds.Function<LinearRGBToHSV>(TEXT("linear_rgb_to_hsv"));
+    Binds.Function<IsAlmostBlack>(TEXT("is_almost_black"));
+    Binds.Function<MakeFromColorTemperature>(TEXT("make_from_color_temperature"));
+    Binds.Function<MakeFromHSV8>(TEXT("make_from_hsv8"));
+    Binds.Function<&MakeFromHex>(TEXT("make_from_hex"));
+    Binds.Function<&MakeFromHexSRGB>(TEXT("make_from_hex"));
+    Binds.Function<MakeRandomColor>(TEXT("make_random_color"));
+    Binds.Function<ToFColor>(TEXT("to_fcolor"));
+
+    Binds.Function<TransformContainsNaN>(TEXT("contains_nan"));
+    Binds.Function<TransformGetLocation>(TEXT("get_location"));
+    Binds.Function<GetScale3D>(TEXT("get_scale3d"));
+    Binds.Function<GetRelativeTransformReverse>(TEXT("get_relative_transform_reverse"));
+    Binds.Function<TransformVectorNoScale>(TEXT("transform_vector_no_scale"));
+    Binds.Function<InverseTransformVectorNoScale>(TEXT("inverse_transform_vector_no_scale"));
+    Binds.Function<TransformIsRotationNormalized>(TEXT("is_rotation_normalized"));
+    Binds.Function<SubtractTranslations>(TEXT("subtract_translations"));
+    Binds.Function<TranslationEquals>(TEXT("translation_equals"));
+    Binds.Function<TranslationEqualsTolerance>(TEXT("translation_equals"));
 }

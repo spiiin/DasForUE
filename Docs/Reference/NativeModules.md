@@ -159,9 +159,13 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 
 | Function | Notes |
 | --- | --- |
+| `all_components_equal(UEVector) : bool` |  |
+| `all_components_equal(UEVector, double) : bool` |  |
 | `angular_distance(UEQuat, UEQuat) : double` |  |
 | `backward_vector() : UEVector` |  |
 | `blend(UETransform, UETransform, double) : UETransform` |  |
+| `bound_to_box(UEVector, UEVector, UEVector) : UEVector` |  |
+| `bound_to_cube(UEVector, double) : UEVector` |  |
 | `c_interp_to(UELinearColor, UELinearColor, double, double) : UELinearColor` |  |
 | `circular_in(double, double, double) : double` |  |
 | `circular_in_out(double, double, double) : double` |  |
@@ -170,17 +174,34 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `clamp_axis(double) : double` |  |
 | `closest_point_on_infinite_line(UEVector, UEVector, UEVector) : UEVector` |  |
 | `closest_point_on_line(UEVector, UEVector, UEVector) : UEVector` |  |
+| `coincident(UEVector, UEVector) : bool` |  |
+| `coincident(UEVector, UEVector, double) : bool` |  |
+| `component_clamp(UEVector, UEVector, UEVector) : UEVector` |  |
 | `component_max(UEVector, UEVector) : UEVector` |  |
 | `component_min(UEVector, UEVector) : UEVector` |  |
+| `contains_nan(UEQuat) : bool` |  |
+| `contains_nan(UERotator) : bool` |  |
+| `contains_nan(UETransform) : bool` |  |
 | `contains_nan(UEVector) : bool` |  |
+| `contains_nan(UEVector2D) : bool` |  |
 | `cosine_angle_2d(UEVector, UEVector) : double` |  |
+| `cubic_interp(UEVector, UEVector, UEVector, UEVector, double) : UEVector` |  |
+| `cubic_interp(double, double, double, double, double) : double` |  |
+| `cubic_interp_derivative(UERotator, UERotator, UERotator, UERotator, double) : UERotator` |  |
+| `cubic_interp_derivative(UEVector, UEVector, UEVector, UEVector, double) : UEVector` |  |
 | `degrees_to_radians(double) : double` |  |
 | `dist_2d(UEVector, UEVector) : double` |  |
 | `dist_squared(UEVector, UEVector) : double` |  |
+| `dist_squared(UEVector2D, UEVector2D) : double` |  |
+| `dist_squared_2d(UEVector, UEVector) : double` |  |
+| `dist_squared_xy(UEVector, UEVector) : double` |  |
+| `dist_xy(UEVector, UEVector) : double` |  |
 | `down_vector() : UEVector` |  |
 | `ease_in(double, double, double, double) : double` |  |
 | `ease_in_out(double, double, double, double) : double` |  |
 | `ease_out(double, double, double, double) : double` |  |
+| `equals(UELinearColor, UELinearColor) : bool` |  |
+| `equals(UELinearColor, UELinearColor, double) : bool` |  |
 | `equals(UEQuat, UEQuat) : bool` |  |
 | `equals(UEQuat, UEQuat, double) : bool` |  |
 | `equals(UERotator, UERotator) : bool` |  |
@@ -191,6 +212,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `equals(UEVector, UEVector, double) : bool` |  |
 | `equals(UEVector2D, UEVector2D, double) : bool` |  |
 | `equals_no_scale(UETransform, UETransform, double) : bool` |  |
+| `error_auto_normalize(UEQuat, UEQuat) : double` |  |
 | `euler(UEQuat) : UEVector` |  |
 | `euler(UERotator) : UEVector` |  |
 | `expo_in(double, double, double) : double` |  |
@@ -198,63 +220,102 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `expo_out(double, double, double) : double` |  |
 | `f_interp_constant_to(double, double, double, double) : double` |  |
 | `f_interp_to(double, double, double, double) : double` |  |
+| `fast_asin(double) : double` |  |
+| `fast_bilerp(UEQuat, UEQuat, UEQuat, UEQuat, double, double) : UEQuat` |  |
 | `fast_lerp(UEQuat, UEQuat, double) : UEQuat` |  |
+| `find_between(UEVector, UEVector) : UEQuat` |  |
 | `find_between_normals(UEVector, UEVector) : UEQuat` |  |
 | `find_between_vectors(UEVector, UEVector) : UEQuat` |  |
 | `find_delta_angle_degrees(double, double) : double` |  |
+| `find_delta_angle_radians(double, double) : double` |  |
 | `forward_vector() : UEVector` |  |
 | `frand() : double` |  |
 | `get_abs(UEVector) : UEVector` |  |
+| `get_abs(UEVector2D) : UEVector2D` |  |
 | `get_abs_max(UEVector) : double` |  |
+| `get_abs_max(UEVector2D) : double` |  |
 | `get_angle(UEQuat) : double` |  |
 | `get_axis_x(UEQuat) : UEVector` |  |
 | `get_axis_y(UEQuat) : UEVector` |  |
 | `get_axis_z(UEQuat) : UEVector` |  |
+| `get_clamped(UELinearColor) : UELinearColor` |  |
+| `get_clamped(UELinearColor, double, double) : UELinearColor` |  |
 | `get_clamped(UERotator) : UERotator` |  |
 | `get_clamped_to_max_size(UEVector, double) : UEVector` |  |
+| `get_clamped_to_max_size(UEVector2D, double) : UEVector2D` |  |
+| `get_clamped_to_max_size_2d(UEVector, double) : UEVector` |  |
 | `get_clamped_to_size(UEVector, double, double) : UEVector` |  |
+| `get_clamped_to_size_2d(UEVector, double, double) : UEVector` |  |
 | `get_denormalized(UERotator) : UERotator` |  |
 | `get_determinant(UETransform) : double` |  |
 | `get_forward_vector(UEQuat) : UEVector` |  |
 | `get_inverse(UERotator) : UERotator` |  |
+| `get_location(UETransform) : UEVector` |  |
 | `get_manhattan_distance(UERotator, UERotator) : double` |  |
 | `get_mapped_range_value_clamped(UEVector2D, UEVector2D, double) : double` |  |
 | `get_mapped_range_value_unclamped(UEVector2D, UEVector2D, double) : double` |  |
 | `get_max(UEVector) : double` |  |
+| `get_max(UEVector2D) : double` |  |
 | `get_maximum_axis_scale(UETransform) : double` |  |
 | `get_min(UEVector) : double` |  |
+| `get_min(UEVector2D) : double` |  |
 | `get_minimum_axis_scale(UETransform) : double` |  |
 | `get_normalized(UERotator) : UERotator` |  |
 | `get_relative_transform(UETransform, UETransform) : UETransform` |  |
+| `get_relative_transform_reverse(UETransform, UETransform) : UETransform` |  |
 | `get_right_vector(UEQuat) : UEVector` |  |
 | `get_rotated(UEVector2D, double) : UEVector2D` |  |
 | `get_rotation_axis(UEQuat) : UEVector` |  |
 | `get_safe_normal(UEVector2D) : UEVector2D` |  |
 | `get_safe_normal_2d(UEVector) : UEVector` |  |
+| `get_scale3d(UETransform) : UEVector` |  |
 | `get_sign_vector(UEVector) : UEVector` |  |
+| `get_sign_vector(UEVector2D) : UEVector2D` |  |
+| `get_twist_angle(UEQuat, UEVector) : double` |  |
 | `get_up_vector(UEQuat) : UEVector` |  |
 | `grid_snap(UEVector, double) : UEVector` |  |
 | `grid_snap(double, double) : double` |  |
 | `heading_angle(UEVector) : double` |  |
+| `hsv_to_linear_rgb(UELinearColor) : UELinearColor` |  |
+| `integer_division_trunc(int, int) : int` |  |
+| `integer_division_trunc(int64, int64) : int64` |  |
+| `inv_sqrt(double) : double` |  |
+| `inv_sqrt_est(double) : double` |  |
 | `inverse_transform_position_no_scale(UETransform, UEVector) : UEVector` |  |
 | `inverse_transform_rotation(UETransform, UEQuat) : UEQuat` |  |
+| `inverse_transform_vector_no_scale(UETransform, UEVector) : UEVector` |  |
+| `is_almost_black(UELinearColor) : bool` |  |
 | `is_identity(UEQuat) : bool` |  |
 | `is_nearly_equal(double, double) : bool` |  |
 | `is_nearly_equal(double, double, double) : bool` |  |
 | `is_nearly_zero(UERotator, double) : bool` |  |
 | `is_nearly_zero(UEVector, double) : bool` |  |
+| `is_nearly_zero(UEVector2D) : bool` |  |
+| `is_nearly_zero(UEVector2D, double) : bool` |  |
 | `is_nearly_zero(double) : bool` |  |
 | `is_nearly_zero(double, double) : bool` |  |
 | `is_normalized(UEVector) : bool` |  |
+| `is_power_of_two(int) : bool` |  |
+| `is_rotation_normalized(UETransform) : bool` |  |
 | `is_unit(UEVector, double) : bool` |  |
 | `is_within(double, double, double) : bool` |  |
 | `is_within_inclusive(double, double, double) : bool` |  |
 | `is_zero(UERotator) : bool` |  |
 | `is_zero(UEVector) : bool` |  |
+| `is_zero(UEVector2D) : bool` |  |
 | `left_vector() : UEVector` |  |
+| `lerp_stable(double, double, double) : double` |  |
+| `line_box_intersection(UEVector, UEVector, UEVector, UEVector) : bool` |  |
 | `line_plane_intersection(UEVector, UEVector, UEVector, UEVector) : UEVector` |  |
 | `line_sphere_intersection(UEVector, UEVector, double, UEVector, double) : bool` |  |
+| `linear_rgb_to_hsv(UELinearColor) : UELinearColor` |  |
+| `log_x(double, double) : double` |  |
+| `make_from_color_temperature(double) : UELinearColor` |  |
 | `make_from_euler(UEVector) : UEQuat` |  |
+| `make_from_hex(int64) : UELinearColor` |  |
+| `make_from_hex(int64, bool) : UELinearColor` |  |
+| `make_from_hsv8(uint8, uint8, uint8) : UELinearColor` |  |
+| `make_from_rotator(UERotator) : UEQuat` |  |
 | `make_from_x(UEVector) : UERotator` |  |
 | `make_from_xy(UEVector, UEVector) : UERotator` |  |
 | `make_from_xz(UEVector, UEVector) : UERotator` |  |
@@ -265,43 +326,75 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `make_from_zx(UEVector, UEVector) : UERotator` |  |
 | `make_from_zy(UEVector, UEVector) : UERotator` |  |
 | `make_pulsating_value(double, double, double) : double` |  |
+| `make_random_color() : UELinearColor` |  |
+| `max3(double, double, double) : double` |  |
+| `min3(double, double, double) : double` |  |
 | `mirror_by_vector(UEVector, UEVector) : UEVector` |  |
 | `normalize_axis(double) : double` |  |
 | `normalize_to_range(double, double, double) : double` |  |
 | `one_vector() : UEVector` |  |
+| `orthogonal(UEVector, UEVector) : bool` |  |
+| `orthogonal(UEVector, UEVector, double) : bool` |  |
+| `parallel(UEVector, UEVector) : bool` |  |
+| `parallel(UEVector, UEVector, double) : bool` |  |
 | `perlin_noise_1d(double) : double` |  |
 | `perlin_noise_2d(UEVector2D) : double` |  |
 | `perlin_noise_3d(UEVector) : double` |  |
 | `point_dist_to_segment(UEVector, UEVector, UEVector) : double` |  |
 | `points_are_near(UEVector, UEVector, double) : bool` |  |
+| `points_are_same(UEVector, UEVector) : bool` |  |
+| `projection(UEVector) : UEVector` |  |
 | `q_interp_constant_to(UEQuat, UEQuat, double, double) : UEQuat` |  |
 | `q_interp_to(UEQuat, UEQuat, double, double) : UEQuat` |  |
 | `quaternion(UERotator) : UEQuat` |  |
 | `r_interp_constant_to(UERotator, UERotator, double, double) : UERotator` |  |
 | `r_interp_to(UERotator, UERotator, double, double) : UERotator` |  |
 | `radians_to_degrees(double) : double` |  |
+| `rand() : int` |  |
 | `rand_bool() : bool` |  |
+| `rand_helper(int) : int` |  |
 | `rand_point_in_circle(double) : UEVector2D` |  |
 | `rand_range(double, double) : double` |  |
 | `rand_range(int, int) : int` |  |
 | `random_point_in_bounding_box(UEVector, UEVector) : UEVector` |  |
 | `random_rotator(bool) : UERotator` |  |
+| `ray_plane_intersection(UEVector, UEVector, UEVector, UEVector) : UEVector` |  |
 | `reciprocal(UEVector) : UEVector` |  |
 | `remove_scaling(UETransform) : UETransform` |  |
 | `right_vector() : UEVector` |  |
 | `rotate_angle_axis(UEVector, double, UEVector) : UEVector` |  |
+| `rotate_angle_axis_rad(UEVector, double, UEVector) : UEVector` |  |
 | `rotation(UEVector) : UERotator` |  |
 | `rotator(UETransform) : UERotator` |  |
+| `rotator_make_from_euler(UEVector) : UERotator` |  |
 | `round_from_zero(double) : double` |  |
+| `round_to_double(double) : double` |  |
+| `round_to_float(double) : double` |  |
 | `sinusoidal_in(double, double, double) : double` |  |
 | `sinusoidal_in_out(double, double, double) : double` |  |
 | `sinusoidal_out(double, double, double) : double` |  |
 | `size_2d(UEVector) : double` |  |
+| `size_squared(UEQuat) : double` |  |
 | `size_squared_2d(UEVector) : double` |  |
 | `slerp_full_path(UEQuat, UEQuat, double) : UEQuat` |  |
+| `slerp_full_path_not_normalized(UEQuat, UEQuat, double) : UEQuat` |  |
+| `slerp_not_normalized(UEQuat, UEQuat, double) : UEQuat` |  |
+| `sphere_aabb_intersection(UEVector, double, UEVector, UEVector) : bool` |  |
+| `squad(UEQuat, UEQuat, UEQuat, UEQuat, double) : UEQuat` |  |
+| `squad_full_path(UEQuat, UEQuat, UEQuat, UEQuat, double) : UEQuat` |  |
+| `subtract_translations(UETransform, UETransform) : UEVector` |  |
+| `to_fcolor(UELinearColor, bool) : UEColor` |  |
 | `to_orientation_quat(UEVector) : UEQuat` |  |
+| `to_orientation_rotator(UEVector) : UERotator` |  |
 | `transform_position_no_scale(UETransform, UEVector) : UEVector` |  |
+| `transform_vector_no_scale(UETransform, UEVector) : UEVector` |  |
+| `translation_equals(UETransform, UETransform) : bool` |  |
+| `translation_equals(UETransform, UETransform, double) : bool` |  |
+| `trunc_to_double(double) : double` |  |
+| `trunc_to_float(double) : double` |  |
+| `trunc_to_int(double) : int` |  |
 | `unwind_degrees(double) : double` |  |
+| `unwind_radians(double) : double` |  |
 | `up_vector() : UEVector` |  |
 | `v_interp_constant_to(UEVector, UEVector, double, double) : UEVector` |  |
 | `v_interp_normal_rotation_to(UEVector, UEVector, double, double) : UEVector` |  |
@@ -312,6 +405,7 @@ Script types: `AActor`, `APawn`, `UActorComponent`, `USceneComponent`, `UWorld`,
 | `vector(UERotator) : UEVector` |  |
 | `vector2d_interp_constant_to(UEVector2D, UEVector2D, double, double) : UEVector2D` |  |
 | `vector2d_interp_to(UEVector2D, UEVector2D, double, double) : UEVector2D` |  |
+| `vector_plane_project(UEVector, UEVector) : UEVector` |  |
 | `zero_rotator() : UERotator` |  |
 | `zero_vector() : UEVector` |  |
 | `zero_vector2d() : UEVector2D` |  |

@@ -13,6 +13,8 @@ def near(a, b : UEVector) : bool {
 
 [export]
 def main(input:int):int {
+    // Input 1: an integer division by zero fails the call (DasNativeMathProbe.cpp checks the message).
+    if (input == 1) { return integer_division_trunc(1, 0) }
     // Interpolation: alpha = clamp(dt * speed, 0, 1) = 0.5; the constant step is speed * dt.
     if (!same(f_interp_to(0.0lf, 10.0lf, 0.1lf, 5.0lf), 5.0lf)) { return 1 }
     if (!same(f_interp_constant_to(0.0lf, 10.0lf, 0.1lf, 5.0lf), 0.5lf)) { return 2 }
@@ -210,6 +212,134 @@ def main(input:int):int {
     if (zero_vector2d() != ue_vector2d(0.0lf, 0.0lf)) { return 100 }
     if (!ue_vector2d(3.0lf, 4.0lf).get_safe_normal().equals(ue_vector2d(0.6lf, 0.8lf), 0.0001lf)) { return 101 }
     if (!ue_vector2d(1.0lf, 0.0lf).get_rotated(90.0lf).equals(ue_vector2d(0.0lf, 1.0lf), 0.0001lf)) { return 102 }
+
+    // Coverage part 1 (Docs/Dev/Architecture/NativeBindsCoverage.md). FMath: Hermite curves (alpha 0.5, flat
+    // tangents: the middle and the slope 1.5 * (P1 - P0)), angles, roots, division, rounding, boxes and planes.
+    if (!same(cubic_interp(0.0lf, 0.0lf, 1.0lf, 0.0lf, 0.5lf), 0.5lf)) { return 103 }
+    if (!near(cubic_interp(zero_vector(), zero_vector(), x10, zero_vector(), 0.5lf), ue_vector(5.0lf, 0.0lf, 0.0lf))) {
+        return 104
+    }
+    let slope = cubic_interp_derivative(zero_vector(), zero_vector(), x10, zero_vector(), 0.5lf)
+    if (!near(slope, ue_vector(15.0lf, 0.0lf, 0.0lf))) { return 105 }
+    if (!same(cubic_interp_derivative(zero_rotator(), zero_rotator(), yaw90, zero_rotator(), 0.5lf).yaw, 135.0lf)) {
+        return 106
+    }
+    if (!same(find_delta_angle_radians(0.0lf, 1.5lf * DBL_PI), -0.5lf * DBL_PI)) { return 107 }
+    if (!same(unwind_radians(3.0lf * DBL_PI), DBL_PI) || abs(fast_asin(0.5lf) - DBL_PI / 6.0lf) > 0.001lf) { return 108 }
+    if (!same(inv_sqrt(4.0lf), 0.5lf) || abs(inv_sqrt_est(4.0lf) - 0.5lf) > 0.01lf) { return 109 }
+    if (!is_power_of_two(64) || is_power_of_two(6)) { return 110 }
+    if (integer_division_trunc(-7, 2) != -3 || integer_division_trunc(-7l, 2l) != -3l) { return 111 }
+    if (!same(lerp_stable(0.0lf, 10.0lf, 0.25lf), 2.5lf) || !same(log_x(2.0lf, 8.0lf), 3.0lf)) { return 112 }
+    if (!same(max3(1.0lf, 5.0lf, 3.0lf), 5.0lf) || !same(min3(1.0lf, 5.0lf, 3.0lf), 1.0lf)) { return 113 }
+    if (rand_helper(1) != 0 || rand() < 0) { return 114 }
+    if (!same(round_to_double(2.5lf), 3.0lf) || !same(round_to_float(2.4lf), 2.0lf)) { return 115 }
+    if (!same(trunc_to_double(-2.7lf), -2.0lf) || !same(trunc_to_float(2.7lf), 2.0lf) || trunc_to_int(-2.7lf) != -2) {
+        return 116
+    }
+    let box_min = ue_vector(-1.0lf, -1.0lf, -1.0lf)
+    if (!line_box_intersection(box_min, one_vector(), ue_vector(-5.0lf, 0.0lf, 0.0lf), ue_vector(5.0lf, 0.0lf, 0.0lf))) {
+        return 117
+    }
+    if (line_box_intersection(box_min, one_vector(), ue_vector(-5.0lf, 5.0lf, 0.0lf), ue_vector(5.0lf, 5.0lf, 0.0lf))) {
+        return 118
+    }
+    let plane_hit = ray_plane_intersection(ue_vector(0.0lf, 0.0lf, 10.0lf), down_vector(), zero_vector(), up_vector())
+    if (!near(plane_hit, zero_vector())) { return 119 }
+    let center = ue_vector(3.0lf, 0.0lf, 0.0lf)
+    if (!sphere_aabb_intersection(center, 4.0lf, box_min, one_vector())) { return 120 }
+    if (sphere_aabb_intersection(center, 3.9lf, box_min, one_vector())) { return 121 }
+
+    // FVector.
+    if (!ue_vector(2.0lf, 2.0lf, 2.0lf).all_components_equal() || ue_vector(1.0lf, 2.0lf, 3.0lf).all_components_equal()) {
+        return 122
+    }
+    if (!ue_vector(1.0lf, 1.05lf, 1.0lf).all_components_equal(0.1lf)) { return 123 }
+    let wide = ue_vector(5.0lf, -5.0lf, 0.0lf)
+    if (!near(wide.bound_to_box(box_min, one_vector()), ue_vector(1.0lf, -1.0lf, 0.0lf))) { return 124 }
+    if (!near(wide.component_clamp(box_min, one_vector()), ue_vector(1.0lf, -1.0lf, 0.0lf))) { return 125 }
+    if (!near(x10.bound_to_cube(2.0lf), ue_vector(2.0lf, 0.0lf, 0.0lf))) { return 126 }
+    if (!coincident(forward_vector(), forward_vector()) || coincident(forward_vector(), backward_vector())) { return 127 }
+    if (!orthogonal(forward_vector(), right_vector()) || !parallel(forward_vector(), backward_vector())) { return 128 }
+    if (!points_are_same(zero_vector(), zero_vector()) || !coincident(forward_vector(), forward_vector(), 0.99lf)) {
+        return 129
+    }
+    let high = ue_vector(3.0lf, 4.0lf, 9.0lf)
+    if (!same(dist_squared_2d(high, zero_vector()), 25.0lf) || !same(dist_squared_xy(high, zero_vector()), 25.0lf)) {
+        return 130
+    }
+    if (!same(dist_xy(high, zero_vector()), 5.0lf)) { return 131 }
+    if (!near(ue_vector(30.0lf, 40.0lf, 7.0lf).get_clamped_to_max_size_2d(5.0lf), ue_vector(3.0lf, 4.0lf, 7.0lf))) {
+        return 132
+    }
+    if (!near(ue_vector(3.0lf, 4.0lf, 1.0lf).get_clamped_to_size_2d(10.0lf, 20.0lf), ue_vector(6.0lf, 8.0lf, 1.0lf))) {
+        return 133
+    }
+    if (!near(ue_vector(2.0lf, 4.0lf, 2.0lf).projection(), ue_vector(1.0lf, 2.0lf, 1.0lf))) { return 134 }
+    if (!near(forward_vector().rotate_angle_axis_rad(0.5lf * DBL_PI, up_vector()), right_vector())) { return 135 }
+    if (!same(right_vector().to_orientation_rotator().yaw, 90.0lf)) { return 136 }
+    if (!near(vector_plane_project(one_vector(), up_vector()), ue_vector(1.0lf, 1.0lf, 0.0lf))) { return 137 }
+
+    // FVector2D.
+    let flat = ue_vector2d(3.0lf, -4.0lf)
+    if (!ue_nearly_equal(flat.get_abs(), ue_vector2d(3.0lf, 4.0lf), 0.0001lf) || !same(flat.get_abs_max(), 4.0lf)) {
+        return 138
+    }
+    if (!same(flat.get_max(), 3.0lf) || !same(flat.get_min(), -4.0lf) || flat.contains_nan()) { return 139 }
+    if (!ue_nearly_equal(flat.get_sign_vector(), ue_vector2d(1.0lf, -1.0lf), 0.0001lf)) { return 140 }
+    if (!same(dist_squared(flat, zero_vector2d()), 25.0lf)) { return 141 }
+    if (!flat.get_clamped_to_max_size(1.0lf).equals(ue_vector2d(0.6lf, -0.8lf), 0.0001lf)) { return 142 }
+    if (!zero_vector2d().is_zero() || flat.is_nearly_zero() || !ue_vector2d(0.0001lf, 0.0lf).is_nearly_zero(0.001lf)) {
+        return 143
+    }
+
+    // FRotator and FQuat.
+    if (yaw90.contains_nan() || !same(rotator_make_from_euler(ue_vector(0.0lf, 0.0lf, 90.0lf)).yaw, 90.0lf)) { return 144 }
+    if (q90.contains_nan() || !same(q90.size_squared(), 1.0lf) || !same(q90.get_twist_angle(up_vector()), 0.5lf * DBL_PI)) {
+        return 145
+    }
+    if (!find_between(forward_vector(), right_vector()).equals(q90, 0.0001lf)) { return 146 }
+    if (!make_from_rotator(yaw90).equals(q90, 0.0001lf) || !same(error_auto_normalize(q90, q90), 0.0lf)) { return 147 }
+    let quat_id = ue_quat_identity()
+    if (!slerp_not_normalized(quat_id, q90, 0.0lf).equals(quat_id, 0.0001lf)) { return 148 }
+    if (!slerp_full_path_not_normalized(quat_id, q90, 1.0lf).equals(q90, 0.0001lf)) { return 149 }
+    if (!squad(quat_id, quat_id, q90, q90, 0.0lf).equals(quat_id, 0.0001lf)) { return 150 }
+    if (!squad_full_path(quat_id, quat_id, q90, q90, 1.0lf).equals(q90, 0.0001lf)) { return 151 }
+    if (!fast_bilerp(quat_id, quat_id, quat_id, quat_id, 0.5lf, 0.5lf).equals(quat_id, 0.0001lf)) { return 152 }
+
+    // FLinearColor.
+    let red = ue_linear_color(1.0f, 0.0f, 0.0f, 1.0f)
+    if (!red.equals(red) || !red.equals(ue_linear_color(0.99f, 0.0f, 0.0f, 1.0f), 0.1lf)) { return 153 }
+    if (!ue_linear_color(2.0f, -1.0f, 0.5f, 1.0f).get_clamped().equals(ue_linear_color(1.0f, 0.0f, 0.5f, 1.0f))) {
+        return 154
+    }
+    if (!ue_linear_color(0.5f, 0.1f, 0.0f, 1.0f).get_clamped(0.2lf, 0.4lf).equals(ue_linear_color(0.4f, 0.2f, 0.2f, 0.4f))) {
+        return 155
+    }
+    let hsv = red.linear_rgb_to_hsv()
+    if (!hsv.equals(ue_linear_color(0.0f, 1.0f, 1.0f, 1.0f), 0.001lf) || !hsv.hsv_to_linear_rgb().equals(red, 0.001lf)) {
+        return 156
+    }
+    if (!ue_linear_color(0.0f, 0.0f, 0.0f, 1.0f).is_almost_black() || red.is_almost_black()) { return 157 }
+    if (!make_from_hsv8(uint8(0), uint8(255), uint8(255)).equals(red, 0.001lf)) { return 158 }
+    if (!make_from_hex(4294901760l).equals(red, 0.001lf)) { return 159 } // 0xFFFF0000
+    if (!make_from_hex(4286611584l, false).equals(ue_linear_color(0.502f, 0.502f, 0.502f, 1.0f), 0.001lf)) {
+        return 160 // 0xFF808080 reinterpreted
+    }
+    let red8 = red.to_fcolor(true)
+    if (int(red8.r) != 255 || int(red8.g) != 0 || int(red8.a) != 255) { return 161 }
+    let daylight = make_from_color_temperature(6500.0lf)
+    if (!(daylight.r > 0.8f && daylight.g > 0.8f && daylight.b > 0.8f)) { return 162 }
+    if (!same(double(make_random_color().a), 1.0lf)) { return 163 }
+
+    // FTransform (t: at (10, 0, 0), yaw 90, scale 2).
+    if (t.contains_nan() || !t.is_rotation_normalized() || !near(t.get_scale3d(), ue_vector(2.0lf, 2.0lf, 2.0lf))) {
+        return 164
+    }
+    if (!near(t.get_location(), x10) || !t.translation_equals(t) || !t.translation_equals(u, 10.5lf)) { return 165 }
+    if (!near(subtract_translations(t, u), x10)) { return 166 }
+    if (!near(t.transform_vector_no_scale(forward_vector()), right_vector())) { return 167 }
+    if (!near(t.inverse_transform_vector_no_scale(right_vector()), forward_vector())) { return 168 }
+    if (!t.get_relative_transform_reverse(t).equals(u, 0.0001lf)) { return 169 }
     return 0
 }
 

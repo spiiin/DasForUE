@@ -38,6 +38,36 @@ ALIASES = {
     ('FTimespan', 'MinValue'): 'min_timespan', ('FTimespan', 'MaxValue'): 'max_timespan',
     ('FVector2D', 'ZeroVector'): 'zero_vector2d',
 }
+# Binds the native modules leave out on purpose, with the reason (counted as "not applicable", not "missing").
+NOT_APPLICABLE = {
+    ('FMath', 'ComputeBoundingSphereForCone'): 'FSphere result (not a script type)',
+    ('FMath', 'FloatSpringInterp'): 'spring state struct (not a script type)',
+    ('FMath', 'VectorSpringInterp'): 'spring state struct (not a script type)',
+    ('FMath', 'QuaternionSpringInterp'): 'spring state struct (not a script type)',
+    ('FQuat', 'InitFromString'): "AngelScript text parsing; scripts build values with ue_foundation's constructors",
+    ('FRotator', 'InitFromString'): "AngelScript text parsing; scripts build values with ue_foundation's constructors",
+    ('FTransform', 'InitFromString'): "AngelScript text parsing; scripts build values with ue_foundation's constructors",
+    ('FVector', 'InitFromString'): "AngelScript text parsing; scripts build values with ue_foundation's constructors",
+    ('FVector2D', 'InitFromString'): "AngelScript text parsing; scripts build values with ue_foundation's constructors",
+    ('FRotator', 'ToColorString'): 'debug text',
+    ('AActor', 'SpawnActor'): 'spawning goes through the DSL (spawn policies, authored classes)',
+    ('AActor', 'SpawnPersistentActor'): 'spawning goes through the DSL (spawn policies, authored classes)',
+    ('AActor', 'FinishSpawningActor'): 'spawning goes through the DSL (spawn policies, authored classes)',
+    ('AActor', 'CreateComponent'): 'components are created through the DSL (component operations)',
+    ('AActor', 'GetOrCreateComponent'): 'components are created through the DSL (component operations)',
+    ('AActor', '__Actor_CreateComponentByClass'): 'components are created through the DSL (component operations)',
+    ('AActor', '__Actor_GetOrCreateComponentByClass'): 'components are created through the DSL (component operations)',
+    ('AActor', '__Actor_GetComponentByClass'): 'AngelScript internal behind GetComponentByClass',
+    ('AActor', '__Actor_GetAllComponentsByClass'): 'AngelScript internal behind GetComponentsByClass',
+    ('UActorComponent', 'SetbIsEditorOnly'): 'editor only',
+    ('UActorComponent', 'SetbTickInEditor'): 'editor only',
+    ('UActorComponent', 'IsVisualizationComponent'): 'editor only',
+    ('UActorComponent', 'SetIsVisualizationComponent'): 'editor only',
+    ('UWorld', 'GetCurrentWorld'): "AngelScript global; scripts take the world from an object (get_world)",
+    ('UWorld', 'SetGameInstance'): 'engine internal',
+    ('UWorld', 'ServerTravel'): 'networking, out of scope',
+    ('UGameInstance', 'FindLocalPlayerFromUniqueNetId'): 'FUniqueNetIdRepl (not a script type)',
+}
 OPERATORS = {'opAdd': '+', 'opSub': '-', 'opMul': '*', 'opDiv': '/', 'opMod': '%', 'opEquals': '==', 'opCmp': '<',
              'opNeg': '-'}
 # Script classes of the generated reflected bindings -> native script types.
@@ -136,12 +166,15 @@ def main():
             continue
         before = baseline.get((f, owner, kind, name), '?')
         now = 'native' if native.find(owner, name) else before
+        if now != 'native' and (owner, name) in NOT_APPLICABLE:
+            now = 'not applicable'
         row = rows.setdefault(owner, collections.Counter())
         row['total'] += 1
         row['before_direct'] += before == 'direct'
         row['before_missing'] += before == 'missing'
         row['native'] += now == 'native'
         row['now_missing'] += now == 'missing'
+        row['not_applicable'] += now == 'not applicable'
         if now == 'missing':
             missing[owner].append(name)
 
@@ -173,12 +206,14 @@ def main():
            '## AngelScript hand-written binds', '',
            'Methods and functions of `Bind_*.cpp` for the owners the native modules cover (no constructors, fields,',
            'float variants). "Before" is the step-1 summary (direct = an extern or a script helper, missing = no',
-           'binding at all); "native" is a native bind now.', '',
-           '| Owner | Binds | Before: direct | Before: missing | Native now | Still missing |',
-           '| --- | ---: | ---: | ---: | ---: | ---: |']
+           'binding at all); "native" is a native bind now; "not applicable" are left out on purpose (the list',
+           'below says why).', '',
+           '| Owner | Binds | Before: direct | Before: missing | Native now | Not applicable | Still missing |',
+           '| --- | ---: | ---: | ---: | ---: | ---: | ---: |']
     for owner, row in rows.items():
-        out.append('| %s | %d | %d | %d | %d | %d |' % (owner, row['total'], row['before_direct'], row['before_missing'],
-                                                       row['native'], row['now_missing']))
+        out.append('| %s | %d | %d | %d | %d | %d | %d |' % (
+            owner, row['total'], row['before_direct'], row['before_missing'], row['native'], row['not_applicable'],
+            row['now_missing']))
     out += ['', '## Reflected functions of the bound classes', '',
             'The functions our generated bindings call through reflection (tens of µs a call, see Performance.md)',
             'for the classes `ue_engine` declares, and how many of them are now direct methods. AngelScript binds',
@@ -192,6 +227,9 @@ def main():
     out += ['', '## Still missing in these areas', '']
     for owner, names in missing.items():
         out.append('- **%s**: %s' % (owner, ', '.join('`%s`' % n for n in sorted(set(names)))))
+    out += ['', '## Not applicable', '']
+    for (owner, name), reason in sorted(NOT_APPLICABLE.items()):
+        out.append('- %s `%s`: %s' % (owner, name, reason))
     with open(args.output, 'w', encoding='utf-8', newline='\n') as w:
         w.write('\n'.join(out) + '\n')
     print('NATIVE_BINDS_COVERAGE=PASS output=%s' % args.output)
