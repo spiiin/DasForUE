@@ -305,7 +305,7 @@ rows of one run only.
   times slower than the same formula in daScript. Native math pays off for work that is not a one-liner.
 - AOT: native binds whose types all have an ABI in the guarded bridge (scalars, strings, engine math values,
   dates and time spans, objects as their handles) are called from AOT code through `dasue::aot::Call`
-  (`DasUEAot.h`). `FName`, `FText`, operators and routed gameplay calls stay closed; a script function that calls one stays in the interpreter (lint
+  (`DasUEAot.h`). Array results and routed gameplay calls stay closed (`FName`, `FText` and operators are open since 2026-10-25); a script function that calls one stays in the interpreter (lint
   `ue_closed_builtin_calls`), the rest of the file is compiled. `DasNativeBindsManifest` checks this on
   `native_binds_aot_check.das`. Measured in `interop_aot.das` (C3, one run, a faster machine state than the
   table above):

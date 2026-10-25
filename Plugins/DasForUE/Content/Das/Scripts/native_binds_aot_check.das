@@ -6,8 +6,8 @@ require ue_engine
 
 // AOT check of the DasNativeBindsManifest commandlet (DasNativeBinds.h). open_only calls native binds with an AOT
 // ABI (scalars, strings, engine values, time values) and with_objects object methods and helpers: both are
-// compiled for AOT and call them through the guarded bridge. with_closed calls a bind with an FName parameter,
-// which has no ABI yet: it stays in the interpreter.
+// compiled for AOT and call them through the guarded bridge. with_closed starts a reflected UFUNCTION call (a call
+// frame, which has no ABI): it stays in the interpreter.
 [export]
 def open_only(input:int):int {
     let d = make_date_time(2024, 2, 29)
@@ -56,6 +56,13 @@ def with_classes(input:int):int {
     return none.valid() && none.get_child_component_by_class(no_class).valid() ? 1 : input
 }
 
+// An FName parameter and == of a class type are compiled.
+[export]
+def with_names(input:int):int {
+    let a = as_AActor(ue_self_object())
+    return a.valid() && a == a && a.actor_has_tag(ue_name_value("tag")) ? 1 : input
+}
+
 // An array result has no AOT ABI yet: this function stays in the interpreter.
 [export]
 def with_arrays(input:int):int {
@@ -65,5 +72,10 @@ def with_arrays(input:int):int {
 
 [export]
 def with_closed(input:int):int {
-    return as_AActor(ue_self_object()).actor_has_tag(ue_name_value("tag")) ? 1 : input
+    if (input < 0) {
+        let call = ue_begin_static_call("/Script/Engine.KismetSystemLibrary", "GetGameTimeInSeconds",
+                                        "worldcontextobject")
+        ue_release_call(call)
+    }
+    return input
 }

@@ -39,7 +39,8 @@
 // Classes. A `UClass*` or `TSubclassOf<T>` parameter is a UEClassHandle in the script; a null handle reaches C++ as
 // nullptr, a class that is not a T is a script error. Results cannot be classes.
 // Arrays. A `TArray<T*>` result (T derived from UObject) is `array<T>` in the script (the class's script type, or
-// UObjectHandle); parameters cannot be arrays. Functions with an array result stay in the interpreter under AOT.
+// UObjectHandle); parameters cannot be arrays. Functions with an array result stay in the interpreter under AOT
+// (the only types without an AOT ABI).
 //
 // Function names may also be operators (+ - * / % == != < <= > >=; "-" with one parameter is the unary minus;
 // += -= *= /= %= take their first parameter by reference).
@@ -186,8 +187,14 @@ class Context;
 }
 
 // AOT (DasUEAot.h): a function whose parameters and result all have an AOT ABI gets an entry that generated code
-// calls through the guarded bridge; the others keep the interpreter (FName, FText and operators for now).
+// calls through the guarded bridge (operators through CallOp); the others keep the interpreter (arrays for now).
 DASRUNTIME_API char* DasNativeAotString(const FString& Value, das::Context* Context);
+// Name and text arguments resolved as the interpreter does (an error goes to the call's slot) and results made
+// tokens of the context's tables.
+DASRUNTIME_API FName DasNativeAotName(FDasNameValue Value, das::Context* Context);
+DASRUNTIME_API FText DasNativeAotText(FDasTextValue Value, das::Context* Context);
+DASRUNTIME_API FDasNameValue DasNativeAotNameValue(FName Value, das::Context* Context);
+DASRUNTIME_API FDasTextValue DasNativeAotTextValue(const FText& Value, das::Context* Context);
 DASRUNTIME_API FString* DasNativeAotEnter();           // the error slot of an AOT call; returns the outer one
 DASRUNTIME_API void DasNativeAotLeave(FString* Outer); // restores it; dasue::aot::Finish reports the error
 DASRUNTIME_API bool DasNativeAotFailed();              // the current AOT call has reported an error
@@ -280,6 +287,29 @@ template <> struct TDasNativeAbi<FString>
     static FString ToCpp(const char* Value) { return Value ? FString(UTF8_TO_TCHAR(Value)) : FString(); }
     static char* FromCpp(const FString& Value, das::Context* Context) { return DasNativeAotString(Value, Context); }
 };
+// FName and FText as their tokens; Convert resolves arguments (they cannot be references).
+template <> struct TDasNativeAbi<FName>
+{
+    static constexpr bool Supported = true;
+    using Arg = FDasNameValue;
+    using RefArg = FDasNativeAbiNone;
+    using Result = FDasNameValue;
+    static FDasNameValue FromCpp(const FName& Value, das::Context* Context)
+    {
+        return DasNativeAotNameValue(Value, Context);
+    }
+};
+template <> struct TDasNativeAbi<FText>
+{
+    static constexpr bool Supported = true;
+    using Arg = FDasTextValue;
+    using RefArg = FDasNativeAbiNone;
+    using Result = FDasTextValue;
+    static FDasTextValue FromCpp(const FText& Value, das::Context* Context)
+    {
+        return DasNativeAotTextValue(Value, Context);
+    }
+};
 template <> struct TDasNativeAbi<FDateTime>
 {
     static constexpr bool Supported = true;
@@ -350,6 +380,10 @@ template <class R, class... A> struct TDasNativeAot
         using D = std::decay_t<T>;
         if constexpr (TDasNativeIsRef<T>)
             return D(TDasNativeAbi<D>::ToCpp(Value));
+        else if constexpr (std::is_same_v<D, FName>)
+            return DasNativeAotName(Value, Context);
+        else if constexpr (std::is_same_v<D, FText>)
+            return DasNativeAotText(Value, Context);
         else if constexpr (std::is_same_v<D, UClass*>)
             return DasNativeAotClass(Value, UObject::StaticClass(), Context, Number);
         else if constexpr (!std::is_void_v<typename TDasNativeSubclassOf<D>::Base>)

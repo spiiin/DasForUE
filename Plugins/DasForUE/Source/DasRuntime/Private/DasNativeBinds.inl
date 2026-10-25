@@ -2,6 +2,32 @@
 // VM arguments to engine values, calls the module's thunk and converts the result back. Classes bound with
 // Class<T>(Name) get their own script types (an object handle under another name) with generated helpers.
 // Included in place; declaration order matters.
+// FName and FText arguments of native binds, for both paths: the value of the token in the active context's table,
+// or the error text of ResolveDSLName / ResolveDSLText (the caller reports it with the function's label).
+const TCHAR* DasNativeNameArgument(FDasNameValue Value, das::Context* Context, FName& Out)
+{
+    Out = NAME_None;
+    if (!Value.Token)
+        return nullptr;
+    const FName* Name =
+        ActiveContext && ActiveContext == Context ? ActiveContext->DSLNames.Find(Value.Token) : nullptr;
+    if (!Name)
+        return TEXT("name belongs to another context");
+    Out = *Name;
+    return nullptr;
+}
+const TCHAR* DasNativeTextArgument(FDasTextValue Value, das::Context* Context, FText& Out)
+{
+    Out = FText::GetEmpty();
+    if (!Value.Token)
+        return nullptr;
+    const FText* Text =
+        ActiveContext && ActiveContext == Context ? ActiveContext->TextValues.Find(Value.Token) : nullptr;
+    if (!Text)
+        return TEXT("invalid or foreign text value");
+    Out = *Text;
+    return nullptr;
+}
 TArray<FDasNativeClassType*>& DasNativeClassTypes()
 {
     static TArray<FDasNativeClassType*> Types;
@@ -228,6 +254,10 @@ const char* DasNativeAbiName(EDasNativeType Type, bool bArgument, bool bRef = fa
         return "uint8_t";
     case EDasNativeType::String:
         return bArgument ? "const char *" : "char *";
+    case EDasNativeType::Name:
+        return "FDasNameValue";
+    case EDasNativeType::Text:
+        return "FDasTextValue";
     case EDasNativeType::DateTime:
         return "FDasDateTimeValue";
     case EDasNativeType::Timespan:
@@ -251,14 +281,11 @@ const char* DasNativeAbiName(EDasNativeType Type, bool bArgument, bool bRef = fa
         return nullptr;
     }
 }
-// The C++ types of a function's AOT entry ("R,A1,...,das::Context *"), or empty when it has none. Operators stay
-// closed (== and != of the class types too): generated code calls an operator with its operands only, without
-// the context argument of the entry.
+// The C++ types of a function's AOT entry ("R,A1,...,das::Context *"), or empty when it has none.
 FString DasNativeAbiTypes(const FDasNativeFunctionDesc& F)
 {
     const char* Result = DasNativeAbiName(F.Result.Type, false);
-    const bool bOperator = !F.Name.IsEmpty() && !FChar::IsAlpha(F.Name[0]) && F.Name[0] != TEXT('_');
-    if (!F.AotEntry || !Result || bOperator)
+    if (!F.AotEntry || !Result)
         return FString();
     FString Types = UTF8_TO_TCHAR(Result);
     for (const FDasNativeParam& P : F.Arguments)
@@ -528,10 +555,14 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
                 break;
             }
             case EDasNativeType::Name:
-                *static_cast<FName*>(Slot) = ResolveDSLName(das::cast<FDasNameValue>::to(Raw[I]), &Context);
+                if (const TCHAR* Error = DasNativeNameArgument(das::cast<FDasNameValue>::to(Raw[I]), &Context,
+                                                               *static_cast<FName*>(Slot)))
+                    Context.throw_error_at(debugInfo, "%s: %s", Label, TCHAR_TO_UTF8(Error));
                 break;
             case EDasNativeType::Text:
-                *static_cast<FText*>(Slot) = ResolveDSLText(das::cast<FDasTextValue>::to(Raw[I]), &Context);
+                if (const TCHAR* Error = DasNativeTextArgument(das::cast<FDasTextValue>::to(Raw[I]), &Context,
+                                                               *static_cast<FText*>(Slot)))
+                    Context.throw_error_at(debugInfo, "%s: %s", Label, TCHAR_TO_UTF8(Error));
                 break;
             case EDasNativeType::Object:
                 Objects[I] = ResolveArgument(Context, Raw[I], I);
@@ -935,7 +966,11 @@ private:
             return;
         }
         AddUEAotEntry(Key, {F.AotEntry, Name + TEXT(":") + Types, UTF8_TO_TCHAR(Fn.Label.c_str()), &Origin.bLoaded});
-        Fn.cppName = TCHAR_TO_UTF8(*FString::Printf(TEXT("dasue::aot::Call<%lluULL,%s>"), Key, *Types));
+        // Generated code calls an operator with its operands only: CallOp adds the context (the entry's last).
+        const bool bOperator = !F.Name.IsEmpty() && !FChar::IsAlpha(F.Name[0]) && F.Name[0] != TEXT('_');
+        const FString Operands = Types.LeftChop(FCString::Strlen(TEXT(",das::Context *")));
+        Fn.cppName = TCHAR_TO_UTF8(*(bOperator ? FString::Printf(TEXT("dasue::aot::CallOp<%lluULL,%s>"), Key, *Operands)
+                                               : FString::Printf(TEXT("dasue::aot::Call<%lluULL,%s>"), Key, *Types)));
         Fn.noAot = false;
     }
     // Helper functions: object parameters and results of a given script type (nullptr: UObjectHandle).
@@ -958,8 +993,7 @@ private:
                            ? FDasNativeResolvedParam{Type ? Type->Class : UObject::StaticClass(), Type}
                            : FDasNativeResolvedParam());
     }
-    // AOT entries of valid and handle (the casts' are made per class, FDasNativeModule::AotCast); == and != are
-    // operators and have none.
+    // AOT entries of valid, handle, == and != (the casts' are made per class, FDasNativeModule::AotCast).
     static bool AotValid(const FDasObjectHandle& Value, das::Context* Context)
     {
         return DasNativeAotObject(Value, UObject::StaticClass(), Context, 0, EDasNativeAotObject::Argument) != nullptr;
@@ -969,6 +1003,16 @@ private:
         const UObject* Object =
             DasNativeAotObject(Value, UObject::StaticClass(), Context, 0, EDasNativeAotObject::Argument);
         return DasNativeAotHandle(Object, UObject::StaticClass(), Context);
+    }
+    // == and != compare the objects, as the interpreter does (null and expired handles are equal).
+    static bool AotEqual(const FDasObjectHandle& A, const FDasObjectHandle& B, das::Context* Context)
+    {
+        return DasNativeAotObject(A, UObject::StaticClass(), Context, 1, EDasNativeAotObject::Argument) ==
+               DasNativeAotObject(B, UObject::StaticClass(), Context, 2, EDasNativeAotObject::Argument);
+    }
+    static bool AotNotEqual(const FDasObjectHandle& A, const FDasObjectHandle& B, das::Context* Context)
+    {
+        return !AotEqual(A, B, Context);
     }
     // valid, handle, ==, != and the casts: from UObjectHandle, to and from the ancestors' types.
     void AddHelpers(const FDasNativeClassType& Type)
@@ -990,6 +1034,8 @@ private:
             Param(F, &Type);
             Param(F, &Type);
             Result(F, EDasNativeType::Bool, nullptr);
+            F.AotEntry = Helper == EDasNativeHelper::Equal ? reinterpret_cast<void*>(&AotEqual)
+                                                           : reinterpret_cast<void*>(&AotNotEqual);
             Add(Desc, F);
         };
         Unary(TEXT("valid"), EDasNativeHelper::Valid, EDasNativeType::Bool, &Type, nullptr);

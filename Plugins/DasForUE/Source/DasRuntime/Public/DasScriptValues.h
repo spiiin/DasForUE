@@ -3,7 +3,8 @@
 
 // Script values with a C++ layout that generated AOT code and game modules share with the runtime: FDateTime and
 // FTimespan as ticks (the ue_foundation types UEDateTime and UETimespan), an object reference as the token of its
-// context's handle table (UObjectHandle and the class types of native binds). Plain data, no daScript headers.
+// context's handle table (UObjectHandle and the class types of native binds), names and texts as tokens of the
+// context's tables. Plain data, no daScript headers.
 struct FDasDateTimeValue
 {
     int64 Ticks = 0;
@@ -18,6 +19,16 @@ struct FDasObjectHandle
 };
 // A class reference (UEClassHandle): the token of the class object in the context's handle table.
 struct FDasClassHandle
+{
+    uint64 Token = 0;
+};
+// An FName (UENameValue) and an FText (UETextValue): tokens of the context's name and text tables, 0 for None and
+// the empty text.
+struct FDasNameValue
+{
+    uint64 Token = 0;
+};
+struct FDasTextValue
 {
     uint64 Token = 0;
 };

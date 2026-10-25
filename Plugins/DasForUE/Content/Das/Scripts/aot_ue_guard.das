@@ -47,6 +47,15 @@ def main(input:int):int {
         let bad=ue_vector(1.0e308lf,0.0lf,0.0lf)*double(input*input)
         return int(ue_length(bad+ue_vector(1.0lf,0.0lf,0.0lf)))
     }
+    if (input==9) {
+        // Names and texts as tokens: constructors, comparison and conversion are compiled.
+        let n=ue_name_value("AotTag")
+        var r=0
+        if (ue_names_equal(n,ue_name_value("AotTag"))) { r+=1 }
+        if (!ue_names_equal(n,ue_name_value("Other"))) { r+=2 }
+        if (ue_text_to_string(ue_text_invariant("hello"))=="hello") { r+=4 }
+        return r
+    }
     if (input==6) {
         // A null handle where an object is required: the extern's own error, the same on both paths.
         return ue_object_valid(ue_cast_object(ue_null_object(),"/Script/CoreUObject.Object")) ? 1 : 0

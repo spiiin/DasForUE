@@ -129,6 +129,9 @@ bool RunDasUEAotProbe(FString& Report)
     Check(!MathError.bSucceeded && !InterpretedMathError.bSucceeded && !Message(MathError.Error).IsEmpty() &&
               Message(MathError.Error) == Message(InterpretedMathError.Error),
           TEXT("math_extern_error"), Message(MathError.Error) + TEXT(" / ") + Message(InterpretedMathError.Error));
+    // Names and texts (their tokens cross the bridge).
+    R = Run(9);
+    Check(R.bSucceeded && R.bUsedAot && R.Value == 7, TEXT("name_text_externs"), R.Error);
     R = Run(1);
     Check(!R.bSucceeded && !R.Error.IsEmpty(), TEXT("missing_property_refused"), R.Error);
     R = Run(2);

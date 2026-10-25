@@ -231,11 +231,7 @@ template <> struct cast<FDasEnumValue>
     static FDasEnumValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasTextValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UETextValue, FDasTextValue);
+MAKE_TYPE_FACTORY(UETextValue, FDasTextValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasTextValue>
@@ -252,11 +248,7 @@ template <> struct ext_ret_to_carrier<FDasTextValue, uint64_t>
     static uint64_t from(FDasTextValue V) { return V.Token; }
 };
 }
-struct FDasNameValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UENameValue, FDasNameValue);
+MAKE_TYPE_FACTORY(UENameValue, FDasNameValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasNameValue>
@@ -684,6 +676,28 @@ TArray<FDasNativeModuleInfo> DescribeDasNativeModules()
 char* DasNativeAotString(const FString& Value, das::Context* Context)
 {
     return CopyDSLString(Value, Context);
+}
+FName DasNativeAotName(FDasNameValue Value, das::Context* Context)
+{
+    FName Out;
+    if (const TCHAR* Error = DasNativeNameArgument(Value, Context, Out))
+        DasNativeError(Error);
+    return Out;
+}
+FText DasNativeAotText(FDasTextValue Value, das::Context* Context)
+{
+    FText Out;
+    if (const TCHAR* Error = DasNativeTextArgument(Value, Context, Out))
+        DasNativeError(Error);
+    return Out;
+}
+FDasNameValue DasNativeAotNameValue(FName Value, das::Context* Context)
+{
+    return MakeDSLName(Value, Context);
+}
+FDasTextValue DasNativeAotTextValue(const FText& Value, das::Context* Context)
+{
+    return MakeDSLText(Value, Context);
 }
 // The checks of SimNode_DasNative::ResolveArgument and ReturnObject for compiled calls; errors go to the AOT call's
 // slot with the interpreter's text (Finish adds the function's label).

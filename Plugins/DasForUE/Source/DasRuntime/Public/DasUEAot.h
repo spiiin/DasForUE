@@ -47,6 +47,11 @@ DAS_UE_AOT_TYPE(das::Context*, "das::Context *")
 // Object references as their handles: the extern resolves and checks them itself, the same code on both paths.
 DAS_UE_AOT_TYPE(const FDasObjectHandle&, "const FDasObjectHandle &")
 DAS_UE_AOT_TYPE(FDasObjectHandle, "FDasObjectHandle")
+// Names, texts and classes as their tokens: the same checks on both paths (the extern or the bind resolves them).
+DAS_UE_AOT_TYPE(FDasNameValue, "FDasNameValue")
+DAS_UE_AOT_TYPE(FDasTextValue, "FDasTextValue")
+DAS_UE_AOT_TYPE(FDasClassHandle, "FDasClassHandle")
+DAS_UE_AOT_TYPE(const FDasClassHandle&, "const FDasClassHandle &")
 // Math values: by const reference, by reference (compound assignments) and as results by value.
 DAS_UE_AOT_TYPE(const FVector&, "const FVector &")
 DAS_UE_AOT_TYPE(FVector&, "FVector &")
@@ -82,7 +87,6 @@ template <class T> struct ValueType
     };
 DAS_UE_AOT_VALUE(FDasDateTimeValue, "FDasDateTimeValue")
 DAS_UE_AOT_VALUE(FDasTimespanValue, "FDasTimespanValue")
-DAS_UE_AOT_VALUE(FDasClassHandle, "FDasClassHandle")
 // Reference parameters of native binds (DasNativeBinds.h: copied in, written back when the call succeeds).
 DAS_UE_AOT_VALUE(bool&, "bool &")
 DAS_UE_AOT_VALUE(int32_t&, "int32_t &")
