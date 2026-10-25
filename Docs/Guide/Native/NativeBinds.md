@@ -176,9 +176,11 @@ gameplay reference passes its handle to the bind, and an object result becomes t
 reflection, a null reference passes as `nullptr` and an expired one is an error.
 
 `Reflects` is checked when the module is built: the `UFUNCTION` exists, is `BlueprintCallable` and native, is not
-an event, static, network or editor-only function, has the same result and only input parameters of the same
-types; the bind is not `NonNullArgs` (reflection passes `nullptr`); one bind per `UFUNCTION`. A mismatch makes the
-module unavailable with the reason.
+an event, static, network or editor-only function, and has the same result and parameters of the same types, an
+output parameter as a `T&` parameter of the bind (`GetActorBounds(bool, FVector& Origin, FVector& Extent, bool)`)
+and an input one as a value; the bind is not `NonNullArgs` (reflection passes `nullptr`); one bind per `UFUNCTION`.
+A mismatch makes the module unavailable with the reason. An output argument behaves as on reflection: it starts
+from the default value and gets the result only when the call succeeds.
 
 The gameplay call stays on reflection when the `UFUNCTION` requires authority or is unsafe in construction
 scripts (the reflected call checks these), when its script types differ from the bind's (an object must be the

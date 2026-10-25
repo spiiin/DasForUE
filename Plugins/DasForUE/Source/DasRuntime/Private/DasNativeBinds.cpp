@@ -307,8 +307,6 @@ FString CheckReflects(FDasNativeFunctionDesc& F)
         return TEXT("is a static, network, delegate or editor-only function");
     if (EnumHasAnyFlags(F.Flags, EDasBind::NonNullArgs))
         return TEXT("is NonNullArgs, the UFUNCTION takes nullptr");
-    if (F.Arguments.ContainsByPredicate([](const FDasNativeParam& P) { return P.bRef; }))
-        return TEXT("has a reference parameter, the UFUNCTION's are values");
     const FProperty* Return = U->GetReturnProperty();
     if (Return ? !SameAsProperty(F.Result, Return) : F.Result.Type != EDasNativeType::Void)
         return TEXT("has another result type");
@@ -317,8 +315,15 @@ FString CheckReflects(FDasNativeFunctionDesc& F)
     {
         if (It->HasAnyPropertyFlags(CPF_ReturnParm))
             continue;
-        if (It->HasAnyPropertyFlags(CPF_OutParm) && !It->HasAnyPropertyFlags(CPF_ConstParm))
-            return FString::Printf(TEXT("has an output parameter %s"), *It->GetName());
+        // An output parameter is a T& parameter of the bind (written back when the call succeeds), an input one
+        // a value.
+        const bool bOut = It->HasAnyPropertyFlags(CPF_OutParm) && !It->HasAnyPropertyFlags(CPF_ConstParm);
+        if (Index < F.Arguments.Num() && bOut && !F.Arguments[Index].bRef)
+            return FString::Printf(TEXT("has an output parameter %s, which the bind must take by reference (T&)"),
+                                   *It->GetName());
+        if (Index < F.Arguments.Num() && !bOut && F.Arguments[Index].bRef)
+            return FString::Printf(TEXT("has an input parameter %s, which the bind takes by reference"),
+                                   *It->GetName());
         if (Index >= F.Arguments.Num() || !SameAsProperty(F.Arguments[Index], *It))
             return FString::Printf(TEXT("has another type of parameter %s"), *It->GetName());
         ++Index;

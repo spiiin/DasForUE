@@ -134,6 +134,23 @@ def pawn_controller(input:int):int {
     let p = ue_ref(type<NativePawnRef>, smoke_routes_pawn())
     return ue_is_valid(p.GetController()) ? 1 : 0
 }
+// Output parameters (the bind's T&): the variables get the bounds and the eyes' view point.
+[export]
+def actor_bounds(input:int):int {
+    let a = self_actor()
+    var origin = ue_vector(7.0lf, 7.0lf, 7.0lf)
+    var extent = ue_vector(7.0lf, 7.0lf, 7.0lf)
+    a.GetActorBounds(false, origin, extent)
+    return int(origin.x + origin.y + origin.z + extent.x + extent.y + extent.z)
+}
+[export]
+def actor_eyes(input:int):int {
+    let a = self_actor()
+    var location = ue_vector(7.0lf, 7.0lf, 7.0lf)
+    var rotation = ue_rotator(7.0lf, 7.0lf, 7.0lf)
+    a.GetActorEyesViewPoint(location, rotation)
+    return near(location, ue_vector(100.0lf, 200.0lf, 300.0lf)) && abs(rotation.yaw - 90.0lf) < 0.001lf ? 0 : 1
+}
 // An expired object argument: both paths refuse it with the same message.
 [export]
 def destroyed_argument(input:int):int {

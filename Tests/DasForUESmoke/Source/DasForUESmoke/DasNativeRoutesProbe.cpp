@@ -56,10 +56,11 @@ FVector Location(const AActor& A)
 {
     return A.GetActorLocation();
 }
-void ScaleOut(const AActor& A, FVector& Scale)
+void ScaleIn(AActor& A, FVector& Scale)
 {
-    Scale = A.GetActorScale3D();
+    A.SetActorScale3D(Scale);
 }
+void EyesByValue(const AActor& A, FVector Location, FRotator Rotation) {}
 void BuildOtherSignature(FDasNativeModule& Binds)
 {
     Binds.Class<AActor>().Method<&SetLocation>(TEXT("bad_set_location")).Reflects(TEXT("K2_SetActorLocation"));
@@ -76,7 +77,11 @@ void BuildNonNull(FDasNativeModule& Binds)
 }
 void BuildReference(FDasNativeModule& Binds)
 {
-    Binds.Class<AActor>().Method<&ScaleOut>(TEXT("bad_scale_out")).Reflects(TEXT("GetActorScale3D"));
+    Binds.Class<AActor>().Method<&ScaleIn>(TEXT("bad_scale_in")).Reflects(TEXT("SetActorScale3D"));
+}
+void BuildOutputValue(FDasNativeModule& Binds)
+{
+    Binds.Class<AActor>().Method<&EyesByValue>(TEXT("bad_eyes")).Reflects(TEXT("GetActorEyesViewPoint"));
 }
 void BuildMissing(FDasNativeModule& Binds)
 {
@@ -213,6 +218,13 @@ bool RunDasNativeRoutesProbe(UWorld* GameWorld, FString& Report)
     Case(TEXT("attach_parent"), 0, 1, None);
     Case(TEXT("component_owner"), 0, 1, None);
     Case(TEXT("pawn_controller"), 0, 1, None);
+    // Output parameters (the bind takes them as T&).
+    FVector BoundsOrigin, BoundsExtent;
+    Self->GetActorBounds(false, BoundsOrigin, BoundsExtent);
+    Case(TEXT("actor_bounds"),
+         int32(BoundsOrigin.X + BoundsOrigin.Y + BoundsOrigin.Z + BoundsExtent.X + BoundsExtent.Y + BoundsExtent.Z), 1,
+         None);
+    Case(TEXT("actor_eyes"), 0, 1, None);
 
     // A destroyed receiver or object argument: both paths refuse it with the same message (the files differ only
     // in the option line).
@@ -272,7 +284,11 @@ bool RunDasNativeRoutesProbe(UWorld* GameWorld, FString& Report)
         {TEXT("event"), &BuildEvent, TEXT("reflects UFUNCTION ReceiveBeginPlay, which is an event")},
         {TEXT("non_null_args"), &BuildNonNull, TEXT("reflects UFUNCTION GetDistanceTo, which is NonNullArgs")},
         {TEXT("reference"), &BuildReference,
-         TEXT("reflects UFUNCTION GetActorScale3D, which has a reference parameter")},
+         TEXT("reflects UFUNCTION SetActorScale3D, which has an input parameter NewScale3D, which the bind takes by "
+              "reference")},
+        {TEXT("output_value"), &BuildOutputValue,
+         TEXT("reflects UFUNCTION GetActorEyesViewPoint, which has an output parameter OutLocation, which the bind "
+              "must take by reference (T&)")},
         {TEXT("missing"), &BuildMissing, TEXT("which is not a UFUNCTION of class Actor")},
         {TEXT("taken"), &BuildTaken, TEXT("which is already reflected by 'get_actor_location' (module 'ue_engine')")},
         {TEXT("twice"), &BuildTwice, TEXT("must follow a Method that reflects nothing yet")}};
@@ -309,7 +325,8 @@ bool FDasNativeRoutesTest::RunTest(const FString&)
     AddExpectedError(TEXT("which has another type of parameter"), Contains, 1);
     AddExpectedError(TEXT("which is an event"), Contains, 1);
     AddExpectedError(TEXT("which is NonNullArgs"), Contains, 1);
-    AddExpectedError(TEXT("which has a reference parameter"), Contains, 1);
+    AddExpectedError(TEXT("which has an input parameter"), Contains, 1);
+    AddExpectedError(TEXT("which has an output parameter"), Contains, 1);
     AddExpectedError(TEXT("which is not a UFUNCTION"), Contains, 1);
     AddExpectedError(TEXT("which is already reflected by"), Contains, 1);
     AddExpectedError(TEXT("must follow a Method that reflects nothing yet"), Contains, 1);

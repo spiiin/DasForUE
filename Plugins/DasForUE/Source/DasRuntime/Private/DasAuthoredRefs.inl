@@ -973,12 +973,17 @@ bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::
     FString Why = DasNativeRoutePolicy(Function, Class);
     das::vector<das::TypeDeclPtr> Types; // the result, then the parameters
     Types.push_back(DSLMethodValueType(Program, Module, Method.ReturnType, Descriptor.Result, Descriptor.Scope, At));
-    for (int32 Index = 0; Why.IsEmpty() && Index < Method.Parameters.Num(); ++Index)
+    for (int32 Index = 0; Index < Method.Parameters.Num(); ++Index)
     {
+        auto Type = DSLMethodValueType(Program, Module, Method.Parameters[Index].Type,
+                                       Descriptor.Parameters[size_t(Index)], Descriptor.Scope, At);
+        // An output parameter is the bind's T& (DasNativeRouteTypes compares the type without the reference).
         if (Method.Parameters[Index].Direction != TEXT("in"))
-            Why = TEXT("an output parameter");
-        Types.push_back(DSLMethodValueType(Program, Module, Method.Parameters[Index].Type,
-                                           Descriptor.Parameters[size_t(Index)], Descriptor.Scope, At));
+        {
+            Type = DSLObjectCopyType(Type);
+            Type->ref = true;
+        }
+        Types.push_back(Type);
     }
     // An object is a native object reference (not an interface or an authored view), whose class the bind must
     // take or return.
@@ -999,40 +1004,80 @@ bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::
     Fn->generated = true;
     Fn->privateFunction = false;
     Fn->result = DSLObjectCopyType(Types[0]);
-    auto AddArgument = [&](const das::string& ArgName, const das::TypeDeclPtr& Type)
+    auto AddArgument = [&](const das::string& ArgName, const das::TypeDeclPtr& Type, bool bMutable)
     {
         auto* Arg = new das::Variable();
         Arg->at = At;
         Arg->name = ArgName;
         Arg->type = DSLObjectCopyType(Type);
-        Arg->type->ref = false;
-        Arg->type->constant = true;
+        Arg->type->ref = bMutable;
+        Arg->type->constant = !bMutable;
         Fn->arguments.push_back(Arg);
         return Arg;
     };
-    AddArgument("receiver", ReceiverType);
+    AddArgument("receiver", ReceiverType, false);
+    auto* Block = new das::ExprBlock();
+    Block->at = At;
+    // A pure out parameter starts from the default value, as on reflection (whose call frame starts it at zero), and
+    // is copied to the caller's variable after a successful call; inout passes the variable itself.
+    das::vector<das::ExpressionPtr> OutCopies;
     das::vector<das::ExpressionPtr> Arguments{new das::ExprField(At, new das::ExprVar(At, "receiver"), "handle"),
                                               new das::ExprConstString(At, DSLUtf8(ClassPath))};
     for (int32 Index = 0; Index < Method.Parameters.Num(); ++Index)
     {
+        const auto& Direction = Method.Parameters[Index].Direction;
         const auto ArgName = "arg_" + das::to_string(Index);
-        auto* Arg = AddArgument(ArgName, Types[size_t(Index) + 1]);
-        Arg->init = DSLMethodArgumentDefault(true, Method.Parameters[Index], Arg->type, At);
+        auto* Arg = AddArgument(ArgName, Types[size_t(Index) + 1], Direction != TEXT("in"));
+        if (Direction == TEXT("in"))
+            Arg->init = DSLMethodArgumentDefault(true, Method.Parameters[Index], Arg->type, At);
         das::ExpressionPtr Value = new das::ExprVar(At, ArgName);
-        if (!ObjectPath(Arg->type).IsEmpty())
+        if (Direction == TEXT("out"))
+        {
+            const auto OutName = "__out_" + das::to_string(Index);
+            auto* Var = new das::Variable();
+            Var->at = At;
+            Var->name = OutName;
+            Var->type = DSLObjectCopyType(Arg->type);
+            Var->type->ref = false;
+            Var->type->constant = false;
+            auto* Let = new das::ExprLet();
+            Let->at = At;
+            Let->variables.push_back(Var);
+            Block->list.push_back(Let);
+            Value = new das::ExprVar(At, OutName);
+            OutCopies.push_back(new das::ExprCopy(At, new das::ExprVar(At, ArgName), new das::ExprVar(At, OutName)));
+        }
+        else if (!ObjectPath(Arg->type).IsEmpty())
             Value = new das::ExprField(At, Value, "handle");
         Arguments.push_back(Value);
     }
     auto* Call = DSLCall(At, DSLUtf8(Route.Function->RouteName), {});
     Call->arguments = std::move(Arguments);
-    auto* Block = new das::ExprBlock();
-    Block->at = At;
+    das::ExpressionPtr Result = Call;
+    if (!ObjectPath(Fn->result).IsEmpty())
+        Result = DSLNativeReferenceUnpack(At, Fn->result, Call);
     if (Fn->result->baseType == das::Type::tVoid)
         Block->list.push_back(Call);
-    else if (!ObjectPath(Fn->result).IsEmpty())
-        Block->list.push_back(new das::ExprReturn(At, DSLNativeReferenceUnpack(At, Fn->result, Call)));
+    else if (OutCopies.empty())
+        Block->list.push_back(new das::ExprReturn(At, Result));
     else
-        Block->list.push_back(new das::ExprReturn(At, Call));
+    {
+        auto* Var = new das::Variable();
+        Var->at = At;
+        Var->name = "__result";
+        Var->type = DSLObjectCopyType(Fn->result);
+        Var->type->ref = false;
+        Var->type->constant = false;
+        Var->init = Result;
+        auto* Let = new das::ExprLet();
+        Let->at = At;
+        Let->variables.push_back(Var);
+        Block->list.push_back(Let);
+    }
+    for (auto& Copy : OutCopies)
+        Block->list.push_back(Copy);
+    if (Fn->result->baseType != das::Type::tVoid && !OutCopies.empty())
+        Block->list.push_back(new das::ExprReturn(At, new das::ExprVar(At, "__result")));
     Fn->body = Block;
     if (!Module->addFunction(Fn, true))
         DSLFail(TEXT("Authored method overload collision"));

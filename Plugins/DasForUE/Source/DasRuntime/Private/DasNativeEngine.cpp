@@ -47,6 +47,12 @@ DAS_ENGINE_FN(GetDistanceTo, (const AActor& A, const AActor* Other), A.GetDistan
 DAS_ENGINE_FN(GetSquaredDistanceTo, (const AActor& A, const AActor* Other), A.GetSquaredDistanceTo(Other))
 DAS_ENGINE_FN(GetHorizontalDistanceTo, (const AActor& A, const AActor* Other), A.GetHorizontalDistanceTo(Other))
 DAS_ENGINE_FN(GetVelocity, (const AActor& A), A.GetVelocity())
+// Output parameters are T& (gameplay calls of these UFUNCTIONs pass their out arguments to them).
+DAS_ENGINE_FN(GetActorBounds,
+              (const AActor& A, bool bOnlyColliding, FVector& Origin, FVector& Extent, bool bChildActors),
+              A.GetActorBounds(bOnlyColliding, Origin, Extent, bChildActors))
+DAS_ENGINE_FN(GetActorEyesViewPoint, (const AActor& A, FVector& Location, FRotator& Rotation),
+              A.GetActorEyesViewPoint(Location, Rotation))
 // Actor: state.
 DAS_ENGINE_FN(IsHidden, (const AActor& A), A.IsHidden())
 DAS_ENGINE_FN(SetActorHiddenInGame, (AActor & A, bool bHidden), A.SetActorHiddenInGame(bHidden))
@@ -254,6 +260,8 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Actor.Method<GetActorForwardVector>(TEXT("get_actor_forward_vector")).Reflects(TEXT("GetActorForwardVector"));
     Actor.Method<GetActorRightVector>(TEXT("get_actor_right_vector")).Reflects(TEXT("GetActorRightVector"));
     Actor.Method<GetActorUpVector>(TEXT("get_actor_up_vector")).Reflects(TEXT("GetActorUpVector"));
+    Actor.Method<GetActorBounds>(TEXT("get_actor_bounds")).Reflects(TEXT("GetActorBounds"));
+    Actor.Method<GetActorEyesViewPoint>(TEXT("get_actor_eyes_view_point")).Reflects(TEXT("GetActorEyesViewPoint"));
     // NonNullArgs (null is an error here), while the UFUNCTIONs return 0 for null: these do not reflect them.
     Actor.Method<GetDistanceTo>(TEXT("get_distance_to"), EDasBind::NonNullArgs);
     Actor.Method<GetSquaredDistanceTo>(TEXT("get_squared_distance_to"), EDasBind::NonNullArgs);

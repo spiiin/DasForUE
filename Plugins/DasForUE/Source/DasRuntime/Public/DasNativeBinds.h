@@ -49,7 +49,8 @@
 // value - is a `var x : T&` parameter in the script: the caller passes a variable and sees the function's changes
 // (setters such as SetLocation, output parameters such as ToAxisAndAngle). The value is copied in and written
 // back after the call, only when the call succeeds: a call that reports DasNativeError leaves it unchanged. Objects,
-// FName and FText cannot be references; Pure functions and Reflects methods take no references.
+// FName and FText cannot be references; Pure functions take no references. A Reflects method takes T& exactly
+// where its UFUNCTION has an output parameter.
 
 // Types of parameters and results. A const reference counts as its value type.
 enum class EDasNativeType : uint8
@@ -727,7 +728,7 @@ public:
     // UFUNCTION on a native reference (`self.Camera.K2_GetComponentLocation()`) then call this bind instead of
     // going through reflection: the same syntax, the same receiver checks, without the call frame. Checked when
     // the module is built: the UFUNCTION must exist, be BlueprintCallable and native, not an event, static,
-    // network or editor-only function, and take and return the same types, every parameter an input; the bind
+    // network or editor-only function, and take and return the same types, an output parameter as T&; the bind
     // must not use EDasBind::NonNullArgs (reflection passes nullptr). One bind per UFUNCTION. UFUNCTIONs that
     // need authority or are unsafe in construction scripts keep the reflected call.
     TDasNativeClass& Reflects(const TCHAR* FunctionName)
