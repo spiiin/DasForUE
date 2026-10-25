@@ -117,7 +117,30 @@ struct FStructRootWalker : das::DataWalker
         return false;
     }
 };
-bool CollectStructValues(FUnrealDasContext& C, const das::LineInfo* At, bool Boundary = false)
+// Diagnostics for compiled code (Performance.md): how many snapshots one top-level execution would keep if
+// snapshots were collected only on its exit, and what the collections in the middle of an execution do.
+struct FDasStructStats
+{
+    uint64 Executions = 0, WithSnapshots = 0, MidCollections = 0, MidReclaimed = 0, MidSkipped = 0;
+    int64 MaxLive = 0, MaxWithoutMid = 0;
+    uint64 Buckets[5] = {}; // without mid-call collection: <= 16, <= 256, <= 1024, <= 4096 (the table limit), more
+};
+FDasStructStats& DasStructStats()
+{
+    static FDasStructStats Stats;
+    return Stats;
+}
+FString DasStructStatsLine()
+{
+    const auto& S = DasStructStats();
+    return FString::Printf(TEXT("DAS_STRUCT_STATS executions=%llu with_snapshots=%llu max_live=%lld "
+                                "max_without_mid=%lld le16=%llu le256=%llu le1024=%llu le4096=%llu over4096=%llu "
+                                "mid_collections=%llu mid_reclaimed=%llu mid_skipped=%llu"),
+                           S.Executions, S.WithSnapshots, S.MaxLive, S.MaxWithoutMid, S.Buckets[0], S.Buckets[1],
+                           S.Buckets[2], S.Buckets[3], S.Buckets[4], S.MidCollections, S.MidReclaimed, S.MidSkipped);
+}
+void RecordStructExecution(FUnrealDasContext& C, bool bAfterCollection); // after NextStructValueToken
+bool CollectStructValuesNow(FUnrealDasContext& C, const das::LineInfo* At, bool Boundary)
 {
     if (C.StructValues.IsEmpty() && C.DelegateValues.IsEmpty())
         return true;
@@ -216,6 +239,18 @@ bool CollectStructValues(FUnrealDasContext& C, const das::LineInfo* At, bool Bou
     C.StructNextCollection = FMath::Min(4096, FMath::Max(256, C.StructValues.Num() + 256));
     return true;
 }
+bool CollectStructValues(FUnrealDasContext& C, const das::LineInfo* At, bool Boundary = false)
+{
+    const uint64 Reclaimed = C.StructReclaimed;
+    const bool bCollected = CollectStructValuesNow(C, At, Boundary);
+    if (!Boundary)
+    {
+        auto& S = DasStructStats();
+        ++(bCollected ? S.MidCollections : S.MidSkipped);
+        S.MidReclaimed += C.StructReclaimed - Reclaimed;
+    }
+    return bCollected;
+}
 void ExplicitStructCollect(das::Context* C, das::LineInfoArg* At)
 {
     if (C != ActiveContext || !ActiveContext || !CollectStructValues(*ActiveContext, At))
@@ -234,6 +269,7 @@ struct FStructCollectOnExit
     {
         if (C.ExecutionDepth > 1)
             return;
+        RecordStructExecution(C, false);
         try
         {
             CollectStructValues(C, nullptr, true);
@@ -241,6 +277,7 @@ struct FStructCollectOnExit
         catch (...)
         { /* Failed root traversal must not turn a result into an exception. */
         }
+        RecordStructExecution(C, true);
     }
 };
 // The context reports every stored snapshot through FInstancedStruct's GC collector.
@@ -252,6 +289,26 @@ bool MathSnapshotValid(const FInstancedStruct& Snapshot)
 // Borrowed snapshots copy only on insertion. Owned temporaries transfer their
 // buffer after validation/deduplication; all routes share one token counter.
 uint64 NextStructValueToken = 1;
+// On a top-level exit: before the collection, the snapshots this execution would keep without collections in its
+// middle (live at the last exit plus tokens issued since; tokens of all contexts, an upper bound); after it, the
+// marks for the next execution.
+void RecordStructExecution(FUnrealDasContext& C, bool bAfterCollection)
+{
+    if (bAfterCollection || C.StructTokenMark < 0)
+    {
+        C.StructTokenMark = int64(NextStructValueToken);
+        C.StructLiveMark = C.StructValues.Num();
+        return;
+    }
+    auto& S = DasStructStats();
+    const int64 Issued = int64(NextStructValueToken) - C.StructTokenMark;
+    const int64 WithoutMid = C.StructLiveMark + Issued;
+    ++S.Executions;
+    S.WithSnapshots += Issued > 0;
+    S.MaxLive = FMath::Max<int64>(S.MaxLive, C.StructValues.Num());
+    S.MaxWithoutMid = FMath::Max(S.MaxWithoutMid, WithoutMid);
+    ++S.Buckets[WithoutMid <= 16 ? 0 : WithoutMid <= 256 ? 1 : WithoutMid <= 1024 ? 2 : WithoutMid <= 4096 ? 3 : 4];
+}
 FDasStructValue StoreGeometry(const UScriptStruct*, const void*, das::Context*, das::LineInfoArg*);
 FDasStructValue StoreInputEvent(const UScriptStruct*, const void*, das::Context*, das::LineInfoArg*);
 FDasStructValue StoreStructValueImpl(const FInstancedStruct& V, FInstancedStruct* Owned, das::Context* C,

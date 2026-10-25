@@ -273,6 +273,9 @@ public:
     TMap<uint64, FInstancedStruct> StructValues;
     uint64 StructCollections = 0, StructReclaimed = 0;
     int32 StructNextCollection = 256;
+    // DasStructStats: snapshot tokens issued and live snapshots at the last top-level exit (-1: not marked yet).
+    int64 StructTokenMark = -1;
+    int32 StructLiveMark = 0;
     TMap<uint64, FText> TextValues;
     struct FEnumValue
     {

@@ -863,8 +863,15 @@ void FDasRuntimeModule::StartupModule()
     UE_LOG(LogDasRuntime, Display, TEXT("daScript initialized; content: %s"), *Root);
 }
 
+// das.StructStats: the snapshot diagnostics so far (DasStructStatsLine).
+static FAutoConsoleCommand GDasStructStatsCommand(TEXT("das.StructStats"),
+                                                  TEXT("Logs struct snapshot counts per top-level execution"),
+                                                  FConsoleCommandDelegate::CreateLambda(
+                                                      []() { UE_LOG(LogDasRuntime, Display, TEXT("%s"),
+                                                                    *DasStructStatsLine()); }));
 void FDasRuntimeModule::ShutdownModule()
 {
+    UE_LOG(LogDasRuntime, Display, TEXT("%s"), *DasStructStatsLine());
     DasRemoveScriptWriteTracker();
     // Release rooted callback signatures while UObject storage is still valid.
     FCoreDelegates::OnPreExit.Remove(RuntimePreExitHandle);

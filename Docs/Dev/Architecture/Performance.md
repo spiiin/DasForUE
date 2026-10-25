@@ -382,6 +382,17 @@ rows of one run only.
   keeps most of its cost (the guards and the work on the other side): a reference parameter saves half, engine
   values and names 15-30%, a guarded scalar extern and a property of self nothing.
 
+  **Struct snapshots and AOT (2026-10-25).** Externs that make struct snapshots stay interpreted: the collection in
+  the middle of an execution finds live snapshots by walking interpreter frames. Collecting only on the exit of a
+  top-level execution would let them compile, so `DAS_STRUCT_STATS` (logged on module shutdown and by
+  `das.StructStats`) counts what that would keep: live snapshots at the last exit plus tokens issued since (an
+  upper bound). Gameplay keeps few: packaged gameplay 578 executions, 501 at most 16, the largest 743, no
+  collection in the middle; playable 989 executions, 1 at most; method values 81; native defaults 36. A
+  foundation stress test makes 10,000 in one execution and lives on 231 collections in its middle; with
+  collection only on exit it would hit the table limit of 4096, and only under AOT. So the externs stay
+  interpreted; compiling them needs either that limit raised for compiled contexts or compiled frames the
+  collector can walk.
+
 Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.
 
 ### Gameplay methods answered by binds (`Reflects`) — 2026-10-24
