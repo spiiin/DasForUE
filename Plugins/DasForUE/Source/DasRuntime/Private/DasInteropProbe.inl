@@ -571,7 +571,7 @@ void RunDasInteropProbe(FDasInteropBench& B)
     // bind (DasNativeBinds.h, ue_time: days_in_year), 5 native binds with engine values (six calls an iteration),
     // 6 native binds with objects (five calls an iteration), 9 output parameters (three calls an iteration),
     // 10 vector arithmetic through ue_foundation's externs (five calls an iteration), 11 the same on float3, 12 ==
-    // of a class type and an FName parameter (two calls an iteration).
+    // of a class type and an FName parameter (two calls an iteration), 13 an array result.
     TStrongObjectPtr<AActor> ActorPin(NewObject<AActor>(GetTransientPackage()));
     TStrongObjectPtr<AActor> OwnerPin(NewObject<AActor>(GetTransientPackage()));
     DasInterop::ObjectsActor = ActorPin.Get();
@@ -586,8 +586,9 @@ void RunDasInteropProbe(FDasInteropBench& B)
     const FAotMode AotValues{TEXT("native_values"), 5}, AotObjects{TEXT("native_objects"), 6};
     const FAotMode AotRefs{TEXT("native_refs"), 9}, AotMath{TEXT("vector_math"), 10};
     const FAotMode AotFloat3{TEXT("float3_math"), 11}, AotNames{TEXT("names_equality"), 12};
+    const FAotMode AotArrays{TEXT("object_array"), 13};
     for (const FAotMode& M : {AotLoop, AotCall, AotField, AotExtern, AotNative, AotValues, AotObjects, AotRefs, AotMath,
-                              AotFloat3, AotNames})
+                              AotFloat3, AotNames, AotArrays})
     {
         int64 Expected = 0;
         for (int32 I = 0; I < AotCalls; ++I)
@@ -596,9 +597,10 @@ void RunDasInteropProbe(FDasInteropBench& B)
             // owner is valid (1) and casts to AActor (2).
             const int32 Value[] = {I & 7, I + 1, 7 + I, I, 365 + I, 1 + 29 + 24 + I, 3 + I};
             // Mode 9: a vector of length I & 7; modes 10 and 11: of length (I & 7) + 2, times I + 1.
-            // Mode 12: the actors differ (1), no tag.
+            // Mode 12: the actors differ (1), no tag; mode 13: no components.
             Expected ^= M.Mode == 9    ? (I & 7) + I
                         : M.Mode == 12 ? 1 + I
+                        : M.Mode == 13 ? I
                         : M.Mode >= 10 ? ((I & 7) + 2) * (I + 1)
                                        : Value[M.Mode];
         }

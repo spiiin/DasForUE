@@ -14,7 +14,8 @@ require math
 // Modes 7 and 8 fail (a null receiver, a null argument of a NonNullArgs bind): the probe compares the errors.
 // Mode 9 passes variables to binds with reference parameters (output parameters). Mode 10 is vector arithmetic
 // with ue_foundation's externs and operators; mode 11 is the same arithmetic on daScript's float3, the floor.
-// Mode 12: == of a class type and a bind with an FName parameter (two calls an iteration).
+// Mode 12: == of a class type and a bind with an FName parameter (two calls an iteration). Mode 13: a bind with an
+// array result (the actor's components: none outside a world).
 def leaf(value:int):int { return value+1 }
 
 [export]
@@ -66,6 +67,11 @@ def main(input:int):int {
         let tag=ue_name_value("interop_tag")
         for (i in range(0,count)) {
             acc^=(a==o ? 0 : 1)+(a.actor_has_tag(tag) ? 2 : 0)+i
+        }
+    } elif (mode==13) {
+        let a=interop_actor()
+        for (i in range(0,count)) {
+            acc^=length(a.get_all_components())+i
         }
     } elif (mode==7) {
         var none : AActor

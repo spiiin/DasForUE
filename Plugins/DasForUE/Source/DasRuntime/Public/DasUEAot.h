@@ -6,6 +6,10 @@
 #include <utility>
 
 // Generated code only sees this ABI, never private UE function addresses or UObject layout.
+namespace das
+{
+template <typename TT> struct TArray;
+}
 namespace dasue::aot
 {
 // A call site's registry entry, looked up once: valid while the registry is unchanged (its generation).
@@ -75,6 +79,30 @@ DAS_UE_AOT_TYPE(const FColor&, "const FColor &")
 DAS_UE_AOT_TYPE(FColor&, "FColor &")
 DAS_UE_AOT_TYPE(FColor, "FColor")
 #undef DAS_UE_AOT_TYPE
+// Arrays of objects (array<T> of a class type) in generated code; complete where generated code includes aot.h.
+using FDasObjectArray = das::TArray<FDasObjectHandle>;
+// A type that crosses the bridge as another: a native bind returns an array of objects as FDasArrayValue (its
+// header has no daScript types), the bridge copies it into the das::TArray of generated code.
+template <class T> struct Wire
+{
+    using Type = T;
+};
+template <> struct Wire<FDasObjectArray>
+{
+    using Type = FDasArrayValue;
+};
+template <class R, class W> R FromWire(W&& Value)
+{
+    if constexpr (std::is_same_v<std::decay_t<W>, FDasArrayValue> && !std::is_same_v<R, FDasArrayValue>)
+    {
+        static_assert(sizeof(R) == sizeof(FDasArrayValue), "das::TArray must have the layout of FDasArrayValue");
+        R Result;
+        FMemory::Memcpy(static_cast<void*>(&Result), &Value, sizeof(R));
+        return Result;
+    }
+    else
+        return std::forward<W>(Value);
+}
 // Values only native binds pass (DasNativeBinds.h); AddUEExtern keeps the scalar, object and math ABI above.
 template <class T> struct ValueType
 {
@@ -87,6 +115,7 @@ template <class T> struct ValueType
     };
 DAS_UE_AOT_VALUE(FDasDateTimeValue, "FDasDateTimeValue")
 DAS_UE_AOT_VALUE(FDasTimespanValue, "FDasTimespanValue")
+DAS_UE_AOT_VALUE(FDasObjectArray, "TArray<FDasObjectHandle>")
 // Reference parameters of native binds (DasNativeBinds.h: copied in, written back when the call succeeds).
 DAS_UE_AOT_VALUE(bool&, "bool &")
 DAS_UE_AOT_VALUE(int32_t&, "int32_t &")
@@ -172,7 +201,7 @@ template <uint64_t Id, class R, class... A> R Call(A... Args)
         ...);
     // Resolve checks thread, role and active context before any native function is entered.
     static FCallSite Site;
-    auto Fn = reinterpret_cast<R (*)(A...)>(Resolve(Id, Context, Site));
+    auto Fn = reinterpret_cast<typename Wire<R>::Type (*)(A...)>(Resolve(Id, Context, Site));
     if constexpr (std::is_void_v<R>)
     {
         Fn(std::forward<A>(Args)...);
@@ -180,7 +209,7 @@ template <uint64_t Id, class R, class... A> R Call(A... Args)
     }
     else
     {
-        R Result = Fn(std::forward<A>(Args)...);
+        R Result = FromWire<R>(Fn(std::forward<A>(Args)...));
         Finish(Id, Context);
         return Result;
     }

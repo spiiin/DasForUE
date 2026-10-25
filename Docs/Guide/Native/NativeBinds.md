@@ -191,8 +191,8 @@ Scripts compiled ahead of time call binds whose types all have an AOT ABI — sc
 values, dates, time spans, classes and objects (receivers, parameters and results, as their handles) — through a
 guarded bridge, operators too, and the `valid`, `handle`, `as_<Name>`, `==` and `!=` helpers of the class types.
 Compiled calls check objects, names and texts as the interpreter does and fail with the same messages (without the
-location in the script). Binds with an array result and gameplay calls routed to binds (`Reflects`) stay closed:
-a script function that calls one stays in the interpreter, the rest of the file is still compiled. Of
+location in the script); array results are compiled too. Gameplay calls routed to binds (`Reflects`) stay
+closed: a script function that calls one stays in the interpreter, the rest of the file is still compiled. Of
 `ue_foundation`'s own externs, those with scalars, strings, objects, math values, names, texts and classes are
 compiled (`ue_self_object()`, `ue_is_valid`, object properties, `ue_vector`, `a + b`, `ue_name_value`,
 `ue_text_to_string`, class literals, ...); reflected `UFUNCTION` calls through a call frame, structs, enums, traces

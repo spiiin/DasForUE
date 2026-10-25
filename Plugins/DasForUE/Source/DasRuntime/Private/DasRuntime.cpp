@@ -699,6 +699,21 @@ FDasTextValue DasNativeAotTextValue(const FText& Value, das::Context* Context)
 {
     return MakeDSLText(Value, Context);
 }
+static_assert(sizeof(FDasArrayValue) == sizeof(das::Array) && alignof(FDasArrayValue) == alignof(das::Array),
+              "FDasArrayValue must have the layout of das::Array");
+// An array result of a compiled call: made in the context's heap like SimNode_DasNative::ReturnObjects (an object
+// that is not a Class reads as null).
+FDasArrayValue DasNativeAotObjects(UObject* const* Objects, int32 Count, UClass* Class, das::Context* Context)
+{
+    FDasArrayValue Result;
+    auto& Array = *reinterpret_cast<das::Array*>(&Result);
+    FMemory::Memzero(&Array, sizeof(das::Array));
+    das::builtin_array_resize(Array, Count, sizeof(FDasObjectHandle), Context, nullptr);
+    auto* Handles = reinterpret_cast<FDasObjectHandle*>(Array.data);
+    for (int32 I = 0; I < Count; ++I)
+        Handles[I] = DasNativeAotHandle(Objects[I], Class, Context);
+    return Result;
+}
 // The checks of SimNode_DasNative::ResolveArgument and ReturnObject for compiled calls; errors go to the AOT call's
 // slot with the interpreter's text (Finish adds the function's label).
 UObject* DasNativeAotObject(const FDasObjectHandle& Handle, UClass* Class, das::Context* Context, int32 Number,

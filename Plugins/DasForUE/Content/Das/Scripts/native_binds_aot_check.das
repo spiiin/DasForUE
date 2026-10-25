@@ -63,7 +63,7 @@ def with_names(input:int):int {
     return a.valid() && a == a && a.actor_has_tag(ue_name_value("tag")) ? 1 : input
 }
 
-// An array result has no AOT ABI yet: this function stays in the interpreter.
+// An array result is compiled too (array<UActorComponent>).
 [export]
 def with_arrays(input:int):int {
     var none : AActor

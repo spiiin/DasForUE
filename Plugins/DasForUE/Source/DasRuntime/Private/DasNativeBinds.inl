@@ -266,6 +266,8 @@ const char* DasNativeAbiName(EDasNativeType Type, bool bArgument, bool bRef = fa
         return bArgument ? "const FDasObjectHandle &" : "FDasObjectHandle";
     case EDasNativeType::Class:
         return bArgument ? "FDasClassHandle" : nullptr; // class results are not bound
+    case EDasNativeType::ObjectArray:
+        return bArgument ? nullptr : "TArray<FDasObjectHandle>"; // das::TArray in generated code (FDasObjectArray)
 #define DAS_NATIVE_ABI(Kind, CppType)                                                                                  \
     case EDasNativeType::Kind:                                                                                         \
         return bArgument ? "const " CppType " &" : CppType;

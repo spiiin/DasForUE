@@ -32,3 +32,9 @@ struct FDasTextValue
 {
     uint64 Token = 0;
 };
+// An array as the script holds it (array<T>), in the layout of das::Array (DasRuntime checks it): native binds
+// return arrays of objects in it, the AOT bridge hands generated code a das::TArray.
+struct alignas(8) FDasArrayValue
+{
+    uint8 Bytes[40];
+};

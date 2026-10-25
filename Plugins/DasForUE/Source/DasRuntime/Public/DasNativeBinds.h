@@ -39,8 +39,7 @@
 // Classes. A `UClass*` or `TSubclassOf<T>` parameter is a UEClassHandle in the script; a null handle reaches C++ as
 // nullptr, a class that is not a T is a script error. Results cannot be classes.
 // Arrays. A `TArray<T*>` result (T derived from UObject) is `array<T>` in the script (the class's script type, or
-// UObjectHandle); parameters cannot be arrays. Functions with an array result stay in the interpreter under AOT
-// (the only types without an AOT ABI).
+// UObjectHandle); parameters cannot be arrays.
 //
 // Function names may also be operators (+ - * / % == != < <= > >=; "-" with one parameter is the unary minus;
 // += -= *= /= %= take their first parameter by reference).
@@ -187,7 +186,7 @@ class Context;
 }
 
 // AOT (DasUEAot.h): a function whose parameters and result all have an AOT ABI gets an entry that generated code
-// calls through the guarded bridge (operators through CallOp); the others keep the interpreter (arrays for now).
+// calls through the guarded bridge (operators through CallOp).
 DASRUNTIME_API char* DasNativeAotString(const FString& Value, das::Context* Context);
 // Name and text arguments resolved as the interpreter does (an error goes to the call's slot) and results made
 // tokens of the context's tables.
@@ -195,6 +194,9 @@ DASRUNTIME_API FName DasNativeAotName(FDasNameValue Value, das::Context* Context
 DASRUNTIME_API FText DasNativeAotText(FDasTextValue Value, das::Context* Context);
 DASRUNTIME_API FDasNameValue DasNativeAotNameValue(FName Value, das::Context* Context);
 DASRUNTIME_API FDasTextValue DasNativeAotTextValue(const FText& Value, das::Context* Context);
+// An array result: handles made for Class in the context's heap.
+DASRUNTIME_API FDasArrayValue DasNativeAotObjects(UObject* const* Objects, int32 Count, UClass* Class,
+                                                  das::Context* Context);
 DASRUNTIME_API FString* DasNativeAotEnter();           // the error slot of an AOT call; returns the outer one
 DASRUNTIME_API void DasNativeAotLeave(FString* Outer); // restores it; dasue::aot::Finish reports the error
 DASRUNTIME_API bool DasNativeAotFailed();              // the current AOT call has reported an error
@@ -308,6 +310,19 @@ template <> struct TDasNativeAbi<FText>
     static FDasTextValue FromCpp(const FText& Value, das::Context* Context)
     {
         return DasNativeAotTextValue(Value, Context);
+    }
+};
+// A TArray<T*> result as the script's array of handles (arrays are never parameters).
+template <class T> struct TDasNativeAbi<TArray<T*>>
+{
+    static constexpr bool Supported = std::is_base_of_v<UObject, std::remove_cv_t<T>>;
+    using Arg = FDasNativeAbiNone;
+    using RefArg = FDasNativeAbiNone;
+    using Result = FDasArrayValue;
+    static FDasArrayValue FromCpp(const TArray<T*>& Value, das::Context* Context)
+    {
+        return DasNativeAotObjects(reinterpret_cast<UObject* const*>(Value.GetData()), Value.Num(),
+                                   std::remove_cv_t<T>::StaticClass(), Context);
     }
 };
 template <> struct TDasNativeAbi<FDateTime>
