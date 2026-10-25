@@ -11,6 +11,14 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Plugins',
 
 # Ported type -> (patterns, files allowed to contain them).
 PORTED = {
+    'EnumStorage': (
+        [r'\bGetCppForm\('],
+        {'DasEnumAdapter.cpp', 'DasContainerRegistry.cpp'},
+    ),
+    'Enum': (
+        [r'\bDSLDirectEnum', r'\bDSLNativeEnum', r'\bDSLStructEnumDefault', r'"UEEnumValue"'],
+        {'DasEnumTypesDSL.inl', 'DasEnumAnnotations.inl', 'DasRuntimeTypeAnnotations.inl'},
+    ),
     'TextName': (
         [r'\bDSLTextDefault', r'"UE(?:Text|Name)Value"'],
         {'DasTextNameTypesDSL.inl', 'DasRuntimeTypeAnnotations.inl'},

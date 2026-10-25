@@ -247,3 +247,37 @@ FText сохраняет wire с namespace/key/source либо признак cu
 Foundation дополнительно проверяет scalar ABI и точный локализационный default поля
 и параметра, а также nominal Name default. Архитектурный gate запрещает отдельные
 UETextValue/UENameValue predicates и DSLTextDefault вне фасета и объявления аннотаций.
+
+
+## Перенос Enum (2026-10-25)
+
+`FDasEnumAdapter` — адаптер вида Enum с обязательной номинальной идентичностью UEnum.
+`UsesTypeIdentity` позволяет искать такой адаптер по виду, сохраняя TypePath в дескрипторе.
+Наличие адаптера не означает валидность пути: `ValidateDeclared` проверяет загруженный UEnum
+и прежний диапазон значений 0..254. Общие ограничения формы дескриптора остаются в validator.
+
+Адаптер владеет созданием и описанием FByteProperty с Enum и FEnumProperty с byte underlying.
+`DasResolvedEnumStorage` расположен рядом с ним и сохраняет существующую политику Automatic:
+native enum class использует Enum8, UDasDefinedEnum — Byte; явное storage сохраняется.
+Описание чужого свойства с широким underlying type отклоняется. Byte без Enum остаётся
+обычным uint8 scalar и не становится enum. Идентичность не выводится из набора чисел.
+
+`FDasEnumScriptFacet` владеет распознаванием ue_enum/ue_native_enum, разрешением авторского
+пути и проверкой member IDs, native view, checked pack/unpack и именованными defaults полей
+и контейнеров. Declaration annotations вынесены в `DasEnumAnnotations.inl`; формат IR,
+пути assets и имена generated entry points сохранены. Общие DSL-участки спрашивают
+`DSLTypedValue`/`DSLNativeValue` и фасет вместо собственных enum-предикатов.
+
+Разделены source type и call type: daScript enumeration в пользовательском коде и
+UEEnumValue token в экспортируемом ABI. `MatchesCallType` не позволяет принять source enum
+с integer layout за token. Native и авторские значения продолжают проходить
+ue_enum_from_number / __ue_checked_enum_number с проверкой конкретного UEnum.
+
+Foundation расширен проверками native/authored × Automatic/Byte/Enum8, обратного описания,
+неизвестного пути и недопустимого значения. Существующий property factory probe проверяет
+оба enum storage в array/map/set, широкие underlying types и сохранение StorageIdentity.
+Method-values и automation покрывают typed values, несовпадающие enum с одинаковыми числами,
+параметры/результаты/ref/out, defaults, сохранение/открытие assets, delegates и reload.
+
+Транспорт контейнеров и предметные операции над enum tokens используют прежние shared
+runtime helpers. Новые формы enum, числовые диапазоны и defaults параметров не добавлены.

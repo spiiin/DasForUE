@@ -250,13 +250,11 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
         if (K == EDasMethodSignature::Byte)
             return T->isSimpleType(das::Type::tUInt8);
         if (const auto* Facet = DSLKindFacet(DasTypeKindOf(K)))
-            return Facet->MatchesScriptType(T);
+            return Facet->MatchesCallType(T);
         if (K == EDasMethodSignature::Class)
             return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEClassHandle";
         if (K == EDasMethodSignature::Delegate)
             return T->isSimpleType(das::Type::tUInt64);
-        if (K == EDasMethodSignature::Enum)
-            return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEEnumValue";
         if (K == EDasMethodSignature::Struct)
             return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEStructValue";
         if (const auto* Adapter = FDasTypeAdapters::Get().FindSignature(K))

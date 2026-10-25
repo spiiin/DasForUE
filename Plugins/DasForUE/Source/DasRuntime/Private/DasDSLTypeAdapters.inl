@@ -9,6 +9,16 @@ const FDasTypeAdapters::FEntry* DSLValueAdapter(const das::TypeDeclPtr& T)
             return &Entry;
     return nullptr;
 }
+bool DSLTypedValue(const das::TypeDeclPtr& T, EDasTypeKind Kind)
+{
+    const auto* Entry = DSLValueAdapter(T);
+    return T && T->baseType != das::Type::tHandle && Entry && Entry->Adapter->GetKind() == Kind;
+}
+bool DSLNativeValue(const das::TypeDeclPtr& T, EDasTypeKind Kind)
+{
+    const auto* Entry = DSLValueAdapter(T);
+    return Entry && Entry->Adapter->GetKind() == Kind && Entry->Script->IsNativeType(T);
+}
 const IDasScriptTypeFacet* DSLKindFacet(EDasTypeKind Kind)
 {
     FDasDeclaredType Type;

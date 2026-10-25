@@ -412,8 +412,9 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     DSLFail(TEXT("Adapter supports int/float/bool/string/double/name properties: ")+ P.Name);
                 P.Type.Kind = FieldType;
                 if (const auto* Adapted = DSLValueAdapter(F.type);
-                    Adapted && Adapted->Script->ParseDefault(EDasScriptDefaultUse::Property, F.type, F.init, Group,
-                                                             St->module, P.Default))
+                    Adapted && Adapted->Adapter->GetKind() != EDasTypeKind::Enum &&
+                    Adapted->Script->ParseDefault(EDasScriptDefaultUse::Property, F.type, F.init, Group, St->module,
+                                                  P.Default))
                 {
                     if (Adapted->Adapter->GetKind() == EDasTypeKind::Struct)
                         P.Type.TypePath = DSLAdaptedPath(F.type);
@@ -464,27 +465,12 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     C.Properties.Add(P);
                     continue;
                 }
-                if (DSLDirectEnum(F.type))
+                if (DSLTypedValue(F.type, EDasTypeKind::Enum))
                 {
                     P.Type.TypePath = DSLDirectPath(F.type, TypeFolder, TypeRegistry);
                     P.Default.Kind = TEXT("string");
-                    if (F.init && F.init->__rtti == das::string("ExprConstEnumeration"))
-                        P.Default.String = DSLText(static_cast<das::ExprConstEnumeration*>(F.init)->text);
-                    else if (F.init && F.init->rtti_isField())
-                    {
-                        auto* Init = static_cast<das::ExprField*>(F.init);
-                        if (!Init->value || !Init->value->rtti_isVar() ||
-                            static_cast<das::ExprVar*>(Init->value)->name != F.type->enumType->name)
-                            DSLFail(TEXT("Direct enum initializer must name its declared enum"));
-                        P.Default.String = DSLText(Init->name);
-                    }
-                    else
-                        DSLFail(TEXT("Direct enum property requires named enum literal initializer: ")+
-                                     (F.init ? DSLText(F.init->__rtti) : TEXT("none")));
-                    if (P.Default.String.Contains(TEXT(".")))
-                        P.Default.String = P.Default.String.RightChop(P.Default.String.Find(TEXT(".")) + 1);
-                    if (P.Default.String.Contains(TEXT("::")))
-                        P.Default.String = P.Default.String.RightChop(P.Default.String.Find(TEXT("::")) + 2);
+                    DSLValueAdapter(F.type)->Script->ParseDefault(EDasScriptDefaultUse::Property, F.type, F.init, Group,
+                                                                  St->module, P.Default);
                     FString Issue;
                     auto* E = ResolveDasEnum(P.Type.TypePath, Issue);
                     if (!E || !ValidateDasEnumNumber(P.Type.TypePath, E->GetValueByNameString(P.Default.String), Issue))
@@ -536,23 +522,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 }
                 if (FieldType == TEXT("enum"))
                 {
-                    if (!F.init || !F.init->rtti_isCall())
-                        DSLFail(TEXT("Enum field requires ue_enum_value(path, member)"));
-                    auto* Call = static_cast<das::ExprCall*>(F.init);
-                    if (Call->name != "ue_enum_value" || Call->arguments.size() != 2 ||
-                        Call->arguments[0]->__rtti != das::string("ExprConstString") ||
-                        Call->arguments[1]->__rtti != das::string("ExprConstString"))
-                        DSLFail(TEXT("Enum initializer requires literal path/member"));
-                    P.Type.TypePath = DSLResolveType(
-                        EDSLTypeKind::Enum, DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text),
-                        TypeScope);
-                    static_cast<das::ExprConstString*>(Call->arguments[0])->text = DSLUtf8(P.Type.TypePath);
-                    P.Default.Kind = TEXT("string");
-                    P.Default.String = DSLText(static_cast<das::ExprConstString*>(Call->arguments[1])->text);
-                    FString Issue;
-                    auto* E = ResolveDasEnum(P.Type.TypePath, Issue);
-                    if (!E || !ValidateDasEnumNumber(P.Type.TypePath, E->GetValueByNameString(P.Default.String), Issue))
-                        DSLFail(Issue);
+                    DSLRawEnumProperty(F.init, TypeScope, P.Type, P.Default);
                     C.Properties.Add(P);
                     continue;
                 }
@@ -765,11 +735,12 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 }
                 if (ResultType == TEXT("enum"))
                 {
-                    M.ReturnType.TypePath = DSLConstraint(
-                        ObjectClasses,
-                        TEXT("return_enum"), EDSLTypeKind::Enum,
-                             DSLDirectEnum(F->result) ? DSLDirectPath(F->result, TypeFolder, TypeRegistry) : FString(),
-                             TypeScope);
+                    M.ReturnType.TypePath =
+                        DSLConstraint(ObjectClasses, TEXT("return_enum"), EDSLTypeKind::Enum,
+                                                          DSLTypedValue(F->result, EDasTypeKind::Enum)
+                                                              ? DSLDirectPath(F->result, TypeFolder, TypeRegistry)
+                                                              : FString(),
+                                                          TypeScope);
                     if (M.ReturnType.TypePath.IsEmpty())
                         DSLFail(TEXT("Enum result requires return_enum"));
                 }
@@ -852,10 +823,11 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     if (K == TEXT("enum"))
                     {
                         const FString Key = TEXT("arg_")+ DSLText(V->name) + TEXT("_enum");
-                        P.Type.TypePath = DSLConstraint(
-                            ObjectClasses, Key, EDSLTypeKind::Enum,
-                            DSLDirectEnum(V->type) ? DSLDirectPath(V->type, TypeFolder, TypeRegistry) : FString(),
-                            TypeScope);
+                        P.Type.TypePath = DSLConstraint(ObjectClasses, Key, EDSLTypeKind::Enum,
+                                                        DSLTypedValue(V->type, EDasTypeKind::Enum)
+                                                            ? DSLDirectPath(V->type, TypeFolder, TypeRegistry)
+                                                            : FString(),
+                                                        TypeScope);
                         if (P.Type.TypePath.IsEmpty())
                             DSLFail(TEXT("Enum argument requires arg_name_enum"));
                     }
@@ -1321,7 +1293,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                         DasTypeKind(Callback.ParameterKind) == EDasTypeKind::Struct)
                     {
                         const auto T = F->arguments[1]->type;
-                        if (!DSLDirectEnum(T) && !DSLDirectStruct(T) && !DSLContainer(T))
+                        if (!DSLTypedValue(T, EDasTypeKind::Enum) && !DSLDirectStruct(T) && !DSLContainer(T))
                             DSLFail(TEXT("Event value requires a concrete registered type/carrier"));
                         Callback.ParameterTypePath = DSLDirectPath(T, TypeFolder, TypeRegistry);
                         FString Issue;
@@ -1447,8 +1419,8 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     if (Parameter != TEXT("enum"))
                         DSLEnsureStructHelpers(SourceType, Carrier, Group, St->module, HelpersGenerated, Helpers);
                     Arg->name = "__ue_event_raw_array";
-                    Arg->type =
-                        DSLHandleType(Group, St->module, Parameter == TEXT("enum")? "UEEnumValue" : "UEStructValue");
+                    Arg->type = DSLPropertyType(Parameter == TEXT("enum") ? TEXT("enum")
+                                                                          : TEXT("struct"), Group, St->module, F->at);
                     auto* Local = new das::Variable();
                     Local->at = F->at;
                     Local->name = OriginalName;

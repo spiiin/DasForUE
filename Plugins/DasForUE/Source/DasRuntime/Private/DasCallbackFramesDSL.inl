@@ -40,7 +40,7 @@ FDasDeclaredType DSLCallbackField(const das::TypeDeclPtr& T, const FString& Fold
     }
     else if (D.GetKind() == EDasTypeKind::Enum)
     {
-        if (!DSLDirectEnum(T))
+        if (!DSLTypedValue(T, EDasTypeKind::Enum))
             DSLFail(TEXT("Callback enums require concrete types"));
         D.TypePath = DSLDirectPath(T, Folder, Registry);
     }

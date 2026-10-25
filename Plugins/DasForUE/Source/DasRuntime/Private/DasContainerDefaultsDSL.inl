@@ -65,33 +65,6 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T, das::Expre
         }
         DSLFail(TEXT("Struct defaults require ue_default_text or an empty constructor"));
     }
-    if (DSLDirectEnum(T))
-    {
-        das::Structure::FieldDeclaration F;
-        F.type = T;
-        F.init = E;
-        FString Member;
-        if (E->rtti_isField())
-        {
-            auto* V = static_cast<das::ExprField*>(E);
-            if (!V->value->rtti_isVar() || static_cast<das::ExprVar*>(V->value)->name != T->enumType->name)
-                DSLFail(TEXT("Container enum default requires its declared enum"));
-            Member = DSLText(V->name);
-        }
-        else if (E->__rtti == das::string("ExprConstEnumeration"))
-        {
-            Member = DSLText(static_cast<das::ExprConstEnumeration*>(E)->text);
-            int32 Dot;
-            if (Member.FindLastChar('.', Dot))
-                Member = Member.Mid(Dot + 1);
-            int32 Colon = Member.Find(TEXT("::"), ESearchCase::CaseSensitive, ESearchDir::FromEnd);
-            if (Colon != INDEX_NONE)
-                Member = Member.Mid(Colon + 2);
-        }
-        else
-            DSLFail(TEXT("Container enum default requires a named enum member"));
-        return MakeShared<FJsonValueString>(Member);
-    }
     if (!DSLMathPath(T).IsEmpty())
     {
         // Constructors are source syntax. Lower their native math fields into the

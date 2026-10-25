@@ -5,17 +5,6 @@ das::TypeDeclPtr DSLCopyType(const das::TypeDeclPtr& T)
     das::TypeDecl::clone(C, T);
     return C;
 }
-bool DSLNativeEnum(const das::TypeDeclPtr& T)
-{
-    return T && T->baseType == das::Type::tEnumeration && T->enumType &&
-           DSLAnnotation(T->enumType->annotations, "ue_native_enum");
-}
-bool DSLDirectEnum(const das::TypeDeclPtr& T)
-{
-    return T && T->baseType == das::Type::tEnumeration && T->enumType &&
-           (DSLAnnotation(T->enumType->annotations, "ue_enum") ||
-            DSLAnnotation(T->enumType->annotations, "ue_native_enum"));
-}
 bool DSLRawStruct(const das::TypeDeclPtr& T)
 {
     return T && T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEStructValue";
@@ -113,56 +102,27 @@ FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FS
         return DSLAdaptedPath(T);
     if (DSLNativeStruct(T))
         return DSLValidateNativeStruct(T);
-    if (DSLNativeEnum(T))
-        return DSLString(DSLAnnotation(T->enumType->annotations, "ue_native_enum")->arguments, "path");
+    if (DSLTypedValue(T, EDasTypeKind::Enum))
+        return DSLValueAdapter(T)->Script->ResolveTypePath(T, Folder, Registry);
     if (!DSLMathPath(T).IsEmpty())
         return DSLMathPath(T);
     if (DSLContainer(T))
         return DasContainerCarrier(DSLContainerType(T, Folder, Registry))->GetPathName();
-    if (!DSLDirectEnum(T) && !DSLDirectStruct(T))
+    if (!DSLDirectStruct(T))
         return {};
     FString Path, Error;
     if (Registry.IsEmpty() && !Folder.StartsWith(TEXT("/Game/")))
         DSLFail(TEXT("Direct authored types require type_registry or type_folder"));
-    const auto* Annotation = DSLDirectEnum(T) ? DSLAnnotation(T->enumType->annotations, "ue_enum")
-                                              : DSLAnnotation(T->structType->annotations, "ue_struct");
+    const auto* Annotation = DSLAnnotation(T->structType->annotations, "ue_struct");
     const auto* DeclaredWire = Annotation->arguments.find("_ue_types_json", das::Type::tString);
     FDasReflectedTypes Declared;
     if (!DeclaredWire || !FDasReflectedTypes::FromJson(DSLText(DeclaredWire->sValue), Declared, Error, true))
         DSLFail(TEXT("Missing authored type identity"));
-    const FString Id = DSLDirectEnum(T) ? Declared.Enums[0].Id : Declared.Structs[0].Id;
-    const FString Name = DSLText(DSLDirectEnum(T) ? T->enumType->name : T->structType->name);
+    const FString Id = Declared.Structs[0].Id;
+    const FString Name = DSLText(T->structType->name);
     Path =
-        DSLResolveType(DSLDirectEnum(T) ? EDSLTypeKind::Enum : EDSLTypeKind::Struct, Registry.IsEmpty()
+        DSLResolveType(EDSLTypeKind::Struct, Registry.IsEmpty()
                        ? Folder + TEXT("/")+ Name + TEXT(".")+ Name : Id, FDSLTypeScope{Declared.Id, Folder, Registry});
-    if (DSLDirectEnum(T))
-    {
-        auto* E = ResolveDasEnum(Path, Error);
-        if (!E)
-            DSLFail(Error);
-        if (E->NumEnums() != static_cast<int32>(T->enumType->list.size()) + 1)
-            DSLFail(TEXT("Direct enum declaration differs from loaded asset"));
-        for (const auto& V : T->enumType->list)
-        {
-            if (!V.value || V.value->__rtti != das::string("ExprConstInt") ||
-                E->GetValueByNameString(DSLText(V.name)) != static_cast<das::ExprConstInt*>(V.value)->getValue())
-                DSLFail(TEXT("Direct enum value differs from loaded asset"));
-        }
-        auto* Authored = Cast<UDasDefinedEnum>(E);
-        if (Authored && !Authored->MemberIds.IsEmpty())
-        {
-            const auto* A = DSLAnnotation(T->enumType->annotations, "ue_enum");
-            const auto* Wire = A->arguments.find("_ue_types_json", das::Type::tString);
-            FDasReflectedTypes Model;
-            if (!Wire || !FDasReflectedTypes::FromJson(DSLText(Wire->sValue), Model, Error, true) ||
-                Model.Enums.Num() != 1 || Authored->MemberIds.Num() != Model.Enums[0].Entries.Num())
-                DSLFail(TEXT("Direct enum member identity differs from loaded asset"));
-            for (const auto& V : Model.Enums[0].Entries)
-                if (Authored->MemberIds.FindRef(V.Value) != V.Id)
-                    DSLFail(TEXT("Direct enum member identity differs from loaded asset"));
-        }
-    }
-    else
     {
         if (!ValidateDasValueStruct(Path, Error))
             DSLFail(Error);
@@ -196,7 +156,7 @@ FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FS
                              : DSLDirectPath(F.type->secondType, Folder, Registry)))
                         DSLFail(TEXT("Direct map struct identity mismatch"));
                 }
-                if (DSLDirectEnum(F.type->secondType))
+                if (DSLTypedValue(F.type->secondType, EDasTypeKind::Enum))
                 {
                     auto* E = DasEnumPropertyType(Map->ValueProp);
                     if (!E || E->GetPathName() != DSLDirectPath(F.type->secondType, Folder, Registry))
@@ -221,7 +181,7 @@ FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FS
                     if (!C || C->GetPathName() != DSLTypedReferencePath(F.type->firstType))
                         DSLFail(TEXT("Direct reference array identity mismatch"));
                 }
-                else if (DSLDirectEnum(F.type->firstType))
+                else if (DSLTypedValue(F.type->firstType, EDasTypeKind::Enum))
                 {
                     auto* E = DasEnumPropertyType(Array->Inner);
                     if (!E || E->GetPathName() != DSLDirectPath(F.type->firstType, Folder, Registry))
@@ -240,7 +200,7 @@ FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FS
             }
             else if (!DSLPropertyMatches(FindDasStructField(S, DSLText(F.name)), DSLTypeName(F.type)))
                 DSLFail(TEXT("Direct struct field differs from loaded asset"));
-            if (DSLDirectEnum(F.type))
+            if (DSLTypedValue(F.type, EDasTypeKind::Enum))
             {
                 auto* E = DasEnumPropertyType(FindDasStructField(S, DSLText(F.name)));
                 if (!E || E->GetPathName() != DSLDirectPath(F.type, Folder, Registry))
@@ -420,18 +380,8 @@ das::ExpressionPtr DSLDirectUnpack(const das::LineInfo& At, const das::TypeDeclP
         return DSLAuthoredUnpack(At, Type, V);
     if (DSLTypedReference(Type))
         return DSLNativeReferenceUnpack(At, Type, V);
-    if (DSLDirectEnum(Type))
-    {
-        auto T = DSLCopyType(Type);
-        T->ref = false;
-        T->constant = false;
-        auto* C = new das::ExprCast(
-            At, DSLCall(At, "__ue_checked_enum_number", {V, new das::ExprConstString(At, DSLUtf8(Path))}), T);
-        C->reinterpret = true;
-        auto* U = new das::ExprUnsafe(At);
-        U->body = C;
-        return U;
-    }
+    if (DSLTypedValue(Type, EDasTypeKind::Enum))
+        return DSLValueAdapter(Type)->Script->UnpackForPath(At, Type, V, Path);
     return DSLCall(At, DSLUtf8(TEXT("__ue_unpack_")+ FMD5::HashAnsiString(*DSLSourceValueKey(Type, Path))), {V});
 }
 das::ExpressionPtr DSLDirectPack(const das::LineInfo& At, const das::TypeDeclPtr& Type, das::ExpressionPtr V,
@@ -443,8 +393,7 @@ das::ExpressionPtr DSLDirectPack(const das::LineInfo& At, const das::TypeDeclPtr
         return V;
     if (DSLAdapted(Type))
         return DSLAdaptedPack(At, Type, V);
-    if (DSLNativeEnum(Type))
-        return DSLCall(At, Type->enumType->module->name + "::__ue_pack_native_enum_" + Type->enumType->name, {V});
+
     if (DSLTypedClass(Type))
         return DSLClassPack(At, Type, V);
     if (DSLDelegate(Type))
@@ -459,9 +408,8 @@ das::ExpressionPtr DSLDirectPack(const das::LineInfo& At, const das::TypeDeclPtr
             {new das::ExprField(At, V, "handle"), new das::ExprConstString(At, DSLUtf8(DSLTypedReferencePath(Type)))});
     if (DSLTypedReference(Type))
         return DSLCall(At, Type->structType->module->name + "::" + Type->structType->name + "_raw", {V});
-    if (DSLDirectEnum(Type))
-        return DSLCall(At, "ue_enum_from_number",
-                       {new das::ExprConstString(At, DSLUtf8(Path)), DSLCall(At, "int", {V})});
+    if (DSLTypedValue(Type, EDasTypeKind::Enum))
+        return DSLValueAdapter(Type)->Script->PackForPath(At, Type, V, Path);
     return DSLCall(At, DSLUtf8(TEXT("__ue_pack_")+ FMD5::HashAnsiString(*DSLSourceValueKey(Type, Path))), {V});
 }
 // Struct-leaf accessor suffix of a scalar kind; name is the remaining reflected scalar.
@@ -604,7 +552,7 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
             UnpackBody->list.push_back(
                 Loop(DSLCall(At, "ue_struct_set_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
         }
-        else if (DSLSet(Field.type) && DSLDirectEnum(Field.type->firstType))
+        else if (DSLSet(Field.type) && DSLTypedValue(Field.type->firstType, EDasTypeKind::Enum))
         {
             const auto Element = Field.type->firstType;
             // Resolve the actual enum from the carrier (authored paths depend on registry scope).
@@ -664,7 +612,7 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
         }
         else if (Field.type->baseType == das::Type::tTable)
         {
-            const das::string K = DSLDirectEnum(Field.type->firstType) ? "enum"
+            const das::string K = DSLTypedValue(Field.type->firstType, EDasTypeKind::Enum) ? "enum"
                                   : DSLObjectKey(Field.type->firstType)
                                       ? "object"
                                       : DSLTypeName(Field.type->firstType) ==
@@ -676,7 +624,8 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
                                                                                 : DSLTypeName(Field.type->firstType) ==
                                                                   TEXT("string")? "string" : "int",
                                                                        V = DSLUtf8(DSLTypeName(Field.type->secondType));
-            const bool StructValue = V == "struct", EnumValue = DSLDirectEnum(Field.type->secondType),
+            const bool StructValue = V == "struct",
+                       EnumValue = DSLTypedValue(Field.type->secondType, EDasTypeKind::Enum),
                        ObjectValue = DSLTypedReference(Field.type->secondType),
                        TypedValue = StructValue || EnumValue || ObjectValue;
             FString ValuePath;
@@ -800,7 +749,7 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
             UnpackBody->list.push_back(
                 Loop(DSLCall(At, "ue_struct_array_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
         }
-        else if (Array && DSLDirectEnum(Child))
+        else if (Array && DSLTypedValue(Child, EDasTypeKind::Enum))
         {
             auto* Native = FindObject<UScriptStruct>(nullptr, *Path);
             auto* ArrayField = CastField<FArrayProperty>(FindDasStructField(Native, DSLText(Field.name)));
@@ -923,7 +872,7 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
                                     ChildPath)));
             }
         }
-        else if (DSLDirectEnum(Field.type))
+        else if (DSLTypedValue(Field.type, EDasTypeKind::Enum))
         {
             auto* Native = FindObject<UScriptStruct>(nullptr, *Path);
             auto* E = DasEnumPropertyType(FindDasStructField(Native, DSLText(Field.name)));

@@ -1,3 +1,4 @@
+#include "DasEnumNativeView.inl"
 #include "DasSoftNativeView.inl"
 das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, const FDasDeclaredType& Type,
                                     const das::LineInfo& At)
@@ -43,23 +44,7 @@ das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, 
         return T;
     }
     if (Type.GetKind() == EDasTypeKind::Enum)
-    {
-        const TCHAR* Source = nullptr;
-        for (const auto& V : DasNativeGameplayEnums)
-            if (Type.TypePath == V.Path)
-            {
-                Source = V.Source;
-                break;
-            }
-        if (!Source)
-            DSLFail(TEXT("Enum not in generated native registry"));
-        auto Types = Program->thisModuleGroup->findEnum(DSLUtf8(Source), Module);
-        if (Types.size() != 1)
-            DSLFail(TEXT("Import ue_native_gameplay for native enum: ")+ Type.TypePath);
-        auto* T = new das::TypeDecl(das::Type::tEnumeration, At);
-        T->enumType = Types[0];
-        return T;
-    }
+        return DSLKindFacet(Type.GetKind())->MakeViewForPath(Type.TypePath, *Program->thisModuleGroup, Module, At);
     if (Type.GetKind() == EDasTypeKind::Struct)
     {
         const auto& Path = Type.TypePath;

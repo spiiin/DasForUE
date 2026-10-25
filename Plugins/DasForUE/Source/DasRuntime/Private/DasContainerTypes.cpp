@@ -4,6 +4,7 @@
 #include "DasContainerTypes.h"
 #include "DasSoftReferences.h"
 #include "DasTypeAdapters.h"
+#include "DasEnumAdapter.h"
 #include "DasAuthoring.h"
 #include "DasPropertyTypes.h"
 #include "DasContainerRegistry.h"
@@ -579,9 +580,7 @@ UScriptStruct* ObjectMapCarrier(const FDasDeclaredType& Type, int StrongOverride
     if (Type.Value->Kind == TEXT("enum"))
     {
         auto* E = FindObject<UEnum>(nullptr, *Type.Value->TypePath);
-        bool Strong = StrongOverride >= 0
-                          ? StrongOverride != 0
-                          : E && !E->IsA<UDasDefinedEnum>() && E->GetCppForm() == UEnum::ECppForm::EnumClass;
+        bool Strong = StrongOverride >= 0 ? StrongOverride != 0 : DasAutomaticEnumStorage(E) == EDasEnumStorage::Enum8;
         Base = ReflectedMapCarrier(E, false, Strong);
     }
     else
@@ -637,8 +636,7 @@ UScriptStruct* EnumMapCarrier(const FDasDeclaredType& Type, int KeyStrong = -1, 
     auto* E = FindObject<UEnum>(nullptr, *Type.Key->TypePath);
     if (!E)
         return nullptr;
-    bool Strong =
-        KeyStrong >= 0 ? KeyStrong != 0 : !E->IsA<UDasDefinedEnum>() && E->GetCppForm() == UEnum::ECppForm::EnumClass;
+    bool Strong = KeyStrong >= 0 ? KeyStrong != 0 : DasAutomaticEnumStorage(E) == EDasEnumStorage::Enum8;
     FDasDeclaredType Proxy = Type;
     auto Key = MakeShared<FDasDeclaredType>();
     Key->Kind = TEXT("int");
@@ -647,8 +645,7 @@ UScriptStruct* EnumMapCarrier(const FDasDeclaredType& Type, int KeyStrong = -1, 
     if (Type.Value->Kind == TEXT("enum"))
     {
         auto* V = FindObject<UEnum>(nullptr, *Type.Value->TypePath);
-        bool VS = ValueStrong >= 0 ? ValueStrong != 0
-                                   : V && !V->IsA<UDasDefinedEnum>() && V->GetCppForm() == UEnum::ECppForm::EnumClass;
+        bool VS = ValueStrong >= 0 ? ValueStrong != 0 : DasAutomaticEnumStorage(V) == EDasEnumStorage::Enum8;
         Base = ReflectedMapCarrier(V, false, VS);
     }
     else
@@ -752,9 +749,9 @@ UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type)
         auto* Enum = FindObject<UEnum>(nullptr, *Type.Element->TypePath);
         // Kismet emits FEnumProperty for native enum classes, but FByteProperty
         // for regular/native-byte enums and authored enums.
-        return EnumSetCarrier(Enum, Storage(Type.Element) >= 0 ? Storage(Type.Element) != 0
-                                                               : Enum && !Enum->IsA<UDasDefinedEnum>() &&
-                                                                     Enum->GetCppForm() == UEnum::ECppForm::EnumClass);
+        return EnumSetCarrier(Enum, Storage(Type.Element) >= 0
+                                        ? Storage(Type.Element) != 0
+                                        : DasAutomaticEnumStorage(Enum) == EDasEnumStorage::Enum8);
     }
     if (Type.Kind == TEXT("map") && Type.Key && Type.Key->Kind == TEXT("name") && Type.Value)
         return NameMapCarrier(Type, Storage(Type.Value) == 1);

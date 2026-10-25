@@ -48,6 +48,22 @@ public:
     virtual das::ExpressionPtr Pack(const das::LineInfo& At, das::ExpressionPtr Value) const = 0;
     virtual das::ExpressionPtr Unpack(const das::LineInfo& At, const das::TypeDeclPtr& Type,
                                       das::ExpressionPtr Handle) const = 0;
+    virtual bool MatchesCallType(const das::TypeDeclPtr& Type) const { return MatchesScriptType(Type); }
+    virtual bool IsNativeType(const das::TypeDeclPtr&) const { return false; }
+    virtual FString ResolveTypePath(const das::TypeDeclPtr& Type, const FString&, const FString&) const
+    {
+        return GetTypePath(Type);
+    }
+    virtual das::ExpressionPtr PackForPath(const das::LineInfo& At, const das::TypeDeclPtr& Type,
+                                           das::ExpressionPtr Value, const FString&) const
+    {
+        return PackTyped(At, Type, Value);
+    }
+    virtual das::ExpressionPtr UnpackForPath(const das::LineInfo& At, const das::TypeDeclPtr& Type,
+                                             das::ExpressionPtr Value, const FString&) const
+    {
+        return Unpack(At, Type, Value);
+    }
     virtual bool ParseDefault(EDasScriptDefaultUse, const das::TypeDeclPtr&, das::ExpressionPtr, das::ModuleGroup&,
                               das::Module*, FDasDeclaredLiteral&) const
     {

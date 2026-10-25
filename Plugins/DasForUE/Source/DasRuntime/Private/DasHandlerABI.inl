@@ -40,15 +40,11 @@ das::FunctionPtr DSLHandlerABI(const das::FunctionPtr& SourceFunction, const das
             Arg->type = new das::TypeDecl(das::Type::tUInt64, SourceFunction->at);
             Value = DSLDirectUnpack(SourceFunction->at, Original, Value, FString());
         }
-        if (DSLTypedClass(Original) || DSLContainer(Original) || DSLDirectEnum(Original) ||
+        if (DSLTypedClass(Original) || DSLContainer(Original) || DSLTypedValue(Original, EDasTypeKind::Enum) ||
             (DSLDirectStruct(Original) || DSLAdaptedSnapshot(Original, EDasCallBridge::FrameSlot)) ||
             DSLTypedReference(Original))
         {
-            Arg->type = DSLHandleType(Group, Module,
-                                      DSLTypedClass(Original)       ? "UEClassHandle"
-                                      : DSLTypedReference(Original) ? "UObjectHandle"
-                                      : DSLDirectEnum(Original)     ? "UEEnumValue"
-                                                                    : "UEStructValue");
+            Arg->type = DSLReflectedValueABI(Original, Group, Module);
             Value = DSLDirectUnpack(SourceFunction->at, Original, Value,
                                     DSLContainer(Original) ? DSLDirectPath(Original, TypeFolder, TypeRegistry)
                                                            : M.Parameters[int32(I)].Type.TypePath);
@@ -99,7 +95,7 @@ das::FunctionPtr DSLHandlerABI(const das::FunctionPtr& SourceFunction, const das
                                                                                : DSLScalarSuffix(Kind);
                 if (DSLTypedClass(Original) || DSLContainer(Original) ||
                     (DSLDirectStruct(Original) || DSLAdaptedSnapshot(Original, EDasCallBridge::FrameSlot)) ||
-                    DSLDirectEnum(Original) || DSLTypedReference(Original))
+                    DSLTypedValue(Original, EDasTypeKind::Enum) || DSLTypedReference(Original))
                     Updated = DSLDirectPack(SourceFunction->at, Original, Updated,
                                             DSLContainer(Original) ? DSLDirectPath(Original, TypeFolder, TypeRegistry)
                                                                    : M.Parameters[I].Type.TypePath);
@@ -113,16 +109,12 @@ das::FunctionPtr DSLHandlerABI(const das::FunctionPtr& SourceFunction, const das
         Value = DSLDirectPack(SourceFunction->at, SourceFunction->result, Value, FString());
     }
     if (DSLTypedClass(SourceFunction->result) || DSLContainer(SourceFunction->result) ||
-        DSLDirectEnum(SourceFunction->result) ||
+        DSLTypedValue(SourceFunction->result, EDasTypeKind::Enum) ||
         (DSLDirectStruct(SourceFunction->result) ||
          DSLAdaptedSnapshot(SourceFunction->result, EDasCallBridge::FrameSlot)) ||
         DSLTypedReference(SourceFunction->result))
     {
-        Wrapper->result = DSLHandleType(Group, Module,
-                                        DSLTypedClass(SourceFunction->result)       ? "UEClassHandle"
-                                        : DSLTypedReference(SourceFunction->result) ? "UObjectHandle"
-                                        : DSLDirectEnum(SourceFunction->result)     ? "UEEnumValue"
-                                                                                    : "UEStructValue");
+        Wrapper->result = DSLReflectedValueABI(SourceFunction->result, Group, Module);
         Value = DSLDirectPack(SourceFunction->at, SourceFunction->result, Value,
                               DSLContainer(SourceFunction->result)
                                   ? DSLDirectPath(SourceFunction->result, TypeFolder, TypeRegistry)

@@ -1,5 +1,8 @@
 #include "DasTypeAdapters.h"
 #include "DasSoftReferences.h"
+#include "DasDefinedEnum.h"
+#include "Engine/EngineTypes.h"
+#include "UObject/StrongObjectPtr.h"
 #include "GameFramework/Actor.h"
 #include "UObject/Class.h"
 #include "UObject/UnrealType.h"
@@ -22,6 +25,60 @@ bool CheckDasTypeAdapters(FString& Error)
                 Error = TEXT("Struct adapter is not reachable: ")+ Struct->GetPathName();
                 return false;
             }
+            continue;
+        }
+        if (Adapter->GetKind() == EDasTypeKind::Enum)
+        {
+            TStrongObjectPtr<UDasDefinedEnum> Authored(NewObject<UDasDefinedEnum>());
+            const FString Prefix = Authored->GetName() + TEXT("::");
+            TArray<TPair<FName, int64>> Members = {{FName(*(Prefix + TEXT("Zero"))), 0},
+                                                    {FName(*(Prefix + TEXT("Last"))), 254}};
+            Authored->SetEnums(Members, UEnum::ECppForm::EnumClass, UEnum::EUnderlyingType::uint8, EEnumFlags::None,
+                               UEnum::EAddMaxKeyIfMissing::No);
+            UEnum* Native = StaticEnum<ESpawnActorCollisionHandlingMethod>();
+            for (UEnum* Enum : {Native, static_cast<UEnum*>(Authored.Get())})
+                for (auto Storage : {EDasEnumStorage::Automatic, EDasEnumStorage::Byte, EDasEnumStorage::Enum8})
+                {
+                    FDasDeclaredType Type;
+                    Type.Kind = TEXT("enum");
+                    Type.TypePath = Enum->GetPathName();
+                    Type.EnumStorage = Storage;
+                    auto* Property =
+                        CreateDasProperty(FFieldVariant(), TEXT("EnumValue"), Type, EDasPropertyUsage::Value, Error);
+                    const bool Strong =
+                        Storage == EDasEnumStorage::Enum8 || (Storage == EDasEnumStorage::Automatic && Enum == Native);
+                    FDasDeclaredType RoundTrip;
+                    const bool Good =
+                        Property && Registry.Find(Type) == Adapter && Registry.FindProperty(Property) == Adapter &&
+                        DasPropertyKind(Property) == EDasTypeKind::Enum &&
+                        bool(CastField<FEnumProperty>(Property)) == Strong &&
+                        DescribeDasProperty(Property, RoundTrip, Error) && RoundTrip.TypePath == Type.TypePath &&
+                        RoundTrip.EnumStorage == (Strong ? EDasEnumStorage::Enum8 : EDasEnumStorage::Byte);
+                    delete Property;
+                    if (!Good)
+                    {
+                        Error = TEXT("Enum adapter lost nominal identity or byte/strong storage");
+                        return false;
+                    }
+                }
+            FDasDeclaredType Missing;
+            Missing.Kind = TEXT("enum");
+            Missing.TypePath = TEXT("/Script/DasRuntime.MissingAdapterEnum");
+            if (ValidateDasPropertyType(Missing, EDasPropertyUsage::Value, Error))
+            {
+                Error = TEXT("Enum adapter accepted an unknown enum identity");
+                return false;
+            }
+            Members.Last().Value = 255;
+            Authored->SetEnums(Members, UEnum::ECppForm::EnumClass, UEnum::EUnderlyingType::uint8, EEnumFlags::None,
+                               UEnum::EAddMaxKeyIfMissing::No);
+            Missing.TypePath = Authored->GetPathName();
+            if (ValidateDasPropertyType(Missing, EDasPropertyUsage::Value, Error))
+            {
+                Error = TEXT("Enum adapter accepted a value above 254");
+                return false;
+            }
+            Error.Reset();
             continue;
         }
         if (Adapter->IsStructFamily())

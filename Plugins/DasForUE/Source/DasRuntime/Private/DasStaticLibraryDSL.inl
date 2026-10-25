@@ -80,7 +80,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                     if (DSLAuthoredView(T))
                         D.AuthoredId = DSLReferenceDeclaration(T).Id;
                 }
-                else if (DSLDirectEnum(T) || DSLDirectStruct(T) || !DSLMathPath(T).IsEmpty())
+                else if (DSLTypedValue(T, EDasTypeKind::Enum) || DSLDirectStruct(T) || !DSLMathPath(T).IsEmpty())
                 {
                     D.TypePath = DSLDirectPath(T, TypeFolder, TypeRegistry);
                     if (DSLDirectStruct(T) || DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge))
@@ -94,17 +94,14 @@ struct FUELibraryAnnotation : das::StructureAnnotation
             };
             auto Packed = [](const das::TypeDeclPtr& T)
             {
-                return DSLTypedClass(T) || DSLContainer(T) || DSLDirectEnum(T) || DSLDirectStruct(T) ||
-                       DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge) || DSLTypedReference(T);
+                return DSLTypedClass(T) || DSLContainer(T) || DSLTypedValue(T, EDasTypeKind::Enum) ||
+                       DSLDirectStruct(T) || DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge) ||
+                       DSLTypedReference(T);
             };
             auto ABI = [&](const das::TypeDeclPtr& T)
             {
                 return DSLDelegate(T) ? static_cast<das::TypeDeclPtr>(new das::TypeDecl(das::Type::tUInt64, T->at))
-                                      : DSLHandleType(Group, St->module,
-                                                      DSLTypedClass(T)       ? "UEClassHandle"
-                                                      : DSLTypedReference(T) ? "UObjectHandle"
-                                                      : DSLDirectEnum(T)     ? "UEEnumValue"
-                                                                             : "UEStructValue");
+                                      : DSLReflectedValueABI(T, Group, St->module);
             };
             for (const auto& F : Functions)
             {

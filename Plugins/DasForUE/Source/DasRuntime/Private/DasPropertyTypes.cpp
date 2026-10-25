@@ -1,7 +1,6 @@
 #include "DasPropertyTypes.h"
 #include "DasTypeAdapters.h"
 #include "DasSoftReferences.h"
-#include "DasDefinedEnum.h"
 #include "UObject/UnrealType.h"
 #include "UObject/StrProperty.h"
 #include "UObject/TextProperty.h"
@@ -97,21 +96,13 @@ bool Validate(const FDasDeclaredType& T, EDasPropertyUsage Usage, FString& Error
             return Fail(TEXT("Missing loaded struct"));
         return Usage != EDasPropertyUsage::Container || ValidateDasValueStruct(T.TypePath, Error);
     }
-    if (K == EDasTypeKind::Enum)
-    {
-        auto* E = FindObject<UEnum>(nullptr, *T.TypePath);
-        if (!E)
-            return Fail(TEXT("Missing loaded enum"));
-        for (int32 I = 0; I < E->NumEnums(); ++I)
+    if (const auto* Adapter = FDasTypeAdapters::Get().Find(T))
+        if (const auto Result = Adapter->ValidateDeclared(T, Usage, Error); Result.IsSet())
         {
-            if (E->GetNameStringByIndex(I).EndsWith(TEXT("_MAX")))
-                continue;
-            const auto N = E->GetValueByIndex(I);
-            if (N < 0 || N > 254)
-                return Fail(TEXT("Enum property requires values in 0..254"));
+            if (!Result.GetValue())
+                Error += TEXT(": ") + T.Kind + TEXT(" ") + T.TypePath;
+            return Result.GetValue();
         }
-        return true;
-    }
     return T.TypePath.IsEmpty() ? true : Fail(TEXT("Primitive has a type identity"));
 }
 bool Describe(const FProperty* P, FDasDeclaredType& Out, FString& Error, int32 Depth, int32& Nodes)
@@ -155,22 +146,10 @@ bool Describe(const FProperty* P, FDasDeclaredType& Out, FString& Error, int32 D
         return Describe(M->KeyProp, *Key, Error, Depth + 1, Nodes) &&
                Describe(M->ValueProp, *Value, Error, Depth + 1, Nodes);
     }
-    if (auto* E = CastField<FEnumProperty>(P))
-    {
-        if (!E->GetUnderlyingProperty() || !E->GetUnderlyingProperty()->IsA<FByteProperty>())
-        {
-            Error = TEXT("Only byte-sized enum storage is supported");
-            return false;
-        }
-        Out.TypePath = E->GetEnum()->GetPathName();
-        Out.EnumStorage = EDasEnumStorage::Enum8;
-    }
-    else if (auto* B = CastField<FByteProperty>(P); B && B->Enum)
-    {
-        Out.TypePath = B->Enum->GetPathName();
-        Out.EnumStorage = EDasEnumStorage::Byte;
-    }
-    else if (auto* Soft = DasSoftCarrierForProperty(P))
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P))
+        if (const auto Result = Adapter->DescribeProperty(P, Out, Error); Result.IsSet())
+            return Result.GetValue();
+    if (auto* Soft = DasSoftCarrierForProperty(P))
         Out.TypePath = Soft->GetPathName();
     else if (auto* C = CastField<FClassProperty>(P))
         Out.TypePath = C->MetaClass->GetPathName();
@@ -225,20 +204,6 @@ FProperty* Build(FFieldVariant Owner, FName Name, const FDasDeclaredType& T, EDa
         P->MetaClass = FindObject<UClass>(nullptr, *T.TypePath);
         return P;
     }
-    case EDasTypeKind::Enum:
-    {
-        auto* E = FindObject<UEnum>(nullptr, *T.TypePath);
-        if (DasResolvedEnumStorage(T) == EDasEnumStorage::Enum8)
-        {
-            auto* P = new FEnumProperty(Owner, Name);
-            P->SetEnum(E);
-            P->AddCppProperty(new FByteProperty(P, TEXT("UnderlyingType")));
-            return P;
-        }
-        auto* P = new FByteProperty(Owner, Name);
-        P->Enum = E;
-        return P;
-    }
     case EDasTypeKind::Array:
     {
         auto* P = new FArrayProperty(Owner, Name);
@@ -265,17 +230,6 @@ FProperty* Build(FFieldVariant Owner, FName Name, const FDasDeclaredType& T, EDa
         return nullptr;
     }
 }
-}
-EDasEnumStorage DasResolvedEnumStorage(const FDasDeclaredType& Type)
-{
-    if (Type.GetKind() != EDasTypeKind::Enum)
-        return EDasEnumStorage::Automatic;
-    if (Type.EnumStorage != EDasEnumStorage::Automatic)
-        return Type.EnumStorage;
-    const auto* Enum = FindObject<UEnum>(nullptr, *Type.TypePath);
-    return Enum && !Enum->IsA<UDasDefinedEnum>() && Enum->GetCppForm() == UEnum::ECppForm::EnumClass
-               ? EDasEnumStorage::Enum8
-               : EDasEnumStorage::Byte;
 }
 FString FDasDeclaredType::StorageIdentity() const
 {
@@ -306,10 +260,6 @@ EDasTypeKind DasPropertyKind(const FProperty* P)
         return EDasTypeKind::Set;
     if (CastField<FMapProperty>(P))
         return EDasTypeKind::Map;
-    if (auto* B = CastField<FByteProperty>(P))
-        return B->Enum ? EDasTypeKind::Enum : EDasTypeKind::Byte;
-    if (CastField<FEnumProperty>(P))
-        return EDasTypeKind::Enum;
     if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P); Adapter && !Adapter->GetStruct())
         return Adapter->GetKind();
     if (CastField<FClassProperty>(P))

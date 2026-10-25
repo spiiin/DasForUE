@@ -5,6 +5,7 @@
 #include "UObject/FieldPath.h"
 #include "DasGameplayTags.h"
 #include "DasTypeAdapters.h"
+#include "DasEnumAdapter.h"
 #include "DasValueKinds.h"
 #include "DasUEAot.h"
 #if DAS_WITH_TEST_PROBES
