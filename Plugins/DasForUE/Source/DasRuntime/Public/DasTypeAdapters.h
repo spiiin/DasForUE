@@ -11,11 +11,24 @@ enum class EDasAdapterDefault : uint8
     ImplicitEmpty // authored fields take no initializer and export an empty default
 };
 
+// A container composes child types through these slots. Descriptor traversal keeps one depth/node
+// budget; reflected readers never create carriers or load classes.
+struct FDasContainerSlot
+{
+    using FDescriptor = TSharedPtr<const FDasDeclaredType> FDasDeclaredType::*;
+    FDescriptor Descriptor;
+    const FProperty* (*ReadProperty)(const FProperty*);
+    bool bHashKey;
+};
+
 class DASRUNTIME_API IDasTypeAdapter
 {
 public:
     virtual ~IDasTypeAdapter() = default;
     virtual EDasTypeKind GetKind() const = 0;
+    virtual TConstArrayView<FDasContainerSlot> GetContainerSlots() const { return {}; }
+    virtual bool SupportsContainerValue() const { return true; }
+    virtual bool CanBeContainerKey(const FDasDeclaredType&) const { return false; }
     // Struct adapters are found by this struct; kind adapters return nullptr.
     virtual const UScriptStruct* GetStruct() const { return nullptr; }
     // Dynamic carrier families participate without mutating the registry after startup.
@@ -69,6 +82,7 @@ public:
     void Register(TSharedRef<const IDasTypeAdapter> Adapter, const IDasScriptTypeFacet* Script = nullptr);
 
     const IDasTypeAdapter* Find(const FDasDeclaredType& Type) const;
+    const IDasTypeAdapter* FindKind(EDasTypeKind Kind) const;
     const IDasTypeAdapter* FindStruct(const UScriptStruct* Type) const;
     const IDasTypeAdapter* FindStructPath(const FString& Path) const;
     const IDasTypeAdapter* FindProperty(const FProperty* Property) const;

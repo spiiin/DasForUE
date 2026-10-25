@@ -10,6 +10,12 @@ public:
     explicit FDasObjectClassAdapter(bool IsClass) : Class(IsClass) {}
     EDasTypeKind GetKind() const override { return Class ? EDasTypeKind::Class : EDasTypeKind::Object; }
     bool UsesTypeIdentity() const override { return true; }
+    bool SupportsContainerValue() const override { return !Class; }
+    bool CanBeContainerKey(const FDasDeclaredType& Type) const override
+    {
+        auto* C = FindObject<UClass>(nullptr, *Type.TypePath);
+        return !Class && C && !C->HasAnyClassFlags(CLASS_Interface);
+    }
     bool MatchesProperty(const FProperty* Property) const override
     {
         return Class ? CastField<FClassProperty>(Property) != nullptr : DasReferencePropertyClass(Property) != nullptr;

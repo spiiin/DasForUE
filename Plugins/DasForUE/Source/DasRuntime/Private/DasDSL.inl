@@ -386,80 +386,51 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
 {
     FDasDeclaredType D;
     D.Kind = DSLTypeName(T);
-    auto First = MakeShared<FDasDeclaredType>();
-    First->Kind = DSLTypeName(T->firstType);
-    if (DSLObjectKey(T->firstType))
+    const auto* Adapter = FDasTypeAdapters::Get().Find(D);
+    if (!Adapter || Adapter->GetContainerSlots().IsEmpty())
+        DSLFail(TEXT("Expected array, map or set"));
+    for (const auto& Slot : Adapter->GetContainerSlots())
     {
-        if (D.GetKind() != EDasTypeKind::Set && D.GetKind() != EDasTypeKind::Map)
-            DSLFail(TEXT("Object keys are only supported as map keys or set elements"));
-        const auto* Key = DSLKeyAnnotation(T->firstType);
-        First->Kind = TEXT("object");
-        First->TypePath = Key->ClassPath;
-        First->AuthoredId = Key->AuthoredId;
-    }
-    else if ((D.GetKind() == EDasTypeKind::Set || D.GetKind() == EDasTypeKind::Map) &&
-             First->GetKind() == EDasTypeKind::Object)
-        DSLFail(TEXT("Use UEObjectKey<Reference> for UObject table keys"));
-    if (D.GetKind() == EDasTypeKind::Array && DSLTypedReference(T->firstType))
-    {
-        if (DSLAuthoredView(T->firstType))
-            First->AuthoredId = DSLReferenceDeclaration(T->firstType).Id;
-        First->TypePath = DSLTypedReferencePath(T->firstType);
-        if (!First->TypePath.StartsWith(TEXT("/Script/")))
-            DSLFail(TEXT("Reference arrays require native object/interface types"));
-    }
-    if ((D.GetKind() == EDasTypeKind::Array || D.GetKind() == EDasTypeKind::Set || D.GetKind() == EDasTypeKind::Map) &&
-        DSLTypedValue(T->firstType, EDasTypeKind::Enum))
-        First->TypePath = DSLDirectPath(T->firstType, Folder, Registry);
-    if (D.GetKind() == EDasTypeKind::Array && First->GetKind() == EDasTypeKind::Struct)
-    {
-        if (DSLAdapted(T->firstType))
-            First->TypePath = DSLAdaptedPath(T->firstType);
-        else if (!DSLMathPath(T->firstType).IsEmpty())
-            First->TypePath = DSLMathPath(T->firstType);
-        else
+        const auto& Source = Slot.Descriptor == &FDasDeclaredType::Value ? T->secondType : T->firstType;
+        auto Child = MakeShared<FDasDeclaredType>();
+        Child->Kind = DSLTypeName(Source);
+        if (DSLObjectKey(Source))
         {
-            if (!T->firstType->structType ||
-                (!DSLAnnotation(T->firstType->structType->annotations, "ue_struct") &&
-                 !DSLAnnotation(T->firstType->structType->annotations, "ue_native_struct")))
-                DSLFail(TEXT("Struct arrays require authored ue_struct or supported math elements"));
-            First->TypePath = DSLDirectPath(T->firstType, Folder, Registry);
+            if (!Slot.bHashKey)
+                DSLFail(TEXT("Object keys are only supported as map keys or set elements"));
+            const auto* Key = DSLKeyAnnotation(Source);
+            Child->Kind = TEXT("object");
+            Child->TypePath = Key->ClassPath;
+            Child->AuthoredId = Key->AuthoredId;
         }
-    }
-    if (D.GetKind() == EDasTypeKind::Map)
-    {
-        D.Key = First;
-        auto Value = MakeShared<FDasDeclaredType>();
-        Value->Kind = DSLTypeName(T->secondType);
-        if (DSLTypedValue(T->secondType, EDasTypeKind::Enum))
-            Value->TypePath = DSLDirectPath(T->secondType, Folder, Registry);
-        if (DSLTypedReference(T->secondType))
+        else if (Slot.bHashKey && Child->GetKind() == EDasTypeKind::Object)
+            DSLFail(TEXT("Use UEObjectKey<Reference> for UObject table keys"));
+        else if (!Slot.bHashKey && DSLTypedReference(Source))
         {
-            if (DSLAuthoredView(T->secondType))
-                Value->AuthoredId = DSLReferenceDeclaration(T->secondType).Id;
-            Value->TypePath = DSLTypedReferencePath(T->secondType);
-            if (!Value->TypePath.StartsWith(TEXT("/Script/")))
-                DSLFail(TEXT("Reference maps require native object/interface hosts"));
+            if (DSLAuthoredView(Source))
+                Child->AuthoredId = DSLReferenceDeclaration(Source).Id;
+            Child->TypePath = DSLTypedReferencePath(Source);
+            if (!Child->TypePath.StartsWith(TEXT("/Script/")))
+                DSLFail(TEXT("Reference containers require native object/interface types"));
         }
-        if (Value->GetKind() == EDasTypeKind::Struct)
+        if (DSLTypedValue(Source, EDasTypeKind::Enum))
+            Child->TypePath = DSLDirectPath(Source, Folder, Registry);
+        if (!Slot.bHashKey && Child->GetKind() == EDasTypeKind::Struct)
         {
-            if (DSLAdapted(T->secondType))
-                Value->TypePath = DSLAdaptedPath(T->secondType);
-            else if (!DSLMathPath(T->secondType).IsEmpty())
-                Value->TypePath = DSLMathPath(T->secondType);
+            if (DSLAdapted(Source))
+                Child->TypePath = DSLAdaptedPath(Source);
+            else if (!DSLMathPath(Source).IsEmpty())
+                Child->TypePath = DSLMathPath(Source);
             else
             {
-                if (!T->secondType->structType ||
-                    (!DSLAnnotation(T->secondType->structType->annotations, "ue_struct") &&
-                     !DSLAnnotation(T->secondType->structType->annotations, "ue_native_struct")))
-                    DSLFail(TEXT("Struct maps require authored ue_struct or supported math values"));
-                Value->TypePath = DSLDirectPath(T->secondType, Folder, Registry);
+                if (!Source->structType || (!DSLAnnotation(Source->structType->annotations, "ue_struct") &&
+                                            !DSLAnnotation(Source->structType->annotations, "ue_native_struct")))
+                    DSLFail(TEXT("Struct containers require authored ue_struct or supported math values"));
+                Child->TypePath = DSLDirectPath(Source, Folder, Registry);
             }
         }
-        D.Value = Value;
+        D.*Slot.Descriptor = Child;
     }
-    else
-        D.Element = First;
     if (!DasContainerCarrier(D))
         DSLFail(TEXT("Standalone containers require primitive/authored-struct arrays, int/string/name/enum/object-key sets or int/string/name/enum/object-key scalar/name/struct/enum/reference maps"));
     return D;

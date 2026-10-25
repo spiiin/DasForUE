@@ -41,11 +41,13 @@ const IDasTypeAdapter* FDasTypeAdapters::Find(const FDasDeclaredType& Type) cons
     const EDasTypeKind Kind = Type.GetKind();
     if (Kind == EDasTypeKind::Struct)
         return FindStructPath(Type.TypePath);
+    const auto* Adapter = FindKind(Kind);
+    return Adapter && (Type.TypePath.IsEmpty() || Adapter->UsesTypeIdentity()) ? Adapter : nullptr;
+}
+const IDasTypeAdapter* FDasTypeAdapters::FindKind(EDasTypeKind Kind) const
+{
     const int32* Index = ByKind.Find(Kind);
-    if (!Index)
-        return nullptr;
-    const auto* Adapter = &*EntryList[*Index].Adapter;
-    return Type.TypePath.IsEmpty() || Adapter->UsesTypeIdentity() ? Adapter : nullptr;
+    return Index ? &*EntryList[*Index].Adapter : nullptr;
 }
 const IDasTypeAdapter* FDasTypeAdapters::FindStruct(const UScriptStruct* Type) const
 {

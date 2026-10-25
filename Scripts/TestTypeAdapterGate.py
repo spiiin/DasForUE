@@ -11,6 +11,10 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Plugins',
 
 # Ported type -> (patterns, files allowed to contain them).
 PORTED = {
+    'ContainerPropertyFactory': (
+        [r'\bnew F(?:Array|Set|Map)Property\b'],
+        {'DasContainerAdapters.cpp'},
+    ),
     'InterfaceMembership': (
         [r'->ImplementsInterface\('],
         {'DasInterfaceContracts.cpp'},

@@ -7,15 +7,6 @@
 
 namespace
 {
-bool HashKey(EDasTypeKind K)
-{
-    return K == EDasTypeKind::Int || K == EDasTypeKind::Byte || K == EDasTypeKind::String || K == EDasTypeKind::Name ||
-           K == EDasTypeKind::Enum || K == EDasTypeKind::Object;
-}
-bool Container(EDasTypeKind K)
-{
-    return K == EDasTypeKind::Array || K == EDasTypeKind::Set || K == EDasTypeKind::Map;
-}
 bool Validate(const FDasDeclaredType& T, EDasPropertyUsage Usage, FString& Error, int32 Depth, int32& Nodes)
 {
     auto Fail = [&](const TCHAR* Why)
@@ -37,42 +28,31 @@ bool Validate(const FDasDeclaredType& T, EDasPropertyUsage Usage, FString& Error
         return Fail(TEXT("Authored object identity on a non-object type"));
     if (!T.DelegateWire.IsEmpty())
         return Fail(TEXT("Unexpected delegate signature"));
-    if (Container(K))
+    const auto* Adapter = FDasTypeAdapters::Get().Find(T);
+    // The kind adapter remains available for malformed identities so shape errors stay explicit.
+    const auto* ShapeAdapter = Adapter ? Adapter : FDasTypeAdapters::Get().FindKind(K);
+    const auto Slots = ShapeAdapter ? ShapeAdapter->GetContainerSlots() : TConstArrayView<FDasContainerSlot>();
+    if (!Slots.IsEmpty())
     {
-        if ((T.Element && T.Element->WeakReference) || (T.Key && T.Key->WeakReference) ||
-            (T.Value && T.Value->WeakReference))
-            return Fail(TEXT("Direct weak-reference containers need a storage-preserving carrier"));
         if (!T.TypePath.IsEmpty())
             return Fail(TEXT("Container type_path must be empty"));
-        if (K == EDasTypeKind::Map)
+        const int32 Present = int32(bool(T.Element)) + int32(bool(T.Key)) + int32(bool(T.Value));
+        if (Present != Slots.Num())
+            return Fail(TEXT("Unsupported container shape"));
+        for (const auto& Slot : Slots)
         {
-            if (!T.Key || !T.Value || T.Element || !HashKey(T.Key->GetKind()) || Container(T.Value->GetKind()) ||
-                T.Value->GetKind() == EDasTypeKind::Class)
-                return Fail(TEXT("Unsupported map shape"));
-            if (!Validate(*T.Key, Usage, Error, Depth + 1, Nodes) ||
-                !Validate(*T.Value, Usage, Error, Depth + 1, Nodes))
+            const auto& Child = T.*Slot.Descriptor;
+            if (!Child)
+                return Fail(TEXT("Missing container child"));
+            if (Child->WeakReference)
+                return Fail(TEXT("Direct weak-reference containers need a storage-preserving carrier"));
+            const auto* ChildAdapter = FDasTypeAdapters::Get().Find(*Child);
+            if (ChildAdapter && !ChildAdapter->SupportsContainerValue())
+                return Fail(TEXT("Unsupported container child type"));
+            if (!Validate(*Child, Usage, Error, Depth + 1, Nodes))
                 return false;
-            if (T.Key->GetKind() == EDasTypeKind::Object)
-            {
-                auto* C = FindObject<UClass>(nullptr, *T.Key->TypePath);
-                if (C->HasAnyClassFlags(CLASS_Interface))
-                    return Fail(TEXT("Interface object keys are unsupported"));
-            }
-        }
-        else
-        {
-            if (!T.Element || T.Key || T.Value || Container(T.Element->GetKind()) ||
-                T.Element->GetKind() == EDasTypeKind::Class ||
-                (K == EDasTypeKind::Set && !HashKey(T.Element->GetKind())))
-                return Fail(TEXT("Unsupported element shape"));
-            if (!Validate(*T.Element, Usage, Error, Depth + 1, Nodes))
-                return false;
-            if (K == EDasTypeKind::Set && T.Element->GetKind() == EDasTypeKind::Object)
-            {
-                auto* C = FindObject<UClass>(nullptr, *T.Element->TypePath);
-                if (C->HasAnyClassFlags(CLASS_Interface))
-                    return Fail(TEXT("Interface object sets are unsupported"));
-            }
+            if (Slot.bHashKey && (!ChildAdapter || !ChildAdapter->CanBeContainerKey(*Child)))
+                return Fail(TEXT("Unsupported container hash key"));
         }
         return true;
     }
@@ -85,7 +65,7 @@ bool Validate(const FDasDeclaredType& T, EDasPropertyUsage Usage, FString& Error
             return Fail(TEXT("Missing loaded struct"));
         return Usage != EDasPropertyUsage::Container || ValidateDasValueStruct(T.TypePath, Error);
     }
-    if (const auto* Adapter = FDasTypeAdapters::Get().Find(T))
+    if (Adapter)
         if (const auto Result = Adapter->ValidateDeclared(T, Usage, Error); Result.IsSet())
         {
             if (!Result.GetValue())
@@ -114,25 +94,20 @@ bool Describe(const FProperty* P, FDasDeclaredType& Out, FString& Error, int32 D
         Error = TEXT("Unsupported reflected property: ")+ P->GetClass()->GetName();
         return false;
     }
-    if (auto* A = CastField<FArrayProperty>(P))
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P))
     {
-        auto Child = MakeShared<FDasDeclaredType>();
-        Out.Element = Child;
-        return Describe(A->Inner, *Child, Error, Depth + 1, Nodes);
-    }
-    if (auto* S = CastField<FSetProperty>(P))
-    {
-        auto Child = MakeShared<FDasDeclaredType>();
-        Out.Element = Child;
-        return Describe(S->ElementProp, *Child, Error, Depth + 1, Nodes);
-    }
-    if (auto* M = CastField<FMapProperty>(P))
-    {
-        auto Key = MakeShared<FDasDeclaredType>(), Value = MakeShared<FDasDeclaredType>();
-        Out.Key = Key;
-        Out.Value = Value;
-        return Describe(M->KeyProp, *Key, Error, Depth + 1, Nodes) &&
-               Describe(M->ValueProp, *Value, Error, Depth + 1, Nodes);
+        const auto Slots = Adapter->GetContainerSlots();
+        if (!Slots.IsEmpty())
+        {
+            for (const auto& Slot : Slots)
+            {
+                auto Child = MakeShared<FDasDeclaredType>();
+                Out.*Slot.Descriptor = Child;
+                if (!Describe(Slot.ReadProperty(P), *Child, Error, Depth + 1, Nodes))
+                    return false;
+            }
+            return true;
+        }
     }
     if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P))
         if (const auto Result = Adapter->DescribeProperty(P, Out, Error); Result.IsSet())
@@ -154,39 +129,13 @@ FProperty* Build(FFieldVariant Owner, FName Name, const FDasDeclaredType& T, EDa
     if (const auto* Adapter = FDasTypeAdapters::Get().Find(T))
         if (FProperty* P = Adapter->MakeProperty(Owner, Name, T, Usage))
             return P;
-    switch (T.GetKind())
-    {
-    case EDasTypeKind::Struct:
+    if (T.GetKind() == EDasTypeKind::Struct)
     {
         auto* P = new FStructProperty(Owner, Name);
         P->Struct = FindObject<UScriptStruct>(nullptr, *T.TypePath);
         return P;
     }
-    case EDasTypeKind::Array:
-    {
-        auto* P = new FArrayProperty(Owner, Name);
-        P->Inner =
-            Build(P, Usage == EDasPropertyUsage::DelegateParameter ? TEXT("Inner"): TEXT("Values"), *T.Element, Usage);
-        return P;
-    }
-    case EDasTypeKind::Set:
-    {
-        auto* P = new FSetProperty(Owner, Name);
-        P->ElementProp = Build(P, TEXT("Element"), *T.Element, Usage);
-        P->ElementProp->SetPropertyFlags(CPF_HasGetValueTypeHash);
-        return P;
-    }
-    case EDasTypeKind::Map:
-    {
-        auto* P = new FMapProperty(Owner, Name);
-        P->KeyProp = Build(P, TEXT("Key"), *T.Key, Usage);
-        P->KeyProp->SetPropertyFlags(CPF_HasGetValueTypeHash);
-        P->ValueProp = Build(P, TEXT("Value"), *T.Value, Usage);
-        return P;
-    }
-    default:
-        return nullptr;
-    }
+    return nullptr;
 }
 }
 FString FDasDeclaredType::StorageIdentity() const
@@ -212,12 +161,6 @@ EDasTypeKind DasPropertyKind(const FProperty* P)
 {
     if (!P || P->ArrayDim != 1)
         return EDasTypeKind::Invalid;
-    if (CastField<FArrayProperty>(P))
-        return EDasTypeKind::Array;
-    if (CastField<FSetProperty>(P))
-        return EDasTypeKind::Set;
-    if (CastField<FMapProperty>(P))
-        return EDasTypeKind::Map;
     if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P); Adapter && !Adapter->GetStruct())
         return Adapter->GetKind();
     if (CastField<FSoftObjectProperty>(P))

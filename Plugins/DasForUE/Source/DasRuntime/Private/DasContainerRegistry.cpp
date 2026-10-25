@@ -1,5 +1,6 @@
 #include "DasContainerRegistry.h"
 #include "DasPropertyTypes.h"
+#include "DasTypeAdapters.h"
 #include "DasDefinedEnum.h"
 #include "UObject/Package.h"
 #include "UObject/UnrealType.h"
@@ -93,12 +94,14 @@ private:
                                      uint64(P->GetPropertyFlags()));
         if (auto* S = CastField<FStructProperty>(P))
             return Struct(S->Struct, Depth + 1);
-        if (auto* A = CastField<FArrayProperty>(P))
-            return Property(A->Inner, Depth + 1);
-        if (auto* M = CastField<FMapProperty>(P))
-            return Property(M->KeyProp, Depth + 1) && Property(M->ValueProp, Depth + 1);
-        if (auto* Set = CastField<FSetProperty>(P))
-            return Property(Set->ElementProp, Depth + 1);
+        if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P))
+            if (const auto Slots = Adapter->GetContainerSlots(); !Slots.IsEmpty())
+            {
+                for (const auto& Slot : Slots)
+                    if (!Property(Slot.ReadProperty(P), Depth + 1))
+                        return false;
+                return true;
+            }
         if (auto* C = CastField<FSoftClassProperty>(P))
             return Reference(C->MetaClass);
         if (auto* O = CastField<FSoftObjectProperty>(P))
@@ -144,8 +147,8 @@ UScriptStruct* FDasContainerRegistry::GetOrCreate(const FString& Path, const FDa
     if (!Path.StartsWith(Prefix) || Path.Len() >= NAME_SIZE || Path.Len() == Prefix.Len() ||
         Path.RightChop(Prefix.Len()).Contains(TEXT("/")) || Path.RightChop(Prefix.Len()).Contains(TEXT(".")))
         return Fail(TEXT("Invalid carrier path"));
-    if (Type.GetKind() != EDasTypeKind::Array && Type.GetKind() != EDasTypeKind::Set &&
-        Type.GetKind() != EDasTypeKind::Map)
+    const auto* Adapter = FDasTypeAdapters::Get().Find(Type);
+    if (!Adapter || Adapter->GetContainerSlots().IsEmpty())
         return Fail(TEXT("Expected container descriptor"));
     if (!ValidateDasPropertyType(Type, EDasPropertyUsage::Container, Error))
         return nullptr;

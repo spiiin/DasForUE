@@ -21,6 +21,7 @@ class FDasEnumAdapter final : public IDasTypeAdapter
 {
 public:
     EDasTypeKind GetKind() const override { return EDasTypeKind::Enum; }
+    bool CanBeContainerKey(const FDasDeclaredType&) const override { return true; }
     bool UsesTypeIdentity() const override { return true; }
     bool MatchesProperty(const FProperty* Property) const override
     {

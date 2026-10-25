@@ -1,4 +1,5 @@
 #include "DasPropertyTypes.h"
+#include "DasTypeAdapters.h"
 #include "DasSnapshotContainers.h"
 #include "UObject/StructOnScope.h"
 #include "DasContainerRegistry.h"
@@ -240,6 +241,77 @@ bool CheckDasPropertyTypes(FString& Error)
         Error = TEXT("Static carrier accepted unexpected descriptor children");
         return false;
     }
+    // Every combinator rejects missing/extra children without attaching anything to its owner.
+    for (const TCHAR* Kind : {TEXT("array"), TEXT("set"), TEXT("map")})
+    {
+        auto Missing = Leaf(Kind);
+        if (!Reject(Missing, EDasPropertyUsage::Container))
+            return false;
+        const auto* Adapter = FDasTypeAdapters::Get().FindKind(Missing.GetKind());
+        auto* Direct =
+            Adapter ? Adapter->MakeProperty(Owner.Get(), TEXT("Direct"), Missing, EDasPropertyUsage::Value) : nullptr;
+        const bool Safe = Adapter && !Direct && !Owner->ChildProperties;
+        delete Direct;
+        if (!Safe)
+        {
+            Error = TEXT("Direct container adapter accepted a malformed descriptor");
+            return false;
+        }
+        auto ExtraChild = Shape(Kind, Leaf(TEXT("int")), Leaf(TEXT("string")));
+        if (ExtraChild.GetKind() == EDasTypeKind::Map)
+            ExtraChild.Element = MakeShared<FDasDeclaredType>();
+        else
+            ExtraChild.Value = MakeShared<FDasDeclaredType>();
+        if (!Reject(ExtraChild, EDasPropertyUsage::Container))
+            return false;
+    }
+    for (const auto& Bad :
+         {Leaf(TEXT("float")), Leaf(TEXT("double")),
+                                    Leaf(TEXT("bool")), Leaf(TEXT("text")),
+                                                             Leaf(TEXT("class"), AActor::StaticClass()->GetPathName())})
+        if (!Reject(Shape(TEXT("set"), Bad), EDasPropertyUsage::Container) ||
+                    !Reject(Shape(TEXT("map"), Bad, Leaf(TEXT("int"))), EDasPropertyUsage::Container))
+            return false;
+    auto Cycle = MakeShared<FDasDeclaredType>();
+    Cycle->Kind = TEXT("array");
+    Cycle->Element = Cycle;
+    const bool CycleRejected = Reject(*Cycle, EDasPropertyUsage::Container);
+    Cycle->Element.Reset();
+    if (!CycleRejected || FDasTypeAdapters::Get().FindProperty(nullptr))
+        return false;
+    auto RejectDescription = [&](FProperty* Root)
+    {
+        FDasDeclaredType Out;
+        FString Why;
+        const bool Rejected = !DescribeDasProperty(Root, Out, Why) && Out.Kind.IsEmpty() && !Why.IsEmpty();
+        delete Root;
+        if (!Rejected)
+            Error = TEXT("Container reflection traversal exceeded its shared budget or published partial output");
+        return Rejected;
+    };
+    auto* Deep = new FArrayProperty(FFieldVariant(), TEXT("Deep"));
+    auto* DeepParent = Deep;
+    for (int32 I = 0; I < 18; ++I)
+    {
+        auto* Child = new FArrayProperty(DeepParent, TEXT("Values"));
+        DeepParent->Inner = Child;
+        DeepParent = Child;
+    }
+    DeepParent->Inner = new FIntProperty(DeepParent, TEXT("Values"));
+    if (!RejectDescription(Deep))
+        return false;
+    TFunction<FProperty*(FFieldVariant, int32)> WideTree;
+    WideTree = [&](FFieldVariant Parent, int32 Depth) -> FProperty*
+    {
+        if (!Depth)
+            return new FIntProperty(Parent, TEXT("Leaf"));
+        auto* Map = new FMapProperty(Parent, TEXT("Node"));
+        Map->KeyProp = WideTree(Map, Depth - 1);
+        Map->ValueProp = WideTree(Map, Depth - 1);
+        return Map;
+    };
+    if (!RejectDescription(WideTree(FFieldVariant(), 10)))
+        return false;
     // Reflection lookup must reject unsupported shapes before selecting a carrier.
     auto RejectLookup = [&](FProperty* P)
     {

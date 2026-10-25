@@ -7,6 +7,11 @@ template <class K> class TDasScalarTypeAdapter final : public IDasTypeAdapter
 public:
     explicit TDasScalarTypeAdapter(EDasTypeKind InKind) : Kind(InKind) {}
     virtual EDasTypeKind GetKind() const override { return Kind; }
+    bool CanBeContainerKey(const FDasDeclaredType&) const override
+    {
+        return Kind == EDasTypeKind::Int || Kind == EDasTypeKind::Byte || Kind == EDasTypeKind::String ||
+               Kind == EDasTypeKind::Name;
+    }
     virtual bool MatchesProperty(const FProperty* Property) const override
     {
         const auto* Typed = CastField<typename K::Property>(Property);
@@ -35,6 +40,8 @@ void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
                                                                   DasScalarScriptFacet(DasTypeKind(TEXT(#Suffix))));
     DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_SCALAR_ADAPTER)
 #undef DAS_REGISTER_SCALAR_ADAPTER
+    for (auto Kind : {EDasTypeKind::Array, EDasTypeKind::Set, EDasTypeKind::Map})
+        Registry.Register(MakeDasContainerAdapter(Kind));
     static const FDasObjectClassScriptFacet ObjectScript(false), ClassScript(true);
     Registry.Register(MakeDasObjectClassAdapter(false), &ObjectScript);
     Registry.Register(MakeDasObjectClassAdapter(true), &ClassScript);

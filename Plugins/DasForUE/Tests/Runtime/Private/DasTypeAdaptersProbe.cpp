@@ -19,6 +19,48 @@ bool CheckDasTypeAdapters(FString& Error)
     {
         const IDasTypeAdapter* Adapter = &*Entry.Adapter;
         const FString Name = DasTypeKindName(Adapter->GetKind());
+        if (const auto Slots = Adapter->GetContainerSlots(); !Slots.IsEmpty())
+        {
+            FDasDeclaredType Type;
+            Type.Kind = Name;
+            for (const auto& Slot : Slots)
+                Type.*Slot.Descriptor = MakeShared<FDasDeclaredType>(); // int children
+            auto* Property = Adapter->MakeProperty(FFieldVariant(), TEXT("Container"), Type, EDasPropertyUsage::Value);
+            FDasDeclaredType Described;
+            bool Good = Property && Registry.Find(Type) == Adapter && Registry.FindProperty(Property) == Adapter &&
+                        !Adapter->SupportsContainerValue() && DescribeDasProperty(Property, Described, Error) &&
+                        Described.StorageIdentity() == Type.StorageIdentity();
+            if (Property)
+                for (const auto& Slot : Slots)
+                {
+                    const auto* Child = Slot.ReadProperty(Property);
+                    Good &= Child && (!Slot.bHashKey || Child->HasAnyPropertyFlags(CPF_HasGetValueTypeHash));
+                }
+            delete Property;
+            auto* Delegate =
+                Adapter->MakeProperty(FFieldVariant(), TEXT("Input"), Type, EDasPropertyUsage::DelegateParameter);
+            Good &= Delegate != nullptr;
+            if (Delegate)
+                for (const auto& Slot : Slots)
+                {
+                    const auto* Child = Slot.ReadProperty(Delegate);
+                    const FName Expected =
+                        Adapter->GetKind() == EDasTypeKind::Array ? TEXT("Inner")
+                                                                  : Slot.Descriptor == &FDasDeclaredType::Key
+                        ? TEXT("Key")
+                        : Slot.Descriptor == &FDasDeclaredType::Value
+                        ? TEXT("Value")
+                        : TEXT("Element");
+                    Good &= Child && Child->GetFName() == Expected;
+                }
+            delete Delegate;
+            if (!Good)
+            {
+                Error = TEXT("Container adapter lost descriptor slots or child hash policy: ") + Name;
+                return false;
+            }
+            continue;
+        }
         if (const UScriptStruct* Struct = Adapter->GetStruct())
         {
             FDasDeclaredType Declared;

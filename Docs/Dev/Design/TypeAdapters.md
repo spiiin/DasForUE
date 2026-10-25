@@ -347,3 +347,47 @@ AuthoredInterface Create/Reopen probe: реальные assets, generated wrappe
 дополненные проверками общего resolver. Reopen создаёт frame, меняет identity через тестовую native-функцию и проверяет отказ без изменения Score; после восстановления ID новый frame выполняет AddScore. Временный скрипт хранится в Saved, mutation helper — только в test probes. Method-values и automation остаются общей регрессией.
 Физическое хранение/GC interface references и контейнерные правила не менялись. Container
 combinators остаются следующим шагом переноса адаптеров.
+
+
+## Container combinators: структура и DSL (2026-10-25)
+
+Array, Set и Map зарегистрированы в том же `FDasTypeAdapters`, как kind adapters.
+`FDasContainerAdapter` задаёт неизменяемые slots: Element для array/set, Key/Value для map.
+Slot связывает поле FDasDeclaredType с reader дочернего FProperty и ролью hash key.
+Дополнительного реестра или нового persisted type descriptor нет. FindKind позволяет
+проверить форму даже у descriptor с ошибочным TypePath; Find сохраняет прежние правила identity.
+
+Общий validator проверяет точный набор slots и затем рекурсивно валидирует их с единым
+depth/node budget. Leaf adapter отвечает за SupportsContainerValue и CanBeContainerKey:
+int/byte/string/name и enum могут быть ключами, object — только concrete class;
+class references и прямые вложенные containers не принимаются. Direct weak containers
+по-прежнему отклоняются до создания свойства. Эти capabilities не заменяют полную
+валидацию identity, storage и контекста использования дочернего типа.
+
+Создание FArrayProperty/FSetProperty/FMapProperty перенесено из общего builder в комбинатор.
+Дети создаются существующей фабрикой через свои адаптеры, без присоединения root к owner.
+Имена Values/Inner (delegate array), Element, Key, Value и CPF_HasGetValueTypeHash сохранены.
+Обратное описание использует slots с общими ограничителями глубины и числа узлов; при
+ошибке наружу не публикуется частичный descriptor. Та же схема используется проверкой
+direct weak references и reflection-частью layout fingerprint carrier registry.
+
+DSLContainerType теперь обходит slots и один раз реализует разрешение типа ребёнка:
+scalar, enum, adapted/native/authored struct и object/interface reference. Специфика
+UEObjectKey сохраняется у hash-слотов. Carrier names, StorageIdentity, static UHT carriers
+и существующая lifetime/layout validation не меняются; runtime codecs остаются прежними.
+
+Foundation проверяет registry roundtrip всех комбинаторов и существующую матрицу leaf/key/value,
+hash flags, missing/extra slots, direct calls с ошибочным descriptor, недопустимые ключи,
+цикл descriptor, а также depth/node limits на reflection trees. Архитектурный gate запрещает
+создание container properties вне файла комбинаторов.
+
+Это структурная часть 2.3. Матрица typed map externs пока остаётся ABI-фасетом; её сокращение
+требует отдельного выбора общего транспорта ключа с проверкой lifetime/GC и измерением
+in-place access. Замена на boxed values ради числа символов не считается выполнением
+этого пункта. Валидация ещё не зарегистрированных авторских типов и backend schemas также
+сохраняет собственные правила разрешения ссылок, поверх общего property contract.
+
+Кандидат для следующего ABI-шага: daScript addInterop передаёт vec4f arguments вместе с
+call->types (так реализован builtin hash). Это позволяет стереть тип ключа без boxed-value
+и без хранения raw string pointer между вызовами. Перед применением к UE map access нужны
+GuardUEExtern, отдельная совместимость с текущим checked AOT bridge и замеры hot path.

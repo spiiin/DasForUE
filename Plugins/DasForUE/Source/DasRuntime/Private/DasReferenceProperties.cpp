@@ -1,17 +1,16 @@
 #include "DasInterfaceContracts.h"
 #include "DasSchema.h"
+#include "DasTypeAdapters.h"
 #include "UObject/UnrealType.h"
 #include "UObject/ScriptInterface.h"
 #include "GameFramework/Actor.h"
 #include "Components/ActorComponent.h"
 bool DasHasDirectWeakContainer(const FProperty* P)
 {
-    if (auto* A = CastField<FArrayProperty>(P))
-        return CastField<FWeakObjectProperty>(A->Inner) != nullptr;
-    if (auto* S = CastField<FSetProperty>(P))
-        return CastField<FWeakObjectProperty>(S->ElementProp) != nullptr;
-    if (auto* M = CastField<FMapProperty>(P))
-        return CastField<FWeakObjectProperty>(M->KeyProp) || CastField<FWeakObjectProperty>(M->ValueProp);
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P))
+        for (const auto& Slot : Adapter->GetContainerSlots())
+            if (CastField<FWeakObjectProperty>(Slot.ReadProperty(P)))
+                return true;
     return false;
 }
 UClass* DasReferencePropertyClass(const FProperty* P)
