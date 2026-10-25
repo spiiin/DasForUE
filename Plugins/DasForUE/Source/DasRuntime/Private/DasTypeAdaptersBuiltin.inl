@@ -31,7 +31,8 @@ private:
 void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
 {
 #define DAS_REGISTER_SCALAR_ADAPTER(Suffix, SelfKind, RefKind)                                                         \
-    Registry.Register(MakeShared<TDasScalarTypeAdapter<SelfKind>>(DasTypeKind(TEXT(#Suffix))));
+    Registry.Register(MakeShared<TDasScalarTypeAdapter<SelfKind>>(DasTypeKind(TEXT(#Suffix))),                         \
+                                                                  DasScalarScriptFacet(DasTypeKind(TEXT(#Suffix))));
     DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_SCALAR_ADAPTER)
 #undef DAS_REGISTER_SCALAR_ADAPTER
     static const FDasSoftReferenceScriptFacet SoftScript;

@@ -11,6 +11,10 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Plugins',
 
 # Ported type -> (patterns, files allowed to contain them).
 PORTED = {
+    'TextName': (
+        [r'\bDSLTextDefault', r'"UE(?:Text|Name)Value"'],
+        {'DasTextNameTypesDSL.inl', 'DasRuntimeTypeAnnotations.inl'},
+    ),
     'SoftReference': (
         [r'\bDSLSoft', r'\bDasSoftProperty\b', r'\bCreateDasSoftProperty\b'],
         {'DasSoftReferences.cpp', 'DasSoftReferences.h', 'DasSoftTypes.inl',

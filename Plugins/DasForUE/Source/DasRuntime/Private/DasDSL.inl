@@ -27,33 +27,9 @@ bool DSLBool(const das::AnnotationArgument& A)
     return A.bValue;
 }
 
-FDasDeclaredLiteral DSLTextDefault(das::ExpressionPtr E)
-{
-    FDasDeclaredLiteral D;
-    if (!E)
-        return D;
-    if (!E->rtti_isCall())
-        DSLFail(TEXT("FText defaults require ue_text or ue_text_invariant literals"));
-    auto* Call = static_cast<das::ExprCall*>(E);
-    const bool Invariant = Call->name == "ue_text_invariant";
-    if (!Invariant && Call->name != "ue_text")
-        DSLFail(TEXT("FText defaults require ue_text or ue_text_invariant"));
-    if (Call->arguments.size() != (Invariant ? 1 : 3))
-        DSLFail(TEXT("Invalid text default arguments"));
-    TArray<FString> A;
-    for (auto* X : Call->arguments)
-    {
-        if (X->__rtti != das::string("ExprConstString"))
-            DSLFail(TEXT("Text default arguments must be string literals"));
-        A.Add(DSLText(static_cast<das::ExprConstString*>(X)->text));
-    }
-    if ((!Invariant && (A[0].IsEmpty() || A[1].IsEmpty() || A[0].Len() > 1024 || A[1].Len() > 1024)) ||
-        A.Last().Len() > 65536)
-        DSLFail(TEXT("Text default identity/source limits exceeded"));
-    D.Kind = TEXT("string");
-    D.String = DasTextLiteral(Invariant ? FString() : A[0], Invariant ? FString() : A[1], A.Last(), Invariant);
-    return D;
-}
+#include "DasDSLTypeAdapters.inl"
+das::TypeDeclPtr DSLHandleType(das::ModuleGroup&, das::Module*, const char*);
+#include "DasTextNameTypesDSL.inl"
 FDasDeclaredLiteral DSLByteDefault(das::ExpressionPtr E)
 {
     FDasDeclaredLiteral D;
@@ -77,26 +53,6 @@ FDasDeclaredLiteral DSLByteDefault(das::ExpressionPtr E)
     D.Number = Number;
     return D;
 }
-das::ExpressionPtr DSLTextDefaultExpression(const FDasDeclaredLiteral& D, const das::LineInfo& At)
-{
-    FText Text;
-    FString Error;
-    if (!ParseDasTextDefault(D.String, Text, Error))
-        DSLFail(Error);
-    auto* Call = new das::ExprCall(At, Text.IsCultureInvariant() ? "ue_text_invariant" : "ue_text");
-    if (!Text.IsCultureInvariant())
-    {
-        const auto N = FTextInspector::GetNamespace(Text), K = FTextInspector::GetKey(Text);
-        if (!N.IsSet() || !K.IsSet())
-            DSLFail(TEXT("Text default has no localization identity"));
-        Call->arguments.push_back(new das::ExprConstString(At, DSLUtf8(N.GetValue())));
-        Call->arguments.push_back(new das::ExprConstString(At, DSLUtf8(K.GetValue())));
-    }
-    const auto* Source = FTextInspector::GetSourceString(Text);
-    Call->arguments.push_back(new das::ExprConstString(At, DSLUtf8(Source ? *Source : FString())));
-    return Call;
-}
-
 FDasDeclaredLiteral DSLParameterDefault(das::ExpressionPtr Init)
 {
     FDasDeclaredLiteral Result;
@@ -152,8 +108,9 @@ das::ExpressionPtr DSLParameterDefaultExpression(const FDasDeclaredParameter& P,
 {
     if (P.Default.Kind.IsEmpty())
         return nullptr;
-    if (P.Type.GetKind() == EDasTypeKind::Text)
-        return DSLTextDefaultExpression(P.Default, At);
+    if (const auto* Facet = DSLKindFacet(P.Type.GetKind()))
+        if (auto Expression = Facet->DefaultExpression(P.Default, At))
+            return Expression;
     if (P.Type.GetKind() == EDasTypeKind::Byte)
         return new das::ExprConstUInt8(At, uint8(P.Default.Number));
     if (P.Type.GetKind() == EDasTypeKind::Int)
@@ -355,7 +312,6 @@ struct FDSLTypeCallVisitor : das::Visitor
 #include "DasObjectTypes.inl"
 #include "DasClassTypes.inl"
 #include "DasSoftTypes.inl"
-#include "DasDSLTypeAdapters.inl"
 #include "DasGameplayTagsDSL.inl"
 das::ExpressionPtr DSLDirectPack(const das::LineInfo&, const das::TypeDeclPtr&, das::ExpressionPtr, const FString&);
 das::ExpressionPtr DSLDirectUnpack(const das::LineInfo&, const das::TypeDeclPtr&, das::ExpressionPtr, const FString&);
@@ -364,8 +320,8 @@ FString DSLTypeName(const das::TypeDeclPtr& T)
 {
     if (!T)
         return {};
-    if (DSLAdapted(T))
-        return TEXT("struct");
+    if (const auto* Entry = DSLValueAdapter(T))
+        return DasTypeKindName(Entry->Adapter->GetKind());
     if (DSLObjectKey(T))
         return TEXT("object_key");
     if (DSLTypedClass(T))
@@ -404,14 +360,10 @@ FString DSLTypeName(const das::TypeDeclPtr& T)
     case das::Type::tVoid:
         return TEXT("void");
     case das::Type::tHandle:
-        if (T->annotation && T->annotation->name == "UETextValue")
-            return TEXT("text");
         if (T->annotation && T->annotation->name == "UEClassHandle")
             return TEXT("class");
         if (T->annotation && T->annotation->name == "UEEnumValue")
             return TEXT("enum");
-        if (T->annotation && T->annotation->name == "UENameValue")
-            return TEXT("name");
         if (T->annotation && T->annotation->name == "UObjectHandle")
             return TEXT("object");
         if (T->annotation && (DSLAdaptedHandle(T) || T->annotation->name == "UEStructValue"))

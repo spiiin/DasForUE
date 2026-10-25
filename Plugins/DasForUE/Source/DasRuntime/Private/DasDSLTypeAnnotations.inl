@@ -469,8 +469,11 @@ struct FUEStructAnnotation : das::StructureAnnotation
                 }
                 if (!Marked || !F.type || F.type->ref)
                     DSLFail(TEXT("Struct fields require ue_property and by-value scalar type"));
-                if (P.Type.GetKind() == EDasTypeKind::Text)
-                    P.Default = DSLTextDefault(F.init);
+                const auto* DefaultAdapter = DSLValueAdapter(F.type);
+                if (DefaultAdapter && DefaultAdapter->Script->ParseDefault(EDasScriptDefaultUse::StructField, F.type,
+                                                                           F.init, Group, S->module, P.Default))
+                {
+                }
                 else if (P.Type.GetKind() == EDasTypeKind::Byte)
                     P.Default = DSLByteDefault(F.init);
                 else if (F.init && P.Type.GetKind() != EDasTypeKind::Struct && P.Type.GetKind() != EDasTypeKind::Enum)

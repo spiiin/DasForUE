@@ -411,16 +411,12 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 if (!F.type || F.type->ref || FieldType.IsEmpty() || FieldType == TEXT("void"))
                     DSLFail(TEXT("Adapter supports int/float/bool/string/double/name properties: ")+ P.Name);
                 P.Type.Kind = FieldType;
-                if (const auto* Adapted = DSLAdapted(F.type);
-                    Adapted && Adapted->Script->PropertyDefault(F.type, F.init, Group, St->module, P.Default))
+                if (const auto* Adapted = DSLValueAdapter(F.type);
+                    Adapted && Adapted->Script->ParseDefault(EDasScriptDefaultUse::Property, F.type, F.init, Group,
+                                                             St->module, P.Default))
                 {
-                    P.Type.TypePath = DSLAdaptedPath(F.type);
-                    C.Properties.Add(P);
-                    continue;
-                }
-                if (FieldType == TEXT("text"))
-                {
-                    P.Default = DSLTextDefault(F.init);
+                    if (Adapted->Adapter->GetKind() == EDasTypeKind::Struct)
+                        P.Type.TypePath = DSLAdaptedPath(F.type);
                     C.Properties.Add(P);
                     continue;
                 }
@@ -629,15 +625,6 @@ struct FUEClassAnnotation : das::StructureAnnotation
                         P.Default.Kind = TEXT("string");
                         P.Default.String = DSLText(static_cast<das::ExprConstString*>(F.init)->text);
                     }
-                    else if (P.Type.GetKind() == EDasTypeKind::Name && F.init->rtti_isCall())
-                    {
-                        auto* Call = static_cast<das::ExprCall*>(F.init);
-                        if (Call->name != "ue_name_value" || Call->arguments.size() != 1 ||
-                            Call->arguments[0]->__rtti != das::string("ExprConstString"))
-                            DSLFail(TEXT("Name default requires ue_name_value with literal string"));
-                        P.Default.Kind = TEXT("string");
-                        P.Default.String = DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text);
-                    }
                     else
                         DSLFail(TEXT("Only literal property defaults supported: ")+ P.Name);
                 }
@@ -840,9 +827,11 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     if (K.IsEmpty() || K == TEXT("void"))
                         DSLFail(TEXT("Unsupported parameter type/ref/default: ")+ DSLText(V->name));
                     FDasDeclaredParameter P;
-                    P.Default = K == TEXT("text")
-                                          ? DSLTextDefault(V->init)
-                                          : K == TEXT("byte")? DSLByteDefault(V->init) : DSLParameterDefault(V->init);
+                    const auto* DefaultAdapter = DSLValueAdapter(V->type);
+                    if (!DefaultAdapter ||
+                        !DefaultAdapter->Script->ParseDefault(EDasScriptDefaultUse::Parameter, V->type, V->init, Group,
+                                                              St->module, P.Default))
+                        P.Default = K == TEXT("byte") ? DSLByteDefault(V->init) : DSLParameterDefault(V->init);
                     P.Direction = Direction;
                     Directions.Remove(DSLText(V->name));
                     P.Name = LegacySingle ? TEXT("Input"): DSLText(V->name);

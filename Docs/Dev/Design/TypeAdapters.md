@@ -220,3 +220,30 @@ resolve/load, ограничения на преобразования object/cl
 `TestTypeAdapterGate.py` запрещает возврат soft-предикатов в общий DSL и property builder.
 Существующие soft-reference foundation/PIE tests покрывают defaults, GC, generated native
 views, upcasts, загрузку и отмену запросов; общий automation-набор проверяет соседние типы.
+
+
+## Перенос Text/Name (2026-10-25)
+
+Name и Text остаются scalar-адаптерами, использующими FNameProperty/FTextProperty и
+общие FDasKindName/FDasKindText accessor traits. К ним подключён
+`FDasTextNameScriptFacet` из `DasTextNameTypesDSL.inl`:
+
+- распознавание UENameValue/UETextValue и выбор view для native/authored свойств;
+- разбор литеральных defaults обычных классов и контейнеров;
+- FText defaults в ue_struct и параметрах методов, восстановление default AST;
+- проверка runtime-сигнатуры через тот же фасет.
+
+`DSLValueAdapter` ищет все представления; существующие `DSLAdapted` и
+`DSLAdaptedHandle` ограничены Struct kind. Поэтому scalar handles Name/Text не
+попадают в struct snapshot pack/unpack и не требуют UScriptStruct или TypePath.
+
+Сайт defaults передаётся явно (`Property`, `StructField`, `Parameter`). Это сохраняет
+существующие различия синтаксиса: ue_name_value принимается как default обычного поля
+и элемента контейнера, но не становится новым default параметра или ue_struct-поля.
+FText сохраняет wire с namespace/key/source либо признак culture-invariant; он не
+превращается в обычную строку. Локализационные операции, владение runtime-снимками и
+грамматика сериализации остаются в существующих runtime/scalar helpers.
+
+Foundation дополнительно проверяет scalar ABI и точный локализационный default поля
+и параметра, а также nominal Name default. Архитектурный gate запрещает отдельные
+UETextValue/UENameValue predicates и DSLTextDefault вне фасета и объявления аннотаций.

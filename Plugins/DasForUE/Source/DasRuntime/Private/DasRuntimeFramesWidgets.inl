@@ -1,3 +1,4 @@
+const IDasScriptTypeFacet* DSLKindFacet(EDasTypeKind Kind);
 // Part of DasRuntime.cpp: Call-frame publication of math/name values and widget paint/reply/drag scopes.
 // Included in place; declaration order matters.
 void PublishFrameName(int32 I, FDasNameValue X, das::Context* C)
@@ -248,8 +249,8 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
             return false;
         if (K == EDasMethodSignature::Byte)
             return T->isSimpleType(das::Type::tUInt8);
-        if (K == EDasMethodSignature::Text)
-            return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UETextValue";
+        if (const auto* Facet = DSLKindFacet(DasTypeKindOf(K)))
+            return Facet->MatchesScriptType(T);
         if (K == EDasMethodSignature::Class)
             return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEClassHandle";
         if (K == EDasMethodSignature::Delegate)
@@ -264,8 +265,6 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
                     return Entry.Script->MatchesScriptType(T);
         if (K == EDasMethodSignature::Object)
             return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UObjectHandle";
-        if (K == EDasMethodSignature::Name)
-            return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UENameValue";
         const auto D = K == EDasMethodSignature::String   ? das::Type::tString
                        : K == EDasMethodSignature::Double ? das::Type::tDouble
                        : K == EDasMethodSignature::Int    ? das::Type::tInt

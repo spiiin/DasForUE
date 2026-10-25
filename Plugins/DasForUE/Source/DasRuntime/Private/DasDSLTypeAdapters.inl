@@ -1,11 +1,30 @@
 // Part of DasDSL.inl: daScript views of adapted value types (DasTypeAdapters.h). Lowering asks these
 // helpers instead of per-type predicates; the facets themselves live next to their adapters.
+const FDasTypeAdapters::FEntry* DSLValueAdapter(const das::TypeDeclPtr& T)
+{
+    if (!T)
+        return nullptr;
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+        if (Entry.Script && Entry.Script->MatchesScriptType(T))
+            return &Entry;
+    return nullptr;
+}
+const IDasScriptTypeFacet* DSLKindFacet(EDasTypeKind Kind)
+{
+    FDasDeclaredType Type;
+    Type.Kind = DasTypeKindName(Kind);
+    const auto* Adapter = FDasTypeAdapters::Get().Find(Type);
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+        if (&*Entry.Adapter == Adapter)
+            return Entry.Script;
+    return nullptr;
+}
 const FDasTypeAdapters::FEntry* DSLAdapted(const das::TypeDeclPtr& T)
 {
     if (!T || T->baseType != das::Type::tStructure || !T->structType)
         return nullptr;
     for (const auto& Entry : FDasTypeAdapters::Get().Entries())
-        if (Entry.Script && Entry.Script->MatchesScriptType(T))
+        if (Entry.Adapter->GetKind() == EDasTypeKind::Struct && Entry.Script && Entry.Script->MatchesScriptType(T))
             return &Entry;
     return nullptr;
 }
@@ -41,7 +60,7 @@ const FDasTypeAdapters::FEntry* DSLAdaptedHandle(const das::TypeDeclPtr& T)
     if (!T || T->baseType != das::Type::tHandle || !T->annotation)
         return nullptr;
     for (const auto& Entry : FDasTypeAdapters::Get().Entries())
-        if (Entry.Script && Entry.Script->MatchesScriptType(T))
+        if (Entry.Adapter->GetKind() == EDasTypeKind::Struct && Entry.Script && Entry.Script->MatchesScriptType(T))
             return &Entry;
     return nullptr;
 }

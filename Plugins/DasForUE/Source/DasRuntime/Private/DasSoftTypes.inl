@@ -288,9 +288,11 @@ struct FUESoftCallMacro : das::CallMacro
 class FDasSoftReferenceScriptFacet final : public IDasScriptTypeFacet
 {
 public:
-    bool PropertyDefault(const das::TypeDeclPtr& Type, das::ExpressionPtr InitExpression, das::ModuleGroup& Group,
-                         das::Module* Module, FDasDeclaredLiteral& Default) const override
+    bool ParseDefault(EDasScriptDefaultUse Use, const das::TypeDeclPtr& Type, das::ExpressionPtr InitExpression,
+                      das::ModuleGroup& Group, das::Module* Module, FDasDeclaredLiteral& Default) const override
     {
+        if (Use != EDasScriptDefaultUse::Property)
+            return false;
         if (InitExpression)
         {
             if (InitExpression->__rtti != das::string("ExprCallMacro"))

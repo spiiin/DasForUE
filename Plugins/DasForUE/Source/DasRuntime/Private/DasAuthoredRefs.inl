@@ -502,6 +502,8 @@ struct FUEReferenceFactory : das::CallMacro
 };
 das::TypeDeclPtr DSLPropertyType(const FString& Kind, das::ModuleGroup& G, das::Module* M, const das::LineInfo& At)
 {
+    if (const auto* Facet = DSLKindFacet(DasTypeKind(Kind)))
+        return Facet->MakeView(G, M, At);
     if (Kind == TEXT("class"))
         return DSLHandleType(G, M, "UEClassHandle");
     if (Kind == TEXT("object"))
@@ -510,10 +512,6 @@ das::TypeDeclPtr DSLPropertyType(const FString& Kind, das::ModuleGroup& G, das::
         return DSLHandleType(G, M, "UEStructValue");
     if (Kind == TEXT("enum"))
         return DSLHandleType(G, M, "UEEnumValue");
-    if (Kind == TEXT("text"))
-        return DSLHandleType(G, M, "UETextValue");
-    if (Kind == TEXT("name"))
-        return DSLHandleType(G, M, "UENameValue");
     return new das::TypeDecl(
         (Kind == TEXT("int") || Kind == TEXT("byte"))
          ? das::Type::tInt

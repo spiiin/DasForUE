@@ -4,7 +4,7 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T, das::Expre
 {
     if (!E)
         DSLFail(TEXT("Missing container default value"));
-    if (const auto* Adapted = DSLAdapted(T))
+    if (const auto* Adapted = DSLValueAdapter(T))
         if (auto Value = Adapted->Script->DefaultJson(T, E, Group, Module))
             return Value;
     if (DSLTypedReference(T) || DSLObjectKey(T))
@@ -129,22 +129,6 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T, das::Expre
     {
         const auto D = DSLByteDefault(E);
         return MakeShared<FJsonValueNumber>(D.Number);
-    }
-    if (K == TEXT("text"))
-    {
-        const auto D = DSLTextDefault(E);
-        auto O = MakeShared<FJsonObject>();
-        O->SetStringField(TEXT("text"), D.String);
-        return MakeShared<FJsonValueObject>(O);
-    }
-
-    if (K == TEXT("name"))
-    {
-        auto* Call = E->rtti_isCall() ? static_cast<das::ExprCall*>(E) : nullptr;
-        if (!Call || Call->name != "ue_name_value" || Call->arguments.size() != 1 ||
-            Call->arguments[0]->__rtti != das::string("ExprConstString"))
-            DSLFail(TEXT("Container FName defaults require ue_name_value(string)"));
-        return MakeShared<FJsonValueString>(DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text));
     }
     if (K == TEXT("string") && E->__rtti == das::string("ExprConstString"))
         return MakeShared<FJsonValueString>(DSLText(static_cast<das::ExprConstString*>(E)->text));

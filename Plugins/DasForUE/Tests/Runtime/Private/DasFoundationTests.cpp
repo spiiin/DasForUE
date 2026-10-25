@@ -135,6 +135,28 @@ bool RunDasFoundationTests(FString& Report)
     const auto SoftSmoke = Run(TEXT("soft_references_smoke.das"));
     Expect(SoftSmoke.bSucceeded && SoftSmoke.Value == 42,
            TEXT("soft_source_aliases_default_path_and_resolve_without_load"), SoftSmoke.Error);
+    {
+        FDasAuthoringModule Model;
+        FString Error;
+        const bool Loaded = Runtime.ReadAuthoringScript(Runtime.ScriptPath(TEXT("dsl_text_byte.das")), Model, Error);
+        const auto* Class =
+            Model.Classes.FindByPredicate([](const auto& C) { return C.Name == TEXT("TextByteActor"); });
+        const auto* Title =
+            Class ? Class->Properties.FindByPredicate([](const auto& P) { return P.Name == TEXT("Title"); }) : nullptr;
+        const auto* Method =
+            Class ? Class->Methods.FindByPredicate([](const auto& M) { return M.Name == TEXT("DefaultText"); })
+                  : nullptr;
+        Expect(Loaded && Title && Title->Type.GetKind() == EDasTypeKind::Text && Title->Type.TypePath.IsEmpty() &&
+               Title->Default.String ==
+                   DasTextLiteral(TEXT("DasTextByte"),
+                       TEXT("Title"), TEXT("Example title"), false) && Method &&
+                            Method->ReturnType.GetKind() == EDasTypeKind::Text && Method->Parameters.Num() == 1 &&
+                            Method->Parameters[0].Type.GetKind() == EDasTypeKind::Text &&
+                            Method->Parameters[0].Default.String ==
+                                DasTextLiteral(TEXT("DasTextByte"), TEXT("Default"), TEXT("Default text"), false),
+                                                    TEXT("text_adapter_preserves_scalar_ABI_and_localized_defaults"),
+                                                         Error);
+    }
     const auto Again = Run(TEXT("smoke.das"));
     Expect(Again.bSucceeded && Again.Value == 42, TEXT("independent_context"), Again.Error);
     const auto Syntax = Run(TEXT("invalid.das"));
@@ -1829,9 +1851,14 @@ bool RunDasFoundationTests(FString& Report)
         const FString TextPath = Runtime.ScriptPath(TEXT("dsl_text_methods.das"));
         FString TextError;
         FDasAuthoringModule TextModel;
-        Expect(Runtime.ReadAuthoringScript(TextPath, TextModel, TextError) && TextModel.Classes.Num() == 1 &&
-                   TextModel.Classes[0].Properties.Num() == 3,
-               TEXT("text_double_nominal_name_DSL_model"), TextError);
+        const bool Loaded = Runtime.ReadAuthoringScript(TextPath, TextModel, TextError);
+        const auto* Key = Loaded && TextModel.Classes.Num() == 1
+                              ? TextModel.Classes[0].Properties.FindByPredicate([](const auto& P)
+                                                                                { return P.Name == TEXT("DSLKey"); })
+                              : nullptr;
+        Expect(Key && TextModel.Classes[0].Properties.Num() == 3 && Key->Type.GetKind() == EDasTypeKind::Name &&
+               Key->Type.TypePath.IsEmpty() &&
+               Key->Default.String == TEXT("Initial_7"), TEXT("text_double_nominal_name_DSL_model"), TextError);
         TStrongObjectPtr<UDasObjectFixture> TextObject(NewObject<UDasObjectFixture>());
         FDasScalarValue S;
         S.Kind = 5;

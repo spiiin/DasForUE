@@ -34,6 +34,12 @@ enum class EDasCallBridge : uint8
 
 // daScript view of an adapted value type: recognising the view, crossing the boundary and making the view
 // type for properties of the type (Docs/Dev/Design/TypeAdapters.md).
+enum class EDasScriptDefaultUse : uint8
+{
+    Property,
+    StructField,
+    Parameter
+};
 class IDasScriptTypeFacet
 {
 public:
@@ -42,10 +48,14 @@ public:
     virtual das::ExpressionPtr Pack(const das::LineInfo& At, das::ExpressionPtr Value) const = 0;
     virtual das::ExpressionPtr Unpack(const das::LineInfo& At, const das::TypeDeclPtr& Type,
                                       das::ExpressionPtr Handle) const = 0;
-    virtual bool PropertyDefault(const das::TypeDeclPtr&, das::ExpressionPtr, das::ModuleGroup&, das::Module*,
-                                 FDasDeclaredLiteral&) const
+    virtual bool ParseDefault(EDasScriptDefaultUse, const das::TypeDeclPtr&, das::ExpressionPtr, das::ModuleGroup&,
+                              das::Module*, FDasDeclaredLiteral&) const
     {
         return false;
+    }
+    virtual das::ExpressionPtr DefaultExpression(const FDasDeclaredLiteral&, const das::LineInfo&) const
+    {
+        return nullptr;
     }
     virtual TSharedPtr<FJsonValue> DefaultJson(const das::TypeDeclPtr&, das::ExpressionPtr, das::ModuleGroup&,
                                                das::Module*) const
