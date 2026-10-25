@@ -1,7 +1,7 @@
 {
   "FileVersion": 3,
   "Version": 1,
-  "VersionName": "0.1-foundation",
+  "VersionName": "0.1.0",
   "FriendlyName": "Das For Unreal \u2014 Foundation",
   "Description": "Independent daScript integration and DSL feasibility tests.",
   "Category": "Scripting",

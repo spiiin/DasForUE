@@ -5,7 +5,7 @@ This page collects the limitations that still apply to DasForUE2, grouped by are
 ## Production, platform and security
 
 - **Shipping builds** are not supported; the plugin is developed and checked with Win64 Development (Editor and packaged game).
-- **Full AOT** of the game path is not available. Scripts run in the daScript interpreter; UE externs are deliberately excluded from AOT so their guards cannot be bypassed.
+- **AOT is partial.** Compiled scripts call native binds and `ue_foundation`'s externs through a guarded bridge (the interpreter's guards and messages). Externs that make struct snapshots, every function that can reach one, and the isolated physics VM's externs stay interpreted (see [Native binds, AOT](../Guide/Native/NativeBinds.md#aot)). AOT code is generated into C++ and linked by rebuilding the plugin.
 - **Networking** is not supported: no replication, no RPC (net functions are never exported or authorable), no network roles for spawned actors, no async-physics network rewind/resimulation.
 - **Clean-machine deployment** has not been established; builds assume the documented toolchain (source-built UE 5.8.3, VS 2022/MSVC 14.44, Windows SDK 10.0.22621). Debug CRT is not supported, and only AVX2 hosts have been used.
 - The runtime module cannot be unloaded dynamically.
@@ -37,7 +37,6 @@ This page collects the limitations that still apply to DasForUE2, grouped by are
 - Property defaults: persisted object references must be top-level assets or classes, not actors or subobjects; non-null authored-object reference defaults and authored object-reference keys are not supported; nonempty soft-reference members of authored structs are rejected.
 - Delegates: no worker-thread delivery, no native non-`UFUNCTION` delegates, no script lambda bindings. A context holds at most 4096 live delegate values and 256 signature contracts.
 - Component composition: at most 32 components per actor, direct authored ActorComponent types.
-- Canonical math types (`UEVector` …) have no arithmetic operators; use helper functions or the [Math package](../Api/Math.md).
 - Localization gathering from DAS sources is not automatic; keyed text needs matching localization resources.
 - SaveGame and DataAsset classes cannot declare world lifecycle hooks, components or async physics hooks; SaveGame has no schema migration or save-format versioning.
 - An editor code action that generates delegate handlers (VS Code) is not part of this repository.
@@ -58,7 +57,8 @@ This page collects the limitations that still apply to DasForUE2, grouped by are
 ## Native API
 
 - Non-reflected C++ is reachable only through hand-written [native binds](../Guide/Native/NativeBinds.md) (`DAS_NATIVE_BINDS`): there is no C++ header parser, no access to private properties, no virtual overrides, no vtable patching.
-- C++ calls scripts through [`TDasFunction`](../Guide/Native/NativeBinds.md#calling-scripts-from-c-tdasfunction) with an owner object only (its session runs the call), on the game thread, without output parameters; types are scalars, strings, names, texts, vectors, rotators, transforms and objects.
+- C++ calls scripts through [`TDasFunction`](../Guide/Native/NativeBinds.md#calling-scripts-from-c-tdasfunction) with an owner object only (its session runs the call), on the game thread, without output parameters; types are scalars (including `int64`), strings, names, texts, math values, colors, dates, time spans and objects.
+- `Reflects` routes a gameplay call only when its `UFUNCTION` has the bind's types (an output parameter as `T&`, an enum as its value); authority-only and construction-unsafe `UFUNCTION`s, enum output parameters, types without a bind type (such as `FHitResult`), interfaces and authored classes keep the reflected call.
 - Latent, CustomThunk, RPC, delegate-signature, internal, protected and deprecated functions are excluded unless a dedicated adapter exists. Async-proxy factories (such as `CreateMoveToProxyObject`) are replaced by managed adapters.
 - API packages: all arguments are explicit (no C++ defaults); soft object/class parameters have no generic wrapper ABI; maps/sets of structs or objects are not supported; object views, `UEName` and enums are not unified between packages, so qualify names when importing several packages. `ue_api_pawn_ai` and `ue_api_animation_audio_vfx` are not installed by default. See [API packages](../Api/README.md).
 - A returned reference type does not expose all members of its class; only classes discovered from `[ue_native_object]` declarations get full member access ([Native class bindings](NativeClassBindings.md)).

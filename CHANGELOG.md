@@ -8,6 +8,51 @@ Target environment for every entry: Unreal Engine 5.8.3 (source build),
 daScript 0.6.4 (pinned), Win64 Development. Start at the
 [documentation index](Docs/index.md).
 
+## 0.1.0 — 2026-10-25
+
+The first tagged release. This section covers 2026-10-23 to 2026-10-25: C++ and daScript call each other
+directly, gameplay calls skip reflection, and scripts compile ahead of time through a guarded bridge.
+
+### Added
+
+- **Native binds** (`DasNativeBinds.h`, `DAS_NATIVE_BINDS`): C++ functions, classes and methods exposed to
+  scripts without reflection or Blueprint glue. Types: scalars, `int64`, strings, `FName`, `FText`, math values,
+  `FDateTime` / `FTimespan`, objects (receivers, parameters, results as the class's script type), `UClass*` /
+  `TSubclassOf<T>`, `TArray<T*>` results, `T&` parameters (copied in, written back on success), UENUMs (their
+  `int32` value) and operators. Modules `ue_engine` (actors, pawns, components, world, game instance), `ue_math`
+  (FMath and the math types) and `ue_time`; the AngelScript bind coverage report has no missing entries. A manifest
+  commandlet lists every module, function and route. See [Native binds](Docs/Guide/Native/NativeBinds.md).
+- **`Reflects`**: a bind that does what a `UFUNCTION` does answers the gameplay call of that `UFUNCTION`
+  (`self.Camera.K2_GetComponentLocation()`) with the same syntax and receiver checks, 50-120x faster than
+  reflection; object parameters and results, output parameters (the bind's `T&`) and enums are routed. `ue_engine`
+  reflects about 47 `UFUNCTION`s.
+- **`TDasFunction<R(A...)>`** (`DasScript.h`): typed calls of exported script functions from C++ in the owner's
+  persistent session, about 430 ns a call on the fast path (packaged).
+- **AOT through a guarded bridge** (`DasUEAot.h`): compiled scripts call native binds and `ue_foundation`'s externs
+  with the interpreter's guards and error messages: scalars, strings, objects, math values and operators, names,
+  texts, classes, struct and enum tokens, call frames, traces, UI and input values, arrays of objects, blocks and
+  routed gameplay calls. A call through the bridge costs about 25 ns; a function that calls something without an
+  AOT ABI stays interpreted, the rest of the file is compiled.
+- **Benchmarks**: AOT against the interpreter side by side (the ratio per round, independent of the machine's
+  state), the same workloads as a Blueprint graph, in C++ and in daScript (in the editor daScript is ~160x faster
+  on integer arithmetic and 9-14x on engine calls and vector math), the `TDasFunction` fast and full path side by
+  side, and struct snapshot counts per execution (`das.StructStats`). See
+  [Performance](Docs/Dev/Architecture/Performance.md).
+
+### Changed
+
+- Externs that make struct snapshots stay interpreted under AOT (snapshot collection walks interpreter frames
+  only), and so does every function that can reach one; the AOT generator keeps them interpreted instead of failing
+  the build.
+- The plugin version is `0.1.0`.
+
+### Fixed
+
+- Field access on math and trace values (`v.x`) in AOT code: generated code used the script's field name instead
+  of the C++ member.
+- A wrong expectation in the interop benchmark (`ue_state_get_int` is get-or-set), hidden by an XOR checksum that
+  cancelled to 0 over a power-of-two number of iterations.
+
 ## 2026-10-23
 
 ### Added

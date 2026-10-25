@@ -110,13 +110,20 @@ More: [Examples](Docs/Guide/GettingStarted/Examples.md) and the scripts in
   UMG widgets, and GAS (attribute sets, effects, abilities, calculations, cues).
 - **Core gameplay modules:** input (Enhanced Input), spawning and queries, timers, collision and physics, animation
   and effects (Niagara), AI and perception, UMG, GAS, generated bindings for a large part of the engine API.
+- **daScript ↔ C++ without Blueprint glue.** [Native binds](Docs/Guide/Native/NativeBinds.md) expose C++ functions
+  and classes to scripts (`ue_engine`, `ue_math`, `ue_time` ship with the plugin); gameplay calls of a `UFUNCTION`
+  that a bind reflects skip reflection; `TDasFunction` calls script functions from C++ with typed arguments.
+- **AOT.** Scripts compile to C++ and call the engine through a guarded bridge with the interpreter's checks; a
+  function that needs something without an AOT ABI stays interpreted. In the editor, daScript runs integer
+  arithmetic ~160x and engine calls and vector math 9-14x faster than the same Blueprint graph (a packaged game
+  narrows the gap; see [Performance](Docs/Dev/Architecture/Performance.md)).
 - **Editor, PIE and packaged Development builds** on Win64.
 
 ## Planned
 
-- **daScript ↔ C++:** call project C++ from scripts and scripts from C++ without Blueprint glue; AOT for the whole
-  gameplay path.
-- **Performance:** fewer marshalling layers on hot calls, AOT/JIT where it pays, profiling hooks.
+- **AOT for the rest of the gameplay path:** code that makes struct snapshots, JIT where it pays.
+- **Performance:** fewer marshalling layers on the remaining reflected calls, profiling hooks, Blueprint
+  comparisons in a packaged game.
 - **Closing gaps in the bindings:** the remaining refused reload cases, binding blockers listed in
   [Limitations](Docs/Reference/Limitations.md).
 - **Broader engine coverage:** more engine modules and plugins (Mass, StateTree, Chaos vehicles, audio, sequencer, …).

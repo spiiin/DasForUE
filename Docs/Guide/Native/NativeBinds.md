@@ -198,8 +198,7 @@ guarded bridge, operators too, and the `valid`, `handle`, `as_<Name>`, `==` and 
 Compiled calls check objects, names and texts as the interpreter does and fail with the same messages (without the
 location in the script); array results and gameplay calls routed to binds (`Reflects`) are compiled too. A
 script function that calls something without an AOT ABI stays in the interpreter, the rest of the file is still
-compiled. Of
-`ue_foundation`'s own externs, objects, math values, names, texts, classes, enums, reflected `UFUNCTION` calls
+compiled. Of `ue_foundation`'s own externs, objects, math values, names, texts, classes, enums, reflected `UFUNCTION` calls
 through a call frame, traces, UI and input tokens and externs that take a block (the scope of authored function
 libraries) are compiled. Externs that make struct snapshots and value results (`ue_struct_default`,
 `ue_struct_with_*`, `ue_struct_edit`, geometry, input events, ...) stay interpreted: they may collect snapshots,
